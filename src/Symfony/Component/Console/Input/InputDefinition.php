@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -21,16 +21,16 @@ namespace Symfony\Component\Console\Input;
  *       new InputOption('foo', 'f', InputOption::VALUE_REQUIRED),
  *     ));
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class InputDefinition
 {
-    protected $arguments;
-    protected $requiredCount;
-    protected $hasAnArrayArgument = false;
-    protected $hasOptional;
-    protected $options;
-    protected $shortcuts;
+    private $arguments;
+    private $requiredCount;
+    private $hasAnArrayArgument = false;
+    private $hasOptional;
+    private $options;
+    private $shortcuts;
 
     /**
      * Constructor.
@@ -335,7 +335,7 @@ class InputDefinition
      *
      * @throws \InvalidArgumentException When option given does not exist
      */
-    protected function shortcutToName($shortcut)
+    private function shortcutToName($shortcut)
     {
         if (!isset($this->shortcuts[$shortcut])) {
             throw new \InvalidArgumentException(sprintf('The "-%s" option does not exist.', $shortcut));

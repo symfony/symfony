@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,11 +19,11 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 /**
  * SecurityDataCollector.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class SecurityDataCollector extends DataCollector
 {
-    protected $context;
+    private $context;
 
     public function __construct(SecurityContextInterface $context = null)
     {
@@ -53,7 +53,7 @@ class SecurityDataCollector extends DataCollector
             $this->data = array(
                 'enabled'       => true,
                 'authenticated' => $token->isAuthenticated(),
-                'user'          => (string) $token,
+                'user'          => $token->getUsername(),
                 'roles'         => array_map(function ($role){ return $role->getRole();}, $token->getRoles()),
             );
         }

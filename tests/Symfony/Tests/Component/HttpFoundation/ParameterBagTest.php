@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -53,7 +53,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('bar', $bag->get('foo'), '->get() gets the value of a parameter');
         $this->assertEquals('default', $bag->get('unknown', 'default'), '->get() returns second argument as default if a parameter is not defined');
-        $this->assertNull($bag->get('null', 'default'), '->get() retuns null if null is set');
+        $this->assertNull($bag->get('null', 'default'), '->get() returns null if null is set');
     }
 
     /**

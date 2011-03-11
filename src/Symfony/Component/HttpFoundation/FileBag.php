@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 /**
  * FileBag is a container for HTTP headers.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  */
 class FileBag extends ParameterBag
@@ -86,13 +86,14 @@ class FileBag extends ParameterBag
             }
             if ($keys != $this->fileKeys) {
                 $file = array_map(array($this, 'convertFileInformation'), $file);
-            } else
+            } else {
                 if ($file['error'] === UPLOAD_ERR_NO_FILE) {
                     $file = null;
                 } else {
                     $file = new UploadedFile($file['tmp_name'], $file['name'],
                     $file['type'], $file['size'], $file['error']);
                 }
+            }
         }
         return $file;
     }

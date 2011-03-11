@@ -1,14 +1,13 @@
 <?xml version="1.0" ?>
 
-<container xmlns="http://www.symfony-project.org/schema/dic/services"
+<container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
         <parameter key="assetic.controller.class">Symfony\Bundle\AsseticBundle\Controller\AsseticController</parameter>
         <parameter key="assetic.routing_loader.class">Symfony\Bundle\AsseticBundle\Routing\AsseticLoader</parameter>
         <parameter key="assetic.cache.class">Assetic\Cache\FilesystemCache</parameter>
-        <parameter key="assetic.cache_dir">%kernel.cache_dir%/assetic</parameter>
     </parameters>
 
     <services>
@@ -18,12 +17,11 @@
         </service>
         <service id="assetic.controller" class="%assetic.controller.class%" scope="prototype">
             <argument type="service" id="request" />
-            <argument type="service" id="response" />
             <argument type="service" id="assetic.asset_manager" />
             <argument type="service" id="assetic.cache" />
         </service>
         <service id="assetic.cache" class="%assetic.cache.class%" public="false">
-            <argument>%assetic.cache_dir%</argument>
+            <argument>%assetic.cache_dir%/assets</argument>
         </service>
     </services>
 </container>

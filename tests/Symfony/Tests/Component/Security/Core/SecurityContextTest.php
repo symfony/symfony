@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -37,7 +37,7 @@ class SecurityContextTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true))
         ;
 
-        $this->assertTrue($context->vote('foo'));
+        $this->assertTrue($context->isGranted('foo'));
         $this->assertSame($newToken, $context->getToken());
     }
 
@@ -51,10 +51,10 @@ class SecurityContextTest extends \PHPUnit_Framework_TestCase
             $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')
         );
 
-        $context->vote('ROLE_FOO');
+        $context->isGranted('ROLE_FOO');
     }
 
-    public function testVote()
+    public function testIsGranted()
     {
         $manager = $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface');
         $manager->expects($this->once())->method('decide')->will($this->returnValue(false));
@@ -65,7 +65,7 @@ class SecurityContextTest extends \PHPUnit_Framework_TestCase
             ->method('isAuthenticated')
             ->will($this->returnValue(true))
         ;
-        $this->assertFalse($context->vote('ROLE_FOO'));
+        $this->assertFalse($context->isGranted('ROLE_FOO'));
 
         $manager = $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface');
         $manager->expects($this->once())->method('decide')->will($this->returnValue(true));
@@ -76,7 +76,7 @@ class SecurityContextTest extends \PHPUnit_Framework_TestCase
             ->method('isAuthenticated')
             ->will($this->returnValue(true))
         ;
-        $this->assertTrue($context->vote('ROLE_FOO'));
+        $this->assertTrue($context->isGranted('ROLE_FOO'));
     }
 
     public function testGetSetToken()

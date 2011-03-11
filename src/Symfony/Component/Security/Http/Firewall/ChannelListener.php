@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -21,37 +21,19 @@ use Symfony\Component\EventDispatcher\EventInterface;
  * ChannelListener switches the HTTP protocol based on the access control
  * configuration.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class ChannelListener implements ListenerInterface
 {
-    protected $map;
-    protected $authenticationEntryPoint;
-    protected $logger;
+    private $map;
+    private $authenticationEntryPoint;
+    private $logger;
 
     public function __construct(AccessMap $map, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
     {
         $this->map = $map;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
         $this->logger = $logger;
-    }
-
-    /**
-     *
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
     }
 
     /**

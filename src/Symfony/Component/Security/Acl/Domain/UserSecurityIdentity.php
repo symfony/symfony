@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Acl\Domain;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\User\AccountInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 /**
@@ -22,8 +22,8 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
  */
 class UserSecurityIdentity implements SecurityIdentityInterface
 {
-    protected $username;
-    protected $class;
+    private $username;
+    private $class;
 
     /**
      * Constructor
@@ -45,12 +45,12 @@ class UserSecurityIdentity implements SecurityIdentityInterface
     }
 
     /**
-     * Creates a user security identity from an AccountInterface
+     * Creates a user security identity from an UserInterface
      *
-     * @param AccountInterface $user
+     * @param UserInterface $user
      * @return UserSecurityIdentity
      */
-    public static function fromAccount(AccountInterface $user)
+    public static function fromAccount(UserInterface $user)
     {
         return new self($user->getUsername(), get_class($user));
     }
@@ -65,7 +65,7 @@ class UserSecurityIdentity implements SecurityIdentityInterface
     {
         $user = $token->getUser();
 
-        if ($user instanceof AccountInterface) {
+        if ($user instanceof UserInterface) {
             return self::fromAccount($user);
         }
 

@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,14 +16,14 @@ use Symfony\Component\CssSelector\Parser as CssParser;
 /**
  * Crawler eases navigation of a list of \DOMNode objects.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Crawler extends \SplObjectStorage
 {
-    protected $uri;
-    protected $host;
-    protected $path;
-    protected $base;
+    private $uri;
+    private $host;
+    private $path;
+    private $base;
 
     /**
      * Constructor.
@@ -560,7 +560,7 @@ class Crawler extends \SplObjectStorage
         return $form;
     }
 
-    protected function getNode($position)
+    private function getNode($position)
     {
         foreach ($this as $i => $node) {
             if ($i == $position) {
@@ -573,7 +573,7 @@ class Crawler extends \SplObjectStorage
         // @codeCoverageIgnoreEnd
     }
 
-    protected function parseUri($uri)
+    private function parseUri($uri)
     {
         if ('http' !== substr($uri, 0, 4)) {
             return array(null, '/');
@@ -584,7 +584,7 @@ class Crawler extends \SplObjectStorage
         return array(preg_replace('#^(.*?//[^/]+)\/.*$#', '$1', $uri), $path);
     }
 
-    protected function sibling($node, $siblingDir = 'nextSibling')
+    private function sibling($node, $siblingDir = 'nextSibling')
     {
         $nodes = array();
 
@@ -592,7 +592,7 @@ class Crawler extends \SplObjectStorage
             if ($node !== $this->getNode(0) && $node->nodeType === 1) {
                 $nodes[] = $node;
             }
-        } while($node = $node->$siblingDir);
+        } while ($node = $node->$siblingDir);
 
         return $nodes;
     }

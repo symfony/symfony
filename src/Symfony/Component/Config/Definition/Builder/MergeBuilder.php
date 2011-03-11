@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -25,9 +25,9 @@ class MergeBuilder
     /**
      * Constructor
      *
-     * @param Symfony\Component\Config\Definition\Builder\NodeBuilder $parent The parent node
+     * @param NodeBuilder $parent The parent node
      */
-    public function __construct($parent)
+    public function __construct(NodeBuilder $parent)
     {
         $this->parent = $parent;
         $this->allowFalse = false;
@@ -37,8 +37,8 @@ class MergeBuilder
     /**
      * Sets whether the node can be unset.
      *
-     * @param boolean $allow
-     * @return Symfony\Component\Config\Definition\Builder\MergeBuilder
+     * @param Boolean $allow
+     * @return MergeBuilder
      */
     public function allowUnset($allow = true)
     {
@@ -50,9 +50,9 @@ class MergeBuilder
     /**
      * Sets whether the node can be overwritten.
      *
-     * @param boolean $deny Whether the overwritting is forbidden or not
+     * @param Boolean $deny Whether the overwriting is forbidden or not
      *
-     * @return Symfony\Component\Config\Definition\Builder\MergeBuilder
+     * @return MergeBuilder
      */
     public function denyOverwrite($deny = true)
     {
@@ -64,7 +64,7 @@ class MergeBuilder
     /**
      * Returns the parent node.
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function end()
     {

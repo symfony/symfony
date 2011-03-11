@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -140,7 +140,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     public function getFormatToMimeTypeMapProvider()
     {
         return array(
-            array(null, array(null, 'unexistant-mime-type')),
+            array(null, array(null, 'unexistent-mime-type')),
             array('txt', array('text/plain')),
             array('js', array('application/javascript', 'application/x-javascript', 'text/javascript')),
             array('css', array('text/css')),
@@ -507,10 +507,12 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     public function testOverrideGlobals()
     {
-        $time = $_SERVER['REQUEST_TIME']; // fix for phpunit timer
-
         $request = new Request();
         $request->initialize(array('foo' => 'bar'));
+
+        // as the Request::overrideGlobals really work, it erase $_SERVER, so we must backup it
+        $server = $_SERVER;
+
         $request->overrideGlobals();
 
         $this->assertEquals(array('foo' => 'bar'), $_GET);
@@ -530,7 +532,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $this->assertArrayHasKey('HTTP_X_FORWARDED_PROTO', $_SERVER);
 
-        $_SERVER['REQUEST_TIME'] = $time; // fix for phpunit timer
+        // restore initial $_SERVER array
+        $_SERVER = $server;
     }
 
     public function testGetScriptName()

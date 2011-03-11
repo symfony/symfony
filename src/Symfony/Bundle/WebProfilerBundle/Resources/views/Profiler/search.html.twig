@@ -6,19 +6,27 @@
     <form action="{{ path('_profiler_search') }}" method="get">
         <label for="ip">IP</label>
         <input type="text" name="ip" id="ip" value="{{ ip }}" />
-        <div class="clearfix"></div>
+        <div class="clear_fix"></div>
         <label for="url">URL</label>
         <input type="text" name="url" id="url" value="{{ url }}" />
-        <div class="clearfix"></div>
+        <div class="clear_fix"></div>
         <label for="token">Token</label>
-        <input type="text" name="token" id="token" />
-        <div class="clearfix"></div>
+        <input type="text" name="token" id="token" value="{{ token }}" />
+        <div class="clear_fix"></div>
         <label for="limit">Limit</label>
         <select name="limit" id="limit">
             {% for l in [10, 50, 100] %}
                 <option{{ l == limit ? ' selected="selected"' : '' }}>{{ l }}</option>
             {% endfor %}
         </select>
-        <input class="submit" type="submit" value="update" /><br />
+
+        <button type="submit">
+            <span class="border_l">
+                <span class="border_r">
+                    <span class="btn_bg">update</span>
+                </span>
+            </span>
+        </button>
+        <div class="clear_fix"></div>
     </form>
 </div>

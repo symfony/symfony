@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -21,20 +21,21 @@ use Symfony\Component\Console\Application;
 /**
  * Base class for all commands.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Command
 {
-    protected $name;
-    protected $namespace;
-    protected $aliases;
-    protected $definition;
-    protected $help;
-    protected $application;
-    protected $description;
-    protected $ignoreValidationErrors;
-    protected $applicationDefinitionMerged;
-    protected $code;
+    private $application;
+    private $name;
+    private $namespace;
+    private $aliases;
+    private $definition;
+    private $help;
+    private $description;
+    private $ignoreValidationErrors;
+    private $applicationDefinitionMerged;
+    private $code;
+    private $synopsis;
 
     /**
      * Constructor.
@@ -69,6 +70,16 @@ class Command
     public function setApplication(Application $application = null)
     {
         $this->application = $application;
+    }
+
+    /**
+     * Gets the application instance for this command.
+     *
+     * @return Application An Application instance
+     */
+    public function getApplication()
+    {
+        return $this->application;
     }
 
     /**
@@ -137,6 +148,9 @@ class Command
      */
     public function run(InputInterface $input, OutputInterface $output)
     {
+        // force the creation of the synopsis before the merge with the app definition
+        $this->getSynopsis();
+
         // add the application arguments and options
         $this->mergeApplicationDefinition();
 
@@ -159,9 +173,9 @@ class Command
 
         if ($this->code) {
             return call_user_func($this->code, $input, $output);
-        } else {
-            return $this->execute($input, $output);
         }
+
+        return $this->execute($input, $output);
     }
 
     /**
@@ -186,7 +200,7 @@ class Command
     /**
      * Merges the application definition with the command definition.
      */
-    protected function mergeApplicationDefinition()
+    private function mergeApplicationDefinition()
     {
         if (null === $this->application || true === $this->applicationDefinitionMerged) {
             return;
@@ -431,7 +445,11 @@ class Command
      */
     public function getSynopsis()
     {
-        return sprintf('%s %s', $this->getFullName(), $this->definition->getSynopsis());
+        if (null === $this->synopsis) {
+            $this->synopsis = trim(sprintf('%s %s', $this->getFullName(), $this->definition->getSynopsis()));
+        }
+
+        return $this->synopsis;
     }
 
     /**
@@ -443,21 +461,7 @@ class Command
      *
      * @throws \InvalidArgumentException if the helper is not defined
      */
-    protected function getHelper($name)
-    {
-        return $this->application->getHelperSet()->get($name);
-    }
-
-    /**
-     * Gets a helper instance by name.
-     *
-     * @param string $name The helper name
-     *
-     * @return mixed The helper value
-     *
-     * @throws \InvalidArgumentException if the helper is not defined
-     */
-    public function __get($name)
+    public function getHelper($name)
     {
         return $this->application->getHelperSet()->get($name);
     }

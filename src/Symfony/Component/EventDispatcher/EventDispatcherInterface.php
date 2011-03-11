@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,7 +16,7 @@ namespace Symfony\Component\EventDispatcher;
  *
  * @see http://developer.apple.com/documentation/Cocoa/Conceptual/Notifications/index.html Apple's Cocoa framework
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 interface EventDispatcherInterface
 {
@@ -54,7 +54,7 @@ interface EventDispatcherInterface
      * A listener tells the dispatcher that it has processed the event
      * by calling the setProcessed() method on it.
      *
-     * It can then return a value that will be fowarded to the caller.
+     * It can then return a value that will be forwarded to the caller.
      *
      * @param  EventInterface $event An EventInterface instance
      *

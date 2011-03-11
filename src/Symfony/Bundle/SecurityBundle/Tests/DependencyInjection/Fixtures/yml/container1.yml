@@ -3,7 +3,7 @@ security:
         JMS\FooBundle\Entity\User1: plaintext
         JMS\FooBundle\Entity\User2:
             algorithm: sha1
-            encode_as_base64: true
+            encode_as_base64: false
             iterations: 5
         JMS\FooBundle\Entity\User3:
             algorithm: md5
@@ -50,5 +50,4 @@ security:
         - { path: /blog/524, role: ROLE_USER, requires_channel: https }
         -
             path: /blog/.*
-            attributes: { _controller: .*\\BlogBundle\\.* }
             role: IS_AUTHENTICATED_ANONYMOUSLY

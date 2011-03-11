@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,11 +14,11 @@ namespace Symfony\Component\Security\Core\Encoder;
 /**
  * PlaintextPasswordEncoder does not do any encoding.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class PlaintextPasswordEncoder extends BasePasswordEncoder
 {
-    protected $ignorePasswordCase;
+    private $ignorePasswordCase;
 
     public function __construct($ignorePasswordCase = false)
     {
@@ -42,8 +42,8 @@ class PlaintextPasswordEncoder extends BasePasswordEncoder
 
         if (!$this->ignorePasswordCase) {
             return $this->comparePasswords($encoded, $pass2);
-        } else {
-            return $this->comparePasswords(strtolower($encoded), strtolower($pass2));
         }
+
+        return $this->comparePasswords(strtolower($encoded), strtolower($pass2));
     }
 }

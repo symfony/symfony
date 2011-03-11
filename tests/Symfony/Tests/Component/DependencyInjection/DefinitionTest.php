@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -219,5 +219,23 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
             ->setArgument(1, 'bar')
         ;
         $this->assertSame(array('foo', 'bar'), $def->getArguments());
+    }
+
+    public function testSetGetProperties()
+    {
+        $def = new Definition('stdClass');
+
+        $this->assertEquals(array(), $def->getProperties());
+        $this->assertSame($def, $def->setProperties(array('foo' => 'bar')));
+        $this->assertEquals(array('foo' => 'bar'), $def->getProperties());
+    }
+
+    public function testSetProperty()
+    {
+        $def = new Definition('stdClass');
+
+        $this->assertEquals(array(), $def->getProperties());
+        $this->assertSame($def, $def->setProperty('foo', 'bar'));
+        $this->assertEquals(array('foo' => 'bar'), $def->getProperties());
     }
 }

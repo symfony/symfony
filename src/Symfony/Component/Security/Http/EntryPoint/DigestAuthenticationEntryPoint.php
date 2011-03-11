@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -22,14 +22,14 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
 /**
  * DigestAuthenticationEntryPoint starts an HTTP Digest authentication.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {
-    protected $key;
-    protected $realmName;
-    protected $nonceValiditySeconds;
-    protected $logger;
+    private $key;
+    private $realmName;
+    private $nonceValiditySeconds;
+    private $logger;
 
     public function __construct($realmName, $key, $nonceValiditySeconds = 300, LoggerInterface $logger = null)
     {
@@ -61,15 +61,5 @@ class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterfac
         $response->setStatusCode(401, $authException->getMessage());
 
         return $response;
-    }
-
-    public function getKey()
-    {
-        return $this->key;
-    }
-
-    public function getRealmName()
-    {
-        return $this->realmName;
     }
 }

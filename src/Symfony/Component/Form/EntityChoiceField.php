@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -57,7 +57,7 @@ use Doctrine\ORM\NoResultException;
  * )));
  * </code>
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
 class EntityChoiceField extends ChoiceField
 {
@@ -283,7 +283,7 @@ class EntityChoiceField extends ChoiceField
      * Returns the entity for the given key
      *
      * If the underlying entities have composite identifiers, the choices
-     * are intialized. The key is expected to be the index in the choices
+     * are initialized. The key is expected to be the index in the choices
      * array in this case.
      *
      * If they have single identifiers, they are either fetched from the
@@ -320,7 +320,7 @@ class EntityChoiceField extends ChoiceField
      * underlying class
      *
      * @param  string $property     The name of the property
-     * @return \ReflectionProperty  The reflection instsance
+     * @return \ReflectionProperty  The reflection instance
      */
     protected function getReflProperty($property)
     {

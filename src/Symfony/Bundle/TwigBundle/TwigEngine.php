@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * This engine knows how to render Twig templates.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class TwigEngine implements EngineInterface
 {
@@ -68,7 +68,7 @@ class TwigEngine implements EngineInterface
     {
         try {
             $this->load($name);
-        } catch (\Twig_Error_Loader $e) {
+        } catch (\InvalidArgumentException $e) {
             return false;
         }
 
@@ -133,6 +133,5 @@ class TwigEngine implements EngineInterface
         } catch (\Twig_Error_Loader $e) {
             throw new \InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
-        
     }
 }

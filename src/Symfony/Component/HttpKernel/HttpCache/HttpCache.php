@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * This code is partially based on the Rack-Cache library by Ryan Tomayko,
  * which is released under the MIT license.
@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Cache provides HTTP caching.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class HttpCache implements HttpKernelInterface
 {
@@ -31,7 +31,7 @@ class HttpCache implements HttpKernelInterface
     protected $store;
     protected $request;
     protected $esi;
-    protected $esiTtls;
+    protected $esiCacheStrategy;
 
     /**
      * Constructor.
@@ -137,7 +137,9 @@ class HttpCache implements HttpKernelInterface
         if (HttpKernelInterface::MASTER_REQUEST === $type) {
             $this->traces = array();
             $this->request = $request;
-            $this->esiTtls = array();
+            if (null !== $this->esi) {
+                $this->esiCacheStrategy = $this->esi->createCacheStrategy();
+            }
         }
 
         $path = $request->getPathInfo();
@@ -146,7 +148,7 @@ class HttpCache implements HttpKernelInterface
         }
         $this->traces[$request->getMethod().' '.$path] = array();
 
-        if (!$request->isMethodSafe($request)) {
+        if (!$request->isMethodSafe()) {
             $response = $this->invalidate($request, $catch);
         } elseif ($request->headers->has('expect')) {
             $response = $this->pass($request, $catch);
@@ -163,41 +165,14 @@ class HttpCache implements HttpKernelInterface
         }
 
         if (null !== $this->esi) {
-            $this->addEsiTtl($response);
+            $this->esiCacheStrategy->add($response);
 
-            if ($request === $this->request) {
-                $this->updateResponseCacheControl($response);
+            if (HttpKernelInterface::MASTER_REQUEST === $type) {
+                $this->esiCacheStrategy->update($response);
             }
         }
 
         return $response;
-    }
-
-    /**
-     * Stores the response's TTL locally.
-     *
-     * @param Response $response
-     */
-    protected function addEsiTtl(Response $response)
-    {
-        $this->esiTtls[] = $response->isValidateable() ? -1 : $response->getTtl();
-    }
-
-    /**
-     * Changes the master response TTL to the smallest TTL received or force validation if
-     * one of the ESI has validation cache strategy.
-     *
-     * @param Response $response
-     */
-    protected function updateResponseCacheControl(Response $response)
-    {
-        $ttl = min($this->esiTtls);
-        if (-1 === $ttl) {
-            $response->headers->set('Cache-Control', 'no-cache, must-revalidate');
-        } else {
-            $response->setSharedMaxAge($ttl);
-            $response->setMaxAge(0);
-        }
     }
 
     /**
@@ -365,7 +340,7 @@ class HttpCache implements HttpKernelInterface
     /**
      * Forwards the Request to the backend and determines whether the response should be stored.
      *
-     * This methods is trigered when the cache missed or a reload is required.
+     * This methods is triggered when the cache missed or a reload is required.
      *
      * @param Request  $request A Request instance
      * @param Boolean  $catch   whether to process exceptions
@@ -481,32 +456,30 @@ class HttpCache implements HttpKernelInterface
 
                 // server the stale response while there is a revalidation
                 return true;
-            } else {
-                // wait for the lock to be released
-                $wait = 0;
-                while (file_exists($lock) && $wait < 5000000) {
-                    usleep($wait += 50000);
-                }
-
-                if ($wait < 2000000) {
-                    // replace the current entry with the fresh one
-                    $new = $this->lookup($request);
-                    $entry->headers = $new->headers;
-                    $entry->setContent($new->getContent());
-                    $entry->setStatusCode($new->getStatusCode());
-                    $entry->setProtocolVersion($new->getProtocolVersion());
-                    $entry->setCookies($new->getCookies());
-
-                    return true;
-                } else {
-                    // backend is slow as hell, send a 503 response (to avoid the dog pile effect)
-                    $entry->setStatusCode(503);
-                    $entry->setContent('503 Service Unavailable');
-                    $entry->headers->set('Retry-After', 10);
-
-                    return true;
-                }
             }
+
+            // wait for the lock to be released
+            $wait = 0;
+            while (file_exists($lock) && $wait < 5000000) {
+                usleep($wait += 50000);
+            }
+
+            if ($wait < 2000000) {
+                // replace the current entry with the fresh one
+                $new = $this->lookup($request);
+                $entry->headers = $new->headers;
+                $entry->setContent($new->getContent());
+                $entry->setStatusCode($new->getStatusCode());
+                $entry->setProtocolVersion($new->getProtocolVersion());
+                $entry->setCookies($new->getCookies());
+            } else {
+                // backend is slow as hell, send a 503 response (to avoid the dog pile effect)
+                $entry->setStatusCode(503);
+                $entry->setContent('503 Service Unavailable');
+                $entry->headers->set('Retry-After', 10);
+            }
+
+            return true;
         }
 
         // we have the lock, call the backend

@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,12 +14,13 @@ namespace Symfony\Component\Security\Core\Authentication\Token;
 /**
  * AnonymousToken represents an anonymous token.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
-class AnonymousToken extends Token
+use Symfony\Component\Security\Core\User\UserInterface;
+
+class AnonymousToken extends AbstractToken
 {
-    protected $user;
-    protected $key;
+    private $key;
 
     /**
      * Constructor.
@@ -33,9 +34,8 @@ class AnonymousToken extends Token
         parent::__construct($roles);
 
         $this->key = $key;
-        $this->user = $user;
-
-        parent::setAuthenticated(true);
+        $this->setUser($user);
+        $this->setAuthenticated(true);
     }
 
     /**
@@ -54,5 +54,22 @@ class AnonymousToken extends Token
     public function getKey()
     {
         return $this->key;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function serialize()
+    {
+        return serialize(array($this->key, parent::serialize()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function unserialize($str)
+    {
+        list($this->key, $parentStr) = unserialize($str);
+        parent::unserialize($parentStr);
     }
 }

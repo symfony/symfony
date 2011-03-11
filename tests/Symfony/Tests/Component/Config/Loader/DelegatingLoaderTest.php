@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,10 +13,10 @@ namespace Symfony\Tests\Component\Config\Loader;
 
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
-use Symfony\Component\Config\Loader\XmlFileLoader;
-use Symfony\Component\Config\Loader\ClosureLoader;
-use Symfony\Component\Config\RouteCollection;
-use Symfony\Component\Config\Route;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
+use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Route;
 
 class DelegatingLoaderTest extends \PHPUnit_Framework_TestCase
 {

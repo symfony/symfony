@@ -1,4 +1,4 @@
-<div class="import clearfix">
+<div class="search import clearfix">
     <h3>
         <img style="margin: 0 5px 0 0; vertical-align: middle; height: 16px" width="16" height="16" alt="Import" src="{{ asset('bundles/webprofiler/images/import.png') }}" />
         Admin
@@ -13,6 +13,13 @@
         </div>
         &raquo;&nbsp;<label for="file">Import</label><br />
         <input type="file" name="file" id="file" /><br />
-        <input class="submit" type="submit" value="upload" />
+        <button type="submit">
+            <span class="border_l">
+                <span class="border_r">
+                    <span class="btn_bg">upload</span>
+                </span>
+            </span>
+        </button>
+        <div class="clear_fix"></div>
     </form>
 </div>

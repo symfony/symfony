@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony framework.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -11,10 +11,12 @@
 
 namespace Symfony\Bundle\AsseticBundle\Tests;
 
-use Symfony\Bundle\AsseticBundle\Tests\Kernel\TestKernel;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @group functional
+ */
 class FunctionalTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
@@ -23,17 +25,17 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Assetic is not available.');
         }
 
-        $cache = __DIR__.'/Kernel/cache';
+        $cache = __DIR__.'/Resources/cache';
         if (!is_dir($cache)) {
             mkdir($cache);
         } else {
-            shell_exec('rm -rf '.escapeshellarg(__DIR__.'/Kernel/cache/*'));
+            shell_exec('rm -rf '.escapeshellarg(__DIR__.'/Resources/cache/*'));
         }
     }
 
     protected function tearDown()
     {
-        shell_exec('rm -rf '.escapeshellarg(__DIR__.'/Kernel/cache'));
+        shell_exec('rm -rf '.escapeshellarg(__DIR__.'/Resources/cache'));
     }
 
     /**
@@ -44,11 +46,10 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $kernel = new TestKernel('test', $debug);
         $kernel->boot();
         $container = $kernel->getContainer();
-        $container->get('cache_warmer')->warmUp($container->getParameter('kernel.cache_dir'));
 
-        $assets = $container->get('assetic.asset_manager')->all();
+        $names = $container->get('assetic.asset_manager')->getNames();
 
-        $this->assertEquals($count, count($assets));
+        $this->assertEquals($count, count($names));
     }
 
     /**
@@ -59,7 +60,6 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $kernel = new TestKernel('test', $debug);
         $kernel->boot();
         $container = $kernel->getContainer();
-        $container->get('cache_warmer')->warmUp($container->getParameter('kernel.cache_dir'));
 
         $routes = $container->get('router')->getRouteCollection()->all();
 
@@ -80,7 +80,6 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $container = $kernel->getContainer();
         $container->enterScope('request');
         $container->set('request', new Request());
-        $container->get('cache_warmer')->warmUp($container->getParameter('kernel.cache_dir'));
 
         $content = $container->get('templating')->render('::layout.html.twig');
         $crawler = new Crawler($content);
@@ -91,14 +90,11 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
 
     public function testPhpRenderDebug()
     {
-        $this->markTestIncomplete('PHP templating is not ready yet.');
-
         $kernel = new TestKernel('test', true);
         $kernel->boot();
         $container = $kernel->getContainer();
         $container->enterScope('request');
         $container->set('request', new Request());
-        $container->get('cache_warmer')->warmUp($container->getParameter('kernel.cache_dir'));
 
         $content = $container->get('templating')->render('::layout.html.php');
         $crawler = new Crawler($content);

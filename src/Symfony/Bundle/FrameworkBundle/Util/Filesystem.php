@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,7 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Util;
 /**
  * Provides basic utility to manipulate the file system.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Filesystem
 {
@@ -42,8 +42,8 @@ class Filesystem
         $mostRecent = false;
         if (file_exists($targetFile)) {
             $statTarget = stat($targetFile);
-            $stat_origin = stat($originFile);
-            $mostRecent = ($stat_origin['mtime'] > $statTarget['mtime']) ? true : false;
+            $statOrigin = stat($originFile);
+            $mostRecent = $statOrigin['mtime'] > $statTarget['mtime'];
         }
 
         if ($options['override'] || !file_exists($targetFile) || $mostRecent) {

@@ -1,13 +1,12 @@
 <?xml version="1.0" ?>
 
-<container xmlns="http://www.symfony-project.org/schema/dic/services"
+<container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
         <parameter key="assetic.helper.class">Symfony\Bundle\AsseticBundle\Templating\AsseticHelper</parameter>
-        <parameter key="assetic.cache_warmer.php.class">Symfony\Bundle\AsseticBundle\CacheWarmer\PhpTemplatingAssetsCacheWarmer</parameter>
-        <parameter key="assetic.php_formula_loader.class">Symfony\Bundle\AsseticBundle\Templating\FormulaLoader</parameter>
+        <parameter key="assetic.php_formula_loader.class">Symfony\Bundle\AsseticBundle\Factory\Loader\AsseticHelperFormulaLoader</parameter>
     </parameters>
 
     <services>
@@ -19,16 +18,16 @@
             <argument>%assetic.default_javascripts_output%</argument>
             <argument>%assetic.default_stylesheets_output%</argument>
         </service>
-        <service id="assetic.cache_warmer.php" class="%assetic.cache_warmer.php.class%" public="false">
-            <tag name="kernel.cache_warmer" priority="10" />
+        <service id="assetic.php_formula_loader" class="%assetic.cached_formula_loader.class%" public="false">
+            <tag name="assetic.formula_loader" alias="php" />
             <tag name="assetic.templating.php" />
-            <argument type="service" id="kernel" />
-            <argument type="service" id="assetic.php_formula_loader" />
+            <argument type="service" id="assetic.php_formula_loader.real" />
+            <argument type="service" id="assetic.config_cache" />
+            <argument>%kernel.debug%</argument>
         </service>
-        <service id="assetic.php_formula_loader" class="%assetic.php_formula_loader.class%" public="false">
+        <service id="assetic.php_formula_loader.real" class="%assetic.php_formula_loader.class%" public="false">
             <tag name="assetic.templating.php" />
-            <argument type="service" id="templating.name_parser" />
-            <argument type="service" id="templating.loader" />
+            <argument type="service" id="assetic.asset_factory" />
         </service>
     </services>
 </container>

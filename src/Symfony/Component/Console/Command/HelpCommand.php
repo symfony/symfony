@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -21,11 +21,11 @@ use Symfony\Component\Console\Command\Command;
 /**
  * HelpCommand displays the help for a given command.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class HelpCommand extends Command
 {
-    protected $command;
+    private $command;
 
     /**
      * {@inheritdoc}
@@ -70,7 +70,7 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if (null === $this->command) {
-            $this->command = $this->application->get($input->getArgument('command_name'));
+            $this->command = $this->getApplication()->get($input->getArgument('command_name'));
         }
 
         if ($input->getOption('xml')) {

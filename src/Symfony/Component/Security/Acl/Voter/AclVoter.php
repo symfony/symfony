@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -32,12 +32,12 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
  */
 class AclVoter implements VoterInterface
 {
-    protected $aclProvider;
-    protected $permissionMap;
-    protected $objectIdentityRetrievalStrategy;
-    protected $securityIdentityRetrievalStrategy;
-    protected $allowIfObjectIdentityUnavailable;
-    protected $logger;
+    private $aclProvider;
+    private $permissionMap;
+    private $objectIdentityRetrievalStrategy;
+    private $securityIdentityRetrievalStrategy;
+    private $allowIfObjectIdentityUnavailable;
+    private $logger;
 
     public function __construct(AclProviderInterface $aclProvider, ObjectIdentityRetrievalStrategyInterface $oidRetrievalStrategy, SecurityIdentityRetrievalStrategyInterface $sidRetrievalStrategy, PermissionMapInterface $permissionMap, LoggerInterface $logger = null, $allowIfObjectIdentityUnavailable = true)
     {
@@ -111,13 +111,13 @@ class AclVoter implements VoterInterface
                     }
 
                     return self::ACCESS_GRANTED;
-                } else {
-                    if (null !== $this->logger) {
-                        $this->logger->debug('ACL found, insufficient permissions. Voting to deny access.');
-                    }
-
-                    return self::ACCESS_DENIED;
                 }
+
+                if (null !== $this->logger) {
+                    $this->logger->debug('ACL found, insufficient permissions. Voting to deny access.');
+                }
+
+                return self::ACCESS_DENIED;
             } catch (NoAceFoundException $noAce) {
                 if (null !== $this->logger) {
                     $this->logger->debug('ACL found, no ACE applicable. Voting to deny access.');

@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -23,15 +23,15 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 /**
  * LogoutListener logout users.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class LogoutListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $logoutPath;
-    protected $targetUrl;
-    protected $handlers;
-    protected $successHandler;
+    private $securityContext;
+    private $logoutPath;
+    private $targetUrl;
+    private $handlers;
+    private $successHandler;
 
     /**
      * Constructor
@@ -58,24 +58,6 @@ class LogoutListener implements ListenerInterface
     public function addHandler(LogoutHandlerInterface $handler)
     {
         $this->handlers[] = $handler;
-    }
-
-    /**
-     * Registers a core.security listener.
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
     }
 
     /**

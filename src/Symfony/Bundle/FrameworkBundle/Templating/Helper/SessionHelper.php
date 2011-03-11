@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * SessionHelper provides read-only access to the session attributes.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class SessionHelper extends Helper
 {
@@ -59,6 +59,11 @@ class SessionHelper extends Helper
     public function getFlash($name, $default = null)
     {
         return $this->session->getFlash($name, $default);
+    }
+
+    public function getFlashes()
+    {
+        return $this->session->getFlashes();
     }
 
     public function hasFlash($name)

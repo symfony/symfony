@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -26,12 +26,12 @@ class PassConfig
     const TYPE_OPTIMIZE = 'optimization';
     const TYPE_REMOVE = 'removing';
 
-    protected $mergePass;
-    protected $afterRemovingPasses;
-    protected $beforeOptimizationPasses;
-    protected $beforeRemovingPasses;
-    protected $optimizationPasses;
-    protected $removingPasses;
+    private $mergePass;
+    private $afterRemovingPasses;
+    private $beforeOptimizationPasses;
+    private $beforeRemovingPasses;
+    private $optimizationPasses;
+    private $removingPasses;
 
     /**
      * Constructor.

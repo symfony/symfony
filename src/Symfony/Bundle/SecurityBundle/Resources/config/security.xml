@@ -1,14 +1,14 @@
 <?xml version="1.0" ?>
 
-<container xmlns="http://www.symfony-project.org/schema/dic/services"
+<container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
         <parameter key="security.context.class">Symfony\Component\Security\Core\SecurityContext</parameter>
         <parameter key="security.context.always_authenticate">false</parameter>
 
-        <parameter key="security.account_checker.class">Symfony\Component\Security\Core\User\AccountChecker</parameter>
+        <parameter key="security.user_checker.class">Symfony\Component\Security\Core\User\UserChecker</parameter>
 
         <parameter key="security.encoder_factory.generic.class">Symfony\Component\Security\Core\Encoder\EncoderFactory</parameter>
         <parameter key="security.encoder.digest.class">Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder</parameter>
@@ -72,7 +72,7 @@
 
         <service id="security.encoder_factory" alias="security.encoder_factory.generic"></service>
         
-        <service id="security.account_checker" class="%security.account_checker.class%" public="false" />
+        <service id="security.user_checker" class="%security.user_checker.class%" public="false" />
 
 
         <!-- Authorization related services -->

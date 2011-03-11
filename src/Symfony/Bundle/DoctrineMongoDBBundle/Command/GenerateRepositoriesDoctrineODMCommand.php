@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -21,7 +21,7 @@ use Doctrine\ODM\MongoDB\Tools\DocumentRepositoryGenerator;
 /**
  * Command to generate repository classes for mapping information.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class GenerateRepositoriesDoctrineODMCommand extends DoctrineODMCommand
@@ -60,7 +60,7 @@ EOT
                 if ($metadata->customRepositoryClassName) {
                     if (strpos($metadata->customRepositoryClassName, $foundBundle->getName()) === false) {
                         throw new \RuntimeException(
-                            "Repository " . $metadata->customRepositoryClassName . " and bundle don't have a commont namespace, ".
+                            "Repository " . $metadata->customRepositoryClassName . " and bundle don't have a common namespace, ".
                             "generation failed because the target directory cannot be detected.");
                     }
 

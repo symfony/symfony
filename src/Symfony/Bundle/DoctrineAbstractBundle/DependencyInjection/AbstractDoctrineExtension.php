@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -43,19 +43,7 @@ abstract class AbstractDoctrineExtension extends Extension
     protected function loadMappingInformation(array $objectManager, $container)
     {
         if (isset($objectManager['mappings'])) {
-            // fix inconsistency between yaml and xml naming
-            if (isset($objectManager['mappings']['mapping'])) {
-                if (isset($objectManager['mappings']['mapping'][0])) {
-                    $objectManager['mappings'] = $objectManager['mappings']['mapping'];
-                } else {
-                    $objectManager['mappings'] = array($objectManager['mappings']['mapping']);
-                }
-            }
-
             foreach ($objectManager['mappings'] as $mappingName => $mappingConfig) {
-                if (is_string($mappingConfig)) {
-                    $mappingConfig = array('type' => $mappingConfig);
-                }
                 if (!isset($mappingConfig['dir'])) {
                     $mappingConfig['dir'] = false;
                 }
@@ -73,12 +61,6 @@ abstract class AbstractDoctrineExtension extends Extension
                 }
                 if (!isset($mappingConfig['is_bundle'])) {
                     $mappingConfig['is_bundle'] = !file_exists($mappingConfig['dir']);
-                }
-
-                if (isset($mappingConfig['name'])) {
-                    $mappingName = $mappingConfig['name'];
-                } else if ($mappingConfig === null) {
-                    $mappingConfig = array();
                 }
 
                 if ($mappingConfig['is_bundle']) {
@@ -127,7 +109,7 @@ abstract class AbstractDoctrineExtension extends Extension
     }
 
     /**
-     * Registter the mapping driver configuration for later use with the object managers metadata driver chain.
+     * Register the mapping driver configuration for later use with the object managers metadata driver chain.
      *
      * @param array $mappingConfig
      * @param string $mappingName
@@ -187,7 +169,7 @@ abstract class AbstractDoctrineExtension extends Extension
     }
 
     /**
-     * Register all the collected mapping information with the object manager by registering the appropiate mapping drivers.
+     * Register all the collected mapping information with the object manager by registering the appropriate mapping drivers.
      *
      * @param array $objectManager
      * @param Container $container
@@ -298,7 +280,7 @@ abstract class AbstractDoctrineExtension extends Extension
     }
 
     /**
-     * Prefixes the relative dependency injenction container path with the object manager prefix.
+     * Prefixes the relative dependency injection container path with the object manager prefix.
      *
      * @example $name is 'entity_manager' then the result would be 'doctrine.orm.entity_manager'
      *

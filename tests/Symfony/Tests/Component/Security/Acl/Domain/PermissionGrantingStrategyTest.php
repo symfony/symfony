@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -21,20 +21,6 @@ use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
 
 class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers:Symfony\Component\Security\Acl\Domain\PermissionGrantingStrategy::getAuditLogger
-     * @covers:Symfony\Component\Security\Acl\Domain\PermissionGrantingStrategy::setAuditLogger
-     */
-    public function testGetSetAuditLogger()
-    {
-        $strategy = new PermissionGrantingStrategy();
-        $logger = $this->getMock('Symfony\Component\Security\Acl\Model\AuditLoggerInterface');
-
-        $this->assertNull($strategy->getAuditLogger());
-        $strategy->setAuditLogger($logger);
-        $this->assertSame($logger, $strategy->getAuditLogger());
-    }
-
     public function testIsGrantedObjectAcesHavePriority()
     {
         $strategy = new PermissionGrantingStrategy();

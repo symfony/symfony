@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -62,7 +62,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException Symfony\Component\Security\Core\Exception\AuthenticationServiceException
      */
-    public function testAuthenticateWhenProviderDoesNotReturnAnAccountInterface()
+    public function testAuthenticateWhenProviderDoesNotReturnAnUserInterface()
     {
         $provider = $this->getProvider(false, true);
         $provider->expects($this->once())
@@ -78,7 +78,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testAuthenticateWhenPreChecksFails()
     {
-        $userChecker = $this->getMock('Symfony\Component\Security\Core\User\AccountCheckerInterface');
+        $userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
         $userChecker->expects($this->once())
                     ->method('checkPreAuth')
                     ->will($this->throwException($this->getMock('Symfony\Component\Security\Core\Exception\CredentialsExpiredException', null, array(), '', false)))
@@ -87,7 +87,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $provider = $this->getProvider($userChecker);
         $provider->expects($this->once())
                  ->method('retrieveUser')
-                 ->will($this->returnValue($this->getMock('Symfony\Component\Security\Core\User\AccountInterface')))
+                 ->will($this->returnValue($this->getMock('Symfony\Component\Security\Core\User\UserInterface')))
         ;
 
         $provider->authenticate($this->getSupportedToken());
@@ -98,7 +98,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testAuthenticateWhenPostChecksFails()
     {
-        $userChecker = $this->getMock('Symfony\Component\Security\Core\User\AccountCheckerInterface');
+        $userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
         $userChecker->expects($this->once())
                     ->method('checkPostAuth')
                     ->will($this->throwException($this->getMock('Symfony\Component\Security\Core\Exception\AccountExpiredException', null, array(), '', false)))
@@ -107,7 +107,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $provider = $this->getProvider($userChecker);
         $provider->expects($this->once())
                  ->method('retrieveUser')
-                 ->will($this->returnValue($this->getMock('Symfony\Component\Security\Core\User\AccountInterface')))
+                 ->will($this->returnValue($this->getMock('Symfony\Component\Security\Core\User\UserInterface')))
         ;
 
         $provider->authenticate($this->getSupportedToken());
@@ -121,7 +121,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $provider = $this->getProvider();
         $provider->expects($this->once())
                  ->method('retrieveUser')
-                 ->will($this->returnValue($this->getMock('Symfony\Component\Security\Core\User\AccountInterface')))
+                 ->will($this->returnValue($this->getMock('Symfony\Component\Security\Core\User\UserInterface')))
         ;
         $provider->expects($this->once())
                  ->method('checkAuthentication')
@@ -133,7 +133,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testAuthenticate()
     {
-        $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user->expects($this->once())
              ->method('getRoles')
              ->will($this->returnValue(array('ROLE_FOO')))
@@ -157,6 +157,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($user, $authToken->getUser());
         $this->assertEquals(array(new Role('ROLE_FOO')), $authToken->getRoles());
         $this->assertEquals('foo', $authToken->getCredentials());
+        $this->assertEquals(array('foo' => 'bar'), $authToken->getAttributes(), '->authenticate() copies token attributes');
     }
 
     protected function getSupportedToken()
@@ -168,13 +169,15 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('key'))
         ;
 
+        $mock->setAttributes(array('foo' => 'bar'));
+
         return $mock;
     }
 
     protected function getProvider($userChecker = false, $hide = true)
     {
         if (false === $userChecker) {
-            $userChecker = $this->getMock('Symfony\Component\Security\Core\User\AccountCheckerInterface');
+            $userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
         }
 
         return $this->getMockForAbstractClass('Symfony\Component\Security\Core\Authentication\Provider\UserAuthenticationProvider', array($userChecker, 'key', $hide));

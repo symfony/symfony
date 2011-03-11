@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony framework.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -11,8 +11,9 @@
 
 namespace Symfony\Bundle\AsseticBundle\Routing;
 
-use Assetic\AssetManager;
+use Assetic\Factory\LazyAssetManager;
 use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -31,21 +32,37 @@ use Symfony\Component\Routing\RouteCollection;
  * In a production environment you should use the `assetic:dump` command to
  * create static asset files.
  *
- * @author Kris Wallsmith <kris.wallsmith@symfony-project.com>
+ * @author Kris Wallsmith <kris.wallsmith@symfony.com>
  */
 class AsseticLoader extends Loader
 {
     protected $am;
 
-    public function __construct(AssetManager $am)
+    public function __construct(LazyAssetManager $am)
     {
         $this->am = $am;
     }
 
-    public function load($resource, $type = null)
+    public function load($routingResource, $type = null)
     {
         $routes = new RouteCollection();
-        foreach ($this->am->all() as $name => $asset) {
+
+        // resources
+        foreach ($this->am->getResources() as $resources) {
+            if (!$resources instanceof \Traversable) {
+                $resources = array($resources);
+            }
+            foreach ($resources as $resource) {
+                if (file_exists($path = (string) $resource)) {
+                    $routes->addResource(new FileResource($path));
+                }
+            }
+        }
+
+        // routes
+        foreach ($this->am->getNames() as $name) {
+            $asset = $this->am->get($name);
+
             $defaults = array(
                 '_controller' => 'assetic.controller:render',
                 'name'        => $name,

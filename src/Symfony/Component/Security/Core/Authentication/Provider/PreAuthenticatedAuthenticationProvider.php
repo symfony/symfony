@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Provider;
 
-use Symfony\Component\Security\Core\User\AccountInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\User\AccountCheckerInterface;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -26,24 +26,24 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * UserProviderInterface implementation may still throw a
  * UsernameNotFoundException, for example.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderInterface
 {
-    protected $userProvider;
-    protected $accountChecker;
-    protected $providerKey;
+    private $userProvider;
+    private $userChecker;
+    private $providerKey;
 
     /**
      * Constructor.
      *
      * @param UserProviderInterface   $userProvider   A UserProviderInterface instance
-     * @param AccountCheckerInterface $accountChecker An AccountCheckerInterface instance
+     * @param UserCheckerInterface $userChecker An UserCheckerInterface instance
      */
-    public function __construct(UserProviderInterface $userProvider, AccountCheckerInterface $accountChecker, $providerKey)
+    public function __construct(UserProviderInterface $userProvider, UserCheckerInterface $userChecker, $providerKey)
     {
         $this->userProvider = $userProvider;
-        $this->accountChecker = $accountChecker;
+        $this->userChecker = $userChecker;
         $this->providerKey = $providerKey;
     }
 
@@ -66,9 +66,12 @@ class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderIn
 */
         $user = $this->userProvider->loadUserByUsername($user);
 
-        $this->accountChecker->checkPostAuth($user);
+        $this->userChecker->checkPostAuth($user);
 
-        return new PreAuthenticatedToken($user, $token->getCredentials(), $this->providerKey, $user->getRoles());
+        $authenticatedToken = new PreAuthenticatedToken($user, $token->getCredentials(), $this->providerKey, $user->getRoles());
+        $authenticatedToken->setAttributes($token->getAttributes());
+
+        return $authenticatedToken;
     }
 
     /**

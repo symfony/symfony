@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony framework.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -50,7 +50,6 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
         $this->container = new ContainerBuilder();
         $this->container->addScope(new Scope('request'));
         $this->container->register('request', 'Symfony\\Component\\HttpFoundation\\Request')->setScope('request');
-        $this->container->register('response', 'Symfony\\Component\\HttpFoundation\\Response')->setScope('prototype');
         $this->container->register('twig', 'Twig_Environment');
         $this->container->setParameter('kernel.debug', false);
         $this->container->setParameter('kernel.root_dir', __DIR__);
@@ -91,25 +90,6 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->container->has('assetic.filter.yui_js'), '->load() loads the yui_js filter when a yui value is provided');
 
         $this->assertSaneContainer($this->getDumpedContainer());
-    }
-
-    /**
-     * @dataProvider getDocumentRootKeys
-     */
-    public function testDocumentRoot($key)
-    {
-        $extension = new AsseticExtension();
-        $extension->load(array(array($key => '/path/to/web')), $this->container);
-
-        $this->assertEquals('/path/to/web', $this->container->getParameter('assetic.document_root'), '"'.$key.'" sets document root');
-    }
-
-    public function getDocumentRootKeys()
-    {
-        return array(
-            array('document_root'),
-            array('document-root'),
-        );
     }
 
     /**

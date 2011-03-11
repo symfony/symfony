@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -22,7 +22,7 @@ use Symfony\Component\BrowserKit\CookieJar;
 /**
  * Client simulates a browser and makes requests to a Kernel object.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Client extends BaseClient
 {
@@ -95,12 +95,7 @@ EOF;
      */
     protected function filterRequest(DomRequest $request)
     {
-        $uri = $request->getUri();
-        if (preg_match('#^https?\://([^/]+)/(.*)$#', $uri, $matches)) {
-            $uri = '/'.$matches[2];
-        }
-
-        return Request::create($uri, $request->getMethod(), $request->getParameters(), $request->getCookies(), $request->getFiles(), $request->getServer(), $request->getContent());
+        return Request::create($request->getUri(), $request->getMethod(), $request->getParameters(), $request->getCookies(), $request->getFiles(), $request->getServer(), $request->getContent());
     }
 
     /**

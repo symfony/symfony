@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -28,42 +28,23 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterfa
  * authenticates users based on a pre-authenticated request (like a certificate
  * for instance).
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class AbstractPreAuthenticatedListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $authenticationManager;
-    protected $providerKey;
     protected $logger;
-    protected $eventDispatcher;
+    private $securityContext;
+    private $authenticationManager;
+    private $providerKey;
+    private $eventDispatcher;
 
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, LoggerInterface $logger = null, EventDispatcherInterface $eventDispatcher = null)
     {
         $this->securityContext = $securityContext;
         $this->authenticationManager = $authenticationManager;
         $this->providerKey = $providerKey;
         $this->logger = $logger;
-    }
-
-    /**
-     *
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
-
-        $this->eventDispatcher = $dispatcher;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -82,11 +63,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
         list($user, $credentials) = $this->getPreAuthenticatedData($request);
 
         if (null !== $token = $this->securityContext->getToken()) {
-            if ($token->isImmutable()) {
-                return;
-            }
-
-            if ($token instanceof PreAuthenticatedToken && $token->isAuthenticated() && (string) $token === $user) {
+            if ($token instanceof PreAuthenticatedToken && $token->isAuthenticated() && $token->getUsername() === $user) {
                 return;
             }
         }

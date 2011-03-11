@@ -5,7 +5,7 @@ $container->loadFromExtension('security', array(
         'JMS\FooBundle\Entity\User1' => 'plaintext',
         'JMS\FooBundle\Entity\User2' => array(
             'algorithm' => 'sha1',
-            'encode_as_base64' => true,
+            'encode_as_base64' => false,
             'iterations' => 5,
         ),
         'JMS\FooBundle\Entity\User3' => array(
@@ -58,7 +58,7 @@ $container->loadFromExtension('security', array(
 
     'access_control' => array(
         array('path' => '/blog/524', 'role' => 'ROLE_USER', 'requires_channel' => 'https'),
-        array('path' => '/blog/.*', 'attributes' => array('_controller' => '.*\\BlogBundle\\.*'), 'role' => 'IS_AUTHENTICATED_ANONYMOUSLY'),
+        array('path' => '/blog/.*', 'role' => 'IS_AUTHENTICATED_ANONYMOUSLY'),
     ),
 
     'role_hierarchy' => array(

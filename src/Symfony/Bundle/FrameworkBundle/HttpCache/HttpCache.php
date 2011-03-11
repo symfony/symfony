@@ -5,6 +5,7 @@ namespace Symfony\Bundle\FrameworkBundle\HttpCache;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache as BaseHttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
+use Symfony\Component\HttpKernel\HttpCache\EsiResponseCacheStrategy;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -20,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.org>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class HttpCache extends BaseHttpCache
 {
@@ -40,7 +41,7 @@ abstract class HttpCache extends BaseHttpCache
     /**
      * Forwards the Request to the backend and returns the Response.
      *
-     * @param Requset  $request  A Request instance
+     * @param Request  $request  A Request instance
      * @param Boolean  $raw      Whether to catch exceptions or not
      * @param Response $response A Response instance (the stale entry if present, null otherwise)
      *

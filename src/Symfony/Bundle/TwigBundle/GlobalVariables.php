@@ -14,7 +14,7 @@ namespace Symfony\Bundle\TwigBundle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * AppVariables is the entry point for Symfony global variables in Twig templates.
+ * GlobalVariables is the entry point for Symfony global variables in Twig templates.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

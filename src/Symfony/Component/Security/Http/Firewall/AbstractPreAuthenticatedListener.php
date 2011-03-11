@@ -21,7 +21,6 @@ use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\HttpFoundation\Request;
 
-
 /**
  * AbstractPreAuthenticatedListener is the base class for all listener that
  * authenticates users based on a pre-authenticated request (like a certificate

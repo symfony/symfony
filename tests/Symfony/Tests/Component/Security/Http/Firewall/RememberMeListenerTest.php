@@ -11,20 +11,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testRegister()
-    {
-        list($listener,,,,) = $this->getListener();
-
-        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcher');
-        $dispatcher
-            ->expects($this->at(0))
-            ->method('connect')
-            ->with($this->equalTo('core.security'))
-        ;
-
-        $listener->register($dispatcher);
-    }
-
     public function testCheckCookiesDoesNotTryToPopulateNonEmptySecurityContext()
     {
         list($listener, $context, $service,,) = $this->getListener();
@@ -40,7 +26,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->method('setToken')
         ;
 
-        $this->assertNull($listener->checkCookies($this->getEvent()));
+        $this->assertNull($listener->handle($this->getEvent()));
     }
 
     public function testCheckCookiesDoesNothingWhenNoCookieIsSet()
@@ -67,7 +53,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(new Request()))
         ;
 
-        $this->assertNull($listener->checkCookies($event));
+        $this->assertNull($listener->handle($event));
     }
 
     public function testCheckCookiesIgnoresAuthenticationExceptionThrownByAuthenticationManagerImplementation()
@@ -106,7 +92,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(new Request()))
         ;
 
-        $listener->checkCookies($event);
+        $listener->handle($event);
     }
 
     public function testCheckCookies()
@@ -146,7 +132,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(new Request()))
         ;
 
-        $listener->checkCookies($event);
+        $listener->handle($event);
     }
 
     protected function getEvent()

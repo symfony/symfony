@@ -160,6 +160,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     public final function loginFail(Request $request)
     {
         $this->cancelCookie($request);
+        $this->onLoginFail($request);
     }
 
     /**

@@ -32,7 +32,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ExceptionListener implements ListenerInterface
+class ExceptionListener
 {
     private $context;
     private $accessDeniedHandler;

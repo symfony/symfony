@@ -46,8 +46,8 @@ class ContextListener implements ListenerInterface
         $this->userProviders = $userProviders;
         $this->contextKey = $contextKey;
 
-        if (null !== $this->eventDispatcher) {
-            $this->eventDispatcher->connect('core.response', array($this, 'write'), 0);
+        if (null !== $eventDispatcher) {
+            $eventDispatcher->connect('core.response', array($this, 'write'), 0);
         }
     }
 

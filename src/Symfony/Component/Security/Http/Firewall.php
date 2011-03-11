@@ -38,7 +38,7 @@ class Firewall
      *
      * @param FirewallMap $map A FirewallMap instance
      */
-    public function __construct(FirewallMapInterface $map)
+    public function __construct(FirewallMapInterface $map, EventDispatcherInterface $dispatcher)
     {
         $this->map = $map;
         $this->dispatcher = $dispatcher;

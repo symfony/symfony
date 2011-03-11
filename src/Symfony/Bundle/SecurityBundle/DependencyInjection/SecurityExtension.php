@@ -156,8 +156,7 @@ class SecurityExtension extends Extension
                 $access['path'],
                 $access['host'],
                 count($access['methods']) === 0 ? null : $access['methods'],
-                $access['ip'],
-                $access['attributes']
+                $access['ip']
             );
 
             $container->getDefinition('security.access_map')

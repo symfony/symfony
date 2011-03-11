@@ -38,7 +38,7 @@ class Application extends BaseApplication
 
         $this->getDefinition()->addOption(new InputOption('--shell', '-s', InputOption::VALUE_NONE, 'Launch the shell.'));
         $this->getDefinition()->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The Environment name.', 'dev'));
-        $this->getDefinition()->addOption(new InputOption('--debug', '-d', InputOption::VALUE_NONE, 'Whether to run in debug mode.'));
+        $this->getDefinition()->addOption(new InputOption('--no-debug', null, InputOption::VALUE_NONE, 'Switches off debug mode.'));
 
         $this->kernel->boot();
 

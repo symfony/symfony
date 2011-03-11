@@ -61,24 +61,6 @@ class LogoutListener implements ListenerInterface
     }
 
     /**
-     * Registers a core.security listener.
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
-    }
-
-    /**
      * Performs the logout if requested
      *
      * @param EventInterface $event An EventInterface instance

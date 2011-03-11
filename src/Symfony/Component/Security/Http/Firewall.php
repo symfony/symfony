@@ -32,19 +32,16 @@ use Symfony\Component\HttpFoundation\Request;
 class Firewall
 {
     private $map;
-    private $dispatcher;
-    private $currentListeners;
 
     /**
      * Constructor.
      *
      * @param FirewallMap $map A FirewallMap instance
      */
-    public function __construct(FirewallMapInterface $map, EventDispatcherInterface $dispatcher)
+    public function __construct(FirewallMapInterface $map)
     {
         $this->map = $map;
         $this->dispatcher = $dispatcher;
-        $this->currentListeners = array();
     }
 
     /**
@@ -58,38 +55,19 @@ class Firewall
             return;
         }
 
-        $request = $event->get('request');
-
-        // disconnect all listeners from core.security to avoid the overhead
-        // of most listeners having to do this manually
-        $this->dispatcher->disconnect('core.security');
-
-        // ensure that listeners disconnect from wherever they have connected to
-        foreach ($this->currentListeners as $listener) {
-            $listener->unregister($this->dispatcher);
-        }
-
         // register listeners for this firewall
-        list($listeners, $exception) = $this->map->getListeners($request);
+        list($listeners, $exception) = $this->map->getListeners($event->get('request'));
         if (null !== $exception) {
             $exception->register($this->dispatcher);
         }
-        foreach ($listeners as $listener) {
-            $listener->register($this->dispatcher);
-        }
-
-        // save current listener instances
-        $this->currentListeners = $listeners;
-        if (null !== $exception) {
-            $this->currentListeners[] = $exception;
-        }
 
         // initiate the listener chain
-        $ret = $this->dispatcher->notifyUntil($securityEvent = new Event($request, 'core.security', array('request' => $request)));
-        if ($securityEvent->isProcessed()) {
-            $event->setProcessed();
+        foreach ($listeners as $listener) {
+            $response = $listener->handle($event);
 
-            return $ret;
+            if ($event->isProcessed()) {
+                return $response;
+            }
         }
     }
 }

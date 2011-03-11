@@ -45,32 +45,13 @@ class RememberMeListener implements ListenerInterface
      * @param AuthenticationManagerInterface $authenticationManager
      * @param LoggerInterface $logger
      */
-    public function __construct(SecurityContext $securityContext, RememberMeServicesInterface $rememberMeServices, AuthenticationManagerInterface $authenticationManager, LoggerInterface $logger = null)
+    public function __construct(SecurityContext $securityContext, RememberMeServicesInterface $rememberMeServices, AuthenticationManagerInterface $authenticationManager, LoggerInterface $logger = null, EventDispatcherInterface $eventDispatcher = null)
     {
         $this->securityContext = $securityContext;
         $this->rememberMeServices = $rememberMeServices;
         $this->authenticationManager = $authenticationManager;
         $this->logger = $logger;
-    }
-
-    /**
-     * Listen to core.security, and core.response event
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer         $priority   The priority
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'checkCookies'), 0);
-
-        $this->eventDispatcher = $dispatcher;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -78,7 +59,7 @@ class RememberMeListener implements ListenerInterface
      *
      * @param Event $event An Event instance
      */
-    public function checkCookies(EventInterface $event)
+    public function handle(EventInterface $event)
     {
         if (null !== $this->securityContext->getToken()) {
             return;

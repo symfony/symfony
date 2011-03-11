@@ -80,6 +80,7 @@
             <argument type="collection"></argument>
             <argument /> <!-- Provider Key -->
             <argument type="service" id="logger" on-invalid="null" />
+            <argument type="service" id="event_dispatcher" on-invalid="null"/>
         </service>
 
         <service id="security.logout_listener" class="%security.logout_listener.class%" public="false" abstract="true">
@@ -102,6 +103,7 @@
             <argument type="service" id="security.authentication.success_handler" on-invalid="null" />
             <argument type="service" id="security.authentication.failure_handler" on-invalid="null" />
             <argument type="service" id="logger" on-invalid="null" />
+            <argument type="service" id="event_dispatcher" on-invalid="null"/>
         </service>
 
         <service id="security.authentication.listener.form" 
@@ -117,6 +119,7 @@
             <argument>%security.authentication.x509.user%</argument>
             <argument>%security.authentication.x509.credentials%</argument>
             <argument type="service" id="logger" on-invalid="null" />
+            <argument type="service" id="event_dispatcher" on-invalid="null"/>
         </service>
 
         <service id="security.authentication.listener.basic" class="%security.authentication.listener.basic.class%" public="false" abstract="true">
@@ -163,6 +166,7 @@
             <argument /> <!--  Provider Key -->
             <argument type="service" id="security.access.decision_manager" />
             <argument type="service" id="logger" on-invalid="null" />
+            <argument type="service" id="event_dispatcher" on-invalid="null"/>
         </service>
 
         <service id="security.access_listener" class="%security.access_listener.class%" public="false">

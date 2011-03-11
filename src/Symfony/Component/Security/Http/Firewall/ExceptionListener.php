@@ -63,14 +63,6 @@ class ExceptionListener implements ListenerInterface
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->disconnect('core.exception', array($this, 'handleException'));
-    }
-
-    /**
      * Handles security related exceptions.
      *
      * @param EventInterface $event An EventInterface instance

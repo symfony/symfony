@@ -36,7 +36,7 @@ class ContextListener implements ListenerInterface
     private $logger;
     private $userProviders;
 
-    public function __construct(SecurityContext $context, array $userProviders, $contextKey, LoggerInterface $logger = null)
+    public function __construct(SecurityContext $context, array $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $eventDispatcher = null)
     {
         if (empty($contextKey)) {
             throw new \InvalidArgumentException('$contextKey must not be empty.');
@@ -45,28 +45,10 @@ class ContextListener implements ListenerInterface
         $this->context = $context;
         $this->userProviders = $userProviders;
         $this->contextKey = $contextKey;
-        $this->logger = $logger;
-    }
 
-    /**
-     * Registers a core.security listener to load the SecurityContext from the
-     * session.
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'read'), 0);
-        $dispatcher->connect('core.response', array($this, 'write'), 0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->disconnect('core.response', array($this, 'write'));
+        if (null !== $this->eventDispatcher) {
+            $this->eventDispatcher->connect('core.response', array($this, 'write'), 0);
+        }
     }
 
     /**
@@ -74,7 +56,7 @@ class ContextListener implements ListenerInterface
      *
      * @param EventInterface $event An EventInterface instance
      */
-    public function read(EventInterface $event)
+    public function handle(EventInterface $event)
     {
         $request = $event->get('request');
 

@@ -3,11 +3,8 @@
 namespace Symfony\Tests\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
-
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
-
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
@@ -133,6 +130,56 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         $def = $container->getDefinition('child2');
         $this->assertEquals(array('a', 'b', 'c'), $def->getArguments());
         $this->assertEquals('foo', $def->getClass());
+    }
+
+    public function testProcessIgnoreAbstractDefinitions()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('parent')
+        ;
+
+        $container
+            ->setDefinition('child', new DefinitionDecorator('parent'))
+            ->setAbstract(true)
+        ;
+
+        $pass = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Compiler\\ResolveDefinitionTemplatesPass')
+            ->setMethods(array('resolveDefinition'))
+            ->getMock()
+        ;
+
+        $pass->expects($this->never())
+            ->method('resolveDefinition')
+        ;
+
+        $pass->process($container);
+    }
+
+    public function testProcessDontIgnoreNonAbstractDefinitions()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('parent')
+        ;
+
+        $container
+            ->setDefinition('child', new DefinitionDecorator('parent'))
+            ->setAbstract(false)
+        ;
+
+        $pass = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Compiler\\ResolveDefinitionTemplatesPass')
+            ->setMethods(array('resolveDefinition'))
+            ->getMock()
+        ;
+
+        $pass->expects($this->once())
+            ->method('resolveDefinition')
+        ;
+
+        $pass->process($container);
     }
 
     protected function process(ContainerBuilder $container)

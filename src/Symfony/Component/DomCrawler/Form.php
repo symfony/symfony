@@ -20,14 +20,14 @@ use Symfony\Component\DomCrawler\Field\FormField;
  */
 class Form implements \ArrayAccess
 {
-    protected $document;
-    protected $button;
-    protected $node;
-    protected $fields;
-    protected $method;
-    protected $host;
-    protected $path;
-    protected $base;
+    private $document;
+    private $button;
+    private $node;
+    private $fields;
+    private $method;
+    private $host;
+    private $path;
+    private $base;
 
     /**
      * Constructor.
@@ -269,7 +269,7 @@ class Form implements \ArrayAccess
         return $this->fields;
     }
 
-    protected function initialize()
+    private function initialize()
     {
         $this->fields = array();
 

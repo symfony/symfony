@@ -20,9 +20,9 @@ namespace Symfony\Component\DomCrawler\Field;
  */
 class ChoiceFormField extends FormField
 {
-    protected $type;
-    protected $multiple;
-    protected $options;
+    private $type;
+    private $multiple;
+    private $options;
 
     /**
      * Returns true if the field should be included in the submitted values.

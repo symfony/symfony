@@ -18,11 +18,11 @@ namespace Symfony\Component\DomCrawler;
  */
 class Link
 {
-    protected $node;
-    protected $method;
-    protected $host;
-    protected $path;
-    protected $base;
+    private $node;
+    private $method;
+    private $host;
+    private $path;
+    private $base;
 
     /**
      * Constructor.

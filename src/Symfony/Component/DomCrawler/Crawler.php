@@ -20,10 +20,10 @@ use Symfony\Component\CssSelector\Parser as CssParser;
  */
 class Crawler extends \SplObjectStorage
 {
-    protected $uri;
-    protected $host;
-    protected $path;
-    protected $base;
+    private $uri;
+    private $host;
+    private $path;
+    private $base;
 
     /**
      * Constructor.
@@ -560,7 +560,7 @@ class Crawler extends \SplObjectStorage
         return $form;
     }
 
-    protected function getNode($position)
+    private function getNode($position)
     {
         foreach ($this as $i => $node) {
             if ($i == $position) {
@@ -573,7 +573,7 @@ class Crawler extends \SplObjectStorage
         // @codeCoverageIgnoreEnd
     }
 
-    protected function parseUri($uri)
+    private function parseUri($uri)
     {
         if ('http' !== substr($uri, 0, 4)) {
             return array(null, '/');
@@ -584,7 +584,7 @@ class Crawler extends \SplObjectStorage
         return array(preg_replace('#^(.*?//[^/]+)\/.*$#', '$1', $uri), $path);
     }
 
-    protected function sibling($node, $siblingDir = 'nextSibling')
+    private function sibling($node, $siblingDir = 'nextSibling')
     {
         $nodes = array();
 

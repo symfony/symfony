@@ -182,7 +182,9 @@ class UniversalClassLoader
      */
     public function loadClass($class)
     {
-        $class = ltrim($class, '\\');
+        if ('\\' == $class[0]) {
+            $class = substr($class, 1);
+        }
 
         if (false !== ($pos = strrpos($class, '\\'))) {
             // namespaced class name

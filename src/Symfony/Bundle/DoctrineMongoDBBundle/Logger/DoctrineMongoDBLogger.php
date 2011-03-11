@@ -249,6 +249,8 @@ class DoctrineMongoDBLogger
 
             if (is_bool($value)) {
                 $formatted = $value ? 'true' : 'false';
+            } elseif (is_numeric($value)) {
+                $formatted = $value;
             } elseif (is_scalar($value)) {
                 $formatted = '"'.$value.'"';
             } elseif (is_array($value)) {

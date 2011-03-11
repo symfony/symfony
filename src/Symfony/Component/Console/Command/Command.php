@@ -35,6 +35,7 @@ class Command
     protected $ignoreValidationErrors;
     protected $applicationDefinitionMerged;
     protected $code;
+    protected $synopsis;
 
     /**
      * Constructor.
@@ -137,6 +138,9 @@ class Command
      */
     public function run(InputInterface $input, OutputInterface $output)
     {
+        // force the creation of the synopsis before the merge with the app definition
+        $this->getSynopsis();
+
         // add the application arguments and options
         $this->mergeApplicationDefinition();
 
@@ -431,7 +435,11 @@ class Command
      */
     public function getSynopsis()
     {
-        return sprintf('%s %s', $this->getFullName(), $this->definition->getSynopsis());
+        if (null === $this->synopsis) {
+            $this->synopsis = trim(sprintf('%s %s', $this->getFullName(), $this->definition->getSynopsis()));
+        }
+
+        return $this->synopsis;
     }
 
     /**

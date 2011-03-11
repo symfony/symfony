@@ -13,8 +13,8 @@ namespace Symfony\Component\DependencyInjection;
 
 class Alias
 {
-    protected $id;
-    protected $public;
+    private $id;
+    private $public;
 
     /**
      * Constructor.

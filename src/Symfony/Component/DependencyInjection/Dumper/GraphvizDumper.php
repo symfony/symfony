@@ -28,8 +28,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class GraphvizDumper extends Dumper
 {
-    protected $nodes;
-    protected $edges;
+    private $nodes;
+    private $edges;
 
     /**
      * Dumps the service container as a graphviz graph.
@@ -89,7 +89,7 @@ class GraphvizDumper extends Dumper
      *
      * @return string A string representation of all nodes
      */
-    protected function addNodes()
+    private function addNodes()
     {
         $code = '';
         foreach ($this->nodes as $id => $node) {
@@ -106,7 +106,7 @@ class GraphvizDumper extends Dumper
      *
      * @return string A string representation of all edges
      */
-    protected function addEdges()
+    private function addEdges()
     {
         $code = '';
         foreach ($this->edges as $id => $edges) {
@@ -127,7 +127,7 @@ class GraphvizDumper extends Dumper
      * @param string $name
      * @return array An array of edges
      */
-    protected function findEdges($id, $arguments, $required, $name)
+    private function findEdges($id, $arguments, $required, $name)
     {
         $edges = array();
         foreach ($arguments as $argument) {
@@ -156,7 +156,7 @@ class GraphvizDumper extends Dumper
      *
      * @return array An array of all nodes
      */
-    protected function findNodes()
+    private function findNodes()
     {
         $nodes = array();
 
@@ -188,7 +188,7 @@ class GraphvizDumper extends Dumper
      *
      * @return string The string representation of a start dot
      */
-    protected function startDot()
+    private function startDot()
     {
         return sprintf("digraph sc {\n  %s\n  node [%s];\n  edge [%s];\n\n",
             $this->addOptions($this->options['graph']),
@@ -202,7 +202,7 @@ class GraphvizDumper extends Dumper
      *
      * @return void
      */
-    protected function endDot()
+    private function endDot()
     {
         return "}\n";
     }
@@ -213,7 +213,7 @@ class GraphvizDumper extends Dumper
      * @param array $attributes An array of attributes
      * @return string A comma separated list of attributes
      */
-    protected function addAttributes($attributes)
+    private function addAttributes($attributes)
     {
         $code = array();
         foreach ($attributes as $k => $v) {
@@ -230,7 +230,7 @@ class GraphvizDumper extends Dumper
      *
      * @return string A space separated list of options
      */
-    protected function addOptions($options)
+    private function addOptions($options)
     {
         $code = array();
         foreach ($options as $k => $v) {
@@ -246,7 +246,7 @@ class GraphvizDumper extends Dumper
      * @param string $id The identifier to dotize
      * @return string A dotized string
      */
-    protected function dotize($id)
+    private function dotize($id)
     {
         return strtolower(preg_replace('/[^\w]/i', '_', $id));
     }
@@ -257,7 +257,7 @@ class GraphvizDumper extends Dumper
      * @param string $id A service id
      * @return array An array of aliases
      */
-    protected function getAliases($id)
+    private function getAliases($id)
     {
         $aliases = array();
         foreach ($this->container->getAliases() as $alias => $origin) {

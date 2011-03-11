@@ -20,9 +20,9 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  */
 class InterfaceInjector
 {
-    protected $class;
-    protected $calls = array();
-    protected $processedDefinitions = array();
+    private $class;
+    private $calls = array();
+    private $processedDefinitions = array();
 
     /**
      * Constructs interface injector by specifying the target class name

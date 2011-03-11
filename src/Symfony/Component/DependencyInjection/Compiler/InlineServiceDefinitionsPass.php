@@ -23,8 +23,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class InlineServiceDefinitionsPass implements RepeatablePassInterface
 {
-    protected $repeatedPass;
-    protected $graph;
+    private $repeatedPass;
+    private $graph;
 
     /**
      * {@inheritDoc}
@@ -64,7 +64,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
      * @param ContainerBuilder $container The ContainerBuilder
      * @param array $arguments An array of arguments
      */
-    protected function inlineArguments(ContainerBuilder $container, array $arguments)
+    private function inlineArguments(ContainerBuilder $container, array $arguments)
     {
         foreach ($arguments as $k => $argument) {
             if (is_array($argument)) {
@@ -99,7 +99,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
      * @param Definition $definition
      * @return boolean If the definition is inlineable
      */
-    protected function isInlinableDefinition(ContainerBuilder $container, $id, Definition $definition)
+    private function isInlinableDefinition(ContainerBuilder $container, $id, Definition $definition)
     {
         if (ContainerInterface::SCOPE_PROTOTYPE === $definition->getScope()) {
             return true;

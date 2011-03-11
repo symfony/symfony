@@ -26,12 +26,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class AnalyzeServiceReferencesPass implements RepeatablePassInterface
 {
-    protected $graph;
-    protected $container;
-    protected $currentId;
-    protected $currentDefinition;
-    protected $repeatedPass;
-    protected $onlyConstructorArguments;
+    private $graph;
+    private $container;
+    private $currentId;
+    private $currentDefinition;
+    private $repeatedPass;
+    private $onlyConstructorArguments;
 
     /**
      * Constructor.
@@ -86,7 +86,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
      *
      * @param array $arguments An array of Reference or Definition objects relating to service definitions
      */
-    protected function processArguments(array $arguments)
+    private function processArguments(array $arguments)
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
@@ -113,7 +113,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
      * @param string $id A full id or alias for a service definition.
      * @return Definition The definition related to the supplied id
      */
-    protected function getDefinition($id)
+    private function getDefinition($id)
     {
         while ($this->container->hasAlias($id)) {
             $id = (string) $this->container->getAlias($id);

@@ -23,8 +23,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ResolveInvalidReferencesPass implements CompilerPassInterface
 {
-    protected $container;
-    protected $exceptions;
+    private $container;
+    private $exceptions;
 
     /**
      * Constructor.
@@ -92,7 +92,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
      * @param array $arguments An array of Reference objects
      * @param boolean $inMethodCall
      */
-    protected function processArguments(array $arguments, $inMethodCall = false)
+    private function processArguments(array $arguments, $inMethodCall = false)
     {
         foreach ($arguments as $k => $argument) {
             if (is_array($argument)) {

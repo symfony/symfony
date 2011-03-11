@@ -89,7 +89,7 @@ class YamlFileLoader extends FileLoader
      * @param string $file
      * @return void
      */
-    protected function parseImports($content, $file)
+    private function parseImports($content, $file)
     {
         if (!isset($content['imports'])) {
             return;
@@ -108,7 +108,7 @@ class YamlFileLoader extends FileLoader
      * @param string $file
      * @return void
      */
-    protected function parseInterfaceInjectors($content, $file)
+    private function parseInterfaceInjectors($content, $file)
     {
         if (!isset($content['interfaces'])) {
             return;
@@ -127,7 +127,7 @@ class YamlFileLoader extends FileLoader
      * @param string $file
      * @return void
      */
-    protected function parseInterfaceInjector($class, $interface, $file)
+    private function parseInterfaceInjector($class, $interface, $file)
     {
         $injector = new InterfaceInjector($class);
         if (isset($interface['calls'])) {
@@ -145,7 +145,7 @@ class YamlFileLoader extends FileLoader
      * @param string $file
      * @return void
      */
-    protected function parseDefinitions($content, $file)
+    private function parseDefinitions($content, $file)
     {
         if (!isset($content['services'])) {
             return;
@@ -164,7 +164,7 @@ class YamlFileLoader extends FileLoader
      * @param string $file
      * @return void
      */
-    protected function parseDefinition($id, $service, $file)
+    private function parseDefinition($id, $service, $file)
     {
         if (is_string($service) && 0 === strpos($service, '@')) {
             $this->container->setAlias($id, substr($service, 1));
@@ -267,7 +267,7 @@ class YamlFileLoader extends FileLoader
      * @param string $file
      * @return array The file content
      */
-    protected function loadFile($file)
+    private function loadFile($file)
     {
         return $this->validate(Yaml::load($file), $file);
     }
@@ -281,7 +281,7 @@ class YamlFileLoader extends FileLoader
      *
      * @throws \InvalidArgumentException When service file is not valid
      */
-    protected function validate($content, $file)
+    private function validate($content, $file)
     {
         if (null === $content) {
             return $content;
@@ -310,7 +310,7 @@ class YamlFileLoader extends FileLoader
      * @param string $value
      * @return void
      */
-    protected function resolveServices($value)
+    private function resolveServices($value)
     {
         if (is_array($value)) {
             $value = array_map(array($this, 'resolveServices'), $value);
@@ -342,7 +342,7 @@ class YamlFileLoader extends FileLoader
      * @param array $content
      * @return void
      */
-    protected function loadFromExtensions($content)
+    private function loadFromExtensions($content)
     {
         foreach ($content as $namespace => $values) {
             if (in_array($namespace, array('imports', 'parameters', 'services', 'interfaces'))) {

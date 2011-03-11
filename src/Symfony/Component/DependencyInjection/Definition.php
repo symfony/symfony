@@ -18,20 +18,21 @@ namespace Symfony\Component\DependencyInjection;
  */
 class Definition
 {
-    protected $class;
-    protected $file;
-    protected $factoryClass;
-    protected $factoryMethod;
-    protected $factoryService;
-    protected $scope;
+    private $class;
+    private $file;
+    private $factoryClass;
+    private $factoryMethod;
+    private $factoryService;
+    private $scope;
+    private $properties;
+    private $calls;
+    private $configurator;
+    private $tags;
+    private $public;
+    private $synthetic;
+    private $abstract;
+
     protected $arguments;
-    protected $properties;
-    protected $calls;
-    protected $configurator;
-    protected $tags;
-    protected $public;
-    protected $synthetic;
-    protected $abstract;
 
     /**
      * Constructor.

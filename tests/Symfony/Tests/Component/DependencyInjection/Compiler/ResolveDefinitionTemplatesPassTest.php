@@ -134,56 +134,6 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $def->getClass());
     }
 
-    public function testProcessIgnoreAbstractDefinitions()
-    {
-        $container = new ContainerBuilder();
-
-        $container
-            ->register('parent')
-        ;
-
-        $container
-            ->setDefinition('child', new DefinitionDecorator('parent'))
-            ->setAbstract(true)
-        ;
-
-        $pass = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Compiler\\ResolveDefinitionTemplatesPass')
-            ->setMethods(array('resolveDefinition'))
-            ->getMock()
-        ;
-
-        $pass->expects($this->never())
-            ->method('resolveDefinition')
-        ;
-
-        $pass->process($container);
-    }
-
-    public function testProcessDontIgnoreNonAbstractDefinitions()
-    {
-        $container = new ContainerBuilder();
-
-        $container
-            ->register('parent')
-        ;
-
-        $container
-            ->setDefinition('child', new DefinitionDecorator('parent'))
-            ->setAbstract(false)
-        ;
-
-        $pass = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Compiler\\ResolveDefinitionTemplatesPass')
-            ->setMethods(array('resolveDefinition'))
-            ->getMock()
-        ;
-
-        $pass->expects($this->once())
-            ->method('resolveDefinition')
-        ;
-
-        $pass->process($container);
-    }
-
     protected function process(ContainerBuilder $container)
     {
         $pass = new ResolveDefinitionTemplatesPass();

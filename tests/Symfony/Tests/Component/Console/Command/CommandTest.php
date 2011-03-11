@@ -168,7 +168,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command = new \TestCommand();
         $command->setApplication($application);
         $formatterHelper = new FormatterHelper();
-        $this->assertEquals($formatterHelper->getName(), $command->formatter->getName(), '->__get() returns the correct helper');
+        $this->assertEquals($formatterHelper->getName(), $command->getHelper('formatter')->getName(), '->__get() returns the correct helper');
     }
 
     public function testMergeApplicationDefinition()
@@ -179,17 +179,18 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command = new \TestCommand();
         $command->setApplication($application1);
         $command->setDefinition($definition = new InputDefinition(array(new InputArgument('bar'), new InputOption('foo'))));
-        $command->mergeApplicationDefinition();
+
+        $r = new \ReflectionObject($command);
+        $m = $r->getMethod('mergeApplicationDefinition');
+        $m->setAccessible(true);
+        $m->invoke($command);
         $this->assertTrue($command->getDefinition()->hasArgument('foo'), '->mergeApplicationDefinition() merges the application arguments and the command arguments');
         $this->assertTrue($command->getDefinition()->hasArgument('bar'), '->mergeApplicationDefinition() merges the application arguments and the command arguments');
         $this->assertTrue($command->getDefinition()->hasOption('foo'), '->mergeApplicationDefinition() merges the application options and the command options');
         $this->assertTrue($command->getDefinition()->hasOption('bar'), '->mergeApplicationDefinition() merges the application options and the command options');
 
-        $command->mergeApplicationDefinition();
+        $m->invoke($command);
         $this->assertEquals(3, $command->getDefinition()->getArgumentCount(), '->mergeApplicationDefinition() does not try to merge twice the application arguments and options');
-
-        $command = new \TestCommand();
-        $command->mergeApplicationDefinition();
     }
 
     public function testRun()

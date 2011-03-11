@@ -59,9 +59,9 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if ($input->getOption('xml')) {
-            $output->writeln($this->application->asXml($input->getArgument('namespace')), Output::OUTPUT_RAW);
+            $output->writeln($this->getApplication()->asXml($input->getArgument('namespace')), Output::OUTPUT_RAW);
         } else {
-            $output->writeln($this->application->asText($input->getArgument('namespace')));
+            $output->writeln($this->getApplication()->asText($input->getArgument('namespace')));
         }
     }
 }

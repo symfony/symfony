@@ -56,7 +56,7 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $bundle = $this->application->getKernel()->getBundle($input->getArgument('bundle'));
+        $bundle = $this->getApplication()->getKernel()->getBundle($input->getArgument('bundle'));
 
         $entity = $input->getArgument('entity');
         $fullEntityClassName = $bundle->getNamespace().'\\Entity\\'.$entity;

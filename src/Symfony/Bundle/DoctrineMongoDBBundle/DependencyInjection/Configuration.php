@@ -12,10 +12,21 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
  */
 class Configuration
 {
+    private $debug;
+
+    /**
+     * Constructor.
+     *
+     * @param Boolean $debug The kernel.debug value
+     */
+    public function __construct($debug)
+    {
+        $this->debug = (Boolean) $debug;
+    }
+
     /**
      * Generates the configuration tree.
      *
-     * @param boolean $kernelDebug The kernel.debug DIC parameter
      * @return \Symfony\Component\DependencyInjection\Configuration\NodeInterface
      */
     public function getConfigTree()
@@ -54,6 +65,7 @@ class Configuration
                     ->builder($this->getMetadataCacheDriverNode())
                     ->scalarNode('connection')->end()
                     ->scalarNode('database')->end()
+                    ->booleanNode('logging')->defaultValue($this->debug)->end()
                     ->fixXmlConfig('mapping')
                     ->builder($this->getMappingsNode())
                 ->end()

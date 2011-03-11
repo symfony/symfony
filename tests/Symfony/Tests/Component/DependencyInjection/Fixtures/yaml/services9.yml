@@ -11,6 +11,7 @@ services:
       - { name: foo, bar: bar }
     factory_method: getInstance
     arguments: [foo, '@foo.baz', { '%foo%': 'foo is %foo%', bar: '%foo%' }, true, '@service_container']
+    properties: { foo: bar, moo: '@foo.baz' }
     calls:
       - [setBar, ['@bar']]
       - [initialize, {  }]

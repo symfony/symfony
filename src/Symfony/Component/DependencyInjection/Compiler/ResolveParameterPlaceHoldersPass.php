@@ -25,7 +25,7 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
     /**
      * Processes the ContainerBuilder to resolve parameter placeholders.
      *
-     * @param ContainerBuilder $container 
+     * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {
@@ -41,6 +41,8 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
                 $calls[$this->resolveValue($name)] = $this->resolveValue($arguments);
             }
             $definition->setMethodCalls($calls);
+
+            $definition->setProperties($this->resolveValue($definition->getProperties()));
         }
 
         $aliases = array();

@@ -25,6 +25,7 @@ class Definition
     protected $factoryService;
     protected $scope;
     protected $arguments;
+    protected $properties;
     protected $calls;
     protected $configurator;
     protected $tags;
@@ -48,6 +49,7 @@ class Definition
         $this->public = true;
         $this->synthetic = false;
         $this->abstract = false;
+        $this->properties = array();
     }
 
     /**
@@ -157,6 +159,25 @@ class Definition
     public function setArguments(array $arguments)
     {
         $this->arguments = $arguments;
+
+        return $this;
+    }
+
+    public function setProperties(array $properties)
+    {
+        $this->properties = $properties;
+
+        return $this;
+    }
+
+    public function getProperties()
+    {
+        return $this->properties;
+    }
+
+    public function setProperty($name, $value)
+    {
+        $this->properties[$name] = $value;
 
         return $this;
     }

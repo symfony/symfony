@@ -59,10 +59,18 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooService()
     {
-        $instance = call_user_func(array('FooClass', 'getInstance'), 'foo', $this->get('foo.baz'), array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo'), 'bar' => $this->getParameter('foo')), true, $this);
+        $a = $this->get('foo.baz');
+
+        $instance = call_user_func(array('FooClass', 'getInstance'), 'foo', $a, array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo'), 'bar' => $this->getParameter('foo')), true, $this);
 
         $instance->setBar($this->get('bar'));
         $instance->initialize();
+        $b = new \ReflectionProperty($instance, 'foo');
+        $b->setAccessible(true);
+        $b->setValue($instance, 'bar');
+        $c = new \ReflectionProperty($instance, 'moo');
+        $c->setAccessible(true);
+        $c->setValue($instance, $a);
         sc_configure($instance);
 
         return $instance;

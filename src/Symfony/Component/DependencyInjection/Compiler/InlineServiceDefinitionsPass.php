@@ -51,6 +51,10 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
             $definition->setMethodCalls(
                 $this->inlineArguments($container, $definition->getMethodCalls())
             );
+
+            $definition->setProperties(
+                $this->inlineArguments($container, $definition->getProperties())
+            );
         }
     }
 
@@ -80,6 +84,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
             } else if ($argument instanceof Definition) {
                 $argument->setArguments($this->inlineArguments($container, $argument->getArguments()));
                 $argument->setMethodCalls($this->inlineArguments($container, $argument->getMethodCalls()));
+                $argument->setProperties($this->inlineArguments($container, $argument->getProperties()));
             }
         }
 

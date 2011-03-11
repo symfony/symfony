@@ -23,9 +23,7 @@ class Configuration
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('doctrine_mongo_db', 'array');
 
-        $this->addSingleDocumentManagerSection($rootNode);
         $this->addDocumentManagersSection($rootNode);
-        $this->addSingleConnectionSection($rootNode);
         $this->addConnectionsSection($rootNode);
 
         $rootNode
@@ -33,24 +31,12 @@ class Configuration
             ->scalarNode('auto_generate_proxy_classes')->defaultValue(false)->end()
             ->scalarNode('hydrator_namespace')->defaultValue('Hydrators')->end()
             ->scalarNode('auto_generate_hydrator_classes')->defaultValue(false)->end()
+            ->scalarNode('default_document_manager')->defaultValue('default')->end()
+            ->scalarNode('default_connection')->defaultValue('default')->end()
+            ->scalarNode('default_database')->defaultValue('default')->end()
         ;
 
         return $treeBuilder->buildTree();
-    }
-
-    /**
-     * Builds the nodes responsible for the config that supports the single
-     * document manager.
-     */
-    private function addSingleDocumentManagerSection(NodeBuilder $rootNode)
-    {
-        $rootNode
-            ->scalarNode('default_document_manager')->defaultValue('default')->end()
-            ->scalarNode('default_database')->defaultValue('default')->end()
-            ->builder($this->getMetadataCacheDriverNode())
-            ->fixXmlConfig('mapping')
-            ->builder($this->getMappingsNode())
-        ;
     }
 
     /**
@@ -63,31 +49,15 @@ class Configuration
             ->arrayNode('document_managers')
                 ->useAttributeAsKey('id')
                 ->prototype('array')
-                    ->performNoDeepMerging()
+                    //->performNoDeepMerging()
                     ->treatNullLike(array())
                     ->builder($this->getMetadataCacheDriverNode())
-                    ->scalarNode('default_database')->end()
                     ->scalarNode('connection')->end()
                     ->scalarNode('database')->end()
                     ->fixXmlConfig('mapping')
                     ->builder($this->getMappingsNode())
                 ->end()
             ->end()
-        ;
-    }
-
-    /**
-     * Configures the single-connection section:
-     *   * default_connection
-     *   * server
-     *   * options
-     */
-    private function addSingleConnectionSection(NodeBuilder $rootNode)
-    {
-        $rootNode
-            ->scalarNode('default_connection')->defaultValue('default')->end()
-            ->builder($this->addConnectionServerNode())
-            ->builder($this->addConnectionOptionsNode())
         ;
     }
 
@@ -102,7 +72,7 @@ class Configuration
                 ->useAttributeAsKey('id')
                 ->prototype('array')
                     ->performNoDeepMerging()
-                    ->builder($this->addConnectionServerNode())
+                    ->scalarNode('server')->defaultNull()->end()
                     ->builder($this->addConnectionOptionsNode())
                 ->end()
             ->end()
@@ -139,20 +109,6 @@ class Configuration
                 ->performNoDeepMerging()
             ->end()
         ;
-
-        return $node;
-    }
-
-    /**
-     * Adds the NodeBuilder for the "server" key of a connection.
-     */
-    private function addConnectionServerNode()
-    {
-        $node = new NodeBuilder('server', 'scalar');
-
-        $node
-            ->defaultValue(null)
-        ->end();
 
         return $node;
     }

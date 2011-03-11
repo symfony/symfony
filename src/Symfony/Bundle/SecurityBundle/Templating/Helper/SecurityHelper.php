@@ -18,11 +18,11 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 /**
  * SecurityHelper provides read-only access to the security context.
  *
- * @author     Fabien Potencier <fabien@symfony.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class SecurityHelper extends Helper
 {
-    protected $context;
+    private $context;
 
     /**
      * Constructor.
@@ -34,7 +34,7 @@ class SecurityHelper extends Helper
         $this->context = $context;
     }
 
-    public function vote($role, $object = null, $field = null)
+    public function isGranted($role, $object = null, $field = null)
     {
         if (null === $this->context) {
             return false;
@@ -44,7 +44,7 @@ class SecurityHelper extends Helper
             $object = new FieldVote($object, $field);
         }
 
-        return $this->context->vote($role, $object);
+        return $this->context->isGranted($role, $object);
     }
 
     /**

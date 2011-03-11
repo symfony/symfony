@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <command id="namespace:name" namespace="namespace" name="name">
-  <usage>namespace:name [-h|--help] [-q|--quiet] [-v|--verbose] [-V|--version] [-a|--ansi] [-n|--no-interaction] command</usage>
+  <usage>namespace:name</usage>
   <description>description</description>
   <help>help</help>
   <aliases>

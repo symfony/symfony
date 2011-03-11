@@ -11,16 +11,7 @@
 
 namespace Symfony\Tests\Component\Security\Core\Authentication\Token;
 
-use Symfony\Component\Security\Core\Authentication\Token\Token as BaseToken;
 use Symfony\Component\Security\Core\Role\Role;
-
-class Token extends BaseToken
-{
-    public function setCredentials($credentials)
-    {
-        $this->credentials = $credentials;
-    }
-}
 
 class TestUser
 {
@@ -37,33 +28,28 @@ class TestUser
     }
 }
 
-class TokenTest extends \PHPUnit_Framework_TestCase
+class AbstractTokenTest extends \PHPUnit_Framework_TestCase
 {
-    public function testMagicToString()
+    public function testGetUsername()
     {
-        $token = new Token(array('ROLE_FOO'));
+        $token = $this->getToken(array('ROLE_FOO'));
         $token->setUser('fabien');
-        $this->assertEquals('fabien', (string) $token);
+        $this->assertEquals('fabien', $token->getUsername());
 
         $token->setUser(new TestUser('fabien'));
-        $this->assertEquals('fabien', (string) $token);
+        $this->assertEquals('fabien', $token->getUsername());
 
-        $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user->expects($this->once())->method('getUsername')->will($this->returnValue('fabien'));
-
         $token->setUser($user);
-        $this->assertEquals('fabien', (string) $token);
+        $this->assertEquals('fabien', $token->getUsername());
     }
 
     public function testEraseCredentials()
     {
-        $token = new Token(array('ROLE_FOO'));
+        $token = $this->getToken(array('ROLE_FOO'));
 
-        $credentials = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
-        $credentials->expects($this->once())->method('eraseCredentials');
-        $token->setCredentials($credentials);
-
-        $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user->expects($this->once())->method('eraseCredentials');
         $token->setUser($user);
 
@@ -76,10 +62,13 @@ class TokenTest extends \PHPUnit_Framework_TestCase
      */
     public function testSerialize()
     {
-        $token = new Token(array('ROLE_FOO'));
+        $token = $this->getToken(array('ROLE_FOO'));
         $token->setAttributes(array('foo' => 'bar'));
 
-        $this->assertEquals($token, unserialize(serialize($token)));
+        $uToken = unserialize(serialize($token));
+
+        $this->assertEquals($token->getRoles(), $uToken->getRoles());
+        $this->assertEquals($token->getAttributes(), $uToken->getAttributes());
     }
 
     /**
@@ -87,27 +76,13 @@ class TokenTest extends \PHPUnit_Framework_TestCase
      */
     public function testConstructor()
     {
-        $token = new Token(array('ROLE_FOO'));
+        $token = $this->getToken(array('ROLE_FOO'));
         $this->assertEquals(array(new Role('ROLE_FOO')), $token->getRoles());
 
-        $token = new Token(array(new Role('ROLE_FOO')));
+        $token = $this->getToken(array(new Role('ROLE_FOO')));
         $this->assertEquals(array(new Role('ROLE_FOO')), $token->getRoles());
 
-        $token = new Token(array(new Role('ROLE_FOO'), 'ROLE_BAR'));
-        $this->assertEquals(array(new Role('ROLE_FOO'), new Role('ROLE_BAR')), $token->getRoles());
-    }
-
-    /**
-     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::addRole
-     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::getRoles
-     */
-    public function testAddRole()
-    {
-        $token = new Token();
-        $token->addRole(new Role('ROLE_FOO'));
-        $this->assertEquals(array(new Role('ROLE_FOO')), $token->getRoles());
-
-        $token->addRole(new Role('ROLE_BAR'));
+        $token = $this->getToken(array(new Role('ROLE_FOO'), 'ROLE_BAR'));
         $this->assertEquals(array(new Role('ROLE_FOO'), new Role('ROLE_BAR')), $token->getRoles());
     }
 
@@ -117,7 +92,7 @@ class TokenTest extends \PHPUnit_Framework_TestCase
      */
     public function testAuthenticatedFlag()
     {
-        $token = new Token();
+        $token = $this->getToken();
         $this->assertFalse($token->isAuthenticated());
 
         $token->setAuthenticated(true);
@@ -125,42 +100,6 @@ class TokenTest extends \PHPUnit_Framework_TestCase
 
         $token->setAuthenticated(false);
         $this->assertFalse($token->isAuthenticated());
-    }
-
-    /**
-     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::isImmutable
-     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::setImmutable
-     */
-    public function testImmutableFlag()
-    {
-        $token = new Token();
-        $this->assertFalse($token->isImmutable());
-
-        $token->setImmutable();
-        $this->assertTrue($token->isImmutable());
-    }
-
-    /**
-     * @expectedException \LogicException
-     * @dataProvider getImmutabilityTests
-     */
-    public function testImmutabilityIsEnforced($setter, $value)
-    {
-        $token = new Token();
-        $token->setImmutable(true);
-        $token->$setter($value);
-    }
-
-    public function getImmutabilityTests()
-    {
-        return array(
-            array('setUser', 'foo'),
-            array('eraseCredentials', null),
-            array('setAuthenticated', true),
-            array('setAuthenticated', false),
-            array('addRole', new Role('foo')),
-            array('setRoles', array('foo', 'asdf')),
-        );
     }
 
     /**
@@ -173,7 +112,7 @@ class TokenTest extends \PHPUnit_Framework_TestCase
     public function testAttributes()
     {
         $attributes = array('foo' => 'bar');
-        $token = new Token();
+        $token = $this->getToken();
         $token->setAttributes($attributes);
 
         $this->assertEquals($attributes, $token->getAttributes(), '->getAttributes() returns the token attributes');
@@ -190,5 +129,108 @@ class TokenTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->getAttribute() throws an \InvalidArgumentException exception when the attribute does not exist');
             $this->assertEquals('This token has no "foobar" attribute.', $e->getMessage(), '->getAttribute() throws an \InvalidArgumentException exception when the attribute does not exist');
         }
+    }
+
+    /**
+     * @dataProvider getUsers
+     */
+    public function testSetUser($user)
+    {
+        $token = $this->getToken();
+        $token->setUser($user);
+        $this->assertSame($user, $token->getUser());
+    }
+
+    public function getUsers()
+    {
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user
+            ->expects($this->any())
+            ->method('equals')
+            ->will($this->returnValue(true))
+        ;
+
+        return array(
+            array($user),
+            array(new TestUser('foo')),
+            array('foo'),
+        );
+    }
+
+    /**
+     * @dataProvider getUserChanges
+     */
+    public function testSetUserSetsAuthenticatedToFalseWhenUserChanges($firstUser, $secondUser)
+    {
+        $token = $this->getToken();
+        $token->setAuthenticated(true);
+        $this->assertTrue($token->isAuthenticated());
+
+        $token->setUser($firstUser);
+        $this->assertTrue($token->isAuthenticated());
+
+        $token->setUser($secondUser);
+        $this->assertFalse($token->isAuthenticated());
+    }
+
+    public function getUserChanges()
+    {
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user
+            ->expects($this->any())
+            ->method('equals')
+            ->will($this->returnValue(false))
+        ;
+
+        return array(
+            array(
+                'foo', 'bar',
+            ),
+            array(
+                'foo', new TestUser('bar'),
+            ),
+            array(
+                'foo', $user,
+            ),
+            array(
+                $user, $user,
+            ),
+            array(
+                $user, 'foo'
+            ),
+            array(
+                $user, new TestUser('foo'),
+            ),
+            array(
+                new TestUser('foo'), new TestUser('bar'),
+            ),
+            array(
+                new TestUser('foo'), 'bar',
+            ),
+            array(
+                new TestUser('foo'), $user,
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider getUsers
+     */
+    public function testSetUserDoesNotSetAuthenticatedToFalseWhenUserDoesNotChange($user)
+    {
+        $token = $this->getToken();
+        $token->setAuthenticated(true);
+        $this->assertTrue($token->isAuthenticated());
+
+        $token->setUser($user);
+        $this->assertTrue($token->isAuthenticated());
+
+        $token->setUser($user);
+        $this->assertTrue($token->isAuthenticated());
+    }
+
+    protected function getToken(array $roles = array())
+    {
+        return $this->getMockForAbstractClass('Symfony\Component\Security\Core\Authentication\Token\AbstractToken', array($roles));
     }
 }

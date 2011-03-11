@@ -12,9 +12,10 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
     public function testProcess()
     {
         $container = new ContainerBuilder();
-        $container->register('parent', 'foo')->setArguments(array('moo', 'b'));
+        $container->register('parent', 'foo')->setArguments(array('moo', 'b'))->setProperty('foo', 'moo');
         $container->setDefinition('child', new DefinitionDecorator('parent'))
             ->setArgument(0, 'a')
+            ->setProperty('foo', 'bar')
             ->setClass('bar')
         ;
 
@@ -24,6 +25,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertNotInstanceOf('Symfony\Component\DependencyInjection\DefinitionDecorator', $def);
         $this->assertEquals('bar', $def->getClass());
         $this->assertEquals(array('a', 'b'), $def->getArguments());
+        $this->assertEquals(array('foo' => 'bar'), $def->getProperties());
     }
 
     public function testProcessAppendsMethodCallsAlways()

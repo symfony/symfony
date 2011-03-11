@@ -28,11 +28,11 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class AccessListener implements ListenerInterface
 {
-    protected $context;
-    protected $accessDecisionManager;
-    protected $map;
-    protected $authManager;
-    protected $logger;
+    private $context;
+    private $accessDecisionManager;
+    private $map;
+    private $authManager;
+    private $logger;
 
     public function __construct(SecurityContext $context, AccessDecisionManagerInterface $accessDecisionManager, AccessMap $map, AuthenticationManagerInterface $authManager, LoggerInterface $logger = null)
     {
@@ -41,24 +41,6 @@ class AccessListener implements ListenerInterface
         $this->map = $map;
         $this->authManager = $authManager;
         $this->logger = $logger;
-    }
-
-    /**
-     * Registers a core.security listener to enforce authorization rules.
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
     }
 
     /**

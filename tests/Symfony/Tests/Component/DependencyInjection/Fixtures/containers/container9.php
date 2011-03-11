@@ -15,6 +15,7 @@ $container->
     setFactoryClass('FooClass')->
     setFactoryMethod('getInstance')->
     setArguments(array('foo', new Reference('foo.baz'), array('%foo%' => 'foo is %foo%', 'bar' => '%foo%'), true, new Reference('service_container')))->
+    setProperties(array('foo' => 'bar', 'moo' => new Reference('foo.baz')))->
     setScope('prototype')->
     addMethodCall('setBar', array(new Reference('bar')))->
     addMethodCall('initialize')->

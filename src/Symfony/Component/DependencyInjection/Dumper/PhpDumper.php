@@ -134,8 +134,8 @@ EOF;
     /**
      * Generates Service local temp variables.
      *
-     * @param string $cId 
-     * @param string $definition 
+     * @param string $cId
+     * @param string $definition
      * @return string
      */
     protected function addServiceLocalTempVariables($cId, $definition)
@@ -151,6 +151,7 @@ EOF;
         foreach ($localDefinitions as $iDefinition) {
             $this->getServiceCallsFromArguments($iDefinition->getArguments(), $calls, $behavior);
             $this->getServiceCallsFromArguments($iDefinition->getMethodCalls(), $calls, $behavior);
+            $this->getServiceCallsFromArguments($iDefinition->getProperties(), $calls, $behavior);
         }
 
         $code = '';
@@ -182,7 +183,7 @@ EOF;
      * Generates the require_once statement for service includes.
      *
      * @param string $id The service id
-     * @param Definition $definition 
+     * @param Definition $definition
      * @return string
      */
     protected function addServiceInclude($id, $definition)
@@ -210,8 +211,8 @@ EOF;
     /**
      * Generates the inline definition of a service.
      *
-     * @param string $id 
-     * @param Definition $definition 
+     * @param string $id
+     * @param Definition $definition
      * @return string
      */
     protected function addServiceInlinedDefinitions($id, $definition)
@@ -238,7 +239,7 @@ EOF;
             $processed->offsetSet($sDefinition);
 
             $class = $this->dumpValue($sDefinition->getClass());
-            if ($nbOccurrences->offsetGet($sDefinition) > 1 || count($sDefinition->getMethodCalls()) > 0 || null !== $sDefinition->getConfigurator() || false !== strpos($class, '$')) {
+            if ($nbOccurrences->offsetGet($sDefinition) > 1 || count($sDefinition->getMethodCalls()) > 0 || $sDefinition->getProperties() || null !== $sDefinition->getConfigurator() || false !== strpos($class, '$')) {
                 $name = $this->getNextVariableName();
                 $variableMap->offsetSet($sDefinition, new Variable($name));
 
@@ -272,8 +273,9 @@ EOF;
                     $code .= sprintf("        \$%s = new \\%s(%s);\n", $name, substr(str_replace('\\\\', '\\', $class), 1, -1), implode(', ', $arguments));
                 }
 
-                if (!$this->hasReference($id, $sDefinition->getMethodCalls())) {
+                if (!$this->hasReference($id, $sDefinition->getMethodCalls()) && !$this->hasReference($id, $sDefinition->getProperties())) {
                     $code .= $this->addServiceMethodCalls(null, $sDefinition, $name);
+                    $code .= $this->addServiceProperties(null, $sDefinition, $name);
                     $code .= $this->addServiceConfigurator(null, $sDefinition, $name);
                 }
 
@@ -288,7 +290,7 @@ EOF;
      * Adds the service return statement.
      *
      * @param string $id Service id
-     * @param Definition $definition 
+     * @param Definition $definition
      * @return string
      */
     protected function addServiceReturn($id, $definition)
@@ -304,7 +306,7 @@ EOF;
      * Generates the service instance.
      *
      * @param string $id
-     * @param Definition $definition 
+     * @param Definition $definition
      * @return string
      *
      * @throws \InvalidArgumentException
@@ -365,8 +367,8 @@ EOF;
     /**
      * Checks if the definition is a simple instance.
      *
-     * @param string $id 
-     * @param Definition $definition 
+     * @param string $id
+     * @param Definition $definition
      * @return boolean
      */
     protected function isSimpleInstance($id, $definition)
@@ -376,7 +378,7 @@ EOF;
                 continue;
             }
 
-            if ($sDefinition->getMethodCalls() || $sDefinition->getConfigurator()) {
+            if ($sDefinition->getMethodCalls() || $sDefinition->getProperties() || $sDefinition->getConfigurator()) {
                 return false;
             }
         }
@@ -387,9 +389,9 @@ EOF;
     /**
      * Adds method calls to a service definition.
      *
-     * @param string $id 
-     * @param Definition $definition 
-     * @param string $variableName 
+     * @param string $id
+     * @param Definition $definition
+     * @param string $variableName
      * @return string
      */
     protected function addServiceMethodCalls($id, $definition, $variableName = 'instance')
@@ -411,11 +413,23 @@ EOF;
         return $calls;
     }
 
+    protected function addServiceProperties($id, $definition, $variableName = 'instance')
+    {
+        $code = '';
+        foreach ($definition->getProperties() as $name => $value) {
+            $code .= sprintf("        \$%s = new \ReflectionProperty(\$%s, %s);\n", $refName = $this->getNextVariableName(), $variableName, var_export($name, true));
+            $code .= sprintf("        \$%s->setAccessible(true);\n", $refName);
+            $code .= sprintf("        \$%s->setValue(\$%s, %s);\n", $refName, $variableName, $this->dumpValue($value));
+        }
+
+        return $code;
+    }
+
     /**
      * Generates the inline definition setup.
      *
-     * @param string $id 
-     * @param Definition $definition 
+     * @param string $id
+     * @param Definition $definition
      * @return string
      */
     protected function addServiceInlinedDefinitionsSetup($id, $definition)
@@ -452,9 +466,9 @@ EOF;
     /**
      * Adds configurator definition
      *
-     * @param string $id 
-     * @param Definition $definition 
-     * @param string $variableName 
+     * @param string $id
+     * @param Definition $definition
+     * @param string $variableName
      * @return string
      */
     protected function addServiceConfigurator($id, $definition, $variableName = 'instance')
@@ -477,8 +491,8 @@ EOF;
     /**
      * Adds a service
      *
-     * @param string $id 
-     * @param Definition $definition 
+     * @param string $id
+     * @param Definition $definition
      * @return string
      */
     protected function addService($id, $definition)
@@ -552,6 +566,7 @@ EOF;
                 $this->addServiceInstance($id, $definition).
                 $this->addServiceInlinedDefinitionsSetup($id, $definition).
                 $this->addServiceMethodCalls($id, $definition).
+                $this->addServiceProperties($id, $definition).
                 $this->addServiceConfigurator($id, $definition).
                 $this->addServiceReturn($id, $definition)
             ;
@@ -566,8 +581,8 @@ EOF;
     /**
      * Adds a service alias.
      *
-     * @param string $alias 
-     * @param string $id 
+     * @param string $alias
+     * @param string $id
      * @return string
      */
     protected function addServiceAlias($alias, $id)
@@ -795,8 +810,8 @@ EOF;
     /**
      * Exports parameters.
      *
-     * @param string $parameters 
-     * @param integer $indent 
+     * @param string $parameters
+     * @param integer $indent
      * @return string
      */
     protected function exportParameters($parameters, $indent = 12)
@@ -837,8 +852,8 @@ EOF;
     /**
      * Wraps the service conditionals.
      *
-     * @param string $value 
-     * @param string $code 
+     * @param string $value
+     * @param string $code
      * @return string
      */
     protected function wrapServiceConditionals($value, $code)
@@ -861,7 +876,7 @@ EOF;
     /**
      * Builds service calls from arguments
      *
-     * @param array $arguments 
+     * @param array $arguments
      * @param string $calls By reference
      * @param string $behavior By reference
      * @return void
@@ -891,17 +906,17 @@ EOF;
     /**
      * Returns the inline definition
      *
-     * @param Definition $definition 
+     * @param Definition $definition
      * @return string
      */
     protected function getInlinedDefinitions(Definition $definition)
     {
         if (false === $this->inlinedDefinitions->contains($definition)) {
-            $definitions = $this->getDefinitionsFromArguments($definition->getArguments());
-
-            foreach ($definition->getMethodCalls() as $arguments) {
-                $definitions = array_merge($definitions, $this->getDefinitionsFromArguments($arguments));
-            }
+            $definitions = array_merge(
+                $this->getDefinitionsFromArguments($definition->getArguments()),
+                $this->getDefinitionsFromArguments($definition->getMethodCalls()),
+                $this->getDefinitionsFromArguments($definition->getProperties())
+            );
 
             $this->inlinedDefinitions->offsetSet($definition, $definitions);
 
@@ -914,7 +929,7 @@ EOF;
     /**
      * Gets the definition from arguments
      *
-     * @param array $arguments 
+     * @param array $arguments
      * @return array
      */
     protected function getDefinitionsFromArguments(array $arguments)
@@ -938,8 +953,8 @@ EOF;
     /**
      * Checks if a service id has a reference
      *
-     * @param string $id 
-     * @param array $arguments 
+     * @param string $id
+     * @param array $arguments
      * @return boolean
      */
     protected function hasReference($id, array $arguments)
@@ -962,8 +977,8 @@ EOF;
     /**
      * Dumps values.
      *
-     * @param string $value 
-     * @param boolean $interpolate 
+     * @param string $value
+     * @param boolean $interpolate
      * @return string
      */
     protected function dumpValue($value, $interpolate = true)
@@ -1046,7 +1061,7 @@ EOF;
     /**
      * Dumps a parameter
      *
-     * @param string $name 
+     * @param string $name
      * @return string
      */
     public function dumpParameter($name)
@@ -1061,8 +1076,8 @@ EOF;
     /**
      * Gets a service call
      *
-     * @param string $id 
-     * @param Reference $reference 
+     * @param string $id
+     * @param Reference $reference
      * @return string
      */
     protected function getServiceCall($id, Reference $reference = null)

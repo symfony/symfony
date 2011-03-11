@@ -39,7 +39,13 @@ class OutputTest extends \PHPUnit_Framework_TestCase
     public function testSetStyle()
     {
         Output::setStyle('FOO', array('bg' => 'red', 'fg' => 'yellow', 'blink' => true));
-        $this->assertEquals(array('bg' => 'red', 'fg' => 'yellow', 'blink' => true), TestOutput::getStyle('foo'), '::setStyle() sets a new style');
+
+        $r = new \ReflectionClass('Symfony\Component\Console\Output\Output');
+        $p = $r->getProperty('styles');
+        $p->setAccessible(true);
+        $styles = $p->getValue(null);
+
+        $this->assertEquals(array('bg' => 'red', 'fg' => 'yellow', 'blink' => true), $styles['foo'], '::setStyle() sets a new style');
     }
 
     public function testWrite()
@@ -91,11 +97,6 @@ class OutputTest extends \PHPUnit_Framework_TestCase
 class TestOutput extends Output
 {
     public $output = '';
-
-    static public function getStyle($name)
-    {
-        return static::$styles[$name];
-    }
 
     public function doWrite($message, $newline)
     {

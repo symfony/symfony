@@ -32,11 +32,11 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  */
 class DigestAuthenticationListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $provider;
-    protected $providerKey;
-    protected $authenticationEntryPoint;
-    protected $logger;
+    private $securityContext;
+    private $provider;
+    private $providerKey;
+    private $authenticationEntryPoint;
+    private $logger;
 
     public function __construct(SecurityContextInterface $securityContext, UserProviderInterface $provider, $providerKey, DigestAuthenticationEntryPoint $authenticationEntryPoint, LoggerInterface $logger = null)
     {
@@ -49,24 +49,6 @@ class DigestAuthenticationListener implements ListenerInterface
         $this->providerKey = $providerKey;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
         $this->logger = $logger;
-    }
-
-    /**
-     *
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
     }
 
     /**
@@ -85,11 +67,7 @@ class DigestAuthenticationListener implements ListenerInterface
         $digestAuth = new DigestData($header);
 
         if (null !== $token = $this->securityContext->getToken()) {
-            if ($token->isImmutable()) {
-                return;
-            }
-
-            if ($token instanceof UsernamePasswordToken && $token->isAuthenticated() && (string) $token === $digestAuth->getUsername()) {
+            if ($token instanceof UsernamePasswordToken && $token->isAuthenticated() && $token->getUsername() === $digestAuth->getUsername()) {
                 return;
             }
         }
@@ -143,7 +121,7 @@ class DigestAuthenticationListener implements ListenerInterface
         $this->securityContext->setToken(new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey));
     }
 
-    protected function fail(EventInterface $event, Request $request, AuthenticationException $authException)
+    private function fail(EventInterface $event, Request $request, AuthenticationException $authException)
     {
         $this->securityContext->setToken(null);
 
@@ -157,9 +135,9 @@ class DigestAuthenticationListener implements ListenerInterface
 
 class DigestData
 {
-    protected $elements;
-    protected $header;
-    protected $nonceExpiryTime;
+    private $elements;
+    private $header;
+    private $nonceExpiryTime;
 
     public function __construct($header)
     {

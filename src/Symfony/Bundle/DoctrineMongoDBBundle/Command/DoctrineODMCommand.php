@@ -85,7 +85,7 @@ abstract class DoctrineODMCommand extends Command
     protected function findBundle($bundleName)
     {
         $foundBundle = false;
-        foreach ($this->application->getKernel()->getBundles() as $bundle) {
+        foreach ($this->getApplication()->getKernel()->getBundles() as $bundle) {
             /* @var $bundle Bundle */
             if (strtolower($bundleName) == strtolower($bundle->getName())) {
                 $foundBundle = $bundle;

@@ -35,7 +35,7 @@ class StringInput extends ArgvInput
     {
         parent::__construct(array(), $definition);
 
-        $this->tokens = $this->tokenize($input);
+        $this->setTokens($this->tokenize($input));
     }
 
     /**
@@ -44,7 +44,7 @@ class StringInput extends ArgvInput
      * @param string $input The input to tokenise
      * @throws \InvalidArgumentException When unable to parse input (should never happen)
      */
-    protected function tokenize($input)
+    private function tokenize($input)
     {
         $input = preg_replace('/(\r\n|\r|\n|\t)/', ' ', $input);
 

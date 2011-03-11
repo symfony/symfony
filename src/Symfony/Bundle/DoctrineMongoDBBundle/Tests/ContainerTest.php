@@ -30,7 +30,7 @@ class ContainerTest extends TestCase
         $container->registerExtension($loader);
 
         $configs = array();
-        $configs[] = array('mappings' => array('YamlBundle' => array()));
+        $configs[] = array('connections' => array('default' => array()), 'document_managers' => array('default' => array('mappings' => array('YamlBundle' => array()))));
         $loader->load($configs, $container);
 
         return $container;

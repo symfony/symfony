@@ -50,5 +50,4 @@ security:
         - { path: /blog/524, role: ROLE_USER, requires_channel: https }
         -
             path: /blog/.*
-            attributes: { _controller: .*\\BlogBundle\\.* }
             role: IS_AUTHENTICATED_ANONYMOUSLY

@@ -2,7 +2,7 @@
 
 namespace Symfony\Tests\Component\Security\Core\User;
 
-use Symfony\Component\Security\Core\Exception\UnsupportedAccountException;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 
@@ -57,47 +57,47 @@ class ChainUserProviderTest extends \PHPUnit_Framework_TestCase
         $provider->loadUserByUsername('foo');
     }
 
-    public function testLoadUserByAccount()
+    public function testloadUser()
     {
         $provider1 = $this->getProvider();
         $provider1
             ->expects($this->once())
-            ->method('loadUserByAccount')
-            ->will($this->throwException(new UnsupportedAccountException('unsupported')))
+            ->method('loadUser')
+            ->will($this->throwException(new UnsupportedUserException('unsupported')))
         ;
 
         $provider2 = $this->getProvider();
         $provider2
             ->expects($this->once())
-            ->method('loadUserByAccount')
+            ->method('loadUser')
             ->will($this->returnValue($account = $this->getAccount()))
         ;
 
         $provider = new ChainUserProvider(array($provider1, $provider2));
-        $this->assertSame($account, $provider->loadUserByAccount($this->getAccount()));
+        $this->assertSame($account, $provider->loadUser($this->getAccount()));
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\UnsupportedAccountException
+     * @expectedException Symfony\Component\Security\Core\Exception\UnsupportedUserException
      */
-    public function testLoadUserByAccountThrowsUnsupportedAccountException()
+    public function testloadUserThrowsUnsupportedUserException()
     {
         $provider1 = $this->getProvider();
         $provider1
             ->expects($this->once())
-            ->method('loadUserByAccount')
-            ->will($this->throwException(new UnsupportedAccountException('unsupported')))
+            ->method('loadUser')
+            ->will($this->throwException(new UnsupportedUserException('unsupported')))
         ;
 
         $provider2 = $this->getProvider();
         $provider2
             ->expects($this->once())
-            ->method('loadUserByAccount')
-            ->will($this->throwException(new UnsupportedAccountException('unsupported')))
+            ->method('loadUser')
+            ->will($this->throwException(new UnsupportedUserException('unsupported')))
         ;
 
         $provider = new ChainUserProvider(array($provider1, $provider2));
-        $provider->loadUserByAccount($this->getAccount());
+        $provider->loadUser($this->getAccount());
     }
 
     public function testSupportsClass()
@@ -146,7 +146,7 @@ class ChainUserProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function getAccount()
     {
-        return $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        return $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
     }
 
     protected function getProvider()

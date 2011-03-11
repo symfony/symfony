@@ -26,7 +26,7 @@ namespace Symfony\Component\Console\Output;
  */
 class StreamOutput extends Output
 {
-    protected $stream;
+    private $stream;
 
     /**
      * Constructor.

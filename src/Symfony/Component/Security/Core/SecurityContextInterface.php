@@ -16,6 +16,6 @@ interface SecurityContextInterface
     const LAST_USERNAME        = '_security.last_username';
 
     function getToken();
-    function setToken(TokenInterface $account);
-    function vote($attributes, $object = null);
+    function setToken(TokenInterface $token);
+    function isGranted($attributes, $object = null);
 }

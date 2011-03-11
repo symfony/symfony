@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Security\Core;
 
-use Symfony\Component\Security\Core\User\AccountInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
@@ -28,10 +28,10 @@ use Symfony\Component\Security\Acl\Voter\FieldVote;
  */
 class SecurityContext implements SecurityContextInterface
 {
-    protected $token;
-    protected $accessDecisionManager;
-    protected $authenticationManager;
-    protected $alwaysAuthenticate;
+    private $token;
+    private $accessDecisionManager;
+    private $authenticationManager;
+    private $alwaysAuthenticate;
 
     /**
      * Constructor.
@@ -45,7 +45,7 @@ class SecurityContext implements SecurityContextInterface
         $this->alwaysAuthenticate = $alwaysAuthenticate;
     }
 
-    public final function vote($attributes, $object = null)
+    public final function isGranted($attributes, $object = null)
     {
         if (null === $this->token) {
             throw new AuthenticationCredentialsNotFoundException('The security context contains no authentication token.');

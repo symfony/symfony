@@ -25,33 +25,15 @@ use Symfony\Component\EventDispatcher\EventInterface;
  */
 class ChannelListener implements ListenerInterface
 {
-    protected $map;
-    protected $authenticationEntryPoint;
-    protected $logger;
+    private $map;
+    private $authenticationEntryPoint;
+    private $logger;
 
     public function __construct(AccessMap $map, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
     {
         $this->map = $map;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
         $this->logger = $logger;
-    }
-
-    /**
-     *
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
     }
 
     /**

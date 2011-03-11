@@ -22,10 +22,10 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class AccessDecisionManager implements AccessDecisionManagerInterface
 {
-    protected $voters;
-    protected $strategy;
-    protected $allowIfAllAbstainDecisions;
-    protected $allowIfEqualGrantedDeniedDecisions;
+    private $voters;
+    private $strategy;
+    private $allowIfAllAbstainDecisions;
+    private $allowIfEqualGrantedDeniedDecisions;
 
     /**
      * Constructor.
@@ -34,8 +34,12 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      * @param string           $strategy                   The vote strategy
      * @param Boolean          $allowIfAllAbstainDecisions Whether to grant access if all voters abstained or not
      */
-    public function __construct(array $voters = array(), $strategy = 'affirmative', $allowIfAllAbstainDecisions = false, $allowIfEqualGrantedDeniedDecisions = true)
+    public function __construct(array $voters, $strategy = 'affirmative', $allowIfAllAbstainDecisions = false, $allowIfEqualGrantedDeniedDecisions = true)
     {
+        if (!$voters) {
+            throw new \InvalidArgumentException('You must at least add one voter.');
+        }
+
         $this->voters = $voters;
         $this->strategy = 'decide'.ucfirst($strategy);
         $this->allowIfAllAbstainDecisions = (Boolean) $allowIfAllAbstainDecisions;
@@ -48,43 +52,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     public function decide(TokenInterface $token, array $attributes, $object = null)
     {
         return $this->{$this->strategy}($token, $attributes, $object);
-    }
-
-    /**
-     * Returns all voters.
-     *
-     * @return VoterInterface[] $voters An array of VoterInterface instances
-     */
-    public function getVoters()
-    {
-        return $this->voters;
-    }
-
-    /**
-     * Sets voters.
-     *
-     * @param VoterInterface[] $voters An array of VoterInterface instances
-     */
-    public function setVoters(array $voters)
-    {
-        if (!count($voters)) {
-            throw new \LogicException('You must have at least one voter.');
-        }
-
-        $this->voters = array();
-        foreach ($voters as $voter) {
-            $this->addVoter($voter);
-        }
-    }
-
-    /**
-     * Adds a voter.
-     *
-     * @param VoterInterface $voter A VoterInterface instance
-     */
-    public function addVoter(VoterInterface $voter)
-    {
-        $this->voters[] = $voter;
     }
 
     /**
@@ -121,7 +88,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      * If all voters abstained from voting, the decision will be based on the
      * allowIfAllAbstainDecisions property value (defaults to false).
      */
-    protected function decideAffirmative(TokenInterface $token, array $attributes, $object = null)
+    private function decideAffirmative(TokenInterface $token, array $attributes, $object = null)
     {
         $deny = 0;
         foreach ($this->voters as $voter) {
@@ -161,7 +128,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      * If all voters abstained from voting, the decision will be based on the
      * allowIfAllAbstainDecisions property value (defaults to false).
      */
-    protected function decideConsensus(TokenInterface $token, array $attributes, $object = null)
+    private function decideConsensus(TokenInterface $token, array $attributes, $object = null)
     {
         $grant = 0;
         $deny = 0;
@@ -208,7 +175,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      * If all voters abstained from voting, the decision will be based on the
      * allowIfAllAbstainDecisions property value (defaults to false).
      */
-    protected function decideUnanimous(TokenInterface $token, array $attributes, $object = null)
+    private function decideUnanimous(TokenInterface $token, array $attributes, $object = null)
     {
         $grant = 0;
         foreach ($attributes as $attribute) {

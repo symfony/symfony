@@ -32,6 +32,6 @@ abstract class Command extends BaseCommand
 
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
-        $this->container = $this->application->getKernel()->getContainer();
+        $this->container = $this->getApplication()->getKernel()->getContainer();
     }
 }

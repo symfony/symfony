@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Provider;
 
-use Symfony\Component\Security\Core\User\AccountInterface;
-use Symfony\Component\Security\Core\User\AccountCheckerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -27,23 +27,23 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 abstract class UserAuthenticationProvider implements AuthenticationProviderInterface
 {
-    protected $hideUserNotFoundExceptions;
-    protected $accountChecker;
-    protected $providerKey;
+    private $hideUserNotFoundExceptions;
+    private $userChecker;
+    private $providerKey;
 
     /**
      * Constructor.
      *
-     * @param AccountCheckerInterface $accountChecker             An AccountCheckerInterface interface
+     * @param UserCheckerInterface $userChecker             An UserCheckerInterface interface
      * @param Boolean                 $hideUserNotFoundExceptions Whether to hide user not found exception or not
      */
-    public function __construct(AccountCheckerInterface $accountChecker, $providerKey, $hideUserNotFoundExceptions = true)
+    public function __construct(UserCheckerInterface $userChecker, $providerKey, $hideUserNotFoundExceptions = true)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
         }
 
-        $this->accountChecker = $accountChecker;
+        $this->userChecker = $userChecker;
         $this->providerKey = $providerKey;
         $this->hideUserNotFoundExceptions = $hideUserNotFoundExceptions;
     }
@@ -57,18 +57,21 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
             return null;
         }
 
-        $username = null === $token->getUser() ? 'NONE_PROVIDED' : (string) $token;
+        $username = $token->getUsername();
+        if (empty($username)) {
+            $username = 'NONE_PROVIDED';
+        }
 
         try {
             $user = $this->retrieveUser($username, $token);
 
-            if (!$user instanceof AccountInterface) {
-                throw new AuthenticationServiceException('retrieveUser() must return an AccountInterface.');
+            if (!$user instanceof UserInterface) {
+                throw new AuthenticationServiceException('retrieveUser() must return an UserInterface.');
             }
 
-            $this->accountChecker->checkPreAuth($user);
+            $this->userChecker->checkPreAuth($user);
             $this->checkAuthentication($user, $token);
-            $this->accountChecker->checkPostAuth($user);
+            $this->userChecker->checkPostAuth($user);
 
             $authenticatedToken = new UsernamePasswordToken($user, $token->getCredentials(), $this->providerKey, $user->getRoles());
             $authenticatedToken->setAttributes($token->getAttributes());
@@ -107,10 +110,10 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
      * Does additional checks on the user and token (like validating the
      * credentials).
      *
-     * @param AccountInterface      $account The retrieved AccountInterface instance
+     * @param UserInterface      $user The retrieved UserInterface instance
      * @param UsernamePasswordToken $token   The UsernamePasswordToken token to be authenticated
      *
      * @throws AuthenticationException if the credentials could not be validated
      */
-    abstract protected function checkAuthentication(AccountInterface $account, UsernamePasswordToken $token);
+    abstract protected function checkAuthentication(UserInterface $user, UsernamePasswordToken $token);
 }

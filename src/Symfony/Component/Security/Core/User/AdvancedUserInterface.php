@@ -12,11 +12,11 @@
 namespace Symfony\Component\Security\Core\User;
 
 /**
- * AdvancedAccountInterface adds status flags to a regular account.
+ * AdvancedUserInterface adds status flags to a regular account.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-interface AdvancedAccountInterface extends AccountInterface
+interface AdvancedUserInterface extends UserInterface
 {
     /**
      * Checks whether the user's account has expired.

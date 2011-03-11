@@ -9,9 +9,11 @@
     <config>
         <orm
             auto-generate-proxy-classes="false"
-            metadata-cache-driver="apc"
+            default-entity-manager="default"
         >
-            <mapping name="YamlBundle" />
+            <entity-manager name="default" metadata-cache-driver="apc">
+                <mapping name="YamlBundle" />
+            </entity-manager>
         </orm>
     </config>
 </srv:container>

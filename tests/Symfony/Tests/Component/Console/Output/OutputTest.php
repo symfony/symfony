@@ -84,13 +84,13 @@ class OutputTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('Unknown output type given (24)', $e->getMessage());
         }
 
-        try {
-            $output->writeln('<bar>foo</bar>');
-            $this->fail('->writeln() throws an \InvalidArgumentException when a style does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->writeln() throws an \InvalidArgumentException when a style does not exist');
-            $this->assertEquals('Unknown style "bar".', $e->getMessage());
-        }
+        $output->clear();
+        $output->write('<bar>foo</bar>');
+        $this->assertEquals('<bar>foo</bar>', $output->output, '->write() do nothing when a style does not exist');
+
+        $output->clear();
+        $output->writeln('<bar>foo</bar>');
+        $this->assertEquals("<bar>foo</bar>\n", $output->output, '->writeln() do nothing when a style does not exist');
     }
 }
 

@@ -198,7 +198,7 @@ abstract class Output implements OutputInterface
         } else {
             // bg=blue;fg=red
             if (!preg_match_all('/([^=]+)=([^;]+)(;|$)/', strtolower($match[1]), $matches, PREG_SET_ORDER)) {
-                throw new \InvalidArgumentException(sprintf('Unknown style "%s".', $match[1]));
+                return $match[0];
             }
 
             $parameters = array();
@@ -235,6 +235,10 @@ abstract class Output implements OutputInterface
      */
     private function replaceEndStyle($match)
     {
+        if (!isset(self::$styles[strtolower($match[1])])) {
+            return $match[0];
+        }
+
         if (!$this->decorated) {
             return '';
         }

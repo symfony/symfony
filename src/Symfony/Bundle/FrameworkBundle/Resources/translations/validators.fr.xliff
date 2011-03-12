@@ -72,7 +72,7 @@
             </trans-unit>
             <trans-unit id="18">
                 <source>This value is too long. It should have {{ limit }} characters or less</source>
-                <target>Cette chaine est trop longue. Elle doit avoir 5 caractères au maximum</target>
+                <target>Cette chaine est trop longue. Elle doit avoir {{ limit }} caractères au maximum</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>This value should be {{ limit }} or more</source>
@@ -80,7 +80,7 @@
             </trans-unit>
             <trans-unit id="20">
                 <source>This value is too short. It should have {{ limit }} characters or more</source>
-                <target>Cette chaine est trop petite. Elle doit avoir {{ limit }} caractères au minimum</target>
+                <target>Cette chaine est trop courte. Elle doit avoir {{ limit }} caractères au minimum</target>
             </trans-unit>
             <trans-unit id="21">
                 <source>This value should not be blank</source>
@@ -116,7 +116,7 @@
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file</source>
-                <target>Le fichier envoyé est trop lourd. Merci d'essayer d'envoyer un fichier plus léger</target>
+                <target>Le fichier envoyé est trop gros. Merci d'essayer d'envoyer un fichier plus petit</target>
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid</source>

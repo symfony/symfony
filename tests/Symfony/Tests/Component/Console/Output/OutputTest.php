@@ -98,6 +98,11 @@ class TestOutput extends Output
 {
     public $output = '';
 
+    public function clear()
+    {
+        $this->output = '';
+    }
+
     public function doWrite($message, $newline)
     {
         $this->output .= $message.($newline ? "\n" : '');

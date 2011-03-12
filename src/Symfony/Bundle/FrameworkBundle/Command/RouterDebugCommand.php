@@ -85,7 +85,7 @@ EOF
         $format  = '%-'.$maxName.'s %-'.$maxMethod.'s %s';
 
         // displays the generated routes
-        $format1  = '%-'.($maxName + 9).'s %-'.($maxMethod + 9).'s %s';
+        $format1  = '%-'.($maxName + 19).'s %-'.($maxMethod + 19).'s %s';
         $output->writeln(sprintf($format1, '<comment>Name</comment>', '<comment>Method</comment>', '<comment>Pattern</comment>'));
         foreach ($routes as $name => $route) {
             $requirements = $route->getRequirements();

@@ -235,7 +235,7 @@ class Application
             '<comment>Options:</comment>',
         );
 
-        foreach ($this->definition->getOptions() as $option) {
+        foreach ($this->getDefinition()->getOptions() as $option) {
             $messages[] = sprintf('  %-29s %s %s',
                 '<info>--'.$option->getName().'</info>',
                 $option->getShortcut() ? '<info>-'.$option->getShortcut().'</info>' : '  ',

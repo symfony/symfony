@@ -34,3 +34,60 @@
     {% endset %}
     {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
 {% endblock %}
+
+{% block menu %}
+<span class="label">
+    <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/config.png') }}" alt="Configuration" /></span>
+    <strong>Config</strong>
+</span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Configuration</h2>
+    <table>
+        <tr>
+            <th>Key</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <th>Symfony version</th>
+            <td>{{ collector.symfonyversion }}</td>
+        </tr>
+        <tr>
+            <th>Application</th>
+            <td>{{ collector.appname }}</td>
+        </tr>
+        <tr>
+            <th>Environment</th>
+            <td>{{ collector.env }}</td>
+        </tr>
+        <tr>
+            <th>Debug</th>
+            <td>{{ collector.debug ? 'enabled' : 'disabled' }}</td>
+        </tr>
+        <tr>
+            <th>PHP version</th>
+            <td>{{ collector.phpversion }}</td>
+        </tr>
+        <tr>
+            <th>Xdebug</th>
+            <td>{{ collector.hasxdebug ? 'enabled' : 'disabled' }}</td>
+        </tr>
+        <tr>
+            <th>PHP acceleration</th>
+            <td>{{ collector.hasaccelerator ? 'enabled' : 'disabled' }}</td>
+        </tr>
+        <tr>
+            <th>XCache</th>
+            <td>{{ collector.hasxcache ? 'enabled' : 'disabled' }}</td>
+        </tr>
+        <tr>
+            <th>APC</th>
+            <td>{{ collector.hasapc ? 'enabled' : 'disabled' }}</td>
+        </tr>
+        <tr>
+            <th>EAccelerator</th>
+            <td>{{ collector.haseaccelerator ? 'enabled' : 'disabled' }}</td>
+        </tr>
+    </table>
+{% endblock %}

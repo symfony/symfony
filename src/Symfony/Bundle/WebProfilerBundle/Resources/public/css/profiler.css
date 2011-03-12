@@ -198,9 +198,9 @@ fieldset
     background:#d1d1d1 url(../images/profiler/bg_submenu.gif) repeat-x 0 0;
 }
 
-.menu_profiler .request,
-.menu_profiler .request a,
-.menu_profiler .request a span.label
+.menu_profiler li:first-child,
+.menu_profiler li:first-child a,
+.menu_profiler li:first-child a span.label
 {
     -moz-border-radius:16px 0 0 0;
     -webkit-border-radius:16px 0 0 0;

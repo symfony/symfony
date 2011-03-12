@@ -30,9 +30,11 @@ class ProfilerController extends ContainerAware
      *
      * @return Response A Response instance
      */
-    public function panelAction($token, $panel = 'request')
+    public function panelAction($token)
     {
         $this->container->get('profiler')->disable();
+
+        $panel = $this->container->get('request')->query->get('panel', 'request');
 
         $profiler = $this->container->get('profiler')->loadFromToken($token);
 

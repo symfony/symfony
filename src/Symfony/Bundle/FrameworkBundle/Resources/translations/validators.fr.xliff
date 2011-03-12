@@ -4,31 +4,31 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false</source>
-                <target>Cette valeur doit-être fausse</target>
+                <target>Cette valeur doit être fausse</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true</source>
-                <target>Cette valeur doit-être vraie</target>
+                <target>Cette valeur doit être vraie</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}</source>
-                <target>Cette valeur doit-être de type {{ type }}</target>
+                <target>Cette valeur doit être de type {{ type }}</target>
             </trans-unit>
             <trans-unit id="4">
                 <source>This value should be blank</source>
-                <target>Cette valeur doit-être vide</target>
+                <target>Cette valeur doit être vide</target>
             </trans-unit>
             <trans-unit id="5">
                 <source>This value should be one of the given choices</source>
-                <target>Cette valeur doit-être l'un des choix proposés</target>
+                <target>Cette valeur doit être l'un des choix proposés</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You should select at least {{ limit }} choices</source>
-                <target>Vous devez sélectionner au moins 5 choix</target>
+                <target>Vous devez sélectionner au moins {{ limit }} choix</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You should select at most {{ limit }} choices</source>
-                <target>Vous devez sélectionner au maximum 5 choix</target>
+                <target>Vous devez sélectionner au maximum {{ limit }} choix</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>The fields {{ fields }} were not expected</source>
@@ -68,7 +68,7 @@
             </trans-unit>
             <trans-unit id="17">
                 <source>This value should be {{ limit }} or less</source>
-                <target>Cette valeur doit-être {{ limit }} ou moins</target>
+                <target>Cette valeur doit être {{ limit }} ou moins</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value is too long. It should have {{ limit }} characters or less</source>
@@ -76,7 +76,7 @@
             </trans-unit>
             <trans-unit id="19">
                 <source>This value should be {{ limit }} or more</source>
-                <target>Cette valeur doit-être {{ limit }} ou plus</target>
+                <target>Cette valeur doit être {{ limit }} ou plus</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>This value is too short. It should have {{ limit }} characters or more</source>
@@ -92,7 +92,7 @@
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should be null</source>
-                <target>Cette valeur doit-être nulle</target>
+                <target>Cette valeur doit être nulle</target>
             </trans-unit>
             <trans-unit id="24">
                 <source>This value is not valid</source>
@@ -108,7 +108,7 @@
             </trans-unit>
             <trans-unit id="27">
                 <source>This value should be instance of class {{ class }}</source>
-                <target>Cette valeur doit-être une instance de la classe {{ class }}</target>
+                <target>Cette valeur doit être une instance de la classe {{ class }}</target>
             </trans-unit>
             <trans-unit id="28">
                 <source>This field group should not contain extra fields</source>

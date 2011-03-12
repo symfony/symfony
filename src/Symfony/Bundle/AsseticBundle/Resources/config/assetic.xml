@@ -20,14 +20,13 @@
         <parameter key="assetic.filter.less.class">Assetic\Filter\LessFilter</parameter>
         <parameter key="assetic.filter.sass.class">Assetic\Filter\Sass\SassFilter</parameter>
         <parameter key="assetic.filter.scss.class">Assetic\Filter\Sass\ScssFilter</parameter>
-        <parameter key="assetic.filter.sprockets.class">Assetic\Filter\SprocketsFilter</parameter>
         <parameter key="assetic.filter.stylus.class">Assetic\Filter\StylusFilter</parameter>
 
         <parameter key="assetic.java_bin">/usr/bin/java</parameter>
         <parameter key="assetic.sass_bin">/usr/bin/sass</parameter>
         <parameter key="assetic.node_bin">/usr/bin/node</parameter>
         <parameter key="assetic.node_paths" type="collection"></parameter>
-        <parameter key="assetic.sprocketize_bin">/usr/bin/sprocketize</parameter>
+        <parameter key="assetic.ruby_bin">/usr/bin/ruby</parameter>
         <parameter key="assetic.coffee_bin">/usr/bin/coffee</parameter>
 
         <parameter key="assetic.cache_dir">%kernel.cache_dir%/assetic</parameter>
@@ -70,11 +69,6 @@
         </service>
         <service id="assetic.filter.google_closure_compiler" class="%assetic.filter.google_closure_compiler_api.class%">
             <tag name="assetic.filter" alias="closure" />
-        </service>
-        <service id="assetic.filter.sprockets" class="%assetic.filter.sprockets.class%">
-            <tag name="assetic.filter" alias="sprockets" />
-            <argument>%assetic.read_from%</argument>
-            <argument>%assetic.sprocketize_bin%</argument>
         </service>
         <service id="assetic.filter.coffee" class="%assetic.filter.coffee.class%">
             <tag name="assetic.filter" alias="coffee" />

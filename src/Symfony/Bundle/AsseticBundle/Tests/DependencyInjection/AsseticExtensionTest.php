@@ -102,6 +102,16 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertSaneContainer($this->getDumpedContainer());
     }
 
+    public function testSprocketsConfig()
+    {
+        $extension = new AsseticExtension();
+        $extension->load(array(array('sprockets' => '/path/to/sprockets/lib')), $this->container);
+
+        $this->assertTrue($this->container->has('assetic.filter.sprockets'), '->load() loads the sprockets filter when a sprockets value is provided');
+
+        $this->assertSaneContainer($this->getDumpedContainer());
+    }
+
     /**
      * @dataProvider getUseControllerKeys
      */

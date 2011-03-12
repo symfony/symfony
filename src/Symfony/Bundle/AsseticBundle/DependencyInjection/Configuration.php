@@ -38,6 +38,7 @@ class Configuration
             ->scalarNode('write_to')->defaultValue('%assetic.read_from%')->end()
             ->scalarNode('closure')->end()
             ->scalarNode('yui')->end()
+            ->scalarNode('sprockets')->end()
             ->scalarNode('default_javascripts_output')->defaultValue('js/*.js')->end()
             ->scalarNode('default_stylesheets_output')->defaultValue('css/*.css')->end()
             ->fixXmlConfig('bundle')

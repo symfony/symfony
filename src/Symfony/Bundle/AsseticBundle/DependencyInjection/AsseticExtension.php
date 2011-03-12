@@ -58,6 +58,11 @@ class AsseticExtension extends Extension
             $loader->load('yui_compressor.xml');
         }
 
+        if (isset($config['sprockets'])) {
+            $container->setParameter('assetic.sprockets_lib', $config['sprockets']);
+            $loader->load('sprockets.xml');
+        }
+
         if ($container->getParameterBag()->resolveValue($container->getParameterBag()->get('assetic.use_controller'))) {
             $loader->load('controller.xml');
             $container->setParameter('assetic.twig_extension.class', '%assetic.twig_extension.dynamic.class%');

@@ -124,7 +124,7 @@
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal</source>
-                <target>Les deux valeurs doivent-être égales</target>
+                <target>Les deux valeurs doivent être égales</target>
             </trans-unit>
         </body>
     </file>

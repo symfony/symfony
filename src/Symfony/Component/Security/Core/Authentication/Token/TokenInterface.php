@@ -22,6 +22,15 @@ use Symfony\Component\Security\Core\User\UserInterface;
 interface TokenInterface extends \Serializable
 {
     /**
+     * Returns a string representation ofthe Token.
+     *
+     * This is only to be used for debugging purposes.
+     *
+     * @return string
+     */
+    function __toString();
+
+    /**
      * Returns the user roles.
      *
      * @return Role[] An array of Role instances.

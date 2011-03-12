@@ -204,4 +204,20 @@ abstract class AbstractToken implements TokenInterface
     {
         $this->attributes[$name] = $value;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function __toString()
+    {
+        $class = get_class($this);
+        $class = substr($class, strrpos($class, '\\')+1);
+
+        $roles = array();
+        foreach ($this->roles as $role) {
+            $roles[] = $role->getRole();
+        }
+
+        return sprintf('%s(user="%s", authenticated=%s, roles="%s")', $class, $this->getUsername(), json_encode($this->authenticated), implode(', ', $roles));
+    }
 }

@@ -181,6 +181,26 @@ abstract class Output implements OutputInterface
     abstract public function doWrite($message, $newline);
 
     /**
+     * Gets regex for a style start.
+     *
+     * @return  string
+     */
+    protected function getStartStyleRegex()
+    {
+        return '#<([a-z][a-z0-9\-_=;]+)>#i';
+    }
+
+    /**
+     * Gets regex for a style end.
+     *
+     * @return  string
+     */
+    protected function getEndStyleRegex()
+    {
+        return '#</([a-z][a-z0-9\-_]*)?>#i';
+    }
+
+    /**
      * Formats a message according to the given styles.
      *
      * @param  string $message The message to style
@@ -189,9 +209,9 @@ abstract class Output implements OutputInterface
      */
     protected function format($message)
     {
-        $message = preg_replace_callback('#<([a-z][a-z0-9\-_=;]+)>#i', array($this, 'replaceStartStyle'), $message);
+        $message = preg_replace_callback($this->getStartStyleRegex(), array($this, 'replaceStartStyle'), $message);
 
-        return preg_replace_callback('#</([a-z][a-z0-9\-_]*)?>#i', array($this, 'replaceEndStyle'), $message);
+        return preg_replace_callback($this->getEndStyleRegex(), array($this, 'replaceEndStyle'), $message);
     }
 
     /**

@@ -560,6 +560,32 @@ class Crawler extends \SplObjectStorage
         return $form;
     }
 
+    static public function xpathLiteral($s)
+    {
+        if (false === strpos($s, "'")) {
+            return sprintf("'%s'", $s);
+        }
+
+        if (false === strpos($s, '"')) {
+            return sprintf('"%s"', $s);
+        }
+
+        $string = $s;
+        $parts = array();
+        while (true) {
+            if (false !== $pos = strpos($string, "'")) {
+                $parts[] = sprintf("'%s'", substr($string, 0, $pos));
+                $parts[] = "\"'\"";
+                $string = substr($string, $pos + 1);
+            } else {
+                $parts[] = "'$string'";
+                break;
+            }
+        }
+
+        return sprintf("concat(%s)", implode($parts, ', '));
+    }
+
     private function getNode($position)
     {
         foreach ($this as $i => $node) {
@@ -595,31 +621,5 @@ class Crawler extends \SplObjectStorage
         } while ($node = $node->$siblingDir);
 
         return $nodes;
-    }
-
-    static public function xpathLiteral($s)
-    {
-        if (false === strpos($s, "'")) {
-            return sprintf("'%s'", $s);
-        }
-
-        if (false === strpos($s, '"')) {
-            return sprintf('"%s"', $s);
-        }
-
-        $string = $s;
-        $parts = array();
-        while (true) {
-            if (false !== $pos = strpos($string, "'")) {
-                $parts[] = sprintf("'%s'", substr($string, 0, $pos));
-                $parts[] = "\"'\"";
-                $string = substr($string, $pos + 1);
-            } else {
-                $parts[] = "'$string'";
-                break;
-            }
-        }
-
-        return sprintf("concat(%s)", implode($parts, ', '));
     }
 }

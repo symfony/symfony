@@ -69,6 +69,22 @@ abstract class Output implements OutputInterface
     }
 
     /**
+     * Gets style options from style with specified name.
+     *
+     * @param   string  $name
+     *
+     * @return  array
+     */
+    static public function getStyle($name)
+    {
+        if (!isset(self::$styles[strtolower($name)])) {
+            throw new \InvalidArgumentException('Undefined style: ' . $name);
+        }
+
+        return self::$styles[strtolower($name)];
+    }
+
+    /**
      * Sets the decorated flag.
      *
      * @param Boolean $decorated Whether to decorated the messages or not

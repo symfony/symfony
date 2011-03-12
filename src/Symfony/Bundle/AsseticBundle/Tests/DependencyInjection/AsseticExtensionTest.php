@@ -92,6 +92,16 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertSaneContainer($this->getDumpedContainer());
     }
 
+    public function testClosureConfig()
+    {
+        $extension = new AsseticExtension();
+        $extension->load(array(array('closure' => '/path/to/closure.jar')), $this->container);
+
+        $this->assertTrue($this->container->has('assetic.filter.closure'), '->load() loads the closure filter when a closure value is provided');
+
+        $this->assertSaneContainer($this->getDumpedContainer());
+    }
+
     /**
      * @dataProvider getUseControllerKeys
      */

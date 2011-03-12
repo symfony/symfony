@@ -185,7 +185,7 @@ abstract class Output implements OutputInterface
      *
      * @return  string
      */
-    protected function getStartStyleRegex()
+    protected function getBeginStyleRegex()
     {
         return '#<([a-z][a-z0-9\-_=;]+)>#i';
     }
@@ -209,7 +209,7 @@ abstract class Output implements OutputInterface
      */
     protected function format($message)
     {
-        $message = preg_replace_callback($this->getStartStyleRegex(), array($this, 'replaceStartStyle'), $message);
+        $message = preg_replace_callback($this->getBeginStyleRegex(), array($this, 'replaceBeginStyle'), $message);
 
         return preg_replace_callback($this->getEndStyleRegex(), array($this, 'replaceEndStyle'), $message);
     }
@@ -223,7 +223,7 @@ abstract class Output implements OutputInterface
      *
      * @throws \InvalidArgumentException When style is unknown
      */
-    private function replaceStartStyle($match)
+    private function replaceBeginStyle($match)
     {
         if (!$this->decorated) {
             return '';

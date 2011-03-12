@@ -69,6 +69,22 @@ abstract class Output implements OutputInterface
     }
 
     /**
+     * Gets style options from style with specified name.
+     *
+     * @param   string  $name
+     *
+     * @return  array
+     */
+    static public function getStyle($name)
+    {
+        if (!isset(self::$styles[strtolower($name)])) {
+            throw new \InvalidArgumentException('Undefined style: ' . $name);
+        }
+
+        return self::$styles[strtolower($name)];
+    }
+
+    /**
      * Sets the decorated flag.
      *
      * @param Boolean $decorated Whether to decorated the messages or not
@@ -165,6 +181,26 @@ abstract class Output implements OutputInterface
     abstract public function doWrite($message, $newline);
 
     /**
+     * Gets regex for a style start.
+     *
+     * @return  string
+     */
+    protected function getBeginStyleRegex()
+    {
+        return '#<([a-z][a-z0-9\-_=;]+)>#i';
+    }
+
+    /**
+     * Gets regex for a style end.
+     *
+     * @return  string
+     */
+    protected function getEndStyleRegex()
+    {
+        return '#</([a-z][a-z0-9\-_]*)?>#i';
+    }
+
+    /**
      * Formats a message according to the given styles.
      *
      * @param  string $message The message to style
@@ -173,9 +209,9 @@ abstract class Output implements OutputInterface
      */
     protected function format($message)
     {
-        $message = preg_replace_callback('#<([a-z][a-z0-9\-_=;]+)>#i', array($this, 'replaceStartStyle'), $message);
+        $message = preg_replace_callback($this->getBeginStyleRegex(), array($this, 'replaceBeginStyle'), $message);
 
-        return preg_replace_callback('#</([a-z][a-z0-9\-_]*)?>#i', array($this, 'replaceEndStyle'), $message);
+        return preg_replace_callback($this->getEndStyleRegex(), array($this, 'replaceEndStyle'), $message);
     }
 
     /**
@@ -187,7 +223,7 @@ abstract class Output implements OutputInterface
      *
      * @throws \InvalidArgumentException When style is unknown
      */
-    private function replaceStartStyle($match)
+    private function replaceBeginStyle($match)
     {
         if (!$this->decorated) {
             return '';

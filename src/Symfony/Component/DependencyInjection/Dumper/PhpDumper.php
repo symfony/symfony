@@ -39,11 +39,11 @@ class PhpDumper extends Dumper
      */
     const NON_FIRST_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789_';
 
-    protected $inlinedDefinitions;
-    protected $definitionVariables;
-    protected $referenceVariables;
-    protected $variableCount;
-    protected $reservedVariables = array('instance', 'class');
+    private $inlinedDefinitions;
+    private $definitionVariables;
+    private $referenceVariables;
+    private $variableCount;
+    private $reservedVariables = array('instance', 'class');
 
     /**
      * {@inheritDoc}
@@ -97,7 +97,7 @@ class PhpDumper extends Dumper
      *
      * @return string
      */
-    protected function addInterfaceInjectors()
+    private function addInterfaceInjectors()
     {
         if ($this->container->isFrozen() || 0 === count($this->container->getInterfaceInjectors())) {
             return;
@@ -138,7 +138,7 @@ EOF;
      * @param string $definition
      * @return string
      */
-    protected function addServiceLocalTempVariables($cId, $definition)
+    private function addServiceLocalTempVariables($cId, $definition)
     {
         static $template = "        \$%s = %s;\n";
 
@@ -186,7 +186,7 @@ EOF;
      * @param Definition $definition
      * @return string
      */
-    protected function addServiceInclude($id, $definition)
+    private function addServiceInclude($id, $definition)
     {
         $template = "        require_once %s;\n";
         $code = '';
@@ -215,7 +215,7 @@ EOF;
      * @param Definition $definition
      * @return string
      */
-    protected function addServiceInlinedDefinitions($id, $definition)
+    private function addServiceInlinedDefinitions($id, $definition)
     {
         $code = '';
         $variableMap = $this->definitionVariables;
@@ -293,7 +293,7 @@ EOF;
      * @param Definition $definition
      * @return string
      */
-    protected function addServiceReturn($id, $definition)
+    private function addServiceReturn($id, $definition)
     {
         if ($this->isSimpleInstance($id, $definition)) {
             return "    }\n";
@@ -312,7 +312,7 @@ EOF;
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    protected function addServiceInstance($id, $definition)
+    private function addServiceInstance($id, $definition)
     {
         $class = $this->dumpValue($definition->getClass());
 
@@ -371,7 +371,7 @@ EOF;
      * @param Definition $definition
      * @return boolean
      */
-    protected function isSimpleInstance($id, $definition)
+    private function isSimpleInstance($id, $definition)
     {
         foreach (array_merge(array($definition), $this->getInlinedDefinitions($definition)) as $sDefinition) {
             if ($definition !== $sDefinition && !$this->hasReference($id, $sDefinition->getMethodCalls())) {
@@ -394,7 +394,7 @@ EOF;
      * @param string $variableName
      * @return string
      */
-    protected function addServiceMethodCalls($id, $definition, $variableName = 'instance')
+    private function addServiceMethodCalls($id, $definition, $variableName = 'instance')
     {
         $calls = '';
         foreach ($definition->getMethodCalls() as $call) {
@@ -413,7 +413,7 @@ EOF;
         return $calls;
     }
 
-    protected function addServiceProperties($id, $definition, $variableName = 'instance')
+    private function addServiceProperties($id, $definition, $variableName = 'instance')
     {
         $code = '';
         foreach ($definition->getProperties() as $name => $value) {
@@ -432,7 +432,7 @@ EOF;
      * @param Definition $definition
      * @return string
      */
-    protected function addServiceInlinedDefinitionsSetup($id, $definition)
+    private function addServiceInlinedDefinitionsSetup($id, $definition)
     {
         $this->referenceVariables[$id] = new Variable('instance');
 
@@ -471,7 +471,7 @@ EOF;
      * @param string $variableName
      * @return string
      */
-    protected function addServiceConfigurator($id, $definition, $variableName = 'instance')
+    private function addServiceConfigurator($id, $definition, $variableName = 'instance')
     {
         if (!$callable = $definition->getConfigurator()) {
             return '';
@@ -495,7 +495,7 @@ EOF;
      * @param Definition $definition
      * @return string
      */
-    protected function addService($id, $definition)
+    private function addService($id, $definition)
     {
         $name = Container::camelize($id);
         $this->definitionVariables = new \SplObjectStorage();
@@ -585,7 +585,7 @@ EOF;
      * @param string $id
      * @return string
      */
-    protected function addServiceAlias($alias, $id)
+    private function addServiceAlias($alias, $id)
     {
         $name = Container::camelize($alias);
         $type = 'Object';
@@ -615,7 +615,7 @@ EOF;
      *
      * @return string
      */
-    protected function addServices()
+    private function addServices()
     {
         $publicServices = $privateServices = $aliasServices = '';
         $definitions = $this->container->getDefinitions();
@@ -644,7 +644,7 @@ EOF;
      * @param string $baseClass The name of the base class
      * @return string
      */
-    protected function startClass($class, $baseClass)
+    private function startClass($class, $baseClass)
     {
         $bagClass = $this->container->isFrozen() ? '' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
 
@@ -673,7 +673,7 @@ EOF;
      *
      * @return string
      */
-    protected function addConstructor()
+    private function addConstructor()
     {
         $code = <<<EOF
 
@@ -705,7 +705,7 @@ EOF;
      *
      * @return string
      */
-    protected function addFrozenConstructor()
+    private function addFrozenConstructor()
     {
         $code = <<<EOF
 
@@ -746,7 +746,7 @@ EOF;
      *
      * @return string
      */
-    protected function addDefaultParametersMethod()
+    private function addDefaultParametersMethod()
     {
         if (!$this->container->getParameterBag()->all()) {
             return '';
@@ -814,7 +814,7 @@ EOF;
      * @param integer $indent
      * @return string
      */
-    protected function exportParameters($parameters, $indent = 12)
+    private function exportParameters($parameters, $indent = 12)
     {
         $php = array();
         foreach ($parameters as $key => $value) {
@@ -841,7 +841,7 @@ EOF;
      *
      * @return void
      */
-    protected function endClass()
+    private function endClass()
     {
         return <<<EOF
 }
@@ -856,7 +856,7 @@ EOF;
      * @param string $code
      * @return string
      */
-    protected function wrapServiceConditionals($value, $code)
+    private function wrapServiceConditionals($value, $code)
     {
         if (!$services = ContainerBuilder::getServiceConditionals($value)) {
             return $code;
@@ -881,7 +881,7 @@ EOF;
      * @param string $behavior By reference
      * @return void
      */
-    protected function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior)
+    private function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior)
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
@@ -909,7 +909,7 @@ EOF;
      * @param Definition $definition
      * @return string
      */
-    protected function getInlinedDefinitions(Definition $definition)
+    private function getInlinedDefinitions(Definition $definition)
     {
         if (false === $this->inlinedDefinitions->contains($definition)) {
             $definitions = array_merge(
@@ -932,7 +932,7 @@ EOF;
      * @param array $arguments
      * @return array
      */
-    protected function getDefinitionsFromArguments(array $arguments)
+    private function getDefinitionsFromArguments(array $arguments)
     {
         $definitions = array();
         foreach ($arguments as $argument) {
@@ -957,7 +957,7 @@ EOF;
      * @param array $arguments
      * @return boolean
      */
-    protected function hasReference($id, array $arguments)
+    private function hasReference($id, array $arguments)
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
@@ -981,7 +981,7 @@ EOF;
      * @param boolean $interpolate
      * @return string
      */
-    protected function dumpValue($value, $interpolate = true)
+    private function dumpValue($value, $interpolate = true)
     {
         if (is_array($value)) {
             $code = array();
@@ -1080,7 +1080,7 @@ EOF;
      * @param Reference $reference
      * @return string
      */
-    protected function getServiceCall($id, Reference $reference = null)
+    private function getServiceCall($id, Reference $reference = null)
     {
         if ('service_container' === $id) {
             return '$this';
@@ -1102,7 +1102,7 @@ EOF;
      *
      * @return string
      */
-    protected function getNextVariableName()
+    private function getNextVariableName()
     {
         $firstChars = self::FIRST_CHARS;
         $firstCharsLength = strlen($firstChars);

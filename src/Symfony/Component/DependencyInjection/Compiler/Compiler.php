@@ -21,11 +21,11 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
  */
 class Compiler
 {
-    protected $passConfig;
-    protected $currentPass;
-    protected $currentStartTime;
-    protected $log;
-    protected $serviceReferenceGraph;
+    private $passConfig;
+    private $currentPass;
+    private $currentStartTime;
+    private $log;
+    private $serviceReferenceGraph;
 
     /**
      * Constructor.
@@ -107,7 +107,7 @@ class Compiler
      *
      * @param CompilerPassInterface $pass The pass to start
      */
-    protected function startPass(CompilerPassInterface $pass)
+    private function startPass(CompilerPassInterface $pass)
     {
         $this->currentPass = $pass;
         $this->currentStartTime = microtime(true);
@@ -118,7 +118,7 @@ class Compiler
      *
      * @param CompilerPassInterface $pass The compiler pass
      */
-    protected function endPass(CompilerPassInterface $pass)
+    private function endPass(CompilerPassInterface $pass)
     {
         $this->currentPass = null;
         $this->addLogMessage(sprintf('%s finished in %.3fs', get_class($pass), microtime(true) - $this->currentStartTime));

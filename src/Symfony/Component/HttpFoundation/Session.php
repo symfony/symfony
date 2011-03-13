@@ -223,6 +223,7 @@ class Session implements \Serializable
         }
 
         $this->attributes['_flash'] = $values;
+        $this->oldFlashes = array();
     }
 
     public function getFlash($name, $default = null)
@@ -242,27 +243,42 @@ class Session implements \Serializable
 
     public function hasFlash($name)
     {
+        if (false === $this->started) {
+            $this->start();
+        }
+
         return array_key_exists($name, $this->attributes['_flash']);
     }
 
     public function removeFlash($name)
     {
+        if (false === $this->started) {
+            $this->start();
+        }
+
         unset($this->attributes['_flash'][$name]);
     }
 
     public function clearFlashes()
     {
+        if (false === $this->started) {
+            $this->start();
+        }
+
         $this->attributes['_flash'] = array();
+        $this->oldFlashes = array();
     }
 
     public function save()
     {
-        if (true === $this->started) {
-            if (isset($this->attributes['_flash'])) {
-                $this->attributes['_flash'] = array_diff_key($this->attributes['_flash'], $this->oldFlashes);
-            }
-            $this->storage->write('_symfony2', $this->attributes);
+        if (false === $this->started) {
+            $this->start();
         }
+
+        if (isset($this->attributes['_flash'])) {
+            $this->attributes['_flash'] = array_diff_key($this->attributes['_flash'], $this->oldFlashes);
+        }
+        $this->storage->write('_symfony2', $this->attributes);
     }
 
     public function __destruct()

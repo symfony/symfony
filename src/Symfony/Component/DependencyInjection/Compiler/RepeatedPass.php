@@ -20,8 +20,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class RepeatedPass implements CompilerPassInterface
 {
-    protected $repeat;
-    protected $passes;
+    private $repeat;
+    private $passes;
 
     /**
      * Constructor.

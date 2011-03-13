@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
 {
-    protected $parameterBag;
+    private $parameterBag;
 
     /**
      * Processes the ContainerBuilder to resolve parameter placeholders.
@@ -70,7 +70,7 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
      * @param mixed $value The value to resolve
      * @return mixed The resolved value
      */
-    protected function resolveValue($value)
+    private function resolveValue($value)
     {
         if (is_array($value)) {
             $resolved = array();

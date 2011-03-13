@@ -20,10 +20,10 @@ use Symfony\Component\CssSelector\Parser as CssParser;
  */
 class Crawler extends \SplObjectStorage
 {
-    protected $uri;
-    protected $host;
-    protected $path;
-    protected $base;
+    private $uri;
+    private $host;
+    private $path;
+    private $base;
 
     /**
      * Constructor.
@@ -560,43 +560,6 @@ class Crawler extends \SplObjectStorage
         return $form;
     }
 
-    protected function getNode($position)
-    {
-        foreach ($this as $i => $node) {
-            if ($i == $position) {
-                return $node;
-            }
-        // @codeCoverageIgnoreStart
-        }
-
-        return null;
-        // @codeCoverageIgnoreEnd
-    }
-
-    protected function parseUri($uri)
-    {
-        if ('http' !== substr($uri, 0, 4)) {
-            return array(null, '/');
-        }
-
-        $path = parse_url($uri, PHP_URL_PATH);
-
-        return array(preg_replace('#^(.*?//[^/]+)\/.*$#', '$1', $uri), $path);
-    }
-
-    protected function sibling($node, $siblingDir = 'nextSibling')
-    {
-        $nodes = array();
-
-        do {
-            if ($node !== $this->getNode(0) && $node->nodeType === 1) {
-                $nodes[] = $node;
-            }
-        } while ($node = $node->$siblingDir);
-
-        return $nodes;
-    }
-
     static public function xpathLiteral($s)
     {
         if (false === strpos($s, "'")) {
@@ -621,5 +584,42 @@ class Crawler extends \SplObjectStorage
         }
 
         return sprintf("concat(%s)", implode($parts, ', '));
+    }
+
+    private function getNode($position)
+    {
+        foreach ($this as $i => $node) {
+            if ($i == $position) {
+                return $node;
+            }
+        // @codeCoverageIgnoreStart
+        }
+
+        return null;
+        // @codeCoverageIgnoreEnd
+    }
+
+    private function parseUri($uri)
+    {
+        if ('http' !== substr($uri, 0, 4)) {
+            return array(null, '/');
+        }
+
+        $path = parse_url($uri, PHP_URL_PATH);
+
+        return array(preg_replace('#^(.*?//[^/]+)\/.*$#', '$1', $uri), $path);
+    }
+
+    private function sibling($node, $siblingDir = 'nextSibling')
+    {
+        $nodes = array();
+
+        do {
+            if ($node !== $this->getNode(0) && $node->nodeType === 1) {
+                $nodes[] = $node;
+            }
+        } while ($node = $node->$siblingDir);
+
+        return $nodes;
     }
 }

@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ResolveDefinitionTemplatesPass implements CompilerPassInterface
 {
-    protected $container;
+    private $container;
 
     /**
      * Process the ContainerBuilder to replace DefinitionDecorator instances with their real Definition instances.
@@ -43,7 +43,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
      * @param DefinitionDecorator $definition
      * @return Definition
      */
-    protected function resolveDefinition($id, DefinitionDecorator $definition)
+    private function resolveDefinition($id, DefinitionDecorator $definition)
     {
         if (!$this->container->hasDefinition($parent = $definition->getParent())) {
             throw new \RuntimeException(sprintf('The parent definition "%s" defined for definition "%s" does not exist.', $parent, $id));

@@ -125,6 +125,11 @@ class ProfilerController extends ContainerAware
      */
     public function toolbarAction($token, $position = null)
     {
+        $request = $this->container->get('request');
+
+        // keep current flashes for one more request
+        $request->getSession()->setFlashes($request->getSession()->getFlashes());
+
         if (null === $token) {
             return new Response();
         }

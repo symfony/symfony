@@ -52,7 +52,13 @@ class ConfigDataCollector extends DataCollector
             'eaccel_enabled'  => extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'),
             'apc_enabled'     => extension_loaded('apc') && ini_get('apc.enabled'),
             'xcache_enabled'  => extension_loaded('xcache') && ini_get('xcache.cacher'),
+            'bundles'         => array(),
         );
+
+        foreach ($this->kernel->getBundles() as $name => $bundle) {
+            $this->data['bundles'][$name] = $bundle->getPath();
+        }
+
     }
 
     /**
@@ -163,6 +169,11 @@ class ConfigDataCollector extends DataCollector
     public function hasAccelerator()
     {
         return $this->hasApc() || $this->hasEAccelerator() || $this->hasXCache();
+    }
+
+    public function getBundles()
+    {
+        return $this->data['bundles'];
     }
 
     /**

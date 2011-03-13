@@ -80,7 +80,7 @@ tr
 table
 {
     width:100%;
-    margin:10px 0 60px;
+    margin:10px 0 30px;
 }
 
 table th
@@ -137,7 +137,7 @@ fieldset
 
 #header
 {
-    padding:30px 30px 20px 30px;
+    padding:30px 30px 20px;
 }
 
 #header h1
@@ -347,7 +347,7 @@ ul.alt li.error {
     margin-bottom: 1px;
 }
 
-td#main, td.menu {
+td.main, td.menu {
     text-align: left;
     margin: 0;
     padding: 0;

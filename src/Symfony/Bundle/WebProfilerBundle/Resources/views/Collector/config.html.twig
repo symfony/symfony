@@ -43,7 +43,7 @@
 {% endblock %}
 
 {% block panel %}
-    <h2>Configuration</h2>
+    <h2>Project Configuration</h2>
     <table>
         <tr>
             <th>Key</th>
@@ -54,7 +54,7 @@
             <td>{{ collector.symfonyversion }}</td>
         </tr>
         <tr>
-            <th>Application</th>
+            <th>Application name</th>
             <td>{{ collector.appname }}</td>
         </tr>
         <tr>
@@ -64,6 +64,14 @@
         <tr>
             <th>Debug</th>
             <td>{{ collector.debug ? 'enabled' : 'disabled' }}</td>
+        </tr>
+    </table>
+
+    <h2>PHP configuration</h2>
+    <table>
+        <tr>
+            <th>Key</th>
+            <th>Value</th>
         </tr>
         <tr>
             <th>PHP version</th>
@@ -90,4 +98,19 @@
             <td>{{ collector.haseaccelerator ? 'enabled' : 'disabled' }}</td>
         </tr>
     </table>
+
+    <h2>Active bundles</h2>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Path</th>
+        </tr>
+        {% for name, path in collector.bundles %}
+        <tr>
+            <th>{{ name }}</th>
+            <td>{{ path }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
 {% endblock %}

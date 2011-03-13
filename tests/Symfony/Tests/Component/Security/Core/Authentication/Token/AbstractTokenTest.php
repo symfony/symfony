@@ -57,8 +57,8 @@ class AbstractTokenTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::serialize
-     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::unserialize
+     * @covers Symfony\Component\Security\Core\Authentication\Token\AbstractToken::serialize
+     * @covers Symfony\Component\Security\Core\Authentication\Token\AbstractToken::unserialize
      */
     public function testSerialize()
     {
@@ -72,7 +72,7 @@ class AbstractTokenTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::__construct
+     * @covers Symfony\Component\Security\Core\Authentication\Token\AbstractToken::__construct
      */
     public function testConstructor()
     {
@@ -87,8 +87,8 @@ class AbstractTokenTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::isAuthenticated
-     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::setAuthenticated
+     * @covers Symfony\Component\Security\Core\Authentication\Token\AbstractToken::isAuthenticated
+     * @covers Symfony\Component\Security\Core\Authentication\Token\AbstractToken::setAuthenticated
      */
     public function testAuthenticatedFlag()
     {
@@ -103,11 +103,11 @@ class AbstractTokenTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::getAttributes
-     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::setAttributes
-     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::hasAttribute
-     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::getAttribute
-     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::setAttribute
+     * @covers Symfony\Component\Security\Core\Authentication\Token\AbstractToken::getAttributes
+     * @covers Symfony\Component\Security\Core\Authentication\Token\AbstractToken::setAttributes
+     * @covers Symfony\Component\Security\Core\Authentication\Token\AbstractToken::hasAttribute
+     * @covers Symfony\Component\Security\Core\Authentication\Token\AbstractToken::getAttribute
+     * @covers Symfony\Component\Security\Core\Authentication\Token\AbstractToken::setAttribute
      */
     public function testAttributes()
     {

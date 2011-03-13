@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\Debug;
 
-use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,9 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * ExceptionListener.
  *
- * The handle method must be connected to the core.exception event.
- *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class ExceptionListener
 {
@@ -36,7 +34,7 @@ class ExceptionListener
         $this->logger = $logger;
     }
 
-    public function handle(EventInterface $event)
+    public function onCoreException(GetResponseForExceptionEvent $event)
     {
         static $handling;
 
@@ -46,8 +44,8 @@ class ExceptionListener
 
         $handling = true;
 
-        $exception = $event->get('exception');
-        $request = $event->get('request');
+        $exception = $event->getException();
+        $request = $event->getRequest();
 
         if (null !== $this->logger) {
             $this->logger->err(sprintf('%s: %s (uncaught exception)', get_class($exception), $exception->getMessage()));
@@ -68,7 +66,7 @@ class ExceptionListener
         $request = $request->duplicate(null, null, $attributes);
 
         try {
-            $response = $event->getSubject()->handle($request, HttpKernelInterface::SUB_REQUEST, true);
+            $response = $event->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, true);
         } catch (\Exception $e) {
             $message = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage());
             if (null !== $this->logger) {
@@ -77,14 +75,15 @@ class ExceptionListener
                 error_log($message);
             }
 
+            // set handling to false otherwise it wont be able to handle further more
+            $handling = false;
+
             // re-throw the exception as this is a catch-all
             throw $exception;
         }
 
-        $event->setProcessed();
+        $event->setResponse($response);
 
         $handling = false;
-
-        return $response;
     }
 }

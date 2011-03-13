@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Input;
 /**
  * Represents a command line argument.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class InputArgument
 {
@@ -22,10 +22,10 @@ class InputArgument
     const OPTIONAL = 2;
     const IS_ARRAY = 4;
 
-    protected $name;
-    protected $mode;
-    protected $default;
-    protected $description;
+    private $name;
+    private $mode;
+    private $default;
+    private $description;
 
     /**
      * Constructor.

@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -28,7 +28,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 /**
  * Load data fixtures from bundles.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class LoadDataFixturesDoctrineCommand extends DoctrineCommand
@@ -68,7 +68,7 @@ EOT
             $paths = is_array($dirOrFile) ? $dirOrFile : array($dirOrFile);
         } else {
             $paths = array();
-            foreach ($this->application->getKernel()->getBundles() as $bundle) {
+            foreach ($this->getApplication()->getKernel()->getBundles() as $bundle) {
                 $paths[] = $bundle->getPath().'/DataFixtures/ORM';
             }
         }

@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -98,7 +98,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('service_container', 'foo', 'bar'), $sc->getServiceIds(), '->getServiceIds() returns all defined service ids');
 
         $sc = new ProjectServiceContainer();
-        $this->assertEquals(array('scoped', 'scoped_foo', 'bar', 'foo_bar', 'foo.baz', 'circular', 'service_container'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods');
+        $this->assertEquals(array('scoped', 'scoped_foo', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'service_container'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods');
     }
 
     /**
@@ -337,6 +337,25 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($c->isScopeActive('foo'));
     }
 
+    public function testGetThrowsException()
+    {
+        $c = new ProjectServiceContainer();
+
+        try {
+            $c->get('throw_exception');
+            $this->fail();
+        } catch (\Exception $e) {
+            $this->assertEquals('Something went terribly wrong!', $e->getMessage());
+        }
+
+        try {
+            $c->get('throw_exception');
+            $this->fail();
+        } catch (\Exception $e) {
+            $this->assertEquals('Something went terribly wrong!', $e->getMessage());
+        }
+    }
+
     public function getInvalidParentScopes()
     {
         return array(
@@ -411,5 +430,10 @@ class ProjectServiceContainer extends Container
     protected function getCircularService()
     {
         return $this->get('circular');
+    }
+
+    protected function getThrowExceptionService()
+    {
+        throw new \Exception('Something went terribly wrong!');
     }
 }

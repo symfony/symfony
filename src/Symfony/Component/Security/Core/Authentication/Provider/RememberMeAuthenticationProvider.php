@@ -1,21 +1,21 @@
 <?php
 namespace Symfony\Component\Security\Core\Authentication\Provider;
 
-use Symfony\Component\Security\Core\User\AccountCheckerInterface;
-use Symfony\Component\Security\Core\User\AccountInterface;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 class RememberMeAuthenticationProvider implements AuthenticationProviderInterface
 {
-    protected $accountChecker;
-    protected $key;
-    protected $providerKey;
+    private $userChecker;
+    private $key;
+    private $providerKey;
 
-    public function __construct(AccountCheckerInterface $accountChecker, $key, $providerKey)
+    public function __construct(UserCheckerInterface $userChecker, $key, $providerKey)
     {
-        $this->accountChecker = $accountChecker;
+        $this->userChecker = $userChecker;
         $this->key = $key;
         $this->providerKey = $providerKey;
     }
@@ -31,11 +31,12 @@ class RememberMeAuthenticationProvider implements AuthenticationProviderInterfac
         }
 
         $user = $token->getUser();
-        $this->accountChecker->checkPreAuth($user);
-        $this->accountChecker->checkPostAuth($user);
-        $token->setAuthenticated(true);
+        $this->userChecker->checkPostAuth($user);
 
-        return $token;
+        $authenticatedToken = new RememberMeToken($user, $this->providerKey, $this->key);
+        $authenticatedToken->setAttributes($token->getAttributes());
+
+        return $authenticatedToken;
     }
 
     public function supports(TokenInterface $token)

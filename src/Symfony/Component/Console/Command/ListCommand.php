@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -21,7 +21,7 @@ use Symfony\Component\Console\Command\Command;
 /**
  * ListCommand displays the list of all available commands for the application.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class ListCommand extends Command
 {
@@ -59,9 +59,9 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if ($input->getOption('xml')) {
-            $output->writeln($this->application->asXml($input->getArgument('namespace')), Output::OUTPUT_RAW);
+            $output->writeln($this->getApplication()->asXml($input->getArgument('namespace')), Output::OUTPUT_RAW);
         } else {
-            $output->writeln($this->application->asText($input->getArgument('namespace')));
+            $output->writeln($this->getApplication()->asText($input->getArgument('namespace')));
         }
     }
 }

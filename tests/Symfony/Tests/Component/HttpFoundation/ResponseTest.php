@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -118,6 +118,14 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertLessThan(1, 60 - $response->getTtl(), '->getTtl() uses Cache-Control max-age when present');
     }
 
+    public function testSetClientTtl()
+    {
+        $response = new Response();
+        $response->setClientTtl(10);
+
+        $this->assertEquals($response->getMaxAge(), $response->getAge() + 10);
+    }
+
     public function testGetVary()
     {
         $response = new Response();
@@ -134,6 +142,19 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response = new Response();
         $response->headers->set('Vary', 'Accept-Language,User-Agent,    X-Foo');
         $this->assertEquals(array('Accept-Language', 'User-Agent', 'X-Foo'), $response->getVary(), '->getVary() parses multiple header name values separated by commas');
+    }
+
+    public function testSetVary()
+    {
+        $response = new Response();
+        $response->setVary('Accept-Language');
+        $this->assertEquals(array('Accept-Language'), $response->getVary());
+
+        $response->setVary('Accept-Language, User-Agent');
+        $this->assertEquals(array('Accept-Language', 'User-Agent'), $response->getVary(), '->setVary() replace the vary header by default');
+
+        $response->setVary('X-Foo', false);
+        $this->assertEquals(array('Accept-Language', 'User-Agent'), $response->getVary(), '->setVary() doesn\'t change the Vary header if replace is set to false');
     }
 
     public function testDefaultContentType()
@@ -156,6 +177,216 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response->setCharset('Foo');
         // verify second set()
         $response->__toString();
+    }
+
+    public function testSetCache()
+    {
+        $response = new Response();
+        //array('etag', 'last_modified', 'max_age', 's_maxage', 'private', 'public')
+        try {
+            $response->setCache(array("wrong option" => "value"));
+            $this->fail('->setCache() throws an InvalidArgumentException if an option is not supported');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('InvalidArgumentException', $e, '->setCache() throws an InvalidArgumentException if an option is not supported');
+        }
+
+        $options = array('etag' => '"whatever"');
+        $response->setCache($options);
+        $this->assertEquals($response->getEtag(), '"whatever"');
+
+        $now = new \DateTime();
+        $options = array('last_modified' => $now);
+        $response->setCache($options);
+        $this->assertEquals($response->getLastModified()->getTimestamp(), $now->getTimestamp());
+
+        $options = array('max_age' => 100);
+        $response->setCache($options);
+        $this->assertEquals($response->getMaxAge(), 100);
+
+        $options = array('s_maxage' => 200);
+        $response->setCache($options);
+        $this->assertEquals($response->getMaxAge(), 200);
+
+        $this->assertFalse($response->headers->hasCacheControlDirective('public'));
+        $this->assertFalse($response->headers->hasCacheControlDirective('private'));
+
+        $response->setCache(array('public' => true));
+        $this->assertTrue($response->headers->hasCacheControlDirective('public'));
+        $this->assertFalse($response->headers->hasCacheControlDirective('private'));
+
+        $response->setCache(array('public' => false));
+        $this->assertFalse($response->headers->hasCacheControlDirective('public'));
+        $this->assertTrue($response->headers->hasCacheControlDirective('private'));
+
+        $response->setCache(array('private' => true));
+        $this->assertFalse($response->headers->hasCacheControlDirective('public'));
+        $this->assertTrue($response->headers->hasCacheControlDirective('private'));
+
+        $response->setCache(array('private' => false));
+        $this->assertTrue($response->headers->hasCacheControlDirective('public'));
+        $this->assertFalse($response->headers->hasCacheControlDirective('private'));
+    }
+
+    public function testSendContent()
+    {
+        $response = new Response('test response rendering', 200);
+
+        ob_start();
+        $response->sendContent();
+        $string = ob_get_clean();
+        $this->assertContains('test response rendering', $string);
+    }
+
+    public function testSetPublic()
+    {
+        $response = new Response();
+        $response->setPublic();
+
+        $this->assertTrue($response->headers->hasCacheControlDirective('public'));
+        $this->assertFalse($response->headers->hasCacheControlDirective('private'));
+    }
+
+    public function testSetExpires()
+    {
+        $response = new Response();
+        $response->setExpires(null);
+
+        $this->assertNull($response->getExpires(), '->setExpires() remove the header when passed null');
+
+        $now = new \DateTime();
+        $response->setExpires($now);
+
+        $this->assertEquals($response->getExpires()->getTimestamp(), $now->getTimestamp());
+    }
+
+    public function testSetLastModified()
+    {
+        $response = new Response();
+        $response->setLastModified(new \DateTime());
+        $this->assertNotNull($response->getLastModified());
+
+        $response->setLastModified(null);
+        $this->assertNull($response->getLastModified());
+    }
+
+    public function testIsInvalid()
+    {
+        $response = new Response();
+
+        try {
+            $response->setStatusCode(99);
+            $this->fail();
+        } catch(\InvalidArgumentException $e) {
+            $this->assertTrue($response->isInvalid());
+        }
+
+        try {
+            $response->setStatusCode(650);
+            $this->fail();
+        } catch(\InvalidArgumentException $e) {
+            $this->assertTrue($response->isInvalid());
+        }
+
+        $response = new Response('', 200);
+        $this->assertFalse($response->isInvalid());
+    }
+
+    public function testIsInformational()
+    {
+        $response = new Response('', 100);
+        $this->assertTrue($response->isInformational());
+
+        $response = new Response('', 200);
+        $this->assertFalse($response->isInformational());
+    }
+
+    public function testIsRedirectRedirection()
+    {
+        foreach (array(301, 302, 303, 307) as $code)
+        {
+            $response = new Response('', $code);
+            $this->assertTrue($response->isRedirection());
+            $this->assertTrue($response->isRedirect());
+        }
+
+        $response = new Response('', 304);
+        $this->assertTrue($response->isRedirection());
+        $this->assertFalse($response->isRedirect());
+
+        $response = new Response('', 200);
+        $this->assertFalse($response->isRedirection());
+        $this->assertFalse($response->isRedirect());
+
+        $response = new Response('', 404);
+        $this->assertFalse($response->isRedirection());
+        $this->assertFalse($response->isRedirect());
+    }
+
+    public function testIsNotFound()
+    {
+        $response = new Response('', 404);
+        $this->assertTrue($response->isNotFound());
+
+        $response = new Response('', 200);
+        $this->assertFalse($response->isNotFound());
+    }
+
+    public function testIsEmpty()
+    {
+        foreach (array(201, 204, 304) as $code)
+        {
+            $response = new Response('', $code);
+            $this->assertTrue($response->isEmpty());
+        }
+
+        $response = new Response('', 200);
+        $this->assertFalse($response->isEmpty());
+    }
+
+    public function testIsForbidden()
+    {
+        $response = new Response('', 403);
+        $this->assertTrue($response->isForbidden());
+
+        $response = new Response('', 200);
+        $this->assertFalse($response->isForbidden());
+    }
+
+    public function testIsOk()
+    {
+        $response = new Response('', 200);
+        $this->assertTrue($response->isOk());
+
+        $response = new Response('', 404);
+        $this->assertFalse($response->isOk());
+    }
+
+    public function testIsServerOrClientError()
+    {
+        $response = new Response('', 404);
+        $this->assertTrue($response->isClientError());
+        $this->assertFalse($response->isServerError());
+
+        $response = new Response('', 500);
+        $this->assertFalse($response->isClientError());
+        $this->assertTrue($response->isServerError());
+    }
+
+    public function testHasVary()
+    {
+        $response = new Response();
+        $this->assertFalse($response->hasVary());
+
+        $response->setVary('User-Agent');
+        $this->assertTrue($response->hasVary());
+    }
+
+    public function testSetEtag()
+    {
+        $response = new Response('', 200, array('ETag' => '"12345"'));
+        $response->setEtag();
+
+        $this->assertNull($response->headers->get('Etag'), '->setEtag() removes Etags when call with null');
     }
 
     protected function createDateTimeOneHourAgo()

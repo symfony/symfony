@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -21,13 +21,13 @@ use Symfony\Component\Console\Output\ConsoleOutput;
  * This class only works with a PHP compiled with readline support
  * (either --with-readline or --with-libedit)
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Shell
 {
-    protected $application;
-    protected $history;
-    protected $output;
+    private $application;
+    private $history;
+    private $output;
 
     /**
      * Constructor.
@@ -86,7 +86,7 @@ class Shell
      * @param string  $text     The last segment of the entered text
      * @param integer $position The current position
      */
-    protected function autocompleter($text, $position)
+    private function autocompleter($text, $position)
     {
         $info = readline_info();
         $text = substr($info['line_buffer'], 0, $info['end']);

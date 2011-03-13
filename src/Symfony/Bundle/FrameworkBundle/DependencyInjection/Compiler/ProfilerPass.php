@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 /**
  * Adds tagged data_collector services to profiler service
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class ProfilerPass implements CompilerPassInterface
 {
@@ -35,7 +35,11 @@ class ProfilerPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds('data_collector') as $id => $attributes) {
             $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
             $template = null;
-            if (isset($attributes[0]['template']) && isset($attributes[0]['id'])) {
+
+            if (isset($attributes[0]['template'])) {
+                if (!isset($attributes[0]['id'])) {
+                    throw new \InvalidArgumentException(sprintf('Data collector service "%s" must have an id attribute in order to specify a template', $id));
+                }
                 $template = array($attributes[0]['id'], $attributes[0]['template']);
             }
 

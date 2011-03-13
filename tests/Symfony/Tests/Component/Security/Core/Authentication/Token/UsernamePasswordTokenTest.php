@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -48,5 +48,11 @@ class UsernamePasswordTokenTest extends \PHPUnit_Framework_TestCase
         $token = new UsernamePasswordToken('foo', 'bar', 'key');
         $token->eraseCredentials();
         $this->assertEquals('', $token->getCredentials());
+    }
+
+    public function testToString()
+    {
+        $token = new UsernamePasswordToken('foo', '', 'foo', array('A', 'B'));
+        $this->assertEquals('UsernamePasswordToken(user="foo", authenticated=true, roles="A, B")', (string) $token);
     }
 }

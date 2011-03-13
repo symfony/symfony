@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<xsd:schema xmlns="http://www.symfony-project.org/schema/dic/symfony"
+<xsd:schema xmlns="http://symfony.com/schema/dic/symfony"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://www.symfony-project.org/schema/dic/symfony"
+    targetNamespace="http://symfony.com/schema/dic/symfony"
     elementFormDefault="qualified">
 
     <xsd:element name="config" type="config" />
@@ -90,10 +90,10 @@
         <xsd:sequence>
             <xsd:element name="loader" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="engine" type="templating_engine" minOccurs="1" maxOccurs="unbounded" />
+            <xsd:element name="assets-base-url" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
 
         <xsd:attribute name="assets-version" type="xsd:string" />
-        <xsd:attribute name="assets-base-urls" type="xsd:string" />
         <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="cache-warmer" type="cache_warmer" />
     </xsd:complexType>

@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,23 +15,23 @@ use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
 
 use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Kernel\Event\GetResponseEvent;
+use Symfony\Component\Kernel\Events;
 
 /**
  * LogoutListener logout users.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class LogoutListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $logoutPath;
-    protected $targetUrl;
-    protected $handlers;
-    protected $successHandler;
+    private $securityContext;
+    private $logoutPath;
+    private $targetUrl;
+    private $handlers;
+    private $successHandler;
 
     /**
      * Constructor
@@ -61,31 +61,13 @@ class LogoutListener implements ListenerInterface
     }
 
     /**
-     * Registers a core.security listener.
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
-    }
-
-    /**
      * Performs the logout if requested
      *
-     * @param EventInterface $event An EventInterface instance
+     * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public function handle(EventInterface $event)
+    public function onCoreSecurity(GetResponseEvent $event)
     {
-        $request = $event->get('request');
+        $request = $event->getRequest();
 
         if ($this->logoutPath !== $request->getPathInfo()) {
             return;
@@ -110,8 +92,6 @@ class LogoutListener implements ListenerInterface
 
         $this->securityContext->setToken(null);
 
-        $event->setProcessed();
-
-        return $response;
+        $event->setResponse($response);
     }
 }

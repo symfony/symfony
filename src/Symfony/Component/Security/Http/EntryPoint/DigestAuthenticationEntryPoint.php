@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,25 +11,25 @@
 
 namespace Symfony\Component\Security\Http\EntryPoint;
 
-use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Core\Exception\NonceExpiredException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
  * DigestAuthenticationEntryPoint starts an HTTP Digest authentication.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {
-    protected $key;
-    protected $realmName;
-    protected $nonceValiditySeconds;
-    protected $logger;
+    private $key;
+    private $realmName;
+    private $nonceValiditySeconds;
+    private $logger;
 
     public function __construct($realmName, $key, $nonceValiditySeconds = 300, LoggerInterface $logger = null)
     {
@@ -39,7 +39,7 @@ class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterfac
         $this->logger = $logger;
     }
 
-    public function start(EventInterface $event, Request $request, AuthenticationException $authException = null)
+    public function start(GetResponseEvent $event, Request $request, AuthenticationException $authException = null)
     {
         $expiryTime = microtime(true) + $this->nonceValiditySeconds * 1000;
         $signatureValue = md5($expiryTime.':'.$this->key);
@@ -61,15 +61,5 @@ class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterfac
         $response->setStatusCode(401, $authException->getMessage());
 
         return $response;
-    }
-
-    public function getKey()
-    {
-        return $this->key;
-    }
-
-    public function getRealmName()
-    {
-        return $this->realmName;
     }
 }

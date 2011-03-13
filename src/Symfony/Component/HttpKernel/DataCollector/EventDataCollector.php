@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\HttpKernel\DataCollector;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Debug\EventDispatcherTraceableInterface;
+use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * EventDataCollector.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class EventDataCollector extends DataCollector
 {
@@ -27,7 +27,7 @@ class EventDataCollector extends DataCollector
 
     public function setEventDispatcher(EventDispatcherInterface $dispatcher)
     {
-        if ($dispatcher instanceof EventDispatcherTraceableInterface) {
+        if ($dispatcher instanceof TraceableEventDispatcherInterface) {
             $this->dispatcher = $dispatcher;
         }
     }
@@ -48,7 +48,7 @@ class EventDataCollector extends DataCollector
      *
      * @return array An array of called listeners
      *
-     * @see EventDispatcherTraceableInterface
+     * @see TraceableEventDispatcherInterface
      */
     public function getCalledListeners()
     {
@@ -60,7 +60,7 @@ class EventDataCollector extends DataCollector
      *
      * @return array An array of not called listeners
      *
-     * @see EventDispatcherTraceableInterface
+     * @see TraceableEventDispatcherInterface
      */
     public function getNotCalledListeners()
     {

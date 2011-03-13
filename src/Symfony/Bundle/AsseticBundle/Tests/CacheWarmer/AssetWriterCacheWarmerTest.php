@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony framework.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -12,7 +12,8 @@
 namespace Symfony\Bundle\AsseticBundle\Tests\CacheWarmer;
 
 use Symfony\Bundle\AsseticBundle\CacheWarmer\AssetWriterCacheWarmer;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Bundle\AsseticBundle\Event\WriteEvent;
+use Symfony\Bundle\AsseticBundle\Events;
 
 class AssetWriterCacheWarmerTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,13 +30,13 @@ class AssetWriterCacheWarmerTest extends \PHPUnit_Framework_TestCase
         $writer = $this->getMockBuilder('Assetic\\AssetWriter')
             ->disableOriginalConstructor()
             ->getMock();
-        $dispatcher = $this->getMock('Symfony\\Component\\EventDispatcher\\EventDispatcher');
+        $dispatcher = $this->getMock('Symfony\\Component\\EventDispatcher\\EventDispatcherInterface');
 
-        $event = new Event(null, 'assetic.write');
+        $event = new WriteEvent();
 
         $dispatcher->expects($this->once())
-            ->method('notify')
-            ->with($event);
+            ->method('dispatchEvent')
+            ->with(Events::onAsseticWrite, $event);
         $writer->expects($this->once())
             ->method('writeManagerAssets')
             ->with($am);

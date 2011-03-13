@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -26,7 +26,7 @@ use Doctrine\ORM\Tools\Export\ClassMetadataExporter;
 /**
  * Import Doctrine ORM metadata mapping information from an existing database.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class ImportMappingDoctrineCommand extends DoctrineCommand
@@ -53,7 +53,7 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $bundle = $this->application->getKernel()->getBundle($input->getArgument('bundle'));
+        $bundle = $this->getApplication()->getKernel()->getBundle($input->getArgument('bundle'));
 
         $destPath = $bundle->getPath();
         $type = $input->getArgument('mapping-type') ? $input->getArgument('mapping-type') : 'xml';

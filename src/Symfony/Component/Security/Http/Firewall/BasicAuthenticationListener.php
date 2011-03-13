@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,24 +15,24 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Events;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * BasicAuthenticationListener implements Basic HTTP authentication.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class BasicAuthenticationListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $authenticationManager;
-    protected $providerKey;
-    protected $authenticationEntryPoint;
-    protected $logger;
-    protected $ignoreFailure;
+    private $securityContext;
+    private $authenticationManager;
+    private $providerKey;
+    private $authenticationEntryPoint;
+    private $logger;
+    private $ignoreFailure;
 
     public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
     {
@@ -49,42 +49,20 @@ class BasicAuthenticationListener implements ListenerInterface
     }
 
     /**
-     *
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
-    }
-
-    /**
      * Handles basic authentication.
      *
-     * @param EventInterface $event An EventInterface instance
+     * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public function handle(EventInterface $event)
+    public function onCoreSecurity(GetResponseEvent $event)
     {
-        $request = $event->get('request');
+        $request = $event->getRequest();
 
         if (false === $username = $request->server->get('PHP_AUTH_USER', false)) {
             return;
         }
 
         if (null !== $token = $this->securityContext->getToken()) {
-            if ($token->isImmutable()) {
-                return;
-            }
-
-            if ($token instanceof UsernamePasswordToken && $token->isAuthenticated() && (string) $token === $username) {
+            if ($token instanceof UsernamePasswordToken && $token->isAuthenticated() && $token->getUsername() === $username) {
                 return;
             }
         }

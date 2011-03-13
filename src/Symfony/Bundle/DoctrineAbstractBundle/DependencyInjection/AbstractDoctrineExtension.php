@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -43,19 +43,7 @@ abstract class AbstractDoctrineExtension extends Extension
     protected function loadMappingInformation(array $objectManager, $container)
     {
         if (isset($objectManager['mappings'])) {
-            // fix inconsistency between yaml and xml naming
-            if (isset($objectManager['mappings']['mapping'])) {
-                if (isset($objectManager['mappings']['mapping'][0])) {
-                    $objectManager['mappings'] = $objectManager['mappings']['mapping'];
-                } else {
-                    $objectManager['mappings'] = array($objectManager['mappings']['mapping']);
-                }
-            }
-
             foreach ($objectManager['mappings'] as $mappingName => $mappingConfig) {
-                if (is_string($mappingConfig)) {
-                    $mappingConfig = array('type' => $mappingConfig);
-                }
                 if (!isset($mappingConfig['dir'])) {
                     $mappingConfig['dir'] = false;
                 }
@@ -73,12 +61,6 @@ abstract class AbstractDoctrineExtension extends Extension
                 }
                 if (!isset($mappingConfig['is_bundle'])) {
                     $mappingConfig['is_bundle'] = !file_exists($mappingConfig['dir']);
-                }
-
-                if (isset($mappingConfig['name'])) {
-                    $mappingName = $mappingConfig['name'];
-                } else if ($mappingConfig === null) {
-                    $mappingConfig = array();
                 }
 
                 if ($mappingConfig['is_bundle']) {

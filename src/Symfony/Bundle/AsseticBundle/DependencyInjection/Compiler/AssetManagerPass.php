@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony framework.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 /**
  * Adds services tagged as assets to the asset manager.
  *
- * @author Kris Wallsmith <kris.wallsmith@symfony-project.com>
+ * @author Kris Wallsmith <kris.wallsmith@symfony.com>
  */
 class AssetManagerPass implements CompilerPassInterface
 {
@@ -54,7 +54,7 @@ class AssetManagerPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds('assetic.formula_resource') as $id => $attributes) {
             foreach ($attributes as $attr) {
                 if (isset($attr['loader'])) {
-                    $am->addMethodCall('addResource', array($attr['loader'], new Reference($id)));
+                    $am->addMethodCall('addResource', array(new Reference($id), $attr['loader']));
                 }
             }
         }

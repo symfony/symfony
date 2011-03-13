@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -21,7 +21,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
  */
 class ServiceReferenceGraph
 {
-    protected $nodes;
+    private $nodes;
 
     /**
      * Constructor.
@@ -101,7 +101,7 @@ class ServiceReferenceGraph
      * @param string $value 
      * @return ServiceReferenceGraphNode
      */
-    protected function createNode($id, $value)
+    private function createNode($id, $value)
     {
         if (isset($this->nodes[$id]) && $this->nodes[$id]->getValue() === $value) {
             return $this->nodes[$id];

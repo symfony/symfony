@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,12 +14,12 @@ namespace Symfony\Component\Security\Core\Role;
 /**
  * RoleHierarchy defines a role hierarchy.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class RoleHierarchy implements RoleHierarchyInterface
 {
-    protected $hierarchy;
-    protected $map;
+    private $hierarchy;
+    private $map;
 
     /**
      * Constructor.
@@ -56,7 +56,7 @@ class RoleHierarchy implements RoleHierarchyInterface
         return $reachableRoles;
     }
 
-    protected function buildRoleMap()
+    private function buildRoleMap()
     {
         $this->map = array();
         foreach ($this->hierarchy as $main => $roles) {

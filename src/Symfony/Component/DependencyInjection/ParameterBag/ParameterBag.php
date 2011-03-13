@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,7 +13,7 @@ namespace Symfony\Component\DependencyInjection\ParameterBag;
 
 /**
  * 
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class ParameterBag implements ParameterBagInterface
 {
@@ -152,7 +152,7 @@ class ParameterBag implements ParameterBagInterface
      * @param array $match 
      * @return string
      */
-    protected function resolveValueCallback($match)
+    private function resolveValueCallback($match)
     {
         return $this->get(strtolower($match[1]));
     }

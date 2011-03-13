@@ -2,14 +2,14 @@
 
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Extension\Extension as BaseExtension;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Container;
 
 /*
  * This file is part of the Symfony framework.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -18,9 +18,9 @@ use Symfony\Component\DependencyInjection\Container;
 /**
  * Provides useful features shared by many extensions.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class Extension extends BaseExtension
+abstract class Extension implements ExtensionInterface
 {
     protected $classes = array();
     protected $classMap = array();

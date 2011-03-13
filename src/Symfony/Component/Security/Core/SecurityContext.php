@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Security\Core;
 
-use Symfony\Component\Security\Core\User\AccountInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
@@ -23,15 +23,15 @@ use Symfony\Component\Security\Acl\Voter\FieldVote;
  *
  * It gives access to the token representing the current user authentication.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class SecurityContext implements SecurityContextInterface
 {
-    protected $token;
-    protected $accessDecisionManager;
-    protected $authenticationManager;
-    protected $alwaysAuthenticate;
+    private $token;
+    private $accessDecisionManager;
+    private $authenticationManager;
+    private $alwaysAuthenticate;
 
     /**
      * Constructor.
@@ -45,7 +45,7 @@ class SecurityContext implements SecurityContextInterface
         $this->alwaysAuthenticate = $alwaysAuthenticate;
     }
 
-    public final function vote($attributes, $object = null)
+    public final function isGranted($attributes, $object = null)
     {
         if (null === $this->token) {
             throw new AuthenticationCredentialsNotFoundException('The security context contains no authentication token.');

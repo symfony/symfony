@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -40,11 +40,17 @@ class AnalyzeServiceReferencesPassTest extends \PHPUnit_Framework_TestCase
             ->addArgument($ref4 = new Reference('b'))
         ;
 
+        $d = $container
+            ->register('d')
+            ->setProperty('foo', $ref5 = new Reference('b'))
+        ;
+
         $graph = $this->process($container);
 
-        $this->assertEquals(2, count($edges = $graph->getNode('b')->getInEdges()));
+        $this->assertEquals(3, count($edges = $graph->getNode('b')->getInEdges()));
         $this->assertSame($ref1, $edges[0]->getValue());
         $this->assertSame($ref4, $edges[1]->getValue());
+        $this->assertSame($ref5, $edges[2]->getValue());
     }
 
     public function testProcessDetectsReferencesFromInlinedDefinitions()

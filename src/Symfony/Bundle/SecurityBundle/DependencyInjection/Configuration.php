@@ -58,7 +58,7 @@ class Configuration
         return $tb->buildTree();
     }
 
-    protected function addAclSection($rootNode)
+    private function addAclSection($rootNode)
     {
         $rootNode
             ->arrayNode('acl')
@@ -68,7 +68,7 @@ class Configuration
         ;
     }
 
-    protected function addRoleHierarchySection($rootNode)
+    private function addRoleHierarchySection($rootNode)
     {
         $rootNode
             ->fixXmlConfig('role', 'role_hierarchy')
@@ -87,7 +87,7 @@ class Configuration
         ;
     }
 
-    protected function addAccessControlSection($rootNode)
+    private function addAccessControlSection($rootNode)
     {
         $rootNode
             ->fixXmlConfig('rule', 'access_control')
@@ -107,22 +107,12 @@ class Configuration
                         ->beforeNormalization()->ifString()->then(function($v) { return preg_split('/\s*,\s*/', $v); })->end()
                         ->prototype('scalar')->end()
                     ->end()
-                    ->fixXmlConfig('attribute')
-                    ->arrayNode('attributes')
-                        ->useAttributeAsKey('key')
-                        ->prototype('scalar')
-                            ->beforeNormalization()
-                                ->ifTrue(function($v) { return is_array($v) && isset($v['pattern']); })
-                                ->then(function($v) { return $v['pattern']; })
-                            ->end()
-                        ->end()
-                    ->end()
                 ->end()
             ->end()
         ;
     }
 
-    protected function addFirewallsSection($rootNode, array $factories)
+    private function addFirewallsSection($rootNode, array $factories)
     {
         $firewallNodeBuilder =
         $rootNode
@@ -186,7 +176,7 @@ class Configuration
         }
     }
 
-    protected function addProvidersSection($rootNode)
+    private function addProvidersSection($rootNode)
     {
         $rootNode
             ->fixXmlConfig('provider')
@@ -225,7 +215,7 @@ class Configuration
         ;
     }
 
-    protected function addEncodersSection($rootNode)
+    private function addEncodersSection($rootNode)
     {
         $rootNode
             ->fixXmlConfig('encoder')
@@ -237,9 +227,9 @@ class Configuration
                     ->performNoDeepMerging()
                     ->beforeNormalization()->ifString()->then(function($v) { return array('algorithm' => $v); })->end()
                     ->scalarNode('algorithm')->cannotBeEmpty()->end()
-                    ->booleanNode('ignore_case')->end()
-                    ->booleanNode('encode_as_base64')->end()
-                    ->scalarNode('iterations')->end()
+                    ->booleanNode('ignore_case')->defaultFalse()->end()
+                    ->booleanNode('encode_as_base64')->defaultTrue()->end()
+                    ->scalarNode('iterations')->defaultValue(5000)->end()
                     ->scalarNode('id')->end()
                 ->end()
             ->end()

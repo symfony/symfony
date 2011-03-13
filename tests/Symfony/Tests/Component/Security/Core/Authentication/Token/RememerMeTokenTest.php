@@ -60,19 +60,9 @@ class RememberMeTokenTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testPersistentToken()
-    {
-        $token = new RememberMeToken($this->getUser(), 'fookey', 'foo');
-        $persistentToken = $this->getMock('Symfony\Component\Security\Core\Authentication\RememberMe\PersistentTokenInterface');
-
-        $this->assertNull($token->getPersistentToken());
-        $token->setPersistentToken($persistentToken);
-        $this->assertSame($persistentToken, $token->getPersistentToken());
-    }
-
     protected function getUser($roles = array('ROLE_FOO'))
     {
-        $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user
             ->expects($this->once())
             ->method('getRoles')

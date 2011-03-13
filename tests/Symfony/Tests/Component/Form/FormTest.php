@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -414,7 +414,9 @@ class FormTest extends TestCase
 
     public function testSupportsCountable()
     {
-        $form = $this->factory->getInstance('form', 'group');
+        $form = $this->factory->getInstance('form', 'group', array(
+            'csrf_protection' => false,
+        ));
         $form->add($this->createMockField('firstName'));
         $form->add($this->createMockField('lastName'));
         $this->assertEquals(2, count($form));
@@ -425,7 +427,9 @@ class FormTest extends TestCase
 
     public function testSupportsIterable()
     {
-        $form = $this->factory->getInstance('form', 'group');
+        $form = $this->factory->getInstance('form', 'group', array(
+            'csrf_protection' => false,
+        ));
         $form->add($field1 = $this->createMockField('field1'));
         $form->add($field2 = $this->createMockField('field2'));
         $form->add($field3 = $this->createMockField('field3'));
@@ -728,7 +732,7 @@ class FormTest extends TestCase
         // the authors should differ to make sure the test works
         $transformedAuthor->firstName = 'Foo';
 
-        $form = new TestForm('author');
+        $form = $this->factory->getInstance('form', 'author');
 
         $transformer = $this->createMockTransformer();
         $transformer->expects($this->once())
@@ -754,7 +758,7 @@ class FormTest extends TestCase
     {
         $originalAuthor = new Author();
 
-        $form = new TestForm('author');
+        $form = $this->factory->getInstance('form', 'author');
 
         $transformer = $this->createMockTransformer();
         $transformer->expects($this->once())
@@ -804,28 +808,6 @@ class FormTest extends TestCase
         $form->add('firstName');
     }
 
-    public function testAddUsesFieldFromFactoryIfStringIsGiven()
-    {
-        $author = new \stdClass();
-        $field = $this->createMockField('firstName');
-
-        $factory = $this->getMock('Symfony\Component\Form\FieldFactory\FieldFactoryInterface');
-        $factory->expects($this->once())
-                ->method('getInstance')
-                ->with($this->equalTo('stdClass'), $this->equalTo('firstName'), $this->equalTo(array('foo' => 'bar')))
-                ->will($this->returnValue($field));
-
-        $form = $this->factory->getInstance('form', 'author', array(
-            'data' => $author,
-            'data_class' => 'stdClass',
-            'field_factory' => $factory,
-        ));
-
-        $form->add('firstName', array('foo' => 'bar'));
-
-        $this->assertSame($field, $form['firstName']);
-    }
-
     public function testSetDataUpdatesAllFieldsFromTransformedData()
     {
         $originalAuthor = new Author();
@@ -833,7 +815,7 @@ class FormTest extends TestCase
         // the authors should differ to make sure the test works
         $transformedAuthor->firstName = 'Foo';
 
-        $form = new TestForm('author');
+        $form = $this->factory->getInstance('form', 'author');
 
         $transformer = $this->createMockTransformer();
         $transformer->expects($this->once())
@@ -969,7 +951,7 @@ class FormTest extends TestCase
     public function testSetDataToNullCreatesArrayIfNoDataClassOrConstructor()
     {
         $author = new Author();
-        $form = new Form('author');
+        $form = $this->factory->getInstance('form', 'author');
         $form->setData(null);
 
         $this->assertSame(array(), $form->getData());
@@ -982,7 +964,9 @@ class FormTest extends TestCase
         // the authors should differ to make sure the test works
         $transformedAuthor->firstName = 'Foo';
 
-        $form = new TestForm('author', array('validator' => $this->validator));
+        $form = $this->factory->getInstance('form', 'author', array(
+            'validator' => $this->validator,
+        ));
 
         $transformer = $this->createMockTransformer();
         $transformer->expects($this->exactly(2))
@@ -1028,7 +1012,9 @@ class FormTest extends TestCase
                     ->method('getDisplayedData')
                     ->will($this->returnValue('Bernhard'));
 
-        $form = $this->factory->getInstance('form', 'author');
+        $form = $this->factory->getInstance('form', 'author', array(
+            'csrf_protection' => false,
+        ));
         $form->add($field);
 
         $this->assertEquals(array('firstName' => 'Bernhard'), $form->getDisplayedData());
@@ -1050,16 +1036,6 @@ class FormTest extends TestCase
         $form->add($this->createNonMultipartMockField('lastName'));
 
         $this->assertFalse($form->isMultipart());
-    }
-
-    public function testSupportsClone()
-    {
-        $form = $this->factory->getInstance('form', 'author');
-        $form->add($this->createMockField('firstName'));
-
-        $clone = clone $form;
-
-        $this->assertNotSame($clone['firstName'], $form['firstName']);
     }
 
     public function testSubmitWithoutPriorSetData()

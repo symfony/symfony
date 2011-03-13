@@ -1,5 +1,6 @@
 doctrine:
     dbal:
+        default_connection: mysql
         connections:
             mysql:
                 dbname: mysql_db

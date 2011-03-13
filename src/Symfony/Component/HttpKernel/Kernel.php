@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Config\FileLocator;
+use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\ConfigCache;
@@ -33,7 +34,7 @@ use Symfony\Component\Config\ConfigCache;
  *
  * It manages an environment made of bundles.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.org>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class Kernel implements KernelInterface
 {
@@ -457,6 +458,7 @@ abstract class Kernel implements KernelInterface
         $parameterBag = new ParameterBag($this->getKernelParameters());
 
         $container = new ContainerBuilder($parameterBag);
+        $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass());
         foreach ($this->bundles as $bundle) {
             $bundle->build($container);
 

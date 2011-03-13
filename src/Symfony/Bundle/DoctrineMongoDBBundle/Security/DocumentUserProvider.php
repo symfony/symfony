@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\DoctrineMongoDBBundle\Security;
 
-use Symfony\Component\Security\Core\User\AccountInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\Exception\UnsupportedAccountException;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 class DocumentUserProvider implements UserProviderInterface
@@ -59,13 +59,13 @@ class DocumentUserProvider implements UserProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function loadUserByAccount(AccountInterface $account)
+    public function loadUser(UserInterface $user)
     {
-        if (!$account instanceof $this->class) {
-            throw new UnsupportedAccountException(sprintf('Instances of "%s" are not supported.', get_class($account)));
+        if (!$user instanceof $this->class) {
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));
         }
 
-        return $this->loadUserByUsername($account->getUsername());
+        return $this->loadUserByUsername($user->getUsername());
     }
 
     /**

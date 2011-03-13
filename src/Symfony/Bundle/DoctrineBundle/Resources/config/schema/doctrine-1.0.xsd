@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<xsd:schema xmlns="http://www.symfony-project.org/schema/dic/doctrine"
+<xsd:schema xmlns="http://symfony.com/schema/dic/doctrine"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://www.symfony-project.org/schema/dic/doctrine"
+    targetNamespace="http://symfony.com/schema/dic/doctrine"
     elementFormDefault="qualified">
 
     <xsd:element name="config">
@@ -33,25 +33,13 @@
     </xsd:attributeGroup>
 
     <xsd:complexType name="dbal">
-        <xsd:all>
-            <xsd:element name="connections" type="connections" minOccurs="0" maxOccurs="1" />
-            <xsd:element name="types" type="types" minOccurs="0" maxOccurs="1" />
-        </xsd:all>
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="connection" type="connection" />
+            <xsd:element name="type" type="type" />
+        </xsd:choice>
 
         <xsd:attribute name="default-connection" type="xsd:string" />
         <xsd:attributeGroup ref="connection-config" />
-    </xsd:complexType>
-
-    <xsd:complexType name="connections">
-        <xsd:choice minOccurs="1" maxOccurs="unbounded">
-            <xsd:element name="connection" type="connection" />
-        </xsd:choice>
-    </xsd:complexType>
-
-    <xsd:complexType name="types">
-        <xsd:choice minOccurs="1" maxOccurs="unbounded">
-            <xsd:element name="type" type="type" />
-        </xsd:choice>
     </xsd:complexType>
 
     <xsd:complexType name="type">
@@ -73,18 +61,12 @@
         <xsd:attribute name="is-bundle" type="xsd:boolean" />
     </xsd:complexType>
 
-    <xsd:complexType name="mappings">
-        <xsd:choice minOccurs="1" maxOccurs="unbounded">
-            <xsd:element name="mapping" type="mapping" />
-        </xsd:choice>
-    </xsd:complexType>
-
     <xsd:complexType name="orm">
-        <xsd:all>
-            <xsd:element name="entity-managers" type="entity_managers" minOccurs="0" maxOccurs="1" />
-            <xsd:element name="mappings" type="mappings" minOccurs="0" maxOccurs="1" />
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="entity-manager" type="entity_manager" />
+            <xsd:element name="mapping" type="mapping" />
             <xsd:element name="metadata-cache-driver" type="metadata_cache_driver" minOccurs="0" maxOccurs="1" />
-        </xsd:all>
+        </xsd:choice>
 
         <xsd:attribute name="default-entity-manager" type="xsd:string" />
         <xsd:attribute name="default-connection" type="xsd:string" />
@@ -106,17 +88,11 @@
         <xsd:attribute name="type" type="xsd:string" />
     </xsd:complexType>
 
-    <xsd:complexType name="entity_managers">
-        <xsd:choice minOccurs="1" maxOccurs="unbounded">
-            <xsd:element name="entity-manager" type="entity_manager" />
-        </xsd:choice>
-    </xsd:complexType>
-
     <xsd:complexType name="entity_manager">
-        <xsd:all>
-            <xsd:element name="mappings" type="mappings" minOccurs="0" maxOccurs="1" />
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="mapping" type="mapping" />
             <xsd:element name="metadata-cache-driver" type="metadata_cache_driver" minOccurs="0" maxOccurs="1" />
-        </xsd:all>
+        </xsd:choice>
 
         <xsd:attribute name="connection" type="xsd:string" />
         <xsd:attribute name="name" type="xsd:string" />

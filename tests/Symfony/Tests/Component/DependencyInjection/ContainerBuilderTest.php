@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -445,6 +445,29 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException('LogicException');
         $container->getExtension('no_registered');
+    }
+
+    public function testRegisteredButNotLoadedExtension()
+    {
+        $extension = $this->getMock('Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface');
+        $extension->expects($this->once())->method('getAlias')->will($this->returnValue('project'));
+        $extension->expects($this->never())->method('load');
+
+        $container = new ContainerBuilder();
+        $container->registerExtension($extension);
+        $container->compile();
+    }
+
+    public function testRegisteredAndLoadedExtension()
+    {
+        $extension = $this->getMock('Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface');
+        $extension->expects($this->exactly(2))->method('getAlias')->will($this->returnValue('project'));
+        $extension->expects($this->once())->method('load')->with(array(array('foo' => 'bar')));
+
+        $container = new ContainerBuilder();
+        $container->registerExtension($extension);
+        $container->loadFromExtension('project', array('foo' => 'bar'));
+        $container->compile();
     }
 
     /**

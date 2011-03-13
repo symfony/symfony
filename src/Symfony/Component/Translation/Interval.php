@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -29,7 +29,7 @@ namespace Symfony\Component\Translation;
  *
  * @see http://en.wikipedia.org/wiki/Interval_%28mathematics%29#The_ISO_notation
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Interval
 {
@@ -90,7 +90,7 @@ class Interval
 EOF;
     }
 
-    static protected function convertNumber($number)
+    static private function convertNumber($number)
     {
         if ('-Inf' === $number) {
             return log(0);

@@ -21,7 +21,7 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
     const MIGRATE      = 'migrate';
     const INVALIDATE   = 'invalidate';
 
-    protected $strategy;
+    private $strategy;
 
     public function __construct($strategy)
     {

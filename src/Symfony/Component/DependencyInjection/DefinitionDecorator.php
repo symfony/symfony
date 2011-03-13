@@ -9,8 +9,8 @@ namespace Symfony\Component\DependencyInjection;
  */
 class DefinitionDecorator extends Definition
 {
-    protected $parent;
-    protected $changes;
+    private $parent;
+    private $changes;
 
     /**
      * Constructor.

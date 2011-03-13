@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,7 +14,7 @@ namespace Symfony\Component\Routing\Matcher;
 /**
  * UrlMatcherInterface is the interface that all URL matcher classes must implements.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 interface UrlMatcherInterface
 {
@@ -23,9 +23,9 @@ interface UrlMatcherInterface
      *
      * Returns false if no route matches the URL.
      *
-     * @param  string $url URL to be parsed
+     * @param  string $pathinfo The path info to be parsed
      *
      * @return array|false An array of parameters or false if no route matches
      */
-    function match($url);
+    function match($pathinfo);
 }

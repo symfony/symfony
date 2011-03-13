@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,14 +16,14 @@ use Symfony\Component\CssSelector\Parser as CssParser;
 /**
  * Crawler eases navigation of a list of \DOMNode objects.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Crawler extends \SplObjectStorage
 {
-    protected $uri;
-    protected $host;
-    protected $path;
-    protected $base;
+    private $uri;
+    private $host;
+    private $path;
+    private $base;
 
     /**
      * Constructor.
@@ -560,43 +560,6 @@ class Crawler extends \SplObjectStorage
         return $form;
     }
 
-    protected function getNode($position)
-    {
-        foreach ($this as $i => $node) {
-            if ($i == $position) {
-                return $node;
-            }
-        // @codeCoverageIgnoreStart
-        }
-
-        return null;
-        // @codeCoverageIgnoreEnd
-    }
-
-    protected function parseUri($uri)
-    {
-        if ('http' !== substr($uri, 0, 4)) {
-            return array(null, '/');
-        }
-
-        $path = parse_url($uri, PHP_URL_PATH);
-
-        return array(preg_replace('#^(.*?//[^/]+)\/.*$#', '$1', $uri), $path);
-    }
-
-    protected function sibling($node, $siblingDir = 'nextSibling')
-    {
-        $nodes = array();
-
-        do {
-            if ($node !== $this->getNode(0) && $node->nodeType === 1) {
-                $nodes[] = $node;
-            }
-        } while ($node = $node->$siblingDir);
-
-        return $nodes;
-    }
-
     static public function xpathLiteral($s)
     {
         if (false === strpos($s, "'")) {
@@ -621,5 +584,42 @@ class Crawler extends \SplObjectStorage
         }
 
         return sprintf("concat(%s)", implode($parts, ', '));
+    }
+
+    private function getNode($position)
+    {
+        foreach ($this as $i => $node) {
+            if ($i == $position) {
+                return $node;
+            }
+        // @codeCoverageIgnoreStart
+        }
+
+        return null;
+        // @codeCoverageIgnoreEnd
+    }
+
+    private function parseUri($uri)
+    {
+        if ('http' !== substr($uri, 0, 4)) {
+            return array(null, '/');
+        }
+
+        $path = parse_url($uri, PHP_URL_PATH);
+
+        return array(preg_replace('#^(.*?//[^/]+)\/.*$#', '$1', $uri), $path);
+    }
+
+    private function sibling($node, $siblingDir = 'nextSibling')
+    {
+        $nodes = array();
+
+        do {
+            if ($node !== $this->getNode(0) && $node->nodeType === 1) {
+                $nodes[] = $node;
+            }
+        } while ($node = $node->$siblingDir);
+
+        return $nodes;
     }
 }

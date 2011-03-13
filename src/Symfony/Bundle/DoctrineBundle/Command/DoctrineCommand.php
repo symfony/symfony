@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -33,7 +33,7 @@ use Doctrine\ORM\Tools\EntityGenerator;
  * Provides some helper and convenience methods to configure doctrine commands in the context of bundles
  * and multiple connections/entity managers.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class DoctrineCommand extends Command
 {
@@ -141,7 +141,7 @@ abstract class DoctrineCommand extends Command
     protected function findBundle($bundleName)
     {
         $foundBundle = false;
-        foreach ($this->application->getKernel()->getBundles() as $bundle) {
+        foreach ($this->getApplication()->getKernel()->getBundles() as $bundle) {
             /* @var $bundle Bundle */
             if (strtolower($bundleName) == strtolower($bundle->getName())) {
                 $foundBundle = $bundle;

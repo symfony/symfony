@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -60,6 +60,19 @@ class ResolveInvalidReferencesPassTest extends \PHPUnit_Framework_TestCase
 
         $arguments = $def->getArguments();
         $this->assertEquals('bar', (string) $arguments[0]);
+    }
+
+    public function testProcessRemovesPropertiesOnInvalid()
+    {
+        $container = new ContainerBuilder();
+        $def = $container
+            ->register('foo')
+            ->setProperty('foo', new Reference('bar', ContainerInterface::IGNORE_ON_INVALID_REFERENCE))
+        ;
+
+        $this->process($container);
+
+        $this->assertEquals(array(), $def->getProperties());
     }
 
     protected function process(ContainerBuilder $container, array $exceptions = array())

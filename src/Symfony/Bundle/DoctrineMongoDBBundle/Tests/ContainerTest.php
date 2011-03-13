@@ -25,6 +25,7 @@ class ContainerTest extends TestCase
         $container = new ContainerBuilder(new ParameterBag(array(
             'kernel.bundles'     => array('YamlBundle' => 'DoctrineMongoDBBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle\YamlBundle'),
             'kernel.cache_dir'   => sys_get_temp_dir(),
+            'kernel.debug'       => true,
         )));
         $loader = new DoctrineMongoDBExtension();
         $container->registerExtension($loader);

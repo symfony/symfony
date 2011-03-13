@@ -352,10 +352,10 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
     {
         require_once __DIR__.'/Fixtures/Bundles/'.$bundle.'/'.$bundle.'.php';
 
-
         return new ContainerBuilder(new ParameterBag(array(
             'kernel.bundles'     => array($bundle => 'DoctrineMongoDBBundle\\Tests\\DependencyInjection\\Fixtures\\Bundles\\'.$bundle.'\\'.$bundle),
             'kernel.cache_dir'   => sys_get_temp_dir(),
+            'kernel.debug'       => true,
         )));
     }
 }

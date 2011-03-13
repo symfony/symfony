@@ -24,6 +24,7 @@ class DoctrineMongoDBExtensionTest extends \PHPUnit_Framework_TestCase
     public function testParameterOverride($option, $parameter, $value)
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', true);
         $loader = new DoctrineMongoDBExtension();
         $loader->load(array(array($option => $value)), $container);
 

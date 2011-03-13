@@ -11,18 +11,18 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Debug;
 
-use Symfony\Bundle\FrameworkBundle\ContainerAwareEventManager;
+use Symfony\Bundle\FrameworkBundle\ContainerAwareEventDispatcher;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Debug\TraceableEventManagerInterface;
+use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcherInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Doctrine\Common\EventArgs;
+use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Extends the ContainerAwareEventManager to add some debugging tools.
+ * Extends the ContainerAwareEventDispatcher to add some debugging tools.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TraceableEventManager extends ContainerAwareEventManager implements TraceableEventManagerInterface
+class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements TraceableEventDispatcherInterface
 {
     protected $logger;
     protected $called;
@@ -44,9 +44,9 @@ class TraceableEventManager extends ContainerAwareEventManager implements Tracea
     /**
      * {@inheritDoc}
      */
-    protected function triggerListener($listener, $eventName, EventArgs $eventArgs)
+    protected function triggerListener($listener, $eventName, Event $event)
     {
-        parent::triggerListener($listener, $eventName, $eventArgs);
+        parent::triggerListener($listener, $eventName, $event);
 
         $listenerString = $this->listenerToString($listener);
 
@@ -59,7 +59,7 @@ class TraceableEventManager extends ContainerAwareEventManager implements Tracea
             'listener' => $listenerString,
         );
 
-        if ($eventArgs->isPropagationStopped() && null !== $this->logger) {
+        if ($event->isPropagationStopped() && null !== $this->logger) {
             $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s"', $this->listenerToString($listener), $eventName));
 
             $skippedListeners = $this->getListeners($eventName);

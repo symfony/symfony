@@ -14,8 +14,8 @@ namespace Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
-use Symfony\Component\HttpKernel\Event\FilterResponseEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Events;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Doctrine\Common\EventManager;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * ContextListener manages the SecurityContext persistence through a session.
@@ -38,7 +38,7 @@ class ContextListener implements ListenerInterface
     private $logger;
     private $userProviders;
 
-    public function __construct(SecurityContext $context, array $userProviders, $contextKey, LoggerInterface $logger = null, EventManager $evm = null)
+    public function __construct(SecurityContext $context, array $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         if (empty($contextKey)) {
             throw new \InvalidArgumentException('$contextKey must not be empty.');
@@ -48,19 +48,19 @@ class ContextListener implements ListenerInterface
         $this->userProviders = $userProviders;
         $this->contextKey = $contextKey;
 
-        if (null !== $evm) {
-            $evm->connect(Events::onCoreResponse, $this);
+        if (null !== $dispatcher) {
+            $dispatcher->connect(Events::onCoreResponse, $this);
         }
     }
 
     /**
      * Reads the SecurityContext from the session.
      *
-     * @param GetResponseEventArgs $eventArgs A GetResponseEventArgs instance
+     * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public function onCoreSecurity(GetResponseEventArgs $eventArgs)
+    public function onCoreSecurity(GetResponseEvent $event)
     {
-        $request = $eventArgs->getRequest();
+        $request = $event->getRequest();
 
         $session = $request->hasSession() ? $request->getSession() : null;
 
@@ -84,11 +84,11 @@ class ContextListener implements ListenerInterface
     /**
      * Writes the SecurityContext to the session.
      *
-     * @param FilterResponseEventArgs $eventArgs A FilterResponseEventArgs instance
+     * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
-    public function filterCoreResponse(FilterResponseEventArgs $eventArgs)
+    public function filterCoreResponse(FilterResponseEvent $event)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $eventArgs->getRequestType()) {
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;
         }
 
@@ -104,7 +104,7 @@ class ContextListener implements ListenerInterface
             $this->logger->debug('Write SecurityContext in the session');
         }
 
-        $eventArgs->getRequest()->getSession()->set('_security_'.$this->contextKey, serialize($token));
+        $event->getRequest()->getSession()->set('_security_'.$this->contextKey, serialize($token));
     }
 
     /**

@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\Security\Http\AccessMap;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Events;
 
 /**
@@ -39,11 +39,11 @@ class ChannelListener implements ListenerInterface
     /**
      * Handles channel management.
      *
-     * @param GetResponseEventArgs $eventArgs A GetResponseEventArgs instance
+     * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public function onCoreSecurity(GetResponseEventArgs $eventArgs)
+    public function onCoreSecurity(GetResponseEvent $event)
     {
-        $request = $eventArgs->getRequest();
+        $request = $event->getRequest();
 
         list($attributes, $channel) = $this->map->getPatterns($request);
 
@@ -52,9 +52,9 @@ class ChannelListener implements ListenerInterface
                 $this->logger->debug('Redirecting to HTTPS');
             }
 
-            $response = $this->authenticationEntryPoint->start($eventArgs, $request);
+            $response = $this->authenticationEntryPoint->start($event, $request);
 
-            $eventArgs->setResponse($response);
+            $event->setResponse($response);
 
             return;
         }
@@ -64,9 +64,9 @@ class ChannelListener implements ListenerInterface
                 $this->logger->debug('Redirecting to HTTP');
             }
 
-            $response = $this->authenticationEntryPoint->start($eventArgs, $request);
+            $response = $this->authenticationEntryPoint->start($event, $request);
 
-            $eventArgs->setResponse($response);
+            $event->setResponse($response);
         }
     }
 }

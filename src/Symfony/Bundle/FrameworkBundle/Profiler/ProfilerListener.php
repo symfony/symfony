@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Profiler;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Event\FilterResponseEventArgs;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -46,29 +46,29 @@ class ProfilerListener
     /**
      * Handles the onCoreException event.
      *
-     * @param ExceptionEventArgs $eventArgs An ExceptionEventArgs instance
+     * @param ExceptionEvent $event An ExceptionEvent instance
      */
-    public function onCoreException(ExceptionEventArgs $eventArgs)
+    public function onCoreException(ExceptionEvent $event)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $eventArgs->getRequestType()) {
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;
         }
 
-        $this->exception = $eventArgs->getException();
+        $this->exception = $event->getException();
     }
 
     /**
      * Handles the filterCoreResponse event.
      *
-     * @param FilterResponseEventArgs $eventArgs A FilterResponseEventArgs instance
+     * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
-    public function filterCoreResponse(FilterResponseEventArgs $eventArgs)
+    public function filterCoreResponse(FilterResponseEvent $event)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $eventArgs->getRequestType()) {
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;
         }
 
-        if (null !== $this->matcher && !$this->matcher->matches($eventArgs->getRequest())) {
+        if (null !== $this->matcher && !$this->matcher->matches($event->getRequest())) {
             return;
         }
 
@@ -76,7 +76,7 @@ class ProfilerListener
             return;
         }
 
-        $this->container->get('profiler')->collect($eventArgs->getRequest(), $response, $this->exception);
+        $this->container->get('profiler')->collect($event->getRequest(), $response, $this->exception);
         $this->exception = null;
     }
 }

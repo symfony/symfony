@@ -108,7 +108,7 @@
         <service id="security.firewall" class="%security.firewall.class%">
             <tag name="kernel.listener" event="onCoreRequest" priority="-128" />
             <argument type="service" id="security.firewall.map" />
-            <argument type="service" id="event_manager" />
+            <argument type="service" id="event_dispatcher" />
         </service>
 
         <service id="security.firewall.map" class="%security.firewall.map.class%" public="false">

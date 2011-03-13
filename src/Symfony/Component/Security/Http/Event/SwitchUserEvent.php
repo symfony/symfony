@@ -13,9 +13,9 @@ namespace Symfony\Component\Security\Http\Event;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Doctrine\Common\EventArgs;
+use Symfony\Component\EventDispatcher\Event;
 
-class SwitchUserEventArgs extends EventArgs
+class SwitchUserEvent extends Event
 {
     private $request;
 

@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface
 use Symfony\Component\Security\Http\AccessMap;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Events;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -46,15 +46,15 @@ class AccessListener implements ListenerInterface
     /**
      * Handles access authorization.
      *
-     * @param GetResponseEventArgs $eventArgs A GetResponseEventArgs instance
+     * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public function onCoreSecurity(GetResponseEventArgs $eventArgs)
+    public function onCoreSecurity(GetResponseEvent $event)
     {
         if (null === $token = $this->context->getToken()) {
             throw new AuthenticationCredentialsNotFoundException('A Token was not found in the SecurityContext.');
         }
 
-        $request = $eventArgs->getRequest();
+        $request = $event->getRequest();
 
         list($attributes, $channel) = $this->map->getPatterns($request);
 

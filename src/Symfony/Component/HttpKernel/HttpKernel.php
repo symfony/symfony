@@ -13,14 +13,14 @@ namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Event\FilterControllerEventArgs;
-use Symfony\Component\HttpKernel\Event\FilterResponseEventArgs;
-use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEventArgs;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEventArgs;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Doctrine\Common\EventManager;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * HttpKernel notifies events to convert a Request object to a Response one.
@@ -29,18 +29,18 @@ use Doctrine\Common\EventManager;
  */
 class HttpKernel implements HttpKernelInterface
 {
-    private $evm;
+    private $dispatcher;
     private $resolver;
 
     /**
      * Constructor
      *
-     * @param EventManager $evm An EventManager instance
+     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
      * @param ControllerResolverInterface $resolver A ControllerResolverInterface instance
      */
-    public function __construct(EventManager $evm, ControllerResolverInterface $resolver)
+    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver)
     {
-        $this->evm = $evm;
+        $this->dispatcher = $dispatcher;
         $this->resolver = $resolver;
     }
 
@@ -57,14 +57,14 @@ class HttpKernel implements HttpKernelInterface
             }
 
             // exception
-            $eventArgs = new GetResponseForExceptionEventArgs($this, $request, $type, $e);
-            $this->evm->dispatchEvent(Events::onCoreException, $eventArgs);
+            $event = new GetResponseForExceptionEvent($this, $request, $type, $e);
+            $this->dispatcher->dispatchEvent(Events::onCoreException, $event);
 
-            if (!$eventArgs->hasResponse()) {
+            if (!$event->hasResponse()) {
                 throw $e;
             }
 
-            $response = $this->filterResponse($eventArgs->getResponse(), $request, $type);
+            $response = $this->filterResponse($event->getResponse(), $request, $type);
         }
 
         return $response;
@@ -86,11 +86,11 @@ class HttpKernel implements HttpKernelInterface
     protected function handleRaw(Request $request, $type = self::MASTER_REQUEST)
     {
         // request
-        $eventArgs = new GetResponseEventArgs($this, $request, $type);
-        $this->evm->dispatchEvent(Events::onCoreRequest, $eventArgs);
+        $event = new GetResponseEvent($this, $request, $type);
+        $this->dispatcher->dispatchEvent(Events::onCoreRequest, $event);
 
-        if ($eventArgs->hasResponse()) {
-            return $this->filterResponse($eventArgs->getResponse(), $request, $type);
+        if ($event->hasResponse()) {
+            return $this->filterResponse($event->getResponse(), $request, $type);
         }
 
         // load controller
@@ -98,9 +98,9 @@ class HttpKernel implements HttpKernelInterface
             throw new NotFoundHttpException(sprintf('Unable to find the controller for path "%s". Maybe you forgot to add the matching route in your routing configuration?', $request->getPathInfo()));
         }
 
-        $eventArgs = new FilterControllerEventArgs($this, $controller, $request, $type);
-        $this->evm->dispatchEvent(Events::filterCoreController, $eventArgs);
-        $controller = $eventArgs->getController();
+        $event = new FilterControllerEvent($this, $controller, $request, $type);
+        $this->dispatcher->dispatchEvent(Events::filterCoreController, $event);
+        $controller = $event->getController();
 
         // controller arguments
         $arguments = $this->resolver->getArguments($request, $controller);
@@ -110,11 +110,11 @@ class HttpKernel implements HttpKernelInterface
 
         // view
         if (!$response instanceof Response) {
-            $eventArgs = new GetResponseForControllerResultEventArgs($this, $request, $type, $response);
-            $this->evm->dispatchEvent(Events::onCoreView, $eventArgs);
+            $event = new GetResponseForControllerResultEvent($this, $request, $type, $response);
+            $this->dispatcher->dispatchEvent(Events::onCoreView, $event);
 
-            if ($eventArgs->hasResponse()) {
-                $response = $eventArgs->getResponse();
+            if ($event->hasResponse()) {
+                $response = $event->getResponse();
             }
 
             if (!$response instanceof Response) {
@@ -138,11 +138,11 @@ class HttpKernel implements HttpKernelInterface
      */
     protected function filterResponse(Response $response, Request $request, $type)
     {
-        $eventArgs = new FilterResponseEventArgs($this, $request, $type, $response);
+        $event = new FilterResponseEvent($this, $request, $type, $response);
 
-        $this->evm->dispatchEvent(Events::filterCoreResponse, $eventArgs);
+        $this->dispatcher->dispatchEvent(Events::filterCoreResponse, $event);
 
-        return $eventArgs->getResponse();
+        return $event->getResponse();
     }
 
     protected function varToString($var)

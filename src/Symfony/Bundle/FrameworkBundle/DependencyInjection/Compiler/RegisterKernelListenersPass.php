@@ -19,12 +19,12 @@ class RegisterKernelListenersPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('event_manager')) {
+        if (!$container->hasDefinition('event_dispatcher')) {
             return;
         }
 
         $listeners = array();
-        $definition = $container->getDefinition('event_manager');
+        $definition = $container->getDefinition('event_dispatcher');
 
         foreach ($container->findTaggedServiceIds('kernel.listener') as $id => $events) {
             foreach ($events as $event) {

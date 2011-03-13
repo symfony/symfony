@@ -13,26 +13,20 @@ namespace Symfony\Component\HttpKernel\Event;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
-class FilterResponseEventArgs extends KernelEventArgs
+class GetResponseForControllerResultEvent extends GetResponseEvent
 {
-    private $response;
+    private $controllerResult;
 
-    public function __construct(HttpKernelInterface $kernel, Request $request, $requestType, Response $response)
+    public function __construct(HttpKernelInterface $kernel, Request $request, $requestType, $controllerResult)
     {
         parent::__construct($kernel, $request, $requestType);
 
-        $this->setResponse($response);
+        $this->controllerResult = $controllerResult;
     }
 
-    public function getResponse()
+    public function getControllerResult()
     {
-        return $this->response;
-    }
-
-    public function setResponse(Response $response)
-    {
-        $this->response = $response;
+        return $this->controllerResult;
     }
 }

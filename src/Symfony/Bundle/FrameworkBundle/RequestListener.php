@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -36,10 +36,10 @@ class RequestListener
         $this->logger = $logger;
     }
 
-    public function onCoreRequest(GetResponseEventArgs $eventArgs)
+    public function onCoreRequest(GetResponseEvent $event)
     {
-        $request = $eventArgs->getRequest();
-        $master = HttpKernelInterface::MASTER_REQUEST === $eventArgs->getRequestType();
+        $request = $event->getRequest();
+        $master = HttpKernelInterface::MASTER_REQUEST === $event->getRequestType();
 
         $this->initializeSession($request, $master);
 

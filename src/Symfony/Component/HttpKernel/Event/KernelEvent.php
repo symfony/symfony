@@ -13,9 +13,9 @@ namespace Symfony\Component\HttpKernel\Event;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\Common\EventArgs;
+use Symfony\Component\EventDispatcher\Event;
 
-class KernelEventArgs extends EventArgs
+class KernelEvent extends Event
 {
     private $kernel;
 

@@ -51,8 +51,8 @@ class FrameworkExtension extends Extension
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.xml');
-            $container->setDefinition('event_manager', $container->findDefinition('debug.event_manager'));
-            $container->setAlias('debug.event_manager', 'event_manager');
+            $container->setDefinition('event_dispatcher', $container->findDefinition('debug.event_dispatcher'));
+            $container->setAlias('debug.event_dispatcher', 'event_dispatcher');
         }
 
         $processor = new Processor();
@@ -140,12 +140,12 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\HttpKernel\\ResponseListener',
             'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver',
             'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface',
-            'Symfony\\Component\\HttpKernel\\Event\\KernelEventArgs',
-            'Symfony\\Component\\HttpKernel\\Event\\FilterControllerEventArgs',
-            'Symfony\\Component\\HttpKernel\\Event\\FilterResponseEventArgs',
-            'Symfony\\Component\\HttpKernel\\Event\\GetResponseEventArgs',
-            'Symfony\\Component\\HttpKernel\\Event\\GetResponseForControllerResultEventArgs',
-            'Symfony\\Component\\HttpKernel\\Event\\GetResponseForExceptionEventArgs',
+            'Symfony\\Component\\HttpKernel\\Event\\KernelEvent',
+            'Symfony\\Component\\HttpKernel\\Event\\FilterControllerEvent',
+            'Symfony\\Component\\HttpKernel\\Event\\FilterResponseEvent',
+            'Symfony\\Component\\HttpKernel\\Event\\GetResponseEvent',
+            'Symfony\\Component\\HttpKernel\\Event\\GetResponseForControllerResultEvent',
+            'Symfony\\Component\\HttpKernel\\Event\\GetResponseForExceptionEvent',
             'Symfony\\Component\\HttpKernel\\Events',
 
             'Symfony\\Bundle\\FrameworkBundle\\RequestListener',
@@ -153,11 +153,12 @@ class FrameworkExtension extends Extension
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
 
-            'Symfony\\Bundle\\FrameworkBundle\\ContainerAwareEventManager',
+            'Symfony\\Bundle\\FrameworkBundle\\ContainerAwareEventDispatcher',
 
-            'Doctrine\\Common\\EventManager',
-            'Doctrine\\Common\\EventArgs',
-            'Doctrine\\Common\\EventSubscriber',
+            'Symfony\\Component\\EventDispatcher\\EventDispatcher',
+            'Symfony\\Component\\EventDispatcher\\EventDispatcherInterface',
+            'Symfony\\Component\\EventDispatcher\\Event',
+            'Symfony\\Component\\EventDispatcher\\EventSubscriberInterface',
         ));
     }
 

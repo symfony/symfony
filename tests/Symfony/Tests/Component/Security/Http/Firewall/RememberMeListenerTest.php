@@ -135,12 +135,12 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function getGetResponseEvent()
     {
-        return $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEventArgs', array(), array(), '', false);
+        return $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
     }
 
     protected function getFilterResponseEvent()
     {
-        return $this->getMock('Symfony\Component\HttpKernel\Event\FilterResponseEventArgs', array(), array(), '', false);
+        return $this->getMock('Symfony\Component\HttpKernel\Event\FilterResponseEvent', array(), array(), '', false);
     }
 
     protected function getListener()

@@ -48,7 +48,7 @@ class LoggerDataCollector extends DataCollector
      *
      * @return array An array of called events
      *
-     * @see TraceableEventManagerInterface
+     * @see TraceableEventDispatcherInterface
      */
     public function countErrors()
     {

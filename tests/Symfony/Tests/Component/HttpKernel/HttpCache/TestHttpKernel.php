@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
-use Doctrine\Common\EventManager;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
 {
@@ -36,7 +36,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
         $this->called = false;
         $this->catch = false;
 
-        parent::__construct(new EventManager(), $this);
+        parent::__construct(new EventDispatcher(), $this);
     }
 
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = false)

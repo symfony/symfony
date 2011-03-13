@@ -15,13 +15,13 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Http\Event\InteractiveLoginEventArgs;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Events;
-use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Events as KernelEvents;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\Common\EventManager;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * AbstractPreAuthenticatedListener is the base class for all listener that
@@ -36,25 +36,25 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
     private $securityContext;
     private $authenticationManager;
     private $providerKey;
-    private $evm;
+    private $dispatcher;
 
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, LoggerInterface $logger = null, EventManager $evm = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->securityContext = $securityContext;
         $this->authenticationManager = $authenticationManager;
         $this->providerKey = $providerKey;
         $this->logger = $logger;
-        $this->evm = $evm;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
      * Handles X509 authentication.
      *
-     * @param GetResponseEventArgs $eventArgs A GetResponseEventArgs instance
+     * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public function onCoreSecurity(GetResponseEventArgs $eventArgs)
+    public function onCoreSecurity(GetResponseEvent $event)
     {
-        $request = $eventArgs->getRequest();
+        $request = $event->getRequest();
 
         if (null !== $this->logger) {
             $this->logger->debug(sprintf('Checking secure context token: %s', $this->securityContext->getToken()));
@@ -80,9 +80,9 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
             }
             $this->securityContext->setToken($token);
 
-            if (null !== $this->evm) {
-                $loginEventArgs = new InteractiveLoginEventArgs($request, $token);
-                $this->evm->notify(Events::onSecurityInteractiveLogin, $loginEventArgs);
+            if (null !== $this->dispatcher) {
+                $loginEvent = new InteractiveLoginEvent($request, $token);
+                $this->dispatcher->notify(Events::onSecurityInteractiveLogin, $loginEvent);
             }
         } catch (AuthenticationException $failed) {
             $this->securityContext->setToken(null);

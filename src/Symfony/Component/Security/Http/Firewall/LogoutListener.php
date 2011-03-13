@@ -17,7 +17,7 @@ use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Kernel\Event\GetResponseEventArgs;
+use Symfony\Component\Kernel\Event\GetResponseEvent;
 use Symfony\Component\Kernel\Events;
 
 /**
@@ -63,18 +63,18 @@ class LogoutListener implements ListenerInterface
     /**
      * Performs the logout if requested
      *
-     * @param GetResponseEventArgs $eventArgs A GetResponseEventArgs instance
+     * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public function onCoreSecurity(GetResponseEventArgs $eventArgs)
+    public function onCoreSecurity(GetResponseEvent $event)
     {
-        $request = $eventArgs->getRequest();
+        $request = $event->getRequest();
 
         if ($this->logoutPath !== $request->getPathInfo()) {
             return;
         }
 
         if (null !== $this->successHandler) {
-            $response = $this->successHandler->onLogoutSuccess($eventArgs, $request);
+            $response = $this->successHandler->onLogoutSuccess($event, $request);
 
             if (!$response instanceof Response) {
                 throw new \RuntimeException('Logout Success Handler did not return a Response.');

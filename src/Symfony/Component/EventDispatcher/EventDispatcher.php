@@ -23,7 +23,7 @@
 namespace Symfony\Component\EventDispatcher;
 
 /**
- * The EventManager is the central point of Doctrine's event listener system.
+ * The EventDispatcherInterface is the central point of Doctrine's event listener system.
  * Listeners are registered on the manager and events are dispatched through the
  * manager.
  *

@@ -13,9 +13,9 @@ namespace Symfony\Component\Security\Http;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Events;
-use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\Common\EventManager;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Firewall uses a FirewallMap to register security listeners for the given
@@ -30,7 +30,7 @@ use Doctrine\Common\EventManager;
 class Firewall
 {
     private $map;
-    private $evm;
+    private $dispatcher;
     private $currentListeners;
 
     /**
@@ -38,35 +38,35 @@ class Firewall
      *
      * @param FirewallMap $map A FirewallMap instance
      */
-    public function __construct(FirewallMapInterface $map, EventManager $evm)
+    public function __construct(FirewallMapInterface $map, EventDispatcherInterface $dispatcher)
     {
         $this->map = $map;
-        $this->evm = $evm;
+        $this->dispatcher = $dispatcher;
         $this->currentListeners = array();
     }
 
     /**
      * Handles security.
      *
-     * @param GetResponseEventArgs $eventArgs An GetResponseEventArgs instance
+     * @param GetResponseEvent $event An GetResponseEvent instance
      */
-    public function onCoreRequest(GetResponseEventArgs $eventArgs)
+    public function onCoreRequest(GetResponseEvent $event)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $eventArgs->getRequestType()) {
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;
         }
 
         // register listeners for this firewall
-        list($listeners, $exception) = $this->map->getListeners($eventArgs->getRequest());
+        list($listeners, $exception) = $this->map->getListeners($event->getRequest());
         if (null !== $exception) {
-            $exception->register($this->evm);
+            $exception->register($this->dispatcher);
         }
 
         // initiate the listener chain
         foreach ($listeners as $listener) {
-            $response = $listener->handle($eventArgs);
+            $response = $listener->handle($event);
 
-            if ($eventArgs->hasResponse()) {
+            if ($event->hasResponse()) {
                 break;
             }
         }

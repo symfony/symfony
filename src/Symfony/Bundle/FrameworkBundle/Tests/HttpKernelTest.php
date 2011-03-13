@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Bundle\FrameworkBundle\HttpKernel;
-use Doctrine\Common\EventManager;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class HttpKernelTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,9 +36,9 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('request'), $this->equalTo($request), $this->equalTo('request'))
         ;
 
-        $evm = new EventManager();
+        $dispatcher = new EventDispatcher();
         $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
-        $kernel = new HttpKernel($evm, $container, $resolver);
+        $kernel = new HttpKernel($dispatcher, $container, $resolver);
 
         $controller = function() use($expected)
         {
@@ -84,9 +84,9 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('request'), $this->equalTo($request), $this->equalTo('request'))
         ;
 
-        $evm = new EventManager();
+        $dispatcher = new EventDispatcher();
         $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
-        $kernel = new HttpKernel($evm, $container, $resolver);
+        $kernel = new HttpKernel($dispatcher, $container, $resolver);
 
         $controller = function() use ($expected)
         {

@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
  * FormAuthenticationEntryPoint starts an authentication via a login form.
@@ -44,7 +44,7 @@ class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
     /**
      * {@inheritdoc}
      */
-    public function start(GetResponseEventArgs $eventArgs, Request $request, AuthenticationException $authException = null)
+    public function start(GetResponseEvent $event, Request $request, AuthenticationException $authException = null)
     {
         if ($this->useForward) {
             return $event->getKernel()->handle(Request::create($this->loginPath), HttpKernelInterface::SUB_REQUEST);

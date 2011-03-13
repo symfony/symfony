@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class GetResponseEventArgs extends KernelEventArgs
+class GetResponseEvent extends KernelEvent
 {
     private $response;
 

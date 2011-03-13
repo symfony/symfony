@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\Security\Http\Authentication;
 
-use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -22,12 +22,12 @@ interface AuthenticationSuccessHandlerInterface
      * is called by authentication listeners inheriting from
      * AbstractAuthenticationListener.
      *
-     * @param GetResponseEventArgs $eventArgs the "onCoreSecurity" event, this event always
+     * @param GetResponseEvent $event the "onCoreSecurity" event, this event always
      *                              has the kernel as target
      * @param Request        $request
      * @param TokenInterface $token
      *
      * @return Response the response to return
      */
-    function onAuthenticationSuccess(GetResponseEventArgs $eventArgs, Request $request, TokenInterface $token);
+    function onAuthenticationSuccess(GetResponseEvent $event, Request $request, TokenInterface $token);
 }

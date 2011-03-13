@@ -12,9 +12,9 @@
 namespace Symfony\Component\Security\Http\Event;
 
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\Common\EventArgs;
+use Symfony\Component\EventDispatcher\Event;
 
-class InteractiveLoginEventArgs extends EventArgs
+class InteractiveLoginEvent extends Event
 {
     private $request;
 

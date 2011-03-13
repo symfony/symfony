@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Doctrine\Common\EventManager;
-use Doctrine\Common\EventArgs;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Lazily loads listeners and subscribers from the dependency injection
@@ -22,7 +22,7 @@ use Doctrine\Common\EventArgs;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class ContainerAwareEventManager extends EventManager
+class ContainerAwareEventDispatcher extends EventDispatcher
 {
     /**
      * The container from where services are loaded
@@ -92,7 +92,7 @@ class ContainerAwareEventManager extends EventManager
      * Lazily loads listeners for this event from the dependency injection
      * container.
      */
-    public function dispatchEvent($eventName, EventArgs $eventArgs = null)
+    public function dispatchEvent($eventName, Event $event = null)
     {
         if (isset($this->listenerIds[$eventName])) {
             foreach ($this->listenerIds[$eventName] as $serviceId => $priority) {
@@ -100,6 +100,6 @@ class ContainerAwareEventManager extends EventManager
             }
         }
 
-        parent::dispatchEvent($eventName, $eventArgs);
+        parent::dispatchEvent($eventName, $event);
     }
 }

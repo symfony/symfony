@@ -15,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\HttpFoundation\SessionListener;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Event\FilterResponseEventArgs;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
 /**
  * SessionListenerTest.
@@ -54,11 +54,11 @@ class SessionListenerTest extends \PHPUnit_Framework_TestCase
         $request->setSession($this->session);
         $response = new Response();
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
-        $eventArgs = new FilterResponseEventArgs($kernel, $request, $type, $response);
+        $event = new FilterResponseEvent($kernel, $request, $type, $response);
 
-        $this->listener->filterCoreResponse($eventArgs);
+        $this->listener->filterCoreResponse($event);
 
-        $this->assertSame($response, $eventArgs->getResponse());
+        $this->assertSame($response, $event->getResponse());
     }
 
     private function sessionMustNotBeSaved()

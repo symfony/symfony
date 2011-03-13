@@ -7,7 +7,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\HttpKernel as BaseHttpKernel;
-use Doctrine\Common\EventManager;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * This HttpKernel is used to manage scope changes of the DI container.
@@ -19,9 +19,9 @@ class HttpKernel extends BaseHttpKernel
     private $container;
     private $esiSupport;
 
-    public function __construct(EventManager $evm, ContainerInterface $container, ControllerResolverInterface $controllerResolver)
+    public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver)
     {
-        parent::__construct($evm, $controllerResolver);
+        parent::__construct($dispatcher, $controllerResolver);
 
         $this->container = $container;
     }

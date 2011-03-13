@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Debug\ExceptionListener;
 use Symfony\Component\HttpKernel\Debug\ErrorException;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Tests\Component\HttpKernel\Logger;
@@ -44,19 +44,19 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provider
      */
-    public function testHandleWithoutLogger($eventArgs, $eventArgs2)
+    public function testHandleWithoutLogger($event, $event2)
     {
         //store the current error_log, and set the new one to dev/null
         $error_log = ini_get('error_log');
         ini_set('error_log', '/dev/null');
 
         $l = new ExceptionListener('foo');
-        $l->onCoreException($eventArgs);
+        $l->onCoreException($event);
 
-        $this->assertEquals(new Response('foo'), $eventArgs->getResponse());
+        $this->assertEquals(new Response('foo'), $event->getResponse());
 
         try {
-            $l->onCoreException($eventArgs2);
+            $l->onCoreException($event2);
         } catch(\Exception $e) {
             $this->assertSame('foo', $e->getMessage());
         }
@@ -68,17 +68,17 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provider
      */
-    public function testHandleWithLogger($eventArgs, $eventArgs2)
+    public function testHandleWithLogger($event, $event2)
     {
         $logger = new TestLogger();
 
         $l = new ExceptionListener('foo', $logger);
-        $l->onCoreException($eventArgs);
+        $l->onCoreException($event);
 
-        $this->assertEquals(new Response('foo'), $eventArgs->getResponse());
+        $this->assertEquals(new Response('foo'), $event->getResponse());
 
         try {
-            $l->onCoreException($eventArgs2);
+            $l->onCoreException($event2);
         } catch(\Exception $e) {
             $this->assertSame('foo', $e->getMessage());
         }
@@ -91,11 +91,11 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
         $exception = new ErrorException('foo');
-        $eventArgs = new GetResponseForExceptionEventArgs(new TestKernel(), $request, 'foo', $exception);
-        $eventArgs2 = new GetResponseForExceptionEventArgs(new TestKernelThatThrowsException(), $request, 'foo', $exception);
+        $event = new GetResponseForExceptionEvent(new TestKernel(), $request, 'foo', $exception);
+        $event2 = new GetResponseForExceptionEvent(new TestKernelThatThrowsException(), $request, 'foo', $exception);
 
         return array(
-            array($eventArgs, $eventArgs2)
+            array($event, $event2)
         );
     }
 

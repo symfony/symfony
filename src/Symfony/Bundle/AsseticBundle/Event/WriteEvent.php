@@ -11,12 +11,12 @@
 
 namespace Symfony\Bundle\AsseticBundle\Event;
 
-use Doctrine\Common\EventArgs;
+use Symfony\Component\EventDispatcher\Event;
 
 /**
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class WriteEventArgs extends EventArgs
+class WriteEvent extends Event
 {
     private $targetPath;
 

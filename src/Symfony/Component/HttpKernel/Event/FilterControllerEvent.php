@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpKernel\Event;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class FilterControllerEventArgs extends KernelEventArgs
+class FilterControllerEvent extends KernelEvent
 {
     private $controller;
 

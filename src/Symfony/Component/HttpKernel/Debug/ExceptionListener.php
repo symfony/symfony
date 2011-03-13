@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\Debug;
 
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,7 +34,7 @@ class ExceptionListener
         $this->logger = $logger;
     }
 
-    public function onCoreException(GetResponseForExceptionEventArgs $eventArgs)
+    public function onCoreException(GetResponseForExceptionEvent $event)
     {
         static $handling;
 
@@ -44,8 +44,8 @@ class ExceptionListener
 
         $handling = true;
 
-        $exception = $eventArgs->getException();
-        $request = $eventArgs->getRequest();
+        $exception = $event->getException();
+        $request = $event->getRequest();
 
         if (null !== $this->logger) {
             $this->logger->err(sprintf('%s: %s (uncaught exception)', get_class($exception), $exception->getMessage()));
@@ -66,7 +66,7 @@ class ExceptionListener
         $request = $request->duplicate(null, null, $attributes);
 
         try {
-            $response = $eventArgs->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, true);
+            $response = $event->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, true);
         } catch (\Exception $e) {
             $message = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage());
             if (null !== $this->logger) {
@@ -82,7 +82,7 @@ class ExceptionListener
             throw $exception;
         }
 
-        $eventArgs->setResponse($response);
+        $event->setResponse($response);
 
         $handling = false;
     }

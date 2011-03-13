@@ -3,7 +3,7 @@
 namespace Symfony\Component\Security\Http\Logout;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
  * LogoutSuccesshandlerInterface.
@@ -21,9 +21,9 @@ interface LogoutSuccessHandlerInterface
     /**
      * Creates a Response object to send upon a successful logout.
      *
-     * @param GetResponseEventArgs $eventArgs
+     * @param GetResponseEvent $event
      * @param Request $request
      * @return Response never null
      */
-    function onLogoutSuccess(GetResponseEventArgs $eventArgs, Request $request);
+    function onLogoutSuccess(GetResponseEvent $event, Request $request);
 }

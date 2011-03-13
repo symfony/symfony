@@ -66,7 +66,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         $loader->load('mongodb.xml');
 
         $processor = new Processor();
-        $configuration = new Configuration();
+        $configuration = new Configuration($container->getParameter('kernel.debug'));
         $config = $processor->process($configuration->getConfigTree(), $configs);
 
         // can't currently default this correctly in Configuration
@@ -177,8 +177,12 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
             'setHydratorNamespace' => '%doctrine.odm.mongodb.hydrator_namespace%',
             'setAutoGenerateHydratorClasses' => '%doctrine.odm.mongodb.auto_generate_hydrator_classes%',
             'setDefaultDB' => $defaultDatabase,
-            'setLoggerCallable' => array(new Reference('doctrine.odm.mongodb.logger'), 'logQuery'),
         );
+
+        if ($documentManager['logging']) {
+            $methods['setLoggerCallable'] = array(new Reference('doctrine.odm.mongodb.logger'), 'logQuery');
+        }
+
         foreach ($methods as $method => $arg) {
             if ($odmConfigDef->hasMethodCall($method)) {
                 $odmConfigDef->removeMethodCall($method);

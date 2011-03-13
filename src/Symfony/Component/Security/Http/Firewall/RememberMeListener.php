@@ -34,12 +34,11 @@ use Doctrine\Common\EventManager;
  */
 class RememberMeListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $rememberMeServices;
-    protected $authenticationManager;
-    protected $logger;
-    protected $lastState;
-    protected $evm;
+    private $securityContext;
+    private $rememberMeServices;
+    private $authenticationManager;
+    private $logger;
+    private $evm;
 
     /**
      * Constructor
@@ -49,35 +48,13 @@ class RememberMeListener implements ListenerInterface
      * @param AuthenticationManagerInterface $authenticationManager
      * @param LoggerInterface $logger
      */
-    public function __construct(SecurityContext $securityContext, RememberMeServicesInterface $rememberMeServices, AuthenticationManagerInterface $authenticationManager, LoggerInterface $logger = null)
+    public function __construct(SecurityContext $securityContext, RememberMeServicesInterface $rememberMeServices, AuthenticationManagerInterface $authenticationManager, LoggerInterface $logger = null, EventManager $evm = null)
     {
         $this->securityContext = $securityContext;
         $this->rememberMeServices = $rememberMeServices;
         $this->authenticationManager = $authenticationManager;
         $this->logger = $logger;
-    }
-
-    /**
-     * Listen to onCoreSecurity and filterCoreResponse event
-     *
-     * @param EventManager $evm An EventManager instance
-     */
-    public function register(EventManager $evm)
-    {
-        $evm->addEventListener(
-            array(KernelEvents::onCoreSecurity, KernelEvents::filterCoreResponse),
-            $this
-        );
-
         $this->evm = $evm;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventManager $evm)
-    {
-        $evm->removeEventListener(KernelEvents::onCoreSecurity, $this);
     }
 
     /**
@@ -87,73 +64,37 @@ class RememberMeListener implements ListenerInterface
      */
     public function onCoreSecurity(GetResponseEventArgs $eventArgs)
     {
-        $this->lastState = null;
-
         if (null !== $this->securityContext->getToken()) {
             return;
         }
 
-        try {
-            if (null === $token = $this->rememberMeServices->autoLogin($eventArgs->getRequest())) {
-                return;
-            }
-
-            try {
-                if (null === $token = $this->authenticationManager->authenticate($token)) {
-                    return;
-                }
-
-                $this->securityContext->setToken($token);
-
-                if (null !== $this->evm) {
-                    $loginEventArgs = new InteractiveLoginEventArgs($eventArgs->getRequest(), $token);
-                    $this->evm->dispatchEvent(Events::onSecurityInteractiveLogin, $loginEventArgs);
-                }
-
-                if (null !== $this->logger) {
-                    $this->logger->debug('SecurityContext populated with remember-me token.');
-                }
-
-                $this->lastState = $token;
-            } catch (AuthenticationException $failed) {
-                if (null !== $this->logger) {
-                    $this->logger->debug(
-                        'SecurityContext not populated with remember-me token as the'
-                       .' AuthenticationManager rejected the AuthenticationToken returned'
-                       .' by the RememberMeServices: '.$failed->getMessage()
-                    );
-                }
-
-                $this->lastState = $failed;
-            }
-        } catch (AuthenticationException $cookieInvalid) {
-            $this->lastState = $cookieInvalid;
-
-            if (null !== $this->logger) {
-                $this->logger->debug('The presented cookie was invalid: '.$cookieInvalid->getMessage());
-            }
-
-            // silently ignore everything except a cookie theft exception
-            if ($cookieInvalid instanceof CookieTheftException) {
-                throw $cookieInvalid;
-            }
-        }
-    }
-
-    /**
-     * Update cookies
-     * @param Event $event
-     */
-    public function filterCoreResponse(FilterResponseEventArgs $eventArgs)
-    {
-        if (HttpKernelInterface::MASTER_REQUEST !== $eventArgs->getRequestType()) {
+        $request = $eventArgs->getRequest();
+        if (null === $token = $this->rememberMeServices->autoLogin($request)) {
             return;
         }
 
-        if ($this->lastState instanceof TokenInterface) {
-            $this->rememberMeServices->loginSuccess($eventArgs->getRequest(), $eventArgs->getResponse(), $this->lastState);
-        } else if ($this->lastState instanceof AuthenticationException) {
-            $this->rememberMeServices->loginFail($eventArgs->getRequest(), $eventArgs->getResponse());
+        try {
+            $token = $this->authenticationManager->authenticate($token);
+            $this->securityContext->setToken($token);
+
+            if (null !== $this->evm) {
+                $loginEventArgs = new InteractiveLoginEventArgs($request, $token);
+                $this->evm->dispatchEvent(Events::onSecurityInteractiveLogin, $loginEventArgs);
+            }
+
+            if (null !== $this->logger) {
+                $this->logger->debug('SecurityContext populated with remember-me token.');
+            }
+        } catch (AuthenticationException $failed) {
+            if (null !== $this->logger) {
+                $this->logger->debug(
+                    'SecurityContext not populated with remember-me token as the'
+                   .' AuthenticationManager rejected the AuthenticationToken returned'
+                   .' by the RememberMeServices: '.$failed->getMessage()
+                );
+            }
+
+            $this->rememberMeServices->loginFail($request);
         }
     }
 }

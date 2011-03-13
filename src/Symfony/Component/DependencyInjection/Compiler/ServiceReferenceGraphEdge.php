@@ -20,9 +20,9 @@ namespace Symfony\Component\DependencyInjection\Compiler;
  */
 class ServiceReferenceGraphEdge
 {
-    protected $sourceNode;
-    protected $destNode;
-    protected $value;
+    private $sourceNode;
+    private $destNode;
+    private $value;
 
     /**
      * Constructor.

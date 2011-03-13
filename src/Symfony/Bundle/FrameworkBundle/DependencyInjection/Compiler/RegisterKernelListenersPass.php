@@ -30,8 +30,6 @@ class RegisterKernelListenersPass implements CompilerPassInterface
             foreach ($events as $event) {
                 $priority = isset($event['priority']) ? $event['priority'] : 0;
 
-                var_dump($id);
-
                 if (!isset($event['event'])) {
                     $definition->addMethodCall('addEventSubscriberService', array($id, $priority));
                 } else {

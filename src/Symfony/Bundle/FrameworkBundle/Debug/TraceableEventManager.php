@@ -44,24 +44,36 @@ class TraceableEventManager extends ContainerAwareEventManager implements Tracea
     /**
      * {@inheritDoc}
      */
-    public function dispatchEvent($eventName, EventArgs $eventArgs = null)
+    protected function triggerListener($listener, $eventName, EventArgs $eventArgs)
     {
-        parent::dispatchEvent($eventName, $eventArgs);
-    }
+        parent::triggerListener($listener, $eventName, $eventArgs);
 
-    /**
-     * {@inheritDoc}
-     */
-    public function notify(EventInterface $event)
-    {
-        foreach ($this->getListeners($event->getName()) as $listener) {
-            if (is_array($listener) && is_string($listener[0])) {
-                $listener[0] = $this->container->get($listener[0]);
+        $listenerString = $this->listenerToString($listener);
+
+        if (null !== $this->logger) {
+            $this->logger->debug(sprintf('Notified event "%s" to listener "%s"', $eventName, $listenerString));
+        }
+
+        $this->called[$eventName.'.'.$listenerString] = array(
+            'event'    => $eventName,
+            'listener' => $listenerString,
+        );
+
+        if ($eventArgs->isPropagationStopped() && null !== $this->logger) {
+            $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s"', $this->listenerToString($listener), $eventName));
+
+            $skippedListeners = $this->getListeners($eventName);
+            $skipped = false;
+
+            foreach ($skippedListeners as $skippedListener) {
+                if ($skipped) {
+                    $this->logger->debug(sprintf('Listener "%s" was not called for event "%s"', $this->listenerToString($skippedListener), $eventName));
+                }
+
+                if ($skippedListener === $listener) {
+                    $skipped = false;
+                }
             }
-
-            $this->addCall($event, $listener, 'notify');
-
-            call_user_func($listener, $event);
         }
     }
 
@@ -82,10 +94,6 @@ class TraceableEventManager extends ContainerAwareEventManager implements Tracea
 
         foreach (array_keys($this->listeners) as $name) {
             foreach ($this->getListeners($name) as $listener) {
-                if (is_array($listener) && is_string($listener[0])) {
-                    $listener[0] = $this->container->get($listener[0]);
-                }
-
                 $listener = $this->listenerToString($listener);
 
                 if (!isset($this->called[$name.'.'.$listener])) {
@@ -100,32 +108,18 @@ class TraceableEventManager extends ContainerAwareEventManager implements Tracea
         return $notCalled;
     }
 
-    protected function listenerToString($listener)
+    protected function listenerToString($listener, $eventName)
     {
-        if (is_object($listener) && $listener instanceof \Closure) {
-            return 'Closure';
-        }
+        if (is_object($listener)) {
+            if ($listener instanceof \Closure) {
+                return 'Closure';
+            }
 
-        if (is_string($listener)) {
-            return $listener;
+            return get_class($listener).'::'.$eventName;
         }
 
         if (is_array($listener)) {
-            return sprintf('%s::%s', is_object($listener[0]) ? get_class($listener[0]) : $listener[0], $listener[1]);
+            return is_object($listener[0]) ? sprintf('%s::%s', get_class($listener[0]), $listener[1]) : implode('::', $listener);
         }
-    }
-
-    protected function addCall(EventInterface $event, $listener, $type)
-    {
-        $listener = $this->listenerToString($listener);
-
-        if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Notified event "%s" to listener "%s" (%s)', $event->getName(), $listener, $type));
-        }
-
-        $this->called[$event->getName().'.'.$listener] = array(
-            'event'    => $event->getName(),
-            'listener' => $listener,
-        );
     }
 }

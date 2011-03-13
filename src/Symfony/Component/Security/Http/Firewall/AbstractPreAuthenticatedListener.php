@@ -32,43 +32,25 @@ use Doctrine\Common\EventManager;
  */
 abstract class AbstractPreAuthenticatedListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $authenticationManager;
-    protected $providerKey;
     protected $logger;
-    protected $evm;
+    private $securityContext;
+    private $authenticationManager;
+    private $providerKey;
+    private $evm;
 
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, LoggerInterface $logger = null, EventManager $evm = null)
     {
         $this->securityContext = $securityContext;
         $this->authenticationManager = $authenticationManager;
         $this->providerKey = $providerKey;
         $this->logger = $logger;
-    }
-
-    /**
-     *
-     *
-     * @param EventManager $evm An EventManager instance
-     */
-    public function register(EventManager $evm)
-    {
-        $evm->addEventListener(KernelEvents::onCoreSecurity, $this);
-
         $this->evm = $evm;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventManager $evm)
-    {
     }
 
     /**
      * Handles X509 authentication.
      *
-     * @param EventInterface $event An EventInterface instance
+     * @param GetResponseEventArgs $eventArgs A GetResponseEventArgs instance
      */
     public function onCoreSecurity(GetResponseEventArgs $eventArgs)
     {
@@ -81,11 +63,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
         list($user, $credentials) = $this->getPreAuthenticatedData($request);
 
         if (null !== $token = $this->securityContext->getToken()) {
-            if ($token->isImmutable()) {
-                return;
-            }
-
-            if ($token instanceof PreAuthenticatedToken && $token->isAuthenticated() && (string) $token === $user) {
+            if ($token instanceof PreAuthenticatedToken && $token->isAuthenticated() && $token->getUsername() === $user) {
                 return;
             }
         }

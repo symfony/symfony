@@ -54,10 +54,10 @@ namespace Symfony\Component\ClassLoader;
  */
 class UniversalClassLoader
 {
-    protected $namespaces = array();
-    protected $prefixes = array();
-    protected $namespaceFallback = array();
-    protected $prefixFallback = array();
+    private $namespaces = array();
+    private $prefixes = array();
+    private $namespaceFallback = array();
+    private $prefixFallback = array();
 
     /**
      * Gets the configured namespaces.
@@ -182,9 +182,25 @@ class UniversalClassLoader
      */
     public function loadClass($class)
     {
-        $class = ltrim($class, '\\');
+        if ($file = $this->findFile($class)) {
+            require $file;
+        }
+    }
 
-        if (false !== ($pos = strrpos($class, '\\'))) {
+    /**
+     * Finds the path to the file where the class is defined.
+     *
+     * @param string $class The name of the class
+     *
+     * @return string|null The path, if found
+     */
+    protected function findFile($class)
+    {
+        if ('\\' == $class[0]) {
+            $class = substr($class, 1);
+        }
+
+        if (false !== $pos = strrpos($class, '\\')) {
             // namespaced class name
             $namespace = substr($class, 0, $pos);
             foreach ($this->namespaces as $ns => $dirs) {
@@ -193,8 +209,7 @@ class UniversalClassLoader
                         $className = substr($class, $pos + 1);
                         $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $className).'.php';
                         if (file_exists($file)) {
-                            require $file;
-                            return;
+                            return $file;
                         }
                     }
                 }
@@ -203,8 +218,7 @@ class UniversalClassLoader
             foreach ($this->namespaceFallback as $dir) {
                 $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
                 if (file_exists($file)) {
-                    require $file;
-                    return;
+                    return $file;
                 }
             }
         } else {
@@ -214,8 +228,7 @@ class UniversalClassLoader
                     if (0 === strpos($class, $prefix)) {
                         $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
                         if (file_exists($file)) {
-                            require $file;
-                            return;
+                            return $file;
                         }
                     }
                 }
@@ -224,8 +237,7 @@ class UniversalClassLoader
             foreach ($this->prefixFallback as $dir) {
                 $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
                 if (file_exists($file)) {
-                    require $file;
-                    return;
+                    return $file;
                 }
             }
         }

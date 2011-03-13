@@ -46,7 +46,7 @@ class ProfilerListener
     /**
      * Handles the onCoreException event.
      *
-     * @param EventInterface $event An EventInterface instance
+     * @param ExceptionEventArgs $eventArgs An ExceptionEventArgs instance
      */
     public function onCoreException(ExceptionEventArgs $eventArgs)
     {
@@ -60,7 +60,7 @@ class ProfilerListener
     /**
      * Handles the filterCoreResponse event.
      *
-     * @param EventInterface $eventArgs An EventInterface instance
+     * @param FilterResponseEventArgs $eventArgs A FilterResponseEventArgs instance
      */
     public function filterCoreResponse(FilterResponseEventArgs $eventArgs)
     {

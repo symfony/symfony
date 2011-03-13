@@ -15,83 +15,44 @@ use Symfony\Component\Console\Input\StringInput;
 
 class StringInputTest extends \PHPUnit_Framework_TestCase
 {
-    public function testTokenize()
+    /**
+     * @dataProvider getTokenizeData
+     */
+    public function testTokenize($input, $tokens, $message)
     {
-        $input = new TestInput1('');
-        $this->assertEquals(array(), $input->getTokens(), '->tokenize() parses an empty string');
-
-        $input = new TestInput1('foo');
-        $this->assertEquals(array('foo'), $input->getTokens(), '->tokenize() parses arguments');
-
-        $input = new TestInput1('  foo  bar  ');
-        $this->assertEquals(array('foo', 'bar'), $input->getTokens(), '->tokenize() ignores whitespaces between arguments');
-
-        $input = new TestInput1('"quoted"');
-        $this->assertEquals(array('quoted'), $input->getTokens(), '->tokenize() parses quoted arguments');
-
-        $input = new TestInput1("'quoted'");
-        $this->assertEquals(array('quoted'), $input->getTokens(), '->tokenize() parses quoted arguments');
-
-        $input = new TestInput1('\"quoted\"');
-        $this->assertEquals(array('"quoted"'), $input->getTokens(), '->tokenize() parses escaped-quoted arguments');
-
-        $input = new TestInput1("\'quoted\'");
-        $this->assertEquals(array('\'quoted\''), $input->getTokens(), '->tokenize() parses escaped-quoted arguments');
-
-        $input = new TestInput1('-a');
-        $this->assertEquals(array('-a'), $input->getTokens(), '->tokenize() parses short options');
-
-        $input = new TestInput1('-azc');
-        $this->assertEquals(array('-azc'), $input->getTokens(), '->tokenize() parses aggregated short options');
-
-        $input = new TestInput1('-awithavalue');
-        $this->assertEquals(array('-awithavalue'), $input->getTokens(), '->tokenize() parses short options with a value');
-
-        $input = new TestInput1('-a"foo bar"');
-        $this->assertEquals(array('-afoo bar'), $input->getTokens(), '->tokenize() parses short options with a value');
-
-        $input = new TestInput1('-a"foo bar""foo bar"');
-        $this->assertEquals(array('-afoo barfoo bar'), $input->getTokens(), '->tokenize() parses short options with a value');
-
-        $input = new TestInput1('-a\'foo bar\'');
-        $this->assertEquals(array('-afoo bar'), $input->getTokens(), '->tokenize() parses short options with a value');
-
-        $input = new TestInput1('-a\'foo bar\'\'foo bar\'');
-        $this->assertEquals(array('-afoo barfoo bar'), $input->getTokens(), '->tokenize() parses short options with a value');
-
-        $input = new TestInput1('-a\'foo bar\'"foo bar"');
-        $this->assertEquals(array('-afoo barfoo bar'), $input->getTokens(), '->tokenize() parses short options with a value');
-
-        $input = new TestInput1('--long-option');
-        $this->assertEquals(array('--long-option'), $input->getTokens(), '->tokenize() parses long options');
-
-        $input = new TestInput1('--long-option=foo');
-        $this->assertEquals(array('--long-option=foo'), $input->getTokens(), '->tokenize() parses long options with a value');
-
-        $input = new TestInput1('--long-option="foo bar"');
-        $this->assertEquals(array('--long-option=foo bar'), $input->getTokens(), '->tokenize() parses long options with a value');
-
-        $input = new TestInput1('--long-option="foo bar""another"');
-        $this->assertEquals(array('--long-option=foo baranother'), $input->getTokens(), '->tokenize() parses long options with a value');
-
-        $input = new TestInput1('--long-option=\'foo bar\'');
-        $this->assertEquals(array('--long-option=foo bar'), $input->getTokens(), '->tokenize() parses long options with a value');
-
-        $input = new TestInput1("--long-option='foo bar''another'");
-        $this->assertEquals(array("--long-option=foo baranother"), $input->getTokens(), '->tokenize() parses long options with a value');
-
-        $input = new TestInput1("--long-option='foo bar'\"another\"");
-        $this->assertEquals(array("--long-option=foo baranother"), $input->getTokens(), '->tokenize() parses long options with a value');
-
-        $input = new TestInput1('foo -a -ffoo --long bar');
-        $this->assertEquals(array('foo', '-a', '-ffoo', '--long', 'bar'), $input->getTokens(), '->tokenize() parses when several arguments and options');
+        $input = new StringInput($input);
+        $r = new \ReflectionClass('Symfony\Component\Console\Input\ArgvInput');
+        $p = $r->getProperty('tokens');
+        $p->setAccessible(true);
+        $this->assertEquals($tokens, $p->getValue($input), $message);
     }
-}
 
-class TestInput1 extends StringInput
-{
-    public function getTokens()
+    public function getTokenizeData()
     {
-        return $this->tokens;
+        return array(
+            array('', array(), '->tokenize() parses an empty string'),
+            array('foo', array('foo'), '->tokenize() parses arguments'),
+            array('  foo  bar  ', array('foo', 'bar'), '->tokenize() ignores whitespaces between arguments'),
+            array('"quoted"', array('quoted'), '->tokenize() parses quoted arguments'),
+            array("'quoted'", array('quoted'), '->tokenize() parses quoted arguments'),
+            array('\"quoted\"', array('"quoted"'), '->tokenize() parses escaped-quoted arguments'),
+            array("\'quoted\'", array('\'quoted\''), '->tokenize() parses escaped-quoted arguments'),
+            array('-a', array('-a'), '->tokenize() parses short options'),
+            array('-azc', array('-azc'), '->tokenize() parses aggregated short options'),
+            array('-awithavalue', array('-awithavalue'), '->tokenize() parses short options with a value'),
+            array('-a"foo bar"', array('-afoo bar'), '->tokenize() parses short options with a value'),
+            array('-a"foo bar""foo bar"', array('-afoo barfoo bar'), '->tokenize() parses short options with a value'),
+            array('-a\'foo bar\'', array('-afoo bar'), '->tokenize() parses short options with a value'),
+            array('-a\'foo bar\'\'foo bar\'', array('-afoo barfoo bar'), '->tokenize() parses short options with a value'),
+            array('-a\'foo bar\'"foo bar"', array('-afoo barfoo bar'), '->tokenize() parses short options with a value'),
+            array('--long-option', array('--long-option'), '->tokenize() parses long options'),
+            array('--long-option=foo', array('--long-option=foo'), '->tokenize() parses long options with a value'),
+            array('--long-option="foo bar"', array('--long-option=foo bar'), '->tokenize() parses long options with a value'),
+            array('--long-option="foo bar""another"', array('--long-option=foo baranother'), '->tokenize() parses long options with a value'),
+            array('--long-option=\'foo bar\'', array('--long-option=foo bar'), '->tokenize() parses long options with a value'),
+            array("--long-option='foo bar''another'", array("--long-option=foo baranother"), '->tokenize() parses long options with a value'),
+            array("--long-option='foo bar'\"another\"", array("--long-option=foo baranother"), '->tokenize() parses long options with a value'),
+            array('foo -a -ffoo --long bar', array('foo', '-a', '-ffoo', '--long', 'bar'), '->tokenize() parses when several arguments and options'),
+        );
     }
 }

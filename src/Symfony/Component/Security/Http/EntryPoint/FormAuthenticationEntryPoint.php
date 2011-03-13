@@ -26,8 +26,8 @@ use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
  */
 class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {
-    protected $loginPath;
-    protected $useForward;
+    private $loginPath;
+    private $useForward;
 
     /**
      * Constructor

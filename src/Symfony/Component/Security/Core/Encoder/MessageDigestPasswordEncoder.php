@@ -18,8 +18,8 @@ namespace Symfony\Component\Security\Core\Encoder;
  */
 class MessageDigestPasswordEncoder extends BasePasswordEncoder
 {
-    protected $algorithm;
-    protected $encodeHashAsBase64;
+    private $algorithm;
+    private $encodeHashAsBase64;
 
     /**
      * Constructor.

@@ -29,9 +29,9 @@ use Doctrine\Common\EventManager;
  */
 class Firewall
 {
-    protected $map;
-    protected $evm;
-    protected $currentListeners;
+    private $map;
+    private $evm;
+    private $currentListeners;
 
     /**
      * Constructor.
@@ -56,38 +56,19 @@ class Firewall
             return;
         }
 
-        $request = $eventArgs->getRequest();
-
-        // disconnect all listeners from onCoreSecurity to avoid the overhead
-        // of most listeners having to do this manually
-        $this->evm->removeEventListeners(Events::onCoreSecurity);
-
-        // ensure that listeners disconnect from wherever they have connected to
-        foreach ($this->currentListeners as $listener) {
-            $listener->unregister($this->evm);
-        }
-
         // register listeners for this firewall
-        list($listeners, $exception) = $this->map->getListeners($request);
+        list($listeners, $exception) = $this->map->getListeners($eventArgs->getRequest());
         if (null !== $exception) {
             $exception->register($this->evm);
         }
-        foreach ($listeners as $listener) {
-            $listener->register($this->evm);
-        }
-
-        // save current listener instances
-        $this->currentListeners = $listeners;
-        if (null !== $exception) {
-            $this->currentListeners[] = $exception;
-        }
 
         // initiate the listener chain
-        $securityEventArgs = new GetResponseEventArgs($eventArgs->getKernel(), $request, $eventArgs->getRequestType());
-        $this->evm->dispatchEvent($securityEventArgs);
+        foreach ($listeners as $listener) {
+            $response = $listener->handle($eventArgs);
 
-        if ($securityEventArgs->hasResponse()) {
-            $eventArgs->setResponse($securityEventArgs->getResponse());
+            if ($eventArgs->hasResponse()) {
+                break;
+            }
         }
     }
 }

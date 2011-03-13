@@ -27,8 +27,8 @@ use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
  */
 class RetryAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {
-    protected $httpPort;
-    protected $httpsPort;
+    private $httpPort;
+    private $httpsPort;
 
     public function __construct($httpPort = 80, $httpsPort = 443)
     {

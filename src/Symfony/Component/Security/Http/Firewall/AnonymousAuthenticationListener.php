@@ -16,7 +16,6 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
 use Symfony\Component\HttpKernel\Events;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
-use Doctrine\Common\EventManager;
 
 /**
  * AnonymousAuthenticationListener automatically addds a Token if none is
@@ -26,33 +25,15 @@ use Doctrine\Common\EventManager;
  */
 class AnonymousAuthenticationListener implements ListenerInterface
 {
-    protected $context;
-    protected $key;
-    protected $logger;
+    private $context;
+    private $key;
+    private $logger;
 
     public function __construct(SecurityContextInterface $context, $key, LoggerInterface $logger = null)
     {
         $this->context = $context;
         $this->key     = $key;
         $this->logger  = $logger;
-    }
-
-    /**
-     * Registers a onCoreSecurity listener to load the SecurityContext from the
-     * session.
-     *
-     * @param EventManager $evm An EventManager instance
-     */
-    public function register(EventManager $evm)
-    {
-        $evm->addEventListener(Events::onCoreSecurity, $this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventManager $evm)
-    {
     }
 
     /**

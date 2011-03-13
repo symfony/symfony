@@ -1,9 +1,5 @@
 <?php
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Extension\Extension;
-
 class ProjectWithXsdExtension extends ProjectExtension
 {
     public function getXsdValidationBasePath()

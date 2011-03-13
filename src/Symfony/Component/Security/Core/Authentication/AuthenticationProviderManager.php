@@ -25,8 +25,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class AuthenticationProviderManager implements AuthenticationManagerInterface
 {
-    protected $providers;
-    protected $eraseCredentials;
+    private $providers;
+    private $eraseCredentials;
 
     /**
      * Constructor.
@@ -34,9 +34,13 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
      * @param AuthenticationProviderInterface[] $providers        An array of AuthenticationProviderInterface instances
      * @param Boolean                           $eraseCredentials Whether to erase credentials after authentication or not
      */
-    public function __construct(array $providers = array(), $eraseCredentials = true)
+    public function __construct(array $providers, $eraseCredentials = true)
     {
-        $this->setProviders($providers);
+        if (!$providers) {
+            throw new \InvalidArgumentException('You must at least add one authentication provider.');
+        }
+
+        $this->providers = $providers;
         $this->eraseCredentials = (Boolean) $eraseCredentials;
     }
 
@@ -45,10 +49,6 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
      */
     public function authenticate(TokenInterface $token)
     {
-        if (!count($this->providers)) {
-            throw new \LogicException('You must add at least one provider.');
-        }
-
         $lastException = null;
         $result = null;
 
@@ -83,38 +83,5 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
         $lastException->setExtraInformation($token);
 
         throw $lastException;
-    }
-
-    /**
-     * Returns the list of current providers.
-     *
-     * @return AuthenticationProviderInterface[] An array of AuthenticationProviderInterface instances
-     */
-    public function all()
-    {
-        return $this->providers;
-    }
-
-    /**
-     * Sets the providers instances.
-     *
-     * @param AuthenticationProviderInterface[] $providers An array of AuthenticationProviderInterface instances
-     */
-    public function setProviders(array $providers)
-    {
-        $this->providers = array();
-        foreach ($providers as $provider) {
-            $this->add($provider);
-        }
-    }
-
-    /**
-     * Adds a provider.
-     *
-     * @param AuthenticationProviderInterface $provider A AuthenticationProviderInterface instance
-     */
-    public function add(AuthenticationProviderInterface $provider)
-    {
-        $this->providers[] = $provider;
     }
 }

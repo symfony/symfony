@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 class Application extends BaseApplication
 {
-    protected $kernel;
+    private $kernel;
 
     /**
      * Constructor.
@@ -36,9 +36,9 @@ class Application extends BaseApplication
 
         parent::__construct('Symfony', Kernel::VERSION.' - '.$kernel->getName().'/'.$kernel->getEnvironment().($kernel->isDebug() ? '/debug' : ''));
 
-        $this->definition->addOption(new InputOption('--shell', '-s', InputOption::VALUE_NONE, 'Launch the shell.'));
-        $this->definition->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The Environment name.', 'dev'));
-        $this->definition->addOption(new InputOption('--debug', '-d', InputOption::VALUE_NONE, 'Whether to run in debug mode.'));
+        $this->getDefinition()->addOption(new InputOption('--shell', '-s', InputOption::VALUE_NONE, 'Launch the shell.'));
+        $this->getDefinition()->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The Environment name.', 'dev'));
+        $this->getDefinition()->addOption(new InputOption('--no-debug', null, InputOption::VALUE_NONE, 'Switches off debug mode.'));
 
         $this->kernel->boot();
 

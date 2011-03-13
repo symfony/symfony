@@ -152,7 +152,7 @@ class ParameterBag implements ParameterBagInterface
      * @param array $match 
      * @return string
      */
-    protected function resolveValueCallback($match)
+    private function resolveValueCallback($match)
     {
         return $this->get(strtolower($match[1]));
     }

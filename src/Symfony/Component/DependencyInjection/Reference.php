@@ -18,9 +18,9 @@ namespace Symfony\Component\DependencyInjection;
  */
 class Reference
 {
-    protected $id;
-    protected $invalidBehavior;
-    protected $strict;
+    private $id;
+    private $invalidBehavior;
+    private $strict;
 
     /**
      * Constructor.

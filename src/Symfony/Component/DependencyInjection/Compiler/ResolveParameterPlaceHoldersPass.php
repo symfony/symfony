@@ -20,12 +20,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
 {
-    protected $parameterBag;
+    private $parameterBag;
 
     /**
      * Processes the ContainerBuilder to resolve parameter placeholders.
      *
-     * @param ContainerBuilder $container 
+     * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {
@@ -41,6 +41,8 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
                 $calls[$this->resolveValue($name)] = $this->resolveValue($arguments);
             }
             $definition->setMethodCalls($calls);
+
+            $definition->setProperties($this->resolveValue($definition->getProperties()));
         }
 
         $aliases = array();
@@ -68,7 +70,7 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
      * @param mixed $value The value to resolve
      * @return mixed The resolved value
      */
-    protected function resolveValue($value)
+    private function resolveValue($value)
     {
         if (is_array($value)) {
             $resolved = array();

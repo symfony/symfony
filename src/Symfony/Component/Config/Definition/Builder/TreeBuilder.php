@@ -11,10 +11,7 @@
 
 namespace Symfony\Component\Config\Definition\Builder;
 
-use Symfony\Component\Config\Definition\BaseNode;
-
 use Symfony\Component\Config\Definition\BooleanNode;
-
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\ScalarNode;
 use Symfony\Component\Config\Definition\VariableNode;
@@ -24,7 +21,7 @@ use Symfony\Component\Config\Definition\VariableNode;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class TreeBuilder
+class TreeBuilder implements BuilderInterface
 {
     protected $root;
     protected $tree;
@@ -35,7 +32,7 @@ class TreeBuilder
      * @param string $name The name of the node
      * @param string $type The type of the node
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function root($name, $type)
     {
@@ -80,7 +77,7 @@ class TreeBuilder
     }
 
     /**
-     * Creates a boolean node.
+     * Creates a Boolean node.
      *
      * @param NodeBuilder $node The builder of the node
      *
@@ -89,7 +86,7 @@ class TreeBuilder
     protected function createBooleanConfigNode(NodeBuilder $node)
     {
         $configNode = new BooleanNode($node->name, $node->parent);
-        $this->configureScalarNode($configNode, $node);
+        $this->configureVariableNode($configNode, $node);
 
         return $configNode;
     }
@@ -104,18 +101,18 @@ class TreeBuilder
     protected function createScalarConfigNode(NodeBuilder $node)
     {
         $configNode = new ScalarNode($node->name, $node->parent);
-        $this->configureScalarNode($configNode, $node);
+        $this->configureVariableNode($configNode, $node);
 
         return $configNode;
     }
 
     /**
-     * Configures a scalar node.
+     * Configures a variable node.
      *
-     * @param ScalarNode  $configNode The node to configure
-     * @param NodeBuilder $node       The builder of the node
+     * @param VariableNode $configNode The node to configure
+     * @param NodeBuilder  $node       The builder of the node
      */
-    protected function configureScalarNode(ScalarNode $configNode, NodeBuilder $node)
+    protected function configureVariableNode(VariableNode $configNode, NodeBuilder $node)
     {
         if (null !== $node->normalization) {
             $configNode->setNormalizationClosures(
@@ -157,35 +154,7 @@ class TreeBuilder
     protected function createVariableConfigNode(NodeBuilder $node)
     {
         $configNode = new VariableNode($node->name, $node->parent);
-
-        if (null !== $node->normalization) {
-            $configNode->setNormalizationClosures(
-                $this->buildExpressions($node->normalization->before)
-            );
-        }
-
-        if (null !== $node->merge) {
-            $configNode->setAllowOverwrite($node->merge->allowOverwrite);
-        }
-
-        if (true === $node->default) {
-            $configNode->setDefaultValue($node->defaultValue);
-        }
-
-        if (false === $node->allowEmptyValue) {
-            $configNode->setAllowEmptyValue($node->allowEmptyValue);
-        }
-
-        $configNode->addEquivalentValue(null, $node->nullEquivalent);
-        $configNode->addEquivalentValue(true, $node->trueEquivalent);
-        $configNode->addEquivalentValue(false, $node->falseEquivalent);
-        $configNode->setRequired($node->required);
-
-        if (null !== $node->validation) {
-            $configNode->setFinalValidationClosures(
-                $this->buildExpressions($node->validation->rules)
-            );
-        }
+        $this->configureVariableNode($configNode, $node);
 
         return $configNode;
     }

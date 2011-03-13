@@ -11,19 +11,22 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
-use Symfony\Component\Security\Core\User\AccountInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * TokenInterface is the interface for the user authentication information.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 interface TokenInterface extends \Serializable
 {
     /**
-     * Returns a string representation of the token.
+     * Returns a string representation ofthe Token.
      *
-     * @return string A string representation
+     * This is only to be used for debugging purposes.
+     *
+     * @return string
      */
     function __toString();
 
@@ -33,14 +36,6 @@ interface TokenInterface extends \Serializable
      * @return Role[] An array of Role instances.
      */
     function getRoles();
-
-    /**
-     * Sets the user's roles
-     *
-     * @param array $roles
-     * @return void
-     */
-    function setRoles(array $roles);
 
     /**
      * Returns the user credentials.
@@ -58,12 +53,18 @@ interface TokenInterface extends \Serializable
     function getUser();
 
     /**
-     * Sets the user.
+     * Sets a user.
      *
-     * @param mixed $user can either be an object which implements __toString(), or
-     *                       only a primitive string
+     * @param mixed $user
      */
     function setUser($user);
+
+    /**
+     * Returns the username.
+     *
+     * @return string
+     */
+    function getUsername();
 
     /**
      * Checks if the user is authenticated or not.
@@ -78,22 +79,6 @@ interface TokenInterface extends \Serializable
      * @param Boolean $isAuthenticated The authenticated flag
      */
     function setAuthenticated($isAuthenticated);
-
-    /**
-     * Whether this token is considered immutable
-     *
-     * @return Boolean
-     */
-    function isImmutable();
-
-    /**
-     * Marks this token as immutable. This change cannot be reversed.
-     *
-     * You'll need to create a new token if you want a mutable token again.
-     *
-     * @return void
-     */
-    function setImmutable();
 
     /**
      * Removes sensitive information from the token.

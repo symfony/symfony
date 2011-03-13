@@ -72,11 +72,11 @@ class Container implements ContainerInterface
     {
         $this->parameterBag = null === $parameterBag ? new ParameterBag() : $parameterBag;
 
-        $this->services =
-        $this->scopes =
-        $this->scopeChildren =
-        $this->scopedServices =
-        $this->scopeStacks = array();
+        $this->services       = array();
+        $this->scopes         = array();
+        $this->scopeChildren  = array();
+        $this->scopedServices = array();
+        $this->scopeStacks    = array();
 
         $this->set('service_container', $this);
     }
@@ -223,7 +223,12 @@ class Container implements ContainerInterface
         if (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service')) {
             $this->loading[$id] = true;
 
-            $service = $this->$method();
+            try {
+                $service = $this->$method();
+            } catch (\Exception $e) {
+                unset($this->loading[$id]);
+                throw $e;
+            }
 
             unset($this->loading[$id]);
 

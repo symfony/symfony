@@ -22,7 +22,7 @@ namespace Symfony\Component\Security\Acl\Exception;
  */
 class NotAllAclsFoundException extends AclNotFoundException
 {
-    protected $partialResult;
+    private $partialResult;
 
     /**
      * Sets the partial result

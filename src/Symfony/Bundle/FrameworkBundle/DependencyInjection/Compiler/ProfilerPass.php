@@ -35,7 +35,11 @@ class ProfilerPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds('data_collector') as $id => $attributes) {
             $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
             $template = null;
-            if (isset($attributes[0]['template']) && isset($attributes[0]['id'])) {
+
+            if (isset($attributes[0]['template'])) {
+                if (!isset($attributes[0]['id'])) {
+                    throw new \InvalidArgumentException(sprintf('Data collector service "%s" must have an id attribute in order to specify a template', $id));
+                }
                 $template = array($attributes[0]['id'], $attributes[0]['template']);
             }
 

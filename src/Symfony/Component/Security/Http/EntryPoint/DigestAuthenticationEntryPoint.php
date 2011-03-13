@@ -26,10 +26,10 @@ use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
  */
 class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {
-    protected $key;
-    protected $realmName;
-    protected $nonceValiditySeconds;
-    protected $logger;
+    private $key;
+    private $realmName;
+    private $nonceValiditySeconds;
+    private $logger;
 
     public function __construct($realmName, $key, $nonceValiditySeconds = 300, LoggerInterface $logger = null)
     {
@@ -61,15 +61,5 @@ class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterfac
         $response->setStatusCode(401, $authException->getMessage());
 
         return $response;
-    }
-
-    public function getKey()
-    {
-        return $this->key;
-    }
-
-    public function getRealmName()
-    {
-        return $this->realmName;
     }
 }

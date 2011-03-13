@@ -7,6 +7,8 @@ use Symfony\Bundle\DoctrineBundle\Command\InfoDoctrineCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\StringInput;
 
+require_once __DIR__.'/../DependencyInjection/Fixtures/Bundles/YamlBundle/Entity/Test.php';
+
 class InfoDoctrineCommandTest extends TestCase
 {
     public function testAnnotationsBundle()

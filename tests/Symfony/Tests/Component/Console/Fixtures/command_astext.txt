@@ -1,5 +1,5 @@
 <comment>Usage:</comment>
- namespace:name [-h|--help] [-q|--quiet] [-v|--verbose] [-V|--version] [-a|--ansi] [-n|--no-interaction] command
+ namespace:name
 
 <comment>Aliases:</comment> <info>name</info>
 <comment>Arguments:</comment>

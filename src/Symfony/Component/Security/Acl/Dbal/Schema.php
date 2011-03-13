@@ -18,7 +18,7 @@ use Doctrine\DBAL\Schema\Schema as BaseSchema;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class Schema extends BaseSchema
+final class Schema extends BaseSchema
 {
     protected $options;
 

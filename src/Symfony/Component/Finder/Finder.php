@@ -27,18 +27,18 @@ namespace Symfony\Component\Finder;
  */
 class Finder implements \IteratorAggregate
 {
-    protected $mode        = 0;
-    protected $names       = array();
-    protected $notNames    = array();
-    protected $exclude     = array();
-    protected $filters     = array();
-    protected $depths      = array();
-    protected $sizes       = array();
-    protected $followLinks = false;
-    protected $sort        = false;
-    protected $ignoreVCS   = true;
-    protected $dirs        = array();
-    protected $dates       = array();
+    private $mode        = 0;
+    private $names       = array();
+    private $notNames    = array();
+    private $exclude     = array();
+    private $filters     = array();
+    private $depths      = array();
+    private $sizes       = array();
+    private $followLinks = false;
+    private $sort        = false;
+    private $ignoreVCS   = true;
+    private $dirs        = array();
+    private $dates       = array();
 
     /**
      * Restricts the matching to directories only.
@@ -336,7 +336,7 @@ class Finder implements \IteratorAggregate
         return $iterator;
     }
 
-    protected function searchInDirectory($dir)
+    private function searchInDirectory($dir)
     {
         $flags = \RecursiveDirectoryIterator::SKIP_DOTS;
 

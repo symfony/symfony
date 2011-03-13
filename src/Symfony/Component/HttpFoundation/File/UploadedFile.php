@@ -2,7 +2,7 @@
 
 /*
  * This file is part of the Symfony package.
- * 
+ *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
@@ -101,13 +101,18 @@ class UploadedFile extends File
     }
 
     /**
-     * Returns the original file name including its extension.
+     * Returns the absolute file name without dots
      *
-     * @returns string  The file name
+     * Until the uploaded file is moved, it will return the name of the temporary file
+     *
+     * @returns string  The file path
      */
-    public function getOriginalName()
+    public function getName()
     {
-        return $this->originalName;
+        if (!$this->moved) {
+            return $this->originalName;
+        }
+        return parent::getName();
     }
 
     /**

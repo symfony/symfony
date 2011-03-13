@@ -16,8 +16,11 @@ namespace Symfony\Component\Security\Core\Authentication\Token;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class UsernamePasswordToken extends Token
+class UsernamePasswordToken extends AbstractToken
 {
+    private $credentials;
+    private $providerKey;
+
     /**
      * Constructor.
      *
@@ -28,11 +31,15 @@ class UsernamePasswordToken extends Token
     {
         parent::__construct($roles);
 
+        if (empty($providerKey)) {
+            throw new \InvalidArgumentException('$providerKey must not be empty.');
+        }
+
         $this->setUser($user);
         $this->credentials = $credentials;
         $this->providerKey = $providerKey;
 
-        parent::setAuthenticated((Boolean) count($roles));
+        parent::setAuthenticated(count($roles) > 0);
     }
 
     /**
@@ -47,6 +54,16 @@ class UsernamePasswordToken extends Token
         parent::setAuthenticated(false);
     }
 
+    public function getCredentials()
+    {
+        return $this->credentials;
+    }
+
+    public function getProviderKey()
+    {
+        return $this->providerKey;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -55,5 +72,16 @@ class UsernamePasswordToken extends Token
         parent::eraseCredentials();
 
         $this->credentials = null;
+    }
+
+    public function serialize()
+    {
+        return serialize(array($this->credentials, $this->providerKey, parent::serialize()));
+    }
+
+    public function unserialize($str)
+    {
+        list($this->credentials, $this->providerKey, $parentStr) = unserialize($str);
+        parent::unserialize($parentStr);
     }
 }

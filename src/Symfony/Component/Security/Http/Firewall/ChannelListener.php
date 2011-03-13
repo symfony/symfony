@@ -16,7 +16,6 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
 use Symfony\Component\HttpKernel\Events;
-use Doctrine\Common\EventManager;
 
 /**
  * ChannelListener switches the HTTP protocol based on the access control
@@ -26,32 +25,15 @@ use Doctrine\Common\EventManager;
  */
 class ChannelListener implements ListenerInterface
 {
-    protected $map;
-    protected $authenticationEntryPoint;
-    protected $logger;
+    private $map;
+    private $authenticationEntryPoint;
+    private $logger;
 
     public function __construct(AccessMap $map, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
     {
         $this->map = $map;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
         $this->logger = $logger;
-    }
-
-    /**
-     *
-     *
-     * @param EventManager $evm An EventManager instance
-     */
-    public function register(EventManager $evm)
-    {
-        $evm->addEventListener(Events::onCoreSecurity, $this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventManager $evm)
-    {
     }
 
     /**

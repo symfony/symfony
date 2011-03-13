@@ -19,7 +19,6 @@ use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
 use Symfony\Component\HttpKernel\Events;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Doctrine\Common\EventManager;
 
 /**
  * BasicAuthenticationListener implements Basic HTTP authentication.
@@ -28,12 +27,12 @@ use Doctrine\Common\EventManager;
  */
 class BasicAuthenticationListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $authenticationManager;
-    protected $providerKey;
-    protected $authenticationEntryPoint;
-    protected $logger;
-    protected $ignoreFailure;
+    private $securityContext;
+    private $authenticationManager;
+    private $providerKey;
+    private $authenticationEntryPoint;
+    private $logger;
+    private $ignoreFailure;
 
     public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
     {
@@ -50,23 +49,6 @@ class BasicAuthenticationListener implements ListenerInterface
     }
 
     /**
-     *
-     *
-     * @param EventManager $evm An EventManager instance
-     */
-    public function register(EventManager $evm)
-    {
-        $evm->addEventListener(Events::onCoreSecurity, $this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventManager $evm)
-    {
-    }
-
-    /**
      * Handles basic authentication.
      *
      * @param GetResponseEventArgs $eventArgs A GetResponseEventArgs instance
@@ -80,11 +62,7 @@ class BasicAuthenticationListener implements ListenerInterface
         }
 
         if (null !== $token = $this->securityContext->getToken()) {
-            if ($token->isImmutable()) {
-                return;
-            }
-
-            if ($token instanceof UsernamePasswordToken && $token->isAuthenticated() && (string) $token === $username) {
+            if ($token instanceof UsernamePasswordToken && $token->isAuthenticated() && $token->getUsername() === $username) {
                 return;
             }
         }

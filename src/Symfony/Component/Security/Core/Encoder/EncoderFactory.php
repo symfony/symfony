@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Encoder;
 
-use Symfony\Component\Security\Core\User\AccountInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * A generic encoder factory implementation
@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\User\AccountInterface;
  */
 class EncoderFactory implements EncoderFactoryInterface
 {
-    protected $encoders;
+    private $encoders;
 
     public function __construct(array $encoders)
     {
@@ -30,10 +30,10 @@ class EncoderFactory implements EncoderFactoryInterface
     /**
      * {@inheritDoc}
      */
-    public function getEncoder(AccountInterface $account)
+    public function getEncoder(UserInterface $user)
     {
         foreach ($this->encoders as $class => $encoder) {
-            if (!$account instanceof $class) {
+            if (!$user instanceof $class) {
                 continue;
             }
 
@@ -44,7 +44,7 @@ class EncoderFactory implements EncoderFactoryInterface
             return $this->encoders[$class];
         }
 
-        throw new \RuntimeException(sprintf('No encoder has been configured for account "%s".', get_class($account)));
+        throw new \RuntimeException(sprintf('No encoder has been configured for account "%s".', get_class($user)));
     }
 
     /**
@@ -53,7 +53,7 @@ class EncoderFactory implements EncoderFactoryInterface
      * @param array $config
      * @return PasswordEncoderInterface
      */
-    protected function createEncoder(array $config)
+    private function createEncoder(array $config)
     {
         if (!isset($config['class'])) {
             throw new \InvalidArgumentException(sprintf('"class" must be set in %s.', json_encode($config)));

@@ -35,7 +35,7 @@ class DumpCommand extends Command
             ->setName('assetic:dump')
             ->setDescription('Dumps all assets to the filesystem')
             ->addArgument('write_to', InputArgument::OPTIONAL, 'Override the configured asset root')
-            ->addOption('watch', null, InputOption::VALUE_NONE, 'Check for changes every second')
+            ->addOption('watch', null, InputOption::VALUE_NONE, 'Check for changes every second, debug mode only')
         ;
     }
 
@@ -73,6 +73,10 @@ class DumpCommand extends Command
      */
     protected function watch(LazyAssetManager $am, $basePath, OutputInterface $output, $debug = false)
     {
+        if (!$debug) {
+            throw new \RuntimeException('The --watch option is only available in debug mode.');
+        }
+
         $refl = new \ReflectionClass('Assetic\\AssetManager');
         $prop = $refl->getProperty('assets');
         $prop->setAccessible(true);
@@ -95,9 +99,7 @@ class DumpCommand extends Command
 
                 // reset the asset manager
                 $prop->setValue($am, array());
-                if ($debug) {
-                    $am->load();
-                }
+                $am->load();
 
                 file_put_contents($cache, serialize($previously));
                 $error = '';

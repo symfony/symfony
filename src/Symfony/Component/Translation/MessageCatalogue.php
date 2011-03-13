@@ -20,9 +20,9 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  */
 class MessageCatalogue implements MessageCatalogueInterface
 {
-    protected $messages = array();
-    protected $locale;
-    protected $resources;
+    private $messages = array();
+    private $locale;
+    private $resources;
 
     /**
      * Constructor.

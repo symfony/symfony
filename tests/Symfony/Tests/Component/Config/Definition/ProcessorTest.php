@@ -9,22 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\DependencyInjection\Extension;
+namespace Symfony\Tests\Component\Config\Definition;
 
-use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\Config\Definition\Processor;
 
-require_once __DIR__.'/../Fixtures/includes/ProjectExtension.php';
-
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
-class ExtensionTest extends \PHPUnit_Framework_TestCase
+class ProcessorTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider getKeyNormalizationTests
      */
     public function testNormalizeKeys($denormalized, $normalized)
     {
-        $this->assertSame($normalized, Extension::normalizeKeys($denormalized));
+        $this->assertSame($normalized, Processor::normalizeKeys($denormalized));
     }
 
     public function getKeyNormalizationTests()

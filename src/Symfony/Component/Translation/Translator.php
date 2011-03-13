@@ -22,10 +22,10 @@ class Translator implements TranslatorInterface
 {
     protected $catalogues;
     protected $locale;
-    protected $fallbackLocale;
-    protected $loaders;
-    protected $resources;
-    protected $selector;
+    private $fallbackLocale;
+    private $loaders;
+    private $resources;
+    private $selector;
 
     /**
      * Constructor.
@@ -136,7 +136,6 @@ class Translator implements TranslatorInterface
         $this->catalogues[$locale] = new MessageCatalogue($locale);
 
         if (isset($this->resources[$locale])) {
-
             foreach ($this->resources[$locale] as $resource) {
                 if (!isset($this->loaders[$resource[0]])) {
                     throw new \RuntimeException(sprintf('The "%s" translation loader is not registered.', $resource[0]));
@@ -148,7 +147,7 @@ class Translator implements TranslatorInterface
         $this->optimizeCatalogue($locale);
     }
 
-    protected function optimizeCatalogue($locale)
+    private function optimizeCatalogue($locale)
     {
         if (strlen($locale) > 3) {
             $fallback = substr($locale, 0, -strlen(strrchr($locale, '_')));

@@ -17,11 +17,11 @@ namespace Symfony\Component\Yaml;
  */
 class Parser
 {
-    protected $offset         = 0;
-    protected $lines          = array();
-    protected $currentLineNb  = -1;
-    protected $currentLine    = '';
-    protected $refs           = array();
+    private $offset         = 0;
+    private $lines          = array();
+    private $currentLineNb  = -1;
+    private $currentLine    = '';
+    private $refs           = array();
 
     /**
      * Constructor
@@ -223,7 +223,7 @@ class Parser
      *
      * @return integer The current line number
      */
-    protected function getRealCurrentLineNb()
+    private function getRealCurrentLineNb()
     {
         return $this->currentLineNb + $this->offset;
     }
@@ -233,7 +233,7 @@ class Parser
      *
      * @return integer The current line indentation
      */
-    protected function getCurrentLineIndentation()
+    private function getCurrentLineIndentation()
     {
         return strlen($this->currentLine) - strlen(ltrim($this->currentLine, ' '));
     }
@@ -247,7 +247,7 @@ class Parser
      *
      * @throws ParserException When indentation problem are detected
      */
-    protected function getNextEmbedBlock($indentation = null)
+    private function getNextEmbedBlock($indentation = null)
     {
         $this->moveToNextLine();
 
@@ -296,7 +296,7 @@ class Parser
      *
      * @return Boolean
      */
-    protected function moveToNextLine()
+    private function moveToNextLine()
     {
         if ($this->currentLineNb >= count($this->lines) - 1) {
             return false;
@@ -310,7 +310,7 @@ class Parser
     /**
      * Moves the parser to the previous line.
      */
-    protected function moveToPreviousLine()
+    private function moveToPreviousLine()
     {
         $this->currentLine = $this->lines[--$this->currentLineNb];
     }
@@ -324,7 +324,7 @@ class Parser
      *
      * @throws ParserException When reference does not exist
      */
-    protected function parseValue($value)
+    private function parseValue($value)
     {
         if ('*' === substr($value, 0, 1)) {
             if (false !== $pos = strpos($value, '#')) {
@@ -357,7 +357,7 @@ class Parser
      *
      * @return string  The text value
      */
-    protected function parseFoldedScalar($separator, $indicator = '', $indentation = 0)
+    private function parseFoldedScalar($separator, $indicator = '', $indentation = 0)
     {
         $separator = '|' == $separator ? "\n" : ' ';
         $text = '';
@@ -427,7 +427,7 @@ class Parser
      *
      * @return Boolean Returns true if the next line is indented, false otherwise
      */
-    protected function isNextLineIndented()
+    private function isNextLineIndented()
     {
         $currentIndentation = $this->getCurrentLineIndentation();
         $notEOF = $this->moveToNextLine();
@@ -455,7 +455,7 @@ class Parser
      *
      * @return Boolean Returns true if the current line is empty or if it is a comment line, false otherwise
      */
-    protected function isCurrentLineEmpty()
+    private function isCurrentLineEmpty()
     {
         return $this->isCurrentLineBlank() || $this->isCurrentLineComment();
     }
@@ -465,7 +465,7 @@ class Parser
      *
      * @return Boolean Returns true if the current line is blank, false otherwise
      */
-    protected function isCurrentLineBlank()
+    private function isCurrentLineBlank()
     {
         return '' == trim($this->currentLine, ' ');
     }
@@ -475,7 +475,7 @@ class Parser
      *
      * @return Boolean Returns true if the current line is a comment line, false otherwise
      */
-    protected function isCurrentLineComment()
+    private function isCurrentLineComment()
     {
         //checking explicitly the first char of the trim is faster than loops or strpos
         $ltrimmedLine = ltrim($this->currentLine, ' ');
@@ -489,7 +489,7 @@ class Parser
      *
      * @return string A cleaned up YAML string
      */
-    protected function cleanup($value)
+    private function cleanup($value)
     {
         $value = str_replace(array("\r\n", "\r"), "\n", $value);
 

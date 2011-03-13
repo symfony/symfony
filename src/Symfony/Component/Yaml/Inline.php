@@ -114,7 +114,7 @@ class Inline
      *
      * @return string The YAML string representing the PHP array
      */
-    static protected function dumpArray($value)
+    static private function dumpArray($value)
     {
         // array
         $keys = array_keys($value);
@@ -189,7 +189,7 @@ class Inline
      *
      * @throws ParserException When malformed inline YAML string is parsed
      */
-    static protected function parseQuotedScalar($scalar, &$i)
+    static private function parseQuotedScalar($scalar, &$i)
     {
         if (!preg_match('/'.self::REGEX_QUOTED_STRING.'/Au', substr($scalar, $i), $match)) {
             throw new ParserException(sprintf('Malformed inline YAML string (%s).', substr($scalar, $i)));
@@ -219,7 +219,7 @@ class Inline
      *
      * @throws ParserException When malformed inline YAML string is parsed
      */
-    static protected function parseSequence($sequence, &$i = 0)
+    static private function parseSequence($sequence, &$i = 0)
     {
         $output = array();
         $len = strlen($sequence);
@@ -275,7 +275,7 @@ class Inline
      *
      * @throws ParserException When malformed inline YAML string is parsed
      */
-    static protected function parseMapping($mapping, &$i = 0)
+    static private function parseMapping($mapping, &$i = 0)
     {
         $output = array();
         $len = strlen($mapping);
@@ -336,7 +336,7 @@ class Inline
      *
      * @return string A YAML string
      */
-    static protected function evaluateScalar($scalar)
+    static private function evaluateScalar($scalar)
     {
         $scalar = trim($scalar);
 
@@ -383,7 +383,7 @@ class Inline
      *
      * @return string The regular expression
      */
-    static protected function getTimestampRegex()
+    static private function getTimestampRegex()
     {
         return <<<EOF
         ~^

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Http\Event;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\User\AccountInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\Common\EventArgs;
 
 class SwitchUserEventArgs extends EventArgs
@@ -21,7 +21,7 @@ class SwitchUserEventArgs extends EventArgs
 
     private $targetUser;
 
-    public function __construct(Request $request, AccountInterface $targetUser)
+    public function __construct(Request $request, UserInterface $targetUser)
     {
         $this->request = $request;
         $this->targetUser = $targetUser;

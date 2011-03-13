@@ -24,7 +24,6 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\NonceExpiredException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Doctrine\Common\EventManager;
 
 /**
  * DigestAuthenticationListener implements Digest HTTP authentication.
@@ -33,11 +32,11 @@ use Doctrine\Common\EventManager;
  */
 class DigestAuthenticationListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $provider;
-    protected $providerKey;
-    protected $authenticationEntryPoint;
-    protected $logger;
+    private $securityContext;
+    private $provider;
+    private $providerKey;
+    private $authenticationEntryPoint;
+    private $logger;
 
     public function __construct(SecurityContextInterface $securityContext, UserProviderInterface $provider, $providerKey, DigestAuthenticationEntryPoint $authenticationEntryPoint, LoggerInterface $logger = null)
     {
@@ -50,23 +49,6 @@ class DigestAuthenticationListener implements ListenerInterface
         $this->providerKey = $providerKey;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
         $this->logger = $logger;
-    }
-
-    /**
-     *
-     *
-     * @param EventManager $evm An EventManager instance
-     */
-    public function register(EventManager $evm)
-    {
-        $evm->addEventListener(Events::onCoreSecurity, $this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventManager $evm)
-    {
     }
 
     /**
@@ -85,11 +67,7 @@ class DigestAuthenticationListener implements ListenerInterface
         $digestAuth = new DigestData($header);
 
         if (null !== $token = $this->securityContext->getToken()) {
-            if ($token->isImmutable()) {
-                return;
-            }
-
-            if ($token instanceof UsernamePasswordToken && $token->isAuthenticated() && (string) $token === $digestAuth->getUsername()) {
+            if ($token instanceof UsernamePasswordToken && $token->isAuthenticated() && $token->getUsername() === $digestAuth->getUsername()) {
                 return;
             }
         }
@@ -101,7 +79,7 @@ class DigestAuthenticationListener implements ListenerInterface
         try {
             $digestAuth->validateAndDecode($this->authenticationEntryPoint->getKey(), $this->authenticationEntryPoint->getRealmName());
         } catch (BadCredentialsException $e) {
-            $this->fail($event, $request, $e);
+            $this->fail($eventArgs, $request, $e);
 
             return;
         }
@@ -115,7 +93,7 @@ class DigestAuthenticationListener implements ListenerInterface
 
             $serverDigestMd5 = $digestAuth->calculateServerDigest($user->getPassword(), $request->getMethod());
         } catch (UsernameNotFoundException $notFound) {
-            $this->fail($event, $request, new BadCredentialsException(sprintf('Username %s not found.', $digestAuth->getUsername())));
+            $this->fail($eventArgs, $request, new BadCredentialsException(sprintf('Username %s not found.', $digestAuth->getUsername())));
 
             return;
         }
@@ -125,13 +103,13 @@ class DigestAuthenticationListener implements ListenerInterface
                 $this->logger->debug(sprintf("Expected response: '%s' but received: '%s'; is AuthenticationDao returning clear text passwords?", $serverDigestMd5, $digestAuth->getResponse()));
             }
 
-            $this->fail($event, $request, new BadCredentialsException('Incorrect response'));
+            $this->fail($eventArgs, $request, new BadCredentialsException('Incorrect response'));
 
             return;
         }
 
         if ($digestAuth->isNonceExpired()) {
-            $this->fail($event, $request, new NonceExpiredException('Nonce has expired/timed out.'));
+            $this->fail($eventArgs, $request, new NonceExpiredException('Nonce has expired/timed out.'));
 
             return;
         }
@@ -143,7 +121,7 @@ class DigestAuthenticationListener implements ListenerInterface
         $this->securityContext->setToken(new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey));
     }
 
-    protected function fail(EventInterface $event, Request $request, AuthenticationException $authException)
+    private function fail(GetResponseEventArgs $eventArgs, Request $request, AuthenticationException $authException)
     {
         $this->securityContext->setToken(null);
 
@@ -151,15 +129,15 @@ class DigestAuthenticationListener implements ListenerInterface
             $this->logger->debug($authException);
         }
 
-        $this->authenticationEntryPoint->start($event, $request, $authException);
+        $this->authenticationEntryPoint->start($eventArgs, $request, $authException);
     }
 }
 
 class DigestData
 {
-    protected $elements;
-    protected $header;
-    protected $nonceExpiryTime;
+    private $elements;
+    private $header;
+    private $nonceExpiryTime;
 
     public function __construct($header)
     {

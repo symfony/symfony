@@ -123,13 +123,4 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $user->eraseCredentials();
         $this->assertEquals('superpass', $user->getPassword());
     }
-
-    /**
-     * @covers Symfony\Component\Security\Core\User\User::__toString
-     */
-    public function testMagicToString()
-    {
-        $user = new User('fabien', 'superpass');
-        $this->assertEquals('fabien', (string) $user);
-    }
 }

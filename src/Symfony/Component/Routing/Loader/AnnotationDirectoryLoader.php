@@ -12,7 +12,7 @@
 namespace Symfony\Component\Routing\Loader;
 
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\DirectoryResource;
 
 /**
  * AnnotationDirectoryLoader loads routing information from annotations set
@@ -37,13 +37,13 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
         $dir = $this->locator->locate($path);
 
         $collection = new RouteCollection();
+        $collection->addResource(new DirectoryResource($dir));
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
             if (!$file->isFile() || '.php' !== substr($file->getFilename(), -4)) {
                 continue;
             }
 
             if ($class = $this->findClass($file)) {
-                $collection->addResource(new FileResource($file));
                 $collection->addCollection($this->loader->load($class, $type));
             }
         }

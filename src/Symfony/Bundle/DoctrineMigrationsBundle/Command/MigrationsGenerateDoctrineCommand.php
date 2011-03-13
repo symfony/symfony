@@ -36,10 +36,10 @@ class MigrationsGenerateDoctrineCommand extends GenerateCommand
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
+        DoctrineCommand::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
 
         $configuration = $this->getMigrationConfiguration($input, $output);
-        DoctrineCommand::configureMigrations($this->application->getKernel()->getContainer(), $configuration);
+        DoctrineCommand::configureMigrations($this->getApplication()->getKernel()->getContainer(), $configuration);
 
         parent::execute($input, $output);
     }

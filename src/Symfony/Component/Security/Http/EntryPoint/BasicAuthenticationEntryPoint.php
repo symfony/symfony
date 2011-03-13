@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
  */
 class BasicAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {
-    protected $realmName;
+    private $realmName;
 
     public function __construct($realmName)
     {

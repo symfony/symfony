@@ -1,4 +1,9 @@
 doctrine:
     orm:
         auto_generate_proxy_classes: false
-        metadata_cache_driver: apc
+        default_entity_manager: default
+        entity_managers:
+            default:
+                metadata_cache_driver: apc
+                mappings:
+                    YamlBundle: ~

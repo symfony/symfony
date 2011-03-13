@@ -119,16 +119,20 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('The command "foofoo" does not exist.', $e->getMessage(), '->get() throws an \InvalidArgumentException if the command does not exist');
         }
 
-        $application = new TestApplication();
+        $application = new Application();
         $application->add($foo = new \FooCommand());
-        $application->setWantHelps();
+        // simulate --help
+        $r = new \ReflectionObject($application);
+        $p = $r->getProperty('wantHelps');
+        $p->setAccessible(true);
+        $p->setValue($application, true);
         $command = $application->get('foo:bar');
         $this->assertEquals('Symfony\Component\Console\Command\HelpCommand', get_class($command), '->get() returns the help command if --help is provided as the input');
     }
 
     public function testGetNamespaces()
     {
-        $application = new TestApplication();
+        $application = new Application();
         $application->add(new \FooCommand());
         $application->add(new \Foo1Command());
         $this->assertEquals(array('foo'), $application->getNamespaces(), '->getNamespaces() returns an array of unique used namespaces');
@@ -136,7 +140,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     public function testFindNamespace()
     {
-        $application = new TestApplication();
+        $application = new Application();
         $application->add(new \FooCommand());
         $this->assertEquals('foo', $application->findNamespace('foo'), '->findNamespace() returns the given namespace if it exists');
         $this->assertEquals('foo', $application->findNamespace('f'), '->findNamespace() finds a namespace given an abbreviation');
@@ -161,7 +165,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     public function testFind()
     {
-        $application = new TestApplication();
+        $application = new Application();
         $application->add(new \FooCommand());
         $this->assertEquals('FooCommand', get_class($application->find('foo:bar')), '->find() returns a command if its name exists');
         $this->assertEquals('Symfony\Component\Console\Command\HelpCommand', get_class($application->find('h')), '->find() returns a command if its name exists');
@@ -343,13 +347,5 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $tester->run(array('command' => 'foo:bar', '-n' => true));
         $this->assertEquals("called\n", $this->normalize($tester->getDisplay()), '->run() does not called interact() if -n is passed');
-    }
-}
-
-class TestApplication extends Application
-{
-    public function setWantHelps()
-    {
-        $this->wantHelps = true;
     }
 }

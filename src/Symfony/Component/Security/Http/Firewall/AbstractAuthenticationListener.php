@@ -35,8 +35,8 @@ use Doctrine\Common\EventManager;
  * Subclasses likely have to implement the following:
  * - an TokenInterface to hold authentication related data
  * - an AuthenticationProvider to perform the actual authentication of the
- *   token, retrieve the AccountInterface implementation from a database, and
- *   perform the specific account checks using the AccountChecker
+ *   token, retrieve the UserInterface implementation from a database, and
+ *   perform the specific account checks using the UserChecker
  *
  * By default, this listener only is active for a specific path, e.g.
  * /login_check. If you want to change this behavior, you can overwrite the
@@ -47,16 +47,16 @@ use Doctrine\Common\EventManager;
  */
 abstract class AbstractAuthenticationListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $authenticationManager;
-    protected $sessionStrategy;
-    protected $providerKey;
-    protected $evm;
     protected $options;
-    protected $successHandler;
-    protected $failureHandler;
     protected $logger;
-    protected $rememberMeServices;
+    protected $authenticationManager;
+    protected $providerKey;
+    private $securityContext;
+    private $sessionStrategy;
+    private $evm;
+    private $successHandler;
+    private $failureHandler;
+    private $rememberMeServices;
 
     /**
      * Constructor.
@@ -66,7 +66,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * @param array                          $options               An array of options for the processing of a successful, or failed authentication attempt
      * @param LoggerInterface                $logger                A LoggerInterface instance
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null, EventManager $evm = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -89,6 +89,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             'failure_forward'                => false,
         ), $options);
         $this->logger = $logger;
+        $this->evm = $evm;
     }
 
     /**
@@ -99,25 +100,6 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices)
     {
         $this->rememberMeServices = $rememberMeServices;
-    }
-
-    /**
-     * Subscribe to the onCoreSecurity event
-     *
-     * @param EventManager $evm An EventManager instance
-     */
-    public function register(EventManager $evm)
-    {
-        $evm->addEventListener(KernelEvents::onCoreSecurity, $this);
-
-        $this->evm = $evm;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventManager $evm)
-    {
     }
 
     /**
@@ -170,7 +152,18 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         return $this->options['check_path'] === $request->getPathInfo();
     }
 
-    protected function onFailure(GetResponseEventArgs $eventArgs, Request $request, AuthenticationException $failed)
+    /**
+     * Performs authentication.
+     *
+     * @param  Request $request A Request instance
+     *
+     * @return TokenInterface The authenticated token, or null if full authentication is not possible
+     *
+     * @throws AuthenticationException if the authentication fails
+     */
+    abstract protected function attemptAuthentication(Request $request);
+
+    private function onFailure(GetResponseEventArgs $eventArgs, Request $request, AuthenticationException $failed)
     {
         if (null !== $this->logger) {
             $this->logger->debug(sprintf('Authentication request failed: %s', $failed->getMessage()));
@@ -206,7 +199,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         return new RedirectResponse(0 !== strpos($this->options['failure_path'], 'http') ? $request->getUriForPath($this->options['failure_path']) : $this->options['failure_path'], 302);
     }
 
-    protected function onSuccess(GetResponseEventArgs $eventArgs, Request $request, TokenInterface $token)
+    private function onSuccess(GetResponseEventArgs $eventArgs, Request $request, TokenInterface $token)
     {
         if (null !== $this->logger) {
             $this->logger->debug('User has been authenticated successfully');
@@ -244,7 +237,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      *
      * @return string
      */
-    protected function determineTargetUrl(Request $request)
+    private function determineTargetUrl(Request $request)
     {
         if ($this->options['always_use_default_target_path']) {
             return $this->options['default_target_path'];
@@ -267,15 +260,4 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 
         return $this->options['default_target_path'];
     }
-
-    /**
-     * Performs authentication.
-     *
-     * @param  Request $request A Request instance
-     *
-     * @return TokenInterface The authenticated token, or null if full authentication is not possible
-     *
-     * @throws AuthenticationException if the authentication fails
-     */
-    abstract protected function attemptAuthentication(Request $request);
 }

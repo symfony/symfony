@@ -11,30 +11,30 @@
     </srv:parameters>
 
     <config>
-        <dbal>
-            <connections>
-                <connection
-                    name="conn1"
-                    driver="pdo_sqlite"
-                    dbname="sqlite_db"
-                    user="sqlite_user"
-                    password="sqlite_s3cr3t"
-                    memory="true" />
-                <connection
-                    name="conn2"
-                    driver="pdo_sqlite"
-                    dbname="sqlite_db"
-                    user="sqlite_user"
-                    password="sqlite_s3cr3t"
-                    memory="true" />
-            </connections>
+        <dbal default-connection="conn1">
+            <connection
+                name="conn1"
+                driver="pdo_sqlite"
+                dbname="sqlite_db"
+                user="sqlite_user"
+                password="sqlite_s3cr3t"
+                memory="true" />
+            <connection
+                name="conn2"
+                driver="pdo_sqlite"
+                dbname="sqlite_db"
+                user="sqlite_user"
+                password="sqlite_s3cr3t"
+                memory="true" />
         </dbal>
 
-        <orm default-entity-manager="dm2" default-connection="conn1" auto-generate-proxy-classes="true">
-            <entity-managers>
-                <entity-manager name="dm1" metadata-cache-driver="xcache" connection="conn1" />
-                <entity-manager name="dm2" connection="conn2" metadata-cache-driver="apc" />
-            </entity-managers>
+        <orm default-entity-manager="em2" auto-generate-proxy-classes="true">
+            <entity-manager name="em1" metadata-cache-driver="xcache" connection="conn1">
+                <mapping name="YamlBundle" />
+            </entity-manager>
+            <entity-manager name="em2" connection="conn2" metadata-cache-driver="apc">
+                <mapping name="YamlBundle" />
+            </entity-manager>
         </orm>
     </config>
 </srv:container>

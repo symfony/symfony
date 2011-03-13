@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
 use Doctrine\Common\EventManager;
 
 /**
@@ -21,22 +22,9 @@ use Doctrine\Common\EventManager;
 interface ListenerInterface
 {
     /**
-     * The implementation must connect this listener to all necessary events.
+     * This interface must be implemented by firewall listeners.
      *
-     * Typical events are: "onCoreSecurity", and "filterCoreResponse"
-     *
-     * @param EventManager $evm
+     * @param GetResponseEventArgs $eventArgs
      */
-    function register(EventManager $evm);
-
-    /**
-     * The implementation must remove this listener from any events that it had
-     * connected to in register().
-     *
-     * It may remove this listener from "onCoreSecurity", but this is ensured by
-     * the firewall anyway.
-     *
-     * @param EventManager $evm
-     */
-    function unregister(EventManager $evm);
+    function onCoreSecurity(GetResponseEventArgs $eventArgs);
 }

@@ -20,7 +20,6 @@ use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
 use Symfony\Component\HttpKernel\Events;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Doctrine\Common\EventManager;
 
 /**
  * AccessListener enforces access control rules.
@@ -29,11 +28,11 @@ use Doctrine\Common\EventManager;
  */
 class AccessListener implements ListenerInterface
 {
-    protected $context;
-    protected $accessDecisionManager;
-    protected $map;
-    protected $authManager;
-    protected $logger;
+    private $context;
+    private $accessDecisionManager;
+    private $map;
+    private $authManager;
+    private $logger;
 
     public function __construct(SecurityContext $context, AccessDecisionManagerInterface $accessDecisionManager, AccessMap $map, AuthenticationManagerInterface $authManager, LoggerInterface $logger = null)
     {
@@ -42,23 +41,6 @@ class AccessListener implements ListenerInterface
         $this->map = $map;
         $this->authManager = $authManager;
         $this->logger = $logger;
-    }
-
-    /**
-     * Registers a onCoreSecurity listener to enforce authorization rules.
-     *
-     * @param EventManager $evm An EventManager instance
-     */
-    public function register(EventManager $evm)
-    {
-        $evm->addEventListener(Events::onCoreSecurity, $this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventManager $evm)
-    {
     }
 
     /**

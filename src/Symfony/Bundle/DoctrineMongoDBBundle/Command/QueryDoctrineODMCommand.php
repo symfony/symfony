@@ -37,7 +37,7 @@ class QueryDoctrineODMCommand extends QueryCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        DoctrineODMCommand::setApplicationDocumentManager($this->application, $input->getOption('dm'));
+        DoctrineODMCommand::setApplicationDocumentManager($this->getApplication(), $input->getOption('dm'));
 
         return parent::execute($input, $output);
     }

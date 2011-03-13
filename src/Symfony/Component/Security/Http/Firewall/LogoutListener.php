@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Kernel\Event\GetResponseEventArgs;
 use Symfony\Component\Kernel\Events;
-use Doctrine\Common\EventManager;
 
 /**
  * LogoutListener logout users.
@@ -28,11 +27,11 @@ use Doctrine\Common\EventManager;
  */
 class LogoutListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $logoutPath;
-    protected $targetUrl;
-    protected $handlers;
-    protected $successHandler;
+    private $securityContext;
+    private $logoutPath;
+    private $targetUrl;
+    private $handlers;
+    private $successHandler;
 
     /**
      * Constructor
@@ -59,23 +58,6 @@ class LogoutListener implements ListenerInterface
     public function addHandler(LogoutHandlerInterface $handler)
     {
         $this->handlers[] = $handler;
-    }
-
-    /**
-     * Registers a onCoreSecurity listener.
-     *
-     * @param EventManager $evm An EventManager instance
-     */
-    public function register(EventManager $evm)
-    {
-        $evm->addEventListener(Events::onCoreSecurity, $this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventManager $evm)
-    {
     }
 
     /**

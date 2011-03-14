@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 /**
  * Base PDO storage for profiling information in a PDO database.
  *
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author Jan Schumann <js@schumann-it.com>
  */
 abstract class PdoProfilerStorage implements ProfilerStorageInterface
@@ -56,24 +57,6 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
         $this->close($db);
 
         return $tokens;
-    }
-
-    protected function buildCriteria($ip, $url, $limit)
-    {
-        $criteria = array();
-        $args = array();
-
-        if ($ip = preg_replace('/[^\d\.]/', '', $ip)) {
-            $criteria[] = 'ip LIKE :ip';
-            $args[':ip'] = '%'.$ip.'%';
-        }
-
-        if ($url) {
-            $criteria[] = 'url LIKE :url';
-            $args[':url'] = '%'.addcslashes($url, '%_\\').'%';
-        }
-
-        return array($criteria, $args);
     }
 
     /**
@@ -129,17 +112,30 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
         $this->close($db);
     }
 
+    /**
+     * Build SQL criteria to fetch records by ip and url
+     *
+     * @param string $ip    The IP
+     * @param string $url   The URL
+     * @param string $limit The maximum number of tokens to return
+     *
+     * @return array An array with (creteria, args)
+     */
+    abstract protected function buildCriteria($ip, $url, $limit);
+
+    /**
+     * Initializes the database
+     *
+     * @throws \RuntimeException When the requeted database driver is not installed
+     */
+    abstract protected function initDb();
+
     protected function cleanup()
     {
         $db = $this->initDb();
         $this->exec($db, 'DELETE FROM data WHERE created_at < :time', array(':time' => time() - $this->lifetime));
         $this->close($db);
     }
-
-    /**
-     * @throws \RuntimeException When the requeted database driver is not installed
-     */
-    abstract protected function initDb();
 
     protected function exec($db, $query, array $args = array())
     {
@@ -187,8 +183,5 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
 
     protected function close($db)
     {
-        if ($db instanceof \SQLite3) {
-            $db->close();
-        }
     }
 }

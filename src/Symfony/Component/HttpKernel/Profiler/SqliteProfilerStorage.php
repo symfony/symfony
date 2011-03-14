@@ -20,24 +20,6 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
  */
 class SqliteProfilerStorage extends PdoProfilerStorage
 {
-    protected function buildCriteria($ip, $url, $limit)
-    {
-        $criteria = array();
-        $args = array();
-
-        if ($ip = preg_replace('/[^\d\.]/', '', $ip)) {
-            $criteria[] = 'ip LIKE :ip';
-            $args[':ip'] = '%'.$ip.'%';
-        }
-
-        if ($url) {
-            $criteria[] = 'url LIKE :url ESCAPE "\"';
-            $args[':url'] = '%'.addcslashes($url, '%_\\').'%';
-        }
-
-        return array($criteria, $args);
-    }
-
     /**
      * @throws \RuntimeException When neither of SQLite or PDO_SQLite extension is enabled
      */
@@ -106,6 +88,27 @@ class SqliteProfilerStorage extends PdoProfilerStorage
         }
 
         return $return;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function buildCriteria($ip, $url, $limit)
+    {
+        $criteria = array();
+        $args = array();
+
+        if ($ip = preg_replace('/[^\d\.]/', '', $ip)) {
+            $criteria[] = 'ip LIKE :ip';
+            $args[':ip'] = '%'.$ip.'%';
+        }
+
+        if ($url) {
+            $criteria[] = 'url LIKE :url ESCAPE "\"';
+            $args[':url'] = '%'.addcslashes($url, '%_\\').'%';
+        }
+
+        return array($criteria, $args);
     }
 
     protected function close($db)

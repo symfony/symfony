@@ -23,14 +23,12 @@ class MysqlProfilerStorage extends PdoProfilerStorage
      */
     protected function initDb()
     {
-        if (is_null($this->db))
-        {
-            if ('mysql' !== substr($this->dsn, 0, 5))
-             {
-                  throw new \RuntimeException('Please check your configuration. You are trying to use Mysql with a wrong dsn. "' . $this->dsn . '"');
-             }
+        if (is_null($this->db)) {
+            if ('mysql' !== substr($this->dsn, 0, 5)) {
+                throw new \RuntimeException('Please check your configuration. You are trying to use Mysql with a wrong dsn. "' . $this->dsn . '"');
+            }
 
-             if (!class_exists('PDO') || !in_array('mysql', \PDO::getAvailableDrivers(), true)) {
+            if ( ! class_exists('PDO') ||  ! in_array('mysql', \PDO::getAvailableDrivers(), true)) {
                 throw new \RuntimeException('You need to enable PDO_Mysql extension for the profiler to run properly.');
             }
 
@@ -41,5 +39,26 @@ class MysqlProfilerStorage extends PdoProfilerStorage
         }
 
         return $this->db;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function buildCriteria($ip, $url, $limit)
+    {
+        $criteria = array();
+        $args = array();
+
+        if ($ip = preg_replace('/[^\d\.]/', '', $ip)) {
+            $criteria[] = 'ip LIKE :ip';
+            $args[':ip'] = '%' . $ip . '%';
+        }
+
+        if ($url) {
+            $criteria[] = 'url LIKE :url';
+            $args[':url'] = '%' . addcslashes($url, '%_\\') . '%';
+        }
+
+        return array($criteria, $args);
     }
 }

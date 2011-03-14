@@ -61,7 +61,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $loader->load('dbal.xml');
 
         if (empty ($config['default_connection'])) {
-            $config['default_connection'] = reset(array_keys($config['connections']));
+            $keys = array_keys($config['connections']);
+            $config['default_connection'] = reset($keys);
         }
 
         $container->setAlias('database_connection', sprintf('doctrine.dbal.%s_connection', $config['default_connection']));

@@ -50,10 +50,13 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         }
 
         if (empty ($config['default_connection'])) {
-            $config['default_connection'] = reset(array_keys($config['connections']));
+            $keys = array_keys($config['connections']);
+            $config['default_connection'] = reset($keys);
         }
+
         if (empty ($config['default_document_manager'])) {
-            $config['default_document_manager'] = reset(array_keys($config['document_managers']));
+            $keys = array_keys($config['document_managers']);
+            $config['default_document_manager'] = reset($keys);
         }
 
         // set some options as parameters and unset them

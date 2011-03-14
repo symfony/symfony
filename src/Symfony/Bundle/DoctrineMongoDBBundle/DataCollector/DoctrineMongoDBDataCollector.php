@@ -56,11 +56,4 @@ class DoctrineMongoDBDataCollector extends DataCollector
     {
         return 'mongodb';
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getStatus() {
-        return $this->getQueryCount() < 10 ? self::INFO : self::WARNING;
-    }
 }

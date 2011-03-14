@@ -72,12 +72,4 @@ class LoggerDataCollector extends DataCollector
     {
         return 'logger';
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getStatus()
-    {
-        return 0 === $this->countErrors() ? self::INFO : self::ERROR;
-    }
 }

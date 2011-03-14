@@ -3,14 +3,7 @@
         <a style="text-decoration: none; margin: 0; padding: 0;" href="{{ path('_profiler', { 'token': token, 'panel': name }) }}">{{ icon }}</a>
     {% endset %}
 {% endif %}
-{% if 'info' == status|default('info') %}
-    {% set style = '' %}
-{% elseif 'warning' == status %}
-    {% set style = 'background-color: #fa2;' %}
-{% else %}
-    {% set style = 'background-color: #f66;' %}
-{% endif %}
-<span style="{{ style }}white-space:nowrap; color:#2f2f2f; display:inline-block; min-height:24px; border-right:1px solid #cdcdcd; padding:5px 10px 5px 6px; ">
+<span style="white-space:nowrap; color:#2f2f2f; display:inline-block; min-height:24px; border-right:1px solid #cdcdcd; padding:5px 10px 5px 6px; ">
      {{ icon|default('') }}
      {{ text|default('') }}
 </span>

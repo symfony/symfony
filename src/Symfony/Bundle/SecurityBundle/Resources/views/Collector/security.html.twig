@@ -15,7 +15,7 @@
             {% endif %}
         </span>
     {% endset %}
-    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url, 'status': collector.status } %}
+    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
 {% endblock %}
 
 {% block menu %}

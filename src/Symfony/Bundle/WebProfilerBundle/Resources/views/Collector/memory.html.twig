@@ -7,5 +7,5 @@
     {% set text %}
         {{ '%.0f'|format(collector.memory / 1024) }} KB
     {% endset %}
-    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': false, 'status': collector.status } %}
+    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': false } %}
 {% endblock %}

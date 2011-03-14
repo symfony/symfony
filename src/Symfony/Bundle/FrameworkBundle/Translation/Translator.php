@@ -89,7 +89,7 @@ class Translator extends BaseTranslator
             return parent::loadCatalogue($locale);
         }
 
-        $cache = new ConfigCache($this->options['cache_dir'], 'catalogue.'.$locale, $this->options['debug']);
+        $cache = new ConfigCache($this->options['cache_dir'].'/catalogue.'.$locale.'.php', $this->options['debug']);
         if (!$cache->isFresh()) {
             $this->initialize();
 

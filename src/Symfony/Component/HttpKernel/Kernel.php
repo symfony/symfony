@@ -400,7 +400,7 @@ abstract class Kernel implements KernelInterface
     protected function initializeContainer()
     {
         $class = $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
-        $cache = new ConfigCache($this->getCacheDir(), $class, $this->debug);
+        $cache = new ConfigCache($this->getCacheDir().'/'.$class.'.php', $this->debug);
         $fresh = false;
         if (!$cache->isFresh()) {
             $container = $this->buildContainer();
@@ -471,13 +471,7 @@ abstract class Kernel implements KernelInterface
         if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
             $container->merge($cont);
         }
-        $container->compile();
 
-        return $container;
-    }
-
-    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class)
-    {
         foreach (array('cache', 'logs') as $name) {
             $dir = $container->getParameter(sprintf('kernel.%s_dir', $name));
             if (!is_dir($dir)) {
@@ -489,6 +483,13 @@ abstract class Kernel implements KernelInterface
             }
         }
 
+        $container->compile();
+
+        return $container;
+    }
+
+    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class)
+    {
         // cache the container
         $dumper = new PhpDumper($container);
         $content = $dumper->dump(array('class' => $class));

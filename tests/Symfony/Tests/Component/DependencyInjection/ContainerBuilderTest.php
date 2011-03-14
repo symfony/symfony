@@ -107,9 +107,9 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $builder->register('baz', 'stdClass')->setArguments(array(new Reference('baz')));
         try {
             @$builder->get('baz');
-            $this->fail('->get() throws a LogicException if the service has a circular reference to itself');
-        } catch (\LogicException $e) {
-            $this->assertEquals('Circular reference detected for service "baz" (services currently loading: baz).', $e->getMessage(), '->get() throws a LogicException if the service has a circular reference to itself');
+            $this->fail('->get() throws a CircularReferenceException if the service has a circular reference to itself');
+        } catch (\Symfony\Component\DependencyInjection\Exception\CircularReferenceException $e) {
+            $this->assertEquals('Circular reference detected for service "baz", path: "baz".', $e->getMessage(), '->get() throws a LogicException if the service has a circular reference to itself');
         }
 
         $builder->register('foobar', 'stdClass')->setScope('container');

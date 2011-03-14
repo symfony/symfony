@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Dumper;
 
+use Symfony\Component\DependencyInjection\Exception\CircularReferenceException;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -251,7 +252,7 @@ EOF;
                 // $a = new ServiceA(ServiceB $b);
                 // $b->setServiceA(ServiceA $a);
                 if ($this->hasReference($id, $sDefinition->getArguments())) {
-                    throw new \RuntimeException('Unresolvable reference detected in service definition for '.$id);
+                    throw new CircularReferenceException($id, array($id));
                 }
 
                 $arguments = array();
@@ -549,7 +550,7 @@ EOF;
         if (ContainerInterface::SCOPE_CONTAINER !== $scope && ContainerInterface::SCOPE_PROTOTYPE !== $scope) {
             $code .= <<<EOF
         if (!isset(\$this->scopedServices['$scope'])) {
-            throw new \RuntimeException('You cannot create a service ("$id") of an inactive scope ("$scope").');
+            throw new InactiveScopeException('$id', '$scope');
         }
 
 
@@ -653,6 +654,7 @@ EOF;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 $bagClass

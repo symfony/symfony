@@ -1,6 +1,6 @@
 {% if link %}
     {% set icon %}
-        <a href="{{ path('_profiler', { 'token': token, 'panel': name }) }}">{{ icon }}</a>
+        <a style="text-decoration: none; margin: 0; padding: 0;" href="{{ path('_profiler', { 'token': token, 'panel': name }) }}">{{ icon }}</a>
     {% endset %}
 {% endif %}
 {% if 'info' == status|default('info') %}

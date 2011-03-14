@@ -52,9 +52,9 @@ class Configuration
                 ->beforeNormalization()
                     ->ifNull()
                     // Define a default connection using the default values
-                    ->then(function($v) { return array ('default_connection' => 'default', 'connections' => array('default' => array())); })
+                    ->then(function($v) { return array ('connections' => array('default' => array())); })
                 ->end()
-                ->scalarNode('default_connection')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('default_connection')->end()
                 ->fixXmlConfig('type')
                 ->arrayNode('types')
                     ->useAttributeAsKey('name')
@@ -109,7 +109,7 @@ class Configuration
     {
         $node
             ->arrayNode('orm')
-                ->scalarNode('default_entity_manager')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('default_entity_manager')->end()
                 ->booleanNode('auto_generate_proxy_classes')->defaultFalse()->end()
                 ->scalarNode('proxy_dir')->defaultValue('%kernel.cache_dir%/doctrine/orm/Proxies')->end()
                 ->scalarNode('proxy_namespace')->defaultValue('Proxies')->end()

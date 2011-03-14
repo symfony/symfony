@@ -49,6 +49,16 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
             $config['metadata_cache_driver'] = array('type' => 'array');
         }
 
+        if (empty ($config['default_connection'])) {
+            $keys = array_keys($config['connections']);
+            $config['default_connection'] = reset($keys);
+        }
+
+        if (empty ($config['default_document_manager'])) {
+            $keys = array_keys($config['document_managers']);
+            $config['default_document_manager'] = reset($keys);
+        }
+
         // set some options as parameters and unset them
         $config = $this->overrideParameters($config, $container);
 

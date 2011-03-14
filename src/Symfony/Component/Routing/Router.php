@@ -68,12 +68,21 @@ class Router implements RouterInterface
             'resource_type'          => null,
         );
 
-        // check option names
-        if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
-            throw new \InvalidArgumentException(sprintf('The Router does not support the following options: \'%s\'.', implode('\', \'', $diff)));
+        // check option names and live merge, if errors are encountered Exception will be thrown
+        $invalid = array();
+        $isInvalid = false;
+        foreach ($options as $key => $value) {
+            if (array_key_exists($key, $this->options)) {
+                $this->options[$key] = $value;
+            } else {
+                $isInvalid = true;
+                $invalid[] = $key;
+            }
         }
 
-        $this->options = array_merge($this->options, $options);
+        if ($isInvalid) {
+            throw new \InvalidArgumentException(sprintf('The Router does not support the following options: \'%s\'.', implode('\', \'', $invalid)));
+        }
     }
 
     /**

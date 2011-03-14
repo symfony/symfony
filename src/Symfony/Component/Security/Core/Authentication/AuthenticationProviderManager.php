@@ -59,7 +59,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
 
             try {
                 $result = $provider->authenticate($token);
-                if (null != $result) {
+                if (null !== $result) {
                     break;
                 }
             } catch (AccountStatusException $e) {

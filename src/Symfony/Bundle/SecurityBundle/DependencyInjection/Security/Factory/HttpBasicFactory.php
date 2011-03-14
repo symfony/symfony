@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -55,11 +55,13 @@ class HttpBasicFactory implements SecurityFactoryInterface
         return 'http-basic';
     }
 
-    public function addConfiguration(NodeBuilder $builder)
+    public function addConfiguration(NodeDefinition $node)
     {
-        $builder
-            ->scalarNode('provider')->end()
-            ->scalarNode('realm')->defaultValue('Secured Area')->end()
+        $node
+            ->children()
+                ->scalarNode('provider')->end()
+                ->scalarNode('realm')->defaultValue('Secured Area')->end()
+            ->end()
         ;
     }
 

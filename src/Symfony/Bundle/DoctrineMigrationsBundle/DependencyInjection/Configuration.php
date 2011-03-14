@@ -2,7 +2,6 @@
 
 namespace Symfony\Bundle\DoctrineMigrationsBundle\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 /**
@@ -15,7 +14,7 @@ class Configuration
     /**
      * Generates the configuration tree.
      *
-     * @return \Symfony\Component\Config\Definition\NodeInterface
+     * @return NodeInterface
      */
     public function getConfigTree()
     {
@@ -23,10 +22,13 @@ class Configuration
         $rootNode = $treeBuilder->root('doctrine_migrations', 'array');
 
         $rootNode
-            ->scalarNode('dir_name')->defaultValue('%kernel.root_dir%/DoctrineMigrations')->cannotBeEmpty()->end()
-            ->scalarNode('namespace')->defaultValue('Application\Migrations')->cannotBeEmpty()->end()
-            ->scalarNode('table_name')->defaultValue('migration_versions')->cannotBeEmpty()->end()
-            ->scalarNode('name')->defaultValue('Application Migrations')->end();
+            ->children()
+                ->scalarNode('dir_name')->defaultValue('%kernel.root_dir%/DoctrineMigrations')->cannotBeEmpty()->end()
+                ->scalarNode('namespace')->defaultValue('Application\Migrations')->cannotBeEmpty()->end()
+                ->scalarNode('table_name')->defaultValue('migration_versions')->cannotBeEmpty()->end()
+                ->scalarNode('name')->defaultValue('Application Migrations')->end()
+            ->end()
+        ;
 
         return $treeBuilder->buildTree();
     }

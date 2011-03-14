@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -60,9 +60,11 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         return array($authProviderId, $listenerId, $entryPointId);
     }
 
-    public function addConfiguration(NodeBuilder $node)
+    public function addConfiguration(NodeDefinition $node)
     {
-        $node
+        $builder = $node->children();
+
+        $builder
             ->scalarNode('provider')->end()
             ->booleanNode('remember_me')->defaultTrue()->end()
             ->scalarNode('success_handler')->end()
@@ -71,9 +73,9 @@ abstract class AbstractFactory implements SecurityFactoryInterface
 
         foreach ($this->options as $name => $default) {
             if (is_bool($default)) {
-                $node->booleanNode($name)->defaultValue($default);
+                $builder->booleanNode($name)->defaultValue($default);
             } else {
-                $node->scalarNode($name)->defaultValue($default);
+                $builder->scalarNode($name)->defaultValue($default);
             }
         }
     }

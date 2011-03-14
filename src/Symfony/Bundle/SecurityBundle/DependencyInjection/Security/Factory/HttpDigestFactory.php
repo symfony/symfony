@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -56,12 +56,14 @@ class HttpDigestFactory implements SecurityFactoryInterface
         return 'http-digest';
     }
 
-    public function addConfiguration(NodeBuilder $builder)
+    public function addConfiguration(NodeDefinition $node)
     {
-        $builder
-            ->scalarNode('provider')->end()
-            ->scalarNode('realm')->defaultValue('Secured Area')->end()
-            ->scalarNode('key')->cannotBeEmpty()->end()
+        $node
+            ->children()
+                ->scalarNode('provider')->end()
+                ->scalarNode('realm')->defaultValue('Secured Area')->end()
+                ->scalarNode('key')->cannotBeEmpty()->end()
+            ->end()
         ;
     }
 

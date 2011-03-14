@@ -107,7 +107,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      *
      * @param Event $event An Event instance
      */
-    public function handle(EventInterface $event)
+    public final function handle(EventInterface $event)
     {
         $request = $event->get('request');
 

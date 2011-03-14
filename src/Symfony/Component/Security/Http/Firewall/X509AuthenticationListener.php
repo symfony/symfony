@@ -25,8 +25,8 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
  */
 class X509AuthenticationListener extends AbstractPreAuthenticatedListener
 {
-    protected $userKey;
-    protected $credentialKey;
+    private $userKey;
+    private $credentialKey;
 
     public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, $userKey = 'SSL_CLIENT_S_DN_Email', $credentialKey = 'SSL_CLIENT_S_DN', LoggerInterface $logger = null, EventDispatcherInterface $eventDispatcher = null)
     {

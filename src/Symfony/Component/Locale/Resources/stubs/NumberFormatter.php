@@ -12,7 +12,7 @@
 /**
  * Stub implementation for the NumberFormatter class of the intl extension
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @see Symfony\Component\Locale\Stub\StubNumberFormatter
  */
 class NumberFormatter extends \Symfony\Component\Locale\Stub\StubNumberFormatter {}

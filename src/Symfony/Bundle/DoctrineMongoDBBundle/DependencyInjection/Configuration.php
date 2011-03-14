@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 /**
@@ -27,24 +27,26 @@ class Configuration
     /**
      * Generates the configuration tree.
      *
-     * @return \Symfony\Component\DependencyInjection\Configuration\NodeInterface
+     * @return NodeInterface
      */
     public function getConfigTree()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('doctrine_mongo_db', 'array');
+        $rootNode = $treeBuilder->root('doctrine_mongo_db');
 
         $this->addDocumentManagersSection($rootNode);
         $this->addConnectionsSection($rootNode);
 
         $rootNode
-            ->scalarNode('proxy_namespace')->defaultValue('Proxies')->end()
-            ->scalarNode('auto_generate_proxy_classes')->defaultValue(false)->end()
-            ->scalarNode('hydrator_namespace')->defaultValue('Hydrators')->end()
-            ->scalarNode('auto_generate_hydrator_classes')->defaultValue(false)->end()
-            ->scalarNode('default_document_manager')->end()
-            ->scalarNode('default_connection')->end()
-            ->scalarNode('default_database')->defaultValue('default')->end()
+            ->children()
+                ->scalarNode('proxy_namespace')->defaultValue('Proxies')->end()
+                ->scalarNode('auto_generate_proxy_classes')->defaultValue(false)->end()
+                ->scalarNode('hydrator_namespace')->defaultValue('Hydrators')->end()
+                ->scalarNode('auto_generate_hydrator_classes')->defaultValue(false)->end()
+                ->scalarNode('default_document_manager')->end()
+                ->scalarNode('default_connection')->end()
+                ->scalarNode('default_database')->defaultValue('default')->end()
+            ->end()
         ;
 
         return $treeBuilder->buildTree();
@@ -53,21 +55,25 @@ class Configuration
     /**
      * Configures the "document_managers" section
      */
-    private function addDocumentManagersSection(NodeBuilder $rootNode)
+    private function addDocumentManagersSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
             ->fixXmlConfig('document_manager')
-            ->arrayNode('document_managers')
-                ->useAttributeAsKey('id')
-                ->prototype('array')
-                    //->performNoDeepMerging()
-                    ->treatNullLike(array())
-                    ->builder($this->getMetadataCacheDriverNode())
-                    ->scalarNode('connection')->end()
-                    ->scalarNode('database')->end()
-                    ->booleanNode('logging')->defaultValue($this->debug)->end()
-                    ->fixXmlConfig('mapping')
-                    ->builder($this->getMappingsNode())
+            ->children()
+                ->arrayNode('document_managers')
+                    ->useAttributeAsKey('id')
+                    ->prototype('array')
+                        //->performNoDeepMerging()
+                        ->treatNullLike(array())
+                        ->append($this->getMetadataCacheDriverNode())
+                        ->children()
+                            ->scalarNode('connection')->end()
+                            ->scalarNode('database')->end()
+                            ->booleanNode('logging')->defaultValue($this->debug)->end()
+                        ->end()
+                        ->fixXmlConfig('mapping')
+                        ->append($this->getMappingsNode())
+                    ->end()
                 ->end()
             ->end()
         ;
@@ -76,16 +82,20 @@ class Configuration
     /**
      * Adds the configuration for the "connections" key
      */
-    private function addConnectionsSection(NodeBuilder $rootNode)
+    private function addConnectionsSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
             ->fixXmlConfig('connection')
-            ->arrayNode('connections')
-                ->useAttributeAsKey('id')
-                ->prototype('array')
-                    ->performNoDeepMerging()
-                    ->scalarNode('server')->defaultNull()->end()
-                    ->builder($this->addConnectionOptionsNode())
+            ->children()
+                ->arrayNode('connections')
+                    ->useAttributeAsKey('id')
+                    ->prototype('array')
+                        ->performNoDeepMerging()
+                        ->children()
+                            ->scalarNode('server')->defaultNull()->end()
+                        ->end()
+                        ->append($this->addConnectionOptionsNode())
+                    ->end()
                 ->end()
             ->end()
         ;
@@ -101,7 +111,9 @@ class Configuration
      */
     protected function getMappingsNode()
     {
-        $node = new Nodebuilder('mappings', 'array');
+        $builder = new TreeBuilder();
+        $node = $builder->root('mappings');
+
         $node
             ->useAttributeAsKey('name')
             ->prototype('array')
@@ -113,11 +125,13 @@ class Configuration
                 // I believe that "null" should *not* set the type
                 // it's guessed in AbstractDoctrineExtension::detectMetadataDriver
                 ->treatNullLike(array())
-                ->scalarNode('type')->end()
-                ->scalarNode('dir')->end()
-                ->scalarNode('prefix')->end()
-                ->scalarNode('alias')->end()
-                ->booleanNode('is_bundle')->end()
+                ->children()
+                    ->scalarNode('type')->end()
+                    ->scalarNode('dir')->end()
+                    ->scalarNode('prefix')->end()
+                    ->scalarNode('alias')->end()
+                    ->booleanNode('is_bundle')->end()
+                ->end()
                 ->performNoDeepMerging()
             ->end()
         ;
@@ -130,20 +144,22 @@ class Configuration
      */
     private function addConnectionOptionsNode()
     {
-        $node = new NodeBuilder('options', 'array');
+        $builder = new TreeBuilder();
+        $node = $builder->root('options');
 
         $node
             ->performNoDeepMerging()
             ->addDefaultsIfNotSet() // adds an empty array of omitted
-
             // options go into the Mongo constructor
             // http://www.php.net/manual/en/mongo.construct.php
-            ->booleanNode('connect')->end()
-            ->scalarNode('persist')->end()
-            ->scalarNode('timeout')->end()
-            ->booleanNode('replicaSet')->end()
-            ->scalarNode('username')->end()
-            ->scalarNode('password')->end()
+            ->children()
+                ->booleanNode('connect')->end()
+                ->scalarNode('persist')->end()
+                ->scalarNode('timeout')->end()
+                ->booleanNode('replicaSet')->end()
+                ->scalarNode('username')->end()
+                ->scalarNode('password')->end()
+            ->end()
         ->end();
 
         return $node;
@@ -151,7 +167,8 @@ class Configuration
 
     private function getMetadataCacheDriverNode()
     {
-        $node = new NodeBuilder('metadata_cache_driver', 'array');
+        $builder = new TreeBuilder();
+        $node = $builder->root('metadata_cache_driver');
 
         $node
             ->beforeNormalization()
@@ -159,11 +176,13 @@ class Configuration
                 ->ifTrue(function($v) { return !is_array($v); })
                 ->then(function($v) { return array('type' => $v); })
             ->end()
-            ->scalarNode('type')->end()
-            ->scalarNode('class')->end()
-            ->scalarNode('host')->end()
-            ->scalarNode('port')->end()
-            ->scalarNode('instance_class')->end()
+            ->children()
+                ->scalarNode('type')->end()
+                ->scalarNode('class')->end()
+                ->scalarNode('host')->end()
+                ->scalarNode('port')->end()
+                ->scalarNode('instance_class')->end()
+            ->end()
         ->end();
 
         return $node;

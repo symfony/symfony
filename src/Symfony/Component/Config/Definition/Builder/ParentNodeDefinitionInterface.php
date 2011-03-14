@@ -12,11 +12,16 @@
 namespace Symfony\Component\Config\Definition\Builder;
 
 /**
- * Defines a common interface for node & tree builders
+ * An interface that must be implemented by nodes which can have children
  *
  * @author Victor Berchet <victor@suumit.com>
  */
-interface BuilderInterface
+interface ParentNodeDefinitionInterface
 {
+    function children();
+
+    function append(NodeDefinition $node);
+
+    function setBuilder(NodeBuilder $builder);
 }
  

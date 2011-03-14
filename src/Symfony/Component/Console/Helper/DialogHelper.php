@@ -85,7 +85,7 @@ class DialogHelper extends Helper
         $error = null;
         while (false === $attempts || $attempts--) {
             if (null !== $error) {
-                $output->writeln($this->getHelper('formatter')->formatBlock($error->getMessage(), 'error'));
+                $output->writeln($this->getHelperSet()->get('formatter')->formatBlock($error->getMessage(), 'error'));
             }
 
             $value = $this->ask($output, $question, null);

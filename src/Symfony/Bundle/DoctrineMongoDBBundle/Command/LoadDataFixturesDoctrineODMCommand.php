@@ -24,6 +24,7 @@ use Doctrine\Common\DataFixtures\Purger\MongoDBPurger;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Internal\CommitOrderCalculator;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
+use InvalidArgumentException;
 
 /**
  * Load data fixtures from bundles.
@@ -62,6 +63,16 @@ EOT
         $dmName = $input->getOption('dm');
         $dmName = $dmName ? $dmName : 'default';
         $dmServiceName = sprintf('doctrine.odm.mongodb.%s_document_manager', $dmName);
+
+        if (!$this->container->has($dmServiceName)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Could not find a document manager configured with the name "%s". Check your '.
+                    'application configuration to configure your Doctrine document managers.', $emName
+                )
+            );
+        }
+
         $dm = $this->container->get($dmServiceName);
         $dirOrFile = $input->getOption('fixtures');
         if ($dirOrFile) {
@@ -78,6 +89,11 @@ EOT
             if (is_dir($path)) {
                 $loader->loadFromDirectory($path);
             }
+        }
+        if (!$fixtures) {
+            throw new InvalidArgumentException(
+                sprintf('Could not find any fixtures to load in: %s', "\n\n- ".implode("\n- ", $paths))
+            );
         }
         $fixtures = $loader->getFixtures();
         $purger = new MongoDBPurger($dm);

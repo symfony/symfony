@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,7 +14,7 @@ namespace Symfony\Component\Config;
 /**
  * FileLocator uses an array of pre-defined paths to find files.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class FileLocator implements FileLocatorInterface
 {
@@ -38,7 +38,7 @@ class FileLocator implements FileLocatorInterface
      *
      * @param mixed   $name        The file name to locate
      * @param string  $currentPath The current path
-     * @param Boolean $first       Wether to return the first occurence or an array of filenames
+     * @param Boolean $first       Whether to return the first occurrence or an array of filenames
      *
      * @return string|array The full path to the file|An array of file paths
      *
@@ -75,7 +75,7 @@ class FileLocator implements FileLocatorInterface
             throw new \InvalidArgumentException(sprintf('The file "%s" does not exist (in: %s%s).', $name, null !== $currentPath ? $currentPath.', ' : '', implode(', ', $this->paths)));
         }
 
-        return $filepaths;
+        return array_values(array_unique($filepaths));
     }
 
     /**

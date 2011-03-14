@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -40,20 +40,20 @@ use Symfony\Component\Console\Helper\DialogHelper;
  *     $app->add(new SimpleCommand());
  *     $app->run();
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Application
 {
-    protected $commands;
-    protected $aliases;
-    protected $wantHelps = false;
-    protected $runningCommand;
-    protected $name;
-    protected $version;
-    protected $catchExceptions;
-    protected $autoExit;
-    protected $definition;
-    protected $helperSet;
+    private $commands;
+    private $aliases;
+    private $wantHelps = false;
+    private $runningCommand;
+    private $name;
+    private $version;
+    private $catchExceptions;
+    private $autoExit;
+    private $definition;
+    private $helperSet;
 
     /**
      * Constructor.
@@ -129,9 +129,9 @@ class Application
             // @codeCoverageIgnoreStart
             exit($statusCode);
             // @codeCoverageIgnoreEnd
-        } else {
-            return $statusCode;
         }
+
+        return $statusCode;
     }
 
     /**
@@ -235,7 +235,7 @@ class Application
             '<comment>Options:</comment>',
         );
 
-        foreach ($this->definition->getOptions() as $option) {
+        foreach ($this->getDefinition()->getOptions() as $option) {
             $messages[] = sprintf('  %-29s %s %s',
                 '<info>--'.$option->getName().'</info>',
                 $option->getShortcut() ? '<info>-'.$option->getShortcut().'</info>' : '  ',
@@ -315,9 +315,9 @@ class Application
     {
         if ('UNKNOWN' !== $this->getName() && 'UNKNOWN' !== $this->getVersion()) {
             return sprintf('<info>%s</info> version <comment>%s</comment>', $this->getName(), $this->getVersion());
-        } else {
-            return '<info>Console Tool</info>';
         }
+
+        return '<info>Console Tool</info>';
     }
 
     /**
@@ -736,7 +736,7 @@ class Application
      *
      * @return array A sorted array of commands
      */
-    protected function sortCommands($commands)
+    private function sortCommands($commands)
     {
         $namespacedCommands = array();
         foreach ($commands as $name => $command) {
@@ -764,7 +764,7 @@ class Application
      *
      * @return string A formatted string of abbreviated suggestions
      */
-    protected function getAbbreviationSuggestions($abbrevs)
+    private function getAbbreviationSuggestions($abbrevs)
     {
         return sprintf('%s, %s%s', $abbrevs[0], $abbrevs[1], count($abbrevs) > 2 ? sprintf(' and %d more', count($abbrevs) - 2) : '');
     }

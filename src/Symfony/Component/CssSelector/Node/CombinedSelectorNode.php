@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,11 +19,11 @@ use Symfony\Component\CssSelector\SyntaxError;
  * This component is a port of the Python lxml library,
  * which is copyright Infrae and distributed under the BSD license.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class CombinedSelectorNode implements NodeInterface
 {
-    static protected $_method_mapping = array(
+    static protected $methodMapping = array(
         ' ' => 'descendant',
         '>' => 'child',
         '+' => 'direct_adjacent',
@@ -64,11 +64,11 @@ class CombinedSelectorNode implements NodeInterface
      */
     public function toXpath()
     {
-        if (!isset(self::$_method_mapping[$this->combinator])) {
+        if (!isset(self::$methodMapping[$this->combinator])) {
             throw new SyntaxError(sprintf('Unknown combinator: %s', $this->combinator));
         }
 
-        $method = '_xpath_'.self::$_method_mapping[$this->combinator];
+        $method = '_xpath_'.self::$methodMapping[$this->combinator];
         $path = $this->selector->toXpath();
 
         return $this->$method($path, $this->subselector);

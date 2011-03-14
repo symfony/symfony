@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -59,6 +59,9 @@ class MimeTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGuessWithNonReadablePath()
     {
+        if (strstr(PHP_OS, 'WIN')) {
+            $this->markTestSkipped('Can not verify chmod operations on Windows');
+        }
         $path = __DIR__.'/../Fixtures/to_delete';
         touch($path);
         chmod($path, 0333);

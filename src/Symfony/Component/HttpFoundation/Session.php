@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface;
 /**
  * Session.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Session implements \Serializable
 {
@@ -213,7 +213,7 @@ class Session implements \Serializable
 
     public function getFlashes()
     {
-        return $this->attributes['_flash'];
+        return isset($this->attributes['_flash']) ? $this->attributes['_flash'] : array();
     }
 
     public function setFlashes($values)
@@ -223,6 +223,7 @@ class Session implements \Serializable
         }
 
         $this->attributes['_flash'] = $values;
+        $this->oldFlashes = array();
     }
 
     public function getFlash($name, $default = null)
@@ -242,27 +243,42 @@ class Session implements \Serializable
 
     public function hasFlash($name)
     {
+        if (false === $this->started) {
+            $this->start();
+        }
+
         return array_key_exists($name, $this->attributes['_flash']);
     }
 
     public function removeFlash($name)
     {
+        if (false === $this->started) {
+            $this->start();
+        }
+
         unset($this->attributes['_flash'][$name]);
     }
 
     public function clearFlashes()
     {
+        if (false === $this->started) {
+            $this->start();
+        }
+
         $this->attributes['_flash'] = array();
+        $this->oldFlashes = array();
     }
 
     public function save()
     {
-        if (true === $this->started) {
-            if (isset($this->attributes['_flash'])) {
-                $this->attributes['_flash'] = array_diff_key($this->attributes['_flash'], $this->oldFlashes);
-            }
-            $this->storage->write('_symfony2', $this->attributes);
+        if (false === $this->started) {
+            $this->start();
         }
+
+        if (isset($this->attributes['_flash'])) {
+            $this->attributes['_flash'] = array_diff_key($this->attributes['_flash'], $this->oldFlashes);
+        }
+        $this->storage->write('_symfony2', $this->attributes);
     }
 
     public function __destruct()

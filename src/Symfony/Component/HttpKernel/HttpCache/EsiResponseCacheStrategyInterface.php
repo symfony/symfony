@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * This code is partially based on the Rack-Cache library by Ryan Tomayko,
  * which is released under the MIT license.
@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
  * EsiResponseCacheStrategyInterface implementations know how to compute the
  * Response cache HTTP header based on the different ESI response cache headers.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 interface EsiResponseCacheStrategyInterface
 {

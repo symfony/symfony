@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<xsd:schema xmlns="http://www.symfony-project.org/schema/dic/services"
+<xsd:schema xmlns="http://symfony.com/schema/dic/services"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-     targetNamespace="http://www.symfony-project.org/schema/dic/services"
+     targetNamespace="http://symfony.com/schema/dic/services"
      elementFormDefault="qualified">
 
   <xsd:annotation>
@@ -98,6 +98,7 @@
       <xsd:element name="configurator" type="configurator" minOccurs="0" maxOccurs="1" />
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
     </xsd:choice>
     <xsd:attribute name="id" type="xsd:string" />
     <xsd:attribute name="class" type="xsd:string" />
@@ -133,6 +134,14 @@
     <xsd:attribute name="id" type="xsd:string" />
     <xsd:attribute name="key" type="xsd:string" />
     <xsd:attribute name="on-invalid" type="invalid_sequence" />
+  </xsd:complexType>
+
+  <xsd:complexType name="property" mixed="true">
+    <xsd:attribute name="type" type="argument_type" />
+    <xsd:attribute name="id" type="xsd:string" />
+    <xsd:attribute name="name" type="xsd:string" />
+    <xsd:attribute name="on-invalid" type="xsd:string" />
+    <xsd:attribute name="strict" type="boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="argument" mixed="true">

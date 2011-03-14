@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,6 +17,9 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Dbal\Schema;
 use Doctrine\DBAL\DriverManager;
 
+/**
+ * @group benchmark
+ */
 class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
 {
     protected $con;
@@ -26,9 +29,24 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
     protected $insertOidStmt;
     protected $insertEntryStmt;
 
+    protected function setUp()
+    {
+        $this->con = DriverManager::getConnection(array(
+            'driver' => 'pdo_mysql',
+            'host' => 'localhost',
+            'user' => 'root',
+            'dbname' => 'testdb',
+        ));
+    }
+
+    protected function tearDown()
+    {
+        $this->con = null;
+    }
+
     public function testFindAcls()
     {
-//        $this->generateTestData();
+        // $this->generateTestData();
 
         // get some random test object identities from the database
         $oids = array();
@@ -43,25 +61,6 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
         $provider->findAcls($oids);
         $time = microtime(true) - $start;
         echo "Total Time: ".$time."s\n";
-    }
-
-
-    protected function setUp()
-    {
-        // comment the following line, and run only this test, if you need to benchmark
-        $this->markTestSkipped();
-
-        $this->con = DriverManager::getConnection(array(
-            'driver' => 'pdo_mysql',
-            'host' => 'localhost',
-            'user' => 'root',
-            'dbname' => 'testdb',
-        ));
-    }
-
-    protected function tearDown()
-    {
-        $this->con = null;
     }
 
     /**

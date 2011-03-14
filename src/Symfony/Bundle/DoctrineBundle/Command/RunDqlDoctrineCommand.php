@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -21,7 +21,7 @@ use Doctrine\ORM\Tools\Console\Command\RunDqlCommand;
 /**
  * Execute a Doctrine DQL query and output the results.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class RunDqlDoctrineCommand extends RunDqlCommand
@@ -42,7 +42,7 @@ You can also optional specify some additional options like what type of hydratio
 
   <info>./app/console doctrine:query:dql "SELECT u FROM UserBundle:User u" --hydrate=array</info>
 
-Additionaly you can specify the first result and maximum amount of results to show:
+Additionally you can specify the first result and maximum amount of results to show:
 
   <info>./app/console doctrine:query:dql "SELECT u FROM UserBundle:User u" --first-result=0 --max-result=30</info>
 EOT
@@ -51,7 +51,7 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
+        DoctrineCommand::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
 
         return parent::execute($input, $output);
     }

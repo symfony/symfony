@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -122,14 +122,5 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $user = new User('fabien', 'superpass');
         $user->eraseCredentials();
         $this->assertEquals('superpass', $user->getPassword());
-    }
-
-    /**
-     * @covers Symfony\Component\Security\Core\User\User::__toString
-     */
-    public function testMagicToString()
-    {
-        $user = new User('fabien', 'superpass');
-        $this->assertEquals('fabien', (string) $user);
     }
 }

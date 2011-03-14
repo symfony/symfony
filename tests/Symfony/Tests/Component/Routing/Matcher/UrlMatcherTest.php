@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,26 +17,6 @@ use Symfony\Component\Routing\Route;
 
 class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 {
-    public function testNormalizeUrl()
-    {
-        $collection = new RouteCollection();
-        $collection->add('foo', new Route('/{foo}'));
-
-        $matcher = new UrlMatcherForTests($collection, array(), array());
-
-        $this->assertEquals('/foo', $matcher->normalizeUrl('/foo?foo=bar'), '->normalizeUrl() removes the query string');
-        $this->assertEquals('/foo/bar', $matcher->normalizeUrl('/foo//bar'), '->normalizeUrl() removes duplicated /');
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testNormalizeUrlThrowsAnExceptionIfTheUrlIsInvalid()
-    {
-        $matcher = new UrlMatcherForTests(new RouteCollection(), array(), array());
-        $matcher->normalizeUrl('');
-    }
-
     public function testMatch()
     {
       // test the patterns are matched are parameters are returned
@@ -52,7 +32,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
       $matcher = new UrlMatcher($collection, array(), array());
       $this->assertEquals(array('_route' => 'foo', 'bar' => 'baz', 'def' => 'test'), $matcher->match('/foo/baz'));
 
-      // test that route "metod" is ignore if no method is given in the context
+      // test that route "method" is ignore if no method is given in the context
       $collection = new RouteCollection();
       $collection->add('foo', new Route('/foo', array(), array('_method' => 'GET|head')));
 
@@ -69,13 +49,5 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
       $this->assertNotEquals(false, $matcher->match('/foo'));
       $matcher = new UrlMatcher($collection, array('method' => 'HEAD'), array());
       $this->assertNotEquals(false, $matcher->match('/foo'));
-    }
-}
-
-class UrlMatcherForTests extends UrlMatcher
-{
-    public function normalizeUrl($url)
-    {
-        return parent::normalizeUrl($url);
     }
 }

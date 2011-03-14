@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\Output;
 /**
  * Generate entity classes from mapping information
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class GenerateEntitiesDoctrineCommand extends DoctrineCommand
@@ -43,7 +43,7 @@ Alternatively, you can limit generation to a single entity within a bundle:
 
   <info>./app/console doctrine:generate:entities "MyCustomBundle" --entity="User"</info>
 
-You have to specifiy the shortname (without namespace) of the entity you want to filter for.
+You have to specify the shortname (without namespace) of the entity you want to filter for.
 EOT
         );
     }
@@ -66,7 +66,7 @@ EOT
 
                 if (strpos($metadata->name, $foundBundle->getNamespace()) === false) {
                     throw new \RuntimeException(
-                        "Entity " . $metadata->name . " and bundle don't have a commont namespace, ".
+                        "Entity " . $metadata->name . " and bundle don't have a common namespace, ".
                         "generation failed because the target directory cannot be detected.");
                 }
 

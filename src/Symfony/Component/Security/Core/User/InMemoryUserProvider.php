@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Core\User;
 
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\Exception\UnsupportedAccountException;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 
 /**
  * InMemoryUserProvider is a simple non persistent user provider.
@@ -20,11 +20,11 @@ use Symfony\Component\Security\Core\Exception\UnsupportedAccountException;
  * Useful for testing, demonstration, prototyping, and for simple needs
  * (a backend with a unique admin for instance)
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class InMemoryUserProvider implements UserProviderInterface
 {
-    protected $users;
+    private $users;
 
     /**
      * Constructor.
@@ -50,9 +50,9 @@ class InMemoryUserProvider implements UserProviderInterface
     /**
      * Adds a new User to the provider.
      *
-     * @param AccountInterface $user A AccountInterface instance
+     * @param UserInterface $user A UserInterface instance
      */
-    public function createUser(AccountInterface $user)
+    public function createUser(UserInterface $user)
     {
         if (isset($this->users[strtolower($user->getUsername())])) {
             throw new \LogicException('Another user with the same username already exist.');
@@ -79,13 +79,13 @@ class InMemoryUserProvider implements UserProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function loadUserByAccount(AccountInterface $account)
+    public function loadUser(UserInterface $user)
     {
-        if (!$account instanceof User) {
-            throw new UnsupportedAccountException(sprintf('Instances of "%s" are not supported.', get_class($account)));
+        if (!$user instanceof User) {
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));
         }
 
-        return $this->loadUserByUsername((string) $account);
+        return $this->loadUserByUsername($user->getUsername());
     }
 
     /**

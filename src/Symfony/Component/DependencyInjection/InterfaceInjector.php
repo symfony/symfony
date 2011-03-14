@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -20,12 +20,12 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  */
 class InterfaceInjector
 {
-    protected $class;
-    protected $calls = array();
-    protected $processedDefinitions = array();
+    private $class;
+    private $calls = array();
+    private $processedDefinitions = array();
 
     /**
-     * Contructs interface injector by specifying the target class name
+     * Constructs interface injector by specifying the target class name
      *
      * @param string $class
      */

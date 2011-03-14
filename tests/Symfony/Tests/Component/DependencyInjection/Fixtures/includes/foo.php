@@ -2,6 +2,8 @@
 
 class FooClass
 {
+    private $foo, $moo;
+
     public $bar = null, $initialized = false, $configured = false, $called = false, $arguments = array();
 
     public function __construct($arguments = array())

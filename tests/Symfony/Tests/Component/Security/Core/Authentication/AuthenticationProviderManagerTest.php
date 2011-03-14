@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,23 +19,12 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class AuthenticationProviderManagerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testProviderAccessors()
-    {
-        $manager = new AuthenticationProviderManager();
-        $manager->add($provider = $this->getMock('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface'));
-        $this->assertSame(array($provider), $manager->all());
-
-        $manager->setProviders($providers = array($this->getMock('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')));
-        $this->assertSame($providers, $manager->all());
-    }
-
     /**
-     * @expectedException LogicException
+     * @expectedException InvalidArgumentException
      */
     public function testAuthenticateWithoutProviders()
     {
-        $manager = new AuthenticationProviderManager();
-        $manager->authenticate($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
+        new AuthenticationProviderManager(array());
     }
 
     public function testAuthenticateWhenNoProviderSupportsToken()

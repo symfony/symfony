@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -54,7 +54,7 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
             array('http://www.google.com'),
             array('https://google.com/'),
             array('https://google.com:80/'),
-            array('http://www.symfony-project.com/'),
+            array('http://www.symfony.com/'),
             array('http://127.0.0.1/'),
             array('http://127.0.0.1:80/'),
         );

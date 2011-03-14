@@ -8,7 +8,7 @@ class XMLSchemaTest extends \PHPUnit_Framework_TestCase
     {
         $schemaFiles = array();
         $di = new \DirectoryIterator(__DIR__ . "/Fixtures/config/xml");
-        foreach ($di AS $element) {
+        foreach ($di as $element) {
             if ($element->isFile() && strpos($element->getFilename(), ".xml") !== false) {
                 $schemaFiles[] = array($element->getPathname());
             }
@@ -27,7 +27,7 @@ class XMLSchemaTest extends \PHPUnit_Framework_TestCase
         $dom->load($file);
 
 
-        $dbalElements = $dom->getElementsByTagNameNS("http://www.symfony-project.org/schema/dic/doctrine", "config");
+        $dbalElements = $dom->getElementsByTagNameNS("http://symfony.com/schema/dic/doctrine", "config");
         if ($dbalElements->length) {
             $dbalDom = new \DOMDocument('1.0', 'UTF-8');
             $dbalNode = $dbalDom->importNode($dbalElements->item(0));
@@ -38,7 +38,7 @@ class XMLSchemaTest extends \PHPUnit_Framework_TestCase
             $found = true;
         }
 
-        $ormElements = $dom->getElementsByTagNameNS("http://www.symfony-project.org/schema/dic/doctrine", "config");
+        $ormElements = $dom->getElementsByTagNameNS("http://symfony.com/schema/dic/doctrine", "config");
         if ($ormElements->length) {
             $ormDom = new \DOMDocument('1.0', 'UTF-8');
             $ormNode = $ormDom->importNode($ormElements->item(0));
@@ -49,6 +49,6 @@ class XMLSchemaTest extends \PHPUnit_Framework_TestCase
             $found = true;
         }
 
-        $this->assertTrue($found, "Neither <doctrine:orm> nor <doctrine:dbal> elements found in given XML. Are namespace sconfigured correctly?");
+        $this->assertTrue($found, "Neither <doctrine:orm> nor <doctrine:dbal> elements found in given XML. Are namespaces configured correctly?");
     }
 }

@@ -36,27 +36,11 @@ class RememberMeAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\CredentialsExpiredException
-     */
-    public function testAuthenticateWhenPreChecksFails()
-    {
-        $userChecker = $this->getMock('Symfony\Component\Security\Core\User\AccountCheckerInterface');
-        $userChecker->expects($this->once())
-                    ->method('checkPreAuth')
-                    ->will($this->throwException($this->getMock('Symfony\Component\Security\Core\Exception\CredentialsExpiredException', null, array(), '', false)))
-        ;
-
-        $provider = $this->getProvider($userChecker);
-
-        $provider->authenticate($this->getSupportedToken());
-    }
-
-    /**
      * @expectedException Symfony\Component\Security\Core\Exception\AccountExpiredException
      */
     public function testAuthenticateWhenPostChecksFails()
     {
-        $userChecker = $this->getMock('Symfony\Component\Security\Core\User\AccountCheckerInterface');
+        $userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
         $userChecker->expects($this->once())
                     ->method('checkPostAuth')
                     ->will($this->throwException($this->getMock('Symfony\Component\Security\Core\Exception\AccountExpiredException', null, array(), '', false)))
@@ -69,8 +53,8 @@ class RememberMeAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testAuthenticate()
     {
-        $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
-        $user->expects($this->once())
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user->expects($this->exactly(2))
              ->method('getRoles')
              ->will($this->returnValue(array('ROLE_FOO')))
         ;
@@ -78,24 +62,18 @@ class RememberMeAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $provider = $this->getProvider();
 
         $token = $this->getSupportedToken($user);
-        $token
-            ->expects($this->once())
-            ->method('getCredentials')
-            ->will($this->returnValue('foo'))
-        ;
-
         $authToken = $provider->authenticate($token);
 
         $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken', $authToken);
         $this->assertSame($user, $authToken->getUser());
         $this->assertEquals(array(new Role('ROLE_FOO')), $authToken->getRoles());
-        $this->assertEquals('foo', $authToken->getCredentials());
+        $this->assertEquals('', $authToken->getCredentials());
     }
 
     protected function getSupportedToken($user = null, $key = 'test')
     {
         if (null === $user) {
-            $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+            $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
             $user
                 ->expects($this->any())
                 ->method('getRoles')
@@ -103,7 +81,7 @@ class RememberMeAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
             ;
         }
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken', array('getCredentials', 'getProviderKey'), array($user, 'foo', $key));
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken', array('getProviderKey'), array($user, 'foo', $key));
         $token
             ->expects($this->once())
             ->method('getProviderKey')
@@ -116,7 +94,7 @@ class RememberMeAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     protected function getProvider($userChecker = null, $key = 'test')
     {
         if (null === $userChecker) {
-            $userChecker = $this->getMock('Symfony\Component\Security\Core\User\AccountCheckerInterface');
+            $userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
         }
 
         return new RememberMeAuthenticationProvider($userChecker, $key, 'foo');

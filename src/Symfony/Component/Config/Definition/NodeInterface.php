@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -38,14 +38,14 @@ interface NodeInterface
     /**
      * Returns true when the node is required.
      *
-     * @return boolean If the node is required
+     * @return Boolean If the node is required
      */
     function isRequired();
     
     /**
      * Returns true when the node has a default value.
      *
-     * @return boolean If the node has a default value
+     * @return Boolean If the node has a default value
      */
     function hasDefaultValue();
     

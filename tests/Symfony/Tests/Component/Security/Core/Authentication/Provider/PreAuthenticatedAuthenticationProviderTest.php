@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -52,7 +52,12 @@ class PreAuthenticatedAuthenticationProviderTest extends \PHPUnit_Framework_Test
 
     public function testAuthenticate()
     {
-        $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user
+            ->expects($this->once())
+            ->method('getRoles')
+            ->will($this->returnValue(array()))
+        ;
         $provider = $this->getProvider($user);
 
         $token = $provider->authenticate($this->getSupportedToken('fabien', 'pass'));
@@ -60,17 +65,18 @@ class PreAuthenticatedAuthenticationProviderTest extends \PHPUnit_Framework_Test
         $this->assertEquals('pass', $token->getCredentials());
         $this->assertEquals('key', $token->getProviderKey());
         $this->assertEquals(array(), $token->getRoles());
+        $this->assertEquals(array('foo' => 'bar'), $token->getAttributes(), '->authenticate() copies token attributes');
         $this->assertSame($user, $token->getUser());
     }
 
     /**
      * @expectedException Symfony\Component\Security\Core\Exception\LockedException
      */
-    public function testAuthenticateWhenAccountCheckerThrowsException()
+    public function testAuthenticateWhenUserCheckerThrowsException()
     {
-        $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
 
-        $userChecker = $this->getMock('Symfony\Component\Security\Core\User\AccountCheckerInterface');
+        $userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
         $userChecker->expects($this->once())
                     ->method('checkPostAuth')
                     ->will($this->throwException($this->getMock('Symfony\Component\Security\Core\Exception\LockedException', null, array(), '', false)))
@@ -103,6 +109,8 @@ class PreAuthenticatedAuthenticationProviderTest extends \PHPUnit_Framework_Test
             ->will($this->returnValue('key'))
         ;
 
+        $token->setAttributes(array('foo' => 'bar'));
+
         return $token;
     }
 
@@ -117,7 +125,7 @@ class PreAuthenticatedAuthenticationProviderTest extends \PHPUnit_Framework_Test
         }
 
         if (false === $userChecker) {
-            $userChecker = $this->getMock('Symfony\Component\Security\Core\User\AccountCheckerInterface');
+            $userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
         }
 
         return new PreAuthenticatedAuthenticationProvider($userProvider, $userChecker, 'key');

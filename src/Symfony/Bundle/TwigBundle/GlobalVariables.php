@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,9 +14,9 @@ namespace Symfony\Bundle\TwigBundle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * AppVariables is the entry point for Symfony global variables in Twig templates.
+ * GlobalVariables is the entry point for Symfony global variables in Twig templates.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class GlobalVariables
 {
@@ -65,7 +65,7 @@ class GlobalVariables
     }
 
     /**
-     * Returns the security context service.
+     * Returns the current request.
      *
      * @return Symfony\Component\HttpFoundation\Request|void The http request object
      */
@@ -77,7 +77,7 @@ class GlobalVariables
     }
 
     /**
-     * Returns the security context service.
+     * Returns the current session.
      *
      * @return Symfony\Component\HttpFoundation\Session|void The session
      */

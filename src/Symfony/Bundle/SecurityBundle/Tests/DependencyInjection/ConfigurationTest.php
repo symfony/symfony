@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -48,6 +48,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $config = $processor->process($tree, array($config));
 
         $this->assertFalse(array_key_exists('factory', $config), 'The factory key is silently removed without an exception');
-        $this->assertEquals(array(), $config['factories'], 'The factories key is jsut an empty array');
+        $this->assertEquals(array(), $config['factories'], 'The factories key is just an empty array');
     }
 }

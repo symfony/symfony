@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 /*
  * This file is part of the Symfony framework.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -66,7 +66,8 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
                 '@Type' => 'test'
             ),
             'föo_bär' => '',
-            "Bar" => array(1,2,3)
+            "Bar" => array(1,2,3),
+            'a' => 'b',
         );
         $expected = '<?xml version="1.0"?>'."\n".
             '<response>'.
@@ -76,6 +77,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
             '<Bar>1</Bar>'.
             '<Bar>2</Bar>'.
             '<Bar>3</Bar>'.
+            '<a><![CDATA[b]]></a>'.
             '</response>'."\n";
         $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
     }

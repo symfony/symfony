@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,18 +16,18 @@ use Symfony\Component\DomCrawler\Field\FormField;
 /**
  * Form represents an HTML form.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Form implements \ArrayAccess
 {
-    protected $document;
-    protected $button;
-    protected $node;
-    protected $fields;
-    protected $method;
-    protected $host;
-    protected $path;
-    protected $base;
+    private $document;
+    private $button;
+    private $node;
+    private $fields;
+    private $method;
+    private $host;
+    private $path;
+    private $base;
 
     /**
      * Constructor.
@@ -269,7 +269,7 @@ class Form implements \ArrayAccess
         return $this->fields;
     }
 
-    protected function initialize()
+    private function initialize()
     {
         $this->fields = array();
 

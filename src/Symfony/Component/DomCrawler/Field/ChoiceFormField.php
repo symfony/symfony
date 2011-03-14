@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,13 +16,13 @@ namespace Symfony\Component\DomCrawler\Field;
  *
  * It is constructed from a HTML select tag, or a HTML checkbox, or radio inputs.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class ChoiceFormField extends FormField
 {
-    protected $type;
-    protected $multiple;
-    protected $options;
+    private $type;
+    private $multiple;
+    private $options;
 
     /**
      * Returns true if the field should be included in the submitted values.

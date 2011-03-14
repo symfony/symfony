@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -21,7 +21,7 @@ use Doctrine\ODM\MongoDB\Tools\Console\Command\QueryCommand;
 /**
  * Execute a Doctrine MongoDB ODM query and output the results.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class QueryDoctrineODMCommand extends QueryCommand
@@ -37,7 +37,7 @@ class QueryDoctrineODMCommand extends QueryCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        DoctrineODMCommand::setApplicationDocumentManager($this->application, $input->getOption('dm'));
+        DoctrineODMCommand::setApplicationDocumentManager($this->getApplication(), $input->getOption('dm'));
 
         return parent::execute($input, $output);
     }

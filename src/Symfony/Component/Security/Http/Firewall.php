@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -27,13 +27,11 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * The handle method must be connected to the core.request event.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Firewall
 {
-    protected $map;
-    protected $dispatcher;
-    protected $currentListeners;
+    private $map;
 
     /**
      * Constructor.
@@ -44,7 +42,6 @@ class Firewall
     {
         $this->map = $map;
         $this->dispatcher = $dispatcher;
-        $this->currentListeners = array();
     }
 
     /**
@@ -58,38 +55,19 @@ class Firewall
             return;
         }
 
-        $request = $event->get('request');
-
-        // disconnect all listeners from core.security to avoid the overhead
-        // of most listeners having to do this manually
-        $this->dispatcher->disconnect('core.security');
-
-        // ensure that listeners disconnect from wherever they have connected to
-        foreach ($this->currentListeners as $listener) {
-            $listener->unregister($this->dispatcher);
-        }
-
         // register listeners for this firewall
-        list($listeners, $exception) = $this->map->getListeners($request);
+        list($listeners, $exception) = $this->map->getListeners($event->get('request'));
         if (null !== $exception) {
             $exception->register($this->dispatcher);
         }
-        foreach ($listeners as $listener) {
-            $listener->register($this->dispatcher);
-        }
-
-        // save current listener instances
-        $this->currentListeners = $listeners;
-        if (null !== $exception) {
-            $this->currentListeners[] = $exception;
-        }
 
         // initiate the listener chain
-        $ret = $this->dispatcher->notifyUntil($securityEvent = new Event($request, 'core.security', array('request' => $request)));
-        if ($securityEvent->isProcessed()) {
-            $event->setProcessed();
+        foreach ($listeners as $listener) {
+            $response = $listener->handle($event);
 
-            return $ret;
+            if ($event->isProcessed()) {
+                return $response;
+            }
         }
     }
 }

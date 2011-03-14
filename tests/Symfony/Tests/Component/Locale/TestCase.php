@@ -78,6 +78,10 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             return self::$icuVersion;
         }
 
+        if (!$this->isIntlExtensionLoaded()) {
+            throw new \RuntimeException('The intl extension is not available');
+        }
+
         ob_start();
         phpinfo(INFO_MODULES);
         $output = ob_get_clean();

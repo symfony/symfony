@@ -80,6 +80,15 @@ EOT
             throw new \InvalidArgumentException('The bundle name must end with Bundle.');
         }
 
+        // validate that the namespace is at least one level deep
+        if (false === strpos($namespace, '\\')) {
+            $msg = array();
+            $msg[] = sprintf('The namespace must contain a vendor namespace (e.g. "VendorName\%s" instead of simply "%s").', $namespace, $namespace);
+            $msg[] = 'If you\'ve specified a vendor namespace, did you forget to surround it with quotes (init:bundle "Acme\BlogBundle")?';
+
+            throw new \InvalidArgumentException(implode("\n\n", $msg));
+        }
+
         $dir = $input->getArgument('dir');
 
         // add trailing / if necessary
@@ -87,7 +96,7 @@ EOT
 
         $targetDir = $dir.strtr($namespace, '\\', '/');
 
-        $output->writeln(sprintf('Initializing bundle "<info>%s</info>" in "<info>%s</info>"', $bundle, $dir));
+
 
         if (file_exists($targetDir)) {
             throw new \RuntimeException(sprintf('Bundle "%s" already exists.', $bundle));
@@ -103,5 +112,24 @@ EOT
         ));
 
         rename($targetDir.'/Bundle.php', $targetDir.'/'.$bundle.'.php');
+
+        $output->writeln('<comment>Summary of actions</comment>');
+        $output->writeln(sprintf('- The bundle "<info>%s</info>" was created at "<info>%s</info>" and is using the namespace "<info>%s</info>".', $bundle, $targetDir, $namespace));
+        $output->writeln(sprintf('- The bundle contains a sample controller, a sample template and a sample routing file.'));
+
+        $output->writeln('');
+        $output->writeln('<comment>Follow-up actions</comment>');
+
+        $output->writeln('- Enable the bundle inside the AppKernel::registerBundles() method.');
+        $output->writeln('      Resource: <info>http://symfony.com/doc/2.0/book/page_creation.html#create-the-bundle</info>');
+
+        $output->writeln('- Ensure that the namespace is registered with the autoloader.');
+        $output->writeln('      Resource: <info>http://symfony.com/doc/2.0/book/page_creation.html#autoloading-introduction-sidebar</info>');
+
+        $output->writeln('- If using routing, import the bundle\'s routing resource.');
+        $output->writeln('      Resource: <info>http://symfony.com/doc/2.0/book/routing.html#including-external-routing-resources</info>');
+
+        $output->writeln('- Starting building your bundle!');
+        $output->writeln('      Resource: <info>http://symfony.com/doc/2.0/book/page_creation.html#the-hello-symfony-page</info>');
     }
 }

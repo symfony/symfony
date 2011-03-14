@@ -28,6 +28,7 @@ class ContainerBuilderDebugDumpPass implements CompilerPassInterface
     {
         $file = self::getBuilderCacheFilename($container);
 
+        @mkdir(dirname($file), 0777, true);
         if (false !== @file_put_contents($file, serialize($container))) {
             chmod($file, 0666);
         } else {

@@ -30,7 +30,7 @@ class ContainerDebugCommand extends Command
     /**
      * @var \Symfony\Component\DependencyInjection\ContainerBuilder
      */
-    protected $containerBuilder;
+    private $containerBuilder;
 
     /**
      * @see Command
@@ -135,7 +135,7 @@ EOF
                 $output->writeln(sprintf($format, $serviceId, $definition->getScope(), $definition->getClass()));
             } elseif ($definition instanceof Alias) {
                 $alias = $definition;
-                $output->writeln(sprintf($format, $serviceId, sprintf('<comment>--> Alias for service</comment> <info>%s</info>', (string) $alias), ''));
+                $output->writeln(sprintf($format, $serviceId, 'n/a', sprintf('<comment>alias for</comment> <info>%s</info>', (string) $alias)));
             } else {
                 // we have no information (happens with "service_container")
                 $service = $definition;
@@ -159,12 +159,12 @@ EOF
             $output->writeln(sprintf('<comment>Service Id</comment>   %s', $serviceId));
             $output->writeln(sprintf('<comment>Class</comment>        %s', $definition->getClass()));
 
-            $tags = $definition->getTags() ? implode(', ', array_keys($definition->getTags())) : '<comment>no tags</comment>';
+            $tags = $definition->getTags() ? implode(', ', array_keys($definition->getTags())) : '-';
             $output->writeln(sprintf('<comment>Tags</comment>         %s', $tags));
 
             $output->writeln(sprintf('<comment>Scope</comment>        %s', $definition->getScope()));
 
-            $public = $definition->isPublic() ? 'public' : 'private';
+            $public = $definition->isPublic() ? 'yes' : 'no';
             $output->writeln(sprintf('<comment>Public</comment>       %s', $public));
         } elseif ($definition instanceof Alias) {
             $alias = $definition;

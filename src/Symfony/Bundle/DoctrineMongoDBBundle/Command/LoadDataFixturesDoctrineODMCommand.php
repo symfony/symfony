@@ -90,12 +90,14 @@ EOT
                 $loader->loadFromDirectory($path);
             }
         }
+
+        $fixtures = $loader->getFixtures();
         if (!$fixtures) {
             throw new InvalidArgumentException(
                 sprintf('Could not find any fixtures to load in: %s', "\n\n- ".implode("\n- ", $paths))
             );
         }
-        $fixtures = $loader->getFixtures();
+
         $purger = new MongoDBPurger($dm);
         $executor = new MongoDBExecutor($dm, $purger);
         $executor->setLogger(function($message) use ($output) {

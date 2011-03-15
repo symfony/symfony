@@ -33,7 +33,13 @@
             </tr>
             <tr>
                 <th>Authenticated?</th>
-                <td>{{ collector.authenticated ? 'yes' : 'no' }}</td>
+                <td>
+                    {% if collector.authenticated %}
+                        yes
+                    {% else %}
+                        no {% if not collector.roles|length %}<em>(probably because the user has no roles)</em>{% endif %}
+                    {% endif %}
+                </td>
             </tr>
             <tr>
                 <th>Roles</th>

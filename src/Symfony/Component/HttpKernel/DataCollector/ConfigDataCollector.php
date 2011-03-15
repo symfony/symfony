@@ -58,7 +58,6 @@ class ConfigDataCollector extends DataCollector
         foreach ($this->kernel->getBundles() as $name => $bundle) {
             $this->data['bundles'][$name] = $bundle->getPath();
         }
-
     }
 
     /**

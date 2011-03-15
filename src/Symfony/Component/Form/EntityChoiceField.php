@@ -143,6 +143,16 @@ class EntityChoiceField extends ChoiceField
     }
 
     /**
+     * Adds support for many-to-many entity choice fields.
+     * @param integer $choice
+     * @return boolean
+     */
+    public function isChoiceSelected($choice)
+    {
+        return in_array($choice, (array) $this->getDisplayedData());
+    }
+
+    /**
      * Returns the query builder instance for the choices of this field
      *
      * @return Doctrine\ORM\QueryBuilder  The query builder

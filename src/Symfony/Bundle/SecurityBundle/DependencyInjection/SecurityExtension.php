@@ -345,7 +345,7 @@ class SecurityExtension extends Extension
         }
 
         // Anonymous
-        if (isset($firewall['anonymous'])) {
+        if ($firewall['anonymous']) {
             $listeners[] = new Reference('security.authentication.listener.anonymous');
             $authenticationProviders[] = 'security.authentication.provider.anonymous';
             $hasListeners = true;

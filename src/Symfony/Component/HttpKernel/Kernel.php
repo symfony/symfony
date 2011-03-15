@@ -397,9 +397,19 @@ abstract class Kernel implements KernelInterface
 
     }
 
+    /**
+     * Gets the container class.
+     *
+     * @return string The container class
+     */
+    protected function getContainerClass()
+    {
+        return $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
+    }
+
     protected function initializeContainer()
     {
-        $class = $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
+        $class = $this->getContainerClass();
         $cache = new ConfigCache($this->getCacheDir().'/'.$class.'.php', $this->debug);
         $fresh = false;
         if (!$cache->isFresh()) {
@@ -428,14 +438,15 @@ abstract class Kernel implements KernelInterface
 
         return array_merge(
             array(
-                'kernel.root_dir'    => $this->rootDir,
-                'kernel.environment' => $this->environment,
-                'kernel.debug'       => $this->debug,
-                'kernel.name'        => $this->name,
-                'kernel.cache_dir'   => $this->getCacheDir(),
-                'kernel.logs_dir'    => $this->getLogDir(),
-                'kernel.bundles'     => $bundles,
-                'kernel.charset'     => 'UTF-8',
+                'kernel.root_dir'        => $this->rootDir,
+                'kernel.environment'     => $this->environment,
+                'kernel.debug'           => $this->debug,
+                'kernel.name'            => $this->name,
+                'kernel.cache_dir'       => $this->getCacheDir(),
+                'kernel.logs_dir'        => $this->getLogDir(),
+                'kernel.bundles'         => $bundles,
+                'kernel.charset'         => 'UTF-8',
+                'kernel.container_class' => $this->getContainerClass(),
             ),
             $this->getEnvParameters()
         );

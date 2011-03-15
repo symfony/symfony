@@ -26,11 +26,20 @@
 {% block panel %}
     <h2>Security</h2>
     {% if collector.user %}
-        <p>
-            Username: <strong>{{ collector.user }}</strong><br />
-            Authenticated? <strong>{{ collector.authenticated ? 'yes' : 'no' }}</strong><br />
-            Roles: <strong>{{ collector.roles|yaml_encode }}</strong>
-        </p>
+        <table>
+            <tr>
+                <th>Username</th>
+                <td>{{ collector.user }}</td>
+            </tr>
+            <tr>
+                <th>Authenticated?</th>
+                <td>{{ collector.authenticated ? 'yes' : 'no' }}</td>
+            </tr>
+            <tr>
+                <th>Roles</th>
+                <td>{{ collector.roles|yaml_encode }}</td>
+            </tr>
+        </table>
     {% elseif collector.enabled %}
         <p>
             <em>No token</em>

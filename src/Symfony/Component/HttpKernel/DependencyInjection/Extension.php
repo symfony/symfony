@@ -5,6 +5,14 @@ namespace Symfony\Component\HttpKernel\DependencyInjection;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\Config\Loader\DelegatingLoader;
 
 /*
  * This file is part of the Symfony framework.
@@ -101,5 +109,19 @@ abstract class Extension implements ExtensionInterface
         $classBaseName = substr(strrchr($className, '\\'), 1, -9);
 
         return Container::underscore($classBaseName);
+    }
+
+    protected function getContainerLoader(ContainerBuilder $container, $paths)
+    {
+        $locator = new FileLocator($paths);
+        $resolver = new LoaderResolver(array(
+            new XmlFileLoader($container, $locator),
+            new YamlFileLoader($container, $locator),
+            new IniFileLoader($container, $locator),
+            new PhpFileLoader($container, $locator),
+            new ClosureLoader($container, $locator),
+        ));
+
+        return new DelegatingLoader($resolver);
     }
 }

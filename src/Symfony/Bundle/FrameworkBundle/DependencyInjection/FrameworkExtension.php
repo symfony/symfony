@@ -16,11 +16,10 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Loader\LoaderInterface;
 
 /**
  * FrameworkExtension.
@@ -38,7 +37,7 @@ class FrameworkExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = $this->getContainerLoader($container, __DIR__.'/../Resources/config');
 
         $loader->load('web.xml');
         $loader->load('form.xml');
@@ -173,9 +172,9 @@ class FrameworkExtension extends Extension
      * Loads the ESI configuration.
      *
      * @param array            $config    An ESI configuration array
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     * @param LoaderInterface  $loader    A LoaderInterface instance
      */
-    private function registerEsiConfiguration(array $config, XmlFileLoader $loader)
+    private function registerEsiConfiguration(array $config, LoaderInterface $loader)
     {
         if (!empty($config['enabled'])) {
             $loader->load('esi.xml');
@@ -187,9 +186,9 @@ class FrameworkExtension extends Extension
      *
      * @param array            $config    A profiler configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     * @param LoaderInterface  $loader    A LoaderInterface instance
      */
-    private function registerProfilerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerProfilerConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader)
     {
         $loader->load('profiling.xml');
         $loader->load('collectors.xml');
@@ -221,9 +220,9 @@ class FrameworkExtension extends Extension
      *
      * @param array            $config    A router configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     * @param LoaderInterface  $loader    A LoaderInterface instance
      */
-    private function registerRouterConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerRouterConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader)
     {
         $loader->load('routing.xml');
 
@@ -253,9 +252,9 @@ class FrameworkExtension extends Extension
      *
      * @param array            $config    A session configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     * @param LoaderInterface  $loader    A LoaderInterface instance
      */
-    private function registerSessionConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerSessionConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader)
     {
         $loader->load('session.xml');
 
@@ -293,9 +292,9 @@ class FrameworkExtension extends Extension
      *
      * @param array            $config    A templating configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     * @param LoaderInterface  $loader    A LoaderInterface instance
      */
-    private function registerTemplatingConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerTemplatingConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader)
     {
         $loader->load('templating.xml');
         $loader->load('templating_php.xml');
@@ -423,9 +422,9 @@ class FrameworkExtension extends Extension
      *
      * @param array            $config    A validation configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     * @param LoaderInterface  $loader    A LoaderInterface instance
      */
-    private function registerValidationConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerValidationConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader)
     {
         if (empty($config['enabled'])) {
             return;

@@ -5,6 +5,8 @@ namespace Symfony\Component\HttpKernel\DependencyInjection;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\Config\FileLocator;
 
 /*
  * This file is part of the Symfony framework.
@@ -101,5 +103,10 @@ abstract class Extension implements ExtensionInterface
         $classBaseName = substr(strrchr($className, '\\'), 1, -9);
 
         return Container::underscore($classBaseName);
+    }
+
+    protected function getXmlFileLoader(ContainerBuilder $container, $paths)
+    {
+        return new XmlFileLoader($container, new FileLocator($paths));
     }
 }

@@ -502,12 +502,13 @@ abstract class Kernel implements KernelInterface
 
     protected function getContainerLoader(ContainerInterface $container)
     {
+        $locator = new FileLocator($this);
         $resolver = new LoaderResolver(array(
-            new XmlFileLoader($container, new FileLocator($this)),
-            new YamlFileLoader($container, new FileLocator($this)),
-            new IniFileLoader($container, new FileLocator($this)),
-            new PhpFileLoader($container, new FileLocator($this)),
-            new ClosureLoader($container, new FileLocator($this)),
+            new XmlFileLoader($container, $locator),
+            new YamlFileLoader($container, $locator),
+            new IniFileLoader($container, $locator),
+            new PhpFileLoader($container, $locator),
+            new ClosureLoader($container, $locator),
         ));
 
         return new DelegatingLoader($resolver);

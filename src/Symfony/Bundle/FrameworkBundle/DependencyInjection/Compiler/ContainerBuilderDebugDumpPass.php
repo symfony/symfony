@@ -41,10 +41,8 @@ class ContainerBuilderDebugDumpPass implements CompilerPassInterface
      */
     static public function getBuilderCacheFilename(ContainerInterface $container)
     {
-        $name = $container->getParameter('kernel.name');
-        $env = ucfirst($container->getParameter('kernel.environment'));
-        $debug = $container->getParameter('kernel.debug') ? 'Debug' : '';
+        $class = $container->getParameter('kernel.container_class');
 
-        return $container->getParameter('kernel.cache_dir').'/'.$name.$env.$debug.'ProjectContainerBuilder.cache';
+        return $container->getParameter('kernel.cache_dir').'/'.$class.'Builder.cache';
     }
 }

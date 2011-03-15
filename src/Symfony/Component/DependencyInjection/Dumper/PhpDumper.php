@@ -118,6 +118,7 @@ EOF;
         foreach ($this->container->getInterfaceInjectors() as $injector) {
             $code .= sprintf("        if (\$instance instanceof \\%s) {\n", $injector->getClass());
             foreach ($injector->getMethodCalls() as $call) {
+                $arguments = array();
                 foreach ($call[1] as $value) {
                     $arguments[] = $this->dumpValue($value);
                 }

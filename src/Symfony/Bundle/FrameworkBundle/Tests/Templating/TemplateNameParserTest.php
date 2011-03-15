@@ -43,6 +43,14 @@ class TemplateNameParserTest extends TestCase
         $this->assertEquals($template->getSignature(), $ref->getSignature());
     }
 
+    /**
+     * @dataProvider getLogicalNameToTemplateProvider
+     */
+    public function testName($name, $ref)
+    {
+        $this->assertEquals($name, $this->parser->name($ref));
+    }
+
     public function getLogicalNameToTemplateProvider()
     {
         return array(
@@ -82,7 +90,7 @@ class TemplateNameParserTest extends TestCase
     public function testParseFromFilename($file, $ref)
     {
         $template = $this->parser->parseFromFilename($file);
-        
+
         if ($ref === false) {
             $this->assertFalse($template);
         } else {

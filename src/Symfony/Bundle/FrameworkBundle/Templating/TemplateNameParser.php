@@ -80,10 +80,21 @@ class TemplateNameParser extends BaseTemplateNameParser
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function name(TemplateReferenceInterface $template)
+    {
+        $parts = sprintf('%s:%s:', $template->get('bundle'), $template->get('controller'));
+        $elements = sprintf('%s.%s.%s', $template->get('name'), $template->get('format'), $template->get('engine'));
+
+        return $parts . $elements;
+    }
+
+    /**
      * Convert a filename to a template.
      *
      * @param string $file The filename
-     * 
+     *
      * @return TemplateReferenceInterface A template
      */
     public function parseFromFilename($file)

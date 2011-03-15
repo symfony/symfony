@@ -6,7 +6,7 @@
     {% endset %}
     {% set text %}
         {% if collector.user %}
-            {{ collector.user }} ({{ collector.authenticated ? 'auth.' : 'not auth.' }})
+            {{ collector.user }} {% if not collector.authenticated %}<em>(not auth.)</em>{% endif %}
         {% elseif collector.enabled %}
             not authenticated
         {% else %}

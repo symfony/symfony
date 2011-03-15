@@ -44,4 +44,16 @@ class TemplateNameParser implements TemplateNameParserInterface
 
         return new TemplateReference($name, $engine);
     }
+
+    /**
+     * Converts an array of parameters to a template name
+     *
+     * @param TemplateReferenceInterface $template
+     *
+     * @return string A template name
+     */
+    public function name(TemplateReferenceInterface $template)
+    {
+        return $template->get('name') . '.' . $template->get('engine');
+    }
 }

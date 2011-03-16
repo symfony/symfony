@@ -314,7 +314,7 @@ class Container implements ContainerInterface
             return null;
         }
 
-        return $this->scopeStacks[$name]->current();
+        return $this->scopeStacks[$name]->top();
     }
 
     /**

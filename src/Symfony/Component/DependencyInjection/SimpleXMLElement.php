@@ -45,7 +45,7 @@ class SimpleXMLElement extends \SimpleXMLElement
             $key = isset($arg['key']) ? (string) $arg['key'] : (!$arguments ? 0 : max(array_keys($arguments)) + 1);
 
             // parameter keys are case insensitive
-            if ('parameter' == $name and $lowercase) {
+            if ('parameter' == $name && $lowercase) {
                 $key = strtolower($key);
             }
 

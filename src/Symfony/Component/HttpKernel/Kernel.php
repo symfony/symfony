@@ -61,7 +61,8 @@ abstract class Kernel implements KernelInterface
         $this->environment = $environment;
         $this->debug = (Boolean) $debug;
         $this->booted = false;
-        $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->getRootDir()));
+        $this->rootDir = $this->getRootDir();
+        $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
 
         if ($this->debug) {
             ini_set('display_errors', 1);
@@ -303,7 +304,7 @@ abstract class Kernel implements KernelInterface
             $r = new \ReflectionObject($this);
             $this->rootDir = dirname($r->getFileName());
         }
-        
+
         return $this->rootDir;
     }
 
@@ -334,7 +335,7 @@ abstract class Kernel implements KernelInterface
      */
     public function getCacheDir()
     {
-        return $this->getRootDir().'/cache/'.$this->environment;
+        return $this->rootDir.'/cache/'.$this->environment;
     }
 
     /**
@@ -344,7 +345,7 @@ abstract class Kernel implements KernelInterface
      */
     public function getLogDir()
     {
-        return $this->getRootDir().'/logs';
+        return $this->rootDir.'/logs';
     }
 
     /**
@@ -458,7 +459,7 @@ abstract class Kernel implements KernelInterface
 
         return array_merge(
             array(
-                'kernel.root_dir'        => $this->getRootDir(),
+                'kernel.root_dir'        => $this->rootDir,
                 'kernel.environment'     => $this->environment,
                 'kernel.debug'           => $this->debug,
                 'kernel.name'            => $this->name,

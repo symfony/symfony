@@ -194,9 +194,27 @@ class FrameworkExtension extends Extension
         $loader->load('profiling.xml');
         $loader->load('collectors.xml');
 
-        if (isset($config['only_exceptions'])) {
-            $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);
+        $container->getDefinition('profiler_listener')
+            ->setArgument(2, $config['only_exceptions'])
+        ;
+
+        // Choose storage class based on the DSN
+        $supported = array(
+            'sqlite' => 'Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage',
+            'mysql'  => 'Symfony\Component\HttpKernel\Profiler\MysqlProfilerStorage',
+        );
+        list($class, ) = explode(':', $config['dsn']);
+        if (!isset($supported[$class])) {
+            throw new \LogicException(sprintf('Driver "%s" is not supported for the profiler.', $class));
         }
+
+        $container->getDefinition('profiler.storage')
+            ->setArgument(0, $config['dsn'])
+            ->setArgument(1, $config['username'])
+            ->setArgument(2, $config['password'])
+            ->setArgument(3, $config['lifetime'])
+            ->setClass($supported[$class])
+        ;
 
         if (isset($config['matcher'])) {
             if (isset($config['matcher']['service'])) {

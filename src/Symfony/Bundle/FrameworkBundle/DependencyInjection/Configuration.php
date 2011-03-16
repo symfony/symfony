@@ -76,7 +76,11 @@ class Configuration
         $rootNode
             ->arrayNode('profiler')
                 ->canBeUnset()
-                ->booleanNode('only_exceptions')->end()
+                ->booleanNode('only_exceptions')->defaultValue(false)->end()
+                ->scalarNode('dsn')->defaultValue('sqlite:%kernel.cache_dir%/profiler.db')->end()
+                ->scalarNode('username')->defaultValue('')->end()
+                ->scalarNode('password')->defaultValue('')->end()
+                ->scalarNode('lifetime')->defaultValue(86400)->end()
                 ->arrayNode('matcher')
                     ->canBeUnset()
                     ->performNoDeepMerging()

@@ -53,7 +53,11 @@
             <xsd:element name="matcher" type="profiler_matcher" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
-        <xsd:attribute name="only-exceptions" type="xsd:boolean" />
+        <xsd:attribute name="only-exceptions" type="xsd:string" />
+        <xsd:attribute name="dsn" type="xsd:string" />
+        <xsd:attribute name="username" type="xsd:string" />
+        <xsd:attribute name="password" type="xsd:string" />
+        <xsd:attribute name="lifetime" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="profiler_matcher">

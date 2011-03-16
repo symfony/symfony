@@ -49,7 +49,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
      */
     public function getDefaultValue()
     {
-        return $this->defaultValue;
+        return $this->defaultValue instanceof \Closure ? call_user_func($this->defaultValue) : $this->defaultValue;
     }
 
     /**

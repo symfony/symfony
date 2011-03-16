@@ -35,7 +35,7 @@ class SimpleXMLElement extends \SimpleXMLElement
      * @param string $name
      * @return mixed
      */
-    public function getArgumentsAsPhp($name)
+    public function getArgumentsAsPhp($name, $lowercase = true)
     {
         $arguments = array();
         foreach ($this->$name as $arg) {
@@ -45,7 +45,7 @@ class SimpleXMLElement extends \SimpleXMLElement
             $key = isset($arg['key']) ? (string) $arg['key'] : (!$arguments ? 0 : max(array_keys($arguments)) + 1);
 
             // parameter keys are case insensitive
-            if ('parameter' == $name) {
+            if ('parameter' == $name and $lowercase) {
                 $key = strtolower($key);
             }
 
@@ -73,7 +73,7 @@ class SimpleXMLElement extends \SimpleXMLElement
                     $arguments[$key] = new Reference((string) $arg['id'], $invalidBehavior, $strict);
                     break;
                 case 'collection':
-                    $arguments[$key] = $arg->getArgumentsAsPhp($name);
+                    $arguments[$key] = $arg->getArgumentsAsPhp($name, false);
                     break;
                 case 'string':
                     $arguments[$key] = (string) $arg;

@@ -345,9 +345,22 @@ class SecurityExtension extends Extension
         }
 
         // Anonymous
-        if ($firewall['anonymous']) {
-            $listeners[] = new Reference('security.authentication.listener.anonymous');
-            $authenticationProviders[] = 'security.authentication.provider.anonymous';
+        if (isset($firewall['anonymous'])) {
+            $listenerId = 'security.authentication.listener.anonymous.'.$id;
+            $container
+                ->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.anonymous'))
+                ->setArgument(1, $firewall['anonymous']['key'])
+            ;
+
+            $listeners[] = new Reference($listenerId);
+
+            $providerId = 'security.authentication.provider.anonymous.'.$id;
+            $container
+                ->setDefinition($providerId, new DefinitionDecorator('security.authentication.provider.anonymous'))
+                ->setArgument(0, $firewall['anonymous']['key'])
+            ;
+
+            $authenticationProviders[] = $providerId;
             $hasListeners = true;
         }
 

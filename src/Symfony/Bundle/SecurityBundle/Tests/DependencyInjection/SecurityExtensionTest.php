@@ -83,7 +83,7 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
                 'security.authentication.listener.form.secure',
                 'security.authentication.listener.basic.secure',
                 'security.authentication.listener.digest.secure',
-                'security.authentication.listener.anonymous',
+                'security.authentication.listener.anonymous.secure',
                 'security.access_listener',
                 'security.authentication.switchuser_listener.secure',
             ),

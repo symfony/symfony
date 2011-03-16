@@ -37,18 +37,17 @@
         <parameter key="security.authentication.provider.pre_authenticated.class">Symfony\Component\Security\Core\Authentication\Provider\PreAuthenticatedAuthenticationProvider</parameter>
 
         <parameter key="security.authentication.provider.anonymous.class">Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider</parameter>
-        <parameter key="security.anonymous.key">SomeRandomValue</parameter>
     </parameters>
 
     <services>
         <service id="security.authentication.listener.anonymous" class="%security.authentication.listener.anonymous.class%" public="false">
             <argument type="service" id="security.context" />
-            <argument>%security.anonymous.key%</argument>
+            <argument /> <!-- Key -->
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
         <service id="security.authentication.provider.anonymous" class="%security.authentication.provider.anonymous.class%" public="false">
-            <argument>%security.anonymous.key%</argument>
+            <argument /> <!-- Key -->
         </service>
 
         <service id="security.authentication.retry_entry_point" class="%security.authentication.retry_entry_point.class%" public="false" />

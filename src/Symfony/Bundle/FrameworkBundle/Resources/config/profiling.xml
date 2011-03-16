@@ -7,7 +7,9 @@
     <parameters>
         <parameter key="profiler.class">Symfony\Component\HttpKernel\Profiler\Profiler</parameter>
         <parameter key="profiler.storage.class">Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage</parameter>
-        <parameter key="profiler.storage.file">%kernel.cache_dir%/profiler.db</parameter>
+        <parameter key="profiler.storage.dsn">sqlite:%kernel.cache_dir%/profiler.db</parameter>
+        <parameter key="profiler.storage.username"></parameter>
+        <parameter key="profiler.storage.password"></parameter>
         <parameter key="profiler.storage.lifetime">86400</parameter>
         <parameter key="profiler_listener.class">Symfony\Bundle\FrameworkBundle\Profiler\ProfilerListener</parameter>
         <parameter key="profiler_listener.only_exceptions">false</parameter>
@@ -20,7 +22,9 @@
         </service>
 
         <service id="profiler.storage" class="%profiler.storage.class%" public="false">
-            <argument>%profiler.storage.file%</argument>
+            <argument>%profiler.storage.dsn%</argument>
+            <argument>%profiler.storage.username%</argument>
+            <argument>%profiler.storage.password%</argument>
             <argument>%profiler.storage.lifetime%</argument>
         </service>
 

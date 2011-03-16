@@ -12,19 +12,14 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\HttpFoundation\RequestMatcher;
 
 /**
  * SecurityExtension.
@@ -61,7 +56,7 @@ class SecurityExtension extends Extension
         $config = $processor->process($tree, $configs);
 
         // load services
-        $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config')));
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('security.xml');
         $loader->load('security_listeners.xml');
         $loader->load('security_rememberme.xml');
@@ -109,7 +104,7 @@ class SecurityExtension extends Extension
 
     private function aclLoad($config, ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config')));
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('security_acl.xml');
 
         if (isset($config['connection'])) {
@@ -548,7 +543,7 @@ class SecurityExtension extends Extension
         // load service templates
         $c = new ContainerBuilder();
         $parameterBag = $container->getParameterBag();
-        $loader = new XmlFileLoader($c, new FileLocator(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config')));
+        $loader = new XmlFileLoader($c, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('security_factories.xml');
 
         // load user-created listener factories

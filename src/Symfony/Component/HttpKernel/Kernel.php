@@ -348,7 +348,8 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Initialize the data structures related to the bundle management:
+     * Initializes the data structures related to the bundle management.
+     *
      *  - the bundles property maps a bundle name to the bundle instance,
      *  - the bundleMap property maps a bundle name to the bundle inheritance hierarchy (most derived bundle first).
      *
@@ -416,9 +417,9 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Initializes the DI container
+     * Initializes the service container.
      *
-     * The cached version of the DI container is used when fresh, otherwise the
+     * The cached version of the service container is used when fresh, otherwise the
      * container is built.
      */
     protected function initializeContainer()
@@ -444,7 +445,7 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Returns the kernel parameters
+     * Returns the kernel parameters.
      *
      * @return array An array of kernel parameters
      */
@@ -472,9 +473,9 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Gets the environment parameters
+     * Gets the environment parameters.
      *
-     * Only the parameters starting with "SYMFONY__" are considered
+     * Only the parameters starting with "SYMFONY__" are considered.
      *
      * @return array An array of parameters
      */
@@ -491,9 +492,9 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Builds the DI container
+     * Builds the service container.
      *
-     * @return ContainerBuilder The compiled DI container
+     * @return ContainerBuilder The compiled service container
      */
     protected function buildContainer()
     {
@@ -531,10 +532,10 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Dumps the DI container to PHP code in the cache
-     * 
+     * Dumps the service container to PHP code in the cache.
+     *
      * @param ConfigCache       $cache      The config cache
-     * @param ContainerBuilder  $container  The DI container
+     * @param ContainerBuilder  $container  The service container
      * @param string            $class      The name of the class to generate
      */
     protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class)
@@ -550,9 +551,10 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Returns a loader for the container
-     * 
-     * @param ContainerInterface $container The DI container
+     * Returns a loader for the container.
+     *
+     * @param ContainerInterface $container The service container
+     *
      * @return DelegatingLoader The loader
      */
     protected function getContainerLoader(ContainerInterface $container)

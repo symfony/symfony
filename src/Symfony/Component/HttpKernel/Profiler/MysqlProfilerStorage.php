@@ -23,7 +23,7 @@ class MysqlProfilerStorage extends PdoProfilerStorage
      */
     protected function initDb()
     {
-        if (is_null($this->db)) {
+        if (null === $this->db) {
             if ('mysql' !== substr($this->dsn, 0, 5)) {
                 throw new \RuntimeException('Please check your configuration. You are trying to use Mysql with a wrong dsn. "' . $this->dsn . '"');
             }
@@ -33,7 +33,7 @@ class MysqlProfilerStorage extends PdoProfilerStorage
             }
 
             $db = new \PDO($this->dsn, $this->username, $this->password);
-            $db->exec('CREATE TABLE IF NOT EXISTS data (token VARCHAR(255) PRIMARY KEY, data LONGTEXT, ip VARCHAR(64), url VARCHAR(255), time INTEGER UNSIGNED, parent VARCHAR(255), created_at INTEGER UNSIGNED, KEY (created_at), KEY (ip), KEY (url), KEY (parent))');
+            $db->exec('CREATE TABLE IF NOT EXISTS sf_profiler_data (token VARCHAR(255) PRIMARY KEY, data LONGTEXT, ip VARCHAR(64), url VARCHAR(255), time INTEGER UNSIGNED, parent VARCHAR(255), created_at INTEGER UNSIGNED, KEY (created_at), KEY (ip), KEY (url), KEY (parent))');
 
             $this->db = $db;
         }

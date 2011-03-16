@@ -53,7 +53,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
         $criteria = $criteria ? 'WHERE '.implode(' AND ', $criteria) : '';
 
         $db = $this->initDb();
-        $tokens = $this->fetch($db, 'SELECT token, ip, url, time, parent FROM data '.$criteria.' ORDER BY time DESC LIMIT '.((integer) $limit), $args);
+        $tokens = $this->fetch($db, 'SELECT token, ip, url, time, parent FROM sf_profiler_data '.$criteria.' ORDER BY time DESC LIMIT '.((integer) $limit), $args);
         $this->close($db);
 
         return $tokens;
@@ -66,7 +66,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
      {
          $db = $this->initDb();
          $args = array(':token' => $token);
-         $tokens = $this->fetch($db, 'SELECT token FROM data WHERE parent = :token LIMIT 1', $args);
+         $tokens = $this->fetch($db, 'SELECT token FROM sf_profiler_data WHERE parent = :token LIMIT 1', $args);
          $this->close($db);
 
         return $tokens;
@@ -79,7 +79,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
     {
         $db = $this->initDb();
         $args = array(':token' => $token);
-        $data = $this->fetch($db, 'SELECT data, parent, ip, url, time FROM data WHERE token = :token LIMIT 1', $args);
+        $data = $this->fetch($db, 'SELECT data, parent, ip, url, time FROM sf_profiler_data WHERE token = :token LIMIT 1', $args);
         $this->close($db);
         if (isset($data[0]['data'])) {
             return array($data[0]['data'], $data[0]['parent'], $data[0]['ip'], $data[0]['url'], $data[0]['time']);
@@ -104,7 +104,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
             ':created_at'   => time(),
         );
         try {
-            $this->exec($db, 'INSERT INTO data (token, parent, data, ip, url, time, created_at) VALUES (:token, :parent, :data, :ip, :url, :time, :created_at)', $args);
+            $this->exec($db, 'INSERT INTO sf_profiler_data (token, parent, data, ip, url, time, created_at) VALUES (:token, :parent, :data, :ip, :url, :time, :created_at)', $args);
             $this->cleanup();
             $status = true;
         } catch (\Exception $e) {
@@ -121,7 +121,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
     public function purge()
     {
         $db = $this->initDb();
-        $this->exec($db, 'DELETE FROM data');
+        $this->exec($db, 'DELETE FROM sf_profiler_data');
         $this->close($db);
     }
 
@@ -146,7 +146,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
     protected function cleanup()
     {
         $db = $this->initDb();
-        $this->exec($db, 'DELETE FROM data WHERE created_at < :time', array(':time' => time() - $this->lifetime));
+        $this->exec($db, 'DELETE FROM sf_profiler_data WHERE created_at < :time', array(':time' => time() - $this->lifetime));
         $this->close($db);
     }
 

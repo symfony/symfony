@@ -19,11 +19,9 @@
         <parameter key="security.authentication.digest_entry_point.class">Symfony\Component\Security\Http\EntryPoint\DigestAuthenticationEntryPoint</parameter>
 
         <parameter key="security.authentication.listener.x509.class">Symfony\Component\Security\Http\Firewall\X509AuthenticationListener</parameter>
-        <parameter key="security.authentication.x509.user">SSL_CLIENT_S_DN_Email</parameter>
-        <parameter key="security.authentication.x509.credentials">SSL_CLIENT_S_DN</parameter>
 
         <parameter key="security.authentication.listener.anonymous.class">Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener</parameter>
-        
+
         <parameter key="security.authentication.switchuser_listener.class">Symfony\Component\Security\Http\Firewall\SwitchUserListener</parameter>
 
         <parameter key="security.logout_listener.class">Symfony\Component\Security\Http\Firewall\LogoutListener</parameter>
@@ -38,10 +36,10 @@
         <parameter key="security.authentication.provider.dao.class">Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider</parameter>
         <parameter key="security.authentication.provider.pre_authenticated.class">Symfony\Component\Security\Core\Authentication\Provider\PreAuthenticatedAuthenticationProvider</parameter>
 
-        <parameter key="security.authentication.provider.anonymous">Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider</parameter>
+        <parameter key="security.authentication.provider.anonymous.class">Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider</parameter>
         <parameter key="security.anonymous.key">SomeRandomValue</parameter>
     </parameters>
-    
+
     <services>
         <service id="security.authentication.listener.anonymous" class="%security.authentication.listener.anonymous.class%" public="false">
             <argument type="service" id="security.context" />
@@ -49,7 +47,7 @@
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
-        <service id="security.authentication.provider.anonymous" class="%security.authentication.provider.anonymous%" public="false">
+        <service id="security.authentication.provider.anonymous" class="%security.authentication.provider.anonymous.class%" public="false">
             <argument>%security.anonymous.key%</argument>
         </service>
 
@@ -107,9 +105,9 @@
         <service id="security.authentication.listener.x509" class="%security.authentication.listener.x509.class%" public="false" abstract="true">
             <argument type="service" id="security.context" />
             <argument type="service" id="security.authentication.manager" />
-            <argument />
-            <argument>%security.authentication.x509.user%</argument>
-            <argument>%security.authentication.x509.credentials%</argument>
+            <argument /> <!-- Provider-shared Key -->
+            <argument /> <!-- x509 user -->
+            <argument /> <!-- x509 credentials -->
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="event_dispatcher" on-invalid="null"/>
         </service>

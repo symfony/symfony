@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\TwigBundle;
 
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\ContainerInterface;

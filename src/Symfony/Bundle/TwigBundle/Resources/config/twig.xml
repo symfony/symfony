@@ -7,7 +7,6 @@
     <parameters>
         <parameter key="twig.class">Twig_Environment</parameter>
         <parameter key="twig.loader.class">Symfony\Bundle\TwigBundle\Loader\FilesystemLoader</parameter>
-        <parameter key="twig.globals.class">Symfony\Bundle\TwigBundle\GlobalVariables</parameter>
         <parameter key="templating.engine.twig.class">Symfony\Bundle\TwigBundle\TwigEngine</parameter>
         <parameter key="templating.cache_warmer.templates_cache.class">Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheCacheWarmer</parameter>
     </parameters>
@@ -30,11 +29,7 @@
         <service id="templating.engine.twig" class="%templating.engine.twig.class%" public="false">
             <argument type="service" id="twig" />
             <argument type="service" id="templating.name_parser" />
-            <argument type="service" id="twig.globals" />
-        </service>
-
-        <service id="twig.globals" class="%twig.globals.class%">
-            <argument type="service" id="service_container" />
+            <argument type="service" id="templating.globals" />
         </service>
 
         <service id="twig.extension.trans" class="Symfony\Bundle\TwigBundle\Extension\TransExtension" public="false">

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\TwigBundle;
+namespace Symfony\Bundle\FrameworkBundle\Templating;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 

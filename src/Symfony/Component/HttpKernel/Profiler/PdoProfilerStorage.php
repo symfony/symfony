@@ -53,8 +53,21 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
         $criteria = $criteria ? 'WHERE '.implode(' AND ', $criteria) : '';
 
         $db = $this->initDb();
-        $tokens = $this->fetch($db, 'SELECT token, ip, url, time FROM data '.$criteria.' ORDER BY time DESC LIMIT '.((integer) $limit), $args);
+        $tokens = $this->fetch($db, 'SELECT token, ip, url, time, parent FROM data '.$criteria.' ORDER BY time DESC LIMIT '.((integer) $limit), $args);
         $this->close($db);
+
+        return $tokens;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+     public function findChildren($token)
+     {
+         $db = $this->initDb();
+         $args = array(':token' => $token);
+         $tokens = $this->fetch($db, 'SELECT token FROM data WHERE parent = :token LIMIT 1', $args);
+         $this->close($db);
 
         return $tokens;
     }
@@ -66,10 +79,10 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
     {
         $db = $this->initDb();
         $args = array(':token' => $token);
-        $data = $this->fetch($db, 'SELECT data, ip, url, time FROM data WHERE token = :token LIMIT 1', $args);
+        $data = $this->fetch($db, 'SELECT data, parent, ip, url, time FROM data WHERE token = :token LIMIT 1', $args);
         $this->close($db);
         if (isset($data[0]['data'])) {
-            return array($data[0]['data'], $data[0]['ip'], $data[0]['url'], $data[0]['time']);
+            return array($data[0]['data'], $data[0]['parent'], $data[0]['ip'], $data[0]['url'], $data[0]['time']);
         }
 
         return false;

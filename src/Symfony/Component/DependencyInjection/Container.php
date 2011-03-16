@@ -301,6 +301,22 @@ class Container implements ContainerInterface
         $this->scopedServices[$name] = array();
     }
 
+
+    /**
+     * Returns the current stacked service scope for the given name
+     *
+     * @param string $name The service name
+     * @return array The service scope
+     */
+    public function getCurrentScopedStack($name)
+    {
+        if (!isset($this->scopeStacks[$name]) || 0 === $this->scopeStacks[$name]->count()) {
+            return null;
+        }
+
+        return $this->scopeStacks[$name]->current();
+    }
+
     /**
      * This is called to leave the current scope, and move back to the parent
      * scope.

@@ -24,7 +24,7 @@ class SqliteProfilerStorageTest extends \PHPUnit_Framework_TestCase
         if (file_exists(self::$dbFile)) {
             @unlink(self::$dbFile);
         }
-        self::$storage = new SqliteProfilerStorage('sqlite:' . self::$dbFile);
+        self::$storage = new SqliteProfilerStorage('sqlite:'.self::$dbFile);
     }
 
     public static function tearDownAfterClass()

@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -28,7 +28,7 @@ class MysqlProfilerStorage extends PdoProfilerStorage
                 throw new \RuntimeException('Please check your configuration. You are trying to use Mysql with a wrong dsn. "' . $this->dsn . '"');
             }
 
-            if ( ! class_exists('PDO') ||  ! in_array('mysql', \PDO::getAvailableDrivers(), true)) {
+            if (!class_exists('PDO') || !in_array('mysql', \PDO::getAvailableDrivers(), true)) {
                 throw new \RuntimeException('You need to enable PDO_Mysql extension for the profiler to run properly.');
             }
 

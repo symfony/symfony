@@ -198,6 +198,18 @@ class DoctrineExtension extends AbstractDoctrineExtension
             $ormConfigDef->addMethodCall($method, array($arg));
         }
 
+        if (!empty($entityManager['dql'])) {
+            foreach ($entityManager['dql']['string_functions'] as $name => $function) {
+                $ormConfigDef->addMethodCall('addCustomStringFunction', array ($name, $function));
+            }
+            foreach ($entityManager['dql']['numeric_functions'] as $name => $function) {
+                $ormConfigDef->addMethodCall('addCustomNumericFunction', array ($name, $function));
+            }
+            foreach ($entityManager['dql']['datetime_functions'] as $name => $function) {
+                $ormConfigDef->addMethodCall('addCustomDatetimeFunction', array ($name, $function));
+            }
+        }
+
         $entityManagerService = sprintf('doctrine.orm.%s_entity_manager', $entityManager['name']);
         $connectionId = isset($entityManager['connection']) ? sprintf('doctrine.dbal.%s_connection', $entityManager['connection']) : 'database_connection';
         $eventManagerID = isset($entityManager['connection']) ? sprintf('doctrine.dbal.%s_connection.event_manager', $entityManager['connection']) : 'doctrine.dbal.event_manager';

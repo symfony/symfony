@@ -14,12 +14,9 @@
 
         <parameter key="security.authentication.listener.basic.class">Symfony\Component\Security\Http\Firewall\BasicAuthenticationListener</parameter>
         <parameter key="security.authentication.basic_entry_point.class">Symfony\Component\Security\Http\EntryPoint\BasicAuthenticationEntryPoint</parameter>
-        <parameter key="security.authentication.basic_entry_point.realm">Symfony2</parameter>
 
         <parameter key="security.authentication.listener.digest.class">Symfony\Component\Security\Http\Firewall\DigestAuthenticationListener</parameter>
         <parameter key="security.authentication.digest_entry_point.class">Symfony\Component\Security\Http\EntryPoint\DigestAuthenticationEntryPoint</parameter>
-        <parameter key="security.authentication.digest_entry_point.realm">Symfony2</parameter>
-        <parameter key="security.authentication.digest_entry_point.key">SomethingUnique</parameter>
 
         <parameter key="security.authentication.listener.x509.class">Symfony\Component\Security\Http\Firewall\X509AuthenticationListener</parameter>
         <parameter key="security.authentication.x509.user">SSL_CLIENT_S_DN_Email</parameter>
@@ -58,14 +55,9 @@
 
         <service id="security.authentication.retry_entry_point" class="%security.authentication.retry_entry_point.class%" public="false" />
 
-        <service id="security.authentication.basic_entry_point" class="%security.authentication.basic_entry_point.class%" public="false">
-            <argument>%security.authentication.basic_entry_point.realm%</argument>
-        </service>
+        <service id="security.authentication.basic_entry_point" class="%security.authentication.basic_entry_point.class%" public="false" />
 
-        <service id="security.authentication.digest_entry_point" class="%security.authentication.digest_entry_point.class%" public="false">
-            <argument>%security.authentication.digest_entry_point.realm%</argument>
-            <argument>%security.authentication.digest_entry_point.key%</argument>
-        </service>
+        <service id="security.authentication.digest_entry_point" class="%security.authentication.digest_entry_point.class%" public="false" />
 
         <service id="security.channel_listener" class="%security.channel_listener.class%" public="false">
             <argument type="service" id="security.access_map" />
@@ -125,31 +117,31 @@
         <service id="security.authentication.listener.basic" class="%security.authentication.listener.basic.class%" public="false" abstract="true">
             <argument type="service" id="security.context" />
             <argument type="service" id="security.authentication.manager" />
-            <argument></argument>
-            <argument type="service" id="security.authentication.basic_entry_point" />
+            <argument /> <!-- Provider-shared Key -->
+            <argument /> <!-- Entry Point -->
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
         <service id="security.authentication.listener.digest" class="%security.authentication.listener.digest.class%" public="false" abstract="true">
             <argument type="service" id="security.context" />
-            <argument type="service" id="security.user.provider.in_memory" />
-            <argument></argument>
-            <argument type="service" id="security.authentication.digest_entry_point" />
+            <argument /> <!-- User Provider -->
+            <argument /> <!-- Provider-shared Key -->
+            <argument /> <!-- Entry Point -->
             <argument type="service" id="logger" on-invalid="null" />
         </service>
-        
+
         <service id="security.authentication.provider.dao" class="%security.authentication.provider.dao.class%" abstract="true" public="false">
             <argument /> <!-- User Provider -->
             <argument type="service" id="security.user_checker" />
             <argument /> <!-- Provider-shared Key -->
             <argument type="service" id="security.encoder_factory" />
         </service>
-        
+
         <service id="security.authentication.provider.pre_authenticated" class="%security.authentication.provider.pre_authenticated.class%" abstract="true" public="false">
             <argument /> <!-- User Provider -->
             <argument type="service" id="security.user_checker" />
         </service>
-        
+
         <service id="security.exception_listener" class="%security.exception_listener.class%" public="false" abstract="true">
             <argument type="service" id="security.context" />
             <argument type="service" id="security.authentication.trust_resolver" />

@@ -25,7 +25,7 @@ class CollectionFieldConfig extends AbstractFieldConfig
             ));
         }
 
-        $field->addEventListener(new ResizeFormListener($field,
+        $field->addEventSubscriber(new ResizeFormListener($field,
                 $options['prototype'], $options['modifiable']));
     }
 

@@ -9,17 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Filter;
+namespace Symfony\Component\Form\EventListener;
 
 use Symfony\Component\Form\FieldInterface;
-use Symfony\Component\Form\Filters;
+use Symfony\Component\Form\Events;
+use Symfony\Component\Form\Event\FilterDataEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Adds a protocol to a URL if it doesn't already have one.
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class FixUrlProtocolFilter implements FilterInterface
+class FixUrlProtocolListener implements EventSubscriberInterface
 {
     private $defaultProtocol;
 
@@ -28,17 +30,17 @@ class FixUrlProtocolFilter implements FilterInterface
         $this->defaultProtocol = $defaultProtocol;
     }
 
-    public function filterBoundData($data)
+    public function filterBoundData(FilterDataEvent $event)
     {
-        if ($this->defaultProtocol && $data && !preg_match('~^\w+://~', $data)) {
-            $data = $this->defaultProtocol . '://' . $data;
-        }
+        $data = $event->getData();
 
-        return $data;
+        if ($this->defaultProtocol && $data && !preg_match('~^\w+://~', $data)) {
+            $event->setData($this->defaultProtocol . '://' . $data);
+        }
     }
 
-    public function getSupportedFilters()
+    public static function getSubscribedEvents()
     {
-        return Filters::filterBoundData;
+        return Events::filterBoundData;
     }
 }

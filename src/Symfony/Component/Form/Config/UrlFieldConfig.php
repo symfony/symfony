@@ -12,13 +12,13 @@
 namespace Symfony\Component\Form\Config;
 
 use Symfony\Component\Form\FieldInterface;
-use Symfony\Component\Form\Filter\FixUrlProtocolFilter;
+use Symfony\Component\Form\EventListener\FixUrlProtocolListener;
 
 class UrlFieldConfig extends AbstractFieldConfig
 {
     public function configure(FieldInterface $field, array $options)
     {
-        $field->prependFilter(new FixUrlProtocolFilter($options['default_protocol']));
+        $field->addEventSubscriber(new FixUrlProtocolListener($options['default_protocol']));
     }
 
     public function getDefaultOptions(array $options)

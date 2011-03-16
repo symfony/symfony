@@ -15,7 +15,7 @@ require_once __DIR__ . '/TestCase.php';
 require_once __DIR__ . '/Fixtures/Author.php';
 require_once __DIR__ . '/Fixtures/InvalidField.php';
 require_once __DIR__ . '/Fixtures/FixedValueTransformer.php';
-require_once __DIR__ . '/Fixtures/FixedFilter.php';
+require_once __DIR__ . '/Fixtures/FixedFilterListener.php';
 
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\PropertyPath;
@@ -25,7 +25,7 @@ use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
 use Symfony\Tests\Component\Form\Fixtures\Author;
 use Symfony\Tests\Component\Form\Fixtures\InvalidField;
 use Symfony\Tests\Component\Form\Fixtures\FixedValueTransformer;
-use Symfony\Tests\Component\Form\Fixtures\FixedFilter;
+use Symfony\Tests\Component\Form\Fixtures\FixedFilterListener;
 
 class FieldTest extends TestCase
 {
@@ -199,7 +199,7 @@ class FieldTest extends TestCase
 
     public function testSubmittedDataIsTransformedCorrectly()
     {
-        $filter = new FixedFilter(array(
+        $filter = new FixedFilterListener(array(
             'filterBoundDataFromClient' => array(
                 // 1. The value is converted to a string and passed to the
                 //    first filter
@@ -223,7 +223,7 @@ class FieldTest extends TestCase
             'app[filter2[norm[filter1[0]]]]' => 'filter2[norm[filter1[0]]]',
         ));
 
-        $this->field->appendFilter($filter);
+        $this->field->addEventSubscriber($filter);
         $this->field->setValueTransformer($valueTransformer);
         $this->field->setNormalizationTransformer($normTransformer);
         $this->field->submit(0);

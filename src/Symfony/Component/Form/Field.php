@@ -15,10 +15,10 @@ use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
 use Symfony\Component\Form\Renderer\RendererInterface;
 use Symfony\Component\Form\Renderer\Plugin\PluginInterface;
-use Symfony\Component\Form\Filter\FilterChain;
-use Symfony\Component\Form\Filter\FilterInterface;
-use Symfony\Component\Form\EventListener\EventManager;
-use Symfony\Component\Form\EventListener\EventListenerInterface;
+use Symfony\Component\Form\Event\DataEvent;
+use Symfony\Component\Form\Event\FilterDataEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Base class for form fields
@@ -70,15 +70,12 @@ class Field implements FieldInterface
     private $hidden = false;
     private $trim = true;
     private $disabled = false;
-    private $filterChain;
-    private $eventManager;
+    private $dispatcher;
 
-    public function __construct($key)
+    public function __construct($key, EventDispatcherInterface $dispatcher)
     {
         $this->key = (string)$key;
-        // TODO should be injected instead
-        $this->filterChain = new FilterChain(Filters::$all);
-        $this->eventManager = new EventManager(Events::$all);
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -89,34 +86,29 @@ class Field implements FieldInterface
     }
 
     /**
-     * @deprecated
+     * Adds an event listener for events on this field
+     *
+     * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addEventListener
      */
-    public function prependFilter(FilterInterface $filter)
+    public function addEventListener($eventNames, $listener, $priority = 0)
     {
-        $this->filterChain->prependFilter($filter);
+        $this->dispatcher->addEventListener($eventNames, $listener, $priority);
 
         return $this;
     }
 
     /**
-     * @deprecated
+     * Adds an event subscriber for events on this field
+     *
+     * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addEventSubscriber
      */
-    public function appendFilter(FilterInterface $filter)
+    public function addEventSubscriber(EventSubscriberInterface $subscriber, $priority = 0)
     {
-        $this->filterChain->appendFilter($filter);
+        $this->dispatcher->addEventSubscriber($subscriber, $priority);
 
         return $this;
     }
 
-    /**
-     * @deprecated
-     */
-    public function addEventListener(EventListenerInterface $listener)
-    {
-        $this->eventManager->addEventListener($listener);
-
-        return $this;
-    }
 
     /**
      * Returns the data of the field as it is displayed to the user.
@@ -280,10 +272,13 @@ class Field implements FieldInterface
      */
     public function setData($appData)
     {
-        $this->eventManager->triggerEvent(Events::preSetData, $appData);
+        $event = new DataEvent($appData);
+        $this->dispatcher->dispatchEvent(Events::preSetData, $event);
 
         // Hook to change content of the data
-        $appData = $this->filterChain->filter(Filters::filterSetData, $appData);
+        $event = new FilterDataEvent($appData);
+        $this->dispatcher->dispatchEvent(Events::filterSetData, $event);
+        $appData = $event->getData();
 
         // Treat data as strings unless a value transformer exists
         if (null === $this->valueTransformer && is_scalar($appData)) {
@@ -298,7 +293,8 @@ class Field implements FieldInterface
         $this->normalizedData = $normData;
         $this->transformedData = $clientData;
 
-        $this->eventManager->triggerEvent(Events::postSetData);
+        $event = new DataEvent($appData);
+        $this->dispatcher->dispatchEvent(Events::postSetData, $event);
 
         return $this;
     }
@@ -314,7 +310,8 @@ class Field implements FieldInterface
             $clientData = (string)$clientData;
         }
 
-        $this->eventManager->triggerEvent(Events::preBind, $clientData);
+        $event = new DataEvent($clientData);
+        $this->dispatcher->dispatchEvent(Events::preBind, $event);
 
         if (is_string($clientData) && $this->trim) {
             $clientData = trim($clientData);
@@ -324,7 +321,9 @@ class Field implements FieldInterface
         $normData = null;
 
         // Hook to change content of the data submitted by the browser
-        $clientData = $this->filterChain->filter(Filters::filterBoundDataFromClient, $clientData);
+        $event = new FilterDataEvent($clientData);
+        $this->dispatcher->dispatchEvent(Events::filterBoundDataFromClient, $event);
+        $clientData = $event->getData();
 
         try {
             // Normalize data to unified representation
@@ -337,7 +336,9 @@ class Field implements FieldInterface
         if ($this->transformationSuccessful) {
             // Hook to change content of the data in the normalized
             // representation
-            $normData = $this->filterChain->filter(Filters::filterBoundData, $normData);
+            $event = new FilterDataEvent($normData);
+            $this->dispatcher->dispatchEvent(Events::filterBoundData, $event);
+            $normData = $event->getData();
 
             // Synchronize representations - must not change the content!
             $appData = $this->denormalize($normData);
@@ -350,7 +351,8 @@ class Field implements FieldInterface
         $this->normalizedData = $normData;
         $this->transformedData = $clientData;
 
-        $this->eventManager->triggerEvent(Events::postBind);
+        $event = new DataEvent($clientData);
+        $this->dispatcher->dispatchEvent(Events::postBind, $event);
     }
 
     /**

@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ExecutionContext;
+use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\MissingOptionsException;
 use Symfony\Component\Form\Exception\AlreadySubmittedException;
@@ -22,7 +23,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\DanglingFieldException;
 use Symfony\Component\Form\Exception\FieldDefinitionException;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
-use Symfony\Component\Form\Filter\FilterInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Form represents a form.
@@ -39,7 +41,7 @@ use Symfony\Component\Form\Filter\FilterInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class Form extends Field implements \IteratorAggregate, FormInterface, FilterInterface
+class Form extends Field implements \IteratorAggregate, FormInterface, EventSubscriberInterface
 {
     /**
      * Contains all the fields of this group
@@ -79,16 +81,17 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
 
     private $csrfProvider;
 
-    public function __construct($key, FormFactoryInterface $factory,
-            CsrfProviderInterface $csrfProvider, ValidatorInterface $validator)
+    public function __construct($key, EventDispatcherInterface $dispatcher,
+            FormFactoryInterface $factory, CsrfProviderInterface $csrfProvider,
+            ValidatorInterface $validator)
     {
-        parent::__construct($key);
+        $dispatcher->addEventSubscriber($this);
+
+        parent::__construct($key, $dispatcher);
 
         $this->factory = $factory;
         $this->csrfProvider = $csrfProvider;
         $this->validator = $validator;
-
-        $this->appendFilter($this);
     }
 
     /**
@@ -255,29 +258,31 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
         return $this;
     }
 
-    public function filterSetData($data)
+    public function filterSetData(FilterDataEvent $event)
     {
         if (null === $this->getValueTransformer() && null === $this->getNormalizationTransformer()) {
+            $data = $event->getData();
+
             // Empty values must be converted to objects or arrays so that
             // they can be read by PropertyPath in the child fields
             if (empty($data)) {
                 if ($this->dataConstructor) {
                     $constructor = $this->dataConstructor;
-                    $data = $constructor();
+                    $event->setData($constructor());
                 } else if ($this->dataClass) {
                     $class = $this->dataClass;
-                    $data = new $class();
+                    $event->setData(new $class());
                 } else {
-                    $data = array();
+                    $event->setData(array());
                 }
             }
         }
-
-        return $data;
     }
 
-    public function filterBoundDataFromClient($data)
+    public function filterBoundDataFromClient(FilterDataEvent $event)
     {
+        $data = $event->getData();
+
         if (!is_array($data)) {
             throw new UnexpectedTypeException($data, 'array');
         }
@@ -298,14 +303,14 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
 
         $this->writeObject($data);
 
-        return $data;
+        $event->setData($data);
     }
 
-    public function getSupportedFilters()
+    public static function getSubscribedEvents()
     {
         return array(
-            Filters::filterSetData,
-            Filters::filterBoundDataFromClient,
+            Events::filterSetData,
+            Events::filterBoundDataFromClient,
         );
     }
 

@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\Renderer\Plugin\FormPlugin;
 use Symfony\Component\Validator\ValidatorInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class FormConfig extends AbstractFieldConfig
 {
@@ -65,8 +66,8 @@ class FormConfig extends AbstractFieldConfig
 
     public function createInstance($key)
     {
-        return new Form($key, $this->getFormFactory(), $this->csrfProvider,
-                $this->validator);
+        return new Form($key, new EventDispatcher(), $this->getFormFactory(),
+                $this->csrfProvider, $this->validator);
     }
 
     public function getParent(array $options)

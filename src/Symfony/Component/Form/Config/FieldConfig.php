@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Renderer\DefaultRenderer;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Form\Renderer\Plugin\FieldPlugin;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class FieldConfig extends AbstractFieldConfig
 {
@@ -64,7 +65,7 @@ class FieldConfig extends AbstractFieldConfig
 
     public function createInstance($key)
     {
-        return new Field($key);
+        return new Field($key, new EventDispatcher());
     }
 
     public function getParent(array $options)

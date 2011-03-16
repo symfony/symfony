@@ -12,11 +12,13 @@
 namespace Symfony\Component\Form\EventListener;
 
 use Symfony\Component\Form\Events;
+use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ResizeFormListener implements EventListenerInterface
+class ResizeFormListener implements EventSubscriberInterface
 {
     private $form;
 
@@ -31,7 +33,7 @@ class ResizeFormListener implements EventListenerInterface
         $this->resizeOnBind = $resizeOnBind;
     }
 
-    public function getSupportedEvents()
+    public static function getSubscribedEvents()
     {
         return array(
             Events::preSetData,
@@ -39,8 +41,10 @@ class ResizeFormListener implements EventListenerInterface
         );
     }
 
-    public function preSetData($collection)
+    public function preSetData(DataEvent $event)
     {
+        $collection = $event->getData();
+
         if (null === $collection) {
             $collection = array();
         }
@@ -62,8 +66,10 @@ class ResizeFormListener implements EventListenerInterface
         }
     }
 
-    public function preBind($data)
+    public function preBind(DataEvent $event)
     {
+        $data = $event->getData();
+
         $this->removedFields = array();
 
         if (null === $data) {

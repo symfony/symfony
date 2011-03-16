@@ -9,10 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Filter;
+namespace Symfony\Component\Form\EventListener;
 
 use Symfony\Component\Form\FieldInterface;
-use Symfony\Component\Form\Filters;
+use Symfony\Component\Form\Events;
+use Symfony\Component\Form\Event\FilterDataEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\TemporaryStorage;
@@ -22,7 +24,7 @@ use Symfony\Component\HttpFoundation\File\TemporaryStorage;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class FileUploadFilter implements FilterInterface
+class FixFileUploadListener implements EventSubscriberInterface
 {
     private $field;
 
@@ -34,12 +36,12 @@ class FileUploadFilter implements FilterInterface
         $this->storage = $storage;
     }
 
-    public function getSupportedFilters()
+    public static function getSubscribedEvents()
     {
-        return Filters::filterBoundDataFromClient;
+        return Events::filterBoundDataFromClient;
     }
 
-    public function filterBoundDataFromClient($data)
+    public function filterBoundDataFromClient(FilterDataEvent $event)
     {
         // TODO should be disableable
 
@@ -48,7 +50,7 @@ class FileUploadFilter implements FilterInterface
             'file' => '',
             'token' => '',
             'name' => '',
-        ), $data);
+        ), $event->getData());
 
         // Newly uploaded file
         if ($data['file'] instanceof UploadedFile && $data['file']->isValid()) {
@@ -79,6 +81,6 @@ class FileUploadFilter implements FilterInterface
             $data = $this->field->getNormalizedData();
         }
 
-        return $data;
+        $event->setData($data);
     }
 }

@@ -21,9 +21,12 @@
         <div id="main">
     
             <div class="clear_fix">
-
+                <div id="collector_wrapper">
+                    <div id="collector_content">
+                        {% block panel '' %}
+                    </div>
+                </div>
                 <div id="navigation">
-            
                     {% if templates is defined %}
                         <ul id="menu_profiler">
                             {% for name, template in templates %}
@@ -36,15 +39,8 @@
                             {% endfor %}
                         </ul>
                     {% endif %}
-
                     {% render 'WebProfilerBundle:Profiler:searchBar' %}
-
                     {% include 'WebProfilerBundle:Profiler:admin.html.twig' with { 'token': token } only %}
-
-                </div>
-
-                <div id="collector_content">
-                    {% block panel '' %}
                 </div>
             </div>
         </div>

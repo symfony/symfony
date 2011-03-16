@@ -215,20 +215,22 @@ fieldset
     top: 20px;
 }
 
-#navigation, #collector_content
-{
-    float:left
-}
-
-#navigation
-{
-    width:250px;
+#collector_wrapper {
+    float: left;
+    width: 100%;
 }
 
 #collector_content
 {
-    width:620px;
-    padding:40px 0 40px 50px;
+    margin-left: 250px;
+    padding: 40px 50px;
+}
+
+#navigation
+{
+    float: left;
+    width: 250px;
+    margin-left: -100%;
 }
 
 #collector_content table td

@@ -9,54 +9,37 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\TwigBundle\Tests;
+namespace Symfony\Bundle\FrameworkBundle\Tests\Templating;
 
-use Symfony\Bundle\TwigBundle\TwigEngine;
+use Symfony\Bundle\FrameworkBundle\Templating\PhpEngine;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session;
 use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
 use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
+use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
-class TwigEngineTest extends TestCase
+class PhpEngineTest extends TestCase
 {
     public function testEvaluateAddsAppGlobal()
     {
-        $environment = $this->getTwigEnvironment();
         $container = $this->getContainer();
-        $engine = new TwigEngine($environment, new TemplateNameParser(), $app = new GlobalVariables($container));
-
-        $template = $this->getMock('\Twig_TemplateInterface');
-
-        $environment->expects($this->once())
-            ->method('loadTemplate')
-            ->will($this->returnValue($template));
-
-        $engine->render('name');
-
-        $request = $container->get('request');
-        $globals = $environment->getGlobals();
+        $loader = $this->getMockForAbstractClass('Symfony\Component\Templating\Loader\Loader');
+        $engine = new PhpEngine(new TemplateNameParser(), $container, $loader, $app = new GlobalVariables($container));
+        $globals = $engine->getGlobals();
         $this->assertSame($app, $globals['app']);
     }
 
     public function testEvaluateWithoutAvailableRequest()
     {
-        $environment = $this->getTwigEnvironment();
         $container = new Container();
-        $engine = new TwigEngine($environment, new TemplateNameParser(), new GlobalVariables($container));
-
-        $template = $this->getMock('\Twig_TemplateInterface');
-
-        $environment->expects($this->once())
-            ->method('loadTemplate')
-            ->will($this->returnValue($template));
+        $loader = $this->getMockForAbstractClass('Symfony\Component\Templating\Loader\Loader');
+        $engine = new PhpEngine(new TemplateNameParser(), $container, $loader, $app = new GlobalVariables($container));
 
         $container->set('request', null);
 
-        $engine->render('name');
-
-        $globals = $environment->getGlobals();
+        $globals = $engine->getGlobals();
         $this->assertEmpty($globals['app']->getRequest());
     }
 
@@ -75,18 +58,5 @@ class TwigEngineTest extends TestCase
         $container->set('request', $request);
 
         return $container;
-    }
-
-    /**
-     * Creates a mock Twig_Environment object.
-     *
-     * @return \Twig_Environment
-     */
-    protected function getTwigEnvironment()
-    {
-        return $this
-            ->getMockBuilder('\Twig_Environment')
-            ->setMethods(array('loadTemplate'))
-            ->getMock();
     }
 }

@@ -57,8 +57,10 @@ class AsseticExtension extends Extension
             $container->setParameter('assetic.yui_jar', $config['yui']);
             $loader->load('yui_compressor.xml');
         }
-        if (isset($config['lessphp_file'])) {
-            $container->getDefinition('assetic.filter.lessphp')->setFile($config['lessphp_file']);
+        if (isset($config['file'])) {
+            if (isset($config['lessphp'])) {
+                $container->getDefinition('assetic.filter.lessphp')->setFile($config['file']['lessphp']);
+            }
         }
 
         if ($container->getParameterBag()->resolveValue($container->getParameterBag()->get('assetic.use_controller'))) {

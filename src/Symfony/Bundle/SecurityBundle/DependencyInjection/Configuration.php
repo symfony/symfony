@@ -157,7 +157,7 @@ class Configuration
                         ->end()
                     ->end()
                     ->arrayNode('anonymous')
-                        ->scalarNode('key')->defaultValue(function () { return uniqid(); })->end()
+                        ->scalarNode('key')->defaultValue(uniqid())->end()
                     ->end()
                     ->arrayNode('switch_user')
                         ->scalarNode('provider')->end()

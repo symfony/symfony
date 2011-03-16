@@ -19,18 +19,21 @@ use Symfony\Component\Form\Field;
 
 class CollectionFieldTest extends TestCase
 {
-    public function testContainsNoFieldsByDefault()
+    public function testContainsOnlyCsrfTokenByDefault()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
-            'prototype' => new Field(),
+            'prototype' => 'field',
+            'csrf_field_name' => 'abc',
         ));
-        $this->assertEquals(0, count($field));
+
+        $this->assertTrue($field->has('abc'));
+        $this->assertEquals(1, count($field));
     }
 
     public function testSetDataAdjustsSize()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
-            'prototype' => new Field(),
+            'prototype' => 'field',
         ));
         $field->setData(array('foo@foo.com', 'foo@bar.com'));
 
@@ -50,7 +53,7 @@ class CollectionFieldTest extends TestCase
     public function testSetDataAdjustsSizeIfModifiable()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
-            'prototype' => new Field(),
+            'prototype' => 'field',
             'modifiable' => true,
         ));
         $field->setData(array('foo@foo.com', 'foo@bar.com'));
@@ -70,7 +73,7 @@ class CollectionFieldTest extends TestCase
     public function testThrowsExceptionIfObjectIsNotTraversable()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
-            'prototype' => new Field(),
+            'prototype' => 'field',
         ));
         $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $field->setData(new \stdClass());
@@ -79,7 +82,7 @@ class CollectionFieldTest extends TestCase
     public function testModifiableCollectionsContainExtraField()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
-            'prototype' => new Field(),
+            'prototype' => 'field',
             'modifiable' => true,
         ));
         $field->setData(array('foo@bar.com'));
@@ -92,7 +95,7 @@ class CollectionFieldTest extends TestCase
     public function testNotResizedIfSubmittedWithMissingData()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
-            'prototype' => new Field(),
+            'prototype' => 'field',
         ));
         $field->setData(array('foo@foo.com', 'bar@bar.com'));
         $field->submit(array('foo@bar.com'));
@@ -106,7 +109,7 @@ class CollectionFieldTest extends TestCase
     public function testResizedIfSubmittedWithMissingDataAndModifiable()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
-            'prototype' => new Field(),
+            'prototype' => 'field',
             'modifiable' => true,
         ));
         $field->setData(array('foo@foo.com', 'bar@bar.com'));
@@ -120,7 +123,7 @@ class CollectionFieldTest extends TestCase
     public function testNotResizedIfSubmittedWithExtraData()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
-            'prototype' => new Field(),
+            'prototype' => 'field',
         ));
         $field->setData(array('foo@bar.com'));
         $field->submit(array('foo@foo.com', 'bar@bar.com'));
@@ -133,7 +136,7 @@ class CollectionFieldTest extends TestCase
     public function testResizedUpIfSubmittedWithExtraDataAndModifiable()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
-            'prototype' => new Field(),
+            'prototype' => 'field',
             'modifiable' => true,
         ));
         $field->setData(array('foo@bar.com'));
@@ -149,7 +152,7 @@ class CollectionFieldTest extends TestCase
     public function testResizedDownIfSubmittedWithLessDataAndModifiable()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
-            'prototype' => new Field(),
+            'prototype' => 'field',
             'modifiable' => true,
         ));
         $field->setData(array('foo@bar.com', 'bar@bar.com'));

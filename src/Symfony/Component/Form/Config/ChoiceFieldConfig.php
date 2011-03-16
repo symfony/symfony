@@ -68,6 +68,7 @@ class ChoiceFieldConfig extends AbstractFieldConfig
             'expanded' => false,
             'choices' => array(),
             'preferred_choices' => array(),
+            'csrf_protection' => false,
         );
 
         $options = array_replace($defaultOptions, $options);

@@ -111,6 +111,7 @@ class DateFieldConfig extends AbstractFieldConfig
             'format' => \IntlDateFormatter::MEDIUM,
             'data_timezone' => date_default_timezone_get(),
             'user_timezone' => date_default_timezone_get(),
+            'csrf_protection' => false,
         );
     }
 

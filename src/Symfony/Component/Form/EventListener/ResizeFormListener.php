@@ -24,7 +24,7 @@ class ResizeFormListener implements EventListenerInterface
 
     private $resizeOnBind;
 
-    public function __construct(FormInterface $form, FieldInterface $prototype, $resizeOnBind = false)
+    public function __construct(FormInterface $form, $prototype, $resizeOnBind = false)
     {
         $this->form = $form;
         $this->prototype = $prototype;
@@ -56,7 +56,9 @@ class ResizeFormListener implements EventListenerInterface
         }
 
         foreach ($collection as $name => $value) {
-            $this->form->add($this->newField($name));
+            $this->form->add($this->prototype, $name, array(
+                'property_path' => '['.$name.']',
+            ));
         }
     }
 
@@ -77,17 +79,10 @@ class ResizeFormListener implements EventListenerInterface
 
         foreach ($data as $name => $value) {
             if (!$this->form->has($name) && $this->resizeOnBind) {
-                $this->form->add($this->newField($name));
+                $this->form->add($this->prototype, $name, array(
+                    'property_path' => '['.$name.']',
+                ));
             }
         }
-    }
-
-    protected function newField($key)
-    {
-        $field = clone $this->prototype;
-        $field->setKey($key);
-        $field->setPropertyPath('['.$key.']');
-
-        return $field;
     }
 }

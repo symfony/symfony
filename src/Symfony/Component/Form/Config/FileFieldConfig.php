@@ -56,6 +56,7 @@ class FileFieldConfig extends AbstractFieldConfig
         return array(
             'template' => 'file',
             'type' => 'string',
+            'csrf_protection' => false,
         );
     }
 

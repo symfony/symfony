@@ -34,6 +34,7 @@ class RepeatedFieldConfig extends AbstractFieldConfig
             'options' => array(),
             'first_key' => 'first',
             'second_key' => 'second',
+            'csrf_protection' => false,
         );
     }
 

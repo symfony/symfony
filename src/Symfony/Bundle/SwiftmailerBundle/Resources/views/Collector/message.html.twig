@@ -30,10 +30,11 @@
     {% else %}
         <ul class="alt">
             {% for i, message in collector.messages %}
-                <li class="{{ i is odd ? 'odd' : 'even' }}" style="border:1px solid #ccc;margin-bottom:5px;">
+                <li class="{{ cycle(['odd', 'even'], i) }}" style="border:1px solid #ccc;margin-bottom:5px;">
                     <div>
                         <h3>{{ message.subject }} ({{ message.date |date() }})</h3>
-                        <span>Priority {{ message.priority }}</span>
+                        <span>Priority: {{ message.priority }} | </span>
+                        <span>Charset: {{ message.charset }} </span>
                         <p>
                             From: <br />
                             {% for email, name in message.from %}
@@ -45,6 +46,10 @@
                             {% for email, name in message.to %}
                                 {{ name }} < {{ email }} ><br />
                             {% endfor %}
+                        </p>
+                        <p>
+                            Body: <br />
+                            {{ message.body }}
                         </p>
                         <p>
                             Headers: <br />

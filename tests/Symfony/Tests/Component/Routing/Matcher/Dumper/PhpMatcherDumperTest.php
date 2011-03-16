@@ -42,7 +42,10 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
             '/test/baz'
         ));
         $collection->add('baz2', new Route(
-            '/test/baz.html'
+            '/test/baz.html',
+            array(),
+            array(),
+            array('case_sensitive' => false)
         ));
         $collection->add('baz3', new Route(
             '/test/baz3/'
@@ -50,6 +53,19 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection->add('baz4', new Route(
             '/test/{foo}/'
         ));
+        $collection->add('baz5', new Route(
+            '/test/{foo}',
+            array(),
+            array('foo' => 'foo|symfony'),
+            array('case_sensitive' => false)
+        ));
+        $collection->add('baz6', new Route(
+            '/test/baz6/',
+            array(),
+            array(),
+            array('case_sensitive' => false)
+        ));
+
 
         $dumper = new PhpMatcherDumper($collection);
         $this->assertStringEqualsFile(self::$fixturesPath.'/dumper/url_matcher1.php', $dumper->dump(), '->dump() dumps basic routes to the correct PHP file.');

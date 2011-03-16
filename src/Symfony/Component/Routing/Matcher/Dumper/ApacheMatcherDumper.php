@@ -43,13 +43,15 @@ class ApacheMatcherDumper extends MatcherDumper
 
         foreach ($this->routes->all() as $name => $route) {
             $compiledRoute = $route->compile();
+            $caseSensitive = $route->getOption('case_sensitive');
 
             // Apache "only" supports 9 variables
             if (count($compiledRoute->getVariables()) > 9) {
                 throw new \RuntimeException(sprintf('Unable to dump a route collection as route "%s" has more than 9 variables', $name));
             }
 
-            $regex = preg_replace('/\?P<.+?>/', '', substr($compiledRoute->getRegex(), 1, -2));
+            $pos = $caseSensitive ? -2 : -3 ;
+            $regex = preg_replace('/\?P<.+?>/', '', substr($compiledRoute->getRegex(), 1, $pos));
 
             $variables = array('E=_ROUTING__route:'.$name);
             foreach (array_keys($compiledRoute->getVariables()) as $i => $variable) {
@@ -67,11 +69,12 @@ class ApacheMatcherDumper extends MatcherDumper
 
             $conditions = count($conditions) ? implode(" [OR]\n", $conditions)."\n" : '';
 
-            $regexes[] = sprintf("%sRewriteCond %%{PATH_INFO} %s\nRewriteRule .* %s [QSA,L,%s]", $conditions, $regex, $options['script_name'], $variables);
+            $flags = $caseSensitive ? '' : ' [NC]';
+            $regexes[] = sprintf("%sRewriteCond %%{PATH_INFO} %s%s\nRewriteRule .* %s [QSA,L,%s]", $conditions, $regex, $flags, $options['script_name'], $variables);
 
             // add redirect for missing trailing slash
             if ('/$' === substr($regex, -2)) {
-                $regexes[count($regexes)-1] .= sprintf("\nRewriteCond %%{PATH_INFO} %s\nRewriteRule .* /$0/ [QSA,L,R=301]", substr($regex, 0, -2).'$');
+                $regexes[count($regexes)-1] .= sprintf("\nRewriteCond %%{PATH_INFO} %s%s\nRewriteRule .* /$0/ [QSA,L,R=301]", substr($regex, 0, -2).'$', $flags);
             }
         }
 

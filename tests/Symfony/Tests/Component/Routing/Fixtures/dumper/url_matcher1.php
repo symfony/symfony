@@ -31,7 +31,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             return array_merge($this->mergeDefaults(array(), array ()), array('_route' => 'baz'));
         }
 
-        if ($pathinfo === '/test/baz.html') {
+        if (strtolower($pathinfo) === strtolower('/test/baz.html')) {
             return array_merge($this->mergeDefaults(array(), array ()), array('_route' => 'baz2'));
         }
 
@@ -47,6 +47,17 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 return array('_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction', 'url' => $this->context['base_url'].$pathinfo.'/', 'permanent' => true, '_route' => 'baz4');
             }
             return array_merge($this->mergeDefaults($matches, array ()), array('_route' => 'baz4'));
+        }
+
+        if (0 === stripos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>foo|symfony)$#xi', $pathinfo, $matches)) {
+            return array_merge($this->mergeDefaults($matches, array ()), array('_route' => 'baz5'));
+        }
+
+        if (strtolower(rtrim($pathinfo, '/')) === strtolower('/test/baz6')) {
+            if (substr($pathinfo, -1) !== '/') {
+                return array('_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction', 'url' => $this->context['base_url'].$pathinfo.'/', 'permanent' => true, '_route' => 'baz6');
+            }
+            return array_merge($this->mergeDefaults(array(), array ()), array('_route' => 'baz6'));
         }
 
         return false;

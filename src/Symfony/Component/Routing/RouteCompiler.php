@@ -62,6 +62,7 @@ class RouteCompiler implements RouteCompilerInterface
         }
 
         $this->regex = "#^".implode("", $this->segments)."".preg_quote($separator, '#')."$#x";
+        $this->regex .= $this->options['case_sensitive'] ? '' : 'i';
 
         // optimize tokens for generation
         $tokens = array();

@@ -44,6 +44,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         'segment_separators' => array('/', '.'),
         'text_regex'         => '.+?',
         'compiler_class'     => 'Symfony\\Component\\Routing\\RouteCompiler',
+        'case_sensitive'     => true,
         ), array('foo' => 'bar')), $route->getOptions(), '->setOptions() sets the options');
         $this->assertEquals($route, $route->setOptions(array()), '->setOptions() implements a fluent interface');
     }

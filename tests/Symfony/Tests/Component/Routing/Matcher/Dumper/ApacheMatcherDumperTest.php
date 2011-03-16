@@ -44,6 +44,18 @@ class ApacheMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection->add('baz2', new Route(
             '/test/{foo}/'
         ));
+        $collection->add('baz3', new Route(
+            '/test/{foo}',
+            array(),
+            array('foo' => 'foo|symfony'),
+            array('case_sensitive' => false)
+        ));
+        $collection->add('baz4', new Route(
+            '/test/baz4/',
+            array(),
+            array(),
+            array('case_sensitive' => false)
+        ));
 
         $dumper = new ApacheMatcherDumper($collection);
 

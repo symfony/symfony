@@ -104,6 +104,7 @@ class Route
             'segment_separators' => array('/', '.'),
             'text_regex'         => '.+?',
             'compiler_class'     => 'Symfony\\Component\\Routing\\RouteCompiler',
+            'case_sensitive'     => true,
         ), $options);
 
         return $this;

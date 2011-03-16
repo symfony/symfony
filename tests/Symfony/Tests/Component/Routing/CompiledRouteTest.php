@@ -40,6 +40,7 @@ class CompiledRouteTest extends \PHPUnit_Framework_TestCase
             'segment_separators' => array('/', '.'),
             'text_regex'         => '.+?',
             'compiler_class'     => 'Symfony\\Component\\Routing\\RouteCompiler',
+            'case_sensitive'     => true,
         ), array('foo' => 'bar')), $compiled->getOptions(), '->getOptions() returns the route options');
     }
 }

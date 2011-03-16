@@ -91,6 +91,13 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 '', '#^/foo/(?P<foo>[^/\.]+?)$#x', array('foo' => '=foo'), array(
                     array('label', '/', '=foo', 'foo'),
                 )),
+
+            array(
+                'Route with a custom token and case insensitive',
+                array('/=foo', array(), array(), array('compiler_class' => 'Symfony\\Tests\\Component\\Routing\\RouteCompiler', 'case_sensitive' => false)),
+                '', '#^/foo/(?P<foo>[^/\.]+?)$#xi', array('foo' => '=foo'), array(
+                    array('label', '/', '=foo', 'foo'),
+                )),
         );
     }
 }

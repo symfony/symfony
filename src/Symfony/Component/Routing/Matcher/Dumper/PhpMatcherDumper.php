@@ -53,6 +53,7 @@ class PhpMatcherDumper extends MatcherDumper
 
         foreach ($this->routes->all() as $name => $route) {
             $compiledRoute = $route->compile();
+            $caseSensitive = $route->getOption('case_sensitive');
 
             $conditions = array();
 
@@ -63,16 +64,19 @@ class PhpMatcherDumper extends MatcherDumper
             $hasTrailingSlash = false;
             if (!count($compiledRoute->getVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#', $compiledRoute->getRegex(), $m)) {
                 if (substr($m['url'], -1) === '/') {
-                    $conditions[] = sprintf("rtrim(\$pathinfo, '/') === '%s'", rtrim(str_replace('\\', '', $m['url']), '/'));
+                    $condition = $caseSensitive ? "rtrim(\$pathinfo, '/') === '%s'" : "strtolower(rtrim(\$pathinfo, '/')) === strtolower('%s')" ;
+                    $conditions[] = sprintf($condition, rtrim(str_replace('\\', '', $m['url']), '/'));
                     $hasTrailingSlash = true;
                 } else {
-                    $conditions[] = sprintf("\$pathinfo === '%s'", str_replace('\\', '', $m['url']));
+                    $condition = $caseSensitive ? "\$pathinfo === '%s'" : "strtolower(\$pathinfo) === strtolower('%s')" ;
+                    $conditions[] = sprintf($condition, str_replace('\\', '', $m['url']));
                 }
 
                 $matches = 'array()';
             } else {
                 if ($compiledRoute->getStaticPrefix()) {
-                    $conditions[] = sprintf("0 === strpos(\$pathinfo, '%s')", $compiledRoute->getStaticPrefix());
+                    $function = $caseSensitive ? 'strpos' : 'stripos';
+                    $conditions[] = sprintf("0 === %s(\$pathinfo, '%s')", $function, $compiledRoute->getStaticPrefix());
                 }
 
                 $regex = $compiledRoute->getRegex();

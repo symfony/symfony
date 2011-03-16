@@ -61,7 +61,7 @@ class SecurityExtension extends Extension
         $config = $processor->process($tree, $configs);
 
         // load services
-        $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config')));
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('security.xml');
         $loader->load('security_listeners.xml');
         $loader->load('security_rememberme.xml');
@@ -109,7 +109,7 @@ class SecurityExtension extends Extension
 
     private function aclLoad($config, ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config')));
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('security_acl.xml');
 
         if (isset($config['connection'])) {
@@ -548,7 +548,7 @@ class SecurityExtension extends Extension
         // load service templates
         $c = new ContainerBuilder();
         $parameterBag = $container->getParameterBag();
-        $loader = new XmlFileLoader($c, new FileLocator(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config')));
+        $loader = new XmlFileLoader($c, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('security_factories.xml');
 
         // load user-created listener factories

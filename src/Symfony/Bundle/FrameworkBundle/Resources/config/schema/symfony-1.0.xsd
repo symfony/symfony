@@ -95,6 +95,7 @@
             <xsd:element name="loader" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="engine" type="templating_engine" minOccurs="1" maxOccurs="unbounded" />
             <xsd:element name="assets-base-url" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="package" type="package" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
 
         <xsd:attribute name="assets-version" type="xsd:string" />
@@ -104,6 +105,15 @@
 
     <xsd:complexType name="templating_engine">
         <xsd:attribute name="id" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="package">
+        <xsd:sequence>
+            <xsd:element name="base-url" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="version" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="translator">

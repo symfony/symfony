@@ -35,6 +35,18 @@ $container->loadFromExtension('framework', array(
         'cache_warmer'     => true,
         'engines'          => array('php', 'twig'),
         'loader'           => array('loader.foo', 'loader.bar'),
+        'packages'         => array(
+            'images' => array(
+                'version'   => '1.0.0',
+                'base_urls' => array('http://images1.example.com', 'http://images2.example.com'),
+            ),
+            'foo' => array(
+                'version' => '1.0.0',
+            ),
+            'bar' => array(
+                'base_urls' => array('http://bar1.example.com', 'http://bar2.example.com'),
+            ),
+        ),
     ),
     'translator' => array(
         'enabled'  => true,

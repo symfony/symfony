@@ -330,6 +330,15 @@ class FrameworkExtension extends Extension
             $container->setParameter('templating.assets.base_urls', $config['assets_base_urls']);
         }
 
+        $packages = array();
+        foreach ($config['packages'] as $name => $package) {
+            $packages[$name] = new Definition('Symfony\\Component\\Templating\\Asset\\AssetPackage', array(
+                $package['base_urls'],
+                $package['version'],
+            ));
+        }
+        $container->setParameter('templating.assets.packages', $packages);
+
         if (!empty($config['loaders'])) {
             $loaders = array_map(function($loader) { return new Reference($loader); }, $config['loaders']);
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Tests\Component\Templating\Helper;
 
+use Symfony\Component\Templating\Asset\AssetPackage;
 use Symfony\Component\Templating\Helper\AssetsHelper;
 
 class AssetsHelperTest extends \PHPUnit_Framework_TestCase
@@ -19,8 +20,7 @@ class AssetsHelperTest extends \PHPUnit_Framework_TestCase
     {
         $helper = new AssetsHelper('foo', 'http://www.example.com', 'abcd');
         $this->assertEquals('/foo/', $helper->getBasePath(), '__construct() takes a base path as its first argument');
-        $this->assertEquals(array('http://www.example.com'), $helper->getBaseURLs(), '__construct() takes a base URL as its second argument');
-        $this->assertEquals('abcd', $helper->getVersion(), '__construct() takes a version as its thrid argument');
+        $this->assertEquals(new AssetPackage('http://www.example.com', 'abcd'), $helper->getPackage(), '->__construct() creates a default asset package');
     }
 
     public function testGetSetBasePath()
@@ -36,28 +36,10 @@ class AssetsHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/0/', $helper->getBasePath(), '->setBasePath() returns /0/ if 0 is given');
     }
 
-    public function testGetSetVersion()
+    public function testGetVersion()
     {
-        $helper = new AssetsHelper();
-        $helper->setVersion('foo');
-        $this->assertEquals('foo', $helper->getVersion(), '->setVersion() sets the version');
-    }
-
-    public function testSetGetBaseURLs()
-    {
-        $helper = new AssetsHelper();
-        $helper->setBaseURLs('http://www.example.com/');
-        $this->assertEquals(array('http://www.example.com'), $helper->getBaseURLs(), '->setBaseURLs() removes the / at the of an absolute base path');
-        $helper->setBaseURLs(array('http://www1.example.com/', 'http://www2.example.com/'));
-        $URLs = array();
-        for ($i = 0; $i < 20; $i++) {
-            $URLs[] = $helper->getBaseURL($i);
-        }
-        $URLs = array_values(array_unique($URLs));
-        sort($URLs);
-        $this->assertEquals(array('http://www1.example.com', 'http://www2.example.com'), $URLs, '->getBaseURL() returns a random base URL if several are given');
-        $helper->setBaseURLs('');
-        $this->assertEquals('', $helper->getBaseURL(1), '->getBaseURL() returns an empty string if no base URL exist');
+        $helper = new AssetsHelper(null, array(), 'foo');
+        $this->assertEquals('foo', $helper->getVersion(), '->getVersion() returns the version');
     }
 
     public function testGetUrl()

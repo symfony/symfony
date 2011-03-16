@@ -16,7 +16,6 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Bundle\DoctrineAbstractBundle\DependencyInjection\AbstractDoctrineExtension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Definition\Processor;
@@ -59,6 +58,11 @@ class DoctrineExtension extends AbstractDoctrineExtension
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('dbal.xml');
+
+        if (empty ($config['default_connection'])) {
+            $keys = array_keys($config['connections']);
+            $config['default_connection'] = reset($keys);
+        }
 
         $container->setAlias('database_connection', sprintf('doctrine.dbal.%s_connection', $config['default_connection']));
         $container->setAlias('doctrine.dbal.event_manager', new Alias(sprintf('doctrine.dbal.%s_connection.event_manager', $config['default_connection']), false));
@@ -140,6 +144,13 @@ class DoctrineExtension extends AbstractDoctrineExtension
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('orm.xml');
+
+        $entityManagers = array_keys($config['entity_managers']);
+
+        if (empty ($config['default_entity_manager'])) {
+            $config['default_entity_manager'] = reset($entityManagers);
+        }
+
         $options = array('default_entity_manager', 'auto_generate_proxy_classes', 'proxy_dir', 'proxy_namespace');
         foreach ($options as $key) {
             $container->setParameter('doctrine.orm.'.$key, $config[$key]);
@@ -152,7 +163,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             $this->loadOrmEntityManager($entityManager, $container);
         }
 
-        $container->setParameter('doctrine.orm.entity_managers', array_keys($config['entity_managers']));
+        $container->setParameter('doctrine.orm.entity_managers', $entityManagers);
     }
 
     /**

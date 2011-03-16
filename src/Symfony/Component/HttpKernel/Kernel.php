@@ -397,10 +397,20 @@ abstract class Kernel implements KernelInterface
 
     }
 
+    /**
+     * Gets the container class.
+     *
+     * @return string The container class
+     */
+    protected function getContainerClass()
+    {
+        return $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
+    }
+
     protected function initializeContainer()
     {
-        $class = $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
-        $cache = new ConfigCache($this->getCacheDir(), $class, $this->debug);
+        $class = $this->getContainerClass();
+        $cache = new ConfigCache($this->getCacheDir().'/'.$class.'.php', $this->debug);
         $fresh = false;
         if (!$cache->isFresh()) {
             $container = $this->buildContainer();
@@ -428,14 +438,15 @@ abstract class Kernel implements KernelInterface
 
         return array_merge(
             array(
-                'kernel.root_dir'    => $this->rootDir,
-                'kernel.environment' => $this->environment,
-                'kernel.debug'       => $this->debug,
-                'kernel.name'        => $this->name,
-                'kernel.cache_dir'   => $this->getCacheDir(),
-                'kernel.logs_dir'    => $this->getLogDir(),
-                'kernel.bundles'     => $bundles,
-                'kernel.charset'     => 'UTF-8',
+                'kernel.root_dir'        => $this->rootDir,
+                'kernel.environment'     => $this->environment,
+                'kernel.debug'           => $this->debug,
+                'kernel.name'            => $this->name,
+                'kernel.cache_dir'       => $this->getCacheDir(),
+                'kernel.logs_dir'        => $this->getLogDir(),
+                'kernel.bundles'         => $bundles,
+                'kernel.charset'         => 'UTF-8',
+                'kernel.container_class' => $this->getContainerClass(),
             ),
             $this->getEnvParameters()
         );
@@ -471,13 +482,7 @@ abstract class Kernel implements KernelInterface
         if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
             $container->merge($cont);
         }
-        $container->compile();
 
-        return $container;
-    }
-
-    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class)
-    {
         foreach (array('cache', 'logs') as $name) {
             $dir = $container->getParameter(sprintf('kernel.%s_dir', $name));
             if (!is_dir($dir)) {
@@ -489,6 +494,13 @@ abstract class Kernel implements KernelInterface
             }
         }
 
+        $container->compile();
+
+        return $container;
+    }
+
+    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class)
+    {
         // cache the container
         $dumper = new PhpDumper($container);
         $content = $dumper->dump(array('class' => $class));
@@ -501,12 +513,13 @@ abstract class Kernel implements KernelInterface
 
     protected function getContainerLoader(ContainerInterface $container)
     {
+        $locator = new FileLocator($this);
         $resolver = new LoaderResolver(array(
-            new XmlFileLoader($container, new FileLocator($this)),
-            new YamlFileLoader($container, new FileLocator($this)),
-            new IniFileLoader($container, new FileLocator($this)),
-            new PhpFileLoader($container, new FileLocator($this)),
-            new ClosureLoader($container, new FileLocator($this)),
+            new XmlFileLoader($container, $locator),
+            new YamlFileLoader($container, $locator),
+            new IniFileLoader($container, $locator),
+            new PhpFileLoader($container, $locator),
+            new ClosureLoader($container, $locator),
         ));
 
         return new DelegatingLoader($resolver);

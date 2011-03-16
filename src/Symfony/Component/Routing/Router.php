@@ -68,12 +68,21 @@ class Router implements RouterInterface
             'resource_type'          => null,
         );
 
-        // check option names
-        if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
-            throw new \InvalidArgumentException(sprintf('The Router does not support the following options: \'%s\'.', implode('\', \'', $diff)));
+        // check option names and live merge, if errors are encountered Exception will be thrown
+        $invalid = array();
+        $isInvalid = false;
+        foreach ($options as $key => $value) {
+            if (array_key_exists($key, $this->options)) {
+                $this->options[$key] = $value;
+            } else {
+                $isInvalid = true;
+                $invalid[] = $key;
+            }
         }
 
-        $this->options = array_merge($this->options, $options);
+        if ($isInvalid) {
+            throw new \InvalidArgumentException(sprintf('The Router does not support the following options: \'%s\'.', implode('\', \'', $invalid)));
+        }
     }
 
     /**
@@ -145,7 +154,7 @@ class Router implements RouterInterface
         }
 
         $class = $this->options['matcher_cache_class'];
-        $cache = new ConfigCache($this->options['cache_dir'], $class, $this->options['debug']);
+        $cache = new ConfigCache($this->options['cache_dir'].'/'.$class.'.php', $this->options['debug']);
         if (!$cache->isFresh($class)) {
             $dumper = new $this->options['matcher_dumper_class']($this->getRouteCollection());
 
@@ -178,7 +187,7 @@ class Router implements RouterInterface
         }
 
         $class = $this->options['generator_cache_class'];
-        $cache = new ConfigCache($this->options['cache_dir'], $class, $this->options['debug']);
+        $cache = new ConfigCache($this->options['cache_dir'].'/'.$class.'.php', $this->options['debug']);
         if (!$cache->isFresh($class)) {
             $dumper = new $this->options['generator_dumper_class']($this->getRouteCollection());
 

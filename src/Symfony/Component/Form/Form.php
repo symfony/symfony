@@ -372,23 +372,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
         }
     }
 
-    /**
-     * Processes the submitted data before it is passed to the individual fields
-     *
-     * The data is in the user format.
-     *
-     * @param  array $data
-     * @return array
-     */
-    protected function preprocessData($data)
-    {
-        if ($this->dataPreprocessor) {
-            return $this->dataPreprocessor->processData($data);
-        }
-
-        return $data;
-    }
-
     public function setVirtual($virtual)
     {
         $this->virtual = $virtual;

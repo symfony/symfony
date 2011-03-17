@@ -56,6 +56,6 @@ class MessageDataCollector extends DataCollector
      */
     public function getName()
     {
-        return 'message';
+        return 'swiftmailer';
     }
 }

@@ -102,7 +102,6 @@ class SwiftmailerExtension extends Extension
             $container->setParameter('swiftmailer.single_address', null);
         }
 
-
         if (isset($config['disable_delivery']) && $config['disable_delivery']) {
             $container->findDefinition('swiftmailer.transport')->addMethodCall('registerPlugin', array(new Reference('swiftmailer.plugin.blackhole')));
         }

@@ -69,7 +69,7 @@
     <service id="swiftmailer.plugin.messagelogger" class="%swiftmailer.plugin.messagelogger.class%" public="false" />
 
     <service id="swiftmailer.data_collector" class="%swiftmailer.data_collector.class%" public="false">
-        <tag name="data_collector" template="SwiftmailerBundle:Collector:message" id="message" />
+        <tag name="data_collector" template="SwiftmailerBundle:Collector:message" id="swiftmailer" />
         <argument type="service" id="swiftmailer.plugin.messagelogger" />
         <argument type="service" id="swiftmailer.mailer" />
     </service>

@@ -1,0 +1,95 @@
+{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+        <img style="margin: 0 5px 0 10px; vertical-align: middle; height: 24px" width="24" height="24" alt="Swiftmailer" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAADNElEQVRIidWVzW4cRRDHf9092zvj3c14vR/MSpgTByR84IAckQfgYr8CDxDEExCJF4A8DQfulh/BjkWkROZgs4ode8N+2DszXcVhdhcbIdtSCBJ/qdU9PV1VXf/6aKOqfEjYD6r9vzBgtra2vnz69Nvv8iJH/85X9WUeqqxe9+bVq9e/PX/+0w+rzZ2d3W+KotR/C3t7e8eqynJEQJHnOcfHp7RaLVqtFiLycAqMQVW5vLwkjmNUmdz8b1WFJEnIsozZbMZwOCSEQBCp5juGiHJ1dcXp6Snee3q9LtbaWzRHqhBCAAwvX/66EnTu/virKiKCcw5rq/O1mq9n2eAza00+Ho8vIgARIS9yRIQnXz0BYxARjLk7viKCtXZF0wKfHh0dHdTrnu+fPfsxUtXq1iEAMHr3jmazuYrFSvAfjC13lmeMMVhrzXg8diEEfK0WrTwIIWCModfrMRwOmUwmdDqdWwrugjEGUeXi7Vucc3S7Hax1GikVjyKCAtZasizj4uKCk5MTNjY28N7fmVnWWq7nc0aXl6RpSpqmq4tFqFYZIwKqlGVARFhfbxPHMWdnZyRJQrPZWnhy0xuDMYbRaESe5/R6Pbz3FEUBJIBil1lU5MUicAGRQFkWeO8ZDAaUZcn5+TlFkRNEKMsqjYui4Pz8DFElyzKcc5RluWBEEVGsMcbG9TqDQYYxZpGmFWVlWaIK7XabEEqGwyFXsxkigdlsxunvJwBstNurOC5lRQRRIZpOJ6MXLw6P37w568RxPQGiim8DBq5nU4KU9Pt9Qgj8MR4zn89xzrH58Saqymg0oh7HeO8XDFa0qyh2f3//l+3t7c93d3c+Ojg4/DmOE0SUoiyYTqZEkeNR6xHWOWre0+126ff7dLpdoloN7z1pmiIhMJ1MVoW69MYuetRMVa+MMUWQwDyfE8pAmj5irdHAWkvkHJFzOGtxizlyrlo7R5qmNJtNrufX5HmOyF/NboUgYoqioLG2RpIkVdaognP31oGqsraQG48n5PM5IuG2gWajkWy01+9Vdh8ajTUAfL0em5tVuv348defbG5+UZTlez/Uvlbj4PBw3zykDbwP/v+P/p/fhU37KZPH8QAAAABJRU5ErkJggg==" />
+    {% endset %}
+    {% set text %}
+        <span title="{{ collector.messagecount }} messages">{{ collector.messagecount }}</span>
+    {% endset %}
+    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
+{% endblock %}
+
+{% block menu %}
+<span class="label">
+    <span class="icon"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAADNElEQVRIidWVzW4cRRDHf9092zvj3c14vR/MSpgTByR84IAckQfgYr8CDxDEExCJF4A8DQfulh/BjkWkROZgs4ode8N+2DszXcVhdhcbIdtSCBJ/qdU9PV1VXf/6aKOqfEjYD6r9vzBgtra2vnz69Nvv8iJH/85X9WUeqqxe9+bVq9e/PX/+0w+rzZ2d3W+KotR/C3t7e8eqynJEQJHnOcfHp7RaLVqtFiLycAqMQVW5vLwkjmNUmdz8b1WFJEnIsozZbMZwOCSEQBCp5juGiHJ1dcXp6Snee3q9LtbaWzRHqhBCAAwvX/66EnTu/virKiKCcw5rq/O1mq9n2eAza00+Ho8vIgARIS9yRIQnXz0BYxARjLk7viKCtXZF0wKfHh0dHdTrnu+fPfsxUtXq1iEAMHr3jmazuYrFSvAfjC13lmeMMVhrzXg8diEEfK0WrTwIIWCModfrMRwOmUwmdDqdWwrugjEGUeXi7Vucc3S7Hax1GikVjyKCAtZasizj4uKCk5MTNjY28N7fmVnWWq7nc0aXl6RpSpqmq4tFqFYZIwKqlGVARFhfbxPHMWdnZyRJQrPZWnhy0xuDMYbRaESe5/R6Pbz3FEUBJIBil1lU5MUicAGRQFkWeO8ZDAaUZcn5+TlFkRNEKMsqjYui4Pz8DFElyzKcc5RluWBEEVGsMcbG9TqDQYYxZpGmFWVlWaIK7XabEEqGwyFXsxkigdlsxunvJwBstNurOC5lRQRRIZpOJ6MXLw6P37w568RxPQGiim8DBq5nU4KU9Pt9Qgj8MR4zn89xzrH58Saqymg0oh7HeO8XDFa0qyh2f3//l+3t7c93d3c+Ojg4/DmOE0SUoiyYTqZEkeNR6xHWOWre0+126ff7dLpdoloN7z1pmiIhMJ1MVoW69MYuetRMVa+MMUWQwDyfE8pAmj5irdHAWkvkHJFzOGtxizlyrlo7R5qmNJtNrufX5HmOyF/NboUgYoqioLG2RpIkVdaognP31oGqsraQG48n5PM5IuG2gWajkWy01+9Vdh8ajTUAfL0em5tVuv348defbG5+UZTlez/Uvlbj4PBw3zykDbwP/v+P/p/fhU37KZPH8QAAAABJRU5ErkJggg==" alt="" /></span>
+    <strong>Mails</strong>
+    <span class="count">
+        <span>{{ collector.messagecount }}</span>
+    </span>
+</span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Messages sent</h2>
+    
+    {% if not collector.messages %}
+        <p>
+            <em>No message sent.</em>
+        </p>
+    {% else %}
+        <ul class="alt">
+            {% for i, message in collector.messages %}
+                <li class="{{ cycle(['odd', 'even'], i) }}" style="border:1px solid #ccc;margin-bottom:5px;">
+                    <div>
+                        <h3>{{ message.subject }} ({{ message.date |date() }})</h3>
+                        <span>Priority: {{ message.priority }} | </span>
+                        <span>Charset: {{ message.charset }} </span>
+                        <p>
+                            From: <br />
+                            {% for email, name in message.from %}
+                                {{ name }} < {{ email }} ><br />
+                            {% endfor %}
+                        </p>
+                        <p>
+                            To: <br />
+                            {% for email, name in message.to %}
+                                {{ name }} < {{ email }} ><br />
+                            {% endfor %}
+                        </p>
+                        <p>
+                            Body: <br />
+                            {{ message.body }}
+                        </p>
+                        <p>
+                            Headers: <br />
+                            <code>{{ message.headers }}</code>
+                        </p>
+                        {% if message.replyto %}
+                        <p>
+                            ReplyTo: <br />
+                                {% for email, name in message.replyto %}
+                                    {{ name }} < {{ email }} ><br />
+                                {% endfor %}
+                        </p>
+                        {% endif %}
+                        {% if message.cc %}
+                        <p>
+                            CC: <br />
+                            {% for email, name in message.cc %}
+                                {{ name }} < {{ email }} ><br />
+                            {% endfor %}
+                        </p>
+                        {% endif %}
+                        {% if message.bcc %}
+                        <p>
+                            BCC: <br />
+                            {% for email, name in message.bcc %}
+                                {{ name }} < {{ email }} ><br />
+                            {% endfor %}
+                        </p>
+                        {% endif %}
+                        {% if message.readReceiptTo %}
+                        <p>
+                            ReadReceiptTo: <br />
+                            {% for email, name in message.readReceiptTo %}
+                                {{ name }} < {{ email }} ><br />
+                            {% endfor %}
+                        </p>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

@@ -135,7 +135,6 @@ class Configuration
                 ->fixXmlConfig('mapping')
                 ->arrayNode('mappings')
                     ->isRequired()
-                    ->requiresAtLeastOneElement()
                     ->useAttributeAsKey('name')
                     ->prototype('array')
                         ->beforeNormalization()

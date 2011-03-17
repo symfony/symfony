@@ -409,7 +409,7 @@ EOF;
         }
 
         if (!$this->container->isFrozen() && count($this->container->getInterfaceInjectors()) > 0) {
-            $calls = sprintf("\n        \$this->applyInterfaceInjectors(\$%s);\n", $variableName);
+            $calls .= sprintf("\n        \$this->applyInterfaceInjectors(\$%s);\n", $variableName);
         }
 
         return $calls;

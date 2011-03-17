@@ -64,7 +64,7 @@ class Configuration
                 ->scalarNode('type')->defaultValue('file')->end()
                 ->scalarNode('path')->defaultValue('%kernel.cache_dir%/swiftmailer/spool')->end()
             ->end()
-            ->scalarNode('delivery_adress')->end()
+            ->scalarNode('delivery_address')->end()
             ->booleanNode('disable_delivery')->end();
 
         return $treeBuilder->buildTree();

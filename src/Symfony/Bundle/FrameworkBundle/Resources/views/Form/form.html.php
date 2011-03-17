@@ -1,9 +1,6 @@
-<?php echo $view['form']->errors($field) ?>
-
 <div>
-    <?php foreach ($field->getVisibleFields() as $child): ?>
-        <?php echo $view['form']->row($child) ?>
-    <?php endforeach; ?>
+    <?php echo $field->getErrors() ?>
+    <?php echo $field->getRows() ?>
+    <?php echo $field->getRest() ?>
 </div>
 
-<?php echo $view['form']->hidden($field) ?>

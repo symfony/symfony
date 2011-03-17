@@ -1,47 +1,39 @@
-<?php if ($field->isExpanded()): ?>
-    <?php foreach ($field as $choice => $child): ?>
-        <?php echo $view['form']->render($child) ?>
-        <label for="<?php echo $child->getId() ?>"><?php echo $field->getLabel($choice) ?></label>
+<?php if ($expanded): ?>
+    <?php foreach ($fields as $choice => $child): ?>
+        <?php echo $child->getWidget() ?>
+        <label for="<?php echo $child->getVar('id') ?>"><?php echo $child->getLabel($choice) ?></label>
     <?php endforeach ?>
 <?php else: ?>
     <select
-        id="<?php echo $field->getId() ?>"
-        name="<?php echo $field->getName() ?>"
-        <?php if ($field->isDisabled()): ?> disabled="disabled"<?php endif ?>
-        <?php if ($field->isMultipleChoice()): ?> multiple="multiple"<?php endif ?>
-        <?php echo $view['form']->attributes($attr) ?>
+        id="<?php echo $id ?>"
+        name="<?php echo $name ?>"
+        <?php if ($disabled): ?> disabled="disabled"<?php endif ?>
+        <?php if ($multiple): ?> multiple="multiple"<?php endif ?>
+        <?php if ($class): ?> class="<?php echo $class ?>"<?php endif ?>
     >
-        <?php if (count($field->getPreferredChoices()) > 0): ?>
-            <?php foreach ($field->getPreferredChoices() as $choice => $label): ?>
-                <?php if ($field->isChoiceGroup($label)): ?>
+        <?php if (count($preferred_choices) > 0): ?>
+            <?php foreach ($preferred_choices as $choice => $label): ?>
+                <?php if ($choice_list->isChoiceGroup($label)): ?>
                     <optgroup label="<?php echo $choice ?>">
                         <?php foreach ($label as $nestedChoice => $nestedLabel): ?>
-                            <option value="<?php echo $nestedChoice ?>"<?php if ($field->isChoiceSelected($nestedChoice)): ?> selected="selected"<?php endif?>>
-                                <?php echo $nestedLabel ?>
-                            </option>
+                            <option value="<?php echo $nestedChoice ?>"<?php if ($choice_list->isChoiceSelected($nestedChoice, $value)): ?> selected="selected"<?php endif?>><?php echo $nestedLabel ?></option>
                         <?php endforeach ?>
                     </optgroup>
                 <?php else: ?>
-                    <option value="<?php echo $choice ?>"<?php if ($field->isChoiceSelected($choice)): ?> selected="selected"<?php endif?>>
-                        <?php echo $label ?>
-                    </option>
+                    <option value="<?php echo $choice ?>"<?php if ($choice_list->isChoiceSelected($choice, $value)): ?> selected="selected"<?php endif?>><?php echo $label ?></option>
                 <?php endif ?>
             <?php endforeach ?>
-            <option disabled="disabled"><?php echo isset($separator) ? $separator : '-----------------' ?></option>
+            <option disabled="disabled"><?php echo $separator ?></option>
         <?php endif ?>
-        <?php foreach ($field->getOtherChoices() as $choice => $label): ?>
-            <?php if ($field->isChoiceGroup($label)): ?>
+        <?php foreach ($choices as $choice => $label): ?>
+            <?php if ($choice_list->isChoiceGroup($label)): ?>
                 <optgroup label="<?php echo $choice ?>">
                     <?php foreach ($label as $nestedChoice => $nestedLabel): ?>
-                        <option value="<?php echo $nestedChoice ?>"<?php if ($field->isChoiceSelected($nestedChoice)): ?> selected="selected"<?php endif?>>
-                            <?php echo $nestedLabel ?>
-                        </option>
+                        <option value="<?php echo $nestedChoice ?>"<?php if ($choice_list->isChoiceSelected($nestedChoice, $value)): ?> selected="selected"<?php endif?>><?php echo $nestedLabel ?></option>
                     <?php endforeach ?>
                 </optgroup>
             <?php else: ?>
-                <option value="<?php echo $choice ?>"<?php if ($field->isChoiceSelected($choice)): ?> selected="selected"<?php endif?>>
-                    <?php echo $label ?>
-                </option>
+                <option value="<?php echo $choice ?>"<?php if ($choice_list->isChoiceSelected($choice, $value)): ?> selected="selected"<?php endif?>><?php echo $label ?></option>
             <?php endif ?>
         <?php endforeach ?>
     </select>

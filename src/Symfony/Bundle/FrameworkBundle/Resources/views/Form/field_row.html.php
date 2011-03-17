@@ -1,5 +1,5 @@
 <div>
-    <?php echo $view['form']->label($field) ?>
-    <?php echo $view['form']->errors($field) ?>
-    <?php echo $view['form']->render($field) ?>
+    <?php echo $field->getLabel() ?>
+    <?php echo $field->getErrors() ?>
+    <?php echo $field->getWidget() ?>
 </div>

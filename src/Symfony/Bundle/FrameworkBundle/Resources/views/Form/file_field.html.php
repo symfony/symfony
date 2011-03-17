@@ -1,10 +1,10 @@
 <input type="file"
-    id="<?php echo $field['file']->getId() ?>"
-    name="<?php echo $field['file']->getName() ?>"
-    <?php if ($field['file']->isDisabled()): ?>disabled="disabled"<?php endif ?>
-    <?php if ($field['file']->isRequired()): ?>required="required"<?php endif ?>
-    <?php echo $view['form']->attributes($attr) ?>
+    id="<?php echo $field['file']->getVar('id') ?>"
+    name="<?php echo $field['file']->getVar('name') ?>"
+    <?php if ($field['file']->getVar('disabled')): ?>disabled="disabled"<?php endif ?>
+    <?php if ($field['file']->getVar('required')): ?>required="required"<?php endif ?>
+    <?php if ($field['file']->getVar('class')): ?>class="<?php echo $field['file']->getVar('class') ?>"<?php endif ?>
 />
 
-<?php echo $view['form']->render($field['token']) ?>
-<?php echo $view['form']->render($field['original_name']) ?>
+<?php echo $fields['token']->getWidget() ?>
+<?php echo $fields['original_name']->getWidget() ?>

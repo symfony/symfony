@@ -75,43 +75,4 @@ class PhpTheme implements ThemeInterface
 
         return $template;
     }
-
-    /**
-     * Convert an array of HTML attributes into its string representation.
-     * 
-     * @param  array $attributes
-     * @return string
-     */
-    private function attributes($attributes)
-    {
-        if ($attributes instanceof \Traversable) {
-            $attributes = iterator_to_array($attributes);
-        }
-
-        return implode('', array_map(array($this, 'attributesCallback'), array_keys($attributes), array_values($attributes)));
-    }
-
-    private function attribute($name, $value)
-    {
-        return sprintf('%s="%s"', $name, true === $value ? $name : $value);
-    }
-
-    /**
-     * Prepares an attribute key and value for HTML representation.
-     *
-     * It removes empty attributes, except for the value one.
-     *
-     * @param  string $name   The attribute name
-     * @param  string $value  The attribute value
-     *
-     * @return string The HTML representation of the HTML key attribute pair.
-     */
-    private function attributesCallback($name, $value)
-    {
-        if (false === $value || null === $value || ('' === $value && 'value' != $name)) {
-            return '';
-        }
-
-        return ' '.$this->attribute($name, $value);
-    }
 }

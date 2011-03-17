@@ -1,16 +1,16 @@
-<?php if ($field->isField()): ?>
+<?php if ($widget == 'text'): ?>
     <input type="text"
-        id="<?php echo $field->getId() ?>"
-        name="<?php echo $field->getName() ?>"
-        value="<?php echo $field->getDisplayedData() ?>"
-        <?php if ($field->isDisabled()): ?>disabled="disabled"<?php endif ?>
-        <?php if ($field->isRequired()): ?>required="required"<?php endif ?>
-        <?php echo $view['form']->attributes($attr) ?>
+        id="<?php echo $id ?>"
+        name="<?php echo $name ?>"
+        value="<?php echo $value ?>"
+        <?php if ($disabled): ?>disabled="disabled"<?php endif ?>
+        <?php if ($required): ?>required="required"<?php endif ?>
+        <?php if ($class): ?>class="<?php echo $class ?>"<?php endif ?>
     />
 <?php else: ?>
     <?php echo str_replace(array('{{ year }}', '{{ month }}', '{{ day }}'), array(
-        $view['form']->render($field['year']),
-        $view['form']->render($field['month']),
-        $view['form']->render($field['day']),
-    ), $field->getPattern()) ?>
+        $fields['year']->getWidget(),
+        $fields['month']->getWidget(),
+        $fields['day']->getWidget(),
+    ), $pattern) ?>
 <?php endif ?>

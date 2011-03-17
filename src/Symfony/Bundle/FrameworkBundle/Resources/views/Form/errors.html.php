@@ -1,6 +1,6 @@
-<?php if ($field->hasErrors()): ?>
+<?php if ($errors): ?>
     <ul>
-        <?php foreach ($field->getErrors() as $error): ?>
+        <?php foreach ($errors as $error): ?>
             <li><?php echo $view['translator']->trans(
                 $error->getMessageTemplate(),
                 $error->getMessageParameters(),

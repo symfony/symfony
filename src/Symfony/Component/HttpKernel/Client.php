@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Test\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\BrowserKit\Client as BaseClient;
 use Symfony\Component\BrowserKit\Request as DomRequest;
@@ -95,7 +96,11 @@ EOF;
      */
     protected function filterRequest(DomRequest $request)
     {
-        return Request::create($request->getUri(), $request->getMethod(), $request->getParameters(), $request->getCookies(), $request->getFiles(), $request->getServer(), $request->getContent());
+        $httpRequest = Request::create($request->getUri(), $request->getMethod(), $request->getParameters(), $request->getCookies(), $request->getFiles(), $request->getServer(), $request->getContent());
+
+        $httpRequest->files->replace($this->filterFiles($httpRequest->files->all()));
+
+        return $httpRequest;
     }
 
     /**
@@ -108,5 +113,23 @@ EOF;
     protected function filterResponse($response)
     {
         return new DomResponse($response->getContent(), $response->getStatusCode(), $response->headers->all());
+    }
+
+    /**
+     * Filters files and replaces them with uploaded file classes compatible with functional tests.
+     *
+     * @param array $files An array of files
+     *
+     * @return array The filtered array
+     */
+    protected function filterFiles(array $files)
+    {
+        $filtered = array();
+
+        foreach ($files as $key => $value) {
+            $filtered[$key] = $value ? (is_array($value) ? $this->filterFiles($value) : UploadedFile::wrap($value)) : $value;
+        }
+
+        return $filtered;
     }
 }

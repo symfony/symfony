@@ -56,20 +56,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
      */
     private $extraFields = array();
 
-    /**
-     * Stores the class that the data of this form must be instances of
-     * @var string
-     */
-    private $dataClass;
-
-    /**
-     * Stores the constructor closure for creating new domain object instances
-     * @var \Closure
-     */
-    private $dataConstructor;
-
-    private $modifyByReference = true;
-
     private $factory;
 
     private $validator;
@@ -152,6 +138,8 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
 
                 $field = $this->factory->getInstance($identifier, $name, $options);
             } else {
+                throw new \Exception('Currently not supported');
+
                 $class = $this->getDataClass();
 
                 if (!$class) {
@@ -178,7 +166,8 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
         // if the property "data" is NULL, getTransformedData() returns an empty
         // string
         if (!empty($data)) {
-            $field->readProperty($data);
+            // TODO fix or remove add()
+            // $field->readProperty($data);
         }
 
         return $this;
@@ -232,45 +221,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
         return $this->fields;
     }
 
-    public function postSetData(DataEvent $event)
-    {
-        // get transformed data and pass its values to child fields
-        $data = $this->getTransformedData();
-
-        if (!empty($data) && !is_array($data) && !is_object($data)) {
-            throw new \InvalidArgumentException(sprintf('Expected argument of type object or array, %s given', gettype($data)));
-        }
-
-        if (!empty($data)) {
-            if ($this->dataClass && !$data instanceof $this->dataClass) {
-                throw new FormException(sprintf('Form data should be instance of %s', $this->dataClass));
-            }
-
-            $this->readObject($data);
-        }
-    }
-
-    public function filterSetData(FilterDataEvent $event)
-    {
-        if (null === $this->getValueTransformer() && null === $this->getNormalizationTransformer()) {
-            $data = $event->getData();
-
-            // Empty values must be converted to objects or arrays so that
-            // they can be read by PropertyPath in the child fields
-            if (empty($data)) {
-                if ($this->dataConstructor) {
-                    $constructor = $this->dataConstructor;
-                    $event->setData($constructor());
-                } else if ($this->dataClass) {
-                    $class = $this->dataClass;
-                    $event->setData(new $class());
-                } else {
-                    $event->setData(array());
-                }
-            }
-        }
-    }
-
     public function filterBoundDataFromClient(FilterDataEvent $event)
     {
         $data = $event->getData();
@@ -291,19 +241,13 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
             }
         }
 
-        $data = $this->getTransformedData();
-
-        $this->writeObject($data);
-
         $event->setData($data);
     }
 
     public static function getSubscribedEvents()
     {
         return array(
-            Events::postSetData,
             Events::preBind,
-            Events::filterSetData,
             Events::filterBoundDataFromClient,
         );
     }
@@ -316,45 +260,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
             if (!$this->has($name)) {
                 $this->extraFields[] = $name;
             }
-        }
-    }
-
-    /**
-     * Updates the child fields from the properties of the given data
-     *
-     * This method calls readProperty() on all child fields that have a
-     * property path set. If a child field has no property path set but
-     * implements FormInterface, writeProperty() is called on its
-     * children instead.
-     *
-     * @param array|object $objectOrArray
-     */
-    protected function readObject(&$objectOrArray)
-    {
-        $iterator = new RecursiveFieldIterator($this);
-        $iterator = new \RecursiveIteratorIterator($iterator);
-
-        foreach ($iterator as $field) {
-            $field->readProperty($objectOrArray);
-        }
-    }
-
-    /**
-     * Updates all properties of the given data from the child fields
-     *
-     * This method calls writeProperty() on all child fields that have a property
-     * path set. If a child field has no property path set but implements
-     * FormInterface, writeProperty() is called on its children instead.
-     *
-     * @param array|object $objectOrArray
-     */
-    protected function writeObject(&$objectOrArray)
-    {
-        $iterator = new RecursiveFieldIterator($this);
-        $iterator = new \RecursiveIteratorIterator($iterator);
-
-        foreach ($iterator as $field) {
-            $field->writeProperty($objectOrArray);
         }
     }
 
@@ -716,40 +621,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
     }
 
     /**
-     * Sets the class that object bound to this form must be instances of
-     *
-     * @param string  A fully qualified class name
-     */
-    public function setDataClass($class)
-    {
-        $this->dataClass = $class;
-
-        return $this;
-    }
-
-    /**
-     * Returns the class that object must have that are bound to this form
-     *
-     * @return string  A fully qualified class name
-     */
-    public function getDataClass()
-    {
-        return $this->dataClass;
-    }
-
-    public function setDataConstructor($dataConstructor)
-    {
-        $this->dataConstructor = $dataConstructor;
-
-        return $this;
-    }
-
-    public function getDataConstructor()
-    {
-        return $this->dataConstructor;
-    }
-
-    /**
      * Validates the data of this form
      *
      * This method is called automatically during the validation process.
@@ -787,27 +658,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
     /**
      * {@inheritDoc}
      */
-    public function writeProperty(&$objectOrArray)
-    {
-        $isReference = false;
-
-        // If the data is identical to the value in $objectOrArray, we are
-        // dealing with a reference
-        if ($this->getPropertyPath() !== null) {
-            $isReference = $this->getData() === $this->getPropertyPath()->getValue($objectOrArray);
-        }
-
-        // Don't write into $objectOrArray if $objectOrArray is an object,
-        // $isReference is true (see above) and the option "by_reference" is
-        // true as well
-        if (!is_object($objectOrArray) || !$isReference || !$this->modifyByReference) {
-            parent::writeProperty($objectOrArray);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function isEmpty()
     {
         foreach ($this->fields as $field) {
@@ -817,17 +667,5 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
         }
 
         return true;
-    }
-
-    public function setModifyByReference($modifyByReference)
-    {
-        $this->modifyByReference = $modifyByReference;
-
-        return $this;
-    }
-
-    public function isModifiedByReference()
-    {
-        return $this->modifyByReference;
     }
 }

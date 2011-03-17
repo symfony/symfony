@@ -151,9 +151,9 @@ class FormTest extends TestCase
 
         $provider = $this->createMockCsrfProvider();
         $provider->expects($this->once())
-                ->method('generateCsrfToken')
-                ->with($this->equalTo('Symfony\Component\Form\Form'))
-                ->will($this->returnValue('ABCDEF'));
+        ->method('generateCsrfToken')
+        ->with($this->equalTo('Symfony\Component\Form\Form'))
+        ->will($this->returnValue('ABCDEF'));
 
         $form = $this->factory->getInstance('form', 'author', array(
             'csrf_provider' => $provider,
@@ -182,9 +182,9 @@ class FormTest extends TestCase
 
         $provider = $this->createMockCsrfProvider();
         $provider->expects($this->once())
-                ->method('isCsrfTokenValid')
-                ->with($this->equalTo('Symfony\Component\Form\Form'), $this->equalTo('ABCDEF'))
-                ->will($this->returnValue(true));
+        ->method('isCsrfTokenValid')
+        ->with($this->equalTo('Symfony\Component\Form\Form'), $this->equalTo('ABCDEF'))
+        ->will($this->returnValue(true));
 
         $form = $this->factory->getInstance('form', 'author', array(
             'csrf_provider' => $provider,
@@ -204,9 +204,9 @@ class FormTest extends TestCase
 
         $provider = $this->createMockCsrfProvider();
         $provider->expects($this->once())
-                ->method('isCsrfTokenValid')
-                ->with($this->equalTo('Symfony\Component\Form\Form'), $this->equalTo('ABCDEF'))
-                ->will($this->returnValue(false));
+        ->method('isCsrfTokenValid')
+        ->with($this->equalTo('Symfony\Component\Form\Form'), $this->equalTo('ABCDEF'))
+        ->will($this->returnValue(false));
 
         $form = $this->factory->getInstance('form', 'author', array(
             'csrf_provider' => $provider,
@@ -281,8 +281,8 @@ class FormTest extends TestCase
         $form->add($this->factory->getInstance('field', 'firstName'));
 
         $this->validator->expects($this->once())
-            ->method('validate')
-            ->with($this->equalTo($form));
+        ->method('validate')
+        ->with($this->equalTo($form));
 
         // concrete request is irrelevant
         $form->bindRequest($this->createPostRequest());
@@ -297,8 +297,8 @@ class FormTest extends TestCase
 
         // only the form is validated
         $this->validator->expects($this->once())
-            ->method('validate')
-            ->with($this->equalTo($form));
+        ->method('validate')
+        ->with($this->equalTo($form));
 
         // concrete request is irrelevant
         // data is an array
@@ -311,7 +311,7 @@ class FormTest extends TestCase
             'author' => array(
                 'name' => 'Bernhard',
                 'image' => array('filename' => 'foobar.png'),
-            ),
+        ),
         );
         $files = array(
             'author' => array(
@@ -320,7 +320,7 @@ class FormTest extends TestCase
                 'size' => array('image' => array('file' => 123)),
                 'tmp_name' => array('image' => array('file' => 'abcdef.png')),
                 'type' => array('image' => array('file' => 'image/png')),
-            ),
+        ),
         );
 
         $form = $this->factory->getInstance('form', 'author', array('validator' => $this->validator));
@@ -337,36 +337,6 @@ class FormTest extends TestCase
         $this->assertEquals('Bernhard', $form['name']->getData());
         $this->assertEquals('foobar.png', $form['image']['filename']->getData());
         $this->assertEquals($file, $form['image']['file']->getData());
-    }
-
-    public function testReadPropertyIsIgnoredIfPropertyPathIsNull()
-    {
-        $author = new Author();
-        $author->child = new Author();
-        $standaloneChild = new Author();
-
-        $form = $this->factory->getInstance('form', 'child');
-        $form->setData($standaloneChild);
-        $form->setPropertyPath(null);
-        $form->readProperty($author);
-
-        // should not be $author->child!!
-        $this->assertSame($standaloneChild, $form->getData());
-    }
-
-    public function testWritePropertyIsIgnoredIfPropertyPathIsNull()
-    {
-        $author = new Author();
-        $author->child = $child = new Author();
-        $standaloneChild = new Author();
-
-        $form = $this->factory->getInstance('form', 'child');
-        $form->setData($standaloneChild);
-        $form->setPropertyPath(null);
-        $form->writeProperty($author);
-
-        // $author->child was not modified
-        $this->assertSame($child, $author->child);
     }
 
     public function testSupportsArrayAccess()
@@ -478,8 +448,8 @@ class FormTest extends TestCase
     {
         $field = $this->createMockField('firstName');
         $field->expects($this->once())
-                    ->method('bind')
-                    ->with($this->equalTo(null));
+        ->method('bind')
+        ->with($this->equalTo(null));
 
         $form = $this->factory->getInstance('form', 'author', array('validator' => $this->validator));
         $form->add($field);
@@ -493,8 +463,8 @@ class FormTest extends TestCase
 
         $field = $this->createMockField('firstName');
         $field->expects($this->once())
-                    ->method('addError')
-                    ->with($this->equalTo($error));
+        ->method('addError')
+        ->with($this->equalTo($error));
 
         $form = $this->factory->getInstance('form', 'author');
         $form->add($field);
@@ -510,8 +480,8 @@ class FormTest extends TestCase
 
         $field = $this->createMockField('firstName');
         $field->expects($this->once())
-                    ->method('addError')
-                    ->with($this->equalTo($error));
+        ->method('addError')
+        ->with($this->equalTo($error));
 
         $form = $this->factory->getInstance('form', 'author');
         $innerGroup = $this->factory->getInstance('form', 'names');
@@ -527,7 +497,7 @@ class FormTest extends TestCase
     {
         $field = $this->createMockField('foo');
         $field->expects($this->never())
-                    ->method('addError');
+        ->method('addError');
 
         $form = $this->factory->getInstance('form', 'author');
         $form->add($field);
@@ -543,10 +513,10 @@ class FormTest extends TestCase
     {
         $field = $this->createMockField('firstName');
         $field->expects($this->any())
-                    ->method('isHidden')
-                    ->will($this->returnValue(true));
+        ->method('isHidden')
+        ->will($this->returnValue(true));
         $field->expects($this->never())
-                    ->method('addError');
+        ->method('addError');
 
         $form = $this->factory->getInstance('form', 'author');
         $form->add($field);
@@ -568,11 +538,11 @@ class FormTest extends TestCase
 
         $field = $this->createMockField('firstName');
         $field->expects($this->any())
-                    ->method('getPropertyPath')
-                    ->will($this->returnValue(new PropertyPath('firstName')));
+        ->method('getPropertyPath')
+        ->will($this->returnValue(new PropertyPath('firstName')));
         $field->expects($this->once())
-                    ->method('addError')
-                    ->with($this->equalTo($error), $this->equalTo($expectedPathIterator));
+        ->method('addError')
+        ->with($this->equalTo($error), $this->equalTo($expectedPathIterator));
 
         $form = $this->factory->getInstance('form', 'author');
         $form->add($field);
@@ -586,10 +556,10 @@ class FormTest extends TestCase
     {
         $field = $this->createMockField('foo');
         $field->expects($this->any())
-                    ->method('getPropertyPath')
-                    ->will($this->returnValue(new PropertyPath('foo')));
+        ->method('getPropertyPath')
+        ->will($this->returnValue(new PropertyPath('foo')));
         $field->expects($this->never())
-                    ->method('addError');
+        ->method('addError');
 
         $form = $this->factory->getInstance('form', 'author');
         $form->add($field);
@@ -603,13 +573,13 @@ class FormTest extends TestCase
     {
         $field = $this->createMockField('firstName');
         $field->expects($this->any())
-                    ->method('isHidden')
-                    ->will($this->returnValue(true));
+        ->method('isHidden')
+        ->will($this->returnValue(true));
         $field->expects($this->any())
-                    ->method('getPropertyPath')
-                    ->will($this->returnValue(new PropertyPath('firstName')));
+        ->method('getPropertyPath')
+        ->will($this->returnValue(new PropertyPath('firstName')));
         $field->expects($this->never())
-                    ->method('addError');
+        ->method('addError');
 
         $form = $this->factory->getInstance('form', 'author');
         $form->add($field);
@@ -630,11 +600,11 @@ class FormTest extends TestCase
 
         $field = $this->createMockField('address');
         $field->expects($this->any())
-                    ->method('getPropertyPath')
-                    ->will($this->returnValue(new PropertyPath('address')));
+        ->method('getPropertyPath')
+        ->will($this->returnValue(new PropertyPath('address')));
         $field->expects($this->once())
-                    ->method('addError')
-                    ->with($this->equalTo($error), $this->equalTo($expectedPathIterator));
+        ->method('addError')
+        ->with($this->equalTo($error), $this->equalTo($expectedPathIterator));
 
         $form = $this->factory->getInstance('form', 'author');
         $form->add($field);
@@ -654,11 +624,11 @@ class FormTest extends TestCase
 
         $field = $this->createMockField('address');
         $field->expects($this->any())
-                    ->method('getPropertyPath')
-                    ->will($this->returnValue(new PropertyPath('address')));
+        ->method('getPropertyPath')
+        ->will($this->returnValue(new PropertyPath('address')));
         $field->expects($this->once())
-                    ->method('addError')
-                    ->with($this->equalTo($error), $this->equalTo($expectedPathIterator));
+        ->method('addError')
+        ->with($this->equalTo($error), $this->equalTo($expectedPathIterator));
 
         $form = $this->factory->getInstance('form', 'author');
         $nestedForm = $this->factory->getInstance('form', 'nested', array('virtual' => true));
@@ -686,8 +656,8 @@ class FormTest extends TestCase
 
         $field = $this->createMockField('firstName');
         $field->expects($this->once())
-                    ->method('setParent')
-                    ->with($this->equalTo($form));
+        ->method('setParent')
+        ->with($this->equalTo($form));
 
         $form->add($field);
     }
@@ -698,62 +668,11 @@ class FormTest extends TestCase
 
         $field = $this->createMockField('firstName');
         $field->expects($this->exactly(2))
-                    ->method('setParent');
-                    // PHPUnit fails to compare subsequent method calls with different arguments
+        ->method('setParent');
+        // PHPUnit fails to compare subsequent method calls with different arguments
 
         $form->add($field);
         $form->remove('firstName');
-    }
-
-    public function testAddUpdatesFieldFromTransformedData()
-    {
-        $originalAuthor = new Author();
-        $transformedAuthor = new Author();
-        // the authors should differ to make sure the test works
-        $transformedAuthor->firstName = 'Foo';
-
-        $form = $this->factory->getInstance('form', 'author');
-
-        $transformer = $this->createMockTransformer();
-        $transformer->expects($this->once())
-                                ->method('transform')
-                                ->with($this->equalTo($originalAuthor))
-                                ->will($this->returnValue($transformedAuthor));
-
-        $form->setValueTransformer($transformer);
-        $form->setData($originalAuthor);
-
-        $field = $this->createMockField('firstName');
-        $field->expects($this->any())
-                    ->method('getPropertyPath')
-                    ->will($this->returnValue(new PropertyPath('firstName')));
-        $field->expects($this->once())
-                    ->method('readProperty')
-                    ->with($this->equalTo($transformedAuthor));
-
-        $form->add($field);
-    }
-
-    public function testAddDoesNotUpdateFieldIfTransformedDataIsEmpty()
-    {
-        $originalAuthor = new Author();
-
-        $form = $this->factory->getInstance('form', 'author');
-
-        $transformer = $this->createMockTransformer();
-        $transformer->expects($this->once())
-                                ->method('transform')
-                                ->with($this->equalTo($originalAuthor))
-                                ->will($this->returnValue(''));
-
-        $form->setValueTransformer($transformer);
-        $form->setData($originalAuthor);
-
-        $field = $this->createMockField('firstName');
-        $field->expects($this->never())
-                    ->method('readProperty');
-
-        $form->add($field);
     }
 
     /**
@@ -778,48 +697,30 @@ class FormTest extends TestCase
         $form->add($field);
     }
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
-     */
-    public function testAddThrowsExceptionIfStringButNoFieldFactory()
-    {
-        $form = $this->factory->getInstance('form', 'author');
-
-        $form->add('firstName');
-    }
-
     public function testSetDataUpdatesAllFieldsFromTransformedData()
     {
         $originalAuthor = new Author();
         $transformedAuthor = new Author();
-        // the authors should differ to make sure the test works
         $transformedAuthor->firstName = 'Foo';
+        $transformedAuthor->setLastName('Bar');
 
         $form = $this->factory->getInstance('form', 'author');
 
         $transformer = $this->createMockTransformer();
         $transformer->expects($this->once())
-                                ->method('transform')
-                                ->with($this->equalTo($originalAuthor))
-                                ->will($this->returnValue($transformedAuthor));
+            ->method('transform')
+            ->with($this->equalTo($originalAuthor))
+            ->will($this->returnValue($transformedAuthor));
 
         $form->setValueTransformer($transformer);
 
-        $field = $this->createMockField('firstName');
-        $field->expects($this->once())
-                    ->method('readProperty')
-                    ->with($this->equalTo($transformedAuthor));
-
-        $form->add($field);
-
-        $field = $this->createMockField('lastName');
-        $field->expects($this->once())
-                    ->method('readProperty')
-                    ->with($this->equalTo($transformedAuthor));
-
-        $form->add($field);
+        $form->add($this->factory->getInstance('field', 'firstName'));
+        $form->add($this->factory->getInstance('field', 'lastName'));
 
         $form->setData($originalAuthor);
+
+        $this->assertEquals('Foo', $form['firstName']->getData());
+        $this->assertEquals('Bar', $form['lastName']->getData());
     }
 
     /**
@@ -846,6 +747,7 @@ class FormTest extends TestCase
     {
         $author = new Author();
         $author->firstName = 'Foo';
+        $author->setLastName('Bar');
 
         $form = $this->factory->getInstance('form', 'author');
         $nestedForm = $this->factory->getInstance('form', 'personal_data', array(
@@ -854,22 +756,14 @@ class FormTest extends TestCase
 
         // both fields are in the nested group but receive the object of the
         // top-level group because the nested group is virtual
-        $field = $this->createMockField('firstName');
-        $field->expects($this->once())
-                    ->method('readProperty')
-                    ->with($this->equalTo($author));
-
-        $nestedForm->add($field);
-
-        $field = $this->createMockField('lastName');
-        $field->expects($this->once())
-                    ->method('readProperty')
-                    ->with($this->equalTo($author));
-
-        $nestedForm->add($field);
+        $nestedForm->add($this->factory->getInstance('field', 'firstName'));
+        $nestedForm->add($this->factory->getInstance('field', 'lastName'));
 
         $form->add($nestedForm);
         $form->setData($author);
+
+        $this->assertEquals('Foo', $nestedForm['firstName']->getData());
+        $this->assertEquals('Bar', $nestedForm['lastName']->getData());
     }
 
     public function testSetDataThrowsAnExceptionIfArgumentIsNotObjectOrArray()
@@ -917,12 +811,12 @@ class FormTest extends TestCase
         $author = new Author();
         $form = $this->factory->getInstance('form', 'author', array(
             'data_constructor' => function () use ($author) {
-                return $author;
+        return $author;
             }
-        ));
-        $form->setData(null);
+            ));
+            $form->setData(null);
 
-        $this->assertSame($author, $form->getData());
+            $this->assertSame($author, $form->getData());
     }
 
     /*
@@ -941,8 +835,6 @@ class FormTest extends TestCase
     {
         $originalAuthor = new Author();
         $transformedAuthor = new Author();
-        // the authors should differ to make sure the test works
-        $transformedAuthor->firstName = 'Foo';
 
         $form = $this->factory->getInstance('form', 'author', array(
             'validator' => $this->validator,
@@ -950,31 +842,25 @@ class FormTest extends TestCase
 
         $transformer = $this->createMockTransformer();
         $transformer->expects($this->exactly(2))
-                                ->method('transform')
-                                // the method is first called with NULL, then
-                                // with $originalAuthor -> not testable by PHPUnit
-                                // ->with($this->equalTo(null))
-                                // ->with($this->equalTo($originalAuthor))
-                                ->will($this->returnValue($transformedAuthor));
+            ->method('transform')
+            // the method is first called with NULL, then
+            // with $originalAuthor -> not testable by PHPUnit
+            // ->with($this->equalTo(null))
+            // ->with($this->equalTo($originalAuthor))
+            ->will($this->returnValue($transformedAuthor));
 
         $form->setValueTransformer($transformer);
+        $form->add('field', 'firstName');
+        $form->add('field', 'lastName');
         $form->setData($originalAuthor);
 
-        $field = $this->createMockField('firstName');
-        $field->expects($this->once())
-                    ->method('writeProperty')
-                    ->with($this->equalTo($transformedAuthor));
+        $form->bind(array(
+            'firstName' => 'Foo',
+            'lastName' => 'Bar',
+        ));
 
-        $form->add($field);
-
-        $field = $this->createMockField('lastName');
-        $field->expects($this->once())
-                    ->method('writeProperty')
-                    ->with($this->equalTo($transformedAuthor));
-
-        $form->add($field);
-
-        $form->bind(array()); // irrelevant
+        $this->assertEquals('Foo', $transformedAuthor->firstName);
+        $this->assertEquals('Bar', $transformedAuthor->getLastName());
     }
 
     public function testGetDataReturnsObject()
@@ -990,8 +876,8 @@ class FormTest extends TestCase
         return; // TODO
         $field = $this->createMockField('firstName');
         $field->expects($this->any())
-                    ->method('getData')
-                    ->will($this->returnValue('Bernhard'));
+        ->method('getData')
+        ->will($this->returnValue('Bernhard'));
 
         $form = $this->factory->getInstance('form', 'author');
         $form->add($field);
@@ -1013,12 +899,12 @@ class FormTest extends TestCase
         )));
 
         $graphWalker->expects($this->exactly(2))
-                ->method('walkReference')
-                ->with($object,
-                    // should test for groups - PHPUnit limitation
-                    $this->anything(),
+        ->method('walkReference')
+        ->with($object,
+        // should test for groups - PHPUnit limitation
+        $this->anything(),
                     'data',
-                    true);
+        true);
 
         $form->setData($object);
         $form->validateData($context);
@@ -1034,11 +920,11 @@ class FormTest extends TestCase
         $form = $this->factory->getInstance('form', 'author');
 
         $graphWalker->expects($this->once())
-                ->method('walkReference')
-                ->with($object,
-                    null,
+        ->method('walkReference')
+        ->with($object,
+        null,
                     'path.data',
-                    true);
+        true);
 
         $form->setData($object);
         $form->validateData($context);
@@ -1054,10 +940,10 @@ class FormTest extends TestCase
         $test = $this;
 
         $graphWalker->expects($this->once())
-                ->method('walkReference')
-                ->will($this->returnCallback(function () use ($context, $test) {
-                    $test->assertEquals('data', $context->getCurrentProperty());
-                }));
+        ->method('walkReference')
+        ->will($this->returnCallback(function () use ($context, $test) {
+            $test->assertEquals('data', $context->getCurrentProperty());
+        }));
 
         $form->setData($object);
         $form->validateData($context);
@@ -1072,11 +958,11 @@ class FormTest extends TestCase
         $form = $this->factory->getInstance('form', 'author', array('value_transformer' => $valueTransformer));
 
         $graphWalker->expects($this->never())
-                ->method('walkReference');
+        ->method('walkReference');
 
         $valueTransformer->expects($this->atLeastOnce())
-                ->method('reverseTransform')
-                ->will($this->returnValue('foobar'));
+        ->method('reverseTransform')
+        ->will($this->returnValue('foobar'));
 
         $form->bind(array('foo' => 'bar')); // reverse transformed to "foobar"
         $form->validateData($context);
@@ -1087,10 +973,10 @@ class FormTest extends TestCase
         $author = new FormTest_AuthorWithoutRefSetter(new Author());
 
         $form = $this->factory->getInstance('form', 'author', array('validator' => $this->createMockValidator()));
-        $form->setData($author);
         $refForm = $this->factory->getInstance('form', 'reference');
         $refForm->add($this->factory->getInstance('field', 'firstName'));
         $form->add($refForm);
+        $form->setData($author);
 
         $form->bindRequest($this->createPostRequest(array(
             'author' => array(
@@ -1120,11 +1006,11 @@ class FormTest extends TestCase
 
         $form->bindRequest($this->createPostRequest(array(
             'author' => array(
-                // referenceCopy has a getter that returns a copy
+        // referenceCopy has a getter that returns a copy
                 'referenceCopy' => array(
                     'firstName' => 'Foo',
-                )
-            )
+        )
+        )
         )));
 
         $this->assertEquals('Foo', $author->getReferenceCopy()->firstName);
@@ -1135,18 +1021,18 @@ class FormTest extends TestCase
         $author = new FormTest_AuthorWithoutRefSetter(new Author());
 
         $form = $this->factory->getInstance('form', 'author', array('validator' => $this->createMockValidator()));
-        $form->setData($author);
         $refForm = $this->factory->getInstance('form', 'referenceCopy', array('by_reference' => false));
         $refForm->add($this->factory->getInstance('field', 'firstName'));
         $form->add($refForm);
+        $form->setData($author);
 
         $form->bindRequest($this->createPostRequest(array(
             'author' => array(
-                // referenceCopy has a getter that returns a copy
+        // referenceCopy has a getter that returns a copy
                 'referenceCopy' => array(
                     'firstName' => 'Foo',
-                )
-            )
+        )
+        )
         )));
 
         // firstName can only be updated if setReferenceCopy() was called
@@ -1161,17 +1047,17 @@ class FormTest extends TestCase
         $form->setData($author);
         $form->add($this->factory->getInstance('form', 'referenceCopy', array(
             'value_transformer' => new CallbackTransformer(
-                function () {},
-                function ($value) { // reverseTransform
-                    return 'foobar';
-                }
-            )
+        function () {},
+        function ($value) { // reverseTransform
+            return 'foobar';
+        }
+        )
         )));
 
         $form->bindRequest($this->createPostRequest(array(
             'author' => array(
                 'referenceCopy' => array(), // doesn't matter actually
-            )
+        )
         )));
 
         // firstName can only be updated if setReferenceCopy() was called
@@ -1188,17 +1074,17 @@ class FormTest extends TestCase
         $form->setData($author);
         $form->add($this->factory->getInstance('form', 'referenceCopy', array(
             'value_transformer' => new CallbackTransformer(
-                function () {},
-                function ($value) use ($ref2) { // reverseTransform
-                    return $ref2;
-                }
-            )
+        function () {},
+        function ($value) use ($ref2) { // reverseTransform
+            return $ref2;
+        }
+        )
         )));
 
         $form->bindRequest($this->createPostRequest(array(
             'author' => array(
                 'referenceCopy' => array('a' => 'b'), // doesn't matter actually
-            )
+        )
         )));
 
         // the new reference was inserted into the array
@@ -1244,15 +1130,15 @@ class FormTest extends TestCase
         // add a visible field
         $visibleField = $this->createMockField('visibleField');
         $visibleField->expects($this->once())
-                    ->method('isHidden')
-                    ->will($this->returnValue(false));
+        ->method('isHidden')
+        ->will($this->returnValue(false));
         $form->add($visibleField);
 
         // add a hidden field
         $hiddenField = $this->createMockField('hiddenField');
         $hiddenField->expects($this->once())
-                    ->method('isHidden')
-                    ->will($this->returnValue(true));
+        ->method('isHidden')
+        ->will($this->returnValue(true));
         $form->add($hiddenField);
 
         return $form;
@@ -1262,16 +1148,16 @@ class FormTest extends TestCase
     {
         $field = $this->getMock(
             'Symfony\Component\Form\FieldInterface',
-            array(),
-            array(),
+        array(),
+        array(),
             '',
-            false, // don't use constructor
-            false  // don't call parent::__clone
+        false, // don't use constructor
+        false  // don't call parent::__clone
         );
 
         $field->expects($this->any())
-                    ->method('getName')
-                    ->will($this->returnValue($key));
+        ->method('getName')
+        ->will($this->returnValue($key));
 
         return $field;
     }
@@ -1280,16 +1166,16 @@ class FormTest extends TestCase
     {
         $form = $this->getMock(
             'Symfony\Component\Form\Form',
-            array(),
-            array(),
+        array(),
+        array(),
             '',
-            false, // don't use constructor
-            false  // don't call parent::__clone)
+        false, // don't use constructor
+        false  // don't call parent::__clone)
         );
 
         $form->expects($this->any())
-                ->method('getRoot')
-                ->will($this->returnValue($form));
+        ->method('getRoot')
+        ->will($this->returnValue($form));
 
         return $form;
     }
@@ -1298,8 +1184,8 @@ class FormTest extends TestCase
     {
         $field = $this->createMockField($key);
         $field->expects($this->any())
-                    ->method('isValid')
-                    ->will($this->returnValue(false));
+        ->method('isValid')
+        ->will($this->returnValue(false));
 
         return $field;
     }
@@ -1308,8 +1194,8 @@ class FormTest extends TestCase
     {
         $field = $this->createMockField($key);
         $field->expects($this->any())
-                    ->method('isValid')
-                    ->will($this->returnValue(true));
+        ->method('isValid')
+        ->will($this->returnValue(true));
 
         return $field;
     }
@@ -1318,8 +1204,8 @@ class FormTest extends TestCase
     {
         $field = $this->createMockField($key);
         $field->expects($this->any())
-                    ->method('isMultipart')
-                    ->will($this->returnValue(false));
+        ->method('isMultipart')
+        ->will($this->returnValue(false));
 
         return $field;
     }
@@ -1328,8 +1214,8 @@ class FormTest extends TestCase
     {
         $field = $this->createMockField($key);
         $field->expects($this->any())
-                    ->method('isMultipart')
-                    ->will($this->returnValue(true));
+        ->method('isMultipart')
+        ->will($this->returnValue(true));
 
         return $field;
     }
@@ -1352,8 +1238,8 @@ class FormTest extends TestCase
     protected function createMockGraphWalker()
     {
         return $this->getMockBuilder('Symfony\Component\Validator\GraphWalker')
-                ->disableOriginalConstructor()
-                ->getMock();
+        ->disableOriginalConstructor()
+        ->getMock();
     }
 
     protected function createMockMetadataFactory()

@@ -15,6 +15,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Form\EventListener\ObjectMapperListener;
 use Symfony\Component\Form\Renderer\Plugin\FormPlugin;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -37,12 +38,16 @@ class FormConfig extends AbstractFieldConfig
 
     public function configure(FieldInterface $field, array $options)
     {
-        $field->setDataClass($options['data_class'])
-            ->setDataConstructor($options['data_constructor'])
-            ->setValidationGroups($options['validation_groups'])
+        $field->setValidationGroups($options['validation_groups'])
             ->setVirtual($options['virtual'])
             ->setValidator($options['validator'])
-            ->addRendererPlugin(new FormPlugin());
+            ->addRendererPlugin(new FormPlugin())
+            ->addEventSubscriber(new ObjectMapperListener(
+                $options['data_class'],
+                $options['data_constructor']
+            ), -10)
+            // ObjectMapperListener modifies data, so set again
+            ->setData($options['data']);
 
         if ($options['csrf_protection']) {
             $field->enableCsrfProtection($options['csrf_provider'], $options['csrf_field_name']);

@@ -71,6 +71,7 @@ class Field implements FieldInterface
     private $trim = true;
     private $disabled = false;
     private $dispatcher;
+    private $modifyByReference = true;
 
     public function __construct($name, EventDispatcherInterface $dispatcher)
     {
@@ -243,11 +244,11 @@ class Field implements FieldInterface
      */
     public function setData($appData)
     {
-        $event = new DataEvent($appData);
+        $event = new DataEvent($this, $appData);
         $this->dispatcher->dispatchEvent(Events::preSetData, $event);
 
         // Hook to change content of the data
-        $event = new FilterDataEvent($appData);
+        $event = new FilterDataEvent($this, $appData);
         $this->dispatcher->dispatchEvent(Events::filterSetData, $event);
         $appData = $event->getData();
 
@@ -264,7 +265,7 @@ class Field implements FieldInterface
         $this->normalizedData = $normData;
         $this->transformedData = $clientData;
 
-        $event = new DataEvent($appData);
+        $event = new DataEvent($this, $appData);
         $this->dispatcher->dispatchEvent(Events::postSetData, $event);
 
         return $this;
@@ -281,14 +282,14 @@ class Field implements FieldInterface
             $clientData = (string)$clientData;
         }
 
-        $event = new DataEvent($clientData);
+        $event = new DataEvent($this, $clientData);
         $this->dispatcher->dispatchEvent(Events::preBind, $event);
 
         $appData = null;
         $normData = null;
 
         // Hook to change content of the data bound by the browser
-        $event = new FilterDataEvent($clientData);
+        $event = new FilterDataEvent($this, $clientData);
         $this->dispatcher->dispatchEvent(Events::filterBoundDataFromClient, $event);
         $clientData = $event->getData();
 
@@ -303,7 +304,7 @@ class Field implements FieldInterface
         if ($this->transformationSuccessful) {
             // Hook to change content of the data in the normalized
             // representation
-            $event = new FilterDataEvent($normData);
+            $event = new FilterDataEvent($this, $normData);
             $this->dispatcher->dispatchEvent(Events::filterBoundData, $event);
             $normData = $event->getData();
 
@@ -318,7 +319,7 @@ class Field implements FieldInterface
         $this->normalizedData = $normData;
         $this->transformedData = $clientData;
 
-        $event = new DataEvent($clientData);
+        $event = new DataEvent($this, $clientData);
         $this->dispatcher->dispatchEvent(Events::postBind, $event);
     }
 
@@ -549,32 +550,20 @@ class Field implements FieldInterface
     /**
      * {@inheritDoc}
      */
-    public function readProperty(&$objectOrArray)
-    {
-        // TODO throw exception if not object or array
-
-        if ($this->propertyPath !== null) {
-            $this->setData($this->propertyPath->getValue($objectOrArray));
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function writeProperty(&$objectOrArray)
-    {
-        // TODO throw exception if not object or array
-
-        if ($this->propertyPath !== null) {
-            $this->propertyPath->setValue($objectOrArray, $this->getData());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function isEmpty()
     {
         return null === $this->data || '' === $this->data;
+    }
+
+    public function setModifyByReference($modifyByReference)
+    {
+        $this->modifyByReference = $modifyByReference;
+
+        return $this;
+    }
+
+    public function isModifiedByReference()
+    {
+        return $this->modifyByReference;
     }
 }

@@ -71,24 +71,6 @@ interface FieldInterface
     function getPropertyPath();
 
     /**
-     * Writes a property value of the object into the field
-     *
-     * The chosen property is determined by the field's property path.
-     *
-     * @param array|object $objectOrArray
-     */
-    function readProperty(&$objectOrArray);
-
-    /**
-     * Writes a the field value into a property of the object
-     *
-     * The chosen property is determined by the field's property path.
-     *
-     * @param array|object $objectOrArray
-     */
-    function writeProperty(&$objectOrArray);
-
-    /**
      * Recursively adds constraint violations to the fields
      *
      * Violations in the form fields usually have property paths like:

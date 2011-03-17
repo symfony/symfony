@@ -300,17 +300,6 @@ class FieldTest extends TestCase
         $this->assertEquals('reverse[ a ]', $field->getData());
     }
 
-    public function testWritePropertyDoesNotWritePropertyIfPropertyPathIsEmpty()
-    {
-        $object = new Author();
-
-        $field = $this->factory->getInstance('field', 'firstName', array('property_path' => null));
-        $field->bind('Bernhard');
-        $field->writeProperty($object);
-
-        $this->assertEquals(null, $object->firstName);
-    }
-
     public function testIsTransformationSuccessfulReturnsTrueIfReverseTransformSucceeded()
     {
         $field = $this->factory->getInstance('field', 'title', array(

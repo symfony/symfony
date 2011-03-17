@@ -16,11 +16,11 @@ use Symfony\Component\EventDispatcher\Event;
 /**
  * MessageLogger.
  *
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Clément JOBEILI <clement.jobeili@gmail.com>
  */
 class MessageLogger implements \Swift_Events_SendListener
 {
-
     /**
      * @var array
      */
@@ -28,7 +28,7 @@ class MessageLogger implements \Swift_Events_SendListener
 
     public function __construct()
     {
-        $this->messages = array();   
+        $this->messages = array();
     }
 
     /**
@@ -50,7 +50,7 @@ class MessageLogger implements \Swift_Events_SendListener
     {
         return count($this->messages);
     }
-    
+
     /**
      * Empty the message list
      * 
@@ -61,15 +61,19 @@ class MessageLogger implements \Swift_Events_SendListener
     }
 
     /**
-     * {@inheritdoc}
+     * Invoked immediately before the Message is sent.
+     *
+     * @param \Swift_Events_SendEvent $evt
      */
     public function beforeSendPerformed(\Swift_Events_SendEvent $evt)
     {
-        $this->messages[] = $message = clone $evt->getMessage();
+        $this->messages[] = clone $evt->getMessage();
     }
 
     /**
-     * {@inheritdoc}
+     * Invoked immediately after the Message is sent.
+     *
+     * @param \Swift_Events_SendEvent $evt
      */
     public function sendPerformed(\Swift_Events_SendEvent $evt)
     {

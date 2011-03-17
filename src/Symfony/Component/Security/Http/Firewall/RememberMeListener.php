@@ -62,7 +62,7 @@ class RememberMeListener implements ListenerInterface
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public function onCoreSecurity(GetResponseEvent $event)
+    public function handle(GetResponseEvent $event)
     {
         if (null !== $this->securityContext->getToken()) {
             return;

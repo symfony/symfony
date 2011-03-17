@@ -41,7 +41,7 @@ class ChannelListener implements ListenerInterface
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public function onCoreSecurity(GetResponseEvent $event)
+    public function handle(GetResponseEvent $event)
     {
         $request = $event->getRequest();
 

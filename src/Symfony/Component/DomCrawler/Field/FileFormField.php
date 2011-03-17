@@ -55,13 +55,21 @@ class FileFormField extends FormField
         if (null !== $value && is_readable($value)) {
             $error = UPLOAD_ERR_OK;
             $size = filesize($value);
+            $name = basename($value);
+
+            // copy to a tmp location
+            $tmp = tempnam(sys_get_temp_dir(), 'upload');
+            unlink($tmp);
+            copy($value, $tmp);
+            $value = $tmp;
         } else {
             $error = UPLOAD_ERR_NO_FILE;
             $size = 0;
+            $name = '';
             $value = '';
         }
 
-        $this->value = array('name' => basename($value), 'type' => '', 'tmp_name' => $value, 'error' => $error, 'size' => $size);
+        $this->value = array('name' => $name, 'type' => '', 'tmp_name' => $value, 'error' => $error, 'size' => $size);
     }
 
     /**

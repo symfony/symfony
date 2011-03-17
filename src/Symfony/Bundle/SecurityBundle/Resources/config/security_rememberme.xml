@@ -51,7 +51,7 @@
         </service>
         
         <service id="security.rememberme.response_listener" class="%security.rememberme.response_listener.class%">
-            <tag name="kernel.listener" method="handle" event="core.response"/>
+            <tag name="kernel.listener" event="filterCoreResponse"/>
         </service>
     </services>
     

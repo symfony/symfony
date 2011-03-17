@@ -36,7 +36,7 @@ class ConnectionFactory
 
     /**
      * Create a connection by name.
-     * 
+     *
      * @param  string $connectionName
      * @return Doctrine\DBAL\Connection
      */

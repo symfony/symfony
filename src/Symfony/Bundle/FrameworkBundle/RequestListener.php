@@ -13,15 +13,13 @@ namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * RequestListener.
- *
- * The handle method must be connected to the core.request event.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -38,10 +36,10 @@ class RequestListener
         $this->logger = $logger;
     }
 
-    public function handle(EventInterface $event)
+    public function onCoreRequest(GetResponseEvent $event)
     {
-        $request = $event->get('request');
-        $master = HttpKernelInterface::MASTER_REQUEST === $event->get('request_type');
+        $request = $event->getRequest();
+        $master = HttpKernelInterface::MASTER_REQUEST === $event->getRequestType();
 
         $this->initializeSession($request, $master);
 

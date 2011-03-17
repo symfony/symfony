@@ -15,8 +15,8 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\EntryPoint\DigestAuthenticationEntryPoint;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Events;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
@@ -54,11 +54,11 @@ class DigestAuthenticationListener implements ListenerInterface
     /**
      * Handles digest authentication.
      *
-     * @param EventInterface $event An EventInterface instance
+     * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public function handle(EventInterface $event)
+    public function handle(GetResponseEvent $event)
     {
-        $request = $event->get('request');
+        $request = $event->getRequest();
 
         if (!$header = $request->server->get('PHP_AUTH_DIGEST')) {
             return;
@@ -121,7 +121,7 @@ class DigestAuthenticationListener implements ListenerInterface
         $this->securityContext->setToken(new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey));
     }
 
-    private function fail(EventInterface $event, Request $request, AuthenticationException $authException)
+    private function fail(GetResponseEvent $event, Request $request, AuthenticationException $authException)
     {
         $this->securityContext->setToken(null);
 

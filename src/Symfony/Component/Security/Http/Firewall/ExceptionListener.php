@@ -17,14 +17,14 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Events;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * ExceptionListener catches authentication exception and converts them to
@@ -52,25 +52,24 @@ class ExceptionListener
     }
 
     /**
-     * Registers a core.exception listener to take care of security exceptions.
+     * Registers a onCoreException listener to take care of security exceptions.
      *
      * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
      */
     public function register(EventDispatcherInterface $dispatcher)
     {
-        $dispatcher->connect('core.exception', array($this, 'handleException'), 0);
+        $dispatcher->addEventListener(Events::onCoreException, $this);
     }
 
     /**
      * Handles security related exceptions.
      *
-     * @param EventInterface $event An EventInterface instance
+     * @param ExceptionEvent $event An ExceptionEvent instance
      */
-    public function handleException(EventInterface $event)
+    public function onCoreException(ExceptionEvent $event)
     {
-        $exception = $event->get('exception');
-        $request = $event->get('request');
+        $exception = $event->getException();
+        $request = $event->getRequest();
 
         if ($exception instanceof AuthenticationException) {
             if (null !== $this->logger) {
@@ -118,7 +117,7 @@ class ExceptionListener
                         $subRequest = Request::create($this->errorPage);
                         $subRequest->attributes->set(SecurityContextInterface::ACCESS_DENIED_ERROR, $exception);
 
-                        $response = $event->getSubject()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
+                        $response = $event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
                         $response->setStatusCode(403);
                     }
                 } catch (\Exception $e) {
@@ -126,7 +125,7 @@ class ExceptionListener
                         $this->logger->err(sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage()));
                     }
 
-                    $event->set('exception', new \RuntimeException('Exception thrown when handling an exception.', 0, $e));
+                    $event->setException(new \RuntimeException('Exception thrown when handling an exception.', 0, $e));
 
                     return;
                 }
@@ -135,12 +134,10 @@ class ExceptionListener
             return;
         }
 
-        $event->setProcessed();
-
-        return $response;
+        $event->setResponse($response);
     }
 
-    private function startAuthentication(EventInterface $event, Request $request, AuthenticationException $authException)
+    private function startAuthentication(ExceptionEvent $event, Request $request, AuthenticationException $authException)
     {
         $this->context->setToken(null);
 

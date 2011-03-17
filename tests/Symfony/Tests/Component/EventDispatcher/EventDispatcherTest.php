@@ -13,126 +13,187 @@ namespace Symfony\Tests\Component\EventDispatcher;
 
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 {
-    public function testConnectAndDisconnect()
+    /* Some pseudo events */
+    const preFoo = 'preFoo';
+    const postFoo = 'postFoo';
+    const preBar = 'preBar';
+    const postBar = 'postBar';
+
+    private $dispatcher;
+
+    private $listener;
+
+    protected function setUp()
     {
-        $dispatcher = new EventDispatcher();
-
-        $dispatcher->connect('bar', 'listenToBar');
-        $this->assertEquals(array('listenToBar'), $dispatcher->getListeners('bar'), '->connect() connects a listener to an event name');
-        $dispatcher->connect('bar', 'listenToBarBar');
-        $this->assertEquals(array('listenToBar', 'listenToBarBar'), $dispatcher->getListeners('bar'), '->connect() can connect several listeners for the same event name');
-
-        $dispatcher->connect('barbar', 'listenToBarBar');
-
-        $dispatcher->disconnect('bar');
-        $this->assertEquals(array(), $dispatcher->getListeners('bar'), '->disconnect() without a listener disconnects all listeners of for an event name');
-        $this->assertEquals(array('listenToBarBar'), $dispatcher->getListeners('barbar'), '->disconnect() without a listener disconnects all listeners of for an event name');
+        $this->dispatcher = new EventDispatcher();
+        $this->listener = new TestEventListener();
     }
 
-    public function testGetHasListeners()
+    public function testInitialState()
     {
-        $dispatcher = new EventDispatcher();
-
-        $this->assertFalse($dispatcher->hasListeners('foo'), '->hasListeners() returns false if the event has no listener');
-        $dispatcher->connect('foo', 'listenToFoo');
-        $this->assertEquals(true, $dispatcher->hasListeners('foo'), '->hasListeners() returns true if the event has some listeners');
-        $dispatcher->disconnect('foo', 'listenToFoo');
-        $this->assertFalse($dispatcher->hasListeners('foo'), '->hasListeners() returns false if the event has no listener');
-
-        $dispatcher->connect('bar', 'listenToBar');
-        $this->assertEquals(array('listenToBar'), $dispatcher->getListeners('bar'), '->getListeners() returns an array of listeners connected to the given event name');
-        $this->assertEquals(array(), $dispatcher->getListeners('foobar'), '->getListeners() returns an empty array if no listener are connected to the given event name');
+        $this->assertEquals(array(), $this->dispatcher->getListeners());
+        $this->assertFalse($this->dispatcher->hasListeners(self::preFoo));
+        $this->assertFalse($this->dispatcher->hasListeners(self::postFoo));
     }
 
-    public function testNotify()
+    public function testAddEventListener()
     {
-        $listener = new Listener();
-        $dispatcher = new EventDispatcher();
-        $dispatcher->connect('foo', array($listener, 'listenToFoo'));
-        $dispatcher->connect('foo', array($listener, 'listenToFooBis'));
-        $e = $dispatcher->notify($event = new Event(new \stdClass(), 'foo'));
-        $this->assertEquals('listenToFoolistenToFooBis', $listener->getValue(), '->notify() notifies all registered listeners in order');
-
-        $listener->reset();
-        $dispatcher = new EventDispatcher();
-        $dispatcher->connect('foo', array($listener, 'listenToFooBis'));
-        $dispatcher->connect('foo', array($listener, 'listenToFoo'));
-        $dispatcher->notify(new Event(new \stdClass(), 'foo'));
-        $this->assertEquals('listenToFooBislistenToFoo', $listener->getValue(), '->notify() notifies all registered listeners in order');
+        $this->dispatcher->addEventListener(array('preFoo', 'postFoo'), $this->listener);
+        $this->assertTrue($this->dispatcher->hasListeners(self::preFoo));
+        $this->assertTrue($this->dispatcher->hasListeners(self::postFoo));
+        $this->assertEquals(1, count($this->dispatcher->getListeners(self::preFoo)));
+        $this->assertEquals(1, count($this->dispatcher->getListeners(self::postFoo)));
+        $this->assertEquals(2, count($this->dispatcher->getListeners()));
     }
 
-    public function testNotifyUntil()
+    public function testGetListenersSortsByPriority()
     {
-        $listener = new Listener();
-        $dispatcher = new EventDispatcher();
-        $dispatcher->connect('foo', array($listener, 'listenToFoo'));
-        $dispatcher->connect('foo', array($listener, 'listenToFooBis'));
-        $dispatcher->notifyUntil($event = new Event(new \stdClass(), 'foo'));
-        $this->assertEquals('listenToFoolistenToFooBis', $listener->getValue(), '->notifyUntil() notifies all registered listeners in order and stops when the event is processed');
+        $listener1 = new TestEventListener();
+        $listener2 = new TestEventListener();
+        $listener3 = new TestEventListener();
 
-        $listener->reset();
-        $dispatcher = new EventDispatcher();
-        $dispatcher->connect('foo', array($listener, 'listenToFooBis'));
-        $dispatcher->connect('foo', array($listener, 'listenToFoo'));
-        $dispatcher->notifyUntil($event = new Event(new \stdClass(), 'foo'));
-        $this->assertEquals('listenToFooBis', $listener->getValue(), '->notifyUntil() notifies all registered listeners in order and stops when the event is processed');
+        $this->dispatcher->addEventListener('preFoo', $listener1, -10);
+        $this->dispatcher->addEventListener('preFoo', $listener2);
+        $this->dispatcher->addEventListener('preFoo', $listener3, 10);
+
+        $expected = array(
+            spl_object_hash($listener3) => $listener3,
+            spl_object_hash($listener2) => $listener2,
+            spl_object_hash($listener1) => $listener1,
+        );
+
+        $this->assertSame($expected, $this->dispatcher->getListeners('preFoo'));
     }
 
-    public function testFilter()
+    public function testGetAllListenersSortsByPriority()
     {
-        $listener = new Listener();
-        $dispatcher = new EventDispatcher();
-        $dispatcher->connect('foo', array($listener, 'filterFoo'));
-        $dispatcher->connect('foo', array($listener, 'filterFooBis'));
-        $ret = $dispatcher->filter($event = new Event(new \stdClass(), 'foo'), 'foo');
-        $this->assertEquals('-*foo*-', $ret, '->filter() returns the filtered value');
+        $listener1 = new TestEventListener();
+        $listener2 = new TestEventListener();
+        $listener3 = new TestEventListener();
+        $listener4 = new TestEventListener();
+        $listener5 = new TestEventListener();
+        $listener6 = new TestEventListener();
 
-        $listener->reset();
-        $dispatcher = new EventDispatcher();
-        $dispatcher->connect('foo', array($listener, 'filterFooBis'));
-        $dispatcher->connect('foo', array($listener, 'filterFoo'));
-        $ret = $dispatcher->filter($event = new Event(new \stdClass(), 'foo'), 'foo');
-        $this->assertEquals('*-foo-*', $ret, '->filter() returns the filtered value');
+        $this->dispatcher->addEventListener('preFoo', $listener1, -10);
+        $this->dispatcher->addEventListener('preFoo', $listener2);
+        $this->dispatcher->addEventListener('preFoo', $listener3, 10);
+        $this->dispatcher->addEventListener('postFoo', $listener4, -10);
+        $this->dispatcher->addEventListener('postFoo', $listener5);
+        $this->dispatcher->addEventListener('postFoo', $listener6, 10);
+
+        $expected = array(
+            'preFoo' => array(
+                spl_object_hash($listener3) => $listener3,
+                spl_object_hash($listener2) => $listener2,
+                spl_object_hash($listener1) => $listener1,
+             ),
+            'postFoo' => array(
+                spl_object_hash($listener6) => $listener6,
+                spl_object_hash($listener5) => $listener5,
+                spl_object_hash($listener4) => $listener4,
+             ),
+        );
+
+        $this->assertSame($expected, $this->dispatcher->getListeners());
+    }
+
+    public function testDispatchEvent()
+    {
+        $this->dispatcher->addEventListener(array('preFoo', 'postFoo'), $this->listener);
+        $this->dispatcher->dispatchEvent(self::preFoo);
+        $this->assertTrue($this->listener->preFooInvoked);
+        $this->assertFalse($this->listener->postFooInvoked);
+    }
+
+    public function testDispatchEventForClosure()
+    {
+        $invoked = 0;
+        $listener = function () use (&$invoked) {
+            $invoked++;
+        };
+        $this->dispatcher->addEventListener(array('preFoo', 'postFoo'), $listener);
+        $this->dispatcher->dispatchEvent(self::preFoo);
+        $this->assertEquals(1, $invoked);
+    }
+
+    public function testStopEventPropagation()
+    {
+        $otherListener = new TestEventListener;
+
+        // postFoo() stops the propagation, so only one listener should
+        // be executed
+        // Manually set priority to enforce $this->listener to be called first
+        $this->dispatcher->addEventListener('postFoo', $this->listener, 10);
+        $this->dispatcher->addEventListener('postFoo', $otherListener);
+        $this->dispatcher->dispatchEvent(self::postFoo);
+        $this->assertTrue($this->listener->postFooInvoked);
+        $this->assertFalse($otherListener->postFooInvoked);
+    }
+
+    public function testDispatchByPriority()
+    {
+        $invoked = array();
+        $listener1 = function () use (&$invoked) {
+            $invoked[] = '1';
+        };
+        $listener2 = function () use (&$invoked) {
+            $invoked[] = '2';
+        };
+        $listener3 = function () use (&$invoked) {
+            $invoked[] = '3';
+        };
+        $this->dispatcher->addEventListener('preFoo', $listener1, -10);
+        $this->dispatcher->addEventListener('preFoo', $listener2);
+        $this->dispatcher->addEventListener('preFoo', $listener3, 10);
+        $this->dispatcher->dispatchEvent(self::preFoo);
+        $this->assertEquals(array('3', '2', '1'), $invoked);
+    }
+
+    public function testRemoveEventListener()
+    {
+        $this->dispatcher->addEventListener(array('preBar'), $this->listener);
+        $this->assertTrue($this->dispatcher->hasListeners(self::preBar));
+        $this->dispatcher->removeEventListener(array('preBar'), $this->listener);
+        $this->assertFalse($this->dispatcher->hasListeners(self::preBar));
+    }
+
+    public function testAddEventSubscriber()
+    {
+        $eventSubscriber = new TestEventSubscriber();
+        $this->dispatcher->addEventSubscriber($eventSubscriber);
+        $this->assertTrue($this->dispatcher->hasListeners(self::preFoo));
+        $this->assertTrue($this->dispatcher->hasListeners(self::postFoo));
     }
 }
 
-class Listener
+class TestEventListener
 {
-    protected
-        $value = '';
+    public $preFooInvoked = false;
+    public $postFooInvoked = false;
 
-    function filterFoo(Event $event, $foo)
+    /* Listener methods */
+
+    public function preFoo(Event $e)
     {
-        return "*$foo*";
+        $this->preFooInvoked = true;
     }
 
-    function filterFooBis(Event $event, $foo)
+    public function postFoo(Event $e)
     {
-        return "-$foo-";
+        $this->postFooInvoked = true;
+
+        $e->stopPropagation();
     }
+}
 
-    function listenToFoo(Event $event)
+class TestEventSubscriber implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents()
     {
-        $this->value .= 'listenToFoo';
-    }
-
-    function listenToFooBis(Event $event)
-    {
-        $this->value .= 'listenToFooBis';
-
-        $event->setProcessed();
-    }
-
-    function getValue()
-    {
-        return $this->value;
-    }
-
-    function reset()
-    {
-        $this->value = '';
+        return array('preFoo', 'postFoo');
     }
 }

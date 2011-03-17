@@ -48,7 +48,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     {
         parent::triggerListener($listener, $eventName, $event);
 
-        $listenerString = $this->listenerToString($listener);
+        $listenerString = $this->listenerToString($listener, $eventName);
 
         if (null !== $this->logger) {
             $this->logger->debug(sprintf('Notified event "%s" to listener "%s"', $eventName, $listenerString));

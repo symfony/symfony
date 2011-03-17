@@ -55,6 +55,21 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
         $this->assertSame($output, $transformer->transform(null));
     }
 
+    public function testTransform_empty_withFields()
+    {
+        $transformer = new DateTimeToArrayTransformer(array(
+            'fields' => array('year', 'minute', 'second'),
+        ));
+
+        $output = array(
+            'year' => '',
+            'minute' => '',
+            'second' => '',
+        );
+
+        $this->assertSame($output, $transformer->transform(null));
+    }
+
     public function testTransform_withFields()
     {
         $transformer = new DateTimeToArrayTransformer(array(

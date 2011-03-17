@@ -18,6 +18,11 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
  */
 class Configuration
 {
+    /**
+     * Generates the configuration tree.
+     *
+     * @return \Symfony\Component\Config\Definition\ArrayNode The config tree
+     */
     public function getFactoryConfigTree()
     {
         $tb = new TreeBuilder();

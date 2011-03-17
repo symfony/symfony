@@ -33,6 +33,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
         $this->theme = $this->getMock('Symfony\Component\Form\Renderer\Theme\ThemeInterface');
         $this->csrfProvider = $this->getMock('Symfony\Component\Form\CsrfProvider\CsrfProviderInterface');
         $this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
+
         $this->storage = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\TemporaryStorage')
             ->disableOriginalConstructor()
             ->getMock();

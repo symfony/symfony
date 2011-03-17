@@ -24,23 +24,18 @@ class FormConfig extends AbstractFieldConfig
 {
     private $csrfProvider;
 
-    private $validator;
-
     public function __construct(FormFactoryInterface $factory,
-            CsrfProviderInterface $csrfProvider,
-            ValidatorInterface $validator)
+            CsrfProviderInterface $csrfProvider)
     {
         parent::__construct($factory);
 
         $this->csrfProvider = $csrfProvider;
-        $this->validator = $validator;
     }
 
     public function configure(FieldInterface $field, array $options)
     {
         $field->setValidationGroups($options['validation_groups'])
             ->setVirtual($options['virtual'])
-            ->setValidator($options['validator'])
             ->addRendererPlugin(new FormPlugin())
             ->addEventSubscriber(new ObjectMapperListener(
                 $options['data_class'],
@@ -65,14 +60,13 @@ class FormConfig extends AbstractFieldConfig
             'csrf_provider' => $this->csrfProvider,
             'validation_groups' => null,
             'virtual' => false,
-            'validator' => $this->validator,
         );
     }
 
     public function createInstance($name)
     {
         return new Form($name, new EventDispatcher(), $this->getFormFactory(),
-                $this->csrfProvider, $this->validator);
+                $this->csrfProvider);
     }
 
     public function getParent(array $options)

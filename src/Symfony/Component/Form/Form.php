@@ -58,10 +58,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
 
     private $factory;
 
-    private $validator;
-
-    private $validationGroups;
-
     private $virtual;
 
     private $csrfFieldName;
@@ -69,8 +65,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
     private $csrfProvider;
 
     public function __construct($name, EventDispatcherInterface $dispatcher,
-            FormFactoryInterface $factory, CsrfProviderInterface $csrfProvider,
-            ValidatorInterface $validator)
+            FormFactoryInterface $factory, CsrfProviderInterface $csrfProvider)
     {
         $dispatcher->addEventSubscriber($this);
 
@@ -78,7 +73,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
 
         $this->factory = $factory;
         $this->csrfProvider = $csrfProvider;
-        $this->validator = $validator;
     }
 
     /**
@@ -419,46 +413,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
         return count($this->fields);
     }
 
-    public function setValidator(ValidatorInterface $validator)
-    {
-        $this->validator = $validator;
-
-        return $this;
-    }
-
-    /**
-     * Returns the validator used by the form
-     *
-     * @return ValidatorInterface  The validator instance
-     */
-    public function getValidator()
-    {
-        return $this->validator;
-    }
-
-    public function setValidationGroups($validationGroups)
-    {
-        $this->validationGroups = empty($validationGroups) ? null : (array)$validationGroups;
-
-        return $this;
-    }
-
-    /**
-     * Returns the validation groups validated by the form
-     *
-     * @return array  A list of validation groups or null
-     */
-    public function getValidationGroups()
-    {
-        $groups = $this->validationGroups;
-
-        if (!$groups && $this->hasParent()) {
-            $groups = $this->getParent()->getValidationGroups();
-        }
-
-        return $groups;
-    }
-
     public function enableCsrfProtection(CsrfProviderInterface $provider, $fieldName = '_token')
     {
         $this->csrfProvider = $provider;
@@ -557,40 +511,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
         }
 
         $this->bind($data);
-        $this->validate();
-    }
-
-    /**
-     * Validates the form and its domain object
-     *
-     * @throws FormException  If the option "validator" was not set
-     */
-    public function validate()
-    {
-        if (null === $this->validator) {
-            throw new MissingOptionsException('A validator is required for validating', array('validator'));
-        }
-
-        // Validate the form in group "Default"
-        // Validation of the data in the custom group is done by validateData(),
-        // which is constrained by the Execute constraint
-        if ($violations = $this->validator->validate($this)) {
-            foreach ($violations as $violation) {
-                $propertyPath = new PropertyPath($violation->getPropertyPath());
-                $iterator = $propertyPath->getIterator();
-                $template = $violation->getMessageTemplate();
-                $parameters = $violation->getMessageParameters();
-
-                if ($iterator->current() == 'data') {
-                    $iterator->next(); // point at the first data element
-                    $error = new DataError($template, $parameters);
-                } else {
-                    $error = new FieldError($template, $parameters);
-                }
-
-                $this->addError($error, $iterator);
-            }
-        }
     }
 
     /**

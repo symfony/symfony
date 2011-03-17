@@ -96,7 +96,6 @@ class TestSetDataBeforeConfigureForm extends Form
 
 class FormTest extends TestCase
 {
-    protected $validator;
     protected $form;
 
     public static function setUpBeforeClass()
@@ -108,8 +107,7 @@ class FormTest extends TestCase
     {
         parent::setUp();
 
-        $this->validator = $this->createMockValidator();
-        $this->form = $this->factory->getInstance('form', 'author', array('validator' => $this->validator));
+        $this->form = $this->factory->getInstance('form', 'author');
     }
 
     public function testNoCsrfProtectionByDefault()
@@ -220,11 +218,6 @@ class FormTest extends TestCase
         $this->assertFalse($form->isCsrfTokenValid());
     }
 
-    public function testGetValidator()
-    {
-        $this->assertSame($this->validator, $this->form->getValidator());
-    }
-
     public function testValidationGroupNullByDefault()
     {
         $this->assertNull($this->form->getValidationGroups());
@@ -276,16 +269,15 @@ class FormTest extends TestCase
     {
         $form = $this->factory->getInstance('form', 'author', array(
             'validation_groups' => 'group',
-            'validator' => $this->validator,
         ));
         $form->add($this->factory->getInstance('field', 'firstName'));
 
         $this->validator->expects($this->once())
-        ->method('validate')
-        ->with($this->equalTo($form));
+            ->method('validate')
+            ->with($this->equalTo($form));
 
-        // concrete request is irrelevant
-        $form->bindRequest($this->createPostRequest());
+        // specific data is irrelevant
+        $form->bind(array());
     }
 
     public function testBindDoesNotValidateArrays()

@@ -29,8 +29,8 @@ class DefaultConfigLoader implements ConfigLoaderInterface
             ValidatorInterface $validator, TemporaryStorage $storage,
             EntityManager $em = null)
     {
-        $this->addConfig(new Config\FieldConfig($factory, $theme));
-        $this->addConfig(new Config\FormConfig($factory, $csrfProvider, $validator));
+        $this->addConfig(new Config\FieldConfig($factory, $theme, $validator));
+        $this->addConfig(new Config\FormConfig($factory, $csrfProvider));
         $this->addConfig(new Config\CheckboxFieldConfig($factory));
         $this->addConfig(new Config\ChoiceFieldConfig($factory));
         $this->addConfig(new Config\CollectionFieldConfig($factory));

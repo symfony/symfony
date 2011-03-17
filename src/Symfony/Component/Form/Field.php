@@ -72,6 +72,7 @@ class Field implements FieldInterface
     private $disabled = false;
     private $dispatcher;
     private $modifyByReference = true;
+    private $validationGroups;
 
     public function __construct($name, EventDispatcherInterface $dispatcher)
     {
@@ -565,5 +566,28 @@ class Field implements FieldInterface
     public function isModifiedByReference()
     {
         return $this->modifyByReference;
+    }
+
+    public function setValidationGroups($validationGroups)
+    {
+        $this->validationGroups = empty($validationGroups) ? null : (array)$validationGroups;
+
+        return $this;
+    }
+
+    /**
+     * Returns the validation groups validated by the form
+     *
+     * @return array  A list of validation groups or null
+     */
+    public function getValidationGroups()
+    {
+        $groups = $this->validationGroups;
+
+        if (!$groups && $this->hasParent()) {
+            $groups = $this->getParent()->getValidationGroups();
+        }
+
+        return $groups;
     }
 }

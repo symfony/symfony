@@ -18,17 +18,23 @@ use Symfony\Component\Form\Renderer\DefaultRenderer;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Form\Renderer\Plugin\FieldPlugin;
 use Symfony\Component\Form\EventListener\TrimListener;
+use Symfony\Component\Form\EventListener\ValidationListener;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Validator\ValidatorInterface;
 
 class FieldConfig extends AbstractFieldConfig
 {
     private $theme;
 
-    public function __construct(FormFactoryInterface $factory, ThemeInterface $theme)
+    private $validator;
+
+    public function __construct(FormFactoryInterface $factory,
+            ThemeInterface $theme, ValidatorInterface $validator)
     {
         parent::__construct($factory);
 
         $this->theme = $theme;
+        $this->validator = $validator;
     }
 
     public function configure(FieldInterface $field, array $options)
@@ -40,6 +46,7 @@ class FieldConfig extends AbstractFieldConfig
             ->setDisabled($options['disabled'])
             ->setValueTransformer($options['value_transformer'])
             ->setNormalizationTransformer($options['normalization_transformer'])
+            ->addEventSubscriber(new ValidationListener($this->validator), -128)
             ->setData($options['data'])
             ->setRenderer(new DefaultRenderer($field, $this->theme, $options['template']))
             ->addRendererPlugin(new FieldPlugin());

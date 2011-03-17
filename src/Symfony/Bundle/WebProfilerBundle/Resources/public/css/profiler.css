@@ -21,7 +21,7 @@ p
 {
   font-size:14px;
   line-height:20px;
-  color:#868686;
+  color:#313131;
   padding-bottom:20px
 }
 
@@ -247,6 +247,7 @@ h1
 h2, h3
 {
     font-weight:bold;
+    margin-bottom: 20px;
 }
 
 li
@@ -302,10 +303,9 @@ table th.value
 
 #content h2
 {
-    font-size:16px;
+    font-size:24px;
     color:#313131;
     font-weight:bold;
-    padding-bottom:2px;
 }
 
 #content #main
@@ -317,7 +317,7 @@ table th.value
 
 #content #main p
 {
-    color:#868686;
+    color:#313131;
     font-size:14px;
     padding-bottom:20px;
 }

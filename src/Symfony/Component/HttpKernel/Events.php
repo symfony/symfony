@@ -56,8 +56,6 @@ final class Events
      */
     const onCoreView = 'onCoreView';
 
-    const onCoreSecurity = 'onCoreSecurity';
-
     /**
      * The filterCoreController event occurs once a controller was found for
      * handling a request

@@ -14,7 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Profiler;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseFromExceptionEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -61,9 +61,9 @@ class ProfilerListener
     /**
      * Handles the onCoreException event.
      *
-     * @param GetResponseFromExceptionEvent $event A GetResponseFromExceptionEvent instance
+     * @param GetResponseForExceptionEvent $event A GetResponseForExceptionEvent instance
      */
-    public function onCoreException(GetResponseFromExceptionEvent $event)
+    public function onCoreException(GetResponseForExceptionEvent $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;

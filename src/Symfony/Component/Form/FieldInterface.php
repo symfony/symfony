@@ -121,13 +121,6 @@ interface FieldInterface
     function isValid();
 
     /**
-     * Returns whether the field requires a multipart form.
-     *
-     * @return Boolean
-     */
-    function isMultipart();
-
-    /**
      * Returns whether the field is required to be filled out.
      *
      * If the field has a parent and the parent is not required, this method

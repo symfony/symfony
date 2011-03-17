@@ -1005,24 +1005,6 @@ class FormTest extends TestCase
         $this->assertEquals($object, $form->getData());
     }
 
-    public function testIsMultipartIfAnyFieldIsMultipart()
-    {
-        $form = $this->factory->getInstance('form', 'author');
-        $form->add($this->createMultipartMockField('firstName'));
-        $form->add($this->createNonMultipartMockField('lastName'));
-
-        $this->assertTrue($form->isMultipart());
-    }
-
-    public function testIsNotMultipartIfNoFieldIsMultipart()
-    {
-        $form = $this->factory->getInstance('form', 'author');
-        $form->add($this->createNonMultipartMockField('firstName'));
-        $form->add($this->createNonMultipartMockField('lastName'));
-
-        $this->assertFalse($form->isMultipart());
-    }
-
     public function testSubmitWithoutPriorSetData()
     {
         return; // TODO

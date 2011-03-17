@@ -51,5 +51,6 @@ class FieldPlugin implements RendererPluginInterface
         $renderer->setVar('max_length', null);
         $renderer->setVar('size', null);
         $renderer->setVar('label', ucfirst(strtolower(str_replace('_', ' ', $field->getName()))));
+        $renderer->setVar('multipart', false);
     }
 }

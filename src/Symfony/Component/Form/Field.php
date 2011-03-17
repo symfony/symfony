@@ -189,14 +189,6 @@ class Field implements FieldInterface
     /**
      * {@inheritDoc}
      */
-    public function isMultipart()
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function setParent(FieldInterface $parent = null)
     {
         $this->parent = $parent;

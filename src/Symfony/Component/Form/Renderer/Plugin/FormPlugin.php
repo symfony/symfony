@@ -25,11 +25,14 @@ class FormPlugin implements RendererPluginInterface
         }
 
         $fields = array();
+        $multipart = false;
 
-        foreach ($this->form as $name => $field) {
+        foreach ($form as $name => $field) {
             $fields[$name] = $field->getRenderer();
+            $multipart = $multipart || $fields[$name]->getVar('multipart');
         }
 
         $renderer->setVar('fields', $fields);
+        $renderer->setVar('multipart', $multipart);
     }
 }

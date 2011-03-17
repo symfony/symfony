@@ -477,22 +477,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
     }
 
     /**
-     * Returns whether the field requires a multipart form.
-     *
-     * @return Boolean
-     */
-    public function isMultipart()
-    {
-        foreach ($this->fields as $field) {
-            if ($field->isMultipart()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Returns true if the field exists (implements the \ArrayAccess interface).
      *
      * @param string $name The name of the field

@@ -42,11 +42,7 @@ class FieldConfig extends AbstractFieldConfig
             ->setNormalizationTransformer($options['normalization_transformer'])
             ->setData($options['data'])
             ->setRenderer(new DefaultRenderer($field, $this->theme, $options['template']))
-            ->addRendererPlugin(new FieldPlugin())
-            ->setRendererVar('class', null)
-            ->setRendererVar('max_length', null)
-            ->setRendererVar('size', null)
-            ->setRendererVar('label', ucfirst(strtolower(str_replace('_', ' ', $field->getName()))));
+            ->addRendererPlugin(new FieldPlugin());
 
         if ($options['trim']) {
             $field->addEventSubscriber(new TrimListener());

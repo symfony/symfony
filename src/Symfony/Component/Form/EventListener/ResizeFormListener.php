@@ -54,7 +54,7 @@ class ResizeFormListener implements EventSubscriberInterface
         }
 
         foreach ($this->form as $name => $field) {
-            if (!$this->resizeOnBind || '$$key$$' != $name) {
+            if (!$this->resizeOnBind || '$$name$$' != $name) {
                 $this->form->remove($name);
             }
         }
@@ -77,7 +77,7 @@ class ResizeFormListener implements EventSubscriberInterface
         }
 
         foreach ($this->form as $name => $field) {
-            if (!isset($data[$name]) && $this->resizeOnBind && '$$key$$' != $name) {
+            if (!isset($data[$name]) && $this->resizeOnBind && '$$name$$' != $name) {
                 $this->form->remove($name);
                 $this->removedFields[] = $name;
             }

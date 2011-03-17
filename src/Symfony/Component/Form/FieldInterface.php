@@ -47,28 +47,17 @@ interface FieldInterface
     function getParent();
 
     /**
-     * Sets the key by which the field is identified in field groups.
+     * Returns the name by which the field is identified in forms.
      *
-     * Once this field is nested in a field group, i.e. after setParent() was
-     * called for the first time, this method should throw an exception.
-     *
-     * @param  string $key             The key of the field
-     * @throws BadMethodCallException  When the field already has a parent
+     * @return string  The name of the field.
      */
-    function setKey($key);
-
-    /**
-     * Returns the key by which the field is identified in field groups.
-     *
-     * @return string  The key of the field.
-     */
-    function getKey();
+    function getName();
 
     /**
      * Sets the property path
      *
      * The property path determines the property or a sequence of properties
-     * that a field updates in the data of the field group.
+     * that a field updates in the data of the form.
      *
      * @param string $propertyPath
      */

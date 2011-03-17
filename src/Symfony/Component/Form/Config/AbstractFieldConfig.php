@@ -28,16 +28,16 @@ abstract class AbstractFieldConfig implements FieldConfigInterface
         return $this->factory;
     }
 
-    protected function getInstance($identifier, $key = null, array $options = array())
+    protected function getInstance($identifier, $name = null, array $options = array())
     {
-        return $this->factory->getInstance($identifier, $key, $options);
+        return $this->factory->getInstance($identifier, $name, $options);
     }
 
     public function configure(FieldInterface $field, array $options)
     {
     }
 
-    public function createInstance($key)
+    public function createInstance($name)
     {
         return null;
     }

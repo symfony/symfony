@@ -27,8 +27,8 @@ class FormPlugin implements PluginInterface
     {
         $fields = array();
 
-        foreach ($this->form as $key => $field) {
-            $fields[$key] = $field->getRenderer();
+        foreach ($this->form as $name => $field) {
+            $fields[$name] = $field->getRenderer();
         }
 
         $renderer->setVar('fields', $fields);

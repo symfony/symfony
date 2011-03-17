@@ -1323,7 +1323,7 @@ class FormTest extends TestCase
         );
 
         $field->expects($this->any())
-                    ->method('getKey')
+                    ->method('getName')
                     ->will($this->returnValue($key));
 
         return $field;

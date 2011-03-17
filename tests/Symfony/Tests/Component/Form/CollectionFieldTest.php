@@ -60,13 +60,13 @@ class CollectionFieldTest extends TestCase
 
         $this->assertTrue($field[0] instanceof Field);
         $this->assertTrue($field[1] instanceof Field);
-        $this->assertTrue($field['$$key$$'] instanceof Field);
+        $this->assertTrue($field['$$name$$'] instanceof Field);
         $this->assertEquals(3, count($field));
 
         $field->setData(array('foo@baz.com'));
         $this->assertTrue($field[0] instanceof Field);
         $this->assertFalse(isset($field[1]));
-        $this->assertTrue($field['$$key$$'] instanceof Field);
+        $this->assertTrue($field['$$name$$'] instanceof Field);
         $this->assertEquals(2, count($field));
     }
 
@@ -88,7 +88,7 @@ class CollectionFieldTest extends TestCase
         $field->setData(array('foo@bar.com'));
 
         $this->assertTrue($field['0'] instanceof Field);
-        $this->assertTrue($field['$$key$$'] instanceof Field);
+        $this->assertTrue($field['$$name$$'] instanceof Field);
         $this->assertEquals(2, count($field));
     }
 

@@ -55,7 +55,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class Field implements FieldInterface
 {
     private $errors = array();
-    private $key = '';
+    private $name = '';
     private $parent;
     private $submitted = false;
     private $required;
@@ -72,9 +72,9 @@ class Field implements FieldInterface
     private $disabled = false;
     private $dispatcher;
 
-    public function __construct($key, EventDispatcherInterface $dispatcher)
+    public function __construct($name, EventDispatcherInterface $dispatcher)
     {
-        $this->key = (string)$key;
+        $this->name = (string)$name;
         $this->dispatcher = $dispatcher;
     }
 
@@ -153,17 +153,9 @@ class Field implements FieldInterface
     /**
      * {@inheritDoc}
      */
-    public function setKey($key)
+    public function getName()
     {
-        $this->key = (string)$key;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getKey()
-    {
-        return $this->key;
+        return $this->name;
     }
 
     /**

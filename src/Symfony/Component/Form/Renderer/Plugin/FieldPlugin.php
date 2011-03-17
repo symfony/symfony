@@ -34,7 +34,7 @@ class FieldPlugin implements PluginInterface
      */
     public function setUp(RendererInterface $renderer)
     {
-        $fieldKey = $this->field->getKey();
+        $fieldKey = $this->field->getName();
 
         if ($this->field->hasParent()) {
             $parentRenderer = $this->field->getParent()->getRenderer();
@@ -57,6 +57,6 @@ class FieldPlugin implements PluginInterface
         $renderer->setVar('class', null);
         $renderer->setVar('max_length', null);
         $renderer->setVar('size', null);
-        $renderer->setVar('label', ucfirst(strtolower(str_replace('_', ' ', $this->field->getKey()))));
+        $renderer->setVar('label', ucfirst(strtolower(str_replace('_', ' ', $this->field->getName()))));
     }
 }

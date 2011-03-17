@@ -64,9 +64,9 @@ class FormConfig extends AbstractFieldConfig
         );
     }
 
-    public function createInstance($key)
+    public function createInstance($name)
     {
-        return new Form($key, new EventDispatcher(), $this->getFormFactory(),
+        return new Form($name, new EventDispatcher(), $this->getFormFactory(),
                 $this->csrfProvider, $this->validator);
     }
 

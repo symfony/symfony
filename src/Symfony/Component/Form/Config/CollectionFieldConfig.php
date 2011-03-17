@@ -19,7 +19,7 @@ class CollectionFieldConfig extends AbstractFieldConfig
     public function configure(FieldInterface $field, array $options)
     {
         if ($options['modifiable']) {
-            $field->add($options['prototype'], '$$key$$', array(
+            $field->add($options['prototype'], '$$name$$', array(
                 'property_path' => null,
                 'required' => false,
             ));

@@ -81,13 +81,13 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
 
     private $csrfProvider;
 
-    public function __construct($key, EventDispatcherInterface $dispatcher,
+    public function __construct($name, EventDispatcherInterface $dispatcher,
             FormFactoryInterface $factory, CsrfProviderInterface $csrfProvider,
             ValidatorInterface $validator)
     {
         $dispatcher->addEventSubscriber($this);
 
-        parent::__construct($key, $dispatcher);
+        parent::__construct($name, $dispatcher);
 
         $this->factory = $factory;
         $this->csrfProvider = $csrfProvider;
@@ -142,14 +142,14 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
                 throw new UnexpectedTypeException($field, 'FieldInterface or string');
             }
 
-            // TODO turn order of $identifier and $key around
+            // TODO turn order of $identifier and $name around
 
             if (func_num_args() > 2 || (func_num_args() > 1 && !is_array(func_get_arg(1)))) {
                 $identifier = func_get_arg(0);
-                $key = func_get_arg(1);
+                $name = func_get_arg(1);
                 $options = func_num_args() > 2 ? func_get_arg(2) : array();
 
-                $field = $this->factory->getInstance($identifier, $key, $options);
+                $field = $this->factory->getInstance($identifier, $name, $options);
             } else {
                 $class = $this->getDataClass();
 
@@ -164,11 +164,11 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
             }
         }
 
-        if ('' === $field->getKey() || null === $field->getKey()) {
+        if ('' === $field->getName() || null === $field->getName()) {
             throw new FieldDefinitionException('You cannot add anonymous fields');
         }
 
-        $this->fields[$field->getKey()] = $field;
+        $this->fields[$field->getName()] = $field;
 
         $field->setParent($this);
 
@@ -184,41 +184,41 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
     }
 
     /**
-     * Removes the field with the given key.
+     * Removes the field with the given name.
      *
-     * @param string $key
+     * @param string $name
      */
-    public function remove($key)
+    public function remove($name)
     {
-        $this->fields[$key]->setParent(null);
+        $this->fields[$name]->setParent(null);
 
-        unset($this->fields[$key]);
+        unset($this->fields[$name]);
     }
 
     /**
-     * Returns whether a field with the given key exists.
+     * Returns whether a field with the given name exists.
      *
-     * @param  string $key
+     * @param  string $name
      * @return Boolean
      */
-    public function has($key)
+    public function has($name)
     {
-        return isset($this->fields[$key]);
+        return isset($this->fields[$name]);
     }
 
     /**
-     * Returns the field with the given key.
+     * Returns the field with the given name.
      *
-     * @param  string $key
+     * @param  string $name
      * @return FieldInterface
      */
-    public function get($key)
+    public function get($name)
     {
-        if (isset($this->fields[$key])) {
-            return $this->fields[$key];
+        if (isset($this->fields[$name])) {
+            return $this->fields[$name];
         }
 
-        throw new \InvalidArgumentException(sprintf('Field "%s" does not exist.', $key));
+        throw new \InvalidArgumentException(sprintf('Field "%s" does not exist.', $name));
     }
 
     /**
@@ -287,15 +287,15 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
             throw new UnexpectedTypeException($data, 'array');
         }
 
-        foreach ($this->fields as $key => $field) {
-            if (!isset($data[$key])) {
-                $data[$key] = null;
+        foreach ($this->fields as $name => $field) {
+            if (!isset($data[$name])) {
+                $data[$name] = null;
             }
         }
 
-        foreach ($data as $key => $value) {
-            if ($this->has($key)) {
-                $this->fields[$key]->submit($value);
+        foreach ($data as $name => $value) {
+            if ($this->has($name)) {
+                $this->fields[$name]->submit($value);
             }
         }
 
@@ -324,8 +324,8 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
     {
         $values = array();
 
-        foreach ($this->fields as $key => $field) {
-            $values[$key] = $field->getDisplayedData();
+        foreach ($this->fields as $name => $field) {
+            $values[$name] = $field->getDisplayedData();
         }
 
         return $values;
@@ -343,9 +343,9 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
 
         $this->extraFields = array();
 
-        foreach ((array)$data as $key => $value) {
-            if (!$this->has($key)) {
-                $this->extraFields[] = $key;
+        foreach ((array)$data as $name => $value) {
+            if (!$this->has($name)) {
+                $this->extraFields[] = $name;
             }
         }
     }
@@ -512,25 +512,25 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
     /**
      * Returns true if the field exists (implements the \ArrayAccess interface).
      *
-     * @param string $key The key of the field
+     * @param string $name The name of the field
      *
      * @return Boolean true if the widget exists, false otherwise
      */
-    public function offsetExists($key)
+    public function offsetExists($name)
     {
-        return $this->has($key);
+        return $this->has($name);
     }
 
     /**
      * Returns the form field associated with the name (implements the \ArrayAccess interface).
      *
-     * @param string $key The offset of the value to get
+     * @param string $name The offset of the value to get
      *
      * @return Field A form field instance
      */
-    public function offsetGet($key)
+    public function offsetGet($name)
     {
-        return $this->get($key);
+        return $this->get($name);
     }
 
     /**
@@ -541,7 +541,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
      *
      * @throws \LogicException
      */
-    public function offsetSet($key, $field)
+    public function offsetSet($name, $field)
     {
         throw new \LogicException('Use the method add() to add fields');
     }
@@ -549,13 +549,13 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
     /**
      * Throws an exception saying that values cannot be unset (implements the \ArrayAccess interface).
      *
-     * @param string $key
+     * @param string $name
      *
      * @throws \LogicException
      */
-    public function offsetUnset($key)
+    public function offsetUnset($name)
     {
-        return $this->remove($key);
+        return $this->remove($name);
     }
 
     /**
@@ -699,7 +699,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
      */
     public function bind(Request $request, $data = null)
     {
-        if (!$this->getKey()) {
+        if (!$this->getName()) {
             throw new FormException('You cannot bind anonymous forms. Please give this form a name');
         }
 
@@ -718,22 +718,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
 
             $this->validate();
         }
-    }
-
-    /**
-     * @deprecated
-     */
-    private function getName()
-    {
-        return null === $this->getParent() ? $this->getKey() : $this->getParent()->getName().'['.$this->key.']';
-    }
-
-    /**
-     * @deprecated
-     */
-    private function getId()
-    {
-        return null === $this->getParent() ? $this->getKey() : $this->getParent()->getId().'_'.$this->key;
     }
 
     /**

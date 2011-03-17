@@ -34,7 +34,7 @@ class FieldConfig extends AbstractFieldConfig
     public function configure(FieldInterface $field, array $options)
     {
         $field->setPropertyPath($options['property_path'] === false
-                    ? $field->getKey()
+                    ? $field->getName()
                     : $options['property_path'])
             ->setRequired($options['required'])
             ->setDisabled($options['disabled'])
@@ -46,7 +46,7 @@ class FieldConfig extends AbstractFieldConfig
             ->setRendererVar('class', null)
             ->setRendererVar('max_length', null)
             ->setRendererVar('size', null)
-            ->setRendererVar('label', ucfirst(strtolower(str_replace('_', ' ', $field->getKey()))));
+            ->setRendererVar('label', ucfirst(strtolower(str_replace('_', ' ', $field->getName()))));
 
         if ($options['trim']) {
             $field->addEventSubscriber(new TrimListener());
@@ -67,9 +67,9 @@ class FieldConfig extends AbstractFieldConfig
         );
     }
 
-    public function createInstance($key)
+    public function createInstance($name)
     {
-        return new Field($key, new EventDispatcher());
+        return new Field($name, new EventDispatcher());
     }
 
     public function getParent(array $options)

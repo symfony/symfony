@@ -25,7 +25,7 @@ class Configuration
         $rootNode
             ->children()
                 ->scalarNode('cache_warmer')->end()
-                ->end();
+            ->end();
         ;
 
         $this->addExtensionsSection($rootNode);

@@ -102,7 +102,7 @@ class Configuration
                 ->end()
                 ->fixXmlConfig('driver_class', 'driverClass')
                 ->children()
-                    ->scalarNode('driver_class')->end()
+                    ->scalarNode('driverClass')->end()
                 ->end()
                 ->fixXmlConfig('options', 'driverOptions')
                 ->children()
@@ -113,7 +113,7 @@ class Configuration
                 ->end()
                 ->fixXmlConfig('wrapper_class', 'wrapperClass')
                 ->children()
-                    ->scalarNode('wrapper_class')->end()
+                    ->scalarNode('wrapperClass')->end()
                 ->end()
             ->end()
         ;

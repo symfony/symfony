@@ -35,8 +35,8 @@ abstract class Output implements OutputInterface
     const OUTPUT_RAW = 1;
     const OUTPUT_PLAIN = 2;
 
-    protected $verbosity;
-    protected $formatter;
+    private $verbosity;
+    private $formatter;
 
     /**
      * Constructor.

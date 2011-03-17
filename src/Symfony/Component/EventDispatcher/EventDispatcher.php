@@ -23,7 +23,8 @@
 namespace Symfony\Component\EventDispatcher;
 
 /**
- * The EventDispatcherInterface is the central point of Doctrine's event listener system.
+ * The EventDispatcherInterface is the central point of Symfony's event listener system.
+ *
  * Listeners are registered on the manager and events are dispatched through the
  * manager.
  *
@@ -65,9 +66,9 @@ class EventDispatcher implements EventDispatcherInterface
     private $sorted = array();
 
     /**
-     * @see EventDispatcherInterface::dispatchEvent
+     * @see EventDispatcherInterface::dispatch
      */
-    public function dispatchEvent($eventName, Event $event = null)
+    public function dispatch($eventName, Event $event = null)
     {
         if (isset($this->listeners[$eventName])) {
             if (null === $event) {
@@ -84,6 +85,78 @@ class EventDispatcher implements EventDispatcherInterface
                 }
             }
         }
+    }
+
+    /**
+     * @see EventDispatcherInterface::getListeners
+     */
+    public function getListeners($eventName = null)
+    {
+        if ($eventName) {
+            $this->sortListeners($eventName);
+
+            return $this->listeners[$eventName];
+        }
+
+        foreach ($this->listeners as $eventName => $listeners) {
+            $this->sortListeners($eventName);
+        }
+
+        return $this->listeners;
+    }
+
+    /**
+     * @see EventDispatcherInterface::hasListeners
+     */
+    public function hasListeners($eventName)
+    {
+        return isset($this->listeners[$eventName]) && $this->listeners[$eventName];
+    }
+
+    /**
+     * @see EventDispatcherInterface::addListener
+     */
+    public function addListener($eventNames, $listener, $priority = 0)
+    {
+        // Picks the hash code related to that listener
+        $hash = spl_object_hash($listener);
+
+        foreach ((array) $eventNames as $eventName) {
+            if (!isset($this->listeners[$eventName])) {
+                $this->listeners[$eventName] = array();
+                $this->priorities[$eventName] = array();
+            }
+
+            // Prevents duplicate listeners on same event (same instance only)
+            $this->listeners[$eventName][$hash] = $listener;
+            $this->priorities[$eventName][$hash] = $priority;
+            $this->sorted[$eventName] = false;
+        }
+    }
+
+    /**
+     * @see EventDispatcherInterface::removeListener
+     */
+    public function removeListener($eventNames, $listener)
+    {
+        // Picks the hash code related to that listener
+        $hash = spl_object_hash($listener);
+
+        foreach ((array) $eventNames as $eventName) {
+            // Check if actually have this listener associated
+            if (isset($this->listeners[$eventName][$hash])) {
+                unset($this->listeners[$eventName][$hash]);
+                unset($this->priorities[$eventName][$hash]);
+            }
+        }
+    }
+
+    /**
+     * @see EventDispatcherInterface::addSubscriber
+     */
+    public function addSubscriber(EventSubscriberInterface $subscriber, $priority = 0)
+    {
+        $this->addListener($subscriber->getSubscribedEvents(), $subscriber, $priority);
     }
 
     /**
@@ -126,77 +199,5 @@ class EventDispatcher implements EventDispatcherInterface
 
             $this->sorted[$eventName] = true;
         }
-    }
-
-    /**
-     * @see EventDispatcherInterface::getListeners
-     */
-    public function getListeners($eventName = null)
-    {
-        if ($eventName) {
-            $this->sortListeners($eventName);
-
-            return $this->listeners[$eventName];
-        }
-
-        foreach ($this->listeners as $eventName => $listeners) {
-            $this->sortListeners($eventName);
-        }
-
-        return $this->listeners;
-    }
-
-    /**
-     * @see EventDispatcherInterface::hasListeners
-     */
-    public function hasListeners($eventName)
-    {
-        return isset($this->listeners[$eventName]) && $this->listeners[$eventName];
-    }
-
-    /**
-     * @see EventDispatcherInterface::addEventListener
-     */
-    public function addEventListener($eventNames, $listener, $priority = 0)
-    {
-        // Picks the hash code related to that listener
-        $hash = spl_object_hash($listener);
-
-        foreach ((array) $eventNames as $eventName) {
-            if (!isset($this->listeners[$eventName])) {
-                $this->listeners[$eventName] = array();
-                $this->priorities[$eventName] = array();
-            }
-
-            // Prevents duplicate listeners on same event (same instance only)
-            $this->listeners[$eventName][$hash] = $listener;
-            $this->priorities[$eventName][$hash] = $priority;
-            $this->sorted[$eventName] = false;
-        }
-    }
-
-    /**
-     * @see EventDispatcherInterface::removeEventListener
-     */
-    public function removeEventListener($eventNames, $listener)
-    {
-        // Picks the hash code related to that listener
-        $hash = spl_object_hash($listener);
-
-        foreach ((array) $eventNames as $eventName) {
-            // Check if actually have this listener associated
-            if (isset($this->listeners[$eventName][$hash])) {
-                unset($this->listeners[$eventName][$hash]);
-                unset($this->priorities[$eventName][$hash]);
-            }
-        }
-    }
-
-    /**
-     * @see EventDispatcherInterface::addEventSubscriber
-     */
-    public function addEventSubscriber(EventSubscriberInterface $subscriber, $priority = 0)
-    {
-        $this->addEventListener($subscriber->getSubscribedEvents(), $subscriber, $priority);
     }
 }

@@ -58,7 +58,7 @@ class ExceptionListener
      */
     public function register(EventDispatcherInterface $dispatcher)
     {
-        $dispatcher->addEventListener(Events::onCoreException, $this);
+        $dispatcher->addListener(Events::onCoreException, $this);
     }
 
     /**

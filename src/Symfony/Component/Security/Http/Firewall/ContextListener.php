@@ -49,7 +49,7 @@ class ContextListener implements ListenerInterface
         $this->contextKey = $contextKey;
 
         if (null !== $dispatcher) {
-            $dispatcher->addEventListener(Events::onCoreResponse, $this);
+            $dispatcher->addListener(Events::onCoreResponse, $this);
         }
     }
 

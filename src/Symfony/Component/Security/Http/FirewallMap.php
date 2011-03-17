@@ -23,7 +23,7 @@ use Symfony\Component\Security\Http\Firewall\ExceptionListener;
  */
 class FirewallMap implements FirewallMapInterface
 {
-    protected $map = array();
+    private $map = array();
 
     public function add(RequestMatcherInterface $requestMatcher = null, array $listeners = array(), ExceptionListener $exceptionListener = null)
     {

@@ -7,29 +7,27 @@
                         http://symfony.com/schema/dic/doctrine http://symfony.com/schema/dic/doctrine/doctrine-1.0.xsd">
 
     <config>
-        <dbal>
-            <connections>
-                <connection
-                    name="mysql"
-                    dbname="mysql_db"
-                    user="mysql_user"
-                    password="mysql_s3cr3t"
-                    unix-socket="/path/to/mysqld.sock" /><!--  -->
-                <connection
-                    name="sqlite"
-                    driver="pdo_sqlite"
-                    dbname="sqlite_db"
-                    user="sqlite_user"
-                    password="sqlite_s3cr3t"
-                    memory="true" />
-                <connection
-                    name="oci"
-                    driver="oci8"
-                    dbname="oracle_db"
-                    user="oracle_user"
-                    password="oracle_s3cr3t"
-                    charset="utf8" />
-            </connections>
+        <dbal default-connection="mysql">
+            <connection
+                name="mysql"
+                dbname="mysql_db"
+                user="mysql_user"
+                password="mysql_s3cr3t"
+                unix-socket="/path/to/mysqld.sock" /><!--  -->
+            <connection
+                name="sqlite"
+                driver="pdo_sqlite"
+                dbname="sqlite_db"
+                user="sqlite_user"
+                password="sqlite_s3cr3t"
+                memory="true" />
+            <connection
+                name="oci"
+                driver="oci8"
+                dbname="oracle_db"
+                user="oracle_user"
+                password="oracle_s3cr3t"
+                charset="utf8" />
         </dbal>
     </config>
 </srv:container>

@@ -47,7 +47,11 @@ class WebDebugToolbarListener
             return $response;
         }
 
+        $request = $event->get('request');
         if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects) {
+            // keep current flashes for one more request
+            $request->getSession()->setFlashes($request->getSession()->getFlashes());
+
             $response->setContent(
                 sprintf('<html><head></head><body><h1>This Request redirects to<br /><a href="%1$s">%1$s</a>.</h1><h4>The redirect was intercepted by the web debug toolbar to help debugging.<br/>For more information, see the "intercept-redirects" option of the Profiler.</h4></body></html>',
                 $response->headers->get('Location'))
@@ -56,7 +60,6 @@ class WebDebugToolbarListener
             $response->headers->remove('Location');
         }
 
-        $request = $event->get('request');
         if (!$response->headers->has('X-Debug-Token')
             || '3' === substr($response->getStatusCode(), 0, 1)
             || ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))
@@ -86,13 +89,12 @@ class WebDebugToolbarListener
             $substrFunction = 'substr';
         }
 
-        $toolbar = "\n".str_replace("\n", '', $this->templating->render('WebProfilerBundle:Profiler:toolbar_js.html.twig', array('token' => $response->headers->get('X-Debug-Token'))))."\n";
         $content = $response->getContent();
 
         if (false !== $pos = $posrFunction($content, '</body>')) {
+            $toolbar = "\n".str_replace("\n", '', $this->templating->render('WebProfilerBundle:Profiler:toolbar_js.html.twig', array('token' => $response->headers->get('X-Debug-Token'))))."\n";
             $content = $substrFunction($content, 0, $pos).$toolbar.$substrFunction($content, $pos);
+            $response->setContent($content);
         }
-
-        $response->setContent($content);
     }
 }

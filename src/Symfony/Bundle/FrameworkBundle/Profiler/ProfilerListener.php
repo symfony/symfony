@@ -47,6 +47,19 @@ class ProfilerListener
     }
 
     /**
+     * Handles the core.request event
+     *
+     * This method initialize the profiler to be able to get it as a scoped
+     * service when handleResponse() will collect the sub request
+     *
+     * @param EventInterface $event An EventInterface instance
+     */
+    public function handleRequest(EventInterface $event)
+    {
+        $this->container->get('profiler');
+    }
+
+    /**
      * Handles the core.exception event.
      *
      * @param EventInterface $event An EventInterface instance
@@ -71,10 +84,6 @@ class ProfilerListener
      */
     public function handleResponse(EventInterface $event, Response $response)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
-            return $response;
-        }
-
         if (null !== $this->matcher && !$this->matcher->matches($event->get('request'))) {
             return $response;
         }
@@ -83,7 +92,13 @@ class ProfilerListener
             return $response;
         }
 
-        $this->container->get('profiler')->collect($event->get('request'), $response, $this->exception);
+        $profiler = $this->container->get('profiler');
+
+        if ($parent = $this->container->getCurrentScopedStack('request')) {
+            $profiler->setParent($parent['request']['profiler']->getToken());
+        }
+
+        $profiler->collect($event->get('request'), $response, $this->exception);
         $this->exception = null;
 
         return $response;

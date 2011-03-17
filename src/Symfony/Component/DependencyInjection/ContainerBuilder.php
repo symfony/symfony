@@ -27,16 +27,14 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  */
 class ContainerBuilder extends Container implements TaggedContainerInterface
 {
-    protected $extensions     = array();
-    protected $extensionsByNs = array();
-
-    protected $definitions      = array();
-    protected $aliases          = array();
-    protected $loading          = array();
-    protected $resources        = array();
-    protected $extensionConfigs = array();
-    protected $injectors        = array();
-    protected $compiler;
+    private $extensions       = array();
+    private $extensionsByNs   = array();
+    private $definitions      = array();
+    private $aliases          = array();
+    private $resources        = array();
+    private $extensionConfigs = array();
+    private $injectors        = array();
+    private $compiler;
 
     /**
      * Registers an extension.
@@ -344,7 +342,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $this->addDefinitions($container->getDefinitions());
         $this->addAliases($container->getAliases());
         $this->addInterfaceInjectors($container->getInterfaceInjectors());
-        $this->parameterBag->add($container->getParameterBag()->all());
+        $this->getParameterBag()->add($container->getParameterBag()->all());
 
         foreach ($container->getResources() as $resource) {
             $this->addResource($resource);
@@ -718,7 +716,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @throws \InvalidArgumentException When configure callable is not callable
      */
-    protected function createService(Definition $definition, $id)
+    private function createService(Definition $definition, $id)
     {
         if (null !== $definition->getFile()) {
             require_once $this->getParameterBag()->resolveValue($definition->getFile());

@@ -18,27 +18,82 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class SqliteProfilerStorage implements ProfilerStorageInterface
+class SqliteProfilerStorage extends PdoProfilerStorage
 {
-    protected $store;
-    protected $lifetime;
-
     /**
-     * Constructor.
-     *
-     * @param string  $store    The path to the SQLite DB
-     * @param integer $lifetime The lifetime to use for the purge
+     * @throws \RuntimeException When neither of SQLite or PDO_SQLite extension is enabled
      */
-    public function __construct($store, $lifetime = 86400)
+    protected function initDb()
     {
-        $this->store = $store;
-        $this->lifetime = (int) $lifetime;
+        if (null === $this->db || $this->db instanceof \SQLite3) {
+            if ('sqlite' !== substr($this->dsn, 0, 6 )) {
+                throw new \RuntimeException('You are trying to use Sqlite with a wrong dsn. "'.$this->dsn.'"');
+            }
+            if (class_exists('SQLite3')) {
+                $db = new \SQLite3(substr($this->dsn, 7, strlen($this->dsn)), \SQLITE3_OPEN_READWRITE | \SQLITE3_OPEN_CREATE);
+            } elseif (class_exists('PDO') && in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
+                $db = new \PDO($this->dsn);
+            } else {
+                throw new \RuntimeException('You need to enable either the SQLite or PDO_SQLite extension for the profiler to run properly.');
+            }
+
+            $db->exec('CREATE TABLE IF NOT EXISTS sf_profiler_data (token STRING, data STRING, ip STRING, url STRING, time INTEGER, parent STRING, created_at INTEGER)');
+            $db->exec('CREATE INDEX IF NOT EXISTS data_created_at ON sf_profiler_data (created_at)');
+            $db->exec('CREATE INDEX IF NOT EXISTS data_ip ON sf_profiler_data (ip)');
+            $db->exec('CREATE INDEX IF NOT EXISTS data_url ON sf_profiler_data (url)');
+            $db->exec('CREATE INDEX IF NOT EXISTS data_parent ON sf_profiler_data (parent)');
+            $db->exec('CREATE UNIQUE INDEX IF NOT EXISTS data_token ON sf_profiler_data (token)');
+
+            $this->db = $db;
+        }
+
+        return $this->db;
+    }
+
+    protected function exec($db, $query, array $args = array())
+    {
+        if ($db instanceof \SQLite3) {
+            $stmt = $this->prepareStatement($db, $query);
+            foreach ($args as $arg => $val) {
+                $stmt->bindValue($arg, $val, is_int($val) ? \SQLITE3_INTEGER : \SQLITE3_TEXT);
+            }
+
+            $res = $stmt->execute();
+            if (false === $res) {
+                throw new \RuntimeException(sprintf('Error executing SQLite query "%s"', $query));
+            }
+            $res->finalize();
+        } else {
+            parent::exec($db, $query, $args);
+        }
+    }
+
+    protected function fetch($db, $query, array $args = array())
+    {
+        $return = array();
+
+        if ($db instanceof \SQLite3) {
+            $stmt = $this->prepareStatement($db, $query, true);
+            foreach ($args as $arg => $val) {
+                $stmt->bindValue($arg, $val, is_int($val) ? \SQLITE3_INTEGER : \SQLITE3_TEXT);
+            }
+            $res = $stmt->execute();
+            while ($row = $res->fetchArray(\SQLITE3_ASSOC)) {
+                $return[] = $row;
+            }
+            $res->finalize();
+            $stmt->close();
+        } else {
+            $return = parent::fetch($db, $query, $args);
+        }
+
+        return $return;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function find($ip, $url, $limit)
+    protected function buildCriteria($ip, $url, $limit)
     {
         $criteria = array();
         $args = array();
@@ -53,151 +108,7 @@ class SqliteProfilerStorage implements ProfilerStorageInterface
             $args[':url'] = '%'.addcslashes($url, '%_\\').'%';
         }
 
-        $criteria = $criteria ? 'WHERE '.implode(' AND ', $criteria) : '';
-
-        $db = $this->initDb();
-        $tokens = $this->fetch($db, 'SELECT token, ip, url, time FROM data '.$criteria.' ORDER BY time DESC LIMIT '.((integer) $limit), $args);
-        $this->close($db);
-
-        return $tokens;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function read($token)
-    {
-        $db = $this->initDb();
-        $args = array(':token' => $token);
-        $data = $this->fetch($db, 'SELECT data, ip, url, time FROM data WHERE token = :token LIMIT 1', $args);
-        $this->close($db);
-        if (isset($data[0]['data'])) {
-            return array($data[0]['data'], $data[0]['ip'], $data[0]['url'], $data[0]['time']);
-        }
-
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function write($token, $parent, $data, $ip, $url, $time)
-    {
-        $db = $this->initDb();
-        $args = array(
-            ':token'        => $token,
-            ':parent'       => $parent,
-            ':data'         => $data,
-            ':ip'           => $ip,
-            ':url'          => $url,
-            ':time'         => $time,
-            ':created_at'   => time(),
-        );
-        try {
-            $this->exec($db, 'INSERT INTO data (token, parent, data, ip, url, time, created_at) VALUES (:token, :parent, :data, :ip, :url, :time, :created_at)', $args);
-            $this->cleanup();
-            $status = true;
-        } catch (\Exception $e) {
-            $status = false;
-        }
-        $this->close($db);
-
-        return $status;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function purge()
-    {
-        $db = $this->initDb();
-        $this->exec($db, 'DELETE FROM data');
-        $this->close($db);
-    }
-
-    protected function cleanup()
-    {
-        $db = $this->initDb();
-        $this->exec($db, 'DELETE FROM data WHERE created_at < :time', array(':time' => time() - $this->lifetime));
-        $this->close($db);
-    }
-
-    /**
-     * @throws \RuntimeException When neither of SQLite or PDO_SQLite extension is enabled
-     */
-    protected function initDb()
-    {
-        if (class_exists('SQLite3')) {
-            $db = new \SQLite3($this->store, \SQLITE3_OPEN_READWRITE | \SQLITE3_OPEN_CREATE);
-        } elseif (class_exists('PDO') && in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
-            $db = new \PDO('sqlite:'.$this->store);
-        } else {
-            throw new \RuntimeException('You need to enable either the SQLite or PDO_SQLite extension for the profiler to run properly.');
-        }
-
-        $db->exec('CREATE TABLE IF NOT EXISTS data (token STRING, data STRING, ip STRING, url STRING, time INTEGER, parent STRING, created_at INTEGER)');
-        $db->exec('CREATE INDEX IF NOT EXISTS data_created_at ON data (created_at)');
-        $db->exec('CREATE INDEX IF NOT EXISTS data_ip ON data (ip)');
-        $db->exec('CREATE INDEX IF NOT EXISTS data_url ON data (url)');
-        $db->exec('CREATE INDEX IF NOT EXISTS data_parent ON data (parent)');
-        $db->exec('CREATE UNIQUE INDEX IF NOT EXISTS data_token ON data (token)');
-
-        return $db;
-    }
-
-    protected function exec($db, $query, array $args = array())
-    {
-        $stmt = $db->prepare($query);
-
-        if (false === $stmt) {
-            throw new \RuntimeException('The database cannot successfully prepare the statement');
-        }
-
-        if ($db instanceof \SQLite3) {
-            foreach ($args as $arg => $val) {
-                $stmt->bindValue($arg, $val, is_int($val) ? \SQLITE3_INTEGER : \SQLITE3_TEXT);
-            }
-
-            $res = $stmt->execute();
-            if (false === $res) {
-                throw new \RuntimeException(sprintf('Error executing SQLite query "%s"', $query));
-            }
-            $res->finalize();
-        } else {
-            foreach ($args as $arg => $val) {
-                $stmt->bindValue($arg, $val, is_int($val) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
-            }
-            $success = $stmt->execute();
-            if (!$success) {
-                throw new \RuntimeException(sprintf('Error executing SQLite query "%s"', $query));
-            }
-        }
-    }
-
-    protected function fetch($db, $query, array $args = array())
-    {
-        $return = array();
-        $stmt = $db->prepare($query);
-
-        if ($db instanceof \SQLite3) {
-            foreach ($args as $arg => $val) {
-                $stmt->bindValue($arg, $val, is_int($val) ? \SQLITE3_INTEGER : \SQLITE3_TEXT);
-            }
-            $res = $stmt->execute();
-            while ($row = $res->fetchArray(\SQLITE3_ASSOC)) {
-                $return[] = $row;
-            }
-            $res->finalize();
-            $stmt->close();
-        } else {
-            foreach ($args as $arg => $val) {
-                $stmt->bindValue($arg, $val, is_int($val) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
-            }
-            $stmt->execute();
-            $return = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        }
-
-        return $return;
+        return array($criteria, $args);
     }
 
     protected function close($db)

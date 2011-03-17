@@ -47,27 +47,11 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException LogicException
+     * @expectedException InvalidArgumentException
      */
     public function testSetVotersEmpty()
     {
-        $manager = new AccessDecisionManager();
-        $manager->setVoters(array());
-    }
-
-    public function testSetVoters()
-    {
-        $manager = new AccessDecisionManager();
-        $manager->setVoters(array($voter = $this->getVoterSupportsAttribute(true)));
-
-        $this->assertSame(array($voter), $manager->getVoters());
-    }
-
-    public function testGetVoters()
-    {
-        $manager = new AccessDecisionManager(array($voter = $this->getVoterSupportsAttribute(true)));
-
-        $this->assertSame(array($voter), $manager->getVoters());
+        $manager = new AccessDecisionManager(array());
     }
 
     /**
@@ -88,7 +72,6 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
             array('affirmative', $this->getVoters(1, 0, 0), false, true, true),
             array('affirmative', $this->getVoters(1, 2, 0), false, true, true),
             array('affirmative', $this->getVoters(0, 1, 0), false, true, false),
-            array('affirmative', $this->getVoters(0, 0, 0), false, true, false),
             array('affirmative', $this->getVoters(0, 0, 1), false, true, false),
             array('affirmative', $this->getVoters(0, 0, 1), true, true, true),
 
@@ -97,10 +80,8 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
             array('consensus', $this->getVoters(1, 2, 0), false, true, false),
             array('consensus', $this->getVoters(2, 1, 0), false, true, true),
 
-            array('consensus', $this->getVoters(0, 0, 0), false, true, false),
             array('consensus', $this->getVoters(0, 0, 1), false, true, false),
 
-            array('consensus', $this->getVoters(0, 0, 0), true, true, true),
             array('consensus', $this->getVoters(0, 0, 1), true, true, true),
 
             array('consensus', $this->getVoters(2, 2, 0), false, true, true),
@@ -113,9 +94,6 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
             array('unanimous', $this->getVoters(1, 0, 0), false, true, true),
             array('unanimous', $this->getVoters(1, 0, 1), false, true, true),
             array('unanimous', $this->getVoters(1, 1, 0), false, true, false),
-
-            array('unanimous', $this->getVoters(0, 0, 0), false, true, false),
-            array('unanimous', $this->getVoters(0, 0, 0), true, true, true),
 
             array('unanimous', $this->getVoters(0, 0, 2), false, true, false),
             array('unanimous', $this->getVoters(0, 0, 2), true, true, true),

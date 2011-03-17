@@ -3,20 +3,27 @@
 {% block panel %}
     <h2>Search Results</h2>
 
-    <table>
-        <tr>
-            <th>Token</th>
-            <th>IP</th>
-            <th>URL</th>
-            <th>Time</th>
-        </tr>
-        {% for elements in tokens %}
+    {% if tokens %}
+        <table>
             <tr>
-                <td><a href="{{ path('_profiler', { 'token': elements.token }) }}">{{ elements.token }}</a></td>
-                <td>{{ elements.ip }}</td>
-                <td>{{ elements.url }}</td>
-                <td>{{ elements.time|date('r') }}</td>
+                <th>Token</th>
+                <th>IP</th>
+                <th>URL</th>
+                <th>Time</th>
             </tr>
-        {% endfor %}
-    </table>
+            {% for elements in tokens %}
+                <tr>
+                    <td><a href="{{ path('_profiler', { 'token': elements.token }) }}">{{ elements.token }}</a></td>
+                    <td>{{ elements.ip }}</td>
+                    <td>{{ elements.url }}</td>
+                    <td>{{ elements.time|date('r') }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>
+            <em>The query returned no result.</em>
+        </p>
+    {% endif %}
+
 {% endblock %}

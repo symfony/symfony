@@ -56,7 +56,7 @@ class FileLocatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             __DIR__.'/Fixtures'.DIRECTORY_SEPARATOR.'foo.xml',
-            $loader->locate(__DIR__.'/Fixtures/foo.xml', __DIR__),
+            $loader->locate(__DIR__.'/Fixtures'.DIRECTORY_SEPARATOR.'foo.xml', __DIR__),
             '->locate() returns the absolute filename if the file exists in one of the paths given in the constructor'
         );
 

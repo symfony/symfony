@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
  */
 class InMemoryTokenProvider implements TokenProviderInterface
 {
-    protected $tokens = array();
+    private $tokens = array();
 
     public function loadTokenBySeries($series)
     {

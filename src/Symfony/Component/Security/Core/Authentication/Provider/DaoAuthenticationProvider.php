@@ -14,8 +14,8 @@ namespace Symfony\Component\Security\Core\Authentication\Provider;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\User\AccountCheckerInterface;
-use Symfony\Component\Security\Core\User\AccountInterface;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -29,19 +29,19 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
  */
 class DaoAuthenticationProvider extends UserAuthenticationProvider
 {
-    protected $encoderFactory;
-    protected $userProvider;
+    private $encoderFactory;
+    private $userProvider;
 
     /**
      * Constructor.
      *
      * @param UserProviderInterface    $userProvider    A UserProviderInterface instance
-     * @param AccountCheckerInterface  $accountChecker  An AccountCheckerInterface instance
+     * @param UserCheckerInterface  $userChecker  An UserCheckerInterface instance
      * @param EncoderFactoryInterface  $encoderFactory  A EncoderFactoryInterface instance
      */
-    public function __construct(UserProviderInterface $userProvider, AccountCheckerInterface $accountChecker, $providerKey, EncoderFactoryInterface $encoderFactory, $hideUserNotFoundExceptions = true)
+    public function __construct(UserProviderInterface $userProvider, UserCheckerInterface $userChecker, $providerKey, EncoderFactoryInterface $encoderFactory, $hideUserNotFoundExceptions = true)
     {
-        parent::__construct($accountChecker, $providerKey, $hideUserNotFoundExceptions);
+        parent::__construct($userChecker, $providerKey, $hideUserNotFoundExceptions);
 
         $this->encoderFactory = $encoderFactory;
         $this->userProvider = $userProvider;
@@ -50,19 +50,19 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
     /**
      * {@inheritdoc}
      */
-    protected function checkAuthentication(AccountInterface $account, UsernamePasswordToken $token)
+    protected function checkAuthentication(UserInterface $user, UsernamePasswordToken $token)
     {
-        $user = $token->getUser();
-        if ($user instanceof AccountInterface) {
-            if ($account->getPassword() !== $user->getPassword()) {
+        $currentUser = $token->getUser();
+        if ($currentUser instanceof UserInterface) {
+            if ($currentUser->getPassword() !== $user->getPassword()) {
                 throw new BadCredentialsException('The credentials were changed from another session.');
             }
         } else {
-            if (!$presentedPassword = (string) $token->getCredentials()) {
+            if (!$presentedPassword = $token->getCredentials()) {
                 throw new BadCredentialsException('Bad credentials');
             }
 
-            if (!$this->encoderFactory->getEncoder($account)->isPasswordValid($account->getPassword(), $presentedPassword, $account->getSalt())) {
+            if (!$this->encoderFactory->getEncoder($user)->isPasswordValid($user->getPassword(), $presentedPassword, $user->getSalt())) {
                 throw new BadCredentialsException('Bad credentials');
             }
         }
@@ -74,15 +74,15 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
     protected function retrieveUser($username, UsernamePasswordToken $token)
     {
         $user = $token->getUser();
-        if ($user instanceof AccountInterface) {
+        if ($user instanceof UserInterface) {
             return $user;
         }
 
         try {
             $user = $this->userProvider->loadUserByUsername($username);
 
-            if (!$user instanceof AccountInterface) {
-                throw new AuthenticationServiceException('The user provider must return an AccountInterface object.');
+            if (!$user instanceof UserInterface) {
+                throw new AuthenticationServiceException('The user provider must return an UserInterface object.');
             }
 
             return $user;

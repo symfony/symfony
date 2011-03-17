@@ -30,7 +30,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         if (file_exists($tmp)) {
             @unlink($tmp);
         }
-        $storage = new SqliteProfilerStorage($tmp);
+        $storage = new SqliteProfilerStorage('sqlite:'.$tmp);
         $storage->purge();
 
         $profiler = new Profiler($storage);

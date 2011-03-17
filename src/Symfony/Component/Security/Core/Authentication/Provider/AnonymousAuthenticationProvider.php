@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
  */
 class AnonymousAuthenticationProvider implements AuthenticationProviderInterface
 {
-    protected $key;
+    private $key;
 
     /**
      * Constructor.

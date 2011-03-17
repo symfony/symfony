@@ -23,7 +23,7 @@ use Symfony\Component\Config\Loader\Loader;
  */
 class ClosureLoader extends Loader
 {
-    protected $container;
+    private $container;
 
     /**
      * Constructor.

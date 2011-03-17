@@ -11,15 +11,14 @@
 
 namespace Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection;
 
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Bundle\DoctrineAbstractBundle\DependencyInjection\AbstractDoctrineExtension;
+use Symfony\Component\Config\Definition\Processor;
 
 /**
  * Doctrine MongoDB ODM extension.
@@ -30,96 +29,115 @@ use Symfony\Bundle\DoctrineAbstractBundle\DependencyInjection\AbstractDoctrineEx
  */
 class DoctrineMongoDBExtension extends AbstractDoctrineExtension
 {
+    /**
+     * Responds to the doctrine_mongo_db configuration parameter.
+     */
     public function load(array $configs, ContainerBuilder $container)
     {
-        foreach ($configs as $config) {
-            $this->doMongodbLoad($config, $container);
+        // Load DoctrineMongoDBBundle/Resources/config/mongodb.xml
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('mongodb.xml');
+
+        $processor = new Processor();
+        $configuration = new Configuration($container->getParameter('kernel.debug'));
+        $config = $processor->process($configuration->getConfigTree(), $configs);
+
+        // can't currently default this correctly in Configuration
+        if (!isset($config['metadata_cache_driver'])) {
+            $config['metadata_cache_driver'] = array('type' => 'array');
         }
+
+        if (empty ($config['default_connection'])) {
+            $keys = array_keys($config['connections']);
+            $config['default_connection'] = reset($keys);
+        }
+
+        if (empty ($config['default_document_manager'])) {
+            $keys = array_keys($config['document_managers']);
+            $config['default_document_manager'] = reset($keys);
+        }
+
+        // set some options as parameters and unset them
+        $config = $this->overrideParameters($config, $container);
+
+        // load the connections
+        $this->loadConnections($config['connections'], $container);
+
+        // load the document managers
+        $this->loadDocumentManagers(
+            $config['document_managers'],
+            $config['default_document_manager'],
+            $config['default_database'],
+            $config['metadata_cache_driver'],
+            $container
+        );
+
+        $this->loadConstraints($container);
     }
 
     /**
-     * Loads the MongoDB ODM configuration.
+     * Uses some of the extension options to override DI extension parameters.
      *
-     * Usage example:
-     *
-     *     <doctrine:mongodb server="mongodb://localhost:27017" />
-     *
-     * @param array $config An array of configuration settings
+     * @param array $options The available configuration options
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    protected function doMongodbLoad($config, ContainerBuilder $container)
+    protected function overrideParameters($options, ContainerBuilder $container)
     {
-        $this->loadDefaults($config, $container);
-        $this->loadConnections($config, $container);
-        $this->loadDocumentManagers($config, $container);
-        $this->loadConstraints($config, $container);
-    }
-
-    /**
-     * Loads the default configuration.
-     *
-     * @param array $config An array of configuration settings
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     */
-    protected function loadDefaults(array $config, ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition('doctrine.odm.mongodb.metadata.annotation')) {
-            // Load DoctrineMongoDBBundle/Resources/config/mongodb.xml
-            $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-            $loader->load('mongodb.xml');
-        }
-
-        // Allow these application configuration options to override the defaults
-        $options = array(
-            'default_document_manager',
-            'default_connection',
-            'metadata_cache_driver',
+        $overrides = array(
             'proxy_namespace',
             'auto_generate_proxy_classes',
             'hydrator_namespace',
             'auto_generate_hydrator_classes',
-            'default_database',
         );
-        foreach ($options as $key) {
-            if (isset($config[$key])) {
-                $container->setParameter('doctrine.odm.mongodb.'.$key, $config[$key]);
-            }
 
-            $nKey = str_replace('_', '-', $key);
-            if (isset($config[$nKey])) {
-                $container->setParameter('doctrine.odm.mongodb.'.$key, $config[$nKey]);
+        foreach ($overrides as $key) {
+            if (isset($options[$key])) {
+                $container->setParameter('doctrine.odm.mongodb.'.$key, $options[$key]);
+
+                // the option should not be used, the parameter should be referenced
+                unset($options[$key]);
             }
         }
+
+        return $options;
     }
 
     /**
      * Loads the document managers configuration.
      *
-     * @param array $config An array of configuration settings
+     * @param array $dmConfigs An array of document manager configs
+     * @param string $defaultDM The default document manager name
+     * @param string $defaultDB The default db name
+     * @param string $defaultMetadataCache The default metadata cache configuration
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    protected function loadDocumentManagers(array $config, ContainerBuilder $container)
+    protected function loadDocumentManagers(array $dmConfigs, $defaultDM, $defaultDB, $defaultMetadataCache, ContainerBuilder $container)
     {
-        $documentManagers = $this->getDocumentManagers($config, $container);
-        foreach ($documentManagers as $name => $documentManager) {
+        foreach ($dmConfigs as $name => $documentManager) {
             $documentManager['name'] = $name;
-            $this->loadDocumentManager($documentManager, $container);
+            $this->loadDocumentManager(
+                $documentManager,
+                $defaultDM,
+                $defaultDB,
+                $defaultMetadataCache,
+                $container
+            );
         }
-        $container->setParameter('doctrine.odm.mongodb.document_managers', array_keys($documentManagers));
+        $container->setParameter('doctrine.odm.mongodb.document_managers', array_keys($dmConfigs));
     }
 
     /**
      * Loads a document manager configuration.
      *
      * @param array $documentManager        A document manager configuration array
+     * @param string $defaultDM The default document manager name
+     * @param string $defaultDB The default db name
+     * @param string $defaultMetadataCache The default metadata cache configuration
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    protected function loadDocumentManager(array $documentManager, ContainerBuilder $container)
+    protected function loadDocumentManager(array $documentManager, $defaultDM, $defaultDB, $defaultMetadataCache, ContainerBuilder $container)
     {
-        $defaultDocumentManager = $container->getParameter('doctrine.odm.mongodb.default_document_manager');
-        $defaultDatabase = isset($documentManager['default_database']) ? $documentManager['default_database'] : $container->getParameter('doctrine.odm.mongodb.default_database');
-        $proxyCacheDir = $container->getParameter('kernel.cache_dir').'/doctrine/odm/mongodb/Proxies';
-        $hydratorCacheDir = $container->getParameter('kernel.cache_dir').'/doctrine/odm/mongodb/Hydrators';
+        $defaultDatabase = isset($documentManager['default_database']) ? $documentManager['default_database'] : $defaultDB;
         $configServiceName = sprintf('doctrine.odm.mongodb.%s_configuration', $documentManager['name']);
 
         if ($container->hasDefinition($configServiceName)) {
@@ -130,20 +148,24 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         }
 
         $this->loadDocumentManagerBundlesMappingInformation($documentManager, $odmConfigDef, $container);
-        $this->loadDocumentManagerMetadataCacheDriver($documentManager, $container);
+        $this->loadDocumentManagerMetadataCacheDriver($documentManager, $container, $defaultMetadataCache);
 
         $methods = array(
             'setMetadataCacheImpl' => new Reference(sprintf('doctrine.odm.mongodb.%s_metadata_cache', $documentManager['name'])),
             'setMetadataDriverImpl' => new Reference(sprintf('doctrine.odm.mongodb.%s_metadata_driver', $documentManager['name'])),
-            'setProxyDir' => $proxyCacheDir,
-            'setProxyNamespace' => $container->getParameter('doctrine.odm.mongodb.proxy_namespace'),
-            'setAutoGenerateProxyClasses' => $container->getParameter('doctrine.odm.mongodb.auto_generate_proxy_classes'),
-            'setHydratorDir' => $hydratorCacheDir,
-            'setHydratorNamespace' => $container->getParameter('doctrine.odm.mongodb.hydrator_namespace'),
-            'setAutoGenerateHydratorClasses' => $container->getParameter('doctrine.odm.mongodb.auto_generate_hydrator_classes'),
+            'setProxyDir' => '%kernel.cache_dir%'.'/doctrine/odm/mongodb/Proxies',
+            'setProxyNamespace' => '%doctrine.odm.mongodb.proxy_namespace%',
+            'setAutoGenerateProxyClasses' => '%doctrine.odm.mongodb.auto_generate_proxy_classes%',
+            'setHydratorDir' => '%kernel.cache_dir%'.'/doctrine/odm/mongodb/Hydrators',
+            'setHydratorNamespace' => '%doctrine.odm.mongodb.hydrator_namespace%',
+            'setAutoGenerateHydratorClasses' => '%doctrine.odm.mongodb.auto_generate_hydrator_classes%',
             'setDefaultDB' => $defaultDatabase,
-            'setLoggerCallable' => array(new Reference('doctrine.odm.mongodb.logger'), 'logQuery'),
         );
+
+        if ($documentManager['logging']) {
+            $methods['setLoggerCallable'] = array(new Reference('doctrine.odm.mongodb.logger'), 'logQuery');
+        }
+
         foreach ($methods as $method => $arg) {
             if ($odmConfigDef->hasMethodCall($method)) {
                 $odmConfigDef->removeMethodCall($method);
@@ -172,7 +194,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         $odmDmDef->addTag('doctrine.odm.mongodb.document_manager');
         $container->setDefinition(sprintf('doctrine.odm.mongodb.%s_document_manager', $documentManager['name']), $odmDmDef);
 
-        if ($documentManager['name'] == $defaultDocumentManager) {
+        if ($documentManager['name'] == $defaultDM) {
             $container->setAlias(
                 'doctrine.odm.mongodb.document_manager',
                 new Alias(sprintf('doctrine.odm.mongodb.%s_document_manager', $documentManager['name']))
@@ -185,52 +207,16 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
     }
 
     /**
-     * Gets the configured document managers.
-     *
-     * @param array $config An array of configuration settings
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     */
-    protected function getDocumentManagers(array $config, ContainerBuilder $container)
-    {
-        $defaultDocumentManager = $container->getParameter('doctrine.odm.mongodb.default_document_manager');
-
-        $documentManagers = array();
-
-        if (isset($config['document-managers'])) {
-            $config['document_managers'] = $config['document-managers'];
-        }
-
-        if (isset($config['document_managers'])) {
-            $configDocumentManagers = $config['document_managers'];
-
-            if (isset($config['document_managers']['document-manager'])) {
-                $config['document_managers']['document_manager'] = $config['document_managers']['document-manager'];
-            }
-
-            if (isset($config['document_managers']['document_manager']) && isset($config['document_managers']['document_manager'][0])) {
-                // Multiple document managers
-                $configDocumentManagers = $config['document_managers']['document_manager'];
-            }
-            foreach ($configDocumentManagers as $name => $documentManager) {
-                $documentManagers[isset($documentManager['id']) ? $documentManager['id'] : $name] = $documentManager;
-            }
-        } else {
-            $documentManagers = array($defaultDocumentManager => $config);
-        }
-        return $documentManagers;
-    }
-
-    /**
      * Loads the configured document manager metadata cache driver.
      *
-     * @param array $config        A configured document manager array
-     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param array $config                 A configured document manager array
+     * @param ContainerBuilder $container   A ContainerBuilder instance
+     * @param array $defaultMetadataCache   The default metadata cache configuration array
      */
-    protected function loadDocumentManagerMetadataCacheDriver(array $documentManager, ContainerBuilder $container)
+    protected function loadDocumentManagerMetadataCacheDriver(array $documentManager, ContainerBuilder $container, $defaultMetadataCache)
     {
-        $metadataCacheDriver = $container->getParameter('doctrine.odm.mongodb.metadata_cache_driver');
-        $dmMetadataCacheDriver = isset($documentManager['metadata-cache-driver']) ? $documentManager['metadata-cache-driver'] : (isset($documentManager['metadata_cache_driver']) ? $documentManager['metadata_cache_driver'] : $metadataCacheDriver);
-        $type = is_array($dmMetadataCacheDriver) && isset($dmMetadataCacheDriver['type']) ? $dmMetadataCacheDriver['type'] : $dmMetadataCacheDriver;
+        $dmMetadataCacheDriver = isset($documentManager['metadata_cache_driver']) ? $documentManager['metadata_cache_driver'] : $defaultMetadataCache;
+        $type = $dmMetadataCacheDriver['type'];
 
         if ('memcache' === $type) {
             $memcacheClass = isset($dmMetadataCacheDriver['class']) ? $dmMetadataCacheDriver['class'] : sprintf('%%doctrine.odm.mongodb.cache.%s_class%%', $type);
@@ -245,18 +231,18 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         } else {
              $cacheDef = new Definition(sprintf('%%doctrine.odm.mongodb.cache.%s_class%%', $type));
         }
+
         $container->setDefinition(sprintf('doctrine.odm.mongodb.%s_metadata_cache', $documentManager['name']), $cacheDef);
     }
 
     /**
      * Loads the configured connections.
      *
-     * @param array $config An array of configuration settings
+     * @param array $config An array of connections configurations
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    protected function loadConnections(array $config, ContainerBuilder $container)
+    protected function loadConnections(array $connections, ContainerBuilder $container)
     {
-        $connections = $this->getConnections($config, $container);
         foreach ($connections as $name => $connection) {
             $odmConnArgs = array(
                 isset($connection['server']) ? $connection['server'] : null,
@@ -266,32 +252,6 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
             $odmConnDef = new Definition('%doctrine.odm.mongodb.connection_class%', $odmConnArgs);
             $container->setDefinition(sprintf('doctrine.odm.mongodb.%s_connection', $name), $odmConnDef);
         }
-    }
-
-    /**
-     * Gets the configured connections.
-     *
-     * @param array $config An array of configuration settings
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     */
-    protected function getConnections(array $config, ContainerBuilder $container)
-    {
-        $defaultConnection = $container->getParameter('doctrine.odm.mongodb.default_connection');
-
-        $connections = array();
-        if (isset($config['connections'])) {
-            $configConnections = $config['connections'];
-            if (isset($config['connections']['connection']) && isset($config['connections']['connection'][0])) {
-                // Multiple connections
-                $configConnections = $config['connections']['connection'];
-            }
-            foreach ($configConnections as $name => $connection) {
-                $connections[isset($connection['id']) ? $connection['id'] : $name] = $connection;
-            }
-        } else {
-            $connections = array($defaultConnection => $config);
-        }
-        return $connections;
     }
 
     /**
@@ -349,7 +309,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         $odmConfigDef->addMethodCall('setDocumentNamespaces', array($this->aliasMap));
     }
 
-    protected function loadConstraints($config, ContainerBuilder $container)
+    protected function loadConstraints(ContainerBuilder $container)
     {
         if ($container->hasParameter('validator.annotations.namespaces')) {
             $container->setParameter('validator.annotations.namespaces', array_merge(

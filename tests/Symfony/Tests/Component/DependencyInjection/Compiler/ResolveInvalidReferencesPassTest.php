@@ -62,6 +62,19 @@ class ResolveInvalidReferencesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', (string) $arguments[0]);
     }
 
+    public function testProcessRemovesPropertiesOnInvalid()
+    {
+        $container = new ContainerBuilder();
+        $def = $container
+            ->register('foo')
+            ->setProperty('foo', new Reference('bar', ContainerInterface::IGNORE_ON_INVALID_REFERENCE))
+        ;
+
+        $this->process($container);
+
+        $this->assertEquals(array(), $def->getProperties());
+    }
+
     protected function process(ContainerBuilder $container, array $exceptions = array())
     {
         $pass = new ResolveInvalidReferencesPass($exceptions);

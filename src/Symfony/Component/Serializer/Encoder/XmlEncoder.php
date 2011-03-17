@@ -296,6 +296,6 @@ class XmlEncoder extends AbstractEncoder
     {
         return $name &&
             false === strpos($name, ' ') &&
-            preg_match('#^[\pL_][\pL0-9._-]+$#ui', $name);
+            preg_match('#^[\pL_][\pL0-9._-]*$#ui', $name);
     }
 }

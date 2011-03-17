@@ -16,21 +16,39 @@ namespace Symfony\Component\Security\Core\Authentication\Token;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class PreAuthenticatedToken extends Token
+class PreAuthenticatedToken extends AbstractToken
 {
+    private $credentials;
+    private $providerKey;
+
     /**
      * Constructor.
      */
-    public function __construct($user, $credentials, $providerKey, array $roles = null)
+    public function __construct($user, $credentials, $providerKey, array $roles = array())
     {
-        parent::__construct(null === $roles ? array() : $roles);
-        if (null !== $roles) {
-            $this->setAuthenticated(true);
+        parent::__construct($roles);
+
+        if (empty($providerKey)) {
+            throw new \InvalidArgumentException('$providerKey must not be empty.');
         }
 
-        $this->user = $user;
+        $this->setUser($user);
         $this->credentials = $credentials;
         $this->providerKey = $providerKey;
+
+        if ($roles) {
+            $this->setAuthenticated(true);
+        }
+    }
+
+    public function getProviderKey()
+    {
+        return $this->providerKey;
+    }
+
+    public function getCredentials()
+    {
+        return $this->credentials;
     }
 
     /**
@@ -41,5 +59,16 @@ class PreAuthenticatedToken extends Token
         parent::eraseCredentials();
 
         $this->credentials = null;
+    }
+
+    public function serialize()
+    {
+        return serialize(array($this->credentials, $this->providerKey, parent::serialize()));
+    }
+
+    public function unserialize($str)
+    {
+        list($this->credentials, $this->providerKey, $parentStr) = unserialize($str);
+        parent::unserialize($parentStr);
     }
 }

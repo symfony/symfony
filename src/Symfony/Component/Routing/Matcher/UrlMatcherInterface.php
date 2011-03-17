@@ -23,9 +23,9 @@ interface UrlMatcherInterface
      *
      * Returns false if no route matches the URL.
      *
-     * @param  string $url URL to be parsed
+     * @param  string $pathinfo The path info to be parsed
      *
      * @return array|false An array of parameters or false if no route matches
      */
-    function match($url);
+    function match($pathinfo);
 }

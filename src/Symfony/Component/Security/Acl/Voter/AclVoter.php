@@ -32,12 +32,12 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
  */
 class AclVoter implements VoterInterface
 {
-    protected $aclProvider;
-    protected $permissionMap;
-    protected $objectIdentityRetrievalStrategy;
-    protected $securityIdentityRetrievalStrategy;
-    protected $allowIfObjectIdentityUnavailable;
-    protected $logger;
+    private $aclProvider;
+    private $permissionMap;
+    private $objectIdentityRetrievalStrategy;
+    private $securityIdentityRetrievalStrategy;
+    private $allowIfObjectIdentityUnavailable;
+    private $logger;
 
     public function __construct(AclProviderInterface $aclProvider, ObjectIdentityRetrievalStrategyInterface $oidRetrievalStrategy, SecurityIdentityRetrievalStrategyInterface $sidRetrievalStrategy, PermissionMapInterface $permissionMap, LoggerInterface $logger = null, $allowIfObjectIdentityUnavailable = true)
     {

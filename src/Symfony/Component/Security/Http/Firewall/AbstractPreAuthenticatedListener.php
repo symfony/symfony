@@ -30,38 +30,19 @@ use Symfony\Component\HttpFoundation\Request;
  */
 abstract class AbstractPreAuthenticatedListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $authenticationManager;
-    protected $providerKey;
     protected $logger;
-    protected $eventDispatcher;
+    private $securityContext;
+    private $authenticationManager;
+    private $providerKey;
+    private $eventDispatcher;
 
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, LoggerInterface $logger = null, EventDispatcherInterface $eventDispatcher = null)
     {
         $this->securityContext = $securityContext;
         $this->authenticationManager = $authenticationManager;
         $this->providerKey = $providerKey;
         $this->logger = $logger;
-    }
-
-    /**
-     *
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
-
-        $this->eventDispatcher = $dispatcher;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -69,7 +50,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
      *
      * @param EventInterface $event An EventInterface instance
      */
-    public function handle(EventInterface $event)
+    public final function handle(EventInterface $event)
     {
         $request = $event->get('request');
 
@@ -80,11 +61,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
         list($user, $credentials) = $this->getPreAuthenticatedData($request);
 
         if (null !== $token = $this->securityContext->getToken()) {
-            if ($token->isImmutable()) {
-                return;
-            }
-
-            if ($token instanceof PreAuthenticatedToken && $token->isAuthenticated() && (string) $token === $user) {
+            if ($token instanceof PreAuthenticatedToken && $token->isAuthenticated() && $token->getUsername() === $user) {
                 return;
             }
         }

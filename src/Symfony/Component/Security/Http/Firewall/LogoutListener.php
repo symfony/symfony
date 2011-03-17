@@ -27,11 +27,11 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  */
 class LogoutListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $logoutPath;
-    protected $targetUrl;
-    protected $handlers;
-    protected $successHandler;
+    private $securityContext;
+    private $logoutPath;
+    private $targetUrl;
+    private $handlers;
+    private $successHandler;
 
     /**
      * Constructor
@@ -58,24 +58,6 @@ class LogoutListener implements ListenerInterface
     public function addHandler(LogoutHandlerInterface $handler)
     {
         $this->handlers[] = $handler;
-    }
-
-    /**
-     * Registers a core.security listener.
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
     }
 
     /**

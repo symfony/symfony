@@ -98,7 +98,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('service_container', 'foo', 'bar'), $sc->getServiceIds(), '->getServiceIds() returns all defined service ids');
 
         $sc = new ProjectServiceContainer();
-        $this->assertEquals(array('scoped', 'scoped_foo', 'bar', 'foo_bar', 'foo.baz', 'circular', 'service_container'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods');
+        $this->assertEquals(array('scoped', 'scoped_foo', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'service_container'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods');
     }
 
     /**
@@ -173,9 +173,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $sc = new ProjectServiceContainer();
         try {
             $sc->get('circular');
-            $this->fail('->get() throws a \LogicException if it contains circular reference');
+            $this->fail('->get() throws a CircularReferenceException if it contains circular reference');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\LogicException', $e, '->get() throws a \LogicException if it contains circular reference');
+            $this->assertInstanceOf('\Symfony\Component\DependencyInjection\Exception\CircularReferenceException', $e, '->get() throws a CircularReferenceException if it contains circular reference');
             $this->assertStringStartsWith('Circular reference detected for service "circular"', $e->getMessage(), '->get() throws a \LogicException if it contains circular reference');
         }
     }
@@ -337,6 +337,25 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($c->isScopeActive('foo'));
     }
 
+    public function testGetThrowsException()
+    {
+        $c = new ProjectServiceContainer();
+
+        try {
+            $c->get('throw_exception');
+            $this->fail();
+        } catch (\Exception $e) {
+            $this->assertEquals('Something went terribly wrong!', $e->getMessage());
+        }
+
+        try {
+            $c->get('throw_exception');
+            $this->fail();
+        } catch (\Exception $e) {
+            $this->assertEquals('Something went terribly wrong!', $e->getMessage());
+        }
+    }
+
     public function getInvalidParentScopes()
     {
         return array(
@@ -411,5 +430,10 @@ class ProjectServiceContainer extends Container
     protected function getCircularService()
     {
         return $this->get('circular');
+    }
+
+    protected function getThrowExceptionService()
+    {
+        throw new \Exception('Something went terribly wrong!');
     }
 }

@@ -47,11 +47,11 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
     public function notify(EventInterface $event)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
+            $this->addCall($event, $listener, 'notify');
+
             if (is_array($listener) && is_string($listener[0])) {
                 $listener[0] = $this->container->get($listener[0]);
             }
-
-            $this->addCall($event, $listener, 'notify');
 
             call_user_func($listener, $event);
         }
@@ -63,11 +63,11 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
     public function notifyUntil(EventInterface $event)
     {
         foreach ($this->getListeners($event->getName()) as $i => $listener) {
+            $this->addCall($event, $listener, 'notifyUntil');
+
             if (is_array($listener) && is_string($listener[0])) {
                 $listener[0] = $this->container->get($listener[0]);
             }
-
-            $this->addCall($event, $listener, 'notifyUntil');
 
             $ret = call_user_func($listener, $event);
             if ($event->isProcessed()) {
@@ -91,11 +91,11 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
     public function filter(EventInterface $event, $value)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
+            $this->addCall($event, $listener, 'filter');
+
             if (is_array($listener) && is_string($listener[0])) {
                 $listener[0] = $this->container->get($listener[0]);
             }
-
-            $this->addCall($event, $listener, 'filter');
 
             $value = call_user_func($listener, $event, $value);
         }
@@ -120,10 +120,6 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
 
         foreach (array_keys($this->listeners) as $name) {
             foreach ($this->getListeners($name) as $listener) {
-                if (is_array($listener) && is_string($listener[0])) {
-                    $listener[0] = $this->container->get($listener[0]);
-                }
-
                 $listener = $this->listenerToString($listener);
 
                 if (!isset($this->called[$name.'.'.$listener])) {
@@ -149,7 +145,7 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
         }
 
         if (is_array($listener)) {
-            return sprintf('%s::%s', is_object($listener[0]) ? get_class($listener[0]) : $listener[0], $listener[1]);
+            return is_object($listener[0]) ? sprintf('%s::%s', get_class($listener[0]), $listener[1]) : implode(':', $listener);
         }
     }
 

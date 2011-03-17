@@ -28,7 +28,7 @@ class BasicPermissionMap implements PermissionMapInterface
     const PERMISSION_MASTER      = 'MASTER';
     const PERMISSION_OWNER       = 'OWNER';
 
-    protected $map = array(
+    private $map = array(
         self::PERMISSION_VIEW => array(
             MaskBuilder::MASK_VIEW,
             MaskBuilder::MASK_EDIT,

@@ -28,9 +28,9 @@ use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class PersistentTokenBasedRememberMeServices extends RememberMeServices
+class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
 {
-    protected $tokenProvider;
+    private $tokenProvider;
 
     /**
      * Sets the token provider
@@ -41,6 +41,21 @@ class PersistentTokenBasedRememberMeServices extends RememberMeServices
     public function setTokenProvider(TokenProviderInterface $tokenProvider)
     {
         $this->tokenProvider = $tokenProvider;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function logout(Request $request, Response $response, TokenInterface $token)
+    {
+        parent::logout($request, $response, $token);
+
+        if (null !== ($cookie = $request->cookies->get($this->options['name']))
+            && count($parts = $this->decodeCookie($cookie)) === 2
+        ) {
+            list($series, $tokenValue) = $parts;
+            $this->tokenProvider->deleteTokenBySeries($series);
+        }
     }
 
     /**
@@ -65,11 +80,22 @@ class PersistentTokenBasedRememberMeServices extends RememberMeServices
             throw new AuthenticationException('The cookie has expired.');
         }
 
-        $user = $this->getUserProvider($persistentToken->getClass())->loadUserByUsername($persistentToken->getUsername());
-        $authenticationToken = new RememberMeToken($user, $this->providerKey, $this->key);
-        $authenticationToken->setPersistentToken($persistentToken);
+        $series = $persistentToken->getSeries();
+        $tokenValue = $this->generateRandomValue();
+        $this->tokenProvider->updateToken($series, $tokenValue, new \DateTime());
+        $request->attributes->set(self::COOKIE_ATTR_NAME,
+            new Cookie(
+                $this->options['name'],
+                $this->encodeCookie(array($series, $tokenValue)),
+                time() + $this->options['lifetime'],
+                $this->options['path'],
+                $this->options['domain'],
+                $this->options['secure'],
+                $this->options['httponly']
+            )
+        );
 
-        return $authenticationToken;
+        return $this->getUserProvider($persistentToken->getClass())->loadUserByUsername($persistentToken->getUsername());
     }
 
     /**
@@ -77,34 +103,23 @@ class PersistentTokenBasedRememberMeServices extends RememberMeServices
      */
     protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token)
     {
-        if ($token instanceof RememberMeToken) {
-            if (null === $persistentToken = $token->getPersistentToken()) {
-                throw new \RuntimeException('RememberMeToken must contain a PersistentTokenInterface implementation when used as login.');
-            }
+        $series = $this->generateRandomValue();
+        $tokenValue = $this->generateRandomValue();
 
-            $series = $persistentToken->getSeries();
-            $tokenValue = $this->generateRandomValue();
-
-            $this->tokenProvider->updateToken($series, $tokenValue, new \DateTime());
-        } else {
-            $series = $this->generateRandomValue();
-            $tokenValue = $this->generateRandomValue();
-
-            $this->tokenProvider->createNewToken(
-                new PersistentToken(
-                    get_class($user = $token->getUser()),
-                    $user->getUsername(),
-                    $series,
-                    $tokenValue,
-                    new \DateTime()
-                )
-            );
-        }
+        $this->tokenProvider->createNewToken(
+            new PersistentToken(
+                get_class($user = $token->getUser()),
+                $user->getUsername(),
+                $series,
+                $tokenValue,
+                new \DateTime()
+            )
+        );
 
         $response->headers->setCookie(
             new Cookie(
                 $this->options['name'],
-                $this->generateCookieValue($series, $tokenValue),
+                $this->encodeCookie(array($series, $tokenValue)),
                 time() + $this->options['lifetime'],
                 $this->options['path'],
                 $this->options['domain'],
@@ -115,33 +130,6 @@ class PersistentTokenBasedRememberMeServices extends RememberMeServices
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function logout(Request $request, Response $response, TokenInterface $token)
-    {
-        parent::logout($request, $response, $token);
-
-        if (null !== ($cookie = $request->cookies->get($this->options['name']))
-            && count($parts = $this->decodeCookie($cookie)) === 2
-        ) {
-            list($series, $tokenValue) = $parts;
-            $this->tokenProvider->deleteTokenBySeries($series);
-        }
-    }
-
-    /**
-     * Generates the value for the cookie
-     *
-     * @param string $series
-     * @param string $tokenValue
-     * @return string
-     */
-    protected function generateCookieValue($series, $tokenValue)
-    {
-        return $this->encodeCookie(array($series, $tokenValue));
-    }
-
-    /**
      * Generates a cryptographically strong random value
      *
      * @return string
@@ -149,7 +137,7 @@ class PersistentTokenBasedRememberMeServices extends RememberMeServices
     protected function generateRandomValue()
     {
         if (function_exists('openssl_random_pseudo_bytes')) {
-            $bytes = openssl_random_pseudo_bytes(32, $strong);
+            $bytes = openssl_random_pseudo_bytes(64, $strong);
 
             if (true === $strong && false !== $bytes) {
                 return base64_encode($bytes);
@@ -160,6 +148,6 @@ class PersistentTokenBasedRememberMeServices extends RememberMeServices
             $this->logger->warn('Could not produce a cryptographically strong random value. Please install/update the OpenSSL extension.');
         }
 
-        return base64_encode(hash('sha256', uniqid(mt_rand(), true), true));
+        return base64_encode(hash('sha512', uniqid(mt_rand(), true), true));
     }
 }

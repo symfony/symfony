@@ -59,7 +59,7 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
      * @param string $currentId The alias identifier being replaced
      * @param string $newId The id of the service the alias points to
      */
-    protected function updateReferences($container, $currentId, $newId)
+    private function updateReferences($container, $currentId, $newId)
     {
         foreach ($container->getAliases() as $id => $alias) {
             if ($currentId === (string) $alias) {
@@ -85,7 +85,7 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
      * @param string $currentId The alias identifier
      * @param string $newId The identifier the alias points to
      */
-    protected function updateArgumentReferences(array $arguments, $currentId, $newId)
+    private function updateArgumentReferences(array $arguments, $currentId, $newId)
     {
         foreach ($arguments as $k => $argument) {
             if (is_array($argument)) {

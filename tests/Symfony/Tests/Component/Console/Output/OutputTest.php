@@ -39,7 +39,13 @@ class OutputTest extends \PHPUnit_Framework_TestCase
     public function testSetStyle()
     {
         Output::setStyle('FOO', array('bg' => 'red', 'fg' => 'yellow', 'blink' => true));
-        $this->assertEquals(array('bg' => 'red', 'fg' => 'yellow', 'blink' => true), TestOutput::getStyle('foo'), '::setStyle() sets a new style');
+
+        $r = new \ReflectionClass('Symfony\Component\Console\Output\Output');
+        $p = $r->getProperty('styles');
+        $p->setAccessible(true);
+        $styles = $p->getValue(null);
+
+        $this->assertEquals(array('bg' => 'red', 'fg' => 'yellow', 'blink' => true), $styles['foo'], '::setStyle() sets a new style');
     }
 
     public function testWrite()
@@ -78,13 +84,13 @@ class OutputTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('Unknown output type given (24)', $e->getMessage());
         }
 
-        try {
-            $output->writeln('<bar>foo</bar>');
-            $this->fail('->writeln() throws an \InvalidArgumentException when a style does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->writeln() throws an \InvalidArgumentException when a style does not exist');
-            $this->assertEquals('Unknown style "bar".', $e->getMessage());
-        }
+        $output->clear();
+        $output->write('<bar>foo</bar>');
+        $this->assertEquals('<bar>foo</bar>', $output->output, '->write() do nothing when a style does not exist');
+
+        $output->clear();
+        $output->writeln('<bar>foo</bar>');
+        $this->assertEquals("<bar>foo</bar>\n", $output->output, '->writeln() do nothing when a style does not exist');
     }
 }
 
@@ -92,9 +98,9 @@ class TestOutput extends Output
 {
     public $output = '';
 
-    static public function getStyle($name)
+    public function clear()
     {
-        return static::$styles[$name];
+        $this->output = '';
     }
 
     public function doWrite($message, $newline)

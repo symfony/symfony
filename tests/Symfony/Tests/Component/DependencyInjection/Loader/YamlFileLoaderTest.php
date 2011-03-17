@@ -34,10 +34,13 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadFile()
     {
-        $loader = new ProjectLoader3(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/ini'));
+        $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/ini'));
+        $r = new \ReflectionObject($loader);
+        $m = $r->getMethod('loadFile');
+        $m->setAccessible(true);
 
         try {
-            $loader->loadFile('foo.yml');
+            $m->invoke($loader, 'foo.yml');
             $this->fail('->load() throws an InvalidArgumentException if the loaded file does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the loaded file does not exist');
@@ -45,18 +48,18 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         }
 
         try {
-            $loader->loadFile('parameters.ini');
+            $m->invoke($loader, 'parameters.ini');
             $this->fail('->load() throws an InvalidArgumentException if the loaded file is not a valid YAML file');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the loaded file is not a valid YAML file');
             $this->assertEquals('The service file "parameters.ini" is not valid.', $e->getMessage(), '->load() throws an InvalidArgumentException if the loaded file is not a valid YAML file');
         }
 
-        $loader = new ProjectLoader3(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
 
         foreach (array('nonvalid1', 'nonvalid2') as $fixture) {
             try {
-                $loader->loadFile($fixture.'.yml');
+                $m->invoke($loader, $fixture.'.yml');
                 $this->fail('->load() throws an InvalidArgumentException if the loaded file does not validate');
             } catch (\Exception $e) {
                 $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the loaded file does not validate');
@@ -68,9 +71,9 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoadParameters()
     {
         $container = new ContainerBuilder();
-        $loader = new ProjectLoader3($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services2.yml');
-        $this->assertEquals(array('foo' => 'bar', 'values' => array(true, false, 0, 1000.3), 'bar' => 'foo', 'foo_bar' => new Reference('foo_bar')), $container->getParameterBag()->all(), '->load() converts YAML keys to lowercase');
+        $this->assertEquals(array('foo' => 'bar', 'mixedcase' => array('MixedCaseKey' => 'value'), 'values' => array(true, false, 0, 1000.3), 'bar' => 'foo', 'foo_bar' => new Reference('foo_bar')), $container->getParameterBag()->all(), '->load() converts YAML keys to lowercase');
     }
 
     public function testLoadImports()
@@ -79,20 +82,20 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $resolver = new LoaderResolver(array(
             new IniFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml')),
             new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml')),
-            $loader = new ProjectLoader3($container, new FileLocator(self::$fixturesPath.'/yaml')),
+            $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml')),
         ));
         $loader->setResolver($resolver);
         $loader->load('services4.yml');
 
         $actual = $container->getParameterBag()->all();
-        $expected = array('foo' => 'bar', 'values' => array(true, false), 'bar' => '%foo%', 'foo_bar' => new Reference('foo_bar'), 'imported_from_ini' => true, 'imported_from_xml' => true);
+        $expected = array('foo' => 'bar', 'values' => array(true, false), 'bar' => '%foo%', 'foo_bar' => new Reference('foo_bar'), 'mixedcase' => array('MixedCaseKey' => 'value'), 'imported_from_ini' => true, 'imported_from_xml' => true);
         $this->assertEquals(array_keys($expected), array_keys($actual), '->load() imports and merges imported files');
     }
 
     public function testLoadServices()
     {
         $container = new ContainerBuilder();
-        $loader = new ProjectLoader3($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services6.yml');
         $services = $container->getDefinitions();
         $this->assertTrue(isset($services['foo']), '->load() parses service elements');
@@ -124,7 +127,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
         $container->registerExtension(new \ProjectExtension());
-        $loader = new ProjectLoader3($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services10.yml');
         $container->compile();
         $services = $container->getDefinitions();
@@ -159,7 +162,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoadInterfaceInjectors()
     {
         $container = new ContainerBuilder();
-        $loader = new ProjectLoader3($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('interfaces1.yml');
         $interfaces = $container->getInterfaceInjectors('FooClass');
         $this->assertEquals(1, count($interfaces), '->load() parses interfaces');
@@ -189,13 +192,5 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if a tag is missing the name key');
             $this->assertStringStartsWith('A "tags" entry is missing a "name" key must be an array for service ', $e->getMessage(), '->load() throws an InvalidArgumentException if a tag is missing the name key');
         }
-    }
-}
-
-class ProjectLoader3 extends YamlFileLoader
-{
-    public function loadFile($file)
-    {
-        return parent::loadFile($file);
     }
 }

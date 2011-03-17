@@ -25,34 +25,15 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
  */
 class AnonymousAuthenticationListener implements ListenerInterface
 {
-    protected $context;
-    protected $key;
-    protected $logger;
+    private $context;
+    private $key;
+    private $logger;
 
     public function __construct(SecurityContextInterface $context, $key, LoggerInterface $logger = null)
     {
         $this->context = $context;
         $this->key     = $key;
         $this->logger  = $logger;
-    }
-
-    /**
-     * Registers a core.security listener to load the SecurityContext from the
-     * session.
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
     }
 
     /**

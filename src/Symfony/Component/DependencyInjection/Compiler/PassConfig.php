@@ -26,12 +26,12 @@ class PassConfig
     const TYPE_OPTIMIZE = 'optimization';
     const TYPE_REMOVE = 'removing';
 
-    protected $mergePass;
-    protected $afterRemovingPasses;
-    protected $beforeOptimizationPasses;
-    protected $beforeRemovingPasses;
-    protected $optimizationPasses;
-    protected $removingPasses;
+    private $mergePass;
+    private $afterRemovingPasses;
+    private $beforeOptimizationPasses;
+    private $beforeRemovingPasses;
+    private $optimizationPasses;
+    private $removingPasses;
 
     /**
      * Constructor.

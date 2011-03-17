@@ -20,8 +20,8 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
  */
 class Translator implements TranslatorInterface
 {
-    private $catalogues;
-    private $locale;
+    protected $catalogues;
+    protected $locale;
     private $fallbackLocale;
     private $loaders;
     private $resources;
@@ -131,7 +131,7 @@ class Translator implements TranslatorInterface
         return strtr($this->selector->choose($this->catalogues[$locale]->get($id, $domain), (int) $number, $locale), $parameters);
     }
 
-    private function loadCatalogue($locale)
+    protected function loadCatalogue($locale)
     {
         $this->catalogues[$locale] = new MessageCatalogue($locale);
 

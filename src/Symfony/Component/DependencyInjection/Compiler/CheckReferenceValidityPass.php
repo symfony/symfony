@@ -2,6 +2,8 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Exception\ScopeWideningInjectionException;
+use Symfony\Component\DependencyInjection\Exception\ScopeCrossingInjectionException;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
@@ -19,17 +21,17 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class CheckReferenceValidityPass implements CompilerPassInterface
 {
-    protected $container;
-    protected $currentId;
-    protected $currentDefinition;
-    protected $currentScope;
-    protected $currentScopeAncestors;
-    protected $currentScopeChildren;
+    private $container;
+    private $currentId;
+    private $currentDefinition;
+    private $currentScope;
+    private $currentScopeAncestors;
+    private $currentScopeChildren;
 
     /**
      * Processes the ContainerBuilder to validate References.
      *
-     * @param ContainerBuilder $container 
+     * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {
@@ -66,6 +68,7 @@ class CheckReferenceValidityPass implements CompilerPassInterface
 
             $this->validateReferences($definition->getArguments());
             $this->validateReferences($definition->getMethodCalls());
+            $this->validateReferences($definition->getProperties());
         }
     }
 
@@ -75,7 +78,7 @@ class CheckReferenceValidityPass implements CompilerPassInterface
      * @param array $arguments An array of Reference objects
      * @throws \RuntimeException when there is a reference to an abstract definition.
      */
-    protected function validateReferences(array $arguments)
+    private function validateReferences(array $arguments)
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
@@ -100,11 +103,11 @@ class CheckReferenceValidityPass implements CompilerPassInterface
     /**
      * Validates the scope of a single Reference.
      *
-     * @param Reference $reference 
-     * @param Definition $definition 
+     * @param Reference $reference
+     * @param Definition $definition
      * @throws \RuntimeException when there is an issue with the Reference scope
      */
-    protected function validateScope(Reference $reference, Definition $definition = null)
+    private function validateScope(Reference $reference, Definition $definition = null)
     {
         if (ContainerInterface::SCOPE_PROTOTYPE === $this->currentScope) {
             return;
@@ -125,30 +128,11 @@ class CheckReferenceValidityPass implements CompilerPassInterface
         $id = (string) $reference;
 
         if (in_array($scope, $this->currentScopeChildren, true)) {
-            throw new \RuntimeException(sprintf(
-                'Scope Widening Injection detected: The definition "%s" references the service "%s" which belongs to a narrower scope. '
-               .'Generally, it is safer to either move "%s" to scope "%s" or alternatively rely on the provider pattern by injecting the container itself, and requesting the service "%s" each time it is needed. '
-               .'In rare, special cases however that might not be necessary, then you can set the reference to strict=false to get rid of this error.',
-               $this->currentId,
-               $id,
-               $this->currentId,
-               $scope,
-               $id
-            ));
+            throw new ScopeWideningInjectionException($this->currentId, $this->currentScope, $id, $scope);
         }
 
         if (!in_array($scope, $this->currentScopeAncestors, true)) {
-            throw new \RuntimeException(sprintf(
-                'Cross-Scope Injection detected: The definition "%s" references the service "%s" which belongs to another scope hierarchy. '
-               .'This service might not be available consistently. Generally, it is safer to either move the definition "%s" to scope "%s", or '
-               .'declare "%s" as a child scope of "%s". If you can be sure that the other scope is always active, you can set the reference to strict=false to get rid of this error.',
-               $this->currentId,
-               $id,
-               $this->currentId,
-               $scope,
-               $this->currentScope,
-               $scope
-            ));
+            throw new ScopeCrossingInjectionException($this->currentId, $this->currentScope, $id, $scope);
         }
     }
 
@@ -158,7 +142,7 @@ class CheckReferenceValidityPass implements CompilerPassInterface
      * @param string $id Definition identifier
      * @return Definition
      */
-    protected function getDefinition($id)
+    private function getDefinition($id)
     {
         if (!$this->container->hasDefinition($id)) {
             return null;

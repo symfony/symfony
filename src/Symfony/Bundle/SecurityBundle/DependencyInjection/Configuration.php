@@ -58,7 +58,7 @@ class Configuration
         return $tb->buildTree();
     }
 
-    protected function addAclSection($rootNode)
+    private function addAclSection($rootNode)
     {
         $rootNode
             ->arrayNode('acl')
@@ -68,7 +68,7 @@ class Configuration
         ;
     }
 
-    protected function addRoleHierarchySection($rootNode)
+    private function addRoleHierarchySection($rootNode)
     {
         $rootNode
             ->fixXmlConfig('role', 'role_hierarchy')
@@ -87,7 +87,7 @@ class Configuration
         ;
     }
 
-    protected function addAccessControlSection($rootNode)
+    private function addAccessControlSection($rootNode)
     {
         $rootNode
             ->fixXmlConfig('rule', 'access_control')
@@ -107,22 +107,12 @@ class Configuration
                         ->beforeNormalization()->ifString()->then(function($v) { return preg_split('/\s*,\s*/', $v); })->end()
                         ->prototype('scalar')->end()
                     ->end()
-                    ->fixXmlConfig('attribute')
-                    ->arrayNode('attributes')
-                        ->useAttributeAsKey('key')
-                        ->prototype('scalar')
-                            ->beforeNormalization()
-                                ->ifTrue(function($v) { return is_array($v) && isset($v['pattern']); })
-                                ->then(function($v) { return $v['pattern']; })
-                            ->end()
-                        ->end()
-                    ->end()
                 ->end()
             ->end()
         ;
     }
 
-    protected function addFirewallsSection($rootNode, array $factories)
+    private function addFirewallsSection($rootNode, array $factories)
     {
         $firewallNodeBuilder =
         $rootNode
@@ -166,7 +156,9 @@ class Configuration
                             ->prototype('scalar')->end()
                         ->end()
                     ->end()
-                    ->booleanNode('anonymous')->defaultFalse()->end()
+                    ->arrayNode('anonymous')
+                        ->scalarNode('key')->defaultValue(uniqid())->end()
+                    ->end()
                     ->arrayNode('switch_user')
                         ->scalarNode('provider')->end()
                         ->scalarNode('parameter')->defaultValue('_switch_user')->end()
@@ -186,7 +178,7 @@ class Configuration
         }
     }
 
-    protected function addProvidersSection($rootNode)
+    private function addProvidersSection($rootNode)
     {
         $rootNode
             ->fixXmlConfig('provider')
@@ -225,7 +217,7 @@ class Configuration
         ;
     }
 
-    protected function addEncodersSection($rootNode)
+    private function addEncodersSection($rootNode)
     {
         $rootNode
             ->fixXmlConfig('encoder')

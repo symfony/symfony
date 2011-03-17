@@ -28,7 +28,7 @@ interface UserProviderInterface
      * @throws UsernameNotFoundException if the user is not found
      * @param string $username The username
      *
-     * @return AccountInterface
+     * @return UserInterface
      */
     function loadUserByUsername($username);
 
@@ -39,12 +39,12 @@ interface UserProviderInterface
      * from the database, or if it simply merges the passed User into the
      * identity map of an entity manager.
      *
-     * @throws UnsupportedAccountException if the account is not supported
-     * @param AccountInterface $account
+     * @throws UnsupportedUserException if the account is not supported
+     * @param UserInterface $user
      *
-     * @return AccountInterface
+     * @return UserInterface
      */
-    function loadUserByAccount(AccountInterface $account);
+    function loadUser(UserInterface $user);
 
     /**
      * Whether this provider supports the given user class

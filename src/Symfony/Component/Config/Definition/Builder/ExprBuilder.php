@@ -26,9 +26,9 @@ class ExprBuilder
     /**
      * Constructor
      *
-     * @param Symfony\Component\Config\Definition\Builder\NodeBuilder $parent The parent node
+     * @param NodeBuilder $parent The parent node
      */
-    public function __construct($parent)
+    public function __construct(NodeBuilder $parent)
     {
         $this->parent = $parent;
     }
@@ -36,7 +36,7 @@ class ExprBuilder
     /**
      * Mark the expression as being always used.
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function always()
     {
@@ -51,7 +51,7 @@ class ExprBuilder
      * The default one tests if the value is true.
      *
      * @param \Closure $closure
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function ifTrue(\Closure $closure = null)
     {
@@ -67,7 +67,7 @@ class ExprBuilder
     /**
      * Tests if the value is a string.
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function ifString()
     {
@@ -79,7 +79,7 @@ class ExprBuilder
     /**
      * Tests if the value is null.
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function ifNull()
     {
@@ -91,7 +91,7 @@ class ExprBuilder
     /**
      * Tests if the value is an array.
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function ifArray()
     {
@@ -105,7 +105,7 @@ class ExprBuilder
      *
      * @param array $array
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function ifInArray(array $array)
     {
@@ -119,7 +119,7 @@ class ExprBuilder
      *
      * @param array $array
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function ifNotInArray(array $array)
     {
@@ -133,7 +133,7 @@ class ExprBuilder
      *
      * @param \Closure $closure
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function then(\Closure $closure)
     {
@@ -145,7 +145,7 @@ class ExprBuilder
     /**
      * Sets a closure returning an empty array.
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function thenEmptyArray()
     {
@@ -161,7 +161,7 @@ class ExprBuilder
      *
      * @param string $message
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function thenInvalid($message)
     {
@@ -173,7 +173,7 @@ class ExprBuilder
     /**
      * Sets a closure unsetting this key of the array at validation time.
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function thenUnset()
     {
@@ -185,7 +185,7 @@ class ExprBuilder
     /**
      * Returns the parent node
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function end()
     {

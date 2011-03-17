@@ -24,6 +24,7 @@ use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationExceptio
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Events;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -64,9 +65,9 @@ class ExceptionListener
     /**
      * Handles security related exceptions.
      *
-     * @param ExceptionEvent $event An ExceptionEvent instance
+     * @param GetResponseForExceptionEvent $event An GetResponseForExceptionEvent instance
      */
-    public function onCoreException(ExceptionEvent $event)
+    public function onCoreException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();
         $request = $event->getRequest();
@@ -137,7 +138,7 @@ class ExceptionListener
         $event->setResponse($response);
     }
 
-    private function startAuthentication(ExceptionEvent $event, Request $request, AuthenticationException $authException)
+    private function startAuthentication(GetResponseForExceptionEvent $event, Request $request, AuthenticationException $authException)
     {
         $this->context->setToken(null);
 

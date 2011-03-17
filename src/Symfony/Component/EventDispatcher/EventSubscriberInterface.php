@@ -1,8 +1,6 @@
 <?php
 
 /*
- *  $Id: EventListener.php 4653 2008-07-10 17:17:58Z romanb $
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -43,5 +41,5 @@ interface EventSubscriberInterface
      *
      * @return array
      */
-    public static function getSubscribedEvents();
+    static function getSubscribedEvents();
 }

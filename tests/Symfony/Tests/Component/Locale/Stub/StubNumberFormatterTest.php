@@ -743,7 +743,10 @@ class StubNumberFormatterTest extends LocaleTestCase
     public function testParseTypeInt64IntlWith32BitIntegerInPhp32Bit()
     {
         $this->skipIfIntlExtensionIsNotLoaded();
-        $this->skipIfPhpIsNot32Bit();
+        if (!$this->is32Bit()) {
+            // the PHP must be compiled in 32 bit mode to run this test (64 bits test will be run instead).
+            return;
+        }
         $formatter = $this->getIntlFormatterWithDecimalStyle();
 
         $parsedValue = $formatter->parse('2,147,483,647', \NumberFormatter::TYPE_INT64);
@@ -759,7 +762,10 @@ class StubNumberFormatterTest extends LocaleTestCase
     public function testParseTypeInt64IntlWith32BitIntegerInPhp64Bit()
     {
         $this->skipIfIntlExtensionIsNotLoaded();
-        $this->skipIfPhpIsNot64Bit();
+        if (!$this->is64Bit()) {
+            // the PHP must be compiled in 64 bit mode to run this test (32 bits test will be run instead).
+            return;
+        }
         $formatter = $this->getIntlFormatterWithDecimalStyle();
 
         $parsedValue = $formatter->parse('2,147,483,647', \NumberFormatter::TYPE_INT64);
@@ -777,7 +783,10 @@ class StubNumberFormatterTest extends LocaleTestCase
     public function testParseTypeInt64IntlWith64BitIntegerInPhp32Bit()
     {
         $this->skipIfIntlExtensionIsNotLoaded();
-        $this->skipIfPhpIsNot32Bit();
+        if (!$this->is32Bit()) {
+            // the PHP must be compiled in 32 bit mode to run this test (64 bits test will be run instead).
+            return;
+        }
         $formatter = $this->getIntlFormatterWithDecimalStyle();
 
         // int 64 using only 32 bit range strangeness
@@ -796,7 +805,10 @@ class StubNumberFormatterTest extends LocaleTestCase
     public function testParseTypeInt64IntlWith64BitIntegerInPhp64Bit()
     {
         $this->skipIfIntlExtensionIsNotLoaded();
-        $this->skipIfPhpIsNot64Bit();
+        if (!$this->is64Bit()) {
+            // the PHP must be compiled in 64 bit mode to run this test (32 bits test will be run instead).
+            return;
+        }
         $formatter = $this->getIntlFormatterWithDecimalStyle();
 
         $parsedValue = $formatter->parse('2,147,483,648', \NumberFormatter::TYPE_INT64);

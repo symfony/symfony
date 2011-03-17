@@ -25,20 +25,6 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         return PHP_INT_SIZE == 8;
     }
 
-    protected function skipIfPhpIsNot32Bit()
-    {
-        if (!$this->is32Bit()) {
-            $this->markTestSkipped('The PHP must be compiled in 32 bit mode to run this test.');
-        }
-    }
-
-    protected function skipIfPhpIsNot64Bit()
-    {
-        if (!$this->is64Bit()) {
-            $this->markTestSkipped('The PHP must be compiled in 64 bit mode to run this test.');
-        }
-    }
-
     protected function isIntlExtensionLoaded()
     {
         return extension_loaded('intl');

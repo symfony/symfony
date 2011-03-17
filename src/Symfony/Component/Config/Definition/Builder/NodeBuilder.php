@@ -19,6 +19,21 @@ namespace Symfony\Component\Config\Definition\Builder;
 class NodeBuilder implements NodeParentInterface
 {
     protected $parent;
+    protected $nodeMapping;
+
+    /**
+     * Constructor
+     *
+     */
+    public function __construct()
+    {
+        $this->nodeMapping = array(
+            'variable'    => __NAMESPACE__.'\\VariableNodeDefinition',
+            'scalar'      => __NAMESPACE__.'\\ScalarNodeDefinition',
+            'boolean'     => __NAMESPACE__.'\\BooleanNodeDefinition',
+            'array'       => __NAMESPACE__.'\\ArrayNodeDefinition',
+        );
+    }
 
     /**
      * Set the parent node
@@ -100,15 +115,12 @@ class NodeBuilder implements NodeParentInterface
      *
      * @return NodeDefinition The child node
      *
-     * @throws \RuntimeException When the node type is not supported
+     * @throws \RuntimeException When the node type is not registered
+     * @throws \RuntimeException When the node class is not found
      */
     public function node($name, $type)
     {
         $class = $this->getNodeClass($type);
-
-        if (!class_exists($class)) {
-            throw new \RuntimeException(sprintf('Unknown node type: "%s"', $type));
-        }
 
         $node = new $class($name);
 
@@ -128,14 +140,43 @@ class NodeBuilder implements NodeParentInterface
     }
 
     /**
+     * Add or override a node Type
+     *
+     * @param string $type The name of the type
+     * @param string $class The fully qualified name the node definition class
+     */
+    public function setNodeClass($type, $class)
+    {
+        $this->nodeMapping[strtolower($type)] = $class;
+
+        return $this;
+    }
+
+    /**
      * Returns the class name of the node definition
      * 
      * @param string $type The node type
+     * 
      * @return string The node definition class name
+     *
+     * @throws \RuntimeException When the node type is not registered
+     * @throws \RuntimeException When the node class is not found
      */
     protected function getNodeClass($type)
     {
-        return $class = __NAMESPACE__.'\\'.ucfirst($type).'NodeDefinition';
+        $type = strtolower($type);
+
+        if (!isset($this->nodeMapping[$type])) {
+            throw new \RuntimeException(sprintf('The node type "%s" is not registered.', $type));
+        }
+
+        $class = $this->nodeMapping[$type];
+
+        if (!class_exists($class)) {
+            throw new \RuntimeException(sprintf('The node class "%s" does not exist.', $class));
+        }
+
+        return $class;
     }
 
 }

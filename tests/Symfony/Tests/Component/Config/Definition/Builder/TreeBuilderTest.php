@@ -2,7 +2,9 @@
 
 namespace Symfony\Tests\Component\Config\Definition\Builder;
 
+use Symfony\Tests\Component\Config\Definition\Builder\NodeBuilder as CustomNodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 require __DIR__.'/../../Fixtures/Builder/NodeBuilder.php';
 require __DIR__.'/../../Fixtures/Builder/BarNodeDefinition.php';
@@ -13,7 +15,7 @@ class TreeBuilderTest extends \PHPUnit_Framework_TestCase
     public function testUsingACustomNodeBuilder()
     {
         $builder = new TreeBuilder();
-        $root = $builder->root('custom', 'array', new NodeBuilder());
+        $root = $builder->root('custom', 'array', new CustomNodeBuilder());
 
         $nodeBuilder = $root->children();
 
@@ -27,7 +29,7 @@ class TreeBuilderTest extends \PHPUnit_Framework_TestCase
     public function testOverrideABuiltInNodeType()
     {
         $builder = new TreeBuilder();
-        $root = $builder->root('override', 'array', new NodeBuilder());
+        $root = $builder->root('override', 'array', new CustomNodeBuilder());
 
         $definition = $root->children()->variableNode('variable');
 
@@ -37,7 +39,7 @@ class TreeBuilderTest extends \PHPUnit_Framework_TestCase
     public function testAddANodeType()
     {
         $builder = new TreeBuilder();
-        $root = $builder->root('override', 'array', new NodeBuilder());
+        $root = $builder->root('override', 'array', new CustomNodeBuilder());
 
         $definition = $root->children()->barNode('variable');
 
@@ -47,7 +49,7 @@ class TreeBuilderTest extends \PHPUnit_Framework_TestCase
     public function testCreateABuiltInNodeTypeWithACustomNodeBuilder()
     {
         $builder = new TreeBuilder();
-        $root = $builder->root('builtin', 'array', new NodeBuilder());
+        $root = $builder->root('builtin', 'array', new CustomNodeBuilder());
 
         $definition = $root->children()->booleanNode('boolean');
 
@@ -57,9 +59,25 @@ class TreeBuilderTest extends \PHPUnit_Framework_TestCase
     public function testPrototypedArrayNodeUseTheCustomNodeBuilder()
     {
         $builder = new TreeBuilder();
-        $root = $builder->root('override', 'array', new NodeBuilder());
+        $root = $builder->root('override', 'array', new CustomNodeBuilder());
 
         $root->prototype('bar')->end();
     }
 
+    public function testAnExtendedNodeBuilderGetsPropagatedToTheChildren()
+    {
+        $builder = new TreeBuilder();
+
+        $builder->root('propagation')
+            ->children()
+                ->setNodeClass('extended', 'Symfony\Tests\Component\Config\Definition\Builder\VariableNodeDefinition')
+                ->node('foo', 'extended')->end()
+                ->arrayNode('child')
+                    ->children()
+                        ->node('foo', 'extended')
+                    ->end()
+                ->end()
+            ->end()
+        ->end();
+    }
 }

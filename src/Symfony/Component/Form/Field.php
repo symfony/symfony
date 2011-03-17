@@ -313,10 +313,6 @@ class Field implements FieldInterface
         $event = new DataEvent($clientData);
         $this->dispatcher->dispatchEvent(Events::preBind, $event);
 
-        if (is_string($clientData) && $this->trim) {
-            $clientData = trim($clientData);
-        }
-
         $appData = null;
         $normData = null;
 
@@ -483,18 +479,6 @@ class Field implements FieldInterface
     public function getValueTransformer()
     {
         return $this->valueTransformer;
-    }
-
-    public function setTrim($trim)
-    {
-        $this->trim = $trim;
-
-        return $this;
-    }
-
-    public function getTrim()
-    {
-        return $this->trim;
     }
 
     /**

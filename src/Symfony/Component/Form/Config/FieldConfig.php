@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Renderer\DefaultRenderer;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Form\Renderer\Plugin\FieldPlugin;
+use Symfony\Component\Form\EventListener\TrimListener;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class FieldConfig extends AbstractFieldConfig
@@ -35,7 +36,6 @@ class FieldConfig extends AbstractFieldConfig
         $field->setPropertyPath($options['property_path'] === false
                     ? $field->getKey()
                     : $options['property_path'])
-            ->setTrim($options['trim'])
             ->setRequired($options['required'])
             ->setDisabled($options['disabled'])
             ->setValueTransformer($options['value_transformer'])
@@ -47,6 +47,10 @@ class FieldConfig extends AbstractFieldConfig
             ->setRendererVar('max_length', null)
             ->setRendererVar('size', null)
             ->setRendererVar('label', ucfirst(strtolower(str_replace('_', ' ', $field->getKey()))));
+
+        if ($options['trim']) {
+            $field->addEventSubscriber(new TrimListener());
+        }
     }
 
     public function getDefaultOptions(array $options)

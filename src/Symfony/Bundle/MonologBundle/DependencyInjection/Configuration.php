@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\MonologBundle\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 /**
  * This class contains the configuration information for the bundle
@@ -36,45 +36,51 @@ class Configuration
 
         $handlersPrototype = $rootNode
             ->fixXmlConfig('handler')
-            ->arrayNode('handlers')
-                ->canBeUnset()
-                ->performNoDeepMerging()
-                ->useAttributeAsKey('name')
-                ->prototype('array')
-                    ->scalarNode('action_level')->end() // fingerscrossed specific
-                    ->scalarNode('buffer_size')->end() // fingerscrossed specific
-                    ->builder($this->getHandlerSubnode())
-                    ->validate()
-                        ->ifTrue(function($v) { return 'fingerscrossed' === $v['type'] && !isset($v['handler']); })
-                        ->thenInvalid('The handler has to be specified to use a FingersCrossedHandler')
-                    ->end()
+            ->children()
+                ->arrayNode('handlers')
+                    ->canBeUnset()
+                    ->performNoDeepMerging()
+                    ->useAttributeAsKey('name')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('action_level')->end() // fingerscrossed specific
+                            ->scalarNode('buffer_size')->end() // fingerscrossed specific
+                        ->end()
+                        ->append($this->getHandlerSubnode())
+                        ->validate()
+                            ->ifTrue(function($v) { return 'fingerscrossed' === $v['type'] && !isset($v['handler']); })
+                            ->thenInvalid('The handler has to be specified to use a FingersCrossedHandler')
+                        ->end()
         ;
         $this->addHandlerSection($handlersPrototype);
 
         return $treeBuilder->buildTree();
     }
 
-    private function addHandlerSection(NodeBuilder $node)
+    private function addHandlerSection(ArrayNodeDefinition $node)
     {
         $node
             ->performNoDeepMerging()
-            ->scalarNode('type')
-                ->isRequired()
-                ->treatNullLike('null')
-                ->beforeNormalization()
-                    ->always()
-                    ->then(function($v) { return strtolower($v); })
+            ->children()
+                ->scalarNode('type')
+                    ->isRequired()
+                    ->treatNullLike('null')
+                    ->beforeNormalization()
+                        ->always()
+                        ->then(function($v) { return strtolower($v); })
+                    ->end()
                 ->end()
+                ->scalarNode('level')->defaultValue('DEBUG')->end()
+                ->booleanNode('bubble')->defaultFalse()->end()
+                ->scalarNode('path')->end() // stream specific
             ->end()
-            ->scalarNode('level')->defaultValue('DEBUG')->end()
-            ->booleanNode('bubble')->defaultFalse()->end()
-            ->scalarNode('path')->end() // stream specific
         ;
     }
 
     private function getHandlerSubnode()
     {
-        $node = new NodeBuilder('handler', 'array');
+        $builder = new TreeBuilder();
+        $node = $builder->root('handler');
         $this->addHandlerSection($node);
 
         return $node;

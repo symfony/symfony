@@ -29,7 +29,7 @@ class Configuration
      * @param Boolean $debug    Wether to use the debug mode
      * @param array   $bundles  An array of bundle names
      * 
-     * @return NodeInterface The config tree
+     * @return \Symfony\Component\Config\Definition\ArrayNode The config tree
      */
     public function getConfigTree($debug, array $bundles)
     {

@@ -30,7 +30,8 @@ class Configuration
      * Generates the configuration tree.
      *
      * @param Boolean $kernelDebug
-     * @return \Symfony\Component\Config\Definition\NodeInterface
+     *
+     * @return \Symfony\Component\Config\Definition\ArrayNode The config tree
      */
     public function getConfigTree($kernelDebug)
     {

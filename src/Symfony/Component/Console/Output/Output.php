@@ -45,8 +45,7 @@ abstract class Output implements OutputInterface
      * @param Boolean                   $decorated  Whether to decorate messages or not (null for auto-guessing)
      * @param OutputFormatterInterface  $formatter  Output formatter instance
      */
-    public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null,
-                                OutputFormatterInterface $formatter = null)
+    public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
     {
         if (null === $formatter) {
             $formatter = new OutputFormatter();

@@ -35,8 +35,7 @@ class ConsoleOutput extends StreamOutput
      * @param Boolean $decorated Whether to decorate messages or not (null for auto-guessing)
      * @param OutputFormatter   $formatter  Output formatter instance
      */
-    public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null,
-                                OutputFormatter $formatter = null)
+    public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatter $formatter = null)
     {
         parent::__construct(fopen('php://stdout', 'w'), $verbosity, $decorated, $formatter);
     }

@@ -18,7 +18,7 @@ class PasswordFieldConfig extends AbstractFieldConfig
 {
     public function configure(FieldInterface $field, array $options)
     {
-        $field->addRendererPlugin(new PasswordValuePlugin($field, $options['always_empty']));
+        $field->addRendererPlugin(new PasswordValuePlugin($options['always_empty']));
     }
 
     public function getDefaultOptions(array $options)

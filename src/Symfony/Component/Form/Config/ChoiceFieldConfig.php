@@ -56,7 +56,7 @@ class ChoiceFieldConfig extends AbstractFieldConfig
         }
 
         if ($options['multiple'] && !$options['expanded']) {
-            $field->addRendererPlugin(new SelectMultipleNamePlugin($field));
+            $field->addRendererPlugin(new SelectMultipleNamePlugin());
         }
     }
 

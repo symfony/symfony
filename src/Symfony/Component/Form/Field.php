@@ -14,7 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
 use Symfony\Component\Form\Renderer\RendererInterface;
-use Symfony\Component\Form\Renderer\Plugin\PluginInterface;
+use Symfony\Component\Form\Renderer\Plugin\RendererPluginInterface;
 use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -495,7 +495,7 @@ class Field implements FieldInterface
         return $this->renderer;
     }
 
-    public function addRendererPlugin(PluginInterface $plugin)
+    public function addRendererPlugin(RendererPluginInterface $plugin)
     {
         $this->renderer->addPlugin($plugin);
 

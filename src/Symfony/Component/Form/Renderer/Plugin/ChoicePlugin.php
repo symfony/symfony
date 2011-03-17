@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Form\Renderer\Plugin;
 
+use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\Renderer\RendererInterface;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 
-class ChoicePlugin implements PluginInterface
+class ChoicePlugin implements RendererPluginInterface
 {
     private $choiceList;
 
@@ -23,7 +24,7 @@ class ChoicePlugin implements PluginInterface
         $this->choiceList = $choiceList;
     }
 
-    public function setUp(RendererInterface $renderer)
+    public function setUp(FieldInterface $field, RendererInterface $renderer)
     {
         $choiceList = $this->choiceList;
 

@@ -42,7 +42,7 @@ class FormConfig extends AbstractFieldConfig
             ->setValidationGroups($options['validation_groups'])
             ->setVirtual($options['virtual'])
             ->setValidator($options['validator'])
-            ->addRendererPlugin(new FormPlugin($field    ));
+            ->addRendererPlugin(new FormPlugin());
 
         if ($options['csrf_protection']) {
             $field->enableCsrfProtection($options['csrf_provider'], $options['csrf_field_name']);

@@ -21,8 +21,8 @@ class RadioFieldConfig extends AbstractFieldConfig
     public function configure(FieldInterface $field, array $options)
     {
         $field->setValueTransformer(new BooleanToStringTransformer())
-            ->addRendererPlugin(new CheckedPlugin($field))
-            ->addRendererPlugin(new ParentNamePlugin($field))
+            ->addRendererPlugin(new CheckedPlugin())
+            ->addRendererPlugin(new ParentNamePlugin())
             ->setRendererVar('value', $options['value']);
     }
 

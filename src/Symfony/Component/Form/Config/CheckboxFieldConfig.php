@@ -20,7 +20,7 @@ class CheckboxFieldConfig extends AbstractFieldConfig
     public function configure(FieldInterface $field, array $options)
     {
         $field->setValueTransformer(new BooleanToStringTransformer())
-            ->addRendererPlugin(new CheckedPlugin($field))
+            ->addRendererPlugin(new CheckedPlugin())
             ->setRendererVar('value', $options['value']);
     }
 

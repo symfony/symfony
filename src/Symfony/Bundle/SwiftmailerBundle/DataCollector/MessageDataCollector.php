@@ -18,15 +18,18 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * MessageDataCollector.
  *
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Clément JOBEILI <clement.jobeili@gmail.com>
  */
 class MessageDataCollector extends DataCollector
 {
     protected $logger;
-    
-    public function __construct(\Swift_Events_SendListener $logger)
+
+    public function __construct(\Swift_Events_SendListener $logger, \Swift_Mailer $mailer)
     {
         $this->logger = $logger;
+        // we do nothing with the mailer
+        // it's in the constructor just to force SwiftMailer to be initialized
     }
 
     /**
@@ -37,7 +40,7 @@ class MessageDataCollector extends DataCollector
         $this->data['messages'] = $this->logger->getMessages();
         $this->data['messageCount'] = $this->logger->countMessages();
     }
-    
+
     public function getMessageCount()
     {
         return $this->data['messageCount'];
@@ -47,7 +50,7 @@ class MessageDataCollector extends DataCollector
     {
         return $this->data['messages'];
     }
-    
+
     /**
      * {@inheritdoc}
      */

@@ -71,6 +71,7 @@
     <service id="swiftmailer.data_collector" class="%swiftmailer.data_collector.class%" public="false">
         <tag name="data_collector" template="SwiftmailerBundle:Collector:message" id="message" />
         <argument type="service" id="swiftmailer.plugin.messagelogger" />
+        <argument type="service" id="swiftmailer.mailer" />
     </service>
 
     <service id="swiftmailer.transport" alias="swiftmailer.transport.smtp" public="false" />

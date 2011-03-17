@@ -60,14 +60,14 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
         );
 
         if ($event->isPropagationStopped() && null !== $this->logger) {
-            $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s"', $this->listenerToString($listener), $eventName));
+            $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s"', $this->listenerToString($listener, $eventName), $eventName));
 
             $skippedListeners = $this->getListeners($eventName);
             $skipped = false;
 
             foreach ($skippedListeners as $skippedListener) {
                 if ($skipped) {
-                    $this->logger->debug(sprintf('Listener "%s" was not called for event "%s"', $this->listenerToString($skippedListener), $eventName));
+                    $this->logger->debug(sprintf('Listener "%s" was not called for event "%s"', $this->listenerToString($skippedListener, $eventName), $eventName));
                 }
 
                 if ($skippedListener === $listener) {
@@ -92,9 +92,9 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     {
         $notCalled = array();
 
-        foreach (array_keys($this->listeners) as $name) {
+        foreach (array_keys($this->getListeners()) as $name) {
             foreach ($this->getListeners($name) as $listener) {
-                $listener = $this->listenerToString($listener);
+                $listener = $this->listenerToString($listener, $name);
 
                 if (!isset($this->called[$name.'.'.$listener])) {
                     $notCalled[] = array(

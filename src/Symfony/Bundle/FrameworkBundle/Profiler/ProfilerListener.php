@@ -79,6 +79,8 @@ class ProfilerListener
      */
     public function filterCoreResponse(FilterResponseEvent $event)
     {
+        $response = $event->getResponse();
+
         if (null !== $this->matcher && !$this->matcher->matches($event->getRequest())) {
             return $response;
         }

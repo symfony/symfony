@@ -31,10 +31,10 @@ class RegisterKernelListenersPass implements CompilerPassInterface
                 $priority = isset($event['priority']) ? $event['priority'] : 0;
 
                 if (!isset($event['event'])) {
-                    $definition->addMethodCall('addEventSubscriberService', array($id, $priority));
-                } else {
-                    $definition->addMethodCall('addEventListenerService', array($event['event'], $id, $priority));
+                    throw new \InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "kernel.listener" tags.', $id));
                 }
+
+                $definition->addMethodCall('addEventListenerService', array($event['event'], $id, $priority));
             }
         }
     }

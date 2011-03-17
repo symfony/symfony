@@ -35,7 +35,7 @@ class TimeFieldTest extends DateTimeTestCase
         $dateTime = new \DateTime('1970-01-01 03:04:00 UTC');
 
         $this->assertEquals($dateTime, $field->getData());
-        $this->assertEquals($input, $field->getDisplayedData());
+        $this->assertEquals($input, $field->getTransformedData());
     }
 
     public function testSubmit_string()
@@ -54,7 +54,7 @@ class TimeFieldTest extends DateTimeTestCase
         $field->submit($input);
 
         $this->assertEquals('03:04:00', $field->getData());
-        $this->assertEquals($input, $field->getDisplayedData());
+        $this->assertEquals($input, $field->getTransformedData());
     }
 
     public function testSubmit_timestamp()
@@ -75,7 +75,7 @@ class TimeFieldTest extends DateTimeTestCase
         $dateTime = new \DateTime('1970-01-01 03:04:00 UTC');
 
         $this->assertEquals($dateTime->format('U'), $field->getData());
-        $this->assertEquals($input, $field->getDisplayedData());
+        $this->assertEquals($input, $field->getTransformedData());
     }
 
     public function testSubmit_array()
@@ -99,7 +99,7 @@ class TimeFieldTest extends DateTimeTestCase
         $field->submit($input);
 
         $this->assertEquals($data, $field->getData());
-        $this->assertEquals($input, $field->getDisplayedData());
+        $this->assertEquals($input, $field->getTransformedData());
     }
 
     public function testSetData_withSeconds()
@@ -113,7 +113,7 @@ class TimeFieldTest extends DateTimeTestCase
 
         $field->setData(new \DateTime('03:04:05 UTC'));
 
-        $this->assertEquals(array('hour' => 3, 'minute' => 4, 'second' => 5), $field->getDisplayedData());
+        $this->assertEquals(array('hour' => 3, 'minute' => 4, 'second' => 5), $field->getTransformedData());
     }
 
     public function testSetData_differentTimezones()
@@ -139,7 +139,7 @@ class TimeFieldTest extends DateTimeTestCase
             'second' => (int)$dateTime->format('s')
         );
 
-        $this->assertEquals($displayedData, $field->getDisplayedData());
+        $this->assertEquals($displayedData, $field->getTransformedData());
     }
 
     public function testIsHourWithinRange_returnsTrueIfWithin()

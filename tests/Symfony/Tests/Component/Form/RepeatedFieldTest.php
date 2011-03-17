@@ -44,10 +44,10 @@ class RepeatedFieldTest extends TestCase
 
         $this->field->submit($input);
 
-        $this->assertEquals('foo', $this->field['first']->getDisplayedData());
-        $this->assertEquals('bar', $this->field['second']->getDisplayedData());
+        $this->assertEquals('foo', $this->field['first']->getTransformedData());
+        $this->assertEquals('bar', $this->field['second']->getTransformedData());
         $this->assertFalse($this->field->isTransformationSuccessful());
-        $this->assertEquals($input, $this->field->getDisplayedData());
+        $this->assertEquals($input, $this->field->getTransformedData());
         $this->assertEquals(null, $this->field->getData());
     }
 
@@ -57,10 +57,10 @@ class RepeatedFieldTest extends TestCase
 
         $this->field->submit($input);
 
-        $this->assertEquals('foo', $this->field['first']->getDisplayedData());
-        $this->assertEquals('foo', $this->field['second']->getDisplayedData());
+        $this->assertEquals('foo', $this->field['first']->getTransformedData());
+        $this->assertEquals('foo', $this->field['second']->getTransformedData());
         $this->assertTrue($this->field->isTransformationSuccessful());
-        $this->assertEquals($input, $this->field->getDisplayedData());
+        $this->assertEquals($input, $this->field->getTransformedData());
         $this->assertEquals('foo', $this->field->getData());
     }
 }

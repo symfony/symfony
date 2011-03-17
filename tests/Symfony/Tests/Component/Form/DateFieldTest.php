@@ -37,7 +37,7 @@ class DateFieldTest extends DateTimeTestCase
         $field->submit('2.6.2010');
 
         $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $field->getData());
-        $this->assertEquals('02.06.2010', $field->getDisplayedData());
+        $this->assertEquals('02.06.2010', $field->getTransformedData());
     }
 
     public function testSubmit_fromInput_string()
@@ -52,7 +52,7 @@ class DateFieldTest extends DateTimeTestCase
         $field->submit('2.6.2010');
 
         $this->assertEquals('2010-06-02', $field->getData());
-        $this->assertEquals('02.06.2010', $field->getDisplayedData());
+        $this->assertEquals('02.06.2010', $field->getTransformedData());
     }
 
     public function testSubmit_fromInput_timestamp()
@@ -69,7 +69,7 @@ class DateFieldTest extends DateTimeTestCase
         $dateTime = new \DateTime('2010-06-02 UTC');
 
         $this->assertEquals($dateTime->format('U'), $field->getData());
-        $this->assertEquals('02.06.2010', $field->getDisplayedData());
+        $this->assertEquals('02.06.2010', $field->getTransformedData());
     }
 
     public function testSubmit_fromInput_raw()
@@ -90,7 +90,7 @@ class DateFieldTest extends DateTimeTestCase
         );
 
         $this->assertEquals($output, $field->getData());
-        $this->assertEquals('02.06.2010', $field->getDisplayedData());
+        $this->assertEquals('02.06.2010', $field->getTransformedData());
     }
 
     public function testSubmit_fromChoice()
@@ -112,7 +112,7 @@ class DateFieldTest extends DateTimeTestCase
         $dateTime = new \DateTime('2010-06-02 UTC');
 
         $this->assertDateTimeEquals($dateTime, $field->getData());
-        $this->assertEquals($text, $field->getDisplayedData());
+        $this->assertEquals($text, $field->getTransformedData());
     }
 
     public function testSubmit_fromChoice_empty()
@@ -133,7 +133,7 @@ class DateFieldTest extends DateTimeTestCase
         $field->submit($text);
 
         $this->assertSame(null, $field->getData());
-        $this->assertEquals($text, $field->getDisplayedData());
+        $this->assertEquals($text, $field->getTransformedData());
     }
 
     public function testSetData_differentTimezones()
@@ -148,7 +148,7 @@ class DateFieldTest extends DateTimeTestCase
 
         $field->setData('2010-06-02');
 
-        $this->assertEquals('01.06.2010', $field->getDisplayedData());
+        $this->assertEquals('01.06.2010', $field->getTransformedData());
     }
 
     public function testIsYearWithinRange_returnsTrueIfWithin()

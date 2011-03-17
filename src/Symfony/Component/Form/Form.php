@@ -315,23 +315,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
     }
 
     /**
-     * Returns the data of the field as it is displayed to the user.
-     *
-     * @see FieldInterface
-     * @return array of field name => value
-     */
-    public function getDisplayedData()
-    {
-        $values = array();
-
-        foreach ($this->fields as $name => $field) {
-            $values[$name] = $field->getDisplayedData();
-        }
-
-        return $values;
-    }
-
-    /**
      * Binds POST data to the field, transforms and validates it.
      *
      * @param  string|array $data  The POST data
@@ -678,7 +661,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
         if (!$this->isCsrfProtected()) {
             return true;
         } else {
-            $token = $this->get($this->csrfFieldName)->getDisplayedData();
+            $token = $this->get($this->csrfFieldName)->getTransformedData();
 
             return $this->csrfProvider->isCsrfTokenValid(get_class($this), $token);
         }

@@ -174,7 +174,7 @@ class FieldTest extends TestCase
         $field = $this->factory->getInstance('field', 'name');
 
         $this->assertEquals(null, $this->field->getData());
-        $this->assertEquals('', $this->field->getDisplayedData());
+        $this->assertEquals('', $this->field->getTransformedData());
     }
 
     public function testDataIsTransformedCorrectlyIfNull_noValueTransformer()
@@ -182,7 +182,7 @@ class FieldTest extends TestCase
         $this->field->setData(null);
 
         $this->assertSame(null, $this->field->getData());
-        $this->assertSame('', $this->field->getDisplayedData());
+        $this->assertSame('', $this->field->getTransformedData());
     }
 
     public function testDataIsTransformedCorrectlyIfNotNull_noValueTransformer()
@@ -194,7 +194,7 @@ class FieldTest extends TestCase
         // should be casted to an integer when the field is bound
         // Even without binding, the data will thus be a string
         $this->assertSame('123', $this->field->getData());
-        $this->assertSame('123', $this->field->getDisplayedData());
+        $this->assertSame('123', $this->field->getTransformedData());
     }
 
     public function testSubmittedDataIsTransformedCorrectly()
@@ -230,7 +230,7 @@ class FieldTest extends TestCase
 
         $this->assertEquals('app[filter2[norm[filter1[0]]]]', $this->field->getData());
         $this->assertEquals('filter2[norm[filter1[0]]]', $this->field->getNormalizedData());
-        $this->assertEquals('client[filter2[norm[filter1[0]]]]', $this->field->getDisplayedData());
+        $this->assertEquals('client[filter2[norm[filter1[0]]]]', $this->field->getTransformedData());
     }
 
     public function testSubmittedDataIsTransformedCorrectlyIfEmpty_noValueTransformer()
@@ -238,7 +238,7 @@ class FieldTest extends TestCase
         $this->field->submit('');
 
         $this->assertSame(null, $this->field->getData());
-        $this->assertEquals('', $this->field->getDisplayedData());
+        $this->assertEquals('', $this->field->getTransformedData());
     }
 
     public function testSetDataIsTransformedCorrectly()
@@ -262,7 +262,7 @@ class FieldTest extends TestCase
 
         $this->assertEquals(0, $field->getData());
         $this->assertEquals('norm[0]', $field->getNormalizedData());
-        $this->assertEquals('transform[norm[0]]', $field->getDisplayedData());
+        $this->assertEquals('transform[norm[0]]', $field->getTransformedData());
     }
 
     public function testSubmittedDataIsTrimmedBeforeTransforming()
@@ -278,7 +278,7 @@ class FieldTest extends TestCase
 
         $field->submit(' a ');
 
-        $this->assertEquals('a', $field->getDisplayedData());
+        $this->assertEquals('a', $field->getTransformedData());
         $this->assertEquals('reverse[a]', $field->getData());
     }
 
@@ -296,7 +296,7 @@ class FieldTest extends TestCase
 
         $field->submit(' a ');
 
-        $this->assertEquals(' a ', $field->getDisplayedData());
+        $this->assertEquals(' a ', $field->getTransformedData());
         $this->assertEquals('reverse[ a ]', $field->getData());
     }
 
@@ -319,7 +319,7 @@ class FieldTest extends TestCase
 
         $field->submit('a');
 
-        $this->assertEquals('a', $field->getDisplayedData());
+        $this->assertEquals('a', $field->getTransformedData());
         $this->assertTrue($field->isTransformationSuccessful());
     }
 
@@ -339,7 +339,7 @@ class FieldTest extends TestCase
 
         $field->submit('a');
 
-        $this->assertEquals('a', $field->getDisplayedData());
+        $this->assertEquals('a', $field->getTransformedData());
         $this->assertFalse($field->isTransformationSuccessful());
     }
 

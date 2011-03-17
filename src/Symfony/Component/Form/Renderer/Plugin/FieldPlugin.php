@@ -44,7 +44,7 @@ class FieldPlugin implements RendererPluginInterface
         $renderer->setVar('id', $id);
         $renderer->setVar('name', $name);
         $renderer->setVar('errors', $field->getErrors());
-        $renderer->setVar('value', $field->getDisplayedData());
+        $renderer->setVar('value', $field->getTransformedData());
         $renderer->setVar('disabled', $field->isDisabled());
         $renderer->setVar('required', $field->isRequired());
         $renderer->setVar('class', null);

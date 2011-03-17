@@ -164,7 +164,7 @@ class FormTest extends TestCase
         $field = $form->get($form->getCsrfFieldName());
 
         $this->assertTrue($field instanceof HiddenField);
-        $this->assertEquals('ABCDEF', $field->getDisplayedData());
+        $this->assertEquals('ABCDEF', $field->getTransformedData());
     }
 
     public function testIsCsrfTokenValidPassesIfCsrfProtectionIsDisabled()
@@ -1003,21 +1003,6 @@ class FormTest extends TestCase
         $object = new \stdClass();
         $form->setData($object);
         $this->assertEquals($object, $form->getData());
-    }
-
-    public function testGetDisplayedDataForwardsCall()
-    {
-        $field = $this->createValidMockField('firstName');
-        $field->expects($this->atLeastOnce())
-                    ->method('getDisplayedData')
-                    ->will($this->returnValue('Bernhard'));
-
-        $form = $this->factory->getInstance('form', 'author', array(
-            'csrf_protection' => false,
-        ));
-        $form->add($field);
-
-        $this->assertEquals(array('firstName' => 'Bernhard'), $form->getDisplayedData());
     }
 
     public function testIsMultipartIfAnyFieldIsMultipart()

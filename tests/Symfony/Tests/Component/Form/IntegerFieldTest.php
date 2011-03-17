@@ -24,6 +24,6 @@ class IntegerFieldTest extends LocalizedTestCase
         $field->submit('1.678');
 
         $this->assertSame(1, $field->getData());
-        $this->assertSame('1', $field->getDisplayedData());
+        $this->assertSame('1', $field->getTransformedData());
     }
 }

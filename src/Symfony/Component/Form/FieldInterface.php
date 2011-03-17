@@ -89,15 +89,6 @@ interface FieldInterface
     function writeProperty(&$objectOrArray);
 
     /**
-     * Returns the data of the field as it is displayed to the user.
-     *
-     * @return string|array  When the field is not bound, the transformed
-     *                       default data is returned. When the field is bound,
-     *                       the bound data is returned.
-     */
-    function getDisplayedData();
-
-    /**
      * Recursively adds constraint violations to the fields
      *
      * Violations in the form fields usually have property paths like:

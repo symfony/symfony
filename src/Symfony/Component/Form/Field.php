@@ -109,19 +109,6 @@ class Field implements FieldInterface
         return $this;
     }
 
-
-    /**
-     * Returns the data of the field as it is displayed to the user.
-     *
-     * @return string|array  When the field is not submitted, the transformed
-     *                       default data is returned. When the field is submitted,
-     *                       the submitted data is returned.
-     */
-    public function getDisplayedData()
-    {
-        return $this->getTransformedData();
-    }
-
     /**
      * Returns the data transformed by the value transformer
      *

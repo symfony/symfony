@@ -103,6 +103,7 @@ class TimeFieldConfig extends AbstractFieldConfig
             'pattern' => null,
             'data_timezone' => date_default_timezone_get(),
             'user_timezone' => date_default_timezone_get(),
+            'csrf_protection' => false,
         );
     }
 

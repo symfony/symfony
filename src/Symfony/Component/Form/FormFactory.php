@@ -32,7 +32,7 @@ class FormFactory implements FormFactoryInterface
         $this->guessers[] = $guesser;
     }
 
-    public function getInstance($identifier, $key = null, array $options = array())
+    public function getInstance($identifier, $name = null, array $options = array())
     {
         // TODO $identifier can be FQN of a config class
 
@@ -40,15 +40,15 @@ class FormFactory implements FormFactoryInterface
         $hierarchy = array();
 
         // TESTME
-        if (null === $key) {
-            $key = $identifier;
+        if (null === $name) {
+            $name = $identifier;
         }
 
         while (null !== $identifier) {
             // TODO check if identifier exists
             $config = $this->configLoader->getConfig($identifier);
             array_unshift($hierarchy, $config);
-            $instance = $instance ?: $config->createInstance($key);
+            $instance = $instance ?: $config->createInstance($name);
             $options = array_merge($config->getDefaultOptions($options), $options);
             $identifier = $config->getParent($options);
         }

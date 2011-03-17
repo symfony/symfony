@@ -126,7 +126,7 @@
         <service id="security.user.provider.entity" class="%security.user.provider.entity.class%" abstract="true" public="false">
             <argument type="service" id="security.user.entity_manager" />
         </service>
-        <service id="security.user.entity_manager" alias="doctrine.orm.default_entity_manager" public="false" />
+        <service id="security.user.entity_manager" alias="doctrine.orm.entity_manager" public="false" />
 
         <service id="security.user.provider.in_memory" class="%security.user.provider.in_memory.class%" abstract="true" public="false" />
         <service id="security.user.provider.in_memory.user" class="%security.user.provider.in_memory.user.class%" abstract="true" public="false" />

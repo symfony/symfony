@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Form\Renderer\Plugin;
 
-use Symfony\Component\Form\Renderer\RendererInterface;
 use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\Renderer\RendererInterface;
 
-class MaxLengthPlugin implements PluginInterface
+class MaxLengthPlugin implements RendererPluginInterface
 {
     private $maxLength;
 
@@ -23,16 +23,7 @@ class MaxLengthPlugin implements PluginInterface
         $this->maxLength = $maxLength;
     }
 
-    /**
-     * Renders the HTML enctype in the field tag, if necessary
-     *
-     * Example usage in Twig templates:
-     *
-     *     <field action="..." method="post" {{ field.render.enctype }}>
-     *
-     * @param Form $field   The field for which to render the encoding type
-     */
-    public function setUp(RendererInterface $renderer)
+    public function setUp(FieldInterface $field, RendererInterface $renderer)
     {
         $renderer->setVar('max_length', $this->maxLength);
     }

@@ -33,11 +33,11 @@ class DateFieldConfig extends AbstractFieldConfig
 
         if ($options['widget'] === 'text') {
             $field->setValueTransformer(new DateTimeToLocalizedStringTransformer(array(
-                    'date_format' => $options['format'],
-                    'time_format' => \IntlDateFormatter::NONE,
-                    'input_timezone' => $options['data_timezone'],
-                    'output_timezone' => $options['user_timezone'],
-                )));
+                'date_format' => $options['format'],
+                'time_format' => \IntlDateFormatter::NONE,
+                'input_timezone' => $options['data_timezone'],
+                'output_timezone' => $options['user_timezone'],
+            )));
         } else {
             // Only pass a subset of the options to children
             $yearOptions = array(
@@ -111,6 +111,7 @@ class DateFieldConfig extends AbstractFieldConfig
             'format' => \IntlDateFormatter::MEDIUM,
             'data_timezone' => date_default_timezone_get(),
             'user_timezone' => date_default_timezone_get(),
+            'csrf_protection' => false,
         );
     }
 

@@ -11,13 +11,11 @@
 
 namespace Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection;
 
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Bundle\DoctrineAbstractBundle\DependencyInjection\AbstractDoctrineExtension;
 use Symfony\Component\Config\Definition\Processor;
@@ -47,6 +45,16 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         // can't currently default this correctly in Configuration
         if (!isset($config['metadata_cache_driver'])) {
             $config['metadata_cache_driver'] = array('type' => 'array');
+        }
+
+        if (empty ($config['default_connection'])) {
+            $keys = array_keys($config['connections']);
+            $config['default_connection'] = reset($keys);
+        }
+
+        if (empty ($config['default_document_manager'])) {
+            $keys = array_keys($config['document_managers']);
+            $config['default_document_manager'] = reset($keys);
         }
 
         // set some options as parameters and unset them

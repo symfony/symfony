@@ -19,11 +19,11 @@ class RepeatedFieldConfig extends AbstractFieldConfig
     public function configure(FieldInterface $field, array $options)
     {
         $field->setValueTransformer(new ValueToDuplicatesTransformer(array(
-                $options['first_key'],
-                $options['second_key'],
+                $options['first_name'],
+                $options['second_name'],
             )))
-            ->add($this->getInstance($options['identifier'], $options['first_key'], $options['options']))
-            ->add($this->getInstance($options['identifier'], $options['second_key'], $options['options']));
+            ->add($this->getInstance($options['identifier'], $options['first_name'], $options['options']))
+            ->add($this->getInstance($options['identifier'], $options['second_name'], $options['options']));
     }
 
     public function getDefaultOptions(array $options)
@@ -32,8 +32,9 @@ class RepeatedFieldConfig extends AbstractFieldConfig
             'template' => 'repeated',
             'identifier' => 'text',
             'options' => array(),
-            'first_key' => 'first',
-            'second_key' => 'second',
+            'first_name' => 'first',
+            'second_name' => 'second',
+            'csrf_protection' => false,
         );
     }
 

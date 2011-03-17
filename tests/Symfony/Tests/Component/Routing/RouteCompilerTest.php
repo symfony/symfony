@@ -69,7 +69,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
 
             array(
                 'Route with several variables that have default values',
-                array('/foo/{bar}/{foobar}', array('bar' => 'bar', 'foobar' => 'foobar')),
+                array('/foo/{bar}/{foobar}', array('bar' => 'bar', 'foobar' => '')),
                 '/foo', '#^/foo(?:/(?P<bar>[^/\.]+?) (?:/(?P<foobar>[^/\.]+?) )?)?$#x', array('bar' => '{bar}', 'foobar' => '{foobar}'), array(
                     array('variable', '/', '{foobar}', 'foobar'),
                     array('variable', '/', '{bar}', 'bar'),

@@ -20,7 +20,7 @@ class ContainerTest extends TestCase
         $container = $this->createYamlBundleTestContainer();
         $this->assertInstanceOf('Doctrine\DBAL\Logging\DebugStack', $container->get('doctrine.dbal.logger.debug'));
         $this->assertInstanceOf('Doctrine\DBAL\Logging\DebugStack', $container->get('doctrine.dbal.logger'));
-        $this->assertInstanceOf('Symfony\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector', $container->get('doctrine.data_collector'));
+        $this->assertInstanceOf('Symfony\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector', $container->get('data_collector.doctrine'));
         $this->assertInstanceOf('Doctrine\DBAL\Configuration', $container->get('doctrine.dbal.default_connection.configuration'));
         $this->assertInstanceOf('Doctrine\Common\EventManager', $container->get('doctrine.dbal.default_connection.event_manager'));
         $this->assertInstanceOf('Doctrine\DBAL\Connection', $container->get('doctrine.dbal.default_connection'));

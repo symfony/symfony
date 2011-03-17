@@ -14,28 +14,20 @@ namespace Symfony\Bundle\AsseticBundle\CacheWarmer;
 use Assetic\AssetManager;
 use Assetic\AssetWriter;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
-use Symfony\Bundle\AsseticBundle\Event\WriteEvent;
-use Symfony\Bundle\AsseticBundle\Events;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class AssetWriterCacheWarmer extends CacheWarmer
 {
     protected $am;
     protected $writer;
-    protected $dispatcher;
 
-    public function __construct(AssetManager $am, AssetWriter $writer, EventDispatcherInterface $dispatcher)
+    public function __construct(AssetManager $am, AssetWriter $writer)
     {
         $this->am = $am;
         $this->writer = $writer;
-        $this->dispatcher = $dispatcher;
     }
 
     public function warmUp($cacheDir)
     {
-        // notify an event so custom stream wrappers can be registered lazily
-        $this->dispatcher->dispatchEvent(Events::onAsseticWrite, new WriteEvent());
-
         $this->writer->writeManagerAssets($this->am);
     }
 

@@ -49,14 +49,14 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
     public function transform($dateTime)
     {
         if (null === $dateTime) {
-            return array(
+            return array_intersect_key(array(
                 'year'    => '',
                 'month'   => '',
                 'day'     => '',
                 'hour'    => '',
                 'minute'  => '',
                 'second'  => '',
-            );
+            ), array_flip($this->getOption('fields')));
         }
 
         if (!$dateTime instanceof \DateTime) {

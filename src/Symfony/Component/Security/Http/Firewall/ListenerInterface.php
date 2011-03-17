@@ -26,5 +26,5 @@ interface ListenerInterface
      *
      * @param GetResponseEvent $event
      */
-    function onCoreSecurity(GetResponseEvent $event);
+    function handle(GetResponseEvent $event);
 }

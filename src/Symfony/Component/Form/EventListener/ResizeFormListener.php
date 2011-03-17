@@ -12,11 +12,13 @@
 namespace Symfony\Component\Form\EventListener;
 
 use Symfony\Component\Form\Events;
+use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ResizeFormListener implements EventListenerInterface
+class ResizeFormListener implements EventSubscriberInterface
 {
     private $form;
 
@@ -24,14 +26,14 @@ class ResizeFormListener implements EventListenerInterface
 
     private $resizeOnBind;
 
-    public function __construct(FormInterface $form, FieldInterface $prototype, $resizeOnBind = false)
+    public function __construct(FormInterface $form, $prototype, $resizeOnBind = false)
     {
         $this->form = $form;
         $this->prototype = $prototype;
         $this->resizeOnBind = $resizeOnBind;
     }
 
-    public function getSupportedEvents()
+    public static function getSubscribedEvents()
     {
         return array(
             Events::preSetData,
@@ -39,8 +41,10 @@ class ResizeFormListener implements EventListenerInterface
         );
     }
 
-    public function preSetData($collection)
+    public function preSetData(DataEvent $event)
     {
+        $collection = $event->getData();
+
         if (null === $collection) {
             $collection = array();
         }
@@ -50,18 +54,22 @@ class ResizeFormListener implements EventListenerInterface
         }
 
         foreach ($this->form as $name => $field) {
-            if (!$this->resizeOnBind || '$$key$$' != $name) {
+            if (!$this->resizeOnBind || '$$name$$' != $name) {
                 $this->form->remove($name);
             }
         }
 
         foreach ($collection as $name => $value) {
-            $this->form->add($this->newField($name));
+            $this->form->add($this->prototype, $name, array(
+                'property_path' => '['.$name.']',
+            ));
         }
     }
 
-    public function preBind($data)
+    public function preBind(DataEvent $event)
     {
+        $data = $event->getData();
+
         $this->removedFields = array();
 
         if (null === $data) {
@@ -69,7 +77,7 @@ class ResizeFormListener implements EventListenerInterface
         }
 
         foreach ($this->form as $name => $field) {
-            if (!isset($data[$name]) && $this->resizeOnBind && '$$key$$' != $name) {
+            if (!isset($data[$name]) && $this->resizeOnBind && '$$name$$' != $name) {
                 $this->form->remove($name);
                 $this->removedFields[] = $name;
             }
@@ -77,17 +85,10 @@ class ResizeFormListener implements EventListenerInterface
 
         foreach ($data as $name => $value) {
             if (!$this->form->has($name) && $this->resizeOnBind) {
-                $this->form->add($this->newField($name));
+                $this->form->add($this->prototype, $name, array(
+                    'property_path' => '['.$name.']',
+                ));
             }
         }
-    }
-
-    protected function newField($key)
-    {
-        $field = clone $this->prototype;
-        $field->setKey($key);
-        $field->setPropertyPath('['.$key.']');
-
-        return $field;
     }
 }

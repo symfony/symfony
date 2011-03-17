@@ -19,18 +19,21 @@ use Symfony\Component\Form\Field;
 
 class CollectionFieldTest extends TestCase
 {
-    public function testContainsNoFieldsByDefault()
+    public function testContainsOnlyCsrfTokenByDefault()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
-            'prototype' => new Field(),
+            'prototype' => 'field',
+            'csrf_field_name' => 'abc',
         ));
-        $this->assertEquals(0, count($field));
+
+        $this->assertTrue($field->has('abc'));
+        $this->assertEquals(1, count($field));
     }
 
     public function testSetDataAdjustsSize()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
-            'prototype' => new Field(),
+            'prototype' => 'field',
         ));
         $field->setData(array('foo@foo.com', 'foo@bar.com'));
 
@@ -50,27 +53,27 @@ class CollectionFieldTest extends TestCase
     public function testSetDataAdjustsSizeIfModifiable()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
-            'prototype' => new Field(),
+            'prototype' => 'field',
             'modifiable' => true,
         ));
         $field->setData(array('foo@foo.com', 'foo@bar.com'));
 
         $this->assertTrue($field[0] instanceof Field);
         $this->assertTrue($field[1] instanceof Field);
-        $this->assertTrue($field['$$key$$'] instanceof Field);
+        $this->assertTrue($field['$$name$$'] instanceof Field);
         $this->assertEquals(3, count($field));
 
         $field->setData(array('foo@baz.com'));
         $this->assertTrue($field[0] instanceof Field);
         $this->assertFalse(isset($field[1]));
-        $this->assertTrue($field['$$key$$'] instanceof Field);
+        $this->assertTrue($field['$$name$$'] instanceof Field);
         $this->assertEquals(2, count($field));
     }
 
     public function testThrowsExceptionIfObjectIsNotTraversable()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
-            'prototype' => new Field(),
+            'prototype' => 'field',
         ));
         $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $field->setData(new \stdClass());
@@ -79,23 +82,23 @@ class CollectionFieldTest extends TestCase
     public function testModifiableCollectionsContainExtraField()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
-            'prototype' => new Field(),
+            'prototype' => 'field',
             'modifiable' => true,
         ));
         $field->setData(array('foo@bar.com'));
 
         $this->assertTrue($field['0'] instanceof Field);
-        $this->assertTrue($field['$$key$$'] instanceof Field);
+        $this->assertTrue($field['$$name$$'] instanceof Field);
         $this->assertEquals(2, count($field));
     }
 
-    public function testNotResizedIfSubmittedWithMissingData()
+    public function testNotResizedIfBoundWithMissingData()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
-            'prototype' => new Field(),
+            'prototype' => 'field',
         ));
         $field->setData(array('foo@foo.com', 'bar@bar.com'));
-        $field->submit(array('foo@bar.com'));
+        $field->bind(array('foo@bar.com'));
 
         $this->assertTrue($field->has('0'));
         $this->assertTrue($field->has('1'));
@@ -103,41 +106,41 @@ class CollectionFieldTest extends TestCase
         $this->assertEquals(null, $field[1]->getData());
     }
 
-    public function testResizedIfSubmittedWithMissingDataAndModifiable()
+    public function testResizedIfBoundWithMissingDataAndModifiable()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
-            'prototype' => new Field(),
+            'prototype' => 'field',
             'modifiable' => true,
         ));
         $field->setData(array('foo@foo.com', 'bar@bar.com'));
-        $field->submit(array('foo@bar.com'));
+        $field->bind(array('foo@bar.com'));
 
         $this->assertTrue($field->has('0'));
         $this->assertFalse($field->has('1'));
         $this->assertEquals('foo@bar.com', $field[0]->getData());
     }
 
-    public function testNotResizedIfSubmittedWithExtraData()
+    public function testNotResizedIfBoundWithExtraData()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
-            'prototype' => new Field(),
+            'prototype' => 'field',
         ));
         $field->setData(array('foo@bar.com'));
-        $field->submit(array('foo@foo.com', 'bar@bar.com'));
+        $field->bind(array('foo@foo.com', 'bar@bar.com'));
 
         $this->assertTrue($field->has('0'));
         $this->assertFalse($field->has('1'));
         $this->assertEquals('foo@foo.com', $field[0]->getData());
     }
 
-    public function testResizedUpIfSubmittedWithExtraDataAndModifiable()
+    public function testResizedUpIfBoundWithExtraDataAndModifiable()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
-            'prototype' => new Field(),
+            'prototype' => 'field',
             'modifiable' => true,
         ));
         $field->setData(array('foo@bar.com'));
-        $field->submit(array('foo@foo.com', 'bar@bar.com'));
+        $field->bind(array('foo@foo.com', 'bar@bar.com'));
 
         $this->assertTrue($field->has('0'));
         $this->assertTrue($field->has('1'));
@@ -146,14 +149,14 @@ class CollectionFieldTest extends TestCase
         $this->assertEquals(array('foo@foo.com', 'bar@bar.com'), $field->getData());
     }
 
-    public function testResizedDownIfSubmittedWithLessDataAndModifiable()
+    public function testResizedDownIfBoundWithLessDataAndModifiable()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
-            'prototype' => new Field(),
+            'prototype' => 'field',
             'modifiable' => true,
         ));
         $field->setData(array('foo@bar.com', 'bar@bar.com'));
-        $field->submit(array('foo@foo.com'));
+        $field->bind(array('foo@foo.com'));
 
         $this->assertTrue($field->has('0'));
         $this->assertFalse($field->has('1'));

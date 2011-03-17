@@ -19,32 +19,24 @@ class CollectionFieldConfig extends AbstractFieldConfig
     public function configure(FieldInterface $field, array $options)
     {
         if ($options['modifiable']) {
-            $child = clone $options['prototype'];
-            $child->setKey('$$key$$');
-            $child->setPropertyPath(null);
-            // TESTME
-            $child->setRequired(false);
-            $field->add($child);
+            $field->add($options['prototype'], '$$name$$', array(
+                'property_path' => null,
+                'required' => false,
+            ));
         }
 
-        $field->addEventListener(new ResizeFormListener($field,
+        $field->addEventSubscriber(new ResizeFormListener($field,
                 $options['prototype'], $options['modifiable']));
     }
 
     public function getDefaultOptions(array $options)
     {
-        $defaultOptions = array(
+        return array(
             'template' => 'collection',
             'prototype' => null,
             'modifiable' => false,
+            'prototype' => 'text',
         );
-
-        // Lazy creation of the prototype
-        if (!isset($options['prototype'])) {
-            $defaultOptions['prototype'] = $this->getInstance('text');
-        }
-
-        return $defaultOptions;
     }
 
     public function getParent(array $options)

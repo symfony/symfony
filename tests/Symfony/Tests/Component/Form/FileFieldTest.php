@@ -81,7 +81,7 @@ class FileFieldTest extends TestCase
              ->method('getPath')
              ->will($this->returnValue($tmpDir.'/original_name.jpg'));
 
-        $this->field->submit(array(
+        $this->field->bind(array(
             'file' => $file,
             'token' => '',
             'name' => '',
@@ -92,7 +92,7 @@ class FileFieldTest extends TestCase
             'file' => $file,
             'token' => $generatedToken,
             'name' => 'original_name.jpg',
-        ), $this->field->getDisplayedData());
+        ), $this->field->getTransformedData());
         $this->assertEquals($tmpDir.'/original_name.jpg', $this->field->getData());
     }
 
@@ -107,7 +107,7 @@ class FileFieldTest extends TestCase
             ->with($this->equalTo('123456'))
             ->will($this->returnValue($tmpDir));
 
-        $this->field->submit(array(
+        $this->field->bind(array(
             'file' => null,
             'token' => '123456',
             'name' => 'original_name.jpg',
@@ -121,7 +121,7 @@ class FileFieldTest extends TestCase
             'file' => $file,
             'token' => '123456',
             'name' => 'original_name.jpg',
-        ), $this->field->getDisplayedData());
+        ), $this->field->getTransformedData());
         $this->assertEquals($tmpPath, $this->field->getData());
     }
 
@@ -130,7 +130,7 @@ class FileFieldTest extends TestCase
         $this->storage->expects($this->never())
             ->method('getTempDir');
 
-        $this->field->submit(array(
+        $this->field->bind(array(
             'file' => '',
             'token' => '',
             'name' => '',
@@ -140,7 +140,7 @@ class FileFieldTest extends TestCase
             'file' => '',
             'token' => '',
             'name' => '',
-        ), $this->field->getDisplayedData());
+        ), $this->field->getTransformedData());
         $this->assertEquals(null, $this->field->getData());
     }
 
@@ -154,7 +154,7 @@ class FileFieldTest extends TestCase
             ->method('getTempDir');
 
         $this->field->setData($tmpPath);
-        $this->field->submit(array(
+        $this->field->bind(array(
             'file' => '',
             'token' => '',
             'name' => '',
@@ -164,7 +164,7 @@ class FileFieldTest extends TestCase
             'file' => $file,
             'token' => '',
             'name' => '',
-        ), $this->field->getDisplayedData());
+        ), $this->field->getTransformedData());
         $this->assertEquals($tmpPath, $this->field->getData());
     }
 }

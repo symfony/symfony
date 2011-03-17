@@ -24,10 +24,9 @@ final class Events
 
     const postSetData = 'postSetData';
 
-    public static $all = array(
-        self::preBind,
-        self::postBind,
-        self::preSetData,
-        self::postSetData,
-    );
+    const filterBoundDataFromClient = 'filterBoundDataFromClient';
+
+    const filterBoundData = 'filterBoundData';
+
+    const filterSetData = 'filterSetData';
 }

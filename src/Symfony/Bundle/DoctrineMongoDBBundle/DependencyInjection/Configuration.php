@@ -42,8 +42,8 @@ class Configuration
             ->scalarNode('auto_generate_proxy_classes')->defaultValue(false)->end()
             ->scalarNode('hydrator_namespace')->defaultValue('Hydrators')->end()
             ->scalarNode('auto_generate_hydrator_classes')->defaultValue(false)->end()
-            ->scalarNode('default_document_manager')->defaultValue('default')->end()
-            ->scalarNode('default_connection')->defaultValue('default')->end()
+            ->scalarNode('default_document_manager')->end()
+            ->scalarNode('default_connection')->end()
             ->scalarNode('default_database')->defaultValue('default')->end()
         ;
 

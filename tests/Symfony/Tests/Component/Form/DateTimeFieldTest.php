@@ -29,7 +29,7 @@ class DateTimeFieldTest extends DateTimeTestCase
             'type' => 'datetime',
         ));
 
-        $field->submit(array(
+        $field->bind(array(
             'date' => array(
                 'day' => '2',
                 'month' => '6',
@@ -56,7 +56,7 @@ class DateTimeFieldTest extends DateTimeTestCase
             'time_widget' => 'choice',
         ));
 
-        $field->submit(array(
+        $field->bind(array(
             'date' => array(
                 'day' => '2',
                 'month' => '6',
@@ -81,7 +81,7 @@ class DateTimeFieldTest extends DateTimeTestCase
             'time_widget' => 'choice',
         ));
 
-        $field->submit(array(
+        $field->bind(array(
             'date' => array(
                 'day' => '2',
                 'month' => '6',
@@ -124,7 +124,7 @@ class DateTimeFieldTest extends DateTimeTestCase
             ),
         );
 
-        $field->submit($input);
+        $field->bind($input);
 
         $this->assertDateTimeEquals(new \DateTime('2010-06-02 03:04:05 UTC'), $field->getData());
     }
@@ -143,7 +143,7 @@ class DateTimeFieldTest extends DateTimeTestCase
 
         $dateTime = new \DateTime('2010-06-02 03:04:05 Pacific/Tahiti');
 
-        $field->submit(array(
+        $field->bind(array(
             'date' => array(
                 'day' => (int)$dateTime->format('d'),
                 'month' => (int)$dateTime->format('m'),

@@ -52,7 +52,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public function onCoreSecurity(GetResponseEvent $event)
+    public final function handle(GetResponseEvent $event)
     {
         $request = $event->getRequest();
 
@@ -82,7 +82,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
 
             if (null !== $this->dispatcher) {
                 $loginEvent = new InteractiveLoginEvent($request, $token);
-                $this->dispatcher->notify(Events::onSecurityInteractiveLogin, $loginEvent);
+                $this->dispatcher->dispatchEvent(Events::onSecurityInteractiveLogin, $loginEvent);
             }
         } catch (AuthenticationException $failed) {
             $this->securityContext->setToken(null);

@@ -22,16 +22,14 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testDefaults()
     {
         $processor = new Processor();
-        $configuration = new Configuration();
+        $configuration = new Configuration(false);
         $options = $processor->process($configuration->getConfigTree(), array());
 
         $defaults = array(
             'auto_generate_hydrator_classes'    => false,
             'auto_generate_proxy_classes'       => false,
-            'default_document_manager'          => 'default',
             'default_database'                  => 'default',
             'document_managers'                 => array(),
-            'default_connection'                => 'default',
             'connections'                       => array(),
             'proxy_namespace'                   => 'Proxies',
             'hydrator_namespace'                => 'Hydrators',
@@ -57,7 +55,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testFullConfiguration($config)
     {
         $processor = new Processor();
-        $configuration = new Configuration();
+        $configuration = new Configuration(false);
         $options = $processor->process($configuration->getConfigTree(), array($config));
 
         $expected = array(
@@ -99,6 +97,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                         'port'      => 1234,
                         'instance_class' => 'instance_val',
                     ),
+                    'logging' => false,
                 ),
                 'dm2' => array(
                     'connection' => 'dm2_connection',
@@ -114,7 +113,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     ),
                     'metadata_cache_driver' => array(
                         'type' => 'apc',
-                    )
+                    ),
+                    'logging' => true,
                 )
             )
         );
@@ -140,7 +140,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testMergeOptions(array $configs, array $correctValues)
     {
         $processor = new Processor();
-        $configuration = new Configuration();
+        $configuration = new Configuration(false);
         $options = $processor->process($configuration->getConfigTree(), $configs);
 
         foreach ($correctValues as $key => $correctVal)
@@ -193,7 +193,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 array('document_managers' => array('default' => array('mappings' => array('foomap' => array('type' => 'val1'), 'barmap' => array('dir' => 'val2'))))),
                 array('document_managers' => array('default' => array('mappings' => array('barmap' => array('prefix' => 'val3'))))),
             ),
-            array('document_managers' => array('default' => array('mappings' => array('foomap' => array('type' => 'val1'), 'barmap' => array('prefix' => 'val3'))))),
+            array('document_managers' => array('default' => array('logging' => false, 'mappings' => array('foomap' => array('type' => 'val1'), 'barmap' => array('prefix' => 'val3'))))),
         );
 
         // connections are merged non-recursively.
@@ -215,8 +215,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 array('document_managers' => array('bardm' => array('database' => 'val3'))),
             ),
             array('document_managers' => array(
-                'foodm' => array('database' => 'val1', 'mappings' => array()),
-                'bardm' => array('database' => 'val3', 'mappings' => array()),
+                'foodm' => array('database' => 'val1', 'logging' => false, 'mappings' => array()),
+                'bardm' => array('database' => 'val3', 'logging' => false, 'mappings' => array()),
             )),
         );
 
@@ -229,7 +229,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testNormalizeOptions(array $config, $targetKey, array $normalized)
     {
         $processor = new Processor();
-        $configuration = new Configuration();
+        $configuration = new Configuration(false);
         $options = $processor->process($configuration->getConfigTree(), array($config));
         $this->assertSame($normalized, $options[$targetKey]);
     }
@@ -257,8 +257,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 )),
                 'document_managers',
                 array(
-                    'foo' => array('connection' => 'conn1', 'mappings' => array()),
-                    'bar' => array('connection' => 'conn2', 'mappings' => array()),
+                    'foo' => array('connection' => 'conn1', 'logging' => false, 'mappings' => array()),
+                    'bar' => array('connection' => 'conn2', 'logging' => false, 'mappings' => array()),
                 ),
             ),
             // mapping configuration that's beneath a specific document manager
@@ -272,7 +272,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 array(
                     'foo' => array('connection' => 'conn1', 'mappings' => array(
                         'foo-mapping' => array('type' => 'xml'),
-                    )),
+                    ), 'logging' => false),
                 ),
             ),
         );

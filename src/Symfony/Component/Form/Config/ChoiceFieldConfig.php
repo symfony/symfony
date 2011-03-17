@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Config;
 
 use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\ChoiceList\DefaultChoiceList;
-use Symfony\Component\Form\Filter\RadioInputFilter;
+use Symfony\Component\Form\EventListener\FixRadioInputListener;
 use Symfony\Component\Form\Renderer\Plugin\ChoicePlugin;
 use Symfony\Component\Form\Renderer\Plugin\SelectMultipleNamePlugin;
 use Symfony\Component\Form\ValueTransformer\ScalarToChoicesTransformer;
@@ -52,11 +52,11 @@ class ChoiceFieldConfig extends AbstractFieldConfig
 
         if (!$options['multiple'] && $options['expanded']) {
             $field->setValueTransformer(new ScalarToChoicesTransformer($options['choice_list']));
-            $field->prependFilter(new RadioInputFilter());
+            $field->addEventSubscriber(new FixRadioInputListener(), 10);
         }
 
         if ($options['multiple'] && !$options['expanded']) {
-            $field->addRendererPlugin(new SelectMultipleNamePlugin($field));
+            $field->addRendererPlugin(new SelectMultipleNamePlugin());
         }
     }
 
@@ -68,6 +68,7 @@ class ChoiceFieldConfig extends AbstractFieldConfig
             'expanded' => false,
             'choices' => array(),
             'preferred_choices' => array(),
+            'csrf_protection' => false,
         );
 
         $options = array_replace($defaultOptions, $options);

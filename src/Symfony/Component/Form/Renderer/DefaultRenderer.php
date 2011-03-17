@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Renderer;
 
 use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
-use Symfony\Component\Form\Renderer\Plugin\PluginInterface;
+use Symfony\Component\Form\Renderer\Plugin\RendererPluginInterface;
 
 class DefaultRenderer implements RendererInterface, \ArrayAccess
 {
@@ -33,8 +33,9 @@ class DefaultRenderer implements RendererInterface, \ArrayAccess
 
     private $children = array();
 
-    public function __construct(ThemeInterface $theme, $template)
+    public function __construct(FieldInterface $field, ThemeInterface $theme, $template)
     {
+        $this->field = $field;
         $this->theme = $theme;
         $this->template = $template;
     }
@@ -56,8 +57,8 @@ class DefaultRenderer implements RendererInterface, \ArrayAccess
             // Make sure that plugins and set variables are applied in the
             // order they were added
             foreach ($this->changes as $key => $value) {
-                if ($value instanceof PluginInterface) {
-                    $value->setUp($this);
+                if ($value instanceof RendererPluginInterface) {
+                    $value->setUp($this->field, $this);
                 } else {
                     $this->vars[$key] = $value;
                 }
@@ -82,7 +83,7 @@ class DefaultRenderer implements RendererInterface, \ArrayAccess
         return $this->theme;
     }
 
-    public function addPlugin(PluginInterface $plugin)
+    public function addPlugin(RendererPluginInterface $plugin)
     {
         $this->initialized = false;
         $this->changes[] = $plugin;
@@ -155,6 +156,11 @@ class DefaultRenderer implements RendererInterface, \ArrayAccess
         }
 
         return $this->render('label', $vars);
+    }
+
+    public function getEnctype()
+    {
+        return $this->render('enctype', $vars);
     }
 
     protected function render($block, array $vars = array())

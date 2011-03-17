@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\Renderer\Plugin\FormPlugin;
 use Symfony\Component\Validator\ValidatorInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class FormConfig extends AbstractFieldConfig
 {
@@ -41,7 +42,7 @@ class FormConfig extends AbstractFieldConfig
             ->setValidationGroups($options['validation_groups'])
             ->setVirtual($options['virtual'])
             ->setValidator($options['validator'])
-            ->addRendererPlugin(new FormPlugin($field    ));
+            ->addRendererPlugin(new FormPlugin());
 
         if ($options['csrf_protection']) {
             $field->enableCsrfProtection($options['csrf_provider'], $options['csrf_field_name']);
@@ -63,10 +64,10 @@ class FormConfig extends AbstractFieldConfig
         );
     }
 
-    public function createInstance($key)
+    public function createInstance($name)
     {
-        return new Form($key, $this->getFormFactory(), $this->csrfProvider,
-                $this->validator);
+        return new Form($name, new EventDispatcher(), $this->getFormFactory(),
+                $this->csrfProvider, $this->validator);
     }
 
     public function getParent(array $options)

@@ -47,28 +47,17 @@ interface FieldInterface
     function getParent();
 
     /**
-     * Sets the key by which the field is identified in field groups.
+     * Returns the name by which the field is identified in forms.
      *
-     * Once this field is nested in a field group, i.e. after setParent() was
-     * called for the first time, this method should throw an exception.
-     *
-     * @param  string $key             The key of the field
-     * @throws BadMethodCallException  When the field already has a parent
+     * @return string  The name of the field.
      */
-    function setKey($key);
-
-    /**
-     * Returns the key by which the field is identified in field groups.
-     *
-     * @return string  The key of the field.
-     */
-    function getKey();
+    function getName();
 
     /**
      * Sets the property path
      *
      * The property path determines the property or a sequence of properties
-     * that a field updates in the data of the field group.
+     * that a field updates in the data of the form.
      *
      * @param string $propertyPath
      */
@@ -98,15 +87,6 @@ interface FieldInterface
      * @param array|object $objectOrArray
      */
     function writeProperty(&$objectOrArray);
-
-    /**
-     * Returns the data of the field as it is displayed to the user.
-     *
-     * @return string|array  When the field is not bound, the transformed
-     *                       default data is returned. When the field is bound,
-     *                       the bound data is returned.
-     */
-    function getDisplayedData();
 
     /**
      * Recursively adds constraint violations to the fields
@@ -141,13 +121,6 @@ interface FieldInterface
     function isValid();
 
     /**
-     * Returns whether the field requires a multipart form.
-     *
-     * @return Boolean
-     */
-    function isMultipart();
-
-    /**
      * Returns whether the field is required to be filled out.
      *
      * If the field has a parent and the parent is not required, this method
@@ -179,7 +152,7 @@ interface FieldInterface
     function isEmpty();
 
     /**
-     * Sets whether this field is required to be filled out when submitted.
+     * Sets whether this field is required to be filled out when bound.
      *
      * @param Boolean $required
      */
@@ -190,5 +163,5 @@ interface FieldInterface
      *
      * @param mixed $data  The data from the POST request
      */
-    function submit($data);
+    function bind($data);
 }

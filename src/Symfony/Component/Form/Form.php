@@ -15,14 +15,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ExecutionContext;
+use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\MissingOptionsException;
-use Symfony\Component\Form\Exception\AlreadySubmittedException;
+use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\DanglingFieldException;
 use Symfony\Component\Form\Exception\FieldDefinitionException;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
-use Symfony\Component\Form\Filter\FilterInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Form represents a form.
@@ -39,7 +41,7 @@ use Symfony\Component\Form\Filter\FilterInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class Form extends Field implements \IteratorAggregate, FormInterface, FilterInterface
+class Form extends Field implements \IteratorAggregate, FormInterface, EventSubscriberInterface
 {
     /**
      * Contains all the fields of this group
@@ -48,7 +50,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
     private $fields = array();
 
     /**
-     * Contains the names of submitted values who don't belong to any fields
+     * Contains the names of bound values who don't belong to any fields
      * @var array
      */
     private $extraFields = array();
@@ -79,16 +81,17 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
 
     private $csrfProvider;
 
-    public function __construct($key, FormFactoryInterface $factory,
-            CsrfProviderInterface $csrfProvider, ValidatorInterface $validator)
+    public function __construct($name, EventDispatcherInterface $dispatcher,
+            FormFactoryInterface $factory, CsrfProviderInterface $csrfProvider,
+            ValidatorInterface $validator)
     {
-        parent::__construct($key);
+        $dispatcher->addEventSubscriber($this);
+
+        parent::__construct($name, $dispatcher);
 
         $this->factory = $factory;
         $this->csrfProvider = $csrfProvider;
         $this->validator = $validator;
-
-        $this->appendFilter($this);
     }
 
     /**
@@ -128,8 +131,8 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
      */
     public function add($field)
     {
-        if ($this->isSubmitted()) {
-            throw new AlreadySubmittedException('You cannot add fields after submitting a form');
+        if ($this->isBound()) {
+            throw new AlreadyBoundException('You cannot add fields after binding a form');
         }
 
         // if the field is given as string, ask the field factory of the form
@@ -139,14 +142,14 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
                 throw new UnexpectedTypeException($field, 'FieldInterface or string');
             }
 
-            // TODO turn order of $identifier and $key around
+            // TODO turn order of $identifier and $name around
 
             if (func_num_args() > 2 || (func_num_args() > 1 && !is_array(func_get_arg(1)))) {
                 $identifier = func_get_arg(0);
-                $key = func_get_arg(1);
+                $name = func_get_arg(1);
                 $options = func_num_args() > 2 ? func_get_arg(2) : array();
 
-                $field = $this->factory->getInstance($identifier, $key, $options);
+                $field = $this->factory->getInstance($identifier, $name, $options);
             } else {
                 $class = $this->getDataClass();
 
@@ -161,11 +164,11 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
             }
         }
 
-        if ('' === $field->getKey() || null === $field->getKey()) {
+        if ('' === $field->getName() || null === $field->getName()) {
             throw new FieldDefinitionException('You cannot add anonymous fields');
         }
 
-        $this->fields[$field->getKey()] = $field;
+        $this->fields[$field->getName()] = $field;
 
         $field->setParent($this);
 
@@ -181,41 +184,41 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
     }
 
     /**
-     * Removes the field with the given key.
+     * Removes the field with the given name.
      *
-     * @param string $key
+     * @param string $name
      */
-    public function remove($key)
+    public function remove($name)
     {
-        $this->fields[$key]->setParent(null);
+        $this->fields[$name]->setParent(null);
 
-        unset($this->fields[$key]);
+        unset($this->fields[$name]);
     }
 
     /**
-     * Returns whether a field with the given key exists.
+     * Returns whether a field with the given name exists.
      *
-     * @param  string $key
+     * @param  string $name
      * @return Boolean
      */
-    public function has($key)
+    public function has($name)
     {
-        return isset($this->fields[$key]);
+        return isset($this->fields[$name]);
     }
 
     /**
-     * Returns the field with the given key.
+     * Returns the field with the given name.
      *
-     * @param  string $key
+     * @param  string $name
      * @return FieldInterface
      */
-    public function get($key)
+    public function get($name)
     {
-        if (isset($this->fields[$key])) {
-            return $this->fields[$key];
+        if (isset($this->fields[$name])) {
+            return $this->fields[$name];
         }
 
-        throw new \InvalidArgumentException(sprintf('Field "%s" does not exist.', $key));
+        throw new \InvalidArgumentException(sprintf('Field "%s" does not exist.', $name));
     }
 
     /**
@@ -255,42 +258,44 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
         return $this;
     }
 
-    public function filterSetData($data)
+    public function filterSetData(FilterDataEvent $event)
     {
         if (null === $this->getValueTransformer() && null === $this->getNormalizationTransformer()) {
+            $data = $event->getData();
+
             // Empty values must be converted to objects or arrays so that
             // they can be read by PropertyPath in the child fields
             if (empty($data)) {
                 if ($this->dataConstructor) {
                     $constructor = $this->dataConstructor;
-                    $data = $constructor();
+                    $event->setData($constructor());
                 } else if ($this->dataClass) {
                     $class = $this->dataClass;
-                    $data = new $class();
+                    $event->setData(new $class());
                 } else {
-                    $data = array();
+                    $event->setData(array());
                 }
             }
         }
-
-        return $data;
     }
 
-    public function filterBoundDataFromClient($data)
+    public function filterBoundDataFromClient(FilterDataEvent $event)
     {
+        $data = $event->getData();
+
         if (!is_array($data)) {
             throw new UnexpectedTypeException($data, 'array');
         }
 
-        foreach ($this->fields as $key => $field) {
-            if (!isset($data[$key])) {
-                $data[$key] = null;
+        foreach ($this->fields as $name => $field) {
+            if (!isset($data[$name])) {
+                $data[$name] = null;
             }
         }
 
-        foreach ($data as $key => $value) {
-            if ($this->has($key)) {
-                $this->fields[$key]->submit($value);
+        foreach ($data as $name => $value) {
+            if ($this->has($name)) {
+                $this->fields[$name]->bind($value);
             }
         }
 
@@ -298,32 +303,15 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
 
         $this->writeObject($data);
 
-        return $data;
+        $event->setData($data);
     }
 
-    public function getSupportedFilters()
+    public static function getSubscribedEvents()
     {
         return array(
-            Filters::filterSetData,
-            Filters::filterBoundDataFromClient,
+            Events::filterSetData,
+            Events::filterBoundDataFromClient,
         );
-    }
-
-    /**
-     * Returns the data of the field as it is displayed to the user.
-     *
-     * @see FieldInterface
-     * @return array of field name => value
-     */
-    public function getDisplayedData()
-    {
-        $values = array();
-
-        foreach ($this->fields as $key => $field) {
-            $values[$key] = $field->getDisplayedData();
-        }
-
-        return $values;
     }
 
     /**
@@ -331,16 +319,16 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
      *
      * @param  string|array $data  The POST data
      */
-    public function submit($data)
+    public function bind($data)
     {
         // set and reverse transform the data
-        parent::submit($data);
+        parent::bind($data);
 
         $this->extraFields = array();
 
-        foreach ((array)$data as $key => $value) {
-            if (!$this->has($key)) {
-                $this->extraFields[] = $key;
+        foreach ((array)$data as $name => $value) {
+            if (!$this->has($name)) {
+                $this->extraFields[] = $name;
             }
         }
     }
@@ -384,23 +372,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
         }
     }
 
-    /**
-     * Processes the submitted data before it is passed to the individual fields
-     *
-     * The data is in the user format.
-     *
-     * @param  array $data
-     * @return array
-     */
-    protected function preprocessData($data)
-    {
-        if ($this->dataPreprocessor) {
-            return $this->dataPreprocessor->processData($data);
-        }
-
-        return $data;
-    }
-
     public function setVirtual($virtual)
     {
         $this->virtual = $virtual;
@@ -417,11 +388,11 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
     }
 
     /**
-     * Returns whether this form was submitted with extra fields
+     * Returns whether this form was bound with extra fields
      *
      * @return Boolean
      */
-    public function isSubmittedWithExtraFields()
+    public function isBoundWithExtraFields()
     {
         // TODO: integrate the field names in the error message
         return count($this->extraFields) > 0;
@@ -489,43 +460,27 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
     }
 
     /**
-     * Returns whether the field requires a multipart form.
-     *
-     * @return Boolean
-     */
-    public function isMultipart()
-    {
-        foreach ($this->fields as $field) {
-            if ($field->isMultipart()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Returns true if the field exists (implements the \ArrayAccess interface).
      *
-     * @param string $key The key of the field
+     * @param string $name The name of the field
      *
      * @return Boolean true if the widget exists, false otherwise
      */
-    public function offsetExists($key)
+    public function offsetExists($name)
     {
-        return $this->has($key);
+        return $this->has($name);
     }
 
     /**
      * Returns the form field associated with the name (implements the \ArrayAccess interface).
      *
-     * @param string $key The offset of the value to get
+     * @param string $name The offset of the value to get
      *
      * @return Field A form field instance
      */
-    public function offsetGet($key)
+    public function offsetGet($name)
     {
-        return $this->get($key);
+        return $this->get($name);
     }
 
     /**
@@ -536,7 +491,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
      *
      * @throws \LogicException
      */
-    public function offsetSet($key, $field)
+    public function offsetSet($name, $field)
     {
         throw new \LogicException('Use the method add() to add fields');
     }
@@ -544,13 +499,13 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
     /**
      * Throws an exception saying that values cannot be unset (implements the \ArrayAccess interface).
      *
-     * @param string $key
+     * @param string $name
      *
      * @throws \LogicException
      */
-    public function offsetUnset($key)
+    public function offsetUnset($name)
     {
-        return $this->remove($key);
+        return $this->remove($name);
     }
 
     /**
@@ -673,7 +628,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
         if (!$this->isCsrfProtected()) {
             return true;
         } else {
-            $token = $this->get($this->csrfFieldName)->getDisplayedData();
+            $token = $this->get($this->csrfFieldName)->getTransformedData();
 
             return $this->csrfProvider->isCsrfTokenValid(get_class($this), $token);
         }
@@ -682,7 +637,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
     /**
      * Binds a request to the form
      *
-     * If the request was a POST request, the data is submitted to the form,
+     * If the request was a POST request, the data is bound to the form,
      * transformed and written into the form data (an object or an array).
      * You can set the form data by passing it in the second parameter
      * of this method or by passing it in the "data" option of the form's
@@ -690,45 +645,28 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
      *
      * @param Request $request    The request to bind to the form
      * @param array|object $data  The data from which to read default values
-     *                            and where to write submitted values
+     *                            and where to write bound values
      */
-    public function bind(Request $request, $data = null)
+    public function bindRequest(Request $request)
     {
-        if (!$this->getKey()) {
-            throw new FormException('You cannot bind anonymous forms. Please give this form a name');
+        // Store the bound data in case of a post request
+        switch ($request->getMethod()) {
+            case 'POST':
+            case 'PUT':
+                $data = array_replace_recursive(
+                    $request->request->get($this->getName(), array()),
+                    $request->files->get($this->getName(), array())
+                );
+                break;
+            case 'GET':
+                $data = $request->query->get($this->getName(), array());
+                break;
+            default:
+                throw new FormException(sprintf('The request method "%s" is not supported', $request->getMethod()));
         }
 
-        // Store object from which to read the default values and where to
-        // write the submitted values
-        if (null !== $data) {
-            $this->setData($data);
-        }
-
-        // Store the submitted data in case of a post request
-        if ('POST' == $request->getMethod()) {
-            $values = $request->request->get($this->getName(), array());
-            $files = $request->files->get($this->getName(), array());
-
-            $this->submit(self::deepArrayUnion($values, $files));
-
-            $this->validate();
-        }
-    }
-
-    /**
-     * @deprecated
-     */
-    private function getName()
-    {
-        return null === $this->getParent() ? $this->getKey() : $this->getParent()->getName().'['.$this->key.']';
-    }
-
-    /**
-     * @deprecated
-     */
-    private function getId()
-    {
-        return null === $this->getParent() ? $this->getKey() : $this->getParent()->getId().'_'.$this->key;
+        $this->bind($data);
+        $this->validate();
     }
 
     /**

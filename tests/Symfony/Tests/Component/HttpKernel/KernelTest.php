@@ -466,11 +466,6 @@ class KernelForTest extends Kernel
         return $this->bundleMap;
     }
 
-    public function registerRootDir()
-    {
-        return __DIR__;
-    }
-
     public function registerBundles()
     {
     }

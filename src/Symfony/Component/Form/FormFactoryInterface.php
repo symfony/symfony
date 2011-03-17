@@ -13,7 +13,7 @@ namespace Symfony\Component\Form;
 
 interface FormFactoryInterface
 {
-    function getInstance($identifier, $key = null, array $options = array());
+    function getInstance($identifier, $name = null, array $options = array());
 
     function getInstanceForProperty($class, $property, array $options = array());
 }

@@ -15,7 +15,7 @@ require_once __DIR__ . '/TestCase.php';
 require_once __DIR__ . '/Fixtures/Author.php';
 require_once __DIR__ . '/Fixtures/InvalidField.php';
 require_once __DIR__ . '/Fixtures/FixedValueTransformer.php';
-require_once __DIR__ . '/Fixtures/FixedFilter.php';
+require_once __DIR__ . '/Fixtures/FixedFilterListener.php';
 
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\PropertyPath;
@@ -25,7 +25,7 @@ use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
 use Symfony\Tests\Component\Form\Fixtures\Author;
 use Symfony\Tests\Component\Form\Fixtures\InvalidField;
 use Symfony\Tests\Component\Form\Fixtures\FixedValueTransformer;
-use Symfony\Tests\Component\Form\Fixtures\FixedFilter;
+use Symfony\Tests\Component\Form\Fixtures\FixedFilterListener;
 
 class FieldTest extends TestCase
 {
@@ -98,14 +98,14 @@ class FieldTest extends TestCase
 
     public function testFieldWithNoErrorsIsValid()
     {
-        $this->field->submit('data');
+        $this->field->bind('data');
 
         $this->assertTrue($this->field->isValid());
     }
 
     public function testFieldWithErrorsIsInvalid()
     {
-        $this->field->submit('data');
+        $this->field->bind('data');
         $this->field->addError(new FieldError('Some error'));
 
         $this->assertFalse($this->field->isValid());
@@ -114,12 +114,12 @@ class FieldTest extends TestCase
     public function testSubmitResetsErrors()
     {
         $this->field->addError(new FieldError('Some error'));
-        $this->field->submit('data');
+        $this->field->bind('data');
 
         $this->assertTrue($this->field->isValid());
     }
 
-    public function testUnsubmittedFieldIsInvalid()
+    public function testUnboundFieldIsInvalid()
     {
         $this->assertFalse($this->field->isValid());
     }
@@ -162,11 +162,11 @@ class FieldTest extends TestCase
         $this->assertFalse($this->field->isRequired());
     }
 
-    public function testIsSubmitted()
+    public function testIsBound()
     {
-        $this->assertFalse($this->field->isSubmitted());
-        $this->field->submit('symfony');
-        $this->assertTrue($this->field->isSubmitted());
+        $this->assertFalse($this->field->isBound());
+        $this->field->bind('symfony');
+        $this->assertTrue($this->field->isBound());
     }
 
     public function testDefaultDataIsTransformedCorrectly()
@@ -174,7 +174,7 @@ class FieldTest extends TestCase
         $field = $this->factory->getInstance('field', 'name');
 
         $this->assertEquals(null, $this->field->getData());
-        $this->assertEquals('', $this->field->getDisplayedData());
+        $this->assertEquals('', $this->field->getTransformedData());
     }
 
     public function testDataIsTransformedCorrectlyIfNull_noValueTransformer()
@@ -182,7 +182,7 @@ class FieldTest extends TestCase
         $this->field->setData(null);
 
         $this->assertSame(null, $this->field->getData());
-        $this->assertSame('', $this->field->getDisplayedData());
+        $this->assertSame('', $this->field->getTransformedData());
     }
 
     public function testDataIsTransformedCorrectlyIfNotNull_noValueTransformer()
@@ -194,12 +194,12 @@ class FieldTest extends TestCase
         // should be casted to an integer when the field is bound
         // Even without binding, the data will thus be a string
         $this->assertSame('123', $this->field->getData());
-        $this->assertSame('123', $this->field->getDisplayedData());
+        $this->assertSame('123', $this->field->getTransformedData());
     }
 
-    public function testSubmittedDataIsTransformedCorrectly()
+    public function testBoundDataIsTransformedCorrectly()
     {
-        $filter = new FixedFilter(array(
+        $filter = new FixedFilterListener(array(
             'filterBoundDataFromClient' => array(
                 // 1. The value is converted to a string and passed to the
                 //    first filter
@@ -223,22 +223,22 @@ class FieldTest extends TestCase
             'app[filter2[norm[filter1[0]]]]' => 'filter2[norm[filter1[0]]]',
         ));
 
-        $this->field->appendFilter($filter);
+        $this->field->addEventSubscriber($filter);
         $this->field->setValueTransformer($valueTransformer);
         $this->field->setNormalizationTransformer($normTransformer);
-        $this->field->submit(0);
+        $this->field->bind(0);
 
         $this->assertEquals('app[filter2[norm[filter1[0]]]]', $this->field->getData());
         $this->assertEquals('filter2[norm[filter1[0]]]', $this->field->getNormalizedData());
-        $this->assertEquals('client[filter2[norm[filter1[0]]]]', $this->field->getDisplayedData());
+        $this->assertEquals('client[filter2[norm[filter1[0]]]]', $this->field->getTransformedData());
     }
 
-    public function testSubmittedDataIsTransformedCorrectlyIfEmpty_noValueTransformer()
+    public function testBoundDataIsTransformedCorrectlyIfEmpty_noValueTransformer()
     {
-        $this->field->submit('');
+        $this->field->bind('');
 
         $this->assertSame(null, $this->field->getData());
-        $this->assertEquals('', $this->field->getDisplayedData());
+        $this->assertEquals('', $this->field->getTransformedData());
     }
 
     public function testSetDataIsTransformedCorrectly()
@@ -262,10 +262,10 @@ class FieldTest extends TestCase
 
         $this->assertEquals(0, $field->getData());
         $this->assertEquals('norm[0]', $field->getNormalizedData());
-        $this->assertEquals('transform[norm[0]]', $field->getDisplayedData());
+        $this->assertEquals('transform[norm[0]]', $field->getTransformedData());
     }
 
-    public function testSubmittedDataIsTrimmedBeforeTransforming()
+    public function testBoundDataIsTrimmedBeforeTransforming()
     {
         $transformer = new FixedValueTransformer(array(
             null => '',
@@ -276,13 +276,13 @@ class FieldTest extends TestCase
             'value_transformer' => $transformer,
         ));
 
-        $field->submit(' a ');
+        $field->bind(' a ');
 
-        $this->assertEquals('a', $field->getDisplayedData());
+        $this->assertEquals('a', $field->getTransformedData());
         $this->assertEquals('reverse[a]', $field->getData());
     }
 
-    public function testSubmittedDataIsNotTrimmedBeforeTransformingIfDisabled()
+    public function testBoundDataIsNotTrimmedBeforeTransformingIfDisabled()
     {
         $transformer = new FixedValueTransformer(array(
             null => '',
@@ -294,9 +294,9 @@ class FieldTest extends TestCase
             'value_transformer' => $transformer,
         ));
 
-        $field->submit(' a ');
+        $field->bind(' a ');
 
-        $this->assertEquals(' a ', $field->getDisplayedData());
+        $this->assertEquals(' a ', $field->getTransformedData());
         $this->assertEquals('reverse[ a ]', $field->getData());
     }
 
@@ -305,7 +305,7 @@ class FieldTest extends TestCase
         $object = new Author();
 
         $field = $this->factory->getInstance('field', 'firstName', array('property_path' => null));
-        $field->submit('Bernhard');
+        $field->bind('Bernhard');
         $field->writeProperty($object);
 
         $this->assertEquals(null, $object->firstName);
@@ -317,9 +317,9 @@ class FieldTest extends TestCase
             'trim' => false,
         ));
 
-        $field->submit('a');
+        $field->bind('a');
 
-        $this->assertEquals('a', $field->getDisplayedData());
+        $this->assertEquals('a', $field->getTransformedData());
         $this->assertTrue($field->isTransformationSuccessful());
     }
 
@@ -337,9 +337,9 @@ class FieldTest extends TestCase
                 ->method('reverseTransform')
                 ->will($this->throwException(new TransformationFailedException()));
 
-        $field->submit('a');
+        $field->bind('a');
 
-        $this->assertEquals('a', $field->getDisplayedData());
+        $this->assertEquals('a', $field->getTransformedData());
         $this->assertFalse($field->isTransformationSuccessful());
     }
 

@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Routing\Matcher\Dumper\ApacheMatcherDumper;
 
 /**
- * RouterDebugCommand.
+ * A console command for retrieving information about routes
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

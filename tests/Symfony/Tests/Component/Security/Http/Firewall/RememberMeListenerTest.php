@@ -27,7 +27,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->method('setToken')
         ;
 
-        $this->assertNull($listener->onCoreSecurity($this->getGetResponseEvent()));
+        $this->assertNull($listener->handle($this->getGetResponseEvent()));
     }
 
     public function testOnCoreSecurityDoesNothingWhenNoCookieIsSet()
@@ -53,7 +53,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(new Request()))
         ;
 
-        $this->assertNull($listener->onCoreSecurity($event));
+        $this->assertNull($listener->handle($event));
     }
 
     public function testOnCoreSecurityIgnoresAuthenticationExceptionThrownByAuthenticationManagerImplementation()
@@ -91,7 +91,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(new Request()))
         ;
 
-        $listener->onCoreSecurity($event);
+        $listener->handle($event);
     }
 
     public function testOnCoreSecurity()
@@ -130,7 +130,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(new Request()))
         ;
 
-        $listener->onCoreSecurity($event);
+        $listener->handle($event);
     }
 
     protected function getGetResponseEvent()

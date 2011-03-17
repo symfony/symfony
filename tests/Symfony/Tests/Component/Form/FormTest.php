@@ -164,14 +164,14 @@ class FormTest extends TestCase
         $field = $form->get($form->getCsrfFieldName());
 
         $this->assertTrue($field instanceof HiddenField);
-        $this->assertEquals('ABCDEF', $field->getDisplayedData());
+        $this->assertEquals('ABCDEF', $field->getTransformedData());
     }
 
     public function testIsCsrfTokenValidPassesIfCsrfProtectionIsDisabled()
     {
         $this->markTestSkipped('CSRF protection needs to be fixed');
 
-        $this->form->submit(array());
+        $this->form->bind(array());
 
         $this->assertTrue($this->form->isCsrfTokenValid());
     }
@@ -193,7 +193,7 @@ class FormTest extends TestCase
 
         $field = $form->getCsrfFieldName();
 
-        $form->submit(array($field => 'ABCDEF'));
+        $form->bind(array($field => 'ABCDEF'));
 
         $this->assertTrue($form->isCsrfTokenValid());
     }
@@ -215,7 +215,7 @@ class FormTest extends TestCase
 
         $field = $form->getCsrfFieldName();
 
-        $form->submit(array($field => 'ABCDEF'));
+        $form->bind(array($field => 'ABCDEF'));
 
         $this->assertFalse($form->isCsrfTokenValid());
     }
@@ -272,16 +272,6 @@ class FormTest extends TestCase
         $this->assertEquals(array('group2'), $childForm->getValidationGroups());
     }
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
-     */
-    public function testBindThrowsExceptionIfAnonymous()
-    {
-        $form = $this->factory->getInstance('form', null, array('validator' => $this->createMockValidator()));
-
-        $form->bind($this->createPostRequest());
-    }
-
     public function testBindValidatesData()
     {
         $form = $this->factory->getInstance('form', 'author', array(
@@ -295,7 +285,7 @@ class FormTest extends TestCase
             ->with($this->equalTo($form));
 
         // concrete request is irrelevant
-        $form->bind($this->createPostRequest());
+        $form->bindRequest($this->createPostRequest());
     }
 
     public function testBindDoesNotValidateArrays()
@@ -312,7 +302,7 @@ class FormTest extends TestCase
 
         // concrete request is irrelevant
         // data is an array
-        $form->bind($this->createPostRequest(), array());
+        $form->bindRequest($this->createPostRequest(), array());
     }
 
     public function testBindReadsRequestData()
@@ -340,23 +330,13 @@ class FormTest extends TestCase
         $imageForm->add($this->factory->getInstance('field', 'filename'));
         $form->add($imageForm);
 
-        $form->bind($this->createPostRequest($values, $files));
+        $form->bindRequest($this->createPostRequest($values, $files));
 
         $file = new UploadedFile('abcdef.png', 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
         $this->assertEquals('Bernhard', $form['name']->getData());
         $this->assertEquals('foobar.png', $form['image']['filename']->getData());
         $this->assertEquals($file, $form['image']['file']->getData());
-    }
-
-    public function testBindAcceptsObject()
-    {
-        $object = new \stdClass();
-        $form = $this->factory->getInstance('form', 'author', array('validator' => $this->validator));
-
-        $form->bind(new Request(), $object);
-
-        $this->assertSame($object, $form->getData());
     }
 
     public function testReadPropertyIsIgnoredIfPropertyPathIsNull()
@@ -443,12 +423,12 @@ class FormTest extends TestCase
         $this->assertEquals($expected, iterator_to_array($form));
     }
 
-    public function testIsSubmitted()
+    public function testIsBound()
     {
         $form = $this->factory->getInstance('form', 'author', array('validator' => $this->validator));
-        $this->assertFalse($form->isSubmitted());
-        $form->submit(array('firstName' => 'Bernhard'));
-        $this->assertTrue($form->isSubmitted());
+        $this->assertFalse($form->isBound());
+        $form->bind(array('firstName' => 'Bernhard'));
+        $this->assertTrue($form->isBound());
     }
 
     public function testValidIfAllFieldsAreValid()
@@ -457,7 +437,7 @@ class FormTest extends TestCase
         $form->add($this->createValidMockField('firstName'));
         $form->add($this->createValidMockField('lastName'));
 
-        $form->submit(array('firstName' => 'Bernhard', 'lastName' => 'Potencier'));
+        $form->bind(array('firstName' => 'Bernhard', 'lastName' => 'Potencier'));
 
         $this->assertTrue($form->isValid());
     }
@@ -468,20 +448,20 @@ class FormTest extends TestCase
         $form->add($this->createInvalidMockField('firstName'));
         $form->add($this->createValidMockField('lastName'));
 
-        $form->submit(array('firstName' => 'Bernhard', 'lastName' => 'Potencier'));
+        $form->bind(array('firstName' => 'Bernhard', 'lastName' => 'Potencier'));
 
         $this->assertFalse($form->isValid());
     }
 
-    public function testInvalidIfSubmittedWithExtraFields()
+    public function testInvalidIfBoundWithExtraFields()
     {
         $form = $this->factory->getInstance('form', 'author', array('validator' => $this->validator));
         $form->add($this->createValidMockField('firstName'));
         $form->add($this->createValidMockField('lastName'));
 
-        $form->submit(array('foo' => 'bar', 'firstName' => 'Bernhard', 'lastName' => 'Potencier'));
+        $form->bind(array('foo' => 'bar', 'firstName' => 'Bernhard', 'lastName' => 'Potencier'));
 
-        $this->assertTrue($form->isSubmittedWithExtraFields());
+        $this->assertTrue($form->isBoundWithExtraFields());
     }
 
     public function testHasNoErrorsIfOnlyFieldHasErrors()
@@ -489,7 +469,7 @@ class FormTest extends TestCase
         $form = $this->factory->getInstance('form', 'author', array('validator' => $this->validator));
         $form->add($this->createInvalidMockField('firstName'));
 
-        $form->submit(array('firstName' => 'Bernhard'));
+        $form->bind(array('firstName' => 'Bernhard'));
 
         $this->assertFalse($form->hasErrors());
     }
@@ -498,13 +478,13 @@ class FormTest extends TestCase
     {
         $field = $this->createMockField('firstName');
         $field->expects($this->once())
-                    ->method('submit')
+                    ->method('bind')
                     ->with($this->equalTo(null));
 
         $form = $this->factory->getInstance('form', 'author', array('validator' => $this->validator));
         $form->add($field);
 
-        $form->submit(array());
+        $form->bind(array());
     }
 
     public function testAddErrorMapsFieldValidationErrorsOntoFields()
@@ -690,13 +670,13 @@ class FormTest extends TestCase
         $form->addError($error, $path->getIterator());
     }
 
-    public function testAddThrowsExceptionIfAlreadySubmitted()
+    public function testAddThrowsExceptionIfAlreadyBound()
     {
         $form = $this->factory->getInstance('form', 'author', array('validator' => $this->validator));
         $form->add($this->createMockField('firstName'));
-        $form->submit(array());
+        $form->bind(array());
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\AlreadySubmittedException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\AlreadyBoundException');
         $form->add($this->createMockField('lastName'));
     }
 
@@ -994,7 +974,7 @@ class FormTest extends TestCase
 
         $form->add($field);
 
-        $form->submit(array()); // irrelevant
+        $form->bind(array()); // irrelevant
     }
 
     public function testGetDataReturnsObject()
@@ -1003,39 +983,6 @@ class FormTest extends TestCase
         $object = new \stdClass();
         $form->setData($object);
         $this->assertEquals($object, $form->getData());
-    }
-
-    public function testGetDisplayedDataForwardsCall()
-    {
-        $field = $this->createValidMockField('firstName');
-        $field->expects($this->atLeastOnce())
-                    ->method('getDisplayedData')
-                    ->will($this->returnValue('Bernhard'));
-
-        $form = $this->factory->getInstance('form', 'author', array(
-            'csrf_protection' => false,
-        ));
-        $form->add($field);
-
-        $this->assertEquals(array('firstName' => 'Bernhard'), $form->getDisplayedData());
-    }
-
-    public function testIsMultipartIfAnyFieldIsMultipart()
-    {
-        $form = $this->factory->getInstance('form', 'author');
-        $form->add($this->createMultipartMockField('firstName'));
-        $form->add($this->createNonMultipartMockField('lastName'));
-
-        $this->assertTrue($form->isMultipart());
-    }
-
-    public function testIsNotMultipartIfNoFieldIsMultipart()
-    {
-        $form = $this->factory->getInstance('form', 'author');
-        $form->add($this->createNonMultipartMockField('firstName'));
-        $form->add($this->createNonMultipartMockField('lastName'));
-
-        $this->assertFalse($form->isMultipart());
     }
 
     public function testSubmitWithoutPriorSetData()
@@ -1049,7 +996,7 @@ class FormTest extends TestCase
         $form = $this->factory->getInstance('form', 'author');
         $form->add($field);
 
-        $form->submit(array('firstName' => 'Bernhard'));
+        $form->bind(array('firstName' => 'Bernhard'));
 
         $this->assertEquals(array('firstName' => 'Bernhard'), $form->getData());
     }
@@ -1131,7 +1078,7 @@ class FormTest extends TestCase
                 ->method('reverseTransform')
                 ->will($this->returnValue('foobar'));
 
-        $form->submit(array('foo' => 'bar')); // reverse transformed to "foobar"
+        $form->bind(array('foo' => 'bar')); // reverse transformed to "foobar"
         $form->validateData($context);
     }
 
@@ -1145,7 +1092,7 @@ class FormTest extends TestCase
         $refForm->add($this->factory->getInstance('field', 'firstName'));
         $form->add($refForm);
 
-        $form->bind($this->createPostRequest(array(
+        $form->bindRequest($this->createPostRequest(array(
             'author' => array(
                 // reference has a getter, but not setter
                 'reference' => array(
@@ -1171,7 +1118,7 @@ class FormTest extends TestCase
 
         $refForm->setData($newReference); // new author object
 
-        $form->bind($this->createPostRequest(array(
+        $form->bindRequest($this->createPostRequest(array(
             'author' => array(
                 // referenceCopy has a getter that returns a copy
                 'referenceCopy' => array(
@@ -1193,7 +1140,7 @@ class FormTest extends TestCase
         $refForm->add($this->factory->getInstance('field', 'firstName'));
         $form->add($refForm);
 
-        $form->bind($this->createPostRequest(array(
+        $form->bindRequest($this->createPostRequest(array(
             'author' => array(
                 // referenceCopy has a getter that returns a copy
                 'referenceCopy' => array(
@@ -1221,7 +1168,7 @@ class FormTest extends TestCase
             )
         )));
 
-        $form->bind($this->createPostRequest(array(
+        $form->bindRequest($this->createPostRequest(array(
             'author' => array(
                 'referenceCopy' => array(), // doesn't matter actually
             )
@@ -1248,7 +1195,7 @@ class FormTest extends TestCase
             )
         )));
 
-        $form->bind($this->createPostRequest(array(
+        $form->bindRequest($this->createPostRequest(array(
             'author' => array(
                 'referenceCopy' => array('a' => 'b'), // doesn't matter actually
             )
@@ -1323,7 +1270,7 @@ class FormTest extends TestCase
         );
 
         $field->expects($this->any())
-                    ->method('getKey')
+                    ->method('getName')
                     ->will($this->returnValue($key));
 
         return $field;

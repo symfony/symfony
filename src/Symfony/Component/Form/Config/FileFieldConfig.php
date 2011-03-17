@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Config;
 
 use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\Filter\FileUploadFilter;
+use Symfony\Component\Form\EventListener\FixFileUploadListener;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
 use Symfony\Component\Form\ValueTransformer\ReversedTransformer;
 use Symfony\Component\Form\ValueTransformer\FileToStringTransformer;
@@ -43,7 +43,7 @@ class FileFieldConfig extends AbstractFieldConfig
             $field->setNormalizationTransformer(new FileToArrayTransformer());
         }
 
-        $field->prependFilter(new FileUploadFilter($field, $this->storage))
+        $field->addEventSubscriber(new FixFileUploadListener($field, $this->storage), 10)
             ->add($this->getInstance('field', 'file')->setRendererVar('type', 'file'))
             ->add($this->getInstance('hidden', 'token'))
             ->add($this->getInstance('hidden', 'name'))
@@ -56,6 +56,7 @@ class FileFieldConfig extends AbstractFieldConfig
         return array(
             'template' => 'file',
             'type' => 'string',
+            'csrf_protection' => false,
         );
     }
 

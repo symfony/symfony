@@ -26,7 +26,7 @@ interface AuthenticationEntryPointInterface
     /**
      * Starts the authentication scheme.
      *
-     * @param GetResponseEvent        $event     The "onCoreSecurity" event
+     * @param GetResponseEvent        $event     The "onCoreRequest" event
      * @param object                  $request       The request that resulted in an AuthenticationException
      * @param AuthenticationException $authException The exception that started the authentication process
      */

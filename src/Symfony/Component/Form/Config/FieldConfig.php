@@ -17,6 +17,8 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Renderer\DefaultRenderer;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Form\Renderer\Plugin\FieldPlugin;
+use Symfony\Component\Form\EventListener\TrimListener;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class FieldConfig extends AbstractFieldConfig
 {
@@ -32,20 +34,19 @@ class FieldConfig extends AbstractFieldConfig
     public function configure(FieldInterface $field, array $options)
     {
         $field->setPropertyPath($options['property_path'] === false
-                    ? $field->getKey()
+                    ? $field->getName()
                     : $options['property_path'])
-            ->setTrim($options['trim'])
             ->setRequired($options['required'])
             ->setDisabled($options['disabled'])
             ->setValueTransformer($options['value_transformer'])
             ->setNormalizationTransformer($options['normalization_transformer'])
             ->setData($options['data'])
-            ->setRenderer(new DefaultRenderer($this->theme, $options['template']))
-            ->addRendererPlugin(new FieldPlugin($field))
-            ->setRendererVar('class', null)
-            ->setRendererVar('max_length', null)
-            ->setRendererVar('size', null)
-            ->setRendererVar('label', ucfirst(strtolower(str_replace('_', ' ', $field->getKey()))));
+            ->setRenderer(new DefaultRenderer($field, $this->theme, $options['template']))
+            ->addRendererPlugin(new FieldPlugin());
+
+        if ($options['trim']) {
+            $field->addEventSubscriber(new TrimListener());
+        }
     }
 
     public function getDefaultOptions(array $options)
@@ -62,9 +63,9 @@ class FieldConfig extends AbstractFieldConfig
         );
     }
 
-    public function createInstance($key)
+    public function createInstance($name)
     {
-        return new Field($key);
+        return new Field($name, new EventDispatcher());
     }
 
     public function getParent(array $options)

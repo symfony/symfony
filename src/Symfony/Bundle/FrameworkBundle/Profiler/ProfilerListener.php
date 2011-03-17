@@ -13,6 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\Profiler;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseFromExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -44,11 +46,24 @@ class ProfilerListener
     }
 
     /**
+     * Handles the onCoreRequest event
+     *
+     * This method initialize the profiler to be able to get it as a scoped
+     * service when filterCoreResponse() will collect the sub request
+     *
+     * @param GetResponseEvent $event A GetResponseEvent instance
+     */
+    public function onCoreRequest(GetResponseEvent $event)
+    {
+        $this->container->get('profiler');
+    }
+
+    /**
      * Handles the onCoreException event.
      *
-     * @param ExceptionEvent $event An ExceptionEvent instance
+     * @param GetResponseFromExceptionEvent $event A GetResponseFromExceptionEvent instance
      */
-    public function onCoreException(ExceptionEvent $event)
+    public function onCoreException(GetResponseFromExceptionEvent $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;
@@ -64,19 +79,21 @@ class ProfilerListener
      */
     public function filterCoreResponse(FilterResponseEvent $event)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
-            return;
-        }
-
         if (null !== $this->matcher && !$this->matcher->matches($event->getRequest())) {
-            return;
+            return $response;
         }
 
         if ($this->onlyException && null === $this->exception) {
             return;
         }
 
-        $this->container->get('profiler')->collect($event->getRequest(), $response, $this->exception);
+        $profiler = $this->container->get('profiler');
+
+        if ($parent = $this->container->getCurrentScopedStack('request')) {
+            $profiler->setParent($parent['request']['profiler']->getToken());
+        }
+
+        $profiler->collect($event->getRequest(), $response, $this->exception);
         $this->exception = null;
     }
 }

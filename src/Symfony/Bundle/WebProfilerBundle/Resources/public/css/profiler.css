@@ -21,7 +21,7 @@ p
 {
   font-size:14px;
   line-height:20px;
-  color:#868686;
+  color:#313131;
   padding-bottom:20px
 }
 
@@ -80,7 +80,7 @@ tr
 table
 {
     width:100%;
-    margin:10px 0 60px;
+    margin:10px 0 30px;
 }
 
 table th
@@ -135,12 +135,12 @@ fieldset
     min-width:   970px;
 }
 
-.header
+#header
 {
-    padding:30px 30px 20px 30px;
+    padding:30px 30px 20px;
 }
 
-.header h1
+#header h1
 {
     float:left;
 }
@@ -150,12 +150,12 @@ fieldset
     float:right;
 }
 
-.menu_profiler
+#menu_profiler
 {
     border-right: 1px solid #dfdfdf;
 }
 
-.menu_profiler li
+#menu_profiler li
 {
     border-bottom:    1px solid #dfdfdf;
     position:         relative;
@@ -164,7 +164,7 @@ fieldset
     background-color: #f6f6f6;
 }
 
-.menu_profiler li a
+#menu_profiler li a
 {
     color:           #404040;
     display:         block;
@@ -174,7 +174,7 @@ fieldset
     cursor:          pointer;
 }
 
-.menu_profiler li a span.label
+#menu_profiler li a span.label
 {
     display:    block;
     padding:    20px 20px 16px 65px;
@@ -182,7 +182,7 @@ fieldset
     _height:    24px;
 }
 
-.menu_profiler li a span.icon
+#menu_profiler li a span.icon
 {
     display: block;
     position: absolute;
@@ -192,22 +192,22 @@ fieldset
     text-align: center;
 }
 
-.menu_profiler li.selected a,
-.menu_profiler li a:hover
+#menu_profiler li.selected a,
+#menu_profiler li a:hover
 {
     background:#d1d1d1 url(../images/profiler/bg_submenu.gif) repeat-x 0 0;
 }
 
-.menu_profiler .request,
-.menu_profiler .request a,
-.menu_profiler .request a span.label
+#menu_profiler li:first-child,
+#menu_profiler li:first-child a,
+#menu_profiler li:first-child a span.label
 {
     -moz-border-radius:16px 0 0 0;
     -webkit-border-radius:16px 0 0 0;
     border-radius:16px 0 0 0;
 }
 
-.menu_profiler li a span.count
+#menu_profiler li a span.count
 {
     padding: 0;
     position:absolute;
@@ -215,23 +215,25 @@ fieldset
     top: 20px;
 }
 
-.navigation, .collector_content
-{
-    float:left
+#collector_wrapper {
+    float: left;
+    width: 100%;
 }
 
-.navigation
+#collector_content
 {
-    width:250px;
+    margin-left: 250px;
+    padding: 40px 50px;
 }
 
-.collector_content
+#navigation
 {
-    width:620px;
-    padding:40px 0 40px 50px;
+    float: left;
+    width: 250px;
+    margin-left: -100%;
 }
 
-.collector_content table td
+#collector_content table td
 {
     background-color: white;
 }
@@ -245,6 +247,7 @@ h1
 h2, h3
 {
     font-weight:bold;
+    margin-bottom: 20px;
 }
 
 li
@@ -253,7 +256,7 @@ li
 
 }
 
-.main, .resume
+#main, #resume
 {
     -moz-border-radius:16px;
     -webkit-border-radius:16px;
@@ -261,7 +264,7 @@ li
     margin-bottom:20px;
 }
 
-.menu_profiler span.count span
+#menu_profiler span.count span
 {
     display:inline-block;
     background-color:#aacd4e;
@@ -274,20 +277,20 @@ li
     font-size: 11px;
 }
 
-.resume
+#resume
 {
     background-color:#f6f6f6;
     border:1px solid #dfdfdf;
     padding:16px 28px;
 }
 
-.resume p
+#resume p
 {
     color:#313131;
     font-size:12px;
 }
 
-.resume .date
+#resume .date
 {
     display:block;
 }
@@ -300,22 +303,21 @@ table th.value
 
 #content h2
 {
-    font-size:16px;
+    font-size:24px;
     color:#313131;
     font-weight:bold;
-    padding-bottom:2px;
 }
 
-#content .main
+#content #main
 {
     padding: 0;
     background-color:#FFFFFF;
     border:1px solid #dfdfdf;
 }
 
-#content .main p
+#content #main p
 {
-    color:#868686;
+    color:#313131;
     font-size:14px;
     padding-bottom:20px;
 }
@@ -344,6 +346,7 @@ ul.alt li.even {
 
 ul.alt li.error {
     background-color: #f66;
+    margin-bottom: 1px;
 }
 
 td.main, td.menu {
@@ -437,7 +440,7 @@ td.main, td.menu {
     background: transparent url(../images/profiler/btn_bg.png) repeat-x top left;
 }
 
-.navigation .search
+#navigation .search
 {
     padding-top: 15px;
     float: none;
@@ -448,7 +451,7 @@ td.main, td.menu {
     border-left: none;
 }
 
-.navigation .search h3
+#navigation .search h3
 {
     font-family: Arial,Helvetica,sans-serif;
     text-transform: uppercase;
@@ -456,49 +459,49 @@ td.main, td.menu {
     font-size: 13px;
 }
 
-.navigation .search form
+#navigation .search form
 {
     padding: 15px 0;
 }
 
-.navigation .search button
+#navigation .search button
 {
     float: right;
     margin-right: 20px;
 }
 
-.navigation .search label
+#navigation .search label
 {
     display: block;
     float: left;
     width: 50px;
 }
 
-.navigation .search input, 
-.navigation .search select, 
-.navigation .search label, 
-.navigation .search a
+#navigation .search input,
+#navigation .search select,
+#navigation .search label,
+#navigation .search a
 {
     font-size: 12px;
 }
 
-.navigation .search form
+#navigation .search form
 {
     padding-left: 10px;
 }
 
-.navigation .search input
+#navigation .search input
 {
     width: 160px;
 }
 
-.navigation .import label
+#navigation .import label
 {
     float: none;
     display: inline;
 }
 
-.navigation .import input
+#navigation .import input
 {
     width: 100px;
 }

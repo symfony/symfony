@@ -57,7 +57,7 @@ class Field implements FieldInterface
     private $errors = array();
     private $name = '';
     private $parent;
-    private $submitted = false;
+    private $bound = false;
     private $required;
     private $data;
     private $normalizedData;
@@ -275,7 +275,7 @@ class Field implements FieldInterface
      *
      * @param  string|array $data  The POST data
      */
-    public function submit($clientData)
+    public function bind($clientData)
     {
         if (is_scalar($clientData) || null === $clientData) {
             $clientData = (string)$clientData;
@@ -287,7 +287,7 @@ class Field implements FieldInterface
         $appData = null;
         $normData = null;
 
-        // Hook to change content of the data submitted by the browser
+        // Hook to change content of the data bound by the browser
         $event = new FilterDataEvent($clientData);
         $this->dispatcher->dispatchEvent(Events::filterBoundDataFromClient, $event);
         $clientData = $event->getData();
@@ -312,7 +312,7 @@ class Field implements FieldInterface
             $clientData = $this->transform($normData);
         }
 
-        $this->submitted = true;
+        $this->bound = true;
         $this->errors = array();
         $this->data = $appData;
         $this->normalizedData = $normData;
@@ -335,8 +335,8 @@ class Field implements FieldInterface
     /**
      * Returns the normalized data of the field.
      *
-     * @return mixed  When the field is not submitted, the default data is returned.
-     *                When the field is submitted, the normalized submitted data is
+     * @return mixed  When the field is not bound, the default data is returned.
+     *                When the field is bound, the normalized bound data is
      *                returned if the field is valid, null otherwise.
      */
     public function getNormalizedData()
@@ -355,17 +355,17 @@ class Field implements FieldInterface
     }
 
     /**
-     * Returns whether the field is submitted.
+     * Returns whether the field is bound.
      *
-     * @return Boolean  true if the form is submitted to input values, false otherwise
+     * @return Boolean  true if the form is bound to input values, false otherwise
      */
-    public function isSubmitted()
+    public function isBound()
     {
-        return $this->submitted;
+        return $this->bound;
     }
 
     /**
-     * Returns whether the submitted value could be reverse transformed correctly
+     * Returns whether the bound value could be reverse transformed correctly
      *
      * @return Boolean
      */
@@ -381,13 +381,13 @@ class Field implements FieldInterface
      */
     public function isValid()
     {
-        return $this->isSubmitted() && !$this->hasErrors(); // TESTME
+        return $this->isBound() && !$this->hasErrors(); // TESTME
     }
 
     /**
      * Returns whether or not there are errors.
      *
-     * @return Boolean  true if form is submitted and not valid
+     * @return Boolean  true if form is bound and not valid
      */
     public function hasErrors()
     {
@@ -401,7 +401,7 @@ class Field implements FieldInterface
     /**
      * Returns all errors
      *
-     * @return array  An array of FieldError instances that occurred during submitting
+     * @return array  An array of FieldError instances that occurred during binding
      */
     public function getErrors()
     {

@@ -25,7 +25,7 @@ class PasswordValuePlugin implements RendererPluginInterface
 
     public function setUp(FieldInterface $field, RendererInterface $renderer)
     {
-        $value = $this->alwaysEmpty || !$field->isSubmitted()
+        $value = $this->alwaysEmpty || !$field->isBound()
                 ? ''
                 : $field->getTransformedData();
 

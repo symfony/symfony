@@ -92,13 +92,13 @@ class CollectionFieldTest extends TestCase
         $this->assertEquals(2, count($field));
     }
 
-    public function testNotResizedIfSubmittedWithMissingData()
+    public function testNotResizedIfBoundWithMissingData()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
             'prototype' => 'field',
         ));
         $field->setData(array('foo@foo.com', 'bar@bar.com'));
-        $field->submit(array('foo@bar.com'));
+        $field->bind(array('foo@bar.com'));
 
         $this->assertTrue($field->has('0'));
         $this->assertTrue($field->has('1'));
@@ -106,41 +106,41 @@ class CollectionFieldTest extends TestCase
         $this->assertEquals(null, $field[1]->getData());
     }
 
-    public function testResizedIfSubmittedWithMissingDataAndModifiable()
+    public function testResizedIfBoundWithMissingDataAndModifiable()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
             'prototype' => 'field',
             'modifiable' => true,
         ));
         $field->setData(array('foo@foo.com', 'bar@bar.com'));
-        $field->submit(array('foo@bar.com'));
+        $field->bind(array('foo@bar.com'));
 
         $this->assertTrue($field->has('0'));
         $this->assertFalse($field->has('1'));
         $this->assertEquals('foo@bar.com', $field[0]->getData());
     }
 
-    public function testNotResizedIfSubmittedWithExtraData()
+    public function testNotResizedIfBoundWithExtraData()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
             'prototype' => 'field',
         ));
         $field->setData(array('foo@bar.com'));
-        $field->submit(array('foo@foo.com', 'bar@bar.com'));
+        $field->bind(array('foo@foo.com', 'bar@bar.com'));
 
         $this->assertTrue($field->has('0'));
         $this->assertFalse($field->has('1'));
         $this->assertEquals('foo@foo.com', $field[0]->getData());
     }
 
-    public function testResizedUpIfSubmittedWithExtraDataAndModifiable()
+    public function testResizedUpIfBoundWithExtraDataAndModifiable()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
             'prototype' => 'field',
             'modifiable' => true,
         ));
         $field->setData(array('foo@bar.com'));
-        $field->submit(array('foo@foo.com', 'bar@bar.com'));
+        $field->bind(array('foo@foo.com', 'bar@bar.com'));
 
         $this->assertTrue($field->has('0'));
         $this->assertTrue($field->has('1'));
@@ -149,14 +149,14 @@ class CollectionFieldTest extends TestCase
         $this->assertEquals(array('foo@foo.com', 'bar@bar.com'), $field->getData());
     }
 
-    public function testResizedDownIfSubmittedWithLessDataAndModifiable()
+    public function testResizedDownIfBoundWithLessDataAndModifiable()
     {
         $field = $this->factory->getInstance('collection', 'emails', array(
             'prototype' => 'field',
             'modifiable' => true,
         ));
         $field->setData(array('foo@bar.com', 'bar@bar.com'));
-        $field->submit(array('foo@foo.com'));
+        $field->bind(array('foo@foo.com'));
 
         $this->assertTrue($field->has('0'));
         $this->assertFalse($field->has('1'));

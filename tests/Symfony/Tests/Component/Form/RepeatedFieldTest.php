@@ -42,7 +42,7 @@ class RepeatedFieldTest extends TestCase
     {
         $input = array('first' => 'foo', 'second' => 'bar');
 
-        $this->field->submit($input);
+        $this->field->bind($input);
 
         $this->assertEquals('foo', $this->field['first']->getTransformedData());
         $this->assertEquals('bar', $this->field['second']->getTransformedData());
@@ -55,7 +55,7 @@ class RepeatedFieldTest extends TestCase
     {
         $input = array('first' => 'foo', 'second' => 'foo');
 
-        $this->field->submit($input);
+        $this->field->bind($input);
 
         $this->assertEquals('foo', $this->field['first']->getTransformedData());
         $this->assertEquals('foo', $this->field['second']->getTransformedData());

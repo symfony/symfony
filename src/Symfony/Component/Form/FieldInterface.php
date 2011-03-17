@@ -152,7 +152,7 @@ interface FieldInterface
     function isEmpty();
 
     /**
-     * Sets whether this field is required to be filled out when submitted.
+     * Sets whether this field is required to be filled out when bound.
      *
      * @param Boolean $required
      */
@@ -163,5 +163,5 @@ interface FieldInterface
      *
      * @param mixed $data  The data from the POST request
      */
-    function submit($data);
+    function bind($data);
 }

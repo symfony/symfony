@@ -57,19 +57,19 @@ class ChoiceFieldTest extends TestCase
             )
         ));
 
-        $field->submit(0);
+        $field->bind(0);
 
         $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $field->getTransformedData()));
         $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $field->getTransformedData()));
         $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected('', $field->getTransformedData()));
 
-        $field->submit('0');
+        $field->bind('0');
 
         $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $field->getTransformedData()));
         $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $field->getTransformedData()));
         $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected('', $field->getTransformedData()));
 
-        $field->submit('');
+        $field->bind('');
 
         $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $field->getTransformedData()));
         $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $field->getTransformedData()));
@@ -85,19 +85,19 @@ class ChoiceFieldTest extends TestCase
             )
         ));
 
-        $field->submit(0);
+        $field->bind(0);
 
         $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $field->getTransformedData()));
         $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $field->getTransformedData()));
         $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected('', $field->getTransformedData()));
 
-        $field->submit('0');
+        $field->bind('0');
 
         $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $field->getTransformedData()));
         $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $field->getTransformedData()));
         $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected('', $field->getTransformedData()));
 
-        $field->submit('');
+        $field->bind('');
 
         $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $field->getTransformedData()));
         $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $field->getTransformedData()));
@@ -158,7 +158,7 @@ class ChoiceFieldTest extends TestCase
             'choices' => $choices,
         ));
 
-        $field->submit('b');
+        $field->bind('b');
 
         $this->assertEquals('b', $field->getData());
         $this->assertEquals('b', $field->getTransformedData());
@@ -175,7 +175,7 @@ class ChoiceFieldTest extends TestCase
             'choices' => $choices,
         ));
 
-        $field->submit(array('a', 'b'));
+        $field->bind(array('a', 'b'));
 
         $this->assertEquals(array('a', 'b'), $field->getData());
         $this->assertEquals(array('a', 'b'), $field->getTransformedData());
@@ -192,7 +192,7 @@ class ChoiceFieldTest extends TestCase
             'choices' => $choices,
         ));
 
-        $field->submit('b');
+        $field->bind('b');
 
         $this->assertSame('b', $field->getData());
         $this->assertSame(false, $field['a']->getData());
@@ -218,7 +218,7 @@ class ChoiceFieldTest extends TestCase
             'choices' => $choices,
         ));
 
-        $field->submit('1');
+        $field->bind('1');
 
         $this->assertSame(1, $field->getData());
         $this->assertSame(false, $field[0]->getData());
@@ -244,7 +244,7 @@ class ChoiceFieldTest extends TestCase
             'choices' => $choices,
         ));
 
-        $field->submit(array('a' => 'a', 'b' => 'b'));
+        $field->bind(array('a' => 'a', 'b' => 'b'));
 
         $this->assertSame(array('a', 'b'), $field->getData());
         $this->assertSame(true, $field['a']->getData());
@@ -270,7 +270,7 @@ class ChoiceFieldTest extends TestCase
             'choices' => $choices,
         ));
 
-        $field->submit(array(1 => 1, 2 => 2));
+        $field->bind(array(1 => 1, 2 => 2));
 
         $this->assertSame(array(1, 2), $field->getData());
         $this->assertSame(false, $field[0]->getData());

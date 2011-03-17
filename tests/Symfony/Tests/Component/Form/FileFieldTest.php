@@ -81,7 +81,7 @@ class FileFieldTest extends TestCase
              ->method('getPath')
              ->will($this->returnValue($tmpDir.'/original_name.jpg'));
 
-        $this->field->submit(array(
+        $this->field->bind(array(
             'file' => $file,
             'token' => '',
             'name' => '',
@@ -107,7 +107,7 @@ class FileFieldTest extends TestCase
             ->with($this->equalTo('123456'))
             ->will($this->returnValue($tmpDir));
 
-        $this->field->submit(array(
+        $this->field->bind(array(
             'file' => null,
             'token' => '123456',
             'name' => 'original_name.jpg',
@@ -130,7 +130,7 @@ class FileFieldTest extends TestCase
         $this->storage->expects($this->never())
             ->method('getTempDir');
 
-        $this->field->submit(array(
+        $this->field->bind(array(
             'file' => '',
             'token' => '',
             'name' => '',
@@ -154,7 +154,7 @@ class FileFieldTest extends TestCase
             ->method('getTempDir');
 
         $this->field->setData($tmpPath);
-        $this->field->submit(array(
+        $this->field->bind(array(
             'file' => '',
             'token' => '',
             'name' => '',

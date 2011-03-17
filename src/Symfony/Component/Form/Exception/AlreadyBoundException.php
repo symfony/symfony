@@ -11,6 +11,6 @@
 
 namespace Symfony\Component\Form\Exception;
 
-class AlreadySubmittedException extends FormException
+class AlreadyBoundException extends FormException
 {
 }

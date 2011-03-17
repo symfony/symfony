@@ -18,7 +18,7 @@ use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\MissingOptionsException;
-use Symfony\Component\Form\Exception\AlreadySubmittedException;
+use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\DanglingFieldException;
 use Symfony\Component\Form\Exception\FieldDefinitionException;
@@ -50,7 +50,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
     private $fields = array();
 
     /**
-     * Contains the names of submitted values who don't belong to any fields
+     * Contains the names of bound values who don't belong to any fields
      * @var array
      */
     private $extraFields = array();
@@ -131,8 +131,8 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
      */
     public function add($field)
     {
-        if ($this->isSubmitted()) {
-            throw new AlreadySubmittedException('You cannot add fields after submitting a form');
+        if ($this->isBound()) {
+            throw new AlreadyBoundException('You cannot add fields after binding a form');
         }
 
         // if the field is given as string, ask the field factory of the form
@@ -295,7 +295,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
 
         foreach ($data as $name => $value) {
             if ($this->has($name)) {
-                $this->fields[$name]->submit($value);
+                $this->fields[$name]->bind($value);
             }
         }
 
@@ -319,10 +319,10 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
      *
      * @param  string|array $data  The POST data
      */
-    public function submit($data)
+    public function bind($data)
     {
         // set and reverse transform the data
-        parent::submit($data);
+        parent::bind($data);
 
         $this->extraFields = array();
 
@@ -388,11 +388,11 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
     }
 
     /**
-     * Returns whether this form was submitted with extra fields
+     * Returns whether this form was bound with extra fields
      *
      * @return Boolean
      */
-    public function isSubmittedWithExtraFields()
+    public function isBoundWithExtraFields()
     {
         // TODO: integrate the field names in the error message
         return count($this->extraFields) > 0;
@@ -637,7 +637,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
     /**
      * Binds a request to the form
      *
-     * If the request was a POST request, the data is submitted to the form,
+     * If the request was a POST request, the data is bound to the form,
      * transformed and written into the form data (an object or an array).
      * You can set the form data by passing it in the second parameter
      * of this method or by passing it in the "data" option of the form's
@@ -645,11 +645,11 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
      *
      * @param Request $request    The request to bind to the form
      * @param array|object $data  The data from which to read default values
-     *                            and where to write submitted values
+     *                            and where to write bound values
      */
     public function bindRequest(Request $request)
     {
-        // Store the submitted data in case of a post request
+        // Store the bound data in case of a post request
         switch ($request->getMethod()) {
             case 'POST':
             case 'PUT':
@@ -665,7 +665,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
                 throw new FormException(sprintf('The request method "%s" is not supported', $request->getMethod()));
         }
 
-        $this->submit($data);
+        $this->bind($data);
         $this->validate();
     }
 

@@ -17,7 +17,7 @@
     <property name="fields">
       <constraint name="Valid" />
     </property>
-    <getter property="submittedWithExtraFields">
+    <getter property="boundWithExtraFields">
       <constraint name="AssertFalse">
         <option name="message">This form should not contain extra fields</option>
       </constraint>

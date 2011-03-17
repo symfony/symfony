@@ -20,13 +20,13 @@ class Kernel extends BaseKernel
 {
     public function __construct()
     {
-        $this->tmpDir = sys_get_temp_dir().'/sf2_'.rand(1, 9999);
-        if (!is_dir($this->tmpDir)) {
-            if (false === @mkdir($this->tmpDir)) {
-                die(sprintf('Unable to create a temporary directory (%s)', $this->tmpDir));
+        $this->rootDir = sys_get_temp_dir().'/sf2_'.rand(1, 9999);
+        if (!is_dir($this->rootDir)) {
+            if (false === @mkdir($this->rootDir)) {
+                die(sprintf('Unable to create a temporary directory (%s)', $this->rootDir));
             }
-        } elseif (!is_writable($this->tmpDir)) {
-            die(sprintf('Unable to write in a temporary directory (%s)', $this->tmpDir));
+        } elseif (!is_writable($this->rootDir)) {
+            die(sprintf('Unable to write in a temporary directory (%s)', $this->rootDir));
         }
 
         parent::__construct('env', true);
@@ -42,12 +42,7 @@ class Kernel extends BaseKernel
     public function __destruct()
     {
         $fs = new Filesystem();
-        $fs->remove($this->tmpDir);
-    }
-
-    public function registerRootDir()
-    {
-        return $this->tmpDir;
+        $fs->remove($this->rootDir);
     }
 
     public function registerBundles()

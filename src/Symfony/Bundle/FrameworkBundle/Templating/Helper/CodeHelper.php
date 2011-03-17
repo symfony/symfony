@@ -80,10 +80,7 @@ class CodeHelper extends Helper
     {
         if (false !== strpos($method, '::')) {
             list($class, $method) = explode('::', $method);
-
-            $parts  = explode('\\', $class);
-            $short  = array_pop($parts);
-            $result = sprintf("<abbr title=\"%s\">%s</abbr>::%s()", $class, $short, $method);
+            $result = sprintf("%s::%s()", $this->abbrClass($class), $method);
         } else if ('Closure' === $method) {
             $result = sprintf("<abbr title=\"%s\">%s</abbr>", $method, $method);
         } else {

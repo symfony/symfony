@@ -184,7 +184,7 @@ class XmlFileLoader extends FileLoader
         }
 
         if (isset($service['parent'])) {
-            $definition = new DefinitionDecorator($service['parent']);
+            $definition = new DefinitionDecorator((string) $service['parent']);
         } else {
             $definition = new Definition();
         }

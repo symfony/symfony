@@ -105,9 +105,9 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     /**
      * Handles form based authentication.
      *
-     * @param Event $event An Event instance
+     * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public function onCoreSecurity(GetResponseEvent $event)
+    public final function onCoreSecurity(GetResponseEvent $event)
     {
         $request = $event->getRequest();
 

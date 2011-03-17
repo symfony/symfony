@@ -80,11 +80,16 @@ class AuthenticationProviderManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $token);
     }
 
-    public function testAuthenticateReturnsTokenForTheLastMatch()
+    public function testAuthenticateReturnsTokenOfTheFirstMatchingProvider()
     {
+        $second = $this->getMock('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface');
+        $second
+            ->expects($this->never())
+            ->method('supports')
+        ;
         $manager = new AuthenticationProviderManager(array(
-            $this->getAuthenticationProvider(true, $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')),
             $this->getAuthenticationProvider(true, $expected = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')),
+            $second,
         ));
 
         $token = $manager->authenticate($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));

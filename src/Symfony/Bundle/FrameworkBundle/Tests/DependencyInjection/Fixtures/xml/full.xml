@@ -18,6 +18,15 @@
             <app:engine id="php" />
             <app:engine id="twig" />
             <app:assets-base-url>http://cdn.example.com</app:assets-base-url>
+            <app:package name="images" version="1.0.0">
+                <app:base-url>http://images1.example.com</app:base-url>
+                <app:base-url>http://images2.example.com</app:base-url>
+            </app:package>
+            <app:package name="foo" version="1.0.0" />
+            <app:package name="bar">
+                <app:base-url>http://bar1.example.com</app:base-url>
+                <app:base-url>http://bar2.example.com</app:base-url>
+            </app:package>
         </app:templating>
         <app:translator enabled="true" fallback="fr" />
         <app:validation enabled="true" />

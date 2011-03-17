@@ -1,18 +1,19 @@
 {% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
 
 {% block toolbar %}
-<span style="white-space:nowrap; color:#2f2f2f; display:inline-block; min-height:24px; border-right:1px solid #cdcdcd; padding:5px 10px 5px 6px; ">
-    <img width="21" height="28" alt="Security" style="vertical-align: middle; margin-right: 10px;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAcCAYAAACOGPReAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAp1JREFUeNrkVU2LUmEUfq/eGs1RCFMG/AA/qIUyIpWEA02MCblw0YdLoZ2bdjEQuBb6Af2AwqV9bAMVmgIhqEWOEIToIC5EUUERNfXac2yulfeOUjmL6IXDvfe855z3Oec8573cdDpl614KdgrrVIJyK/Y3sB5oNJrdYwBCr9c7GA6HT/A+/NNDr/r9/veZTGaazWan9KRv0i9zUi7Z2wyFQs9isZi/3W6zTqfDut0u29nZMQHtpWKx+Bw2X+UceYfDIVFOJhOmVqu94XD4Gs/zDOn+cMA36Y+Ojrz9fv+dUinFxXs8HtmgKpVq7ywWUDFBEOZ79E367e3tvcFgIB/UarVKlMRdILKNx2Mmx2M61Gw2z/Y5TtprfklNBXISD5nTBUGO9cJJjrzFYpk1YRGpQqE4hDMyFyRcJqVWqz2ksiwi1el0jPP5fCwajc4CkZAhpYf3iwj8CXYqGTAD2HkQ8AvVFHaz4CTJZPI7+be2tuYIg8EgCwQC1JAzyOANDP0yNc8B0Q0MxQj8Zel0eo64VqtJJ4pOjUQizG63M1Dmtl6vf7lo02w274Byr0qlEkulUr+wY+WYggGX4/H4B7E0YoqJROIK6v3xdyfKC+d7Lpdr3+l0WqnGJISIpNVquRqNxjnYjSjjZRfKBuQW0tp1u913bTablTgsovyZUiSVSoWVy+VKoVB4gTIdYOu1eMlQ0E3IfYPBcB1TchOkPk+No3GEscjJxbLQGM/2qDHVarWdz+czQP8W2085NOIhbp7HRqORJ45RozB+kuLLXsawxTjPbInr9Xp9nMvlHnG4iUrotI1SPGksV17KKAehpycYUeZNJtMFSvNvl1gmisePRiPtOn8lYImWRz0+08iuMW6H+79/0f9O0G8CDAD1sUxLMA6q7wAAAABJRU5ErkJggg==" />
-    <span style="color: #3a3">
-        {% if collector.authenticated %}
-            {{ collector.user }}
+    {% set icon %}
+        <img width="21" height="28" alt="Security" style="border-width: 0; vertical-align: middle; margin-right: 10px;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAcCAYAAACOGPReAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAp1JREFUeNrkVU2LUmEUfq/eGs1RCFMG/AA/qIUyIpWEA02MCblw0YdLoZ2bdjEQuBb6Af2AwqV9bAMVmgIhqEWOEIToIC5EUUERNfXac2yulfeOUjmL6IXDvfe855z3Oec8573cdDpl614KdgrrVIJyK/Y3sB5oNJrdYwBCr9c7GA6HT/A+/NNDr/r9/veZTGaazWan9KRv0i9zUi7Z2wyFQs9isZi/3W6zTqfDut0u29nZMQHtpWKx+Bw2X+UceYfDIVFOJhOmVqu94XD4Gs/zDOn+cMA36Y+Ojrz9fv+dUinFxXs8HtmgKpVq7ywWUDFBEOZ79E367e3tvcFgIB/UarVKlMRdILKNx2Mmx2M61Gw2z/Y5TtprfklNBXISD5nTBUGO9cJJjrzFYpk1YRGpQqE4hDMyFyRcJqVWqz2ksiwi1el0jPP5fCwajc4CkZAhpYf3iwj8CXYqGTAD2HkQ8AvVFHaz4CTJZPI7+be2tuYIg8EgCwQC1JAzyOANDP0yNc8B0Q0MxQj8Zel0eo64VqtJJ4pOjUQizG63M1Dmtl6vf7lo02w274Byr0qlEkulUr+wY+WYggGX4/H4B7E0YoqJROIK6v3xdyfKC+d7Lpdr3+l0WqnGJISIpNVquRqNxjnYjSjjZRfKBuQW0tp1u913bTablTgsovyZUiSVSoWVy+VKoVB4gTIdYOu1eMlQ0E3IfYPBcB1TchOkPk+No3GEscjJxbLQGM/2qDHVarWdz+czQP8W2085NOIhbp7HRqORJ45RozB+kuLLXsawxTjPbInr9Xp9nMvlHnG4iUrotI1SPGksV17KKAehpycYUeZNJtMFSvNvl1gmisePRiPtOn8lYImWRz0+08iuMW6H+79/0f9O0G8CDAD1sUxLMA6q7wAAAABJRU5ErkJggg==" />
+    {% endset %}
+    {% set text %}
+        {% if collector.user %}
+            {{ collector.user }} {% if not collector.authenticated %}<em>(not auth.)</em>{% endif %}
         {% elseif collector.enabled %}
-            anon.
+            not authenticated
         {% else %}
             disabled
         {% endif %}
-    </span>
-</span>
+    {% endset %}
+    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
 {% endblock %}
 
 {% block menu %}
@@ -24,11 +25,27 @@
 
 {% block panel %}
     <h2>Security</h2>
-    {% if collector.authenticated %}
-        <p>
-            Username: <strong>{{ collector.user }}</strong><br />
-            Roles: {{ collector.roles|yaml_encode }}
-        </p>
+    {% if collector.user %}
+        <table>
+            <tr>
+                <th>Username</th>
+                <td>{{ collector.user }}</td>
+            </tr>
+            <tr>
+                <th>Authenticated?</th>
+                <td>
+                    {% if collector.authenticated %}
+                        yes
+                    {% else %}
+                        no {% if not collector.roles|length %}<em>(probably because the user has no roles)</em>{% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Roles</th>
+                <td>{{ collector.roles|yaml_encode }}</td>
+            </tr>
+        </table>
     {% elseif collector.enabled %}
         <p>
             <em>No token</em>

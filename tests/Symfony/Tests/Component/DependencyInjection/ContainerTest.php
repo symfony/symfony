@@ -173,9 +173,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $sc = new ProjectServiceContainer();
         try {
             $sc->get('circular');
-            $this->fail('->get() throws a \LogicException if it contains circular reference');
+            $this->fail('->get() throws a CircularReferenceException if it contains circular reference');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\LogicException', $e, '->get() throws a \LogicException if it contains circular reference');
+            $this->assertInstanceOf('\Symfony\Component\DependencyInjection\Exception\CircularReferenceException', $e, '->get() throws a CircularReferenceException if it contains circular reference');
             $this->assertStringStartsWith('Circular reference detected for service "circular"', $e->getMessage(), '->get() throws a \LogicException if it contains circular reference');
         }
     }

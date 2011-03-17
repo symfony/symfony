@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ExecutionContext;
+use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\MissingOptionsException;
@@ -231,15 +232,8 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
         return $this->fields;
     }
 
-    /**
-     * Initializes the field group with an object to operate on
-     *
-     * @see FieldInterface
-     */
-    public function setData($data)
+    public function postSetData(DataEvent $event)
     {
-        parent::setData($data);
-
         // get transformed data and pass its values to child fields
         $data = $this->getTransformedData();
 
@@ -254,8 +248,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
 
             $this->readObject($data);
         }
-
-        return $this;
     }
 
     public function filterSetData(FilterDataEvent $event)
@@ -309,24 +301,18 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
     public static function getSubscribedEvents()
     {
         return array(
+            Events::postSetData,
+            Events::preBind,
             Events::filterSetData,
             Events::filterBoundDataFromClient,
         );
     }
 
-    /**
-     * Binds POST data to the field, transforms and validates it.
-     *
-     * @param  string|array $data  The POST data
-     */
-    public function bind($data)
+    public function preBind(DataEvent $event)
     {
-        // set and reverse transform the data
-        parent::bind($data);
-
         $this->extraFields = array();
 
-        foreach ((array)$data as $name => $value) {
+        foreach ((array)$event->getData() as $name => $value) {
             if (!$this->has($name)) {
                 $this->extraFields[] = $name;
             }

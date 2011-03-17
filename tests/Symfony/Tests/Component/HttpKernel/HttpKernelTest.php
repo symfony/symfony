@@ -114,7 +114,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     public function testHandleWithAResponseListener()
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(Events::filterCoreResponse, function ($event)
+        $dispatcher->addListener(Events::onCoreResponse, function ($event)
         {
             $event->setResponse(new Response('foo'));
         });

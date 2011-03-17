@@ -101,7 +101,7 @@ class HttpKernel implements HttpKernelInterface
         }
 
         $event = new FilterControllerEvent($this, $controller, $request, $type);
-        $this->dispatcher->dispatch(Events::filterCoreController, $event);
+        $this->dispatcher->dispatch(Events::onCoreController, $event);
         $controller = $event->getController();
 
         // controller arguments
@@ -142,7 +142,7 @@ class HttpKernel implements HttpKernelInterface
     {
         $event = new FilterResponseEvent($this, $request, $type, $response);
 
-        $this->dispatcher->dispatch(Events::filterCoreResponse, $event);
+        $this->dispatcher->dispatch(Events::onCoreResponse, $event);
 
         return $event->getResponse();
     }

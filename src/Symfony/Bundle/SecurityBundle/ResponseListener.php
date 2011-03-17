@@ -13,7 +13,7 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
  */
 class ResponseListener
 {
-    public function filterCoreResponse(FilterResponseEvent $event)
+    public function onCoreResponse(FilterResponseEvent $event)
     {
         $request = $event->getRequest();
         $response = $event->getResponse();

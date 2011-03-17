@@ -69,7 +69,7 @@ class Configuration
                         ->scalarNode('path')->defaultValue('%kernel.cache_dir%/swiftmailer/spool')->end()
                     ->end()
                 ->end()
-                ->scalarNode('delivery_adress')->end()
+                ->scalarNode('delivery_address')->end()
                 ->booleanNode('disable_delivery')->end()
                 ->booleanNode('logging')->defaultValue($kernelDebug)->end()
             ->end()

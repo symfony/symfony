@@ -192,7 +192,10 @@ class EventDispatcher implements EventDispatcherInterface
             $p = $this->priorities[$eventName];
 
             uasort($this->listeners[$eventName], function ($a, $b) use ($p) {
-                return $p[spl_object_hash($b)] - $p[spl_object_hash($a)];
+                $order = $p[spl_object_hash($b)] - $p[spl_object_hash($a)];
+
+                // for the same priority, force the first registered one to stay first
+                return 0 === $order ? 1 : $order;
             });
 
             $this->sorted[$eventName] = true;

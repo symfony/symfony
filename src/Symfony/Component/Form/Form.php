@@ -830,25 +830,4 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
     {
         return $this->modifyByReference;
     }
-
-    /**
-     * Merges two arrays without reindexing numeric keys.
-     *
-     * @param array $array1 An array to merge
-     * @param array $array2 An array to merge
-     *
-     * @return array The merged array
-     */
-    static protected function deepArrayUnion($array1, $array2)
-    {
-        foreach ($array2 as $key => $value) {
-            if (is_array($value) && isset($array1[$key]) && is_array($array1[$key])) {
-                $array1[$key] = self::deepArrayUnion($array1[$key], $value);
-            } else {
-                $array1[$key] = $value;
-            }
-        }
-
-        return $array1;
-    }
 }

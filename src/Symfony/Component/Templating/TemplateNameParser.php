@@ -37,6 +37,7 @@ class TemplateNameParser implements TemplateNameParserInterface
             return $name;
         }
 
+        $name = strtr($name, '\\', '/');
         $engine = null;
         if (false !== $pos = strrpos($name, '.')) {
             $engine = substr($name, $pos + 1);

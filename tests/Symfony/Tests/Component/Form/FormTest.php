@@ -272,16 +272,6 @@ class FormTest extends TestCase
         $this->assertEquals(array('group2'), $childForm->getValidationGroups());
     }
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
-     */
-    public function testBindThrowsExceptionIfAnonymous()
-    {
-        $form = $this->factory->getInstance('form', null, array('validator' => $this->createMockValidator()));
-
-        $form->bind($this->createPostRequest());
-    }
-
     public function testBindValidatesData()
     {
         $form = $this->factory->getInstance('form', 'author', array(
@@ -295,7 +285,7 @@ class FormTest extends TestCase
             ->with($this->equalTo($form));
 
         // concrete request is irrelevant
-        $form->bind($this->createPostRequest());
+        $form->bindRequest($this->createPostRequest());
     }
 
     public function testBindDoesNotValidateArrays()
@@ -312,7 +302,7 @@ class FormTest extends TestCase
 
         // concrete request is irrelevant
         // data is an array
-        $form->bind($this->createPostRequest(), array());
+        $form->bindRequest($this->createPostRequest(), array());
     }
 
     public function testBindReadsRequestData()
@@ -340,23 +330,13 @@ class FormTest extends TestCase
         $imageForm->add($this->factory->getInstance('field', 'filename'));
         $form->add($imageForm);
 
-        $form->bind($this->createPostRequest($values, $files));
+        $form->bindRequest($this->createPostRequest($values, $files));
 
         $file = new UploadedFile('abcdef.png', 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
         $this->assertEquals('Bernhard', $form['name']->getData());
         $this->assertEquals('foobar.png', $form['image']['filename']->getData());
         $this->assertEquals($file, $form['image']['file']->getData());
-    }
-
-    public function testBindAcceptsObject()
-    {
-        $object = new \stdClass();
-        $form = $this->factory->getInstance('form', 'author', array('validator' => $this->validator));
-
-        $form->bind(new Request(), $object);
-
-        $this->assertSame($object, $form->getData());
     }
 
     public function testReadPropertyIsIgnoredIfPropertyPathIsNull()
@@ -1112,7 +1092,7 @@ class FormTest extends TestCase
         $refForm->add($this->factory->getInstance('field', 'firstName'));
         $form->add($refForm);
 
-        $form->bind($this->createPostRequest(array(
+        $form->bindRequest($this->createPostRequest(array(
             'author' => array(
                 // reference has a getter, but not setter
                 'reference' => array(
@@ -1138,7 +1118,7 @@ class FormTest extends TestCase
 
         $refForm->setData($newReference); // new author object
 
-        $form->bind($this->createPostRequest(array(
+        $form->bindRequest($this->createPostRequest(array(
             'author' => array(
                 // referenceCopy has a getter that returns a copy
                 'referenceCopy' => array(
@@ -1160,7 +1140,7 @@ class FormTest extends TestCase
         $refForm->add($this->factory->getInstance('field', 'firstName'));
         $form->add($refForm);
 
-        $form->bind($this->createPostRequest(array(
+        $form->bindRequest($this->createPostRequest(array(
             'author' => array(
                 // referenceCopy has a getter that returns a copy
                 'referenceCopy' => array(
@@ -1188,7 +1168,7 @@ class FormTest extends TestCase
             )
         )));
 
-        $form->bind($this->createPostRequest(array(
+        $form->bindRequest($this->createPostRequest(array(
             'author' => array(
                 'referenceCopy' => array(), // doesn't matter actually
             )
@@ -1215,7 +1195,7 @@ class FormTest extends TestCase
             )
         )));
 
-        $form->bind($this->createPostRequest(array(
+        $form->bindRequest($this->createPostRequest(array(
             'author' => array(
                 'referenceCopy' => array('a' => 'b'), // doesn't matter actually
             )

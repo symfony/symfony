@@ -647,27 +647,26 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
      * @param array|object $data  The data from which to read default values
      *                            and where to write submitted values
      */
-    public function bind(Request $request, $data = null)
+    public function bindRequest(Request $request)
     {
-        if (!$this->getName()) {
-            throw new FormException('You cannot bind anonymous forms. Please give this form a name');
-        }
-
-        // Store object from which to read the default values and where to
-        // write the submitted values
-        if (null !== $data) {
-            $this->setData($data);
-        }
-
         // Store the submitted data in case of a post request
-        if ('POST' == $request->getMethod()) {
-            $values = $request->request->get($this->getName(), array());
-            $files = $request->files->get($this->getName(), array());
-
-            $this->submit(self::deepArrayUnion($values, $files));
-
-            $this->validate();
+        switch ($request->getMethod()) {
+            case 'POST':
+            case 'PUT':
+                $data = array_replace_recursive(
+                    $request->request->get($this->getName(), array()),
+                    $request->files->get($this->getName(), array())
+                );
+                break;
+            case 'GET':
+                $data = $request->query->get($this->getName(), array());
+                break;
+            default:
+                throw new FormException(sprintf('The request method "%s" is not supported', $request->getMethod()));
         }
+
+        $this->submit($data);
+        $this->validate();
     }
 
     /**

@@ -48,7 +48,7 @@ class AccessListener implements ListenerInterface
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public function onCoreSecurity(GetResponseEvent $event)
+    public function handle(GetResponseEvent $event)
     {
         if (null === $token = $this->context->getToken()) {
             throw new AuthenticationCredentialsNotFoundException('A Token was not found in the SecurityContext.');

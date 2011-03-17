@@ -60,10 +60,6 @@ class KernelForTest extends Kernel
         return 'testkernel';
     }
 
-    public function registerRootDir()
-    {
-    }
-
     public function registerBundles()
     {
     }

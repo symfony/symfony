@@ -97,4 +97,21 @@
             <em>No request session attributes</em>
         </p>
     {% endif %}
+
+
+    {% if profiler.parent %}
+        <h2><a href="{{ path('_profiler', { 'token': profiler.parent }) }}">Parent request: {{ profiler.parent }}</a></h2>
+
+        {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': profiler.parenttoken.get('request').requestattributes } only %}
+    {% endif %}
+
+    {% if profiler.children|length %}
+        <h2>Sub requests</h2>
+
+        {% for subrequest in profiler.children %}
+            <h3><a href="{{ path('_profiler', { 'token': subrequest.token }) }}">{{ subrequest.token }}</a></h3>
+            {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': subrequest.get('request').requestattributes } only %}
+        {% endfor %}
+    {% endif %}
+
 {% endblock %}

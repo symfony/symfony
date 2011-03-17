@@ -45,29 +45,31 @@ class HttpKernel implements HttpKernelInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Handles a Request to convert it to a Response.
+     *
+     * When $catch is true, the implementation must catch all exceptions
+     * and do its best to convert them to a Response instance.
+     *
+     * @param  Request $request A Request instance
+     * @param  integer $type    The type of the request
+     *                          (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
+     * @param  Boolean $catch   Whether to catch exceptions or not
+     *
+     * @return Response A Response instance
+     *
+     * @throws \Exception When an Exception occurs during processing
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
         try {
-            $response = $this->handleRaw($request, $type);
+            return $this->handleRaw($request, $type);
         } catch (\Exception $e) {
             if (false === $catch) {
                 throw $e;
             }
 
-            // exception
-            $event = new GetResponseForExceptionEvent($this, $request, $type, $e);
-            $this->dispatcher->dispatchEvent(Events::onCoreException, $event);
-
-            if (!$event->hasResponse()) {
-                throw $e;
-            }
-
-            $response = $this->filterResponse($event->getResponse(), $request, $type);
+            return $this->handleException($e, $request, $type);
         }
-
-        return $response;
     }
 
     /**
@@ -143,6 +145,27 @@ class HttpKernel implements HttpKernelInterface
         $this->dispatcher->dispatchEvent(Events::filterCoreResponse, $event);
 
         return $event->getResponse();
+    }
+
+    /**
+     * Handles and exception by trying to convert it to a Response.
+     *
+     * @param  \Exception $e       An \Exception instance
+     * @param  Request    $request A Request instance
+     * @param  integer    $type    The type of the request
+     *
+     * @return Response A Response instance
+     */
+    protected function handleException(\Exception $e, $request, $type)
+    {
+        $event = new GetResponseForExceptionEvent($this, $request, $type, $e);
+        $this->dispatcher->dispatchEvent(Events::onCoreException, $event);
+
+        if (!$event->hasResponse()) {
+            throw $e;
+        }
+
+        return $this->filterResponse($event->getResponse(), $request, $type);
     }
 
     protected function varToString($var)

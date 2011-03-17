@@ -42,7 +42,8 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('profiler'), '->registerProfilerConfiguration() loads profiling.xml');
         $this->assertTrue($container->hasDefinition('data_collector.config'), '->registerProfilerConfiguration() loads collectors.xml');
-        $this->assertTrue($container->getParameter('profiler_listener.only_exceptions'));
+        $arguments = $container->getDefinition('profiler_listener')->getArguments();
+        $this->assertTrue($arguments[2]);
     }
 
     public function testRouter()

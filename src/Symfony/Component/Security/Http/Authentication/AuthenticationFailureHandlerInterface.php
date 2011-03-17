@@ -22,7 +22,7 @@ interface AuthenticationFailureHandlerInterface
      * called by authentication listeners inheriting from
      * AbstractAuthenticationListener.
      *
-     * @param GetResponseEvent    $event the "onCoreSecurity" event, this event always
+     * @param GetResponseEvent    $event the "onCoreRequest" event, this event always
      *                                       has the kernel as target
      * @param Request                 $request
      * @param AuthenticationException $exception

@@ -61,7 +61,7 @@ abstract class Kernel implements KernelInterface
         $this->environment = $environment;
         $this->debug = (Boolean) $debug;
         $this->booted = false;
-        $this->rootDir = realpath($this->registerRootDir());
+        $this->rootDir = $this->getRootDir();
         $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
 
         if ($this->debug) {
@@ -263,6 +263,11 @@ abstract class Kernel implements KernelInterface
         throw new \InvalidArgumentException(sprintf('Unable to find file "@%s".', $name));
     }
 
+    /**
+     * Gets the name of the kernel
+     *
+     * @return string The kernel name
+     */
     public function getName()
     {
         return $this->name;
@@ -295,6 +300,11 @@ abstract class Kernel implements KernelInterface
      */
     public function getRootDir()
     {
+        if (null === $this->rootDir) {
+            $r = new \ReflectionObject($this);
+            $this->rootDir = dirname($r->getFileName());
+        }
+
         return $this->rootDir;
     }
 
@@ -339,14 +349,14 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Initialize the data structures related to the bundle management:
+     * Initializes the data structures related to the bundle management.
+     *
      *  - the bundles property maps a bundle name to the bundle instance,
      *  - the bundleMap property maps a bundle name to the bundle inheritance hierarchy (most derived bundle first).
      *
      * @throws \LogicException if two bundles share a common name
      * @throws \LogicException if a bundle tries to extend a non-registered bundle
      * @throws \LogicException if two bundles extend the same ancestor
-     *
      */
     protected function initializeBundles()
     {
@@ -407,6 +417,12 @@ abstract class Kernel implements KernelInterface
         return $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
     }
 
+    /**
+     * Initializes the service container.
+     *
+     * The cached version of the service container is used when fresh, otherwise the
+     * container is built.
+     */
     protected function initializeContainer()
     {
         $class = $this->getContainerClass();
@@ -429,6 +445,11 @@ abstract class Kernel implements KernelInterface
         }
     }
 
+    /**
+     * Returns the kernel parameters.
+     *
+     * @return array An array of kernel parameters
+     */
     protected function getKernelParameters()
     {
         $bundles = array();
@@ -452,6 +473,13 @@ abstract class Kernel implements KernelInterface
         );
     }
 
+    /**
+     * Gets the environment parameters.
+     *
+     * Only the parameters starting with "SYMFONY__" are considered.
+     *
+     * @return array An array of parameters
+     */
     protected function getEnvParameters()
     {
         $parameters = array();
@@ -464,6 +492,11 @@ abstract class Kernel implements KernelInterface
         return $parameters;
     }
 
+    /**
+     * Builds the service container.
+     *
+     * @return ContainerBuilder The compiled service container
+     */
     protected function buildContainer()
     {
         $parameterBag = new ParameterBag($this->getKernelParameters());
@@ -499,6 +532,13 @@ abstract class Kernel implements KernelInterface
         return $container;
     }
 
+    /**
+     * Dumps the service container to PHP code in the cache.
+     *
+     * @param ConfigCache       $cache      The config cache
+     * @param ContainerBuilder  $container  The service container
+     * @param string            $class      The name of the class to generate
+     */
     protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class)
     {
         // cache the container
@@ -511,6 +551,13 @@ abstract class Kernel implements KernelInterface
         $cache->write($content, $container->getResources());
     }
 
+    /**
+     * Returns a loader for the container.
+     *
+     * @param ContainerInterface $container The service container
+     *
+     * @return DelegatingLoader The loader
+     */
     protected function getContainerLoader(ContainerInterface $container)
     {
         $locator = new FileLocator($this);

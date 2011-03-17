@@ -49,7 +49,7 @@ class ContextListener implements ListenerInterface
         $this->contextKey = $contextKey;
 
         if (null !== $dispatcher) {
-            $dispatcher->connect(Events::onCoreResponse, $this);
+            $dispatcher->addEventListener(Events::onCoreResponse, $this);
         }
     }
 
@@ -58,7 +58,7 @@ class ContextListener implements ListenerInterface
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public function onCoreSecurity(GetResponseEvent $event)
+    public function handle(GetResponseEvent $event)
     {
         $request = $event->getRequest();
 

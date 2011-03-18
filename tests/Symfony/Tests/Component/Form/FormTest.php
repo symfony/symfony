@@ -215,7 +215,7 @@ class FormTest extends TestCase
 
     public function testValidationGroupNullByDefault()
     {
-        $this->assertNull($this->form->getValidationGroups());
+        $this->assertNull($this->form->getAttribute('validation_groups'));
     }
 
     public function testValidationGroupsCanBeSetToString()
@@ -224,7 +224,7 @@ class FormTest extends TestCase
             'validation_groups' => 'group',
         ));
 
-        $this->assertEquals(array('group'), $form->getValidationGroups());
+        $this->assertEquals(array('group'), $form->getAttribute('validation_groups'));
     }
 
     public function testValidationGroupsCanBeSetToArray()
@@ -233,31 +233,7 @@ class FormTest extends TestCase
             'validation_groups' => array('group1', 'group2'),
         ));
 
-        $this->assertEquals(array('group1', 'group2'), $form->getValidationGroups());
-    }
-
-    public function testValidationGroupsAreInheritedFromParentIfEmpty()
-    {
-        $builder = $this->factory->createBuilder('form', 'parent', array(
-            'validation_groups' => 'group',
-        ));
-        $builder->add('form', 'child');
-        $form = $builder->getInstance();
-
-        $this->assertEquals(array('group'), $form['child']->getValidationGroups());
-    }
-
-    public function testValidationGroupsAreNotInheritedFromParentIfSet()
-    {
-        $builder = $this->factory->createBuilder('form', 'parent', array(
-            'validation_groups' => 'group1',
-        ));
-        $builder->add('form', 'child', array(
-            'validation_groups' => 'group2',
-        ));
-        $form = $builder->getInstance();
-
-        $this->assertEquals(array('group2'), $form['child']->getValidationGroups());
+        $this->assertEquals(array('group1', 'group2'), $form->getAttribute('validation_groups'));
     }
 
     public function testBindValidatesData()

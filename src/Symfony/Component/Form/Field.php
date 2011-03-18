@@ -64,34 +64,25 @@ class Field implements FieldInterface
     private $transformedData = '';
     private $normalizationTransformer;
     private $valueTransformer;
-    private $propertyPath;
     private $transformationSuccessful = true;
     private $renderer;
     private $disabled = false;
     private $dispatcher;
-    private $modifyByReference = true;
-    private $validationGroups;
+    private $attributes;
 
     public function __construct($name, EventDispatcherInterface $dispatcher,
         RendererInterface $renderer, ValueTransformerInterface $valueTransformer = null,
         ValueTransformerInterface $normalizationTransformer = null,
-        $disabled, $modifyByReference, $propertyPath, $required,
-        $validationGroups)
+        $required = false, $disabled = false, array $attributes = array())
     {
         $this->name = (string)$name;
         $this->dispatcher = $dispatcher;
         $this->renderer = $renderer;
         $this->valueTransformer = $valueTransformer;
         $this->normalizationTransformer = $normalizationTransformer;
-        $this->disabled = $disabled;
-        $this->modifyByReference = $modifyByReference;
-        $this->propertyPath = null === $propertyPath || '' === $propertyPath
-                ? null
-                : new PropertyPath($propertyPath);
         $this->required = $required;
-        $this->validationGroups = empty($validationGroups)
-                ? null
-                : (array)$validationGroups;
+        $this->disabled = $disabled;
+        $this->attributes = $attributes;
 
         $renderer->setField($this);
 
@@ -113,14 +104,6 @@ class Field implements FieldInterface
     public function getTransformedData()
     {
         return $this->transformedData;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getPropertyPath()
-    {
-        return $this->propertyPath;
     }
 
     /**
@@ -203,6 +186,16 @@ class Field implements FieldInterface
     public function isRoot()
     {
         return !$this->hasParent();
+    }
+
+    public function hasAttribute($name)
+    {
+        return isset($this->attributes[$name]);
+    }
+
+    public function getAttribute($name)
+    {
+        return $this->attributes[$name];
     }
 
     /**
@@ -344,6 +337,14 @@ class Field implements FieldInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function isEmpty()
+    {
+        return null === $this->data || '' === $this->data;
+    }
+
+    /**
      * Returns whether the field is valid.
      *
      * @return Boolean
@@ -463,34 +464,5 @@ class Field implements FieldInterface
             return '' === $value ? null : $value;
         }
         return $this->valueTransformer->reverseTransform($value, $this->data);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isEmpty()
-    {
-        return null === $this->data || '' === $this->data;
-    }
-
-    public function isModifiedByReference()
-    {
-        return $this->modifyByReference;
-    }
-
-    /**
-     * Returns the validation groups validated by the form
-     *
-     * @return array  A list of validation groups or null
-     */
-    public function getValidationGroups()
-    {
-        $groups = $this->validationGroups;
-
-        if (!$groups && $this->hasParent()) {
-            $groups = $this->getParent()->getValidationGroups();
-        }
-
-        return $groups;
     }
 }

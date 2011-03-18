@@ -40,13 +40,6 @@ interface FieldInterface
     function getName();
 
     /**
-     * Returns the property path of the field
-     *
-     * @return PropertyPath
-     */
-    function getPropertyPath();
-
-    /**
      * Adds an error to this field
      *
      * @param Error $error

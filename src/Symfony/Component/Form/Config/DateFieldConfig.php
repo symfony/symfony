@@ -64,10 +64,7 @@ class DateFieldConfig extends AbstractFieldConfig
                     'output_timezone' => $options['user_timezone'],
                     'fields' => array('year', 'month', 'day'),
                 )))
-                ->addRendererPlugin(new DatePatternPlugin($formatter))
-                // Don't modify \DateTime classes by reference, we treat
-                // them like immutable value objects
-                ->setModifyByReference(false);
+                ->addRendererPlugin(new DatePatternPlugin($formatter));
         }
 
         if ($options['type'] === 'string') {
@@ -112,6 +109,9 @@ class DateFieldConfig extends AbstractFieldConfig
             'data_timezone' => date_default_timezone_get(),
             'user_timezone' => date_default_timezone_get(),
             'csrf_protection' => false,
+            // Don't modify \DateTime classes by reference, we treat
+            // them like immutable value objects
+            'by_reference' => false,
         );
     }
 

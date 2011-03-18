@@ -73,8 +73,8 @@ class ObjectMapper implements DataMapperInterface
 
     public function mapDataToField(&$data, FieldInterface $field)
     {
-        if ($field->getPropertyPath() !== null) {
-            $field->setData($field->getPropertyPath()->getValue($data));
+        if ($field->getAttribute('property_path') !== null) {
+            $field->setData($field->getAttribute('property_path')->getValue($data));
         }
     }
 
@@ -88,14 +88,14 @@ class ObjectMapper implements DataMapperInterface
 
             // If the data is identical to the value in $data, we are
             // dealing with a reference
-            if ($field->getPropertyPath() !== null) {
-                $isReference = $field->getData() === $field->getPropertyPath()->getValue($data);
+            if ($field->getAttribute('property_path') !== null) {
+                $isReference = $field->getData() === $field->getAttribute('property_path')->getValue($data);
             }
 
             // Don't write into $data if $data is an object,
             // $isReference is true (see above) and the option "by_reference" is
             // true as well
-            if (!is_object($data) || !$isReference || !$field->isModifiedByReference()) {
+            if (!is_object($data) || !$isReference || !$field->getAttribute('by_reference')) {
                 $this->mapFieldToData($field, $data);
             }
         }
@@ -103,8 +103,8 @@ class ObjectMapper implements DataMapperInterface
 
     public function mapFieldToData(FieldInterface $field, &$data)
     {
-        if ($field->getPropertyPath() !== null) {
-            $field->getPropertyPath()->setValue($data, $field->getData());
+        if ($field->getAttribute('property_path') !== null) {
+            $field->getAttribute('property_path')->setValue($data, $field->getData());
         }
     }
 }

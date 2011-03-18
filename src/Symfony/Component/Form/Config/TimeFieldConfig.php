@@ -42,10 +42,7 @@ class TimeFieldConfig extends AbstractFieldConfig
         }
 
         $builder->add($options['widget'], 'hour', $hourOptions)
-            ->add($options['widget'], 'minute', $minuteOptions)
-            // Don't modify \DateTime classes by reference, we treat
-            // them like immutable value objects
-            ->setModifyByReference(false);
+            ->add($options['widget'], 'minute', $minuteOptions);
 
         if ($options['with_seconds']) {
             $parts[] = 'second';
@@ -104,6 +101,9 @@ class TimeFieldConfig extends AbstractFieldConfig
             'data_timezone' => date_default_timezone_get(),
             'user_timezone' => date_default_timezone_get(),
             'csrf_protection' => false,
+            // Don't modify \DateTime classes by reference, we treat
+            // them like immutable value objects
+            'by_reference' => false,
         );
     }
 

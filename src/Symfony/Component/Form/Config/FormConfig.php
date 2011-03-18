@@ -21,8 +21,7 @@ class FormConfig extends AbstractFieldConfig
 {
     public function configure(FieldBuilder $builder, array $options)
     {
-        $builder->setValidationGroups($options['validation_groups'])
-            ->setVirtual($options['virtual'])
+        $builder->setAttribute('virtual', $options['virtual'])
             ->addRendererPlugin(new FormPlugin())
             ->setDataClass($options['data_class'])
             ->setDataMapper(new ObjectMapper(

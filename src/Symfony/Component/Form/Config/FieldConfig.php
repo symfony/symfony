@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Config;
 
 use Symfony\Component\Form\Field;
+use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Renderer\DefaultRenderer;
@@ -41,9 +42,25 @@ class FieldConfig extends AbstractFieldConfig
 
     public function configure(FieldBuilder $builder, array $options)
     {
-        $builder->setPropertyPath($options['property_path'])
-            ->setRequired($options['required'])
+        if (false === $options['property_path']) {
+            $options['property_path'] = $builder->getName();
+        }
+
+        if (null === $options['property_path'] || '' === $options['property_path']) {
+            $options['property_path'] = null;
+        } else {
+            $options['property_path'] = new PropertyPath($options['property_path']);
+        }
+
+        $options['validation_groups'] = empty($options['validation_groups'])
+            ? null
+            : (array)$options['validation_groups'];
+
+        $builder->setRequired($options['required'])
             ->setDisabled($options['disabled'])
+            ->setAttribute('by_reference', $options['by_reference'])
+            ->setAttribute('property_path', $options['property_path'])
+            ->setAttribute('validation_groups', $options['validation_groups'])
             ->setValueTransformer($options['value_transformer'])
             ->setNormalizationTransformer($options['normalization_transformer'])
             ->addEventSubscriber(new ValidationListener($this->validator), -128)
@@ -61,13 +78,15 @@ class FieldConfig extends AbstractFieldConfig
         return array(
             'template' => 'text',
             'data' => null,
-            'property_path' => false,
             'trim' => true,
             'required' => true,
             'disabled' => false,
             'value_transformer' => null,
             'normalization_transformer' => null,
             'max_length' => null,
+            'property_path' => false,
+            'by_reference' => true,
+            'validation_groups' => true,
         );
     }
 

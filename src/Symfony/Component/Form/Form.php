@@ -66,9 +66,8 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     public function __construct($name, EventDispatcherInterface $dispatcher,
         RendererInterface $renderer, ValueTransformerInterface $valueTransformer = null,
         ValueTransformerInterface $normalizationTransformer = null,
-        DataMapperInterface $dataMapper,
-        $disabled, $modifyByReference, $propertyPath, $required,
-        $validationGroups, $virtual)
+        DataMapperInterface $dataMapper, $required = false, $disabled = false,
+        array $attributes = array())
     {
         $dispatcher->addListener(array(
             Events::postSetData,
@@ -77,12 +76,10 @@ class Form extends Field implements \IteratorAggregate, FormInterface
             Events::filterBoundDataFromClient,
         ), $this);
 
-        $this->virtual = $virtual;
         $this->dataMapper = $dataMapper;
 
         parent::__construct($name, $dispatcher, $renderer, $valueTransformer,
-            $normalizationTransformer, $disabled, $modifyByReference,
-            $propertyPath, $required, $validationGroups);
+            $normalizationTransformer, $required, $disabled, $attributes);
     }
 
     /**
@@ -200,14 +197,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface
                 $this->extraFields[] = $name;
             }
         }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function isVirtual()
-    {
-        return $this->virtual;
     }
 
     /**
@@ -397,13 +386,20 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     public function validateData(ExecutionContext $context)
     {
         if (is_object($this->getData()) || is_array($this->getData())) {
-            $groups = $this->getValidationGroups();
-            $propertyPath = $context->getPropertyPath();
-            $graphWalker = $context->getGraphWalker();
+            $groups = $this->getAttribute('validation_groups');
+            $field = $this;
+
+            while (!$groups && $field->hasParent()) {
+                $field = $field->getParent();
+                $groups = $field->getAttribute('validation_groups');
+            }
 
             if (null === $groups) {
                 $groups = array(null);
             }
+
+            $propertyPath = $context->getPropertyPath();
+            $graphWalker = $context->getGraphWalker();
 
             // The Execute constraint is called on class level, so we need to
             // set the property manually

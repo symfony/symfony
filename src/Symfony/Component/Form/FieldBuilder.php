@@ -37,13 +37,7 @@ class FieldBuilder
 
     private $csrfProvider;
 
-    private $validationGroups;
-
-    private $modifyByReference = true;
-
     private $disabled;
-
-    private $propertyPath = false;
 
     private $required;
 
@@ -57,11 +51,11 @@ class FieldBuilder
 
     private $theme;
 
-    private $virtual = false;
-
     private $fields = array();
 
     private $dataMapper;
+
+    private $attributes = array();
 
     public function __construct(ThemeInterface $theme,
             EventDispatcherInterface $dispatcher,
@@ -108,30 +102,6 @@ class FieldBuilder
         return $this->data;
     }
 
-    public function setValidationGroups($validationGroups)
-    {
-        $this->validationGroups = $validationGroups;
-
-        return $this;
-    }
-
-    public function getValidationGroups()
-    {
-        return $this->validationGroups;
-    }
-
-    public function setModifyByReference($modifyByReference)
-    {
-        $this->modifyByReference = $modifyByReference;
-
-        return $this;
-    }
-
-    public function getModifyByReference()
-    {
-        return $this->modifyByReference;
-    }
-
     public function setDisabled($disabled)
     {
         $this->disabled = $disabled;
@@ -142,26 +112,6 @@ class FieldBuilder
     public function getDisabled()
     {
         return $this->disabled;
-    }
-
-    /**
-     * Sets the property path
-     *
-     * The property path determines the property or a sequence of properties
-     * that a field updates in the data of the form.
-     *
-     * @param string $propertyPath
-     */
-    public function setPropertyPath($propertyPath)
-    {
-        $this->propertyPath = $propertyPath;
-
-        return $this;
-    }
-
-    public function getPropertyPath()
-    {
-        return $this->propertyPath;
     }
 
     /**
@@ -179,18 +129,6 @@ class FieldBuilder
     public function getRequired()
     {
         return $this->required;
-    }
-
-    public function setVirtual($virtual)
-    {
-        $this->virtual = $virtual;
-
-        return $this;
-    }
-
-    public function getVirtual()
-    {
-        return $this->virtual;
     }
 
     public function setDataMapper(DataMapperInterface $dataMapper)
@@ -510,6 +448,28 @@ class FieldBuilder
         return $this->dataClass;
     }
 
+    public function setAttribute($name, $value)
+    {
+        $this->attributes[$name] = $value;
+
+        return $this;
+    }
+
+    public function getAttribute($name)
+    {
+        return $this->attributes[$name];
+    }
+
+    public function hasAttribute($name)
+    {
+        return isset($this->attributes[$name]);
+    }
+
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
     public function getInstance()
     {
         $this->buildCsrfProtection();
@@ -522,14 +482,9 @@ class FieldBuilder
                 $this->getValueTransformer(),
                 $this->getNormalizationTransformer(),
                 $this->getDataMapper(),
-                $this->getDisabled(),
-                $this->getModifyByReference(),
-                $this->getPropertyPath() === false
-                    ? $this->name
-                    : $this->getPropertyPath(),
                 $this->getRequired(),
-                $this->getValidationGroups(),
-                $this->getVirtual()
+                $this->getDisabled(),
+                $this->getAttributes()
             );
 
             foreach ($this->buildFields() as $field) {
@@ -542,13 +497,9 @@ class FieldBuilder
                 $this->buildRenderer(),
                 $this->getValueTransformer(),
                 $this->getNormalizationTransformer(),
-                $this->getDisabled(),
-                $this->getModifyByReference(),
-                $this->getPropertyPath() === false
-                    ? $this->name
-                    : $this->getPropertyPath(),
                 $this->getRequired(),
-                $this->getValidationGroups()
+                $this->getDisabled(),
+                $this->getAttributes()
             );
         }
 

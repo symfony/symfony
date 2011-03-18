@@ -42,28 +42,28 @@ class FieldTest extends TestCase
     {
         $field = $this->factory->create('field', 'title');
 
-        $this->assertEquals(new PropertyPath('title'), $field->getPropertyPath());
+        $this->assertEquals(new PropertyPath('title'), $field->getAttribute('property_path'));
     }
 
     public function testGetPropertyPath_pathIsZero()
     {
         $field = $this->factory->create('field', 'title', array('property_path' => '0'));
 
-        $this->assertEquals(new PropertyPath('0'), $field->getPropertyPath());
+        $this->assertEquals(new PropertyPath('0'), $field->getAttribute('property_path'));
     }
 
     public function testGetPropertyPath_pathIsEmpty()
     {
         $field = $this->factory->create('field', 'title', array('property_path' => ''));
 
-        $this->assertEquals(null, $field->getPropertyPath());
+        $this->assertEquals(null, $field->getAttribute('property_path'));
     }
 
     public function testGetPropertyPath_pathIsNull()
     {
         $field = $this->factory->create('field', 'title', array('property_path' => null));
 
-        $this->assertEquals(null, $field->getPropertyPath());
+        $this->assertEquals(null, $field->getAttribute('property_path'));
     }
 
     public function testPassRequiredAsOption()

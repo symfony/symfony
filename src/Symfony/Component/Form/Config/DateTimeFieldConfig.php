@@ -80,11 +80,7 @@ class DateTimeFieldConfig extends AbstractFieldConfig
                 )),
             )))
             ->add('date', 'date', $dateOptions)
-            ->add('time', 'time', $timeOptions)
-            // Don't modify \DateTime classes by reference, we treat
-            // them like immutable value objects
-            ->setModifyByReference(false)
-            ->setData(null); // hack: should be invoked automatically
+            ->add('time', 'time', $timeOptions);
 
         if ($options['type'] == 'string') {
             $builder->setNormalizationTransformer(new ReversedTransformer(
@@ -120,6 +116,9 @@ class DateTimeFieldConfig extends AbstractFieldConfig
             'with_seconds' => false,
             'data_timezone' => date_default_timezone_get(),
             'user_timezone' => date_default_timezone_get(),
+            // Don't modify \DateTime classes by reference, we treat
+            // them like immutable value objects
+            'by_reference' => false,
         );
     }
 

@@ -91,7 +91,7 @@ class ValidationListener implements EventSubscriberInterface
                 $iterator = new \RecursiveIteratorIterator($iterator);
 
                 foreach ($iterator as $child) {
-                    if (null !== ($childPath = $child->getPropertyPath())) {
+                    if (null !== ($childPath = $child->getAttribute('property_path'))) {
                         if ($childPath->getElement(0) === $pathIterator->current()) {
                             if ($pathIterator->hasNext()) {
                                 $pathIterator->next();

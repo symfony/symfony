@@ -16,18 +16,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class HttpKernel extends BaseHttpKernel
 {
-    protected $container;
-    protected $esiSupport;
+    private $container;
+    private $esiSupport;
 
-    public function __construct(ContainerInterface $container, ControllerResolverInterface $controllerResolver)
+    public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver)
     {
+        parent::__construct($dispatcher, $controllerResolver);
+
         $this->container = $container;
-        $this->resolver = $controllerResolver;
-    }
-
-    public function setEventDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
     }
 
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)

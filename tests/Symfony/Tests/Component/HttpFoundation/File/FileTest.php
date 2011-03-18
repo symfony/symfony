@@ -111,11 +111,13 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
     public function testSizeReturnsFileSize()
     {
-        $this->assertEquals(filesize($this->file->getPath()), $this->file->size());
+        $this->assertEquals(filesize($this->file->getPath()), $this->file->getSize());
     }
 
     public function testSizeFailing()
     {
+        $this->setExpectedException('Symfony\Component\HttpFoundation\File\Exception\FileException');
+
         $dir = __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'directory';
         $path = $dir.DIRECTORY_SEPARATOR.'test.copy.gif';
         @unlink($path);
@@ -123,10 +125,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
         $file = new File($path);
         @unlink($path);
-
-        $this->setExpectedException('Symfony\Component\HttpFoundation\File\Exception\FileException');
-        $file->size($path);
-
+        $file->getSize();
     }
 
     public function testMove()

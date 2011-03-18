@@ -11,10 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\HttpFoundation;
 
-use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
 /**
  * SessionListener.
@@ -27,23 +27,18 @@ class SessionListener
 {
     /**
      * Checks if session was initialized and saves if current request is master
-     * Runs on 'core.response' in test environment
+     * Runs on 'onCoreResponse' in test environment
      *
-     * @param EventInterface $event
-     * @param Response $response
-     *
-     * @return Response
+     * @param FilterResponseEvent $event
      */
-    public function filter(EventInterface $event, Response $response)
+    public function onCoreResponse(FilterResponseEvent $event)
     {
-        if ($request = $event->get('request')) {
-            if (HttpKernelInterface::MASTER_REQUEST === $event->get('request_type')) {
+        if ($request = $event->getRequest()) {
+            if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
                 if ($session = $request->getSession()) {
                     $session->save();
                 }
             }
         }
-
-        return $response;
     }
 }

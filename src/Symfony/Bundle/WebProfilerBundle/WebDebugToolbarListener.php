@@ -11,17 +11,17 @@
 
 namespace Symfony\Bundle\WebProfilerBundle;
 
-use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 
 /**
  * WebDebugToolbarListener injects the Web Debug Toolbar.
  *
- * The handle method must be connected to the core.response event.
+ * The handle method must be connected to the onCoreResponse event.
  *
  * The WDT is only injected on well-formed HTML (with a proper </body> tag).
  * This means that the WDT is never included in sub-requests or ESI requests.
@@ -41,13 +41,15 @@ class WebDebugToolbarListener
         $this->interceptRedirects = $interceptRedirects;
     }
 
-    public function handle(EventInterface $event, Response $response)
+    public function onCoreResponse(FilterResponseEvent $event)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
-            return $response;
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+            return;
         }
 
-        $request = $event->get('request');
+        $response = $event->getResponse();
+	$request = $event->getRequest();
+
         if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects) {
             // keep current flashes for one more request
             $request->getSession()->setFlashes($request->getSession()->getFlashes());
@@ -66,12 +68,10 @@ class WebDebugToolbarListener
             || 'html' !== $request->getRequestFormat()
             || $request->isXmlHttpRequest()
         ) {
-            return $response;
+            return;
         }
 
         $this->injectToolbar($response);
-
-        return $response;
     }
 
     /**

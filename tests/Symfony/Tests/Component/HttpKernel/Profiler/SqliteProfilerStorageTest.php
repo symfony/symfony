@@ -24,7 +24,7 @@ class SqliteProfilerStorageTest extends \PHPUnit_Framework_TestCase
         if (file_exists(self::$dbFile)) {
             @unlink(self::$dbFile);
         }
-        self::$storage = new SqliteProfilerStorage(self::$dbFile);
+        self::$storage = new SqliteProfilerStorage('sqlite:'.self::$dbFile);
     }
 
     public static function tearDownAfterClass()
@@ -52,7 +52,7 @@ class SqliteProfilerStorageTest extends \PHPUnit_Framework_TestCase
         self::$storage->write('simple_quote', '', 'data', '127.0.0.1', 'http://foo.bar/\'', time());
         self::$storage->write('double_quote', '', 'data', '127.0.0.1', 'http://foo.bar/"', time());
         self::$storage->write('backslash', '', 'data', '127.0.0.1', 'http://foo.bar/\\', time());
-        
+
         $this->assertTrue(false !== self::$storage->read('simple_quote'), '->write() accepts single quotes in URL');
         $this->assertTrue(false !== self::$storage->read('double_quote'), '->write() accepts double quotes in URL');
         $this->assertTrue(false !== self::$storage->read('backslash'), '->write() accpets backslash in URL');

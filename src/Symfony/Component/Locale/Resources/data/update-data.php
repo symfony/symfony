@@ -83,6 +83,15 @@ function genrb($source, $target)
     }
 }
 
+function genrb_file($target, $source, $locale)
+{
+    exec('genrb -v -d '.$target.' '.$source.DIRECTORY_SEPARATOR.$locale.'.txt', $output, $result);
+
+    if ($result !== 0) {
+        bailout('genrb failed');
+    }
+}
+
 function load_resource_bundle($locale, $directory)
 {
     $bundle = new \ResourceBundle($locale, $directory);
@@ -92,6 +101,54 @@ function load_resource_bundle($locale, $directory)
     }
 
     return $bundle;
+}
+
+function get_data($index, $dataDir, $locale = 'en', $constraint = null)
+{
+    $data = array();
+    $bundle = load_resource_bundle($locale, __DIR__.DIRECTORY_SEPARATOR.$dataDir);
+
+    foreach ($bundle->get($index) as $code => $name) {
+        if (!is_null($constraint)) {
+            if ($constraint($code)) {
+                $data[$code] = $name;
+            }
+            continue;
+        }
+
+        $data[$code] = $name;
+    }
+
+    $collator = new \Collator($locale);
+    $collator->asort($data);
+
+    return $data;
+}
+
+function create_stub_datafile($locale, $target, $data) {
+    $template = <<<TEMPLATE
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+return %s;
+
+TEMPLATE;
+
+    $data = var_export($data, true);
+    $data = preg_replace('/array \(/', 'array(', $data);
+    $data = preg_replace('/\n {1,10}array\(/', 'array(', $data);
+    $data = preg_replace('/  /', '    ', $data);
+    $data = sprintf($template, $data);
+
+    file_put_contents($target.DIRECTORY_SEPARATOR.$locale.'.php', $data);
 }
 
 if ($GLOBALS['argc'] !== 2) {
@@ -114,6 +171,7 @@ check_dir($source);
 
 $source = realpath($source);
 
+check_dir($source.DIRECTORY_SEPARATOR.'curr');
 check_dir($source.DIRECTORY_SEPARATOR.'lang');
 check_dir($source.DIRECTORY_SEPARATOR.'locales');
 check_dir($source.DIRECTORY_SEPARATOR.'region');
@@ -122,11 +180,27 @@ check_command('genrb');
 
 // Convert the *.txt resource bundles to *.res files
 $target = __DIR__;
+$currDir = $target.DIRECTORY_SEPARATOR.'curr';
 $langDir = $target.DIRECTORY_SEPARATOR.'lang';
 $localesDir = $target.DIRECTORY_SEPARATOR.'locales';
 $namesDir = $target.DIRECTORY_SEPARATOR.'names';
 $namesGeneratedDir = $namesDir.DIRECTORY_SEPARATOR.'generated';
 $regionDir = $target.DIRECTORY_SEPARATOR.'region';
+
+make_directory($currDir);
+clear_directory($currDir);
+
+genrb_file($currDir, $source.DIRECTORY_SEPARATOR.'curr', 'en');
+genrb_file($currDir, $source.DIRECTORY_SEPARATOR.'curr', 'supplementalData');
+
+// It seems \ResourceBundle does not like locale names with uppercase chars then we rename the binary file
+// See: http://bugs.php.net/bug.php?id=54025
+$filename_from = $currDir.DIRECTORY_SEPARATOR.'supplementalData.res';
+$filename_to   = $currDir.DIRECTORY_SEPARATOR.'supplementaldata.res';
+
+if (!rename($filename_from, $filename_to)) {
+    bailout('The file '.$filename_from.' could not be renamed');
+}
 
 make_directory($langDir);
 clear_directory($langDir);
@@ -322,3 +396,105 @@ genrb($namesGeneratedDir, $namesDir);
 // Clean up
 clear_directory($namesGeneratedDir);
 rmdir($namesGeneratedDir);
+
+
+// Generate the data to the stubbed intl classes We only extract data for the 'en' locale
+// The extracted data is used only by the stub classes
+$defaultLocale = 'en';
+
+$currencies = array();
+$currenciesMeta = array();
+$defaultMeta = array();
+
+$bundle = load_resource_bundle('supplementaldata', __DIR__.'/curr');
+
+foreach ($bundle->get('CurrencyMeta') as $code => $data) {
+    // The 'DEFAULT' key contains the fraction digits and the rounding increment that are common for a lot of currencies
+    // Only currencies with different values are added to the icu-data (e.g: CHF and JPY)
+    if ('DEFAULT' == $code) {
+        $defaultMeta = array(
+            'fractionDigits'    => $data[0],
+            'roundingIncrement' => $data[1],
+        );
+
+        continue;
+    }
+
+    $currenciesMeta[$code]['fractionDigits'] = $data[0];
+    $currenciesMeta[$code]['roundingIncrement'] = $data[1];
+}
+
+$bundle = load_resource_bundle('en', __DIR__.'/curr');
+
+foreach ($bundle->get('Currencies') as $code => $data) {
+    $currencies[$code]['symbol'] = $data[0];
+    $currencies[$code]['name']   = $data[1];
+
+    if (!isset($currenciesMeta[$code])) {
+        $currencies[$code]['fractionDigits'] = $defaultMeta['fractionDigits'];
+        $currencies[$code]['roundingIncrement'] = $defaultMeta['roundingIncrement'];
+        continue;
+    }
+
+    $currencies[$code]['fractionDigits'] = $currenciesMeta[$code]['fractionDigits'];
+    $currencies[$code]['roundingIncrement'] = $currenciesMeta[$code]['roundingIncrement'];
+}
+
+// Countries.
+$countriesConstraint = function($code)
+{
+    // Global countries (f.i. "America") have numeric codes
+    // Countries have alphabetic codes
+    // "ZZ" is the code for unknown country
+    if (ctype_alpha($code) && 'ZZ' !== $code) {
+        return true;
+    }
+
+    return false;
+};
+
+$countries = get_data('Countries', 'region', $defaultLocale, $countriesConstraint);
+
+// Languages
+$languagesConstraint = function($code)
+{
+    // "mul" is the code for multiple languages
+    if ('mul' !== $code) {
+        return true;
+    }
+
+    return false;
+};
+
+$languages = get_data('Languages', 'lang', $defaultLocale, $languagesConstraint);
+
+// Display locales
+$displayLocales = get_data('Locales', 'names', $defaultLocale);
+
+// Create the stubs datafiles
+$stubDir = $target.DIRECTORY_SEPARATOR.'stub';
+$stubCurrDir = $stubDir.DIRECTORY_SEPARATOR.'curr';
+$stubLangDir = $stubDir.DIRECTORY_SEPARATOR.'lang';
+$stubNamesDir = $stubDir.DIRECTORY_SEPARATOR.'names';
+$stubRegionDir = $stubDir.DIRECTORY_SEPARATOR.'region';
+
+// Create the directories
+make_directory($stubDir);
+make_directory($stubCurrDir);
+make_directory($stubLangDir);
+make_directory($stubNamesDir);
+make_directory($stubRegionDir);
+
+clear_directory($stubCurrDir);
+clear_directory($stubLangDir);
+clear_directory($stubNamesDir);
+clear_directory($stubRegionDir);
+
+create_stub_datafile($defaultLocale, $stubCurrDir, $currencies);
+create_stub_datafile($defaultLocale, $stubLangDir, $languages);
+create_stub_datafile($defaultLocale, $stubNamesDir, $displayLocales);
+create_stub_datafile($defaultLocale, $stubRegionDir, $countries);
+
+// Clean up
+clear_directory($currDir);
+rmdir($currDir);

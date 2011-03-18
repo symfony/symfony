@@ -118,6 +118,7 @@ EOF;
         foreach ($this->container->getInterfaceInjectors() as $injector) {
             $code .= sprintf("        if (\$instance instanceof \\%s) {\n", $injector->getClass());
             foreach ($injector->getMethodCalls() as $call) {
+                $arguments = array();
                 foreach ($call[1] as $value) {
                     $arguments[] = $this->dumpValue($value);
                 }
@@ -408,7 +409,7 @@ EOF;
         }
 
         if (!$this->container->isFrozen() && count($this->container->getInterfaceInjectors()) > 0) {
-            $calls = sprintf("\n        \$this->applyInterfaceInjectors(\$%s);\n", $variableName);
+            $calls .= sprintf("\n        \$this->applyInterfaceInjectors(\$%s);\n", $variableName);
         }
 
         return $calls;

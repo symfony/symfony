@@ -92,7 +92,7 @@ class FileFieldTest extends TestCase
             'file' => $file,
             'token' => $generatedToken,
             'name' => 'original_name.jpg',
-        ), $this->field->getTransformedData());
+        ), $this->field->getClientData());
         $this->assertEquals($tmpDir.'/original_name.jpg', $this->field->getData());
     }
 
@@ -121,7 +121,7 @@ class FileFieldTest extends TestCase
             'file' => $file,
             'token' => '123456',
             'name' => 'original_name.jpg',
-        ), $this->field->getTransformedData());
+        ), $this->field->getClientData());
         $this->assertEquals($tmpPath, $this->field->getData());
     }
 
@@ -140,7 +140,7 @@ class FileFieldTest extends TestCase
             'file' => '',
             'token' => '',
             'name' => '',
-        ), $this->field->getTransformedData());
+        ), $this->field->getClientData());
         $this->assertEquals(null, $this->field->getData());
     }
 
@@ -164,7 +164,7 @@ class FileFieldTest extends TestCase
             'file' => $file,
             'token' => '',
             'name' => '',
-        ), $this->field->getTransformedData());
+        ), $this->field->getClientData());
         $this->assertEquals($tmpPath, $this->field->getData());
     }
 }

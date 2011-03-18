@@ -62,7 +62,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     private $dataMapper;
 
     public function __construct($name, EventDispatcherInterface $dispatcher,
-        RendererInterface $renderer, DataTransformerInterface $dataTransformer = null,
+        RendererInterface $renderer, DataTransformerInterface $clientTransformer = null,
         DataTransformerInterface $normalizationTransformer = null,
         DataMapperInterface $dataMapper, DataValidatorInterface $dataValidator = null,
         $required = false, $disabled = false, array $attributes = array())
@@ -76,7 +76,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
         $this->dataMapper = $dataMapper;
 
-        parent::__construct($name, $dispatcher, $renderer, $dataTransformer,
+        parent::__construct($name, $dispatcher, $renderer, $clientTransformer,
             $normalizationTransformer, $dataValidator, $required, $disabled,
             $attributes);
     }
@@ -97,7 +97,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
         $field->setParent($this);
 
-        $data = $this->getTransformedData();
+        $data = $this->getClientData();
 
         if (!empty($data)) {
             $this->dataMapper->mapDataToField($data, $field);
@@ -142,7 +142,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     public function postSetData(DataEvent $event)
     {
         $form = $event->getField();
-        $data = $form->getTransformedData();
+        $data = $form->getClientData();
 
         $this->dataMapper->mapDataToForm($data, $form);
     }
@@ -151,7 +151,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     {
         $field = $event->getField();
 
-        if (null === $field->getDataTransformer() && null === $field->getNormalizationTransformer()) {
+        if (null === $field->getClientTransformer() && null === $field->getNormTransformer()) {
             $data = $event->getData();
 
             if (empty($data)) {
@@ -180,7 +180,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
             }
         }
 
-        $data = $this->getTransformedData();
+        $data = $this->getClientData();
 
         $this->dataMapper->mapFormToData($this, $data);
 
@@ -308,7 +308,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         if (!$this->isCsrfProtected()) {
             return true;
         } else {
-            $token = $this->get($this->csrfFieldName)->getTransformedData();
+            $token = $this->get($this->csrfFieldName)->getClientData();
 
             return $this->csrfProvider->isCsrfTokenValid(get_class($this), $token);
         }

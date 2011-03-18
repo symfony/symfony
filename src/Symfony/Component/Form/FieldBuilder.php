@@ -38,7 +38,7 @@ class FieldBuilder
 
     private $rendererVars = array();
 
-    private $dataTransformer;
+    private $clientTransformer;
 
     private $normalizationTransformer;
 
@@ -162,16 +162,16 @@ class FieldBuilder
     /**
      * Sets the DataTransformer.
      *
-     * @param DataTransformerInterface $dataTransformer
+     * @param DataTransformerInterface $clientTransformer
      */
-    public function setNormalizationTransformer(DataTransformerInterface $normalizationTransformer = null)
+    public function setNormTransformer(DataTransformerInterface $normalizationTransformer = null)
     {
         $this->normalizationTransformer = $normalizationTransformer;
 
         return $this;
     }
 
-    public function getNormalizationTransformer()
+    public function getNormTransformer()
     {
         return $this->normalizationTransformer;
     }
@@ -179,18 +179,18 @@ class FieldBuilder
     /**
      * Sets the DataTransformer.
      *
-     * @param DataTransformerInterface $dataTransformer
+     * @param DataTransformerInterface $clientTransformer
      */
-    public function setDataTransformer(DataTransformerInterface $dataTransformer = null)
+    public function setClientTransformer(DataTransformerInterface $clientTransformer = null)
     {
-        $this->dataTransformer = $dataTransformer;
+        $this->clientTransformer = $clientTransformer;
 
         return $this;
     }
 
-    public function getDataTransformer()
+    public function getClientTransformer()
     {
-        return $this->dataTransformer;
+        return $this->clientTransformer;
     }
 
     /**
@@ -265,8 +265,8 @@ class FieldBuilder
             $this->getName(),
             $this->buildDispatcher(),
             $this->buildRenderer(),
-            $this->getDataTransformer(),
-            $this->getNormalizationTransformer(),
+            $this->getClientTransformer(),
+            $this->getNormTransformer(),
             $this->getDataValidator(),
             $this->getRequired(),
             $this->getDisabled(),

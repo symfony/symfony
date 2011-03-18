@@ -188,7 +188,7 @@ class FieldTest extends TestCase
         $field = $this->factory->create('field', 'name');
 
         $this->assertEquals(null, $this->field->getData());
-        $this->assertEquals('', $this->field->getTransformedData());
+        $this->assertEquals('', $this->field->getClientData());
     }
 
     public function testDataIsTransformedCorrectlyIfNull_noDataTransformer()
@@ -196,7 +196,7 @@ class FieldTest extends TestCase
         $this->field->setData(null);
 
         $this->assertSame(null, $this->field->getData());
-        $this->assertSame('', $this->field->getTransformedData());
+        $this->assertSame('', $this->field->getClientData());
     }
 
     public function testDataIsTransformedCorrectlyIfNotNull_noDataTransformer()
@@ -208,7 +208,7 @@ class FieldTest extends TestCase
         // should be casted to an integer when the field is bound
         // Even without binding, the data will thus be a string
         $this->assertSame('123', $this->field->getData());
-        $this->assertSame('123', $this->field->getTransformedData());
+        $this->assertSame('123', $this->field->getClientData());
     }
 
     public function testBoundDataIsTransformedCorrectly()
@@ -224,7 +224,7 @@ class FieldTest extends TestCase
                 'norm[filter1[0]]' => 'filter2[norm[filter1[0]]]',
             ),
         ));
-        $dataTransformer = new FixedDataTransformer(array(
+        $clientTransformer = new FixedDataTransformer(array(
             // 0. Empty initialization
             null => null,
             // 2. The filtered value is normalized
@@ -242,15 +242,15 @@ class FieldTest extends TestCase
         ));
 
         $this->builder->addEventSubscriber($filter);
-        $this->builder->setDataTransformer($dataTransformer);
-        $this->builder->setNormalizationTransformer($normTransformer);
+        $this->builder->setClientTransformer($clientTransformer);
+        $this->builder->setNormTransformer($normTransformer);
 
         $field = $this->builder->getInstance();
         $field->bind(0);
 
         $this->assertEquals('app[filter2[norm[filter1[0]]]]', $field->getData());
-        $this->assertEquals('filter2[norm[filter1[0]]]', $field->getNormalizedData());
-        $this->assertEquals('client[filter2[norm[filter1[0]]]]', $field->getTransformedData());
+        $this->assertEquals('filter2[norm[filter1[0]]]', $field->getNormData());
+        $this->assertEquals('client[filter2[norm[filter1[0]]]]', $field->getClientData());
     }
 
     public function testBoundDataIsTransformedCorrectlyIfEmpty_noDataTransformer()
@@ -258,7 +258,7 @@ class FieldTest extends TestCase
         $this->field->bind('');
 
         $this->assertSame(null, $this->field->getData());
-        $this->assertEquals('', $this->field->getTransformedData());
+        $this->assertEquals('', $this->field->getClientData());
     }
 
     public function testSetDataIsTransformedCorrectly()
@@ -268,55 +268,56 @@ class FieldTest extends TestCase
             0 => 'norm[0]',
         ));
 
-        $dataTransformer = new FixedDataTransformer(array(
+        $clientTransformer = new FixedDataTransformer(array(
             '' => '',
             'norm[0]' => 'transform[norm[0]]',
         ));
 
-        $field = $this->factory->create('field', 'title', array(
-            'value_transformer' => $dataTransformer,
-            'normalization_transformer' => $normTransformer,
-        ));
+        $builder = $this->factory->createBuilder('field', 'title');
+        $builder->setNormTransformer($normTransformer);
+        $builder->setClientTransformer($clientTransformer);
+        $field = $builder->getInstance();
 
         $field->setData(0);
 
         $this->assertEquals(0, $field->getData());
-        $this->assertEquals('norm[0]', $field->getNormalizedData());
-        $this->assertEquals('transform[norm[0]]', $field->getTransformedData());
+        $this->assertEquals('norm[0]', $field->getNormData());
+        $this->assertEquals('transform[norm[0]]', $field->getClientData());
     }
 
     public function testBoundDataIsTrimmedBeforeTransforming()
     {
-        $transformer = new FixedDataTransformer(array(
+        $clientTransformer = new FixedDataTransformer(array(
             null => '',
             'reverse[a]' => 'a',
         ));
 
-        $field = $this->factory->create('field', 'title', array(
-            'value_transformer' => $transformer,
-        ));
+        $builder = $this->factory->createBuilder('field', 'title');
+        $builder->setClientTransformer($clientTransformer);
+        $field = $builder->getInstance();
 
         $field->bind(' a ');
 
-        $this->assertEquals('a', $field->getTransformedData());
+        $this->assertEquals('a', $field->getClientData());
         $this->assertEquals('reverse[a]', $field->getData());
     }
 
     public function testBoundDataIsNotTrimmedBeforeTransformingIfDisabled()
     {
-        $transformer = new FixedDataTransformer(array(
+        $clientTransformer = new FixedDataTransformer(array(
             null => '',
             'reverse[ a ]' => ' a ',
         ));
 
-        $field = $this->factory->create('field', 'title', array(
+        $builder = $this->factory->createBuilder('field', 'title', array(
             'trim' => false,
-            'value_transformer' => $transformer,
         ));
+        $builder->setClientTransformer($clientTransformer);
+        $field = $builder->getInstance();
 
         $field->bind(' a ');
 
-        $this->assertEquals(' a ', $field->getTransformedData());
+        $this->assertEquals(' a ', $field->getClientData());
         $this->assertEquals('reverse[ a ]', $field->getData());
     }
 
@@ -328,27 +329,28 @@ class FieldTest extends TestCase
 
         $field->bind('a');
 
-        $this->assertEquals('a', $field->getTransformedData());
+        $this->assertEquals('a', $field->getClientData());
         $this->assertTrue($field->isTransformationSuccessful());
     }
 
     public function testIsTransformationSuccessfulReturnsFalseIfReverseTransformThrowsException()
     {
         // The value is passed to the value transformer
-        $transformer = $this->createMockTransformer();
+        $clientTransformer = $this->createMockTransformer();
 
-        $field = $this->factory->create('field', 'title', array(
+        $builder = $this->factory->createBuilder('field', 'title', array(
             'trim' => false,
-            'value_transformer' => $transformer,
         ));
+        $builder->setClientTransformer($clientTransformer);
+        $field = $builder->getInstance();
 
-        $transformer->expects($this->once())
+        $clientTransformer->expects($this->once())
                 ->method('reverseTransform')
                 ->will($this->throwException(new TransformationFailedException()));
 
         $field->bind('a');
 
-        $this->assertEquals('a', $field->getTransformedData());
+        $this->assertEquals('a', $field->getClientData());
         $this->assertFalse($field->isTransformationSuccessful());
     }
 
@@ -397,12 +399,12 @@ class FieldTest extends TestCase
 
     protected function createMockTransformerTransformingTo($value)
     {
-        $transformer = $this->createMockTransformer();
-        $transformer->expects($this->any())
+        $clientTransformer = $this->createMockTransformer();
+        $clientTransformer->expects($this->any())
                                 ->method('reverseTransform')
                                 ->will($this->returnValue($value));
 
-        return $transformer;
+        return $clientTransformer;
     }
 
     protected function createMockGroup()

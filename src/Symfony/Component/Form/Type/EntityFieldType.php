@@ -52,9 +52,9 @@ class EntityFieldType extends AbstractFieldType
         }
 
         if (count($transformers) > 1) {
-            $builder->setDataTransformer(new DataTransformerChain($transformers));
+            $builder->setClientTransformer(new DataTransformerChain($transformers));
         } else {
-            $builder->setDataTransformer(current($transformers));
+            $builder->setClientTransformer(current($transformers));
         }
     }
 

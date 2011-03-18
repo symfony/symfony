@@ -18,7 +18,7 @@ class IntegerFieldType extends AbstractFieldType
 {
     public function configure(FieldBuilder $builder, array $options)
     {
-        $builder->setDataTransformer(new IntegerToLocalizedStringTransformer(array(
+        $builder->setClientTransformer(new IntegerToLocalizedStringTransformer(array(
                 'precision' => $options['precision'],
                 'grouping' => $options['grouping'],
                 'rounding-mode' => $options['rounding_mode'],

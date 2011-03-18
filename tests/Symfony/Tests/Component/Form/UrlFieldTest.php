@@ -24,7 +24,7 @@ class UrlFieldTest extends LocalizedTestCase
         $field->bind('www.domain.com');
 
         $this->assertSame('http://www.domain.com', $field->getData());
-        $this->assertSame('http://www.domain.com', $field->getTransformedData());
+        $this->assertSame('http://www.domain.com', $field->getClientData());
     }
 
     public function testSubmitAddsNoDefaultProtocolIfAlreadyIncluded()
@@ -36,7 +36,7 @@ class UrlFieldTest extends LocalizedTestCase
         $field->bind('ftp://www.domain.com');
 
         $this->assertSame('ftp://www.domain.com', $field->getData());
-        $this->assertSame('ftp://www.domain.com', $field->getTransformedData());
+        $this->assertSame('ftp://www.domain.com', $field->getClientData());
     }
 
     public function testSubmitAddsNoDefaultProtocolIfEmpty()
@@ -48,7 +48,7 @@ class UrlFieldTest extends LocalizedTestCase
         $field->bind('');
 
         $this->assertSame(null, $field->getData());
-        $this->assertSame('', $field->getTransformedData());
+        $this->assertSame('', $field->getClientData());
     }
 
     public function testSubmitAddsNoDefaultProtocolIfSetToNull()
@@ -60,6 +60,6 @@ class UrlFieldTest extends LocalizedTestCase
         $field->bind('www.domain.com');
 
         $this->assertSame('www.domain.com', $field->getData());
-        $this->assertSame('www.domain.com', $field->getTransformedData());
+        $this->assertSame('www.domain.com', $field->getClientData());
     }
 }

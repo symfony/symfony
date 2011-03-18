@@ -43,11 +43,11 @@ class ChoiceFieldType extends AbstractFieldType
             ->setRendererVar('expanded', $options['expanded']);
 
         if ($options['multiple'] && $options['expanded']) {
-            $builder->setDataTransformer(new ArrayToChoicesTransformer($options['choice_list']));
+            $builder->setClientTransformer(new ArrayToChoicesTransformer($options['choice_list']));
         }
 
         if (!$options['multiple'] && $options['expanded']) {
-            $builder->setDataTransformer(new ScalarToChoicesTransformer($options['choice_list']));
+            $builder->setClientTransformer(new ScalarToChoicesTransformer($options['choice_list']));
             $builder->addEventSubscriber(new FixRadioInputListener(), 10);
         }
 

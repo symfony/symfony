@@ -20,7 +20,7 @@ class RadioFieldType extends AbstractFieldType
 {
     public function configure(FieldBuilder $builder, array $options)
     {
-        $builder->setDataTransformer(new BooleanToStringTransformer())
+        $builder->setClientTransformer(new BooleanToStringTransformer())
             ->addRendererPlugin(new CheckedPlugin())
             ->addRendererPlugin(new ParentNamePlugin())
             ->setRendererVar('value', $options['value']);

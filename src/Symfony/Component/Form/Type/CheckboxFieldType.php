@@ -19,7 +19,7 @@ class CheckboxFieldType extends AbstractFieldType
 {
     public function configure(FieldBuilder $builder, array $options)
     {
-        $builder->setDataTransformer(new BooleanToStringTransformer())
+        $builder->setClientTransformer(new BooleanToStringTransformer())
             ->addRendererPlugin(new CheckedPlugin())
             ->setRendererVar('value', $options['value']);
     }

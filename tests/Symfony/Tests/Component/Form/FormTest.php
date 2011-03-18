@@ -157,7 +157,7 @@ class FormTest extends TestCase
         $field = $form->get($form->getCsrfFieldName());
 
         $this->assertTrue($field instanceof HiddenField);
-        $this->assertEquals('ABCDEF', $field->getTransformedData());
+        $this->assertEquals('ABCDEF', $field->getClientData());
     }
 
     public function testIsCsrfTokenValidPassesIfCsrfProtectionIsDisabled()
@@ -670,7 +670,7 @@ class FormTest extends TestCase
             ->will($this->returnValue($transformedAuthor));
 
         $builder = $this->factory->createBuilder('form', 'author');
-        $builder->setDataTransformer($transformer);
+        $builder->setClientTransformer($transformer);
         $builder->setData($originalAuthor);
         $builder->add('field', 'firstName');
         $builder->add('field', 'lastName');
@@ -803,7 +803,7 @@ class FormTest extends TestCase
             ->will($this->returnValue($transformedAuthor));
 
         $builder = $this->factory->createBuilder('form', 'author');
-        $builder->setDataTransformer($transformer);
+        $builder->setClientTransformer($transformer);
         $builder->add('field', 'firstName');
         $builder->add('field', 'lastName');
         $builder->setData($originalAuthor);
@@ -907,16 +907,16 @@ class FormTest extends TestCase
         $graphWalker = $this->createMockGraphWalker();
         $metadataFactory = $this->createMockMetadataFactory();
         $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
-        $dataTransformer = $this->createMockTransformer();
+        $clientTransformer = $this->createMockTransformer();
 
         $builder = $this->factory->createBuilder('form', 'author');
-        $builder->setDataTransformer($dataTransformer);
+        $builder->setClientTransformer($clientTransformer);
         $form = $builder->getInstance();
 
         $graphWalker->expects($this->never())
             ->method('walkReference');
 
-        $dataTransformer->expects($this->atLeastOnce())
+        $clientTransformer->expects($this->atLeastOnce())
             ->method('reverseTransform')
             ->will($this->returnValue('foobar'));
 
@@ -995,7 +995,7 @@ class FormTest extends TestCase
 
         $builder = $this->factory->createBuilder('form', 'author');
         $builder->add('form', 'referenceCopy');
-        $builder->get('referenceCopy')->setDataTransformer(new CallbackTransformer(
+        $builder->get('referenceCopy')->setClientTransformer(new CallbackTransformer(
             function () {},
             function ($value) { // reverseTransform
                 return 'foobar';
@@ -1020,13 +1020,12 @@ class FormTest extends TestCase
 
         $builder = $this->factory->createBuilder('form', 'author');
         $builder->setData($author);
-        $builder->add('form', 'referenceCopy', array(
-            'value_transformer' => new CallbackTransformer(
-                function () {},
-                function ($value) use ($ref2) { // reverseTransform
-                    return $ref2;
-                }
-            )
+        $builder->add('form', 'referenceCopy');
+        $builder->get('referenceCopy')->setClientTransformer(new CallbackTransformer(
+            function () {},
+            function ($value) use ($ref2) { // reverseTransform
+                return $ref2;
+            }
         ));
         $form = $builder->getInstance();
 

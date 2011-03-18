@@ -18,7 +18,7 @@ class RepeatedFieldType extends AbstractFieldType
 {
     public function configure(FieldBuilder $builder, array $options)
     {
-        $builder->setDataTransformer(new ValueToDuplicatesTransformer(array(
+        $builder->setClientTransformer(new ValueToDuplicatesTransformer(array(
                 $options['first_name'],
                 $options['second_name'],
             )))

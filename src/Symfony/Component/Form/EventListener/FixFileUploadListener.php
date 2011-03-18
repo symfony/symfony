@@ -77,7 +77,7 @@ class FixFileUploadListener implements EventSubscriberInterface
         // Clear other fields if we still don't have a file, but keep
         // possible existing files of the field
         if (!$data['file']) {
-            $data = $field->getNormalizedData();
+            $data = $field->getNormData();
         }
 
         $event->setData($data);

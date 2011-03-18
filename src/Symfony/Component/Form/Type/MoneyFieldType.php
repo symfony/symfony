@@ -17,7 +17,7 @@ class MoneyFieldType extends AbstractFieldType
 {
     public function configure(FieldBuilder $builder, array $options)
     {
-        $builder->setDataTransformer(new MoneyToLocalizedStringTransformer(array(
+        $builder->setClientTransformer(new MoneyToLocalizedStringTransformer(array(
                 'precision' => $options['precision'],
                 'grouping' => $options['grouping'],
                 'divisor' => $options['divisor'],

@@ -50,7 +50,7 @@ class TimeFieldType extends AbstractFieldType
         }
 
         if ($options['type'] == 'string') {
-            $builder->setNormalizationTransformer(new ReversedTransformer(
+            $builder->setNormTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer(array(
                     'format' => 'H:i:s',
                     'input_timezone' => $options['data_timezone'],
@@ -58,14 +58,14 @@ class TimeFieldType extends AbstractFieldType
                 ))
             ));
         } else if ($options['type'] == 'timestamp') {
-            $builder->setNormalizationTransformer(new ReversedTransformer(
+            $builder->setNormTransformer(new ReversedTransformer(
                 new DateTimeToTimestampTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['data_timezone'],
                 ))
             ));
         } else if ($options['type'] === 'array') {
-            $builder->setNormalizationTransformer(new ReversedTransformer(
+            $builder->setNormTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['data_timezone'],
@@ -75,7 +75,7 @@ class TimeFieldType extends AbstractFieldType
         }
 
         $builder
-            ->setDataTransformer(new DateTimeToArrayTransformer(array(
+            ->setClientTransformer(new DateTimeToArrayTransformer(array(
                 'input_timezone' => $options['data_timezone'],
                 'output_timezone' => $options['user_timezone'],
                 // if the field is rendered as choice field, the values should be trimmed

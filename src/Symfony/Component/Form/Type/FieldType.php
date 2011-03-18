@@ -56,8 +56,6 @@ class FieldType extends AbstractFieldType
             ->setAttribute('by_reference', $options['by_reference'])
             ->setAttribute('property_path', $options['property_path'])
             ->setAttribute('validation_groups', $options['validation_groups'])
-            ->setDataTransformer($options['value_transformer'])
-            ->setNormalizationTransformer($options['normalization_transformer'])
             ->setData($options['data'])
             ->setRenderer(new DefaultRenderer($this->theme, $options['template']))
             ->addRendererPlugin(new FieldPlugin())
@@ -76,8 +74,6 @@ class FieldType extends AbstractFieldType
             'trim' => true,
             'required' => true,
             'disabled' => false,
-            'value_transformer' => null,
-            'normalization_transformer' => null,
             'max_length' => null,
             'property_path' => false,
             'by_reference' => true,

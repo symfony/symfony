@@ -32,12 +32,12 @@ class FileFieldType extends AbstractFieldType
     public function configure(FieldBuilder $builder, array $options)
     {
         if ($options['type'] === 'string') {
-            $builder->setNormalizationTransformer(new DataTransformerChain(array(
+            $builder->setNormTransformer(new DataTransformerChain(array(
                 new ReversedTransformer(new FileToStringTransformer()),
                 new FileToArrayTransformer(),
             )));
         } else {
-            $builder->setNormalizationTransformer(new FileToArrayTransformer());
+            $builder->setNormTransformer(new FileToArrayTransformer());
         }
 
         $builder->addEventSubscriber(new FixFileUploadListener($this->storage), 10)

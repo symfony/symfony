@@ -68,7 +68,7 @@ class DateTimeFieldType extends AbstractFieldType
             $timeParts[] = 'second';
         }
 
-        $builder->setDataTransformer(new DataTransformerChain(array(
+        $builder->setClientTransformer(new DataTransformerChain(array(
                 new DateTimeToArrayTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['user_timezone'],
@@ -83,7 +83,7 @@ class DateTimeFieldType extends AbstractFieldType
             ->add('time', 'time', $timeOptions);
 
         if ($options['type'] == 'string') {
-            $builder->setNormalizationTransformer(new ReversedTransformer(
+            $builder->setNormTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer(array(
                     'format' => 'Y-m-d H:i:s',
                     'input_timezone' => $options['data_timezone'],
@@ -91,14 +91,14 @@ class DateTimeFieldType extends AbstractFieldType
                 ))
             ));
         } else if ($options['type'] == 'timestamp') {
-            $builder->setNormalizationTransformer(new ReversedTransformer(
+            $builder->setNormTransformer(new ReversedTransformer(
                 new DateTimeToTimestampTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['data_timezone'],
                 ))
             ));
         } else if ($options['type'] === 'array') {
-            $builder->setNormalizationTransformer(new ReversedTransformer(
+            $builder->setNormTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['data_timezone'],

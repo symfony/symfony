@@ -17,7 +17,7 @@ class PercentFieldType extends AbstractFieldType
 {
     public function configure(FieldBuilder $builder, array $options)
     {
-        $builder->setDataTransformer(new PercentToLocalizedStringTransformer(array(
+        $builder->setClientTransformer(new PercentToLocalizedStringTransformer(array(
                 'precision' => $options['precision'],
                 'type' => $options['type'],
             )));

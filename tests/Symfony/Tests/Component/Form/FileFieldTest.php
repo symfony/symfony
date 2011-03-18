@@ -242,4 +242,18 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
             'original_name' => ''
         ));
     }
+
+    public function testSubmitGeneratesToken()
+    {
+        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array(), array(), '', false);
+
+        $this->field->submit(array(
+            'file' => $file,
+            'token' => '',
+            'original_name' => ''
+        ));
+
+        $data = $this->field->getDisplayedData();
+        $this->assertNotEmpty($data['token'], '->submit() generates a token when necessary');
+    }
 }

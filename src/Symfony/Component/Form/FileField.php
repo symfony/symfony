@@ -88,6 +88,11 @@ class FileField extends Form
                     throw new FormException('A PHP extension stopped the file upload (UPLOAD_ERR_EXTENSION)');
                 case UPLOAD_ERR_OK:
                 default:
+                    // generate a token in case a field was added via javascript without a token
+                    if (!isset($data['token']) || empty($data['token'])) {
+                        $data['token'] = rand(100000, 999999);
+                    }
+
                     $data['file']->move($this->getTmpDir());
                     $data['file']->rename($this->getTmpName($data['token']));
                     $data['original_name'] = $data['file']->getName();

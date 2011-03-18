@@ -202,3 +202,4 @@ class EventDispatcher implements EventDispatcherInterface
         }
     }
 }
+ 

@@ -136,8 +136,8 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\HttpFoundation\\Response',
             'Symfony\\Component\\HttpFoundation\\ResponseHeaderBag',
 
-            'Symfony\\Component\\EventDispatcher\\EventDispatcher',
             'Symfony\\Component\\EventDispatcher\\EventDispatcherInterface',
+            'Symfony\\Component\\EventDispatcher\\EventDispatcher',
             'Symfony\\Component\\EventDispatcher\\Event',
             'Symfony\\Component\\EventDispatcher\\EventSubscriberInterface',
 

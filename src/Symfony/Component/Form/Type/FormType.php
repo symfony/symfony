@@ -12,13 +12,25 @@
 namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FieldBuilder;
-use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\DataMapper\ObjectMapper;
 use Symfony\Component\Form\Renderer\Plugin\FormPlugin;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class FormType extends AbstractFieldType
 {
+    private $theme;
+
+    private $csrfProvider;
+
+    public function __construct(ThemeInterface $theme, CsrfProviderInterface $csrfProvider)
+    {
+        $this->theme = $theme;
+        $this->csrfProvider = $csrfProvider;
+    }
+
     public function configure(FieldBuilder $builder, array $options)
     {
         $builder->setAttribute('virtual', $options['virtual'])
@@ -46,6 +58,11 @@ class FormType extends AbstractFieldType
             'validation_groups' => null,
             'virtual' => false,
         );
+    }
+
+    public function createBuilder(array $options)
+    {
+        return new FormBuilder($this->theme, new EventDispatcher(), $this->csrfProvider);
     }
 
     public function getParent(array $options)

@@ -29,8 +29,8 @@ class DefaultTypeLoader implements TypeLoaderInterface
             ValidatorInterface $validator, TemporaryStorage $storage,
             EntityManager $em = null)
     {
-        $this->addType(new Type\FieldType($csrfProvider, $theme, $validator));
-        $this->addType(new Type\FormType());
+        $this->addType(new Type\FieldType($theme, $validator));
+        $this->addType(new Type\FormType($theme, $csrfProvider));
         $this->addType(new Type\CheckboxFieldType());
         $this->addType(new Type\ChoiceFieldType());
         $this->addType(new Type\CollectionFieldType());

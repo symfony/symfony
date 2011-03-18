@@ -11,10 +11,8 @@
 
 namespace Symfony\Component\Form\Type;
 
-use Symfony\Component\Form\Field;
 use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\Form\FieldBuilder;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Renderer\DefaultRenderer;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Form\Renderer\Plugin\FieldPlugin;
@@ -27,16 +25,12 @@ use Symfony\Component\Validator\ValidatorInterface;
 
 class FieldType extends AbstractFieldType
 {
-    private $csrfProvider;
-
     private $theme;
 
     private $validator;
 
-    public function __construct(CsrfProviderInterface $csrfProvider,
-            ThemeInterface $theme, ValidatorInterface $validator)
+    public function __construct(ThemeInterface $theme, ValidatorInterface $validator)
     {
-        $this->csrfProvider = $csrfProvider;
         $this->theme = $theme;
         $this->validator = $validator;
     }
@@ -93,7 +87,7 @@ class FieldType extends AbstractFieldType
 
     public function createBuilder(array $options)
     {
-        return new FieldBuilder($this->theme, new EventDispatcher(), $this->csrfProvider);
+        return new FieldBuilder($this->theme, new EventDispatcher());
     }
 
     public function getParent(array $options)

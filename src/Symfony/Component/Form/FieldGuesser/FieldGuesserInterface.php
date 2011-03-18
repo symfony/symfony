@@ -23,9 +23,9 @@ interface FieldGuesserInterface
      *
      * @param  string $class           The fully qualified class name
      * @param  string $property        The name of the property to guess for
-     * @return FieldIdentifierGuess  A guess for the field's identifier and options
+     * @return FieldTypeGuess  A guess for the field's type and options
      */
-    function guessIdentifier($class, $property);
+    function guessType($class, $property);
 
     /**
      * Returns a guess whether a property of a class is required

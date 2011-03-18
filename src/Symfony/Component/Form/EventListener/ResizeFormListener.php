@@ -23,14 +23,14 @@ class ResizeFormListener implements EventSubscriberInterface
 {
     private $factory;
 
-    private $prototype;
+    private $type;
 
     private $resizeOnBind;
 
-    public function __construct(FormFactoryInterface $factory, $prototype, $resizeOnBind = false)
+    public function __construct(FormFactoryInterface $factory, $type, $resizeOnBind = false)
     {
         $this->factory = $factory;
-        $this->prototype = $prototype;
+        $this->type = $type;
         $this->resizeOnBind = $resizeOnBind;
     }
 
@@ -62,7 +62,7 @@ class ResizeFormListener implements EventSubscriberInterface
         }
 
         foreach ($collection as $name => $value) {
-            $form->add($this->factory->create($this->prototype, $name, array(
+            $form->add($this->factory->create($this->type, $name, array(
                 'property_path' => '['.$name.']',
             )));
         }
@@ -88,7 +88,7 @@ class ResizeFormListener implements EventSubscriberInterface
 
         foreach ($data as $name => $value) {
             if (!$form->has($name) && $this->resizeOnBind) {
-                $form->add($this->factory->create($this->prototype, $name, array(
+                $form->add($this->factory->create($this->type, $name, array(
                     'property_path' => '['.$name.']',
                 )));
             }

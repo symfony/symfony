@@ -203,15 +203,15 @@ class FieldBuilder
             throw new UnexpectedTypeException($field, 'FieldInterface or string');
         }
 
-        // TODO turn order of $identifier and $name around
+        // TODO turn order of $type and $name around
 
         if (func_num_args() > 2 || (func_num_args() > 1 && !is_array(func_get_arg(1)))) {
-            $identifier = func_get_arg(0);
+            $type = func_get_arg(0);
             $name = func_get_arg(1);
             $options = func_num_args() > 2 ? func_get_arg(2) : array();
 
             $this->fields[$name] = array(
-                'identifier' => $identifier,
+                'type' => $type,
                 'options' => $options,
             );
 
@@ -243,9 +243,9 @@ class FieldBuilder
             return $this->fields[$name];
         }
 
-        if (isset($this->fields[$name]['identifier'])) {
+        if (isset($this->fields[$name]['type'])) {
             $this->fields[$name] = $this->factory->createBuilder(
-                $this->fields[$name]['identifier'],
+                $this->fields[$name]['type'],
                 $name,
                 $this->fields[$name]['options']
             );

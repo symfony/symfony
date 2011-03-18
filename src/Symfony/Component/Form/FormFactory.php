@@ -11,20 +11,20 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Config\FieldConfigInterface;
-use Symfony\Component\Form\Config\Loader\ConfigLoaderInterface;
+use Symfony\Component\Form\Type\FieldTypeInterface;
+use Symfony\Component\Form\Type\Loader\TypeLoaderInterface;
 use Symfony\Component\Form\FieldGuesser\FieldGuesserInterface;
 use Symfony\Component\Form\FieldGuesser\FieldGuess;
 
 class FormFactory implements FormFactoryInterface
 {
-    private $configLoader;
+    private $typeLoader;
 
     private $guessers = array();
 
-    public function __construct(ConfigLoaderInterface $configLoader)
+    public function __construct(TypeLoaderInterface $typeLoader)
     {
-        $this->configLoader = $configLoader;
+        $this->typeLoader = $typeLoader;
     }
 
     public function addGuesser(FieldGuesserInterface $guesser)
@@ -32,25 +32,25 @@ class FormFactory implements FormFactoryInterface
         $this->guessers[] = $guesser;
     }
 
-    public function createBuilder($identifier, $name = null, array $options = array())
+    public function createBuilder($type, $name = null, array $options = array())
     {
-        // TODO $identifier can be FQN of a config class
+        // TODO $type can be FQN of a type class
 
         $builder = null;
         $hierarchy = array();
 
         // TESTME
         if (null === $name) {
-            $name = $identifier;
+            $name = $type;
         }
 
-        while (null !== $identifier) {
-            // TODO check if identifier exists
-            $config = $this->configLoader->getConfig($identifier);
-            array_unshift($hierarchy, $config);
-            $options = array_merge($config->getDefaultOptions($options), $options);
-            $builder = $builder ?: $config->createBuilder($options);
-            $identifier = $config->getParent($options);
+        while (null !== $type) {
+            // TODO check if type exists
+            $type = $this->typeLoader->getType($type);
+            array_unshift($hierarchy, $type);
+            $options = array_merge($type->getDefaultOptions($options), $options);
+            $builder = $builder ?: $type->createBuilder($options);
+            $type = $type->getParent($options);
         }
 
         // TODO check if instance exists
@@ -58,23 +58,23 @@ class FormFactory implements FormFactoryInterface
         $builder->setName($name);
         $builder->setFormFactory($this);
 
-        foreach ($hierarchy as $config) {
-            $config->configure($builder, $options);
+        foreach ($hierarchy as $type) {
+            $type->configure($builder, $options);
         }
 
         return $builder;
     }
 
-    public function create($identifier, $name = null, array $options = array())
+    public function create($type, $name = null, array $options = array())
     {
-        return $this->createBuilder($identifier, $name, $options)->getInstance();
+        return $this->createBuilder($type, $name, $options)->getInstance();
     }
 
     public function createBuilderForProperty($class, $property, array $options = array())
     {
         // guess field class and options
-        $identifierGuess = $this->guess(function ($guesser) use ($class, $property) {
-            return $guesser->guessIdentifier($class, $property);
+        $typeGuess = $this->guess(function ($guesser) use ($class, $property) {
+            return $guesser->guessType($class, $property);
         });
 
         // guess maximum length
@@ -88,7 +88,7 @@ class FormFactory implements FormFactoryInterface
         });
 
         // construct field
-        $identifier = $identifierGuess ? $identifierGuess->getIdentifier() : 'text';
+        $type = $typeGuess ? $typeGuess->getType() : 'text';
 
         if ($maxLengthGuess) {
             $options = array_merge(array('max_length' => $maxLengthGuess->getValue()), $options);
@@ -99,11 +99,11 @@ class FormFactory implements FormFactoryInterface
         }
 
         // user options may override guessed options
-        if ($identifierGuess) {
-            $options = array_merge($identifierGuess->getOptions(), $options);
+        if ($typeGuess) {
+            $options = array_merge($typeGuess->getOptions(), $options);
         }
 
-        return $this->createBuilder($identifier, $property, $options);
+        return $this->createBuilder($type, $property, $options);
     }
 
     /**

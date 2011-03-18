@@ -13,7 +13,7 @@ namespace Symfony\Tests\Component\Form;
 
 use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Form\Config\Loader\DefaultConfigLoader;
+use Symfony\Component\Form\Type\Loader\DefaultTypeLoader;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class TestCase extends \PHPUnit_Framework_TestCase
@@ -44,7 +44,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $loader = new DefaultConfigLoader();
+        $loader = new DefaultTypeLoader();
         $this->factory = new FormFactory($loader);
         $loader->initialize($this->factory, $this->theme, $this->csrfProvider,
                 $this->validator, $this->storage, $this->em);

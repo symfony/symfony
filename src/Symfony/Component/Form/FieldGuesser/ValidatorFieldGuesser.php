@@ -34,12 +34,12 @@ class ValidatorFieldGuesser implements FieldGuesserInterface
     /**
      * @inheritDoc
      */
-    public function guessIdentifier($class, $property)
+    public function guessType($class, $property)
     {
         $guesser = $this;
 
         return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
-            return $guesser->guessIdentifierForConstraint($constraint);
+            return $guesser->guessTypeForConstraint($constraint);
         });
     }
 
@@ -103,16 +103,16 @@ class ValidatorFieldGuesser implements FieldGuesserInterface
      * Guesses a field class name for a given constraint
      *
      * @param  Constraint $constraint  The constraint to guess for
-     * @return FieldIdentifierGuess  The guessed field class and options
+     * @return FieldTypeGuess  The guessed field class and options
      */
-    public function guessIdentifierForConstraint(Constraint $constraint)
+    public function guessTypeForConstraint(Constraint $constraint)
     {
         switch (get_class($constraint)) {
             case 'Symfony\Component\Validator\Constraints\AssertType':
                 switch ($constraint->type) {
                     case 'boolean':
                     case 'bool':
-                        return new FieldIdentifierGuess(
+                        return new FieldTypeGuess(
                             'checkbox',
                             array(),
                             FieldGuess::MEDIUM_CONFIDENCE
@@ -121,7 +121,7 @@ class ValidatorFieldGuesser implements FieldGuesserInterface
                     case 'float':
                     case 'numeric':
                     case 'real':
-                        return new FieldIdentifierGuess(
+                        return new FieldTypeGuess(
                             'number',
                             array(),
                             FieldGuess::MEDIUM_CONFIDENCE
@@ -129,19 +129,19 @@ class ValidatorFieldGuesser implements FieldGuesserInterface
                     case 'integer':
                     case 'int':
                     case 'long':
-                        return new FieldIdentifierGuess(
+                        return new FieldTypeGuess(
                             'integer',
                             array(),
                             FieldGuess::MEDIUM_CONFIDENCE
                         );
                     case 'string':
-                        return new FieldIdentifierGuess(
+                        return new FieldTypeGuess(
                             'text',
                             array(),
                             FieldGuess::LOW_CONFIDENCE
                         );
                     case '\DateTime':
-                        return new FieldIdentifierGuess(
+                        return new FieldTypeGuess(
                             'date',
                             array(),
                             FieldGuess::MEDIUM_CONFIDENCE
@@ -149,103 +149,103 @@ class ValidatorFieldGuesser implements FieldGuesserInterface
                 }
                 break;
             case 'Symfony\Component\Validator\Constraints\Choice':
-                return new FieldIdentifierGuess(
+                return new FieldTypeGuess(
                     'choice',
                     array('choices' => $constraint->choices),
                     FieldGuess::HIGH_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\Country':
-                return new FieldIdentifierGuess(
+                return new FieldTypeGuess(
                     'country',
                     array(),
                     FieldGuess::HIGH_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\Date':
-                return new FieldIdentifierGuess(
+                return new FieldTypeGuess(
                     'date',
                     array('type' => 'string'),
                     FieldGuess::HIGH_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\DateTime':
-                return new FieldIdentifierGuess(
+                return new FieldTypeGuess(
                     'datetime',
                     array('type' => 'string'),
                     FieldGuess::HIGH_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\Email':
-                return new FieldIdentifierGuess(
+                return new FieldTypeGuess(
                     'text',
                     array(),
                     FieldGuess::HIGH_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\File':
-                return new FieldIdentifierGuess(
+                return new FieldTypeGuess(
                     'file',
                     array(),
                     FieldGuess::HIGH_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\Image':
-                return new FieldIdentifierGuess(
+                return new FieldTypeGuess(
                     'file',
                     array(),
                     FieldGuess::HIGH_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\Ip':
-                return new FieldIdentifierGuess(
+                return new FieldTypeGuess(
                     'text',
                     array(),
                     FieldGuess::MEDIUM_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\Language':
-                return new FieldIdentifierGuess(
+                return new FieldTypeGuess(
                     'language',
                     array(),
                     FieldGuess::HIGH_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\Locale':
-                return new FieldIdentifierGuess(
+                return new FieldTypeGuess(
                     'locale',
                     array(),
                     FieldGuess::HIGH_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\Max':
-                return new FieldIdentifierGuess(
+                return new FieldTypeGuess(
                     'number',
                     array(),
                     FieldGuess::LOW_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\MaxLength':
-                return new FieldIdentifierGuess(
+                return new FieldTypeGuess(
                     'text',
                     array(),
                     FieldGuess::LOW_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\Min':
-                return new FieldIdentifierGuess(
+                return new FieldTypeGuess(
                     'number',
                     array(),
                     FieldGuess::LOW_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\MinLength':
-                return new FieldIdentifierGuess(
+                return new FieldTypeGuess(
                     'text',
                     array(),
                     FieldGuess::LOW_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\Regex':
-                return new FieldIdentifierGuess(
+                return new FieldTypeGuess(
                     'text',
                     array(),
                     FieldGuess::LOW_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\Time':
-                return new FieldIdentifierGuess(
+                return new FieldTypeGuess(
                     'time',
                     array('type' => 'string'),
                     FieldGuess::HIGH_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\Url':
-                return new FieldIdentifierGuess(
+                return new FieldTypeGuess(
                     'url',
                     array(),
                     FieldGuess::HIGH_CONFIDENCE

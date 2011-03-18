@@ -49,7 +49,7 @@ class EntityFieldGuesser implements FieldGuesserInterface
     /**
      * @inheritDoc
      */
-    public function guessIdentifier($class, $property)
+    public function guessType($class, $property)
     {
         if ($this->isMappedClass($class)) {
             $metadata = $this->em->getClassMetadata($class);
@@ -58,7 +58,7 @@ class EntityFieldGuesser implements FieldGuesserInterface
                 $multiple = $metadata->isCollectionValuedAssociation($property);
                 $mapping = $metadata->getAssociationMapping($property);
 
-                return new FieldIdentifierGuess(
+                return new FieldTypeGuess(
                     'entity',
                     array(
                         'em' => $this->em,
@@ -71,13 +71,13 @@ class EntityFieldGuesser implements FieldGuesserInterface
                 switch ($metadata->getTypeOfField($property))
                 {
         //            case 'array':
-        //                return new FieldIdentifierGuess(
+        //                return new FieldTypeGuess(
         //                    'Collection',
         //                    array(),
         //                    FieldGuess::HIGH_CONFIDENCE
         //                );
                     case 'boolean':
-                        return new FieldIdentifierGuess(
+                        return new FieldTypeGuess(
                             'checkbox',
                             array(),
                             FieldGuess::HIGH_CONFIDENCE
@@ -85,20 +85,20 @@ class EntityFieldGuesser implements FieldGuesserInterface
                     case 'datetime':
                     case 'vardatetime':
                     case 'datetimetz':
-                        return new FieldIdentifierGuess(
+                        return new FieldTypeGuess(
                             'datetime',
                             array(),
                             FieldGuess::HIGH_CONFIDENCE
                         );
                     case 'date':
-                        return new FieldIdentifierGuess(
+                        return new FieldTypeGuess(
                             'date',
                             array(),
                             FieldGuess::HIGH_CONFIDENCE
                         );
                     case 'decimal':
                     case 'float':
-                        return new FieldIdentifierGuess(
+                        return new FieldTypeGuess(
                             'number',
                             array(),
                             FieldGuess::MEDIUM_CONFIDENCE
@@ -106,25 +106,25 @@ class EntityFieldGuesser implements FieldGuesserInterface
                     case 'integer':
                     case 'bigint':
                     case 'smallint':
-                        return new FieldIdentifierGuess(
+                        return new FieldTypeGuess(
                             'integer',
                             array(),
                             FieldGuess::MEDIUM_CONFIDENCE
                         );
                     case 'string':
-                        return new FieldIdentifierGuess(
+                        return new FieldTypeGuess(
                             'text',
                             array(),
                             FieldGuess::MEDIUM_CONFIDENCE
                         );
                     case 'text':
-                        return new FieldIdentifierGuess(
+                        return new FieldTypeGuess(
                             'textarea',
                             array(),
                             FieldGuess::MEDIUM_CONFIDENCE
                         );
                     case 'time':
-                        return new FieldIdentifierGuess(
+                        return new FieldTypeGuess(
                             'time',
                             array(),
                             FieldGuess::HIGH_CONFIDENCE
@@ -134,7 +134,7 @@ class EntityFieldGuesser implements FieldGuesserInterface
             }
         }
 
-        return new FieldIdentifierGuess(
+        return new FieldTypeGuess(
             'text',
             array(),
             FieldGuess::LOW_CONFIDENCE

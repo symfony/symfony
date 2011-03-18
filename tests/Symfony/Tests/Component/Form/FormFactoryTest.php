@@ -13,27 +13,27 @@ namespace Symfony\Tests\Component\Form\FormFactory;
 
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FieldGuesser\FieldGuess;
-use Symfony\Component\Form\FieldGuesser\FieldIdentifierGuess;
+use Symfony\Component\Form\FieldGuesser\FieldTypeGuess;
 
 class FormFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    private $configLoader;
+    private $typeLoader;
 
     private $factory;
 
     protected function setUp()
     {
-        $this->configLoader = $this->getMock('Symfony\Component\Form\Config\Loader\ConfigLoaderInterface');
-        $this->factory = new FormFactory($this->configLoader);
+        $this->typeLoader = $this->getMock('Symfony\Component\Form\Type\Loader\TypeLoaderInterface');
+        $this->factory = new FormFactory($this->typeLoader);
     }
 
     public function testCreateBuilderForPropertyCreatesFieldWithHighestConfidence()
     {
         $guesser1 = $this->getMock('Symfony\Component\Form\FieldGuesser\FieldGuesserInterface');
         $guesser1->expects($this->once())
-            ->method('guessIdentifier')
+            ->method('guessType')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(new FieldIdentifierGuess(
+            ->will($this->returnValue(new FieldTypeGuess(
                 'text',
                 array('max_length' => 10),
                 FieldGuess::MEDIUM_CONFIDENCE
@@ -41,9 +41,9 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $guesser2 = $this->getMock('Symfony\Component\Form\FieldGuesser\FieldGuesserInterface');
         $guesser2->expects($this->once())
-            ->method('guessIdentifier')
+            ->method('guessType')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(new FieldIdentifierGuess(
+            ->will($this->returnValue(new FieldTypeGuess(
                 'password',
                 array('max_length' => 7),
                 FieldGuess::HIGH_CONFIDENCE
@@ -67,7 +67,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $guesser = $this->getMock('Symfony\Component\Form\FieldGuesser\FieldGuesserInterface');
         $guesser->expects($this->once())
-                ->method('guessIdentifier')
+                ->method('guessType')
                 ->with('Application\Author', 'firstName')
                 ->will($this->returnValue(null));
 
@@ -88,9 +88,9 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $guesser = $this->getMock('Symfony\Component\Form\FieldGuesser\FieldGuesserInterface');
         $guesser->expects($this->once())
-                ->method('guessIdentifier')
+                ->method('guessType')
                 ->with('Application\Author', 'firstName')
-                ->will($this->returnValue(new FieldIdentifierGuess(
+                ->will($this->returnValue(new FieldTypeGuess(
                     'text',
                     array('max_length' => 10),
                     FieldGuess::MEDIUM_CONFIDENCE
@@ -191,7 +191,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     {
         return $this->getMockBuilder('Symfony\Component\Form\FormFactory')
             ->setMethods($methods)
-            ->setConstructorArgs(array($this->configLoader))
+            ->setConstructorArgs(array($this->typeLoader))
             ->getMock();
     }
 }

@@ -13,11 +13,11 @@ namespace Symfony\Component\Form;
 
 interface FormFactoryInterface
 {
-    function createBuilder($identifier, $name = null, array $options = array());
+    function createBuilder($type, $name = null, array $options = array());
 
     function createBuilderForProperty($class, $property, array $options = array());
 
-    function create($identifier, $name = null, array $options = array());
+    function create($type, $name = null, array $options = array());
 
     function createForProperty($class, $property, array $options = array());
 }

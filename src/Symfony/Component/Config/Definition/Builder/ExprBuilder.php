@@ -19,18 +19,18 @@ namespace Symfony\Component\Config\Definition\Builder;
  */
 class ExprBuilder
 {
-    public $parent;
+    protected $node;
     public $ifPart;
     public $thenPart;
 
     /**
      * Constructor
      *
-     * @param NodeBuilder $parent The parent node
+     * @param NodeDefinition $parent The related node
      */
-    public function __construct(NodeBuilder $parent)
+    public function __construct(NodeDefinition $node)
     {
-        $this->parent = $parent;
+        $this->node = $node;
     }
 
     /**
@@ -183,9 +183,9 @@ class ExprBuilder
     }
 
     /**
-     * Returns the parent node
+     * Returns the related node
      *
-     * @return NodeBuilder
+     * @return NodeDefinition
      */
     public function end()
     {
@@ -196,6 +196,26 @@ class ExprBuilder
             throw new \RuntimeException('You must specify a then part.');
         }
 
-        return $this->parent;
+        return $this->node;
+    }
+
+    /**
+     * Builds the expressions.
+     *
+     * @param array $expressions An array of ExprBuilder instances to build
+     *
+     * @return array
+     */
+    public static function buildExpressions(array $expressions)
+    {
+        foreach ($expressions as $k => $expr) {
+            if ($expr instanceof ExprBuilder) {
+                $expressions[$k] = function($v) use($expr) {
+                    return call_user_func($expr->ifPart, $v) ? call_user_func($expr->thenPart, $v) : $v;
+                };
+            }
+        }
+
+        return $expressions;
     }
 }

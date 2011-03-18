@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\ZendBundle\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 /**
@@ -27,19 +26,23 @@ class Configuration
     /**
      * Generates the configuration tree.
      *
-     * @return \Symfony\Component\Config\Definition\NodeInterface
+     * @return \Symfony\Component\Config\Definition\ArrayNode The config tree
      */
     public function getConfigTree()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('zend', 'array');
+        $rootNode = $treeBuilder->root('zend');
 
         $rootNode
-            ->arrayNode('logger')
-                ->canBeUnset()
-                ->scalarNode('priority')->defaultValue('INFO')->end()
-                ->scalarNode('path')->defaultValue('%kernel.logs_dir%/%kernel.environment%.log')->end()
-                ->booleanNode('log_errors')->defaultFalse()->end()
+            ->children()
+                ->arrayNode('logger')
+                    ->canBeUnset()
+                    ->children()
+                        ->scalarNode('priority')->defaultValue('INFO')->end()
+                        ->scalarNode('path')->defaultValue('%kernel.logs_dir%/%kernel.environment%.log')->end()
+                        ->booleanNode('log_errors')->defaultFalse()->end()
+                    ->end()
+                ->end()
             ->end()
         ;
 

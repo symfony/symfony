@@ -23,7 +23,7 @@
         </service>
 
         <service id="profiler_listener" class="%profiler_listener.class%">
-            <tag name="kernel.listener" event="filterCoreResponse" />
+            <tag name="kernel.listener" event="onCoreResponse" />
             <tag name="kernel.listener" event="onCoreException" />
             <tag name="kernel.listener" event="onCoreRequest" />
             <argument type="service" id="service_container" />

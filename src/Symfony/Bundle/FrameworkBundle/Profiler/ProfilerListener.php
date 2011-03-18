@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * ProfilerListener collects data for the current request by listening to the filterCoreResponse event.
+ * ProfilerListener collects data for the current request by listening to the onCoreResponse event.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -49,7 +49,7 @@ class ProfilerListener
      * Handles the onCoreRequest event
      *
      * This method initialize the profiler to be able to get it as a scoped
-     * service when filterCoreResponse() will collect the sub request
+     * service when onCoreResponse() will collect the sub request
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
      */
@@ -73,11 +73,11 @@ class ProfilerListener
     }
 
     /**
-     * Handles the filterCoreResponse event.
+     * Handles the onCoreResponse event.
      *
      * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
-    public function filterCoreResponse(FilterResponseEvent $event)
+    public function onCoreResponse(FilterResponseEvent $event)
     {
         $response = $event->getResponse();
 
@@ -95,7 +95,7 @@ class ProfilerListener
             $profiler->setParent($parent['request']['profiler']->getToken());
         }
 
-        $profiler->collect($event->getRequest(), $response, $this->exception);
+        $profiler->collect($event->getRequest(), $event->getResponse(), $this->exception);
         $this->exception = null;
     }
 }

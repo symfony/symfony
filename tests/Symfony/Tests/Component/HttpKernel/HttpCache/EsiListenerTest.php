@@ -29,9 +29,9 @@ class EsiListenerTest extends \PHPUnit_Framework_TestCase
         $response = new Response('foo <esi:include src="" />');
         $listener = new EsiListener(new Esi());
 
-        $dispatcher->addEventListener(Events::filterCoreResponse, $listener);
+        $dispatcher->addListener(Events::onCoreResponse, $listener);
         $event = new FilterResponseEvent($kernel, new Request(), HttpKernelInterface::SUB_REQUEST, $response);
-        $dispatcher->dispatchEvent(Events::filterCoreResponse, $event);
+        $dispatcher->dispatch(Events::onCoreResponse, $event);
 
         $this->assertEquals('', $event->getResponse()->headers->get('Surrogate-Control'));
     }
@@ -43,9 +43,9 @@ class EsiListenerTest extends \PHPUnit_Framework_TestCase
         $response = new Response('foo <esi:include src="" />');
         $listener = new EsiListener(new Esi());
 
-        $dispatcher->addEventListener(Events::filterCoreResponse, $listener);
+        $dispatcher->addListener(Events::onCoreResponse, $listener);
         $event = new FilterResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response);
-        $dispatcher->dispatchEvent(Events::filterCoreResponse, $event);
+        $dispatcher->dispatch(Events::onCoreResponse, $event);
 
         $this->assertEquals('content="ESI/1.0"', $event->getResponse()->headers->get('Surrogate-Control'));
     }
@@ -57,9 +57,9 @@ class EsiListenerTest extends \PHPUnit_Framework_TestCase
         $response = new Response('foo');
         $listener = new EsiListener(new Esi());
 
-        $dispatcher->addEventListener(Events::filterCoreResponse, $listener);
+        $dispatcher->addListener(Events::onCoreResponse, $listener);
         $event = new FilterResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response);
-        $dispatcher->dispatchEvent(Events::filterCoreResponse, $event);
+        $dispatcher->dispatch(Events::onCoreResponse, $event);
 
         $this->assertEquals('', $event->getResponse()->headers->get('Surrogate-Control'));
     }

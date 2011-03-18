@@ -34,7 +34,7 @@ class RegisterKernelListenersPass implements CompilerPassInterface
                     throw new \InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "kernel.listener" tags.', $id));
                 }
 
-                $definition->addMethodCall('addEventListenerService', array($event['event'], $id, $priority));
+                $definition->addMethodCall('addListenerService', array($event['event'], $id, $priority));
             }
         }
     }

@@ -56,7 +56,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
      *                              listener will be triggered in the chain.
      *                              Defaults to 0.
      */
-    public function addEventListenerService($events, $serviceId, $priority = 0)
+    public function addListenerService($events, $serviceId, $priority = 0)
     {
         if (!is_string($serviceId)) {
             throw new \InvalidArgumentException('Expected a string argument');
@@ -74,14 +74,14 @@ class ContainerAwareEventDispatcher extends EventDispatcher
      * Lazily loads listeners for this event from the dependency injection
      * container.
      */
-    public function dispatchEvent($eventName, Event $event = null)
+    public function dispatch($eventName, Event $event = null)
     {
         if (isset($this->listenerIds[$eventName])) {
             foreach ($this->listenerIds[$eventName] as $serviceId => $priority) {
-                $this->addEventListener($eventName, $this->container->get($serviceId), $priority);
+                $this->addListener($eventName, $this->container->get($serviceId), $priority);
             }
         }
 
-        parent::dispatchEvent($eventName, $event);
+        parent::dispatch($eventName, $event);
     }
 }

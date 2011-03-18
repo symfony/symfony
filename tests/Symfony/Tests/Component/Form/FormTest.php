@@ -299,6 +299,9 @@ class FormTest extends TestCase
 
     public function testBindReadsRequestData()
     {
+        $path = tempnam(sys_get_temp_dir(), 'sf2');
+        touch($path);
+
         $values = array(
             'author' => array(
                 'name' => 'Bernhard',
@@ -310,7 +313,7 @@ class FormTest extends TestCase
                 'error' => array('image' => array('file' => UPLOAD_ERR_OK)),
                 'name' => array('image' => array('file' => 'upload.png')),
                 'size' => array('image' => array('file' => 123)),
-                'tmp_name' => array('image' => array('file' => 'abcdef.png')),
+                'tmp_name' => array('image' => array('file' => $path)),
                 'type' => array('image' => array('file' => 'image/png')),
         ),
         );
@@ -324,7 +327,7 @@ class FormTest extends TestCase
 
         $form->bindRequest($this->createPostRequest($values, $files));
 
-        $file = new UploadedFile('abcdef.png', 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
+        $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
         $this->assertEquals('Bernhard', $form['name']->getData());
         $this->assertEquals('foobar.png', $form['image']['filename']->getData());

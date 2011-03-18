@@ -50,7 +50,7 @@ class SwiftmailerExtension extends Extension
 
         $configuration = new Configuration();
         $processor = new Processor();
-        $config = $processor->process($configuration->getConfigTree(), $configs);
+        $config = $processor->process($configuration->getConfigTree($container->getParameter('kernel.debug')), $configs);
 
         if (null === $config['transport']) {
             $transport = 'null';

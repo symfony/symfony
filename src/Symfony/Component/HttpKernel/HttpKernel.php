@@ -89,7 +89,7 @@ class HttpKernel implements HttpKernelInterface
     {
         // request
         $event = new GetResponseEvent($this, $request, $type);
-        $this->dispatcher->dispatchEvent(Events::onCoreRequest, $event);
+        $this->dispatcher->dispatch(Events::onCoreRequest, $event);
 
         if ($event->hasResponse()) {
             return $this->filterResponse($event->getResponse(), $request, $type);
@@ -101,7 +101,7 @@ class HttpKernel implements HttpKernelInterface
         }
 
         $event = new FilterControllerEvent($this, $controller, $request, $type);
-        $this->dispatcher->dispatchEvent(Events::filterCoreController, $event);
+        $this->dispatcher->dispatch(Events::onCoreController, $event);
         $controller = $event->getController();
 
         // controller arguments
@@ -113,7 +113,7 @@ class HttpKernel implements HttpKernelInterface
         // view
         if (!$response instanceof Response) {
             $event = new GetResponseForControllerResultEvent($this, $request, $type, $response);
-            $this->dispatcher->dispatchEvent(Events::onCoreView, $event);
+            $this->dispatcher->dispatch(Events::onCoreView, $event);
 
             if ($event->hasResponse()) {
                 $response = $event->getResponse();
@@ -142,7 +142,7 @@ class HttpKernel implements HttpKernelInterface
     {
         $event = new FilterResponseEvent($this, $request, $type, $response);
 
-        $this->dispatcher->dispatchEvent(Events::filterCoreResponse, $event);
+        $this->dispatcher->dispatch(Events::onCoreResponse, $event);
 
         return $event->getResponse();
     }
@@ -159,7 +159,7 @@ class HttpKernel implements HttpKernelInterface
     protected function handleException(\Exception $e, $request, $type)
     {
         $event = new GetResponseForExceptionEvent($this, $request, $type, $e);
-        $this->dispatcher->dispatchEvent(Events::onCoreException, $event);
+        $this->dispatcher->dispatch(Events::onCoreException, $event);
 
         if (!$event->hasResponse()) {
             throw $e;

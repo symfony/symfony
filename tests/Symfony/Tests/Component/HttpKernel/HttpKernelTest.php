@@ -43,7 +43,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     public function testHandleWhenControllerThrowsAnExceptionAndRawIsFalse()
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addEventListener(Events::onCoreException, function ($event)
+        $dispatcher->addListener(Events::onCoreException, function ($event)
         {
             $event->setResponse(new Response($event->getException()->getMessage()));
         });
@@ -56,7 +56,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     public function testHandleWhenAListenerReturnsAResponse()
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addEventListener(Events::onCoreRequest, function ($event)
+        $dispatcher->addListener(Events::onCoreRequest, function ($event)
         {
             $event->setResponse(new Response('hello'));
         });
@@ -102,7 +102,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     public function testHandleWhenControllerDoesNotReturnAResponseButAViewIsRegistered()
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addEventListener(Events::onCoreView, function ($event)
+        $dispatcher->addListener(Events::onCoreView, function ($event)
         {
             $event->setResponse(new Response($event->getControllerResult()));
         });
@@ -114,7 +114,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     public function testHandleWithAResponseListener()
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addEventListener(Events::filterCoreResponse, function ($event)
+        $dispatcher->addListener(Events::onCoreResponse, function ($event)
         {
             $event->setResponse(new Response('foo'));
         });

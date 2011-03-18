@@ -41,28 +41,33 @@ class FileFormFieldTest extends FormFieldTestCase
         }
     }
 
-    public function testSetValue()
+    /**
+     * @dataProvider getSetValueMethods
+     */
+    public function testSetValue($method)
     {
         $node = $this->createNode('input', '', array('type' => 'file'));
         $field = new FileFormField($node);
 
-        $field->setValue(null);
-        $this->assertEquals(array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => UPLOAD_ERR_NO_FILE, 'size' => 0), $field->getValue(), '->setValue() clears the uploaded file if the value is null');
+        $field->$method(null);
+        $this->assertEquals(array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => UPLOAD_ERR_NO_FILE, 'size' => 0), $field->getValue(), "->$method() clears the uploaded file if the value is null");
 
-        $field->setValue(__FILE__);
-        $this->assertEquals(array('name' => 'FileFormFieldTest.php', 'type' => '', 'tmp_name' => __FILE__, 'error' => 0, 'size' => filesize(__FILE__)), $field->getValue(), '->setValue() sets the value to the given file');
+        $field->$method(__FILE__);
+        $value = $field->getValue();
+
+        $this->assertEquals(basename(__FILE__), $value['name'], "->$method() sets the name of the file field");
+        $this->assertEquals('', $value['type'], "->$method() sets the type of the file field");
+        $this->assertInternalType('string', $value['tmp_name'], "->$method() sets the tmp_name of the file field");
+        $this->assertEquals(0, $value['error'], "->$method() sets the error of the file field");
+        $this->assertEquals(filesize(__FILE__), $value['size'], "->$method() sets the size of the file field");
     }
 
-    public function testUpload()
+    public function getSetValueMethods()
     {
-        $node = $this->createNode('input', '', array('type' => 'file'));
-        $field = new FileFormField($node);
-
-        $field->upload(null);
-        $this->assertEquals(array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => UPLOAD_ERR_NO_FILE, 'size' => 0), $field->getValue(), '->upload() clears the uploaded file if the value is null');
-
-        $field->upload(__FILE__);
-        $this->assertEquals(array('name' => 'FileFormFieldTest.php', 'type' => '', 'tmp_name' => __FILE__, 'error' => 0, 'size' => filesize(__FILE__)), $field->getValue(), '->upload() sets the value to the given file');
+        return array(
+            array('setValue'),
+            array('upload'),
+        );
     }
 
     public function testSetErrorCode()

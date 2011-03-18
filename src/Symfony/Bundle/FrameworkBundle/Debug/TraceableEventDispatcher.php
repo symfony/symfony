@@ -55,8 +55,8 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
         }
 
         $this->called[$eventName.'.'.$listenerString] = array(
-            'event'    => $eventName,
-            'listener' => $listenerString,
+            'class' => $listenerString,
+            'event' => $eventName,
         );
 
         if ($event->isPropagationStopped() && null !== $this->logger) {
@@ -94,12 +94,11 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
 
         foreach (array_keys($this->getListeners()) as $name) {
             foreach ($this->getListeners($name) as $listener) {
-                $listener = $this->listenerToString($listener, $name);
-
+                $listener = $this->listenerToString($listener);
                 if (!isset($this->called[$name.'.'.$listener])) {
                     $notCalled[] = array(
-                        'event'    => $name,
-                        'listener' => $listener,
+                        'class' => $listener,
+                        'event' => $name,
                     );
                 }
             }
@@ -108,18 +107,18 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
         return $notCalled;
     }
 
-    protected function listenerToString($listener, $eventName)
+    protected function listenerToString($listener)
     {
         if (is_object($listener)) {
             if ($listener instanceof \Closure) {
                 return 'Closure';
             }
 
-            return get_class($listener).'::'.$eventName;
+            return get_class($listener);
         }
 
         if (is_array($listener)) {
-            return is_object($listener[0]) ? sprintf('%s::%s', get_class($listener[0]), $listener[1]) : implode('::', $listener);
+            return is_object($listener[0]) ? get_class($listener[0]) : implode('::', $listener);
         }
     }
 }

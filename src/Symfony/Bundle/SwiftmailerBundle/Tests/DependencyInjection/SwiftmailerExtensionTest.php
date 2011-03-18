@@ -20,6 +20,7 @@ class SwiftmailerExtensionTest extends TestCase
     public function testConfigLoad()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
         $loader = new SwiftmailerExtension();
 
         $loader->load(array(array()), $container);
@@ -37,6 +38,7 @@ class SwiftmailerExtensionTest extends TestCase
     public function testSpool()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
         $loader = new SwiftmailerExtension();
 
         $loader->load(array(array('spool' => array())), $container);

@@ -131,7 +131,7 @@ class SwitchUserListener implements ListenerInterface
 
         if (null !== $this->dispatcher) {
             $switchEvent = new SwitchUserEvent($request, $token->getUser());
-            $this->dispatcher->dispatchEvent(Events::onSecuritySwitchUser, $switchEvent);
+            $this->dispatcher->dispatch(Events::onSecuritySwitchUser, $switchEvent);
         }
 
         return $token;
@@ -152,7 +152,7 @@ class SwitchUserListener implements ListenerInterface
 
         if (null !== $this->dispatcher) {
             $switchEvent = new SwitchUserEvent($request, $original->getUser());
-            $this->dispatcher->dispatchEvent(Events::onSecuritySwitchUser, $switchEvent);
+            $this->dispatcher->dispatch(Events::onSecuritySwitchUser, $switchEvent);
         }
 
         return $original;

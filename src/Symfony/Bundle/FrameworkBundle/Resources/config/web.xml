@@ -33,7 +33,7 @@
         </service>
 
         <service id="response_listener" class="%response_listener.class%">
-            <tag name="kernel.listener" event="filterCoreResponse" />
+            <tag name="kernel.listener" event="onCoreResponse" />
             <argument>%kernel.charset%</argument>
         </service>
 

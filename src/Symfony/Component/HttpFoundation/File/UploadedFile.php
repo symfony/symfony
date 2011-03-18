@@ -12,89 +12,80 @@
 namespace Symfony\Component\HttpFoundation\File;
 
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\File\Exception\UploadException;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 
 /**
  * A file uploaded through a form.
  *
- * @author     Bernhard Schussek <bernhard.schussek@symfony.com>
- * @author     Florian Eckerstorfer <florian@eckerstorfer.org>
+ * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
 class UploadedFile extends File
 {
     /**
-     * The original name of the uploaded file
+     * The original name of the uploaded file.
+     *
      * @var string
      */
     protected $originalName;
 
     /**
-     * The mime type provided by the uploader
+     * The mime type provided by the uploader.
+     *
      * @var string
      */
     protected $mimeType;
 
     /**
-     * The file size provided by the uploader
+     * The file size provided by the uploader.
+     *
      * @var integer
      */
     protected $size;
 
     /**
-     * The UPLOAD_ERR_XXX constant provided by the uploader
+     * The UPLOAD_ERR_XXX constant provided by the uploader.
+     *
      * @var integer
      */
     protected $error;
 
     /**
-     * Whether the uploaded file has already been moved
-     * @var boolean
+     * Whether the uploaded file has already been moved.
+     *
+     * @var Boolean
      */
-    protected $moved = false;
+    protected $moved;
 
     /**
-     * Accepts the information of the uploaded file as provided by the PHP
-     * global $_FILES.
+     * Accepts the information of the uploaded file as provided by the PHP global $_FILES.
      *
-     * @param string  $tmpName  The full temporary path to the file
-     * @param string  $name     The original file name
-     * @param string  $type     The type of the file as provided by PHP
-     * @param integer $size     The file size
-     * @param string  $error    The error constant of the upload. Should be
-     *                          one of PHP's UPLOAD_ERR_XXX constants.
+     * @param string  $path         The full temporary path to the file
+     * @param string  $originalName The original file name
+     * @param string  $mimeType     The type of the file as provided by PHP
+     * @param integer $size         The file size
+     * @param integer $error        The error constant of the upload (one of PHP's UPLOAD_ERR_XXX constants)
+     * @param Boolean $moved        Whether the file has been moved from its original location
+     *
+     * @throws FileException         If file_uploads is disabled
+     * @throws FileNotFoundException If the file does not exist
      */
-    public function __construct($path, $originalName, $mimeType, $size, $error)
+    public function __construct($path, $originalName, $mimeType, $size, $error, $moved = false)
     {
         if (!ini_get('file_uploads')) {
             throw new FileException(sprintf('Unable to create UploadedFile because "file_uploads" is disabled in your php.ini file (%s)', get_cfg_var('cfg_file_path')));
         }
 
-        if (null === $error) {
-            $error = UPLOAD_ERR_OK;
+        if (!is_file($path)) {
+            throw new FileNotFoundException($path);
         }
 
-        switch ($error) {
-            // TESTME
-            case UPLOAD_ERR_NO_TMP_DIR:
-                throw new UploadException('Could not upload a file because a temporary directory is missing (UPLOAD_ERR_NO_TMP_DIR)');
-            case UPLOAD_ERR_CANT_WRITE:
-                throw new UploadException('Could not write file to disk (UPLOAD_ERR_CANT_WRITE)');
-            case UPLOAD_ERR_EXTENSION:
-                throw new UploadException('A PHP extension stopped the file upload (UPLOAD_ERR_EXTENSION)');
-        }
-
-        if (is_file($path)) {
-            $this->path = realpath($path);
-        }
-
-        if (null === $mimeType) {
-            $mimeType = 'application/octet-stream';
-        }
-
-        $this->originalName = (string)$originalName;
-        $this->mimeType = $mimeType;
+        $this->path = realpath($path);
+        $this->originalName = $originalName;
+        $this->mimeType = $mimeType ?: 'application/octet-stream';
         $this->size = $size;
-        $this->error = $error;
+        $this->error = $error ?: UPLOAD_ERR_OK;
+        $this->moved = (Boolean) $moved;
     }
 
     /**
@@ -102,28 +93,25 @@ class UploadedFile extends File
      */
     public function getMimeType()
     {
-        $mimeType = parent::getMimeType();
-
-        if (null === $mimeType) {
-            $mimeType = $this->mimeType;
-        }
-
-        return $mimeType;
+        return parent::getMimeType() ?: $this->mimeType;
     }
 
     /**
-     * Returns the absolute file name without dots
+     * @inheritDoc
+     */
+    public function getSize()
+    {
+        return null === $this->size ? parent::getSize() : $this->size;
+    }
+
+    /**
+     * Returns the absolute file name without dots.
      *
-     * Until the uploaded file is moved, it will return the name of the temporary file
-     *
-     * @returns string  The file path
+     * @return string The file path
      */
     public function getName()
     {
-        if (!$this->moved) {
-            return $this->originalName;
-        }
-        return parent::getName();
+        return $this->moved ? parent::getName() : $this->originalName;
     }
 
     /**
@@ -132,7 +120,7 @@ class UploadedFile extends File
      * If the upload was successful, the constant UPLOAD_ERR_OK is returned.
      * Otherwise one of the other UPLOAD_ERR_XXX constants is returned.
      *
-     * @returns integer  The upload error
+     * @return integer The upload error
      */
     public function getError()
     {
@@ -186,18 +174,18 @@ class UploadedFile extends File
      */
     protected function doMove($directory, $filename)
     {
-        if (!$this->moved) {
-            $newPath = $directory . DIRECTORY_SEPARATOR . $filename;
-
-            if (!move_uploaded_file($this->getPath(), $newPath)) {
-                throw new FileException(sprintf('Could not move file %s to %s', $this->getPath(), $newPath));
-            }
-
-            $this->moved = true;
-            $this->path = realpath($newPath);
-        } else {
-            parent::doMove($directory, $filename);
+        if ($this->moved) {
+            return parent::doMove($directory, $filename);
         }
+
+        $newPath = $directory . DIRECTORY_SEPARATOR . $filename;
+
+        if (!move_uploaded_file($this->getPath(), $newPath)) {
+            throw new FileException(sprintf('Could not move file %s to %s', $this->getPath(), $newPath));
+        }
+
+        $this->moved = true;
+        $this->path = realpath($newPath);
     }
 
     /**
@@ -205,14 +193,14 @@ class UploadedFile extends File
      */
     public function move($directory, $name = null)
     {
-        if (!$this->moved) {
-            $this->doMove($directory, $this->originalName);
+        if ($this->moved) {
+            return parent::move($directory, $name);
+        }
 
-            if (null !== $name) {
-                $this->rename($name);
-            }
-        } else {
-            parent::move($directory, $name);
+        $this->doMove($directory, $this->originalName);
+
+        if (null !== $name) {
+            $this->rename($name);
         }
     }
 }

@@ -48,7 +48,7 @@ class DumpCommand extends Command
 
         // notify an event so custom stream wrappers can be registered lazily
         $event = new WriteEvent($basePath);
-        $this->container->get('event_dispatcher')->dispatchEvent(Events::onAsseticWrite, $writeEvent);
+        $this->container->get('event_dispatcher')->dispatch(Events::onAsseticWrite, $writeEvent);
 
         if ($input->getOption('watch')) {
             return $this->watch($am, $basePath, $output, $this->container->getParameter('kernel.debug'));

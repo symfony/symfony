@@ -32,7 +32,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         );
 
         foreach ($subscribers as $id => $instances) {
-            $definition->addMethodCall('addSubscriber', array(new Reference($id)));
+            $definition->addMethodCall('addEventSubscriber', array(new Reference($id)));
         }
     }
 

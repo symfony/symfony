@@ -174,7 +174,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         $this->securityContext->setToken(null);
 
         if (null !== $this->failureHandler) {
-            return $this->failureHandler->onAuthenticationFailure($event, $request, $failed);
+            return $this->failureHandler->onAuthenticationFailure($request, $failed);
         }
 
         if (null === $this->options['failure_path']) {
@@ -219,7 +219,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         }
 
         if (null !== $this->successHandler) {
-            $response = $this->successHandler->onAuthenticationSuccess($event, $request, $token);
+            $response = $this->successHandler->onAuthenticationSuccess($request, $token);
         } else {
             $path = $this->determineTargetUrl($request);
             $response = new RedirectResponse(0 !== strpos($path, 'http') ? $request->getUriForPath($path) : $path, 302);

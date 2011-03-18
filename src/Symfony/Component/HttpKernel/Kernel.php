@@ -427,12 +427,12 @@ abstract class Kernel implements KernelInterface
     {
         $class = $this->getContainerClass();
         $cache = new ConfigCache($this->getCacheDir().'/'.$class.'.php', $this->debug);
-        $fresh = false;
+        $fresh = true;
         if (!$cache->isFresh()) {
             $container = $this->buildContainer();
             $this->dumpContainer($cache, $container, $class);
 
-            $fresh = true;
+            $fresh = false;
         }
 
         require_once $cache;
@@ -440,7 +440,7 @@ abstract class Kernel implements KernelInterface
         $this->container = new $class();
         $this->container->set('kernel', $this);
 
-        if ($fresh && 'cli' !== php_sapi_name()) {
+        if (!$fresh && 'cli' !== php_sapi_name()) {
             $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
         }
     }

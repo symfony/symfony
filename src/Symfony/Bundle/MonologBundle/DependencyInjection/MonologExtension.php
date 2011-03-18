@@ -125,6 +125,6 @@ class MonologExtension extends Extension
 
     public function getNamespace()
     {
-        return 'http://www.symfony-project.org/schema/dic/monolog';
+        return 'http://symfony.com/schema/dic/monolog';
     }
 }

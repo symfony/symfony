@@ -59,13 +59,13 @@ class TemplateCacheCacheWarmer extends CacheWarmer
         $twig = $this->container->get('twig');
 
         foreach ($this->kernel->getBundles() as $name => $bundle) {
-            foreach ($this->findTemplatesIn($bundle->getPath().self::TEMPLATES_PATH_IN_BUNDLE, $name) as $file) {
-                $twig->loadTemplate($file);
+            foreach ($this->findTemplatesIn($bundle->getPath().self::TEMPLATES_PATH_IN_BUNDLE, $name) as $template) {
+                $twig->loadTemplate($template);
             }
         }
 
-        foreach ($this->findTemplatesIn($this->rootDir) as $file) {
-            $twig->loadTemplate($file);
+        foreach ($this->findTemplatesIn($this->rootDir) as $template) {
+            $twig->loadTemplate($template);
         }
     }
 
@@ -85,7 +85,7 @@ class TemplateCacheCacheWarmer extends CacheWarmer
      * @param string $dir       The folder where to look for templates
      * @param string $bundle    The name of the bundle (null when out of a bundle)
      *
-     * @return array An array of template paths
+     * @return array An array of TemplateReference
      */
     protected function findTemplatesIn($dir, $bundle = null)
     {

@@ -153,12 +153,12 @@ class FrameworkExtension extends Extension
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
 
-            'Symfony\\Bundle\\FrameworkBundle\\ContainerAwareEventDispatcher',
-
             'Symfony\\Component\\EventDispatcher\\EventDispatcher',
             'Symfony\\Component\\EventDispatcher\\EventDispatcherInterface',
             'Symfony\\Component\\EventDispatcher\\Event',
             'Symfony\\Component\\EventDispatcher\\EventSubscriberInterface',
+
+            'Symfony\\Bundle\\FrameworkBundle\\ContainerAwareEventDispatcher',
         ));
     }
 

@@ -158,6 +158,14 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
+     * @see EventDispatcherInterface::removeSubscriber
+     */
+    public function removeSubscriber(EventSubscriberInterface $subscriber)
+    {
+        $this->removeListener($subscriber->getSubscribedEvents(), $subscriber);
+    }
+
+    /**
      * Triggers the listener method for an event.
      *
      * This method can be overridden to add functionality that is executed

@@ -164,7 +164,7 @@ class DefaultRenderer implements RendererInterface, \ArrayAccess
 
     public function getEnctype()
     {
-        return $this->render('enctype', $vars);
+        return $this->render('enctype', $this->vars);
     }
 
     protected function render($block, array $vars = array())

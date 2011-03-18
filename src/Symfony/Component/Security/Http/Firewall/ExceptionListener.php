@@ -78,7 +78,7 @@ class ExceptionListener
             }
 
             try {
-                $response = $this->startAuthentication($event, $request, $exception);
+                $response = $this->startAuthentication($request, $exception);
             } catch (\Exception $e) {
                 $event->set('exception', $e);
 
@@ -92,7 +92,7 @@ class ExceptionListener
                 }
 
                 try {
-                    $response = $this->startAuthentication($event, $request, new InsufficientAuthenticationException('Full authentication is required to access this resource.', $token, 0, $exception));
+                    $response = $this->startAuthentication($request, new InsufficientAuthenticationException('Full authentication is required to access this resource.', $token, 0, $exception));
                 } catch (\Exception $e) {
                     $event->set('exception', $e);
 
@@ -105,7 +105,7 @@ class ExceptionListener
 
                 try {
                     if (null !== $this->accessDeniedHandler) {
-                        $response = $this->accessDeniedHandler->handle($event, $request, $exception);
+                        $response = $this->accessDeniedHandler->handle($request, $exception);
 
                         if (!$response instanceof Response) {
                             return;
@@ -155,6 +155,6 @@ class ExceptionListener
             $request->getSession()->set('_security.target_path', $request->getUri());
         }
 
-        return $this->authenticationEntryPoint->start($event, $request, $authException);
+        return $this->authenticationEntryPoint->start($request, $authException);
     }
 }

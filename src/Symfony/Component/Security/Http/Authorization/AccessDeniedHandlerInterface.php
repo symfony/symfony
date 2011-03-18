@@ -18,11 +18,10 @@ interface AccessDeniedHandlerInterface
     /**
      * Handles an access denied failure.
      *
-     * @param GetResponseForExceptionEvent $event
      * @param Request                      $request
      * @param AccessDeniedException        $accessDeniedException
      *
      * @return Response may return null
      */
-    function handle(GetResponseForExceptionEvent $event, Request $request, AccessDeniedException $accessDeniedException);
+    function handle(Request $request, AccessDeniedException $accessDeniedException);
 }

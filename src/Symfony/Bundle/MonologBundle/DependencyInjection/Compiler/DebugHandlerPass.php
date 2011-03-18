@@ -18,14 +18,12 @@ use Symfony\Component\DependencyInjection\Definition;
 use Monolog\Logger;
 
 /**
- * Replaces the default logger by another one with its own channel for tagged services.
+ * Adds the DebugHandler when the profiler is enabled.
  *
  * @author Christophe Coevoet <stof@notk.org>
  */
 class DebugHandlerPass implements CompilerPassInterface
 {
-    protected $channels = array();
-
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('monolog.logger_prototype') || !$container->hasDefinition('profiler')) {

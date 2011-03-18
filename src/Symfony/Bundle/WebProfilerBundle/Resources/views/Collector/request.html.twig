@@ -6,7 +6,14 @@
     {% endset %}
     {% set text %}
         {% spaceless %}
-            <span>{% if collector.controller.class is defined %}{{ collector.controller.class|abbr_class }}::<a style="color: #2f2f2f" href="{{ collector.controller.file|file_link(collector.controller.line) }}">{{ collector.controller.method }}</a>{% else %}{{ collector.controller }}{% endif %}</span>
+            {% if collector.controller.class is defined %}
+                <span>{{ collector.controller.class|abbr_class }}</span>
+                <span>::</span>
+                {% set link = collector.controller.file|file_link(collector.controller.line) %}
+                <span>{% if link %}<a style="color: #2f2f2f" href="{{ link }}">{{ collector.controller.method }}</a>{% else %}{{ collector.controller.method }}{% endif %}</span>
+            {% else %}
+                <span>{{ collector.controller }}</span>
+            {% endif %}
             <span style="margin: 0; padding: 0; color: #979696;">|</span>
             <span{{ not collector.route ? ' style="color:#a33"' : '' }}>{{ collector.route ? collector.route : 'NONE' }}</span>
             <span style="margin: 0; padding: 0; color: #979696;">|</span>

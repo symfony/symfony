@@ -8,7 +8,7 @@
         <parameter key="twig.class">Twig_Environment</parameter>
         <parameter key="twig.loader.class">Symfony\Bundle\TwigBundle\Loader\FilesystemLoader</parameter>
         <parameter key="templating.engine.twig.class">Symfony\Bundle\TwigBundle\TwigEngine</parameter>
-        <parameter key="templating.cache_warmer.templates_cache.class">Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheCacheWarmer</parameter>
+        <parameter key="twig.cache_warmer.class">Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheCacheWarmer</parameter>
     </parameters>
 
     <services>
@@ -17,7 +17,7 @@
             <argument>%twig.options%</argument>
         </service>
 
-        <service id="templating.cache_warmer.templates_cache" class="%templating.cache_warmer.templates_cache.class%" public="false">
+        <service id="twig.cache_warmer" class="%twig.cache_warmer.class%" public="false">
             <argument type="service" id="service_container" />
             <argument>%kernel.root_dir%/views</argument>
         </service>

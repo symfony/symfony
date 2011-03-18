@@ -59,8 +59,6 @@ class MonologExtension extends Extension
                 $handlers[] = $this->buildHandler($container, $name, $handler);
             }
 
-            // TODO somehow the DebugLogger should be pushed on the stack as well, or that concept needs to be changed
-            // didn't have to investigate yet what it is exactly
             $handlers = array_reverse($handlers);
             foreach ($handlers as $handler) {
                 $logger->addMethodCall('pushHandler', array(new Reference($handler)));
@@ -94,7 +92,7 @@ class MonologExtension extends Extension
             $handler['action_level'] = is_int($handler['action_level']) ? $handler['action_level'] : constant('Monolog\Logger::'.strtoupper($handler['action_level']));
 
             $definition->setArguments(array(
-                $this->buildHandler($container, $handler['handler']),
+                new Reference($this->buildHandler($container, sprintf('%s.real', $name), $handler['handler'])),
                 $handler['action_level'],
                 isset($handler['buffer_size']) ? $handler['buffer_size'] : 0,
                 $handler['bubble'],

@@ -19,6 +19,7 @@
 
         <service id="templating.cache_warmer.templates_cache" class="%templating.cache_warmer.templates_cache.class%" public="false">
             <argument type="service" id="service_container" />
+            <argument>%kernel.root_dir%/views</argument>
         </service>
 
         <service id="twig.loader" class="%twig.loader.class%">

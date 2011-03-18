@@ -54,16 +54,6 @@ interface FieldInterface
     function getName();
 
     /**
-     * Sets the property path
-     *
-     * The property path determines the property or a sequence of properties
-     * that a field updates in the data of the form.
-     *
-     * @param string $propertyPath
-     */
-    function setPropertyPath($propertyPath);
-
-    /**
      * Returns the property path of the field
      *
      * @return PropertyPath
@@ -132,13 +122,6 @@ interface FieldInterface
      * @return boolean
      */
     function isEmpty();
-
-    /**
-     * Sets whether this field is required to be filled out when bound.
-     *
-     * @param Boolean $required
-     */
-    function setRequired($required);
 
     /**
      * Writes posted data into the field

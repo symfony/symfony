@@ -11,19 +11,19 @@
 
 namespace Symfony\Component\Form\Config;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\ValueTransformer\ValueToDuplicatesTransformer;
 
 class RepeatedFieldConfig extends AbstractFieldConfig
 {
-    public function configure(FieldInterface $field, array $options)
+    public function configure(FieldBuilder $builder, array $options)
     {
-        $field->setValueTransformer(new ValueToDuplicatesTransformer(array(
+        $builder->setValueTransformer(new ValueToDuplicatesTransformer(array(
                 $options['first_name'],
                 $options['second_name'],
             )))
-            ->add($this->getInstance($options['identifier'], $options['first_name'], $options['options']))
-            ->add($this->getInstance($options['identifier'], $options['second_name'], $options['options']));
+            ->add($options['identifier'], $options['first_name'], $options['options'])
+            ->add($options['identifier'], $options['second_name'], $options['options']);
     }
 
     public function getDefaultOptions(array $options)

@@ -12,47 +12,47 @@
 namespace Symfony\Component\Form\Config;
 
 use Symfony\Component\Form\Field;
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Renderer\DefaultRenderer;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Form\Renderer\Plugin\FieldPlugin;
 use Symfony\Component\Form\EventListener\TrimListener;
 use Symfony\Component\Form\EventListener\ValidationListener;
+use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Validator\ValidatorInterface;
 
 class FieldConfig extends AbstractFieldConfig
 {
+    private $csrfProvider;
+
     private $theme;
 
     private $validator;
 
-    public function __construct(FormFactoryInterface $factory,
+    public function __construct(CsrfProviderInterface $csrfProvider,
             ThemeInterface $theme, ValidatorInterface $validator)
     {
-        parent::__construct($factory);
-
+        $this->csrfProvider = $csrfProvider;
         $this->theme = $theme;
         $this->validator = $validator;
     }
 
-    public function configure(FieldInterface $field, array $options)
+    public function configure(FieldBuilder $builder, array $options)
     {
-        $field->setPropertyPath($options['property_path'] === false
-                    ? $field->getName()
-                    : $options['property_path'])
+        $builder->setPropertyPath($options['property_path'])
             ->setRequired($options['required'])
             ->setDisabled($options['disabled'])
             ->setValueTransformer($options['value_transformer'])
             ->setNormalizationTransformer($options['normalization_transformer'])
             ->addEventSubscriber(new ValidationListener($this->validator), -128)
             ->setData($options['data'])
-            ->setRenderer(new DefaultRenderer($field, $this->theme, $options['template']))
+            ->setRenderer(new DefaultRenderer($this->theme, $options['template']))
             ->addRendererPlugin(new FieldPlugin());
 
         if ($options['trim']) {
-            $field->addEventSubscriber(new TrimListener());
+            $builder->addEventSubscriber(new TrimListener());
         }
     }
 
@@ -70,9 +70,9 @@ class FieldConfig extends AbstractFieldConfig
         );
     }
 
-    public function createInstance($name)
+    public function createBuilder(array $options)
     {
-        return new Field($name, new EventDispatcher());
+        return new FieldBuilder($this->theme, new EventDispatcher(), $this->csrfProvider);
     }
 
     public function getParent(array $options)

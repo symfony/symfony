@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\Form\Config;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\ValueTransformer\IntegerToLocalizedStringTransformer;
 
 class IntegerFieldConfig extends AbstractFieldConfig
 {
-    public function configure(FieldInterface $field, array $options)
+    public function configure(FieldBuilder $builder, array $options)
     {
-        $field->setValueTransformer(new IntegerToLocalizedStringTransformer(array(
+        $builder->setValueTransformer(new IntegerToLocalizedStringTransformer(array(
                 'precision' => $options['precision'],
                 'grouping' => $options['grouping'],
                 'rounding-mode' => $options['rounding_mode'],

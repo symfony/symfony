@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Config;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\ChoiceList\PaddedChoiceList;
 use Symfony\Component\Form\ChoiceList\MonthChoiceList;
 use Symfony\Component\Form\Renderer\Plugin\DatePatternPlugin;
@@ -23,7 +23,7 @@ use Symfony\Component\Form\ValueTransformer\ReversedTransformer;
 
 class DateFieldConfig extends AbstractFieldConfig
 {
-    public function configure(FieldInterface $field, array $options)
+    public function configure(FieldBuilder $builder, array $options)
     {
         $formatter = new \IntlDateFormatter(
             \Locale::getDefault(),
@@ -32,7 +32,7 @@ class DateFieldConfig extends AbstractFieldConfig
         );
 
         if ($options['widget'] === 'text') {
-            $field->setValueTransformer(new DateTimeToLocalizedStringTransformer(array(
+            $builder->setValueTransformer(new DateTimeToLocalizedStringTransformer(array(
                 'date_format' => $options['format'],
                 'time_format' => \IntlDateFormatter::NONE,
                 'input_timezone' => $options['data_timezone'],
@@ -56,9 +56,9 @@ class DateFieldConfig extends AbstractFieldConfig
                 ),
             );
 
-            $field->add($this->getInstance('choice', 'year', $yearOptions))
-                ->add($this->getInstance('choice', 'month', $monthOptions))
-                ->add($this->getInstance('choice', 'day', $dayOptions))
+            $builder->add('choice', 'year', $yearOptions)
+                ->add('choice', 'month', $monthOptions)
+                ->add('choice', 'day', $dayOptions)
                 ->setValueTransformer(new DateTimeToArrayTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['user_timezone'],
@@ -71,7 +71,7 @@ class DateFieldConfig extends AbstractFieldConfig
         }
 
         if ($options['type'] === 'string') {
-            $field->setNormalizationTransformer(new ReversedTransformer(
+            $builder->setNormalizationTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['data_timezone'],
@@ -79,14 +79,14 @@ class DateFieldConfig extends AbstractFieldConfig
                 ))
             ));
         } else if ($options['type'] === 'timestamp') {
-            $field->setNormalizationTransformer(new ReversedTransformer(
+            $builder->setNormalizationTransformer(new ReversedTransformer(
                 new DateTimeToTimestampTransformer(array(
                     'output_timezone' => $options['data_timezone'],
                     'input_timezone' => $options['data_timezone'],
                 ))
             ));
         } else if ($options['type'] === 'array') {
-            $field->setNormalizationTransformer(new ReversedTransformer(
+            $builder->setNormalizationTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['data_timezone'],
@@ -95,7 +95,7 @@ class DateFieldConfig extends AbstractFieldConfig
             ));
         }
 
-        $field->setRendererVar('widget', $options['widget']);
+        $builder->setRendererVar('widget', $options['widget']);
     }
 
     public function getDefaultOptions(array $options)

@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Form\Config;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FieldBuilder;
 
 class PercentFieldConfig extends AbstractFieldConfig
 {
-    public function configure(FieldInterface $field, array $options)
+    public function configure(FieldBuilder $builder, array $options)
     {
-        $field->setValueTransformer(new PercentToLocalizedStringTransformer(array(
+        $builder->setValueTransformer(new PercentToLocalizedStringTransformer(array(
                 'precision' => $options['precision'],
                 'type' => $options['type'],
             )));

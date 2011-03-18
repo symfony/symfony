@@ -67,17 +67,35 @@ class Field implements FieldInterface
     private $propertyPath;
     private $transformationSuccessful = true;
     private $renderer;
-    private $hidden = false;
-    private $trim = true;
     private $disabled = false;
     private $dispatcher;
     private $modifyByReference = true;
     private $validationGroups;
 
-    public function __construct($name, EventDispatcherInterface $dispatcher)
+    public function __construct($name, EventDispatcherInterface $dispatcher,
+        RendererInterface $renderer, ValueTransformerInterface $valueTransformer = null,
+        ValueTransformerInterface $normalizationTransformer = null,
+        $disabled, $modifyByReference, $propertyPath, $required,
+        $validationGroups)
     {
         $this->name = (string)$name;
         $this->dispatcher = $dispatcher;
+        $this->renderer = $renderer;
+        $this->valueTransformer = $valueTransformer;
+        $this->normalizationTransformer = $normalizationTransformer;
+        $this->disabled = $disabled;
+        $this->modifyByReference = $modifyByReference;
+        $this->propertyPath = null === $propertyPath || '' === $propertyPath
+                ? null
+                : new PropertyPath($propertyPath);
+        $this->required = $required;
+        $this->validationGroups = empty($validationGroups)
+                ? null
+                : (array)$validationGroups;
+
+        $renderer->setField($this);
+
+        $this->setData(null);
     }
 
     /**
@@ -88,30 +106,6 @@ class Field implements FieldInterface
     }
 
     /**
-     * Adds an event listener for events on this field
-     *
-     * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addEventListener
-     */
-    public function addEventListener($eventNames, $listener, $priority = 0)
-    {
-        $this->dispatcher->addEventListener($eventNames, $listener, $priority);
-
-        return $this;
-    }
-
-    /**
-     * Adds an event subscriber for events on this field
-     *
-     * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addEventSubscriber
-     */
-    public function addEventSubscriber(EventSubscriberInterface $subscriber, $priority = 0)
-    {
-        $this->dispatcher->addEventSubscriber($subscriber, $priority);
-
-        return $this;
-    }
-
-    /**
      * Returns the data transformed by the value transformer
      *
      * @return string
@@ -119,16 +113,6 @@ class Field implements FieldInterface
     public function getTransformedData()
     {
         return $this->transformedData;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setPropertyPath($propertyPath)
-    {
-        $this->propertyPath = null === $propertyPath || '' === $propertyPath ? null : new PropertyPath($propertyPath);
-
-        return $this;
     }
 
     /**
@@ -150,16 +134,6 @@ class Field implements FieldInterface
     /**
      * {@inheritDoc}
      */
-    public function setRequired($required)
-    {
-        $this->required = $required;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function isRequired()
     {
         if (null === $this->parent || $this->parent->isRequired()) {
@@ -167,13 +141,6 @@ class Field implements FieldInterface
         }
 
         return false;
-    }
-
-    public function setDisabled($disabled)
-    {
-        $this->disabled = $disabled;
-
-        return $this;
     }
 
     /**
@@ -246,11 +213,11 @@ class Field implements FieldInterface
     public function setData($appData)
     {
         $event = new DataEvent($this, $appData);
-        $this->dispatcher->dispatchEvent(Events::preSetData, $event);
+        $this->dispatcher->dispatch(Events::preSetData, $event);
 
         // Hook to change content of the data
         $event = new FilterDataEvent($this, $appData);
-        $this->dispatcher->dispatchEvent(Events::filterSetData, $event);
+        $this->dispatcher->dispatch(Events::filterSetData, $event);
         $appData = $event->getData();
 
         // Treat data as strings unless a value transformer exists
@@ -267,7 +234,7 @@ class Field implements FieldInterface
         $this->transformedData = $clientData;
 
         $event = new DataEvent($this, $appData);
-        $this->dispatcher->dispatchEvent(Events::postSetData, $event);
+        $this->dispatcher->dispatch(Events::postSetData, $event);
 
         return $this;
     }
@@ -284,14 +251,14 @@ class Field implements FieldInterface
         }
 
         $event = new DataEvent($this, $clientData);
-        $this->dispatcher->dispatchEvent(Events::preBind, $event);
+        $this->dispatcher->dispatch(Events::preBind, $event);
 
         $appData = null;
         $normData = null;
 
         // Hook to change content of the data bound by the browser
         $event = new FilterDataEvent($this, $clientData);
-        $this->dispatcher->dispatchEvent(Events::filterBoundDataFromClient, $event);
+        $this->dispatcher->dispatch(Events::filterBoundDataFromClient, $event);
         $clientData = $event->getData();
 
         try {
@@ -306,7 +273,7 @@ class Field implements FieldInterface
             // Hook to change content of the data in the normalized
             // representation
             $event = new FilterDataEvent($this, $normData);
-            $this->dispatcher->dispatchEvent(Events::filterBoundData, $event);
+            $this->dispatcher->dispatch(Events::filterBoundData, $event);
             $normData = $event->getData();
 
             // Synchronize representations - must not change the content!
@@ -321,7 +288,7 @@ class Field implements FieldInterface
         $this->transformedData = $clientData;
 
         $event = new DataEvent($this, $clientData);
-        $this->dispatcher->dispatchEvent(Events::postBind, $event);
+        $this->dispatcher->dispatch(Events::postBind, $event);
     }
 
     /**
@@ -411,18 +378,6 @@ class Field implements FieldInterface
     }
 
     /**
-     * Sets the ValueTransformer.
-     *
-     * @param ValueTransformerInterface $valueTransformer
-     */
-    public function setNormalizationTransformer(ValueTransformerInterface $normalizationTransformer = null)
-    {
-        $this->normalizationTransformer = $normalizationTransformer;
-
-        return $this;
-    }
-
-    /**
      * Returns the ValueTransformer.
      *
      * @return ValueTransformerInterface
@@ -430,18 +385,6 @@ class Field implements FieldInterface
     public function getNormalizationTransformer()
     {
         return $this->normalizationTransformer;
-    }
-
-    /**
-     * Sets the ValueTransformer.
-     *
-     * @param ValueTransformerInterface $valueTransformer
-     */
-    public function setValueTransformer(ValueTransformerInterface $valueTransformer = null)
-    {
-        $this->valueTransformer = $valueTransformer;
-
-        return $this;
     }
 
     /**
@@ -455,18 +398,6 @@ class Field implements FieldInterface
     }
 
     /**
-     * Sets the renderer
-     *
-     * @param RendererInterface $renderer
-     */
-    public function setRenderer(RendererInterface $renderer)
-    {
-        $this->renderer = $renderer;
-
-        return $this;
-    }
-
-    /**
      * Returns the renderer
      *
      * @return RendererInterface
@@ -474,20 +405,6 @@ class Field implements FieldInterface
     public function getRenderer()
     {
         return $this->renderer;
-    }
-
-    public function addRendererPlugin(RendererPluginInterface $plugin)
-    {
-        $this->renderer->addPlugin($plugin);
-
-        return $this;
-    }
-
-    public function setRendererVar($name, $value)
-    {
-        $this->renderer->setVar($name, $value);
-
-        return $this;
     }
 
     /**
@@ -556,23 +473,9 @@ class Field implements FieldInterface
         return null === $this->data || '' === $this->data;
     }
 
-    public function setModifyByReference($modifyByReference)
-    {
-        $this->modifyByReference = $modifyByReference;
-
-        return $this;
-    }
-
     public function isModifiedByReference()
     {
         return $this->modifyByReference;
-    }
-
-    public function setValidationGroups($validationGroups)
-    {
-        $this->validationGroups = empty($validationGroups) ? null : (array)$validationGroups;
-
-        return $this;
     }
 
     /**

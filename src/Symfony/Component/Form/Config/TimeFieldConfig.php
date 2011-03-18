@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Config;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\ChoiceList\PaddedChoiceList;
 use Symfony\Component\Form\ValueTransformer\ReversedTransformer;
 use Symfony\Component\Form\ValueTransformer\DateTimeToStringTransformer;
@@ -20,7 +20,7 @@ use Symfony\Component\Form\ValueTransformer\DateTimeToArrayTransformer;
 
 class TimeFieldConfig extends AbstractFieldConfig
 {
-    public function configure(FieldInterface $field, array $options)
+    public function configure(FieldBuilder $builder, array $options)
     {
         $hourOptions = $minuteOptions = $secondOptions = array();
         $child = $options['widget'] === 'text' ? 'text' : 'choice';
@@ -41,19 +41,19 @@ class TimeFieldConfig extends AbstractFieldConfig
             }
         }
 
-        $field->add($this->getInstance($options['widget'], 'hour', $hourOptions))
-            ->add($this->getInstance($options['widget'], 'minute', $minuteOptions))
+        $builder->add($options['widget'], 'hour', $hourOptions)
+            ->add($options['widget'], 'minute', $minuteOptions)
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             ->setModifyByReference(false);
 
         if ($options['with_seconds']) {
             $parts[] = 'second';
-            $field->add($this->getInstance($options['widget'], 'second', $secondOptions));
+            $builder->add($options['widget'], 'second', $secondOptions);
         }
 
         if ($options['type'] == 'string') {
-            $field->setNormalizationTransformer(new ReversedTransformer(
+            $builder->setNormalizationTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer(array(
                     'format' => 'H:i:s',
                     'input_timezone' => $options['data_timezone'],
@@ -61,14 +61,14 @@ class TimeFieldConfig extends AbstractFieldConfig
                 ))
             ));
         } else if ($options['type'] == 'timestamp') {
-            $field->setNormalizationTransformer(new ReversedTransformer(
+            $builder->setNormalizationTransformer(new ReversedTransformer(
                 new DateTimeToTimestampTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['data_timezone'],
                 ))
             ));
         } else if ($options['type'] === 'array') {
-            $field->setNormalizationTransformer(new ReversedTransformer(
+            $builder->setNormalizationTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['data_timezone'],
@@ -77,7 +77,7 @@ class TimeFieldConfig extends AbstractFieldConfig
             ));
         }
 
-        $field
+        $builder
             ->setValueTransformer(new DateTimeToArrayTransformer(array(
                 'input_timezone' => $options['data_timezone'],
                 'output_timezone' => $options['user_timezone'],

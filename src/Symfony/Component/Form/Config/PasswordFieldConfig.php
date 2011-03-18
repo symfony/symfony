@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\Form\Config;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\Renderer\Plugin\PasswordValuePlugin;
 
 class PasswordFieldConfig extends AbstractFieldConfig
 {
-    public function configure(FieldInterface $field, array $options)
+    public function configure(FieldBuilder $builder, array $options)
     {
-        $field->addRendererPlugin(new PasswordValuePlugin($options['always_empty']));
+        $builder->addRendererPlugin(new PasswordValuePlugin($options['always_empty']));
     }
 
     public function getDefaultOptions(array $options)

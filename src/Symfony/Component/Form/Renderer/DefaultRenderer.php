@@ -33,9 +33,8 @@ class DefaultRenderer implements RendererInterface, \ArrayAccess
 
     private $children = array();
 
-    public function __construct(FieldInterface $field, ThemeInterface $theme, $template)
+    public function __construct(ThemeInterface $theme, $template)
     {
-        $this->field = $field;
         $this->theme = $theme;
         $this->template = $template;
     }
@@ -66,6 +65,11 @@ class DefaultRenderer implements RendererInterface, \ArrayAccess
 
             $this->changes = array();
         }
+    }
+
+    public function setField(FieldInterface $field)
+    {
+        $this->field = $field;
     }
 
     public function setChildren(array $renderers)

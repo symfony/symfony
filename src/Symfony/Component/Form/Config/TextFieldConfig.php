@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Form\Config;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FieldBuilder;
 
 class TextFieldConfig extends AbstractFieldConfig
 {
-    public function configure(FieldInterface $field, array $options)
+    public function configure(FieldBuilder $builder, array $options)
     {
-        $field->setRendererVar('max_length', $options['max_length']);
+        $builder->setRendererVar('max_length', $options['max_length']);
     }
 
     public function getDefaultOptions(array $options)

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Config;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\ValueTransformer\ReversedTransformer;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
 use Symfony\Component\Form\ValueTransformer\DateTimeToArrayTransformer;
@@ -21,7 +21,7 @@ use Symfony\Component\Form\ValueTransformer\ArrayToPartsTransformer;
 
 class DateTimeFieldConfig extends AbstractFieldConfig
 {
-    public function configure(FieldInterface $field, array $options)
+    public function configure(FieldBuilder $builder, array $options)
     {
         // Only pass a subset of the options to children
         $dateOptions = array_intersect_key($options, array_flip(array(
@@ -68,7 +68,7 @@ class DateTimeFieldConfig extends AbstractFieldConfig
             $timeParts[] = 'second';
         }
 
-        $field->setValueTransformer(new ValueTransformerChain(array(
+        $builder->setValueTransformer(new ValueTransformerChain(array(
                 new DateTimeToArrayTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['user_timezone'],
@@ -79,15 +79,15 @@ class DateTimeFieldConfig extends AbstractFieldConfig
                     'time' => $timeParts,
                 )),
             )))
-            ->add($this->getInstance('date', 'date', $dateOptions))
-            ->add($this->getInstance('time', 'time', $timeOptions))
+            ->add('date', 'date', $dateOptions)
+            ->add('time', 'time', $timeOptions)
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             ->setModifyByReference(false)
             ->setData(null); // hack: should be invoked automatically
 
         if ($options['type'] == 'string') {
-            $field->setNormalizationTransformer(new ReversedTransformer(
+            $builder->setNormalizationTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer(array(
                     'format' => 'Y-m-d H:i:s',
                     'input_timezone' => $options['data_timezone'],
@@ -95,14 +95,14 @@ class DateTimeFieldConfig extends AbstractFieldConfig
                 ))
             ));
         } else if ($options['type'] == 'timestamp') {
-            $field->setNormalizationTransformer(new ReversedTransformer(
+            $builder->setNormalizationTransformer(new ReversedTransformer(
                 new DateTimeToTimestampTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['data_timezone'],
                 ))
             ));
         } else if ($options['type'] === 'array') {
-            $field->setNormalizationTransformer(new ReversedTransformer(
+            $builder->setNormalizationTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['data_timezone'],

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Config;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\ChoiceList\TimeZoneChoiceList;
 
 class TimezoneFieldConfig extends AbstractFieldConfig

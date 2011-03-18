@@ -11,23 +11,24 @@
 
 namespace Symfony\Component\Form\Config;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\EventListener\ResizeFormListener;
 
 class CollectionFieldConfig extends AbstractFieldConfig
 {
-    public function configure(FieldInterface $field, array $options)
+    public function configure(FieldBuilder $builder, array $options)
     {
         if ($options['modifiable']) {
-            $field->add($options['prototype'], '$$name$$', array(
+            $builder->add($options['prototype'], '$$name$$', array(
                 'property_path' => null,
                 'required' => false,
             ));
         }
 
-        $listener = new ResizeFormListener($field, $options['prototype'], $options['modifiable']);
+        $listener = new ResizeFormListener($builder->getFormFactory(),
+                $options['prototype'], $options['modifiable']);
 
-        $field->addEventSubscriber($listener, 10);
+        $builder->addEventSubscriber($listener, 10);
     }
 
     public function getDefaultOptions(array $options)

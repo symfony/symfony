@@ -32,11 +32,11 @@ class FormFactory implements FormFactoryInterface
         $this->guessers[] = $guesser;
     }
 
-    public function getInstance($identifier, $name = null, array $options = array())
+    public function createBuilder($identifier, $name = null, array $options = array())
     {
         // TODO $identifier can be FQN of a config class
 
-        $instance = null;
+        $builder = null;
         $hierarchy = array();
 
         // TESTME
@@ -48,24 +48,29 @@ class FormFactory implements FormFactoryInterface
             // TODO check if identifier exists
             $config = $this->configLoader->getConfig($identifier);
             array_unshift($hierarchy, $config);
-            $instance = $instance ?: $config->createInstance($name);
             $options = array_merge($config->getDefaultOptions($options), $options);
+            $builder = $builder ?: $config->createBuilder($options);
             $identifier = $config->getParent($options);
         }
 
         // TODO check if instance exists
 
+        $builder->setName($name);
+        $builder->setFormFactory($this);
+
         foreach ($hierarchy as $config) {
-            $config->configure($instance, $options);
+            $config->configure($builder, $options);
         }
 
-        return $instance;
+        return $builder;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getInstanceForProperty($class, $property, array $options = array())
+    public function getInstance($identifier, $name = null, array $options = array())
+    {
+        return $this->createBuilder($identifier, $name, $options)->getInstance();
+    }
+
+    public function createBuilderForProperty($class, $property, array $options = array())
     {
         // guess field class and options
         $identifierGuess = $this->guess(function ($guesser) use ($class, $property) {
@@ -103,7 +108,15 @@ class FormFactory implements FormFactoryInterface
         // user options may override guessed options
         $options = array_merge($identifierGuess->getOptions(), $options);
 
-        return $this->getInstance($identifier, $property, $options);
+        return $this->createBuilder($identifier, $property, $options);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getInstanceForProperty($class, $property, array $options = array())
+    {
+        return $this->createBuilderForProperty($class, $property, $options)->getInstance();
     }
 
     /**

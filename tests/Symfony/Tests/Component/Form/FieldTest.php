@@ -126,11 +126,17 @@ class FieldTest extends TestCase
 
     public function testIsRequiredReturnsOwnValueIfNoParent()
     {
-        $this->field->setRequired(true);
-        $this->assertTrue($this->field->isRequired());
+        $field = $this->factory->getInstance('field', 'test', array(
+            'required' => true,
+        ));
 
-        $this->field->setRequired(false);
-        $this->assertFalse($this->field->isRequired());
+        $this->assertTrue($field->isRequired());
+
+        $field = $this->factory->getInstance('field', 'test', array(
+            'required' => false,
+        ));
+
+        $this->assertFalse($field->isRequired());
     }
 
     public function testIsRequiredReturnsOwnValueIfParentIsRequired()
@@ -140,13 +146,19 @@ class FieldTest extends TestCase
                     ->method('isRequired')
                     ->will($this->returnValue(true));
 
-        $this->field->setParent($group);
+        $field = $this->factory->getInstance('field', 'test', array(
+            'required' => true,
+        ));
+        $field->setParent($group);
 
-        $this->field->setRequired(true);
-        $this->assertTrue($this->field->isRequired());
+        $this->assertTrue($field->isRequired());
 
-        $this->field->setRequired(false);
-        $this->assertFalse($this->field->isRequired());
+        $field = $this->factory->getInstance('field', 'test', array(
+            'required' => false,
+        ));
+        $field->setParent($group);
+
+        $this->assertFalse($field->isRequired());
     }
 
     public function testIsRequiredReturnsFalseIfParentIsNotRequired()
@@ -156,10 +168,12 @@ class FieldTest extends TestCase
                     ->method('isRequired')
                     ->will($this->returnValue(false));
 
-        $this->field->setParent($group);
-        $this->field->setRequired(true);
+        $field = $this->factory->getInstance('field', 'test', array(
+            'required' => true,
+        ));
+        $field->setParent($group);
 
-        $this->assertFalse($this->field->isRequired());
+        $this->assertFalse($field->isRequired());
     }
 
     public function testIsBound()
@@ -211,26 +225,32 @@ class FieldTest extends TestCase
             ),
         ));
         $valueTransformer = new FixedValueTransformer(array(
+            // 0. Empty initialization
+            null => null,
             // 2. The filtered value is normalized
             'norm[filter1[0]]' => 'filter1[0]',
             // 4a. The filtered normalized value is converted to client
             //     representation
-            'filter2[norm[filter1[0]]]' => 'client[filter2[norm[filter1[0]]]]'
+            'filter2[norm[filter1[0]]]' => 'client[filter2[norm[filter1[0]]]]',
         ));
         $normTransformer = new FixedValueTransformer(array(
+            // 0. Empty initialization
+            null => null,
             // 4b. The filtered normalized value is converted to app
             //     representation
             'app[filter2[norm[filter1[0]]]]' => 'filter2[norm[filter1[0]]]',
         ));
 
-        $this->field->addEventSubscriber($filter);
-        $this->field->setValueTransformer($valueTransformer);
-        $this->field->setNormalizationTransformer($normTransformer);
-        $this->field->bind(0);
+        $this->builder->addEventSubscriber($filter);
+        $this->builder->setValueTransformer($valueTransformer);
+        $this->builder->setNormalizationTransformer($normTransformer);
 
-        $this->assertEquals('app[filter2[norm[filter1[0]]]]', $this->field->getData());
-        $this->assertEquals('filter2[norm[filter1[0]]]', $this->field->getNormalizedData());
-        $this->assertEquals('client[filter2[norm[filter1[0]]]]', $this->field->getTransformedData());
+        $field = $this->builder->getInstance();
+        $field->bind(0);
+
+        $this->assertEquals('app[filter2[norm[filter1[0]]]]', $field->getData());
+        $this->assertEquals('filter2[norm[filter1[0]]]', $field->getNormalizedData());
+        $this->assertEquals('client[filter2[norm[filter1[0]]]]', $field->getTransformedData());
     }
 
     public function testBoundDataIsTransformedCorrectlyIfEmpty_noValueTransformer()

@@ -29,33 +29,33 @@ class DefaultConfigLoader implements ConfigLoaderInterface
             ValidatorInterface $validator, TemporaryStorage $storage,
             EntityManager $em = null)
     {
-        $this->addConfig(new Config\FieldConfig($factory, $theme, $validator));
-        $this->addConfig(new Config\FormConfig($factory, $csrfProvider));
-        $this->addConfig(new Config\CheckboxFieldConfig($factory));
-        $this->addConfig(new Config\ChoiceFieldConfig($factory));
-        $this->addConfig(new Config\CollectionFieldConfig($factory));
-        $this->addConfig(new Config\CountryFieldConfig($factory));
-        $this->addConfig(new Config\DateFieldConfig($factory));
-        $this->addConfig(new Config\DateTimeFieldConfig($factory));
-        $this->addConfig(new Config\FileFieldConfig($factory, $storage));
-        $this->addConfig(new Config\HiddenFieldConfig($factory));
-        $this->addConfig(new Config\IntegerFieldConfig($factory));
-        $this->addConfig(new Config\LanguageFieldConfig($factory));
-        $this->addConfig(new Config\LocaleFieldConfig($factory));
-        $this->addConfig(new Config\MoneyFieldConfig($factory));
-        $this->addConfig(new Config\NumberFieldConfig($factory));
-        $this->addConfig(new Config\PasswordFieldConfig($factory));
-        $this->addConfig(new Config\PercentFieldConfig($factory));
-        $this->addConfig(new Config\RadioFieldConfig($factory));
-        $this->addConfig(new Config\RepeatedFieldConfig($factory));
-        $this->addConfig(new Config\TextareaFieldConfig($factory));
-        $this->addConfig(new Config\TextFieldConfig($factory));
-        $this->addConfig(new Config\TimeFieldConfig($factory));
-        $this->addConfig(new Config\TimezoneFieldConfig($factory));
-        $this->addConfig(new Config\UrlFieldConfig($factory));
+        $this->addConfig(new Config\FieldConfig($csrfProvider, $theme, $validator));
+        $this->addConfig(new Config\FormConfig());
+        $this->addConfig(new Config\CheckboxFieldConfig());
+        $this->addConfig(new Config\ChoiceFieldConfig());
+        $this->addConfig(new Config\CollectionFieldConfig());
+        $this->addConfig(new Config\CountryFieldConfig());
+        $this->addConfig(new Config\DateFieldConfig());
+        $this->addConfig(new Config\DateTimeFieldConfig());
+        $this->addConfig(new Config\FileFieldConfig($storage));
+        $this->addConfig(new Config\HiddenFieldConfig());
+        $this->addConfig(new Config\IntegerFieldConfig());
+        $this->addConfig(new Config\LanguageFieldConfig());
+        $this->addConfig(new Config\LocaleFieldConfig());
+        $this->addConfig(new Config\MoneyFieldConfig());
+        $this->addConfig(new Config\NumberFieldConfig());
+        $this->addConfig(new Config\PasswordFieldConfig());
+        $this->addConfig(new Config\PercentFieldConfig());
+        $this->addConfig(new Config\RadioFieldConfig());
+        $this->addConfig(new Config\RepeatedFieldConfig());
+        $this->addConfig(new Config\TextareaFieldConfig());
+        $this->addConfig(new Config\TextFieldConfig());
+        $this->addConfig(new Config\TimeFieldConfig());
+        $this->addConfig(new Config\TimezoneFieldConfig());
+        $this->addConfig(new Config\UrlFieldConfig());
 
         if (null !== $em) {
-            $this->addConfig(new Config\EntityFieldConfig($factory, $em));
+            $this->addConfig(new Config\EntityFieldConfig($em));
         }
     }
 

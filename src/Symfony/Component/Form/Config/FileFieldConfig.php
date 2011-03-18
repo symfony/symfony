@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Config;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\EventListener\FixFileUploadListener;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
@@ -24,31 +24,28 @@ class FileFieldConfig extends AbstractFieldConfig
 {
     private $storage;
 
-    public function __construct(FormFactoryInterface $factory,
-            TemporaryStorage $storage)
+    public function __construct(TemporaryStorage $storage)
     {
-        parent::__construct($factory);
-
         $this->storage = $storage;
     }
 
-    public function configure(FieldInterface $field, array $options)
+    public function configure(FieldBuilder $builder, array $options)
     {
         if ($options['type'] === 'string') {
-            $field->setNormalizationTransformer(new ValueTransformerChain(array(
+            $builder->setNormalizationTransformer(new ValueTransformerChain(array(
                 new ReversedTransformer(new FileToStringTransformer()),
                 new FileToArrayTransformer(),
             )));
         } else {
-            $field->setNormalizationTransformer(new FileToArrayTransformer());
+            $builder->setNormalizationTransformer(new FileToArrayTransformer());
         }
 
-        $field->addEventSubscriber(new FixFileUploadListener($field, $this->storage), 10)
-            ->add($this->getInstance('field', 'file')->setRendererVar('type', 'file'))
-            ->add($this->getInstance('hidden', 'token'))
-            ->add($this->getInstance('hidden', 'name'))
-            // TODO remove this again
-            ->setData(null);
+        $builder->addEventSubscriber(new FixFileUploadListener($this->storage), 10)
+            ->add('field', 'file')
+            ->add('hidden', 'token')
+            ->add('hidden', 'name');
+
+        $builder->get('file')->setRendererVar('type', 'file');
     }
 
     public function getDefaultOptions(array $options)

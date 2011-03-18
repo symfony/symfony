@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Form\Config;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\ChoiceList\EntityChoiceList;
-use Symfony\Component\Form\ValueTransformer\MergeCollectionTransformer;
+use Symfony\Component\Form\EventListener\MergeCollectionListener;
 use Symfony\Component\Form\ValueTransformer\EntitiesToArrayTransformer;
 use Symfony\Component\Form\ValueTransformer\ArrayToChoicesTransformer;
 use Symfony\Component\Form\ValueTransformer\EntityToIdTransformer;
@@ -26,19 +26,18 @@ class EntityFieldConfig extends AbstractFieldConfig
 {
     private $em;
 
-    public function __construct(FormFactoryInterface $factory, EntityManager $em)
+    public function __construct(EntityManager $em)
     {
-        parent::__construct($factory);
-
         $this->em = $em;
     }
 
-    public function configure(FieldInterface $field, array $options)
+    public function configure(FieldBuilder $builder, array $options)
     {
         $transformers = array();
 
         if ($options['multiple']) {
-            $transformers[] = new MergeCollectionTransformer($field);
+            $builder->addEventSubscriber(new MergeCollectionListener());
+
             $transformers[] = new EntitiesToArrayTransformer($options['choice_list']);
 
             if ($options['expanded']) {
@@ -53,9 +52,9 @@ class EntityFieldConfig extends AbstractFieldConfig
         }
 
         if (count($transformers) > 1) {
-            $field->setValueTransformer(new ValueTransformerChain($transformers));
+            $builder->setValueTransformer(new ValueTransformerChain($transformers));
         } else {
-            $field->setValueTransformer(current($transformers));
+            $builder->setValueTransformer(current($transformers));
         }
     }
 

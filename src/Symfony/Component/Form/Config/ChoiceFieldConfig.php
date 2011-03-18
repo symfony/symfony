@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Config;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\ChoiceList\DefaultChoiceList;
 use Symfony\Component\Form\EventListener\FixRadioInputListener;
 use Symfony\Component\Form\Renderer\Plugin\ChoicePlugin;
@@ -21,7 +21,7 @@ use Symfony\Component\Form\ValueTransformer\ArrayToChoicesTransformer;
 
 class ChoiceFieldConfig extends AbstractFieldConfig
 {
-    public function configure(FieldInterface $field, array $options)
+    public function configure(FieldBuilder $builder, array $options)
     {
         if ($options['expanded']) {
             $choices = array_replace(
@@ -31,32 +31,28 @@ class ChoiceFieldConfig extends AbstractFieldConfig
 
             foreach ($choices as $choice => $value) {
                 if ($options['multiple']) {
-                    $field->add($this->getInstance('checkbox', $choice, array(
-                        'value' => $choice,
-                    )));
+                    $builder->add('checkbox', $choice, array('value' => $choice));
                 } else {
-                    $field->add($this->getInstance('radio', $choice, array(
-                        'value' => $choice,
-                    )));
+                    $builder->add('radio', $choice, array('value' => $choice));
                 }
             }
         }
 
-        $field->addRendererPlugin(new ChoicePlugin($options['choice_list']))
+        $builder->addRendererPlugin(new ChoicePlugin($options['choice_list']))
             ->setRendererVar('multiple', $options['multiple'])
             ->setRendererVar('expanded', $options['expanded']);
 
         if ($options['multiple'] && $options['expanded']) {
-            $field->setValueTransformer(new ArrayToChoicesTransformer($options['choice_list']));
+            $builder->setValueTransformer(new ArrayToChoicesTransformer($options['choice_list']));
         }
 
         if (!$options['multiple'] && $options['expanded']) {
-            $field->setValueTransformer(new ScalarToChoicesTransformer($options['choice_list']));
-            $field->addEventSubscriber(new FixRadioInputListener(), 10);
+            $builder->setValueTransformer(new ScalarToChoicesTransformer($options['choice_list']));
+            $builder->addEventSubscriber(new FixRadioInputListener(), 10);
         }
 
         if ($options['multiple'] && !$options['expanded']) {
-            $field->addRendererPlugin(new SelectMultipleNamePlugin());
+            $builder->addRendererPlugin(new SelectMultipleNamePlugin());
         }
     }
 

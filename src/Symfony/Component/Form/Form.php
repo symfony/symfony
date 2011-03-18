@@ -24,6 +24,9 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\DanglingFieldException;
 use Symfony\Component\Form\Exception\FieldDefinitionException;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
+use Symfony\Component\Form\DataMapper\DataMapperInterface;
+use Symfony\Component\Form\Renderer\RendererInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -42,7 +45,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class Form extends Field implements \IteratorAggregate, FormInterface, EventSubscriberInterface
+class Form extends Field implements \IteratorAggregate, FormInterface
 {
     /**
      * Contains all the fields of this group
@@ -56,127 +59,62 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
      */
     private $extraFields = array();
 
-    private $factory;
-
     private $virtual;
 
-    private $csrfFieldName;
-
-    private $csrfProvider;
+    private $dataMapper;
 
     public function __construct($name, EventDispatcherInterface $dispatcher,
-            FormFactoryInterface $factory, CsrfProviderInterface $csrfProvider)
+        RendererInterface $renderer, ValueTransformerInterface $valueTransformer = null,
+        ValueTransformerInterface $normalizationTransformer = null,
+        DataMapperInterface $dataMapper,
+        $disabled, $modifyByReference, $propertyPath, $required,
+        $validationGroups, $virtual)
     {
-        $dispatcher->addEventSubscriber($this);
+        $dispatcher->addListener(array(
+            Events::postSetData,
+            Events::preBind,
+            Events::filterSetData,
+            Events::filterBoundDataFromClient,
+        ), $this);
 
-        parent::__construct($name, $dispatcher);
+        $this->virtual = $virtual;
+        $this->dataMapper = $dataMapper;
 
-        $this->factory = $factory;
-        $this->csrfProvider = $csrfProvider;
+        parent::__construct($name, $dispatcher, $renderer, $valueTransformer,
+            $normalizationTransformer, $disabled, $modifyByReference,
+            $propertyPath, $required, $validationGroups);
     }
 
     /**
-     * Adds a new field to this group. A field must have a unique name within
-     * the group. Otherwise the existing field is overwritten.
+     * Returns all fields in this group
      *
-     * If you add a nested group, this group should also be represented in the
-     * object hierarchy. If you want to add a group that operates on the same
-     * hierarchy level, use merge().
-     *
-     * <code>
-     * class Entity
-     * {
-     *   public $location;
-     * }
-     *
-     * class Location
-     * {
-     *   public $longitude;
-     *   public $latitude;
-     * }
-     *
-     * $entity = new Entity();
-     * $entity->location = new Location();
-     *
-     * $form = new Form('entity', $entity, $validator);
-     *
-     * $locationGroup = new Form('location');
-     * $locationGroup->add(new TextField('longitude'));
-     * $locationGroup->add(new TextField('latitude'));
-     *
-     * $form->add($locationGroup);
-     * </code>
-     *
-     * @param FieldInterface|string $field
-     * @return FieldInterface
+     * @return array
      */
-    public function add($field)
+    public function getFields()
     {
-        if ($this->isBound()) {
-            throw new AlreadyBoundException('You cannot add fields after binding a form');
-        }
+        return $this->fields;
+    }
 
-        // if the field is given as string, ask the field factory of the form
-        // to create a field
-        if (!$field instanceof FieldInterface) {
-            if (!is_string($field)) {
-                throw new UnexpectedTypeException($field, 'FieldInterface or string');
-            }
-
-            // TODO turn order of $identifier and $name around
-
-            if (func_num_args() > 2 || (func_num_args() > 1 && !is_array(func_get_arg(1)))) {
-                $identifier = func_get_arg(0);
-                $name = func_get_arg(1);
-                $options = func_num_args() > 2 ? func_get_arg(2) : array();
-
-                $field = $this->factory->getInstance($identifier, $name, $options);
-            } else {
-                throw new \Exception('Currently not supported');
-
-                $class = $this->getDataClass();
-
-                if (!$class) {
-                    throw new FormException('The data class must be set to automatically create fields');
-                }
-
-                $property = func_get_arg(0);
-                $options = func_num_args() > 1 ? func_get_arg(1) : array();
-
-                $field = $this->factory->getInstanceForProperty($class, $property, $options);
-            }
-        }
-
-        if ('' === $field->getName() || null === $field->getName()) {
-            throw new FieldDefinitionException('You cannot add anonymous fields');
-        }
-
+    public function add(FieldInterface $field)
+    {
         $this->fields[$field->getName()] = $field;
 
         $field->setParent($this);
 
         $data = $this->getTransformedData();
 
-        // if the property "data" is NULL, getTransformedData() returns an empty
-        // string
         if (!empty($data)) {
-            // TODO fix or remove add()
-            // $field->readProperty($data);
+            $this->dataMapper->mapDataToField($data, $field);
         }
-
-        return $this;
     }
 
-    /**
-     * Removes the field with the given name.
-     *
-     * @param string $name
-     */
     public function remove($name)
     {
-        $this->fields[$name]->setParent(null);
+        if (isset($this->fields[$name])) {
+            $this->fields[$name]->setParent(null);
 
-        unset($this->fields[$name]);
+            unset($this->fields[$name]);
+        }
     }
 
     /**
@@ -205,14 +143,25 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
         throw new \InvalidArgumentException(sprintf('Field "%s" does not exist.', $name));
     }
 
-    /**
-     * Returns all fields in this group
-     *
-     * @return array
-     */
-    public function getFields()
+    public function postSetData(DataEvent $event)
     {
-        return $this->fields;
+        $form = $event->getField();
+        $data = $form->getTransformedData();
+
+        $this->dataMapper->mapDataToForm($data, $form);
+    }
+
+    public function filterSetData(FilterDataEvent $event)
+    {
+        $field = $event->getField();
+
+        if (null === $field->getValueTransformer() && null === $field->getNormalizationTransformer()) {
+            $data = $event->getData();
+
+            if (empty($data)) {
+                $event->setData($this->dataMapper->createEmptyData());
+            }
+        }
     }
 
     public function filterBoundDataFromClient(FilterDataEvent $event)
@@ -235,15 +184,11 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
             }
         }
 
-        $event->setData($data);
-    }
+        $data = $this->getTransformedData();
 
-    public static function getSubscribedEvents()
-    {
-        return array(
-            Events::preBind,
-            Events::filterBoundDataFromClient,
-        );
+        $this->dataMapper->mapFormToData($this, $data);
+
+        $event->setData($data);
     }
 
     public function preBind(DataEvent $event)
@@ -255,13 +200,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
                 $this->extraFields[] = $name;
             }
         }
-    }
-
-    public function setVirtual($virtual)
-    {
-        $this->virtual = $virtual;
-
-        return $this;
     }
 
     /**
@@ -378,7 +316,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
      */
     public function offsetSet($name, $field)
     {
-        throw new \LogicException('Use the method add() to add fields');
+        throw new \BadMethodCallException('offsetSet() is not supported');
     }
 
     /**
@@ -390,7 +328,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
      */
     public function offsetUnset($name)
     {
-        return $this->remove($name);
+        throw new \BadMethodCallException('offsetUnset() is not supported');
     }
 
     /**
@@ -411,56 +349,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface, EventSubs
     public function count()
     {
         return count($this->fields);
-    }
-
-    public function enableCsrfProtection(CsrfProviderInterface $provider, $fieldName = '_token')
-    {
-        $this->csrfProvider = $provider;
-        $this->csrfFieldName = $fieldName;
-
-        $token = $provider->generateCsrfToken(get_class($this));
-
-        $this->add('hidden', $fieldName, array(
-            'data' => $token,
-            'property_path' => null,
-        ));
-    }
-
-    public function disableCsrfProtection()
-    {
-        if ($this->isCsrfProtected()) {
-            $this->remove($this->csrfFieldName);
-            $this->csrfProvider = null;
-            $this->csrfFieldName = null;
-        }
-    }
-
-    /**
-     * Returns the name used for the CSRF protection field
-     *
-     * @return string  The field name
-     */
-    public function getCsrfFieldName()
-    {
-        return $this->csrfFieldName;
-    }
-
-    /**
-     * Returns the provider used for generating and validating CSRF tokens
-     *
-     * @return CsrfProviderInterface  The provider instance
-     */
-    public function getCsrfProvider()
-    {
-        return $this->csrfProvider;
-    }
-
-    /**
-     * @return true if this form is CSRF protected
-     */
-    public function isCsrfProtected()
-    {
-        return $this->csrfFieldName && $this->has($this->csrfFieldName);
     }
 
     /**

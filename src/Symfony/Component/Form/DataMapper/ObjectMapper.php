@@ -9,16 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\EventListener;
+namespace Symfony\Component\Form\DataMapper;
 
+use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\RecursiveFieldIterator;
 use Symfony\Component\Form\Exception\FormException;
-use Symfony\Component\Form\Events;
-use Symfony\Component\Form\Event\DataEvent;
-use Symfony\Component\Form\Event\FilterDataEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ObjectMapperListener implements EventSubscriberInterface
+class ObjectMapper implements DataMapperInterface
 {
     /**
      * Stores the class that the data of this form must be instances of
@@ -38,21 +36,23 @@ class ObjectMapperListener implements EventSubscriberInterface
         $this->dataConstructor = $dataConstructor;
     }
 
-    public static function getSubscribedEvents()
+    public function createEmptyData()
     {
-        return array(
-            Events::postSetData,
-            Events::filterSetData,
-            Events::filterBoundDataFromClient,
-        );
+        if ($this->dataConstructor) {
+            $constructor = $this->dataConstructor;
+
+            return $constructor();
+        } else if ($this->dataClass) {
+            $class = $this->dataClass;
+
+            return new $class();
+        }
+
+        return array();
     }
 
-    public function postSetData(DataEvent $event)
+    public function mapDataToForm(&$data, FormInterface $form)
     {
-        // get transformed data and pass its values to child fields
-        $form = $event->getField();
-        $data = $form->getTransformedData();
-
         if (!empty($data) && !is_array($data) && !is_object($data)) {
             throw new \InvalidArgumentException(sprintf('Expected argument of type object or array, %s given', gettype($data)));
         }
@@ -66,41 +66,20 @@ class ObjectMapperListener implements EventSubscriberInterface
             $iterator = new \RecursiveIteratorIterator($iterator);
 
             foreach ($iterator as $field) {
-                if ($field->getPropertyPath() !== null) {
-                    $field->setData($field->getPropertyPath()->getValue($data));
-                }
+                $this->mapDataToField($data, $field);
             }
         }
     }
 
-    public function filterSetData(FilterDataEvent $event)
+    public function mapDataToField(&$data, FieldInterface $field)
     {
-        $field = $event->getField();
-
-        if (null === $field->getValueTransformer() && null === $field->getNormalizationTransformer()) {
-            $data = $event->getData();
-
-            // Empty values must be converted to objects or arrays so that
-            // they can be read by PropertyPath in the child fields
-            if (empty($data)) {
-                if ($this->dataConstructor) {
-                    $constructor = $this->dataConstructor;
-                    $event->setData($constructor());
-                } else if ($this->dataClass) {
-                    $class = $this->dataClass;
-                    $event->setData(new $class());
-                } else {
-                    $event->setData(array());
-                }
-            }
+        if ($field->getPropertyPath() !== null) {
+            $field->setData($field->getPropertyPath()->getValue($data));
         }
     }
 
-    public function filterBoundDataFromClient(FilterDataEvent $event)
+    public function mapFormToData(FormInterface $form, &$data)
     {
-        $form = $event->getField();
-        $data = $form->getTransformedData();
-
         $iterator = new RecursiveFieldIterator($form);
         $iterator = new \RecursiveIteratorIterator($iterator);
 
@@ -117,12 +96,15 @@ class ObjectMapperListener implements EventSubscriberInterface
             // $isReference is true (see above) and the option "by_reference" is
             // true as well
             if (!is_object($data) || !$isReference || !$field->isModifiedByReference()) {
-                if ($field->getPropertyPath() !== null) {
-                    $field->getPropertyPath()->setValue($data, $field->getData());
-                }
+                $this->mapFieldToData($field, $data);
             }
         }
+    }
 
-        $event->setData($data);
+    public function mapFieldToData(FieldInterface $field, &$data)
+    {
+        if ($field->getPropertyPath() !== null) {
+            $field->getPropertyPath()->setValue($data, $field->getData());
+        }
     }
 }

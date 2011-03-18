@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Form\Config;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FieldBuilder;
 
 interface FieldConfigInterface
 {
-    function configure(FieldInterface $field, array $options);
+    function configure(FieldBuilder $builder, array $options);
 
-    function createInstance($name);
+    function createBuilder(array $options);
 
     function getDefaultOptions(array $options);
 

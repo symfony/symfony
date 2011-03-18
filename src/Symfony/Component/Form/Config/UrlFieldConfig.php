@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\Form\Config;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\EventListener\FixUrlProtocolListener;
 
 class UrlFieldConfig extends AbstractFieldConfig
 {
-    public function configure(FieldInterface $field, array $options)
+    public function configure(FieldBuilder $builder, array $options)
     {
-        $field->addEventSubscriber(new FixUrlProtocolListener($options['default_protocol']));
+        $builder->addEventSubscriber(new FixUrlProtocolListener($options['default_protocol']));
     }
 
     public function getDefaultOptions(array $options)

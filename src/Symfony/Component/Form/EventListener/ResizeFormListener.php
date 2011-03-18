@@ -14,21 +14,22 @@ namespace Symfony\Component\Form\EventListener;
 use Symfony\Component\Form\Events;
 use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ResizeFormListener implements EventSubscriberInterface
 {
-    private $form;
+    private $factory;
 
     private $prototype;
 
     private $resizeOnBind;
 
-    public function __construct(FormInterface $form, $prototype, $resizeOnBind = false)
+    public function __construct(FormFactoryInterface $factory, $prototype, $resizeOnBind = false)
     {
-        $this->form = $form;
+        $this->factory = $factory;
         $this->prototype = $prototype;
         $this->resizeOnBind = $resizeOnBind;
     }
@@ -43,6 +44,7 @@ class ResizeFormListener implements EventSubscriberInterface
 
     public function preSetData(DataEvent $event)
     {
+        $form = $event->getField();
         $collection = $event->getData();
 
         if (null === $collection) {
@@ -53,21 +55,22 @@ class ResizeFormListener implements EventSubscriberInterface
             throw new UnexpectedTypeException($collection, 'array or \Traversable');
         }
 
-        foreach ($this->form as $name => $field) {
+        foreach ($form as $name => $field) {
             if (!$this->resizeOnBind || '$$name$$' != $name) {
-                $this->form->remove($name);
+                $form->remove($name);
             }
         }
 
         foreach ($collection as $name => $value) {
-            $this->form->add($this->prototype, $name, array(
+            $form->add($this->factory->getInstance($this->prototype, $name, array(
                 'property_path' => '['.$name.']',
-            ));
+            )));
         }
     }
 
     public function preBind(DataEvent $event)
     {
+        $form = $event->getField();
         $data = $event->getData();
 
         $this->removedFields = array();
@@ -76,18 +79,18 @@ class ResizeFormListener implements EventSubscriberInterface
             $data = array();
         }
 
-        foreach ($this->form as $name => $field) {
+        foreach ($form as $name => $field) {
             if (!isset($data[$name]) && $this->resizeOnBind && '$$name$$' != $name) {
-                $this->form->remove($name);
+                $form->remove($name);
                 $this->removedFields[] = $name;
             }
         }
 
         foreach ($data as $name => $value) {
-            if (!$this->form->has($name) && $this->resizeOnBind) {
-                $this->form->add($this->prototype, $name, array(
+            if (!$form->has($name) && $this->resizeOnBind) {
+                $form->add($this->factory->getInstance($this->prototype, $name, array(
                     'property_path' => '['.$name.']',
-                ));
+                )));
             }
         }
     }

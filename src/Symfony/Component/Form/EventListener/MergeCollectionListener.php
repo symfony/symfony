@@ -9,27 +9,23 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\ValueTransformer;
+namespace Symfony\Component\Form\EventListener;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\Events;
+use Symfony\Component\Form\Event\FilterDataEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class MergeCollectionTransformer implements ValueTransformerInterface
+class MergeCollectionListener implements EventSubscriberInterface
 {
-    private $field;
-
-    public function __construct(FieldInterface $field)
+    public static function getSubscribedEvents()
     {
-        $this->field = $field;
+        return Events::filterBoundData;
     }
 
-    public function transform($data)
+    public function filterBoundData(FilterDataEvent $event)
     {
-        return $data;
-    }
-
-    public function reverseTransform($data)
-    {
-        $collection = $this->field->getData();
+        $collection = $event->getField()->getData();
+        $data = $event->getData();
 
         if (!$collection) {
             $collection = $data;
@@ -50,6 +46,6 @@ class MergeCollectionTransformer implements ValueTransformerInterface
             }
         }
 
-        return $collection;
+        $event->setData($collection);
     }
 }

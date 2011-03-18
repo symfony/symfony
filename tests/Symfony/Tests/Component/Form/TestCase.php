@@ -11,8 +11,10 @@
 
 namespace Symfony\Tests\Component\Form;
 
+use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Config\Loader\DefaultConfigLoader;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class TestCase extends \PHPUnit_Framework_TestCase
 {
@@ -27,6 +29,8 @@ class TestCase extends \PHPUnit_Framework_TestCase
     private $em;
 
     protected $factory;
+
+    protected $builder;
 
     protected function setUp()
     {
@@ -44,5 +48,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
         $this->factory = new FormFactory($loader);
         $loader->initialize($this->factory, $this->theme, $this->csrfProvider,
                 $this->validator, $this->storage, $this->em);
+
+        $this->builder = new FieldBuilder($this->theme, new EventDispatcher(), $this->csrfProvider);
     }
 }

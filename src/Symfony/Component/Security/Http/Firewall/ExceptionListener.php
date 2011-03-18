@@ -138,7 +138,7 @@ class ExceptionListener
         $event->setResponse($response);
     }
 
-    private function startAuthentication(GetResponseForExceptionEvent $event, Request $request, AuthenticationException $authException)
+    private function startAuthentication(Request $request, AuthenticationException $authException)
     {
         $this->context->setToken(null);
 

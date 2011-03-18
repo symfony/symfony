@@ -19,7 +19,7 @@ class UrlFieldTest extends LocalizedTestCase
 {
     public function testSubmitAddsDefaultProtocolIfNoneIsIncluded()
     {
-        $field = $this->factory->getInstance('url', 'name');
+        $field = $this->factory->create('url', 'name');
 
         $field->bind('www.domain.com');
 
@@ -29,7 +29,7 @@ class UrlFieldTest extends LocalizedTestCase
 
     public function testSubmitAddsNoDefaultProtocolIfAlreadyIncluded()
     {
-        $field = $this->factory->getInstance('url', 'name', array(
+        $field = $this->factory->create('url', 'name', array(
             'default_protocol' => 'http',
         ));
 
@@ -41,7 +41,7 @@ class UrlFieldTest extends LocalizedTestCase
 
     public function testSubmitAddsNoDefaultProtocolIfEmpty()
     {
-        $field = $this->factory->getInstance('url', 'name', array(
+        $field = $this->factory->create('url', 'name', array(
             'default_protocol' => 'http',
         ));
 
@@ -53,7 +53,7 @@ class UrlFieldTest extends LocalizedTestCase
 
     public function testSubmitAddsNoDefaultProtocolIfSetToNull()
     {
-        $field = $this->factory->getInstance('url', 'name', array(
+        $field = $this->factory->create('url', 'name', array(
             'default_protocol' => null,
         ));
 

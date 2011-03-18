@@ -22,7 +22,7 @@ class CountryFieldTest extends TestCase
     {
         \Locale::setDefault('de_AT');
 
-        $field = $this->factory->getInstance('country', 'country');
+        $field = $this->factory->create('country', 'country');
         $choices = $field->getRenderer()->getVar('choices');
 
         $this->assertArrayHasKey('DE', $choices);
@@ -39,7 +39,7 @@ class CountryFieldTest extends TestCase
 
     public function testUnknownCountryIsNotIncluded()
     {
-        $field = $this->factory->getInstance('country', 'country');
+        $field = $this->factory->create('country', 'country');
         $choices = $field->getRenderer()->getVar('choices');
 
         $this->assertArrayNotHasKey('ZZ', $choices);

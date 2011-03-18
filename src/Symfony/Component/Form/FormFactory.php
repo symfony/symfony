@@ -13,8 +13,8 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Config\FieldConfigInterface;
 use Symfony\Component\Form\Config\Loader\ConfigLoaderInterface;
-use Symfony\Component\Form\Guesser\FieldGuesserInterface;
-use Symfony\Component\Form\Guesser\FieldGuess;
+use Symfony\Component\Form\FieldGuesser\FieldGuesserInterface;
+use Symfony\Component\Form\FieldGuesser\FieldGuess;
 
 class FormFactory implements FormFactoryInterface
 {
@@ -65,7 +65,7 @@ class FormFactory implements FormFactoryInterface
         return $builder;
     }
 
-    public function getInstance($identifier, $name = null, array $options = array())
+    public function create($identifier, $name = null, array $options = array())
     {
         return $this->createBuilder($identifier, $name, $options)->getInstance();
     }
@@ -76,10 +76,6 @@ class FormFactory implements FormFactoryInterface
         $identifierGuess = $this->guess(function ($guesser) use ($class, $property) {
             return $guesser->guessIdentifier($class, $property);
         });
-
-        if (!$identifierGuess) {
-            throw new \RuntimeException(sprintf('No field could be guessed for property "%s" of class %s', $property, $class));
-        }
 
         // guess maximum length
         $maxLengthGuess = $this->guess(function ($guesser) use ($class, $property) {
@@ -92,13 +88,10 @@ class FormFactory implements FormFactoryInterface
         });
 
         // construct field
-        $identifier = $identifierGuess->getIdentifier();
+        $identifier = $identifierGuess ? $identifierGuess->getIdentifier() : 'text';
 
-        // TODO all configs supporting the option "max_length" should receive
-        // it
-        if ($maxLengthGuess && $identifier == 'text') {
-// TODO enable me again later
-//            $options = array_merge(array('max_length' => $maxLengthGuess->getValue()), $options);
+        if ($maxLengthGuess) {
+            $options = array_merge(array('max_length' => $maxLengthGuess->getValue()), $options);
         }
 
         if ($requiredGuess) {
@@ -106,7 +99,9 @@ class FormFactory implements FormFactoryInterface
         }
 
         // user options may override guessed options
-        $options = array_merge($identifierGuess->getOptions(), $options);
+        if ($identifierGuess) {
+            $options = array_merge($identifierGuess->getOptions(), $options);
+        }
 
         return $this->createBuilder($identifier, $property, $options);
     }
@@ -114,7 +109,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * @inheritDoc
      */
-    public function getInstanceForProperty($class, $property, array $options = array())
+    public function createForProperty($class, $property, array $options = array())
     {
         return $this->createBuilderForProperty($class, $property, $options)->getInstance();
     }

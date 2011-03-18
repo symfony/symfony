@@ -19,7 +19,7 @@ class TimezoneFieldTest extends TestCase
 {
     public function testTimezonesAreSelectable()
     {
-        $field = $this->factory->getInstance('timezone', 'timezone');
+        $field = $this->factory->create('timezone', 'timezone');
         $choices = $field->getRenderer()->getVar('choices');
 
         $this->assertArrayHasKey('Africa', $choices);

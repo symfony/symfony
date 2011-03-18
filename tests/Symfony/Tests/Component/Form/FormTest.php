@@ -35,7 +35,7 @@ class FormTest_PreconfiguredForm extends Form
 {
     protected function configure()
     {
-        $this->add($this->factory->getInstance('field', 'firstName'));
+        $this->add($this->factory->create('field', 'firstName'));
 
         parent::configure();
     }
@@ -107,7 +107,7 @@ class FormTest extends TestCase
     {
         parent::setUp();
 
-        $this->form = $this->factory->getInstance('form', 'author');
+        $this->form = $this->factory->create('form', 'author');
     }
 
     public function testCsrfProtectionByDefault()
@@ -121,7 +121,7 @@ class FormTest extends TestCase
 
     public function testCsrfProtectionCanBeDisabled()
     {
-        $form =  $this->factory->getInstance('form', 'author', array(
+        $form =  $this->factory->create('form', 'author', array(
             'csrf_protection' => false,
         ));
 
@@ -130,7 +130,7 @@ class FormTest extends TestCase
 
     public function testCsrfFieldNameCanBeSet()
     {
-        $form =  $this->factory->getInstance('form', 'author', array(
+        $form =  $this->factory->create('form', 'author', array(
             'csrf_field_name' => 'foobar',
         ));
 
@@ -148,7 +148,7 @@ class FormTest extends TestCase
         ->with($this->equalTo('Symfony\Component\Form\Form'))
         ->will($this->returnValue('ABCDEF'));
 
-        $form = $this->factory->getInstance('form', 'author', array(
+        $form = $this->factory->create('form', 'author', array(
             'csrf_provider' => $provider,
         ));
 
@@ -179,7 +179,7 @@ class FormTest extends TestCase
         ->with($this->equalTo('Symfony\Component\Form\Form'), $this->equalTo('ABCDEF'))
         ->will($this->returnValue(true));
 
-        $form = $this->factory->getInstance('form', 'author', array(
+        $form = $this->factory->create('form', 'author', array(
             'csrf_provider' => $provider,
             'validator' => $this->validator,
         ));
@@ -201,7 +201,7 @@ class FormTest extends TestCase
         ->with($this->equalTo('Symfony\Component\Form\Form'), $this->equalTo('ABCDEF'))
         ->will($this->returnValue(false));
 
-        $form = $this->factory->getInstance('form', 'author', array(
+        $form = $this->factory->create('form', 'author', array(
             'csrf_provider' => $provider,
             'validator' => $this->validator,
         ));
@@ -220,7 +220,7 @@ class FormTest extends TestCase
 
     public function testValidationGroupsCanBeSetToString()
     {
-        $form = $this->factory->getInstance('form', 'author', array(
+        $form = $this->factory->create('form', 'author', array(
             'validation_groups' => 'group',
         ));
 
@@ -229,7 +229,7 @@ class FormTest extends TestCase
 
     public function testValidationGroupsCanBeSetToArray()
     {
-        $form = $this->factory->getInstance('form', 'author', array(
+        $form = $this->factory->create('form', 'author', array(
             'validation_groups' => array('group1', 'group2'),
         ));
 
@@ -344,14 +344,14 @@ class FormTest extends TestCase
      */
     public function testSupportsUnset()
     {
-        $form = $this->factory->getInstance('form', 'author');
+        $form = $this->factory->create('form', 'author');
 
         unset($form['firstName']);
     }
 
     public function testDoesNotSupportAddingFields()
     {
-        $form = $this->factory->getInstance('form', 'author');
+        $form = $this->factory->create('form', 'author');
 
         $this->setExpectedException('LogicException');
 
@@ -391,7 +391,7 @@ class FormTest extends TestCase
 
     public function testIsBound()
     {
-        $form = $this->factory->getInstance('form', 'author');
+        $form = $this->factory->create('form', 'author');
         $this->assertFalse($form->isBound());
         $form->bind(array('firstName' => 'Bernhard'));
         $this->assertTrue($form->isBound());
@@ -455,7 +455,7 @@ class FormTest extends TestCase
             ->method('bind')
             ->with($this->equalTo(null));
 
-        $form = $this->factory->getInstance('form', 'author');
+        $form = $this->factory->create('form', 'author');
         $form->add($field);
 
         $form->bind(array());
@@ -472,7 +472,7 @@ class FormTest extends TestCase
         ->method('addError')
         ->with($this->equalTo($error));
 
-        $form = $this->factory->getInstance('form', 'author');
+        $form = $this->factory->create('form', 'author');
         $form->add($field);
 
         $path = new PropertyPath('fields[firstName].data');
@@ -491,8 +491,8 @@ class FormTest extends TestCase
         ->method('addError')
         ->with($this->equalTo($error));
 
-        $form = $this->factory->getInstance('form', 'author');
-        $innerGroup = $this->factory->getInstance('form', 'names');
+        $form = $this->factory->create('form', 'author');
+        $innerGroup = $this->factory->create('form', 'names');
         $innerGroup->add($field);
         $form->add($innerGroup);
 
@@ -509,7 +509,7 @@ class FormTest extends TestCase
         $field->expects($this->never())
         ->method('addError');
 
-        $form = $this->factory->getInstance('form', 'author');
+        $form = $this->factory->create('form', 'author');
         $form->add($field);
 
         $path = new PropertyPath('fields[bar].data');
@@ -530,7 +530,7 @@ class FormTest extends TestCase
         $field->expects($this->never())
         ->method('addError');
 
-        $form = $this->factory->getInstance('form', 'author');
+        $form = $this->factory->create('form', 'author');
         $form->add($field);
 
         $path = new PropertyPath('fields[firstName].data');
@@ -558,7 +558,7 @@ class FormTest extends TestCase
         ->method('addError')
         ->with($this->equalTo($error), $this->equalTo($expectedPathIterator));
 
-        $form = $this->factory->getInstance('form', 'author');
+        $form = $this->factory->create('form', 'author');
         $form->add($field);
 
         $path = new PropertyPath('firstName');
@@ -577,7 +577,7 @@ class FormTest extends TestCase
         $field->expects($this->never())
         ->method('addError');
 
-        $form = $this->factory->getInstance('form', 'author');
+        $form = $this->factory->create('form', 'author');
         $form->add($field);
 
         $path = new PropertyPath('bar');
@@ -599,7 +599,7 @@ class FormTest extends TestCase
         $field->expects($this->never())
         ->method('addError');
 
-        $form = $this->factory->getInstance('form', 'author');
+        $form = $this->factory->create('form', 'author');
         $form->add($field);
 
         $path = new PropertyPath('firstName');
@@ -626,7 +626,7 @@ class FormTest extends TestCase
         ->method('addError')
         ->with($this->equalTo($error), $this->equalTo($expectedPathIterator));
 
-        $form = $this->factory->getInstance('form', 'author');
+        $form = $this->factory->create('form', 'author');
         $form->add($field);
 
         $path = new PropertyPath('address.street');
@@ -652,8 +652,8 @@ class FormTest extends TestCase
         ->method('addError')
         ->with($this->equalTo($error), $this->equalTo($expectedPathIterator));
 
-        $form = $this->factory->getInstance('form', 'author');
-        $nestedForm = $this->factory->getInstance('form', 'nested', array('virtual' => true));
+        $form = $this->factory->create('form', 'author');
+        $nestedForm = $this->factory->create('form', 'nested', array('virtual' => true));
         $nestedForm->add($field);
         $form->add($nestedForm);
 
@@ -666,7 +666,7 @@ class FormTest extends TestCase
     {
         $this->markTestSkipped('Currently does not work');
 
-        $form = $this->factory->getInstance('form', 'author');
+        $form = $this->factory->create('form', 'author');
 
         $field = $this->createMockField('firstName');
         $field->expects($this->once())
@@ -711,7 +711,7 @@ class FormTest extends TestCase
      * Example:
      *
      * <code>
-     * $dateRangeField = $this->factory->getInstance('form', 'dateRange');
+     * $dateRangeField = $this->factory->create('form', 'dateRange');
      * $dateRangeField->add(new DateField('startDate'));
      * $dateRangeField->add(new DateField('endDate'));
      * $form->add($dateRangeField);
@@ -747,7 +747,7 @@ class FormTest extends TestCase
 
     public function testSetDataThrowsAnExceptionIfArgumentIsNotObjectOrArray()
     {
-        $form = $this->factory->getInstance('form', 'author');
+        $form = $this->factory->create('form', 'author');
 
         $this->setExpectedException('InvalidArgumentException');
 
@@ -759,7 +759,7 @@ class FormTest extends TestCase
      */
     public function testSetDataMatchesAgainstDataClass_fails()
     {
-        $form = $this->factory->getInstance('form', 'author', array(
+        $form = $this->factory->create('form', 'author', array(
             'data_class' => 'Symfony\Tests\Component\Form\Fixtures\Author',
         ));
 
@@ -768,7 +768,7 @@ class FormTest extends TestCase
 
     public function testSetDataMatchesAgainstDataClass_succeeds()
     {
-        $form = $this->factory->getInstance('form', 'author', array(
+        $form = $this->factory->create('form', 'author', array(
             'data_class' => 'Symfony\Tests\Component\Form\Fixtures\Author',
         ));
 
@@ -777,7 +777,7 @@ class FormTest extends TestCase
 
     public function testSetDataToNullCreatesObjectIfClassAvailable()
     {
-        $form = $this->factory->getInstance('form', 'author', array(
+        $form = $this->factory->create('form', 'author', array(
             'data_class' => 'Symfony\Tests\Component\Form\Fixtures\Author',
         ));
         $form->setData(null);
@@ -788,7 +788,7 @@ class FormTest extends TestCase
     public function testSetDataToNullUsesDataConstructorOption()
     {
         $author = new Author();
-        $form = $this->factory->getInstance('form', 'author', array(
+        $form = $this->factory->create('form', 'author', array(
             'data_constructor' => function () use ($author) {
                 return $author;
             }
@@ -805,7 +805,7 @@ class FormTest extends TestCase
     public function testSetDataToNullCreatesArrayIfNoDataClassOrConstructor()
     {
         $author = new Author();
-        $form = $this->factory->getInstance('form', 'author');
+        $form = $this->factory->create('form', 'author');
         $form->setData(null);
 
         $this->assertSame(array(), $form->getData());
@@ -844,7 +844,7 @@ class FormTest extends TestCase
 
     public function testGetDataReturnsObject()
     {
-        $form = $this->factory->getInstance('form', 'author');
+        $form = $this->factory->create('form', 'author');
         $object = new \stdClass();
         $form->setData($object);
         $this->assertEquals($object, $form->getData());
@@ -859,7 +859,7 @@ class FormTest extends TestCase
         ->method('getData')
         ->will($this->returnValue('Bernhard'));
 
-        $form = $this->factory->getInstance('form', 'author');
+        $form = $this->factory->create('form', 'author');
         $form->add($field);
 
         $form->bind(array('firstName' => 'Bernhard'));
@@ -873,7 +873,7 @@ class FormTest extends TestCase
         $metadataFactory = $this->createMockMetadataFactory();
         $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
         $object = $this->getMock('\stdClass');
-        $form = $this->factory->getInstance('form', 'author', array('validation_groups' => array(
+        $form = $this->factory->create('form', 'author', array('validation_groups' => array(
             'group1',
             'group2',
         )));
@@ -897,7 +897,7 @@ class FormTest extends TestCase
         $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
         $context->setPropertyPath('path');
         $object = $this->getMock('\stdClass');
-        $form = $this->factory->getInstance('form', 'author');
+        $form = $this->factory->create('form', 'author');
 
         $graphWalker->expects($this->once())
             ->method('walkReference')
@@ -913,7 +913,7 @@ class FormTest extends TestCase
         $metadataFactory = $this->createMockMetadataFactory();
         $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
         $object = $this->getMock('\stdClass');
-        $form = $this->factory->getInstance('form', 'author');
+        $form = $this->factory->create('form', 'author');
         $test = $this;
 
         $graphWalker->expects($this->once())
@@ -1090,7 +1090,7 @@ class FormTest extends TestCase
      */
     protected function getGroupWithBothVisibleAndHiddenField()
     {
-        $form = $this->factory->getInstance('form', 'testGroup');
+        $form = $this->factory->create('form', 'testGroup');
 
         // add a visible field
         $visibleField = $this->createMockField('visibleField');

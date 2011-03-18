@@ -67,6 +67,7 @@ class FieldConfig extends AbstractFieldConfig
             'disabled' => false,
             'value_transformer' => null,
             'normalization_transformer' => null,
+            'max_length' => null,
         );
     }
 

@@ -22,7 +22,7 @@ class LocaleFieldTest extends TestCase
     {
         \Locale::setDefault('de_AT');
 
-        $field = $this->factory->getInstance('locale', 'locale');
+        $field = $this->factory->create('locale', 'locale');
         $choices = $field->getRenderer()->getVar('choices');
 
         $this->assertArrayHasKey('en', $choices);

@@ -33,7 +33,7 @@ class FileFieldTest extends TestCase
     {
         parent::setUp();
 
-        $this->field = $this->factory->getInstance('file', 'file');
+        $this->field = $this->factory->create('file', 'file');
     }
 
     protected function tearDown()

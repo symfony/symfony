@@ -17,7 +17,7 @@ interface FormFactoryInterface
 
     function createBuilderForProperty($class, $property, array $options = array());
 
-    function getInstance($identifier, $name = null, array $options = array());
+    function create($identifier, $name = null, array $options = array());
 
-    function getInstanceForProperty($class, $property, array $options = array());
+    function createForProperty($class, $property, array $options = array());
 }

@@ -24,7 +24,6 @@ class TextFieldConfig extends AbstractFieldConfig
     {
         return array(
             'template' => 'text',
-            'max_length' => null,
         );
     }
 

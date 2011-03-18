@@ -62,7 +62,7 @@ class ResizeFormListener implements EventSubscriberInterface
         }
 
         foreach ($collection as $name => $value) {
-            $form->add($this->factory->getInstance($this->prototype, $name, array(
+            $form->add($this->factory->create($this->prototype, $name, array(
                 'property_path' => '['.$name.']',
             )));
         }
@@ -88,7 +88,7 @@ class ResizeFormListener implements EventSubscriberInterface
 
         foreach ($data as $name => $value) {
             if (!$form->has($name) && $this->resizeOnBind) {
-                $form->add($this->factory->getInstance($this->prototype, $name, array(
+                $form->add($this->factory->create($this->prototype, $name, array(
                     'property_path' => '['.$name.']',
                 )));
             }

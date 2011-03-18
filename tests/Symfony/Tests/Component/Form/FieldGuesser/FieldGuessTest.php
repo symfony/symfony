@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Form\FieldFactory;
+namespace Symfony\Tests\Component\Form\FieldGuesser;
 
-use Symfony\Component\Form\Guesser\FieldGuess;
+use Symfony\Component\Form\FieldGuesser\FieldGuess;
 
 class FieldGuessTest extends \PHPUnit_Framework_TestCase
 {

@@ -22,7 +22,7 @@ class LanguageFieldTest extends TestCase
     {
         \Locale::setDefault('de_AT');
 
-        $field = $this->factory->getInstance('language', 'language');
+        $field = $this->factory->create('language', 'language');
         $choices = $field->getRenderer()->getVar('choices');
 
         $this->assertArrayHasKey('en', $choices);
@@ -39,7 +39,7 @@ class LanguageFieldTest extends TestCase
 
     public function testMultipleLanguagesIsNotIncluded()
     {
-        $field = $this->factory->getInstance('language', 'language');
+        $field = $this->factory->create('language', 'language');
         $choices = $field->getRenderer()->getVar('choices');
 
         $this->assertArrayNotHasKey('mul', $choices);

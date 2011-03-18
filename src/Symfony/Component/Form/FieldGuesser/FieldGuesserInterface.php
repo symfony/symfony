@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Guesser;
+namespace Symfony\Component\Form\FieldGuesser;
 
 /**
  * Guesses field classes and options for the properties of a class

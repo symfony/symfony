@@ -50,7 +50,7 @@ class ChoiceFieldTest extends TestCase
 
     public function testIsChoiceSelectedDifferentiatesBetweenZeroAndEmpty_integerZero()
     {
-        $field = $this->factory->getInstance('choice', 'name', array(
+        $field = $this->factory->create('choice', 'name', array(
             'choices' => array(
                 0 => 'Foo',
                 '' => 'Bar',
@@ -78,7 +78,7 @@ class ChoiceFieldTest extends TestCase
 
     public function testIsChoiceSelectedDifferentiatesBetweenZeroAndEmpty_stringZero()
     {
-        $field = $this->factory->getInstance('choice', 'name', array(
+        $field = $this->factory->create('choice', 'name', array(
             'choices' => array(
                 '0' => 'Foo',
                 '' => 'Bar',
@@ -109,7 +109,7 @@ class ChoiceFieldTest extends TestCase
      */
     public function testConfigureChoicesWithNonArray()
     {
-        $field = $this->factory->getInstance('choice', 'name', array(
+        $field = $this->factory->create('choice', 'name', array(
             'choices' => new \ArrayObject(),
         ));
     }
@@ -139,7 +139,7 @@ class ChoiceFieldTest extends TestCase
      */
     public function testClosureShouldReturnArray()
     {
-        $field = $this->factory->getInstance('choice', 'name', array(
+        $field = $this->factory->create('choice', 'name', array(
             'choices' => function () { return 'foobar'; },
         ));
 
@@ -152,7 +152,7 @@ class ChoiceFieldTest extends TestCase
      */
     public function testSubmitSingleNonExpanded($choices)
     {
-        $field = $this->factory->getInstance('choice', 'name', array(
+        $field = $this->factory->create('choice', 'name', array(
             'multiple' => false,
             'expanded' => false,
             'choices' => $choices,
@@ -169,7 +169,7 @@ class ChoiceFieldTest extends TestCase
      */
     public function testSubmitMultipleNonExpanded($choices)
     {
-        $field = $this->factory->getInstance('choice', 'name', array(
+        $field = $this->factory->create('choice', 'name', array(
             'multiple' => true,
             'expanded' => false,
             'choices' => $choices,
@@ -186,7 +186,7 @@ class ChoiceFieldTest extends TestCase
      */
     public function testSubmitSingleExpanded($choices)
     {
-        $field = $this->factory->getInstance('choice', 'name', array(
+        $field = $this->factory->create('choice', 'name', array(
             'multiple' => false,
             'expanded' => true,
             'choices' => $choices,
@@ -212,7 +212,7 @@ class ChoiceFieldTest extends TestCase
      */
     public function testSubmitSingleExpandedNumericChoices($choices)
     {
-        $field = $this->factory->getInstance('choice', 'name', array(
+        $field = $this->factory->create('choice', 'name', array(
             'multiple' => false,
             'expanded' => true,
             'choices' => $choices,
@@ -238,7 +238,7 @@ class ChoiceFieldTest extends TestCase
      */
     public function testSubmitMultipleExpanded($choices)
     {
-        $field = $this->factory->getInstance('choice', 'name', array(
+        $field = $this->factory->create('choice', 'name', array(
             'multiple' => true,
             'expanded' => true,
             'choices' => $choices,
@@ -264,7 +264,7 @@ class ChoiceFieldTest extends TestCase
      */
     public function testSubmitMultipleExpandedNumericChoices($choices)
     {
-        $field = $this->factory->getInstance('choice', 'name', array(
+        $field = $this->factory->create('choice', 'name', array(
             'multiple' => true,
             'expanded' => true,
             'choices' => $choices,

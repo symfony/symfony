@@ -14,10 +14,10 @@ namespace Symfony\Component\Form\Config;
 use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\EventListener\FixFileUploadListener;
-use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
-use Symfony\Component\Form\ValueTransformer\ReversedTransformer;
-use Symfony\Component\Form\ValueTransformer\FileToStringTransformer;
-use Symfony\Component\Form\ValueTransformer\FileToArrayTransformer;
+use Symfony\Component\Form\DataTransformer\DataTransformerChain;
+use Symfony\Component\Form\DataTransformer\ReversedTransformer;
+use Symfony\Component\Form\DataTransformer\FileToStringTransformer;
+use Symfony\Component\Form\DataTransformer\FileToArrayTransformer;
 use Symfony\Component\HttpFoundation\File\TemporaryStorage;
 
 class FileFieldConfig extends AbstractFieldConfig
@@ -32,7 +32,7 @@ class FileFieldConfig extends AbstractFieldConfig
     public function configure(FieldBuilder $builder, array $options)
     {
         if ($options['type'] === 'string') {
-            $builder->setNormalizationTransformer(new ValueTransformerChain(array(
+            $builder->setNormalizationTransformer(new DataTransformerChain(array(
                 new ReversedTransformer(new FileToStringTransformer()),
                 new FileToArrayTransformer(),
             )));

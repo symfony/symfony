@@ -14,17 +14,17 @@ namespace Symfony\Tests\Component\Form;
 require_once __DIR__ . '/TestCase.php';
 require_once __DIR__ . '/Fixtures/Author.php';
 require_once __DIR__ . '/Fixtures/InvalidField.php';
-require_once __DIR__ . '/Fixtures/FixedValueTransformer.php';
+require_once __DIR__ . '/Fixtures/FixedDataTransformer.php';
 require_once __DIR__ . '/Fixtures/FixedFilterListener.php';
 
-use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
+use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
 use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\Form\FieldError;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
+use Symfony\Component\Form\DataTransformer\TransformationFailedException;
 use Symfony\Tests\Component\Form\Fixtures\Author;
 use Symfony\Tests\Component\Form\Fixtures\InvalidField;
-use Symfony\Tests\Component\Form\Fixtures\FixedValueTransformer;
+use Symfony\Tests\Component\Form\Fixtures\FixedDataTransformer;
 use Symfony\Tests\Component\Form\Fixtures\FixedFilterListener;
 
 class FieldTest extends TestCase
@@ -191,7 +191,7 @@ class FieldTest extends TestCase
         $this->assertEquals('', $this->field->getTransformedData());
     }
 
-    public function testDataIsTransformedCorrectlyIfNull_noValueTransformer()
+    public function testDataIsTransformedCorrectlyIfNull_noDataTransformer()
     {
         $this->field->setData(null);
 
@@ -199,7 +199,7 @@ class FieldTest extends TestCase
         $this->assertSame('', $this->field->getTransformedData());
     }
 
-    public function testDataIsTransformedCorrectlyIfNotNull_noValueTransformer()
+    public function testDataIsTransformedCorrectlyIfNotNull_noDataTransformer()
     {
         $this->field->setData(123);
 
@@ -224,7 +224,7 @@ class FieldTest extends TestCase
                 'norm[filter1[0]]' => 'filter2[norm[filter1[0]]]',
             ),
         ));
-        $valueTransformer = new FixedValueTransformer(array(
+        $dataTransformer = new FixedDataTransformer(array(
             // 0. Empty initialization
             null => null,
             // 2. The filtered value is normalized
@@ -233,7 +233,7 @@ class FieldTest extends TestCase
             //     representation
             'filter2[norm[filter1[0]]]' => 'client[filter2[norm[filter1[0]]]]',
         ));
-        $normTransformer = new FixedValueTransformer(array(
+        $normTransformer = new FixedDataTransformer(array(
             // 0. Empty initialization
             null => null,
             // 4b. The filtered normalized value is converted to app
@@ -242,7 +242,7 @@ class FieldTest extends TestCase
         ));
 
         $this->builder->addEventSubscriber($filter);
-        $this->builder->setValueTransformer($valueTransformer);
+        $this->builder->setDataTransformer($dataTransformer);
         $this->builder->setNormalizationTransformer($normTransformer);
 
         $field = $this->builder->getInstance();
@@ -253,7 +253,7 @@ class FieldTest extends TestCase
         $this->assertEquals('client[filter2[norm[filter1[0]]]]', $field->getTransformedData());
     }
 
-    public function testBoundDataIsTransformedCorrectlyIfEmpty_noValueTransformer()
+    public function testBoundDataIsTransformedCorrectlyIfEmpty_noDataTransformer()
     {
         $this->field->bind('');
 
@@ -263,18 +263,18 @@ class FieldTest extends TestCase
 
     public function testSetDataIsTransformedCorrectly()
     {
-        $normTransformer = new FixedValueTransformer(array(
+        $normTransformer = new FixedDataTransformer(array(
             null => '',
             0 => 'norm[0]',
         ));
 
-        $valueTransformer = new FixedValueTransformer(array(
+        $dataTransformer = new FixedDataTransformer(array(
             '' => '',
             'norm[0]' => 'transform[norm[0]]',
         ));
 
         $field = $this->factory->create('field', 'title', array(
-            'value_transformer' => $valueTransformer,
+            'value_transformer' => $dataTransformer,
             'normalization_transformer' => $normTransformer,
         ));
 
@@ -287,7 +287,7 @@ class FieldTest extends TestCase
 
     public function testBoundDataIsTrimmedBeforeTransforming()
     {
-        $transformer = new FixedValueTransformer(array(
+        $transformer = new FixedDataTransformer(array(
             null => '',
             'reverse[a]' => 'a',
         ));
@@ -304,7 +304,7 @@ class FieldTest extends TestCase
 
     public function testBoundDataIsNotTrimmedBeforeTransformingIfDisabled()
     {
-        $transformer = new FixedValueTransformer(array(
+        $transformer = new FixedDataTransformer(array(
             null => '',
             'reverse[ a ]' => ' a ',
         ));
@@ -392,7 +392,7 @@ class FieldTest extends TestCase
 
     protected function createMockTransformer()
     {
-        return $this->getMock('Symfony\Component\Form\ValueTransformer\ValueTransformerInterface', array(), array(), '', false, false);
+        return $this->getMock('Symfony\Component\Form\DataTransformer\DataTransformerInterface', array(), array(), '', false, false);
     }
 
     protected function createMockTransformerTransformingTo($value)

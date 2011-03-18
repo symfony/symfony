@@ -12,14 +12,14 @@
 namespace Symfony\Component\Form\Config;
 
 use Symfony\Component\Form\FieldBuilder;
-use Symfony\Component\Form\ValueTransformer\BooleanToStringTransformer;
+use Symfony\Component\Form\DataTransformer\BooleanToStringTransformer;
 use Symfony\Component\Form\Renderer\Plugin\CheckedPlugin;
 
 class CheckboxFieldConfig extends AbstractFieldConfig
 {
     public function configure(FieldBuilder $builder, array $options)
     {
-        $builder->setValueTransformer(new BooleanToStringTransformer())
+        $builder->setDataTransformer(new BooleanToStringTransformer())
             ->addRendererPlugin(new CheckedPlugin())
             ->setRendererVar('value', $options['value']);
     }

@@ -15,11 +15,11 @@ use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\ChoiceList\PaddedChoiceList;
 use Symfony\Component\Form\ChoiceList\MonthChoiceList;
 use Symfony\Component\Form\Renderer\Plugin\DatePatternPlugin;
-use Symfony\Component\Form\ValueTransformer\DateTimeToLocalizedStringTransformer;
-use Symfony\Component\Form\ValueTransformer\DateTimeToArrayTransformer;
-use Symfony\Component\Form\ValueTransformer\DateTimeToStringTransformer;
-use Symfony\Component\Form\ValueTransformer\DateTimeToTimestampTransformer;
-use Symfony\Component\Form\ValueTransformer\ReversedTransformer;
+use Symfony\Component\Form\DataTransformer\DateTimeToLocalizedStringTransformer;
+use Symfony\Component\Form\DataTransformer\DateTimeToArrayTransformer;
+use Symfony\Component\Form\DataTransformer\DateTimeToStringTransformer;
+use Symfony\Component\Form\DataTransformer\DateTimeToTimestampTransformer;
+use Symfony\Component\Form\DataTransformer\ReversedTransformer;
 
 class DateFieldConfig extends AbstractFieldConfig
 {
@@ -32,7 +32,7 @@ class DateFieldConfig extends AbstractFieldConfig
         );
 
         if ($options['widget'] === 'text') {
-            $builder->setValueTransformer(new DateTimeToLocalizedStringTransformer(array(
+            $builder->setDataTransformer(new DateTimeToLocalizedStringTransformer(array(
                 'date_format' => $options['format'],
                 'time_format' => \IntlDateFormatter::NONE,
                 'input_timezone' => $options['data_timezone'],
@@ -59,7 +59,7 @@ class DateFieldConfig extends AbstractFieldConfig
             $builder->add('choice', 'year', $yearOptions)
                 ->add('choice', 'month', $monthOptions)
                 ->add('choice', 'day', $dayOptions)
-                ->setValueTransformer(new DateTimeToArrayTransformer(array(
+                ->setDataTransformer(new DateTimeToArrayTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['user_timezone'],
                     'fields' => array('year', 'month', 'day'),

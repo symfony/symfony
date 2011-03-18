@@ -12,12 +12,12 @@
 namespace Symfony\Component\Form\Config;
 
 use Symfony\Component\Form\FieldBuilder;
-use Symfony\Component\Form\ValueTransformer\ReversedTransformer;
-use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
-use Symfony\Component\Form\ValueTransformer\DateTimeToArrayTransformer;
-use Symfony\Component\Form\ValueTransformer\DateTimeToStringTransformer;
-use Symfony\Component\Form\ValueTransformer\DateTimeToTimestampTransformer;
-use Symfony\Component\Form\ValueTransformer\ArrayToPartsTransformer;
+use Symfony\Component\Form\DataTransformer\ReversedTransformer;
+use Symfony\Component\Form\DataTransformer\DataTransformerChain;
+use Symfony\Component\Form\DataTransformer\DateTimeToArrayTransformer;
+use Symfony\Component\Form\DataTransformer\DateTimeToStringTransformer;
+use Symfony\Component\Form\DataTransformer\DateTimeToTimestampTransformer;
+use Symfony\Component\Form\DataTransformer\ArrayToPartsTransformer;
 
 class DateTimeFieldConfig extends AbstractFieldConfig
 {
@@ -68,7 +68,7 @@ class DateTimeFieldConfig extends AbstractFieldConfig
             $timeParts[] = 'second';
         }
 
-        $builder->setValueTransformer(new ValueTransformerChain(array(
+        $builder->setDataTransformer(new DataTransformerChain(array(
                 new DateTimeToArrayTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['user_timezone'],

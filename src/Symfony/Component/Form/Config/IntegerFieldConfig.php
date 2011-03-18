@@ -12,13 +12,13 @@
 namespace Symfony\Component\Form\Config;
 
 use Symfony\Component\Form\FieldBuilder;
-use Symfony\Component\Form\ValueTransformer\IntegerToLocalizedStringTransformer;
+use Symfony\Component\Form\DataTransformer\IntegerToLocalizedStringTransformer;
 
 class IntegerFieldConfig extends AbstractFieldConfig
 {
     public function configure(FieldBuilder $builder, array $options)
     {
-        $builder->setValueTransformer(new IntegerToLocalizedStringTransformer(array(
+        $builder->setDataTransformer(new IntegerToLocalizedStringTransformer(array(
                 'precision' => $options['precision'],
                 'grouping' => $options['grouping'],
                 'rounding-mode' => $options['rounding_mode'],

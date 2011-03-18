@@ -17,7 +17,7 @@ class NumberFieldConfig extends AbstractFieldConfig
 {
     public function configure(FieldBuilder $builder, array $options)
     {
-        $builder->setValueTransformer(new NumberToLocalizedStringTransformer(array(
+        $builder->setDataTransformer(new NumberToLocalizedStringTransformer(array(
                 'precision' => $options['precision'],
                 'grouping' => $options['grouping'],
                 'rounding-mode' => $options['rounding_mode'],

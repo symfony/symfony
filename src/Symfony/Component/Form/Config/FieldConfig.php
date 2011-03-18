@@ -62,7 +62,7 @@ class FieldConfig extends AbstractFieldConfig
             ->setAttribute('by_reference', $options['by_reference'])
             ->setAttribute('property_path', $options['property_path'])
             ->setAttribute('validation_groups', $options['validation_groups'])
-            ->setValueTransformer($options['value_transformer'])
+            ->setDataTransformer($options['value_transformer'])
             ->setNormalizationTransformer($options['normalization_transformer'])
             ->setData($options['data'])
             ->setRenderer(new DefaultRenderer($this->theme, $options['template']))

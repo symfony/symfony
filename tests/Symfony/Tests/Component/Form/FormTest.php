@@ -22,7 +22,7 @@ use Symfony\Component\Form\FieldError;
 use Symfony\Component\Form\DataError;
 use Symfony\Component\Form\HiddenField;
 use Symfony\Component\Form\PropertyPath;
-use Symfony\Component\Form\ValueTransformer\CallbackTransformer;
+use Symfony\Component\Form\DataTransformer\CallbackTransformer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -670,7 +670,7 @@ class FormTest extends TestCase
             ->will($this->returnValue($transformedAuthor));
 
         $builder = $this->factory->createBuilder('form', 'author');
-        $builder->setValueTransformer($transformer);
+        $builder->setDataTransformer($transformer);
         $builder->setData($originalAuthor);
         $builder->add('field', 'firstName');
         $builder->add('field', 'lastName');
@@ -803,7 +803,7 @@ class FormTest extends TestCase
             ->will($this->returnValue($transformedAuthor));
 
         $builder = $this->factory->createBuilder('form', 'author');
-        $builder->setValueTransformer($transformer);
+        $builder->setDataTransformer($transformer);
         $builder->add('field', 'firstName');
         $builder->add('field', 'lastName');
         $builder->setData($originalAuthor);
@@ -907,16 +907,16 @@ class FormTest extends TestCase
         $graphWalker = $this->createMockGraphWalker();
         $metadataFactory = $this->createMockMetadataFactory();
         $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
-        $valueTransformer = $this->createMockTransformer();
+        $dataTransformer = $this->createMockTransformer();
 
         $builder = $this->factory->createBuilder('form', 'author');
-        $builder->setValueTransformer($valueTransformer);
+        $builder->setDataTransformer($dataTransformer);
         $form = $builder->getInstance();
 
         $graphWalker->expects($this->never())
             ->method('walkReference');
 
-        $valueTransformer->expects($this->atLeastOnce())
+        $dataTransformer->expects($this->atLeastOnce())
             ->method('reverseTransform')
             ->will($this->returnValue('foobar'));
 
@@ -995,7 +995,7 @@ class FormTest extends TestCase
 
         $builder = $this->factory->createBuilder('form', 'author');
         $builder->add('form', 'referenceCopy');
-        $builder->get('referenceCopy')->setValueTransformer(new CallbackTransformer(
+        $builder->get('referenceCopy')->setDataTransformer(new CallbackTransformer(
             function () {},
             function ($value) { // reverseTransform
                 return 'foobar';
@@ -1163,7 +1163,7 @@ class FormTest extends TestCase
 
     protected function createMockTransformer()
     {
-        return $this->getMock('Symfony\Component\Form\ValueTransformer\ValueTransformerInterface', array(), array(), '', false, false);
+        return $this->getMock('Symfony\Component\Form\DataTransformer\DataTransformerInterface', array(), array(), '', false, false);
     }
 
     protected function createMockValidator()

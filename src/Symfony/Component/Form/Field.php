@@ -11,8 +11,8 @@ namespace Symfony\Component\Form;
  * file that was distributed with this source code.
  */
 
-use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
-use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
+use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
+use Symfony\Component\Form\DataTransformer\TransformationFailedException;
 use Symfony\Component\Form\DataValidator\DataValidatorInterface;
 use Symfony\Component\Form\Renderer\RendererInterface;
 use Symfony\Component\Form\Renderer\Plugin\RendererPluginInterface;
@@ -40,7 +40,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * a checkbox field uses a Boolean value both for internal processing as for
  * storage in the object. In these cases you simply need to set a value
  * transformer to convert between formats (2) and (3). You can do this by
- * calling setValueTransformer() in the configure() method.
+ * calling setDataTransformer() in the configure() method.
  *
  * In some cases though it makes sense to make format (1) configurable. To
  * demonstrate this, let's extend our above date field to store the value
@@ -63,7 +63,7 @@ class Field implements FieldInterface
     private $normalizedData;
     private $transformedData = '';
     private $normalizationTransformer;
-    private $valueTransformer;
+    private $dataTransformer;
     private $transformationSuccessful = true;
     private $dataValidator;
     private $renderer;
@@ -72,15 +72,15 @@ class Field implements FieldInterface
     private $attributes;
 
     public function __construct($name, EventDispatcherInterface $dispatcher,
-        RendererInterface $renderer, ValueTransformerInterface $valueTransformer = null,
-        ValueTransformerInterface $normalizationTransformer = null,
+        RendererInterface $renderer, DataTransformerInterface $dataTransformer = null,
+        DataTransformerInterface $normalizationTransformer = null,
         DataValidatorInterface $dataValidator = null, $required = false,
         $disabled = false, array $attributes = array())
     {
         $this->name = (string)$name;
         $this->dispatcher = $dispatcher;
         $this->renderer = $renderer;
-        $this->valueTransformer = $valueTransformer;
+        $this->dataTransformer = $dataTransformer;
         $this->normalizationTransformer = $normalizationTransformer;
         $this->dataValidator = $dataValidator;
         $this->required = $required;
@@ -217,7 +217,7 @@ class Field implements FieldInterface
         $appData = $event->getData();
 
         // Treat data as strings unless a value transformer exists
-        if (null === $this->valueTransformer && is_scalar($appData)) {
+        if (null === $this->dataTransformer && is_scalar($appData)) {
             $appData = (string)$appData;
         }
 
@@ -386,9 +386,9 @@ class Field implements FieldInterface
     }
 
     /**
-     * Returns the ValueTransformer.
+     * Returns the DataTransformer.
      *
-     * @return ValueTransformerInterface
+     * @return DataTransformerInterface
      */
     public function getNormalizationTransformer()
     {
@@ -396,13 +396,13 @@ class Field implements FieldInterface
     }
 
     /**
-     * Returns the ValueTransformer.
+     * Returns the DataTransformer.
      *
-     * @return ValueTransformerInterface
+     * @return DataTransformerInterface
      */
-    public function getValueTransformer()
+    public function getDataTransformer()
     {
-        return $this->valueTransformer;
+        return $this->dataTransformer;
     }
 
     /**
@@ -451,12 +451,12 @@ class Field implements FieldInterface
      */
     protected function transform($value)
     {
-        if (null === $this->valueTransformer) {
+        if (null === $this->dataTransformer) {
             // Scalar values should always be converted to strings to
             // facilitate differentiation between empty ("") and zero (0).
             return null === $value || is_scalar($value) ? (string)$value : $value;
         }
-        return $this->valueTransformer->transform($value);
+        return $this->dataTransformer->transform($value);
     }
 
     /**
@@ -467,9 +467,9 @@ class Field implements FieldInterface
      */
     protected function reverseTransform($value)
     {
-        if (null === $this->valueTransformer) {
+        if (null === $this->dataTransformer) {
             return '' === $value ? null : $value;
         }
-        return $this->valueTransformer->reverseTransform($value, $this->data);
+        return $this->dataTransformer->reverseTransform($value, $this->data);
     }
 }

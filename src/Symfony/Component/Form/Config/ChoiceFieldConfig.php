@@ -16,8 +16,8 @@ use Symfony\Component\Form\ChoiceList\DefaultChoiceList;
 use Symfony\Component\Form\EventListener\FixRadioInputListener;
 use Symfony\Component\Form\Renderer\Plugin\ChoicePlugin;
 use Symfony\Component\Form\Renderer\Plugin\SelectMultipleNamePlugin;
-use Symfony\Component\Form\ValueTransformer\ScalarToChoicesTransformer;
-use Symfony\Component\Form\ValueTransformer\ArrayToChoicesTransformer;
+use Symfony\Component\Form\DataTransformer\ScalarToChoicesTransformer;
+use Symfony\Component\Form\DataTransformer\ArrayToChoicesTransformer;
 
 class ChoiceFieldConfig extends AbstractFieldConfig
 {
@@ -43,11 +43,11 @@ class ChoiceFieldConfig extends AbstractFieldConfig
             ->setRendererVar('expanded', $options['expanded']);
 
         if ($options['multiple'] && $options['expanded']) {
-            $builder->setValueTransformer(new ArrayToChoicesTransformer($options['choice_list']));
+            $builder->setDataTransformer(new ArrayToChoicesTransformer($options['choice_list']));
         }
 
         if (!$options['multiple'] && $options['expanded']) {
-            $builder->setValueTransformer(new ScalarToChoicesTransformer($options['choice_list']));
+            $builder->setDataTransformer(new ScalarToChoicesTransformer($options['choice_list']));
             $builder->addEventSubscriber(new FixRadioInputListener(), 10);
         }
 

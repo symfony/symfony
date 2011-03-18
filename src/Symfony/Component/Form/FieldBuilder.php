@@ -13,7 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\DataMapper\DataMapperInterface;
 use Symfony\Component\Form\DataValidator\DataValidatorInterface;
-use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
+use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
 use Symfony\Component\Form\Renderer\DefaultRenderer;
 use Symfony\Component\Form\Renderer\RendererInterface;
 use Symfony\Component\Form\Renderer\Plugin\RendererPluginInterface;
@@ -46,7 +46,7 @@ class FieldBuilder
 
     private $rendererVars = array();
 
-    private $valueTransformer;
+    private $dataTransformer;
 
     private $normalizationTransformer;
 
@@ -372,11 +372,11 @@ class FieldBuilder
     }
 
     /**
-     * Sets the ValueTransformer.
+     * Sets the DataTransformer.
      *
-     * @param ValueTransformerInterface $valueTransformer
+     * @param DataTransformerInterface $dataTransformer
      */
-    public function setNormalizationTransformer(ValueTransformerInterface $normalizationTransformer = null)
+    public function setNormalizationTransformer(DataTransformerInterface $normalizationTransformer = null)
     {
         $this->normalizationTransformer = $normalizationTransformer;
 
@@ -389,20 +389,20 @@ class FieldBuilder
     }
 
     /**
-     * Sets the ValueTransformer.
+     * Sets the DataTransformer.
      *
-     * @param ValueTransformerInterface $valueTransformer
+     * @param DataTransformerInterface $dataTransformer
      */
-    public function setValueTransformer(ValueTransformerInterface $valueTransformer = null)
+    public function setDataTransformer(DataTransformerInterface $dataTransformer = null)
     {
-        $this->valueTransformer = $valueTransformer;
+        $this->dataTransformer = $dataTransformer;
 
         return $this;
     }
 
-    public function getValueTransformer()
+    public function getDataTransformer()
     {
-        return $this->valueTransformer;
+        return $this->dataTransformer;
     }
 
     /**
@@ -492,7 +492,7 @@ class FieldBuilder
                 $this->name,
                 $this->buildDispatcher(),
                 $this->buildRenderer(),
-                $this->getValueTransformer(),
+                $this->getDataTransformer(),
                 $this->getNormalizationTransformer(),
                 $this->getDataMapper(),
                 $this->getDataValidator(),
@@ -509,7 +509,7 @@ class FieldBuilder
                 $this->name,
                 $this->buildDispatcher(),
                 $this->buildRenderer(),
-                $this->getValueTransformer(),
+                $this->getDataTransformer(),
                 $this->getNormalizationTransformer(),
                 $this->getDataValidator(),
                 $this->getRequired(),

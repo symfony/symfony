@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Config;
 
 use Symfony\Component\Form\FieldBuilder;
-use Symfony\Component\Form\ValueTransformer\BooleanToStringTransformer;
+use Symfony\Component\Form\DataTransformer\BooleanToStringTransformer;
 use Symfony\Component\Form\Renderer\Plugin\CheckedPlugin;
 use Symfony\Component\Form\Renderer\Plugin\ParentNamePlugin;
 
@@ -20,7 +20,7 @@ class RadioFieldConfig extends AbstractFieldConfig
 {
     public function configure(FieldBuilder $builder, array $options)
     {
-        $builder->setValueTransformer(new BooleanToStringTransformer())
+        $builder->setDataTransformer(new BooleanToStringTransformer())
             ->addRendererPlugin(new CheckedPlugin())
             ->addRendererPlugin(new ParentNamePlugin())
             ->setRendererVar('value', $options['value']);

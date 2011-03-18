@@ -17,7 +17,7 @@ class PercentFieldConfig extends AbstractFieldConfig
 {
     public function configure(FieldBuilder $builder, array $options)
     {
-        $builder->setValueTransformer(new PercentToLocalizedStringTransformer(array(
+        $builder->setDataTransformer(new PercentToLocalizedStringTransformer(array(
                 'precision' => $options['precision'],
                 'type' => $options['type'],
             )));

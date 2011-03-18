@@ -12,13 +12,13 @@
 namespace Symfony\Component\Form\Config;
 
 use Symfony\Component\Form\FieldBuilder;
-use Symfony\Component\Form\ValueTransformer\ValueToDuplicatesTransformer;
+use Symfony\Component\Form\DataTransformer\ValueToDuplicatesTransformer;
 
 class RepeatedFieldConfig extends AbstractFieldConfig
 {
     public function configure(FieldBuilder $builder, array $options)
     {
-        $builder->setValueTransformer(new ValueToDuplicatesTransformer(array(
+        $builder->setDataTransformer(new ValueToDuplicatesTransformer(array(
                 $options['first_name'],
                 $options['second_name'],
             )))

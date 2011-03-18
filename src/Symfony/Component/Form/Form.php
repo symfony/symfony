@@ -23,7 +23,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\DanglingFieldException;
 use Symfony\Component\Form\Exception\FieldDefinitionException;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
-use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
+use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
 use Symfony\Component\Form\DataMapper\DataMapperInterface;
 use Symfony\Component\Form\DataValidator\DataValidatorInterface;
 use Symfony\Component\Form\Renderer\RendererInterface;
@@ -62,8 +62,8 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     private $dataMapper;
 
     public function __construct($name, EventDispatcherInterface $dispatcher,
-        RendererInterface $renderer, ValueTransformerInterface $valueTransformer = null,
-        ValueTransformerInterface $normalizationTransformer = null,
+        RendererInterface $renderer, DataTransformerInterface $dataTransformer = null,
+        DataTransformerInterface $normalizationTransformer = null,
         DataMapperInterface $dataMapper, DataValidatorInterface $dataValidator = null,
         $required = false, $disabled = false, array $attributes = array())
     {
@@ -76,7 +76,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
         $this->dataMapper = $dataMapper;
 
-        parent::__construct($name, $dispatcher, $renderer, $valueTransformer,
+        parent::__construct($name, $dispatcher, $renderer, $dataTransformer,
             $normalizationTransformer, $dataValidator, $required, $disabled,
             $attributes);
     }
@@ -151,7 +151,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     {
         $field = $event->getField();
 
-        if (null === $field->getValueTransformer() && null === $field->getNormalizationTransformer()) {
+        if (null === $field->getDataTransformer() && null === $field->getNormalizationTransformer()) {
             $data = $event->getData();
 
             if (empty($data)) {

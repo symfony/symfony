@@ -15,11 +15,11 @@ use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\ChoiceList\EntityChoiceList;
 use Symfony\Component\Form\EventListener\MergeCollectionListener;
-use Symfony\Component\Form\ValueTransformer\EntitiesToArrayTransformer;
-use Symfony\Component\Form\ValueTransformer\ArrayToChoicesTransformer;
-use Symfony\Component\Form\ValueTransformer\EntityToIdTransformer;
-use Symfony\Component\Form\ValueTransformer\ScalarToChoicesTransformer;
-use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
+use Symfony\Component\Form\DataTransformer\EntitiesToArrayTransformer;
+use Symfony\Component\Form\DataTransformer\ArrayToChoicesTransformer;
+use Symfony\Component\Form\DataTransformer\EntityToIdTransformer;
+use Symfony\Component\Form\DataTransformer\ScalarToChoicesTransformer;
+use Symfony\Component\Form\DataTransformer\DataTransformerChain;
 use Doctrine\ORM\EntityManager;
 
 class EntityFieldConfig extends AbstractFieldConfig
@@ -52,9 +52,9 @@ class EntityFieldConfig extends AbstractFieldConfig
         }
 
         if (count($transformers) > 1) {
-            $builder->setValueTransformer(new ValueTransformerChain($transformers));
+            $builder->setDataTransformer(new DataTransformerChain($transformers));
         } else {
-            $builder->setValueTransformer(current($transformers));
+            $builder->setDataTransformer(current($transformers));
         }
     }
 

@@ -13,10 +13,10 @@ namespace Symfony\Component\Form\Config;
 
 use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\ChoiceList\PaddedChoiceList;
-use Symfony\Component\Form\ValueTransformer\ReversedTransformer;
-use Symfony\Component\Form\ValueTransformer\DateTimeToStringTransformer;
-use Symfony\Component\Form\ValueTransformer\DateTimeToTimestampTransformer;
-use Symfony\Component\Form\ValueTransformer\DateTimeToArrayTransformer;
+use Symfony\Component\Form\DataTransformer\ReversedTransformer;
+use Symfony\Component\Form\DataTransformer\DateTimeToStringTransformer;
+use Symfony\Component\Form\DataTransformer\DateTimeToTimestampTransformer;
+use Symfony\Component\Form\DataTransformer\DateTimeToArrayTransformer;
 
 class TimeFieldConfig extends AbstractFieldConfig
 {
@@ -75,7 +75,7 @@ class TimeFieldConfig extends AbstractFieldConfig
         }
 
         $builder
-            ->setValueTransformer(new DateTimeToArrayTransformer(array(
+            ->setDataTransformer(new DateTimeToArrayTransformer(array(
                 'input_timezone' => $options['data_timezone'],
                 'output_timezone' => $options['user_timezone'],
                 // if the field is rendered as choice field, the values should be trimmed

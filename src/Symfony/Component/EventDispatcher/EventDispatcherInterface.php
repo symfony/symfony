@@ -86,5 +86,5 @@ interface EventDispatcherInterface
      * @return Boolean TRUE if the specified event has any listeners, FALSE
      *                 otherwise.
      */
-    function hasListeners($eventName);
+    function hasListeners($eventName = null);
 }

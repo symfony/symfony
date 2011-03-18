@@ -60,11 +60,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->addListener('preFoo', $listener2);
         $this->dispatcher->addListener('preFoo', $listener3, 10);
 
-        $expected = array(
-            spl_object_hash($listener3) => $listener3,
-            spl_object_hash($listener2) => $listener2,
-            spl_object_hash($listener1) => $listener1,
-        );
+        $expected = array($listener3, $listener2, $listener1);
 
         $this->assertSame($expected, $this->dispatcher->getListeners('preFoo'));
     }
@@ -86,16 +82,8 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->addListener('postFoo', $listener6, 10);
 
         $expected = array(
-            'preFoo' => array(
-                spl_object_hash($listener3) => $listener3,
-                spl_object_hash($listener2) => $listener2,
-                spl_object_hash($listener1) => $listener1,
-             ),
-            'postFoo' => array(
-                spl_object_hash($listener6) => $listener6,
-                spl_object_hash($listener5) => $listener5,
-                spl_object_hash($listener4) => $listener4,
-             ),
+            'preFoo'  => array($listener3, $listener2, $listener1),
+            'postFoo' => array($listener6, $listener5, $listener4),
         );
 
         $this->assertSame($expected, $this->dispatcher->getListeners());

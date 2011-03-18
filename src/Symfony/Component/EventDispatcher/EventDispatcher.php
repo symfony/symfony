@@ -34,33 +34,11 @@ namespace Symfony\Component\EventDispatcher;
  * @author  Jonathan Wage <jonwage@gmail.com>
  * @author  Roman Borschel <roman@code-factory.org>
  * @author  Bernhard Schussek <bschussek@gmail.com>
+ * @author  Fabien Potencier <fabien@symfony.com>
  */
 class EventDispatcher implements EventDispatcherInterface
 {
-    /**
-     * Map of registered listeners.
-     * <event> => (<objecthash> => <listener>)
-     *
-     * @var array
-     */
     private $listeners = array();
-
-    /**
-     * Map of priorities by the object hashes of their listeners.
-     * <event> => (<objecthash> => <priority>)
-     *
-     * This property is used for listener sorting.
-     *
-     * @var array
-     */
-    private $priorities = array();
-
-    /**
-     * Stores which event listener lists are currently sorted.
-     * <event> => <sorted>
-     *
-     * @var array
-     */
     private $sorted = array();
 
     /**
@@ -68,19 +46,19 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function dispatch($eventName, Event $event = null)
     {
-        if (isset($this->listeners[$eventName])) {
-            if (null === $event) {
-                $event = new Event();
-            }
+        if (!isset($this->listeners[$eventName])) {
+            return;
+        }
 
-            $this->sortListeners($eventName);
+        if (null === $event) {
+            $event = new Event();
+        }
 
-            foreach ($this->listeners[$eventName] as $listener) {
-                $this->triggerListener($listener, $eventName, $event);
+        foreach ($this->getListeners($eventName) as $listener) {
+            $this->triggerListener($listener, $eventName, $event);
 
-                if ($event->isPropagationStopped()) {
-                    break;
-                }
+            if ($event->isPropagationStopped()) {
+                break;
             }
         }
     }
@@ -90,25 +68,34 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function getListeners($eventName = null)
     {
-        if ($eventName) {
-            $this->sortListeners($eventName);
+        if (null !== $eventName) {
+            if (!isset($this->sorted[$eventName])) {
+                $this->sortListeners($eventName);
+            }
 
-            return $this->listeners[$eventName];
+            return $this->sorted[$eventName];
         }
 
+        $sorted = array();
         foreach ($this->listeners as $eventName => $listeners) {
-            $this->sortListeners($eventName);
+            if (!isset($this->sorted[$eventName])) {
+                $this->sortListeners($eventName);
+            }
+
+            if ($this->sorted[$eventName]) {
+                $sorted[$eventName] = $this->sorted[$eventName];
+            }
         }
 
-        return $this->listeners;
+        return $sorted;
     }
 
     /**
      * @see EventDispatcherInterface::hasListeners
      */
-    public function hasListeners($eventName)
+    public function hasListeners($eventName = null)
     {
-        return isset($this->listeners[$eventName]) && $this->listeners[$eventName];
+        return (Boolean) count($this->getListeners($eventName));
     }
 
     /**
@@ -116,19 +103,17 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function addListener($eventNames, $listener, $priority = 0)
     {
-        // Picks the hash code related to that listener
         $hash = spl_object_hash($listener);
-
         foreach ((array) $eventNames as $eventName) {
-            if (!isset($this->listeners[$eventName])) {
-                $this->listeners[$eventName] = array();
-                $this->priorities[$eventName] = array();
+            if (!isset($this->listeners[$eventName][$priority])) {
+                if (!isset($this->listeners[$eventName])) {
+                    $this->listeners[$eventName] = array();
+                }
+                $this->listeners[$eventName][$priority] = array();
             }
 
-            // Prevents duplicate listeners on same event (same instance only)
-            $this->listeners[$eventName][$hash] = $listener;
-            $this->priorities[$eventName][$hash] = $priority;
-            $this->sorted[$eventName] = false;
+            $this->listeners[$eventName][$priority][$hash] = $listener;
+            unset($this->sorted[$eventName]);
         }
     }
 
@@ -137,14 +122,16 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function removeListener($eventNames, $listener)
     {
-        // Picks the hash code related to that listener
-        $hash = spl_object_hash($listener);
-
         foreach ((array) $eventNames as $eventName) {
-            // Check if actually have this listener associated
-            if (isset($this->listeners[$eventName][$hash])) {
-                unset($this->listeners[$eventName][$hash]);
-                unset($this->priorities[$eventName][$hash]);
+            if (!isset($this->listeners[$eventName])) {
+                continue;
+            }
+
+            $hash = spl_object_hash($listener);
+            foreach (array_keys($this->listeners[$eventName]) as $priority) {
+                if (isset($this->listeners[$eventName][$priority][$hash])) {
+                    unset($this->listeners[$eventName][$priority][$hash], $this->sorted[$eventName]);
+                }
             }
         }
     }
@@ -188,26 +175,15 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * Sorts the internal list of listeners for the given event by priority.
      *
-     * Calling this method multiple times will not cause overhead unless you
-     * add new listeners. As long as no listener is added, the list for an
-     * event name won't be sorted twice.
-     *
-     * @param string $event The name of the event.
+     * @param string $eventName The name of the event.
      */
     private function sortListeners($eventName)
     {
-        if (!$this->sorted[$eventName]) {
-            $p = $this->priorities[$eventName];
+        $this->sorted[$eventName] = array();
 
-            uasort($this->listeners[$eventName], function ($a, $b) use ($p) {
-                $order = $p[spl_object_hash($b)] - $p[spl_object_hash($a)];
-
-                // for the same priority, force the first registered one to stay first
-                return 0 === $order ? 1 : $order;
-            });
-
-            $this->sorted[$eventName] = true;
+        if (isset($this->listeners[$eventName])) {
+            krsort($this->listeners[$eventName]);
+            $this->sorted[$eventName] = array_values(call_user_func_array('array_merge', $this->listeners[$eventName]));
         }
     }
 }
- 

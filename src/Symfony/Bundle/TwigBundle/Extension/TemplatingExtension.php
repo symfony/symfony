@@ -56,6 +56,7 @@ class TemplatingExtension extends \Twig_Extension
             'file_excerpt'          => new \Twig_Filter_Method($this, 'fileExcerpt', array('is_safe' => array('html'))),
             'format_file'           => new \Twig_Filter_Method($this, 'formatFile', array('is_safe' => array('html'))),
             'format_file_from_text' => new \Twig_Filter_Method($this, 'formatFileFromText', array('is_safe' => array('html'))),
+            'file_link'             => new \Twig_Filter_Method($this, 'getFileLink', array('is_safe' => array('html'))),
         );
     }
 
@@ -160,9 +161,14 @@ class TemplatingExtension extends \Twig_Extension
         return $this->container->get('templating.helper.code')->fileExcerpt($file, $line);
     }
 
-    public function formatFile($file, $line)
+    public function formatFile($file, $line, $text = null)
     {
-        return $this->container->get('templating.helper.code')->formatFile($file, $line);
+        return $this->container->get('templating.helper.code')->formatFile($file, $line, $text);
+    }
+
+    public function getFileLink($file, $line)
+    {
+        return $this->container->get('templating.helper.code')->getFileLink($file, $line);
     }
 
     public function formatFileFromText($text)

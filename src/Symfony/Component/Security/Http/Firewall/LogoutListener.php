@@ -15,10 +15,10 @@ use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
 
 use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Kernel\Event\GetResponseEvent;
+use Symfony\Component\Kernel\Events;
 
 /**
  * LogoutListener logout users.
@@ -63,11 +63,11 @@ class LogoutListener implements ListenerInterface
     /**
      * Performs the logout if requested
      *
-     * @param EventInterface $event An EventInterface instance
+     * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public function handle(EventInterface $event)
+    public function handle(GetResponseEvent $event)
     {
-        $request = $event->get('request');
+        $request = $event->getRequest();
 
         if ($this->logoutPath !== $request->getPathInfo()) {
             return;
@@ -92,8 +92,6 @@ class LogoutListener implements ListenerInterface
 
         $this->securityContext->setToken(null);
 
-        $event->setProcessed();
-
-        return $response;
+        $event->setResponse($response);
     }
 }

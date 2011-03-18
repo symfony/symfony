@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Events;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -27,6 +26,9 @@ use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Http\Event\SwitchUserEvent;
+use Symfony\Component\Security\Http\Events;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * SwitchUserListener allows a user to impersonate another one temporarily
@@ -44,12 +46,12 @@ class SwitchUserListener implements ListenerInterface
     private $usernameParameter;
     private $role;
     private $logger;
-    private $eventDispatcher;
+    private $dispatcher;
 
     /**
      * Constructor.
      */
-    public function __construct(SecurityContextInterface $securityContext, UserProviderInterface $provider, UserCheckerInterface $userChecker, $providerKey, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, $usernameParameter = '_switch_user', $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $eventDispatcher = null)
+    public function __construct(SecurityContextInterface $securityContext, UserProviderInterface $provider, UserCheckerInterface $userChecker, $providerKey, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, $usernameParameter = '_switch_user', $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -63,17 +65,17 @@ class SwitchUserListener implements ListenerInterface
         $this->usernameParameter = $usernameParameter;
         $this->role = $role;
         $this->logger = $logger;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
      * Handles digest authentication.
      *
-     * @param EventInterface $event An EventInterface instance
+     * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public function handle(EventInterface $event)
+    public function handle(GetResponseEvent $event)
     {
-        $request = $event->get('request');
+        $request = $event->getRequest();
 
         if (!$request->get($this->usernameParameter)) {
             return;
@@ -94,9 +96,7 @@ class SwitchUserListener implements ListenerInterface
         $request->server->set('QUERY_STRING', '');
         $response = new RedirectResponse($request->getUri(), 302);
 
-        $event->setProcessed();
-
-        return $response;
+        $event->setResponse($response);
     }
 
     /**
@@ -129,8 +129,9 @@ class SwitchUserListener implements ListenerInterface
 
         $token = new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey, $roles);
 
-        if (null !== $this->eventDispatcher) {
-            $this->eventDispatcher->notify(new Event($this, 'security.switch_user', array('request' => $request, 'target_user' => $token->getUser())));
+        if (null !== $this->dispatcher) {
+            $switchEvent = new SwitchUserEvent($request, $token->getUser());
+            $this->dispatcher->dispatch(Events::onSecuritySwitchUser, $switchEvent);
         }
 
         return $token;
@@ -149,8 +150,9 @@ class SwitchUserListener implements ListenerInterface
             throw new AuthenticationCredentialsNotFoundException(sprintf('Could not find original Token object.'));
         }
 
-        if (null !== $this->eventDispatcher) {
-            $this->eventDispatcher->notify(new Event($this, 'security.switch_user', array('request' => $request, 'target_user' => $original->getUser())));
+        if (null !== $this->dispatcher) {
+            $switchEvent = new SwitchUserEvent($request, $original->getUser());
+            $this->dispatcher->dispatch(Events::onSecuritySwitchUser, $switchEvent);
         }
 
         return $original;

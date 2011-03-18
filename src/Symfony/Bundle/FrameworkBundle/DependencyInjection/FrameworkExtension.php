@@ -140,17 +140,24 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\HttpKernel\\ResponseListener',
             'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver',
             'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface',
+            'Symfony\\Component\\HttpKernel\\Event\\KernelEvent',
+            'Symfony\\Component\\HttpKernel\\Event\\FilterControllerEvent',
+            'Symfony\\Component\\HttpKernel\\Event\\FilterResponseEvent',
+            'Symfony\\Component\\HttpKernel\\Event\\GetResponseEvent',
+            'Symfony\\Component\\HttpKernel\\Event\\GetResponseForControllerResultEvent',
+            'Symfony\\Component\\HttpKernel\\Event\\GetResponseForExceptionEvent',
+            'Symfony\\Component\\HttpKernel\\Events',
+
+            'Symfony\\Component\\EventDispatcher\\EventDispatcher',
+            'Symfony\\Component\\EventDispatcher\\EventDispatcherInterface',
+            'Symfony\\Component\\EventDispatcher\\Event',
+            'Symfony\\Component\\EventDispatcher\\EventSubscriberInterface',
 
             'Symfony\\Bundle\\FrameworkBundle\\RequestListener',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameParser',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
-
-            'Symfony\\Component\\EventDispatcher\\EventInterface',
-            'Symfony\\Component\\EventDispatcher\\Event',
-            'Symfony\\Component\\EventDispatcher\\EventDispatcherInterface',
-            'Symfony\\Component\\EventDispatcher\\EventDispatcher',
-            'Symfony\\Bundle\\FrameworkBundle\\EventDispatcher',
+            'Symfony\\Bundle\\FrameworkBundle\\ContainerAwareEventDispatcher',
         ));
     }
 

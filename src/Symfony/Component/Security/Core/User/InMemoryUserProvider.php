@@ -72,8 +72,8 @@ class InMemoryUserProvider implements UserProviderInterface
 
         $user = $this->users[strtolower($username)];
 
-        return new User($user->getUsername(), $user->getPassword(), $user->getRoles(), $user->isEnabled(), $user->isAccountNonExpired(),
-                $user->isCredentialsNonExpired(), $user->isAccountNonLocked());
+        return new User($user->getUsername(), $user->getPassword(), $user->getRoles(), $user->isEnabled(), $user->isUserNonExpired(),
+                $user->isCredentialsNonExpired(), $user->isUserNonLocked());
     }
 
     /**

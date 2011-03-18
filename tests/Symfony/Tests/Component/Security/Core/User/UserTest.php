@@ -67,15 +67,15 @@ class UserTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\Security\Core\User\User::isAccountNonExpired
+     * @covers Symfony\Component\Security\Core\User\User::isUserNonExpired
      */
     public function testIsAccountNonExpired()
     {
         $user = new User('fabien', 'superpass');
-        $this->assertTrue($user->isAccountNonExpired());
+        $this->assertTrue($user->isUserNonExpired());
 
         $user = new User('fabien', 'superpass', array(), true, false);
-        $this->assertFalse($user->isAccountNonExpired());
+        $this->assertFalse($user->isUserNonExpired());
     }
 
     /**
@@ -91,15 +91,15 @@ class UserTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\Security\Core\User\User::isAccountNonLocked
+     * @covers Symfony\Component\Security\Core\User\User::isUserNonLocked
      */
-    public function testIsAccountNonLocked()
+    public function testIsUserNonLocked()
     {
         $user = new User('fabien', 'superpass');
-        $this->assertTrue($user->isAccountNonLocked());
+        $this->assertTrue($user->isUserNonLocked());
 
         $user = new User('fabien', 'superpass', array(), true, true, true, false);
-        $this->assertFalse($user->isAccountNonLocked());
+        $this->assertFalse($user->isUserNonLocked());
     }
 
     /**

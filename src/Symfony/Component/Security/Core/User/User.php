@@ -77,7 +77,7 @@ final class User implements AdvancedUserInterface
     /**
      * {@inheritdoc}
      */
-    public function isAccountNonExpired()
+    public function isUserNonExpired()
     {
         return $this->userNonExpired;
     }
@@ -85,7 +85,7 @@ final class User implements AdvancedUserInterface
     /**
      * {@inheritdoc}
      */
-    public function isAccountNonLocked()
+    public function isUserNonLocked()
     {
         return $this->userNonLocked;
     }
@@ -134,11 +134,11 @@ final class User implements AdvancedUserInterface
             return false;
         }
 
-        if ($this->userNonExpired !== $user->isAccountNonExpired()) {
+        if ($this->userNonExpired !== $user->isUserNonExpired()) {
             return false;
         }
 
-        if ($this->userNonLocked !== $user->isAccountNonLocked()) {
+        if ($this->userNonLocked !== $user->isUserNonLocked()) {
             return false;
         }
 

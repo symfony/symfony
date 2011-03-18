@@ -57,9 +57,9 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
         $checker = new UserChecker();
 
         $account = $this->getMock('Symfony\Component\Security\Core\User\AdvancedUserInterface');
-        $account->expects($this->once())->method('isAccountNonLocked')->will($this->returnValue(true));
+        $account->expects($this->once())->method('isUserNonLocked')->will($this->returnValue(true));
         $account->expects($this->once())->method('isEnabled')->will($this->returnValue(true));
-        $account->expects($this->once())->method('isAccountNonExpired')->will($this->returnValue(true));
+        $account->expects($this->once())->method('isUserNonExpired')->will($this->returnValue(true));
 
         $this->assertNull($checker->checkPostAuth($account));
     }
@@ -72,7 +72,7 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
         $checker = new UserChecker();
 
         $account = $this->getMock('Symfony\Component\Security\Core\User\AdvancedUserInterface');
-        $account->expects($this->once())->method('isAccountNonLocked')->will($this->returnValue(false));
+        $account->expects($this->once())->method('isUserNonLocked')->will($this->returnValue(false));
 
         $checker->checkPostAuth($account);
     }
@@ -85,7 +85,7 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
         $checker = new UserChecker();
 
         $account = $this->getMock('Symfony\Component\Security\Core\User\AdvancedUserInterface');
-        $account->expects($this->once())->method('isAccountNonLocked')->will($this->returnValue(true));
+        $account->expects($this->once())->method('isUserNonLocked')->will($this->returnValue(true));
         $account->expects($this->once())->method('isEnabled')->will($this->returnValue(false));
 
         $checker->checkPostAuth($account);
@@ -99,9 +99,9 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
         $checker = new UserChecker();
 
         $account = $this->getMock('Symfony\Component\Security\Core\User\AdvancedUserInterface');
-        $account->expects($this->once())->method('isAccountNonLocked')->will($this->returnValue(true));
+        $account->expects($this->once())->method('isUserNonLocked')->will($this->returnValue(true));
         $account->expects($this->once())->method('isEnabled')->will($this->returnValue(true));
-        $account->expects($this->once())->method('isAccountNonExpired')->will($this->returnValue(false));
+        $account->expects($this->once())->method('isUserNonExpired')->will($this->returnValue(false));
 
         $checker->checkPostAuth($account);
     }

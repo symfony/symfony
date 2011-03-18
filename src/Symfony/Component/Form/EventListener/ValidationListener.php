@@ -11,6 +11,11 @@
 
 namespace Symfony\Component\Form\EventListener;
 
+use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\DataError;
+use Symfony\Component\Form\FieldError;
+use Symfony\Component\Form\PropertyPathIterator;
 use Symfony\Component\Form\Events;
 use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -57,9 +62,50 @@ class ValidationListener implements EventSubscriberInterface
                         $error = new FieldError($template, $parameters);
                     }
 
-                    $field->addError($error, $iterator);
+                    $this->mapError($field, $error, $iterator);
                 }
             }
         }
+    }
+
+    private function mapError(FieldInterface $form, Error $error,
+            PropertyPathIterator $pathIterator = null)
+    {
+        if (null !== $pathIterator && $field instanceof FieldInterface) {
+            if ($error instanceof FieldError && $pathIterator->hasNext()) {
+                $pathIterator->next();
+
+                if ($pathIterator->isProperty() && $pathIterator->current() === 'fields') {
+                    $pathIterator->next();
+                }
+
+                if ($field->has($pathIterator->current())) {
+                    $child = $field->get($pathIterator->current());
+
+                    $this->mapError($child, $error, $pathIterator);
+
+                    return;
+                }
+            } else if ($error instanceof DataError) {
+                $iterator = new RecursiveFieldIterator($field);
+                $iterator = new \RecursiveIteratorIterator($iterator);
+
+                foreach ($iterator as $child) {
+                    if (null !== ($childPath = $child->getPropertyPath())) {
+                        if ($childPath->getElement(0) === $pathIterator->current()) {
+                            if ($pathIterator->hasNext()) {
+                                $pathIterator->next();
+                            }
+
+                            $this->mapError($child, $error, $pathIterator);
+
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        $field->addError($error);
     }
 }

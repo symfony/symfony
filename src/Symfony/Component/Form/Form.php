@@ -242,47 +242,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function addError(Error $error, PropertyPathIterator $pathIterator = null)
-    {
-        if (null !== $pathIterator) {
-            if ($error instanceof FieldError && $pathIterator->hasNext()) {
-                $pathIterator->next();
-
-                if ($pathIterator->isProperty() && $pathIterator->current() === 'fields') {
-                    $pathIterator->next();
-                }
-
-                if ($this->has($pathIterator->current())) {
-                    $this->get($pathIterator->current())->addError($error, $pathIterator);
-
-                    return;
-                }
-            } else if ($error instanceof DataError) {
-                $iterator = new RecursiveFieldIterator($this);
-                $iterator = new \RecursiveIteratorIterator($iterator);
-
-                foreach ($iterator as $field) {
-                    if (null !== ($fieldPath = $field->getPropertyPath())) {
-                        if ($fieldPath->getElement(0) === $pathIterator->current()) {
-                            if ($pathIterator->hasNext()) {
-                                $pathIterator->next();
-                            }
-
-                            $field->addError($error, $pathIterator);
-
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-
-        parent::addError($error);
-    }
-
-    /**
      * Returns true if the field exists (implements the \ArrayAccess interface).
      *
      * @param string $name The name of the field

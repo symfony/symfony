@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 /**
  * A form field that can be embedded in a form.
  *
@@ -20,18 +18,6 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 interface FieldInterface
 {
-    /**
-     * Marks a constraint violation in a form field
-     * @var integer
-     */
-    const FIELD_ERROR = 0;
-
-    /**
-     * Marks a constraint violation in the data of a form field
-     * @var integer
-     */
-    const DATA_ERROR = 1;
-
     /**
      * Sets the parent field.
      *
@@ -61,29 +47,11 @@ interface FieldInterface
     function getPropertyPath();
 
     /**
-     * Recursively adds constraint violations to the fields
-     *
-     * Violations in the form fields usually have property paths like:
-     *
-     * <code>
-     * iterator[firstName].data
-     * iterator[firstName].displayedData
-     * iterator[Address].iterator[street].displayedData
-     * ...
-     * </code>
-     *
-     * Violations in the form data usually have property paths like:
-     *
-     * <code>
-     * data.firstName
-     * data.Address.street
-     * ...
-     * </code>
+     * Adds an error to this field
      *
      * @param Error $error
-     * @param PropertyPathIterator $pathIterator
      */
-    function addError(Error $error, PropertyPathIterator $pathIterator = null);
+    function addError(Error $error);
 
     /**
      * Returns whether the field is valid.

@@ -36,9 +36,9 @@ final class User implements AdvancedUserInterface
         $this->username = $username;
         $this->password = $password;
         $this->enabled = $enabled;
-        $this->accountNonExpired = $userNonExpired;
+        $this->userNonExpired = $userNonExpired;
         $this->credentialsNonExpired = $credentialsNonExpired;
-        $this->accountNonLocked = $userNonLocked;
+        $this->userNonLocked = $userNonLocked;
         $this->roles = $roles;
     }
 
@@ -79,7 +79,7 @@ final class User implements AdvancedUserInterface
      */
     public function isAccountNonExpired()
     {
-        return $this->accountNonExpired;
+        return $this->userNonExpired;
     }
 
     /**
@@ -87,7 +87,7 @@ final class User implements AdvancedUserInterface
      */
     public function isAccountNonLocked()
     {
-        return $this->accountNonLocked;
+        return $this->userNonLocked;
     }
 
     /**
@@ -134,11 +134,11 @@ final class User implements AdvancedUserInterface
             return false;
         }
 
-        if ($this->accountNonExpired !== $user->isAccountNonExpired()) {
+        if ($this->userNonExpired !== $user->isAccountNonExpired()) {
             return false;
         }
 
-        if ($this->accountNonLocked !== $user->isAccountNonLocked()) {
+        if ($this->userNonLocked !== $user->isAccountNonLocked()) {
             return false;
         }
 

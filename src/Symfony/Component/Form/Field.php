@@ -13,12 +13,12 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
+use Symfony\Component\Form\DataValidator\DataValidatorInterface;
 use Symfony\Component\Form\Renderer\RendererInterface;
 use Symfony\Component\Form\Renderer\Plugin\RendererPluginInterface;
 use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Base class for form fields
@@ -65,6 +65,7 @@ class Field implements FieldInterface
     private $normalizationTransformer;
     private $valueTransformer;
     private $transformationSuccessful = true;
+    private $dataValidator;
     private $renderer;
     private $disabled = false;
     private $dispatcher;
@@ -73,13 +74,15 @@ class Field implements FieldInterface
     public function __construct($name, EventDispatcherInterface $dispatcher,
         RendererInterface $renderer, ValueTransformerInterface $valueTransformer = null,
         ValueTransformerInterface $normalizationTransformer = null,
-        $required = false, $disabled = false, array $attributes = array())
+        DataValidatorInterface $dataValidator = null, $required = false,
+        $disabled = false, array $attributes = array())
     {
         $this->name = (string)$name;
         $this->dispatcher = $dispatcher;
         $this->renderer = $renderer;
         $this->valueTransformer = $valueTransformer;
         $this->normalizationTransformer = $normalizationTransformer;
+        $this->dataValidator = $dataValidator;
         $this->required = $required;
         $this->disabled = $disabled;
         $this->attributes = $attributes;
@@ -282,6 +285,10 @@ class Field implements FieldInterface
 
         $event = new DataEvent($this, $clientData);
         $this->dispatcher->dispatch(Events::postBind, $event);
+
+        if ($this->isRoot() && $this->dataValidator) {
+            $this->dataValidator->validate($this);
+        }
     }
 
     /**

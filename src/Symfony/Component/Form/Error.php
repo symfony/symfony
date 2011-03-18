@@ -16,7 +16,7 @@ namespace Symfony\Component\Form;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class Error
+abstract class Error
 {
     /**
      * The template for the error message

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\DataMapper\DataMapperInterface;
+use Symfony\Component\Form\DataValidator\DataValidatorInterface;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\Renderer\DefaultRenderer;
 use Symfony\Component\Form\Renderer\RendererInterface;
@@ -54,6 +55,8 @@ class FieldBuilder
     private $fields = array();
 
     private $dataMapper;
+
+    private $dataValidator;
 
     private $attributes = array();
 
@@ -139,6 +142,16 @@ class FieldBuilder
     public function getDataMapper()
     {
         return $this->dataMapper;
+    }
+
+    public function setDataValidator(DataValidatorInterface $dataValidator)
+    {
+        $this->dataValidator = $dataValidator;
+    }
+
+    public function getDataValidator()
+    {
+        return $this->dataValidator;
     }
 
     /**
@@ -482,6 +495,7 @@ class FieldBuilder
                 $this->getValueTransformer(),
                 $this->getNormalizationTransformer(),
                 $this->getDataMapper(),
+                $this->getDataValidator(),
                 $this->getRequired(),
                 $this->getDisabled(),
                 $this->getAttributes()
@@ -497,6 +511,7 @@ class FieldBuilder
                 $this->buildRenderer(),
                 $this->getValueTransformer(),
                 $this->getNormalizationTransformer(),
+                $this->getDataValidator(),
                 $this->getRequired(),
                 $this->getDisabled(),
                 $this->getAttributes()

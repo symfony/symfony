@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\EventListener;
+namespace Symfony\Component\Form\DataValidator;
 
 use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\FormInterface;
@@ -21,7 +21,7 @@ use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Validator\ValidatorInterface;
 
-class ValidationListener implements EventSubscriberInterface
+class DelegatingValidator implements DataValidatorInterface
 {
     private $validator;
 
@@ -30,48 +30,37 @@ class ValidationListener implements EventSubscriberInterface
         $this->validator = $validator;
     }
 
-    public static function getSubscribedEvents()
-    {
-        return array(
-            Events::postBind,
-        );
-    }
-
     /**
      * Validates the form and its domain object
      */
-    public function postBind(DataEvent $event)
+    public function validate(FieldInterface $field)
     {
-        $field = $event->getField();
+        // Validate the field in group "Default"
+        // Validation of the data in the custom group is done by validateData(),
+        // which is constrained by the Execute constraint
+        if ($violations = $this->validator->validate($field)) {
+            foreach ($violations as $violation) {
+                $propertyPath = new PropertyPath($violation->getPropertyPath());
+                $iterator = $propertyPath->getIterator();
+                $template = $violation->getMessageTemplate();
+                $parameters = $violation->getMessageParameters();
 
-        if ($field->isRoot()) {
-            // Validate the field in group "Default"
-            // Validation of the data in the custom group is done by validateData(),
-            // which is constrained by the Execute constraint
-            if ($violations = $this->validator->validate($field)) {
-                foreach ($violations as $violation) {
-                    $propertyPath = new PropertyPath($violation->getPropertyPath());
-                    $iterator = $propertyPath->getIterator();
-                    $template = $violation->getMessageTemplate();
-                    $parameters = $violation->getMessageParameters();
-
-                    if ($iterator->current() == 'data') {
-                        $iterator->next(); // point at the first data element
-                        $error = new DataError($template, $parameters);
-                    } else {
-                        $error = new FieldError($template, $parameters);
-                    }
-
-                    $this->mapError($field, $error, $iterator);
+                if ($iterator->current() == 'data') {
+                    $iterator->next(); // point at the first data element
+                    $error = new DataError($template, $parameters);
+                } else {
+                    $error = new FieldError($template, $parameters);
                 }
+
+                $this->mapError($error, $field, $iterator);
             }
         }
     }
 
-    private function mapError(FieldInterface $form, Error $error,
+    private function mapError(Error $error, FieldInterface $field,
             PropertyPathIterator $pathIterator = null)
     {
-        if (null !== $pathIterator && $field instanceof FieldInterface) {
+        if (null !== $pathIterator && $field instanceof FormInterface) {
             if ($error instanceof FieldError && $pathIterator->hasNext()) {
                 $pathIterator->next();
 
@@ -82,7 +71,7 @@ class ValidationListener implements EventSubscriberInterface
                 if ($field->has($pathIterator->current())) {
                     $child = $field->get($pathIterator->current());
 
-                    $this->mapError($child, $error, $pathIterator);
+                    $this->mapError($error, $child, $pathIterator);
 
                     return;
                 }
@@ -97,7 +86,7 @@ class ValidationListener implements EventSubscriberInterface
                                 $pathIterator->next();
                             }
 
-                            $this->mapError($child, $error, $pathIterator);
+                            $this->mapError($error, $child, $pathIterator);
 
                             return;
                         }

@@ -13,7 +13,6 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\FileBag;
-use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\Event\FilterDataEvent;
@@ -26,6 +25,7 @@ use Symfony\Component\Form\Exception\FieldDefinitionException;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\DataMapper\DataMapperInterface;
+use Symfony\Component\Form\DataValidator\DataValidatorInterface;
 use Symfony\Component\Form\Renderer\RendererInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -59,15 +59,13 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     private $extraFields = array();
 
-    private $virtual;
-
     private $dataMapper;
 
     public function __construct($name, EventDispatcherInterface $dispatcher,
         RendererInterface $renderer, ValueTransformerInterface $valueTransformer = null,
         ValueTransformerInterface $normalizationTransformer = null,
-        DataMapperInterface $dataMapper, $required = false, $disabled = false,
-        array $attributes = array())
+        DataMapperInterface $dataMapper, DataValidatorInterface $dataValidator = null,
+        $required = false, $disabled = false, array $attributes = array())
     {
         $dispatcher->addListener(array(
             Events::postSetData,
@@ -79,7 +77,8 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         $this->dataMapper = $dataMapper;
 
         parent::__construct($name, $dispatcher, $renderer, $valueTransformer,
-            $normalizationTransformer, $required, $disabled, $attributes);
+            $normalizationTransformer, $dataValidator, $required, $disabled,
+            $attributes);
     }
 
     /**

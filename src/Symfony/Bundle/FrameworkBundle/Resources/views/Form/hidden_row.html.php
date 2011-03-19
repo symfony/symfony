@@ -1,0 +1,1 @@
+<?php /** Dont render hidden rows, they are rendered in $form->getRest() */ ?>

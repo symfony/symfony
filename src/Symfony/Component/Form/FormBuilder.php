@@ -14,6 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\DataMapper\DataMapperInterface;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FormBuilder extends FieldBuilder

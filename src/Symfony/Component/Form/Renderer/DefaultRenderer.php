@@ -29,6 +29,15 @@ class DefaultRenderer implements RendererInterface, \ArrayAccess
 
     private $initialized = false;
 
+    /**
+     * Is the field attached to this renderer rendered?
+     *
+     * Rendering happens when either the widget or the row method was called.
+     * Row implicitly includes widget, however certain rendering mechanisms
+     * have to skip widget rendering when a row is rendered.
+     *
+     * @var bool
+     */
     private $rendered = false;
 
     private $children = array();
@@ -139,6 +148,8 @@ class DefaultRenderer implements RendererInterface, \ArrayAccess
 
     public function getRow(array $vars = array())
     {
+        $this->rendered = true;
+
         return $this->render('row', $vars);
     }
 

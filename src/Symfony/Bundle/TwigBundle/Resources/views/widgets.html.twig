@@ -1,6 +1,6 @@
 {% block rows %}
 {% spaceless %}
-    {{ this.errors }}
+    {{ renderer.errors }}
     {% for field in fields %}
         {{ field.row }}
     {% endfor %}

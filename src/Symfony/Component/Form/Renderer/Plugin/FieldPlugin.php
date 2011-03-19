@@ -40,7 +40,7 @@ class FieldPlugin implements RendererPluginInterface
             $name = $fieldKey;
         }
 
-        $renderer->setVar('this', $renderer);
+        $renderer->setVar('renderer', $renderer);
         $renderer->setVar('id', $id);
         $renderer->setVar('name', $name);
         $renderer->setVar('errors', $field->getErrors());

@@ -57,6 +57,14 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('router.cached', (string) $container->getAlias('router'), '->registerRouterConfiguration() changes router alias to cached if cache warming is set');
     }
 
+    public function testForm()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertTrue($container->hasAlias('form.theme'), '->registerTemplatingConfiguration() aliases a form.theme service.');
+        $this->assertEquals('form.theme.twig', (string)$container->getAlias('form.theme'));
+    }
+
     /**
      * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */

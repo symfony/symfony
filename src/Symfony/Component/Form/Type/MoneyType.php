@@ -12,6 +12,8 @@
 namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FieldBuilder;
+use Symfony\Component\Form\DataTransformer\MoneyToLocalizedStringTransformer;
+use Symfony\Component\Form\Renderer\Plugin\MoneyPatternPlugin;
 
 class MoneyType extends AbstractType
 {

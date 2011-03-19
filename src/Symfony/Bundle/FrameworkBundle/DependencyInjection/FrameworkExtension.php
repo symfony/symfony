@@ -407,6 +407,13 @@ class FrameworkExtension extends Extension
             $container->getDefinition('templating.engine.delegating')->setArgument(1, $engines);
             $container->setAlias('templating', 'templating.engine.delegating');
         }
+
+        $container->setAlias('form.theme', 'form.theme.default');
+        foreach ($config['engines'] as $engine) {
+            if ($container->hasDefinition('form.theme.' . $engine)) {
+                $container->setAlias('form.theme', 'form.theme.' . $engine);
+            }
+        }
     }
 
     /**

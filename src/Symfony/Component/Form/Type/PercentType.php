@@ -12,25 +12,23 @@
 namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FieldBuilder;
-use Symfony\Component\Form\DataTransformer\BooleanToStringTransformer;
-use Symfony\Component\Form\Renderer\Plugin\CheckedPlugin;
-use Symfony\Component\Form\Renderer\Plugin\ParentNamePlugin;
 
-class RadioFieldType extends AbstractFieldType
+class PercentType extends AbstractType
 {
     public function configure(FieldBuilder $builder, array $options)
     {
-        $builder->setClientTransformer(new BooleanToStringTransformer())
-            ->addRendererPlugin(new CheckedPlugin())
-            ->addRendererPlugin(new ParentNamePlugin())
-            ->setRendererVar('value', $options['value']);
+        $builder->setClientTransformer(new PercentToLocalizedStringTransformer(array(
+                'precision' => $options['precision'],
+                'type' => $options['type'],
+            )));
     }
 
     public function getDefaultOptions(array $options)
     {
         return array(
-            'template' => 'radio',
-            'value' => null,
+            'template' => 'percent',
+            'precision' => 0,
+            'type' => 'fractional',
         );
     }
 
@@ -41,6 +39,6 @@ class RadioFieldType extends AbstractFieldType
 
     public function getName()
     {
-        return 'radio';
+        return 'percent';
     }
 }

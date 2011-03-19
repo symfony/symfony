@@ -17,7 +17,7 @@ use Symfony\Component\Form\FieldError;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\Validator\CallbackValidator;
 
-class CsrfFieldType extends AbstractFieldType
+class CsrfType extends AbstractType
 {
     private $csrfProvider;
 

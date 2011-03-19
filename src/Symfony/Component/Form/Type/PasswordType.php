@@ -12,37 +12,30 @@
 namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FieldBuilder;
+use Symfony\Component\Form\Renderer\Plugin\PasswordValuePlugin;
 
-class MoneyFieldType extends AbstractFieldType
+class PasswordType extends AbstractType
 {
     public function configure(FieldBuilder $builder, array $options)
     {
-        $builder->setClientTransformer(new MoneyToLocalizedStringTransformer(array(
-                'precision' => $options['precision'],
-                'grouping' => $options['grouping'],
-                'divisor' => $options['divisor'],
-            )))
-            ->addRendererPlugin(new MoneyPatternPlugin($options['currency']));
+        $builder->addRendererPlugin(new PasswordValuePlugin($options['always_empty']));
     }
 
     public function getDefaultOptions(array $options)
     {
         return array(
-            'template' => 'money',
-            'precision' => 2,
-            'grouping' => false,
-            'divisor' => 1,
-            'currency' => 'EUR',
+            'template' => 'password',
+            'always_empty' => true,
         );
     }
 
     public function getParent(array $options)
     {
-        return 'field';
+        return 'text';
     }
 
     public function getName()
     {
-        return 'money';
+        return 'password';
     }
 }

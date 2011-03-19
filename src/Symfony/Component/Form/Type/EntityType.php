@@ -22,7 +22,7 @@ use Symfony\Component\Form\DataTransformer\ScalarToChoicesTransformer;
 use Symfony\Component\Form\DataTransformer\DataTransformerChain;
 use Doctrine\ORM\EntityManager;
 
-class EntityFieldType extends AbstractFieldType
+class EntityType extends AbstractType
 {
     private $em;
 

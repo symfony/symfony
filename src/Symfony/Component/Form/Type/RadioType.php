@@ -14,21 +14,23 @@ namespace Symfony\Component\Form\Type;
 use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\DataTransformer\BooleanToStringTransformer;
 use Symfony\Component\Form\Renderer\Plugin\CheckedPlugin;
+use Symfony\Component\Form\Renderer\Plugin\ParentNamePlugin;
 
-class CheckboxFieldType extends AbstractFieldType
+class RadioType extends AbstractType
 {
     public function configure(FieldBuilder $builder, array $options)
     {
         $builder->setClientTransformer(new BooleanToStringTransformer())
             ->addRendererPlugin(new CheckedPlugin())
+            ->addRendererPlugin(new ParentNamePlugin())
             ->setRendererVar('value', $options['value']);
     }
 
     public function getDefaultOptions(array $options)
     {
         return array(
-            'template' => 'checkbox',
-            'value' => '1',
+            'template' => 'radio',
+            'value' => null,
         );
     }
 
@@ -39,6 +41,6 @@ class CheckboxFieldType extends AbstractFieldType
 
     public function getName()
     {
-        return 'checkbox';
+        return 'radio';
     }
 }

@@ -11,30 +11,24 @@
 
 namespace Symfony\Component\Form\Type;
 
-use Symfony\Component\Form\FieldBuilder;
-use Symfony\Component\Form\EventListener\FixUrlProtocolListener;
+use Symfony\Component\Locale\Locale;
 
-class UrlFieldType extends AbstractFieldType
+class LanguageType extends AbstractType
 {
-    public function configure(FieldBuilder $builder, array $options)
-    {
-        $builder->addEventSubscriber(new FixUrlProtocolListener($options['default_protocol']));
-    }
-
     public function getDefaultOptions(array $options)
     {
         return array(
-            'default_protocol' => 'http',
+            'choices' => Locale::getDisplayLanguages(\Locale::getDefault()),
         );
     }
 
     public function getParent(array $options)
     {
-        return 'text';
+        return 'choice';
     }
 
     public function getName()
     {
-        return 'url';
+        return 'language';
     }
 }

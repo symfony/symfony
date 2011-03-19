@@ -12,23 +12,32 @@
 namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FieldBuilder;
+use Symfony\Component\Form\ChoiceList\TimeZoneChoiceList;
 
-class HiddenFieldType extends AbstractFieldType
+class TimezoneType extends AbstractType
 {
     public function getDefaultOptions(array $options)
     {
-        return array(
-            'template' => 'hidden',
+        $defaultOptions = array(
+            'preferred_choices' => array(),
         );
+
+        $options = array_replace($defaultOptions, $options);
+
+        if (!isset($options['choice_list'])) {
+            $defaultOptions['choice_list'] = new TimeZoneChoiceList($options['preferred_choices']);
+        }
+
+        return $defaultOptions;
     }
 
     public function getParent(array $options)
     {
-        return 'field';
+        return 'choice';
     }
 
     public function getName()
     {
-        return 'hidden';
+        return 'timezone';
     }
 }

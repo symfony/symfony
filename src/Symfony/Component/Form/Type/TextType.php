@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FieldBuilder;
 
-class TextFieldType extends AbstractFieldType
+class TextType extends AbstractType
 {
     public function configure(FieldBuilder $builder, array $options)
     {

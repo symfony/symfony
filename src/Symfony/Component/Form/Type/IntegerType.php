@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Type;
 use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\DataTransformer\IntegerToLocalizedStringTransformer;
 
-class IntegerFieldType extends AbstractFieldType
+class IntegerType extends AbstractType
 {
     public function configure(FieldBuilder $builder, array $options)
     {

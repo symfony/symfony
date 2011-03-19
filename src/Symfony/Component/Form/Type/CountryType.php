@@ -12,23 +12,15 @@
 namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FieldBuilder;
-use Symfony\Component\Form\ChoiceList\TimeZoneChoiceList;
+use Symfony\Component\Locale\Locale;
 
-class TimezoneFieldType extends AbstractFieldType
+class CountryType extends AbstractType
 {
     public function getDefaultOptions(array $options)
     {
-        $defaultOptions = array(
-            'preferred_choices' => array(),
+        return array(
+            'choices' => Locale::getDisplayCountries(\Locale::getDefault()),
         );
-
-        $options = array_replace($defaultOptions, $options);
-
-        if (!isset($options['choice_list'])) {
-            $defaultOptions['choice_list'] = new TimeZoneChoiceList($options['preferred_choices']);
-        }
-
-        return $defaultOptions;
     }
 
     public function getParent(array $options)
@@ -38,6 +30,6 @@ class TimezoneFieldType extends AbstractFieldType
 
     public function getName()
     {
-        return 'timezone';
+        return 'country';
     }
 }

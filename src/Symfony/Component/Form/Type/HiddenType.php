@@ -12,24 +12,23 @@
 namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FieldBuilder;
-use Symfony\Component\Locale\Locale;
 
-class CountryFieldType extends AbstractFieldType
+class HiddenType extends AbstractType
 {
     public function getDefaultOptions(array $options)
     {
         return array(
-            'choices' => Locale::getDisplayCountries(\Locale::getDefault()),
+            'template' => 'hidden',
         );
     }
 
     public function getParent(array $options)
     {
-        return 'choice';
+        return 'field';
     }
 
     public function getName()
     {
-        return 'country';
+        return 'hidden';
     }
 }

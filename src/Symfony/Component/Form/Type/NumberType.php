@@ -13,22 +13,25 @@ namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FieldBuilder;
 
-class PercentFieldType extends AbstractFieldType
+class NumberType extends AbstractType
 {
     public function configure(FieldBuilder $builder, array $options)
     {
-        $builder->setClientTransformer(new PercentToLocalizedStringTransformer(array(
+        $builder->setClientTransformer(new NumberToLocalizedStringTransformer(array(
                 'precision' => $options['precision'],
-                'type' => $options['type'],
+                'grouping' => $options['grouping'],
+                'rounding-mode' => $options['rounding_mode'],
             )));
     }
 
     public function getDefaultOptions(array $options)
     {
         return array(
-            'template' => 'percent',
-            'precision' => 0,
-            'type' => 'fractional',
+            'template' => 'number',
+            // default precision is locale specific (usually around 3)
+            'precision' => null,
+            'grouping' => false,
+            'rounding_mode' => NumberToLocalizedStringTransformer::ROUND_HALFUP,
         );
     }
 
@@ -39,6 +42,6 @@ class PercentFieldType extends AbstractFieldType
 
     public function getName()
     {
-        return 'percent';
+        return 'number';
     }
 }

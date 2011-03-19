@@ -19,7 +19,7 @@ use Symfony\Component\Form\DataMapper\ObjectMapper;
 use Symfony\Component\Form\Renderer\Plugin\FormPlugin;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class FormType extends AbstractFieldType
+class FormType extends AbstractType
 {
     private $theme;
 

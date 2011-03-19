@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FieldBuilder;
 
-class TextareaFieldType extends AbstractFieldType
+class TextareaType extends AbstractType
 {
     public function getDefaultOptions(array $options)
     {

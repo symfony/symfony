@@ -12,23 +12,29 @@
 namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FieldBuilder;
+use Symfony\Component\Form\EventListener\FixUrlProtocolListener;
 
-class BirthdayFieldType extends AbstractFieldType
+class UrlType extends AbstractType
 {
+    public function configure(FieldBuilder $builder, array $options)
+    {
+        $builder->addEventSubscriber(new FixUrlProtocolListener($options['default_protocol']));
+    }
+
     public function getDefaultOptions(array $options)
     {
         return array(
-            'years' => range(date('Y') - 120, date('Y')),
+            'default_protocol' => 'http',
         );
     }
 
     public function getParent(array $options)
     {
-        return 'date';
+        return 'text';
     }
 
     public function getName()
     {
-        return 'birthday';
+        return 'url';
     }
 }

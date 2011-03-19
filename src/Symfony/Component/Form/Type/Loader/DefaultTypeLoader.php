@@ -31,32 +31,32 @@ class DefaultTypeLoader implements TypeLoaderInterface
     {
         $this->addType(new Type\FieldType($theme, $validator));
         $this->addType(new Type\FormType($theme));
-        $this->addType(new Type\CheckboxFieldType());
-        $this->addType(new Type\ChoiceFieldType());
-        $this->addType(new Type\CollectionFieldType());
-        $this->addType(new Type\CountryFieldType());
-        $this->addType(new Type\CsrfFieldType($csrfProvider));
-        $this->addType(new Type\DateFieldType());
-        $this->addType(new Type\DateTimeFieldType());
-        $this->addType(new Type\FileFieldType($storage));
-        $this->addType(new Type\HiddenFieldType());
-        $this->addType(new Type\IntegerFieldType());
-        $this->addType(new Type\LanguageFieldType());
-        $this->addType(new Type\LocaleFieldType());
-        $this->addType(new Type\MoneyFieldType());
-        $this->addType(new Type\NumberFieldType());
-        $this->addType(new Type\PasswordFieldType());
-        $this->addType(new Type\PercentFieldType());
-        $this->addType(new Type\RadioFieldType());
-        $this->addType(new Type\RepeatedFieldType());
-        $this->addType(new Type\TextareaFieldType());
-        $this->addType(new Type\TextFieldType());
-        $this->addType(new Type\TimeFieldType());
-        $this->addType(new Type\TimezoneFieldType());
-        $this->addType(new Type\UrlFieldType());
+        $this->addType(new Type\CheckboxType());
+        $this->addType(new Type\ChoiceType());
+        $this->addType(new Type\CollectionType());
+        $this->addType(new Type\CountryType());
+        $this->addType(new Type\CsrfType($csrfProvider));
+        $this->addType(new Type\DateType());
+        $this->addType(new Type\DateTimeType());
+        $this->addType(new Type\FileType($storage));
+        $this->addType(new Type\HiddenType());
+        $this->addType(new Type\IntegerType());
+        $this->addType(new Type\LanguageType());
+        $this->addType(new Type\LocaleType());
+        $this->addType(new Type\MoneyType());
+        $this->addType(new Type\NumberType());
+        $this->addType(new Type\PasswordType());
+        $this->addType(new Type\PercentType());
+        $this->addType(new Type\RadioType());
+        $this->addType(new Type\RepeatedType());
+        $this->addType(new Type\TextareaType());
+        $this->addType(new Type\TextType());
+        $this->addType(new Type\TimeType());
+        $this->addType(new Type\TimezoneType());
+        $this->addType(new Type\UrlType());
 
         if (null !== $em) {
-            $this->addType(new Type\EntityFieldType($em));
+            $this->addType(new Type\EntityType($em));
         }
     }
 

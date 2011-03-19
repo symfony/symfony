@@ -21,7 +21,7 @@ use Symfony\Component\Form\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\DataTransformer\ReversedTransformer;
 
-class DateFieldType extends AbstractFieldType
+class DateType extends AbstractType
 {
     public function configure(FieldBuilder $builder, array $options)
     {

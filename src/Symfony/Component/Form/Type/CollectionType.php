@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Type;
 use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\EventListener\ResizeFormListener;
 
-class CollectionFieldType extends AbstractFieldType
+class CollectionType extends AbstractType
 {
     public function configure(FieldBuilder $builder, array $options)
     {

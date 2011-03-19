@@ -19,7 +19,7 @@ use Symfony\Component\Form\Renderer\Plugin\SelectMultipleNamePlugin;
 use Symfony\Component\Form\DataTransformer\ScalarToChoicesTransformer;
 use Symfony\Component\Form\DataTransformer\ArrayToChoicesTransformer;
 
-class ChoiceFieldType extends AbstractFieldType
+class ChoiceType extends AbstractType
 {
     public function configure(FieldBuilder $builder, array $options)
     {

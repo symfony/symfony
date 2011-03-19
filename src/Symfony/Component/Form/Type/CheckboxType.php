@@ -12,30 +12,33 @@
 namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FieldBuilder;
-use Symfony\Component\Form\Renderer\Plugin\PasswordValuePlugin;
+use Symfony\Component\Form\DataTransformer\BooleanToStringTransformer;
+use Symfony\Component\Form\Renderer\Plugin\CheckedPlugin;
 
-class PasswordFieldType extends AbstractFieldType
+class CheckboxType extends AbstractType
 {
     public function configure(FieldBuilder $builder, array $options)
     {
-        $builder->addRendererPlugin(new PasswordValuePlugin($options['always_empty']));
+        $builder->setClientTransformer(new BooleanToStringTransformer())
+            ->addRendererPlugin(new CheckedPlugin())
+            ->setRendererVar('value', $options['value']);
     }
 
     public function getDefaultOptions(array $options)
     {
         return array(
-            'template' => 'password',
-            'always_empty' => true,
+            'template' => 'checkbox',
+            'value' => '1',
         );
     }
 
     public function getParent(array $options)
     {
-        return 'text';
+        return 'field';
     }
 
     public function getName()
     {
-        return 'password';
+        return 'checkbox';
     }
 }

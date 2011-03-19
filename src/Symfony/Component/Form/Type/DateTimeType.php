@@ -12,47 +12,80 @@
 namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FieldBuilder;
-use Symfony\Component\Form\ChoiceList\PaddedChoiceList;
 use Symfony\Component\Form\DataTransformer\ReversedTransformer;
+use Symfony\Component\Form\DataTransformer\DataTransformerChain;
+use Symfony\Component\Form\DataTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\DataTransformer\DateTimeToTimestampTransformer;
-use Symfony\Component\Form\DataTransformer\DateTimeToArrayTransformer;
+use Symfony\Component\Form\DataTransformer\ArrayToPartsTransformer;
 
-class TimeFieldType extends AbstractFieldType
+class DateTimeType extends AbstractType
 {
     public function configure(FieldBuilder $builder, array $options)
     {
-        $hourOptions = $minuteOptions = $secondOptions = array();
-        $child = $options['widget'] === 'text' ? 'text' : 'choice';
-        $parts = array('hour', 'minute');
+        // Only pass a subset of the options to children
+        $dateOptions = array_intersect_key($options, array_flip(array(
+            'years',
+            'months',
+            'days',
+        )));
+        $timeOptions = array_intersect_key($options, array_flip(array(
+            'hours',
+            'minutes',
+            'seconds',
+            'with_seconds',
+        )));
 
-        if ($options['widget'] === 'choice') {
-            $hourOptions['choice_list'] =  new PaddedChoiceList(
-                $options['hours'], 2, '0', STR_PAD_LEFT
-            );
-            $minuteOptions['choice_list'] = new PaddedChoiceList(
-                $options['minutes'], 2, '0', STR_PAD_LEFT
-            );
-
-            if ($options['with_seconds']) {
-                $secondOptions['choice_list'] = new PaddedChoiceList(
-                    $options['seconds'], 2, '0', STR_PAD_LEFT
-                );
-            }
+        if (isset($options['date_pattern'])) {
+            $dateOptions['pattern'] = $options['date_pattern'];
+        }
+        if (isset($options['date_widget'])) {
+            $dateOptions['widget'] = $options['date_widget'];
+        }
+        if (isset($options['date_format'])) {
+            $dateOptions['format'] = $options['date_format'];
         }
 
-        $builder->add($options['widget'], 'hour', $hourOptions)
-            ->add($options['widget'], 'minute', $minuteOptions);
+        $dateOptions['type'] = 'array';
+
+        if (isset($options['time_pattern'])) {
+            $timeOptions['pattern'] = $options['time_pattern'];
+        }
+        if (isset($options['time_widget'])) {
+            $timeOptions['widget'] = $options['time_widget'];
+        }
+        if (isset($options['time_format'])) {
+            $timeOptions['format'] = $options['time_format'];
+        }
+
+        $timeOptions['type'] = 'array';
+
+        $parts = array('year', 'month', 'day', 'hour', 'minute');
+        $timeParts = array('hour', 'minute');
 
         if ($options['with_seconds']) {
             $parts[] = 'second';
-            $builder->add($options['widget'], 'second', $secondOptions);
+            $timeParts[] = 'second';
         }
+
+        $builder->setClientTransformer(new DataTransformerChain(array(
+                new DateTimeToArrayTransformer(array(
+                    'input_timezone' => $options['data_timezone'],
+                    'output_timezone' => $options['user_timezone'],
+                    'fields' => $parts,
+                )),
+                new ArrayToPartsTransformer(array(
+                    'date' => array('year', 'month', 'day'),
+                    'time' => $timeParts,
+                )),
+            )))
+            ->add('date', 'date', $dateOptions)
+            ->add('time', 'time', $timeOptions);
 
         if ($options['type'] == 'string') {
             $builder->setNormTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer(array(
-                    'format' => 'H:i:s',
+                    'format' => 'Y-m-d H:i:s',
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['data_timezone'],
                 ))
@@ -73,34 +106,16 @@ class TimeFieldType extends AbstractFieldType
                 ))
             ));
         }
-
-        $builder
-            ->setClientTransformer(new DateTimeToArrayTransformer(array(
-                'input_timezone' => $options['data_timezone'],
-                'output_timezone' => $options['user_timezone'],
-                // if the field is rendered as choice field, the values should be trimmed
-                // of trailing zeros to render the selected choices correctly
-                'pad' => $options['widget'] === 'text',
-                'fields' => $parts,
-            )))
-            ->setRendererVar('widget', $options['widget'])
-            ->setRendererVar('with_seconds', $options['with_seconds']);
     }
 
     public function getDefaultOptions(array $options)
     {
         return array(
-            'template' => 'time',
-            'hours' => range(0, 23),
-            'minutes' => range(0, 59),
-            'seconds' => range(0, 59),
-            'widget' => 'choice',
+            'template' => 'datetime',
             'type' => 'datetime',
             'with_seconds' => false,
-            'pattern' => null,
             'data_timezone' => date_default_timezone_get(),
             'user_timezone' => date_default_timezone_get(),
-            'csrf_protection' => false,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference' => false,
@@ -114,6 +129,6 @@ class TimeFieldType extends AbstractFieldType
 
     public function getName()
     {
-        return 'time';
+        return 'datetime';
     }
 }

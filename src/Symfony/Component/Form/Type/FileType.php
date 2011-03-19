@@ -20,7 +20,7 @@ use Symfony\Component\Form\DataTransformer\FileToStringTransformer;
 use Symfony\Component\Form\DataTransformer\FileToArrayTransformer;
 use Symfony\Component\HttpFoundation\File\TemporaryStorage;
 
-class FileFieldType extends AbstractFieldType
+class FileType extends AbstractType
 {
     private $storage;
 

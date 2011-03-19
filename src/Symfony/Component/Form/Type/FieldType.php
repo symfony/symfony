@@ -23,7 +23,7 @@ use Symfony\Component\Form\Validator\DelegatingValidator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Validator\ValidatorInterface;
 
-class FieldType extends AbstractFieldType
+class FieldType extends AbstractType
 {
     private $theme;
 

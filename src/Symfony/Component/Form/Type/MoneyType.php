@@ -13,25 +13,26 @@ namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FieldBuilder;
 
-class NumberFieldType extends AbstractFieldType
+class MoneyType extends AbstractType
 {
     public function configure(FieldBuilder $builder, array $options)
     {
-        $builder->setClientTransformer(new NumberToLocalizedStringTransformer(array(
+        $builder->setClientTransformer(new MoneyToLocalizedStringTransformer(array(
                 'precision' => $options['precision'],
                 'grouping' => $options['grouping'],
-                'rounding-mode' => $options['rounding_mode'],
-            )));
+                'divisor' => $options['divisor'],
+            )))
+            ->addRendererPlugin(new MoneyPatternPlugin($options['currency']));
     }
 
     public function getDefaultOptions(array $options)
     {
         return array(
-            'template' => 'number',
-            // default precision is locale specific (usually around 3)
-            'precision' => null,
+            'template' => 'money',
+            'precision' => 2,
             'grouping' => false,
-            'rounding_mode' => NumberToLocalizedStringTransformer::ROUND_HALFUP,
+            'divisor' => 1,
+            'currency' => 'EUR',
         );
     }
 
@@ -42,6 +43,6 @@ class NumberFieldType extends AbstractFieldType
 
     public function getName()
     {
-        return 'number';
+        return 'money';
     }
 }

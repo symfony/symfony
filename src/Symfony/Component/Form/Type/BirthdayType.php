@@ -11,24 +11,24 @@
 
 namespace Symfony\Component\Form\Type;
 
-use Symfony\Component\Locale\Locale;
+use Symfony\Component\Form\FieldBuilder;
 
-class LocaleFieldType extends AbstractFieldType
+class BirthdayType extends AbstractType
 {
     public function getDefaultOptions(array $options)
     {
         return array(
-            'choices' => Locale::getDisplayLocales(\Locale::getDefault()),
+            'years' => range(date('Y') - 120, date('Y')),
         );
     }
 
     public function getParent(array $options)
     {
-        return 'choice';
+        return 'date';
     }
 
     public function getName()
     {
-        return 'locale';
+        return 'birthday';
     }
 }

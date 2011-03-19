@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Type;
 use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\DataTransformer\ValueToDuplicatesTransformer;
 
-class RepeatedFieldType extends AbstractFieldType
+class RepeatedType extends AbstractType
 {
     public function configure(FieldBuilder $builder, array $options)
     {

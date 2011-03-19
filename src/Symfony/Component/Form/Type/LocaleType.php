@@ -13,12 +13,12 @@ namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Locale\Locale;
 
-class LanguageFieldType extends AbstractFieldType
+class LocaleType extends AbstractType
 {
     public function getDefaultOptions(array $options)
     {
         return array(
-            'choices' => Locale::getDisplayLanguages(\Locale::getDefault()),
+            'choices' => Locale::getDisplayLocales(\Locale::getDefault()),
         );
     }
 
@@ -29,6 +29,6 @@ class LanguageFieldType extends AbstractFieldType
 
     public function getName()
     {
-        return 'language';
+        return 'locale';
     }
 }

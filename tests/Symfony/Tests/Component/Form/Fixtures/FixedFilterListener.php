@@ -13,27 +13,27 @@ class FixedFilterListener implements EventSubscriberInterface
     public function __construct(array $mapping)
     {
         $this->mapping = array_merge(array(
-            'filterBoundDataFromClient' => array(),
-            'filterBoundData' => array(),
+            'filterBoundClientData' => array(),
+            'filterBoundNormData' => array(),
             'filterSetData' => array(),
         ), $mapping);
     }
 
-    public function filterBoundDataFromClient(FilterDataEvent $event)
+    public function filterBoundClientData(FilterDataEvent $event)
     {
         $data = $event->getData();
 
-        if (isset($this->mapping['filterBoundDataFromClient'][$data])) {
-            $event->setData($this->mapping['filterBoundDataFromClient'][$data]);
+        if (isset($this->mapping['filterBoundClientData'][$data])) {
+            $event->setData($this->mapping['filterBoundClientData'][$data]);
         }
     }
 
-    public function filterBoundData(FilterDataEvent $event)
+    public function filterBoundNormData(FilterDataEvent $event)
     {
         $data = $event->getData();
 
-        if (isset($this->mapping['filterBoundData'][$data])) {
-            $event->setData($this->mapping['filterBoundData'][$data]);
+        if (isset($this->mapping['filterBoundNormData'][$data])) {
+            $event->setData($this->mapping['filterBoundNormData'][$data]);
         }
     }
 
@@ -49,8 +49,8 @@ class FixedFilterListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            Events::filterBoundDataFromClient,
-            Events::filterBoundData,
+            Events::filterBoundClientData,
+            Events::filterBoundNormData,
             Events::filterSetData,
         );
     }

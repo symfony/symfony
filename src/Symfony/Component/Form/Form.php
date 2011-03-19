@@ -25,7 +25,7 @@ use Symfony\Component\Form\Exception\FieldDefinitionException;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
 use Symfony\Component\Form\DataMapper\DataMapperInterface;
-use Symfony\Component\Form\DataValidator\DataValidatorInterface;
+use Symfony\Component\Form\Validator\FieldValidatorInterface;
 use Symfony\Component\Form\Renderer\RendererInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -64,20 +64,20 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     public function __construct($name, EventDispatcherInterface $dispatcher,
         RendererInterface $renderer, DataTransformerInterface $clientTransformer = null,
         DataTransformerInterface $normalizationTransformer = null,
-        DataMapperInterface $dataMapper, DataValidatorInterface $dataValidator = null,
+        DataMapperInterface $dataMapper, FieldValidatorInterface $validator = null,
         $required = false, $disabled = false, array $attributes = array())
     {
         $dispatcher->addListener(array(
             Events::postSetData,
             Events::preBind,
             Events::filterSetData,
-            Events::filterBoundDataFromClient,
+            Events::filterBoundClientData,
         ), $this);
 
         $this->dataMapper = $dataMapper;
 
         parent::__construct($name, $dispatcher, $renderer, $clientTransformer,
-            $normalizationTransformer, $dataValidator, $required, $disabled,
+            $normalizationTransformer, $validator, $required, $disabled,
             $attributes);
     }
 
@@ -160,7 +160,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         }
     }
 
-    public function filterBoundDataFromClient(FilterDataEvent $event)
+    public function filterBoundClientData(FilterDataEvent $event)
     {
         $data = $event->getData();
 
@@ -201,7 +201,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
         $this->extraFields = array();
 
-        foreach ($data as $name => $value) {
+        foreach ((array)$data as $name => $value) {
             if (!$this->has($name)) {
                 $this->extraFields[] = $name;
             }

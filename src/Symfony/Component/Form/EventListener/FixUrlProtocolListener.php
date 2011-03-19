@@ -30,7 +30,7 @@ class FixUrlProtocolListener implements EventSubscriberInterface
         $this->defaultProtocol = $defaultProtocol;
     }
 
-    public function filterBoundData(FilterDataEvent $event)
+    public function filterBoundNormData(FilterDataEvent $event)
     {
         $data = $event->getData();
 
@@ -41,6 +41,6 @@ class FixUrlProtocolListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return Events::filterBoundData;
+        return Events::filterBoundNormData;
     }
 }

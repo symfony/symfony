@@ -11,7 +11,7 @@
 
 namespace Symfony\Tests\Component\Form\Renderer\Theme;
 
-use Symfony\Component\Form\Type\AbstractFieldType;
+use Symfony\Component\Form\Type\AbstractType;
 use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\CsrfProvider\DefaultCsrfProvider;
 use Symfony\Component\Form\Type\Loader\DefaultTypeLoader;
@@ -45,6 +45,8 @@ abstract class AbstractThemeFunctionalTest extends \PHPUnit_Framework_TestCase
 
     public function testFullFormRendering()
     {
+        \Locale::setDefault('en');
+
         $form = $this->factory->create('my.form');
         $html = $form->getRenderer()->getWidget();
 
@@ -98,50 +100,50 @@ abstract class AbstractThemeFunctionalTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class MyTestFormConfig extends AbstractFieldType
+class MyTestFormConfig extends AbstractType
 {
     public function configure(FieldBuilder $builder, array $options)
     {
         $builder->setDataClass('Symfony\Bundle\FrameworkBundle\Tests\Form\MyTestObject');
-        $builder->add('my.sub_form', 'field0');
-        $builder->add('text', 'field1', array('max_length' => 127, 'id' => 'foo'));
-        $builder->add('date', 'field2');
-        $builder->add('time', 'field5');
-        $builder->add('choice', 'field3', array(
+        $builder->add('field0', 'my.sub_form');
+        $builder->add('field1', 'text', array('max_length' => 127, 'id' => 'foo'));
+        $builder->add('field2', 'date');
+        $builder->add('field5', 'time');
+        $builder->add('field3', 'choice', array(
             'expanded' => true,
             'multiple' => false,
             'choices' => array('active' => 'Active', 'inactive' => 'Inactive'),
         ));
-        $builder->add('choice', 'field21', array(
+        $builder->add('field21', 'choice', array(
             'expanded' => false,
             'multiple' => false,
             'choices' => array('active' => 'Active', 'inactive' => 'Inactive'),
         ));
-        $builder->add('choice', 'field22', array(
+        $builder->add('field22', 'choice', array(
             'expanded' => false,
             'multiple' => false,
             'choices' => array('active' => 'Active', 'inactive' => 'Inactive'),
             'preferred_choices' => array('active')
         ));
-        $builder->add('datetime', 'field4');
-        $builder->add('birthday', 'field6');
-        $builder->add('checkbox', 'field7');
-        $builder->add('file', 'field8');
-        $builder->add('hidden', 'field9');
-        $builder->add('integer', 'field10');
-        $builder->add('language', 'field11');
-        $builder->add('locale', 'field12');
-        $builder->add('money', 'field13');
-        $builder->add('number', 'field14');
-        $builder->add('password', 'field15');
-        $builder->add('percent', 'field16');
-        $builder->add('radio', 'field17');
-        $builder->add('repeated', 'field18', array('identifier' => 'password'));
-        $builder->add('collection', 'emails', array(
-            'prototype' => 'text',
+        $builder->add('field4', 'datetime');
+        $builder->add('field6', 'birthday');
+        $builder->add('field7', 'checkbox');
+        $builder->add('field8', 'file');
+        $builder->add('field9', 'hidden');
+        $builder->add('field10', 'integer');
+        $builder->add('field11', 'language');
+        $builder->add('field12', 'locale');
+        $builder->add('field13', 'money');
+        $builder->add('field14', 'number');
+        $builder->add('field15', 'password');
+        $builder->add('field16', 'percent');
+        $builder->add('field17', 'radio');
+        $builder->add('field18', 'repeated', array('identifier' => 'password'));
+        $builder->add('emails', 'collection', array(
+            'type' => 'text',
         ));
-        $builder->add('timezone', 'field19');
-        $builder->add('url', 'field20');
+        $builder->add('field19', 'timezone');
+        $builder->add('field20', 'url');
     }
 
     public function getName()
@@ -159,11 +161,11 @@ class MyTestObject
     private $emails = 'test,foo,bar';
 }
 
-class MyTestSubFormConfig extends AbstractFieldType
+class MyTestSubFormConfig extends AbstractType
 {
     public function configure(FieldBuilder $builder, array $options)
     {
-        $builder->add('text', 'subfield0');
+        $builder->add('subfield0', 'text');
     }
 
     public function getName()

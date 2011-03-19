@@ -13,8 +13,8 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Type\FieldTypeInterface;
 use Symfony\Component\Form\Type\Loader\TypeLoaderInterface;
-use Symfony\Component\Form\FieldGuesser\FieldGuesserInterface;
-use Symfony\Component\Form\FieldGuesser\FieldGuess;
+use Symfony\Component\Form\Type\Guesser\TypeGuesserInterface;
+use Symfony\Component\Form\Type\Guesser\Guess;
 
 class FormFactory implements FormFactoryInterface
 {
@@ -27,7 +27,7 @@ class FormFactory implements FormFactoryInterface
         $this->typeLoader = $typeLoader;
     }
 
-    public function addGuesser(FieldGuesserInterface $guesser)
+    public function addGuesser(TypeGuesserInterface $guesser)
     {
         $this->guessers[] = $guesser;
     }
@@ -133,6 +133,6 @@ class FormFactory implements FormFactoryInterface
             }
         }
 
-        return FieldGuess::getBestGuess($guesses);
+        return Guess::getBestGuess($guesses);
     }
 }

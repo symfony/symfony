@@ -31,7 +31,7 @@ class DateFieldTest extends DateTimeTestCase
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
-            'type' => 'datetime',
+            'input' => 'datetime',
         ));
 
         $field->bind('2.6.2010');
@@ -46,7 +46,7 @@ class DateFieldTest extends DateTimeTestCase
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
-            'type' => 'string',
+            'input' => 'string',
         ));
 
         $field->bind('2.6.2010');
@@ -61,7 +61,7 @@ class DateFieldTest extends DateTimeTestCase
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
-            'type' => 'timestamp',
+            'input' => 'timestamp',
         ));
 
         $field->bind('2.6.2010');
@@ -78,7 +78,7 @@ class DateFieldTest extends DateTimeTestCase
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
-            'type' => 'array',
+            'input' => 'array',
         ));
 
         $field->bind('2.6.2010');
@@ -142,7 +142,7 @@ class DateFieldTest extends DateTimeTestCase
             'data_timezone' => 'America/New_York',
             'user_timezone' => 'Pacific/Tahiti',
             // don't do this test with DateTime, because it leads to wrong results!
-            'type' => 'string',
+            'input' => 'string',
             'widget' => 'text',
         ));
 

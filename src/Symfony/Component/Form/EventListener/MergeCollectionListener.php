@@ -19,10 +19,10 @@ class MergeCollectionListener implements EventSubscriberInterface
 {
     public static function getSubscribedEvents()
     {
-        return Events::filterBoundData;
+        return Events::filterBoundNormData;
     }
 
-    public function filterBoundData(FilterDataEvent $event)
+    public function filterBoundNormData(FilterDataEvent $event)
     {
         $collection = $event->getField()->getData();
         $data = $event->getData();

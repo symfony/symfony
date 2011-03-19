@@ -15,6 +15,7 @@ use Symfony\Component\Form\DataMapper\DataMapperInterface;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FormBuilder extends FieldBuilder
@@ -74,26 +75,16 @@ class FormBuilder extends FieldBuilder
      * @param FieldInterface|string $field
      * @return FieldInterface
      */
-    public function add($field)
+    public function add($name, $type = null, array $options = array())
     {
-        // if the field is given as string, ask the field factory of the form
-        // to create a field
-        if ($field instanceof FieldInterface) {
-            $this->fields[$field->getName()] = $field;
-
-            return $this;
+        if (!is_string($name)) {
+            throw new UnexpectedTypeException($name, 'string');
         }
 
-        if (!is_string($field)) {
-            throw new UnexpectedTypeException($field, 'FieldInterface or string');
-        }
-
-        // TODO turn order of $type and $name around
-
-        if (func_num_args() > 2 || (func_num_args() > 1 && !is_array(func_get_arg(1)))) {
-            $type = func_get_arg(0);
-            $name = func_get_arg(1);
-            $options = func_num_args() > 2 ? func_get_arg(2) : array();
+        if (null !== $type) {
+            if (!is_string($type)) {
+                throw new UnexpectedTypeException($type, 'string');
+            }
 
             $this->fields[$name] = array(
                 'type' => $type,
@@ -107,10 +98,7 @@ class FormBuilder extends FieldBuilder
             throw new FormException('The data class must be set to automatically create fields');
         }
 
-        $property = func_get_arg(0);
-        $options = func_num_args() > 1 ? func_get_arg(1) : array();
-
-        $this->fields[$property] = array(
+        $this->fields[$name] = array(
             'class' => $this->dataClass,
             'options' => $options,
         );
@@ -225,7 +213,7 @@ class FormBuilder extends FieldBuilder
                 $options['csrf_provider'] = $this->csrfProvider;
             }
 
-            $this->add('csrf', $this->csrfFieldName, $options);
+            $this->add($this->csrfFieldName, 'csrf', $options);
         }
     }
 
@@ -252,7 +240,7 @@ class FormBuilder extends FieldBuilder
             $this->getClientTransformer(),
             $this->getNormTransformer(),
             $this->getDataMapper(),
-            $this->getDataValidator(),
+            $this->getValidator(),
             $this->getRequired(),
             $this->getDisabled(),
             $this->getAttributes()

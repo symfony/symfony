@@ -26,7 +26,7 @@ class DateTimeFieldTest extends DateTimeTestCase
             'user_timezone' => 'UTC',
             'date_widget' => 'choice',
             'time_widget' => 'choice',
-            'type' => 'datetime',
+            'input' => 'datetime',
         ));
 
         $field->bind(array(
@@ -51,7 +51,7 @@ class DateTimeFieldTest extends DateTimeTestCase
         $field = $this->factory->create('datetime', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'type' => 'string',
+            'input' => 'string',
             'date_widget' => 'choice',
             'time_widget' => 'choice',
         ));
@@ -76,7 +76,7 @@ class DateTimeFieldTest extends DateTimeTestCase
         $field = $this->factory->create('datetime', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'type' => 'timestamp',
+            'input' => 'timestamp',
             'date_widget' => 'choice',
             'time_widget' => 'choice',
         ));
@@ -105,7 +105,7 @@ class DateTimeFieldTest extends DateTimeTestCase
             'user_timezone' => 'UTC',
             'date_widget' => 'choice',
             'time_widget' => 'choice',
-            'type' => 'datetime',
+            'input' => 'datetime',
             'with_seconds' => true,
         ));
 
@@ -137,7 +137,7 @@ class DateTimeFieldTest extends DateTimeTestCase
             'date_widget' => 'choice',
             'time_widget' => 'choice',
             // don't do this test with DateTime, because it leads to wrong results!
-            'type' => 'string',
+            'input' => 'string',
             'with_seconds' => true,
         ));
 

@@ -214,12 +214,12 @@ class FieldTest extends TestCase
     public function testBoundDataIsTransformedCorrectly()
     {
         $filter = new FixedFilterListener(array(
-            'filterBoundDataFromClient' => array(
+            'filterBoundClientData' => array(
                 // 1. The value is converted to a string and passed to the
                 //    first filter
                 '0' => 'filter1[0]',
             ),
-            'filterBoundData' => array(
+            'filterBoundNormData' => array(
                 // 3. The normalized value is passed to the second filter
                 'norm[filter1[0]]' => 'filter2[norm[filter1[0]]]',
             ),

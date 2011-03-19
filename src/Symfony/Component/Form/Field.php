@@ -13,7 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
 use Symfony\Component\Form\DataTransformer\TransformationFailedException;
-use Symfony\Component\Form\DataValidator\DataValidatorInterface;
+use Symfony\Component\Form\Validator\FieldValidatorInterface;
 use Symfony\Component\Form\Renderer\RendererInterface;
 use Symfony\Component\Form\Renderer\Plugin\RendererPluginInterface;
 use Symfony\Component\Form\Event\DataEvent;
@@ -65,7 +65,7 @@ class Field implements FieldInterface
     private $normTransformer;
     private $clientTransformer;
     private $transformationSuccessful = true;
-    private $dataValidator;
+    private $validator;
     private $renderer;
     private $disabled = false;
     private $dispatcher;
@@ -74,7 +74,7 @@ class Field implements FieldInterface
     public function __construct($name, EventDispatcherInterface $dispatcher,
         RendererInterface $renderer, DataTransformerInterface $clientTransformer = null,
         DataTransformerInterface $normTransformer = null,
-        DataValidatorInterface $dataValidator = null, $required = false,
+        FieldValidatorInterface $validator = null, $required = false,
         $disabled = false, array $attributes = array())
     {
         $this->name = (string)$name;
@@ -82,7 +82,7 @@ class Field implements FieldInterface
         $this->renderer = $renderer;
         $this->clientTransformer = $clientTransformer;
         $this->normTransformer = $normTransformer;
-        $this->dataValidator = $dataValidator;
+        $this->validator = $validator;
         $this->required = $required;
         $this->disabled = $disabled;
         $this->attributes = $attributes;
@@ -244,7 +244,7 @@ class Field implements FieldInterface
 
         // Hook to change content of the data bound by the browser
         $event = new FilterDataEvent($this, $clientData);
-        $this->dispatcher->dispatch(Events::filterBoundDataFromClient, $event);
+        $this->dispatcher->dispatch(Events::filterBoundClientData, $event);
         $clientData = $event->getData();
 
         try {
@@ -259,7 +259,7 @@ class Field implements FieldInterface
             // Hook to change content of the data in the normalized
             // representation
             $event = new FilterDataEvent($this, $normData);
-            $this->dispatcher->dispatch(Events::filterBoundData, $event);
+            $this->dispatcher->dispatch(Events::filterBoundNormData, $event);
             $normData = $event->getData();
 
             // Synchronize representations - must not change the content!
@@ -276,8 +276,8 @@ class Field implements FieldInterface
         $event = new DataEvent($this, $clientData);
         $this->dispatcher->dispatch(Events::postBind, $event);
 
-        if ($this->dataValidator) {
-            $this->dataValidator->validate($this);
+        if ($this->validator) {
+            $this->validator->validate($this);
         }
     }
 

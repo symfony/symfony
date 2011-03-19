@@ -51,4 +51,13 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $loader->load('nonvalid.yml');
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLoadThrowsExceptionIfArrayHasUnsupportedKeys()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader->load('nonvalidkeys.yml');
+    }
 }

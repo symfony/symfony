@@ -80,7 +80,7 @@ class ExceptionListener
             try {
                 $response = $this->startAuthentication($request, $exception);
             } catch (\Exception $e) {
-                $event->set('exception', $e);
+                $event->setException($e);
 
                 return;
             }
@@ -94,7 +94,7 @@ class ExceptionListener
                 try {
                     $response = $this->startAuthentication($request, new InsufficientAuthenticationException('Full authentication is required to access this resource.', $token, 0, $exception));
                 } catch (\Exception $e) {
-                    $event->set('exception', $e);
+                    $event->setException($e);
 
                     return;
                 }

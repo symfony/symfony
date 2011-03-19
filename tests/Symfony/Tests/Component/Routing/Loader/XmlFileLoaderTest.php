@@ -52,5 +52,31 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($routes), 'One route is loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @dataProvider getPathsToInvalidFiles
+     */
+    public function testLoadThrowsExceptionWithInvalidFile($filePath)
+    {
+        $loader = new CustomXmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader->load($filePath);
+    }
+
+    public function getPathsToInvalidFiles()
+    {
+        return array(array('nonvalidnode.xml'), array('nonvalidroute.xml'), array('nonvalid.xml'));
+    }
+}
+
+/**
+ * XmlFileLoader with schema validation turned off
+ */
+class CustomXmlFileLoader extends XmlFileLoader
+{
+    protected function validate(\DOMDocument $dom)
+    {
+        return true;
+    }
 }
 

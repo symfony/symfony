@@ -27,7 +27,7 @@ class MinLengthValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        $value = (string)$value;
+        $value = (string) $value;
 
         $length = function_exists('mb_strlen') ? mb_strlen($value, $constraint->charset) : strlen($value);
 

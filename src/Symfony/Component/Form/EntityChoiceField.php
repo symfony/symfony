@@ -240,7 +240,7 @@ class EntityChoiceField extends ChoiceField
                 $value = $propertyPath->getValue($entity);
             } else {
                 // Otherwise expect a __toString() method in the entity
-                $value = (string)$entity;
+                $value = (string) $entity;
             }
 
             if (count($this->getIdentifierFields()) > 1) {
@@ -422,9 +422,9 @@ class EntityChoiceField extends ChoiceField
         $notFound = array();
 
         if (count($this->getIdentifierFields()) > 1) {
-            $notFound = array_diff((array)$keyOrKeys, array_keys($this->getEntities()));
+            $notFound = array_diff((array) $keyOrKeys, array_keys($this->getEntities()));
         } else if ($this->entities) {
-            $notFound = array_diff((array)$keyOrKeys, array_keys($this->entities));
+            $notFound = array_diff((array) $keyOrKeys, array_keys($this->entities));
         }
 
         if (0 === count($notFound)) {

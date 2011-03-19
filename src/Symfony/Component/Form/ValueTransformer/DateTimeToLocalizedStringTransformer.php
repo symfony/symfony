@@ -71,7 +71,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
             $dateTime->setTimezone(new \DateTimeZone('UTC'));
         }
 
-        $value = $this->getIntlDateFormatter()->format((int)$dateTime->format('U'));
+        $value = $this->getIntlDateFormatter()->format((int) $dateTime->format('U'));
 
         if (intl_get_error_code() != 0) {
             throw new TransformationFailedException(intl_get_error_message());

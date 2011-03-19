@@ -737,7 +737,8 @@ class StubNumberFormatter
      * @param  mixed  $value   The value to be normalized
      * @return int             The normalized value for the attribute (0 or 1)
      */
-    private function normalizeGroupingUsedValue($value) {
+    private function normalizeGroupingUsedValue($value)
+    {
         return (int) (bool) (int) $value;
     }
 

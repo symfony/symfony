@@ -447,7 +447,8 @@ QUERY;
      * @throws \RuntimeException
      * @return \SplObjectStorage
      */
-    private function hydrateObjectIdentities(Statement $stmt, array $oidLookup, array $sids) {
+    private function hydrateObjectIdentities(Statement $stmt, array $oidLookup, array $sids)
+    {
         $parentIdToFill = new \SplObjectStorage();
         $acls = $aces = $emptyArray = array();
         $oidCache = $oidLookup;

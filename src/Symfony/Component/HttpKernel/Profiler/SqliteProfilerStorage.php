@@ -26,7 +26,7 @@ class SqliteProfilerStorage extends PdoProfilerStorage
     protected function initDb()
     {
         if (null === $this->db || $this->db instanceof \SQLite3) {
-            if ('sqlite' !== substr($this->dsn, 0, 6 )) {
+            if ('sqlite' !== substr($this->dsn, 0, 6)) {
                 throw new \RuntimeException('You are trying to use Sqlite with a wrong dsn. "'.$this->dsn.'"');
             }
             if (class_exists('SQLite3')) {

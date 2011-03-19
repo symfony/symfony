@@ -82,7 +82,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         if (!$this->getOption('pad')) {
             foreach ($result as &$entry) {
                 // remove leading zeros
-                $entry = (string)(int)$entry;
+                $entry = (string) (int) $entry;
             }
         }
 

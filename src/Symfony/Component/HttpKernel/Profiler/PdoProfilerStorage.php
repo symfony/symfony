@@ -62,12 +62,12 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-     public function findChildren($token)
-     {
-         $db = $this->initDb();
-         $args = array(':token' => $token);
-         $tokens = $this->fetch($db, 'SELECT token FROM sf_profiler_data WHERE parent = :token LIMIT 1', $args);
-         $this->close($db);
+    public function findChildren($token)
+    {
+        $db = $this->initDb();
+        $args = array(':token' => $token);
+        $tokens = $this->fetch($db, 'SELECT token FROM sf_profiler_data WHERE parent = :token LIMIT 1', $args);
+        $this->close($db);
 
         return $tokens;
     }

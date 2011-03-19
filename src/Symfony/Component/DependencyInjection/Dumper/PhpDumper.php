@@ -570,8 +570,7 @@ EOF;
                 $this->addServiceMethodCalls($id, $definition).
                 $this->addServiceProperties($id, $definition).
                 $this->addServiceConfigurator($id, $definition).
-                $this->addServiceReturn($id, $definition)
-            ;
+                $this->addServiceReturn($id, $definition);
         }
 
         $this->definitionVariables = null;

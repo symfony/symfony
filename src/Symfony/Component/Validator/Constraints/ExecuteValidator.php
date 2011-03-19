@@ -29,7 +29,7 @@ class ExecuteValidator extends ConstraintValidator
             return true;
         }
 
-        $methods = (array)$constraint->methods;
+        $methods = (array) $constraint->methods;
         $context = $this->context;
 
         // save context state

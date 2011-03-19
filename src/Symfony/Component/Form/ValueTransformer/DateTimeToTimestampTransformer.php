@@ -51,7 +51,7 @@ class DateTimeToTimestampTransformer extends Configurable implements ValueTransf
 
         $value->setTimezone(new \DateTimeZone($this->getOption('output_timezone')));
 
-        return (int)$value->format('U');
+        return (int) $value->format('U');
     }
 
     /**

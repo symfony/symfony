@@ -46,7 +46,8 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
     /**
      * {@inheritDoc}
      */
-    public function setRepeatedPass(RepeatedPass $repeatedPass) {
+    public function setRepeatedPass(RepeatedPass $repeatedPass)
+    {
         $this->repeatedPass = $repeatedPass;
     }
 

@@ -302,7 +302,7 @@ class ValidatorFieldFactoryGuesser implements FieldFactoryGuesserInterface
                 );
             case 'Symfony\Component\Validator\Constraints\Max':
                 return new FieldFactoryGuess(
-                    strlen((string)$constraint->limit),
+                    strlen((string) $constraint->limit),
                     FieldFactoryGuess::HIGH_CONFIDENCE
                 );
         }

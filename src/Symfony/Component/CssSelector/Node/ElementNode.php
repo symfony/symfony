@@ -31,7 +31,7 @@ class ElementNode implements NodeInterface
      *
      * @param string $namespace Namespace
      * @param string $element Element
-     */ 
+     */
     public function __construct($namespace, $element)
     {
         $this->namespace = $namespace;

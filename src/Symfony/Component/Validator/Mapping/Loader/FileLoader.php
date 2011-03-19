@@ -50,7 +50,7 @@ abstract class FileLoader implements LoaderInterface
     protected function newConstraint($name, $options)
     {
         if (strpos($name, '\\') !== false && class_exists($name)) {
-            $className = (string)$name;
+            $className = (string) $name;
         } else if (strpos($name, ':') !== false) {
             list($prefix, $className) = explode(':', $name);
 

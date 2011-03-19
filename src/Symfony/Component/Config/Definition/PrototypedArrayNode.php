@@ -182,7 +182,7 @@ class PrototypedArrayNode extends ArrayNode
 
         $value = $this->remapXml($value);
 
-        $normalized = array();         
+        $normalized = array();
         foreach ($value as $k => $v) {
             if (null !== $this->keyAttribute && is_array($v)) {
                 if (!isset($v[$this->keyAttribute]) && is_int($k)) {

@@ -43,8 +43,7 @@ class PhpGeneratorDumper extends GeneratorDumper
             $this->startClass($options['class'], $options['base_class']).
             $this->addConstructor().
             $this->addGenerator().
-            $this->endClass()
-        ;
+            $this->endClass();
     }
 
     protected function addGenerator()

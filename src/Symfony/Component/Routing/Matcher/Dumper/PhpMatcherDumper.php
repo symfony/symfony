@@ -43,8 +43,7 @@ class PhpMatcherDumper extends MatcherDumper
             $this->startClass($options['class'], $options['base_class']).
             $this->addConstructor().
             $this->addMatcher().
-            $this->endClass()
-        ;
+            $this->endClass();
     }
 
     protected function addMatcher()

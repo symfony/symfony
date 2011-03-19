@@ -67,11 +67,11 @@ class Field extends Configurable implements FieldInterface
         $this->addOption('trim', true);
         $this->addOption('required', true);
         $this->addOption('disabled', false);
-        $this->addOption('property_path', (string)$key);
+        $this->addOption('property_path', (string) $key);
         $this->addOption('value_transformer');
         $this->addOption('normalization_transformer');
 
-        $this->key = (string)$key;
+        $this->key = (string) $key;
 
         if (isset($options['data'])) {
             // Populate the field with fixed data
@@ -150,7 +150,7 @@ class Field extends Configurable implements FieldInterface
      */
     public function setKey($key)
     {
-        $this->key = (string)$key;
+        $this->key = (string) $key;
     }
 
     /**
@@ -297,7 +297,7 @@ class Field extends Configurable implements FieldInterface
      */
     public function submit($data)
     {
-        $this->transformedData = (is_array($data) || is_object($data)) ? $data : (string)$data;
+        $this->transformedData = (is_array($data) || is_object($data)) ? $data : (string) $data;
         $this->submitted = true;
         $this->errors = array();
 
@@ -496,7 +496,7 @@ class Field extends Configurable implements FieldInterface
         if (null === $this->valueTransformer) {
             // Scalar values should always be converted to strings to
             // facilitate differentiation between empty ("") and zero (0).
-            return null === $value || is_scalar($value) ? (string)$value : $value;
+            return null === $value || is_scalar($value) ? (string) $value : $value;
         }
         return $this->valueTransformer->transform($value);
     }

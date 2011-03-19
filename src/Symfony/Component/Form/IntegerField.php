@@ -53,6 +53,6 @@ class IntegerField extends NumberField
      */
     public function getData()
     {
-        return (int)parent::getData();
+        return (int) parent::getData();
     }
 }

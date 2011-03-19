@@ -96,7 +96,7 @@ class NodeBuilder implements NodeParentInterface
     {
         return $this->node($name, 'variable');
     }
-    
+
     /**
      * Returns the parent node.
      *

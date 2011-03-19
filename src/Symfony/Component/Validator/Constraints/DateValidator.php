@@ -29,7 +29,7 @@ class DateValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        $value = (string)$value;
+        $value = (string) $value;
 
         if (!preg_match(self::PATTERN, $value, $matches)) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));

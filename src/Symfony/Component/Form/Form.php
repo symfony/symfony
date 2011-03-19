@@ -103,7 +103,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         $this->addOption('by_reference', true);
 
         if (isset($options['validation_groups'])) {
-            $options['validation_groups'] = (array)$options['validation_groups'];
+            $options['validation_groups'] = (array) $options['validation_groups'];
         }
 
         if (isset($options['data_class'])) {
@@ -332,7 +332,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     protected function getFieldsByVisibility($hidden, $recursive)
     {
         $fields = array();
-        $hidden = (Boolean)$hidden;
+        $hidden = (boolean) $hidden;
 
         foreach ($this->fields as $field) {
             if ($field instanceof Form && $recursive) {

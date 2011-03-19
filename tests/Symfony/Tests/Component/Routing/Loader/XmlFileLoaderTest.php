@@ -59,6 +59,16 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadThrowsExceptionWithInvalidFile($filePath)
     {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader->load($filePath);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @dataProvider getPathsToInvalidFiles
+     */
+    public function testLoadThrowsExceptionWithInvalidFileEvenWithoutSchemaValidation($filePath)
+    {
         $loader = new CustomXmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $loader->load($filePath);
     }

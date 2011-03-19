@@ -309,22 +309,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns whether the CSRF token is valid
-     *
-     * @return Boolean
-     */
-    public function isCsrfTokenValid()
-    {
-        if (!$this->isCsrfProtected()) {
-            return true;
-        } else {
-            $token = $this->get($this->csrfFieldName)->getClientData();
-
-            return $this->csrfProvider->isCsrfTokenValid(get_class($this), $token);
-        }
-    }
-
-    /**
      * Binds a request to the form
      *
      * If the request was a POST request, the data is bound to the form,

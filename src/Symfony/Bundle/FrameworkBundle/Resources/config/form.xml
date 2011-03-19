@@ -6,8 +6,8 @@
 
     <parameters>
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
-        <parameter key="form.config.loader.class">Symfony\Bundle\FrameworkBundle\Form\ContainerAwareConfigLoader</parameter>
-        <parameter key="form.guesser.validator.class">Symfony\Component\Form\Guesser\ValidatorFieldGuesser</parameter>
+        <parameter key="form.type.loader.class">Symfony\Bundle\FrameworkBundle\Form\ContainerAwareTypeLoader</parameter>
+        <parameter key="form.guesser.validator.class">Symfony\Component\Form\FieldGuesser\ValidatorFieldGuesser</parameter>
         <parameter key="form.csrf_provider.class">Symfony\Component\Form\CsrfProvider\SessionCsrfProvider</parameter>
         <parameter key="form.theme.twig.class">Symfony\Component\Form\Renderer\Theme\TwigTheme</parameter>
         <parameter key="form.theme.php.class">Symfony\Component\Form\Renderer\Theme\PhpTheme</parameter>
@@ -18,7 +18,7 @@
         <parameter key="form.csrf_protection.secret">secret</parameter>
         <parameter key="form.validation_groups">Default</parameter>
         <parameter key="file.temporary_storage.class">Symfony\Component\HttpFoundation\File\SessionBasedTemporaryStorage</parameter>
-        <!-- TODO: configure through Configuration! -->
+        <!-- TODO: configure through Typeuration! -->
         <parameter key="file.temporary_storage.secret">abcdef</parameter>
         <parameter key="file.temporary_storage.nesting_levels">3</parameter>
         <parameter key="file.temporary_storage.directory"></parameter>
@@ -28,7 +28,7 @@
 
         <!-- FormFactory -->
         <service id="form.factory" class="%form.factory.class%">
-            <argument type="service" id="form.config.loader" />
+            <argument type="service" id="form.type.loader" />
         </service>
 
         <!-- ValidatorFieldGuesser -->
@@ -62,125 +62,103 @@
             <argument>%file.temporary_storage.directory%</argument>
         </service>
         
-        <!-- ContainerAwareConfigLoader -->
-        <service id="form.config.loader" class="%form.config.loader.class%">
+        <!-- ContainerAwareTypeLoader -->
+        <service id="form.type.loader" class="%form.type.loader.class%">
             <argument type="service" id="service_container" />
             <!--
-            All services with tag "form.config" are inserted here by 
-            AddFormConfigsPass
+            All services with tag "form.type" are inserted here by 
+            AddFormTypesPass
             -->
             <argument type="collection" />
         </service>
 
-        <!-- FieldConfigs -->
-        <service id="form.config.field" class="Symfony\Component\Form\Config\FieldConfig">
-            <tag name="form.config" alias="field" />
-            <argument type="service" id="form.factory" />
+        <!-- FieldTypes -->
+        <service id="form.type.field" class="Symfony\Component\Form\Type\FieldType">
+            <tag name="form.type" alias="field" />
             <argument type="service" id="form.theme" />
-        </service>
-        <service id="form.config.form" class="Symfony\Component\Form\Config\FormConfig">
-            <tag name="form.config" alias="form" />
-            <argument type="service" id="form.factory" />
-            <argument type="service" id="form.csrf_provider" />
             <argument type="service" id="validator" />
         </service>
-        <service id="form.config.birthday" class="Symfony\Component\Form\Config\BirthdayFieldConfig">
-            <tag name="form.config" alias="birthday" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.form" class="Symfony\Component\Form\Type\FormType">
+            <tag name="form.type" alias="form" />
+            <argument type="service" id="form.theme" />
         </service>
-        <service id="form.config.checkbox" class="Symfony\Component\Form\Config\CheckboxFieldConfig">
-            <tag name="form.config" alias="checkbox" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.birthday" class="Symfony\Component\Form\Type\BirthdayFieldType">
+            <tag name="form.type" alias="birthday" />
         </service>
-        <service id="form.config.choice" class="Symfony\Component\Form\Config\ChoiceFieldConfig">
-            <tag name="form.config" alias="choice" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.checkbox" class="Symfony\Component\Form\Type\CheckboxFieldType">
+            <tag name="form.type" alias="checkbox" />
         </service>
-        <service id="form.config.collection" class="Symfony\Component\Form\Config\CollectionFieldConfig">
-            <tag name="form.config" alias="collection" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.choice" class="Symfony\Component\Form\Type\ChoiceFieldType">
+            <tag name="form.type" alias="choice" />
         </service>
-        <service id="form.config.country" class="Symfony\Component\Form\Config\CountryFieldConfig">
-            <tag name="form.config" alias="country" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.collection" class="Symfony\Component\Form\Type\CollectionFieldType">
+            <tag name="form.type" alias="collection" />
         </service>
-        <service id="form.config.date" class="Symfony\Component\Form\Config\DateFieldConfig">
-            <tag name="form.config" alias="date" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.country" class="Symfony\Component\Form\Type\CountryFieldType">
+            <tag name="form.type" alias="country" />
         </service>
-        <service id="form.config.datetime" class="Symfony\Component\Form\Config\DateTimeFieldConfig">
-            <tag name="form.config" alias="datetime" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.csrf" class="Symfony\Component\Form\Type\CsrfFieldType">
+            <tag name="form.type" alias="csrf" />
+            <argument type="service" id="form.csrf_provider" />
         </service>
-        <service id="form.config.entity" class="Symfony\Component\Form\Config\EntityFieldConfig">
-            <tag name="form.config" alias="entity" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.date" class="Symfony\Component\Form\Type\DateFieldType">
+            <tag name="form.type" alias="date" />
+        </service>
+        <service id="form.type.datetime" class="Symfony\Component\Form\Type\DateTimeFieldType">
+            <tag name="form.type" alias="datetime" />
+        </service>
+        <service id="form.type.entity" class="Symfony\Component\Form\Type\EntityFieldType">
+            <tag name="form.type" alias="entity" />
             <argument type="service" id="doctrine.orm.default_entity_manager" />
         </service>
-        <service id="form.config.file" class="Symfony\Component\Form\Config\FileFieldConfig">
-            <tag name="form.config" alias="file" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.file" class="Symfony\Component\Form\Type\FileFieldType">
+            <tag name="form.type" alias="file" />
             <argument type="service" id="file.temporary_storage" />
         </service>
-        <service id="form.config.hidden" class="Symfony\Component\Form\Config\HiddenFieldConfig">
-            <tag name="form.config" alias="hidden" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.hidden" class="Symfony\Component\Form\Type\HiddenFieldType">
+            <tag name="form.type" alias="hidden" />
         </service>
-        <service id="form.config.integer" class="Symfony\Component\Form\Config\IntegerFieldConfig">
-            <tag name="form.config" alias="integer" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.integer" class="Symfony\Component\Form\Type\IntegerFieldType">
+            <tag name="form.type" alias="integer" />
         </service>
-        <service id="form.config.language" class="Symfony\Component\Form\Config\LanguageFieldConfig">
-            <tag name="form.config" alias="language" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.language" class="Symfony\Component\Form\Type\LanguageFieldType">
+            <tag name="form.type" alias="language" />
         </service>
-        <service id="form.config.locale" class="Symfony\Component\Form\Config\LocaleFieldConfig">
-            <tag name="form.config" alias="locale" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.locale" class="Symfony\Component\Form\Type\LocaleFieldType">
+            <tag name="form.type" alias="locale" />
         </service>
-        <service id="form.config.money" class="Symfony\Component\Form\Config\MoneyFieldConfig">
-            <tag name="form.config" alias="money" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.money" class="Symfony\Component\Form\Type\MoneyFieldType">
+            <tag name="form.type" alias="money" />
         </service>
-        <service id="form.config.number" class="Symfony\Component\Form\Config\NumberFieldConfig">
-            <tag name="form.config" alias="number" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.number" class="Symfony\Component\Form\Type\NumberFieldType">
+            <tag name="form.type" alias="number" />
         </service>
-        <service id="form.config.password" class="Symfony\Component\Form\Config\PasswordFieldConfig">
-            <tag name="form.config" alias="password" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.password" class="Symfony\Component\Form\Type\PasswordFieldType">
+            <tag name="form.type" alias="password" />
         </service>
-        <service id="form.config.percent" class="Symfony\Component\Form\Config\PercentFieldConfig">
-            <tag name="form.config" alias="percent" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.percent" class="Symfony\Component\Form\Type\PercentFieldType">
+            <tag name="form.type" alias="percent" />
         </service>
-        <service id="form.config.radio" class="Symfony\Component\Form\Config\RadioFieldConfig">
-            <tag name="form.config" alias="radio" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.radio" class="Symfony\Component\Form\Type\RadioFieldType">
+            <tag name="form.type" alias="radio" />
         </service>
-        <service id="form.config.repeated" class="Symfony\Component\Form\Config\RepeatedFieldConfig">
-            <tag name="form.config" alias="repeated" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.repeated" class="Symfony\Component\Form\Type\RepeatedFieldType">
+            <tag name="form.type" alias="repeated" />
         </service>
-        <service id="form.config.textarea" class="Symfony\Component\Form\Config\TextareaFieldConfig">
-            <tag name="form.config" alias="textarea" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.textarea" class="Symfony\Component\Form\Type\TextareaFieldType">
+            <tag name="form.type" alias="textarea" />
         </service>
-        <service id="form.config.text" class="Symfony\Component\Form\Config\TextFieldConfig">
-            <tag name="form.config" alias="text" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.text" class="Symfony\Component\Form\Type\TextFieldType">
+            <tag name="form.type" alias="text" />
         </service>
-        <service id="form.config.time" class="Symfony\Component\Form\Config\TimeFieldConfig">
-            <tag name="form.config" alias="time" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.time" class="Symfony\Component\Form\Type\TimeFieldType">
+            <tag name="form.type" alias="time" />
         </service>
-        <service id="form.config.timezone" class="Symfony\Component\Form\Config\TimezoneFieldConfig">
-            <tag name="form.config" alias="timezone" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.timezone" class="Symfony\Component\Form\Type\TimezoneFieldType">
+            <tag name="form.type" alias="timezone" />
         </service>
-        <service id="form.config.url" class="Symfony\Component\Form\Config\UrlFieldConfig">
-            <tag name="form.config" alias="url" />
-            <argument type="service" id="form.factory" />
+        <service id="form.type.url" class="Symfony\Component\Form\Type\UrlFieldType">
+            <tag name="form.type" alias="url" />
         </service>
         
     </services>

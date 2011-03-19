@@ -164,6 +164,10 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     {
         $data = $event->getData();
 
+        if (empty($data)) {
+            $data = array();
+        }
+
         if (!is_array($data)) {
             throw new UnexpectedTypeException($data, 'array');
         }
@@ -189,9 +193,15 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
     public function preBind(DataEvent $event)
     {
+        $data = $event->getData();
+
+        if (empty($data)) {
+            $data = array();
+        }
+
         $this->extraFields = array();
 
-        foreach ((array)$event->getData() as $name => $value) {
+        foreach ($data as $name => $value) {
             if (!$this->has($name)) {
                 $this->extraFields[] = $name;
             }
@@ -296,22 +306,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     public function count()
     {
         return count($this->fields);
-    }
-
-    /**
-     * Returns whether the CSRF token is valid
-     *
-     * @return Boolean
-     */
-    public function isCsrfTokenValid()
-    {
-        if (!$this->isCsrfProtected()) {
-            return true;
-        } else {
-            $token = $this->get($this->csrfFieldName)->getClientData();
-
-            return $this->csrfProvider->isCsrfTokenValid(get_class($this), $token);
-        }
     }
 
     /**

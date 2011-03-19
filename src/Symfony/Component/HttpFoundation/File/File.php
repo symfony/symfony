@@ -611,7 +611,7 @@ class File
     {
         if (false === $size = @filesize($this->getPath())) {
             $error = error_get_last();
-            throw new FileException(sprintf('Could not read file size of %s (%s)', $this->getPath(), $error['message']));
+            throw new FileException(sprintf('Could not read file size of %s (%s)', $this->getPath(), strip_tags($error['message'])));
         }
 
         return $size;
@@ -631,7 +631,7 @@ class File
 
         if (!@rename($this->getPath(), $newPath)) {
             $error = error_get_last();
-            throw new FileException(sprintf('Could not move file %s to %s (%s)', $this->getPath(), $newPath, $error['message']));
+            throw new FileException(sprintf('Could not move file %s to %s (%s)', $this->getPath(), $newPath, strip_tags($error['message'])));
         }
 
         $this->path = realpath($newPath);

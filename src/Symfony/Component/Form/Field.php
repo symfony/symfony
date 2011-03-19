@@ -276,7 +276,7 @@ class Field implements FieldInterface
         $event = new DataEvent($this, $clientData);
         $this->dispatcher->dispatch(Events::postBind, $event);
 
-        if ($this->isRoot() && $this->dataValidator) {
+        if ($this->dataValidator) {
             $this->dataValidator->validate($this);
         }
     }

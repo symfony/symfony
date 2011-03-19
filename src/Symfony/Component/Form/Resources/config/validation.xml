@@ -27,11 +27,6 @@
         <option name="message">The uploaded file was too large. Please try to upload a smaller file</option>
       </constraint>
     </getter>
-    <getter property="csrfTokenValid">
-      <constraint name="AssertTrue">
-        <option name="message">The CSRF token is invalid. Please try to resubmit the form</option>
-      </constraint>
-    </getter>
   </class>
 
   <class name="Symfony\Component\Form\RepeatedField">

@@ -725,6 +725,7 @@ class Request
         }
 
         $languages = $this->splitHttpAcceptHeader($this->headers->get('Accept-Language'));
+        $this->languages = array();
         foreach ($languages as $lang) {
             if (strstr($lang, '-')) {
                 $codes = explode('-', $lang);

@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\Security\Http\Authentication;
 
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -22,12 +21,10 @@ interface AuthenticationFailureHandlerInterface
      * called by authentication listeners inheriting from
      * AbstractAuthenticationListener.
      *
-     * @param GetResponseEvent    $event the "onCoreRequest" event, this event always
-     *                                       has the kernel as target
      * @param Request                 $request
      * @param AuthenticationException $exception
      *
      * @return Response the response to return
      */
-    function onAuthenticationFailure(GetResponseEvent $event, Request $request, AuthenticationException $exception);
+    function onAuthenticationFailure(Request $request, AuthenticationException $exception);
 }

@@ -28,15 +28,15 @@
             </trans-unit>
             <trans-unit id="7">
                 <source>You should select at most {{ limit }} choices</source>
-                <target>Legfeljebb {{ limit }} értéket lehet kiválasztni</target>
+                <target>Legfeljebb {{ limit }} értéket lehet kiválasztani</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>The fields {{ fields }} were not expected</source>
-                <target>Váratlan mezők {{ fields }} </target>
+                <target>Váratlan mezők: {{ fields }} </target>
             </trans-unit>
             <trans-unit id="9">
                 <source>The fields {{ fields }} are missing</source>
-                <target>Hiányzó mezők {{ fields }}</target>
+                <target>A(z) {{ fields }} mezők hiányoznak</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>This value is not a valid date</source>
@@ -48,7 +48,7 @@
             </trans-unit>
             <trans-unit id="12">
                 <source>This value is not a valid email address</source>
-                <target>Ez az érétk nem egy érévnyes e-mail cím</target>
+                <target>Ez az érték nem egy érvényes e-mail cím</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>The file could not be found</source>
@@ -64,7 +64,7 @@
             </trans-unit>
             <trans-unit id="16">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}</source>
-                <target>A fájl mime típusa érvénytelen ({{ type }}). Enegedélyzett mime típusok {{ types }}</target>
+                <target>A fájl mime típusa érvénytelen ({{ type }}). Az engedélyzett mime típusok: {{ types }}</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>This value should be {{ limit }} or less</source>
@@ -72,7 +72,7 @@
             </trans-unit>
             <trans-unit id="18">
                 <source>This value is too long. It should have {{ limit }} characters or less</source>
-                <target>Ez az érték túl hosszú. {{ limit }} karaktert vagy kevesebb tartalmazzon</target>
+                <target>Ez az érték túl hosszú. {{ limit }} karaktert vagy kevesebbet tartalmazzon</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>This value should be {{ limit }} or more</source>
@@ -80,7 +80,7 @@
             </trans-unit>
             <trans-unit id="20">
                 <source>This value is too short. It should have {{ limit }} characters or more</source>
-                <target>Ez az érték túl rövid. {{ limit }} keraktert vagy többet tartalmazzon</target>
+                <target>Ez az érték túl rövid. {{ limit }} karektert vagy többet tartalmazzon</target>
             </trans-unit>
             <trans-unit id="21">
                 <source>This value should not be blank</source>

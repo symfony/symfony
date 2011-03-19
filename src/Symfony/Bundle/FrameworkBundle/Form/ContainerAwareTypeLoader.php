@@ -11,10 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Form;
 
-use Symfony\Component\Form\Config\Loader\ConfigLoaderInterface;
+use Symfony\Component\Form\Type\Loader\TypeLoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ContainerAwareConfigLoader implements ConfigLoaderInterface
+class ContainerAwareTypeLoader implements TypeLoaderInterface
 {
     private $container;
 
@@ -26,14 +26,14 @@ class ContainerAwareConfigLoader implements ConfigLoaderInterface
         $this->serviceIds = $serviceIds;
     }
 
-    public function getConfig($identifier)
+    public function getType($identifier)
     {
         // TODO check whether identifier exists
 
         return $this->container->get($this->serviceIds[$identifier]);
     }
 
-    public function hasConfig($identifier)
+    public function hasType($identifier)
     {
         return isset($this->serviceIds[$identifier]);
     }

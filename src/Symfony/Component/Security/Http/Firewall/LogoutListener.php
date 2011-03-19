@@ -74,7 +74,7 @@ class LogoutListener implements ListenerInterface
         }
 
         if (null !== $this->successHandler) {
-            $response = $this->successHandler->onLogoutSuccess($event, $request);
+            $response = $this->successHandler->onLogoutSuccess($request);
 
             if (!$response instanceof Response) {
                 throw new \RuntimeException('Logout Success Handler did not return a Response.');

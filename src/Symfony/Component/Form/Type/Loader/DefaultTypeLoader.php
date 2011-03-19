@@ -36,6 +36,7 @@ class DefaultTypeLoader implements TypeLoaderInterface
         $this->addType(new Type\ChoiceFieldType());
         $this->addType(new Type\CollectionFieldType());
         $this->addType(new Type\CountryFieldType());
+        $this->addType(new Type\CsrfFieldType($csrfProvider));
         $this->addType(new Type\DateFieldType());
         $this->addType(new Type\DateTimeFieldType());
         $this->addType(new Type\FileFieldType($storage));

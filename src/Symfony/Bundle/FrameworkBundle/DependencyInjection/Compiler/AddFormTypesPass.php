@@ -15,31 +15,31 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
- * Adds all services with the tag "form.config" as argument
- * to the "form.config.loader" service
+ * Adds all services with the tag "form.type" as argument
+ * to the "form.type.loader" service
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class AddFormConfigsPass implements CompilerPassInterface
+class AddFormTypesPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('form.config.loader')) {
+        if (!$container->hasDefinition('form.type.loader')) {
             return;
         }
 
         // Builds an array with service IDs as keys and tag aliases as values
-        $configs = array_map(function ($arguments) {
+        $types = array_map(function ($arguments) {
             if (!isset($arguments[0]['alias'])) {
                 // TODO throw exception
             }
 
             return $arguments[0]['alias'];
-        }, $container->findTaggedServiceIds('form.config'));
+        }, $container->findTaggedServiceIds('form.type'));
 
-        // Flip, because we want tag aliases (= config identifiers) as keys
-        $configs = array_flip($configs);
+        // Flip, because we want tag aliases (= type identifiers) as keys
+        $types = array_flip($types);
 
-        $container->getDefinition('form.config.loader')->setArgument(1, $configs);
+        $container->getDefinition('form.type.loader')->setArgument(1, $types);
     }
 }

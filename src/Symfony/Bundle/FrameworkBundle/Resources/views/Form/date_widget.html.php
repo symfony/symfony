@@ -12,5 +12,5 @@
         $fields['year']->getWidget(),
         $fields['month']->getWidget(),
         $fields['day']->getWidget(),
-    ), $pattern) ?>
+    ), $date_pattern) ?>
 <?php endif ?>

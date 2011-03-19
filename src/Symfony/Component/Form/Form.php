@@ -189,6 +189,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
         $data = $this->getClientData();
 
+        // Merge form data from fields into existing client data
         $this->dataMapper->mapFormToData($this, $data);
 
         $event->setData($data);

@@ -116,40 +116,30 @@ final class User implements AdvancedUserInterface
     /**
      * {@inheritDoc}
      */
-    public function equals(UserInterface $user)
+     public function equals(AccountInterface $account)
+     {
+         if (!$account instanceof User) {
+             return false;
+         }
+
+         return $this->toArray() === $account->toArray();
+     }
+
+    /**
+     * Returns all account properties as a single array.
+     *
+     * @return array
+     */
+    public function toArray()
     {
-        if (!$user instanceof User) {
-            return false;
-        }
-
-        if ($this->password !== $user->getPassword()) {
-            return false;
-        }
-
-        if ($this->getSalt() !== $user->getSalt()) {
-            return false;
-        }
-
-        if ($this->username !== $user->getUsername()) {
-            return false;
-        }
-
-        if ($this->accountNonExpired !== $user->isAccountNonExpired()) {
-            return false;
-        }
-
-        if ($this->accountNonLocked !== $user->isAccountNonLocked()) {
-            return false;
-        }
-
-        if ($this->credentialsNonExpired !== $user->isCredentialsNonExpired()) {
-            return false;
-        }
-
-        if ($this->enabled !== $user->isEnabled()) {
-            return false;
-        }
-
-        return true;
+        return array(
+            'username' => $this->username,
+            'password' => $this->password,
+            'salt' => $this->getSalt(),
+            'accountNonExpired' => $this->accountNonExpired,
+            'accountNonLocked' => $this->accountNonLocked,
+            'credentialsNonExpired' => $this->credentialsNonExpired,
+            'enabled' => $this->enabled
+        );
     }
 }

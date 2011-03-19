@@ -130,34 +130,24 @@ class User implements AdvancedAccountInterface
             return false;
         }
 
-        if ($this->password !== $account->getPassword()) {
-            return false;
-        }
+        return $this->toArray() === $account->toArray();
+    }
 
-        if ($this->getSalt() !== $account->getSalt()) {
-            return false;
-        }
-
-        if ($this->username !== $account->getUsername()) {
-            return false;
-        }
-
-        if ($this->accountNonExpired !== $account->isAccountNonExpired()) {
-            return false;
-        }
-
-        if ($this->accountNonLocked !== $account->isAccountNonLocked()) {
-            return false;
-        }
-
-        if ($this->credentialsNonExpired !== $account->isCredentialsNonExpired()) {
-            return false;
-        }
-
-        if ($this->enabled !== $account->isEnabled()) {
-            return false;
-        }
-
-        return true;
+    /**
+     * Returns all account properties as a single array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'username'              => $this->username,
+            'password'              => $this->password,
+            'salt'                  => $this->getSalt(),
+            'accountNonExpired'     => $this->accountNonExpired,
+            'accountNonLocked'      => $this->accountNonLocked,
+            'credentialsNonExpired' => $this->credentialsNonExpired,
+            'enabled'               => $this->enabled
+        );
     }
 }

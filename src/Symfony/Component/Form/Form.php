@@ -69,7 +69,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     {
         $dispatcher->addListener(array(
             Events::postSetData,
-            Events::preBind,
             Events::filterSetData,
             Events::filterBoundClientData,
         ), $this);
@@ -178,9 +177,13 @@ class Form extends Field implements \IteratorAggregate, FormInterface
             }
         }
 
+        $this->extraFields = array();
+
         foreach ($data as $name => $value) {
             if ($this->has($name)) {
                 $this->fields[$name]->bind($value);
+            } else {
+                $this->extraFields[] = $name;
             }
         }
 
@@ -189,23 +192,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         $this->dataMapper->mapFormToData($this, $data);
 
         $event->setData($data);
-    }
-
-    public function preBind(DataEvent $event)
-    {
-        $data = $event->getData();
-
-        if (empty($data)) {
-            $data = array();
-        }
-
-        $this->extraFields = array();
-
-        foreach ((array)$data as $name => $value) {
-            if (!$this->has($name)) {
-                $this->extraFields[] = $name;
-            }
-        }
     }
 
     /**

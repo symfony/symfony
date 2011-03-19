@@ -48,7 +48,7 @@ class DefaultFormFactory extends FormFactory
         $csrfProvider = new DefaultCsrfProvider($csrfSecret);
         $tempStorage = new TemporaryStorage($storageSecret);
         $defaultTheme = new PhpTheme($charset);
-        return self::create($defaultTheme, $validator, $csrfProvider, $tempStorage, $entityManager);
+        return self::createInstance($defaultTheme, $validator, $csrfProvider, $tempStorage, $entityManager);
     }
 
     /**
@@ -61,7 +61,7 @@ class DefaultFormFactory extends FormFactory
      * @param \Doctrine\ORM\EntityManager $entityManager
      * @return DefaultFormFactory
      */
-    public static function create(ThemeInterface $theme,
+    public static function createInstance(ThemeInterface $theme,
             ValidatorInterface $validator,
             CsrfProviderInterface $crsfProvider,
             TemporaryStorage $tempStorage,
@@ -71,7 +71,7 @@ class DefaultFormFactory extends FormFactory
         $factory = new self($typeLoader);
         $typeLoader->initialize($factory, $theme, $crsfProvider, $validator, $tempStorage, $entityManager);
 
-        return new self($typeLoader);
+        return $factory;
     }
 
     /**

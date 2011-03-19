@@ -23,7 +23,7 @@ class StripTagsFilterTest extends \PHPUnit_Framework_TestCase
         $event = new FilterDataEvent($field, $data);
 
         $filter = new StripTagsFilter();
-        $filter->filterBoundDataFromClient($event);
+        $filter->filterBoundClientData($event);
 
         $this->assertEquals('Foo!Bar!Baz!', $event->getData());
     }

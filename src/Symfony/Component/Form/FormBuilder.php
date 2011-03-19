@@ -142,9 +142,14 @@ class FormBuilder extends FieldBuilder
      */
     public function remove($name)
     {
-        $this->fields[$name]->setParent(null);
+        if (isset($this->fields[$name])) {
+            // field might still be lazy
+            if ($this->fields[$name] instanceof FieldInterface) {
+                $this->fields[$name]->setParent(null);
+            }
 
-        unset($this->fields[$name]);
+            unset($this->fields[$name]);
+        }
     }
 
     /**

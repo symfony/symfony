@@ -34,8 +34,7 @@ The <info>cache:warmup</info> command warms up the cache.
 
 Before running this command, the cache must be empty.
 EOF
-            )
-        ;
+            );
     }
 
     /**

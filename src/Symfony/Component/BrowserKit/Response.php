@@ -48,7 +48,7 @@ class Response
     {
         $headers = '';
         foreach ($this->headers as $name => $value) {
-            
+
             if (is_string($value)) {
                 $headers .= $this->buildHeader($name, $value);
             } else {

@@ -41,8 +41,7 @@ The <info>router:debug</info> displays the configured routes:
 
   <info>router:debug</info>
 EOF
-            )
-        ;
+            );
     }
 
     /**

@@ -38,7 +38,7 @@ The <info>doctrine:query:sql</info> command executes the given DQL query and out
 
   <info>./app/console doctrine:query:sql "SELECT * from user"</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

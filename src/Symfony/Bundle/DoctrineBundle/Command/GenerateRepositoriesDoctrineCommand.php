@@ -38,7 +38,7 @@ The <info>doctrine:generate:repositories</info> command generates the configured
 
   <info>./app/console doctrine:generate:repositories</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -51,7 +51,7 @@ EOT
         if ($metadatas = $this->getBundleMetadatas($foundBundle)) {
             $output->writeln(sprintf('Generating entity repositories for "<info>%s</info>"', $foundBundle->getName()));
             $generator = new EntityRepositoryGenerator();
-            
+
             foreach ($metadatas as $metadata) {
                 if ($filterEntity && $filterEntity !== $metadata->reflClass->getShortname()) {
                     continue;

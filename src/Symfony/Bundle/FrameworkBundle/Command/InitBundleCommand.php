@@ -49,8 +49,7 @@ If you don't specify a bundle name (e.g. <comment>HelloBundle</comment>), the bu
 be the concatenation of the namespace segments (e.g. <comment>VendorHelloBundle</comment>).
 EOT
             )
-            ->setName('init:bundle')
-        ;
+            ->setName('init:bundle');
     }
 
     /**

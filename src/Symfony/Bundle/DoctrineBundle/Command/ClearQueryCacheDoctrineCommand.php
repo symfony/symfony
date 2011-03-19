@@ -41,7 +41,7 @@ You can also optionally specify the <comment>--em</comment> option to specify wh
 
   <info>./app/console doctrine:cache:clear-query --em=default</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

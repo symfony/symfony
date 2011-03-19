@@ -31,8 +31,7 @@ class MigrationsDiffDoctrineCommand extends DiffCommand
 
         $this
             ->setName('doctrine:migrations:diff')
-            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.')
-        ;
+            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.');
     }
 
     public function execute(InputInterface $input, OutputInterface $output)

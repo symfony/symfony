@@ -40,7 +40,7 @@ If you are using multiple entity managers you can pick your choice with the <inf
 
   <info>./app/console doctrine:mapping:info --em=default</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -69,7 +69,7 @@ EOT
 
         $output->write(sprintf("Found <info>%d</info> entities mapped in entity manager <info>%s</info>:\n",
             count($entityClassNames), $entityManagerName), true);
-        
+
         foreach ($entityClassNames as $entityClassName) {
             try {
                 $cm = $entityManager->getClassMetadata($entityClassName);

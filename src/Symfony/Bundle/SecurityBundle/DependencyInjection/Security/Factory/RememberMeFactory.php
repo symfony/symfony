@@ -48,8 +48,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         if ($container->hasDefinition('security.logout_listener.'.$id)) {
             $container
                 ->getDefinition('security.logout_listener.'.$id)
-                ->addMethodCall('addHandler', array(new Reference($rememberMeServicesId)))
-            ;
+                ->addMethodCall('addHandler', array(new Reference($rememberMeServicesId)));
         }
 
         $rememberMeServices = $container->setDefinition($rememberMeServicesId, new DefinitionDecorator($templateId));
@@ -81,8 +80,7 @@ class RememberMeFactory implements SecurityFactoryInterface
                 $userProviders[] = new Reference($attribute['provider']);
                 $container
                     ->getDefinition($serviceId)
-                    ->addMethodCall('setRememberMeServices', array(new Reference($rememberMeServicesId)))
-                ;
+                    ->addMethodCall('setRememberMeServices', array(new Reference($rememberMeServicesId)));
             }
         }
         if (count($userProviders) === 0) {
@@ -111,7 +109,7 @@ class RememberMeFactory implements SecurityFactoryInterface
     public function addConfiguration(NodeDefinition $node)
     {
         $builder = $node->children();
-        
+
         $builder
             ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
             ->scalarNode('token_provider')->end()

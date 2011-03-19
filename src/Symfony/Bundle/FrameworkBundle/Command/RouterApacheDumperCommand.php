@@ -43,8 +43,7 @@ matching.
 
   <info>router:dump-apache</info>
 EOF
-            )
-        ;
+            );
     }
 
     /**

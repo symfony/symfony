@@ -48,7 +48,7 @@ You can also optionally specify which entity manager to import from with the <in
 
   <info>./app/console doctrine:mapping:import "MyCustomBundle" xml --em=default</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -77,7 +77,7 @@ EOT
         $em = $this->getEntityManager($this->container, $input->getOption('em'));
         $databaseDriver = new DatabaseDriver($em->getConnection()->getSchemaManager());
         $em->getConfiguration()->setMetadataDriverImpl($databaseDriver);
-        
+
         $emName = $input->getOption('em');
         $emName = $emName ? $emName : 'default';
 

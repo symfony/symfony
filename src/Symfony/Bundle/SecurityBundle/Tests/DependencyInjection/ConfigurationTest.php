@@ -41,7 +41,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'factory'   => array('foo' => 'bar'),
             'factories' => array('lorem' => 'ipsum'),
         ));
-        
+
         $configuration = new Configuration();
         $processor = new Processor();
         $tree = $configuration->getMainConfigTree(array());

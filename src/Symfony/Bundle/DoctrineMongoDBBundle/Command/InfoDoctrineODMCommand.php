@@ -41,7 +41,7 @@ If you are using multiple document managers you can pick your choice with the <i
 
   <info>./app/console doctrine:mapping:info --dm=default</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -71,7 +71,7 @@ EOT
         $output->write(sprintf("Found <info>%d</info> documents mapped in document manager <info>%s</info>:\n",
             count($documentClassNames), $documentManagerName), true);
 
-        foreach ($documentClassNames AS $documentClassName) {
+        foreach ($documentClassNames as $documentClassName) {
             try {
                 $cm = $documentManager->getClassMetadata($documentClassName);
                 $output->write("<info>[OK]</info>   " . $documentClassName, true);

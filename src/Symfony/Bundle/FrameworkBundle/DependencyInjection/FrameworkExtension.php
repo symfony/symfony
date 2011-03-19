@@ -203,8 +203,7 @@ class FrameworkExtension extends Extension
         $loader->load('collectors.xml');
 
         $container->getDefinition('profiler_listener')
-            ->setArgument(2, $config['only_exceptions'])
-        ;
+            ->setArgument(2, $config['only_exceptions']);
 
         // Choose storage class based on the DSN
         $supported = array(
@@ -221,8 +220,7 @@ class FrameworkExtension extends Extension
             ->setArgument(1, $config['username'])
             ->setArgument(2, $config['password'])
             ->setArgument(3, $config['lifetime'])
-            ->setClass($supported[$class])
-        ;
+            ->setClass($supported[$class]);
 
         if (isset($config['matcher'])) {
             if (isset($config['matcher']['service'])) {

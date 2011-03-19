@@ -48,7 +48,7 @@ You can also optionally specify the fields you want to generate in the new entit
 
   <info>./app/console doctrine:generate:entity "MyCustomBundle" "User\Group" --fields="name:string(255) description:text"</info>
 EOT
-        );
+            );
     }
 
     /**

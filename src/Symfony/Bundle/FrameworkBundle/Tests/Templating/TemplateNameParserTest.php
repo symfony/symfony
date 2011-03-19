@@ -82,7 +82,7 @@ class TemplateNameParserTest extends TestCase
     public function testParseFromFilename($file, $ref)
     {
         $template = $this->parser->parseFromFilename($file);
-        
+
         if ($ref === false) {
             $this->assertFalse($template);
         } else {

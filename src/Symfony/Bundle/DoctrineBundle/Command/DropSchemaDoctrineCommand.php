@@ -42,7 +42,7 @@ You can also optionally specify the name of a entity manager to drop the schema 
 
   <info>./app/console doctrine:schema:drop --em=default</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

@@ -40,8 +40,7 @@ The <info>swiftmailer:spool:send</info> command send all emails from the spool.
 <info>./app/console swiftmailer:spool:send --message-limit=10 --time-limit=10</info>
 
 EOF
-            )
-        ;
+            );
     }
 
     /**

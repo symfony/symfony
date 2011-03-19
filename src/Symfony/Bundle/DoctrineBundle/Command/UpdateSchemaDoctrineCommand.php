@@ -42,7 +42,7 @@ You can also optionally specify the name of a entity manager to update the schem
 
   <info>./app/console doctrine:schema:update --em=default</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

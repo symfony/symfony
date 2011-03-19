@@ -34,8 +34,7 @@ class DumpCommand extends Command
             ->setName('assetic:dump')
             ->setDescription('Dumps all assets to the filesystem')
             ->addArgument('write_to', InputArgument::OPTIONAL, 'Override the configured asset root')
-            ->addOption('watch', null, InputOption::VALUE_NONE, 'Check for changes every second, debug mode only')
-        ;
+            ->addOption('watch', null, InputOption::VALUE_NONE, 'Check for changes every second, debug mode only');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

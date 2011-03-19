@@ -45,7 +45,7 @@ Alternatively, you can limit generation to a single document within a bundle:
 
 You have to specify the shortname (without namespace) of the document you want to filter for.
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

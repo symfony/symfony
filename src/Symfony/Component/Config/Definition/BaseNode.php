@@ -231,7 +231,7 @@ abstract class BaseNode implements NodeInterface
      * @throws InvalidTypeException when the value is invalid
      */
     abstract protected function validateType($value);
-    
+
     /**
      * Normalizes the value.
      *
@@ -239,7 +239,7 @@ abstract class BaseNode implements NodeInterface
      * @return mixed The normalized value
      */
     abstract protected function normalizeValue($value);
-    
+
     /**
      * Merges two values together
      *
@@ -248,7 +248,7 @@ abstract class BaseNode implements NodeInterface
      * @return mixed The merged value
      */
     abstract protected function mergeValues($leftSide, $rightSide);
-    
+
     /**
      * Finalizes a value
      *

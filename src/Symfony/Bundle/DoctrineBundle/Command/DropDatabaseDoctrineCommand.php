@@ -47,13 +47,13 @@ You can also optionally specify the name of a connection to drop the database fo
 
 <error>Be careful: All data in a given database will be lost when executing this command.</error>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $connection = $this->getDoctrineConnection($input->getOption('connection'));
-        
+
         $params = $connection->getParams();
 
         $name = isset($params['path'])?$params['path']:(isset($params['dbname'])?$params['dbname']:false);

@@ -125,7 +125,7 @@ class Configuration
     {
         $node
             ->children()
-                ->arrayNode('orm')                    
+                ->arrayNode('orm')
                     ->children()
                         ->scalarNode('default_entity_manager')->end()
                         ->booleanNode('auto_generate_proxy_classes')->defaultFalse()->end()

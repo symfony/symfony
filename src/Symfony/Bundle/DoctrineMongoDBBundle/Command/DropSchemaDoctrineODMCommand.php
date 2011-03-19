@@ -41,7 +41,7 @@ You can also optionally specify the name of a document manager to drop the schem
 
   <info>./app/console doctrine:mongodb:schema:drop --dm=default</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

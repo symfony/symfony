@@ -54,5 +54,4 @@ class TemplateTest extends \PHPUnit_Framework_TestCase
             array('Method', '<abbr title="Method">Method</abbr>()')
         );
     }
-    
 }

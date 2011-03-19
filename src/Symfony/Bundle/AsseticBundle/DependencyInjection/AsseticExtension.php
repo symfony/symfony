@@ -130,8 +130,7 @@ class AsseticExtension extends Extension
             ->addArgument('/^[^.]+\.[^.]+\.'.$engine.'$/')
             ->addTag('assetic.templating.'.$engine)
             ->addTag('assetic.formula_resource', array('loader' => $engine))
-            ->setPublic(false)
-        ;
+            ->setPublic(false);
 
         return $definition;
     }

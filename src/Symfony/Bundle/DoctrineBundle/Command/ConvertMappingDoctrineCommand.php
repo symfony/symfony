@@ -38,7 +38,7 @@ The <info>doctrine:mapping:convert</info> command converts mapping information b
 
   <info>./app/console doctrine:mapping:convert xml /path/to/output</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

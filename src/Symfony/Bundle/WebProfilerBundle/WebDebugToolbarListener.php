@@ -48,7 +48,7 @@ class WebDebugToolbarListener
         }
 
         $response = $event->getResponse();
-	$request = $event->getRequest();
+        $request = $event->getRequest();
 
         if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects) {
             // keep current flashes for one more request

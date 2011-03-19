@@ -41,7 +41,7 @@ You can also optionally specify the name of a document manager to create the sch
 
   <info>./app/console doctrine:mongodb:schema:create --dm=default</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

@@ -53,7 +53,7 @@ You can also specify a <comment>--prefix</comment> or <comment>--suffix</comment
 
     <info>./app/console doctrine:cache:clear-result --prefix="user_" --suffix="_frontend"</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

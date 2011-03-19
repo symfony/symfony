@@ -55,7 +55,7 @@ If you want to append the fixtures instead of flushing the database first you ca
 
   <info>./app/console doctrine:data:load --append</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

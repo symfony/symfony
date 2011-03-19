@@ -74,8 +74,7 @@ class HttpBasicFactory implements SecurityFactoryInterface
         $entryPointId = 'security.authentication.basic_entry_point.'.$id;
         $container
             ->setDefinition($entryPointId, new DefinitionDecorator('security.authentication.basic_entry_point'))
-            ->addArgument($config['realm'])
-        ;
+            ->addArgument($config['realm']);
 
         return $entryPointId;
     }

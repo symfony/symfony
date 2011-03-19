@@ -42,13 +42,13 @@ You can also optionally specify the name of a connection to create the database 
 
   <info>./app/console doctrine:database:create --connection=default</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $connection = $this->getDoctrineConnection($input->getOption('connection'));
-        
+
         $params = $connection->getParams();
         $name = isset($params['path']) ? $params['path']:$params['dbname'];
 

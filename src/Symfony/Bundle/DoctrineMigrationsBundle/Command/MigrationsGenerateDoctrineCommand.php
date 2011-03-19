@@ -30,8 +30,7 @@ class MigrationsGenerateDoctrineCommand extends GenerateCommand
 
         $this
             ->setName('doctrine:migrations:generate')
-            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.')
-        ;
+            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.');
     }
 
     public function execute(InputInterface $input, OutputInterface $output)

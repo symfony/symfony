@@ -30,8 +30,7 @@ class InitAclCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('init:acl')
-        ;
+            ->setName('init:acl');
     }
 
     /**

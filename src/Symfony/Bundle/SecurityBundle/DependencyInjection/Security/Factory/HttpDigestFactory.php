@@ -30,8 +30,7 @@ class HttpDigestFactory implements SecurityFactoryInterface
         $container
             ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.dao'))
             ->setArgument(0, new Reference($userProvider))
-            ->setArgument(2, $id)
-        ;
+            ->setArgument(2, $id);
 
         // entry point
         $entryPointId = $this->createEntryPoint($container, $id, $config, $defaultEntryPoint);
@@ -77,8 +76,7 @@ class HttpDigestFactory implements SecurityFactoryInterface
         $container
             ->setDefinition($entryPointId, new DefinitionDecorator('security.authentication.digest_entry_point'))
             ->addArgument($config['realm'])
-            ->addArgument($config['key'])
-        ;
+            ->addArgument($config['key']);
 
         return $entryPointId;
     }

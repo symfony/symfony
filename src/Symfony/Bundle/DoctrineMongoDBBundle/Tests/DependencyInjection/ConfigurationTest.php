@@ -143,8 +143,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $configuration = new Configuration(false);
         $options = $processor->process($configuration->getConfigTree(), $configs);
 
-        foreach ($correctValues as $key => $correctVal)
-        {
+        foreach ($correctValues as $key => $correctVal) {
             $this->assertEquals($correctVal, $options[$key]);
         }
     }

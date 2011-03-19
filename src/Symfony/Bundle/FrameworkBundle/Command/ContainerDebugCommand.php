@@ -64,8 +64,7 @@ using the --show-private flag:
 
   <info>container:debug --show-private</info>
 EOF
-            )
-        ;
+            );
     }
 
     /**

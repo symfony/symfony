@@ -191,8 +191,8 @@ class SecurityExtension extends Extension
             $context = $container->setDefinition($contextId, new DefinitionDecorator('security.firewall.context'));
             $context
                 ->setArgument(0, $listeners)
-                ->setArgument(1, $exceptionListener)
-            ;
+                ->setArgument(1, $exceptionListener);
+                
             $map[$contextId] = $matcher;
         }
         $mapDef->setArgument(1, $map);
@@ -203,8 +203,7 @@ class SecurityExtension extends Extension
         }, array_values(array_unique($authenticationProviders)));
         $container
             ->getDefinition('security.authentication.manager')
-            ->setArgument(0, $authenticationProviders)
-        ;
+            ->setArgument(0, $authenticationProviders);
     }
 
     private function createFirewall(ContainerBuilder $container, $id, $firewall, &$authenticationProviders, $providerIds, array $factories)
@@ -344,16 +343,14 @@ class SecurityExtension extends Extension
             $listenerId = 'security.authentication.listener.anonymous.'.$id;
             $container
                 ->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.anonymous'))
-                ->setArgument(1, $firewall['anonymous']['key'])
-            ;
+                ->setArgument(1, $firewall['anonymous']['key']);
 
             $listeners[] = new Reference($listenerId);
 
             $providerId = 'security.authentication.provider.anonymous.'.$id;
             $container
                 ->setDefinition($providerId, new DefinitionDecorator('security.authentication.provider.anonymous'))
-                ->setArgument(0, $firewall['anonymous']['key'])
-            ;
+                ->setArgument(0, $firewall['anonymous']['key']);
 
             $authenticationProviders[] = $providerId;
             $hasListeners = true;
@@ -442,8 +439,7 @@ class SecurityExtension extends Extension
 
             $container
                 ->setDefinition($name, new DefinitionDecorator('security.user.provider.chain'))
-                ->addArgument($providers)
-            ;
+                ->addArgument($providers);
 
             return $name;
         }
@@ -453,8 +449,7 @@ class SecurityExtension extends Extension
             $container
                 ->setDefinition($name, new DefinitionDecorator('security.user.provider.entity'))
                 ->addArgument($provider['entity']['class'])
-                ->addArgument($provider['entity']['property'])
-            ;
+                ->addArgument($provider['entity']['property']);
 
             return $name;
         }
@@ -466,8 +461,7 @@ class SecurityExtension extends Extension
 
             $container
                 ->setDefinition($userId, new DefinitionDecorator('security.user.provider.in_memory.user'))
-                ->setArguments(array($username, (string)$user['password'], $user['roles']))
-            ;
+                ->setArguments(array($username, (string)$user['password'], $user['roles']));
 
             $definition->addMethodCall('createUser', array(new Reference($userId)));
         }
@@ -528,8 +522,7 @@ class SecurityExtension extends Extension
         $container
             ->register($id, '%security.matcher.class%')
             ->setPublic(false)
-            ->setArguments($arguments)
-        ;
+            ->setArguments($arguments);
 
         return $this->requestMatchers[$id] = new Reference($id);
     }

@@ -42,7 +42,7 @@ You can specify the entity manager you want to generate the proxies for:
 
   <info>./app/console doctrine:generate:proxies --em=name</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

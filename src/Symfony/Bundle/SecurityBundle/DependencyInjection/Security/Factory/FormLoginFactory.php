@@ -66,8 +66,7 @@ class FormLoginFactory extends AbstractFactory
         $container
             ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.dao'))
             ->setArgument(0, new Reference($userProviderId))
-            ->setArgument(2, $id)
-        ;
+            ->setArgument(2, $id);
 
         return $provider;
     }
@@ -79,8 +78,7 @@ class FormLoginFactory extends AbstractFactory
         if (isset($config['csrf_provider'])) {
             $container
                 ->getDefinition($listenerId)
-                ->addArgument(new Reference($config['csrf_provider']))
-            ;
+                ->addArgument(new Reference($config['csrf_provider']));
         }
 
         return $listenerId;
@@ -92,8 +90,7 @@ class FormLoginFactory extends AbstractFactory
         $container
             ->setDefinition($entryPointId, new DefinitionDecorator('security.authentication.form_entry_point'))
             ->addArgument($config['login_path'])
-            ->addArgument($config['use_forward'])
-        ;
+            ->addArgument($config['use_forward']);
 
         return $entryPointId;
     }

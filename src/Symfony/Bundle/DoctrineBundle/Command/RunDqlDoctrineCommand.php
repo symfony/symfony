@@ -46,7 +46,7 @@ Additionally you can specify the first result and maximum amount of results to s
 
   <info>./app/console doctrine:query:dql "SELECT u FROM UserBundle:User u" --first-result=0 --max-result=30</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

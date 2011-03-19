@@ -50,8 +50,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         if ($this->isRememberMeAware($config)) {
             $container
                 ->getDefinition($listenerId)
-                ->addTag('security.remember_me_aware', array('id' => $id, 'provider' => $userProviderId))
-            ;
+                ->addTag('security.remember_me_aware', array('id' => $id, 'provider' => $userProviderId));
         }
 
         // create entry point if applicable (optional)

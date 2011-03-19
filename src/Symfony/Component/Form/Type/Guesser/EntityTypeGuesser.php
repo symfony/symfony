@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\FieldGuesser;
+namespace Symfony\Component\Form\Type\Guesser;
 
 use Doctrine\ORM\EntityManager;
 
@@ -18,7 +18,7 @@ use Doctrine\ORM\EntityManager;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class EntityFieldGuesser implements FieldGuesserInterface
+class EntityTypeGuesser implements TypeGuesserInterface
 {
     /**
      * The Doctrine 2 entity manager
@@ -58,86 +58,86 @@ class EntityFieldGuesser implements FieldGuesserInterface
                 $multiple = $metadata->isCollectionValuedAssociation($property);
                 $mapping = $metadata->getAssociationMapping($property);
 
-                return new FieldTypeGuess(
+                return new TypeGuess(
                     'entity',
                     array(
                         'em' => $this->em,
                         'class' => $mapping['targetEntity'],
                         'multiple' => $multiple,
                     ),
-                    FieldGuess::HIGH_CONFIDENCE
+                    Guess::HIGH_CONFIDENCE
                 );
             } else {
                 switch ($metadata->getTypeOfField($property))
                 {
         //            case 'array':
-        //                return new FieldTypeGuess(
+        //                return new TypeGuess(
         //                    'Collection',
         //                    array(),
-        //                    FieldGuess::HIGH_CONFIDENCE
+        //                    Guess::HIGH_CONFIDENCE
         //                );
                     case 'boolean':
-                        return new FieldTypeGuess(
+                        return new TypeGuess(
                             'checkbox',
                             array(),
-                            FieldGuess::HIGH_CONFIDENCE
+                            Guess::HIGH_CONFIDENCE
                         );
                     case 'datetime':
                     case 'vardatetime':
                     case 'datetimetz':
-                        return new FieldTypeGuess(
+                        return new TypeGuess(
                             'datetime',
                             array(),
-                            FieldGuess::HIGH_CONFIDENCE
+                            Guess::HIGH_CONFIDENCE
                         );
                     case 'date':
-                        return new FieldTypeGuess(
+                        return new TypeGuess(
                             'date',
                             array(),
-                            FieldGuess::HIGH_CONFIDENCE
+                            Guess::HIGH_CONFIDENCE
                         );
                     case 'decimal':
                     case 'float':
-                        return new FieldTypeGuess(
+                        return new TypeGuess(
                             'number',
                             array(),
-                            FieldGuess::MEDIUM_CONFIDENCE
+                            Guess::MEDIUM_CONFIDENCE
                         );
                     case 'integer':
                     case 'bigint':
                     case 'smallint':
-                        return new FieldTypeGuess(
+                        return new TypeGuess(
                             'integer',
                             array(),
-                            FieldGuess::MEDIUM_CONFIDENCE
+                            Guess::MEDIUM_CONFIDENCE
                         );
                     case 'string':
-                        return new FieldTypeGuess(
+                        return new TypeGuess(
                             'text',
                             array(),
-                            FieldGuess::MEDIUM_CONFIDENCE
+                            Guess::MEDIUM_CONFIDENCE
                         );
                     case 'text':
-                        return new FieldTypeGuess(
+                        return new TypeGuess(
                             'textarea',
                             array(),
-                            FieldGuess::MEDIUM_CONFIDENCE
+                            Guess::MEDIUM_CONFIDENCE
                         );
                     case 'time':
-                        return new FieldTypeGuess(
+                        return new TypeGuess(
                             'time',
                             array(),
-                            FieldGuess::HIGH_CONFIDENCE
+                            Guess::HIGH_CONFIDENCE
                         );
     //                case 'object': ???
                 }
             }
         }
 
-        return new FieldTypeGuess(
+        return new TypeGuess(
             'text',
             array(),
-            FieldGuess::LOW_CONFIDENCE
+            Guess::LOW_CONFIDENCE
         );
     }
 
@@ -151,15 +151,15 @@ class EntityFieldGuesser implements FieldGuesserInterface
 
             if ($metadata->hasField($property)) {
                 if (!$metadata->isNullable($property)) {
-                    return new FieldGuess(
+                    return new ValueGuess(
                         true,
-                        FieldGuess::HIGH_CONFIDENCE
+                        Guess::HIGH_CONFIDENCE
                     );
                 }
 
-                return new FieldGuess(
+                return new ValueGuess(
                     false,
-                    FieldGuess::MEDIUM_CONFIDENCE
+                    Guess::MEDIUM_CONFIDENCE
                 );
             }
         }
@@ -178,9 +178,9 @@ class EntityFieldGuesser implements FieldGuesserInterface
 
 
                 if (isset($mapping['length'])) {
-                    return new FieldGuess(
+                    return new ValueGuess(
                         $mapping['length'],
-                        FieldGuess::HIGH_CONFIDENCE
+                        Guess::HIGH_CONFIDENCE
                     );
                 }
             }

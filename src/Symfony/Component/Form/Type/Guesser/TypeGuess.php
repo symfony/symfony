@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\FieldGuesser;
+namespace Symfony\Component\Form\Type\Guesser;
 
 /**
  * Contains a guessed class name and a list of options for creating an instance
@@ -17,13 +17,19 @@ namespace Symfony\Component\Form\FieldGuesser;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class FieldTypeGuess extends FieldGuess
+class TypeGuess extends Guess
 {
+    /**
+     * The guessed field type
+     * @var string
+     */
+    private $type;
+
     /**
      * The guessed options for creating an instance of the guessed class
      * @var array
      */
-    protected $options;
+    private $options;
 
     /**
      * Constructor
@@ -36,23 +42,24 @@ class FieldTypeGuess extends FieldGuess
      */
     public function __construct($type, array $options, $confidence)
     {
-        parent::__construct($type, $confidence);
+        parent::__construct($confidence);
 
+        $this->type = $type;
         $this->options = $options;
     }
 
     /**
-     * Returns the guessed class name
+     * Returns the guessed field type
      *
      * @return string
      */
     public function getType()
     {
-        return $this->getValue();
+        return $this->type;
     }
 
     /**
-     * Returns the guessed options for creating instances of the guessed class
+     * Returns the guessed options for creating instances of the guessed type
      *
      * @return array
      */

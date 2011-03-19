@@ -9,21 +9,21 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\FieldGuesser;
+namespace Symfony\Component\Form\Type\Guesser;
 
 /**
  * Guesses field classes and options for the properties of a class
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-interface FieldGuesserInterface
+interface TypeGuesserInterface
 {
     /**
      * Returns a field guess for a property name of a class
      *
      * @param  string $class           The fully qualified class name
      * @param  string $property        The name of the property to guess for
-     * @return FieldTypeGuess  A guess for the field's type and options
+     * @return TypeGuess  A guess for the field's type and options
      */
     function guessType($class, $property);
 
@@ -32,7 +32,7 @@ interface FieldGuesserInterface
      *
      * @param  string $class      The fully qualified class name
      * @param  string $property   The name of the property to guess for
-     * @return FieldGuess  A guess for the field's required setting
+     * @return Guess  A guess for the field's required setting
      */
     function guessRequired($class, $property);
 
@@ -41,7 +41,7 @@ interface FieldGuesserInterface
      *
      * @param  string $class      The fully qualified class name
      * @param  string $property   The name of the property to guess for
-     * @return FieldGuess  A guess for the field's maximum length
+     * @return Guess  A guess for the field's maximum length
      */
     function guessMaxLength($class, $property);
 }

@@ -9,19 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\FieldGuesser;
+namespace Symfony\Component\Form\Type\Guesser;
 
 /**
- * Contains a value guessed by a FieldGuesserInterface instance
+ * Base class for guesses made by TypeGuesserInterface implementation
  *
- * Each instance also contains a confidence value about the correctness of
- * the guessed value. Thus an instance with confidence HIGH_CONFIDENCE is
- * more likely to contain a correct value than an instance with confidence
- * LOW_CONFIDENCE.
+ * Each instance contains a confidence value about the correctness of the guess.
+ * Thus an instance with confidence HIGH_CONFIDENCE is more likely to be
+ * correct than an instance with confidence LOW_CONFIDENCE.
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class FieldGuess
+abstract class Guess
 {
     /**
      * Marks an instance with a value that is very likely to be correct
@@ -45,17 +44,11 @@ class FieldGuess
      * The list of allowed confidence values
      * @var array
      */
-    protected static $confidences = array(
+    private static $confidences = array(
         self::HIGH_CONFIDENCE,
         self::MEDIUM_CONFIDENCE,
         self::LOW_CONFIDENCE,
     );
-
-    /**
-     * The guessed value
-     * @var mixed
-     */
-    protected $value;
 
     /**
      * The confidence about the correctness of the value
@@ -64,7 +57,7 @@ class FieldGuess
      *
      * @var integer
      */
-    protected $confidence;
+    private $confidence;
 
     /**
      * Returns the guess most likely to be correct from a list of guesses
@@ -73,7 +66,7 @@ class FieldGuess
      * returned guess is any of them.
      *
      * @param  array $guesses     A list of guesses
-     * @return FieldGuess  The guess with the highest confidence
+     * @return Guess  The guess with the highest confidence
      */
     static public function getBestGuess(array $guesses)
     {
@@ -87,27 +80,15 @@ class FieldGuess
     /**
      * Constructor
      *
-     * @param mixed $value          The guessed value
      * @param integer $confidence   The confidence
      */
-    public function __construct($value, $confidence)
+    public function __construct($confidence)
     {
         if (!in_array($confidence, self::$confidences)) {
             throw new \UnexpectedValueException(sprintf('The confidence should be one of "%s"', implode('", "', self::$confidences)));
         }
 
-        $this->value = $value;
         $this->confidence = $confidence;
-    }
-
-    /**
-     * Returns the guessed value
-     *
-     * @return mixed
-     */
-    public function getValue()
-    {
-        return $this->value;
     }
 
     /**

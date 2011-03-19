@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FieldBuilder;
+use Symfony\Component\Form\DataTransformer\NumberToLocalizedStringTransformer;
 
 class NumberFieldType extends AbstractFieldType
 {

@@ -31,6 +31,7 @@ class DefaultTypeLoader implements TypeLoaderInterface
     {
         $this->addType(new Type\FieldType($theme, $validator));
         $this->addType(new Type\FormType($theme, $csrfProvider));
+        $this->addType(new Type\BirthdayFieldType());
         $this->addType(new Type\CheckboxFieldType());
         $this->addType(new Type\ChoiceFieldType());
         $this->addType(new Type\CollectionFieldType());

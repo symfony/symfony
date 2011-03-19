@@ -48,6 +48,8 @@ class FieldBuilder
 
     private $attributes = array();
 
+    private $parent;
+
     public function __construct(ThemeInterface $theme,
             EventDispatcherInterface $dispatcher)
     {
@@ -77,6 +79,23 @@ class FieldBuilder
     public function getName()
     {
         return $this->name;
+    }
+
+    public function setParent(FieldBuilder $builder)
+    {
+        $this->parent = $builder;
+
+        return $this;
+    }
+
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    public function end()
+    {
+        return $this->parent;
     }
 
     public function setData($data)

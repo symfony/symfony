@@ -81,29 +81,43 @@ class FormBuilder extends FieldBuilder
             throw new UnexpectedTypeException($name, 'string');
         }
 
-        if (null !== $type) {
-            if (!is_string($type)) {
-                throw new UnexpectedTypeException($type, 'string');
-            }
-
-            $this->fields[$name] = array(
-                'type' => $type,
-                'options' => $options,
-            );
-
-            return $this;
-        }
-
-        if (!$this->dataClass) {
-            throw new FormException('The data class must be set to automatically create fields');
+        if (null !== $type && !is_string($type)) {
+            throw new UnexpectedTypeException($type, 'string');
         }
 
         $this->fields[$name] = array(
-            'class' => $this->dataClass,
+            'type' => $type,
             'options' => $options,
         );
 
         return $this;
+    }
+
+    public function build($name, $type = null, array $options = array())
+    {
+        if (null !== $type) {
+            $builder = $this->getFormFactory()->createBuilder(
+                $type,
+                $name,
+                $options
+            );
+        } else {
+            if (!$this->dataClass) {
+                throw new FormException('The data class must be set to automatically create fields');
+            }
+
+            $builder = $this->getFormFactory()->createBuilderForProperty(
+                $this->dataClass,
+                $name,
+                $options
+            );
+        }
+
+        $this->fields[$name] = $builder;
+
+        $builder->setParent($this);
+
+        return $builder;
     }
 
     public function get($name)
@@ -112,27 +126,13 @@ class FormBuilder extends FieldBuilder
             throw new FormException(sprintf('The field "%s" does not exist', $name));
         }
 
-        if ($this->fields[$name] instanceof FieldBuilder) {
-            return $this->fields[$name];
+        $field = $this->fields[$name];
+
+        if ($field instanceof FieldBuilder) {
+            return $field;
         }
 
-        if (isset($this->fields[$name]['type'])) {
-            $this->fields[$name] = $this->getFormFactory()->createBuilder(
-                $this->fields[$name]['type'],
-                $name,
-                $this->fields[$name]['options']
-            );
-
-            return $this->fields[$name];
-        }
-
-        $this->fields[$name] = $this->getFormFactory()->createBuilderForProperty(
-            $this->fields[$name]['class'],
-            $name,
-            $this->fields[$name]['options']
-        );
-
-        return $this->fields[$name];
+        return $this->build($name, $field['type'], $field['options']);
     }
 
     /**
@@ -162,8 +162,12 @@ class FormBuilder extends FieldBuilder
     {
         $fields = array();
 
-        foreach ($this->fields as $name => $field) {
-            $fields[$name] = $this->get($name)->getInstance();
+        foreach ($this->fields as $name => $builder) {
+            if (!$builder instanceof FieldBuilder) {
+                $builder = $this->build($name, $builder['type'], $builder['options']);
+            }
+
+            $fields[$name] = $builder->getInstance();
         }
 
         return $fields;

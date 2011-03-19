@@ -27,6 +27,8 @@ use Symfony\Component\DependencyInjection\Parameter;
  */
 class MonologExtension extends Extension
 {
+    private $nestedHandlers = array();
+
     /**
      * Loads the Monolog configuration.
      *
@@ -61,14 +63,16 @@ class MonologExtension extends Extension
 
             $handlers = array_reverse($handlers);
             foreach ($handlers as $handler) {
-                $logger->addMethodCall('pushHandler', array(new Reference($handler)));
+                if (!in_array($handler, $this->nestedHandlers)) {
+                    $logger->addMethodCall('pushHandler', array(new Reference($handler)));
+                }
             }
         }
     }
 
-    public function buildHandler(ContainerBuilder $container, $name, array $handler)
+    private function buildHandler(ContainerBuilder $container, $name, array $handler)
     {
-        $handlerId = sprintf('monolog.handler.%s', $name);
+        $handlerId = $this->getHandlerId($name);
         $definition = new Definition(sprintf('%%monolog.handler.%s.class%%', $handler['type']));
         $handler['level'] = is_int($handler['level']) ? $handler['level'] : constant('Monolog\Logger::'.strtoupper($handler['level']));
 
@@ -90,9 +94,11 @@ class MonologExtension extends Extension
                 $handler['action_level'] = 'WARNING';
             }
             $handler['action_level'] = is_int($handler['action_level']) ? $handler['action_level'] : constant('Monolog\Logger::'.strtoupper($handler['action_level']));
+            $nestedHandlerId = $this->getHandlerId($handler['handler']);
+            array_push($this->nestedHandlers, $nestedHandlerId);
 
             $definition->setArguments(array(
-                new Reference($this->buildHandler($container, sprintf('%s.real', $name), $handler['handler'])),
+                new Reference($nestedHandlerId),
                 $handler['action_level'],
                 isset($handler['buffer_size']) ? $handler['buffer_size'] : 0,
                 $handler['bubble'],
@@ -124,5 +130,10 @@ class MonologExtension extends Extension
     public function getNamespace()
     {
         return 'http://symfony.com/schema/dic/monolog';
+    }
+
+    private function getHandlerId($name)
+    {
+        return sprintf('monolog.handler.%s', $name);
     }
 }

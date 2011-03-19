@@ -32,9 +32,9 @@ class Configuration
     public function getConfigTree()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('monolog', 'array');
+        $rootNode = $treeBuilder->root('monolog');
 
-        $handlersPrototype = $rootNode
+        $rootNode
             ->fixXmlConfig('handler')
             ->children()
                 ->arrayNode('handlers')
@@ -43,46 +43,30 @@ class Configuration
                     ->useAttributeAsKey('name')
                     ->prototype('array')
                         ->children()
+                            ->scalarNode('type')
+                                ->isRequired()
+                                ->treatNullLike('null')
+                                ->beforeNormalization()
+                                    ->always()
+                                    ->then(function($v) { return strtolower($v); })
+                                ->end()
+                            ->end()
+                            ->scalarNode('level')->defaultValue('DEBUG')->end()
+                            ->booleanNode('bubble')->defaultFalse()->end()
+                            ->scalarNode('path')->end() // stream specific
                             ->scalarNode('action_level')->end() // fingerscrossed specific
                             ->scalarNode('buffer_size')->end() // fingerscrossed specific
+                            ->scalarNode('handler')->end() // fingerscrossed specific
                         ->end()
-                        ->append($this->getHandlerSubnode())
                         ->validate()
                             ->ifTrue(function($v) { return 'fingerscrossed' === $v['type'] && !isset($v['handler']); })
                             ->thenInvalid('The handler has to be specified to use a FingersCrossedHandler')
                         ->end()
-        ;
-        $this->addHandlerSection($handlersPrototype);
-
-        return $treeBuilder->buildTree();
-    }
-
-    private function addHandlerSection(ArrayNodeDefinition $node)
-    {
-        $node
-            ->performNoDeepMerging()
-            ->children()
-                ->scalarNode('type')
-                    ->isRequired()
-                    ->treatNullLike('null')
-                    ->beforeNormalization()
-                        ->always()
-                        ->then(function($v) { return strtolower($v); })
                     ->end()
                 ->end()
-                ->scalarNode('level')->defaultValue('DEBUG')->end()
-                ->booleanNode('bubble')->defaultFalse()->end()
-                ->scalarNode('path')->end() // stream specific
             ->end()
         ;
-    }
 
-    private function getHandlerSubnode()
-    {
-        $builder = new TreeBuilder();
-        $node = $builder->root('handler');
-        $this->addHandlerSection($node);
-
-        return $node;
+        return $treeBuilder->buildTree();
     }
 }

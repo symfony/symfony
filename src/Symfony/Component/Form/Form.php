@@ -201,7 +201,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
         $this->extraFields = array();
 
-        foreach ($data as $name => $value) {
+        foreach ((array)$data as $name => $value) {
             if (!$this->has($name)) {
                 $this->extraFields[] = $name;
             }

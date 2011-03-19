@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\MonologBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 /**
  * This class contains the configuration information for the bundle
@@ -21,6 +20,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
  * sections are normalized, and merged.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ * @author Christophe Coevoet <stof@notk.org>
  */
 class Configuration
 {
@@ -36,6 +36,7 @@ class Configuration
 
         $rootNode
             ->fixXmlConfig('handler')
+            ->fixXmlConfig('processor')
             ->children()
                 ->arrayNode('handlers')
                     ->canBeUnset()
@@ -57,7 +58,9 @@ class Configuration
                             ->scalarNode('action_level')->end() // fingerscrossed specific
                             ->scalarNode('buffer_size')->end() // fingerscrossed specific
                             ->scalarNode('handler')->end() // fingerscrossed specific
+                            ->scalarNode('formatter')->end()
                         ->end()
+                        ->append($this->getProcessorsNode())
                         ->validate()
                             ->ifTrue(function($v) { return 'fingerscrossed' === $v['type'] && !isset($v['handler']); })
                             ->thenInvalid('The handler has to be specified to use a FingersCrossedHandler')
@@ -65,8 +68,29 @@ class Configuration
                     ->end()
                 ->end()
             ->end()
+            ->append($this->getProcessorsNode())
         ;
 
         return $treeBuilder->buildTree();
+    }
+
+    private function getProcessorsNode()
+    {
+        $treeBuilder = new TreeBuilder();
+        $node = $treeBuilder->root('processors');
+
+        $node
+            ->canBeUnset()
+            ->performNoDeepMerging()
+            ->useAttributeAsKey('name')
+            ->prototype('scalar')
+                ->beforeNormalization()
+                    ->ifTrue(function($v) { return is_array($v) && isset($v['callback']); })
+                    ->then(function($v){ return $v['callback']; })
+                ->end()
+            ->end()
+        ;
+
+        return $node;
     }
 }

@@ -56,6 +56,10 @@ class MonologExtension extends Extension
 
             $logger = $container->getDefinition('monolog.logger_prototype');
 
+            if (!empty ($config['processors'])) {
+                $this->addProcessors($logger, $config['processors']);
+            }
+
             $handlers = array();
             foreach ($config['handlers'] as $name => $handler) {
                 $handlers[] = $this->buildHandler($container, $name, $handler);
@@ -112,6 +116,13 @@ class MonologExtension extends Extension
             ));
             break;
         }
+
+        if (!empty ($handler['formatter'])) {
+            $definition->addMethodCall('setFormatter', array(new Reference($handler['formatter'])));
+        }
+        if (!empty ($handler['processors'])) {
+            $this->addProcessors($definition, $handler['processors']);
+        }
         $container->setDefinition($handlerId, $definition);
 
         return $handlerId;
@@ -135,5 +146,15 @@ class MonologExtension extends Extension
     private function getHandlerId($name)
     {
         return sprintf('monolog.handler.%s', $name);
+    }
+
+    private function addProcessors(Definition $definition, array $processors)
+    {
+        foreach (array_reverse($processors) as $processor) {
+            if (0 === strpos($processor, '@')) {
+                $processor = new Reference(substr($processor, 1));
+            }
+            $definition->addMethodCall('pushProcessor', array($processor));
+        }
     }
 }

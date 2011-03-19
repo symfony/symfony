@@ -22,7 +22,7 @@ class TimeFieldTest extends DateTimeTestCase
         $field = $this->factory->create('time', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'type' => 'datetime',
+            'input' => 'datetime',
         ));
 
         $input = array(
@@ -43,7 +43,7 @@ class TimeFieldTest extends DateTimeTestCase
         $field = $this->factory->create('time', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'type' => 'string',
+            'input' => 'string',
         ));
 
         $input = array(
@@ -62,7 +62,7 @@ class TimeFieldTest extends DateTimeTestCase
         $field = $this->factory->create('time', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'type' => 'timestamp',
+            'input' => 'timestamp',
         ));
 
         $input = array(
@@ -83,7 +83,7 @@ class TimeFieldTest extends DateTimeTestCase
         $field = $this->factory->create('time', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'type' => 'array',
+            'input' => 'array',
         ));
 
         $input = array(
@@ -107,7 +107,7 @@ class TimeFieldTest extends DateTimeTestCase
         $field = $this->factory->create('time', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'type' => 'datetime',
+            'input' => 'datetime',
             'with_seconds' => true,
         ));
 
@@ -122,7 +122,7 @@ class TimeFieldTest extends DateTimeTestCase
             'data_timezone' => 'America/New_York',
             'user_timezone' => 'Pacific/Tahiti',
             // don't do this test with DateTime, because it leads to wrong results!
-            'type' => 'string',
+            'input' => 'string',
             'with_seconds' => true,
         ));
 

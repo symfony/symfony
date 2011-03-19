@@ -41,9 +41,9 @@ class FileType extends AbstractType
         }
 
         $builder->addEventSubscriber(new FixFileUploadListener($this->storage), 10)
-            ->add('field', 'file')
-            ->add('hidden', 'token')
-            ->add('hidden', 'name');
+            ->add('file', 'field')
+            ->add('token', 'hidden')
+            ->add('name', 'hidden');
 
         $builder->get('file')->setRendererVar('type', 'file');
     }

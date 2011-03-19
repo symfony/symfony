@@ -41,15 +41,15 @@ class TimeType extends AbstractType
             }
         }
 
-        $builder->add($options['widget'], 'hour', $hourOptions)
-            ->add($options['widget'], 'minute', $minuteOptions);
+        $builder->add('hour', $options['widget'], $hourOptions)
+            ->add('minute', $options['widget'], $minuteOptions);
 
         if ($options['with_seconds']) {
             $parts[] = 'second';
-            $builder->add($options['widget'], 'second', $secondOptions);
+            $builder->add('second', $options['widget'], $secondOptions);
         }
 
-        if ($options['type'] == 'string') {
+        if ($options['input'] === 'string') {
             $builder->setNormTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer(array(
                     'format' => 'H:i:s',
@@ -57,14 +57,14 @@ class TimeType extends AbstractType
                     'output_timezone' => $options['data_timezone'],
                 ))
             ));
-        } else if ($options['type'] == 'timestamp') {
+        } else if ($options['input'] === 'timestamp') {
             $builder->setNormTransformer(new ReversedTransformer(
                 new DateTimeToTimestampTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['data_timezone'],
                 ))
             ));
-        } else if ($options['type'] === 'array') {
+        } else if ($options['input'] === 'array') {
             $builder->setNormTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer(array(
                     'input_timezone' => $options['data_timezone'],
@@ -95,7 +95,7 @@ class TimeType extends AbstractType
             'minutes' => range(0, 59),
             'seconds' => range(0, 59),
             'widget' => 'choice',
-            'type' => 'datetime',
+            'input' => 'datetime',
             'with_seconds' => false,
             'pattern' => null,
             'data_timezone' => date_default_timezone_get(),

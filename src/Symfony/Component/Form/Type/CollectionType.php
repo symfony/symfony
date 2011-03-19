@@ -19,7 +19,7 @@ class CollectionType extends AbstractType
     public function configure(FieldBuilder $builder, array $options)
     {
         if ($options['modifiable']) {
-            $builder->add($options['prototype'], '$$name$$', array(
+            $builder->add('$$name$$', $options['type'], array(
                 'property_path' => null,
                 'required' => false,
             ));

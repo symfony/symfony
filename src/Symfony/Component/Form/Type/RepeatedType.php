@@ -22,8 +22,8 @@ class RepeatedType extends AbstractType
                 $options['first_name'],
                 $options['second_name'],
             )))
-            ->add($options['type'], $options['first_name'], $options['options'])
-            ->add($options['type'], $options['second_name'], $options['options']);
+            ->add($options['first_name'], $options['type'], $options['options'])
+            ->add($options['second_name'], $options['type'], $options['options']);
     }
 
     public function getDefaultOptions(array $options)

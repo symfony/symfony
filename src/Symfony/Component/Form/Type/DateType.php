@@ -56,9 +56,9 @@ class DateType extends AbstractType
                 ),
             );
 
-            $builder->add('choice', 'year', $yearOptions)
-                ->add('choice', 'month', $monthOptions)
-                ->add('choice', 'day', $dayOptions)
+            $builder->add('year', 'choice', $yearOptions)
+                ->add('month', 'choice', $monthOptions)
+                ->add('day', 'choice', $dayOptions)
                 ->setClientTransformer(new DateTimeToArrayTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['user_timezone'],
@@ -67,7 +67,7 @@ class DateType extends AbstractType
                 ->addRendererPlugin(new DatePatternPlugin($formatter));
         }
 
-        if ($options['type'] === 'string') {
+        if ($options['input'] === 'string') {
             $builder->setNormTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer(array(
                     'input_timezone' => $options['data_timezone'],
@@ -75,14 +75,14 @@ class DateType extends AbstractType
                     'format' => 'Y-m-d',
                 ))
             ));
-        } else if ($options['type'] === 'timestamp') {
+        } else if ($options['input'] === 'timestamp') {
             $builder->setNormTransformer(new ReversedTransformer(
                 new DateTimeToTimestampTransformer(array(
                     'output_timezone' => $options['data_timezone'],
                     'input_timezone' => $options['data_timezone'],
                 ))
             ));
-        } else if ($options['type'] === 'array') {
+        } else if ($options['input'] === 'array') {
             $builder->setNormTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer(array(
                     'input_timezone' => $options['data_timezone'],
@@ -103,7 +103,7 @@ class DateType extends AbstractType
             'months' => range(1, 12),
             'days' => range(1, 31),
             'widget' => 'choice',
-            'type' => 'datetime',
+            'input' => 'datetime',
             'pattern' => null,
             'format' => \IntlDateFormatter::MEDIUM,
             'data_timezone' => date_default_timezone_get(),

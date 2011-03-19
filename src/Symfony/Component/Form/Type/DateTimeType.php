@@ -46,7 +46,7 @@ class DateTimeType extends AbstractType
             $dateOptions['format'] = $options['date_format'];
         }
 
-        $dateOptions['type'] = 'array';
+        $dateOptions['input'] = 'array';
 
         if (isset($options['time_pattern'])) {
             $timeOptions['pattern'] = $options['time_pattern'];
@@ -58,7 +58,7 @@ class DateTimeType extends AbstractType
             $timeOptions['format'] = $options['time_format'];
         }
 
-        $timeOptions['type'] = 'array';
+        $timeOptions['input'] = 'array';
 
         $parts = array('year', 'month', 'day', 'hour', 'minute');
         $timeParts = array('hour', 'minute');
@@ -82,7 +82,7 @@ class DateTimeType extends AbstractType
             ->add('date', 'date', $dateOptions)
             ->add('time', 'time', $timeOptions);
 
-        if ($options['type'] == 'string') {
+        if ($options['input'] === 'string') {
             $builder->setNormTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer(array(
                     'format' => 'Y-m-d H:i:s',
@@ -90,14 +90,14 @@ class DateTimeType extends AbstractType
                     'output_timezone' => $options['data_timezone'],
                 ))
             ));
-        } else if ($options['type'] == 'timestamp') {
+        } else if ($options['input'] === 'timestamp') {
             $builder->setNormTransformer(new ReversedTransformer(
                 new DateTimeToTimestampTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['data_timezone'],
                 ))
             ));
-        } else if ($options['type'] === 'array') {
+        } else if ($options['input'] === 'array') {
             $builder->setNormTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer(array(
                     'input_timezone' => $options['data_timezone'],
@@ -112,7 +112,7 @@ class DateTimeType extends AbstractType
     {
         return array(
             'template' => 'datetime',
-            'type' => 'datetime',
+            'input' => 'datetime',
             'with_seconds' => false,
             'data_timezone' => date_default_timezone_get(),
             'user_timezone' => date_default_timezone_get(),

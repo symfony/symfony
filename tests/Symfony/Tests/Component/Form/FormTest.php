@@ -241,7 +241,7 @@ class FormTest extends TestCase
         $builder = $this->factory->createBuilder('form', 'author', array(
             'validation_groups' => 'group',
         ));
-        $builder->add('field', 'firstName');
+        $builder->add('firstName', 'field');
         $form = $builder->getInstance();
 
         $this->validator->expects($this->once())
@@ -255,7 +255,7 @@ class FormTest extends TestCase
     public function testBindDoesNotValidateArrays()
     {
         $builder = $this->factory->createBuilder('form', 'author');
-        $builder->add('field', 'firstName');
+        $builder->add('firstName', 'field');
         $form = $builder->getInstance();
 
         // only the form is validated
@@ -290,10 +290,10 @@ class FormTest extends TestCase
         );
 
         $builder = $this->factory->createBuilder('form', 'author');
-        $builder->add('field', 'name');
-        $builder->add('form', 'image');
-        $builder->get('image')->add('field', 'file');
-        $builder->get('image')->add('field', 'filename');
+        $builder->add('name', 'field');
+        $builder->add('image', 'form');
+        $builder->get('image')->add('file', 'field');
+        $builder->get('image')->add('filename', 'field');
         $form = $builder->getInstance();
 
         $form->bindRequest($this->createPostRequest($values, $files));
@@ -308,7 +308,7 @@ class FormTest extends TestCase
     public function testSupportsArrayAccess()
     {
         $builder = $this->factory->createBuilder('form', 'author');
-        $builder->add('field', 'firstName');
+        $builder->add('firstName', 'field');
         $form = $builder->getInstance();
 
         $this->assertEquals($form->get('firstName'), $form['firstName']);
@@ -339,8 +339,8 @@ class FormTest extends TestCase
         $builder = $this->factory->createBuilder('form', 'group', array(
             'csrf_protection' => false,
         ));
-        $builder->add('field', 'firstName');
-        $builder->add('field', 'lastName');
+        $builder->add('firstName', 'field');
+        $builder->add('lastName', 'field');
         $form = $builder->getInstance();
 
         $this->assertEquals(2, count($form));
@@ -351,9 +351,9 @@ class FormTest extends TestCase
         $builder = $this->factory->createBuilder('form', 'group', array(
             'csrf_protection' => false,
         ));
-        $builder->add('field', 'field1');
-        $builder->add('field', 'field2');
-        $builder->add('field', 'field3');
+        $builder->add('field1', 'field');
+        $builder->add('field2', 'field');
+        $builder->add('field3', 'field');
         $form = $builder->getInstance();
 
         $expected = array(
@@ -376,8 +376,8 @@ class FormTest extends TestCase
     public function testValidIfAllFieldsAreValid()
     {
         $builder = $this->factory->createBuilder('form', 'author');
-        $builder->add('field', 'firstName');
-        $builder->add('field', 'lastName');
+        $builder->add('firstName', 'field');
+        $builder->add('lastName', 'field');
         $form = $builder->getInstance();
 
         $form->bind(array('firstName' => 'Bernhard', 'lastName' => 'Potencier'));
@@ -390,8 +390,8 @@ class FormTest extends TestCase
         $this->markTestSkipped('How to force an invalid field?');
 
         $builder = $this->factory->createBuilder('form', 'author');
-        $builder->add('field', 'firstName');
-        $builder->add('field', 'lastName'); // how to make invalid?
+        $builder->add('firstName', 'field');
+        $builder->add('lastName', 'field'); // how to make invalid?
         $form = $builder->getInstance();
 
         $form->bind(array('firstName' => 'Bernhard', 'lastName' => 'Potencier'));
@@ -402,8 +402,8 @@ class FormTest extends TestCase
     public function testInvalidIfBoundWithExtraFields()
     {
         $builder = $this->factory->createBuilder('form', 'author');
-        $builder->add('field', 'firstName');
-        $builder->add('field', 'lastName');
+        $builder->add('firstName', 'field');
+        $builder->add('lastName', 'field');
         $form = $builder->getInstance();
 
         $form->bind(array('foo' => 'bar', 'firstName' => 'Bernhard', 'lastName' => 'Potencier'));
@@ -414,7 +414,7 @@ class FormTest extends TestCase
     public function testHasNoErrorsIfOnlyFieldHasErrors()
     {
         $builder = $this->factory->createBuilder('form', 'author');
-        $builder->add('field', 'firstName');
+        $builder->add('firstName', 'field');
         $form = $builder->getInstance();
 
         $form->bind(array('firstName' => 'Bernhard'));
@@ -672,8 +672,8 @@ class FormTest extends TestCase
         $builder = $this->factory->createBuilder('form', 'author');
         $builder->setClientTransformer($transformer);
         $builder->setData($originalAuthor);
-        $builder->add('field', 'firstName');
-        $builder->add('field', 'lastName');
+        $builder->add('firstName', 'field');
+        $builder->add('lastName', 'field');
         $form = $builder->getInstance();
 
         $this->assertEquals('Foo', $form['firstName']->getData());
@@ -708,13 +708,13 @@ class FormTest extends TestCase
 
         $builder = $this->factory->createBuilder('form', 'author');
         $builder->setData($author);
-        $builder->add('form', 'personalData', array(
+        $builder->add('personalData', 'form', array(
             'virtual' => true,
         ));
         // both fields are in the nested group but receive the object of the
         // top-level group because the nested group is virtual
-        $builder->get('personalData')->add('field', 'firstName');
-        $builder->get('personalData')->add('field', 'lastName');
+        $builder->get('personalData')->add('firstName', 'field');
+        $builder->get('personalData')->add('lastName', 'field');
         $form = $builder->getInstance();
 
         $this->assertEquals('Foo', $form['personalData']['firstName']->getData());
@@ -804,8 +804,8 @@ class FormTest extends TestCase
 
         $builder = $this->factory->createBuilder('form', 'author');
         $builder->setClientTransformer($transformer);
-        $builder->add('field', 'firstName');
-        $builder->add('field', 'lastName');
+        $builder->add('firstName', 'field');
+        $builder->add('lastName', 'field');
         $builder->setData($originalAuthor);
         $form = $builder->getInstance();
 
@@ -929,8 +929,8 @@ class FormTest extends TestCase
         $author = new FormTest_AuthorWithoutRefSetter(new Author());
 
         $builder = $this->factory->createBuilder('form', 'author');
-        $builder->add('form', 'reference');
-        $builder->get('reference')->add('field', 'firstName');
+        $builder->add('reference', 'form');
+        $builder->get('reference')->add('firstName', 'field');
         $builder->setData($author);
         $form = $builder->getInstance();
 
@@ -951,8 +951,8 @@ class FormTest extends TestCase
         $newReference = new Author();
 
         $builder = $this->factory->createBuilder('form', 'author');
-        $builder->add('form', 'referenceCopy');
-        $builder->get('referenceCopy')->add('field', 'firstName');
+        $builder->add('referenceCopy', 'form');
+        $builder->get('referenceCopy')->add('firstName', 'field');
         $builder->setData($author);
         $form = $builder->getInstance();
 
@@ -973,8 +973,8 @@ class FormTest extends TestCase
         $author = new FormTest_AuthorWithoutRefSetter(new Author());
 
         $builder = $this->factory->createBuilder('form', 'author');
-        $builder->add('form', 'referenceCopy', array('by_reference' => false));
-        $builder->get('referenceCopy')->add('field', 'firstName');
+        $builder->add('referenceCopy', 'form', array('by_reference' => false));
+        $builder->get('referenceCopy')->add('firstName', 'field');
         $builder->setData($author);
         $form = $builder->getInstance();
 
@@ -994,7 +994,7 @@ class FormTest extends TestCase
         $author = new FormTest_AuthorWithoutRefSetter('scalar');
 
         $builder = $this->factory->createBuilder('form', 'author');
-        $builder->add('form', 'referenceCopy');
+        $builder->add('referenceCopy', 'form');
         $builder->get('referenceCopy')->setClientTransformer(new CallbackTransformer(
             function () {},
             function ($value) { // reverseTransform
@@ -1020,7 +1020,7 @@ class FormTest extends TestCase
 
         $builder = $this->factory->createBuilder('form', 'author');
         $builder->setData($author);
-        $builder->add('form', 'referenceCopy');
+        $builder->add('referenceCopy', 'form');
         $builder->get('referenceCopy')->setClientTransformer(new CallbackTransformer(
             function () {},
             function ($value) use ($ref2) { // reverseTransform
@@ -1041,8 +1041,8 @@ class FormTest extends TestCase
     public function testIsEmptyReturnsTrueIfAllFieldsAreEmpty()
     {
         $builder = $this->factory->createBuilder('form', 'name');
-        $builder->add('field', 'foo', array('data' => ''));
-        $builder->add('field', 'bar', array('data' => null));
+        $builder->add('foo', 'field', array('data' => ''));
+        $builder->add('bar', 'field', array('data' => null));
         $form = $builder->getInstance();
 
         $this->assertTrue($form->isEmpty());
@@ -1051,8 +1051,8 @@ class FormTest extends TestCase
     public function testIsEmptyReturnsFalseIfAnyFieldIsFilled()
     {
         $builder = $this->factory->createBuilder('form', 'name');
-        $builder->add('field', 'foo', array('data' => 'baz'));
-        $builder->add('field', 'bar', array('data' => null));
+        $builder->add('foo', 'field', array('data' => 'baz'));
+        $builder->add('bar', 'field', array('data' => null));
         $form = $builder->getInstance();
 
         $this->assertFalse($form->isEmpty());

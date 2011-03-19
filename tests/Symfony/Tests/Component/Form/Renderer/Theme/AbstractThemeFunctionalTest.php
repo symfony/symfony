@@ -9,10 +9,8 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Form;
+namespace Symfony\Tests\Component\Form\Renderer\Theme;
 
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Bundle\FrameworkBundle\Form\PhpEngineTheme;
 use Symfony\Component\Form\Type\AbstractFieldType;
 use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\CsrfProvider\DefaultCsrfProvider;
@@ -22,26 +20,16 @@ use Symfony\Component\Form\FormFactory;
 /**
  * Test theme template files shipped with framework bundle.
  */
-class PhpThemeFunctionalTest extends TestCase
+abstract class AbstractThemeFunctionalTest extends \PHPUnit_Framework_TestCase
 {
-    private $engine;
-    private $theme;
     /** @var FormFactory */
     private $factory;
 
+    abstract protected function createTheme();
+
     public function setUp()
     {
-        $parser = new \Symfony\Component\Templating\TemplateNameParser();
-        $loader = new \Symfony\Component\Templating\Loader\FilesystemLoader(__DIR__ . '/../../Resources/views/Form/%name%');
-        $this->engine = new \Symfony\Component\Templating\PhpEngine($parser, $loader, array());
-        $this->engine->addHelpers(array(
-            new \Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper(
-                new \Symfony\Component\Translation\IdentityTranslator(
-                    new \Symfony\Component\Translation\MessageSelector()
-                )
-            )
-        ));
-        $this->theme = new PhpEngineTheme($this->engine);
+        $theme = $this->createTheme();
         $csrfProvider = new DefaultCsrfProvider('foo');
         $validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
         $storage = new \Symfony\Component\HttpFoundation\File\TemporaryStorage('foo', 1, \sys_get_temp_dir());
@@ -49,7 +37,7 @@ class PhpThemeFunctionalTest extends TestCase
         // ok more than 2 lines, see DefaultFormFactory.php for proposed simplication
         $typeLoader = new DefaultTypeLoader();
         $this->factory = new FormFactory($typeLoader);
-        $typeLoader->initialize($this->factory, $this->theme, $csrfProvider, $validator , $storage);
+        $typeLoader->initialize($this->factory, $theme, $csrfProvider, $validator , $storage);
         // this is the relevant bit about your own forms:
         $typeLoader->addType(new MyTestFormConfig());
         $typeLoader->addType(new MyTestSubFormConfig());
@@ -60,14 +48,16 @@ class PhpThemeFunctionalTest extends TestCase
         $form = $this->factory->create('my.form');
         $html = $form->getRenderer()->getWidget();
 
+        libxml_use_internal_errors(true);
         $dom = new \DomDocument('UTF-8');
-        $dom->loadXml($html);
+        $dom->loadHtml($html);
 
         $xpath = new \DomXpath($dom);
         $ids = array();
         foreach ($xpath->evaluate('//*[@id]') as $node) {
             $ids[] = $node->tagName . "#" . $node->getAttribute('id');
         }
+        libxml_use_internal_errors(false);
         $this->assertEquals(array (
             'input#my.form_field0_subfield0',
             'input#my.form_field1',
@@ -92,6 +82,7 @@ class PhpThemeFunctionalTest extends TestCase
             'input#my.form_field8_file',
             'input#my.form_field8_token',
             'input#my.form_field8_name',
+            'input#my.form_field10',
             'select#my.form_field11',
             'select#my.form_field12',
             'input#my.form_field13',

@@ -1,7 +1,7 @@
 <?php if ($expanded): ?>
     <?php foreach ($fields as $choice => $child): ?>
         <?php echo $child->getWidget() ?>
-        <label for="<?php echo $child->getVar('id') ?>"><?php echo $child->getLabel($choice) ?></label>
+        <?php echo $child->getLabel() ?>
     <?php endforeach ?>
 <?php else: ?>
     <select

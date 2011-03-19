@@ -1,1 +1,1 @@
-<?php $renderer->getTheme()->render('number', 'widget', $renderer->getVars()); ?>
+<?php echo $renderer->getTheme()->render('number', 'widget', $renderer->getVars()); ?>

@@ -11,6 +11,7 @@
         <parameter key="form.csrf_provider.class">Symfony\Component\Form\CsrfProvider\SessionCsrfProvider</parameter>
         <parameter key="form.theme.twig.class">Symfony\Component\Form\Renderer\Theme\TwigTheme</parameter>
         <parameter key="form.theme.php.class">Symfony\Component\Form\Renderer\Theme\PhpTheme</parameter>
+        <parameter key="form.theme.phpengine.class">Symfony\Bundle\FrameworkBundle\Form\PhpEngineTheme</parameter>
         <parameter key="form.theme.template">TwigBundle::div_layout.html.twig</parameter>
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
         <parameter key="form.csrf_protection.enabled">true</parameter>
@@ -49,7 +50,11 @@
             <argument>%form.theme.template%</argument>
         </service>
 
-        <service id="form.theme.php" class="%form.theme.php.class%">
+        <service id="form.theme.default" class="%form.theme.php.class%">
+            <argument>%kernel.charset%</argument>
+        </service>
+
+        <service id="form.theme.php" class="%form.theme.phpengine.class%">
             <argument type="service" id="templating.engine.php" />
             <argument>%form.theme.template%</argument>
         </service>

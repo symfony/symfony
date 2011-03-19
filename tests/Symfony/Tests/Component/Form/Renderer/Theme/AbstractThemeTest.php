@@ -9,29 +9,20 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Form;
+namespace Symfony\Tests\Component\Form\Renderer\Theme;
 
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Bundle\FrameworkBundle\Form\PhpEngineTheme;
-use Symfony\Component\Templating\TemplateNameParser;
-use Symfony\Component\Templating\Loader\FilesystemLoader;
-use Symfony\Component\Templating\PhpEngine;
+use Symfony\Component\Form\Renderer\Theme\PhpTheme;
 
-/**
- * Test theme template files shipped with framework bundle.
- */
-class PhpThemeTest extends TestCase
+abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
 {
-    private $engine;
     private $theme;
 
     public function setUp()
     {
-        $parser = new TemplateNameParser();
-        $loader = new FilesystemLoader(__DIR__ . '/../../Resources/views/Form/%name%');
-        $this->engine = new PhpEngine($parser, $loader, array());
-        $this->theme = new PhpEngineTheme($this->engine);
+        $this->theme = $this->createTheme();
     }
+
+    abstract protected function createTheme();
 
     public function testTextWidgetDefault()
     {
@@ -45,7 +36,7 @@ class PhpThemeTest extends TestCase
             'required' => false,
             'size' => null
         ));
-        
+
         $this->assertEquals('input', $input->tagName);
         $this->assertTrue($input->hasAttribute('id'), "Has id attribute");
         $this->assertEquals('foo', $input->getAttribute('id'), "Id attribute is set to field name.");

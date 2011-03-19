@@ -17,23 +17,16 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
 
     public function testFindAcls()
     {
-        $this->generateTestData();
-        
+//        $this->generateTestData();
+
         // get some random test object identities from the database
         $oids = array();
-        $randomKeys = array();
+        $max = $this->con->selectCollection($this->options['oid_table_name'])->find()->count();
+
         for($i=0;$i<25;$i++) {
-           $randomKeys[] = rand(0,$this->aclRandomKeyValue);
-        }
-        $criteria = array(
-            'randomKey' => array('$in' => $randomKeys),
-        );
-        $fields = array(
-            'objectIdentity' => true,
-        );
-        $cursor = $this->con->selectCollection($this->options['oid_table_name'])->find($criteria, $fields);
-        foreach ($cursor as $oid) {
-            $oids[] = new ObjectIdentity($oid['objectIdentifier'], $oid['classType']);
+            $randomKey = rand(0, $max);
+            $oid = $this->con->selectCollection($this->options['oid_table_name'])->findOne(array('randomKey'=>$randomKey));
+            $oids[] = new ObjectIdentity($oid['identifier'], $oid['type']);
         }
         
         $provider = $this->getProvider();
@@ -70,9 +63,12 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
      */
     protected function generateTestData()
     {
+        $this->con->selectCollection($this->options['oid_table_name'])->drop();
+        $this->con->selectCollection($this->options['entry_table_name'])->drop();
+        $this->con->selectCollection($this->options['oid_table_name'])->ensureIndex(array('randomKey'=>1),array());
+
         for ($i=0; $i<40000; $i++) {
             $this->generateAclHierarchy();
-            echo "$i ";
         }
     }
     
@@ -109,10 +105,11 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
 
         $oidCollection = $this->con->selectCollection($this->options['oid_table_name']);
 
-        $acl = array(
-            'objectIdentity' => $objectIdentity,
-            'entriesInheriting' => (boolean)rand(0, 1),
-            'randomKey' => $aclRandomKeyValue,
+        $acl = array_merge($objectIdentity,
+            array(
+                'entriesInheriting' => (boolean)rand(0, 1),
+                'randomKey' => $aclRandomKeyValue,
+            )
         );
         $aclRandomKeyValue++;
         if ($parent) {

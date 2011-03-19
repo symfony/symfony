@@ -251,7 +251,7 @@ class FormBuilder extends FieldBuilder
             $this->getClientTransformer(),
             $this->getNormTransformer(),
             $this->getDataMapper(),
-            $this->getDataValidator(),
+            $this->getValidator(),
             $this->getRequired(),
             $this->getDisabled(),
             $this->getAttributes()

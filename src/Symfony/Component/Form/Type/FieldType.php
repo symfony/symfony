@@ -19,7 +19,7 @@ use Symfony\Component\Form\Renderer\Plugin\FieldPlugin;
 use Symfony\Component\Form\EventListener\TrimListener;
 use Symfony\Component\Form\EventListener\ValidationListener;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
-use Symfony\Component\Form\DataValidator\DelegatingValidator;
+use Symfony\Component\Form\Validator\DelegatingValidator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Validator\ValidatorInterface;
 
@@ -59,7 +59,7 @@ class FieldType extends AbstractFieldType
             ->setData($options['data'])
             ->setRenderer(new DefaultRenderer($this->theme, $options['template']))
             ->addRendererPlugin(new FieldPlugin())
-            ->setDataValidator(new DelegatingValidator($this->validator));
+            ->setValidator(new DelegatingValidator($this->validator));
 
         if ($options['trim']) {
             $builder->addEventSubscriber(new TrimListener());

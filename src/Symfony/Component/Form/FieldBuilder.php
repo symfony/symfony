@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\DataValidator\DataValidatorInterface;
+use Symfony\Component\Form\Validator\FieldValidatorInterface;
 use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
 use Symfony\Component\Form\Renderer\DefaultRenderer;
 use Symfony\Component\Form\Renderer\RendererInterface;
@@ -44,7 +44,7 @@ class FieldBuilder
 
     private $theme;
 
-    private $dataValidator;
+    private $validator;
 
     private $attributes = array();
 
@@ -120,14 +120,14 @@ class FieldBuilder
         return $this->required;
     }
 
-    public function setDataValidator(DataValidatorInterface $dataValidator)
+    public function setValidator(FieldValidatorInterface $validator)
     {
-        $this->dataValidator = $dataValidator;
+        $this->validator = $validator;
     }
 
-    public function getDataValidator()
+    public function getValidator()
     {
-        return $this->dataValidator;
+        return $this->validator;
     }
 
     /**
@@ -267,7 +267,7 @@ class FieldBuilder
             $this->buildRenderer(),
             $this->getClientTransformer(),
             $this->getNormTransformer(),
-            $this->getDataValidator(),
+            $this->getValidator(),
             $this->getRequired(),
             $this->getDisabled(),
             $this->getAttributes()

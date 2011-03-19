@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\DataValidator;
+namespace Symfony\Component\Form\Validator;
 
 use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\FormInterface;
@@ -20,7 +20,7 @@ use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\Form\PropertyPathIterator;
 use Symfony\Component\Validator\ValidatorInterface;
 
-class DelegatingValidator implements DataValidatorInterface
+class DelegatingValidator implements FieldValidatorInterface
 {
     private $validator;
 

@@ -15,7 +15,7 @@ use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\FieldError;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
-use Symfony\Component\Form\DataValidator\CallbackValidator;
+use Symfony\Component\Form\Validator\CallbackValidator;
 
 class CsrfFieldType extends AbstractFieldType
 {
@@ -33,7 +33,7 @@ class CsrfFieldType extends AbstractFieldType
 
         $builder
             ->setData($csrfProvider->generateCsrfToken($pageId))
-            ->setDataValidator(new CallbackValidator(
+            ->setValidator(new CallbackValidator(
                 function (FieldInterface $field) use ($csrfProvider, $pageId) {
                     if (!$csrfProvider->isCsrfTokenValid($pageId, $field->getData())) {
                         // FIXME this error is currently not displayed

@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\DataValidator;
+namespace Symfony\Component\Form\Validator;
 
 use Symfony\Component\Form\FieldInterface;
 
-interface DataValidatorInterface
+interface FieldValidatorInterface
 {
     function validate(FieldInterface $field);
 }

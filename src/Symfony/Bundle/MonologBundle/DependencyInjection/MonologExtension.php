@@ -81,6 +81,10 @@ class MonologExtension extends Extension
         $handler['level'] = is_int($handler['level']) ? $handler['level'] : constant('Monolog\Logger::'.strtoupper($handler['level']));
 
         switch ($handler['type']) {
+        case 'service':
+            $container->setAlias($handlerId, $handler['id']);
+            return $handlerId;
+
         case 'stream':
             if (!isset($handler['path'])) {
                 $handler['path'] = '%kernel.logs_dir%/%kernel.environment%.log';
@@ -108,6 +112,7 @@ class MonologExtension extends Extension
                 $handler['bubble'],
             ));
             break;
+
         default:
             // Handler using the constructor of AbstractHandler without adding their own arguments
             $definition->setArguments(array(

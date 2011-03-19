@@ -52,6 +52,7 @@ class Configuration
                                     ->then(function($v) { return strtolower($v); })
                                 ->end()
                             ->end()
+                            ->scalarNode('id')->end()
                             ->scalarNode('level')->defaultValue('DEBUG')->end()
                             ->booleanNode('bubble')->defaultFalse()->end()
                             ->scalarNode('path')->end() // stream specific
@@ -64,6 +65,10 @@ class Configuration
                         ->validate()
                             ->ifTrue(function($v) { return 'fingerscrossed' === $v['type'] && !isset($v['handler']); })
                             ->thenInvalid('The handler has to be specified to use a FingersCrossedHandler')
+                        ->end()
+                        ->validate()
+                            ->ifTrue(function($v) { return 'service' === $v['type'] && !isset($v['id']); })
+                            ->thenInvalid('The id has to be specified to use a service as handler')
                         ->end()
                     ->end()
                 ->end()

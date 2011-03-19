@@ -71,7 +71,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
             Events::postSetData,
             Events::preBind,
             Events::filterSetData,
-            Events::filterBoundDataFromClient,
+            Events::filterBoundClientData,
         ), $this);
 
         $this->dataMapper = $dataMapper;
@@ -160,7 +160,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         }
     }
 
-    public function filterBoundDataFromClient(FilterDataEvent $event)
+    public function filterBoundClientData(FilterDataEvent $event)
     {
         $data = $event->getData();
 

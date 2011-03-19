@@ -244,7 +244,7 @@ class Field implements FieldInterface
 
         // Hook to change content of the data bound by the browser
         $event = new FilterDataEvent($this, $clientData);
-        $this->dispatcher->dispatch(Events::filterBoundDataFromClient, $event);
+        $this->dispatcher->dispatch(Events::filterBoundClientData, $event);
         $clientData = $event->getData();
 
         try {
@@ -259,7 +259,7 @@ class Field implements FieldInterface
             // Hook to change content of the data in the normalized
             // representation
             $event = new FilterDataEvent($this, $normData);
-            $this->dispatcher->dispatch(Events::filterBoundData, $event);
+            $this->dispatcher->dispatch(Events::filterBoundNormData, $event);
             $normData = $event->getData();
 
             // Synchronize representations - must not change the content!

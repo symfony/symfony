@@ -2,8 +2,8 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Exception\ScopeWideningException;
-use Symfony\Component\DependencyInjection\Exception\ScopeCrossingException;
+use Symfony\Component\DependencyInjection\Exception\ScopeWideningInjectionException;
+use Symfony\Component\DependencyInjection\Exception\ScopeCrossingInjectionException;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
@@ -128,36 +128,11 @@ class CheckReferenceValidityPass implements CompilerPassInterface
         $id = (string) $reference;
 
         if (in_array($scope, $this->currentScopeChildren, true)) {
-            $ex = new ScopeWideningException(sprintf(
-                'Scope Widening Injection detected: The definition "%s" references the service "%s" which belongs to a narrower scope. '
-               .'Generally, it is safer to either move "%s" to scope "%s" or alternatively rely on the provider pattern by injecting the container itself, and requesting the service "%s" each time it is needed. '
-               .'In rare, special cases however that might not be necessary, then you can set the reference to strict=false to get rid of this error.',
-               $this->currentId,
-               $id,
-               $this->currentId,
-               $scope,
-               $id
-            ));
-            $ex->setServiceId($this->currentId);
-
-            throw $ex;
+            throw new ScopeWideningInjectionException($this->currentId, $this->currentScope, $id, $scope);
         }
 
         if (!in_array($scope, $this->currentScopeAncestors, true)) {
-            $ex = new ScopeCrossingException(sprintf(
-                'Scope Crossing Injection detected: The definition "%s" references the service "%s" which belongs to another scope hierarchy. '
-               .'This service might not be available consistently. Generally, it is safer to either move the definition "%s" to scope "%s", or '
-               .'declare "%s" as a child scope of "%s". If you can be sure that the other scope is always active, you can set the reference to strict=false to get rid of this error.',
-               $this->currentId,
-               $id,
-               $this->currentId,
-               $scope,
-               $this->currentScope,
-               $scope
-            ));
-            $ex->setServiceId($this->currentId);
-
-            throw $ex;
+            throw new ScopeCrossingInjectionException($this->currentId, $this->currentScope, $id, $scope);
         }
     }
 

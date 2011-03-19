@@ -22,19 +22,16 @@ namespace Symfony\Component\Config;
 class ConfigCache
 {
     protected $debug;
-    protected $cacheDir;
     protected $file;
 
     /**
      * Constructor.
      *
-     * @param string  $cacheDir The cache directory
-     * @param string  $file     The cache file name (without the .php extension)
+     * @param string  $file     The absolute cache path
      * @param Boolean $debug    Whether debugging is enabled or not
      */
-    public function __construct($cacheDir, $file, $debug)
+    public function __construct($file, $debug)
     {
-        $this->cacheDir = $cacheDir;
         $this->file = $file;
         $this->debug = (Boolean) $debug;
     }
@@ -46,7 +43,7 @@ class ConfigCache
      */
     public function __toString()
     {
-        return $this->getCacheFile();
+        return $this->file;
     }
 
     /**
@@ -58,8 +55,7 @@ class ConfigCache
      */
     public function isFresh()
     {
-        $file = $this->getCacheFile();
-        if (!file_exists($file)) {
+        if (!file_exists($this->file)) {
             return false;
         }
 
@@ -67,12 +63,12 @@ class ConfigCache
             return true;
         }
 
-        $metadata = $this->getCacheFile('meta');
+        $metadata = $this->file.'.meta';
         if (!file_exists($metadata)) {
             return false;
         }
 
-        $time = filemtime($file);
+        $time = filemtime($this->file);
         $meta = unserialize(file_get_contents($metadata));
         foreach ($meta as $resource) {
             if (!$resource->isFresh($time)) {
@@ -93,8 +89,7 @@ class ConfigCache
      */
     public function write($content, array $metadata = null)
     {
-        $file = $this->getCacheFile();
-        $dir = dirname($file);
+        $dir = dirname($this->file);
         if (!is_dir($dir)) {
             if (false === @mkdir($dir, 0777, true)) {
                 throw new \RuntimeException(sprintf('Unable to create the %s directory', $dir));
@@ -103,24 +98,19 @@ class ConfigCache
             throw new \RuntimeException(sprintf('Unable to write in the %s directory', $dir));
         }
 
-        $tmpFile = tempnam(dirname($file), basename($file));
-        if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $file)) {
-            chmod($file, 0666);
+        $tmpFile = tempnam(dirname($this->file), basename($this->file));
+        if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $this->file)) {
+            chmod($this->file, 0666);
         } else {
             throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $this->file));
         }
 
         if (null !== $metadata && true === $this->debug) {
-            $file = $this->getCacheFile('meta');
+            $file = $this->file.'.meta';
             $tmpFile = tempnam(dirname($file), basename($file));
             if (false !== @file_put_contents($tmpFile, serialize($metadata)) && @rename($tmpFile, $file)) {
                 chmod($file, 0666);
             }
         }
-    }
-
-    protected function getCacheFile($extension = 'php')
-    {
-        return $this->cacheDir.'/'.$this->file.'.'.$extension;
     }
 }

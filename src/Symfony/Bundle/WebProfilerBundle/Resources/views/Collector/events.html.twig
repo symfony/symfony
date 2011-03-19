@@ -2,7 +2,7 @@
 
 {% block menu %}
 <span class="label">
-    <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/events.png') }}" alt="" /></span>
+    <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/events.png') }}" alt="Events" /></span>
     <strong>Events</strong>
 </span>
 {% endblock %}
@@ -12,15 +12,13 @@
 
     <table>
         <tr>
+            <th>Class</th>
             <th>Event</th>
-            <th>Caller</th>
-            <th>Listener</th>
         </tr>
         {% for elements in collector.calledlisteners %}
             <tr>
+                <td><code>{{ elements.class|abbr_class }}</code></td>
                 <td><code>{{ elements.event }}</code></td>
-                <td><code>{{ elements.caller|abbr_class }}</code></td>
-                <td><code>{{ elements.listener|abbr_method }}</code></td>
             </tr>
         {% endfor %}
     </table>
@@ -35,8 +33,8 @@
             </tr>
             {% for elements in collector.notcalledlisteners %}
                 <tr>
+                    <td><code>{{ elements.class|abbr_class }}</code></td>
                     <td><code>{{ elements.event }}</code></td>
-                    <td><code>{{ elements.listener|abbr_method }}</code></td>
                 </tr>
             {% endfor %}
         </table>

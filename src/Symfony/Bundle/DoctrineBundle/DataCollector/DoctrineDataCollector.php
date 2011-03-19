@@ -67,4 +67,5 @@ class DoctrineDataCollector extends DataCollector
     {
         return 'db';
     }
+
 }

@@ -8,7 +8,7 @@
         {% include 'WebProfilerBundle:Profiler:header.html.twig' only %}
 
         {% if not profiler.isempty %}
-            <div class="resume">
+            <div id="resume">
                 <p>
                     <strong><a href="{{ profiler.url }}">{{ profiler.url }}</a></strong>
                     <span class="date">
@@ -18,33 +18,29 @@
             </div>
         {% endif %}
 
-        <div class="main">
+        <div id="main">
     
             <div class="clear_fix">
-
-                <div class="navigation">
-            
+                <div id="collector_wrapper">
+                    <div id="collector_content">
+                        {% block panel '' %}
+                    </div>
+                </div>
+                <div id="navigation">
                     {% if templates is defined %}
-                        <ul class="menu_profiler">
+                        <ul id="menu_profiler">
                             {% for name, template in templates %}
                                 {% set menu %}{{ template.renderBlock('menu', { 'collector': profiler.get(name)}) }}{% endset %}
                                 {% if menu != '' %}
                                     <li class="{{ name }}{% if name == panel %} selected{% endif %}">
-                                        <a href="{{ path('_profiler_panel', { 'token': token, 'panel': name }) }}">{{ menu|raw }}</a>
+                                        <a href="{{ path('_profiler', { 'token': token, 'panel': name }) }}">{{ menu|raw }}</a>
                                     </li>
                                 {% endif %}
                             {% endfor %}
                         </ul>
                     {% endif %}
-
                     {% render 'WebProfilerBundle:Profiler:searchBar' %}
-
                     {% include 'WebProfilerBundle:Profiler:admin.html.twig' with { 'token': token } only %}
-
-                </div>
-
-                <div class="collector_content">
-                    {% block panel '' %}
                 </div>
             </div>
         </div>

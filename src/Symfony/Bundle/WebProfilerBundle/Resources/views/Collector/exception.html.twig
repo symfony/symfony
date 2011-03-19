@@ -2,12 +2,12 @@
 
 {% block head %}
     <link href="{{ asset('bundles/framework/css/exception.css') }}" rel="stylesheet" type="text/css" media="screen" />
-    {{ parent() }}    
+    {{ parent() }}
 {% endblock %}
 
 {% block menu %}
 <span class="label">
-    <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/exception.png') }}" alt="" /></span>
+    <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/exception.png') }}" alt="Exception" /></span>
     <strong>Exception</strong>
     <span class="count">
         {% if collector.hasexception %}

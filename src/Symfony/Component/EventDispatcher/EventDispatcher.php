@@ -1,147 +1,190 @@
 <?php
 
 /*
- * This file is part of the Symfony package.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * This software consists of voluntary contributions made by many individuals
+ * and is licensed under the LGPL. For more information, see
+ * <http://www.doctrine-project.org>.
  */
 
 namespace Symfony\Component\EventDispatcher;
 
 /**
- * EventDispatcher implements a dispatcher object.
+ * The EventDispatcherInterface is the central point of Symfony's event listener system.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ * Listeners are registered on the manager and events are dispatched through the
+ * manager.
+ *
+ * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link    www.doctrine-project.org
+ * @since   2.0
+ * @version $Revision: 3938 $
+ * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
+ * @author  Jonathan Wage <jonwage@gmail.com>
+ * @author  Roman Borschel <roman@code-factory.org>
+ * @author  Bernhard Schussek <bschussek@gmail.com>
+ * @author  Fabien Potencier <fabien@symfony.com>
  */
 class EventDispatcher implements EventDispatcherInterface
 {
-    protected $listeners = array();
+    private $listeners = array();
+    private $sorted = array();
 
     /**
-     * Connects a listener to a given event name.
-     *
-     * Listeners with a higher priority are executed first.
-     *
-     * @param string  $name      An event name
-     * @param mixed   $listener  A PHP callable
-     * @param integer $priority  The priority (between -10 and 10 -- defaults to 0)
+     * @see EventDispatcherInterface::dispatch
      */
-    public function connect($name, $listener, $priority = 0)
+    public function dispatch($eventName, Event $event = null)
     {
-        if (!isset($this->listeners[$name][$priority])) {
-            if (!isset($this->listeners[$name])) {
-                $this->listeners[$name] = array();
-            }
-            $this->listeners[$name][$priority] = array();
+        if (!isset($this->listeners[$eventName])) {
+            return;
         }
 
-        $this->listeners[$name][$priority][] = $listener;
+        if (null === $event) {
+            $event = new Event();
+        }
+
+        foreach ($this->getListeners($eventName) as $listener) {
+            $this->triggerListener($listener, $eventName, $event);
+
+            if ($event->isPropagationStopped()) {
+                break;
+            }
+        }
     }
 
     /**
-     * Disconnects one, or all listeners for the given event name.
-     *
-     * @param string     $name     An event name
-     * @param mixed|null $listener The listener to remove, or null to remove all
-     *
-     * @return void
+     * @see EventDispatcherInterface::getListeners
      */
-    public function disconnect($name, $listener = null)
+    public function getListeners($eventName = null)
     {
-        if (!isset($this->listeners[$name])) {
-            return;
+        if (null !== $eventName) {
+            if (!isset($this->sorted[$eventName])) {
+                $this->sortListeners($eventName);
+            }
+
+            return $this->sorted[$eventName];
         }
 
-        if (null === $listener) {
-            unset($this->listeners[$name]);
-            return;
+        $sorted = array();
+        foreach (array_keys($this->listeners) as $eventName) {
+            if (!isset($this->sorted[$eventName])) {
+                $this->sortListeners($eventName);
+            }
+
+            if ($this->sorted[$eventName]) {
+                $sorted[$eventName] = $this->sorted[$eventName];
+            }
         }
 
-        foreach ($this->listeners[$name] as $priority => $callables) {
-            foreach ($callables as $i => $callable) {
-                if ($listener === $callable) {
-                    unset($this->listeners[$name][$priority][$i]);
+        return $sorted;
+    }
+
+    /**
+     * @see EventDispatcherInterface::hasListeners
+     */
+    public function hasListeners($eventName = null)
+    {
+        return (Boolean) count($this->getListeners($eventName));
+    }
+
+    /**
+     * @see EventDispatcherInterface::addListener
+     */
+    public function addListener($eventNames, $listener, $priority = 0)
+    {
+        foreach ((array) $eventNames as $eventName) {
+            if (!isset($this->listeners[$eventName][$priority])) {
+                if (!isset($this->listeners[$eventName])) {
+                    $this->listeners[$eventName] = array();
+                }
+                $this->listeners[$eventName][$priority] = new \SplObjectStorage();
+            }
+
+            $this->listeners[$eventName][$priority]->attach($listener);
+            unset($this->sorted[$eventName]);
+        }
+    }
+
+    /**
+     * @see EventDispatcherInterface::removeListener
+     */
+    public function removeListener($eventNames, $listener)
+    {
+        foreach ((array) $eventNames as $eventName) {
+            if (!isset($this->listeners[$eventName])) {
+                continue;
+            }
+
+            foreach (array_keys($this->listeners[$eventName]) as $priority) {
+                if (isset($this->listeners[$eventName][$priority][$listener])) {
+                    unset($this->listeners[$eventName][$priority][$listener], $this->sorted[$eventName]);
                 }
             }
         }
     }
 
     /**
-     * Notifies all listeners of a given event.
-     *
-     * @param EventInterface $event An EventInterface instance
+     * @see EventDispatcherInterface::addSubscriber
      */
-    public function notify(EventInterface $event)
+    public function addSubscriber(EventSubscriberInterface $subscriber, $priority = 0)
     {
-        foreach ($this->getListeners($event->getName()) as $listener) {
-            call_user_func($listener, $event);
+        $this->addListener($subscriber->getSubscribedEvents(), $subscriber, $priority);
+    }
+
+    /**
+     * @see EventDispatcherInterface::removeSubscriber
+     */
+    public function removeSubscriber(EventSubscriberInterface $subscriber)
+    {
+        $this->removeListener($subscriber->getSubscribedEvents(), $subscriber);
+    }
+
+    /**
+     * Triggers the listener method for an event.
+     *
+     * This method can be overridden to add functionality that is executed
+     * for each listener.
+     *
+     * @param object $listener The event listener on which to invoke the listener method.
+     * @param string $eventName The name of the event to dispatch. The name of the event is
+     *                          the name of the method that is invoked on listeners.
+     * @param Event $event The event arguments to pass to the event handlers/listeners.
+     */
+    protected function triggerListener($listener, $eventName, Event $event)
+    {
+        if ($listener instanceof \Closure) {
+            $listener->__invoke($event);
+        } else {
+            $listener->$eventName($event);
         }
     }
 
     /**
-     * Notifies all listeners of a given event until one processes the event.
+     * Sorts the internal list of listeners for the given event by priority.
      *
-     * @param  EventInterface $event An EventInterface instance
-     *
-     * @return mixed The returned value of the listener that processed the event
+     * @param string $eventName The name of the event.
      */
-    public function notifyUntil(EventInterface $event)
+    private function sortListeners($eventName)
     {
-        foreach ($this->getListeners($event->getName()) as $listener) {
-            $ret = call_user_func($listener, $event);
-            if ($event->isProcessed()) {
-                return $ret;
+        $this->sorted[$eventName] = array();
+        if (isset($this->listeners[$eventName])) {
+            krsort($this->listeners[$eventName]);
+            foreach ($this->listeners[$eventName] as $listeners) {
+                foreach ($listeners as $listener) {
+                    $this->sorted[$eventName][] = $listener;
+                }
             }
         }
-    }
-
-    /**
-     * Filters a value by calling all listeners of a given event.
-     *
-     * @param  EventInterface $event An EventInterface instance
-     * @param  mixed          $value The value to be filtered
-     *
-     * @return mixed The filtered value
-     */
-    public function filter(EventInterface $event, $value)
-    {
-        foreach ($this->getListeners($event->getName()) as $listener) {
-            $value = call_user_func($listener, $event, $value);
-        }
-
-        return $value;
-    }
-
-    /**
-     * Returns true if the given event name has some listeners.
-     *
-     * @param  string $name The event name
-     *
-     * @return Boolean true if some listeners are connected, false otherwise
-     */
-    public function hasListeners($name)
-    {
-        return (Boolean) count($this->getListeners($name));
-    }
-
-    /**
-     * Returns all listeners associated with a given event name.
-     *
-     * @param  string $name The event name
-     *
-     * @return array  An array of listeners
-     */
-    public function getListeners($name)
-    {
-        if (!isset($this->listeners[$name])) {
-            return array();
-        }
-
-        krsort($this->listeners[$name]);
-
-        return call_user_func_array('array_merge', $this->listeners[$name]);
     }
 }

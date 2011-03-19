@@ -61,7 +61,7 @@ abstract class Kernel implements KernelInterface
         $this->environment = $environment;
         $this->debug = (Boolean) $debug;
         $this->booted = false;
-        $this->rootDir = realpath($this->registerRootDir());
+        $this->rootDir = $this->getRootDir();
         $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
 
         if ($this->debug) {
@@ -263,6 +263,11 @@ abstract class Kernel implements KernelInterface
         throw new \InvalidArgumentException(sprintf('Unable to find file "@%s".', $name));
     }
 
+    /**
+     * Gets the name of the kernel
+     *
+     * @return string The kernel name
+     */
     public function getName()
     {
         return $this->name;
@@ -295,6 +300,11 @@ abstract class Kernel implements KernelInterface
      */
     public function getRootDir()
     {
+        if (null === $this->rootDir) {
+            $r = new \ReflectionObject($this);
+            $this->rootDir = dirname($r->getFileName());
+        }
+
         return $this->rootDir;
     }
 
@@ -339,14 +349,14 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Initialize the data structures related to the bundle management:
+     * Initializes the data structures related to the bundle management.
+     *
      *  - the bundles property maps a bundle name to the bundle instance,
      *  - the bundleMap property maps a bundle name to the bundle inheritance hierarchy (most derived bundle first).
      *
      * @throws \LogicException if two bundles share a common name
      * @throws \LogicException if a bundle tries to extend a non-registered bundle
      * @throws \LogicException if two bundles extend the same ancestor
-     *
      */
     protected function initializeBundles()
     {
@@ -397,16 +407,32 @@ abstract class Kernel implements KernelInterface
 
     }
 
+    /**
+     * Gets the container class.
+     *
+     * @return string The container class
+     */
+    protected function getContainerClass()
+    {
+        return $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
+    }
+
+    /**
+     * Initializes the service container.
+     *
+     * The cached version of the service container is used when fresh, otherwise the
+     * container is built.
+     */
     protected function initializeContainer()
     {
-        $class = $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
-        $cache = new ConfigCache($this->getCacheDir(), $class, $this->debug);
-        $fresh = false;
+        $class = $this->getContainerClass();
+        $cache = new ConfigCache($this->getCacheDir().'/'.$class.'.php', $this->debug);
+        $fresh = true;
         if (!$cache->isFresh()) {
             $container = $this->buildContainer();
             $this->dumpContainer($cache, $container, $class);
 
-            $fresh = true;
+            $fresh = false;
         }
 
         require_once $cache;
@@ -414,11 +440,16 @@ abstract class Kernel implements KernelInterface
         $this->container = new $class();
         $this->container->set('kernel', $this);
 
-        if ($fresh && 'cli' !== php_sapi_name()) {
+        if (!$fresh && 'cli' !== php_sapi_name()) {
             $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
         }
     }
 
+    /**
+     * Returns the kernel parameters.
+     *
+     * @return array An array of kernel parameters
+     */
     protected function getKernelParameters()
     {
         $bundles = array();
@@ -428,19 +459,27 @@ abstract class Kernel implements KernelInterface
 
         return array_merge(
             array(
-                'kernel.root_dir'    => $this->rootDir,
-                'kernel.environment' => $this->environment,
-                'kernel.debug'       => $this->debug,
-                'kernel.name'        => $this->name,
-                'kernel.cache_dir'   => $this->getCacheDir(),
-                'kernel.logs_dir'    => $this->getLogDir(),
-                'kernel.bundles'     => $bundles,
-                'kernel.charset'     => 'UTF-8',
+                'kernel.root_dir'        => $this->rootDir,
+                'kernel.environment'     => $this->environment,
+                'kernel.debug'           => $this->debug,
+                'kernel.name'            => $this->name,
+                'kernel.cache_dir'       => $this->getCacheDir(),
+                'kernel.logs_dir'        => $this->getLogDir(),
+                'kernel.bundles'         => $bundles,
+                'kernel.charset'         => 'UTF-8',
+                'kernel.container_class' => $this->getContainerClass(),
             ),
             $this->getEnvParameters()
         );
     }
 
+    /**
+     * Gets the environment parameters.
+     *
+     * Only the parameters starting with "SYMFONY__" are considered.
+     *
+     * @return array An array of parameters
+     */
     protected function getEnvParameters()
     {
         $parameters = array();
@@ -453,6 +492,11 @@ abstract class Kernel implements KernelInterface
         return $parameters;
     }
 
+    /**
+     * Builds the service container.
+     *
+     * @return ContainerBuilder The compiled service container
+     */
     protected function buildContainer()
     {
         $parameterBag = new ParameterBag($this->getKernelParameters());
@@ -471,13 +515,7 @@ abstract class Kernel implements KernelInterface
         if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
             $container->merge($cont);
         }
-        $container->compile();
 
-        return $container;
-    }
-
-    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class)
-    {
         foreach (array('cache', 'logs') as $name) {
             $dir = $container->getParameter(sprintf('kernel.%s_dir', $name));
             if (!is_dir($dir)) {
@@ -489,6 +527,20 @@ abstract class Kernel implements KernelInterface
             }
         }
 
+        $container->compile();
+
+        return $container;
+    }
+
+    /**
+     * Dumps the service container to PHP code in the cache.
+     *
+     * @param ConfigCache       $cache      The config cache
+     * @param ContainerBuilder  $container  The service container
+     * @param string            $class      The name of the class to generate
+     */
+    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class)
+    {
         // cache the container
         $dumper = new PhpDumper($container);
         $content = $dumper->dump(array('class' => $class));
@@ -499,14 +551,22 @@ abstract class Kernel implements KernelInterface
         $cache->write($content, $container->getResources());
     }
 
+    /**
+     * Returns a loader for the container.
+     *
+     * @param ContainerInterface $container The service container
+     *
+     * @return DelegatingLoader The loader
+     */
     protected function getContainerLoader(ContainerInterface $container)
     {
+        $locator = new FileLocator($this);
         $resolver = new LoaderResolver(array(
-            new XmlFileLoader($container, new FileLocator($this)),
-            new YamlFileLoader($container, new FileLocator($this)),
-            new IniFileLoader($container, new FileLocator($this)),
-            new PhpFileLoader($container, new FileLocator($this)),
-            new ClosureLoader($container, new FileLocator($this)),
+            new XmlFileLoader($container, $locator),
+            new YamlFileLoader($container, $locator),
+            new IniFileLoader($container, $locator),
+            new PhpFileLoader($container, $locator),
+            new ClosureLoader($container, $locator),
         ));
 
         return new DelegatingLoader($resolver);

@@ -50,7 +50,7 @@ class SwiftmailerExtension extends Extension
 
         $configuration = new Configuration();
         $processor = new Processor();
-        $config = $processor->process($configuration->getConfigTree(), $configs);
+        $config = $processor->process($configuration->getConfigTree($container->getParameter('kernel.debug')), $configs);
 
         if (null === $config['transport']) {
             $transport = 'null';
@@ -93,13 +93,17 @@ class SwiftmailerExtension extends Extension
             }
         }
 
+        if ($config['logging']) {
+            $container->findDefinition('swiftmailer.transport')->addMethodCall('registerPlugin', array(new Reference('swiftmailer.plugin.messagelogger')));
+            $container->findDefinition('data_collector.swiftmailer')->addTag('data_collector', array('template' => 'SwiftmailerBundle:Collector:swiftmailer', 'id' => 'swiftmailer'));
+        }
+
         if (isset($config['delivery_address']) && $config['delivery_address']) {
             $container->setParameter('swiftmailer.single_address', $config['delivery_address']);
             $container->findDefinition('swiftmailer.transport')->addMethodCall('registerPlugin', array(new Reference('swiftmailer.plugin.redirecting')));
         } else {
             $container->setParameter('swiftmailer.single_address', null);
         }
-
 
         if (isset($config['disable_delivery']) && $config['disable_delivery']) {
             $container->findDefinition('swiftmailer.transport')->addMethodCall('registerPlugin', array(new Reference('swiftmailer.plugin.blackhole')));

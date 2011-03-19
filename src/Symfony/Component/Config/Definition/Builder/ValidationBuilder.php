@@ -18,17 +18,17 @@ namespace Symfony\Component\Config\Definition\Builder;
  */
 class ValidationBuilder
 {
-    public $parent;
+    protected $node;
     public $rules;
 
     /**
      * Constructor
      *
-     * @param NodeBuilder $parent
+     * @param NodeDefinition $node The related node
      */
-    public function __construct(NodeBuilder $parent)
+    public function __construct(NodeDefinition $node)
     {
-        $this->parent = $parent;
+        $this->node = $node;
 
         $this->rules = array();
     }
@@ -48,6 +48,6 @@ class ValidationBuilder
             return $this;
         }
 
-        return $this->rules[] = new ExprBuilder($this->parent);
+        return $this->rules[] = new ExprBuilder($this->node);
     }
 }

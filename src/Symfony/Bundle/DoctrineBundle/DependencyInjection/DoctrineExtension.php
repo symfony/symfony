@@ -16,7 +16,6 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Bundle\DoctrineAbstractBundle\DependencyInjection\AbstractDoctrineExtension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Definition\Processor;
@@ -196,6 +195,18 @@ class DoctrineExtension extends AbstractDoctrineExtension
         );
         foreach ($uniqueMethods as $method => $arg) {
             $ormConfigDef->addMethodCall($method, array($arg));
+        }
+
+        if (!empty($entityManager['dql'])) {
+            foreach ($entityManager['dql']['string_functions'] as $name => $function) {
+                $ormConfigDef->addMethodCall('addCustomStringFunction', array ($name, $function));
+            }
+            foreach ($entityManager['dql']['numeric_functions'] as $name => $function) {
+                $ormConfigDef->addMethodCall('addCustomNumericFunction', array ($name, $function));
+            }
+            foreach ($entityManager['dql']['datetime_functions'] as $name => $function) {
+                $ormConfigDef->addMethodCall('addCustomDatetimeFunction', array ($name, $function));
+            }
         }
 
         $entityManagerService = sprintf('doctrine.orm.%s_entity_manager', $entityManager['name']);

@@ -28,7 +28,4 @@
         <default key="_controller">WebProfilerBundle:Profiler:panel</default>
     </route>
 
-    <route id="_profiler_panel" pattern="/{token}/{panel}">
-        <default key="_controller">WebProfilerBundle:Profiler:panel</default>
-    </route>
 </routes>

@@ -15,7 +15,6 @@
         <parameter key="templating.loader.chain.class">Symfony\Component\Templating\Loader\ChainLoader</parameter>
         <parameter key="templating.assets.version">null</parameter>
         <parameter key="templating.assets.base_urls" type="collection"></parameter>
-        <parameter key="debug.file_link_format">null</parameter>
     </parameters>
 
     <services>

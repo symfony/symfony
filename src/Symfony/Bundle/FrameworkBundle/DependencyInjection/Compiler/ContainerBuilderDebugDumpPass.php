@@ -14,40 +14,35 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Config\ConfigCache;
 
 /**
  * Dumps the ContainerBuilder to a cache file so that it can be used by
  * debugging tools such as the container:debug console command.
  *
  * @author Ryan Weaver <ryan@thatsquality.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class ContainerBuilderDebugDumpPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        $file = self::getBuilderCacheFilename($container);
+        $cache = new ConfigCache(self::getBuilderCacheFilename($container), false);
 
-        if (false !== @file_put_contents($file, serialize($container))) {
-            chmod($file, 0666);
-        } else {
-            throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file));
-        }
+        $cache->write(serialize($container));
     }
 
     /**
      * Calculates the cache filename to be used to cache the ContainerBuilder
      *
      * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+     *
      * @return string
      */
-    public static function getBuilderCacheFilename(ContainerInterface $container)
+    static public function getBuilderCacheFilename(ContainerInterface $container)
     {
-        $cacheDir = $container->getParameter('kernel.cache_dir');
-        $name = $container->getParameter('kernel.name');
-        $env = ucfirst($container->getParameter('kernel.environment'));
-        $debug = ($container->getParameter('kernel.debug')) ? 'Debug' : '';
+        $class = $container->getParameter('kernel.container_class');
 
-        return $cacheDir.'/'.$name.$env.$debug.'ProjectContainerBuilder.cache';
+        return $container->getParameter('kernel.cache_dir').'/'.$class.'Builder.cache';
     }
 }

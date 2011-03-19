@@ -18,18 +18,18 @@ namespace Symfony\Component\Config\Definition\Builder;
  */
 class MergeBuilder
 {
-    public $parent;
+    protected $node;
     public $allowFalse;
     public $allowOverwrite;
 
     /**
      * Constructor
      *
-     * @param NodeBuilder $parent The parent node
+     * @param NodeDefinition $node The related node
      */
-    public function __construct(NodeBuilder $parent)
+    public function __construct(NodeDefinition $node)
     {
-        $this->parent = $parent;
+        $this->node = $node;
         $this->allowFalse = false;
         $this->allowOverwrite = true;
     }
@@ -62,12 +62,12 @@ class MergeBuilder
     }
 
     /**
-     * Returns the parent node.
+     * Returns the related node.
      *
-     * @return NodeBuilder
+     * @return NodeDefinition
      */
     public function end()
     {
-        return $this->parent;
+        return $this->node;
     }
 }

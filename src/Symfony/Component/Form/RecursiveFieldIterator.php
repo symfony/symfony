@@ -34,6 +34,6 @@ class RecursiveFieldIterator extends \IteratorIterator implements \RecursiveIter
     public function hasChildren()
     {
         return $this->current() instanceof FormInterface
-                && $this->current()->isVirtual();
+                && $this->current()->getAttribute('virtual');
     }
 }

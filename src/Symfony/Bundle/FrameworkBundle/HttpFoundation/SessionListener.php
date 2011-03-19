@@ -27,11 +27,11 @@ class SessionListener
 {
     /**
      * Checks if session was initialized and saves if current request is master
-     * Runs on 'filterCoreResponse' in test environment
+     * Runs on 'onCoreResponse' in test environment
      *
      * @param FilterResponseEvent $event
      */
-    public function filterCoreResponse(FilterResponseEvent $event)
+    public function onCoreResponse(FilterResponseEvent $event)
     {
         if ($request = $event->getRequest()) {
             if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {

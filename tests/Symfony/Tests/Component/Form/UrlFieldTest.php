@@ -19,47 +19,47 @@ class UrlFieldTest extends LocalizedTestCase
 {
     public function testSubmitAddsDefaultProtocolIfNoneIsIncluded()
     {
-        $field = $this->factory->getInstance('url', 'name');
+        $field = $this->factory->create('url', 'name');
 
         $field->bind('www.domain.com');
 
         $this->assertSame('http://www.domain.com', $field->getData());
-        $this->assertSame('http://www.domain.com', $field->getTransformedData());
+        $this->assertSame('http://www.domain.com', $field->getClientData());
     }
 
     public function testSubmitAddsNoDefaultProtocolIfAlreadyIncluded()
     {
-        $field = $this->factory->getInstance('url', 'name', array(
+        $field = $this->factory->create('url', 'name', array(
             'default_protocol' => 'http',
         ));
 
         $field->bind('ftp://www.domain.com');
 
         $this->assertSame('ftp://www.domain.com', $field->getData());
-        $this->assertSame('ftp://www.domain.com', $field->getTransformedData());
+        $this->assertSame('ftp://www.domain.com', $field->getClientData());
     }
 
     public function testSubmitAddsNoDefaultProtocolIfEmpty()
     {
-        $field = $this->factory->getInstance('url', 'name', array(
+        $field = $this->factory->create('url', 'name', array(
             'default_protocol' => 'http',
         ));
 
         $field->bind('');
 
         $this->assertSame(null, $field->getData());
-        $this->assertSame('', $field->getTransformedData());
+        $this->assertSame('', $field->getClientData());
     }
 
     public function testSubmitAddsNoDefaultProtocolIfSetToNull()
     {
-        $field = $this->factory->getInstance('url', 'name', array(
+        $field = $this->factory->create('url', 'name', array(
             'default_protocol' => null,
         ));
 
         $field->bind('www.domain.com');
 
         $this->assertSame('www.domain.com', $field->getData());
-        $this->assertSame('www.domain.com', $field->getTransformedData());
+        $this->assertSame('www.domain.com', $field->getClientData());
     }
 }

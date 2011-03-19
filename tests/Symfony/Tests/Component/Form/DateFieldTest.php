@@ -27,7 +27,7 @@ class DateFieldTest extends DateTimeTestCase
 
     public function testSubmit_fromInput_dateTime()
     {
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -37,12 +37,12 @@ class DateFieldTest extends DateTimeTestCase
         $field->bind('2.6.2010');
 
         $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $field->getData());
-        $this->assertEquals('02.06.2010', $field->getTransformedData());
+        $this->assertEquals('02.06.2010', $field->getClientData());
     }
 
     public function testSubmit_fromInput_string()
     {
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -52,12 +52,12 @@ class DateFieldTest extends DateTimeTestCase
         $field->bind('2.6.2010');
 
         $this->assertEquals('2010-06-02', $field->getData());
-        $this->assertEquals('02.06.2010', $field->getTransformedData());
+        $this->assertEquals('02.06.2010', $field->getClientData());
     }
 
     public function testSubmit_fromInput_timestamp()
     {
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -69,12 +69,12 @@ class DateFieldTest extends DateTimeTestCase
         $dateTime = new \DateTime('2010-06-02 UTC');
 
         $this->assertEquals($dateTime->format('U'), $field->getData());
-        $this->assertEquals('02.06.2010', $field->getTransformedData());
+        $this->assertEquals('02.06.2010', $field->getClientData());
     }
 
     public function testSubmit_fromInput_raw()
     {
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -90,12 +90,12 @@ class DateFieldTest extends DateTimeTestCase
         );
 
         $this->assertEquals($output, $field->getData());
-        $this->assertEquals('02.06.2010', $field->getTransformedData());
+        $this->assertEquals('02.06.2010', $field->getClientData());
     }
 
     public function testSubmit_fromChoice()
     {
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
@@ -112,12 +112,12 @@ class DateFieldTest extends DateTimeTestCase
         $dateTime = new \DateTime('2010-06-02 UTC');
 
         $this->assertDateTimeEquals($dateTime, $field->getData());
-        $this->assertEquals($text, $field->getTransformedData());
+        $this->assertEquals($text, $field->getClientData());
     }
 
     public function testSubmit_fromChoice_empty()
     {
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
@@ -133,12 +133,12 @@ class DateFieldTest extends DateTimeTestCase
         $field->bind($text);
 
         $this->assertSame(null, $field->getData());
-        $this->assertEquals($text, $field->getTransformedData());
+        $this->assertEquals($text, $field->getClientData());
     }
 
     public function testSetData_differentTimezones()
     {
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'America/New_York',
             'user_timezone' => 'Pacific/Tahiti',
             // don't do this test with DateTime, because it leads to wrong results!
@@ -148,14 +148,14 @@ class DateFieldTest extends DateTimeTestCase
 
         $field->setData('2010-06-02');
 
-        $this->assertEquals('01.06.2010', $field->getTransformedData());
+        $this->assertEquals('01.06.2010', $field->getClientData());
     }
 
     public function testIsYearWithinRange_returnsTrueIfWithin()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -171,7 +171,7 @@ class DateFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -187,7 +187,7 @@ class DateFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
@@ -207,7 +207,7 @@ class DateFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -223,7 +223,7 @@ class DateFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -239,7 +239,7 @@ class DateFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -255,7 +255,7 @@ class DateFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
@@ -275,7 +275,7 @@ class DateFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -291,7 +291,7 @@ class DateFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -307,7 +307,7 @@ class DateFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -323,7 +323,7 @@ class DateFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
@@ -345,7 +345,7 @@ class DateFieldTest extends DateTimeTestCase
 
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -361,7 +361,7 @@ class DateFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -376,7 +376,7 @@ class DateFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
@@ -395,7 +395,7 @@ class DateFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
@@ -414,7 +414,7 @@ class DateFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getInstance('date', 'name', array(
+        $field = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',

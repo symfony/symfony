@@ -82,7 +82,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
 
             if (null !== $this->dispatcher) {
                 $loginEvent = new InteractiveLoginEvent($request, $token);
-                $this->dispatcher->dispatchEvent(Events::onSecurityInteractiveLogin, $loginEvent);
+                $this->dispatcher->dispatch(Events::onSecurityInteractiveLogin, $loginEvent);
             }
         } catch (AuthenticationException $failed) {
             $this->securityContext->setToken(null);

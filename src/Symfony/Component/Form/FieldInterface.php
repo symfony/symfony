@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 /**
  * A form field that can be embedded in a form.
  *
@@ -20,18 +18,6 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 interface FieldInterface
 {
-    /**
-     * Marks a constraint violation in a form field
-     * @var integer
-     */
-    const FIELD_ERROR = 0;
-
-    /**
-     * Marks a constraint violation in the data of a form field
-     * @var integer
-     */
-    const DATA_ERROR = 1;
-
     /**
      * Sets the parent field.
      *
@@ -54,64 +40,11 @@ interface FieldInterface
     function getName();
 
     /**
-     * Sets the property path
-     *
-     * The property path determines the property or a sequence of properties
-     * that a field updates in the data of the form.
-     *
-     * @param string $propertyPath
-     */
-    function setPropertyPath($propertyPath);
-
-    /**
-     * Returns the property path of the field
-     *
-     * @return PropertyPath
-     */
-    function getPropertyPath();
-
-    /**
-     * Writes a property value of the object into the field
-     *
-     * The chosen property is determined by the field's property path.
-     *
-     * @param array|object $objectOrArray
-     */
-    function readProperty(&$objectOrArray);
-
-    /**
-     * Writes a the field value into a property of the object
-     *
-     * The chosen property is determined by the field's property path.
-     *
-     * @param array|object $objectOrArray
-     */
-    function writeProperty(&$objectOrArray);
-
-    /**
-     * Recursively adds constraint violations to the fields
-     *
-     * Violations in the form fields usually have property paths like:
-     *
-     * <code>
-     * iterator[firstName].data
-     * iterator[firstName].displayedData
-     * iterator[Address].iterator[street].displayedData
-     * ...
-     * </code>
-     *
-     * Violations in the form data usually have property paths like:
-     *
-     * <code>
-     * data.firstName
-     * data.Address.street
-     * ...
-     * </code>
+     * Adds an error to this field
      *
      * @param Error $error
-     * @param PropertyPathIterator $pathIterator
      */
-    function addError(Error $error, PropertyPathIterator $pathIterator = null);
+    function addError(Error $error);
 
     /**
      * Returns whether the field is valid.
@@ -150,13 +83,6 @@ interface FieldInterface
      * @return boolean
      */
     function isEmpty();
-
-    /**
-     * Sets whether this field is required to be filled out when bound.
-     *
-     * @param Boolean $required
-     */
-    function setRequired($required);
 
     /**
      * Writes posted data into the field

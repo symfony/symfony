@@ -27,7 +27,7 @@ class PasswordValuePlugin implements RendererPluginInterface
     {
         $value = $this->alwaysEmpty || !$field->isBound()
                 ? ''
-                : $field->getTransformedData();
+                : $field->getClientData();
 
         $renderer->setVar('value', $value);
     }

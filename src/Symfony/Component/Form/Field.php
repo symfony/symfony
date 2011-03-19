@@ -11,14 +11,14 @@ namespace Symfony\Component\Form;
  * file that was distributed with this source code.
  */
 
-use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
-use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
+use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
+use Symfony\Component\Form\DataTransformer\TransformationFailedException;
+use Symfony\Component\Form\DataValidator\DataValidatorInterface;
 use Symfony\Component\Form\Renderer\RendererInterface;
 use Symfony\Component\Form\Renderer\Plugin\RendererPluginInterface;
 use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Base class for form fields
@@ -40,14 +40,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * a checkbox field uses a Boolean value both for internal processing as for
  * storage in the object. In these cases you simply need to set a value
  * transformer to convert between formats (2) and (3). You can do this by
- * calling setValueTransformer() in the configure() method.
+ * calling setClientTransformer() in the configure() method.
  *
  * In some cases though it makes sense to make format (1) configurable. To
  * demonstrate this, let's extend our above date field to store the value
  * either as "Y-m-d" string or as timestamp. Internally we still want to
  * use a DateTime object for processing. To convert the data from string/integer
  * to DateTime you can set a normalization transformer by calling
- * setNormalizationTransformer() in configure(). The normalized data is then
+ * setNormTransformer() in configure(). The normalized data is then
  * converted to the displayed data as described before.
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
@@ -60,22 +60,36 @@ class Field implements FieldInterface
     private $bound = false;
     private $required;
     private $data;
-    private $normalizedData;
-    private $transformedData = '';
-    private $normalizationTransformer;
-    private $valueTransformer;
-    private $propertyPath;
+    private $normData;
+    private $clientData = '';
+    private $normTransformer;
+    private $clientTransformer;
     private $transformationSuccessful = true;
+    private $dataValidator;
     private $renderer;
-    private $hidden = false;
-    private $trim = true;
     private $disabled = false;
     private $dispatcher;
+    private $attributes;
 
-    public function __construct($name, EventDispatcherInterface $dispatcher)
+    public function __construct($name, EventDispatcherInterface $dispatcher,
+        RendererInterface $renderer, DataTransformerInterface $clientTransformer = null,
+        DataTransformerInterface $normTransformer = null,
+        DataValidatorInterface $dataValidator = null, $required = false,
+        $disabled = false, array $attributes = array())
     {
         $this->name = (string)$name;
         $this->dispatcher = $dispatcher;
+        $this->renderer = $renderer;
+        $this->clientTransformer = $clientTransformer;
+        $this->normTransformer = $normTransformer;
+        $this->dataValidator = $dataValidator;
+        $this->required = $required;
+        $this->disabled = $disabled;
+        $this->attributes = $attributes;
+
+        $renderer->setField($this);
+
+        $this->setData(null);
     }
 
     /**
@@ -83,58 +97,6 @@ class Field implements FieldInterface
      */
     private function __clone()
     {
-    }
-
-    /**
-     * Adds an event listener for events on this field
-     *
-     * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addEventListener
-     */
-    public function addEventListener($eventNames, $listener, $priority = 0)
-    {
-        $this->dispatcher->addEventListener($eventNames, $listener, $priority);
-
-        return $this;
-    }
-
-    /**
-     * Adds an event subscriber for events on this field
-     *
-     * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addEventSubscriber
-     */
-    public function addEventSubscriber(EventSubscriberInterface $subscriber, $priority = 0)
-    {
-        $this->dispatcher->addEventSubscriber($subscriber, $priority);
-
-        return $this;
-    }
-
-    /**
-     * Returns the data transformed by the value transformer
-     *
-     * @return string
-     */
-    public function getTransformedData()
-    {
-        return $this->transformedData;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setPropertyPath($propertyPath)
-    {
-        $this->propertyPath = null === $propertyPath || '' === $propertyPath ? null : new PropertyPath($propertyPath);
-
-        return $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getPropertyPath()
-    {
-        return $this->propertyPath;
     }
 
     /**
@@ -148,16 +110,6 @@ class Field implements FieldInterface
     /**
      * {@inheritDoc}
      */
-    public function setRequired($required)
-    {
-        $this->required = $required;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function isRequired()
     {
         if (null === $this->parent || $this->parent->isRequired()) {
@@ -165,13 +117,6 @@ class Field implements FieldInterface
         }
 
         return false;
-    }
-
-    public function setDisabled($disabled)
-    {
-        $this->disabled = $disabled;
-
-        return $this;
     }
 
     /**
@@ -236,6 +181,16 @@ class Field implements FieldInterface
         return !$this->hasParent();
     }
 
+    public function hasAttribute($name)
+    {
+        return isset($this->attributes[$name]);
+    }
+
+    public function getAttribute($name)
+    {
+        return $this->attributes[$name];
+    }
+
     /**
      * Updates the field with default data
      *
@@ -243,29 +198,29 @@ class Field implements FieldInterface
      */
     public function setData($appData)
     {
-        $event = new DataEvent($appData);
-        $this->dispatcher->dispatchEvent(Events::preSetData, $event);
+        $event = new DataEvent($this, $appData);
+        $this->dispatcher->dispatch(Events::preSetData, $event);
 
         // Hook to change content of the data
-        $event = new FilterDataEvent($appData);
-        $this->dispatcher->dispatchEvent(Events::filterSetData, $event);
+        $event = new FilterDataEvent($this, $appData);
+        $this->dispatcher->dispatch(Events::filterSetData, $event);
         $appData = $event->getData();
 
         // Treat data as strings unless a value transformer exists
-        if (null === $this->valueTransformer && is_scalar($appData)) {
+        if (null === $this->clientTransformer && is_scalar($appData)) {
             $appData = (string)$appData;
         }
 
         // Synchronize representations - must not change the content!
-        $normData = $this->normalize($appData);
-        $clientData = $this->transform($normData);
+        $normData = $this->toNorm($appData);
+        $clientData = $this->toClient($normData);
 
         $this->data = $appData;
-        $this->normalizedData = $normData;
-        $this->transformedData = $clientData;
+        $this->normData = $normData;
+        $this->clientData = $clientData;
 
-        $event = new DataEvent($appData);
-        $this->dispatcher->dispatchEvent(Events::postSetData, $event);
+        $event = new DataEvent($this, $appData);
+        $this->dispatcher->dispatch(Events::postSetData, $event);
 
         return $this;
     }
@@ -281,20 +236,20 @@ class Field implements FieldInterface
             $clientData = (string)$clientData;
         }
 
-        $event = new DataEvent($clientData);
-        $this->dispatcher->dispatchEvent(Events::preBind, $event);
+        $event = new DataEvent($this, $clientData);
+        $this->dispatcher->dispatch(Events::preBind, $event);
 
         $appData = null;
         $normData = null;
 
         // Hook to change content of the data bound by the browser
-        $event = new FilterDataEvent($clientData);
-        $this->dispatcher->dispatchEvent(Events::filterBoundDataFromClient, $event);
+        $event = new FilterDataEvent($this, $clientData);
+        $this->dispatcher->dispatch(Events::filterBoundDataFromClient, $event);
         $clientData = $event->getData();
 
         try {
             // Normalize data to unified representation
-            $normData = $this->reverseTransform($clientData);
+            $normData = $this->fromClient($clientData);
             $this->transformationSuccessful = true;
         } catch (TransformationFailedException $e) {
             $this->transformationSuccessful = false;
@@ -303,23 +258,27 @@ class Field implements FieldInterface
         if ($this->transformationSuccessful) {
             // Hook to change content of the data in the normalized
             // representation
-            $event = new FilterDataEvent($normData);
-            $this->dispatcher->dispatchEvent(Events::filterBoundData, $event);
+            $event = new FilterDataEvent($this, $normData);
+            $this->dispatcher->dispatch(Events::filterBoundData, $event);
             $normData = $event->getData();
 
             // Synchronize representations - must not change the content!
-            $appData = $this->denormalize($normData);
-            $clientData = $this->transform($normData);
+            $appData = $this->fromNorm($normData);
+            $clientData = $this->toClient($normData);
         }
 
         $this->bound = true;
         $this->errors = array();
         $this->data = $appData;
-        $this->normalizedData = $normData;
-        $this->transformedData = $clientData;
+        $this->normData = $normData;
+        $this->clientData = $clientData;
 
-        $event = new DataEvent($clientData);
-        $this->dispatcher->dispatchEvent(Events::postBind, $event);
+        $event = new DataEvent($this, $clientData);
+        $this->dispatcher->dispatch(Events::postBind, $event);
+
+        if ($this->isRoot() && $this->dataValidator) {
+            $this->dataValidator->validate($this);
+        }
     }
 
     /**
@@ -339,9 +298,19 @@ class Field implements FieldInterface
      *                When the field is bound, the normalized bound data is
      *                returned if the field is valid, null otherwise.
      */
-    public function getNormalizedData()
+    public function getNormData()
     {
-        return $this->normalizedData;
+        return $this->normData;
+    }
+
+    /**
+     * Returns the data transformed by the value transformer
+     *
+     * @return string
+     */
+    public function getClientData()
+    {
+        return $this->clientData;
     }
 
     /**
@@ -372,6 +341,14 @@ class Field implements FieldInterface
     public function isTransformationSuccessful()
     {
         return $this->transformationSuccessful;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isEmpty()
+    {
+        return null === $this->data || '' === $this->data;
     }
 
     /**
@@ -409,59 +386,23 @@ class Field implements FieldInterface
     }
 
     /**
-     * Sets the ValueTransformer.
+     * Returns the DataTransformer.
      *
-     * @param ValueTransformerInterface $valueTransformer
+     * @return DataTransformerInterface
      */
-    public function setNormalizationTransformer(ValueTransformerInterface $normalizationTransformer = null)
+    public function getNormTransformer()
     {
-        $this->normalizationTransformer = $normalizationTransformer;
-
-        return $this;
+        return $this->normTransformer;
     }
 
     /**
-     * Returns the ValueTransformer.
+     * Returns the DataTransformer.
      *
-     * @return ValueTransformerInterface
+     * @return DataTransformerInterface
      */
-    public function getNormalizationTransformer()
+    public function getClientTransformer()
     {
-        return $this->normalizationTransformer;
-    }
-
-    /**
-     * Sets the ValueTransformer.
-     *
-     * @param ValueTransformerInterface $valueTransformer
-     */
-    public function setValueTransformer(ValueTransformerInterface $valueTransformer = null)
-    {
-        $this->valueTransformer = $valueTransformer;
-
-        return $this;
-    }
-
-    /**
-     * Returns the ValueTransformer.
-     *
-     * @return ValueTransformerInterface
-     */
-    public function getValueTransformer()
-    {
-        return $this->valueTransformer;
-    }
-
-    /**
-     * Sets the renderer
-     *
-     * @param RendererInterface $renderer
-     */
-    public function setRenderer(RendererInterface $renderer)
-    {
-        $this->renderer = $renderer;
-
-        return $this;
+        return $this->clientTransformer;
     }
 
     /**
@@ -474,32 +415,18 @@ class Field implements FieldInterface
         return $this->renderer;
     }
 
-    public function addRendererPlugin(RendererPluginInterface $plugin)
-    {
-        $this->renderer->addPlugin($plugin);
-
-        return $this;
-    }
-
-    public function setRendererVar($name, $value)
-    {
-        $this->renderer->setVar($name, $value);
-
-        return $this;
-    }
-
     /**
      * Normalizes the value if a normalization transformer is set
      *
      * @param  mixed $value  The value to transform
      * @return string
      */
-    protected function normalize($value)
+    protected function toNorm($value)
     {
-        if (null === $this->normalizationTransformer) {
+        if (null === $this->normTransformer) {
             return $value;
         }
-        return $this->normalizationTransformer->transform($value);
+        return $this->normTransformer->transform($value);
     }
 
     /**
@@ -508,12 +435,12 @@ class Field implements FieldInterface
      * @param  string $value  The value to reverse transform
      * @return mixed
      */
-    protected function denormalize($value)
+    protected function fromNorm($value)
     {
-        if (null === $this->normalizationTransformer) {
+        if (null === $this->normTransformer) {
             return $value;
         }
-        return $this->normalizationTransformer->reverseTransform($value, $this->data);
+        return $this->normTransformer->reverseTransform($value);
     }
 
     /**
@@ -522,14 +449,14 @@ class Field implements FieldInterface
      * @param  mixed $value  The value to transform
      * @return string
      */
-    protected function transform($value)
+    protected function toClient($value)
     {
-        if (null === $this->valueTransformer) {
+        if (null === $this->clientTransformer) {
             // Scalar values should always be converted to strings to
             // facilitate differentiation between empty ("") and zero (0).
             return null === $value || is_scalar($value) ? (string)$value : $value;
         }
-        return $this->valueTransformer->transform($value);
+        return $this->clientTransformer->transform($value);
     }
 
     /**
@@ -538,43 +465,11 @@ class Field implements FieldInterface
      * @param  string $value  The value to reverse transform
      * @return mixed
      */
-    protected function reverseTransform($value)
+    protected function fromClient($value)
     {
-        if (null === $this->valueTransformer) {
+        if (null === $this->clientTransformer) {
             return '' === $value ? null : $value;
         }
-        return $this->valueTransformer->reverseTransform($value, $this->data);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function readProperty(&$objectOrArray)
-    {
-        // TODO throw exception if not object or array
-
-        if ($this->propertyPath !== null) {
-            $this->setData($this->propertyPath->getValue($objectOrArray));
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function writeProperty(&$objectOrArray)
-    {
-        // TODO throw exception if not object or array
-
-        if ($this->propertyPath !== null) {
-            $this->propertyPath->setValue($objectOrArray, $this->getData());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isEmpty()
-    {
-        return null === $this->data || '' === $this->data;
+        return $this->clientTransformer->reverseTransform($value);
     }
 }

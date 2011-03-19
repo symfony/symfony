@@ -26,13 +26,10 @@ use Symfony\Component\HttpFoundation\File\TemporaryStorage;
  */
 class FixFileUploadListener implements EventSubscriberInterface
 {
-    private $field;
-
     private $storage;
 
-    public function __construct(FieldInterface $field, TemporaryStorage $storage)
+    public function __construct(TemporaryStorage $storage)
     {
-        $this->field = $field;
         $this->storage = $storage;
     }
 
@@ -43,6 +40,8 @@ class FixFileUploadListener implements EventSubscriberInterface
 
     public function filterBoundDataFromClient(FilterDataEvent $event)
     {
+        $field = $event->getField();
+
         // TODO should be disableable
 
         // TESTME
@@ -78,7 +77,7 @@ class FixFileUploadListener implements EventSubscriberInterface
         // Clear other fields if we still don't have a file, but keep
         // possible existing files of the field
         if (!$data['file']) {
-            $data = $this->field->getNormalizedData();
+            $data = $field->getNormData();
         }
 
         $event->setData($data);

@@ -19,7 +19,7 @@ class PasswordFieldTest extends TestCase
 {
     public function testGetDisplayedData_beforeSubmit()
     {
-        $field = $this->factory->getInstance('password', 'name');
+        $field = $this->factory->create('password', 'name');
         $field->setData('before');
 
         $this->assertSame('', $field->getRenderer()->getVar('value'));
@@ -27,7 +27,7 @@ class PasswordFieldTest extends TestCase
 
     public function testGetDisplayedData_afterSubmit()
     {
-        $field = $this->factory->getInstance('password', 'name');
+        $field = $this->factory->create('password', 'name');
         $field->bind('after');
 
         $this->assertSame('', $field->getRenderer()->getVar('value'));
@@ -35,7 +35,7 @@ class PasswordFieldTest extends TestCase
 
     public function testGetDisplayedDataWithAlwaysEmptyDisabled_beforeSubmit()
     {
-        $field = $this->factory->getInstance('password', 'name', array('always_empty' => false));
+        $field = $this->factory->create('password', 'name', array('always_empty' => false));
         $field->setData('before');
 
         $this->assertSame('', $field->getRenderer()->getVar('value'));
@@ -43,7 +43,7 @@ class PasswordFieldTest extends TestCase
 
     public function testGetDisplayedDataWithAlwaysEmptyDisabled_afterSubmit()
     {
-        $field = $this->factory->getInstance('password', 'name', array('always_empty' => false));
+        $field = $this->factory->create('password', 'name', array('always_empty' => false));
         $field->bind('after');
 
         $this->assertSame('after', $field->getRenderer()->getVar('value'));

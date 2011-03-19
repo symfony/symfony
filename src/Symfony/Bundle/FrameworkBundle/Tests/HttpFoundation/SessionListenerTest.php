@@ -56,7 +56,7 @@ class SessionListenerTest extends \PHPUnit_Framework_TestCase
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
         $event = new FilterResponseEvent($kernel, $request, $type, $response);
 
-        $this->listener->filterCoreResponse($event);
+        $this->listener->onCoreResponse($event);
 
         $this->assertSame($response, $event->getResponse());
     }

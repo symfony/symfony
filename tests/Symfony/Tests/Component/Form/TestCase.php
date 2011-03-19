@@ -11,8 +11,10 @@
 
 namespace Symfony\Tests\Component\Form;
 
+use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Form\Config\Loader\DefaultConfigLoader;
+use Symfony\Component\Form\Type\Loader\DefaultTypeLoader;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class TestCase extends \PHPUnit_Framework_TestCase
 {
@@ -28,20 +30,25 @@ class TestCase extends \PHPUnit_Framework_TestCase
 
     protected $factory;
 
+    protected $builder;
+
     protected function setUp()
     {
         $this->theme = $this->getMock('Symfony\Component\Form\Renderer\Theme\ThemeInterface');
         $this->csrfProvider = $this->getMock('Symfony\Component\Form\CsrfProvider\CsrfProviderInterface');
         $this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
+
         $this->storage = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\TemporaryStorage')
             ->disableOriginalConstructor()
             ->getMock();
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $loader = new DefaultConfigLoader();
+        $loader = new DefaultTypeLoader();
         $this->factory = new FormFactory($loader);
         $loader->initialize($this->factory, $this->theme, $this->csrfProvider,
                 $this->validator, $this->storage, $this->em);
+
+        $this->builder = new FieldBuilder($this->theme, new EventDispatcher(), $this->csrfProvider);
     }
 }

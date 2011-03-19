@@ -29,7 +29,7 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->dispatcher = new EventDispatcher();
         $listener = new ResponseListener('UTF-8');
-        $this->dispatcher->addEventListener(Events::filterCoreResponse, $listener);
+        $this->dispatcher->addListener(Events::onCoreResponse, $listener);
 
         $this->kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
 
@@ -39,7 +39,7 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
         $response = new Response('foo');
 
         $event = new FilterResponseEvent($this->kernel, new Request(), HttpKernelInterface::SUB_REQUEST, $response);
-        $this->dispatcher->dispatchEvent(Events::filterCoreResponse, $event);
+        $this->dispatcher->dispatch(Events::onCoreResponse, $event);
 
         $this->assertEquals('', $event->getResponse()->headers->get('content-type'));
     }
@@ -50,7 +50,7 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
         $response->headers->set('Content-Type', 'text/plain');
 
         $event = new FilterResponseEvent($this->kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response);
-        $this->dispatcher->dispatchEvent(Events::filterCoreResponse, $event);
+        $this->dispatcher->dispatch(Events::onCoreResponse, $event);
 
         $this->assertEquals('text/plain', $event->getResponse()->headers->get('content-type'));
     }
@@ -60,7 +60,7 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
         $response = new Response('foo');
 
         $event = new FilterResponseEvent($this->kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $response);
-        $this->dispatcher->dispatchEvent(Events::filterCoreResponse, $event);
+        $this->dispatcher->dispatch(Events::onCoreResponse, $event);
 
         $this->assertEquals('', $event->getResponse()->headers->get('content-type'));
     }
@@ -72,7 +72,7 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
         $request->setRequestFormat('json');
 
         $event = new FilterResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
-        $this->dispatcher->dispatchEvent(Events::filterCoreResponse, $event);
+        $this->dispatcher->dispatch(Events::onCoreResponse, $event);
 
         $this->assertEquals('application/json', $event->getResponse()->headers->get('content-type'));
     }

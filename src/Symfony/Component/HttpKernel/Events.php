@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -57,7 +57,7 @@ final class Events
     const onCoreView = 'onCoreView';
 
     /**
-     * The filterCoreController event occurs once a controller was found for
+     * The onCoreController event occurs once a controller was found for
      * handling a request
      *
      * This event allows you to change the controller that will handle the
@@ -66,10 +66,10 @@ final class Events
      *
      * @var string
      */
-    const filterCoreController = 'filterCoreController';
+    const onCoreController = 'onCoreController';
 
     /**
-     * The filterCoreController event occurs once a reponse was created for
+     * The onCoreController event occurs once a reponse was created for
      * replying to a request
      *
      * This event allows you to modify or replace the response that will be
@@ -78,5 +78,5 @@ final class Events
      *
      * @var string
      */
-    const filterCoreResponse = 'filterCoreResponse';
+    const onCoreResponse = 'onCoreResponse';
 }

@@ -139,7 +139,7 @@ class YamlFileLoader extends FileLoader
         foreach ($config as $key => $value) {
             if (!in_array($key, self::$availableKeys)) {
                 throw new \InvalidArgumentException(sprintf(
-                    'Unsupported config key given: "%s". Expected one of the (%s).',
+                    'Yaml routing loader does not support given key: "%s". Expected one of the (%s).',
                     $key, implode(', ', self::$availableKeys)
                 ));
             }

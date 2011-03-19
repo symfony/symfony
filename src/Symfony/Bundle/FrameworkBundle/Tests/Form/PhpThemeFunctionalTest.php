@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Form;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Bundle\FrameworkBundle\Form\PhpEngineTheme;
 use Symfony\Component\Form\Type\AbstractFieldType;
 use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\CsrfProvider\DefaultCsrfProvider;
@@ -40,7 +41,7 @@ class PhpThemeFunctionalTest extends TestCase
                 )
             )
         ));
-        $this->theme = new \Symfony\Component\Form\Renderer\Theme\PhpTheme($this->engine);
+        $this->theme = new PhpEngineTheme($this->engine);
         $csrfProvider = new DefaultCsrfProvider('foo');
         $validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
         $storage = new \Symfony\Component\HttpFoundation\File\TemporaryStorage('foo', 1, \sys_get_temp_dir());

@@ -12,6 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Form;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Bundle\FrameworkBundle\Form\PhpEngineTheme;
+use Symfony\Component\Templating\TemplateNameParser;
+use Symfony\Component\Templating\Loader\FilesystemLoader;
+use Symfony\Component\Templating\PhpEngine;
 
 /**
  * Test theme template files shipped with framework bundle.
@@ -23,10 +27,10 @@ class PhpThemeTest extends TestCase
 
     public function setUp()
     {
-        $parser = new \Symfony\Component\Templating\TemplateNameParser();
-        $loader = new \Symfony\Component\Templating\Loader\FilesystemLoader(__DIR__ . '/../../Resources/views/Form/%name%');
-        $this->engine = new \Symfony\Component\Templating\PhpEngine($parser, $loader, array());
-        $this->theme = new \Symfony\Component\Form\Renderer\Theme\PhpTheme($this->engine);
+        $parser = new TemplateNameParser();
+        $loader = new FilesystemLoader(__DIR__ . '/../../Resources/views/Form/%name%');
+        $this->engine = new PhpEngine($parser, $loader, array());
+        $this->theme = new PhpEngineTheme($this->engine);
     }
 
     public function testTextWidgetDefault()

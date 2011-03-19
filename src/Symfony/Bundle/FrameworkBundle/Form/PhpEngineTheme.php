@@ -9,11 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Renderer\Theme;
+namespace Symfony\Bundle\FrameworkBundle\Form;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Templating\PhpEngine;
 
 /**
@@ -23,7 +24,7 @@ use Symfony\Component\Templating\PhpEngine;
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
-class PhpTheme implements ThemeInterface
+class PhpEngineTheme implements ThemeInterface
 {
     /**
      * @var array

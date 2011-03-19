@@ -12,6 +12,7 @@
 namespace Symfony\Tests\Component\Routing\Loader;
 
 use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\XmlFileLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -31,4 +32,25 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($loader->supports('foo.xml', 'xml'), '->supports() checks the resource type if specified');
         $this->assertFalse($loader->supports('foo.xml', 'foo'), '->supports() checks the resource type if specified');
     }
+
+    public function testLoadWithRoute()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $routeCollection = $loader->load('validpattern.xml');
+        $routes = $routeCollection->all();
+
+        $this->assertEquals(1, count($routes), 'One route is loaded');
+        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+    }
+
+    public function testLoadWithImport()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $routeCollection = $loader->load('validresource.xml');
+        $routes = $routeCollection->all();
+
+        $this->assertEquals(1, count($routes), 'One route is loaded');
+        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+    }
 }
+

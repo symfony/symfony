@@ -13,12 +13,11 @@ namespace Symfony\Component\Form\DataValidator;
 
 use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Error;
 use Symfony\Component\Form\DataError;
 use Symfony\Component\Form\FieldError;
+use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\Form\PropertyPathIterator;
-use Symfony\Component\Form\Events;
-use Symfony\Component\Form\Event\DataEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Validator\ValidatorInterface;
 
 class DelegatingValidator implements DataValidatorInterface
@@ -35,24 +34,26 @@ class DelegatingValidator implements DataValidatorInterface
      */
     public function validate(FieldInterface $field)
     {
-        // Validate the field in group "Default"
-        // Validation of the data in the custom group is done by validateData(),
-        // which is constrained by the Execute constraint
-        if ($violations = $this->validator->validate($field)) {
-            foreach ($violations as $violation) {
-                $propertyPath = new PropertyPath($violation->getPropertyPath());
-                $iterator = $propertyPath->getIterator();
-                $template = $violation->getMessageTemplate();
-                $parameters = $violation->getMessageParameters();
+        if ($field->isRoot()) {
+            // Validate the field in group "Default"
+            // Validation of the data in the custom group is done by validateData(),
+            // which is constrained by the Execute constraint
+            if ($violations = $this->validator->validate($field)) {
+                foreach ($violations as $violation) {
+                    $propertyPath = new PropertyPath($violation->getPropertyPath());
+                    $iterator = $propertyPath->getIterator();
+                    $template = $violation->getMessageTemplate();
+                    $parameters = $violation->getMessageParameters();
 
-                if ($iterator->current() == 'data') {
-                    $iterator->next(); // point at the first data element
-                    $error = new DataError($template, $parameters);
-                } else {
-                    $error = new FieldError($template, $parameters);
+                    if ($iterator->current() == 'data') {
+                        $iterator->next(); // point at the first data element
+                        $error = new DataError($template, $parameters);
+                    } else {
+                        $error = new FieldError($template, $parameters);
+                    }
+
+                    $this->mapError($error, $field, $iterator);
                 }
-
-                $this->mapError($error, $field, $iterator);
             }
         }
     }

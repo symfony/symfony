@@ -28,15 +28,6 @@ class FormBuilder extends FieldBuilder
 
     private $dataMapper;
 
-    public function __construct(ThemeInterface $theme,
-            EventDispatcherInterface $dispatcher,
-            CsrfProviderInterface $csrfProvider)
-    {
-        parent::__construct($theme, $dispatcher);
-
-        $this->csrfProvider = $csrfProvider;
-    }
-
     public function setDataMapper(DataMapperInterface $dataMapper)
     {
         $this->dataMapper = $dataMapper;
@@ -226,12 +217,14 @@ class FormBuilder extends FieldBuilder
     protected function buildCsrfProtection()
     {
         if ($this->hasCsrfProtection()) {
-            $token = $this->csrfProvider->generateCsrfToken(get_class($this));
+            // need a page ID here, maybe FormType class?
+            $options = array('page_id' => null);
 
-            $this->add('hidden', $this->csrfFieldName, array(
-                'data' => $token,
-                'property_path' => null,
-            ));
+            if ($this->csrfProvider) {
+                $options['csrf_provider'] = $this->csrfProvider;
+            }
+
+            $this->add('csrf', $this->csrfFieldName, $options);
         }
     }
 

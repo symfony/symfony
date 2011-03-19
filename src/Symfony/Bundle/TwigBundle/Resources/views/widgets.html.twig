@@ -69,8 +69,8 @@
 {% endspaceless %}
 {% endblock hidden__widget %}
 
-{# Don't render hidden fields - they will be rendered in the "rest" helper #}
 {% block hidden__row %}
+    {{ this.widget }}
 {% endblock hidden__row %}
 
 {% block textarea__widget %}

@@ -30,11 +30,12 @@ class DefaultTypeLoader implements TypeLoaderInterface
             EntityManager $em = null)
     {
         $this->addType(new Type\FieldType($theme, $validator));
-        $this->addType(new Type\FormType($theme, $csrfProvider));
+        $this->addType(new Type\FormType($theme));
         $this->addType(new Type\CheckboxFieldType());
         $this->addType(new Type\ChoiceFieldType());
         $this->addType(new Type\CollectionFieldType());
         $this->addType(new Type\CountryFieldType());
+        $this->addType(new Type\CsrfFieldType($csrfProvider));
         $this->addType(new Type\DateFieldType());
         $this->addType(new Type\DateTimeFieldType());
         $this->addType(new Type\FileFieldType($storage));

@@ -23,12 +23,9 @@ class FormType extends AbstractFieldType
 {
     private $theme;
 
-    private $csrfProvider;
-
-    public function __construct(ThemeInterface $theme, CsrfProviderInterface $csrfProvider)
+    public function __construct(ThemeInterface $theme)
     {
         $this->theme = $theme;
-        $this->csrfProvider = $csrfProvider;
     }
 
     public function configure(FieldBuilder $builder, array $options)
@@ -62,7 +59,7 @@ class FormType extends AbstractFieldType
 
     public function createBuilder(array $options)
     {
-        return new FormBuilder($this->theme, new EventDispatcher(), $this->csrfProvider);
+        return new FormBuilder($this->theme, new EventDispatcher());
     }
 
     public function getParent(array $options)

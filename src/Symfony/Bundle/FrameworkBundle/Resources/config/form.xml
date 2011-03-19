@@ -75,7 +75,6 @@
         <service id="form.type.form" class="Symfony\Component\Form\Type\FormType">
             <tag name="form.type" alias="form" />
             <argument type="service" id="form.theme" />
-            <argument type="service" id="form.csrf_provider" />
         </service>
         <service id="form.type.birthday" class="Symfony\Component\Form\Type\BirthdayFieldType">
             <tag name="form.type" alias="birthday" />
@@ -91,6 +90,10 @@
         </service>
         <service id="form.type.country" class="Symfony\Component\Form\Type\CountryFieldType">
             <tag name="form.type" alias="country" />
+        </service>
+        <service id="form.type.csrf" class="Symfony\Component\Form\Type\CsrfFieldType">
+            <tag name="form.type" alias="csrf" />
+            <argument type="service" id="form.csrf_provider" />
         </service>
         <service id="form.type.date" class="Symfony\Component\Form\Type\DateFieldType">
             <tag name="form.type" alias="date" />

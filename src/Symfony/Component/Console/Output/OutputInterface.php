@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Output;
 
+use Symfony\Component\Console\Formatter\OutputFormatterInterface;
+
 /**
  * OutputInterface is the interface implemented by all Output classes.
  *
@@ -50,4 +52,18 @@ interface OutputInterface
      * @param Boolean $decorated Whether to decorated the messages or not
      */
     function setDecorated($decorated);
+
+    /**
+     * Sets output formatter.
+     *
+     * @param   OutputFormatterInterface    $formatter
+     */
+    function setFormatter(OutputFormatterInterface $formatter);
+
+    /**
+     * Returns current output formatter instance.
+     *
+     * @return  OutputFormatterInterface
+     */
+    function getFormatter();
 }

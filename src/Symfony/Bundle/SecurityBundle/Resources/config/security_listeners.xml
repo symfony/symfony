@@ -81,7 +81,9 @@
         <service id="security.logout.handler.session" class="%security.logout.handler.session.class%" public="false" />
         <service id="security.logout.handler.cookie_clearing" class="%security.logout.handler.cookie_clearing.class%" public="false" abstract="true" />
 
-        <service id="security.authentication.form_entry_point" class="%security.authentication.form_entry_point.class%" public="false" abstract="true" />
+        <service id="security.authentication.form_entry_point" class="%security.authentication.form_entry_point.class%" public="false" abstract="true">
+            <argument type="service" id="http_kernel" />
+        </service>
 
         <service id="security.authentication.listener.abstract" abstract="true" public="false">
             <argument type="service" id="security.context" />

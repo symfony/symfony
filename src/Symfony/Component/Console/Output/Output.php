@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Console\Output;
 
+use Symfony\Component\Console\Formatter\OutputFormatterInterface;
+use Symfony\Component\Console\Formatter\OutputFormatter;
+
 /**
  * Base class for output classes.
  *
@@ -32,56 +35,45 @@ abstract class Output implements OutputInterface
     const OUTPUT_RAW = 1;
     const OUTPUT_PLAIN = 2;
 
-    protected $verbosity;
-    protected $decorated;
-
-    static private $styles = array(
-        'error'    => array('bg' => 'red', 'fg' => 'white'),
-        'info'     => array('fg' => 'green'),
-        'comment'  => array('fg' => 'yellow'),
-        'question' => array('bg' => 'cyan', 'fg' => 'black'),
-    );
-    static private $options    = array('bold' => 1, 'underscore' => 4, 'blink' => 5, 'reverse' => 7, 'conceal' => 8);
-    static private $foreground = array('black' => 30, 'red' => 31, 'green' => 32, 'yellow' => 33, 'blue' => 34, 'magenta' => 35, 'cyan' => 36, 'white' => 37);
-    static private $background = array('black' => 40, 'red' => 41, 'green' => 42, 'yellow' => 43, 'blue' => 44, 'magenta' => 45, 'cyan' => 46, 'white' => 47);
+    private $verbosity;
+    private $formatter;
 
     /**
      * Constructor.
      *
-     * @param integer $verbosity The verbosity level (self::VERBOSITY_QUIET, self::VERBOSITY_NORMAL, self::VERBOSITY_VERBOSE)
-     * @param Boolean $decorated Whether to decorate messages or not (null for auto-guessing)
+     * @param integer                   $verbosity  The verbosity level (self::VERBOSITY_QUIET, self::VERBOSITY_NORMAL, self::VERBOSITY_VERBOSE)
+     * @param Boolean                   $decorated  Whether to decorate messages or not (null for auto-guessing)
+     * @param OutputFormatterInterface  $formatter  Output formatter instance
      */
-    public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null)
+    public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
     {
-        $this->decorated = (Boolean) $decorated;
-        $this->verbosity = null === $verbosity ? self::VERBOSITY_NORMAL : $verbosity;
-    }
-
-    /**
-     * Sets a new style.
-     *
-     * @param string $name    The style name
-     * @param array  $options An array of options
-     */
-    static public function setStyle($name, $options = array())
-    {
-        self::$styles[strtolower($name)] = $options;
-    }
-
-    /**
-     * Gets style options from style with specified name.
-     *
-     * @param   string  $name
-     *
-     * @return  array
-     */
-    static public function getStyle($name)
-    {
-        if (!isset(self::$styles[strtolower($name)])) {
-            throw new \InvalidArgumentException('Undefined style: ' . $name);
+        if (null === $formatter) {
+            $formatter = new OutputFormatter();
         }
 
-        return self::$styles[strtolower($name)];
+        $this->verbosity = null === $verbosity ? self::VERBOSITY_NORMAL : $verbosity;
+        $this->formatter = $formatter;
+        $this->formatter->setDecorated((Boolean) $decorated);
+    }
+
+    /**
+     * Sets output formatter.
+     *
+     * @param   OutputFormatterInterface    $formatter
+     */
+    public function setFormatter(OutputFormatterInterface $formatter)
+    {
+        $this->formatter = $formatter;
+    }
+
+    /**
+     * Returns current output formatter instance.
+     *
+     * @return  OutputFormatterInterface
+     */
+    public function getFormatter()
+    {
+        return $this->formatter;
     }
 
     /**
@@ -91,7 +83,7 @@ abstract class Output implements OutputInterface
      */
     public function setDecorated($decorated)
     {
-        $this->decorated = (Boolean) $decorated;
+        $this->formatter->setDecorated((Boolean) $decorated);
     }
 
     /**
@@ -101,7 +93,7 @@ abstract class Output implements OutputInterface
      */
     public function isDecorated()
     {
-        return $this->decorated;
+        return $this->formatter->isDecorated();
     }
 
     /**
@@ -157,12 +149,12 @@ abstract class Output implements OutputInterface
         foreach ($messages as $message) {
             switch ($type) {
                 case Output::OUTPUT_NORMAL:
-                    $message = $this->format($message);
+                    $message = $this->formatter->format($message);
                     break;
                 case Output::OUTPUT_RAW:
                     break;
                 case Output::OUTPUT_PLAIN:
-                    $message = strip_tags($this->format($message));
+                    $message = strip_tags($this->formatter->format($message));
                     break;
                 default:
                     throw new \InvalidArgumentException(sprintf('Unknown output type given (%s)', $type));
@@ -179,106 +171,4 @@ abstract class Output implements OutputInterface
      * @param Boolean $newline Whether to add a newline or not
      */
     abstract public function doWrite($message, $newline);
-
-    /**
-     * Gets regex for a style start.
-     *
-     * @return  string
-     */
-    protected function getBeginStyleRegex()
-    {
-        return '#<([a-z][a-z0-9\-_=;]+)>#i';
-    }
-
-    /**
-     * Gets regex for a style end.
-     *
-     * @return  string
-     */
-    protected function getEndStyleRegex()
-    {
-        return '#</([a-z][a-z0-9\-_]*)?>#i';
-    }
-
-    /**
-     * Formats a message according to the given styles.
-     *
-     * @param  string $message The message to style
-     *
-     * @return string The styled message
-     */
-    protected function format($message)
-    {
-        $message = preg_replace_callback($this->getBeginStyleRegex(), array($this, 'replaceBeginStyle'), $message);
-
-        return preg_replace_callback($this->getEndStyleRegex(), array($this, 'replaceEndStyle'), $message);
-    }
-
-    /**
-     * Replaces the starting style of the output.
-     *
-     * @param array $match
-     *
-     * @return string The replaced style
-     *
-     * @throws \InvalidArgumentException When style is unknown
-     */
-    private function replaceBeginStyle($match)
-    {
-        if (!$this->decorated) {
-            return '';
-        }
-
-        if (isset(self::$styles[strtolower($match[1])])) {
-            $parameters = self::$styles[strtolower($match[1])];
-        } else {
-            // bg=blue;fg=red
-            if (!preg_match_all('/([^=]+)=([^;]+)(;|$)/', strtolower($match[1]), $matches, PREG_SET_ORDER)) {
-                return $match[0];
-            }
-
-            $parameters = array();
-            foreach ($matches as $match) {
-                $parameters[$match[1]] = $match[2];
-            }
-        }
-
-        $codes = array();
-
-        if (isset($parameters['fg'])) {
-            $codes[] = self::$foreground[$parameters['fg']];
-        }
-
-        if (isset($parameters['bg'])) {
-            $codes[] = self::$background[$parameters['bg']];
-        }
-
-        foreach (self::$options as $option => $value) {
-            if (isset($parameters[$option]) && $parameters[$option]) {
-                $codes[] = $value;
-            }
-        }
-
-        return "\033[".implode(';', $codes).'m';
-    }
-
-    /**
-     * Replaces the end style.
-     *
-     * @param string $match The text to match
-     *
-     * @return string The end style
-     */
-    private function replaceEndStyle($match)
-    {
-        if (!isset(self::$styles[strtolower($match[1])])) {
-            return $match[0];
-        }
-
-        if (!$this->decorated) {
-            return '';
-        }
-
-        return "\033[0m";
-    }
 }

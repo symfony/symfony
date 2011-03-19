@@ -655,7 +655,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     public function testGetLanguages()
     {
         $request = new Request();
-        $this->assertNull($request->getLanguages());
+        $this->assertEquals(array(), $request->getLanguages());
 
         $request = new Request();
         $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');

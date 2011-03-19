@@ -11,7 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -43,12 +44,14 @@ class FormLoginFactory extends AbstractFactory
         return 'form-login';
     }
 
-    public function addConfiguration(NodeBuilder $builder)
+    public function addConfiguration(NodeDefinition $node)
     {
-        parent::addConfiguration($builder);
+        parent::addConfiguration($node);
 
-        $builder
-            ->scalarNode('csrf_provider')->cannotBeEmpty()->end()
+        $node
+            ->children()
+                ->scalarNode('csrf_provider')->cannotBeEmpty()->end()
+            ->end()
         ;
     }
 

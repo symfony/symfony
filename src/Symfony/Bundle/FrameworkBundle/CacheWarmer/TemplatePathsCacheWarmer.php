@@ -49,7 +49,7 @@ class TemplatePathsCacheWarmer extends CacheWarmer
      * @param string $cacheDir The cache directory
      */
     public function warmUp($cacheDir)
-    {       
+    {
         $templates = array();
 
         foreach ($this->kernel->getBundles() as $name => $bundle) {

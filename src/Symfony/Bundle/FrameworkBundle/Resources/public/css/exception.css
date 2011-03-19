@@ -189,7 +189,13 @@ build: 56
     padding-bottom:16px;
 }
 
-.sf-exceptionreset li a, 
+.sf-exceptionreset li a
+{
+    background:none;
+    color:#868686;
+    text-decoration:none;
+}
+
 .sf-exceptionreset li a:hover
 {
     background:none;

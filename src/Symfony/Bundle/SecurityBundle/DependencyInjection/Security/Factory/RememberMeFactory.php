@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 
@@ -108,18 +108,20 @@ class RememberMeFactory implements SecurityFactoryInterface
         return 'remember-me';
     }
 
-    public function addConfiguration(NodeBuilder $node)
+    public function addConfiguration(NodeDefinition $node)
     {
-        $node
+        $builder = $node->children();
+        
+        $builder
             ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
             ->scalarNode('token_provider')->end()
         ;
 
         foreach ($this->options as $name => $value) {
             if (is_bool($value)) {
-                $node->booleanNode($name)->defaultValue($value);
+                $builder->booleanNode($name)->defaultValue($value);
             } else {
-                $node->scalarNode($name)->defaultValue($value);
+                $builder->scalarNode($name)->defaultValue($value);
             }
         }
     }

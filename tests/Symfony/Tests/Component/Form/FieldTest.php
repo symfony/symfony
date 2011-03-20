@@ -77,23 +77,23 @@ class FieldTest extends TestCase
         $this->assertTrue($field->isRequired());
     }
 
-    public function testPassDisabledAsOption()
+    public function testPassReadOnlyAsOption()
     {
-        $field = $this->factory->create('field', 'title', array('disabled' => false));
+        $field = $this->factory->create('field', 'title', array('read_only' => false));
 
-        $this->assertFalse($field->isDisabled());
+        $this->assertFalse($field->isReadOnly());
 
-        $field = $this->factory->create('field', 'title', array('disabled' => true));
+        $field = $this->factory->create('field', 'title', array('read_only' => true));
 
-        $this->assertTrue($field->isDisabled());
+        $this->assertTrue($field->isReadOnly());
     }
 
-    public function testFieldIsDisabledIfParentIsDisabled()
+    public function testFieldIsReadOnlyIfParentIsReadOnly()
     {
-        $field = $this->factory->create('field', 'title', array('disabled' => false));
-        $field->setParent($this->factory->create('field', 'title', array('disabled' => true)));
+        $field = $this->factory->create('field', 'title', array('read_only' => false));
+        $field->setParent($this->factory->create('field', 'title', array('read_only' => true)));
 
-        $this->assertTrue($field->isDisabled());
+        $this->assertTrue($field->isReadOnly());
     }
 
     public function testFieldWithNoErrorsIsValid()
@@ -302,7 +302,7 @@ class FieldTest extends TestCase
         $this->assertEquals('reverse[a]', $field->getData());
     }
 
-    public function testBoundDataIsNotTrimmedBeforeTransformingIfDisabled()
+    public function testBoundDataIsNotTrimmedBeforeTransformingIfReadOnly()
     {
         $clientTransformer = new FixedDataTransformer(array(
             null => '',

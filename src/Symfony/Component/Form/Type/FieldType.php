@@ -52,7 +52,7 @@ class FieldType extends AbstractType
             : (array)$options['validation_groups'];
 
         $builder->setRequired($options['required'])
-            ->setDisabled($options['disabled'])
+            ->setReadOnly($options['read_only'])
             ->setAttribute('by_reference', $options['by_reference'])
             ->setAttribute('property_path', $options['property_path'])
             ->setAttribute('validation_groups', $options['validation_groups'])
@@ -73,7 +73,7 @@ class FieldType extends AbstractType
             'data' => null,
             'trim' => true,
             'required' => true,
-            'disabled' => false,
+            'read_only' => false,
             'max_length' => null,
             'property_path' => false,
             'by_reference' => true,

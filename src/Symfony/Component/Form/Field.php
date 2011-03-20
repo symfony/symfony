@@ -67,7 +67,7 @@ class Field implements FieldInterface
     private $transformationSuccessful = true;
     private $validator;
     private $renderer;
-    private $disabled = false;
+    private $readOnly = false;
     private $dispatcher;
     private $attributes;
 
@@ -75,7 +75,7 @@ class Field implements FieldInterface
         RendererInterface $renderer, DataTransformerInterface $clientTransformer = null,
         DataTransformerInterface $normTransformer = null,
         FieldValidatorInterface $validator = null, $required = false,
-        $disabled = false, array $attributes = array())
+        $readOnly = false, array $attributes = array())
     {
         $this->name = (string)$name;
         $this->dispatcher = $dispatcher;
@@ -84,7 +84,7 @@ class Field implements FieldInterface
         $this->normTransformer = $normTransformer;
         $this->validator = $validator;
         $this->required = $required;
-        $this->disabled = $disabled;
+        $this->readOnly = $readOnly;
         $this->attributes = $attributes;
 
         $renderer->setField($this);
@@ -122,10 +122,10 @@ class Field implements FieldInterface
     /**
      * {@inheritDoc}
      */
-    public function isDisabled()
+    public function isReadOnly()
     {
-        if (null === $this->parent || !$this->parent->isDisabled()) {
-            return $this->disabled;
+        if (null === $this->parent || !$this->parent->isReadOnly()) {
+            return $this->readOnly;
         }
 
         return true;

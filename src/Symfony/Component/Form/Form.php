@@ -65,7 +65,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         RendererInterface $renderer, DataTransformerInterface $clientTransformer = null,
         DataTransformerInterface $normalizationTransformer = null,
         DataMapperInterface $dataMapper, FieldValidatorInterface $validator = null,
-        $required = false, $disabled = false, array $attributes = array())
+        $required = false, $readOnly = false, array $attributes = array())
     {
         $dispatcher->addListener(array(
             Events::postSetData,
@@ -76,7 +76,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         $this->dataMapper = $dataMapper;
 
         parent::__construct($name, $dispatcher, $renderer, $clientTransformer,
-            $normalizationTransformer, $validator, $required, $disabled,
+            $normalizationTransformer, $validator, $required, $readOnly,
             $attributes);
     }
 

@@ -30,7 +30,7 @@ class FieldBuilder
 
     private $factory;
 
-    private $disabled;
+    private $readOnly;
 
     private $required;
 
@@ -110,16 +110,16 @@ class FieldBuilder
         return $this->data;
     }
 
-    public function setDisabled($disabled)
+    public function setReadOnly($readOnly)
     {
-        $this->disabled = $disabled;
+        $this->readOnly = $readOnly;
 
         return $this;
     }
 
-    public function getDisabled()
+    public function getReadOnly()
     {
-        return $this->disabled;
+        return $this->readOnly;
     }
 
     /**
@@ -288,7 +288,7 @@ class FieldBuilder
             $this->getNormTransformer(),
             $this->getValidator(),
             $this->getRequired(),
-            $this->getDisabled(),
+            $this->getReadOnly(),
             $this->getAttributes()
         );
 

@@ -84,6 +84,18 @@ class MonologExtensionTest extends TestCase
     }
 
     /**
+     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     */
+    public function testExceptionWhenUsingDebugName()
+    {
+        // logger
+        $container = new ContainerBuilder();
+        $loader = new MonologExtension();
+
+        $loader->load(array(array('handlers' => array('debug' => array('type' => 'stream')))), $container);
+    }
+
+    /**
      * Assertion on the Class of a DIC Service Definition.
      *
      * @param \Symfony\Component\DependencyInjection\Definition $definition

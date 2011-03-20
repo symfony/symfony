@@ -427,7 +427,7 @@ class FormBuilder
         return isset($this->fields[$name]);
     }
 
-    protected function buildFields()
+    protected function buildChildren()
     {
         $fields = array();
 
@@ -436,7 +436,7 @@ class FormBuilder
                 $builder = $this->build($name, $builder['type'], $builder['options']);
             }
 
-            $fields[$name] = $builder->getInstance();
+            $fields[$name] = $builder->getForm();
         }
 
         return $fields;
@@ -502,7 +502,7 @@ class FormBuilder
         return $this->dataClass;
     }
 
-    public function getInstance()
+    public function getForm()
     {
         $this->buildCsrfProtection();
 
@@ -519,7 +519,7 @@ class FormBuilder
             $this->getAttributes()
         );
 
-        foreach ($this->buildFields() as $field) {
+        foreach ($this->buildChildren() as $field) {
             $instance->add($field);
         }
 

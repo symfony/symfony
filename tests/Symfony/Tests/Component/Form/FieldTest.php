@@ -243,7 +243,7 @@ class FieldTest extends TestCase
         $this->builder->setClientTransformer($clientTransformer);
         $this->builder->setNormTransformer($normTransformer);
 
-        $field = $this->builder->getInstance();
+        $field = $this->builder->getForm();
         $field->bind(0);
 
         $this->assertEquals('app[filter2[norm[filter1[0]]]]', $field->getData());
@@ -274,7 +274,7 @@ class FieldTest extends TestCase
         $builder = $this->factory->createBuilder('field', 'title');
         $builder->setNormTransformer($normTransformer);
         $builder->setClientTransformer($clientTransformer);
-        $field = $builder->getInstance();
+        $field = $builder->getForm();
 
         $field->setData(0);
 
@@ -292,7 +292,7 @@ class FieldTest extends TestCase
 
         $builder = $this->factory->createBuilder('field', 'title');
         $builder->setClientTransformer($clientTransformer);
-        $field = $builder->getInstance();
+        $field = $builder->getForm();
 
         $field->bind(' a ');
 
@@ -311,7 +311,7 @@ class FieldTest extends TestCase
             'trim' => false,
         ));
         $builder->setClientTransformer($clientTransformer);
-        $field = $builder->getInstance();
+        $field = $builder->getForm();
 
         $field->bind(' a ');
 
@@ -340,7 +340,7 @@ class FieldTest extends TestCase
             'trim' => false,
         ));
         $builder->setClientTransformer($clientTransformer);
-        $field = $builder->getInstance();
+        $field = $builder->getForm();
 
         $clientTransformer->expects($this->once())
                 ->method('reverseTransform')

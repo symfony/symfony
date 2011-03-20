@@ -67,7 +67,7 @@ class FormFactory implements FormFactoryInterface
 
     public function create($type, $name = null, array $options = array())
     {
-        return $this->createBuilder($type, $name, $options)->getInstance();
+        return $this->createBuilder($type, $name, $options)->getForm();
     }
 
     public function createBuilderForProperty($class, $property, array $options = array())
@@ -111,7 +111,7 @@ class FormFactory implements FormFactoryInterface
      */
     public function createForProperty($class, $property, array $options = array())
     {
-        return $this->createBuilderForProperty($class, $property, $options)->getInstance();
+        return $this->createBuilderForProperty($class, $property, $options)->getForm();
     }
 
     /**

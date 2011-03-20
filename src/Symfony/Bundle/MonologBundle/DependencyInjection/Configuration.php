@@ -87,7 +87,6 @@ class Configuration
         $node
             ->canBeUnset()
             ->performNoDeepMerging()
-            ->useAttributeAsKey('name')
             ->prototype('scalar')
                 ->beforeNormalization()
                     ->ifTrue(function($v) { return is_array($v) && isset($v['callback']); })

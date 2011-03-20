@@ -32,7 +32,6 @@
 
     <xsd:complexType name="processor">
         <xsd:attribute name="callback" type="xsd:string" use="required" />
-        <xsd:attribute name="name" type="xsd:string" use="required">
     </xsd:complexType>
 
     <xsd:simpleType name="level">

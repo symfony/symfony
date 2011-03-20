@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Form;
+namespace Symfony\Tests\Component\Form\DataTransformer;
 
-require_once __DIR__ . '/LocalizedTestCase.php';
+require_once __DIR__.'/LocalizedTestCase.php';
 
 class DateTimeTestCase extends LocalizedTestCase
 {

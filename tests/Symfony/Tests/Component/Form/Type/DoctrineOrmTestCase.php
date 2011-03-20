@@ -9,17 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Form;
+namespace Symfony\Tests\Component\Form\Type;
 
 require_once __DIR__.'/TestCase.php';
 
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use Symfony\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-class DoctrineOrmTestCase extends TestCase
+abstract class DoctrineOrmTestCase extends TestCase
 {
     protected function setUp()
     {

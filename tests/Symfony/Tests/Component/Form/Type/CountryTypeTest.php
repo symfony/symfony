@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Form;
+namespace Symfony\Tests\Component\Form\Type;
 
 use Symfony\Component\Form\CountryField;
 use Symfony\Component\Form\FormContext;
 
 require_once __DIR__.'/TestCase.php';
 
-class CountryFieldTest extends TestCase
+class CountryTypeTest extends TestCase
 {
     public function testCountriesAreSelectable()
     {

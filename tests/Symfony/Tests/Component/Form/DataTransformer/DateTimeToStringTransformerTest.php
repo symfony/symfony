@@ -11,10 +11,9 @@
 
 namespace Symfony\Tests\Component\Form\DataTransformer;
 
-require_once __DIR__ . '/../DateTimeTestCase.php';
+require_once __DIR__ . '/DateTimeTestCase.php';
 
 use Symfony\Component\Form\DataTransformer\DateTimeToStringTransformer;
-use Symfony\Tests\Component\Form\DateTimeTestCase;
 
 class DateTimeToStringTransformerTest extends DateTimeTestCase
 {

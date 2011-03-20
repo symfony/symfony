@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Form;
+namespace Symfony\Tests\Component\Form\Type;
 
 require_once __DIR__.'/TestCase.php';
 
 use Symfony\Component\Form\LanguageField;
 use Symfony\Component\Form\FormContext;
 
-class LanguageFieldTest extends TestCase
+class LanguageTypeTest extends TestCase
 {
     public function testCountriesAreSelectable()
     {

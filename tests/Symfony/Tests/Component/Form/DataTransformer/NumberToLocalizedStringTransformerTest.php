@@ -11,10 +11,9 @@
 
 namespace Symfony\Tests\Component\Form\DataTransformer;
 
-require_once __DIR__ . '/../LocalizedTestCase.php';
+require_once __DIR__ . '/LocalizedTestCase.php';
 
 use Symfony\Component\Form\DataTransformer\NumberToLocalizedStringTransformer;
-use Symfony\Tests\Component\Form\LocalizedTestCase;
 
 class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
 {

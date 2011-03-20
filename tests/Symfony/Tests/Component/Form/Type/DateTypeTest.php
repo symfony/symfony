@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Form;
+namespace Symfony\Tests\Component\Form\Type;
 
 require_once __DIR__ . '/DateTimeTestCase.php';
 
 use Symfony\Component\Form\DateField;
 use Symfony\Component\Form\FormContext;
 
-class DateFieldTest extends DateTimeTestCase
+class DateTypeTest extends DateTimeTestCase
 {
     protected function setUp()
     {

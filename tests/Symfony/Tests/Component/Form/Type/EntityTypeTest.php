@@ -9,20 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Form;
+namespace Symfony\Tests\Component\Form\Type;
 
 require_once __DIR__.'/DoctrineOrmTestCase.php';
-require_once __DIR__.'/Fixtures/SingleIdentEntity.php';
-require_once __DIR__.'/Fixtures/CompositeIdentEntity.php';
+require_once __DIR__.'/../Fixtures/SingleIdentEntity.php';
+require_once __DIR__.'/../Fixtures/CompositeIdentEntity.php';
 
-use Symfony\Component\Form\EntityChoiceField;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Tests\Component\Form\Fixtures\SingleIdentEntity;
 use Symfony\Tests\Component\Form\Fixtures\CompositeIdentEntity;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Common\Collections\ArrayCollection;
 
-class EntityChoiceFieldTest extends DoctrineOrmTestCase
+class EntityChoiceTypeTest extends DoctrineOrmTestCase
 {
     const SINGLE_IDENT_CLASS = 'Symfony\Tests\Component\Form\Fixtures\SingleIdentEntity';
 

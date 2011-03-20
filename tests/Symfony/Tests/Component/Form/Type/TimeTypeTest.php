@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Form;
+namespace Symfony\Tests\Component\Form\Type;
 
 require_once __DIR__ . '/DateTimeTestCase.php';
 
 use Symfony\Component\Form\TimeField;
 
-class TimeFieldTest extends DateTimeTestCase
+class TimeTypeTest extends DateTimeTestCase
 {
     public function testSubmit_dateTime()
     {

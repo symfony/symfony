@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Form;
+namespace Symfony\Tests\Component\Form\Type;
 
 require_once __DIR__ . '/DateTimeTestCase.php';
 
@@ -17,7 +17,7 @@ use Symfony\Component\Form\DateTimeField;
 use Symfony\Component\Form\DateField;
 use Symfony\Component\Form\TimeField;
 
-class DateTimeFieldTest extends DateTimeTestCase
+class DateTimeTypeTest extends DateTimeTestCase
 {
     public function testSubmit_dateTime()
     {

@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Form;
+namespace Symfony\Tests\Component\Form\Type;
 
 require_once __DIR__ . '/TestCase.php';
-require_once __DIR__ . '/Fixtures/Author.php';
-require_once __DIR__ . '/Fixtures/FixedDataTransformer.php';
-require_once __DIR__ . '/Fixtures/FixedFilterListener.php';
+require_once __DIR__ . '/../Fixtures/Author.php';
+require_once __DIR__ . '/../Fixtures/FixedDataTransformer.php';
+require_once __DIR__ . '/../Fixtures/FixedFilterListener.php';
 
 use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
 use Symfony\Component\Form\PropertyPath;
@@ -25,7 +25,7 @@ use Symfony\Tests\Component\Form\Fixtures\Author;
 use Symfony\Tests\Component\Form\Fixtures\FixedDataTransformer;
 use Symfony\Tests\Component\Form\Fixtures\FixedFilterListener;
 
-class FieldTest extends TestCase
+class FieldTypeTest extends TestCase
 {
     protected $field;
 

@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Form;
+namespace Symfony\Tests\Component\Form\Type;
 
 require_once __DIR__.'/TestCase.php';
 
 use Symfony\Component\Form\ChoiceField;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
-class ChoiceFieldTest extends TestCase
+class ChoiceTypeTest extends TestCase
 {
     protected $choices = array(
         'a' => 'Bernhard',

@@ -16,7 +16,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\RecursiveFieldIterator;
 use Symfony\Component\Form\Exception\FormException;
 
-class ObjectMapper implements DataMapperInterface
+class PropertyPathMapper implements DataMapperInterface
 {
     /**
      * Stores the class that the data of this form must be instances of

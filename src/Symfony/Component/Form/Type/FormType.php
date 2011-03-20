@@ -15,7 +15,7 @@ use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
-use Symfony\Component\Form\DataMapper\ObjectMapper;
+use Symfony\Component\Form\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Renderer\Plugin\FormPlugin;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -33,7 +33,7 @@ class FormType extends AbstractType
         $builder->setAttribute('virtual', $options['virtual'])
             ->addRendererPlugin(new FormPlugin())
             ->setDataClass($options['data_class'])
-            ->setDataMapper(new ObjectMapper(
+            ->setDataMapper(new PropertyPathMapper(
                 $options['data_class'],
                 $options['data_constructor']
             ));

@@ -20,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
-class StripTagsFilter implements EventSubscriberInterface
+class StripTagsListener implements EventSubscriberInterface
 {
     public function filterBoundClientData(FilterDataEvent $event)
     {

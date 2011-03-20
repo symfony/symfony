@@ -12,9 +12,9 @@
 namespace Symfony\Tests\Component\Form\EventListener;
 
 use Symfony\Component\Form\Event\FilterDataEvent;
-use Symfony\Component\Form\EventListener\StripTagsFilter;
+use Symfony\Component\Form\EventListener\StripTagsListener;
 
-class StripTagsFilterTest extends \PHPUnit_Framework_TestCase
+class StripTagsListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testStripTags()
     {
@@ -22,7 +22,7 @@ class StripTagsFilterTest extends \PHPUnit_Framework_TestCase
         $field = $this->getMock('Symfony\Component\Form\FieldInterface');
         $event = new FilterDataEvent($field, $data);
 
-        $filter = new StripTagsFilter();
+        $filter = new StripTagsListener();
         $filter->filterBoundClientData($event);
 
         $this->assertEquals('Foo!Bar!Baz!', $event->getData());

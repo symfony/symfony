@@ -410,7 +410,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @see FormInterface
      */
-    public function addError(Error $error, PropertyPathIterator $pathIterator = null)
+    public function addError(Error $error)
     {
         $this->errors[] = $error;
     }

@@ -261,8 +261,8 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         // Synchronize representations - must not change the content!
-        $normData = $this->toNorm($appData);
-        $clientData = $this->toClient($normData);
+        $normData = $this->appToNorm($appData);
+        $clientData = $this->normToClient($normData);
 
         $this->data = $appData;
         $this->normData = $normData;
@@ -335,7 +335,7 @@ class Form implements \IteratorAggregate, FormInterface
 
         try {
             // Normalize data to unified representation
-            $normData = $this->fromClient($clientData);
+            $normData = $this->clientToNorm($clientData);
             $this->transformationSuccessful = true;
         } catch (TransformationFailedException $e) {
             $this->transformationSuccessful = false;
@@ -349,8 +349,8 @@ class Form implements \IteratorAggregate, FormInterface
             $normData = $event->getData();
 
             // Synchronize representations - must not change the content!
-            $appData = $this->fromNorm($normData);
-            $clientData = $this->toClient($normData);
+            $appData = $this->normToApp($normData);
+            $clientData = $this->normToClient($normData);
         }
 
         $this->bound = true;
@@ -653,7 +653,7 @@ class Form implements \IteratorAggregate, FormInterface
      * @param  mixed $value  The value to transform
      * @return string
      */
-    protected function toNorm($value)
+    private function appToNorm($value)
     {
         if (null === $this->normTransformer) {
             return $value;
@@ -668,7 +668,7 @@ class Form implements \IteratorAggregate, FormInterface
      * @param  string $value  The value to reverse transform
      * @return mixed
      */
-    protected function fromNorm($value)
+    private function normToApp($value)
     {
         if (null === $this->normTransformer) {
             return $value;
@@ -683,7 +683,7 @@ class Form implements \IteratorAggregate, FormInterface
      * @param  mixed $value  The value to transform
      * @return string
      */
-    protected function toClient($value)
+    private function normToClient($value)
     {
         if (null === $this->clientTransformer) {
             // Scalar values should always be converted to strings to
@@ -700,7 +700,7 @@ class Form implements \IteratorAggregate, FormInterface
      * @param  string $value  The value to reverse transform
      * @return mixed
      */
-    protected function fromClient($value)
+    private function clientToNorm($value)
     {
         if (null === $this->clientTransformer) {
             return '' === $value ? null : $value;

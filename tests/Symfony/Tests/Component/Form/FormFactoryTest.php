@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Form\FormFactory;
+namespace Symfony\Tests\Component\Form;
 
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Type\Guesser\Guess;

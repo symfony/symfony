@@ -15,6 +15,14 @@ use Symfony\Component\Form\Events;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Merge changes from the request to a Doctrine\Common\Collections\Collection instance.
+ *
+ * This works with ORM, MongoDB and CouchDB instances of the collection interface.
+ *
+ * @see Doctrine\Common\Collections\Collection
+ * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ */
 class MergeCollectionListener implements EventSubscriberInterface
 {
     public static function getSubscribedEvents()

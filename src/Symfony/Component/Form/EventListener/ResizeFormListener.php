@@ -19,12 +19,26 @@ use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Resize a collection form element based on the data sent from the client.
+ *
+ * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ */
 class ResizeFormListener implements EventSubscriberInterface
 {
+    /**
+     * @var FormFactoryInterface
+     */
     private $factory;
 
+    /**
+     * @var string
+     */
     private $type;
 
+    /**
+     * @var bool
+     */
     private $resizeOnBind;
 
     public function __construct(FormFactoryInterface $factory, $type, $resizeOnBind = false)
@@ -70,24 +84,25 @@ class ResizeFormListener implements EventSubscriberInterface
 
     public function preBind(DataEvent $event)
     {
+        if (!$this->resizeOnBind) {
+            return;
+        }
+
         $form = $event->getField();
         $data = $event->getData();
-
-        $this->removedFields = array();
 
         if (null === $data) {
             $data = array();
         }
 
         foreach ($form as $name => $field) {
-            if (!isset($data[$name]) && $this->resizeOnBind && '$$name$$' != $name) {
+            if (!isset($data[$name]) && '$$name$$' != $name) {
                 $form->remove($name);
-                $this->removedFields[] = $name;
             }
         }
 
         foreach ($data as $name => $value) {
-            if (!$form->has($name) && $this->resizeOnBind) {
+            if (!$form->has($name)) {
                 $form->add($this->factory->create($this->type, $name, array(
                     'property_path' => '['.$name.']',
                 )));

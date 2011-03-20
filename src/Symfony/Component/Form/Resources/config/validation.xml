@@ -17,16 +17,6 @@
     <property name="fields">
       <constraint name="Valid" />
     </property>
-    <getter property="boundWithExtraFields">
-      <constraint name="AssertFalse">
-        <option name="message">This form should not contain extra fields</option>
-      </constraint>
-    </getter>
-    <getter property="postMaxSizeReached">
-      <constraint name="AssertFalse">
-        <option name="message">The uploaded file was too large. Please try to upload a smaller file</option>
-      </constraint>
-    </getter>
   </class>
 
   <class name="Symfony\Component\Form\RepeatedField">

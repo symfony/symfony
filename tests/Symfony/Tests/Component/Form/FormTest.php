@@ -399,18 +399,6 @@ class FormTest extends TestCase
         $this->assertFalse($form->isValid());
     }
 
-    public function testInvalidIfBoundWithExtraFields()
-    {
-        $builder = $this->factory->createBuilder('form', 'author');
-        $builder->add('firstName', 'field');
-        $builder->add('lastName', 'field');
-        $form = $builder->getInstance();
-
-        $form->bind(array('foo' => 'bar', 'firstName' => 'Bernhard', 'lastName' => 'Potencier'));
-
-        $this->assertTrue($form->isBoundWithExtraFields());
-    }
-
     public function testHasNoErrorsIfOnlyFieldHasErrors()
     {
         $builder = $this->factory->createBuilder('form', 'author');

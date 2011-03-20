@@ -17,6 +17,7 @@ use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Renderer\Plugin\FormPlugin;
+use Symfony\Component\Form\Validator\FormValidator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class FormType extends AbstractType
@@ -32,6 +33,7 @@ class FormType extends AbstractType
     {
         $builder->setAttribute('virtual', $options['virtual'])
             ->addRendererPlugin(new FormPlugin())
+            ->addValidator(new FormValidator())
             ->setDataClass($options['data_class'])
             ->setDataMapper(new PropertyPathMapper(
                 $options['data_class'],

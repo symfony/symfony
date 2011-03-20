@@ -33,7 +33,7 @@ class CsrfType extends AbstractType
 
         $builder
             ->setData($csrfProvider->generateCsrfToken($pageId))
-            ->setValidator(new CallbackValidator(
+            ->addValidator(new CallbackValidator(
                 function (FieldInterface $field) use ($csrfProvider, $pageId) {
                     if (!$csrfProvider->isCsrfTokenValid($pageId, $field->getData())) {
                         // FIXME this error is currently not displayed

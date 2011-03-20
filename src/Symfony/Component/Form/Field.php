@@ -65,7 +65,7 @@ class Field implements FieldInterface
     private $normTransformer;
     private $clientTransformer;
     private $transformationSuccessful = true;
-    private $validator;
+    private $validators;
     private $renderer;
     private $readOnly = false;
     private $dispatcher;
@@ -74,15 +74,21 @@ class Field implements FieldInterface
     public function __construct($name, EventDispatcherInterface $dispatcher,
         RendererInterface $renderer, DataTransformerInterface $clientTransformer = null,
         DataTransformerInterface $normTransformer = null,
-        FieldValidatorInterface $validator = null, $required = false,
+        array $validators = array(), $required = false,
         $readOnly = false, array $attributes = array())
     {
+        foreach ($validators as $validator) {
+            if (!$validator instanceof FieldValidatorInterface) {
+                throw new UnexpectedTypeException($validator, 'Symfony\Component\Form\Validator\FieldValidatorInterface');
+            }
+        }
+
         $this->name = (string)$name;
         $this->dispatcher = $dispatcher;
         $this->renderer = $renderer;
         $this->clientTransformer = $clientTransformer;
         $this->normTransformer = $normTransformer;
-        $this->validator = $validator;
+        $this->validators = $validators;
         $this->required = $required;
         $this->readOnly = $readOnly;
         $this->attributes = $attributes;
@@ -276,8 +282,8 @@ class Field implements FieldInterface
         $event = new DataEvent($this, $clientData);
         $this->dispatcher->dispatch(Events::postBind, $event);
 
-        if ($this->validator) {
-            $this->validator->validate($this);
+        foreach ($this->validators as $validator) {
+            $validator->validate($this);
         }
     }
 

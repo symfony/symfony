@@ -44,7 +44,7 @@ class FieldBuilder
 
     private $theme;
 
-    private $validator;
+    private $validators = array();
 
     private $attributes = array();
 
@@ -139,14 +139,16 @@ class FieldBuilder
         return $this->required;
     }
 
-    public function setValidator(FieldValidatorInterface $validator)
+    public function addValidator(FieldValidatorInterface $validator)
     {
-        $this->validator = $validator;
+        $this->validators[] = $validator;
+
+        return $this;
     }
 
-    public function getValidator()
+    public function getValidators()
     {
-        return $this->validator;
+        return $this->validators;
     }
 
     /**
@@ -286,7 +288,7 @@ class FieldBuilder
             $this->buildRenderer(),
             $this->getClientTransformer(),
             $this->getNormTransformer(),
-            $this->getValidator(),
+            $this->getValidators(),
             $this->getRequired(),
             $this->getReadOnly(),
             $this->getAttributes()

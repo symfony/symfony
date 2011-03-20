@@ -57,14 +57,14 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      * Contains the names of bound values who don't belong to any fields
      * @var array
      */
-    private $extraFields = array();
+    private $extraData = array();
 
     private $dataMapper;
 
     public function __construct($name, EventDispatcherInterface $dispatcher,
         RendererInterface $renderer, DataTransformerInterface $clientTransformer = null,
         DataTransformerInterface $normalizationTransformer = null,
-        DataMapperInterface $dataMapper, FieldValidatorInterface $validator = null,
+        DataMapperInterface $dataMapper, array $validators = null,
         $required = false, $readOnly = false, array $attributes = array())
     {
         $dispatcher->addListener(array(
@@ -76,7 +76,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         $this->dataMapper = $dataMapper;
 
         parent::__construct($name, $dispatcher, $renderer, $clientTransformer,
-            $normalizationTransformer, $validator, $required, $readOnly,
+            $normalizationTransformer, $validators, $required, $readOnly,
             $attributes);
     }
 
@@ -177,13 +177,13 @@ class Form extends Field implements \IteratorAggregate, FormInterface
             }
         }
 
-        $this->extraFields = array();
+        $this->extraData = array();
 
         foreach ($data as $name => $value) {
             if ($this->has($name)) {
                 $this->fields[$name]->bind($value);
             } else {
-                $this->extraFields[] = $name;
+                $this->extraData[$name] = $value;
             }
         }
 
@@ -195,15 +195,9 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         $event->setData($data);
     }
 
-    /**
-     * Returns whether this form was bound with extra fields
-     *
-     * @return Boolean
-     */
-    public function isBoundWithExtraFields()
+    public function getExtraData()
     {
-        // TODO: integrate the field names in the error message
-        return count($this->extraFields) > 0;
+        return $this->extraData;
     }
 
     /**
@@ -327,33 +321,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         }
 
         $this->bind($data);
-    }
-
-    /**
-     * Returns whether the maximum POST size was reached in this request.
-     *
-     * @return Boolean
-     */
-    public function isPostMaxSizeReached()
-    {
-        if ($this->isRoot() && isset($_SERVER['CONTENT_LENGTH'])) {
-            $length = (int) $_SERVER['CONTENT_LENGTH'];
-            $max = trim(ini_get('post_max_size'));
-
-            switch (strtolower(substr($max, -1))) {
-                // The 'G' modifier is available since PHP 5.1.0
-                case 'g':
-                    $max *= 1024;
-                case 'm':
-                    $max *= 1024;
-                case 'k':
-                    $max *= 1024;
-            }
-
-            return $length > $max;
-        }
-
-        return false;
     }
 
     /**

@@ -59,7 +59,7 @@ class FieldType extends AbstractType
             ->setData($options['data'])
             ->setRenderer(new DefaultRenderer($this->theme, $options['template']))
             ->addRendererPlugin(new FieldPlugin())
-            ->setValidator(new DelegatingValidator($this->validator));
+            ->addValidator(new DelegatingValidator($this->validator));
 
         if ($options['trim']) {
             $builder->addEventSubscriber(new TrimListener());

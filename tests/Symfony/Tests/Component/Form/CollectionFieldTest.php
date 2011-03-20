@@ -13,16 +13,15 @@ namespace Symfony\Tests\Component\Form;
 
 require_once __DIR__.'/TestCase.php';
 
-use Symfony\Component\Form\CollectionField;
+use Symfony\Component\Form\CollectionForm;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\Field;
 
-class CollectionFieldTest extends TestCase
+class CollectionFormTest extends TestCase
 {
     public function testContainsOnlyCsrfTokenByDefault()
     {
         $field = $this->factory->create('collection', 'emails', array(
-            'prototype' => 'field',
+            'type' => 'field',
             'csrf_field_name' => 'abc',
         ));
 
@@ -33,18 +32,18 @@ class CollectionFieldTest extends TestCase
     public function testSetDataAdjustsSize()
     {
         $field = $this->factory->create('collection', 'emails', array(
-            'prototype' => 'field',
+            'type' => 'field',
         ));
         $field->setData(array('foo@foo.com', 'foo@bar.com'));
 
-        $this->assertTrue($field[0] instanceof Field);
-        $this->assertTrue($field[1] instanceof Field);
+        $this->assertTrue($field[0] instanceof Form);
+        $this->assertTrue($field[1] instanceof Form);
         $this->assertEquals(2, count($field));
         $this->assertEquals('foo@foo.com', $field[0]->getData());
         $this->assertEquals('foo@bar.com', $field[1]->getData());
 
         $field->setData(array('foo@baz.com'));
-        $this->assertTrue($field[0] instanceof Field);
+        $this->assertTrue($field[0] instanceof Form);
         $this->assertFalse(isset($field[1]));
         $this->assertEquals(1, count($field));
         $this->assertEquals('foo@baz.com', $field[0]->getData());
@@ -53,49 +52,49 @@ class CollectionFieldTest extends TestCase
     public function testSetDataAdjustsSizeIfModifiable()
     {
         $field = $this->factory->create('collection', 'emails', array(
-            'prototype' => 'field',
+            'type' => 'field',
             'modifiable' => true,
         ));
         $field->setData(array('foo@foo.com', 'foo@bar.com'));
 
-        $this->assertTrue($field[0] instanceof Field);
-        $this->assertTrue($field[1] instanceof Field);
-        $this->assertTrue($field['$$name$$'] instanceof Field);
+        $this->assertTrue($field[0] instanceof Form);
+        $this->assertTrue($field[1] instanceof Form);
+        $this->assertTrue($field['$$name$$'] instanceof Form);
         $this->assertEquals(3, count($field));
 
         $field->setData(array('foo@baz.com'));
-        $this->assertTrue($field[0] instanceof Field);
+        $this->assertTrue($field[0] instanceof Form);
         $this->assertFalse(isset($field[1]));
-        $this->assertTrue($field['$$name$$'] instanceof Field);
+        $this->assertTrue($field['$$name$$'] instanceof Form);
         $this->assertEquals(2, count($field));
     }
 
     public function testThrowsExceptionIfObjectIsNotTraversable()
     {
         $field = $this->factory->create('collection', 'emails', array(
-            'prototype' => 'field',
+            'type' => 'field',
         ));
         $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $field->setData(new \stdClass());
     }
 
-    public function testModifiableCollectionsContainExtraField()
+    public function testModifiableCollectionsContainExtraForm()
     {
         $field = $this->factory->create('collection', 'emails', array(
-            'prototype' => 'field',
+            'type' => 'field',
             'modifiable' => true,
         ));
         $field->setData(array('foo@bar.com'));
 
-        $this->assertTrue($field['0'] instanceof Field);
-        $this->assertTrue($field['$$name$$'] instanceof Field);
+        $this->assertTrue($field['0'] instanceof Form);
+        $this->assertTrue($field['$$name$$'] instanceof Form);
         $this->assertEquals(2, count($field));
     }
 
     public function testNotResizedIfBoundWithMissingData()
     {
         $field = $this->factory->create('collection', 'emails', array(
-            'prototype' => 'field',
+            'type' => 'field',
         ));
         $field->setData(array('foo@foo.com', 'bar@bar.com'));
         $field->bind(array('foo@bar.com'));
@@ -109,7 +108,7 @@ class CollectionFieldTest extends TestCase
     public function testResizedIfBoundWithMissingDataAndModifiable()
     {
         $field = $this->factory->create('collection', 'emails', array(
-            'prototype' => 'field',
+            'type' => 'field',
             'modifiable' => true,
         ));
         $field->setData(array('foo@foo.com', 'bar@bar.com'));
@@ -123,7 +122,7 @@ class CollectionFieldTest extends TestCase
     public function testNotResizedIfBoundWithExtraData()
     {
         $field = $this->factory->create('collection', 'emails', array(
-            'prototype' => 'field',
+            'type' => 'field',
         ));
         $field->setData(array('foo@bar.com'));
         $field->bind(array('foo@foo.com', 'bar@bar.com'));
@@ -136,7 +135,7 @@ class CollectionFieldTest extends TestCase
     public function testResizedUpIfBoundWithExtraDataAndModifiable()
     {
         $field = $this->factory->create('collection', 'emails', array(
-            'prototype' => 'field',
+            'type' => 'field',
             'modifiable' => true,
         ));
         $field->setData(array('foo@bar.com'));
@@ -152,7 +151,7 @@ class CollectionFieldTest extends TestCase
     public function testResizedDownIfBoundWithLessDataAndModifiable()
     {
         $field = $this->factory->create('collection', 'emails', array(
-            'prototype' => 'field',
+            'type' => 'field',
             'modifiable' => true,
         ));
         $field->setData(array('foo@bar.com', 'bar@bar.com'));

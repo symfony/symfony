@@ -12,7 +12,7 @@
 namespace Symfony\Tests\Component\Form\Renderer\Theme;
 
 use Symfony\Component\Form\Type\AbstractType;
-use Symfony\Component\Form\FieldBuilder;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\CsrfProvider\DefaultCsrfProvider;
 use Symfony\Component\Form\Type\Loader\DefaultTypeLoader;
 use Symfony\Component\Form\FormFactory;
@@ -102,7 +102,7 @@ abstract class AbstractThemeFunctionalTest extends \PHPUnit_Framework_TestCase
 
 class MyTestFormConfig extends AbstractType
 {
-    public function configure(FieldBuilder $builder, array $options)
+    public function configure(FormBuilder $builder, array $options)
     {
         $builder->setDataClass('Symfony\Bundle\FrameworkBundle\Tests\Form\MyTestObject');
         $builder->add('field0', 'my.sub_form');
@@ -163,7 +163,7 @@ class MyTestObject
 
 class MyTestSubFormConfig extends AbstractType
 {
-    public function configure(FieldBuilder $builder, array $options)
+    public function configure(FormBuilder $builder, array $options)
     {
         $builder->add('subfield0', 'text');
     }

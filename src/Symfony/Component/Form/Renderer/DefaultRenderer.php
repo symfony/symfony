@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Renderer;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Form\Renderer\Plugin\RendererPluginInterface;
 
@@ -76,7 +76,7 @@ class DefaultRenderer implements RendererInterface, \ArrayAccess
         }
     }
 
-    public function setField(FieldInterface $field)
+    public function setField(FormInterface $field)
     {
         $this->field = $field;
     }
@@ -161,7 +161,7 @@ class DefaultRenderer implements RendererInterface, \ArrayAccess
     /**
      * Renders the label of the given field
      *
-     * @param FieldInterface $field  The field to render the label for
+     * @param FormInterface $field  The field to render the label for
      * @param array $params          Additional variables passed to the template
      */
     public function getLabel($label = null, array $vars = array())

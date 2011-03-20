@@ -11,18 +11,17 @@
 
 namespace Symfony\Component\Form\DataMapper;
 
-use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\FormInterface;
 
 interface DataMapperInterface
 {
     function createEmptyData();
 
-    function mapDataToForm(&$data, FormInterface $form);
+    function mapDataToForms($data, array $forms);
 
-    function mapDataToField(&$data, FieldInterface $field);
+    function mapDataToForm($data, FormInterface $form);
 
-    function mapFormToData(FormInterface $form, &$data);
+    function mapFormsToData(array $forms, &$data);
 
-    function mapFieldToData(FieldInterface $field, &$data);
+    function mapFormToData(FormInterface $field, &$data);
 }

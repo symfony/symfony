@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Renderer\Plugin;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Renderer\RendererInterface;
 
 class DatePatternPlugin implements RendererPluginInterface
@@ -23,7 +23,7 @@ class DatePatternPlugin implements RendererPluginInterface
         $this->formatter = $formatter;
     }
 
-    public function setUp(FieldInterface $field, RendererInterface $renderer)
+    public function setUp(FormInterface $field, RendererInterface $renderer)
     {
         $renderer->setVar('date_pattern', $this->getPattern());
     }

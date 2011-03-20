@@ -19,21 +19,16 @@ namespace Symfony\Component\Form;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class RecursiveFieldIterator extends \IteratorIterator implements \RecursiveIterator
+class RecursiveFieldIterator extends \ArrayIterator implements \RecursiveIterator
 {
-    public function __construct(FormInterface $group)
-    {
-        parent::__construct($group);
-    }
-
     public function getChildren()
     {
-        return new self($this->current());
+        return new self($this->current()->getChildren());
     }
 
     public function hasChildren()
     {
-        return $this->current() instanceof FormInterface
+        return $this->current()->hasAttribute('virtual')
                 && $this->current()->getAttribute('virtual');
     }
 }

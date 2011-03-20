@@ -19,7 +19,7 @@ class FixUrlProtocolListenerTest extends \PHPUnit_Framework_TestCase
     public function testFixHttpUrl()
     {
         $data = "www.symfony.com";
-        $field = $this->getMock('Symfony\Component\Form\FieldInterface');
+        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
         $event = new FilterDataEvent($field, $data);
 
         $filter = new FixUrlProtocolListener('http');
@@ -31,7 +31,7 @@ class FixUrlProtocolListenerTest extends \PHPUnit_Framework_TestCase
     public function testSkipKnownUrl()
     {
         $data = "http://www.symfony.com";
-        $field = $this->getMock('Symfony\Component\Form\FieldInterface');
+        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
         $event = new FilterDataEvent($field, $data);
 
         $filter = new FixUrlProtocolListener('http');
@@ -43,7 +43,7 @@ class FixUrlProtocolListenerTest extends \PHPUnit_Framework_TestCase
     public function testSkipOtherProtocol()
     {
         $data = "ftp://www.symfony.com";
-        $field = $this->getMock('Symfony\Component\Form\FieldInterface');
+        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
         $event = new FilterDataEvent($field, $data);
 
         $filter = new FixUrlProtocolListener('http');

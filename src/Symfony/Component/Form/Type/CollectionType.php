@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Form\Type;
 
-use Symfony\Component\Form\FieldBuilder;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\EventListener\ResizeFormListener;
 
 class CollectionType extends AbstractType
 {
-    public function configure(FieldBuilder $builder, array $options)
+    public function configure(FormBuilder $builder, array $options)
     {
         if ($options['modifiable']) {
             $builder->add('$$name$$', $options['type'], array(
@@ -28,7 +28,7 @@ class CollectionType extends AbstractType
         $listener = new ResizeFormListener($builder->getFormFactory(),
                 $options['type'], $options['modifiable']);
 
-        $builder->addEventSubscriber($listener, 10);
+        $builder->addEventSubscriber($listener);
     }
 
     public function getDefaultOptions(array $options)

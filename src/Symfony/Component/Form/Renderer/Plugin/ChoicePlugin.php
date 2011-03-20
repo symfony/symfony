@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Renderer\Plugin;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Renderer\RendererInterface;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 
@@ -24,7 +24,7 @@ class ChoicePlugin implements RendererPluginInterface
         $this->choiceList = $choiceList;
     }
 
-    public function setUp(FieldInterface $field, RendererInterface $renderer)
+    public function setUp(FormInterface $field, RendererInterface $renderer)
     {
         $choiceList = $this->choiceList;
 

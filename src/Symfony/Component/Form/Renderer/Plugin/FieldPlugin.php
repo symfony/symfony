@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Renderer\Plugin;
 
 use Symfony\Component\Form\Renderer\RendererInterface;
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FormInterface;
 
 class FieldPlugin implements RendererPluginInterface
 {
@@ -25,7 +25,7 @@ class FieldPlugin implements RendererPluginInterface
      *
      * @param Form $field   The field for which to render the encoding type
      */
-    public function setUp(FieldInterface $field, RendererInterface $renderer)
+    public function setUp(FormInterface $field, RendererInterface $renderer)
     {
         $fieldKey = $field->getName();
 

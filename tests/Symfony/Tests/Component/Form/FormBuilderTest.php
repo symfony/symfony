@@ -94,7 +94,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $factory->expects($this->once())
                 ->method('createBuilder')
                 ->with($this->equalTo($expectedType), $this->equalTo($expectedName), $this->equalTo($expectedOptions))
-                ->will($this->returnValue($this->getMock('Symfony\Component\Form\FieldBuilder', array(), array(), '', false)));
+                ->will($this->returnValue($this->getMock('Symfony\Component\Form\FormBuilder', array(), array(), '', false)));
         $this->builder->setFormFactory($factory);
 
         $this->builder->add($expectedName, $expectedType, $expectedOptions);
@@ -112,7 +112,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $factory->expects($this->once())
                 ->method('createBuilderForProperty')
                 ->with($this->equalTo('stdClass'), $this->equalTo($expectedName), $this->equalTo($expectedOptions))
-                ->will($this->returnValue($this->getMock('Symfony\Component\Form\FieldBuilder', array(), array(), '', false)));
+                ->will($this->returnValue($this->getMock('Symfony\Component\Form\FormBuilder', array(), array(), '', false)));
         $this->builder->setFormFactory($factory);
 
         $this->builder->setDataClass('stdClass');

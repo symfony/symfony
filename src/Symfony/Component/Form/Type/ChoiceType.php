@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Type;
 
-use Symfony\Component\Form\FieldBuilder;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\ChoiceList\DefaultChoiceList;
 use Symfony\Component\Form\EventListener\FixRadioInputListener;
 use Symfony\Component\Form\Renderer\Plugin\ChoicePlugin;
@@ -21,7 +21,7 @@ use Symfony\Component\Form\DataTransformer\ArrayToChoicesTransformer;
 
 class ChoiceType extends AbstractType
 {
-    public function configure(FieldBuilder $builder, array $options)
+    public function configure(FormBuilder $builder, array $options)
     {
         if ($options['expanded']) {
             $choices = array_replace(

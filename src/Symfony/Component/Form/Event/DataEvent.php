@@ -3,7 +3,7 @@
 namespace Symfony\Component\Form\Event;
 
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FormInterface;
 
 class DataEvent extends Event
 {
@@ -11,7 +11,7 @@ class DataEvent extends Event
 
     protected $data;
 
-    public function __construct(FieldInterface $field, $data)
+    public function __construct(FormInterface $field, $data)
     {
         $this->field = $field;
         $this->data = $data;

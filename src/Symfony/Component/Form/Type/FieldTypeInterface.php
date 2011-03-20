@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Form\Type;
 
-use Symfony\Component\Form\FieldBuilder;
+use Symfony\Component\Form\FormBuilder;
 
 interface FieldTypeInterface
 {
-    function configure(FieldBuilder $builder, array $options);
+    function configure(FormBuilder $builder, array $options);
 
     function createBuilder(array $options);
 

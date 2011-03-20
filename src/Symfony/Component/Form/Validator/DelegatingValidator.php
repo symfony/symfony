@@ -11,16 +11,15 @@
 
 namespace Symfony\Component\Form\Validator;
 
-use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Error;
 use Symfony\Component\Form\DataError;
-use Symfony\Component\Form\FieldError;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\Form\PropertyPathIterator;
 use Symfony\Component\Validator\ValidatorInterface;
 
-class DelegatingValidator implements FieldValidatorInterface
+class DelegatingValidator implements FormValidatorInterface
 {
     private $validator;
 
@@ -32,7 +31,7 @@ class DelegatingValidator implements FieldValidatorInterface
     /**
      * Validates the form and its domain object
      */
-    public function validate(FieldInterface $field)
+    public function validate(FormInterface $field)
     {
         if ($field->isRoot()) {
             // Validate the field in group "Default"
@@ -49,7 +48,7 @@ class DelegatingValidator implements FieldValidatorInterface
                         $iterator->next(); // point at the first data element
                         $error = new DataError($template, $parameters);
                     } else {
-                        $error = new FieldError($template, $parameters);
+                        $error = new FormError($template, $parameters);
                     }
 
                     $this->mapError($error, $field, $iterator);
@@ -58,11 +57,11 @@ class DelegatingValidator implements FieldValidatorInterface
         }
     }
 
-    private function mapError(Error $error, FieldInterface $field,
+    private function mapError(Error $error, FormInterface $field,
             PropertyPathIterator $pathIterator = null)
     {
         if (null !== $pathIterator && $field instanceof FormInterface) {
-            if ($error instanceof FieldError && $pathIterator->hasNext()) {
+            if ($error instanceof FormError && $pathIterator->hasNext()) {
                 $pathIterator->next();
 
                 if ($pathIterator->isProperty() && $pathIterator->current() === 'fields') {

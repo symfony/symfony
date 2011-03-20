@@ -11,7 +11,7 @@
 
 namespace Symfony\Tests\Component\Form;
 
-use Symfony\Component\Form\FieldBuilder;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Type\Loader\DefaultTypeLoader;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -49,6 +49,6 @@ class TestCase extends \PHPUnit_Framework_TestCase
         $loader->initialize($this->factory, $this->theme, $this->csrfProvider,
                 $this->validator, $this->storage, $this->em);
 
-        $this->builder = new FieldBuilder($this->theme, new EventDispatcher(), $this->csrfProvider);
+        $this->builder = new FormBuilder($this->theme, new EventDispatcher(), $this->csrfProvider);
     }
 }

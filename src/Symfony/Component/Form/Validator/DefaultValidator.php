@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\Form\Validator;
 
-use Symfony\Component\Form\FieldInterface;
-use Symfony\Component\Form\FieldError;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormError;
 
-class FormValidator implements FieldValidatorInterface
+class DefaultValidator implements FormValidatorInterface
 {
-    public function validate(FieldInterface $form)
+    public function validate(FormInterface $form)
     {
         if (count($form->getExtraData()) > 0) {
-            $form->addError(new FieldError('This form should not contain extra fields'));
+            $form->addError(new FormError('This form should not contain extra fields'));
         }
 
         if ($form->isRoot() && isset($_SERVER['CONTENT_LENGTH'])) {
@@ -37,7 +37,7 @@ class FormValidator implements FieldValidatorInterface
             }
 
             if ($length > $max) {
-                $form->addError(new FieldError('The uploaded file was too large. Please try to upload a smaller file'));
+                $form->addError(new FormError('The uploaded file was too large. Please try to upload a smaller file'));
             }
         }
     }

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Renderer\Plugin;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Renderer\RendererInterface;
 
 class MaxLengthPlugin implements RendererPluginInterface
@@ -23,7 +23,7 @@ class MaxLengthPlugin implements RendererPluginInterface
         $this->maxLength = $maxLength;
     }
 
-    public function setUp(FieldInterface $field, RendererInterface $renderer)
+    public function setUp(FormInterface $field, RendererInterface $renderer)
     {
         $renderer->setVar('max_length', $this->maxLength);
     }

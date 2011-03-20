@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Type;
 
-use Symfony\Component\Form\FieldBuilder;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\DataTransformer\ReversedTransformer;
 use Symfony\Component\Form\DataTransformer\DataTransformerChain;
 use Symfony\Component\Form\DataTransformer\DateTimeToArrayTransformer;
@@ -21,7 +21,7 @@ use Symfony\Component\Form\DataTransformer\ArrayToPartsTransformer;
 
 class DateTimeType extends AbstractType
 {
-    public function configure(FieldBuilder $builder, array $options)
+    public function configure(FormBuilder $builder, array $options)
     {
         // Only pass a subset of the options to children
         $dateOptions = array_intersect_key($options, array_flip(array(

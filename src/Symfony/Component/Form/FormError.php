@@ -16,6 +16,6 @@ namespace Symfony\Component\Form;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class FieldError extends Error
+class FormError extends Error
 {
 }

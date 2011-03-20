@@ -13,17 +13,15 @@ namespace Symfony\Tests\Component\Form;
 
 require_once __DIR__ . '/TestCase.php';
 require_once __DIR__ . '/Fixtures/Author.php';
-require_once __DIR__ . '/Fixtures/InvalidField.php';
 require_once __DIR__ . '/Fixtures/FixedDataTransformer.php';
 require_once __DIR__ . '/Fixtures/FixedFilterListener.php';
 
 use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
 use Symfony\Component\Form\PropertyPath;
-use Symfony\Component\Form\FieldError;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\DataTransformer\TransformationFailedException;
 use Symfony\Tests\Component\Form\Fixtures\Author;
-use Symfony\Tests\Component\Form\Fixtures\InvalidField;
 use Symfony\Tests\Component\Form\Fixtures\FixedDataTransformer;
 use Symfony\Tests\Component\Form\Fixtures\FixedFilterListener;
 
@@ -106,14 +104,14 @@ class FieldTest extends TestCase
     public function testFieldWithErrorsIsInvalid()
     {
         $this->field->bind('data');
-        $this->field->addError(new FieldError('Some error'));
+        $this->field->addError(new FormError('Some error'));
 
         $this->assertFalse($this->field->isValid());
     }
 
     public function testSubmitResetsErrors()
     {
-        $this->field->addError(new FieldError('Some error'));
+        $this->field->addError(new FormError('Some error'));
         $this->field->bind('data');
 
         $this->assertTrue($this->field->isValid());

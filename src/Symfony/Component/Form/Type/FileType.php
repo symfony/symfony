@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Type;
 
-use Symfony\Component\Form\FieldBuilder;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\EventListener\FixFileUploadListener;
 use Symfony\Component\Form\DataTransformer\DataTransformerChain;
@@ -29,7 +29,7 @@ class FileType extends AbstractType
         $this->storage = $storage;
     }
 
-    public function configure(FieldBuilder $builder, array $options)
+    public function configure(FormBuilder $builder, array $options)
     {
         if ($options['type'] === 'string') {
             $builder->setNormTransformer(new DataTransformerChain(array(

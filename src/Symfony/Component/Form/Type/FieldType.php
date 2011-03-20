@@ -12,13 +12,14 @@
 namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\PropertyPath;
-use Symfony\Component\Form\FieldBuilder;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Renderer\DefaultRenderer;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Form\Renderer\Plugin\FieldPlugin;
 use Symfony\Component\Form\EventListener\TrimListener;
 use Symfony\Component\Form\EventListener\ValidationListener;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Form\Validator\DefaultValidator;
 use Symfony\Component\Form\Validator\DelegatingValidator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Validator\ValidatorInterface;
@@ -35,7 +36,7 @@ class FieldType extends AbstractType
         $this->validator = $validator;
     }
 
-    public function configure(FieldBuilder $builder, array $options)
+    public function configure(FormBuilder $builder, array $options)
     {
         if (false === $options['property_path']) {
             $options['property_path'] = $builder->getName();
@@ -59,6 +60,7 @@ class FieldType extends AbstractType
             ->setData($options['data'])
             ->setRenderer(new DefaultRenderer($this->theme, $options['template']))
             ->addRendererPlugin(new FieldPlugin())
+            ->addValidator(new DefaultValidator())
             ->addValidator(new DelegatingValidator($this->validator));
 
         if ($options['trim']) {
@@ -83,7 +85,7 @@ class FieldType extends AbstractType
 
     public function createBuilder(array $options)
     {
-        return new FieldBuilder($this->theme, new EventDispatcher());
+        return new FormBuilder($this->theme, new EventDispatcher());
     }
 
     public function getParent(array $options)

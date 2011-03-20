@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Form\Renderer\Plugin;
 
-use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Renderer\RendererInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class FormPlugin implements RendererPluginInterface
 {
-    public function setUp(FieldInterface $form, RendererInterface $renderer)
+    public function setUp(FormInterface $form, RendererInterface $renderer)
     {
         if (!$form instanceof FormInterface) {
             throw new UnexpectedTypeException($form, 'Symfony\Component\Form\FormInterface');

@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Form\Renderer\Plugin;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Renderer\RendererInterface;
 
 interface RendererPluginInterface
 {
-    function setUp(FieldInterface $field, RendererInterface $renderer);
+    function setUp(FormInterface $field, RendererInterface $renderer);
 }

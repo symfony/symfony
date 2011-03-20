@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\DataMapper;
 
-use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\RecursiveFieldIterator;
 use Symfony\Component\Form\Exception\FormException;
@@ -51,7 +50,7 @@ class PropertyPathMapper implements DataMapperInterface
         return array();
     }
 
-    public function mapDataToForm(&$data, FormInterface $form)
+    public function mapDataToForms($data, array $forms)
     {
         if (!empty($data) && !is_array($data) && !is_object($data)) {
             throw new \InvalidArgumentException(sprintf('Expected argument of type object or array, %s given', gettype($data)));
@@ -62,49 +61,51 @@ class PropertyPathMapper implements DataMapperInterface
                 throw new FormException(sprintf('Form data should be instance of %s', $this->dataClass));
             }
 
-            $iterator = new RecursiveFieldIterator($form);
+            $iterator = new RecursiveFieldIterator($forms);
             $iterator = new \RecursiveIteratorIterator($iterator);
 
-            foreach ($iterator as $field) {
-                $this->mapDataToField($data, $field);
+            foreach ($iterator as $form) {
+                $this->mapDataToForm($data, $form);
             }
         }
     }
 
-    public function mapDataToField(&$data, FieldInterface $field)
+    public function mapDataToForm($data, FormInterface $form)
     {
-        if ($field->getAttribute('property_path') !== null) {
-            $field->setData($field->getAttribute('property_path')->getValue($data));
+        if (!empty($data)) {
+            if ($form->getAttribute('property_path') !== null) {
+                $form->setData($form->getAttribute('property_path')->getValue($data));
+            }
         }
     }
 
-    public function mapFormToData(FormInterface $form, &$data)
+    public function mapFormsToData(array $forms, &$data)
     {
-        $iterator = new RecursiveFieldIterator($form);
+        $iterator = new RecursiveFieldIterator($forms);
         $iterator = new \RecursiveIteratorIterator($iterator);
 
-        foreach ($iterator as $field) {
+        foreach ($iterator as $form) {
             $isReference = false;
 
             // If the data is identical to the value in $data, we are
             // dealing with a reference
-            if ($field->getAttribute('property_path') !== null) {
-                $isReference = $field->getData() === $field->getAttribute('property_path')->getValue($data);
+            if ($form->getAttribute('property_path') !== null) {
+                $isReference = $form->getData() === $form->getAttribute('property_path')->getValue($data);
             }
 
             // Don't write into $data if $data is an object,
             // $isReference is true (see above) and the option "by_reference" is
             // true as well
-            if (!is_object($data) || !$isReference || !$field->getAttribute('by_reference')) {
-                $this->mapFieldToData($field, $data);
+            if (!is_object($data) || !$isReference || !$form->getAttribute('by_reference')) {
+                $this->mapFormToData($form, $data);
             }
         }
     }
 
-    public function mapFieldToData(FieldInterface $field, &$data)
+    public function mapFormToData(FormInterface $form, &$data)
     {
-        if ($field->getAttribute('property_path') !== null) {
-            $field->getAttribute('property_path')->setValue($data, $field->getData());
+        if ($form->getAttribute('property_path') !== null) {
+            $form->getAttribute('property_path')->setValue($data, $form->getData());
         }
     }
 }

@@ -30,7 +30,7 @@ interface RendererInterface
     /**
      * Renders the label of the given field
      *
-     * @param FieldInterface $field  The field to render the label for
+     * @param FormInterface $field  The field to render the label for
      * @param array $params          Additional variables passed to the template
      */
     function getLabel($label = null, array $vars = array());

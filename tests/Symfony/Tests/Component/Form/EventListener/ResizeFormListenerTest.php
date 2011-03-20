@@ -33,11 +33,11 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->factory->expects($this->at(0))
                       ->method('create')
                       ->with($this->equalTo($expectedType), $this->equalTo( 0 ), array('property_path' => '[0]'))
-                      ->will($this->returnValue($this->getMock('Symfony\Component\Form\FieldInterface')));
+                      ->will($this->returnValue($this->getMock('Symfony\Tests\Component\Form\FormInterface')));
         $this->factory->expects($this->at(1))
                       ->method('create')
                       ->with($this->equalTo($expectedType), $this->equalTo( 1 ), array('property_path' => '[1]'))
-                      ->will($this->returnValue($this->getMock('Symfony\Component\Form\FieldInterface')));
+                      ->will($this->returnValue($this->getMock('Symfony\Tests\Component\Form\FormInterface')));
 
         $data = array("string", "string");
         $event = new DataEvent($this->form, $data);
@@ -70,11 +70,11 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $expectedType = "text";
 
         $this->form->expects($this->once())->method('has')->with($this->equalTo('foo'))->will($this->returnValue( false ));
-        $this->form->expects($this->once())->method('add')->with($this->isInstanceOf('Symfony\Component\Form\FieldInterface'));
+        $this->form->expects($this->once())->method('add')->with($this->isInstanceOf('Symfony\Tests\Component\Form\FormInterface'));
         $this->factory->expects($this->at(0))
                       ->method('create')
                       ->with($this->equalTo($expectedType), $this->equalTo('foo'), $this->equalTo(array('property_path' => '[foo]')))
-                      ->will($this->returnValue( $this->getMock('Symfony\Component\Form\FieldInterface') ));
+                      ->will($this->returnValue( $this->getMock('Symfony\Tests\Component\Form\FormInterface') ));
 
         $data = array("foo" => "bar");
         $event = new DataEvent($this->form, $data);

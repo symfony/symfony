@@ -13,12 +13,11 @@ namespace Symfony\Tests\Component\Form;
 
 require_once __DIR__ . '/TestCase.php';
 require_once __DIR__ . '/Fixtures/Author.php';
-require_once __DIR__ . '/Fixtures/TestForm.php';
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormContext;
 use Symfony\Component\Form\Field;
-use Symfony\Component\Form\FieldError;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\DataError;
 use Symfony\Component\Form\HiddenField;
 use Symfony\Component\Form\PropertyPath;
@@ -29,17 +28,6 @@ use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Tests\Component\Form\Fixtures\Author;
-use Symfony\Tests\Component\Form\Fixtures\TestForm;
-
-class FormTest_PreconfiguredForm extends Form
-{
-    protected function configure()
-    {
-        $this->add($this->factory->create('field', 'firstName'));
-
-        parent::configure();
-    }
-}
 
 class FormTest_AuthorWithoutRefSetter
 {
@@ -375,7 +363,9 @@ class FormTest extends TestCase
 
     public function testValidIfAllFieldsAreValid()
     {
-        $builder = $this->factory->createBuilder('form', 'author');
+        $builder = $this->factory->createBuilder('form', 'author', array(
+            'csrf_protection' => false,
+        ));
         $builder->add('firstName', 'field');
         $builder->add('lastName', 'field');
         $form = $builder->getInstance();
@@ -429,7 +419,7 @@ class FormTest extends TestCase
     {
         $this->markTestSkipped('Currently does not work');
 
-        $error = new FieldError('Message');
+        $error = new FormError('Message');
 
         $field = $this->createMockField('firstName');
         $field->expects($this->once())
@@ -441,14 +431,14 @@ class FormTest extends TestCase
 
         $path = new PropertyPath('fields[firstName].data');
 
-        $form->addError(new FieldError('Message'), $path->getIterator());
+        $form->addError(new FormError('Message'), $path->getIterator());
     }
 
     public function testAddErrorMapsFieldValidationErrorsOntoFieldsWithinNestedForms()
     {
         $this->markTestSkipped('Currently does not work');
 
-        $error = new FieldError('Message');
+        $error = new FormError('Message');
 
         $field = $this->createMockField('firstName');
         $field->expects($this->once())
@@ -462,7 +452,7 @@ class FormTest extends TestCase
 
         $path = new PropertyPath('fields[names].fields[firstName].data');
 
-        $form->addError(new FieldError('Message'), $path->getIterator());
+        $form->addError(new FormError('Message'), $path->getIterator());
     }
 
     public function testAddErrorKeepsFieldValidationErrorsIfFieldNotFound()
@@ -478,9 +468,9 @@ class FormTest extends TestCase
 
         $path = new PropertyPath('fields[bar].data');
 
-        $form->addError(new FieldError('Message'), $path->getIterator());
+        $form->addError(new FormError('Message'), $path->getIterator());
 
-        $this->assertEquals(array(new FieldError('Message')), $form->getErrors());
+        $this->assertEquals(array(new FormError('Message')), $form->getErrors());
     }
 
     public function testAddErrorKeepsFieldValidationErrorsIfFieldIsHidden()
@@ -499,9 +489,9 @@ class FormTest extends TestCase
 
         $path = new PropertyPath('fields[firstName].data');
 
-        $form->addError(new FieldError('Message'), $path->getIterator());
+        $form->addError(new FormError('Message'), $path->getIterator());
 
-        $this->assertEquals(array(new FieldError('Message')), $form->getErrors());
+        $this->assertEquals(array(new FormError('Message')), $form->getErrors());
     }
 
     public function testAddErrorMapsDataValidationErrorsOntoFields()
@@ -659,10 +649,11 @@ class FormTest extends TestCase
 
         $builder = $this->factory->createBuilder('form', 'author');
         $builder->setClientTransformer($transformer);
-        $builder->setData($originalAuthor);
         $builder->add('firstName', 'field');
         $builder->add('lastName', 'field');
         $form = $builder->getInstance();
+
+        $form->setData($originalAuthor);
 
         $this->assertEquals('Foo', $form['firstName']->getData());
         $this->assertEquals('Bar', $form['lastName']->getData());
@@ -1075,7 +1066,7 @@ class FormTest extends TestCase
     protected function createMockField($key)
     {
         $field = $this->getMock(
-            'Symfony\Component\Form\FieldInterface',
+            'Symfony\Tests\Component\Form\FormInterface',
         array(),
         array(),
             '',

@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Form\Validator;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FormInterface;
 
-class CallbackValidator implements FieldValidatorInterface
+class CallbackValidator implements FormValidatorInterface
 {
     private $callback;
 
@@ -24,7 +24,7 @@ class CallbackValidator implements FieldValidatorInterface
         $this->callback = $callback;
     }
 
-    public function validate(FieldInterface $field)
+    public function validate(FormInterface $field)
     {
         return call_user_func($this->callback, $field);
     }

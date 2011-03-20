@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Form\Type;
 
-use Symfony\Component\Form\FieldBuilder;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\DataTransformer\MoneyToLocalizedStringTransformer;
 use Symfony\Component\Form\Renderer\Plugin\MoneyPatternPlugin;
 
 class MoneyType extends AbstractType
 {
-    public function configure(FieldBuilder $builder, array $options)
+    public function configure(FormBuilder $builder, array $options)
     {
         $builder->setClientTransformer(new MoneyToLocalizedStringTransformer(array(
                 'precision' => $options['precision'],

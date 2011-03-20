@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Form\Type;
 
-use Symfony\Component\Form\FieldInterface;
-use Symfony\Component\Form\FieldBuilder;
-use Symfony\Component\Form\FieldError;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\Validator\CallbackValidator;
 
@@ -26,7 +26,7 @@ class CsrfType extends AbstractType
         $this->csrfProvider = $csrfProvider;
     }
 
-    public function configure(FieldBuilder $builder, array $options)
+    public function configure(FormBuilder $builder, array $options)
     {
         $csrfProvider = $options['csrf_provider'];
         $pageId = $options['page_id'];
@@ -34,11 +34,11 @@ class CsrfType extends AbstractType
         $builder
             ->setData($csrfProvider->generateCsrfToken($pageId))
             ->addValidator(new CallbackValidator(
-                function (FieldInterface $field) use ($csrfProvider, $pageId) {
+                function (FormInterface $field) use ($csrfProvider, $pageId) {
                     if (!$csrfProvider->isCsrfTokenValid($pageId, $field->getData())) {
                         // FIXME this error is currently not displayed
                         // it needs to be passed up to the form
-                        $field->addError(new FieldError('The CSRF token is invalid. Please try to resubmit the form'));
+                        $field->addError(new FormError('The CSRF token is invalid. Please try to resubmit the form'));
                     }
                 }
             ));

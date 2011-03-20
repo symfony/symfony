@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Form\Validator;
 
-use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FormInterface;
 
-interface FieldValidatorInterface
+interface FormValidatorInterface
 {
-    function validate(FieldInterface $field);
+    function validate(FormInterface $field);
 }

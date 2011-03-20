@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Form\Type;
 
-use Symfony\Component\Form\FieldBuilder;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Renderer\Plugin\PasswordValuePlugin;
 
 class PasswordType extends AbstractType
 {
-    public function configure(FieldBuilder $builder, array $options)
+    public function configure(FormBuilder $builder, array $options)
     {
         $builder->addRendererPlugin(new PasswordValuePlugin($options['always_empty']));
     }

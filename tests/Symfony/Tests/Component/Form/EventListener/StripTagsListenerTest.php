@@ -19,7 +19,7 @@ class StripTagsListenerTest extends \PHPUnit_Framework_TestCase
     public function testStripTags()
     {
         $data = "<div><strong>Foo!</strong>Bar!<span>Baz!</span></table></body>";
-        $field = $this->getMock('Symfony\Component\Form\FieldInterface');
+        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
         $event = new FilterDataEvent($field, $data);
 
         $filter = new StripTagsListener();

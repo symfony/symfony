@@ -12,14 +12,48 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\DataMapper\DataMapperInterface;
+use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
+use Symfony\Component\Form\Renderer\DefaultRenderer;
+use Symfony\Component\Form\Renderer\RendererInterface;
+use Symfony\Component\Form\Renderer\Plugin\RendererPluginInterface;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Form\Validator\FormValidatorInterface;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class FormBuilder extends FieldBuilder
+class FormBuilder
 {
+    private $name;
+
+    private $data;
+
+    private $dispatcher;
+
+    private $factory;
+
+    private $readOnly;
+
+    private $required;
+
+    private $renderer;
+
+    private $rendererVars = array();
+
+    private $clientTransformer;
+
+    private $normalizationTransformer;
+
+    private $theme;
+
+    private $validators = array();
+
+    private $attributes = array();
+
+    private $parent;
+
     private $dataClass;
 
     private $csrfFieldName;
@@ -29,6 +63,236 @@ class FormBuilder extends FieldBuilder
     private $fields = array();
 
     private $dataMapper;
+
+    public function __construct(ThemeInterface $theme,
+            EventDispatcherInterface $dispatcher)
+    {
+        $this->theme = $theme;
+        $this->dispatcher = $dispatcher;
+    }
+
+    public function setFormFactory(FormFactoryInterface $factory)
+    {
+        $this->factory = $factory;
+
+        return $this;
+    }
+
+    public function getFormFactory()
+    {
+        return $this->factory;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setParent(FormBuilder $builder)
+    {
+        $this->parent = $builder;
+
+        return $this;
+    }
+
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    public function end()
+    {
+        return $this->parent;
+    }
+
+    public function setData($data)
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    public function setReadOnly($readOnly)
+    {
+        $this->readOnly = $readOnly;
+
+        return $this;
+    }
+
+    public function getReadOnly()
+    {
+        return $this->readOnly;
+    }
+
+    /**
+     * Sets whether this field is required to be filled out when bound.
+     *
+     * @param Boolean $required
+     */
+    public function setRequired($required)
+    {
+        $this->required = $required;
+
+        return $this;
+    }
+
+    public function getRequired()
+    {
+        return $this->required;
+    }
+
+    public function addValidator(FormValidatorInterface $validator)
+    {
+        $this->validators[] = $validator;
+
+        return $this;
+    }
+
+    public function getValidators()
+    {
+        return $this->validators;
+    }
+
+    /**
+     * Adds an event listener for events on this field
+     *
+     * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addEventListener
+     */
+    public function addEventListener($eventNames, $listener, $priority = 0)
+    {
+        $this->dispatcher->addListener($eventNames, $listener, $priority);
+
+        return $this;
+    }
+
+    /**
+     * Adds an event subscriber for events on this field
+     *
+     * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addEventSubscriber
+     */
+    public function addEventSubscriber(EventSubscriberInterface $subscriber, $priority = 0)
+    {
+        $this->dispatcher->addSubscriber($subscriber, $priority);
+
+        return $this;
+    }
+
+    protected function buildDispatcher()
+    {
+        return $this->dispatcher;
+    }
+
+    /**
+     * Sets the DataTransformer.
+     *
+     * @param DataTransformerInterface $clientTransformer
+     */
+    public function setNormTransformer(DataTransformerInterface $normalizationTransformer = null)
+    {
+        $this->normalizationTransformer = $normalizationTransformer;
+
+        return $this;
+    }
+
+    public function getNormTransformer()
+    {
+        return $this->normalizationTransformer;
+    }
+
+    /**
+     * Sets the DataTransformer.
+     *
+     * @param DataTransformerInterface $clientTransformer
+     */
+    public function setClientTransformer(DataTransformerInterface $clientTransformer = null)
+    {
+        $this->clientTransformer = $clientTransformer;
+
+        return $this;
+    }
+
+    public function getClientTransformer()
+    {
+        return $this->clientTransformer;
+    }
+
+    /**
+     * Sets the renderer
+     *
+     * @param RendererInterface $renderer
+     */
+    public function setRenderer(RendererInterface $renderer)
+    {
+        $this->renderer = $renderer;
+
+        return $this;
+    }
+
+    public function addRendererPlugin(RendererPluginInterface $plugin)
+    {
+        $this->rendererVars[] = $plugin;
+
+        return $this;
+    }
+
+    public function setRendererVar($name, $value)
+    {
+        $this->rendererVars[$name] = $value;
+
+        return $this;
+    }
+
+    protected function buildRenderer()
+    {
+        if (!$this->renderer) {
+            $this->renderer = new DefaultRenderer($this->theme, 'text');
+        }
+
+        foreach ($this->rendererVars as $name => $value) {
+            if ($value instanceof RendererPluginInterface) {
+                $this->renderer->addPlugin($value);
+                continue;
+            }
+
+            $this->renderer->setVar($name, $value);
+        }
+
+        return $this->renderer;
+    }
+
+    public function setAttribute($name, $value)
+    {
+        $this->attributes[$name] = $value;
+
+        return $this;
+    }
+
+    public function getAttribute($name)
+    {
+        return $this->attributes[$name];
+    }
+
+    public function hasAttribute($name)
+    {
+        return isset($this->attributes[$name]);
+    }
+
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
 
     public function setDataMapper(DataMapperInterface $dataMapper)
     {
@@ -72,8 +336,8 @@ class FormBuilder extends FieldBuilder
      * $form->add($locationGroup);
      * </code>
      *
-     * @param FieldInterface|string $field
-     * @return FieldInterface
+     * @param FormInterface|string $field
+     * @return FormInterface
      */
     public function add($name, $type = null, array $options = array())
     {
@@ -128,7 +392,7 @@ class FormBuilder extends FieldBuilder
 
         $field = $this->fields[$name];
 
-        if ($field instanceof FieldBuilder) {
+        if ($field instanceof FormBuilder) {
             return $field;
         }
 
@@ -144,7 +408,7 @@ class FormBuilder extends FieldBuilder
     {
         if (isset($this->fields[$name])) {
             // field might still be lazy
-            if ($this->fields[$name] instanceof FieldInterface) {
+            if ($this->fields[$name] instanceof FormInterface) {
                 $this->fields[$name]->setParent(null);
             }
 
@@ -168,7 +432,7 @@ class FormBuilder extends FieldBuilder
         $fields = array();
 
         foreach ($this->fields as $name => $builder) {
-            if (!$builder instanceof FieldBuilder) {
+            if (!$builder instanceof FormBuilder) {
                 $builder = $this->build($name, $builder['type'], $builder['options']);
             }
 

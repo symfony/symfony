@@ -11,29 +11,19 @@
 
 namespace Symfony\Component\Form\Type;
 
-use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Renderer\Plugin\FormPlugin;
-use Symfony\Component\Form\Validator\FormValidator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class FormType extends AbstractType
 {
-    private $theme;
-
-    public function __construct(ThemeInterface $theme)
-    {
-        $this->theme = $theme;
-    }
-
-    public function configure(FieldBuilder $builder, array $options)
+    public function configure(FormBuilder $builder, array $options)
     {
         $builder->setAttribute('virtual', $options['virtual'])
             ->addRendererPlugin(new FormPlugin())
-            ->addValidator(new FormValidator())
             ->setDataClass($options['data_class'])
             ->setDataMapper(new PropertyPathMapper(
                 $options['data_class'],
@@ -57,11 +47,6 @@ class FormType extends AbstractType
             'validation_groups' => null,
             'virtual' => false,
         );
-    }
-
-    public function createBuilder(array $options)
-    {
-        return new FormBuilder($this->theme, new EventDispatcher());
     }
 
     public function getParent(array $options)

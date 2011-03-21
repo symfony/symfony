@@ -28,7 +28,7 @@ class DateTimeToStringTransformer implements DataTransformerInterface
 
     private $format;
     
-    public function __construct($format = 'Y-m-d H:i:s', $inputTimezone = null, $outputTimezone = null)
+    public function __construct($outputTimezone = null, $format = 'Y-m-d H:i:s', $inputTimezone = null)
     {
         if(is_null($inputTimezone)) {
             $inputTimezone = date_default_timezone_get();

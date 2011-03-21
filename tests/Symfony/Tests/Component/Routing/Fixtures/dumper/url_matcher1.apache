@@ -1,37 +1,49 @@
+# skip "real" requests
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule .* - [QSA,L]
+
 # foo
-RewriteCond %{PATH_INFO}, ^/foo/(baz|symfony)$
+RewriteCond %{REQUEST_URI} ^/foo/(baz|symfony)$
 RewriteRule .* app.php [QSA,L,E=_ROUTING__route:foo,E=_ROUTING_bar:%1,E=_ROUTING_def:test]
 
 # bar
+RewriteCond %{REQUEST_URI} ^/bar/([^/\.]+?)$
 RewriteCond %{REQUEST_METHOD} !^(get|head)$ [NC]
 RewriteRule .* - [S=1,E=_ROUTING__allow_get:1,E=_ROUTING__allow_head:1]
-RewriteCond %{PATH_INFO}, ^/bar/([^/\.]+?)$
+RewriteCond %{REQUEST_URI} ^/bar/([^/\.]+?)$
 RewriteRule .* app.php [QSA,L,E=_ROUTING__route:bar,E=_ROUTING_foo:%1]
 
 # baz
-RewriteCond %{PATH_INFO}, ^/test/baz$
+RewriteCond %{REQUEST_URI} ^/test/baz$
 RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz]
 
 # baz2
-RewriteCond %{PATH_INFO}, ^/test/baz\.html$
+RewriteCond %{REQUEST_URI} ^/test/baz\.html$
 RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz2]
 
 # baz3
-RewriteCond %{PATH_INFO}, ^/test/baz3/$
+RewriteCond %{REQUEST_URI} ^/test/baz3$
+RewriteRule .* $0/ [QSA,L,R=301]
+RewriteCond %{REQUEST_URI} ^/test/baz3/$
 RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz3]
-RewriteCond %{PATH_INFO}, ^/test/baz3$
-RewriteRule .* /$0/ [QSA,L,R=301]
 
 # baz4
-RewriteCond %{PATH_INFO}, ^/test/([^/\.]+?)/$
+RewriteCond %{REQUEST_URI} ^/test/([^/\.]+?)$
+RewriteRule .* $0/ [QSA,L,R=301]
+RewriteCond %{REQUEST_URI} ^/test/([^/\.]+?)/$
 RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz4,E=_ROUTING_foo:%1]
-RewriteCond %{PATH_INFO}, ^/test/([^/\.]+?)$
-RewriteRule .* /$0/ [QSA,L,R=301]
 
 # baz5
+RewriteCond %{REQUEST_URI} ^/test/([^/\.]+?)/$
 RewriteCond %{REQUEST_METHOD} !^(post)$ [NC]
 RewriteRule .* - [S=2,E=_ROUTING__allow_post:1]
-RewriteCond %{PATH_INFO}, ^/test/([^/\.]+?)/$
+RewriteCond %{REQUEST_URI} ^/test/([^/\.]+?)$
+RewriteRule .* $0/ [QSA,L,R=301]
+RewriteCond %{REQUEST_URI} ^/test/([^/\.]+?)/$
 RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz5,E=_ROUTING_foo:%1]
-RewriteCond %{PATH_INFO}, ^/test/([^/\.]+?)$
-RewriteRule .* /$0/ [QSA,L,R=301]
+
+# 405 Method Not Allowed
+RewriteCond %{_ROUTING__allow_get} !-z [OR]
+RewriteCond %{_ROUTING__allow_head} !-z [OR]
+RewriteCond %{_ROUTING__allow_post} !-z
+RewriteRule .* app.php [QSA,L]

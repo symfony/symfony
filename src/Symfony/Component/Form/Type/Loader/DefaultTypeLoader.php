@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Type\Loader;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Type;
 use Symfony\Component\Form\Type\FieldTypeInterface;
-use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
+use Symfony\Component\Form\Renderer\Theme\FormThemeInterface;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\File\TemporaryStorage;
@@ -25,7 +25,7 @@ class DefaultTypeLoader implements TypeLoaderInterface
     private $types = array();
 
     public function initialize(FormFactoryInterface $factory,
-            ThemeInterface $theme, CsrfProviderInterface $csrfProvider,
+            FormThemeInterface $theme, CsrfProviderInterface $csrfProvider,
             ValidatorInterface $validator, TemporaryStorage $storage,
             EntityManager $em = null)
     {

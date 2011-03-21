@@ -27,7 +27,7 @@ use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
 use Symfony\Component\Form\DataTransformer\TransformationFailedException;
 use Symfony\Component\Form\DataMapper\DataMapperInterface;
 use Symfony\Component\Form\Validator\FormValidatorInterface;
-use Symfony\Component\Form\Renderer\RendererInterface;
+use Symfony\Component\Form\Renderer\FormRendererInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -107,7 +107,7 @@ class Form implements \IteratorAggregate, FormInterface
     private $attributes;
 
     public function __construct($name, EventDispatcherInterface $dispatcher,
-        RendererInterface $renderer = null, DataTransformerInterface $clientTransformer = null,
+        FormRendererInterface $renderer = null, DataTransformerInterface $clientTransformer = null,
         DataTransformerInterface $normTransformer = null,
         DataMapperInterface $dataMapper = null, array $validators = array(),
         $required = false, $readOnly = false, array $attributes = array())
@@ -130,7 +130,7 @@ class Form implements \IteratorAggregate, FormInterface
         $this->attributes = $attributes;
 
         if ($renderer) {
-            $renderer->setField($this);
+            $renderer->setForm($this);
         }
 
         $this->setData(null);
@@ -519,7 +519,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns the renderer
      *
-     * @return RendererInterface
+     * @return FormRendererInterface
      */
     public function getRenderer()
     {

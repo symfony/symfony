@@ -12,11 +12,11 @@
 namespace Symfony\Component\Form\Renderer\Plugin;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Renderer\RendererInterface;
+use Symfony\Component\Form\Renderer\FormRendererInterface;
 
-class SelectMultipleNamePlugin implements RendererPluginInterface
+class SelectMultipleNamePlugin implements FormRendererPluginInterface
 {
-    public function setUp(FormInterface $field, RendererInterface $renderer)
+    public function setUp(FormInterface $field, FormRendererInterface $renderer)
     {
         // Add "[]" to the name in case a select tag with multiple options is
         // displayed. Otherwise only one of the selected options is sent in the

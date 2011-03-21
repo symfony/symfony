@@ -12,9 +12,9 @@
 namespace Symfony\Component\Form\Renderer\Plugin;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Renderer\RendererInterface;
+use Symfony\Component\Form\Renderer\FormRendererInterface;
 
-class MoneyPatternPlugin implements RendererPluginInterface
+class MoneyPatternPlugin implements FormRendererPluginInterface
 {
     private static $patterns = array();
 
@@ -25,7 +25,7 @@ class MoneyPatternPlugin implements RendererPluginInterface
         $this->currency = $currency;
     }
 
-    public function setUp(FormInterface $field, RendererInterface $renderer)
+    public function setUp(FormInterface $field, FormRendererInterface $renderer)
     {
         $renderer->setVar('money_pattern', self::getPattern($this->currency));
     }

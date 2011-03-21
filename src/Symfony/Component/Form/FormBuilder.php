@@ -14,9 +14,9 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\DataMapper\DataMapperInterface;
 use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
-use Symfony\Component\Form\Renderer\DefaultRenderer;
-use Symfony\Component\Form\Renderer\RendererInterface;
-use Symfony\Component\Form\Renderer\Plugin\RendererPluginInterface;
+use Symfony\Component\Form\Renderer\ThemeRenderer;
+use Symfony\Component\Form\Renderer\FormRendererInterface;
+use Symfony\Component\Form\Renderer\Plugin\FormRendererPluginInterface;
 use Symfony\Component\Form\Validator\FormValidatorInterface;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -226,16 +226,16 @@ class FormBuilder
     /**
      * Sets the renderer
      *
-     * @param RendererInterface $renderer
+     * @param FormRendererInterface $renderer
      */
-    public function setRenderer(RendererInterface $renderer)
+    public function setRenderer(FormRendererInterface $renderer)
     {
         $this->renderer = $renderer;
 
         return $this;
     }
 
-    public function addRendererPlugin(RendererPluginInterface $plugin)
+    public function addRendererPlugin(FormRendererPluginInterface $plugin)
     {
         $this->rendererVars[] = $plugin;
 
@@ -256,7 +256,7 @@ class FormBuilder
                 throw new FormException('A renderer must be set in order to add renderer variables or plugins');
             }
 
-            if ($value instanceof RendererPluginInterface) {
+            if ($value instanceof FormRendererPluginInterface) {
                 $this->renderer->addPlugin($value);
                 continue;
             }

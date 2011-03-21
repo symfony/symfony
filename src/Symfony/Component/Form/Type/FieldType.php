@@ -13,8 +13,8 @@ namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\Renderer\DefaultRenderer;
-use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
+use Symfony\Component\Form\Renderer\ThemeRenderer;
+use Symfony\Component\Form\Renderer\Theme\FormThemeInterface;
 use Symfony\Component\Form\Renderer\Plugin\FieldPlugin;
 use Symfony\Component\Form\EventListener\TrimListener;
 use Symfony\Component\Form\EventListener\ValidationListener;
@@ -30,7 +30,7 @@ class FieldType extends AbstractType
 
     private $validator;
 
-    public function __construct(ThemeInterface $theme, ValidatorInterface $validator)
+    public function __construct(FormThemeInterface $theme, ValidatorInterface $validator)
     {
         $this->theme = $theme;
         $this->validator = $validator;
@@ -58,7 +58,7 @@ class FieldType extends AbstractType
             ->setAttribute('property_path', $options['property_path'])
             ->setAttribute('validation_groups', $options['validation_groups'])
             ->setData($options['data'])
-            ->setRenderer(new DefaultRenderer($this->theme, $options['template']))
+            ->setRenderer(new ThemeRenderer($this->theme, $options['template']))
             ->addRendererPlugin(new FieldPlugin())
             ->addValidator(new DefaultValidator())
             ->addValidator(new DelegatingValidator($this->validator));

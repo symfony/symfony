@@ -3,10 +3,10 @@
 {% block row %}
 {% spaceless %}
     <tr>
-        <td>{{ this.label }}</td>
+        <td>{{ renderer.label }}</td>
         <td>
-        {{ this.errors }}
-        {{ this.widget }}
+        {{ renderer.errors }}
+        {{ renderer.widget }}
         </td>
     </tr>
 {% endspaceless %}
@@ -30,7 +30,7 @@
 {% spaceless %}
     <table>
     {{ block('rows') }}
-    {{ this.rest }}
+    {{ renderer.rest }}
     </table>
 {% endspaceless %}
 {% endblock form__widget %}

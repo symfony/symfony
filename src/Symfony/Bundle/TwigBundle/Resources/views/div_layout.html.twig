@@ -3,9 +3,9 @@
 {% block row %}
 {% spaceless %}
     <div>
-        {{ this.label }}
-        {{ this.errors }}
-        {{ this.widget }}
+        {{ renderer.label }}
+        {{ renderer.errors }}
+        {{ renderer.widget }}
     </div>
 {% endspaceless %}
 {% endblock row %}
@@ -13,6 +13,6 @@
 {% block form__widget %}
 {% spaceless %}
     {{ block('rows') }}
-    {{ this.rest }}
+    {{ renderer.rest }}
 {% endspaceless %}
 {% endblock form__widget %}

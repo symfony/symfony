@@ -14,7 +14,6 @@ namespace Symfony\Component\Config\Definition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\DuplicateKeyException;
 use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
-use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 /**
@@ -118,7 +117,7 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Sets the node prototype.
      *
-     * @param PrototypeNodeInterface $node 
+     * @param PrototypeNodeInterface $node
      */
     public function setPrototype(PrototypeNodeInterface $node)
     {
@@ -139,7 +138,7 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Finalizes the value of this node.
      *
-     * @param mixed $value 
+     * @param mixed $value
      * @return mixed The finalised value
      * @throws UnsetKeyException
      * @throws InvalidConfigurationException if the node doesn't have enough children
@@ -182,7 +181,7 @@ class PrototypedArrayNode extends ArrayNode
 
         $value = $this->remapXml($value);
 
-        $normalized = array();         
+        $normalized = array();
         foreach ($value as $k => $v) {
             if (null !== $this->keyAttribute && is_array($v)) {
                 if (!isset($v[$this->keyAttribute]) && is_int($k)) {
@@ -257,7 +256,7 @@ class PrototypedArrayNode extends ArrayNode
             }
 
             $this->prototype->setName($k);
-            $leftSide[$k] = $this->prototype->merge($leftSide[$k], $v);            
+            $leftSide[$k] = $this->prototype->merge($leftSide[$k], $v);
         }
 
         return $leftSide;

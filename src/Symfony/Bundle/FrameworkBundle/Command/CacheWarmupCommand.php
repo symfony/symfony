@@ -73,7 +73,7 @@ EOF
                 $this->cacheDir
             );
 
-            $this->clearDir($this->kernelTmp->getCacheDir());
+            $this->container->get('filesystem')->remove($this->kernelTmp->getCacheDir());
 
             $this->kernelTmp->boot();
             unlink($this->kernelTmp->getCacheDir().DIRECTORY_SEPARATOR.$this->kernelTmp->getContainerClass().'.php');
@@ -87,40 +87,5 @@ EOF
         $warmer = $container->get('cache_warmer');
         $warmer->enableOptionalWarmers();
         $warmer->warmUp($container->getParameter('kernel.cache_dir'));
-    }
-
-    protected function clearDir($dir)
-    {
-        if (is_dir($dir)) {
-            $finder = new Finder();
-            $files  = $finder
-                ->in($dir)
-                ->getIterator()
-            ;
-
-            $array = iterator_to_array($files);
-
-            foreach (array_reverse($array) as $file) {
-                if ($file->isFile()) {
-                    if (!is_writable($file->getPathname())) {
-                        throw new \RuntimeException(sprintf('Unable to delete %s file', $file->getPathname()));
-                    }
-
-                    unlink($file->getPathname());
-                } else {
-                    if (!is_writable($file->getPathname())) {
-                        throw new \RuntimeException(sprintf('Unable to delete %s directory', $file->getPathname()));
-                    }
-
-                    rmdir($file->getPathname());
-                }
-            }
-
-            if (!is_writable($dir)) {
-                throw new \RuntimeException(sprintf('Unable to delete %s directory', $dir));
-            }
-
-            rmdir($dir);
-        }
     }
 }

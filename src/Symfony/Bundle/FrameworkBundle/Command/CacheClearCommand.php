@@ -63,13 +63,10 @@ EOF
             throw new \RuntimeException(sprintf('Unable to write %s directory', $this->realCacheDir));
         }
 
-        $this->clearDir($oldCacheDir);
-
         if (!$input->getOption('warmup')) {
             $output->writeln('Clear cache');
 
             rename($realCacheDir, $oldCacheDir);
-            $this->clearDir($oldCacheDir);
         } else {
             parent::execute($input, $output);
 
@@ -78,7 +75,8 @@ EOF
             rename($this->kernelTmp->getCacheDir(), $realCacheDir);
 
             $output->writeln('Clear the old cache');
-            $this->clearDir($oldCacheDir);
         }
+
+        $this->container->get('filesystem')->remove($oldCacheDir);
     }
 }

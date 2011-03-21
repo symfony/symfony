@@ -100,11 +100,11 @@ class FormTest extends TestCase
 
     public function testCsrfProtectionByDefault()
     {
-        $builder =  $this->factory->createBuilder('form', 'author');
-        $form = $builder->getForm();
+        $builder =  $this->factory->create('form', 'author', array(
+            'csrf_field_name' => 'csrf',
+        ));
 
-        $this->assertTrue($builder->hasCsrfProtection());
-        $this->assertTrue($form->has($builder->getCsrfFieldName()));
+        $this->assertTrue($builder->has('csrf'));
     }
 
     public function testCsrfProtectionCanBeDisabled()
@@ -114,91 +114,6 @@ class FormTest extends TestCase
         ));
 
         $this->assertEquals(0, count($form));
-    }
-
-    public function testCsrfFieldNameCanBeSet()
-    {
-        $form =  $this->factory->create('form', 'author', array(
-            'csrf_field_name' => 'foobar',
-        ));
-
-        $this->assertTrue($form->has('foobar'));
-        $this->assertEquals(1, count($form));
-    }
-
-    public function testCsrfProtectedFormsHaveExtraField()
-    {
-        $this->markTestSkipped('CSRF protection needs to be fixed');
-
-        $provider = $this->createMockCsrfProvider();
-        $provider->expects($this->once())
-        ->method('generateCsrfToken')
-        ->with($this->equalTo('Symfony\Component\Form\Form'))
-        ->will($this->returnValue('ABCDEF'));
-
-        $form = $this->factory->create('form', 'author', array(
-            'csrf_provider' => $provider,
-        ));
-
-        $this->assertTrue($form->has($this->form->getCsrfFieldName()));
-
-        $field = $form->get($form->getCsrfFieldName());
-
-        $this->assertTrue($field instanceof HiddenField);
-        $this->assertEquals('ABCDEF', $field->getClientData());
-    }
-
-    public function testIsCsrfTokenValidPassesIfCsrfProtectionIsDisabled()
-    {
-        $this->markTestSkipped('CSRF protection needs to be fixed');
-
-        $this->form->bind(array());
-
-        $this->assertTrue($this->form->isCsrfTokenValid());
-    }
-
-    public function testIsCsrfTokenValidPasses()
-    {
-        $this->markTestSkipped('CSRF protection needs to be fixed');
-
-        $provider = $this->createMockCsrfProvider();
-        $provider->expects($this->once())
-        ->method('isCsrfTokenValid')
-        ->with($this->equalTo('Symfony\Component\Form\Form'), $this->equalTo('ABCDEF'))
-        ->will($this->returnValue(true));
-
-        $form = $this->factory->create('form', 'author', array(
-            'csrf_provider' => $provider,
-            'validator' => $this->validator,
-        ));
-
-        $field = $form->getCsrfFieldName();
-
-        $form->bind(array($field => 'ABCDEF'));
-
-        $this->assertTrue($form->isCsrfTokenValid());
-    }
-
-    public function testIsCsrfTokenValidFails()
-    {
-        $this->markTestSkipped('CSRF protection needs to be fixed');
-
-        $provider = $this->createMockCsrfProvider();
-        $provider->expects($this->once())
-        ->method('isCsrfTokenValid')
-        ->with($this->equalTo('Symfony\Component\Form\Form'), $this->equalTo('ABCDEF'))
-        ->will($this->returnValue(false));
-
-        $form = $this->factory->create('form', 'author', array(
-            'csrf_provider' => $provider,
-            'validator' => $this->validator,
-        ));
-
-        $field = $form->getCsrfFieldName();
-
-        $form->bind(array($field => 'ABCDEF'));
-
-        $this->assertFalse($form->isCsrfTokenValid());
     }
 
     public function testValidationGroupNullByDefault()

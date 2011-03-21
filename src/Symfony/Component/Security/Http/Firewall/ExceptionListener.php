@@ -152,7 +152,10 @@ class ExceptionListener
 
         // session isn't required when using http basic authentification mechanism for example
         if ($request->hasSession()) {
-            $request->getSession()->set('_security.target_path', $request->getUri());
+            $uri = $request->getUri();
+            if (!preg_match('#/favicon\.ico(\?|$)#i', $uri)) {
+                $request->getSession()->set('_security.target_path', $uri);
+            }
         }
 
         return $this->authenticationEntryPoint->start($request, $authException);

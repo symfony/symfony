@@ -44,6 +44,7 @@ abstract class Kernel implements KernelInterface
     protected $rootDir;
     protected $environment;
     protected $debug;
+    protected $cacheDir;
     protected $booted;
     protected $name;
     protected $startTime;
@@ -56,10 +57,11 @@ abstract class Kernel implements KernelInterface
      * @param string  $environment The environment
      * @param Boolean $debug       Whether to enable debugging or not
      */
-    public function __construct($environment, $debug)
+    public function __construct($environment, $debug, $cacheDir = null)
     {
         $this->environment = $environment;
         $this->debug = (Boolean) $debug;
+        $this->cacheDir = $cacheDir;
         $this->booted = false;
         $this->rootDir = $this->getRootDir();
         $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
@@ -335,7 +337,7 @@ abstract class Kernel implements KernelInterface
      */
     public function getCacheDir()
     {
-        return $this->rootDir.'/cache/'.$this->environment;
+        return $this->rootDir.'/cache/'.($this->cacheDir ?: $this->environment);
     }
 
     /**
@@ -414,7 +416,7 @@ abstract class Kernel implements KernelInterface
      */
     protected function getContainerClass()
     {
-        return $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
+        return $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer'.($this->cacheDir ? 'Tmp' : '');
     }
 
     /**
@@ -442,6 +444,19 @@ abstract class Kernel implements KernelInterface
 
         if (!$fresh && 'cli' !== php_sapi_name()) {
             $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
+        }
+
+        if ($cacheDir = $this->cacheDir) {
+            $realCacheDir   = $this->getCacheDir();
+            $this->cacheDir = null;
+
+            $class = $this->getContainerClass();
+            $cache = new ConfigCache($realCacheDir, $class, $this->debug);
+
+            $container = $this->buildContainer();
+            $this->dumpContainer($cache, $container, $class);
+
+            $this->cacheDir = $cacheDir;
         }
     }
 

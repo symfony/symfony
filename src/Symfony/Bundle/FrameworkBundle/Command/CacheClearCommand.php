@@ -19,6 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Clear and Warmup the cache.
  *
  * @author Francis Besset <francis.besset@gmail.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class CacheClearCommand extends CacheWarmupCommand
 {
@@ -30,15 +31,13 @@ class CacheClearCommand extends CacheWarmupCommand
         $this
             ->setName('cache:clear')
             ->setDefinition(array(
-                new InputOption('warmup', '', InputOption::VALUE_NONE, 'Warms up the cache')
+                new InputOption('no-warmup', '', InputOption::VALUE_NONE, 'Do not warm up the cache')
             ))
             ->setDescription('Clear the cache')
             ->setHelp(<<<EOF
-The <info>cache:clear</info> command clear the cache.
+The <info>cache:clear</info> command clears the application cache for the current environment:
 
-<info>./app/console cache:clear --warmup</info>
-
-Warmup option, warms up the cache.
+<info>./app/console cache:clear</info>
 EOF
             )
         ;
@@ -60,21 +59,16 @@ EOF
         $oldCacheDir  = $realCacheDir.'_old';
 
         if (!is_writable($realCacheDir)) {
-            throw new \RuntimeException(sprintf('Unable to write %s directory', $this->realCacheDir));
+            throw new \RuntimeException(sprintf('Unable to write in "%s" directory', $this->realCacheDir));
         }
 
-        if (!$input->getOption('warmup')) {
-            $output->writeln('Clear cache');
-
+        if ($input->getOption('no-warmup')) {
             rename($realCacheDir, $oldCacheDir);
         } else {
             parent::execute($input, $output);
 
-            $output->writeln('Move cache directories');
             rename($realCacheDir, $oldCacheDir);
             rename($this->kernelTmp->getCacheDir(), $realCacheDir);
-
-            $output->writeln('Clear the old cache');
         }
 
         $this->container->get('filesystem')->remove($oldCacheDir);

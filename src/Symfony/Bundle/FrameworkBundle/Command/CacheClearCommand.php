@@ -33,13 +33,16 @@ class CacheClearCommand extends Command
         $this
             ->setName('cache:clear')
             ->setDefinition(array(
-                new InputOption('no-warmup', '', InputOption::VALUE_NONE, 'Do not warm up the cache')
+                new InputOption('no-warmup', '', InputOption::VALUE_NONE, 'Do not warm up the cache'),
+                new InputOption('without-debug', '', InputOption::VALUE_NONE, 'If the cache is warmed up, whether to disable debugging or not'),
             ))
             ->setDescription('Clear the cache')
             ->setHelp(<<<EOF
-The <info>cache:clear</info> command clears the application cache for the current environment:
+The <info>cache:clear</info> command clears the application cache for a given environment
+and debug mode:
 
-<info>./app/console cache:clear</info>
+<info>./app/console cache:clear dev</info>
+<info>./app/console cache:clear prod --without-debug</info>
 EOF
             )
         ;
@@ -54,7 +57,7 @@ EOF
         $oldCacheDir  = $realCacheDir.'_old';
 
         if (!is_writable($realCacheDir)) {
-            throw new \RuntimeException(sprintf('Unable to write in "%s" directory', $this->realCacheDir));
+            throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $this->realCacheDir));
         }
 
         if ($input->getOption('no-warmup')) {
@@ -62,7 +65,7 @@ EOF
         } else {
             $warmupDir = $realCacheDir.'_new';
 
-            $this->warmup($warmupDir);
+            $this->warmup(!$input->getOption('without-debug'), $warmupDir);
 
             rename($realCacheDir, $oldCacheDir);
             rename($warmupDir, $realCacheDir);
@@ -71,18 +74,18 @@ EOF
         $this->container->get('filesystem')->remove($oldCacheDir);
     }
 
-    protected function warmup($warmupDir)
+    protected function warmup($debug, $warmupDir)
     {
         $this->container->get('filesystem')->remove($warmupDir);
 
-        $kernel = $this->getTempKernel($this->container->get('kernel'), $warmupDir);
+        $kernel = $this->getTempKernel($this->container->get('kernel'), $debug, $warmupDir);
         $kernel->boot();
 
         $warmer = $kernel->getContainer()->get('cache_warmer');
         $warmer->enableOptionalWarmers();
         $warmer->warmUp($warmupDir);
 
-        // rename container files
+        // fix container files and classes
         $finder = new Finder();
         foreach ($finder->files()->name(get_class($kernel->getContainer()).'*')->in($warmupDir) as $file) {
             $content = file_get_contents($file);
@@ -92,7 +95,7 @@ EOF
         }
     }
 
-    protected function getTempKernel(KernelInterface $parent, $warmupDir)
+    protected function getTempKernel(KernelInterface $parent, $debug, $warmupDir)
     {
         $parentClass = get_class($parent);
         $rand = uniqid();
@@ -124,6 +127,6 @@ EOF;
         require_once $file;
         @unlink($file);
 
-        return new $class($parent->getEnvironment(), $parent->isDebug());
+        return new $class($parent->getEnvironment(), $debug);
     }
 }

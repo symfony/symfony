@@ -79,7 +79,7 @@ class DelegatingValidator implements FormValidatorInterface
                     return;
                 }
             } else if ($type === self::DATA_ERROR) {
-                $iterator = new RecursiveFieldIterator($form);
+                $iterator = new RecursiveFormIterator($form);
                 $iterator = new \RecursiveIteratorIterator($iterator);
 
                 foreach ($iterator as $child) {

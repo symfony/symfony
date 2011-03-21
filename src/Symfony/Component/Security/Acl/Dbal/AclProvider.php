@@ -321,7 +321,6 @@ FINDCHILDREN;
             FROM %s o
             INNER JOIN %s c ON c.id = o.class_id
             WHERE o.object_identifier = %s AND c.class_type = %s
-            LIMIT 1
 QUERY;
 
         return sprintf(

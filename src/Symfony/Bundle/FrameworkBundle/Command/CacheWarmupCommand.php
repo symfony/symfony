@@ -67,7 +67,8 @@ EOF
         if (!$this->cacheDir) {
             $this->warmUp($this->container);
         } else {
-            $this->kernelTmp = new \AppKernel(
+            $class = get_class($this->container->get('kernel'));
+            $this->kernelTmp = new $class(
                 $this->container->getParameter('kernel.environment'),
                 $this->container->getParameter('kernel.debug'),
                 $this->cacheDir

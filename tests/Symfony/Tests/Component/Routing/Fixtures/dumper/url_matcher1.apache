@@ -1,16 +1,37 @@
-RewriteCond %{PATH_INFO} ^/foo/(baz|symfony)$
+# foo
+RewriteCond %{PATH_INFO}, ^/foo/(baz|symfony)$
 RewriteRule .* app.php [QSA,L,E=_ROUTING__route:foo,E=_ROUTING_bar:%1,E=_ROUTING_def:test]
 
-RewriteCond %{REQUEST_METHOD} ^(GET|head) [NC]
-RewriteCond %{PATH_INFO} ^/bar/([^/\.]+?)$
+# bar
+RewriteCond %{REQUEST_METHOD} !^(get|head)$ [NC]
+RewriteRule .* - [S=1,E=_ROUTING__allow_get:1,E=_ROUTING__allow_head:1]
+RewriteCond %{PATH_INFO}, ^/bar/([^/\.]+?)$
 RewriteRule .* app.php [QSA,L,E=_ROUTING__route:bar,E=_ROUTING_foo:%1]
 
-RewriteCond %{PATH_INFO} ^/test/baz/$
+# baz
+RewriteCond %{PATH_INFO}, ^/test/baz$
 RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz]
-RewriteCond %{PATH_INFO} ^/test/baz$
+
+# baz2
+RewriteCond %{PATH_INFO}, ^/test/baz\.html$
+RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz2]
+
+# baz3
+RewriteCond %{PATH_INFO}, ^/test/baz3/$
+RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz3]
+RewriteCond %{PATH_INFO}, ^/test/baz3$
 RewriteRule .* /$0/ [QSA,L,R=301]
 
-RewriteCond %{PATH_INFO} ^/test/([^/\.]+?)/$
-RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz2,E=_ROUTING_foo:%1]
-RewriteCond %{PATH_INFO} ^/test/([^/\.]+?)$
+# baz4
+RewriteCond %{PATH_INFO}, ^/test/([^/\.]+?)/$
+RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz4,E=_ROUTING_foo:%1]
+RewriteCond %{PATH_INFO}, ^/test/([^/\.]+?)$
+RewriteRule .* /$0/ [QSA,L,R=301]
+
+# baz5
+RewriteCond %{REQUEST_METHOD} !^(post)$ [NC]
+RewriteRule .* - [S=2,E=_ROUTING__allow_post:1]
+RewriteCond %{PATH_INFO}, ^/test/([^/\.]+?)/$
+RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz5,E=_ROUTING_foo:%1]
+RewriteCond %{PATH_INFO}, ^/test/([^/\.]+?)$
 RewriteRule .* /$0/ [QSA,L,R=301]

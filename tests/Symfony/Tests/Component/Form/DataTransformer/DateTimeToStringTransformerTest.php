@@ -19,10 +19,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
 {
     public function testTransform()
     {
-        $transformer = new DateTimeToStringTransformer(array(
-            'input_timezone' => 'UTC',
-            'output_timezone' => 'UTC',
-        ));
+        $transformer = new DateTimeToStringTransformer('UTC','Y-m-d H:i:s','UTC');
 
         $input = new \DateTime('2010-02-03 04:05:06 UTC');
         $output = clone $input;
@@ -41,10 +38,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
 
     public function testTransform_differentTimezones()
     {
-        $transformer = new DateTimeToStringTransformer(array(
-            'input_timezone' => 'Asia/Hong_Kong',
-            'output_timezone' => 'America/New_York',
-        ));
+        $transformer = new DateTimeToStringTransformer('America/New_York','Y-m-d H:i:s','Asia/Hong_Kong');
 
         $input = new \DateTime('2010-02-03 04:05:06 America/New_York');
         $output = $input->format('Y-m-d H:i:s');
@@ -64,10 +58,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
 
     public function testReverseTransform()
     {
-        $reverseTransformer = new DateTimeToStringTransformer(array(
-            'input_timezone' => 'UTC',
-            'output_timezone' => 'UTC',
-        ));
+        $reverseTransformer = new DateTimeToStringTransformer('UTC','Y-m-d H:i:s','UTC');
 
         $output = new \DateTime('2010-02-03 04:05:06 UTC');
         $input = $output->format('Y-m-d H:i:s');
@@ -84,10 +75,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
 
     public function testReverseTransform_differentTimezones()
     {
-        $reverseTransformer = new DateTimeToStringTransformer(array(
-            'input_timezone' => 'America/New_York',
-            'output_timezone' => 'Asia/Hong_Kong',
-        ));
+        $reverseTransformer = new DateTimeToStringTransformer('Asia/Hong_Kong','Y-m-d H:i:s','America/New_York');
 
         $output = new \DateTime('2010-02-03 04:05:06 Asia/Hong_Kong');
         $input = $output->format('Y-m-d H:i:s');

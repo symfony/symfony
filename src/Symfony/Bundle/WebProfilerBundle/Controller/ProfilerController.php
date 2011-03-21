@@ -30,9 +30,11 @@ class ProfilerController extends ContainerAware
      *
      * @return Response A Response instance
      */
-    public function panelAction($token, $panel = 'request')
+    public function panelAction($token)
     {
         $this->container->get('profiler')->disable();
+
+        $panel = $this->container->get('request')->query->get('panel', 'request');
 
         $profiler = $this->container->get('profiler')->loadFromToken($token);
 
@@ -125,6 +127,11 @@ class ProfilerController extends ContainerAware
      */
     public function toolbarAction($token, $position = null)
     {
+        $request = $this->container->get('request');
+
+        // keep current flashes for one more request
+        $request->getSession()->setFlashes($request->getSession()->getFlashes());
+
         if (null === $token) {
             return new Response();
         }
@@ -162,7 +169,7 @@ class ProfilerController extends ContainerAware
      *
      * @return Response A Response instance
      */
-    public function searchBarAction($token)
+    public function searchBarAction()
     {
         $profiler = $this->container->get('profiler');
         $profiler->disable();
@@ -171,11 +178,10 @@ class ProfilerController extends ContainerAware
         $ip = $session->get('_profiler_search_ip');
         $url = $session->get('_profiler_search_url');
         $limit = $session->get('_profiler_search_limit');
+        $token = $session->get('_profiler_search_token');
 
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:search.html.twig', array(
             'token'    => $token,
-            'profiler' => $profiler,
-            'tokens'   => $profiler->find($ip, $url, $limit),
             'ip'       => $ip,
             'url'      => $url,
             'limit'    => $limit,
@@ -192,6 +198,8 @@ class ProfilerController extends ContainerAware
         $profiler = $this->container->get('profiler');
         $profiler->disable();
 
+        $pofiler = $profiler->loadFromToken($token);
+
         $session = $this->container->get('request')->getSession();
         $ip = $session->get('_profiler_search_ip');
         $url = $session->get('_profiler_search_url');
@@ -199,7 +207,7 @@ class ProfilerController extends ContainerAware
 
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:results.html.twig', array(
             'token'    => $token,
-            'profiler' => $this->container->get('profiler')->loadFromToken($token),
+            'profiler' => $profiler,
             'tokens'   => $profiler->find($ip, $url, $limit),
             'ip'       => $ip,
             'url'      => $url,
@@ -220,20 +228,19 @@ class ProfilerController extends ContainerAware
 
         $request = $this->container->get('request');
 
-        if ($token = $request->query->get('token')) {
-            return new RedirectResponse($this->container->get('router')->generate('_profiler', array('token' => $token)));
-        }
-
         $session = $request->getSession();
         $session->set('_profiler_search_ip', $ip = preg_replace('/[^\d\.]/', '', $request->query->get('ip')));
         $session->set('_profiler_search_url', $url = $request->query->get('url'));
         $session->set('_profiler_search_limit', $limit = $request->query->get('limit'));
+        $session->set('_profiler_search_token', $token = $request->query->get('token'));
 
-        $profiler = $this->container->get('profiler');
-        $profiler->disable();
+        if (!empty($token)) {
+            return new RedirectResponse($this->container->get('router')->generate('_profiler', array('token' => $token)));
+        }
+
         $tokens = $profiler->find($ip, $url, $limit);
 
-        return new RedirectResponse($this->container->get('router')->generate('_profiler_search_results', array('token' => $tokens ? $tokens[0]['token'] : '')));
+        return new RedirectResponse($this->container->get('router')->generate('_profiler_search_results', array('token' => $tokens ? $tokens[0]['token'] : 'empty')));
     }
 
     protected function getTemplateNames($profiler)

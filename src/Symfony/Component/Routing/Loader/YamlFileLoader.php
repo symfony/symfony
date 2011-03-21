@@ -24,6 +24,10 @@ use Symfony\Component\Config\Loader\FileLoader;
  */
 class YamlFileLoader extends FileLoader
 {
+    private static $availableKeys = array(
+        'type', 'resource', 'prefix', 'pattern', 'options', 'defaults', 'requirements'
+    );
+
     /**
      * Loads a Yaml file.
      *
@@ -54,6 +58,8 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach ($config as $name => $config) {
+            $config = $this->normalizeRouteConfig($config);
+
             if (isset($config['resource'])) {
                 $type = isset($config['type']) ? $config['type'] : null;
                 $prefix = isset($config['prefix']) ? $config['prefix'] : null;
@@ -117,5 +123,28 @@ class YamlFileLoader extends FileLoader
     protected function loadFile($file)
     {
         return Yaml::load($file);
+    }
+
+    /**
+     * Normalize route configuration.
+     *
+     * @param array  $config A resource config
+     *
+     * @return array
+     *
+     * @throws InvalidArgumentException if one of the provided config keys is not supported
+     */
+    private function normalizeRouteConfig(array $config)
+    {
+        foreach ($config as $key => $value) {
+            if (!in_array($key, self::$availableKeys)) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Yaml routing loader does not support given key: "%s". Expected one of the (%s).',
+                    $key, implode(', ', self::$availableKeys)
+                ));
+            }
+        }
+
+        return $config;
     }
 }

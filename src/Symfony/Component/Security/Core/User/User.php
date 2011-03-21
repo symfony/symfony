@@ -18,16 +18,16 @@ namespace Symfony\Component\Security\Core\User;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class User implements AdvancedAccountInterface
+final class User implements AdvancedUserInterface
 {
-    protected $username;
-    protected $password;
-    protected $accountNonExpired;
-    protected $credentialsNonExpired;
-    protected $accountNonLocked;
-    protected $roles;
+    private $username;
+    private $password;
+    private $userNonExpired;
+    private $credentialsNonExpired;
+    private $userNonLocked;
+    private $roles;
 
-    public function __construct($username, $password, array $roles = array(), $enabled = true, $accountNonExpired = true, $credentialsNonExpired = true, $accountNonLocked = true)
+    public function __construct($username, $password, array $roles = array(), $enabled = true, $userNonExpired = true, $credentialsNonExpired = true, $userNonLocked = true)
     {
         if (empty($username)) {
             throw new \InvalidArgumentException('The username cannot be empty.');
@@ -36,18 +36,10 @@ class User implements AdvancedAccountInterface
         $this->username = $username;
         $this->password = $password;
         $this->enabled = $enabled;
-        $this->accountNonExpired = $accountNonExpired;
+        $this->accountNonExpired = $userNonExpired;
         $this->credentialsNonExpired = $credentialsNonExpired;
-        $this->accountNonLocked = $accountNonLocked;
+        $this->accountNonLocked = $userNonLocked;
         $this->roles = $roles;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __toString()
-    {
-        return $this->username;
     }
 
     /**
@@ -124,37 +116,37 @@ class User implements AdvancedAccountInterface
     /**
      * {@inheritDoc}
      */
-    public function equals(AccountInterface $account)
+    public function equals(UserInterface $user)
     {
-        if (!$account instanceof User) {
+        if (!$user instanceof User) {
             return false;
         }
 
-        if ($this->password !== $account->getPassword()) {
+        if ($this->password !== $user->getPassword()) {
             return false;
         }
 
-        if ($this->getSalt() !== $account->getSalt()) {
+        if ($this->getSalt() !== $user->getSalt()) {
             return false;
         }
 
-        if ($this->username !== $account->getUsername()) {
+        if ($this->username !== $user->getUsername()) {
             return false;
         }
 
-        if ($this->accountNonExpired !== $account->isAccountNonExpired()) {
+        if ($this->accountNonExpired !== $user->isAccountNonExpired()) {
             return false;
         }
 
-        if ($this->accountNonLocked !== $account->isAccountNonLocked()) {
+        if ($this->accountNonLocked !== $user->isAccountNonLocked()) {
             return false;
         }
 
-        if ($this->credentialsNonExpired !== $account->isCredentialsNonExpired()) {
+        if ($this->credentialsNonExpired !== $user->isCredentialsNonExpired()) {
             return false;
         }
 
-        if ($this->enabled !== $account->isEnabled()) {
+        if ($this->enabled !== $user->isEnabled()) {
             return false;
         }
 

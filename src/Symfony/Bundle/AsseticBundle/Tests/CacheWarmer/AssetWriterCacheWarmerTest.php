@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\AsseticBundle\Tests\CacheWarmer;
 
 use Symfony\Bundle\AsseticBundle\CacheWarmer\AssetWriterCacheWarmer;
-use Symfony\Component\EventDispatcher\Event;
 
 class AssetWriterCacheWarmerTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,18 +28,12 @@ class AssetWriterCacheWarmerTest extends \PHPUnit_Framework_TestCase
         $writer = $this->getMockBuilder('Assetic\\AssetWriter')
             ->disableOriginalConstructor()
             ->getMock();
-        $dispatcher = $this->getMock('Symfony\\Component\\EventDispatcher\\EventDispatcher');
 
-        $event = new Event(null, 'assetic.write');
-
-        $dispatcher->expects($this->once())
-            ->method('notify')
-            ->with($event);
         $writer->expects($this->once())
             ->method('writeManagerAssets')
             ->with($am);
 
-        $warmer = new AssetWriterCacheWarmer($am, $writer, $dispatcher);
+        $warmer = new AssetWriterCacheWarmer($am, $writer);
         $warmer->warmUp('/path/to/cache');
     }
 }

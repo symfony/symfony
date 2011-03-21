@@ -26,21 +26,21 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class AnalyzeServiceReferencesPass implements RepeatablePassInterface
 {
-    protected $graph;
-    protected $container;
-    protected $currentId;
-    protected $currentDefinition;
-    protected $repeatedPass;
-    protected $ignoreMethodCalls;
+    private $graph;
+    private $container;
+    private $currentId;
+    private $currentDefinition;
+    private $repeatedPass;
+    private $onlyConstructorArguments;
 
     /**
      * Constructor.
      *
      * @param boolean $ignoreMethodCalls Sets this Service Reference pass to ignore method calls
      */
-    public function __construct($ignoreMethodCalls = false)
+    public function __construct($onlyConstructorArguments = false)
     {
-        $this->ignoreMethodCalls = (Boolean) $ignoreMethodCalls;
+        $this->onlyConstructorArguments = (Boolean) $onlyConstructorArguments;
     }
 
     /**
@@ -53,7 +53,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
     /**
      * Processes a ContainerBuilder object to populate the service reference graph.
      *
-     * @param ContainerBuilder $container 
+     * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {
@@ -70,8 +70,9 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
             $this->currentDefinition = $definition;
             $this->processArguments($definition->getArguments());
 
-            if (!$this->ignoreMethodCalls) {
+            if (!$this->onlyConstructorArguments) {
                 $this->processArguments($definition->getMethodCalls());
+                $this->processArguments($definition->getProperties());
             }
         }
 
@@ -85,7 +86,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
      *
      * @param array $arguments An array of Reference or Definition objects relating to service definitions
      */
-    protected function processArguments(array $arguments)
+    private function processArguments(array $arguments)
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
@@ -101,6 +102,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
             } else if ($argument instanceof Definition) {
                 $this->processArguments($argument->getArguments());
                 $this->processArguments($argument->getMethodCalls());
+                $this->processArguments($argument->getProperties());
             }
         }
     }
@@ -111,7 +113,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
      * @param string $id A full id or alias for a service definition.
      * @return Definition The definition related to the supplied id
      */
-    protected function getDefinition($id)
+    private function getDefinition($id)
     {
         while ($this->container->hasAlias($id)) {
             $id = (string) $this->container->getAlias($id);

@@ -20,14 +20,14 @@ use Symfony\Component\DomCrawler\Field\FormField;
  */
 class Form implements \ArrayAccess
 {
-    protected $document;
-    protected $button;
-    protected $node;
-    protected $fields;
-    protected $method;
-    protected $host;
-    protected $path;
-    protected $base;
+    private $document;
+    private $button;
+    private $node;
+    private $fields;
+    private $method;
+    private $host;
+    private $path;
+    private $base;
 
     /**
      * Constructor.
@@ -230,6 +230,16 @@ class Form implements \ArrayAccess
     }
 
     /**
+     * Removes a field from the form.
+     *
+     * @param string $name The field name
+     */
+    public function remove($name)
+    {
+        unset($this->fields[$name]);
+    }
+
+    /**
      * Gets a named field.
      *
      * @param string $name The field name
@@ -269,7 +279,7 @@ class Form implements \ArrayAccess
         return $this->fields;
     }
 
-    protected function initialize()
+    private function initialize()
     {
         $this->fields = array();
 
@@ -356,12 +366,12 @@ class Form implements \ArrayAccess
     }
 
     /**
-     * Unimplemented.
+     * Removes a field from the form.
      *
      * @param string $name The field name
      */
     public function offsetUnset($name)
     {
-        throw new \LogicException('The Form fields cannot be removed.');
+        $this->remove($name);
     }
 }

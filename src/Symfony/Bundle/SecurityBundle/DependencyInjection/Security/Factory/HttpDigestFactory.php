@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -33,16 +33,17 @@ class HttpDigestFactory implements SecurityFactoryInterface
             ->setArgument(2, $id)
         ;
 
+        // entry point
+        $entryPointId = $this->createEntryPoint($container, $id, $config, $defaultEntryPoint);
+
         // listener
         $listenerId = 'security.authentication.listener.digest.'.$id;
         $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.digest'));
+        $listener->setArgument(1, new Reference($userProvider));
         $listener->setArgument(2, $id);
+        $listener->setArgument(3, new Reference($entryPointId));
 
-        if (null === $defaultEntryPoint) {
-            $defaultEntryPoint = 'security.authentication.digest_entry_point';
-        }
-
-        return array($provider, $listenerId, $defaultEntryPoint);
+        return array($provider, $listenerId, $entryPointId);
     }
 
     public function getPosition()
@@ -55,10 +56,30 @@ class HttpDigestFactory implements SecurityFactoryInterface
         return 'http-digest';
     }
 
-    public function addConfiguration(NodeBuilder $builder)
+    public function addConfiguration(NodeDefinition $node)
     {
-        $builder
-            ->scalarNode('provider')->end()
+        $node
+            ->children()
+                ->scalarNode('provider')->end()
+                ->scalarNode('realm')->defaultValue('Secured Area')->end()
+                ->scalarNode('key')->cannotBeEmpty()->end()
+            ->end()
         ;
+    }
+
+    protected function createEntryPoint($container, $id, $config, $defaultEntryPoint)
+    {
+        if (null !== $defaultEntryPoint) {
+            return $defaultEntryPoint;
+        }
+
+        $entryPointId = 'security.authentication.digest_entry_point.'.$id;
+        $container
+            ->setDefinition($entryPointId, new DefinitionDecorator('security.authentication.digest_entry_point'))
+            ->addArgument($config['realm'])
+            ->addArgument($config['key'])
+        ;
+
+        return $entryPointId;
     }
 }

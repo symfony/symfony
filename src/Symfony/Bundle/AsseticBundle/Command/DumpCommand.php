@@ -14,11 +14,12 @@ namespace Symfony\Bundle\AsseticBundle\Command;
 use Assetic\Asset\AssetInterface;
 use Assetic\Factory\LazyAssetManager;
 use Symfony\Bundle\FrameworkBundle\Command\Command;
+use Symfony\Bundle\AsseticBundle\Event\WriteEvent;
+use Symfony\Bundle\AsseticBundle\Events;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Dumps assets to the filesystem.
@@ -33,7 +34,7 @@ class DumpCommand extends Command
             ->setName('assetic:dump')
             ->setDescription('Dumps all assets to the filesystem')
             ->addArgument('write_to', InputArgument::OPTIONAL, 'Override the configured asset root')
-            ->addOption('watch', null, InputOption::VALUE_NONE, 'Check for changes every second')
+            ->addOption('watch', null, InputOption::VALUE_NONE, 'Check for changes every second, debug mode only')
         ;
     }
 
@@ -46,7 +47,8 @@ class DumpCommand extends Command
         $am = $this->container->get('assetic.asset_manager');
 
         // notify an event so custom stream wrappers can be registered lazily
-        $this->container->get('event_dispatcher')->notify(new Event(null, 'assetic.write', array('path' => $basePath)));
+        $event = new WriteEvent($basePath);
+        $this->container->get('event_dispatcher')->dispatch(Events::onAsseticWrite, $writeEvent);
 
         if ($input->getOption('watch')) {
             return $this->watch($am, $basePath, $output, $this->container->getParameter('kernel.debug'));
@@ -70,6 +72,10 @@ class DumpCommand extends Command
      */
     protected function watch(LazyAssetManager $am, $basePath, OutputInterface $output, $debug = false)
     {
+        if (!$debug) {
+            throw new \RuntimeException('The --watch option is only available in debug mode.');
+        }
+
         $refl = new \ReflectionClass('Assetic\\AssetManager');
         $prop = $refl->getProperty('assets');
         $prop->setAccessible(true);
@@ -92,9 +98,7 @@ class DumpCommand extends Command
 
                 // reset the asset manager
                 $prop->setValue($am, array());
-                if ($debug) {
-                    $am->load();
-                }
+                $am->load();
 
                 file_put_contents($cache, serialize($previously));
                 $error = '';

@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Routing\Matcher\Dumper\ApacheMatcherDumper;
 
 /**
- * RouterDebugCommand.
+ * A console command for retrieving information about routes
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -85,7 +85,7 @@ EOF
         $format  = '%-'.$maxName.'s %-'.$maxMethod.'s %s';
 
         // displays the generated routes
-        $format1  = '%-'.($maxName + 9).'s %-'.($maxMethod + 9).'s %s';
+        $format1  = '%-'.($maxName + 19).'s %-'.($maxMethod + 19).'s %s';
         $output->writeln(sprintf($format1, '<comment>Name</comment>', '<comment>Method</comment>', '<comment>Pattern</comment>'));
         foreach ($routes as $name => $route) {
             $requirements = $route->getRequirements();

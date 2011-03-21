@@ -19,7 +19,7 @@ namespace Symfony\Component\Security\Core\Role;
  */
 class Role implements RoleInterface
 {
-    protected $role;
+    private $role;
 
     /**
      * Constructor.

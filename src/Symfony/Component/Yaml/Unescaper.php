@@ -129,7 +129,7 @@ class Unescaper
      *
      * @throws \RuntimeException if no suitable encoding function is found (iconv or mbstring)
      */
-    protected function convertEncoding($value, $to, $from)
+    private function convertEncoding($value, $to, $from)
     {
         if (function_exists('iconv')) {
             return iconv($from, $to, $value);

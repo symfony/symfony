@@ -18,7 +18,7 @@ namespace Symfony\Component\Translation;
  */
 class IdentityTranslator implements TranslatorInterface
 {
-    protected $selector;
+    private $selector;
 
     /**
      * Constructor.

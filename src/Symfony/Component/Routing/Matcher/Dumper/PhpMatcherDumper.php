@@ -63,25 +63,25 @@ class PhpMatcherDumper extends MatcherDumper
             $hasTrailingSlash = false;
             if (!count($compiledRoute->getVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#', $compiledRoute->getRegex(), $m)) {
                 if (substr($m['url'], -1) === '/') {
-                    $conditions[] = sprintf("rtrim(\$url, '/') === '%s'", rtrim(str_replace('\\', '', $m['url']), '/'));
+                    $conditions[] = sprintf("rtrim(\$pathinfo, '/') === '%s'", rtrim(str_replace('\\', '', $m['url']), '/'));
                     $hasTrailingSlash = true;
                 } else {
-                    $conditions[] = sprintf("\$url === '%s'", str_replace('\\', '', $m['url']));
+                    $conditions[] = sprintf("\$pathinfo === '%s'", str_replace('\\', '', $m['url']));
                 }
 
                 $matches = 'array()';
             } else {
                 if ($compiledRoute->getStaticPrefix()) {
-                    $conditions[] = sprintf("0 === strpos(\$url, '%s')", $compiledRoute->getStaticPrefix());
+                    $conditions[] = sprintf("0 === strpos(\$pathinfo, '%s')", $compiledRoute->getStaticPrefix());
                 }
 
                 $regex = $compiledRoute->getRegex();
                 if ($pos = strpos($regex, '/$')) {
                     $regex = substr($regex, 0, $pos) . '/?$' . substr($regex, $pos+2);
-                    $conditions[] = sprintf("preg_match('%s', \$url, \$matches)", $regex);
+                    $conditions[] = sprintf("preg_match('%s', \$pathinfo, \$matches)", $regex);
                     $hasTrailingSlash = true;
                 } else {
-                    $conditions[] = sprintf("preg_match('%s', \$url, \$matches)", $regex);
+                    $conditions[] = sprintf("preg_match('%s', \$pathinfo, \$matches)", $regex);
                 }
 
                 $matches = '$matches';
@@ -95,8 +95,8 @@ EOF;
 
             if ($hasTrailingSlash) {
                 $code[] = sprintf(<<<EOF
-            if (substr(\$url, -1) !== '/') {
-                return array('_controller' => 'Symfony\\Bundle\\FrameworkBundle\\Controller\\RedirectController::urlRedirectAction', 'url' => \$this->context['base_url'].\$url.'/', 'permanent' => true, '_route' => '%s');
+            if (substr(\$pathinfo, -1) !== '/') {
+                return array('_controller' => 'Symfony\\Bundle\\FrameworkBundle\\Controller\\RedirectController::urlRedirectAction', 'url' => \$this->context['base_url'].\$pathinfo.'/', 'permanent' => true, '_route' => '%s');
             }
 EOF
             , $name);
@@ -114,10 +114,8 @@ EOF
 
         return <<<EOF
 
-    public function match(\$url)
+    public function match(\$pathinfo)
     {
-        \$url = \$this->normalizeUrl(\$url);
-
 $code
         return false;
     }

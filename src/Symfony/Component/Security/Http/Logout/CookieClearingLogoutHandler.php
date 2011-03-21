@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class CookieClearingLogoutHandler implements LogoutHandlerInterface
 {
-    protected $cookies;
+    private $cookies;
 
     /**
      * Constructor

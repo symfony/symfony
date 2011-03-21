@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Http\EntryPoint;
 
-use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Core\Exception\NonceExpiredException;
@@ -26,10 +25,10 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  */
 class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {
-    protected $key;
-    protected $realmName;
-    protected $nonceValiditySeconds;
-    protected $logger;
+    private $key;
+    private $realmName;
+    private $nonceValiditySeconds;
+    private $logger;
 
     public function __construct($realmName, $key, $nonceValiditySeconds = 300, LoggerInterface $logger = null)
     {
@@ -39,7 +38,7 @@ class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterfac
         $this->logger = $logger;
     }
 
-    public function start(EventInterface $event, Request $request, AuthenticationException $authException = null)
+    public function start(Request $request, AuthenticationException $authException = null)
     {
         $expiryTime = microtime(true) + $this->nonceValiditySeconds * 1000;
         $signatureValue = md5($expiryTime.':'.$this->key);
@@ -61,15 +60,5 @@ class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterfac
         $response->setStatusCode(401, $authException->getMessage());
 
         return $response;
-    }
-
-    public function getKey()
-    {
-        return $this->key;
-    }
-
-    public function getRealmName()
-    {
-        return $this->realmName;
     }
 }

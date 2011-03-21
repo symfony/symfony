@@ -18,7 +18,7 @@ namespace Symfony\Component\ClassLoader;
  */
 class ClassCollectionLoader
 {
-    static protected $loaded;
+    static private $loaded;
 
     /**
      * Loads a list of classes and caches them in one big file.
@@ -28,10 +28,11 @@ class ClassCollectionLoader
      * @param string  $name       The cache name prefix
      * @param Boolean $autoReload Whether to flush the cache when the cache is stale or not
      * @param Boolean $adaptive   Whether to remove already declared classes or not
+     * @param string  $extension  File extension of the resulting file
      *
      * @throws \InvalidArgumentException When class can't be loaded
      */
-    static public function load($classes, $cacheDir, $name, $autoReload, $adaptive = false)
+    static public function load($classes, $cacheDir, $name, $autoReload, $adaptive = false, $extension = '.php')
     {
         // each $name can only be loaded once per PHP process
         if (isset(self::$loaded[$name])) {
@@ -50,12 +51,12 @@ class ClassCollectionLoader
             $name = $name.'-'.substr(md5(implode('|', $classes)), 0, 5);
         }
 
-        $cache = $cacheDir.'/'.$name.'.php';
+        $cache = $cacheDir.'/'.$name.$extension;
 
         // auto-reload
         $reload = false;
         if ($autoReload) {
-            $metadata = $cacheDir.'/'.$name.'.meta';
+            $metadata = $cacheDir.'/'.$name.$extension.'.meta';
             if (!file_exists($metadata) || !file_exists($cache)) {
                 $reload = true;
             } else {
@@ -174,8 +175,7 @@ class ClassCollectionLoader
      *
      * @throws \RuntimeException when a cache file cannot be written
      */
-     
-    static protected function writeCacheFile($file, $content)
+    static private function writeCacheFile($file, $content)
     {
         $tmpFile = tempnam(dirname($file), basename($file));
         if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $file)) {
@@ -197,7 +197,7 @@ class ClassCollectionLoader
      *
      * @return string The PHP string with the comments removed
      */
-    static protected function stripComments($source)
+    static private function stripComments($source)
     {
         if (!function_exists('token_get_all')) {
             return $source;

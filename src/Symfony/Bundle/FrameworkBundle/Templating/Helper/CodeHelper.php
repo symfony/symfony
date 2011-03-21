@@ -80,10 +80,7 @@ class CodeHelper extends Helper
     {
         if (false !== strpos($method, '::')) {
             list($class, $method) = explode('::', $method);
-
-            $parts  = explode('\\', $class);
-            $short  = array_pop($parts);
-            $result = sprintf("<abbr title=\"%s\">%s</abbr>::%s()", $class, $short, $method);
+            $result = sprintf("%s::%s()", $this->abbrClass($class), $method);
         } else if ('Closure' === $method) {
             $result = sprintf("<abbr title=\"%s\">%s</abbr>", $method, $method);
         } else {
@@ -156,29 +153,43 @@ class CodeHelper extends Helper
     /**
      * Formats a file path.
      *
-     * @param  string  $file   An absolute file path
-     * @param  integer $line   The line number
-     * @param  string  $format The output format (txt or html)
-     * @param  string  $text   Use this text for the link rather than the file path
+     * @param  string  $file An absolute file path
+     * @param  integer $line The line number
+     * @param  string  $text Use this text for the link rather than the file path
      *
      * @return string
      */
-    public function formatFile($file, $line)
+    public function formatFile($file, $line, $text = null)
     {
-        $file = trim($file);
-        $fileStr = $file;
-        if (0 === strpos($fileStr, $this->rootDir)) {
-            $fileStr = str_replace($this->rootDir, '', str_replace('\\', '/', $fileStr));
-            $fileStr = sprintf('<abbr title="%s">kernel.root_dir</abbr>/%s', $this->rootDir, $fileStr);
+        if (null === $text) {
+            $file = trim($file);
+            $fileStr = $file;
+            if (0 === strpos($fileStr, $this->rootDir)) {
+                $fileStr = str_replace($this->rootDir, '', str_replace('\\', '/', $fileStr));
+                $fileStr = sprintf('<abbr title="%s">kernel.root_dir</abbr>/%s', $this->rootDir, $fileStr);
+            }
+
+            $text = "$fileStr line $line";
         }
 
-        if (!$this->fileLinkFormat) {
-            return "$file line $line";
+        if (false !== $link = $this->getFileLink($file, $line)) {
+            return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', $link, $text);
         }
 
-        $link = strtr($this->fileLinkFormat, array('%f' => $file, '%l' => $line));
+        return $text;
+    }
 
-        return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s line %s</a>', $link, $fileStr, $line);
+    /**
+     * Returns the link for a given file/line pair.
+     *
+     * @param  string  $file An absolute file path
+     * @param  integer $line The line number
+     *
+     * @return string A link of false
+     */
+    public function getFileLink($file, $line)
+    {
+        return $this->fileLinkFormat ? strtr($this->fileLinkFormat, array('%f' => $file, '%l' => $line)) : false;
     }
 
     public function formatFileFromText($text)

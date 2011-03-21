@@ -8,7 +8,7 @@
         <parameter key="security.context.class">Symfony\Component\Security\Core\SecurityContext</parameter>
         <parameter key="security.context.always_authenticate">false</parameter>
 
-        <parameter key="security.account_checker.class">Symfony\Component\Security\Core\User\AccountChecker</parameter>
+        <parameter key="security.user_checker.class">Symfony\Component\Security\Core\User\UserChecker</parameter>
 
         <parameter key="security.encoder_factory.generic.class">Symfony\Component\Security\Core\Encoder\EncoderFactory</parameter>
         <parameter key="security.encoder.digest.class">Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder</parameter>
@@ -72,7 +72,7 @@
 
         <service id="security.encoder_factory" alias="security.encoder_factory.generic"></service>
         
-        <service id="security.account_checker" class="%security.account_checker.class%" public="false" />
+        <service id="security.user_checker" class="%security.user_checker.class%" public="false" />
 
 
         <!-- Authorization related services -->
@@ -106,7 +106,7 @@
 
         <!-- Firewall related services -->
         <service id="security.firewall" class="%security.firewall.class%">
-            <tag name="kernel.listener" event="core.request" method="handle" priority="-128" />
+            <tag name="kernel.listener" event="onCoreRequest" priority="-128" />
             <argument type="service" id="security.firewall.map" />
             <argument type="service" id="event_dispatcher" />
         </service>
@@ -126,7 +126,7 @@
         <service id="security.user.provider.entity" class="%security.user.provider.entity.class%" abstract="true" public="false">
             <argument type="service" id="security.user.entity_manager" />
         </service>
-        <service id="security.user.entity_manager" alias="doctrine.orm.default_entity_manager" public="false" />
+        <service id="security.user.entity_manager" alias="doctrine.orm.entity_manager" public="false" />
 
         <service id="security.user.provider.in_memory" class="%security.user.provider.in_memory.class%" abstract="true" public="false" />
         <service id="security.user.provider.in_memory.user" class="%security.user.provider.in_memory.user.class%" abstract="true" public="false" />

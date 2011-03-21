@@ -22,7 +22,7 @@ namespace Symfony\Component\Console\Input;
  */
 class ArrayInput extends Input
 {
-    protected $parameters;
+    private $parameters;
 
     /**
      * Constructor.
@@ -134,7 +134,7 @@ class ArrayInput extends Input
      *
      * @throws \RuntimeException When option given doesn't exist
      */
-    protected function addShortOption($shortcut, $value)
+    private function addShortOption($shortcut, $value)
     {
         if (!$this->definition->hasShortcut($shortcut)) {
             throw new \InvalidArgumentException(sprintf('The "-%s" option does not exist.', $shortcut));
@@ -152,7 +152,7 @@ class ArrayInput extends Input
      * @throws \InvalidArgumentException When option given doesn't exist
      * @throws \InvalidArgumentException When a required value is missing
      */
-    protected function addLongOption($name, $value)
+    private function addLongOption($name, $value)
     {
         if (!$this->definition->hasOption($name)) {
             throw new \InvalidArgumentException(sprintf('The "--%s" option does not exist.', $name));
@@ -179,7 +179,7 @@ class ArrayInput extends Input
      *
      * @throws \InvalidArgumentException When argument given doesn't exist
      */
-    protected function addArgument($name, $value)
+    private function addArgument($name, $value)
     {
         if (!$this->definition->hasArgument($name)) {
             throw new \InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));

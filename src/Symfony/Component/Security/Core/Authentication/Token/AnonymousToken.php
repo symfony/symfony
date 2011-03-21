@@ -16,10 +16,11 @@ namespace Symfony\Component\Security\Core\Authentication\Token;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class AnonymousToken extends Token
+use Symfony\Component\Security\Core\User\UserInterface;
+
+class AnonymousToken extends AbstractToken
 {
-    protected $user;
-    protected $key;
+    private $key;
 
     /**
      * Constructor.
@@ -33,9 +34,8 @@ class AnonymousToken extends Token
         parent::__construct($roles);
 
         $this->key = $key;
-        $this->user = $user;
-
-        parent::setAuthenticated(true);
+        $this->setUser($user);
+        $this->setAuthenticated(true);
     }
 
     /**
@@ -54,5 +54,22 @@ class AnonymousToken extends Token
     public function getKey()
     {
         return $this->key;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function serialize()
+    {
+        return serialize(array($this->key, parent::serialize()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function unserialize($str)
+    {
+        list($this->key, $parentStr) = unserialize($str);
+        parent::unserialize($parentStr);
     }
 }

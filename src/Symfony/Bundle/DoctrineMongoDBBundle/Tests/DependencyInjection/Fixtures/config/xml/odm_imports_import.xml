@@ -8,7 +8,6 @@
 
     <doctrine:mongodb
         auto-generate-proxy-classes="false"
-        metadata-cache-driver="apc"
     >
     </doctrine:mongodb>
 </container>

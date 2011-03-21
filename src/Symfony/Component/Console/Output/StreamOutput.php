@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Output;
 
+use Symfony\Component\Console\Formatter\OutputFormatter;
+
 /**
  * StreamOutput writes the output to a given stream.
  *
@@ -26,7 +28,7 @@ namespace Symfony\Component\Console\Output;
  */
 class StreamOutput extends Output
 {
-    protected $stream;
+    private $stream;
 
     /**
      * Constructor.
@@ -34,10 +36,11 @@ class StreamOutput extends Output
      * @param mixed   $stream    A stream resource
      * @param integer $verbosity The verbosity level (self::VERBOSITY_QUIET, self::VERBOSITY_NORMAL, self::VERBOSITY_VERBOSE)
      * @param Boolean $decorated Whether to decorate messages or not (null for auto-guessing)
+     * @param OutputFormatter   $formatter  Output formatter instance
      *
      * @throws \InvalidArgumentException When first argument is not a real stream
      */
-    public function __construct($stream, $verbosity = self::VERBOSITY_NORMAL, $decorated = null)
+    public function __construct($stream, $verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatter $formatter = null)
     {
         if (!is_resource($stream) || 'stream' !== get_resource_type($stream)) {
             throw new \InvalidArgumentException('The StreamOutput class needs a stream as its first argument.');
@@ -49,7 +52,7 @@ class StreamOutput extends Output
             $decorated = $this->hasColorSupport($decorated);
         }
 
-        parent::__construct($verbosity, $decorated);
+        parent::__construct($verbosity, $decorated, $formatter);
     }
 
     /**

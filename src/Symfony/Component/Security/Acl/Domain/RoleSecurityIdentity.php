@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Role\Role;
  */
 class RoleSecurityIdentity implements SecurityIdentityInterface
 {
-    protected $role;
+    private $role;
 
     /**
      * Constructor

@@ -21,7 +21,7 @@ namespace Symfony\Component\Finder\Iterator;
  */
 class CustomFilterIterator extends \FilterIterator
 {
-    protected $filters = array();
+    private $filters = array();
 
     /**
      * Constructor.

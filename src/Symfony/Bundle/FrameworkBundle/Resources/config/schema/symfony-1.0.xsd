@@ -53,7 +53,11 @@
             <xsd:element name="matcher" type="profiler_matcher" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
-        <xsd:attribute name="only-exceptions" type="xsd:boolean" />
+        <xsd:attribute name="only-exceptions" type="xsd:string" />
+        <xsd:attribute name="dsn" type="xsd:string" />
+        <xsd:attribute name="username" type="xsd:string" />
+        <xsd:attribute name="password" type="xsd:string" />
+        <xsd:attribute name="lifetime" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="profiler_matcher">
@@ -90,16 +94,26 @@
         <xsd:sequence>
             <xsd:element name="loader" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="engine" type="templating_engine" minOccurs="1" maxOccurs="unbounded" />
+            <xsd:element name="assets-base-url" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="package" type="package" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
 
         <xsd:attribute name="assets-version" type="xsd:string" />
-        <xsd:attribute name="assets-base-urls" type="xsd:string" />
         <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="cache-warmer" type="cache_warmer" />
     </xsd:complexType>
 
     <xsd:complexType name="templating_engine">
         <xsd:attribute name="id" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="package">
+        <xsd:sequence>
+            <xsd:element name="base-url" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="version" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="translator">

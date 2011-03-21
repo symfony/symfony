@@ -12,11 +12,21 @@
         <app:profiler only-exceptions="true" />
         <app:router cache-warmer="true" resource="%kernel.root_dir%/config/routing.xml" type="xml" />
         <app:session auto-start="true" class="Session" default-locale="fr" storage-id="native" name="_SYMFONY" lifetime="86400" path="/" domain="example.com" secure="true" httponly="true" />
-        <app:templating assets-version="SomeVersionScheme" assets-base-urls="http://cdn.example.com" cache-warmer="true">
+        <app:templating assets-version="SomeVersionScheme" cache-warmer="true">
             <app:loader>loader.foo</app:loader>
             <app:loader>loader.bar</app:loader>
             <app:engine id="php" />
             <app:engine id="twig" />
+            <app:assets-base-url>http://cdn.example.com</app:assets-base-url>
+            <app:package name="images" version="1.0.0">
+                <app:base-url>http://images1.example.com</app:base-url>
+                <app:base-url>http://images2.example.com</app:base-url>
+            </app:package>
+            <app:package name="foo" version="1.0.0" />
+            <app:package name="bar">
+                <app:base-url>http://bar1.example.com</app:base-url>
+                <app:base-url>http://bar2.example.com</app:base-url>
+            </app:package>
         </app:templating>
         <app:translator enabled="true" fallback="fr" />
         <app:validation enabled="true" />

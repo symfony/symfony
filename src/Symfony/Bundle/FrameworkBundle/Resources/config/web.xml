@@ -26,19 +26,19 @@
         </service>
 
         <service id="request_listener" class="%request_listener.class%">
-            <tag name="kernel.listener" event="core.request" method="handle" />
+            <tag name="kernel.listener" event="onCoreRequest" />
             <argument type="service" id="service_container" />
             <argument type="service" id="router" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
         <service id="response_listener" class="%response_listener.class%">
-            <tag name="kernel.listener" event="core.response" method="filter" />
+            <tag name="kernel.listener" event="onCoreResponse" />
             <argument>%kernel.charset%</argument>
         </service>
 
         <service id="exception_listener" class="%exception_listener.class%">
-            <tag name="kernel.listener" event="core.exception" method="handle" priority="-128" />
+            <tag name="kernel.listener" event="onCoreException" priority="-128" />
             <argument>%exception_listener.controller%</argument>
             <argument type="service" id="logger" on-invalid="null" />
         </service>

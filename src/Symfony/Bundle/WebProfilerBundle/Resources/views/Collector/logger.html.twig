@@ -1,19 +1,26 @@
 {% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
 
 {% block toolbar %}
-<span style="white-space:nowrap; color:#2f2f2f; display:inline-block; min-height:24px; border-right:1px solid #cdcdcd; padding:5px 10px 5px 6px; ">
-    <img width="15" height="28" alt="Logs" style="vertical-align: middle; margin-right: 10px;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAcCAYAAAC+lOV/AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQVJREFUeNpi/P//PwO5gImBAjBwmlm8vLyOf/v2zYJYDVxcXCe2bdvmeu7cuS+M9vb2ZIWYoKDgUrKcvWLFipWfP38OYcEmeeDAgQtA6gMQCzg4OBigy0tISHxhYmJiYMFh+EIgBhlgAMXo4DEwffzH5ewLwAA5ADUAG/g7lBMJNkFgCO8fGJsJxTNezUTEM15nE4rnAQ4wkjVraWm9BlK/wc62tLR8fOXKFZmmpqYHhoaGT4Fif/Do/Q7Ep/bt28fz+/dvDkZgKdI4ZcqUmMOHD0t8+vSJi1gXKCgoPGQE5ixTIBuExUjwKsiSpyDNnECGOBCLAjEnkeEA8vMbxqFZ6AMEGADoe2NON2x5yQAAAABJRU5ErkJggg=="/>
-    <span>{{ collector.counterrors }}</span>
-</span>
+    {% if collector.counterrors %}
+        {% set icon %}
+            <img width="15" height="28" alt="Logs" style="border-width: 0; vertical-align: middle; margin-right: 5px;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAcCAYAAAC+lOV/AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQVJREFUeNpi/P//PwO5gImBAjBwmlm8vLyOf/v2zYJYDVxcXCe2bdvmeu7cuS+M9vb2ZIWYoKDgUrKcvWLFipWfP38OYcEmeeDAgQtA6gMQCzg4OBigy0tISHxhYmJiYMFh+EIgBhlgAMXo4DEwffzH5ewLwAA5ADUAG/g7lBMJNkFgCO8fGJsJxTNezUTEM15nE4rnAQ4wkjVraWm9BlK/wc62tLR8fOXKFZmmpqYHhoaGT4Fif/Do/Q7Ep/bt28fz+/dvDkZgKdI4ZcqUmMOHD0t8+vSJi1gXKCgoPGQE5ixTIBuExUjwKsiSpyDNnECGOBCLAjEnkeEA8vMbxqFZ6AMEGADoe2NON2x5yQAAAABJRU5ErkJggg=="/>
+        {% endset %}
+        {% set text %}
+            <span>{{ collector.counterrors }}</span>
+        {% endset %}
+        {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
+    {% endif %}
 {% endblock %}
 
 {% block menu %}
 <span class="label">
-    <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/logger.png') }}" alt="" /></span>
+    <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/logger.png') }}" alt="Logger" /></span>
     <strong>Logs</strong>
-    <span class="count">
-        <span>{{ collector.counterrors }}</span>
-    </span>
+    {% if collector.counterrors %}
+        <span class="count">
+            <span>{{ collector.counterrors }}</span>
+        </span>
+    {% endif %}
 </span>
 {% endblock %}
 
@@ -22,14 +29,16 @@
 
     {% if collector.logs %}
         <ul class="alt">
-            {% for i, log in collector.logs %}
-                <li class="{{ i is odd ? 'odd' : 'even' }}{% if 'ERR' == log.priorityName %} error{% endif %}">
+            {% for log in collector.logs %}
+                <li class="{{ cycle(['odd', 'even'], loop.index) }}{% if 'ERR' == log.priorityName %} error{% endif %}">
                     {{ log.priorityName }}
                     {{ log.message }}
                 </li>
             {% endfor %}
         </ul>
     {% else %}
-        <em>No logs available.</em>
+        <p>
+            <em>No logs available.</em>
+        </p>
     {% endif %}
 {% endblock %}

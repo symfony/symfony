@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
 {
-    protected $repeatedPass;
+    private $repeatedPass;
 
     /**
      * {@inheritDoc}

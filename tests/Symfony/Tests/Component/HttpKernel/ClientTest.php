@@ -15,8 +15,6 @@ use Symfony\Component\HttpKernel\Client;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
 
 require_once __DIR__.'/TestHttpKernel.php';
 
@@ -44,6 +42,9 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->request('GET', 'http://www.example.com/');
         $this->assertEquals('Request: /', $client->getResponse()->getContent(), '->doRequest() uses the request handler to make the request');
         $this->assertEquals('www.example.com', $client->getRequest()->getHost(), '->doRequest() uses the request handler to make the request');
+
+        $client->request('GET', 'http://www.example.com/?parameter=http://google.com');
+        $this->assertEquals('http://www.example.com/?parameter='.urlencode('http://google.com'), $client->getRequest()->getUri(), '->doRequest() uses the request handler to make the request');
     }
 
     public function testGetScript()

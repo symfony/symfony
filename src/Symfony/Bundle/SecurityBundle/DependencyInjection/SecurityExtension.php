@@ -12,19 +12,14 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\HttpFoundation\RequestMatcher;
 
 /**
  * SecurityExtension.
@@ -34,11 +29,11 @@ use Symfony\Component\HttpFoundation\RequestMatcher;
  */
 class SecurityExtension extends Extension
 {
-    protected $requestMatchers = array();
-    protected $contextListeners = array();
-    protected $listenerPositions = array('pre_auth', 'form', 'http', 'remember_me');
-    protected $configuration;
-    protected $factories;
+    private $requestMatchers = array();
+    private $contextListeners = array();
+    private $listenerPositions = array('pre_auth', 'form', 'http', 'remember_me');
+    private $configuration;
+    private $factories;
 
     public function __construct()
     {
@@ -61,7 +56,7 @@ class SecurityExtension extends Extension
         $config = $processor->process($tree, $configs);
 
         // load services
-        $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config')));
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('security.xml');
         $loader->load('security_listeners.xml');
         $loader->load('security_rememberme.xml');
@@ -107,9 +102,9 @@ class SecurityExtension extends Extension
         ));
     }
 
-    protected function aclLoad($config, ContainerBuilder $container)
+    private function aclLoad($config, ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config')));
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('security_acl.xml');
 
         if (isset($config['connection'])) {
@@ -128,7 +123,7 @@ class SecurityExtension extends Extension
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
 
-    protected function createRoleHierarchy($config, ContainerBuilder $container)
+    private function createRoleHierarchy($config, ContainerBuilder $container)
     {
         if (!isset($config['role_hierarchy'])) {
             $container->remove('security.access.role_hierarchy_voter');
@@ -140,7 +135,7 @@ class SecurityExtension extends Extension
         $container->remove('security.access.simple_role_voter');
     }
 
-    protected function createAuthorization($config, ContainerBuilder $container)
+    private function createAuthorization($config, ContainerBuilder $container)
     {
         if (!$config['access_control']) {
             return;
@@ -156,8 +151,7 @@ class SecurityExtension extends Extension
                 $access['path'],
                 $access['host'],
                 count($access['methods']) === 0 ? null : $access['methods'],
-                $access['ip'],
-                $access['attributes']
+                $access['ip']
             );
 
             $container->getDefinition('security.access_map')
@@ -165,7 +159,7 @@ class SecurityExtension extends Extension
         }
     }
 
-    protected function createFirewalls($config, ContainerBuilder $container)
+    private function createFirewalls($config, ContainerBuilder $container)
     {
         if (!isset($config['firewalls'])) {
             return;
@@ -213,7 +207,7 @@ class SecurityExtension extends Extension
         ;
     }
 
-    protected function createFirewall(ContainerBuilder $container, $id, $firewall, &$authenticationProviders, $providerIds, array $factories)
+    private function createFirewall(ContainerBuilder $container, $id, $firewall, &$authenticationProviders, $providerIds, array $factories)
     {
         // Matcher
         $i = 0;
@@ -310,7 +304,7 @@ class SecurityExtension extends Extension
         return array($matcher, $listeners, $exceptionListener);
     }
 
-    protected function createContextListener($container, $contextKey)
+    private function createContextListener($container, $contextKey)
     {
         if (isset($this->contextListeners[$contextKey])) {
             return $this->contextListeners[$contextKey];
@@ -323,7 +317,7 @@ class SecurityExtension extends Extension
         return $this->contextListeners[$contextKey] = $listenerId;
     }
 
-    protected function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider, array $factories)
+    private function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider, array $factories)
     {
         $listeners = array();
         $hasListeners = false;
@@ -347,8 +341,21 @@ class SecurityExtension extends Extension
 
         // Anonymous
         if (isset($firewall['anonymous'])) {
-            $listeners[] = new Reference('security.authentication.listener.anonymous');
-            $authenticationProviders[] = 'security.authentication.provider.anonymous';
+            $listenerId = 'security.authentication.listener.anonymous.'.$id;
+            $container
+                ->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.anonymous'))
+                ->setArgument(1, $firewall['anonymous']['key'])
+            ;
+
+            $listeners[] = new Reference($listenerId);
+
+            $providerId = 'security.authentication.provider.anonymous.'.$id;
+            $container
+                ->setDefinition($providerId, new DefinitionDecorator('security.authentication.provider.anonymous'))
+                ->setArgument(0, $firewall['anonymous']['key'])
+            ;
+
+            $authenticationProviders[] = $providerId;
             $hasListeners = true;
         }
 
@@ -359,11 +366,11 @@ class SecurityExtension extends Extension
         return array($listeners, $defaultEntryPoint);
     }
 
-    protected function createEncoders($encoders, ContainerBuilder $container)
+    private function createEncoders($encoders, ContainerBuilder $container)
     {
         $encoderMap = array();
         foreach ($encoders as $class => $encoder) {
-            $encoderMap[$class] = $this->createEncoder($class, $encoder, $container);
+            $encoderMap[$class] = $this->createEncoder($encoder, $container);
         }
 
         $container
@@ -372,7 +379,7 @@ class SecurityExtension extends Extension
         ;
     }
 
-    protected function createEncoder($accountClass, $config, ContainerBuilder $container)
+    private function createEncoder($config, ContainerBuilder $container)
     {
         // a custom encoder service
         if (isset($config['id'])) {
@@ -403,7 +410,7 @@ class SecurityExtension extends Extension
     }
 
     // Parses user providers and returns an array of their ids
-    protected function createUserProviders($config, ContainerBuilder $container)
+    private function createUserProviders($config, ContainerBuilder $container)
     {
         $providerIds = array();
         foreach ($config['providers'] as $name => $provider) {
@@ -415,7 +422,7 @@ class SecurityExtension extends Extension
     }
 
     // Parses a <provider> tag and returns the id for the related user provider service
-    protected function createUserDaoProvider($name, $provider, ContainerBuilder $container, $master = true)
+    private function createUserDaoProvider($name, $provider, ContainerBuilder $container, $master = true)
     {
         $name = $this->getUserProviderId(strtolower($name));
 
@@ -459,7 +466,7 @@ class SecurityExtension extends Extension
 
             $container
                 ->setDefinition($userId, new DefinitionDecorator('security.user.provider.in_memory.user'))
-                ->setArguments(array($username, $user['password'], $user['roles']))
+                ->setArguments(array($username, (string)$user['password'], $user['roles']))
             ;
 
             $definition->addMethodCall('createUser', array(new Reference($userId)));
@@ -468,12 +475,12 @@ class SecurityExtension extends Extension
         return $name;
     }
 
-    protected function getUserProviderId($name)
+    private function getUserProviderId($name)
     {
         return 'security.user.provider.concrete.'.$name;
     }
 
-    protected function createExceptionListener($container, $config, $id, $defaultEntryPoint)
+    private function createExceptionListener($container, $config, $id, $defaultEntryPoint)
     {
         $exceptionListenerId = 'security.exception_listener.'.$id;
         $listener = $container->setDefinition($exceptionListenerId, new DefinitionDecorator('security.exception_listener'));
@@ -489,7 +496,7 @@ class SecurityExtension extends Extension
         return $exceptionListenerId;
     }
 
-    protected function createSwitchUserListener($container, $id, $config, $defaultProvider)
+    private function createSwitchUserListener($container, $id, $config, $defaultProvider)
     {
         $userProvider = isset($config['provider']) ? $this->getUserProviderId($config['provider']) : $defaultProvider;
 
@@ -497,13 +504,13 @@ class SecurityExtension extends Extension
         $listener = $container->setDefinition($switchUserListenerId, new DefinitionDecorator('security.authentication.switchuser_listener'));
         $listener->setArgument(1, new Reference($userProvider));
         $listener->setArgument(3, $id);
-        $listener->addArgument($config['parameter']);
-        $listener->addArgument($config['role']);
+        $listener->setArgument(6, $config['parameter']);
+        $listener->setArgument(7, $config['role']);
 
         return $switchUserListenerId;
     }
 
-    protected function createRequestMatcher($container, $path = null, $host = null, $methods = null, $ip = null, array $attributes = array())
+    private function createRequestMatcher($container, $path = null, $host = null, $methods = null, $ip = null, array $attributes = array())
     {
         $serialized = serialize(array($path, $host, $methods, $ip, $attributes));
         $id = 'security.request_matcher.'.md5($serialized).sha1($serialized);
@@ -527,7 +534,7 @@ class SecurityExtension extends Extension
         return $this->requestMatchers[$id] = new Reference($id);
     }
 
-    protected function createListenerFactories(ContainerBuilder $container, $config)
+    private function createListenerFactories(ContainerBuilder $container, $config)
     {
         if (null !== $this->factories) {
             return $this->factories;
@@ -536,7 +543,7 @@ class SecurityExtension extends Extension
         // load service templates
         $c = new ContainerBuilder();
         $parameterBag = $container->getParameterBag();
-        $loader = new XmlFileLoader($c, new FileLocator(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config')));
+        $loader = new XmlFileLoader($c, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('security_factories.xml');
 
         // load user-created listener factories

@@ -21,7 +21,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
  */
 class ServiceReferenceGraph
 {
-    protected $nodes;
+    private $nodes;
 
     /**
      * Constructor.
@@ -101,7 +101,7 @@ class ServiceReferenceGraph
      * @param string $value 
      * @return ServiceReferenceGraphNode
      */
-    protected function createNode($id, $value)
+    private function createNode($id, $value)
     {
         if (isset($this->nodes[$id]) && $this->nodes[$id]->getValue() === $value) {
             return $this->nodes[$id];

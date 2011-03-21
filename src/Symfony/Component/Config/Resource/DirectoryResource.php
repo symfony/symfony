@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,7 +14,7 @@ namespace Symfony\Component\Config\Resource;
 /**
  * DirectoryResource represents a resources stored in a subdirectory tree.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class DirectoryResource implements ResourceInterface
 {
@@ -27,7 +27,7 @@ class DirectoryResource implements ResourceInterface
      */
     public function __construct($resource)
     {
-        $this->resource = realpath($resource);
+        $this->resource = $resource;
     }
 
     /**
@@ -65,8 +65,9 @@ class DirectoryResource implements ResourceInterface
 
         $newestMTime = 0;
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->resource), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
-          $newestMTime = max(filemtime($file), $newestMTime);
+            $newestMTime = max(filemtime($file), $newestMTime);
         }
+
         return $newestMTime < $timestamp;
     }
 }

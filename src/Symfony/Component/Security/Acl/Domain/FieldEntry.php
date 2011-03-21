@@ -22,7 +22,7 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
  */
 class FieldEntry extends Entry implements FieldAwareEntryInterface
 {
-    protected $field;
+    private $field;
 
     /**
      * Constructor
@@ -60,13 +60,7 @@ class FieldEntry extends Entry implements FieldAwareEntryInterface
     {
         return serialize(array(
             $this->field,
-            $this->mask,
-            $this->id,
-            $this->securityIdentity,
-            $this->strategy,
-            $this->auditFailure,
-            $this->auditSuccess,
-            $this->granting,
+            parent::serialize(),
         ));
     }
 
@@ -75,14 +69,7 @@ class FieldEntry extends Entry implements FieldAwareEntryInterface
      */
     public function unserialize($serialized)
     {
-        list($this->field,
-             $this->mask,
-             $this->id,
-             $this->securityIdentity,
-             $this->strategy,
-             $this->auditFailure,
-             $this->auditSuccess,
-             $this->granting
-        ) = unserialize($serialized);
+        list($this->field, $parentStr) = unserialize($serialized);
+        parent::unserialize($parentStr);
     }
 }

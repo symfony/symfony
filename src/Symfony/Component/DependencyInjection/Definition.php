@@ -18,19 +18,21 @@ namespace Symfony\Component\DependencyInjection;
  */
 class Definition
 {
-    protected $class;
-    protected $file;
-    protected $factoryClass;
-    protected $factoryMethod;
-    protected $factoryService;
-    protected $scope;
+    private $class;
+    private $file;
+    private $factoryClass;
+    private $factoryMethod;
+    private $factoryService;
+    private $scope;
+    private $properties;
+    private $calls;
+    private $configurator;
+    private $tags;
+    private $public;
+    private $synthetic;
+    private $abstract;
+
     protected $arguments;
-    protected $calls;
-    protected $configurator;
-    protected $tags;
-    protected $public;
-    protected $synthetic;
-    protected $abstract;
 
     /**
      * Constructor.
@@ -48,6 +50,7 @@ class Definition
         $this->public = true;
         $this->synthetic = false;
         $this->abstract = false;
+        $this->properties = array();
     }
 
     /**
@@ -157,6 +160,25 @@ class Definition
     public function setArguments(array $arguments)
     {
         $this->arguments = $arguments;
+
+        return $this;
+    }
+
+    public function setProperties(array $properties)
+    {
+        $this->properties = $properties;
+
+        return $this;
+    }
+
+    public function getProperties()
+    {
+        return $this->properties;
+    }
+
+    public function setProperty($name, $value)
+    {
+        $this->properties[$name] = $value;
 
         return $this;
     }

@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
  */
 class SecurityDataCollector extends DataCollector
 {
-    protected $context;
+    private $context;
 
     public function __construct(SecurityContextInterface $context = null)
     {
@@ -53,7 +53,7 @@ class SecurityDataCollector extends DataCollector
             $this->data = array(
                 'enabled'       => true,
                 'authenticated' => $token->isAuthenticated(),
-                'user'          => (string) $token,
+                'user'          => $token->getUsername(),
                 'roles'         => array_map(function ($role){ return $role->getRole();}, $token->getRoles()),
             );
         }

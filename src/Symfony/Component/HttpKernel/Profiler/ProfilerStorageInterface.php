@@ -30,6 +30,15 @@ interface ProfilerStorageInterface
     function find($ip, $url, $limit);
 
     /**
+     * Finds profiler tokens for the given parent token.
+     *
+     * @param string $token    The parent token
+     *
+     * @return array An array of tokens
+     */
+    function findChildren($token);
+
+    /**
      * Reads data associated with the given token.
      *
      * The method returns false if the token does not exists in the storage.

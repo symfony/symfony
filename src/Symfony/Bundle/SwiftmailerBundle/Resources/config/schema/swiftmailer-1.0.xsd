@@ -22,6 +22,7 @@
     <xsd:attribute name="type" type="xsd:string" />
     <xsd:attribute name="delivery-address" type="xsd:string" />
     <xsd:attribute name="disable-delivery" type="xsd:boolean" />
+    <xsd:attribute name="logging" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="spool">

@@ -43,7 +43,7 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        DoctrineCommand::setApplicationConnection($this->application, $input->getOption('connection'));
+        DoctrineCommand::setApplicationConnection($this->getApplication(), $input->getOption('connection'));
 
         return parent::execute($input, $output);
     }

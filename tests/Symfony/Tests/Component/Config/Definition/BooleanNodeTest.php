@@ -1,6 +1,8 @@
 <?php
 
-namespace Symfony\Component\Config\Definition;
+namespace Symfony\Tests\Component\Config\Definition;
+
+use Symfony\Component\Config\Definition\BooleanNode;
 
 class BooleanNodeTest extends \PHPUnit_Framework_TestCase
 {

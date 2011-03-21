@@ -22,9 +22,9 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterf
  */
 class AclCollectionCache
 {
-    protected $aclProvider;
-    protected $objectIdentityRetrievalStrategy;
-    protected $securityIdentityRetrievalStrategy;
+    private $aclProvider;
+    private $objectIdentityRetrievalStrategy;
+    private $securityIdentityRetrievalStrategy;
 
     /**
      * Constructor

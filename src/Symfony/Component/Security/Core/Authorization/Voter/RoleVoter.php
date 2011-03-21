@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class RoleVoter implements VoterInterface
 {
-    protected $prefix;
+    private $prefix;
 
     /**
      * Constructor.

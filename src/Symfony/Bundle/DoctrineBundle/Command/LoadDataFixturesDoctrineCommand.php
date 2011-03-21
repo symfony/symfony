@@ -24,6 +24,7 @@ use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Internal\CommitOrderCalculator;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use InvalidArgumentException;
 
 /**
  * Load data fixtures from bundles.
@@ -62,13 +63,23 @@ EOT
         $emName = $input->getOption('em');
         $emName = $emName ? $emName : 'default';
         $emServiceName = sprintf('doctrine.orm.%s_entity_manager', $emName);
+
+        if (!$this->container->has($emServiceName)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Could not find an entity manager configured with the name "%s". Check your '.
+                    'application configuration to configure your Doctrine entity managers.', $emName
+                )
+            );
+        }
+
         $em = $this->container->get($emServiceName);
         $dirOrFile = $input->getOption('fixtures');
         if ($dirOrFile) {
             $paths = is_array($dirOrFile) ? $dirOrFile : array($dirOrFile);
         } else {
             $paths = array();
-            foreach ($this->application->getKernel()->getBundles() as $bundle) {
+            foreach ($this->getApplication()->getKernel()->getBundles() as $bundle) {
                 $paths[] = $bundle->getPath().'/DataFixtures/ORM';
             }
         }
@@ -80,6 +91,11 @@ EOT
             }
         }
         $fixtures = $loader->getFixtures();
+        if (!$fixtures) {
+            throw new InvalidArgumentException(
+                sprintf('Could not find any fixtures to load in: %s', "\n\n- ".implode("\n- ", $paths))
+            );
+        }
         $purger = new ORMPurger($em);
         $executor = new ORMExecutor($em, $purger);
         $executor->setLogger(function($message) use ($output) {

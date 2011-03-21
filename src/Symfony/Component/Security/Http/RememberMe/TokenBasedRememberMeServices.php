@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\User\AccountInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /*
  * This file is part of the Symfony package.
@@ -25,7 +25,7 @@ use Symfony\Component\Security\Core\User\AccountInterface;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class TokenBasedRememberMeServices extends RememberMeServices
+class TokenBasedRememberMeServices extends AbstractRememberMeServices
 {
     /**
      * {@inheritDoc}
@@ -50,8 +50,8 @@ class TokenBasedRememberMeServices extends RememberMeServices
             throw $ex;
         }
 
-        if (!$user instanceof AccountInterface) {
-            throw new \RuntimeException(sprintf('The UserProviderInterface implementation must return an instance of AccountInterface, but returned "%s".', get_class($user)));
+        if (!$user instanceof UserInterface) {
+            throw new \RuntimeException(sprintf('The UserProviderInterface implementation must return an instance of UserInterface, but returned "%s".', get_class($user)));
         }
 
         if (true !== $this->compareHashes($hash, $this->generateCookieHash($class, $username, $expires, $user->getPassword()))) {
@@ -62,7 +62,7 @@ class TokenBasedRememberMeServices extends RememberMeServices
             throw new AuthenticationException('The cookie has expired.');
         }
 
-        return new RememberMeToken($user, $this->providerKey, $this->key);
+        return $user;
     }
 
     /**
@@ -76,7 +76,7 @@ class TokenBasedRememberMeServices extends RememberMeServices
      *
      * @return Boolean true if the two hashes are the same, false otherwise
      */
-    protected function compareHashes($hash1, $hash2)
+    private function compareHashes($hash1, $hash2)
     {
         if (strlen($hash1) !== $c = strlen($hash2)) {
             return false;
@@ -95,10 +95,6 @@ class TokenBasedRememberMeServices extends RememberMeServices
      */
     protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token)
     {
-        if ($token instanceof RememberMeToken) {
-            return;
-        }
-
         $user = $token->getUser();
         $expires = time() + $this->options['lifetime'];
         $value = $this->generateCookieValue(get_class($user), $user->getUsername(), $expires, $user->getPassword());
@@ -150,6 +146,6 @@ class TokenBasedRememberMeServices extends RememberMeServices
      */
     protected function generateCookieHash($class, $username, $expires, $password)
     {
-        return hash('sha256', $class.$username.$expires.$password.$this->key);
+        return hash('sha256', $class.$username.$expires.$password.$this->getKey());
     }
 }

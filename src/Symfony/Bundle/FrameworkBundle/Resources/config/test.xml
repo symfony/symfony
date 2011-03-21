@@ -25,7 +25,7 @@
         <service id="test.client.cookiejar" class="%test.client.cookiejar.class%" scope="prototype" />
 
         <service id="test.session.listener" class="%test.session.listener.class%">
-            <tag name="kernel.listener" event="core.response" method="filter" priority="-128" />
+            <tag name="kernel.listener" event="onCoreResponse" priority="-128" />
         </service>
     </services>
 </container>

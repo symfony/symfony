@@ -53,7 +53,7 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $bundle = $this->application->getKernel()->getBundle($input->getArgument('bundle'));
+        $bundle = $this->getApplication()->getKernel()->getBundle($input->getArgument('bundle'));
 
         $destPath = $bundle->getPath();
         $type = $input->getArgument('mapping-type') ? $input->getArgument('mapping-type') : 'xml';
@@ -77,6 +77,9 @@ EOT
         $em = $this->getEntityManager($this->container, $input->getOption('em'));
         $databaseDriver = new DatabaseDriver($em->getConnection()->getSchemaManager());
         $em->getConfiguration()->setMetadataDriverImpl($databaseDriver);
+        
+        $emName = $input->getOption('em');
+        $emName = $emName ? $emName : 'default';
 
         $cmf = new DisconnectedClassMetadataFactory();
         $cmf->setEntityManager($em);

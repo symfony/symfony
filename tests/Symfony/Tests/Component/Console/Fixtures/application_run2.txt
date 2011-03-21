@@ -1,5 +1,5 @@
 Usage:
- help [--xml] [-h|--help] [-q|--quiet] [-v|--verbose] [-V|--version] [-a|--ansi] [-n|--no-interaction] command [command_name]
+ help [--xml] [command_name]
 
 Aliases: ?
 Arguments:

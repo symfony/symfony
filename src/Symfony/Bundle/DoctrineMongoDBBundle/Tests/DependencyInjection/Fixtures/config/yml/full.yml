@@ -1,0 +1,47 @@
+doctrine_mongo_db:
+    proxy_namespace:    Test_Proxies
+    auto_generate_proxy_classes:    true
+
+    hydrator_namespace: Test_Hydrators
+    auto_generate_hydrator_classes: true
+
+    default_document_manager:  default_dm_name
+    default_database:          default_db_name
+
+    default_connection:        conn1
+
+    connections:
+        conn1:
+            server:         http://server
+            options:
+                connect:    true
+                persist:    persist_val
+                timeout:    500
+                replicaSet: true
+                username:   username_val
+                password:   password_val
+        conn2:
+            server: http://server2
+
+    document_managers:
+        dm1:
+            mappings:
+                FooBundle:   annotations
+            metadata_cache_driver:
+                type:                  memcache
+                class:                 fooClass
+                host:                  host_val
+                port:                  1234
+                instance_class:        instance_val
+        dm2:
+            connection:       dm2_connection
+            database:         db1
+            mappings:
+                BarBundle:
+                    type:   yml
+                    dir:    %kernel.cache_dir%
+                    prefix: prefix_val
+                    alias:  alias_val
+                    is_bundle: false
+            metadata_cache_driver: apc
+            logging: true

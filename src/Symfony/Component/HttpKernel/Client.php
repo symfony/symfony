@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\BrowserKit\Client as BaseClient;
 use Symfony\Component\BrowserKit\Request as DomRequest;
@@ -95,12 +96,38 @@ EOF;
      */
     protected function filterRequest(DomRequest $request)
     {
-        $uri = $request->getUri();
-        if (preg_match('#^https?\://([^/]+)/(.*)$#', $uri, $matches)) {
-            $uri = '/'.$matches[2];
+        $httpRequest = Request::create($request->getUri(), $request->getMethod(), $request->getParameters(), $request->getCookies(), $request->getFiles(), $request->getServer(), $request->getContent());
+
+        $httpRequest->files->replace($this->filterFiles($httpRequest->files->all()));
+
+        return $httpRequest;
+    }
+
+    /**
+     * Filters an array of files.
+     *
+     * This method marks all uploaded files as already moved thus avoiding
+     * UploadedFile's call to move_uploaded_file(), which would otherwise fail.
+     *
+     * @param array $files An array of files
+     *
+     * @return array An array with all uploaded files marked as already moved
+     */
+    protected function filterFiles(array $files)
+    {
+        $filtered = array();
+        foreach ($files as $key => $value) {
+            if (is_array($value)) {
+                $filtered[$key] = $this->filterFiles($value);
+            } elseif ($value instanceof UploadedFile) {
+                // create an already-moved uploaded file
+                $filtered[$key] = new UploadedFile($value->getPath(), $value->getName(), $value->getMimeType(), $value->getSize(), $value->getError(), true);
+            } else {
+                $filtered[$key] = $value;
+            }
         }
 
-        return Request::create($uri, $request->getMethod(), $request->getParameters(), $request->getCookies(), $request->getFiles(), $request->getServer(), $request->getContent());
+        return $filtered;
     }
 
     /**

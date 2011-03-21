@@ -11,34 +11,29 @@
     </srv:parameters>
 
     <config>
-        <dbal>
-            <connections>
-                <connection
-                    name="default"
-                    driver="pdo_sqlite"
-                    dbname="sqlite_db"
-                    user="sqlite_user"
-                    password="sqlite_s3cr3t"
-                    memory="true" />
-            </connections>
+        <dbal default-connection="default">
+            <connection
+                name="default"
+                driver="pdo_sqlite"
+                dbname="sqlite_db"
+                user="sqlite_user"
+                password="sqlite_s3cr3t"
+                memory="true" />
         </dbal>
 
         <orm
-                metadata-cache-driver="apc"
-                default-entity-manager="dm2"
-                default-connection="conn1"
+                default-entity-manager="default"
                 auto-generate-proxy-classes="true"
             >
-            <entity-managers>
-                <entity-manager name="default" connection="default">
-                    <metadata-cache-driver type="memcache">
-                        <class>Doctrine\Common\Cache\MemcacheCache</class>
-                        <host>localhost</host>
-                        <port>11211</port>
-                        <instance-class>Memcache</instance-class>
-                    </metadata-cache-driver>
-                </entity-manager>
-            </entity-managers>
+            <entity-manager name="default" connection="default">
+                <metadata-cache-driver type="memcache">
+                    <class>Doctrine\Common\Cache\MemcacheCache</class>
+                    <host>localhost</host>
+                    <port>11211</port>
+                    <instance-class>Memcache</instance-class>
+                </metadata-cache-driver>
+                <mapping name="YamlBundle" />
+            </entity-manager>
         </orm>
     </config>
 </srv:container>

@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SwiftmailerBundle\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 /**
@@ -27,45 +27,53 @@ class Configuration
     /**
      * Generates the configuration tree.
      *
-     * @return \Symfony\Component\Config\Definition\NodeInterface
+     * @param Boolean $kernelDebug
+     * 
+     * @return \Symfony\Component\Config\Definition\ArrayNode The config tree
      */
-    public function getConfigTree()
+    public function getConfigTree($kernelDebug)
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('swiftmailer', 'array');
+        $rootNode = $treeBuilder->root('swiftmailer');
 
         $rootNode
-            ->scalarNode('transport')
-                ->defaultValue('smtp')
-                ->validate()
-                    ->ifNotInArray(array ('smtp', 'mail', 'sendmail', 'gmail'))
-                    ->thenInvalid('The %s transport is not supported')
+            ->children()
+                ->scalarNode('transport')
+                    ->defaultValue('smtp')
+                    ->validate()
+                        ->ifNotInArray(array ('smtp', 'mail', 'sendmail', 'gmail'))
+                        ->thenInvalid('The %s transport is not supported')
+                    ->end()
                 ->end()
-            ->end()
-            ->scalarNode('username')->defaultNull()->end()
-            ->scalarNode('password')->defaultNull()->end()
-            ->scalarNode('host')->defaultValue('localhost')->end()
-            ->scalarNode('port')->defaultValue(false)->end()
-            ->scalarNode('encryption')
-                ->defaultNull()
-                ->validate()
-                    ->ifNotInArray(array ('tls', 'ssl', null))
-                    ->thenInvalid('The %s encryption is not supported')
+                ->scalarNode('username')->defaultNull()->end()
+                ->scalarNode('password')->defaultNull()->end()
+                ->scalarNode('host')->defaultValue('localhost')->end()
+                ->scalarNode('port')->defaultValue(false)->end()
+                ->scalarNode('encryption')
+                    ->defaultNull()
+                    ->validate()
+                        ->ifNotInArray(array ('tls', 'ssl', null))
+                        ->thenInvalid('The %s encryption is not supported')
+                    ->end()
                 ->end()
-            ->end()
-            ->scalarNode('auth_mode')
-                ->defaultNull()
-                ->validate()
-                    ->ifNotInArray(array ('plain', 'login', 'cram-md5', null))
-                    ->thenInvalid('The %s authentication mode is not supported')
+                ->scalarNode('auth_mode')
+                    ->defaultNull()
+                    ->validate()
+                        ->ifNotInArray(array ('plain', 'login', 'cram-md5', null))
+                        ->thenInvalid('The %s authentication mode is not supported')
+                    ->end()
                 ->end()
+                ->arrayNode('spool')
+                    ->children()
+                        ->scalarNode('type')->defaultValue('file')->end()
+                        ->scalarNode('path')->defaultValue('%kernel.cache_dir%/swiftmailer/spool')->end()
+                    ->end()
+                ->end()
+                ->scalarNode('delivery_address')->end()
+                ->booleanNode('disable_delivery')->end()
+                ->booleanNode('logging')->defaultValue($kernelDebug)->end()
             ->end()
-            ->arrayNode('spool')
-                ->scalarNode('type')->defaultValue('file')->end()
-                ->scalarNode('path')->defaultValue('%kernel.cache_dir%/swiftmailer/spool')->end()
-            ->end()
-            ->scalarNode('delivery_adress')->end()
-            ->booleanNode('disable_delivery')->end();
+        ;
 
         return $treeBuilder->buildTree();
     }

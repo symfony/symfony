@@ -14,6 +14,7 @@ namespace Symfony\Component\Config\Definition;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 /**
  * The base node class
@@ -57,7 +58,6 @@ abstract class BaseNode implements NodeInterface
      *
      * @param mixed $originalValue 
      * @param mixed $equivalentValue 
-     * @return void
      */
     public function addEquivalentValue($originalValue, $equivalentValue)
     {
@@ -67,8 +67,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Set this node as required.
      *
-     * @param boolean $boolean Required node
-     * @return void
+     * @param Boolean $boolean Required node
      */
     public function setRequired($boolean)
     {
@@ -78,8 +77,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Sets if this node can be overridden.
      *
-     * @param boolean $allow 
-     * @return void
+     * @param Boolean $allow
      */
     public function setAllowOverwrite($allow)
     {
@@ -90,7 +88,6 @@ abstract class BaseNode implements NodeInterface
      * Sets the closures used for normalization.
      *
      * @param array $closures An array of Closures used for normalization
-     * @return void
      */
     public function setNormalizationClosures(array $closures)
     {
@@ -101,7 +98,6 @@ abstract class BaseNode implements NodeInterface
      * Sets the closures used for final validation.
      *
      * @param array $closures An array of Closures used for final validation
-     * @return void
      */
     public function setFinalValidationClosures(array $closures)
     {
@@ -111,7 +107,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Checks if this node is required.
      *
-     * @return boolean 
+     * @return Boolean
      */
     public function isRequired()
     {
@@ -232,8 +228,7 @@ abstract class BaseNode implements NodeInterface
      * Validates the type of a Node.
      *
      * @param mixed $value The value to validate
-     * @return void
-     * @throws \InvalidTypeException when the value is invalid
+     * @throws InvalidTypeException when the value is invalid
      */
     abstract protected function validateType($value);
     

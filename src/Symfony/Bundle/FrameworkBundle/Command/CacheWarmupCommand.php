@@ -37,12 +37,12 @@ class CacheWarmupCommand extends Command
             ->setName('cache:warmup')
             ->setDescription('Warms up an empty cache')
             ->setDefinition(array(
-                new InputOption('warmup-dir', '', InputOption::VALUE_OPTIONAL, 'Warms up the cache in a specific directory')
+                new InputOption('warmup-dir', '', InputOption::VALUE_OPTIONAL, 'Warms up the cache in the specified directory')
             ))
             ->setHelp(<<<EOF
-The <info>cache:warmup --warmup-dir=new_cache</info> command warms up the cache.
+The <info>cache:warmup</info> command warms up the cache.
 
-Before running this command, the cache must be empty if not use warmup-dir option.
+Before running this command, the cache must be empty.
 EOF
             )
         ;

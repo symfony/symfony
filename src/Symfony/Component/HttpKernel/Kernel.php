@@ -414,7 +414,7 @@ abstract class Kernel implements KernelInterface
      *
      * @return string The container class
      */
-    protected function getContainerClass()
+    public function getContainerClass()
     {
         return $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer'.($this->cacheDir ? 'Tmp' : '');
     }

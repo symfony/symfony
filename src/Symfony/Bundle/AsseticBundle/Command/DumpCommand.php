@@ -47,7 +47,7 @@ class DumpCommand extends Command
         $am = $this->container->get('assetic.asset_manager');
 
         // notify an event so custom stream wrappers can be registered lazily
-        $event = new WriteEvent($basePath);
+        $writeEvent = new WriteEvent($basePath);
         $this->container->get('event_dispatcher')->dispatch(Events::onAsseticWrite, $writeEvent);
 
         if ($input->getOption('watch')) {

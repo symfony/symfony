@@ -14,6 +14,8 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Clear and Warmup the cache.
@@ -21,7 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @author Francis Besset <francis.besset@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class CacheClearCommand extends CacheWarmupCommand
+class CacheClearCommand extends Command
 {
     /**
      * @see Command
@@ -58,14 +60,70 @@ EOF
         if ($input->getOption('no-warmup')) {
             rename($realCacheDir, $oldCacheDir);
         } else {
-            $this->setWarmupDir($this->container->getParameter('kernel.environment').'_tmp');
+            $warmupDir = $realCacheDir.'_new';
 
-            parent::execute($input, $output);
+            $this->warmup($warmupDir);
 
             rename($realCacheDir, $oldCacheDir);
-            rename($this->kernelTmp->getCacheDir(), $realCacheDir);
+            rename($warmupDir, $realCacheDir);
         }
 
         $this->container->get('filesystem')->remove($oldCacheDir);
+    }
+
+    protected function warmup($warmupDir)
+    {
+        $this->container->get('filesystem')->remove($warmupDir);
+
+        $kernel = $this->getTempKernel($this->container->get('kernel'), $warmupDir);
+        $kernel->boot();
+
+        $warmer = $kernel->getContainer()->get('cache_warmer');
+        $warmer->enableOptionalWarmers();
+        $warmer->warmUp($warmupDir);
+
+        // rename container files
+        $finder = new Finder();
+        foreach ($finder->files()->name(get_class($kernel->getContainer()).'*')->in($warmupDir) as $file) {
+            $content = file_get_contents($file);
+            $content = preg_replace('/__.*__/', '', $content);
+            file_put_contents(preg_replace('/__.*__/', '', $file), $content);
+            unlink($file);
+        }
+    }
+
+    protected function getTempKernel(KernelInterface $parent, $warmupDir)
+    {
+        $parentClass = get_class($parent);
+        $rand = uniqid();
+        $class = $parentClass.$rand;
+        $rootDir = $parent->getRootDir();
+        $code = <<<EOF
+<?php
+
+class $class extends $parentClass
+{
+    public function getCacheDir()
+    {
+        return '$warmupDir';
+    }
+
+    public function getRootDir()
+    {
+        return '$rootDir';
+    }
+
+    protected function getContainerClass()
+    {
+        return parent::getContainerClass().'__{$rand}__';
+    }
+}
+EOF;
+        $this->container->get('filesystem')->mkdirs($warmupDir);
+        file_put_contents($file = $warmupDir.'/kernel.tmp', $code);
+        require_once $file;
+        @unlink($file);
+
+        return new $class($parent->getEnvironment(), $parent->isDebug());
     }
 }

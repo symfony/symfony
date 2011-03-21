@@ -68,7 +68,7 @@ EOT
             throw new InvalidArgumentException(
                 sprintf(
                     'Could not find a document manager configured with the name "%s". Check your '.
-                    'application configuration to configure your Doctrine document managers.', $emName
+                    'application configuration to configure your Doctrine document managers.', $dmName
                 )
             );
         }

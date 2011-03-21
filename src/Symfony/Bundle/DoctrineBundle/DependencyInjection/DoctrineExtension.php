@@ -327,21 +327,29 @@ class DoctrineExtension extends AbstractDoctrineExtension
      */
     protected function getEntityManagerCacheDefinition(array $entityManager, $cacheDriver, ContainerBuilder $container)
     {
-        if ('memcache' === $cacheDriver['type']) {
-            $memcacheClass = !empty ($cacheDriver['class']) ? $cacheDriver['class'] : '%doctrine.orm.cache.memcache_class%';
-            $memcacheInstanceClass = !empty ($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%doctrine.orm.cache.memcache_instance_class%';
-            $memcacheHost = !empty ($cacheDriver['host']) ? $cacheDriver['host'] : '%doctrine.orm.cache.memcache_host%';
-            $memcachePort = !empty ($cacheDriver['port']) ? $cacheDriver['port'] : '%doctrine.orm.cache.memcache_port%';
-            $cacheDef = new Definition($memcacheClass);
-            $memcacheInstance = new Definition($memcacheInstanceClass);
-            $memcacheInstance->addMethodCall('connect', array(
-                $memcacheHost, $memcachePort
-            ));
-            $container->setDefinition(sprintf('doctrine.orm.%s_memcache_instance', $entityManager['name']), $memcacheInstance);
-            $cacheDef->addMethodCall('setMemcache', array(new Reference(sprintf('doctrine.orm.%s_memcache_instance', $entityManager['name']))));
-        } else if (in_array($cacheDriver['type'], array('apc', 'array', 'xcache'))) {
-            $cacheDef = new Definition('%'.sprintf('doctrine.orm.cache.%s_class', $cacheDriver['type']).'%');
+        switch ($cacheDriver['type']) {
+            case 'memcache':
+                $memcacheClass = !empty ($cacheDriver['class']) ? $cacheDriver['class'] : '%doctrine.orm.cache.memcache_class%';
+                $memcacheInstanceClass = !empty ($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%doctrine.orm.cache.memcache_instance_class%';
+                $memcacheHost = !empty ($cacheDriver['host']) ? $cacheDriver['host'] : '%doctrine.orm.cache.memcache_host%';
+                $memcachePort = !empty ($cacheDriver['port']) ? $cacheDriver['port'] : '%doctrine.orm.cache.memcache_port%';
+                $cacheDef = new Definition($memcacheClass);
+                $memcacheInstance = new Definition($memcacheInstanceClass);
+                $memcacheInstance->addMethodCall('connect', array(
+                    $memcacheHost, $memcachePort
+                ));
+                $container->setDefinition(sprintf('doctrine.orm.%s_memcache_instance', $entityManager['name']), $memcacheInstance);
+                $cacheDef->addMethodCall('setMemcache', array(new Reference(sprintf('doctrine.orm.%s_memcache_instance', $entityManager['name']))));
+                break;
+            case 'apc':
+            case 'array':
+            case 'xcache':
+                $cacheDef = new Definition('%'.sprintf('doctrine.orm.cache.%s_class', $cacheDriver['type']).'%');
+                break;
+            default:
+                throw new \InvalidArgumentException(sprintf('%s is unrecognized cache driver.', $cacheDriver['type']));
         }
+
         $cacheDef->setPublic(false);
         $cacheDef->addMethodCall('setNamespace', array('sf2orm_'.$entityManager['name']));
         return $cacheDef;

@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class CheckCircularReferencesPass implements CompilerPassInterface
 {
     private $currentId;
-    private $currentNode;
     private $currentPath;
 
     /**

@@ -189,7 +189,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             $subRequest = Request::create($this->options['failure_path']);
             $subRequest->attributes->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed);
 
-            return $event->getSubject()->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+            return $event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
         }
 
         if (null !== $this->logger) {

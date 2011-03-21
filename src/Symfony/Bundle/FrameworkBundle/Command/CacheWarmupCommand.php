@@ -25,7 +25,7 @@ use Symfony\Component\Finder\Finder;
  */
 class CacheWarmupCommand extends Command
 {
-    protected $cacheDir;
+    protected $warmupDir;
     protected $kernelTmp;
 
     /**
@@ -37,7 +37,7 @@ class CacheWarmupCommand extends Command
             ->setName('cache:warmup')
             ->setDescription('Warms up an empty cache')
             ->setDefinition(array(
-                new InputOption('warmup-dir', '', InputOption::VALUE_OPTIONAL, 'Warms up the cache in the specified directory')
+                new InputOption('warmup-dir', '', InputOption::VALUE_REQUIRED, 'Warms up the cache in the specified directory')
             ))
             ->setHelp(<<<EOF
 The <info>cache:warmup</info> command warms up the cache.
@@ -48,15 +48,6 @@ EOF
         ;
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
-    {
-        parent::initialize($input, $output);
-
-        if ($input->hasOption('warmup-dir')) {
-            $this->cacheDir = $input->getOption('warmup-dir');
-        }
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -64,14 +55,18 @@ EOF
     {
         $output->writeln('Warming up the cache');
 
-        if (!$this->cacheDir) {
+        if ($input->getOption('warmup-dir')) {
+            $this->setWarmupDir($input->getOption('warmup-dir'));
+        }
+
+        if (!$this->warmupDir) {
             $this->warmUp($this->container);
         } else {
             $class = get_class($this->container->get('kernel'));
             $this->kernelTmp = new $class(
                 $this->container->getParameter('kernel.environment'),
                 $this->container->getParameter('kernel.debug'),
-                $this->cacheDir
+                $this->warmupDir
             );
 
             $this->container->get('filesystem')->remove($this->kernelTmp->getCacheDir());
@@ -88,5 +83,10 @@ EOF
         $warmer = $container->get('cache_warmer');
         $warmer->enableOptionalWarmers();
         $warmer->warmUp($container->getParameter('kernel.cache_dir'));
+    }
+
+    protected function setWarmupDir($dir)
+    {
+        $this->warmupDir = $dir;
     }
 }

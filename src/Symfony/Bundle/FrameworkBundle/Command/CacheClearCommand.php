@@ -43,13 +43,6 @@ EOF
         ;
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
-    {
-        parent::initialize($input, $output);
-
-        $this->cacheDir = $this->container->getParameter('kernel.environment').'_tmp';
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -65,6 +58,8 @@ EOF
         if ($input->getOption('no-warmup')) {
             rename($realCacheDir, $oldCacheDir);
         } else {
+            $this->setWarmupDir($this->container->getParameter('kernel.environment').'_tmp');
+
             parent::execute($input, $output);
 
             rename($realCacheDir, $oldCacheDir);

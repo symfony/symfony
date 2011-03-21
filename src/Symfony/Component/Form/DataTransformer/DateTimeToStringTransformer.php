@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\DataTransformer;
 
-use Symfony\Component\Form\Configurable;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**

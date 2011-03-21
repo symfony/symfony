@@ -21,16 +21,26 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransformer
 {
-    /**
-     * {@inheritDoc}
-     */
-    protected function configure()
-    {
-        $this->addOption('grouping', true);
-        $this->addOption('precision', 2);
-        $this->addOption('divisor', 1);
 
-        parent::configure();
+    private $divisor;
+
+    public function __construct($precision = null, $grouping = null, $roundingMode = null, $divisor = null)
+    {
+        if(is_null($grouping)) {
+            $grouping = true;
+        }
+
+        if(is_null($precision)) {
+            $precision = 2;
+        }
+
+        parent::__construct($precision,$grouping,$roundingMode);
+
+        if(is_null($divisor)) {
+            $divisor = 1;
+        }
+
+        $this->divisor = $divisor;
     }
 
     /**
@@ -46,7 +56,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
                 throw new UnexpectedTypeException($value, 'numeric');
             }
 
-            $value /= $this->getOption('divisor');
+            $value /= $this->divisor;
         }
 
         return parent::transform($value);
@@ -63,7 +73,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
         $value = parent::reverseTransform($value);
 
         if (null !== $value) {
-            $value *= $this->getOption('divisor');
+            $value *= $this->divisor;
         }
 
         return $value;

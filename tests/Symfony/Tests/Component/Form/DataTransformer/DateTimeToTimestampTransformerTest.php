@@ -19,10 +19,7 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
 {
     public function testTransform()
     {
-        $transformer = new DateTimeToTimestampTransformer(array(
-            'input_timezone' => 'UTC',
-            'output_timezone' => 'UTC',
-        ));
+        $transformer = new DateTimeToTimestampTransformer('UTC','UTC');
 
         $input = new \DateTime('2010-02-03 04:05:06 UTC');
         $output = $input->format('U');
@@ -39,10 +36,7 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
 
     public function testTransform_differentTimezones()
     {
-        $transformer = new DateTimeToTimestampTransformer(array(
-            'input_timezone' => 'Asia/Hong_Kong',
-            'output_timezone' => 'America/New_York',
-        ));
+        $transformer = new DateTimeToTimestampTransformer('America/New_York','Asia/Hong_Kong');
 
         $input = new \DateTime('2010-02-03 04:05:06 America/New_York');
         $output = $input->format('U');
@@ -53,10 +47,7 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
 
     public function testTransformFromDifferentTimezone()
     {
-        $transformer = new DateTimeToTimestampTransformer(array(
-            'input_timezone' => 'UTC',
-            'output_timezone' => 'Asia/Hong_Kong',
-        ));
+        $transformer = new DateTimeToTimestampTransformer('Asia/Hong_Kong','UTC');
 
         $input = new \DateTime('2010-02-03 04:05:06 Asia/Hong_Kong');
 
@@ -78,10 +69,7 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
 
     public function testReverseTransform()
     {
-        $reverseTransformer = new DateTimeToTimestampTransformer(array(
-            'input_timezone' => 'UTC',
-            'output_timezone' => 'UTC',
-        ));
+        $reverseTransformer = new DateTimeToTimestampTransformer('UTC','UTC');
 
         $output = new \DateTime('2010-02-03 04:05:06 UTC');
         $input = $output->format('U');
@@ -98,10 +86,7 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
 
     public function testReverseTransform_differentTimezones()
     {
-        $reverseTransformer = new DateTimeToTimestampTransformer(array(
-            'input_timezone' => 'Asia/Hong_Kong',
-            'output_timezone' => 'America/New_York',
-        ));
+        $reverseTransformer = new DateTimeToTimestampTransformer('America/New_York','Asia/Hong_Kong');
 
         $output = new \DateTime('2010-02-03 04:05:06 America/New_York');
         $input = $output->format('U');

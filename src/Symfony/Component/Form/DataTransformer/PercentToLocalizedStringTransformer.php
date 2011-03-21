@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\DataTransformer;
 
-use Symfony\Component\Form\Configurable;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
@@ -20,7 +19,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
-class PercentToLocalizedStringTransformer extends Configurable implements DataTransformerInterface
+class PercentToLocalizedStringTransformer implements DataTransformerInterface
 {
     const FRACTIONAL = 'fractional';
     const INTEGER = 'integer';
@@ -30,19 +29,26 @@ class PercentToLocalizedStringTransformer extends Configurable implements DataTr
         self::INTEGER,
     );
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function configure()
-    {
-        $this->addOption('type', self::FRACTIONAL);
-        $this->addOption('precision', 0);
+    private $type;
 
-        if (!in_array($this->getOption('type'), self::$types, true)) {
+    private $precision;
+
+    public function __construct($precision = null, $type = null)
+    {
+        if(is_null($precision)) {
+            $precision = 0;
+        }
+
+        if(is_null($type)) {
+            $type = self::FRACTIONAL;
+        }
+
+        if (!in_array($type, self::$types, true)) {
             throw new \InvalidArgumentException(sprintf('The option "type" is expected to be one of "%s"', implode('", "', self::$types)));
         }
 
-        parent::configure();
+        $this->type = $type;
+        $this->precision = $precision;
     }
 
     /**
@@ -61,7 +67,7 @@ class PercentToLocalizedStringTransformer extends Configurable implements DataTr
             throw new UnexpectedTypeException($value, 'numeric');
         }
 
-        if (self::FRACTIONAL == $this->getOption('type')) {
+        if (self::FRACTIONAL == $this->type) {
             $value *= 100;
         }
 
@@ -100,7 +106,7 @@ class PercentToLocalizedStringTransformer extends Configurable implements DataTr
             throw new TransformationFailedException($formatter->getErrorMessage());
         }
 
-        if (self::FRACTIONAL == $this->getOption('type')) {
+        if (self::FRACTIONAL == $this->type) {
             $value /= 100;
         }
 
@@ -116,7 +122,7 @@ class PercentToLocalizedStringTransformer extends Configurable implements DataTr
     {
         $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
 
-        $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->getOption('precision'));
+        $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->precision);
 
         return $formatter;
     }

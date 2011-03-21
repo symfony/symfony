@@ -43,9 +43,7 @@ class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
 
     public function testTransformWithInteger()
     {
-        $transformer = new PercentToLocalizedStringTransformer(array(
-            'type' => 'integer',
-        ));
+        $transformer = new PercentToLocalizedStringTransformer(null, 'integer');
 
         $this->assertEquals('0', $transformer->transform(0.1));
         $this->assertEquals('1', $transformer->transform(1));
@@ -55,9 +53,7 @@ class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
 
     public function testTransformWithPrecision()
     {
-        $transformer = new PercentToLocalizedStringTransformer(array(
-            'precision' => 2,
-        ));
+        $transformer = new PercentToLocalizedStringTransformer(2);
 
         $this->assertEquals('12,34', $transformer->transform(0.1234));
     }
@@ -81,9 +77,7 @@ class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
 
     public function testReverseTransformWithInteger()
     {
-        $transformer = new PercentToLocalizedStringTransformer(array(
-            'type' => 'integer',
-        ));
+        $transformer = new PercentToLocalizedStringTransformer(null, 'integer');
 
         $this->assertEquals(10, $transformer->reverseTransform('10', null));
         $this->assertEquals(15, $transformer->reverseTransform('15', null));
@@ -93,9 +87,7 @@ class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
 
     public function testReverseTransformWithPrecision()
     {
-        $transformer = new PercentToLocalizedStringTransformer(array(
-            'precision' => 2,
-        ));
+        $transformer = new PercentToLocalizedStringTransformer(2);
 
         $this->assertEquals(0.1234, $transformer->reverseTransform('12,34', null));
     }

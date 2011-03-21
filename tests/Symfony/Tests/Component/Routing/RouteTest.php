@@ -85,6 +85,13 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $route->setRequirements(array('foo' => array('bar', 'baz')));
     }
 
+    public function testRequirement()
+    {
+        $route = new Route('/{foo}');
+        $route->setRequirement('foo', '^\d+$');
+        $this->assertEquals('\d+', $route->getRequirement('foo'), '->setRequirement() removes ^ and $ from the pattern');
+    }
+
     public function testCompile()
     {
         $route = new Route('/{foo}');

@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\DoctrineMongoDBBundle\Command;
 
-use Doctrine\ODM\MongoDB\Mapping\MappingException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -59,7 +58,7 @@ EOT
                                           ->getMetadataDriverImpl()
                                           ->getAllClassNames();
 
-        if (!$entityClassNames) {
+        if (!$documentClassNames) {
             throw new \Exception(
                 'You do not have any mapped Doctrine MongoDB ODM documents for any of your bundles. '.
                 'Create a class inside the Document namespace of any of your bundles and provide '.
@@ -75,7 +74,7 @@ EOT
             try {
                 $cm = $documentManager->getClassMetadata($documentClassName);
                 $output->write("<info>[OK]</info>   " . $documentClassName, true);
-            } catch(MappingException $e) {
+            } catch(\Exception $e) {
                 $output->write("<error>[FAIL]</error> " . $documentClassName, true);
                 $output->write("<comment>" . $e->getMessage()."</comment>", true);
                 $output->write("", true);

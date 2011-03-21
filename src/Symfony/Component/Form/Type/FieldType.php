@@ -85,7 +85,7 @@ class FieldType extends AbstractType
 
     public function createBuilder(array $options)
     {
-        return new FormBuilder($this->theme, new EventDispatcher());
+        return new FormBuilder(new EventDispatcher());
     }
 
     public function getParent(array $options)

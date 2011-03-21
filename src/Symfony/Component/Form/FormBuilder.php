@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\DataMapper\DataMapperInterface;
 use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
 use Symfony\Component\Form\Renderer\DefaultRenderer;
 use Symfony\Component\Form\Renderer\RendererInterface;
 use Symfony\Component\Form\Renderer\Plugin\RendererPluginInterface;
-use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
-use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\Validator\FormValidatorInterface;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -46,8 +45,6 @@ class FormBuilder
 
     private $normalizationTransformer;
 
-    private $theme;
-
     private $validators = array();
 
     private $attributes = array();
@@ -64,10 +61,8 @@ class FormBuilder
 
     private $dataMapper;
 
-    public function __construct(ThemeInterface $theme,
-            EventDispatcherInterface $dispatcher)
+    public function __construct(EventDispatcherInterface $dispatcher)
     {
-        $this->theme = $theme;
         $this->dispatcher = $dispatcher;
     }
 
@@ -256,11 +251,11 @@ class FormBuilder
 
     protected function buildRenderer()
     {
-        if (!$this->renderer) {
-            $this->renderer = new DefaultRenderer($this->theme, 'text');
-        }
-
         foreach ($this->rendererVars as $name => $value) {
+            if (!$this->renderer) {
+                throw new FormException('A renderer must be set in order to add renderer variables or plugins');
+            }
+
             if ($value instanceof RendererPluginInterface) {
                 $this->renderer->addPlugin($value);
                 continue;

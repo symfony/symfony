@@ -107,7 +107,7 @@ class Form implements \IteratorAggregate, FormInterface
     private $attributes;
 
     public function __construct($name, EventDispatcherInterface $dispatcher,
-        RendererInterface $renderer, DataTransformerInterface $clientTransformer = null,
+        RendererInterface $renderer = null, DataTransformerInterface $clientTransformer = null,
         DataTransformerInterface $normTransformer = null,
         DataMapperInterface $dataMapper = null, array $validators = array(),
         $required = false, $readOnly = false, array $attributes = array())
@@ -129,7 +129,9 @@ class Form implements \IteratorAggregate, FormInterface
         $this->readOnly = $readOnly;
         $this->attributes = $attributes;
 
-        $renderer->setField($this);
+        if ($renderer) {
+            $renderer->setField($this);
+        }
 
         $this->setData(null);
     }

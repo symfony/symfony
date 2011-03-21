@@ -12,6 +12,7 @@
 namespace Symfony\Tests\Component\Form;
 
 use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Type\Guesser\Guess;
 use Symfony\Component\Form\Type\Guesser\ValueGuess;
 use Symfony\Component\Form\Type\Guesser\TypeGuess;
@@ -22,9 +23,8 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $theme = $this->getMock('Symfony\Component\Form\Renderer\Theme\ThemeInterface');
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->builder = new \Symfony\Component\Form\FormBuilder($theme, $dispatcher);
+        $this->builder = new FormBuilder($dispatcher);
     }
 
     public function testAddNameNoString()
@@ -94,7 +94,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $factory->expects($this->once())
                 ->method('createBuilder')
                 ->with($this->equalTo($expectedType), $this->equalTo($expectedName), $this->equalTo($expectedOptions))
-                ->will($this->returnValue($this->getMock('Symfony\Component\Form\FormBuilder', array(), array(), '', false)));
+                ->will($this->returnValue($this->getFormBuilder()));
         $this->builder->setFormFactory($factory);
 
         $this->builder->add($expectedName, $expectedType, $expectedOptions);
@@ -112,7 +112,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $factory->expects($this->once())
                 ->method('createBuilderForProperty')
                 ->with($this->equalTo('stdClass'), $this->equalTo($expectedName), $this->equalTo($expectedOptions))
-                ->will($this->returnValue($this->getMock('Symfony\Component\Form\FormBuilder', array(), array(), '', false)));
+                ->will($this->returnValue($this->getFormBuilder()));
         $this->builder->setFormFactory($factory);
 
         $this->builder->setDataClass('stdClass');
@@ -120,5 +120,12 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = $this->builder->get($expectedName);
 
         $this->assertNotSame($builder, $this->builder);
+    }
+
+    private function getFormBuilder()
+    {
+        return $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 }

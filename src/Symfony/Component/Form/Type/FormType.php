@@ -46,6 +46,9 @@ class FormType extends AbstractType
             'csrf_provider' => null,
             'validation_groups' => null,
             'virtual' => false,
+            // Errors in forms bubble by default, so that form errors will
+            // end up as global errors in the root form
+            'error_bubbling' => true,
         );
     }
 

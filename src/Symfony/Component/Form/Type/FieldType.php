@@ -54,6 +54,7 @@ class FieldType extends AbstractType
 
         $builder->setRequired($options['required'])
             ->setReadOnly($options['read_only'])
+            ->setErrorBubbling($options['error_bubbling'])
             ->setAttribute('by_reference', $options['by_reference'])
             ->setAttribute('property_path', $options['property_path'])
             ->setAttribute('validation_groups', $options['validation_groups'])
@@ -80,6 +81,7 @@ class FieldType extends AbstractType
             'property_path' => false,
             'by_reference' => true,
             'validation_groups' => true,
+            'error_bubbling' => false,
         );
     }
 

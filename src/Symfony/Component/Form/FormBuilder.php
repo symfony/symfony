@@ -61,6 +61,8 @@ class FormBuilder
 
     private $dataMapper;
 
+    private $errorBubbling = false;
+
     public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
@@ -146,6 +148,18 @@ class FormBuilder
     public function getRequired()
     {
         return $this->required;
+    }
+
+    public function setErrorBubbling($errorBubbling)
+    {
+        $this->errorBubbling = $errorBubbling;
+
+        return $this;
+    }
+
+    public function getErrorBubbling()
+    {
+        return $this->errorBubbling;
     }
 
     public function addValidator(FormValidatorInterface $validator)
@@ -511,6 +525,7 @@ class FormBuilder
             $this->getValidators(),
             $this->getRequired(),
             $this->getReadOnly(),
+            $this->getErrorBubbling(),
             $this->getAttributes()
         );
 

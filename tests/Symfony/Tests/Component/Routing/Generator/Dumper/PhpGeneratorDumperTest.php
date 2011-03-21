@@ -45,29 +45,71 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
         $this->generatorDumper = new PhpGeneratorDumper($this->routeCollection);
     }
 
-    public function testDumpWithRoutes()
+    public function tearDown()
     {
-        $this->routeCollection->add('Test', new Route('/testing'));
-        
-        $this->assertStringEqualsFile(self::$fixturesPath.'/dumper/php_generator1.php', $this->generatorDumper->dump()); 
-    }
-    
-    public function testDumpWithoutRoutes()
-    {
-        $this->assertStringEqualsFile(self::$fixturesPath.'/dumper/php_generator2.php', $this->generatorDumper->dump()); 
-    }
-    
-    public function testDumpWithClassNamesOptions()
-    {
-        $this->routeCollection->add('Test', new Route('/testing'));
-        
-        $this->assertStringEqualsFile(self::$fixturesPath.'/dumper/php_generator3.php', $this->generatorDumper->dump(array('class' => 'FooGenerator', 'base_class' => 'FooGeneratorBase')));
+        parent::tearDown();
+     
+        @unlink(self::$fixturesPath.'/dumper/php_generator.php');
     }
 
+    public function testDumpWithRoutes()
+    {
+        $this->routeCollection->add('Test', new Route('/testing/{foo}'));
+        $this->routeCollection->add('Test2', new Route('/testing2'));
+        
+        file_put_contents(self::$fixturesPath.'/dumper/php_generator.php', $this->generatorDumper->dump());
+        include (self::$fixturesPath.'/dumper/php_generator.php');
+
+        $projectUrlGenerator = new \ProjectUrlGenerator(array(
+            'base_url' => '/app.php',
+            'method' => 'GET',
+            'host' => 'localhost',
+            'port' => 80,
+            'is_secure' => false
+        ));
+        
+        $absoluteUrlWithParameter    = $projectUrlGenerator->generate('Test', array('foo' => 'bar'), true);
+        $absoluteUrlWithoutParameter = $projectUrlGenerator->generate('Test2', array(), true);
+        $relativeUrlWithParameter    = $projectUrlGenerator->generate('Test', array('foo' => 'bar'), false);
+        $relativeUrlWithoutParameter = $projectUrlGenerator->generate('Test2', array(), false);
+
+        $this->assertEquals($absoluteUrlWithParameter, 'http://localhost/app.php/testing/bar');
+        $this->assertEquals($absoluteUrlWithoutParameter, 'http://localhost/app.php/testing2');
+        $this->assertEquals($relativeUrlWithParameter, '/app.php/testing/bar');
+        $this->assertEquals($relativeUrlWithoutParameter, '/app.php/testing2');
+    }
+    
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testDumpWithoutRoutes()
+    {
+        file_put_contents(self::$fixturesPath.'/dumper/php_generator.php', 
+            $this->generatorDumper->dump(array('class' => 'WithoutRoutesUrlGenerator')));
+        include (self::$fixturesPath.'/dumper/php_generator.php');
+
+        $projectUrlGenerator = new \WithoutRoutesUrlGenerator(array(
+            'base_url' => '/app.php',
+            'method' => 'GET',
+            'host' => 'localhost',
+            'port' => 80,
+            'is_secure' => false
+        ));
+       
+        $projectUrlGenerator->generate('Test', array());
+    }
+    
     public function testDumpForRouteWithDefaults()
     {
         $this->routeCollection->add('Test', new Route('/testing/{foo}', array('foo' => 'bar')));
         
-        $this->assertStringEqualsFile(self::$fixturesPath.'/dumper/php_generator4.php', $this->generatorDumper->dump());
+        file_put_contents(self::$fixturesPath.'/dumper/php_generator.php', 
+            $this->generatorDumper->dump(array('class' => 'DefaultRoutesUrlGenerator')));
+        include (self::$fixturesPath.'/dumper/php_generator.php');
+        
+        $projectUrlGenerator = new \DefaultRoutesUrlGenerator(array());
+        $url = $projectUrlGenerator->generate('Test', array());
+
+        $this->assertEquals($url, '/testing');
     }
 }

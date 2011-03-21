@@ -23,7 +23,7 @@
 {% endblock %}
 
 {% block panel %}
-    <h2>Messages sent</h2>
+    <h2>Messages {% if not collector.isSpool %} sent {% else %} spooled {% endif %}</h2>
 
     {% if not collector.messages %}
         <p>

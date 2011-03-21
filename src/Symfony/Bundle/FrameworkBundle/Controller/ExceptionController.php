@@ -29,10 +29,13 @@ class ExceptionController extends ContainerAware
      * @param FlattenException     $exception A FlattenException instance
      * @param DebugLoggerInterface $logger    A DebugLoggerInterface instance
      * @param string               $format    The format to use for rendering (html, xml, ...)
+     * @param integer              $code      An HTTP response code
+     * @param string               $message   An HTTP response status message
+     * @param array                $headers   HTTP response headers
      *
      * @throws \InvalidArgumentException When the exception template does not exist
      */
-    public function showAction(FlattenException $exception, DebugLoggerInterface $logger = null, $format = 'html')
+    public function showAction(FlattenException $exception, DebugLoggerInterface $logger = null, $format = 'html', $code = 500, $message = null, array $headers = array())
     {
         $this->container->get('request')->setRequestFormat($format);
 
@@ -44,8 +47,6 @@ class ExceptionController extends ContainerAware
         while (ob_get_level() && --$count) {
             $currentContent .= ob_get_clean();
         }
-
-        $code = $this->getStatusCode($exception);
 
         $name = $this->container->get('kernel')->isDebug() ? 'exception' : 'error';
         if ($this->container->get('kernel')->isDebug() && 'html' == $format) {
@@ -63,27 +64,16 @@ class ExceptionController extends ContainerAware
             $template,
             array(
                 'status_code'    => $code,
-                'status_text'    => Response::$statusTexts[$code],
+                'status_text'    => $message ?: Response::$statusTexts[$code],
                 'exception'      => $exception,
                 'logger'         => $logger,
                 'currentContent' => $currentContent,
             )
         );
 
-        $response->setStatusCode($code);
+        $response->setStatusCode($code, $message);
+        $response->headers->replace($headers);
 
         return $response;
-    }
-
-    protected function getStatusCode(FlattenException $exception)
-    {
-        switch ($exception->getClass()) {
-            case 'Symfony\Component\Security\Core\Exception\AccessDeniedException':
-                return 403;
-            case 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException':
-                return 404;
-            default:
-                return 500;
-        }
     }
 }

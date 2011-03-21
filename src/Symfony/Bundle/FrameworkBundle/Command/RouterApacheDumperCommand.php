@@ -32,7 +32,8 @@ class RouterApacheDumperCommand extends Command
     {
         $this
             ->setDefinition(array(
-                new InputArgument('script_name', InputArgument::OPTIONAL, 'The script name of the application\'s front controller.')
+                new InputArgument('script_name', InputArgument::OPTIONAL, 'The script name of the application\'s front controller.'),
+                new InputOption('base-uri', null, InputOption::VALUE_REQUIRED, 'The base URI'),
             ))
             ->setName('router:dump-apache')
             ->setDescription('Dumps all routes as Apache rewrite rules')
@@ -57,6 +58,9 @@ EOF
         $dumpOptions = array();
         if ($input->getArgument('script_name')) {
             $dumpOptions['script_name'] = $input->getArgument('script_name');
+        }
+        if ($input->getOption('base-uri')) {
+            $dumpOptions['base_uri'] = $input->getOption('base-uri');
         }
 
         $dumper = new ApacheMatcherDumper($router->getRouteCollection());

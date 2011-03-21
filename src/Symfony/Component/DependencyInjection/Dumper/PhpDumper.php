@@ -813,7 +813,7 @@ EOF;
     /**
      * Exports parameters.
      *
-     * @param string $parameters
+     * @param array $parameters
      * @param integer $indent
      * @return string
      */
@@ -910,7 +910,7 @@ EOF;
      * Returns the inline definition
      *
      * @param Definition $definition
-     * @return string
+     * @return array
      */
     private function getInlinedDefinitions(Definition $definition)
     {
@@ -980,7 +980,7 @@ EOF;
     /**
      * Dumps values.
      *
-     * @param string $value
+     * @param array $value
      * @param boolean $interpolate
      * @return string
      */

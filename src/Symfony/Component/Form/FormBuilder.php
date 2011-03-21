@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\DataMapper\DataMapperInterface;
 use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
-use Symfony\Component\Form\Renderer\DefaultRenderer;
-use Symfony\Component\Form\Renderer\RendererInterface;
-use Symfony\Component\Form\Renderer\Plugin\RendererPluginInterface;
-use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
-use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Form\Renderer\ThemeRenderer;
+use Symfony\Component\Form\Renderer\FormRendererInterface;
+use Symfony\Component\Form\Renderer\Plugin\FormRendererPluginInterface;
 use Symfony\Component\Form\Validator\FormValidatorInterface;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -46,8 +45,6 @@ class FormBuilder
 
     private $normalizationTransformer;
 
-    private $theme;
-
     private $validators = array();
 
     private $attributes = array();
@@ -64,10 +61,10 @@ class FormBuilder
 
     private $dataMapper;
 
-    public function __construct(ThemeInterface $theme,
-            EventDispatcherInterface $dispatcher)
+    private $errorBubbling = false;
+
+    public function __construct(EventDispatcherInterface $dispatcher)
     {
-        $this->theme = $theme;
         $this->dispatcher = $dispatcher;
     }
 
@@ -153,6 +150,18 @@ class FormBuilder
         return $this->required;
     }
 
+    public function setErrorBubbling($errorBubbling)
+    {
+        $this->errorBubbling = $errorBubbling;
+
+        return $this;
+    }
+
+    public function getErrorBubbling()
+    {
+        return $this->errorBubbling;
+    }
+
     public function addValidator(FormValidatorInterface $validator)
     {
         $this->validators[] = $validator;
@@ -231,16 +240,16 @@ class FormBuilder
     /**
      * Sets the renderer
      *
-     * @param RendererInterface $renderer
+     * @param FormRendererInterface $renderer
      */
-    public function setRenderer(RendererInterface $renderer)
+    public function setRenderer(FormRendererInterface $renderer)
     {
         $this->renderer = $renderer;
 
         return $this;
     }
 
-    public function addRendererPlugin(RendererPluginInterface $plugin)
+    public function addRendererPlugin(FormRendererPluginInterface $plugin)
     {
         $this->rendererVars[] = $plugin;
 
@@ -256,12 +265,12 @@ class FormBuilder
 
     protected function buildRenderer()
     {
-        if (!$this->renderer) {
-            $this->renderer = new DefaultRenderer($this->theme, 'text');
-        }
-
         foreach ($this->rendererVars as $name => $value) {
-            if ($value instanceof RendererPluginInterface) {
+            if (!$this->renderer) {
+                throw new FormException('A renderer must be set in order to add renderer variables or plugins');
+            }
+
+            if ($value instanceof FormRendererPluginInterface) {
                 $this->renderer->addPlugin($value);
                 continue;
             }
@@ -516,6 +525,7 @@ class FormBuilder
             $this->getValidators(),
             $this->getRequired(),
             $this->getReadOnly(),
+            $this->getErrorBubbling(),
             $this->getAttributes()
         );
 

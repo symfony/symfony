@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Form\Renderer\Plugin;
 
-use Symfony\Component\Form\Renderer\RendererInterface;
+use Symfony\Component\Form\Renderer\FormRendererInterface;
 use Symfony\Component\Form\FormInterface;
 
-class CheckedPlugin implements RendererPluginInterface
+class CheckedPlugin implements FormRendererPluginInterface
 {
-    public function setUp(FormInterface $field, RendererInterface $renderer)
+    public function setUp(FormInterface $field, FormRendererInterface $renderer)
     {
         $renderer->setVar('checked', (bool)$field->getData());
     }

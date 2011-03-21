@@ -23,9 +23,9 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     public function __construct($path, $flags)
     {
         if ($flags & (self::CURRENT_AS_PATHNAME | self::CURRENT_AS_SELF)) {
-            throw new RuntimeException('This iterator only support returning current as fileinfo.');
+            throw new \RuntimeException('This iterator only support returning current as fileinfo.');
         }
-        
+
         parent::__construct($path, $flags);
     }
 

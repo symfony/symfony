@@ -12,8 +12,6 @@
 namespace Symfony\Component\Form\Validator;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Error;
-use Symfony\Component\Form\DataError;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\Form\PropertyPathIterator;
@@ -21,6 +19,10 @@ use Symfony\Component\Validator\ValidatorInterface;
 
 class DelegatingValidator implements FormValidatorInterface
 {
+    const DATA_ERROR = 0;
+
+    const FORM_ERROR = 1;
+
     private $validator;
 
     public function __construct(ValidatorInterface $validator)
@@ -31,52 +33,53 @@ class DelegatingValidator implements FormValidatorInterface
     /**
      * Validates the form and its domain object
      */
-    public function validate(FormInterface $field)
+    public function validate(FormInterface $form)
     {
-        if ($field->isRoot()) {
-            // Validate the field in group "Default"
+        if ($form->isRoot()) {
+            // Validate the form in group "Default"
             // Validation of the data in the custom group is done by validateData(),
             // which is constrained by the Execute constraint
-            if ($violations = $this->validator->validate($field)) {
+            if ($violations = $this->validator->validate($form)) {
                 foreach ($violations as $violation) {
                     $propertyPath = new PropertyPath($violation->getPropertyPath());
                     $iterator = $propertyPath->getIterator();
                     $template = $violation->getMessageTemplate();
                     $parameters = $violation->getMessageParameters();
+                    $error = new FormError($template, $parameters);
 
                     if ($iterator->current() == 'data') {
                         $iterator->next(); // point at the first data element
-                        $error = new DataError($template, $parameters);
+                        $type = self::DATA_ERROR;
                     } else {
-                        $error = new FormError($template, $parameters);
+                        $type = self::FORM_ERROR;
                     }
 
-                    $this->mapError($error, $field, $iterator);
+                    $this->mapError($error, $form, $iterator, $type);
                 }
             }
         }
     }
 
-    private function mapError(Error $error, FormInterface $field,
-            PropertyPathIterator $pathIterator = null)
+    private function mapError(FormError $error, FormInterface $form,
+            PropertyPathIterator $pathIterator, $type)
     {
-        if (null !== $pathIterator && $field instanceof FormInterface) {
-            if ($error instanceof FormError && $pathIterator->hasNext()) {
+        if (null !== $pathIterator && $form instanceof FormInterface) {
+            if ($type === self::FORM_ERROR && $pathIterator->hasNext()) {
                 $pathIterator->next();
 
-                if ($pathIterator->isProperty() && $pathIterator->current() === 'fields') {
+                if ($pathIterator->isProperty() && $pathIterator->current() === 'forms') {
                     $pathIterator->next();
                 }
 
-                if ($field->has($pathIterator->current())) {
-                    $child = $field->get($pathIterator->current());
+                if ($form->has($pathIterator->current())) {
+                    $child = $form->get($pathIterator->current());
 
-                    $this->mapError($error, $child, $pathIterator);
+                    $this->mapError($error, $child, $pathIterator, $type);
 
                     return;
                 }
-            } else if ($error instanceof DataError) {
-                $iterator = new RecursiveFieldIterator($field);
+            } else if ($type === self::DATA_ERROR) {
+                $iterator = new RecursiveFormIterator($form);
                 $iterator = new \RecursiveIteratorIterator($iterator);
 
                 foreach ($iterator as $child) {
@@ -86,7 +89,7 @@ class DelegatingValidator implements FormValidatorInterface
                                 $pathIterator->next();
                             }
 
-                            $this->mapError($error, $child, $pathIterator);
+                            $this->mapError($error, $child, $pathIterator, $type);
 
                             return;
                         }
@@ -95,6 +98,6 @@ class DelegatingValidator implements FormValidatorInterface
             }
         }
 
-        $field->addError($error);
+        $form->addError($error);
     }
 }

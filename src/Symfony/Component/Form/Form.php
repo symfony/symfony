@@ -27,7 +27,7 @@ use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
 use Symfony\Component\Form\DataTransformer\TransformationFailedException;
 use Symfony\Component\Form\DataMapper\DataMapperInterface;
 use Symfony\Component\Form\Validator\FormValidatorInterface;
-use Symfony\Component\Form\Renderer\RendererInterface;
+use Symfony\Component\Form\Renderer\FormRendererInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -83,6 +83,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     private $dataMapper;
     private $errors = array();
+    private $errorBubbling;
     private $name = '';
     private $parent;
     private $bound = false;
@@ -107,10 +108,11 @@ class Form implements \IteratorAggregate, FormInterface
     private $attributes;
 
     public function __construct($name, EventDispatcherInterface $dispatcher,
-        RendererInterface $renderer, DataTransformerInterface $clientTransformer = null,
+        FormRendererInterface $renderer = null, DataTransformerInterface $clientTransformer = null,
         DataTransformerInterface $normTransformer = null,
         DataMapperInterface $dataMapper = null, array $validators = array(),
-        $required = false, $readOnly = false, array $attributes = array())
+        $required = false, $readOnly = false, $errorBubbling = false,
+        array $attributes = array())
     {
         foreach ($validators as $validator) {
             if (!$validator instanceof FormValidatorInterface) {
@@ -128,17 +130,20 @@ class Form implements \IteratorAggregate, FormInterface
         $this->required = $required;
         $this->readOnly = $readOnly;
         $this->attributes = $attributes;
+        $this->errorBubbling = $errorBubbling;
 
-        $renderer->setField($this);
+        if ($renderer) {
+            $renderer->setForm($this);
+        }
 
         $this->setData(null);
     }
 
-    /**
-     * Cloning is not supported
-     */
-    private function __clone()
+    public function __clone()
     {
+        foreach ($this->children as $key => $child) {
+            $this->children[$key] = clone $child;
+        }
     }
 
     /**
@@ -410,9 +415,23 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @see FormInterface
      */
-    public function addError(Error $error)
+    public function addError(FormError $error)
     {
-        $this->errors[] = $error;
+        if ($this->parent && $this->errorBubbling) {
+            $this->parent->addError($error);
+        } else {
+            $this->errors[] = $error;
+        }
+    }
+
+    /**
+     * Returns whether errors bubble up to the parent
+     *
+     * @return Boolean
+     */
+    public function getErrorBubbling()
+    {
+        return $this->errorBubbling;
     }
 
     /**
@@ -517,7 +536,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns the renderer
      *
-     * @return RendererInterface
+     * @return FormRendererInterface
      */
     public function getRenderer()
     {

@@ -12,11 +12,11 @@
 namespace Symfony\Component\Form\Renderer\Plugin;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Renderer\RendererInterface;
+use Symfony\Component\Form\Renderer\FormRendererInterface;
 
-class ParentNamePlugin implements RendererPluginInterface
+class ParentNamePlugin implements FormRendererPluginInterface
 {
-    public function setUp(FormInterface $field, RendererInterface $renderer)
+    public function setUp(FormInterface $field, FormRendererInterface $renderer)
     {
         if ($field->hasParent()) {
             $parentRenderer = $field->getParent()->getRenderer();

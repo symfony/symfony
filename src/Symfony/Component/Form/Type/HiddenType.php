@@ -19,6 +19,8 @@ class HiddenType extends AbstractType
     {
         return array(
             'template' => 'hidden',
+            // Pass errors to the parent
+            'error_bubbling' => true,
         );
     }
 

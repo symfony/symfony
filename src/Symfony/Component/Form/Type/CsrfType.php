@@ -36,8 +36,6 @@ class CsrfType extends AbstractType
             ->addValidator(new CallbackValidator(
                 function (FormInterface $field) use ($csrfProvider, $pageId) {
                     if (!$csrfProvider->isCsrfTokenValid($pageId, $field->getData())) {
-                        // FIXME this error is currently not displayed
-                        // it needs to be passed up to the form
                         $field->addError(new FormError('The CSRF token is invalid. Please try to resubmit the form'));
                     }
                 }

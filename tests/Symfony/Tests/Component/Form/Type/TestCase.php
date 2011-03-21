@@ -26,17 +26,20 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
     protected $storage;
 
-    private $em;
+    protected $em;
 
     protected $factory;
 
     protected $builder;
 
+    protected $dispatcher;
+
     protected function setUp()
     {
-        $this->theme = $this->getMock('Symfony\Component\Form\Renderer\Theme\ThemeInterface');
+        $this->theme = $this->getMock('Symfony\Component\Form\Renderer\Theme\FormThemeInterface');
         $this->csrfProvider = $this->getMock('Symfony\Component\Form\CsrfProvider\CsrfProviderInterface');
         $this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
+        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $this->storage = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\TemporaryStorage')
             ->disableOriginalConstructor()
@@ -49,6 +52,6 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         $loader->initialize($this->factory, $this->theme, $this->csrfProvider,
                 $this->validator, $this->storage, $this->em);
 
-        $this->builder = new FormBuilder($this->theme, new EventDispatcher(), $this->csrfProvider);
+        $this->builder = new FormBuilder($this->dispatcher);
     }
 }

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
+use Symfony\Component\Form\Renderer\Theme\FormThemeInterface;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Renderer\Plugin\FormPlugin;
@@ -46,6 +46,9 @@ class FormType extends AbstractType
             'csrf_provider' => null,
             'validation_groups' => null,
             'virtual' => false,
+            // Errors in forms bubble by default, so that form errors will
+            // end up as global errors in the root form
+            'error_bubbling' => true,
         );
     }
 

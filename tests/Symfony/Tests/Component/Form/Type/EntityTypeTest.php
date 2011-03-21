@@ -21,16 +21,11 @@ use Symfony\Tests\Component\Form\Fixtures\CompositeIdentEntity;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Common\Collections\ArrayCollection;
 
-class EntityChoiceTypeTest extends DoctrineOrmTestCase
+class EntityTypeTest extends DoctrineOrmTestCase
 {
     const SINGLE_IDENT_CLASS = 'Symfony\Tests\Component\Form\Fixtures\SingleIdentEntity';
 
     const COMPOSITE_IDENT_CLASS = 'Symfony\Tests\Component\Form\Fixtures\CompositeIdentEntity';
-
-    /**
-     * @var EntityManager
-     */
-    private $em;
 
     protected function setUp()
     {

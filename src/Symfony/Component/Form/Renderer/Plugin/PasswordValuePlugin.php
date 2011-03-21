@@ -12,9 +12,9 @@
 namespace Symfony\Component\Form\Renderer\Plugin;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Renderer\RendererInterface;
+use Symfony\Component\Form\Renderer\FormRendererInterface;
 
-class PasswordValuePlugin implements RendererPluginInterface
+class PasswordValuePlugin implements FormRendererPluginInterface
 {
     private $alwaysEmpty;
 
@@ -23,7 +23,7 @@ class PasswordValuePlugin implements RendererPluginInterface
         $this->alwaysEmpty = $alwaysEmpty;
     }
 
-    public function setUp(FormInterface $field, RendererInterface $renderer)
+    public function setUp(FormInterface $field, FormRendererInterface $renderer)
     {
         $value = $this->alwaysEmpty || !$field->isBound()
                 ? ''

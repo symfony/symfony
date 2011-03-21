@@ -19,7 +19,7 @@ namespace Symfony\Component\Form\Renderer\Theme;
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
-class PhpTheme implements ThemeInterface
+class PhpTheme implements FormThemeInterface
 {
     /**
      * Charset to be used with htmlentities.

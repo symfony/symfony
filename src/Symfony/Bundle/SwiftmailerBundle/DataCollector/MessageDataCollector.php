@@ -24,12 +24,12 @@ use Symfony\Component\HttpFoundation\Response;
 class MessageDataCollector extends DataCollector
 {
     protected $logger;
-
+    protected $mailer;
+    
     public function __construct(\Swift_Events_SendListener $logger, \Swift_Mailer $mailer)
     {
         $this->logger = $logger;
-        // we do nothing with the mailer
-        // it's in the constructor just to force SwiftMailer to be initialized
+        $this->mailer = $mailer;
     }
 
     /**
@@ -37,8 +37,9 @@ class MessageDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        $this->data['messages'] = $this->logger->getMessages();
+        $this->data['messages']     = $this->logger->getMessages();
         $this->data['messageCount'] = $this->logger->countMessages();
+        $this->data['isSpool']      = $this->mailer->getTransport() instanceof \Swift_Transport_SpoolTransport;
     }
 
     public function getMessageCount()
@@ -49,6 +50,11 @@ class MessageDataCollector extends DataCollector
     public function getMessages()
     {
         return $this->data['messages'];
+    }
+    
+    public function isSpool()
+    {
+        return $this->data['isSpool'];
     }
 
     /**

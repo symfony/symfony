@@ -239,11 +239,12 @@ class FieldTypeTest extends TestCase
             'app[filter2[norm[filter1[0]]]]' => 'filter2[norm[filter1[0]]]',
         ));
 
-        $this->builder->addEventSubscriber($filter);
-        $this->builder->setClientTransformer($clientTransformer);
-        $this->builder->setNormTransformer($normTransformer);
+        $builder = $this->factory->createBuilder('field', 'title');
+        $builder->addEventSubscriber($filter);
+        $builder->setClientTransformer($clientTransformer);
+        $builder->setNormTransformer($normTransformer);
 
-        $field = $this->builder->getForm();
+        $field = $builder->getForm();
         $field->bind(0);
 
         $this->assertEquals('app[filter2[norm[filter1[0]]]]', $field->getData());

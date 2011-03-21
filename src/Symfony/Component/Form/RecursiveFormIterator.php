@@ -19,7 +19,7 @@ namespace Symfony\Component\Form;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class RecursiveFieldIterator extends \ArrayIterator implements \RecursiveIterator
+class RecursiveFormIterator extends \ArrayIterator implements \RecursiveIterator
 {
     public function getChildren()
     {

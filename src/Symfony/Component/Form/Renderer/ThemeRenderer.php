@@ -12,12 +12,12 @@
 namespace Symfony\Component\Form\Renderer;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
-use Symfony\Component\Form\Renderer\Plugin\RendererPluginInterface;
+use Symfony\Component\Form\Renderer\Theme\FormThemeInterface;
+use Symfony\Component\Form\Renderer\Plugin\FormRendererPluginInterface;
 
-class DefaultRenderer implements RendererInterface, \ArrayAccess
+class ThemeRenderer implements FormRendererInterface, \ArrayAccess
 {
-    private $field;
+    private $form;
 
     private $template;
 
@@ -30,7 +30,7 @@ class DefaultRenderer implements RendererInterface, \ArrayAccess
     private $initialized = false;
 
     /**
-     * Is the field attached to this renderer rendered?
+     * Is the form attached to this renderer rendered?
      *
      * Rendering happens when either the widget or the row method was called.
      * Row implicitly includes widget, however certain rendering mechanisms
@@ -42,7 +42,7 @@ class DefaultRenderer implements RendererInterface, \ArrayAccess
 
     private $children = array();
 
-    public function __construct(ThemeInterface $theme, $template)
+    public function __construct(FormThemeInterface $theme, $template)
     {
         $this->theme = $theme;
         $this->template = $template;
@@ -65,8 +65,8 @@ class DefaultRenderer implements RendererInterface, \ArrayAccess
             // Make sure that plugins and set variables are applied in the
             // order they were added
             foreach ($this->changes as $key => $value) {
-                if ($value instanceof RendererPluginInterface) {
-                    $value->setUp($this->field, $this);
+                if ($value instanceof FormRendererPluginInterface) {
+                    $value->setUp($this->form, $this);
                 } else {
                     $this->vars[$key] = $value;
                 }
@@ -76,9 +76,9 @@ class DefaultRenderer implements RendererInterface, \ArrayAccess
         }
     }
 
-    public function setField(FormInterface $field)
+    public function setForm(FormInterface $form)
     {
-        $this->field = $field;
+        $this->form = $form;
     }
 
     public function setChildren(array $renderers)
@@ -86,7 +86,7 @@ class DefaultRenderer implements RendererInterface, \ArrayAccess
         $this->children = $renderers;
     }
 
-    public function setTheme(ThemeInterface $theme)
+    public function setTheme(FormThemeInterface $theme)
     {
         $this->theme = $theme;
     }
@@ -96,7 +96,7 @@ class DefaultRenderer implements RendererInterface, \ArrayAccess
         return $this->theme;
     }
 
-    public function addPlugin(RendererPluginInterface $plugin)
+    public function addPlugin(FormRendererPluginInterface $plugin)
     {
         $this->initialized = false;
         $this->changes[] = $plugin;
@@ -159,9 +159,9 @@ class DefaultRenderer implements RendererInterface, \ArrayAccess
     }
 
     /**
-     * Renders the label of the given field
+     * Renders the label of the given form
      *
-     * @param FormInterface $field  The field to render the label for
+     * @param FormInterface $form  The form to render the label for
      * @param array $params          Additional variables passed to the template
      */
     public function getLabel($label = null, array $vars = array())

@@ -12,9 +12,9 @@
 namespace Symfony\Component\Form\Renderer\Plugin;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Renderer\RendererInterface;
+use Symfony\Component\Form\Renderer\FormRendererInterface;
 
-interface RendererPluginInterface
+interface FormRendererPluginInterface
 {
-    function setUp(FormInterface $field, RendererInterface $renderer);
+    function setUp(FormInterface $field, FormRendererInterface $renderer);
 }

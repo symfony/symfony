@@ -13,8 +13,6 @@ namespace Symfony\Bundle\TwigBundle\Extension;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\TwigBundle\TokenParser\IncludeTokenParser;
-use Symfony\Bundle\TwigBundle\TokenParser\UrlTokenParser;
-use Symfony\Bundle\TwigBundle\TokenParser\PathTokenParser;
 use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;
 use Symfony\Component\Yaml\Dumper as YamlDumper;
 

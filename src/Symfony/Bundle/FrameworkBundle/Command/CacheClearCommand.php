@@ -98,40 +98,38 @@ EOF
     protected function getTempKernel(KernelInterface $parent, $debug, $warmupDir)
     {
         $parentClass = get_class($parent);
-        
+
         $namespace = '';
-        if (($pos = strrpos($parentClass, '\\')) !== false) {
+        if (false !== $pos = strrpos($parentClass, '\\')) {
             $namespace = substr($parentClass, 0, $pos);
             $parentClass = substr($parentClass, $pos + 1);
         }
-        
+
         $rand = uniqid();
         $class = $parentClass.$rand;
         $rootDir = $parent->getRootDir();
         $code = <<<EOF
 <?php
 
-namespace $namespace 
+namespace $namespace
 {
-
-class $class extends $parentClass
-{
-    public function getCacheDir()
+    class $class extends $parentClass
     {
-        return '$warmupDir';
-    }
+        public function getCacheDir()
+        {
+            return '$warmupDir';
+        }
 
-    public function getRootDir()
-    {
-        return '$rootDir';
-    }
+        public function getRootDir()
+        {
+            return '$rootDir';
+        }
 
-    protected function getContainerClass()
-    {
-        return parent::getContainerClass().'__{$rand}__';
+        protected function getContainerClass()
+        {
+            return parent::getContainerClass().'__{$rand}__';
+        }
     }
-}
-
 }
 EOF;
         $this->container->get('filesystem')->mkdirs($warmupDir);
@@ -140,6 +138,7 @@ EOF;
         @unlink($file);
 
         $class = "\\$namespace\\$class"; 
+
         return new $class($parent->getEnvironment(), $debug);
     }
 }

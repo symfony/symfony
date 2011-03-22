@@ -36,6 +36,18 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
 
     function hasChildren();
 
+    function hasParent();
+
+    function getErrors();
+
+    function getData();
+
+    function getClientData();
+
+    function getRenderer();
+
+    function isBound();
+    
     /**
      * Returns the name by which the form is identified in forms.
      *

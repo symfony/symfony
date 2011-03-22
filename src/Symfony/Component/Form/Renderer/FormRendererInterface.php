@@ -22,5 +22,7 @@ interface FormRendererInterface
 
     function setVar($name, $value);
 
+    public function getVar($name);
+
     function addPlugin(FormRendererPluginInterface $plugin);
 }

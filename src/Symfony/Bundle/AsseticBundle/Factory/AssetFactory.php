@@ -30,11 +30,23 @@ class AssetFactory extends BaseAssetFactory
         parent::__construct($baseDir, $debug);
     }
 
+    /**
+     * Adds support for bundle notation and globs.
+     *
+     * Please note this is a naive implementation of globs in that it doesn't
+     * attempt to support bundle inheritance within the glob pattern itself.
+     */
     protected function parseInput($input)
     {
         // expand bundle notation
         if ('@' == $input[0] && false !== strpos($input, '/')) {
-            $input = $this->kernel->locateResource($input);
+            if (false !== $pos = strpos($input, '*')) {
+                // locateResource() does not support globs so we provide a naive implementation here
+                list($before, $after) = explode('*', $input, 2);
+                $input = $this->kernel->locateResource($before).'*'.$after;
+            } else {
+                $input = $this->kernel->locateResource($input);
+            }
         }
 
         return parent::parseInput($input);

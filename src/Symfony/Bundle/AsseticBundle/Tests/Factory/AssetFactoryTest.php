@@ -39,4 +39,25 @@ class AssetFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->factory->createAsset($input);
     }
+
+    /**
+     * @dataProvider getGlobs
+     */
+    public function testBundleGlobNotation($input)
+    {
+        $this->kernel->expects($this->once())
+            ->method('locateResource')
+            ->with('@MyBundle/Resources/css/')
+            ->will($this->returnValue('/path/to/bundle/Resources/css/'));
+
+        $this->factory->createAsset($input);
+    }
+
+    public function getGlobs()
+    {
+        return array(
+            array('@MyBundle/Resources/css/*'),
+            array('@MyBundle/Resources/css/*/*.css'),
+        );
+    }
 }

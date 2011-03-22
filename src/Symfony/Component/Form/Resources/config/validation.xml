@@ -14,7 +14,7 @@
 
   <class name="Symfony\Component\Form\Form">
     <constraint name="Execute">validateData</constraint>
-    <property name="fields">
+    <property name="children">
       <constraint name="Valid" />
     </property>
   </class>

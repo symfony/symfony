@@ -28,6 +28,10 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 {
 
+    private $inputTimezone;
+
+    private $outputTimezone;
+    
     private $dateFormat;
 
     private $timeFormat;

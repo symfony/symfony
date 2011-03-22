@@ -28,6 +28,10 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 class DateTimeToArrayTransformer extends BaseDateTimeTransformer
 {
 
+    private $inputTimezone;
+
+    private $outputTimezone;
+
     private $pad;
 
     private $fields;

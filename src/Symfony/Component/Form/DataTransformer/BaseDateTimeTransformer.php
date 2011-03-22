@@ -13,10 +13,7 @@ namespace Symfony\Component\Form\DataTransformer;
 
 abstract class BaseDateTimeTransformer implements DataTransformerInterface
 {
-    protected $inputTimezone;
-
-    protected $outputTimezone;
-
+    
     protected static $formats = array(
         \IntlDateFormatter::NONE,
         \IntlDateFormatter::FULL,

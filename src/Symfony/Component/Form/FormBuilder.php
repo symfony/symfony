@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\DataMapper\DataMapperInterface;
 use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
 use Symfony\Component\Form\Renderer\ThemeRenderer;
@@ -52,10 +51,6 @@ class FormBuilder
     private $parent;
 
     private $dataClass;
-
-    private $csrfFieldName;
-
-    private $csrfProvider;
 
     private $fields = array();
 
@@ -445,58 +440,10 @@ class FormBuilder
                 $builder = $this->build($name, $builder['type'], $builder['options']);
             }
 
-            $fields[$name] = $builder->getForm();
+            $fields[$builder->getName()] = $builder->getForm();
         }
 
         return $fields;
-    }
-
-    public function addCsrfProtection(CsrfProviderInterface $provider = null, $fieldName = '_token')
-    {
-        if (null !== $provider) {
-            $this->csrfProvider = $provider;
-        }
-
-        $this->csrfFieldName = $fieldName;
-    }
-
-    public function removeCsrfProtection()
-    {
-        $this->csrfFieldName = null;
-
-        return $this;
-    }
-
-    /**
-     * @return true if this form is CSRF protected
-     */
-    public function hasCsrfProtection()
-    {
-        return isset($this->csrfFieldName);
-    }
-
-    public function getCsrfFieldName()
-    {
-        return $this->csrfFieldName;
-    }
-
-    public function getCsrfProvider()
-    {
-        return $this->csrfProvider;
-    }
-
-    protected function buildCsrfProtection()
-    {
-        if ($this->hasCsrfProtection()) {
-            // need a page ID here, maybe FormType class?
-            $options = array('page_id' => null);
-
-            if ($this->csrfProvider) {
-                $options['csrf_provider'] = $this->csrfProvider;
-            }
-
-            $this->add($this->csrfFieldName, 'csrf', $options);
-        }
     }
 
     public function setDataClass($class)
@@ -513,8 +460,6 @@ class FormBuilder
 
     public function getForm()
     {
-        $this->buildCsrfProtection();
-
         $instance = new Form(
             $this->getName(),
             $this->buildDispatcher(),

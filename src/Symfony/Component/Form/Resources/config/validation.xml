@@ -4,17 +4,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping http://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
 
-  <class name="Symfony\Component\Form\Field">
-    <getter property="transformationSuccessful">
-      <constraint name="AssertTrue">
-        <option name="message">This value is invalid</option>
-      </constraint>
-    </getter>
-  </class>
-
   <class name="Symfony\Component\Form\Form">
     <constraint name="Execute">validateData</constraint>
-    <property name="fields">
+    <property name="children">
       <constraint name="Valid" />
     </property>
   </class>

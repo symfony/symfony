@@ -225,7 +225,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $field->bind('2');
 
-        $this->assertTrue($field->isTransformationSuccessful());
+        $this->assertTrue($field->isSynchronized());
         $this->assertEquals($entity2, $field->getData());
         $this->assertEquals(2, $field->getClientData());
     }
@@ -248,7 +248,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         // the collection key is used here
         $field->bind('1');
 
-        $this->assertTrue($field->isTransformationSuccessful());
+        $this->assertTrue($field->isSynchronized());
         $this->assertEquals($entity2, $field->getData());
         $this->assertEquals(1, $field->getClientData());
     }
@@ -273,7 +273,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $expected = new ArrayCollection(array($entity1, $entity3));
 
-        $this->assertTrue($field->isTransformationSuccessful());
+        $this->assertTrue($field->isSynchronized());
         $this->assertEquals($expected, $field->getData());
         $this->assertEquals(array(1, 3), $field->getClientData());
     }
@@ -302,7 +302,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         // entry with index 0 was removed
         $expected = new ArrayCollection(array(1 => $entity1, 2 => $entity3));
 
-        $this->assertTrue($field->isTransformationSuccessful());
+        $this->assertTrue($field->isSynchronized());
         $this->assertEquals($expected, $field->getData());
         // same object still, useful if it is a PersistentCollection
         $this->assertSame($existing, $field->getData());
@@ -330,7 +330,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $expected = new ArrayCollection(array($entity1, $entity3));
 
-        $this->assertTrue($field->isTransformationSuccessful());
+        $this->assertTrue($field->isSynchronized());
         $this->assertEquals($expected, $field->getData());
         $this->assertEquals(array(0, 2), $field->getClientData());
     }
@@ -359,7 +359,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         // entry with index 0 was removed
         $expected = new ArrayCollection(array(1 => $entity1, 2 => $entity3));
 
-        $this->assertTrue($field->isTransformationSuccessful());
+        $this->assertTrue($field->isSynchronized());
         $this->assertEquals($expected, $field->getData());
         // same object still, useful if it is a PersistentCollection
         $this->assertSame($existing, $field->getData());
@@ -383,7 +383,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $field->bind('2');
 
-        $this->assertTrue($field->isTransformationSuccessful());
+        $this->assertTrue($field->isSynchronized());
         $this->assertEquals($entity2, $field->getData());
         $this->assertSame(false, $field['1']->getData());
         $this->assertSame(true, $field['2']->getData());
@@ -411,7 +411,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $expected = new ArrayCollection(array($entity1, $entity3));
 
-        $this->assertTrue($field->isTransformationSuccessful());
+        $this->assertTrue($field->isSynchronized());
         $this->assertEquals($expected, $field->getData());
         $this->assertSame(true, $field['1']->getData());
         $this->assertSame(false, $field['2']->getData());
@@ -440,7 +440,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         $field->bind('2');
 
         $this->assertEquals(array(1 => 'Foo', 2 => 'Bar'), $field->getRenderer()->getVar('choices'));
-        $this->assertTrue($field->isTransformationSuccessful());
+        $this->assertTrue($field->isSynchronized());
         $this->assertEquals($entity2, $field->getData());
         $this->assertEquals(2, $field->getClientData());
     }
@@ -462,7 +462,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $field->bind('3');
 
-        $this->assertFalse($field->isTransformationSuccessful());
+        $this->assertFalse($field->isSynchronized());
         $this->assertNull($field->getData());
     }
 
@@ -483,7 +483,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $field->bind('2');
 
-        $this->assertFalse($field->isTransformationSuccessful());
+        $this->assertFalse($field->isSynchronized());
         $this->assertNull($field->getData());
     }
 
@@ -507,7 +507,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $field->bind('3');
 
-        $this->assertFalse($field->isTransformationSuccessful());
+        $this->assertFalse($field->isSynchronized());
         $this->assertNull($field->getData());
     }
 
@@ -531,7 +531,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $field->bind('3');
 
-        $this->assertFalse($field->isTransformationSuccessful());
+        $this->assertFalse($field->isSynchronized());
         $this->assertNull($field->getData());
     }
 
@@ -555,7 +555,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $field->bind('2');
 
-        $this->assertFalse($field->isTransformationSuccessful());
+        $this->assertFalse($field->isSynchronized());
         $this->assertNull($field->getData());
     }
 }

@@ -59,7 +59,7 @@ class PropertyPath implements \IteratorAggregate
             throw new InvalidPropertyPathException('The property path must not be empty');
         }
 
-        $this->string = $propertyPath;
+        $this->string = (string)$propertyPath;
         $position = 0;
         $remaining = $propertyPath;
 

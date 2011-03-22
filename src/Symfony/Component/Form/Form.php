@@ -100,7 +100,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     private $normTransformer;
     private $clientTransformer;
-    private $transformationSuccessful = true;
+    private $synchronized = true;
     private $validators;
     private $renderer;
     private $readOnly = false;
@@ -272,6 +272,7 @@ class Form implements \IteratorAggregate, FormInterface
         $this->data = $appData;
         $this->normData = $normData;
         $this->clientData = $clientData;
+        $this->synchronized = true;
 
         if ($this->dataMapper) {
             // Update child forms from the data
@@ -301,6 +302,7 @@ class Form implements \IteratorAggregate, FormInterface
         $appData = null;
         $normData = null;
         $extraData = array();
+        $synchronized = false;
 
         // Hook to change content of the data bound by the browser
         $event = new FilterDataEvent($this, $clientData);
@@ -341,12 +343,11 @@ class Form implements \IteratorAggregate, FormInterface
         try {
             // Normalize data to unified representation
             $normData = $this->clientToNorm($clientData);
-            $this->transformationSuccessful = true;
+            $synchronized = true;
         } catch (TransformationFailedException $e) {
-            $this->transformationSuccessful = false;
         }
 
-        if ($this->transformationSuccessful) {
+        if ($synchronized) {
             // Hook to change content of the data in the normalized
             // representation
             $event = new FilterDataEvent($this, $normData);
@@ -364,6 +365,7 @@ class Form implements \IteratorAggregate, FormInterface
         $this->normData = $normData;
         $this->clientData = $clientData;
         $this->extraData = $extraData;
+        $this->synchronized = $synchronized;
 
         $event = new DataEvent($this, $clientData);
         $this->dispatcher->dispatch(Events::postBind, $event);
@@ -445,13 +447,13 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns whether the bound value could be reverse transformed correctly
+     * Returns whether the data in the different formats is synchronized
      *
      * @return Boolean
      */
-    public function isTransformationSuccessful()
+    public function isSynchronized()
     {
-        return $this->transformationSuccessful;
+        return $this->synchronized;
     }
 
     /**
@@ -553,13 +555,20 @@ class Form implements \IteratorAggregate, FormInterface
         return $this->children;
     }
 
+    public function hasChildren()
+    {
+        return count($this->children) > 0;
+    }
+
     public function add(FormInterface $child)
     {
         $this->children[$child->getName()] = $child;
 
         $child->setParent($this);
 
-        $this->dataMapper->mapDataToForm($this->getClientData(), $child);
+        if ($this->dataMapper) {
+            $this->dataMapper->mapDataToForm($this->getClientData(), $child);
+        }
     }
 
     public function remove($name)

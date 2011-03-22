@@ -31,7 +31,13 @@ class FormType extends AbstractType
             ));
 
         if ($options['csrf_protection']) {
-            $builder->addCsrfProtection($options['csrf_provider'], $options['csrf_field_name']);
+            $csrfOptions = array('page_id' => $options['csrf_page_id']);
+
+            if ($options['csrf_provider']) {
+                $csrfOptions['csrf_provider'] = $options['csrf_provider'];
+            }
+
+            $builder->add($options['csrf_field_name'], 'csrf', $csrfOptions);
         }
     }
 
@@ -44,6 +50,7 @@ class FormType extends AbstractType
             'csrf_protection' => true,
             'csrf_field_name' => '_token',
             'csrf_provider' => null,
+            'csrf_page_id' => get_class($this),
             'validation_groups' => null,
             'virtual' => false,
             // Errors in forms bubble by default, so that form errors will

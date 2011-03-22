@@ -32,6 +32,10 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      */
     function getParent();
 
+    function getChildren();
+
+    function hasChildren();
+
     /**
      * Returns the name by which the form is identified in forms.
      *
@@ -90,4 +94,8 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @param mixed $data  The data from the POST request
      */
     function bind($data);
+
+    function hasAttribute($name);
+
+    function getAttribute($name);
 }

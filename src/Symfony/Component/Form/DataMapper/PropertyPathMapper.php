@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\DataMapper;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\RecursiveFormIterator;
+use Symfony\Component\Form\VirtualFormIterator;
 use Symfony\Component\Form\Exception\FormException;
 
 class PropertyPathMapper implements DataMapperInterface
@@ -61,7 +61,7 @@ class PropertyPathMapper implements DataMapperInterface
                 throw new FormException(sprintf('Form data should be instance of %s', $this->dataClass));
             }
 
-            $iterator = new RecursiveFormIterator($forms);
+            $iterator = new VirtualFormIterator($forms);
             $iterator = new \RecursiveIteratorIterator($iterator);
 
             foreach ($iterator as $form) {
@@ -81,7 +81,7 @@ class PropertyPathMapper implements DataMapperInterface
 
     public function mapFormsToData(array $forms, &$data)
     {
-        $iterator = new RecursiveFormIterator($forms);
+        $iterator = new VirtualFormIterator($forms);
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $form) {

@@ -54,16 +54,19 @@ class Esi
     /**
      * Checks that at least one surrogate has ESI/1.0 capability.
      *
-     * @param Request $request A Request instance
+     * @param Request $request      A Request instance
+     * @param Boolean $externalOnly Only test external surrogates
      *
      * @return Boolean true if one surrogate has ESI/1.0 capability, false otherwise
      */
-    public function hasSurrogateEsiCapability(Request $request)
+    public function hasSurrogateEsiCapability(Request $request, $externalOnly = false)
     {
         if (null === $value = $request->headers->get('Surrogate-Capability')) {
             return false;
         }
-
+        if ($externalOnly) {
+            $value = preg_replace('#symfony2="ESI/1\.0"#', '', $value);
+        }
         return (Boolean) preg_match('#ESI/1.0#', $value);
     }
 

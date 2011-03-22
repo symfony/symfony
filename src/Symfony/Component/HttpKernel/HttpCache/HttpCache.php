@@ -555,7 +555,7 @@ class HttpCache implements HttpKernelInterface
 
     protected function processResponseBody(Request $request, Response $response)
     {
-        if (null !== $this->esi && $this->esi->needsEsiParsing($response)) {
+        if (null !== $this->esi && $this->esi->needsEsiParsing($response) && !$this->esi->hasSurrogateEsiCapability($request, true)) {
             $this->esi->process($request, $response);
         }
     }

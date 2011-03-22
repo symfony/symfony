@@ -958,4 +958,42 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTrue($this->response->headers->hasCacheControlDirective('private'));
         $this->assertTrue($this->response->headers->hasCacheControlDirective('no-cache'));
     }
+
+    public function testUseExternalSurrogateEsiCapabilityWhenAvailable()
+    {
+        $responses = array(
+            array(
+                'status'  => 200,
+                'body'    => '<esi:include src="/foo" />',
+                'headers' => array(
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                ),
+            ),
+            array(
+                'status'  => 200,
+                'body'    => 'esi page content',
+                'headers' => array(),
+            ),
+        );
+
+        $this->setNextResponses($responses);
+        $this->request('GET', '/', array(), array(), true);
+        $this->assertEquals($responses[1]['body'], $this->response->getContent());
+        $this->assertNull($this->response->headers->get('Surrogate-Control'));
+
+        $this->setNextResponses($responses);
+        $this->request('GET', '/', array('HTTP_SURROGATE_CAPABILITY' => 'symfony2="ESI/1.0"'), array(), true);
+        $this->assertEquals($responses[1]['body'], $this->response->getContent());
+        $this->assertNull($this->response->headers->get('Surrogate-Control'));
+
+        $this->setNextResponses($responses);
+        $this->request('GET', '/', array('HTTP_SURROGATE_CAPABILITY' => 'abc="ESI/1.0"'), array(), true);
+        $this->assertEquals($responses[0]['body'], $this->response->getContent());
+        $this->assertEquals('content="ESI/1.0"', $this->response->headers->get('Surrogate-Control'));
+
+        $this->setNextResponses($responses);
+        $this->request('GET', '/', array('HTTP_SURROGATE_CAPABILITY' => 'abc="ESI/1.0", symfony2="ESI/1.0"'), array(), true);
+        $this->assertEquals($responses[0]['body'], $this->response->getContent());
+        $this->assertEquals('content="ESI/1.0"', $this->response->headers->get('Surrogate-Control'));
+    }
 }

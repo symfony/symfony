@@ -56,7 +56,7 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetResource()
     {
-        $this->assertEquals(realpath($this->directory), $this->resource->getResource(), '->getResource() returns the path to the resource');
+        $this->assertEquals($this->directory, $this->resource->getResource(), '->getResource() returns the path to the resource');
     }
 
     /**

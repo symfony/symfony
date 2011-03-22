@@ -98,11 +98,21 @@ EOF
     protected function getTempKernel(KernelInterface $parent, $debug, $warmupDir)
     {
         $parentClass = get_class($parent);
+        
+        $namespace = '';
+        if (($pos = strrpos($parentClass, '\\')) !== false) {
+            $namespace = substr($parentClass, 0, $pos);
+            $parentClass = substr($parentClass, $pos + 1);
+        }
+        
         $rand = uniqid();
         $class = $parentClass.$rand;
         $rootDir = $parent->getRootDir();
         $code = <<<EOF
 <?php
+
+namespace $namespace 
+{
 
 class $class extends $parentClass
 {
@@ -121,12 +131,15 @@ class $class extends $parentClass
         return parent::getContainerClass().'__{$rand}__';
     }
 }
+
+}
 EOF;
         $this->container->get('filesystem')->mkdirs($warmupDir);
         file_put_contents($file = $warmupDir.'/kernel.tmp', $code);
         require_once $file;
         @unlink($file);
 
+        $class = "\\$namespace\\$class"; 
         return new $class($parent->getEnvironment(), $debug);
     }
 }

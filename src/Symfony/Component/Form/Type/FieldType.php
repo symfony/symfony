@@ -58,6 +58,7 @@ class FieldType extends AbstractType
             ->setAttribute('by_reference', $options['by_reference'])
             ->setAttribute('property_path', $options['property_path'])
             ->setAttribute('validation_groups', $options['validation_groups'])
+            ->setAttribute('error_mapping', $options['error_mapping'])
             ->setData($options['data'])
             ->setRenderer(new ThemeRenderer($this->theme, $options['template']))
             ->addRendererPlugin(new FieldPlugin())
@@ -82,6 +83,7 @@ class FieldType extends AbstractType
             'by_reference' => true,
             'validation_groups' => true,
             'error_bubbling' => false,
+            'error_mapping' => array(),
         );
     }
 

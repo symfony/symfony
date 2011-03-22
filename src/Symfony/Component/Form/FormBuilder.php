@@ -440,7 +440,7 @@ class FormBuilder
                 $builder = $this->build($name, $builder['type'], $builder['options']);
             }
 
-            $fields[$name] = $builder->getForm();
+            $fields[$builder->getName()] = $builder->getForm();
         }
 
         return $fields;

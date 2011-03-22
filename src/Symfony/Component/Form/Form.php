@@ -553,13 +553,20 @@ class Form implements \IteratorAggregate, FormInterface
         return $this->children;
     }
 
+    public function hasChildren()
+    {
+        return count($this->children) > 0;
+    }
+
     public function add(FormInterface $child)
     {
         $this->children[$child->getName()] = $child;
 
         $child->setParent($this);
 
-        $this->dataMapper->mapDataToForm($this->getClientData(), $child);
+        if ($this->dataMapper) {
+            $this->dataMapper->mapDataToForm($this->getClientData(), $child);
+        }
     }
 
     public function remove($name)

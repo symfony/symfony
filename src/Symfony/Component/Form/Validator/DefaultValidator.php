@@ -18,6 +18,10 @@ class DefaultValidator implements FormValidatorInterface
 {
     public function validate(FormInterface $form)
     {
+        if (!$form->isSynchronized()) {
+            $form->addError(new FormError('The value is invalid'));
+        }
+
         if (count($form->getExtraData()) > 0) {
             $form->addError(new FormError('This form should not contain extra fields'));
         }

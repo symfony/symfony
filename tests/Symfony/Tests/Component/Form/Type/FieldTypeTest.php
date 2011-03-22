@@ -329,7 +329,7 @@ class FieldTypeTest extends TestCase
         $field->bind('a');
 
         $this->assertEquals('a', $field->getClientData());
-        $this->assertTrue($field->isTransformationSuccessful());
+        $this->assertTrue($field->isSynchronized());
     }
 
     public function testIsTransformationSuccessfulReturnsFalseIfReverseTransformThrowsException()
@@ -350,7 +350,7 @@ class FieldTypeTest extends TestCase
         $field->bind('a');
 
         $this->assertEquals('a', $field->getClientData());
-        $this->assertFalse($field->isTransformationSuccessful());
+        $this->assertFalse($field->isSynchronized());
     }
 
     public function testGetRootReturnsRootOfParentIfSet()

@@ -46,7 +46,7 @@ class RepeatedTypeTest extends TestCase
 
         $this->assertEquals('foo', $this->field['first']->getClientData());
         $this->assertEquals('bar', $this->field['second']->getClientData());
-        $this->assertFalse($this->field->isTransformationSuccessful());
+        $this->assertFalse($this->field->isSynchronized());
         $this->assertEquals($input, $this->field->getClientData());
         $this->assertEquals(null, $this->field->getData());
     }
@@ -59,7 +59,7 @@ class RepeatedTypeTest extends TestCase
 
         $this->assertEquals('foo', $this->field['first']->getClientData());
         $this->assertEquals('foo', $this->field['second']->getClientData());
-        $this->assertTrue($this->field->isTransformationSuccessful());
+        $this->assertTrue($this->field->isSynchronized());
         $this->assertEquals($input, $this->field->getClientData());
         $this->assertEquals('foo', $this->field->getData());
     }

@@ -34,9 +34,12 @@ class ProjectServiceContainer extends Container
     protected function getFooService()
     {
         $class = $this->getParameter('cla').'o'.$this->getParameter('ss');
-        return $this->services['foo'] = new $class();
+        $this->services['foo'] = $instance = new $class();
+
 
         $this->applyInterfaceInjectors($instance);
+
+        return $instance;
     }
 
     /**

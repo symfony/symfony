@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\AsseticBundle;
 
+use Symfony\Bundle\AsseticBundle\DependencyInjection\Compiler\AssetFactoryPass;
 use Symfony\Bundle\AsseticBundle\DependencyInjection\Compiler\AssetManagerPass;
 use Symfony\Bundle\AsseticBundle\DependencyInjection\Compiler\FilterManagerPass;
 use Symfony\Bundle\AsseticBundle\DependencyInjection\Compiler\TemplatingPass;
@@ -29,6 +30,7 @@ class AsseticBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new TemplatingPass());
+        $container->addCompilerPass(new AssetFactoryPass());
         $container->addCompilerPass(new AssetManagerPass());
         $container->addCompilerPass(new FilterManagerPass());
     }

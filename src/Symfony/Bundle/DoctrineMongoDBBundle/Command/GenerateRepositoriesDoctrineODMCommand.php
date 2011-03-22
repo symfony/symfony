@@ -58,7 +58,7 @@ EOT
                 }
 
                 if ($metadata->customRepositoryClassName) {
-                    if (strpos($metadata->customRepositoryClassName, $foundBundle->getName()) === false) {
+                    if (strpos($metadata->customRepositoryClassName, $foundBundle->getNamespace()) === false) {
                         throw new \RuntimeException(
                             "Repository " . $metadata->customRepositoryClassName . " and bundle don't have a common namespace, ".
                             "generation failed because the target directory cannot be detected.");

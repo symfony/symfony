@@ -55,4 +55,102 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array($error), $form->getErrors());
         $this->assertEquals(array(), $parent->getErrors());
     }
+
+    public function testValidIfAllChildrenAreValid()
+    {
+        $this->form->add($this->getValidForm('firstName'));
+        $this->form->add($this->getValidForm('lastName'));
+
+        $this->form->bind(array(
+            'firstName' => 'Bernhard',
+            'lastName' => 'Schussek',
+        ));
+
+        $this->assertTrue($this->form->isValid());
+    }
+
+    public function testInvalidIfChildrenIsInvalid()
+    {
+        $this->form->add($this->getValidForm('firstName'));
+        $this->form->add($this->getInvalidForm('lastName'));
+
+        $this->form->bind(array(
+            'firstName' => 'Bernhard',
+            'lastName' => 'Schussek',
+        ));
+
+        $this->assertFalse($this->form->isValid());
+    }
+
+    public function testBind()
+    {
+        $child = $this->getMockForm('firstName');
+
+        $this->form->add($child);
+
+        $child->expects($this->once())
+            ->method('bind')
+            ->with($this->equalTo('Bernhard'));
+
+        $this->form->bind(array('firstName' => 'Bernhard'));
+
+        $this->assertEquals(array('firstName' => 'Bernhard'), $this->form->getData());
+    }
+
+    public function testBindForwardsNullIfValueIsMissing()
+    {
+        $child = $this->getMockForm('firstName');
+
+        $this->form->add($child);
+
+        $child->expects($this->once())
+            ->method('bind')
+            ->with($this->equalTo(null));
+
+        $this->form->bind(array());
+    }
+
+    public function testAddSetsFieldParent()
+    {
+        $child = $this->getMockForm('firstName');
+
+        $child->expects($this->once())
+            ->method('setParent')
+            ->with($this->equalTo($this->form));
+
+        $this->form->add($child);
+    }
+
+    protected function getMockForm($name)
+    {
+        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+
+        $form->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($name));
+
+        return $form;
+    }
+
+    protected function getValidForm($name)
+    {
+        $form = $this->getMockForm($name);
+
+        $form->expects($this->any())
+            ->method('isValid')
+            ->will($this->returnValue(true));
+
+        return $form;
+    }
+
+    protected function getInvalidForm($name)
+    {
+        $form = $this->getMockForm($name);
+
+        $form->expects($this->any())
+            ->method('isValid')
+            ->will($this->returnValue(false));
+
+        return $form;
+    }
 }

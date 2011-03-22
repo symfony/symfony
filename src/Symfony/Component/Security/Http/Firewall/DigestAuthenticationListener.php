@@ -129,7 +129,7 @@ class DigestAuthenticationListener implements ListenerInterface
             $this->logger->debug($authException);
         }
 
-        $this->authenticationEntryPoint->start($event, $request, $authException);
+        $event->setResponse($this->authenticationEntryPoint->start($request, $authException));
     }
 }
 

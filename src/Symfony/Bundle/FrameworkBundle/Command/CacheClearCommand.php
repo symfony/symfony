@@ -41,8 +41,8 @@ class CacheClearCommand extends Command
 The <info>cache:clear</info> command clears the application cache for a given environment
 and debug mode:
 
-<info>./app/console cache:clear dev</info>
-<info>./app/console cache:clear prod --without-debug</info>
+<info>./app/console cache:clear --env=dev</info>
+<info>./app/console cache:clear --env=prod --without-debug</info>
 EOF
             )
         ;

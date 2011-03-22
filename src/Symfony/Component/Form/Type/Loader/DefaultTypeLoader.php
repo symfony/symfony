@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Type\Loader;
 
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Type;
-use Symfony\Component\Form\Type\FieldTypeInterface;
+use Symfony\Component\Form\Type\FormTypeInterface;
 use Symfony\Component\Form\Renderer\Theme\FormThemeInterface;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Validator\ValidatorInterface;
@@ -61,7 +61,7 @@ class DefaultTypeLoader implements TypeLoaderInterface
         }
     }
 
-    public function addType(FieldTypeInterface $type)
+    public function addType(FormTypeInterface $type)
     {
         $this->types[$type->getName()] = $type;
     }

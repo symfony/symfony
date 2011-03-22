@@ -12,7 +12,7 @@
 namespace Symfony\Tests\Component\Form\Type\Loader;
 
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\Type\FieldTypeInterface;
+use Symfony\Component\Form\Type\FormTypeInterface;
 use Symfony\Component\Form\Type\Loader\SimpleTypeLoader;
 
 class SimpleTypeLoaderTest extends \PHPUnit_Framework_TestCase
@@ -56,7 +56,7 @@ class InvalidType
 {
 }
 
-class TestType implements FieldTypeInterface
+class TestType implements FormTypeInterface
 {
     function configure(FormBuilder $builder, array $options) {}
 

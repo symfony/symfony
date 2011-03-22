@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FormBuilder;
 
-interface FieldTypeInterface
+interface FormTypeInterface
 {
     function configure(FormBuilder $builder, array $options);
 

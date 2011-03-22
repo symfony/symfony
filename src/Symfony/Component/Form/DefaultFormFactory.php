@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\File\TemporaryStorage;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Type;
-use Symfony\Component\Form\Type\FieldTypeInterface;
+use Symfony\Component\Form\Type\FormTypeInterface;
 use Symfony\Component\Form\Renderer\Theme\FormThemeInterface;
 use Symfony\Component\Form\Type\Loader\TypeLoaderInterface;
 use Symfony\Component\Form\Type\Loader\DefaultTypeLoader;

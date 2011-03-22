@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Type\Loader;
 
-use Symfony\Component\Form\Type\FieldTypeInterface;
+use Symfony\Component\Form\Type\FormTypeInterface;
 use Symfony\Component\Form\Exception\TypeLoaderException;
 
 class SimpleTypeLoader implements TypeLoaderInterface
@@ -27,8 +27,8 @@ class SimpleTypeLoader implements TypeLoaderInterface
 
             $type = new $name();
 
-            if (!$type instanceof FieldTypeInterface) {
-                throw new TypeLoaderException(sprintf('The type class "%s" must implement "Symfony\Component\Form\Type\FieldTypeInterface"', $name));
+            if (!$type instanceof FormTypeInterface) {
+                throw new TypeLoaderException(sprintf('The type class "%s" must implement "Symfony\Component\Form\Type\FormTypeInterface"', $name));
             }
 
             $this->types[$name] = $type;

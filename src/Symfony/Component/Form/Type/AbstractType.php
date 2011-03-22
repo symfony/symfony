@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Type;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
 
-abstract class AbstractType implements FieldTypeInterface
+abstract class AbstractType implements FormTypeInterface
 {
     public function configure(FormBuilder $builder, array $options)
     {

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Type\FieldTypeInterface;
+use Symfony\Component\Form\Type\FormTypeInterface;
 use Symfony\Component\Form\Type\Loader\TypeLoaderInterface;
 use Symfony\Component\Form\Type\Guesser\TypeGuesserInterface;
 use Symfony\Component\Form\Type\Guesser\Guess;

@@ -32,12 +32,7 @@ class DateType extends AbstractType
         );
 
         if ($options['widget'] === 'text') {
-            $builder->setClientTransformer(new DateTimeToLocalizedStringTransformer(array(
-                'date_format' => $options['format'],
-                'time_format' => \IntlDateFormatter::NONE,
-                'input_timezone' => $options['data_timezone'],
-                'output_timezone' => $options['user_timezone'],
-            )));
+            $builder->setClientTransformer(new DateTimeToLocalizedStringTransformer($options['user_timezone'], $options['data_timezone'], $options['format'], \IntlDateFormatter::NONE));
         } else {
             // Only pass a subset of the options to children
             $yearOptions = array(
@@ -59,36 +54,21 @@ class DateType extends AbstractType
             $builder->add('year', 'choice', $yearOptions)
                 ->add('month', 'choice', $monthOptions)
                 ->add('day', 'choice', $dayOptions)
-                ->setClientTransformer(new DateTimeToArrayTransformer(array(
-                    'input_timezone' => $options['data_timezone'],
-                    'output_timezone' => $options['user_timezone'],
-                    'fields' => array('year', 'month', 'day'),
-                )))
+                ->setClientTransformer(new DateTimeToArrayTransformer($options['user_timezone'], $options['data_timezone'], array('year', 'month', 'day')))
                 ->addRendererPlugin(new DatePatternPlugin($formatter));
         }
 
         if ($options['input'] === 'string') {
             $builder->setNormTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer(array(
-                    'input_timezone' => $options['data_timezone'],
-                    'output_timezone' => $options['data_timezone'],
-                    'format' => 'Y-m-d',
-                ))
+                new DateTimeToStringTransformer($options['data_timezone'], 'Y-m-d', $options['data_timezone'])
             ));
         } else if ($options['input'] === 'timestamp') {
             $builder->setNormTransformer(new ReversedTransformer(
-                new DateTimeToTimestampTransformer(array(
-                    'output_timezone' => $options['data_timezone'],
-                    'input_timezone' => $options['data_timezone'],
-                ))
+                new DateTimeToTimestampTransformer($options['data_timezone'], $options['data_timezone'])
             ));
         } else if ($options['input'] === 'array') {
             $builder->setNormTransformer(new ReversedTransformer(
-                new DateTimeToArrayTransformer(array(
-                    'input_timezone' => $options['data_timezone'],
-                    'output_timezone' => $options['data_timezone'],
-                    'fields' => array('year', 'month', 'day'),
-                ))
+                new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], array('year', 'month', 'day'))
             ));
         }
 

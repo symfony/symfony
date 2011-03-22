@@ -18,11 +18,7 @@ class IntegerType extends AbstractType
 {
     public function configure(FormBuilder $builder, array $options)
     {
-        $builder->setClientTransformer(new IntegerToLocalizedStringTransformer(array(
-                'precision' => $options['precision'],
-                'grouping' => $options['grouping'],
-                'rounding-mode' => $options['rounding_mode'],
-            )));
+        $builder->setClientTransformer(new IntegerToLocalizedStringTransformer($options['precision'], $options['grouping'], $options['rounding_mode']));
     }
 
     public function getDefaultOptions(array $options)

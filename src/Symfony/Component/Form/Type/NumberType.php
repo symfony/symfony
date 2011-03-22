@@ -18,11 +18,7 @@ class NumberType extends AbstractType
 {
     public function configure(FormBuilder $builder, array $options)
     {
-        $builder->setClientTransformer(new NumberToLocalizedStringTransformer(array(
-                'precision' => $options['precision'],
-                'grouping' => $options['grouping'],
-                'rounding-mode' => $options['rounding_mode'],
-            )));
+        $builder->setClientTransformer(new NumberToLocalizedStringTransformer($options['precision'], $options['grouping'], $options['rounding_mode']));
     }
 
     public function getDefaultOptions(array $options)

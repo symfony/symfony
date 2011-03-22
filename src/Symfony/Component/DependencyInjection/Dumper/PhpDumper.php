@@ -375,6 +375,11 @@ EOF;
      */
     private function isSimpleInstance($id, $definition)
     {
+
+        if (!$this->container->isFrozen() && count($this->container->getInterfaceInjectors()) > 0) {
+         	return false;
+        }
+
         foreach (array_merge(array($definition), $this->getInlinedDefinitions($definition)) as $sDefinition) {
             if ($definition !== $sDefinition && !$this->hasReference($id, $sDefinition->getMethodCalls())) {
                 continue;

@@ -19,7 +19,7 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
 {
     public function testTransform()
     {
-        $transformer = new DateTimeToTimestampTransformer('UTC','UTC');
+        $transformer = new DateTimeToTimestampTransformer('UTC', 'UTC');
 
         $input = new \DateTime('2010-02-03 04:05:06 UTC');
         $output = $input->format('U');
@@ -36,7 +36,7 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
 
     public function testTransform_differentTimezones()
     {
-        $transformer = new DateTimeToTimestampTransformer('America/New_York','Asia/Hong_Kong');
+        $transformer = new DateTimeToTimestampTransformer('America/New_York', 'Asia/Hong_Kong');
 
         $input = new \DateTime('2010-02-03 04:05:06 America/New_York');
         $output = $input->format('U');
@@ -47,7 +47,7 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
 
     public function testTransformFromDifferentTimezone()
     {
-        $transformer = new DateTimeToTimestampTransformer('Asia/Hong_Kong','UTC');
+        $transformer = new DateTimeToTimestampTransformer('Asia/Hong_Kong', 'UTC');
 
         $input = new \DateTime('2010-02-03 04:05:06 Asia/Hong_Kong');
 
@@ -69,7 +69,7 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
 
     public function testReverseTransform()
     {
-        $reverseTransformer = new DateTimeToTimestampTransformer('UTC','UTC');
+        $reverseTransformer = new DateTimeToTimestampTransformer('UTC', 'UTC');
 
         $output = new \DateTime('2010-02-03 04:05:06 UTC');
         $input = $output->format('U');
@@ -86,7 +86,7 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
 
     public function testReverseTransform_differentTimezones()
     {
-        $reverseTransformer = new DateTimeToTimestampTransformer('America/New_York','Asia/Hong_Kong');
+        $reverseTransformer = new DateTimeToTimestampTransformer('America/New_York', 'Asia/Hong_Kong');
 
         $output = new \DateTime('2010-02-03 04:05:06 America/New_York');
         $input = $output->format('U');

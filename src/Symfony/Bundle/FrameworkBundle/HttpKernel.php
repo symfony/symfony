@@ -74,6 +74,7 @@ class HttpKernel extends BaseHttpKernel
      *  * ignore_errors: true to return an empty string in case of an error
      *  * alt: an alternative controller to execute in case of an error (can be a controller, a URI, or an array with the controller, the attributes, and the query arguments)
      *  * standalone: whether to generate an esi:include tag or not when ESI is supported
+     *  * relative: use a relative URI when returning an esi:include tag
      *  * comment: a comment to add when returning an esi:include tag
      *
      * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
@@ -89,6 +90,7 @@ class HttpKernel extends BaseHttpKernel
             'ignore_errors' => !$this->container->getParameter('kernel.debug'),
             'alt'           => array(),
             'standalone'    => false,
+            'relative'      => true,
             'comment'       => '',
         ), $options);
 
@@ -101,11 +103,11 @@ class HttpKernel extends BaseHttpKernel
         }
 
         if ($this->esiSupport && $options['standalone']) {
-            $uri = $this->generateInternalUri($controller, $options['attributes'], $options['query']);
+            $uri = $this->generateInternalUri($controller, $options['attributes'], $options['query'], !$options['relative']);
 
             $alt = '';
             if ($options['alt']) {
-                $alt = $this->generateInternalUri($options['alt'][0], isset($options['alt'][1]) ? $options['alt'][1] : array(), isset($options['alt'][2]) ? $options['alt'][2] : array());
+                $alt = $this->generateInternalUri($options['alt'][0], isset($options['alt'][1]) ? $options['alt'][1] : array(), isset($options['alt'][2]) ? $options['alt'][2] : array(), !$options['relative']);
             }
 
             return $this->container->get('esi')->renderIncludeTag($uri, $alt, $options['ignore_errors'], $options['comment']);
@@ -152,13 +154,14 @@ class HttpKernel extends BaseHttpKernel
      *
      * This method uses the "_internal" route, which should be available.
      *
-     * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
-     * @param array  $attributes An array of request attributes
-     * @param array  $query      An array of request query parameters
+     * @param string  $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
+     * @param array   $attributes An array of request attributes
+     * @param array   $query      An array of request query parameters
+     * @param Boolean $relative   Generate a relative URI
      *
      * @return string An internal URI
      */
-    public function generateInternalUri($controller, array $attributes = array(), array $query = array())
+    public function generateInternalUri($controller, array $attributes = array(), array $query = array(), $relative = false)
     {
         if (0 === strpos($controller, '/')) {
             return $controller;
@@ -168,7 +171,7 @@ class HttpKernel extends BaseHttpKernel
             'controller' => $controller,
             'path'       => $attributes ? http_build_query($attributes) : 'none',
             '_format'    => $this->container->get('request')->getRequestFormat(),
-        ), true);
+        ), !$relative);
 
         if ($query) {
             $uri = $uri.'?'.http_build_query($query);

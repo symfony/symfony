@@ -79,10 +79,6 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $route->setRequirements(array('foo' => '^\d+$'));
         $this->assertEquals('\d+', $route->getRequirement('foo'), '->getRequirement() removes ^ and $ from the pattern');
         $this->assertEquals($route, $route->setRequirements(array()), '->setRequirements() implements a fluent interface');
-
-        // test that an array requirement throws an exception
-        $this->setExpectedException('InvalidArgumentException');
-        $route->setRequirements(array('foo' => array('bar', 'baz')));
     }
 
     public function testRequirement()

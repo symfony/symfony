@@ -6,7 +6,9 @@
 
     <parameters>
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
-        <parameter key="form.type.loader.class">Symfony\Bundle\FrameworkBundle\Form\ContainerAwareTypeLoader</parameter>
+        <parameter key="form.type.loader.chain.class">Symfony\Component\Form\Type\Loader\TypeLoaderChain</parameter>
+        <parameter key="form.type.loader.simple.class">Symfony\Component\Form\Type\Loader\SimpleTypeLoader</parameter>
+        <parameter key="form.type.loader.tagged.class">Symfony\Bundle\FrameworkBundle\Form\ContainerAwareTypeLoader</parameter>
         <parameter key="form.guesser.validator.class">Symfony\Component\Form\Type\Guesser\ValidatorTypeGuesser</parameter>
         <parameter key="form.csrf_provider.class">Symfony\Component\Form\CsrfProvider\SessionCsrfProvider</parameter>
         <parameter key="form.theme.twig.class">Symfony\Component\Form\Renderer\Theme\TwigTheme</parameter>
@@ -19,7 +21,6 @@
         <parameter key="form.csrf_protection.secret">secret</parameter>
         <parameter key="form.validation_groups">Default</parameter>
         <parameter key="file.temporary_storage.class">Symfony\Component\HttpFoundation\File\SessionBasedTemporaryStorage</parameter>
-        <!-- TODO: configure through Typeuration! -->
         <parameter key="file.temporary_storage.secret">abcdef</parameter>
         <parameter key="file.temporary_storage.nesting_levels">3</parameter>
         <parameter key="file.temporary_storage.directory"></parameter>
@@ -29,7 +30,7 @@
 
         <!-- FormFactory -->
         <service id="form.factory" class="%form.factory.class%">
-            <argument type="service" id="form.type.loader" />
+            <argument type="service" id="form.type.loader.chain" />
         </service>
 
         <!-- ValidatorTypeGuesser -->
@@ -67,14 +68,28 @@
             <argument>%file.temporary_storage.directory%</argument>
         </service>
         
+        <!-- TypeLoaderChain -->
+        <service id="form.type.loader.chain" class="%form.type.loader.chain.class%">
+            <!--
+            All services with tag "form.type.loader" are inserted here by 
+            AddFormTypeLoadersPass
+            -->
+        </service>
+        
         <!-- ContainerAwareTypeLoader -->
-        <service id="form.type.loader" class="%form.type.loader.class%">
+        <service id="form.type.loader.tagged" class="%form.type.loader.tagged.class%">
+            <tag name="form.type.loader" />
             <argument type="service" id="service_container" />
             <!--
             All services with tag "form.type" are inserted here by 
             AddFormTypesPass
             -->
             <argument type="collection" />
+        </service>
+        
+        <!-- SimpleTypeLoader -->
+        <service id="form.type.loader.simple" class="%form.type.loader.simple.class%">
+            <tag name="form.type.loader" />
         </service>
 
         <!-- FieldTypes -->

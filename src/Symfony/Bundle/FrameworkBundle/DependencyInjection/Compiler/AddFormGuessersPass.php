@@ -29,15 +29,10 @@ class AddFormGuessersPass implements CompilerPassInterface
             return;
         }
 
-        // Builds an array with service IDs as keys and tag aliases as values
-        $guessers = array_map(function ($id) {
-            return new Reference($id);
-        }, array_keys($container->findTaggedServiceIds('form.guesser')));
+        $definition = $container->getDefinition('form.factory');
 
-        $service = $container->getDefinition('form.factory');
-
-        foreach ($guessers as $guesser) {
-            $service->addMethodCall('addGuesser', array($guesser));
+        foreach ($container->findTaggedServiceIds('form.guesser') as $serviceId => $tag) {
+            $definition->addMethodCall('addGuesser', array(new Reference($serviceId)));
         }
     }
 }

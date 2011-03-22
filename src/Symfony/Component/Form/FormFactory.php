@@ -40,8 +40,8 @@ class FormFactory implements FormFactoryInterface
         $hierarchy = array();
 
         // TESTME
-        if (null === $name) {
-            $name = $type;
+        if (null === $name && preg_match('/\w+$/', $type, $matches)) {
+            $name = $matches[0];
         }
 
         while (null !== $type) {

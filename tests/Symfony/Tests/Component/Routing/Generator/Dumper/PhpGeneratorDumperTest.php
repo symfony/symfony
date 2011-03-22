@@ -42,6 +42,13 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
         @unlink($this->testTmpFilepath);
     }
 
+    protected function tearDown()
+    {
+        parent::tearDown();
+        
+        @unlink($this->testTmpFilepath);
+    }
+
     public function testDumpWithRoutes()
     {
         $this->routeCollection->add('Test', new Route('/testing/{foo}'));

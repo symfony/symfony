@@ -13,24 +13,22 @@ namespace Symfony\Tests\Component\Form\Renderer\Plugin;
 
 use Symfony\Component\Form\Renderer\Plugin\ChoicePlugin;
 
-use Symfony\Component\Form\Renderer\DefaultRenderer;
-use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
-
 class ChoicePluginTest extends \PHPUnit_Framework_TestCase
 {
 
     public function testSetUp()
     {
-        $field = $this->getMock('Symfony\Component\Form\ChoiceList\ChoiceListInterface');
-        $field->expects($this->any())
+        $choice = $this->getMock('Symfony\Component\Form\ChoiceList\ChoiceListInterface');
+        $choice->expects($this->any())
               ->method('getOtherChoices')
               ->will($this->returnValue('somechoices'));
-        $field->expects($this->any())
+        $choice->expects($this->any())
               ->method('getPreferredChoices')
               ->will($this->returnValue('somethingelse'));
 
-
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\RendererInterface');
+        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
 
         $renderer->expects($this->at(0))
                 ->method('setVar')
@@ -46,13 +44,13 @@ class ChoicePluginTest extends \PHPUnit_Framework_TestCase
 
         $renderer->expects($this->at(3))
                 ->method('setVar')
-                ->with($this->equalTo('choice_list'), $this->equalTo($field));
+                ->with($this->equalTo('choice_list'), $this->equalTo($choice));
 
         $renderer->expects($this->at(4))
                 ->method('setVar')
                 ->with($this->equalTo('empty_value'), $this->equalTo(''));
 
-        $plugin = new ChoicePlugin($field);
-        $plugin->setUp($renderer);
+        $plugin = new ChoicePlugin($choice);
+        $plugin->setUp($field, $renderer);
     }
 }

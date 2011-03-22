@@ -13,25 +13,22 @@ namespace Symfony\Tests\Component\Form\Renderer\Plugin;
 
 use Symfony\Component\Form\Renderer\Plugin\ParentNamePlugin;
 
-use Symfony\Component\Form\Renderer\DefaultRenderer;
-use Symfony\Component\Form\FieldInterface;
-
 class ParentNamePluginTest extends \PHPUnit_Framework_TestCase
 {
 
     public function testSetUpHasParent()
     {
-        $parentRenderer = $this->getMock('Symfony\Component\Form\Renderer\RendererInterface');
+        $parentRenderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
         $parentRenderer->expects($this->once())
                 ->method('getVar')
                 ->will($this->returnValue("parentName"));
 
-        $parentField = $this->getMock('Symfony\Component\Form\FieldInterface');
+        $parentField = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
         $parentField->expects($this->once())
               ->method('getRenderer')
               ->will($this->returnValue($parentRenderer));
 
-        $field = $this->getMock('Symfony\Component\Form\FieldInterface');
+        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
         $field->expects($this->once())
               ->method('getParent')
               ->will($this->returnValue($parentField));
@@ -40,19 +37,19 @@ class ParentNamePluginTest extends \PHPUnit_Framework_TestCase
               ->method('hasParent')
               ->will($this->returnValue(true));
 
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\RendererInterface');
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
         $renderer->expects($this->once())
                 ->method('setVar')
                 ->with($this->equalTo('name'), $this->equalTo('parentName'));
 
-        $plugin = new ParentNamePlugin($field);
-        $plugin->setUp($renderer);
+        $plugin = new ParentNamePlugin();
+        $plugin->setUp($field, $renderer);
     }
 
     public function testSetUpNoParent()
     {
         
-        $field = $this->getMock('Symfony\Component\Form\FieldInterface');
+        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
         $field->expects($this->never())
               ->method('getParent');
 
@@ -60,11 +57,11 @@ class ParentNamePluginTest extends \PHPUnit_Framework_TestCase
               ->method('hasParent')
               ->will($this->returnValue(false));
 
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\RendererInterface');
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
         $renderer->expects($this->never())
                 ->method('setVar');
 
-        $plugin = new ParentNamePlugin($field);
-        $plugin->setUp($renderer);
+        $plugin = new ParentNamePlugin();
+        $plugin->setUp($field, $renderer);
     }
 }

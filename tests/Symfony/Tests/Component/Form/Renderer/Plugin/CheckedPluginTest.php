@@ -13,41 +13,39 @@ namespace Symfony\Tests\Component\Form\Renderer\Plugin;
 
 use Symfony\Component\Form\Renderer\Plugin\CheckedPlugin;
 
-use Symfony\Component\Form\Renderer\DefaultRenderer;
-use Symfony\Component\Form\FieldInterface;
-
 class CheckedPluginTest extends \PHPUnit_Framework_TestCase
 {
 
     public function testSetUpTrue()
     {
-        $field = $this->getMock('Symfony\Component\Form\FieldInterface');
-        $field->expects($this->any())
+        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        $field->expects($this->once())
               ->method('getData')
               ->will($this->returnValue(1));
-
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\RendererInterface');
+        
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
         $renderer->expects($this->once())
                 ->method('setVar')
                 ->with($this->equalTo('checked'), $this->equalTo(true));
 
-        $plugin = new CheckedPlugin($field);
-        $plugin->setUp($renderer);
+        $plugin = new CheckedPlugin();
+        $plugin->setUp($field, $renderer);
     }
 
     public function testSetUpFalse()
     {
-        $field = $this->getMock('Symfony\Component\Form\FieldInterface');
-        $field->expects($this->any())
+        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        $field->expects($this->once())
               ->method('getData')
               ->will($this->returnValue(0));
 
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\RendererInterface');
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
         $renderer->expects($this->once())
                 ->method('setVar')
                 ->with($this->equalTo('checked'), $this->equalTo(false));
 
-        $plugin = new CheckedPlugin($field);
-        $plugin->setUp($renderer);
+        $plugin = new CheckedPlugin();
+        $plugin->setUp($field, $renderer);
     }
+    
 }

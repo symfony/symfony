@@ -13,17 +13,14 @@ namespace Symfony\Tests\Component\Form\Renderer\Plugin;
 
 use Symfony\Component\Form\Renderer\Plugin\FieldPlugin;
 
-use Symfony\Component\Form\Renderer\DefaultRenderer;
-use Symfony\Component\Form\FieldInterface;
-    
 class FieldPluginTest extends \PHPUnit_Framework_TestCase
 {
 
     public function testSetUp()
     {
-        $field = $this->getMock('Symfony\Component\Form\FieldInterface');
+        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
         $field->expects($this->any())
-              ->method('getDisplayedData')
+              ->method('getClientData')
               ->will($this->returnValue('bar'));
 
         $field->expects($this->any())
@@ -31,8 +28,8 @@ class FieldPluginTest extends \PHPUnit_Framework_TestCase
               ->will($this->returnValue(false));
 
         $field->expects($this->any())
-              ->method('getKey')
-              ->will($this->returnValue('The_Key'));
+              ->method('getName')
+              ->will($this->returnValue('The_Name'));
 
         $field->expects($this->any())
               ->method('getErrors')
@@ -47,19 +44,19 @@ class FieldPluginTest extends \PHPUnit_Framework_TestCase
               ->will($this->returnValue(true));
 
 
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\RendererInterface');
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
 
         $renderer->expects($this->at(0))
                 ->method('setVar')
-                ->with($this->equalTo('this'), $this->equalTo($renderer));
+                ->with($this->equalTo('renderer'), $this->equalTo($renderer));
 
         $renderer->expects($this->at(1))
                 ->method('setVar')
-                ->with($this->equalTo('id'), $this->equalTo('The_Key'));
+                ->with($this->equalTo('id'), $this->equalTo('The_Name'));
 
         $renderer->expects($this->at(2))
                 ->method('setVar')
-                ->with($this->equalTo('name'), $this->equalTo('The_Key'));
+                ->with($this->equalTo('name'), $this->equalTo('The_Name'));
 
         $renderer->expects($this->at(3))
                 ->method('setVar')
@@ -91,11 +88,11 @@ class FieldPluginTest extends \PHPUnit_Framework_TestCase
 
         $renderer->expects($this->at(10))
                 ->method('setVar')
-                ->with($this->equalTo('label'), $this->equalTo('The key'));
+                ->with($this->equalTo('label'), $this->equalTo('The name'));
         
 
-        $plugin = new FieldPlugin($field);
-        $plugin->setUp($renderer);
+        $plugin = new FieldPlugin();
+        $plugin->setUp($field, $renderer);
     }
 
 }

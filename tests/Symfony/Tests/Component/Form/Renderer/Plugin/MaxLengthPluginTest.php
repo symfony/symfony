@@ -13,21 +13,20 @@ namespace Symfony\Tests\Component\Form\Renderer\Plugin;
 
 use Symfony\Component\Form\Renderer\Plugin\MaxLengthPlugin;
 
-use Symfony\Component\Form\Renderer\DefaultRenderer;
-use Symfony\Component\Form\FormInterface;
-
 class MaxLengthPluginTest extends \PHPUnit_Framework_TestCase
 {
 
     public function testSetUp()
     {
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\RendererInterface');
+        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
         $renderer->expects($this->once())
                 ->method('setVar')
                 ->with($this->equalTo('max_length'), $this->equalTo(12));
 
         $plugin = new MaxLengthPlugin(12);
-        $plugin->setUp($renderer);
+        $plugin->setUp($field, $renderer);
 
     }
 }

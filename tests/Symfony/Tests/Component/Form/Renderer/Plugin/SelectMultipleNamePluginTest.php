@@ -13,15 +13,14 @@ namespace Symfony\Tests\Component\Form\Renderer\Plugin;
 
 use Symfony\Component\Form\Renderer\Plugin\SelectMultipleNamePlugin;
 
-use Symfony\Component\Form\Renderer\DefaultRenderer;
-use Symfony\Component\Form\FieldInterface;
-
 class SelectMultipleNamePluginTest extends \PHPUnit_Framework_TestCase
 {
 
     public function testSetUp()
     {
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\RendererInterface');
+        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
         $renderer->expects($this->once())
                 ->method('getVar')
                 ->with($this->equalTo('name'))
@@ -32,6 +31,6 @@ class SelectMultipleNamePluginTest extends \PHPUnit_Framework_TestCase
                 ->with($this->equalTo('name'), $this->equalTo('multiname[]'));
 
         $plugin = new SelectMultipleNamePlugin();
-        $plugin->setUp($renderer);
+        $plugin->setUp($field, $renderer);
     }
 }

@@ -13,9 +13,6 @@ namespace Symfony\Tests\Component\Form\Renderer\Plugin;
 
 use Symfony\Component\Form\Renderer\Plugin\DatePatternPlugin;
 
-use Symfony\Component\Form\Renderer\DefaultRenderer;
-use Symfony\Component\Form\FieldInterface;
-
 class DatePatternPluginTest extends \PHPUnit_Framework_TestCase
 {
 
@@ -24,13 +21,15 @@ class DatePatternPluginTest extends \PHPUnit_Framework_TestCase
 
         $intl = new \IntlDateFormatter("en_US" ,\IntlDateFormatter::SHORT, \IntlDateFormatter::NONE);
 
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\RendererInterface');
+        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
 
         $renderer->expects($this->once())
                 ->method('setVar')
                 ->with($this->equalTo('date_pattern'), $this->equalTo('{{ month }}/{{ day }}/{{ year }}'));
         $plugin = new DatePatternPlugin($intl);
-        $plugin->setUp($renderer);
+        $plugin->setUp($field, $renderer);
     }
 
     public function testen_GB()
@@ -38,13 +37,15 @@ class DatePatternPluginTest extends \PHPUnit_Framework_TestCase
 
         $intl = new \IntlDateFormatter("en_GB" ,\IntlDateFormatter::SHORT, \IntlDateFormatter::NONE);
 
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\RendererInterface');
+        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
 
         $renderer->expects($this->once())
                 ->method('setVar')
                 ->with($this->equalTo('date_pattern'), $this->equalTo('{{ day }}/{{ month }}/{{ year }}'));
         $plugin = new DatePatternPlugin($intl);
-        $plugin->setUp($renderer);
+        $plugin->setUp($field, $renderer);
     }
 
     public function testde_DE()
@@ -52,13 +53,15 @@ class DatePatternPluginTest extends \PHPUnit_Framework_TestCase
 
         $intl = new \IntlDateFormatter("de_DE" ,\IntlDateFormatter::SHORT, \IntlDateFormatter::NONE);
 
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\RendererInterface');
+        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
 
         $renderer->expects($this->once())
                 ->method('setVar')
                 ->with($this->equalTo('date_pattern'), $this->equalTo('{{ day }}.{{ month }}.{{ year }}'));
         $plugin = new DatePatternPlugin($intl);
-        $plugin->setUp($renderer);
+        $plugin->setUp($field, $renderer);
     }
 
     public function testDefault()
@@ -66,12 +69,14 @@ class DatePatternPluginTest extends \PHPUnit_Framework_TestCase
 
         $intl = new \IntlDateFormatter("de_DE" ,\IntlDateFormatter::SHORT, \IntlDateFormatter::SHORT);
 
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\RendererInterface');
+        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
 
         $renderer->expects($this->once())
                 ->method('setVar')
                 ->with($this->equalTo('date_pattern'), $this->equalTo('{{ year }}-{{ month }}-{{ day }}'));
         $plugin = new DatePatternPlugin($intl);
-        $plugin->setUp($renderer);
+        $plugin->setUp($field, $renderer);
     }
 }

@@ -19,6 +19,15 @@ use Symfony\Component\Routing\RouteCollection;
 
 class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 {
+    public function testNoMethodSoAllowed()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo'));
+
+        $matcher = new UrlMatcher($coll, array('method' => 'get'));
+        $matcher->match('/foo');
+    }
+
     public function testMethodNotAllowed()
     {
         $coll = new RouteCollection();

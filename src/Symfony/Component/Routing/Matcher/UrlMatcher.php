@@ -78,7 +78,7 @@ class UrlMatcher implements UrlMatcherInterface
             }
 
             // check HTTP method requirement
-            if (isset($this->context['method']) && ($req = explode('|', $route->getRequirement('_method'))) && !in_array(strtolower($this->context['method']), array_map('strtolower', $req))) {
+            if (isset($this->context['method']) && $route->getRequirement('_method') && ($req = explode('|', $route->getRequirement('_method'))) && !in_array(strtolower($this->context['method']), array_map('strtolower', $req))) {
                 $allow = array_merge($allow, $req);
                 continue;
             }

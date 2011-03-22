@@ -30,26 +30,16 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
-    static protected $testTmpFilepath;
+    private $testTmpFilepath;
 
-    static public function setUpBeforeClass()
-    {
-        self::$testTmpFilepath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'php_generator.php';
-    }
-    
     protected function setUp()
     {
         parent::setUp();
 
         $this->routeCollection = new RouteCollection();
         $this->generatorDumper = new PhpGeneratorDumper($this->routeCollection);
-    }
-
-    public function tearDown()
-    {
-        parent::tearDown();
-     
-        @unlink(self::$testTmpFilepath);
+        $this->testTmpFilepath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'php_generator.php';
+        @unlink($this->testTmpFilepath);
     }
 
     public function testDumpWithRoutes()
@@ -57,8 +47,8 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
         $this->routeCollection->add('Test', new Route('/testing/{foo}'));
         $this->routeCollection->add('Test2', new Route('/testing2'));
         
-        file_put_contents(self::$testTmpFilepath, $this->generatorDumper->dump());
-        include (self::$testTmpFilepath);
+        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
+        include ($this->testTmpFilepath);
 
         $projectUrlGenerator = new \ProjectUrlGenerator(array(
             'base_url' => '/app.php',
@@ -84,8 +74,8 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
      */
     public function testDumpWithoutRoutes()
     {
-        file_put_contents(self::$testTmpFilepath, $this->generatorDumper->dump(array('class' => 'WithoutRoutesUrlGenerator')));
-        include (self::$testTmpFilepath);
+        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump(array('class' => 'WithoutRoutesUrlGenerator')));
+        include ($this->testTmpFilepath);
 
         $projectUrlGenerator = new \WithoutRoutesUrlGenerator(array(
             'base_url' => '/app.php',
@@ -102,8 +92,8 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
     {
         $this->routeCollection->add('Test', new Route('/testing/{foo}', array('foo' => 'bar')));
         
-        file_put_contents(self::$testTmpFilepath, $this->generatorDumper->dump(array('class' => 'DefaultRoutesUrlGenerator')));
-        include (self::$testTmpFilepath);
+        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump(array('class' => 'DefaultRoutesUrlGenerator')));
+        include ($this->testTmpFilepath);
         
         $projectUrlGenerator = new \DefaultRoutesUrlGenerator(array());
         $url = $projectUrlGenerator->generate('Test', array());

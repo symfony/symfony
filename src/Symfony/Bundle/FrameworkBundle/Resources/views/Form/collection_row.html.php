@@ -1,1 +1,1 @@
-<?php echo $renderer->getTheme()->render('form', 'widget', $renderer->getVars()); ?>
+<?php echo $renderer->getEngine()->render('form', 'widget', $renderer->getVars()); ?>

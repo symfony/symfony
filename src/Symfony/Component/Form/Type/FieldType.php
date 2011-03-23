@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Type;
 use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Renderer\ThemeRenderer;
-use Symfony\Component\Form\Renderer\Theme\FormThemeInterface;
+use Symfony\Component\Form\Renderer\Theme\FormThemeEngineInterface;
 use Symfony\Component\Form\Renderer\Plugin\FieldPlugin;
 use Symfony\Component\Form\EventListener\TrimListener;
 use Symfony\Component\Form\EventListener\ValidationListener;
@@ -30,7 +30,7 @@ class FieldType extends AbstractType
 
     private $validator;
 
-    public function __construct(FormThemeInterface $theme, ValidatorInterface $validator)
+    public function __construct(FormThemeEngineInterface $theme, ValidatorInterface $validator)
     {
         $this->theme = $theme;
         $this->validator = $validator;

@@ -408,10 +408,20 @@ class FrameworkExtension extends Extension
             $container->setAlias('templating', 'templating.engine.delegating');
         }
 
-        $container->setAlias('form.theme', 'form.theme.default');
+        // Use the plain PHP engine as default theming engine for Forms
+        $container->setAlias('form.theme.engine', 'form.theme.engine.php');
+
+        // Use the first engine that we find as Form theme engine
         foreach ($config['engines'] as $engine) {
-            if ($container->hasDefinition('form.theme.' . $engine)) {
-                $container->setAlias('form.theme', 'form.theme.' . $engine);
+            if ($container->hasDefinition('form.theme.engine.templating.' . $engine)) {
+                $container->setAlias('form.theme.engine', 'form.theme.engine.templating.' . $engine);
+                break;
+            }
+
+            // Twig is supported seperately from Templating
+            if ($engine === 'twig') {
+                $container->setAlias('form.theme.engine', 'form.theme.engine.twig');
+                break;
             }
         }
     }

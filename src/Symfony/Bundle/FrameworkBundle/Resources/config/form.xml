@@ -11,10 +11,10 @@
         <parameter key="form.type.loader.tagged.class">Symfony\Bundle\FrameworkBundle\Form\ContainerAwareTypeLoader</parameter>
         <parameter key="form.guesser.validator.class">Symfony\Component\Form\Type\Guesser\ValidatorTypeGuesser</parameter>
         <parameter key="form.csrf_provider.class">Symfony\Component\Form\CsrfProvider\SessionCsrfProvider</parameter>
-        <parameter key="form.theme.twig.class">Symfony\Component\Form\Renderer\Theme\TwigTheme</parameter>
-        <parameter key="form.theme.php.class">Symfony\Component\Form\Renderer\Theme\PhpTheme</parameter>
-        <parameter key="form.theme.phpengine.class">Symfony\Bundle\FrameworkBundle\Form\PhpEngineTheme</parameter>
-        <parameter key="form.theme.template">TwigBundle::div_layout.html.twig</parameter>
+        <parameter key="form.theme.engine.twig.class">Symfony\Component\Form\Renderer\Theme\TwigThemeEngine</parameter>
+        <parameter key="form.theme.engine.php.class">Symfony\Component\Form\Renderer\Theme\PhpThemeEngine</parameter>
+        <parameter key="form.theme.engine.templating.php.class">Symfony\Bundle\FrameworkBundle\Form\PhpTemplatingThemeEngine</parameter>
+        <parameter key="form.theme">TwigBundle::div_layout.html.twig</parameter>
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
         <parameter key="form.csrf_protection.enabled">true</parameter>
         <parameter key="form.csrf_protection.field_name">_token</parameter>
@@ -46,18 +46,18 @@
         </service>
         
         <!-- Themes -->
-        <service id="form.theme.twig" class="%form.theme.twig.class%">
+        <service id="form.theme.engine.twig" class="%form.theme.engine.twig.class%">
             <argument type="service" id="twig" />
-            <argument>%form.theme.template%</argument>
+            <argument>%form.theme%</argument>
         </service>
 
-        <service id="form.theme.default" class="%form.theme.php.class%">
+        <service id="form.theme.engine.php" class="%form.theme.engine.php.class%">
             <argument>%kernel.charset%</argument>
         </service>
 
-        <service id="form.theme.php" class="%form.theme.phpengine.class%">
+        <service id="form.theme.engine.templating.php" class="%form.theme.engine.templating.php.class%">
             <argument type="service" id="templating.engine.php" />
-            <argument>%form.theme.template%</argument>
+            <argument>%form.theme%</argument>
         </service>
         
         <!-- TemporaryStorage - where should we put this? -->
@@ -95,7 +95,7 @@
         <!-- FieldTypes -->
         <service id="form.type.field" class="Symfony\Component\Form\Type\FieldType">
             <tag name="form.type" alias="field" />
-            <argument type="service" id="form.theme" />
+            <argument type="service" id="form.theme.engine" />
             <argument type="service" id="validator" />
         </service>
         <service id="form.type.form" class="Symfony\Component\Form\Type\FormType">

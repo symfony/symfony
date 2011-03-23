@@ -11,12 +11,12 @@
 
 namespace Symfony\Tests\Component\Form\Renderer\Theme;
 
-use Symfony\Component\Form\Renderer\Theme\PhpTheme;
+use Symfony\Component\Form\Renderer\Theme\PhpThemeEngine;
 
-class PhpThemeTest extends AbstractThemeTest
+class PhpThemeEngineTest extends AbstractThemeEngineTest
 {
-    protected function createTheme()
+    protected function createEngine()
     {
-        return new PhpTheme();
+        return new PhpThemeEngine();
     }
 }

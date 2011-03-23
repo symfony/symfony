@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Provides integration of the Routing component with Twig.
@@ -20,11 +20,11 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class RoutingExtension extends \Twig_Extension
 {
-    private $router;
+    private $generator;
 
-    public function __construct(RouterInterface $router)
+    public function __construct(UrlGeneratorInterface $generator)
     {
-        $this->router = $router;
+        $this->generator = $generator;
     }
 
     /**
@@ -42,12 +42,12 @@ class RoutingExtension extends \Twig_Extension
 
     public function getPath($name, array $parameters = array())
     {
-        return $this->router->generate($name, $parameters, false);
+        return $this->generator->generate($name, $parameters, false);
     }
 
     public function getUrl($name, array $parameters = array())
     {
-        return $this->router->generate($name, $parameters, true);
+        return $this->generator->generate($name, $parameters, true);
     }
 
     /**

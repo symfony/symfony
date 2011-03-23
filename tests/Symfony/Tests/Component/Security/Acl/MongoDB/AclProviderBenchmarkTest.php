@@ -66,6 +66,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
         $this->con->selectCollection($this->options['oid_table_name'])->drop();
         $this->con->selectCollection($this->options['entry_table_name'])->drop();
         $this->con->selectCollection($this->options['oid_table_name'])->ensureIndex(array('randomKey'=>1),array());
+        $this->con->selectCollection($this->options['oid_table_name'])->ensureIndex(array('identifier'=>1, 'type'=>1));
 
         for ($i=0; $i<40000; $i++) {
             $this->generateAclHierarchy();

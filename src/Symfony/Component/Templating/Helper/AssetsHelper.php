@@ -146,7 +146,7 @@ class AssetsHelper extends Helper implements AssetPackageInterface
      */
     public function getUrl($path, $packageName = null)
     {
-        if (false !== strpos($path, '://')) {
+        if (false !== strpos($path, '://') || 0 === strpos($path, '//')) {
             return $path;
         }
 

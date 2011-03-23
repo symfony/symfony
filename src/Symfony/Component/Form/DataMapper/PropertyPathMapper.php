@@ -85,27 +85,23 @@ class PropertyPathMapper implements DataMapperInterface
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $form) {
-            $isReference = false;
-
-            // If the data is identical to the value in $data, we are
-            // dealing with a reference
-            if ($form->getAttribute('property_path') !== null) {
-                $isReference = $form->getData() === $form->getAttribute('property_path')->getValue($data);
-            }
-
-            // Don't write into $data if $data is an object,
-            // $isReference is true (see above) and the option "by_reference" is
-            // true as well
-            if (!is_object($data) || !$isReference || !$form->getAttribute('by_reference')) {
-                $this->mapFormToData($form, $data);
-            }
+            $this->mapFormToData($form, $data);
         }
     }
 
     public function mapFormToData(FormInterface $form, &$data)
     {
         if ($form->getAttribute('property_path') !== null) {
-            $form->getAttribute('property_path')->setValue($data, $form->getData());
+            $propertyPath = $form->getAttribute('property_path');
+
+            // If the data is identical to the value in $data, we are
+            // dealing with a reference
+            $isReference = $form->getData() === $propertyPath->getValue($data);
+            $byReference = $form->getAttribute('by_reference');
+
+            if (!(is_object($data) && $isReference && $byReference)) {
+                $propertyPath->setValue($data, $form->getData());
+            }
         }
     }
 }

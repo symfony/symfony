@@ -99,7 +99,7 @@
             {% for key, value in collector.sessionattributes %}
                 <tr>
                     <th>{{ key }}</th>
-                    <td>{{ value|dump }}</td>
+                    <td>{{ value|yaml_dump }}</td>
                 </tr>
             {% endfor %}
         </table>

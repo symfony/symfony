@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\DependencyInjection\ContainerAware;
 
 /**
@@ -49,6 +50,19 @@ class Controller extends ContainerAware
     public function forward($controller, array $path = array(), array $query = array())
     {
         return $this->container->get('http_kernel')->forward($controller, $path, $query);
+    }
+
+    /**
+     * Returns a RedirectResponse to the given URL.
+     *
+     * @param string  $url The URL to redirect to
+     * @param integer $status The status code to use for the Response
+     *
+     * @return RedirectResponse
+     */
+    public function redirect($url, $status = 302)
+    {
+        return new RedirectResponse($url, $status);
     }
 
     /**

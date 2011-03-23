@@ -45,8 +45,6 @@ class ExceptionController extends ContainerAware
             $currentContent .= ob_get_clean();
         }
 
-        $code = $this->getStatusCode($exception);
-
         $name = $this->container->get('kernel')->isDebug() ? 'exception' : 'error';
         if ($this->container->get('kernel')->isDebug() && 'html' == $format) {
             $name = 'exception_full';
@@ -59,6 +57,7 @@ class ExceptionController extends ContainerAware
             $template = 'FrameworkBundle:Exception:'.$name.'.html.twig';
         }
 
+        $code = $exception->getStatusCode();
         $response = $templating->renderResponse(
             $template,
             array(
@@ -71,19 +70,8 @@ class ExceptionController extends ContainerAware
         );
 
         $response->setStatusCode($code);
+        $response->headers->replace($exception->getHeaders());
 
         return $response;
-    }
-
-    protected function getStatusCode(FlattenException $exception)
-    {
-        switch ($exception->getClass()) {
-            case 'Symfony\Component\Security\Core\Exception\AccessDeniedException':
-                return 403;
-            case 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException':
-                return 404;
-            default:
-                return 500;
-        }
     }
 }

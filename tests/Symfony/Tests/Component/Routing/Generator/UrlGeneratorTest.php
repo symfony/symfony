@@ -89,4 +89,101 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('https://localhost:8080/app.php/testing', $url);
     }
+
+    public function testRelativeUrlWithoutParameters()
+    {
+        $this->routeCollection->add('test', new Route('/testing'));
+        $this->generator->setContext(array(
+            'base_url'=>'/app.php',
+            'method'=>'GET',
+            'host'=>'localhost',
+            'port'=>80,
+            'is_secure'=>false));
+
+        $url = $this->generator->generate('test', array(), false);
+
+        $this->assertEquals('/app.php/testing', $url);
+    }
+    
+    public function testRelativeUrlWithParameter()
+    {
+        $this->routeCollection->add('test', new Route('/testing/{foo}'));
+        $this->generator->setContext(array(
+            'base_url'=>'/app.php',
+            'method'=>'GET',
+            'host'=>'localhost',
+            'port'=>80,
+            'is_secure'=>false));
+
+        $url = $this->generator->generate('test', array('foo' => 'bar'), false);
+
+        $this->assertEquals('/app.php/testing/bar', $url);
+    }
+    
+    public function testRelativeUrlWithExtraParameters()
+    {
+        $this->routeCollection->add('test', new Route('/testing'));
+        $this->generator->setContext(array(
+            'base_url'=>'/app.php',
+            'method'=>'GET',
+            'host'=>'localhost',
+            'port'=>80,
+            'is_secure'=>false));
+
+        $url = $this->generator->generate('test', array('foo' => 'bar'), false);
+
+        $this->assertEquals('/app.php/testing?foo=bar', $url);
+    }
+    
+    public function testAbsoluteUrlWithExtraParameters()
+    {
+        $this->routeCollection->add('test', new Route('/testing'));
+        $this->generator->setContext(array(
+            'base_url'=>'/app.php',
+            'method'=>'GET',
+            'host'=>'localhost',
+            'port'=>80,
+            'is_secure'=>false));
+
+        $url = $this->generator->generate('test', array('foo' => 'bar'), true);
+
+        $this->assertEquals('http://localhost/app.php/testing?foo=bar', $url);
+    }
+    
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGenerateWithoutRoutes()
+    {       
+        $this->generator->generate('test', array(), true);
+    }
+    
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGenerateForRouteWithoutManditoryParameter()
+    {
+        $this->routeCollection->add('test', new Route('/testing/{foo}'));
+        $this->generator->generate('test', array(), true);
+    }
+    
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGenerateForRouteWithInvalidOptionalParameter()
+    {
+        $route = new Route('/testing/{foo}', array('foo' => '1'), array('foo' => 'd+'));
+        $this->routeCollection->add('test', $route);
+        $this->generator->generate('test', array('foo' => 'bar'), true);
+    }
+    
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGenerateForRouteWithInvalidManditoryParameter()
+    {
+        $route = new Route('/testing/{foo}', array(), array('foo' => 'd+'));
+        $this->routeCollection->add('test', $route);
+        $this->generator->generate('test', array('foo' => 'bar'), true);
+    } 
 }

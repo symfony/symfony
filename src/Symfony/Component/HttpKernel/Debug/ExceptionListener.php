@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -55,9 +56,15 @@ class ExceptionListener
 
         $logger = null !== $this->logger ? $this->logger->getDebugLogger() : null;
 
+        $flattenException = FlattenException::create($exception);
+        if ($exception instanceof HttpExceptionInterface) {
+            $flattenException->setStatusCode($exception->getStatusCode());
+            $flattenException->setHeaders($exception->getHeaders());
+        }
+
         $attributes = array(
             '_controller' => $this->controller,
-            'exception'   => FlattenException::create($exception),
+            'exception'   => $flattenException,
             'logger'      => $logger,
             // when using CLI, we force the format to be TXT
             'format'      => 0 === strncasecmp(PHP_SAPI, 'cli', 3) ? 'txt' : $request->getRequestFormat(),

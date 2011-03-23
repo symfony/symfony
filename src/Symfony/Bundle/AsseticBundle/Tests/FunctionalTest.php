@@ -13,29 +13,34 @@ namespace Symfony\Bundle\AsseticBundle\Tests;
 
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Bundle\FrameworkBundle\Util\Filesystem;
 
 /**
  * @group functional
  */
 class FunctionalTest extends \PHPUnit_Framework_TestCase
 {
+    protected $cacheDir;
+
     protected function setUp()
     {
         if (!class_exists('Assetic\\AssetManager')) {
             $this->markTestSkipped('Assetic is not available.');
         }
 
-        $cache = __DIR__.'/Resources/cache';
-        if (!is_dir($cache)) {
-            mkdir($cache);
-        } else {
-            shell_exec('rm -rf '.escapeshellarg(__DIR__.'/Resources/cache/*'));
+        $this->cacheDir = __DIR__.'/Resources/cache';
+        if (file_exists($this->cacheDir)) {
+            $filesystem = new Filesystem();
+            $filesystem->remove($this->cacheDir);
         }
+
+        mkdir($this->cacheDir, 0777, true);
     }
 
     protected function tearDown()
     {
-        shell_exec('rm -rf '.escapeshellarg(__DIR__.'/Resources/cache'));
+        $filesystem = new Filesystem();
+        $filesystem->remove($this->cacheDir);
     }
 
     /**

@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\TwigBundle\TokenParser;
+namespace Symfony\Bridge\Twig\TokenParser;
 
-use Symfony\Bundle\TwigBundle\Node\TransNode;
+use Symfony\Bridge\Twig\Node\TransNode;
 
 /**
  * 

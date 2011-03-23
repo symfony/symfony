@@ -28,21 +28,39 @@ class ApacheMatcherDumperTest extends \PHPUnit_Framework_TestCase
     {
         $collection = new RouteCollection();
 
+        // defaults and requirements
         $collection->add('foo', new Route(
             '/foo/{bar}',
             array('def' => 'test'),
             array('bar' => 'baz|symfony')
         ));
+        // method requirement
         $collection->add('bar', new Route(
             '/bar/{foo}',
             array(),
             array('_method' => 'GET|head')
         ));
+        // simple
         $collection->add('baz', new Route(
-            '/test/baz/'
+            '/test/baz'
         ));
+        // simple with extension
         $collection->add('baz2', new Route(
+            '/test/baz.html'
+        ));
+        // trailing slash
+        $collection->add('baz3', new Route(
+            '/test/baz3/'
+        ));
+        // trailing slash with variable
+        $collection->add('baz4', new Route(
             '/test/{foo}/'
+        ));
+        // trailing slash and method
+        $collection->add('baz5', new Route(
+            '/test/{foo}/',
+            array(),
+            array('_method' => 'post')
         ));
 
         $dumper = new ApacheMatcherDumper($collection);

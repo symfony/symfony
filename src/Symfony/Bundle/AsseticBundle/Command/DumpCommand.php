@@ -153,7 +153,7 @@ class DumpCommand extends Command
         $target = rtrim($basePath, '/') . '/' . $asset->getTargetUrl();
         if (!is_dir($dir = dirname($target))) {
             $output->writeln('<info>[dir+]</info> '.$dir);
-            if (false === @mkdir($dir)) {
+            if (false === @mkdir($dir, 0777, true)) {
                 throw new \RuntimeException('Unable to create directory '.$dir);
             }
         }

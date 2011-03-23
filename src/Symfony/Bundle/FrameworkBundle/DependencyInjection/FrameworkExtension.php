@@ -259,7 +259,7 @@ class FrameworkExtension extends Extension
             $container->setParameter('router.options.resource_type', $config['type']);
         }
 
-        if (!empty($config['cache_warmer'])) {
+        if ($config['cache_warmer']) {
             $container->getDefinition('router.cache_warmer')->addTag('kernel.cache_warmer');
             $container->setAlias('router', 'router.cached');
         }
@@ -368,7 +368,7 @@ class FrameworkExtension extends Extension
             $container->setParameter('templating.loader.cache.path', null);
         }
 
-        if (isset($config['cache_warmer'])) {
+        if ($config['cache_warmer']) {
             $container->getDefinition('templating.cache_warmer.template_paths')->addTag('kernel.cache_warmer');
             $container->setAlias('templating.locator', 'templating.locator.cached');
         }

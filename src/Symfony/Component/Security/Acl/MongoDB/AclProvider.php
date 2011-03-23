@@ -222,7 +222,7 @@ class AclProvider implements AclProviderInterface
     {
         // FIXME: add support for filtering by sids (right now we select all sids)
         $objIdentities = $this->getObjectIdentities($batch);
-        if (0 === $objIdentities->count()) {
+        if (!$objIdentities->hasNext()) {
             throw new AclNotFoundException('There is no ACL for the given object identity.');
         }
         $oids = $this->getOIDSet($objIdentities, $sids);
@@ -242,12 +242,18 @@ class AclProvider implements AclProviderInterface
     protected function getObjectIdentities(array &$batch)
     {
         $batchSet = array();
+        $dataSet = new \SplObjectStorage();
         for ($i=0,$c=count($batch); $i<$c; $i++) {
-            $batchSet[] = array(
+            $batchSet[] = $query = array(
                 "identifier" => $batch[$i]->getIdentifier(),
                 "type" => $batch[$i]->getType(),
             );
+/*            $oid = $this->connection->selectCollection($this->options['oid_table_name'])->findOne($query);
+            if($oid) {
+                $dataSet->attach($oid);
+            }*/
         }
+//return $dataSet;
         $query = array('$or'=> $batchSet);
 
         return $this->connection->selectCollection($this->options['oid_table_name'])->find($query);
@@ -330,7 +336,7 @@ class AclProvider implements AclProviderInterface
         $aclParentAclProperty = $aclReflection->getProperty('parentAcl');
         $aclParentAclProperty->setAccessible(true);
 
-        // TODO: fetchAll() consumes more memory than consecutive calls to fetch(),
+        // TODO: cursor array consumes more memory than consecutive calls to cursor,
         // but it is faster
         // need to assemble full list of oids needed (include ancestors)
         $entries = array();
@@ -339,18 +345,8 @@ class AclProvider implements AclProviderInterface
             $objectId       = (string)$entry['objectIdentity']['$id'];
             $eid        = (string)$entry['_id'];
             $entries[$objectId][$eid] = $entry;
-            $securityIds[] = $entry['securityIdentity']['$id'];
         }
 
-        if (isset($securityIds)) {
-            $sidQuery = array('_id' => array('$in' => array_unique($securityIds)));
-            $sidCursor = $this->connection->selectCollection($this->options['sid_table_name'])->find($sidQuery);
-            foreach($sidCursor as $curSid) {
-                $sidId = (string)$curSid['_id'];
-                $securityIdentities[$sidId] = $curSid;
-            }
-        }
-        
         foreach($objectCursor as $curObject) {
             $id = (string)$curObject['_id'];
             $oid[$id] = $curObject;
@@ -449,18 +445,18 @@ class AclProvider implements AclProviderInterface
                         // It is important to only ever have one ACE instance per actual row since
                         // some ACEs are shared between ACL instances
                         if (!isset($loadedAces[$aceId])) {
-                            $securityId = (string)$entry['securityIdentity']['$id'];
-                            $securityIdentity = $securityIdentities[$securityId];
-                            $username = $securityIdentity['username'];
-                            $securityIdentifier = $securityIdentity['identifier'];
-                            if (!isset($sids[$securityId])) {
-                                if ($username) {
+                            if (isset($entry['securityIdentity']['username'])) {
+                                $securityId = '1'.$entry['securityIdentity']['class'];
+                                if (!isset($sids[$securityId])) {
                                     $sids[$securityId] = new UserSecurityIdentity(
-                                        substr($securityIdentifier, 1 + $pos = strpos($securityIdentifier, '-')),
-                                        substr($securityIdentifier, 0, $pos)
+                                        $entry['securityIdentity']['username'],
+                                        $entry['securityIdentity']['class']
                                     );
-                                } else {
-                                    $sids[$securityId] = new RoleSecurityIdentity($securityIdentifier);
+                                }
+                            } else {
+                                $securityId = '0'.$entry['securityIdentity']['role'];
+                                if (!isset($sids[$securityId])) {
+                                    $sids[$securityId] = new RoleSecurityIdentity($entry['securityIdentity']['role']);
                                 }
                             }
 

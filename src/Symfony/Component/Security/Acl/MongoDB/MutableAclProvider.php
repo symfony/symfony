@@ -404,17 +404,12 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     {
         list($old, $new) = $changes;
 
-        $sids = new \SplObjectStorage();
         $currentIds = array();
         for ($i=0,$c=count($new); $i<$c; $i++) {
             $ace = $new[$i];
 
             if (null === $ace->getId()) {
-                if ($sids->contains($ace->getSecurityIdentity())) {
-                    $sid = $sids->offsetGet($ace->getSecurityIdentity());
-                } else {
-                    $sid = (string)$this->insertSecurityIdentity($ace->getSecurityIdentity());
-                }
+                $sid = $this->getSecurityIdentityQuery($ace->getSecurityIdentity());
 
                 $objectIdentityId = $name === 'classAces' ? null : $ace->getAcl()->getId();
 
@@ -440,34 +435,21 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     }
 
     /**
-     * Insert a security identity into the db, if it is already there, just return the id.
+     * Create an array of the security identity for inserting in the document
      *
      * @param SecurityIdentityInterface $sid
      * @throws \InvalidArgumentException
-     * @return MongoId
+     * @return array
      */
-    protected function insertSecurityIdentity(SecurityIdentityInterface $sid)
+    protected function getSecurityIdentityQuery(SecurityIdentityInterface $sid)
     {
         if ($sid instanceof UserSecurityIdentity) {
-            $identifier = $sid->getClass().'-'.$sid->getUsername();
-            $username = true;
+            return array('username' => $sid->getUsername(),'class' => $sid->getClass());
         } else if ($sid instanceof RoleSecurityIdentity) {
-            $identifier = $sid->getRole();
-            $username = false;
+            return array('role' => $sid->getRole());
         } else {
             throw new \InvalidArgumentException('$sid must either be an instance of UserSecurityIdentity, or RoleSecurityIdentity.');
         }
-
-        $criteria = array(
-            'identifier' => $identifier,
-            'username'   => $username,
-        );
-        $result = $this->connection->selectCollection($this->options['sid_table_name'])->findOne($criteria);
-        if (isset($result)) {
-            return $result['_id'];
-        }
-        $this->connection->selectCollection($this->options['sid_table_name'])->insert($criteria);
-        return $criteria['_id'];
     }
 
     /**
@@ -484,14 +466,11 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      * @param Boolean $auditFailure
      * @return MongoId
      */
-    protected function insertAccessControlEntry($objectIdentityId, $field, $aceOrder, $securityIdentityId, $strategy, $mask, $granting, $auditSuccess, $auditFailure)
+    protected function insertAccessControlEntry($objectIdentityId, $field, $aceOrder, $securityIdentity, $strategy, $mask, $granting, $auditSuccess, $auditFailure)
     {
         $criteria = array(
             'aceOrder' => $aceOrder,
-            'securityIdentity' => array(
-                '$ref' => $this->options['sid_table_name'],
-                '$id' => new \MongoId($securityIdentityId),
-            ),
+            'securityIdentity' => $securityIdentity,
             'mask' => $mask,
             'granting' => $granting,
             'grantingStrategy' => $strategy,

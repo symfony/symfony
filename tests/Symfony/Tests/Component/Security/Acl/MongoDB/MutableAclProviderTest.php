@@ -326,16 +326,6 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($parentAcl->getId(), $reloadedAcl->getParentAcl()->getId());
     }
 
-    public function testSecurityIdentityDoesNotCreateDuplicates()
-    {
-        $provider = $this->getProvider();
-        $securityIdentity1 = array(new RoleSecurityIdentity('ROLE_FOO'));
-        $sid1 = $this->callMethod($provider, 'insertSecurityIdentity', $securityIdentity1);
-        $securityIdentity2 = array(new RoleSecurityIdentity('ROLE_FOO'));
-        $sid2 = $this->callMethod($provider, 'insertSecurityIdentity', $securityIdentity2);
-        $this->assertEquals($sid1, $sid2, 'insertSecurityIdentity should not create a second document');
-    }
-
     /**
      * Data must have the following format:
      * array(

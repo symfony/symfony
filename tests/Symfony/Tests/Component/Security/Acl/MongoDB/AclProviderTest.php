@@ -135,14 +135,11 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             $classes[$id] = $query;
         }
 
-        $this->sidCollection = $this->con->selectCollection($options['sid_table_name']);
         $fields = array('identifier', 'username');
         $sids = array();
         foreach ($this->getSidData() as $data) {
             $id = array_shift($data);
-            $query = array_combine($fields, $data);
-            $this->sidCollection->insert($query);
-            $sids[$id] = $query;
+            $sids[$id] = $data;
         }
 
         $this->oidCollection = $this->con->selectCollection($options['oid_table_name']);
@@ -181,10 +178,7 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             );
             $sid = $query['securityIdentity'];
             if($sid) {
-                $query['securityIdentity'] = array(
-                    '$ref' => $options['sid_table_name'],
-                    '$id' => $sids[$sid]['_id'],
-                );
+                $query['securityIdentity'] = $sids[$sid];
             }
             $this->entryCollection->insert($query);
         }
@@ -232,12 +226,12 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
     protected function getSidData()
     {
         return array(
-            array(1, 'SomeClass-john.doe', 1),
-            array(2, 'MyClass-john.doe@foo.com', 1),
-            array(3, 'FooClass-123', 1),
-            array(4, 'MooClass-ROLE_USER', 1),
-            array(5, 'ROLE_USER', 0),
-            array(6, 'IS_AUTHENTICATED_FULLY', 0),
+            array('id' => 1, 'class' => 'SomeClass', 'username' => 'john.doe'),
+            array('id' => 2, 'class' => 'MyClass',   'username' => 'john.doe@foo.com'),
+            array('id' => 3, 'class' => 'FooClass',  'username' => '123'),
+            array('id' => 4, 'class' => 'MooClass',  'username' => 'ROLE_USER'),
+            array('id' => 5, 'role' => 'ROLE_USER'),
+            array('id' => 6, 'role' => 'IS_AUTHENTICATED_FULLY'),
         );
     }
 
@@ -254,7 +248,6 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             'oid_table_name' => 'aclObjectIdentities',
-            'sid_table_name' => 'aclSecurityIdentities',
             'entry_table_name' => 'aclEntries',
         );
     }

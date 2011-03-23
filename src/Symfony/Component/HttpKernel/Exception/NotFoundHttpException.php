@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpKernel\Exception;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class NotFoundHttpException extends BaseHttpException
+class NotFoundHttpException extends HttpException
 {
     /**
      * Constructor.

@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpKernel\Exception;
  *
  * @author Kris Wallsmith <kris@symfony.com>
  */
-class MethodNotAllowedHttpException extends BaseHttpException
+class MethodNotAllowedHttpException extends HttpException
 {
     /**
      * Constructor.

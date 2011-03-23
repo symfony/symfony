@@ -12,11 +12,11 @@
 namespace Symfony\Component\HttpKernel\Exception;
 
 /**
- * BaseHttpException.
+ * HttpException.
  *
  * @author Kris Wallsmith <kris@symfony.com>
  */
-abstract class BaseHttpException extends \RuntimeException implements HttpExceptionInterface
+class HttpException extends \RuntimeException implements HttpExceptionInterface
 {
     protected $statusCode;
     protected $statusMessage;

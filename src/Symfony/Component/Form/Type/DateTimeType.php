@@ -107,11 +107,6 @@ class DateTimeType extends AbstractType
         );
     }
 
-    public function getParent(array $options)
-    {
-        return 'form';
-    }
-
     public function getName()
     {
         return 'datetime';

@@ -30,6 +30,11 @@ abstract class AbstractType implements FormTypeInterface
         return array();
     }
 
+    public function getParent(array $options)
+    {
+        return 'form';
+    }
+
     public function getName()
     {
         return get_class($this);

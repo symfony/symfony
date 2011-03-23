@@ -71,7 +71,7 @@ class AclProvider implements AclProviderInterface
     {
         $parentId = $this->retrieveObjectIdentityPrimaryKey($parentOid);
 
-        if($directChildrenOnly) {
+        if ($directChildrenOnly) {
             $query = array(
                 "parent" => $parentId,
             );
@@ -104,9 +104,9 @@ class AclProvider implements AclProviderInterface
         $currentBatch = array();
         $oidLookup = array();
 
-        for ($i=0,$c=count($oids); $i<$c; $i++) {
+        for ($i = 0, $c = count($oids); $i < $c; $i++) {
             $oid = $oids[$i];
-            $oidLookupKey = $oid->getIdentifier().$oid->getType();
+            $oidLookupKey = $oid->getIdentifier() . $oid->getType();
             $oidLookup[$oidLookupKey] = $oid;
             $aclFound = false;
 
@@ -183,7 +183,7 @@ class AclProvider implements AclProviderInterface
                         $this->aclCache->putInCache($loadedAcl);
                     }
 
-                    if (isset($oidLookup[$loadedOid->getIdentifier().$loadedOid->getType()])) {
+                    if (isset($oidLookup[$loadedOid->getIdentifier() . $loadedOid->getType()])) {
                         $result->attach($loadedOid, $loadedAcl);
                     }
                 }
@@ -243,18 +243,13 @@ class AclProvider implements AclProviderInterface
     {
         $batchSet = array();
         $dataSet = new \SplObjectStorage();
-        for ($i=0,$c=count($batch); $i<$c; $i++) {
+        for ($i = 0, $c = count($batch); $i < $c; $i++) {
             $batchSet[] = $query = array(
                 "identifier" => $batch[$i]->getIdentifier(),
                 "type" => $batch[$i]->getType(),
             );
-/*            $oid = $this->connection->selectCollection($this->options['oid_table_name'])->findOne($query);
-            if($oid) {
-                $dataSet->attach($oid);
-            }*/
         }
-//return $dataSet;
-        $query = array('$or'=> $batchSet);
+        $query = array('$or' => $batchSet);
 
         return $this->connection->selectCollection($this->options['oid_table_name'])->find($query);
     }
@@ -279,19 +274,20 @@ class AclProvider implements AclProviderInterface
      * Constructs the query used for looking up object identities and associated
      * ACEs, and security identities.
      *
-     * @param Cursor $objectIdentities
+     * @param Cursor $objectCursor
      * @param array $sids
      * @throws AclNotFoundException
      * @return array $query
      */
-    protected function getOIDSet(Cursor $objectIdentities, array $sids)
+    protected function getOIDSet(Cursor $objectCursor, array $sids)
     {
         // FIXME: add support for filtering by sids (right now we select all sids)
         $oids = array();
-        foreach ($objectIdentities as $result) {
-            $oids[] = $result['_id'];
-            if(isset($result['ancestors'])) {
-                $oids = array_merge($oids, $result['ancestors']);
+        $objectData = iterator_to_array($objectCursor);
+        foreach ($objectData as $object) {
+            $oids[] = $object['_id'];
+            if (isset($object['ancestors'])) {
+                $oids = array_merge($oids, $object['ancestors']);
             }
         }
         return array_unique($oids);
@@ -336,155 +332,160 @@ class AclProvider implements AclProviderInterface
         $aclParentAclProperty = $aclReflection->getProperty('parentAcl');
         $aclParentAclProperty->setAccessible(true);
 
-        // TODO: cursor array consumes more memory than consecutive calls to cursor,
-        // but it is faster
-        // need to assemble full list of oids needed (include ancestors)
+
         $entries = array();
 
-        foreach($entryCursor as $entry) {
-            $objectId       = (string)$entry['objectIdentity']['$id'];
-            $eid        = (string)$entry['_id'];
+        /**
+         * using iterator_to_array is faster, but could cause potential problems with low memory, high data set
+         * if it does in the foreach()
+         * use $entryCursor instead of $entryData
+         * use $objectCursor instead of $objectData
+         *
+         * TODO: should this be configurable?
+         */
+        $entryData = iterator_to_array($entryCursor);
+        foreach ($entryData as $entry) {
+            $objectId = (string)$entry['objectIdentity']['$id'];
+            $eid = (string)$entry['_id'];
             $entries[$objectId][$eid] = $entry;
         }
 
-        foreach($objectCursor as $curObject) {
-            $id = (string)$curObject['_id'];
-            $oid[$id] = $curObject;
-        }
+        $objectData = iterator_to_array($objectCursor);
+        foreach ($objectData as $curObject) {
+            $aclId = (string)$curObject['_id'];
+            $oid[$aclId] = $curObject;
 
-            foreach($oid as $aclId => $objectId) {
-                if(!isset($entries[$aclId])) {
-                    $parent = $curObject;
-                    while((string)$parent['_id']!=$aclId && isset($parent['parent'])) {
-                        if (isset($parent['parent'])) {
-                            $parent = $parent['parent'];
-                        }
+            if (!isset($entries[$aclId])) {
+                $parent = $curObject;
+                while ((string)$parent['_id'] != $aclId && isset($parent['parent'])) {
+                    if (isset($parent['parent'])) {
+                        $parent = $parent['parent'];
                     }
-                    $entries[$aclId][0] = array (
-                        'objectIdentity' => $parent,
-                        'fieldName' => null,
-                        'aceOrder' => null,
-                        'grantingStrategy' => null,
-                        'mask' => null,
-                        'granting' => null,
-                        'auditFailure' => null,
-                        'auditSuccess' => null,
-                    );
                 }
-                foreach($entries[$aclId] as $aceId => $entry) {
-//                    $oidId = $entry['objectIdentifier']['$id'];
-                    $objectIdentity   = $oid[$aclId];
-                    $classType        = $objectIdentity['type'];
-                    $objectIdentifier = $objectIdentity['identifier'];
-                    $fieldName        = isset($entry['fieldName']) ? $entry['fieldName'] : null;
-                    $aceOrder         = $entry['aceOrder'];
-                    $grantingStrategy = $entry['grantingStrategy'];
-                    $mask             = (integer)$entry['mask'];
-                    $granting         = $entry['granting'];
-                    $auditFailure     = $entry['auditFailure'];
-                    $auditSuccess     = $entry['auditSuccess'];
+                $entries[$aclId][0] = array(
+                    'objectIdentity' => $parent,
+                    'fieldName' => null,
+                    'aceOrder' => null,
+                    'grantingStrategy' => null,
+                    'mask' => null,
+                    'granting' => null,
+                    'auditFailure' => null,
+                    'auditSuccess' => null,
+                );
+            }
+            foreach ($entries[$aclId] as $aceId => $entry) {
+                $objectIdentity = $oid[$aclId];
+                $classType = $objectIdentity['type'];
+                $objectIdentifier = $objectIdentity['identifier'];
+                $fieldName = isset($entry['fieldName']) ? $entry['fieldName'] : null;
+                $aceOrder = $entry['aceOrder'];
+                $grantingStrategy = $entry['grantingStrategy'];
+                $mask = (integer)$entry['mask'];
+                $granting = $entry['granting'];
+                $auditFailure = $entry['auditFailure'];
+                $auditSuccess = $entry['auditSuccess'];
 
-                    // has the ACL been hydrated during this hydration cycle?
-                    if (isset($acls[$aclId])) {
-                        $acl = $acls[$aclId];
-                    }
+                // has the ACL been hydrated during this hydration cycle?
+                if (isset($acls[$aclId])) {
+                    $acl = $acls[$aclId];
+                }
                     // has the ACL been hydrated during any previous cycle, or was possibly loaded
                     // from cache?
-                    else if (isset($loadedAcls[$classType][$objectIdentifier])) {
-                        $acl = $loadedAcls[$classType][$objectIdentifier];
+                else if (isset($loadedAcls[$classType][$objectIdentifier])) {
+                    $acl = $loadedAcls[$classType][$objectIdentifier];
 
-                        // keep reference in local array (saves us some hash calculations)
-                        $acls[$aclId] = $acl;
+                    // keep reference in local array (saves us some hash calculations)
+                    $acls[$aclId] = $acl;
 
-                        // attach ACL to the result set; even though we do not enforce that every
-                        // object identity has only one instance, we must make sure to maintain
-                        // referential equality with the oids passed to findAcls()
-                        $oidLookupKey = $objectIdentifier.$classType;
-                        if (!isset($oidCache[$oidLookupKey])) {
-                            $oidCache[$oidLookupKey] = $acl->getObjectIdentity();
-                        }
-                        $result->attach($oidCache[$oidLookupKey], $acl);
+                    // attach ACL to the result set; even though we do not enforce that every
+                    // object identity has only one instance, we must make sure to maintain
+                    // referential equality with the oids passed to findAcls()
+                    $oidLookupKey = $objectIdentifier . $classType;
+                    if (!isset($oidCache[$oidLookupKey])) {
+                        $oidCache[$oidLookupKey] = $acl->getObjectIdentity();
                     }
+                    $result->attach($oidCache[$oidLookupKey], $acl);
+                }
 
                     // so, this hasn't been hydrated yet
-                    else {
-                        // create object identity if we haven't done so yet
-                        $oidLookupKey = $objectIdentifier.$classType;
-                        if (!isset($oidCache[$oidLookupKey])) {
-                            $oidCache[$oidLookupKey] = new ObjectIdentity($objectIdentifier, $classType);
-                        }
-
-                        $acl = new Acl($aclId, $oidCache[$oidLookupKey], $permissionGrantingStrategy, $emptyArray, !!$objectIdentity['entriesInheriting']);
-
-                        // keep a local, and global reference to this ACL
-                        $loadedAcls[$classType][$objectIdentifier] = $acl;
-                        $acls[$aclId] = $acl;
-
-                        // try to fill in parent ACL, or defer until all ACLs have been hydrated
-                        if (isset($objectIdentity['parent'])) {
-                            $parentObjectIdentityId = (string)$objectIdentity['parent']['_id'];
-                            if (isset($acls[$parentObjectIdentityId])) {
-                                $aclParentAclProperty->setValue($acl, $acls[$parentObjectIdentityId]);
-                            } else {
-                                $parentIdToFill->attach($acl, $parentObjectIdentityId);
-                            }
-                        }
-
-                        $result->attach($oidCache[$oidLookupKey], $acl);
+                else {
+                    // create object identity if we haven't done so yet
+                    $oidLookupKey = $objectIdentifier . $classType;
+                    if (!isset($oidCache[$oidLookupKey])) {
+                        $oidCache[$oidLookupKey] = new ObjectIdentity($objectIdentifier, $classType);
                     }
 
-                    // check if this row contains an ACE record
-                    if (0 !== $aceId) {
-                        // have we already hydrated ACEs for this ACL?
-                        if (!isset($aces[$aclId])) {
-                            $aces[$aclId] = array($emptyArray, $emptyArray, $emptyArray, $emptyArray);
+                    $acl = new Acl($aclId, $oidCache[$oidLookupKey], $permissionGrantingStrategy, $emptyArray, !!$objectIdentity['entriesInheriting']);
+
+                    // keep a local, and global reference to this ACL
+                    $loadedAcls[$classType][$objectIdentifier] = $acl;
+                    $acls[$aclId] = $acl;
+
+                    // try to fill in parent ACL, or defer until all ACLs have been hydrated
+                    if (isset($objectIdentity['parent'])) {
+                        $parentObjectIdentityId = (string)$objectIdentity['parent']['_id'];
+                        if (isset($acls[$parentObjectIdentityId])) {
+                            $aclParentAclProperty->setValue($acl, $acls[$parentObjectIdentityId]);
+                        } else {
+                            $parentIdToFill->attach($acl, $parentObjectIdentityId);
                         }
+                    }
 
-                        // has this ACE already been hydrated during a previous cycle, or
-                        // possible been loaded from cache?
-                        // It is important to only ever have one ACE instance per actual row since
-                        // some ACEs are shared between ACL instances
-                        if (!isset($loadedAces[$aceId])) {
-                            if (isset($entry['securityIdentity']['username'])) {
-                                $securityId = '1'.$entry['securityIdentity']['class'];
-                                if (!isset($sids[$securityId])) {
-                                    $sids[$securityId] = new UserSecurityIdentity(
-                                        $entry['securityIdentity']['username'],
-                                        $entry['securityIdentity']['class']
-                                    );
-                                }
-                            } else {
-                                $securityId = '0'.$entry['securityIdentity']['role'];
-                                if (!isset($sids[$securityId])) {
-                                    $sids[$securityId] = new RoleSecurityIdentity($entry['securityIdentity']['role']);
-                                }
-                            }
+                    $result->attach($oidCache[$oidLookupKey], $acl);
+                }
 
-                            if (null === $fieldName) {
-                                $loadedAces[$aceId] = new Entry($aceId, $acl, $sids[$securityId], $grantingStrategy, (integer) $mask, !!$granting, !!$auditFailure, !!$auditSuccess);
-                            } else {
-                                $loadedAces[$aceId] = new FieldEntry($aceId, $acl, $fieldName, $sids[$securityId], $grantingStrategy, (integer) $mask, !!$granting, !!$auditFailure, !!$auditSuccess);
-                            }
-                        }
-                        $ace = $loadedAces[$aceId];
+                // check if this row contains an ACE record
+                if (0 !== $aceId) {
+                    // have we already hydrated ACEs for this ACL?
+                    if (!isset($aces[$aclId])) {
+                        $aces[$aclId] = array($emptyArray, $emptyArray, $emptyArray, $emptyArray);
+                    }
 
-                        // assign ACE to the correct property
-                        if (null === $objectIdentity) {
-                            if (null === $fieldName) {
-                                $aces[$aclId][0][$aceOrder] = $ace;
-                            } else {
-                                $aces[$aclId][1][$fieldName][$aceOrder] = $ace;
+                    // has this ACE already been hydrated during a previous cycle, or
+                    // possible been loaded from cache?
+                    // It is important to only ever have one ACE instance per actual row since
+                    // some ACEs are shared between ACL instances
+                    if (!isset($loadedAces[$aceId])) {
+                        if (isset($entry['securityIdentity']['username'])) {
+                            $securityId = '1' . $entry['securityIdentity']['class'];
+                            if (!isset($sids[$securityId])) {
+                                $sids[$securityId] = new UserSecurityIdentity(
+                                    $entry['securityIdentity']['username'],
+                                    $entry['securityIdentity']['class']
+                                );
                             }
                         } else {
-                            if (null === $fieldName) {
-                                $aces[$aclId][2][$aceOrder] = $ace;
-                            } else {
-                                $aces[$aclId][3][$fieldName][$aceOrder] = $ace;
+                            $securityId = '0' . $entry['securityIdentity']['role'];
+                            if (!isset($sids[$securityId])) {
+                                $sids[$securityId] = new RoleSecurityIdentity($entry['securityIdentity']['role']);
                             }
+                        }
+
+                        if (null === $fieldName) {
+                            $loadedAces[$aceId] = new Entry($aceId, $acl, $sids[$securityId], $grantingStrategy, (integer)$mask, !!$granting, !!$auditFailure, !!$auditSuccess);
+                        } else {
+                            $loadedAces[$aceId] = new FieldEntry($aceId, $acl, $fieldName, $sids[$securityId], $grantingStrategy, (integer)$mask, !!$granting, !!$auditFailure, !!$auditSuccess);
+                        }
+                    }
+                    $ace = $loadedAces[$aceId];
+
+                    // assign ACE to the correct property
+                    if (null === $objectIdentity) {
+                        if (null === $fieldName) {
+                            $aces[$aclId][0][$aceOrder] = $ace;
+                        } else {
+                            $aces[$aclId][1][$fieldName][$aceOrder] = $ace;
+                        }
+                    } else {
+                        if (null === $fieldName) {
+                            $aces[$aclId][2][$aceOrder] = $ace;
+                        } else {
+                            $aces[$aclId][3][$fieldName][$aceOrder] = $ace;
                         }
                     }
                 }
             }
+        }
 
         // We do not sort on database level since we only want certain subsets to be sorted,
         // and we are going to read the entire result set anyway.
@@ -555,7 +556,7 @@ class AclProvider implements AclProviderInterface
         );
 
         $fields = array(
-          "_id" => true,
+            "_id" => true,
         );
         $id = $this->connection->selectCollection($this->options['oid_table_name'])->findOne($query, $fields);
         return $id ? array_pop($id) : null;

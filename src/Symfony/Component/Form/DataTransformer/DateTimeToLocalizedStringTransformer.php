@@ -38,19 +38,19 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 
     public function __construct($outputTimezone = null, $inputTimezone = null, $dateFormat = null, $timeFormat = null)
     {
-        if(is_null($inputTimezone)) {
+        if (is_null($inputTimezone)) {
             $inputTimezone = date_default_timezone_get();
         }
 
-        if(is_null($outputTimezone)) {
+        if (is_null($outputTimezone)) {
             $outputTimezone = date_default_timezone_get();
         }
 
-        if(is_null($dateFormat)) {
+        if (is_null($dateFormat)) {
             $dateFormat = \IntlDateFormatter::MEDIUM;
         }
 
-        if(is_null($timeFormat)) {
+        if (is_null($timeFormat)) {
             $timeFormat = \IntlDateFormatter::SHORT;
         }
 

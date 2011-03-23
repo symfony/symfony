@@ -35,19 +35,18 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
     private $pad;
 
     private $fields;
-    
+
     public function __construct($outputTimezone = null, $inputTimezone = null, $fields = null, $pad = false)
     {
-        if(is_null($inputTimezone)) {
+        if (is_null($inputTimezone)) {
             $inputTimezone = date_default_timezone_get();
         }
 
-        if(is_null($outputTimezone)) {
+        if (is_null($outputTimezone)) {
             $outputTimezone = date_default_timezone_get();
         }
 
-        if(is_null($fields))
-        {
+        if (is_null($fields)) {
             $fields = array('year', 'month', 'day', 'hour', 'minute', 'second');
         }
 

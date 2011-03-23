@@ -158,7 +158,7 @@ class MyTestFormConfig extends AbstractType
 
 class MyTestObject
 {
-    private $emails = 'test,foo,bar';
+    private $emails = 'test, foo, bar';
 }
 
 class MyTestSubFormConfig extends AbstractType

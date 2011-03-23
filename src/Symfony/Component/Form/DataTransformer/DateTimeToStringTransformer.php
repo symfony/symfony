@@ -30,11 +30,11 @@ class DateTimeToStringTransformer implements DataTransformerInterface
     
     public function __construct($outputTimezone = null, $format = 'Y-m-d H:i:s', $inputTimezone = null)
     {
-        if(is_null($inputTimezone)) {
+        if (is_null($inputTimezone)) {
             $inputTimezone = date_default_timezone_get();
         }
         
-        if(is_null($outputTimezone)) {
+        if (is_null($outputTimezone)) {
             $outputTimezone = date_default_timezone_get();
         }
 

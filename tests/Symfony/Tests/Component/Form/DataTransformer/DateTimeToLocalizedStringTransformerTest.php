@@ -247,13 +247,13 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
     {
         $this->setExpectedException('\InvalidArgumentException');
 
-        new DateTimeToLocalizedStringTransformer(null,null, 'foobar');
+        new DateTimeToLocalizedStringTransformer(null, null, 'foobar');
     }
 
     public function testValidateTimeFormatOption()
     {
         $this->setExpectedException('\InvalidArgumentException');
 
-        new DateTimeToLocalizedStringTransformer(null,null,null,'foobar');
+        new DateTimeToLocalizedStringTransformer(null, null, null, 'foobar');
     }
 }

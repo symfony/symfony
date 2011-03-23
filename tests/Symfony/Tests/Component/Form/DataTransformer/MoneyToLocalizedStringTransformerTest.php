@@ -27,14 +27,14 @@ class MoneyToLocalizedStringTransformerTest extends LocalizedTestCase
 
     public function testTransform()
     {
-        $transformer = new MoneyToLocalizedStringTransformer(null,null,null,100);
+        $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
 
         $this->assertEquals('1,23', $transformer->transform(123));
     }
 
     public function testTransformExpectsNumeric()
     {
-        $transformer = new MoneyToLocalizedStringTransformer(null,null,null,100);
+        $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
 
         $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
 
@@ -50,14 +50,14 @@ class MoneyToLocalizedStringTransformerTest extends LocalizedTestCase
 
     public function testReverseTransform()
     {
-        $transformer = new MoneyToLocalizedStringTransformer(null,null,null,100);
+        $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
 
         $this->assertEquals(123, $transformer->reverseTransform('1,23', null));
     }
 
     public function testReverseTransformExpectsString()
     {
-        $transformer = new MoneyToLocalizedStringTransformer(null,null,null,100);
+        $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
 
         $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
 

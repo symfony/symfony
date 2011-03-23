@@ -35,11 +35,11 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
 
     public function __construct($precision = null, $type = null)
     {
-        if(is_null($precision)) {
+        if (is_null($precision)) {
             $precision = 0;
         }
 
-        if(is_null($type)) {
+        if (is_null($type)) {
             $type = self::FRACTIONAL;
         }
 

@@ -24,7 +24,7 @@ use Symfony\Component\Config\FileLocator;
  */
 class AnnotationFileLoader extends FileLoader
 {
-    private $loader;
+    protected $loader;
 
     /**
      * Constructor.
@@ -86,7 +86,7 @@ class AnnotationFileLoader extends FileLoader
      *
      * @return string|false Full class name if found, false otherwise 
      */
-    private function findClass($file)
+    protected function findClass($file)
     {
         $class = false;
         $namespace = false;

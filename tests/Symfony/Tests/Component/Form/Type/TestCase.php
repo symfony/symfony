@@ -36,7 +36,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->theme = $this->getMock('Symfony\Component\Form\Renderer\Theme\FormThemeEngineInterface');
+        $this->theme = $this->getMock('Symfony\Component\Form\Renderer\ThemeEngine\FormThemeEngineInterface');
         $this->csrfProvider = $this->getMock('Symfony\Component\Form\CsrfProvider\CsrfProviderInterface');
         $this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');

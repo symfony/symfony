@@ -16,7 +16,7 @@ use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Type;
 use Symfony\Component\Form\Type\FormTypeInterface;
-use Symfony\Component\Form\Renderer\Theme\FormThemeEngineInterface;
+use Symfony\Component\Form\Renderer\ThemeEngine\FormThemeEngineInterface;
 use Symfony\Component\Form\Type\Loader\TypeLoaderInterface;
 use Symfony\Component\Form\Type\Loader\DefaultTypeLoader;
 use Symfony\Component\Form\Type\AbstractFieldType;

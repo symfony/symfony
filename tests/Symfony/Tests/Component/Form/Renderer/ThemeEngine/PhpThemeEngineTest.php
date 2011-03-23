@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Form\Renderer\Theme;
+namespace Symfony\Tests\Component\Form\Renderer\ThemeEngine;
 
-use Symfony\Component\Form\Renderer\Theme\PhpThemeEngine;
+use Symfony\Component\Form\Renderer\ThemeEngine\PhpThemeEngine;
 
 class PhpThemeEngineTest extends AbstractThemeEngineTest
 {

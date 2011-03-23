@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Type\Loader;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Type;
 use Symfony\Component\Form\Type\FormTypeInterface;
-use Symfony\Component\Form\Renderer\Theme\FormThemeEngineInterface;
+use Symfony\Component\Form\Renderer\ThemeEngine\FormThemeEngineInterface;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\File\TemporaryStorage;

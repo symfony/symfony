@@ -14,7 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Form;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\Exception\FormException;
-use Symfony\Component\Form\Renderer\Theme\FormThemeEngineInterface;
+use Symfony\Component\Form\Renderer\ThemeEngine\FormThemeEngineInterface;
 use Symfony\Component\Templating\PhpEngine;
 
 /**
@@ -39,15 +39,15 @@ class PhpTemplatingThemeEngine implements FormThemeEngineInterface
     /**
      * @var string
      */
-    private $template;
+    private $themePath;
 
     /**
      * @param PhpEngine $engine
      */
-    public function __construct(PhpEngine $engine, $template = null)
+    public function __construct(PhpEngine $engine, $themePath = null)
     {
         $this->engine = $engine;
-        $this->template = $template;
+        $this->themePath = $themePath;
     }
 
     public function render($field, $section, array $parameters)
@@ -67,7 +67,7 @@ class PhpTemplatingThemeEngine implements FormThemeEngineInterface
             return self::$cache[$templateName];
         }
 
-        $template = (($this->template) ? ($this->template.":") : "") . $templateName.'.html.php';
+        $template = (($this->themePath) ? ($this->themePath.":") : "") . $templateName.'.html.php';
         if (!$this->engine->exists($template)) {
             $template = false;
         }

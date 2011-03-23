@@ -47,11 +47,11 @@ class PhpMatcherDumper extends MatcherDumper
         ;
     }
 
-    protected function addMatcher()
+    private function addMatcher()
     {
         $code = array();
 
-        foreach ($this->routes->all() as $name => $route) {
+        foreach ($this->getRoutes()->all() as $name => $route) {
             $compiledRoute = $route->compile();
 
             $conditions = array();
@@ -139,7 +139,7 @@ $code
 EOF;
     }
 
-    protected function startClass($class, $baseClass)
+    private function startClass($class, $baseClass)
     {
         return <<<EOF
 <?php
@@ -159,7 +159,7 @@ class $class extends $baseClass
 EOF;
     }
 
-    protected function addConstructor()
+    private function addConstructor()
     {
         return <<<EOF
     /**
@@ -174,7 +174,7 @@ EOF;
 EOF;
     }
 
-    protected function endClass()
+    private function endClass()
     {
         return <<<EOF
 }

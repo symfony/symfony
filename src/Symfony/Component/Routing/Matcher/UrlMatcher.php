@@ -23,9 +23,10 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class UrlMatcher implements UrlMatcherInterface
 {
-    protected $routes;
     protected $defaults;
     protected $context;
+
+    private $routes;
 
     /**
      * Constructor.

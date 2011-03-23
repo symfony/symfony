@@ -62,7 +62,7 @@ class AnnotationGlobLoader extends AnnotationDirectoryLoader
      *
      * @return array An array of paths matching the glob pattern
      */
-    protected function getAbsolutePaths($glob)
+    private function getAbsolutePaths($glob)
     {
         $dirs = array();
         foreach ($this->paths as $path) {

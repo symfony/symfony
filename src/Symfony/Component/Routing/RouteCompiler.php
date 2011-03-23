@@ -119,7 +119,7 @@ class RouteCompiler implements RouteCompilerInterface
      *
      * @throws \InvalidArgumentException When route can't be parsed
      */
-    protected function tokenize()
+    private function tokenize()
     {
         $this->tokens = array();
         $buffer = $this->route->getPattern();
@@ -221,7 +221,7 @@ class RouteCompiler implements RouteCompilerInterface
     {
     }
 
-    protected function getOptions()
+    private function getOptions()
     {
         $options = $this->route->getOptions();
 

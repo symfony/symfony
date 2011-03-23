@@ -167,7 +167,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return array An array of libxml error strings
      */
-    protected function getXmlErrors()
+    private function getXmlErrors()
     {
         $errors = array();
         foreach (libxml_get_errors() as $error) {

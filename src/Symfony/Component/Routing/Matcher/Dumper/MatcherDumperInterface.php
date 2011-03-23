@@ -31,4 +31,11 @@ interface MatcherDumperInterface
      * @return string A PHP class representing the matcher class
      */
     function dump(array $options = array());
+
+    /**
+     * Gets the routes to match.
+     *
+     * @return RouteCollection A RouteCollection instance
+     */
+    function getRoutes();
 }

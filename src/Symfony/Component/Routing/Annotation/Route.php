@@ -18,11 +18,11 @@ namespace Symfony\Component\Routing\Annotation;
  */
 class Route
 {
-    protected $pattern;
-    protected $name;
-    protected $requirements;
-    protected $options;
-    protected $defaults;
+    private $pattern;
+    private $name;
+    private $requirements;
+    private $options;
+    private $defaults;
 
     /**
      * Constructor.

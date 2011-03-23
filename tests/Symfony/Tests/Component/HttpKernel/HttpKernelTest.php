@@ -123,6 +123,16 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $kernel->handle(new Request())->getContent());
     }
 
+    /**
+     * @expectedException Symfony\Component\HttpKernel\Exception\HttpException
+     */
+    public function testHandleConvertsAnErrorResponseInstanceToAnHttpException()
+    {
+        $kernel = new HttpKernel(new EventDispatcher(), $this->getResolver(function () { return new Response('Not Found', 404); }));
+
+        $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+    }
+
     protected function getResolver($controller = null)
     {
         if (null === $controller) {

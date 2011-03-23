@@ -13,6 +13,7 @@ namespace Symfony\Tests\Component\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
@@ -42,7 +43,12 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = false)
     {
         $this->catch = $catch;
-        return parent::handle($request, $type, $catch);
+
+        try {
+            return parent::handle($request, $type, $catch);
+        } catch (HttpException $e) {
+            return new Response('', $e->getStatusCode());
+        }
     }
 
     public function isCatchingExceptions()

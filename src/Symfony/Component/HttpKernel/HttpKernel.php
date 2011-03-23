@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -138,8 +139,12 @@ class HttpKernel implements HttpKernelInterface
      *
      * @throws \RuntimeException if the passed object is not a Response instance
      */
-    protected function filterResponse(Response $response, Request $request, $type)
+    protected function filterResponse(Response $response, Request $request, $type, $acceptErrors = false)
     {
+        if (HttpKernelInterface::MASTER_REQUEST === $type && !$acceptErrors && $response->isError()) {
+            return $this->handleException(new HttpException($response->getStatusCode(), '', $response->headers->all(), $response->getStatusMessage()), $request, $type);
+        }
+
         $event = new FilterResponseEvent($this, $request, $type, $response);
 
         $this->dispatcher->dispatch(Events::onCoreResponse, $event);
@@ -165,7 +170,7 @@ class HttpKernel implements HttpKernelInterface
             throw $e;
         }
 
-        return $this->filterResponse($event->getResponse(), $request, $type);
+        return $this->filterResponse($event->getResponse(), $request, $type, true);
     }
 
     protected function varToString($var)

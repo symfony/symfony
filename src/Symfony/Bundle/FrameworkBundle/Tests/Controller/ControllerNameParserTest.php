@@ -23,10 +23,7 @@ class ControllerNameParserTest extends TestCase
 {
     public function testParse()
     {
-        $kernel = new Kernel();
-        $kernel->boot();
-        $logger = new Logger();
-        $parser = new ControllerNameParser($kernel, $logger);
+        $parser = $this->createParser();
 
         $this->assertEquals('TestBundle\FooBundle\Controller\DefaultController::indexAction', $parser->parse('FooBundle:Default:index'), '->parse() converts a short a:b:c notation string to a class::method string');
         $this->assertEquals('TestBundle\FooBundle\Controller\Sub\DefaultController::indexAction', $parser->parse('FooBundle:Sub\Default:index'), '->parse() converts a short a:b:c notation string to a class::method string');
@@ -39,12 +36,37 @@ class ControllerNameParserTest extends TestCase
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->parse() throws an \InvalidArgumentException if the controller is not an a:b:c string');
         }
+    }
+
+    /**
+     * @dataProvider getMissingControllersTest
+     */
+    public function testMissingControllers($name)
+    {
+        $parser = $this->createParser();
 
         try {
-            $parser->parse('BarBundle:Default:index');
-            $this->fail('->parse() throws a \InvalidArgumentException if the class is found but does not exist');
+            $parser->parse($name);
+            $this->fail('->parse() throws a \InvalidArgumentException if the string is in the valid format, but not matching class can be found');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->parse() throws a \LogicException if the class is found but does not exist');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->parse() throws a \InvalidArgumentException if the class is found but does not exist');
         }
+    }
+
+    public function getMissingControllersTest()
+    {
+        return array(
+            array('FooBundle:Fake:index'),          // a normal bundle
+            array('SensioFooBundle:Fake:index'),    // a bundle with children
+        );
+    }
+
+    private function createParser()
+    {
+        $kernel = new Kernel();
+        $kernel->boot();
+        $logger = new Logger();
+
+        return new ControllerNameParser($kernel, $logger);
     }
 }

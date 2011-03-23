@@ -169,7 +169,7 @@ class FlattenException
         }
     }
 
-    protected function flattenArgs($args)
+    private function flattenArgs($args)
     {
         $result = array();
         foreach ($args as $key => $value) {

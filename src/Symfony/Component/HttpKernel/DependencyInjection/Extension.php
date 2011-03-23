@@ -22,8 +22,8 @@ use Symfony\Component\DependencyInjection\Container;
  */
 abstract class Extension implements ExtensionInterface
 {
-    protected $classes = array();
-    protected $classMap = array();
+    private $classes = array();
+    private $classMap = array();
 
     /**
      * Gets the classes to cache.
@@ -40,7 +40,7 @@ abstract class Extension implements ExtensionInterface
      *
      * @param array $classes An array of classes
      */
-    protected function addClassesToCompile(array $classes)
+    public function addClassesToCompile(array $classes)
     {
         $this->classes = array_merge($this->classes, $classes);
     }

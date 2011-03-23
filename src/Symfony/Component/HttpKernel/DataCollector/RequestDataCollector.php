@@ -122,7 +122,7 @@ class RequestDataCollector extends DataCollector
         return 'request';
     }
 
-    protected function getCookieHeader($name, $value, $expires, $path, $domain, $secure, $httponly)
+    private function getCookieHeader($name, $value, $expires, $path, $domain, $secure, $httponly)
     {
         $cookie = sprintf('%s=%s', $name, urlencode($value));
 

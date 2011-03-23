@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ResponseListener
 {
-    protected $charset;
+    private $charset;
 
     public function __construct($charset)
     {

@@ -26,8 +26,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ExceptionListener
 {
-    protected $controller;
-    protected $logger;
+    private $controller;
+    private $logger;
 
     public function __construct($controller, LoggerInterface $logger = null)
     {

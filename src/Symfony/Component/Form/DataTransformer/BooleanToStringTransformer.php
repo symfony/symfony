@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\DataTransformer;
 
-use Symfony\Component\Form\Configurable;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
@@ -20,7 +19,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
-class BooleanToStringTransformer extends Configurable implements DataTransformerInterface
+class BooleanToStringTransformer implements DataTransformerInterface
 {
     /**
      * Transforms a Boolean into a string.

@@ -18,10 +18,7 @@ class PercentType extends AbstractType
 {
     public function configure(FormBuilder $builder, array $options)
     {
-        $builder->setClientTransformer(new PercentToLocalizedStringTransformer(array(
-                'precision' => $options['precision'],
-                'type' => $options['type'],
-            )));
+        $builder->setClientTransformer(new PercentToLocalizedStringTransformer($options['precision'], $options['type']));
     }
 
     public function getDefaultOptions(array $options)

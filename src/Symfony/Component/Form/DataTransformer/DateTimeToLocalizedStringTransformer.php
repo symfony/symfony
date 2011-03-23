@@ -27,25 +27,45 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 {
-    /**
-     * {@inheritDoc}
-     */
-    protected function configure()
+
+    private $inputTimezone;
+
+    private $outputTimezone;
+    
+    private $dateFormat;
+
+    private $timeFormat;
+
+    public function __construct($outputTimezone = null, $inputTimezone = null, $dateFormat = null, $timeFormat = null)
     {
-        $this->addOption('date_format', \IntlDateFormatter::MEDIUM);
-        $this->addOption('time_format', \IntlDateFormatter::SHORT);
-        $this->addOption('input_timezone', 'UTC');
-        $this->addOption('output_timezone', 'UTC');
-
-        if (!in_array($this->getOption('date_format'), self::$formats, true)) {
-            throw new \InvalidArgumentException(sprintf('The option "date_format" is expected to be one of "%s". Is "%s"', implode('", "', self::$formats), $this->getOption('time_format')));
+        if(is_null($inputTimezone)) {
+            $inputTimezone = date_default_timezone_get();
         }
 
-        if (!in_array($this->getOption('time_format'), self::$formats, true)) {
-            throw new \InvalidArgumentException(sprintf('The option "time_format" is expected to be one of "%s". Is "%s"', implode('", "', self::$formats), $this->getOption('time_format')));
+        if(is_null($outputTimezone)) {
+            $outputTimezone = date_default_timezone_get();
         }
 
-        parent::configure();
+        if(is_null($dateFormat)) {
+            $dateFormat = \IntlDateFormatter::MEDIUM;
+        }
+
+        if(is_null($timeFormat)) {
+            $timeFormat = \IntlDateFormatter::SHORT;
+        }
+
+        if (!in_array($dateFormat, self::$formats, true)) {
+            throw new \InvalidArgumentException(sprintf('The value $dateFormat is expected to be one of "%s". Is "%s"', implode('", "', self::$formats), $dateFormat));
+        }
+
+        if (!in_array($timeFormat, self::$formats, true)) {
+            throw new \InvalidArgumentException(sprintf('The value $timeFormat is expected to be one of "%s". Is "%s"', implode('", "', self::$formats), $timeFormat));
+        }
+        
+        $this->inputTimezone = $inputTimezone;
+        $this->outputTimezone = $outputTimezone;
+        $this->dateFormat = $dateFormat;
+        $this->timeFormat = $timeFormat;
     }
 
     /**
@@ -64,7 +84,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
             throw new UnexpectedTypeException($dateTime, '\DateTime');
         }
 
-        $inputTimezone = $this->getOption('input_timezone');
+        $inputTimezone = $this->inputTimezone;
 
         // convert time to UTC before passing it to the formatter
         if ('UTC' != $inputTimezone) {
@@ -88,7 +108,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      */
     public function reverseTransform($value)
     {
-        $inputTimezone = $this->getOption('input_timezone');
+        $inputTimezone = $this->inputTimezone;
 
         if (!is_string($value)) {
             throw new UnexpectedTypeException($value, 'string');
@@ -121,9 +141,9 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      */
     protected function getIntlDateFormatter()
     {
-        $dateFormat = $this->getOption('date_format');
-        $timeFormat = $this->getOption('time_format');
-        $timezone = $this->getOption('output_timezone');
+        $dateFormat = $this->dateFormat;
+        $timeFormat = $this->timeFormat;
+        $timezone = $this->outputTimezone;
 
         return new \IntlDateFormatter(\Locale::getDefault(), $dateFormat, $timeFormat, $timezone);
     }

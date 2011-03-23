@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\DataTransformer;
 
-use Symfony\Component\Form\Configurable;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
@@ -20,18 +19,28 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
-class DateTimeToStringTransformer extends Configurable implements DataTransformerInterface
+class DateTimeToStringTransformer implements DataTransformerInterface
 {
-    /**
-     * {@inheritDoc}
-     */
-    protected function configure()
-    {
-        $this->addOption('input_timezone', date_default_timezone_get());
-        $this->addOption('output_timezone', date_default_timezone_get());
-        $this->addOption('format', 'Y-m-d H:i:s');
 
-        parent::configure();
+    private $inputTimezone;
+
+    private $outputTimezone;
+
+    private $format;
+    
+    public function __construct($outputTimezone = null, $format = 'Y-m-d H:i:s', $inputTimezone = null)
+    {
+        if(is_null($inputTimezone)) {
+            $inputTimezone = date_default_timezone_get();
+        }
+        
+        if(is_null($outputTimezone)) {
+            $outputTimezone = date_default_timezone_get();
+        }
+
+        $this->format = $format;
+        $this->inputTimezone = $inputTimezone;
+        $this->outputTimezone = $outputTimezone;
     }
 
     /**
@@ -51,9 +60,9 @@ class DateTimeToStringTransformer extends Configurable implements DataTransforme
             throw new UnexpectedTypeException($value, '\DateTime');
         }
 
-        $value->setTimezone(new \DateTimeZone($this->getOption('output_timezone')));
+        $value->setTimezone(new \DateTimeZone($this->outputTimezone));
 
-        return $value->format($this->getOption('format'));
+        return $value->format($this->format);
     }
 
     /**
@@ -72,8 +81,8 @@ class DateTimeToStringTransformer extends Configurable implements DataTransforme
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        $outputTimezone = $this->getOption('output_timezone');
-        $inputTimezone = $this->getOption('input_timezone');
+        $outputTimezone = $this->outputTimezone;
+        $inputTimezone = $this->inputTimezone;
 
         try {
             $dateTime = new \DateTime("$value $outputTimezone");

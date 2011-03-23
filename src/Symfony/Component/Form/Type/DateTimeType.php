@@ -69,11 +69,7 @@ class DateTimeType extends AbstractType
         }
 
         $builder->setClientTransformer(new DataTransformerChain(array(
-                new DateTimeToArrayTransformer(array(
-                    'input_timezone' => $options['data_timezone'],
-                    'output_timezone' => $options['user_timezone'],
-                    'fields' => $parts,
-                )),
+                new DateTimeToArrayTransformer($options['user_timezone'], $options['data_timezone'], $parts),
                 new ArrayToPartsTransformer(array(
                     'date' => array('year', 'month', 'day'),
                     'time' => $timeParts,
@@ -84,26 +80,15 @@ class DateTimeType extends AbstractType
 
         if ($options['input'] === 'string') {
             $builder->setNormTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer(array(
-                    'format' => 'Y-m-d H:i:s',
-                    'input_timezone' => $options['data_timezone'],
-                    'output_timezone' => $options['data_timezone'],
-                ))
+                new DateTimeToStringTransformer($options['data_timezone'], 'Y-m-d H:i:s', $options['data_timezone'])
             ));
         } else if ($options['input'] === 'timestamp') {
             $builder->setNormTransformer(new ReversedTransformer(
-                new DateTimeToTimestampTransformer(array(
-                    'input_timezone' => $options['data_timezone'],
-                    'output_timezone' => $options['data_timezone'],
-                ))
+                new DateTimeToTimestampTransformer($options['data_timezone'], $options['data_timezone'])
             ));
         } else if ($options['input'] === 'array') {
             $builder->setNormTransformer(new ReversedTransformer(
-                new DateTimeToArrayTransformer(array(
-                    'input_timezone' => $options['data_timezone'],
-                    'output_timezone' => $options['data_timezone'],
-                    'fields' => $parts,
-                ))
+                new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], $parts)
             ));
         }
     }

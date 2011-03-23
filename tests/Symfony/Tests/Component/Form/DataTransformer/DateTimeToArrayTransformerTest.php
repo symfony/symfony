@@ -19,10 +19,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 {
     public function testTransform()
     {
-        $transformer = new DateTimeToArrayTransformer(array(
-            'input_timezone' => 'UTC',
-            'output_timezone' => 'UTC',
-        ));
+        $transformer = new DateTimeToArrayTransformer('UTC', 'UTC');
 
         $input = new \DateTime('2010-02-03 04:05:06 UTC');
 
@@ -56,9 +53,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
     public function testTransform_empty_withFields()
     {
-        $transformer = new DateTimeToArrayTransformer(array(
-            'fields' => array('year', 'minute', 'second'),
-        ));
+        $transformer = new DateTimeToArrayTransformer(null, null, array('year', 'minute', 'second'));
 
         $output = array(
             'year' => '',
@@ -71,11 +66,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
     public function testTransform_withFields()
     {
-        $transformer = new DateTimeToArrayTransformer(array(
-            'input_timezone' => 'UTC',
-            'output_timezone' => 'UTC',
-            'fields' => array('year', 'month', 'minute', 'second'),
-        ));
+        $transformer = new DateTimeToArrayTransformer('UTC', 'UTC', array('year', 'month', 'minute', 'second'));
 
         $input = new \DateTime('2010-02-03 04:05:06 UTC');
 
@@ -91,11 +82,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
     public function testTransform_withPadding()
     {
-        $transformer = new DateTimeToArrayTransformer(array(
-            'input_timezone' => 'UTC',
-            'output_timezone' => 'UTC',
-            'pad' => true,
-        ));
+        $transformer = new DateTimeToArrayTransformer('UTC', 'UTC', null, true);
 
         $input = new \DateTime('2010-02-03 04:05:06 UTC');
 
@@ -113,10 +100,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
     public function testTransform_differentTimezones()
     {
-        $transformer = new DateTimeToArrayTransformer(array(
-            'input_timezone' => 'America/New_York',
-            'output_timezone' => 'Asia/Hong_Kong',
-        ));
+        $transformer = new DateTimeToArrayTransformer('Asia/Hong_Kong', 'America/New_York');
 
         $input = new \DateTime('2010-02-03 04:05:06 America/New_York');
 
@@ -145,10 +129,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
     public function testReverseTransform()
     {
-        $transformer = new DateTimeToArrayTransformer(array(
-            'input_timezone' => 'UTC',
-            'output_timezone' => 'UTC',
-        ));
+        $transformer = new DateTimeToArrayTransformer('UTC', 'UTC');
 
         $input = array(
             'year' => '2010',
@@ -182,9 +163,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
     public function testReverseTransform_completelyEmpty_subsetOfFields()
     {
-        $transformer = new DateTimeToArrayTransformer(array(
-            'fields' => array('year', 'month', 'day')
-        ));
+        $transformer = new DateTimeToArrayTransformer(null, null, array('year', 'month', 'day'));
 
         $input = array(
             'year' => '',
@@ -294,10 +273,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
     public function testReverseTransform_differentTimezones()
     {
-        $transformer = new DateTimeToArrayTransformer(array(
-            'input_timezone' => 'America/New_York',
-            'output_timezone' => 'Asia/Hong_Kong',
-        ));
+        $transformer = new DateTimeToArrayTransformer('Asia/Hong_Kong', 'America/New_York');
 
         $input = array(
             'year' => '2010',
@@ -316,10 +292,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
     public function testReverseTransformToDifferentTimezone()
     {
-        $transformer = new DateTimeToArrayTransformer(array(
-            'input_timezone' => 'Asia/Hong_Kong',
-            'output_timezone' => 'UTC',
-        ));
+        $transformer = new DateTimeToArrayTransformer('UTC', 'Asia/Hong_Kong');
 
         $input = array(
             'year' => '2010',

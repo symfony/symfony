@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\DataTransformer;
 
-use Symfony\Component\Form\Configurable;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
@@ -21,7 +20,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
-class NumberToLocalizedStringTransformer extends Configurable implements DataTransformerInterface
+class NumberToLocalizedStringTransformer implements DataTransformerInterface
 {
     const ROUND_FLOOR    = \NumberFormatter::ROUND_FLOOR;
     const ROUND_DOWN     = \NumberFormatter::ROUND_DOWN;
@@ -31,16 +30,25 @@ class NumberToLocalizedStringTransformer extends Configurable implements DataTra
     const ROUND_UP       = \NumberFormatter::ROUND_UP;
     const ROUND_CEILING  = \NumberFormatter::ROUND_CEILING;
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function configure()
-    {
-        $this->addOption('precision', null);
-        $this->addOption('grouping', false);
-        $this->addOption('rounding-mode', self::ROUND_HALFUP);
+    protected $precision;
 
-        parent::configure();
+    protected $grouping;
+
+    protected $roundingMode;
+
+    public function __construct($precision = null, $grouping = null, $roundingMode = null)
+    {
+        if(is_null($grouping)) {
+            $grouping = false;
+        }
+
+        if(is_null($roundingMode)) {
+            $roundingMode = self::ROUND_HALFUP;
+        }
+
+        $this->precision = $precision;
+        $this->grouping = $grouping;
+        $this->roundingMode = $roundingMode;
     }
 
     /**
@@ -103,12 +111,12 @@ class NumberToLocalizedStringTransformer extends Configurable implements DataTra
     {
         $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
 
-        if ($this->getOption('precision') !== null) {
-            $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->getOption('precision'));
-            $formatter->setAttribute(\NumberFormatter::ROUNDING_MODE, $this->getOption('rounding-mode'));
+        if ($this->precision !== null) {
+            $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->precision);
+            $formatter->setAttribute(\NumberFormatter::ROUNDING_MODE, $this->roundingMode);
         }
 
-        $formatter->setAttribute(\NumberFormatter::GROUPING_USED, $this->getOption('grouping'));
+        $formatter->setAttribute(\NumberFormatter::GROUPING_USED, $this->grouping);
 
         return $formatter;
     }

@@ -21,7 +21,8 @@ use Symfony\Component\Config\FileLocatorInterface;
 abstract class FileLoader extends Loader
 {
     protected $locator;
-    protected $currentDir;
+
+    private $currentDir;
 
     /**
      * Constructor.
@@ -29,6 +30,11 @@ abstract class FileLoader extends Loader
     public function __construct(FileLocatorInterface $locator)
     {
         $this->locator = $locator;
+    }
+
+    public function setCurrentDir($dir)
+    {
+        $this->currentDir = $dir;
     }
 
     public function getLocator()

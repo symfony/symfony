@@ -85,7 +85,7 @@ class FileLocator implements FileLocatorInterface
      *
      * @return Boolean
      */
-    protected function isAbsolutePath($file)
+    private function isAbsolutePath($file)
     {
         if ($file[0] == '/' || $file[0] == '\\'
             || (strlen($file) > 3 && ctype_alpha($file[0])

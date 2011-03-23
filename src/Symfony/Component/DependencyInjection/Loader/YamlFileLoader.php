@@ -96,7 +96,7 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach ($content['imports'] as $import) {
-            $this->currentDir = dirname($file);
+            $this->setCurrentDir(dirname($file));
             $this->import($import['resource'], isset($import['ignore_errors']) ? (Boolean) $import['ignore_errors'] : false);
         }
     }

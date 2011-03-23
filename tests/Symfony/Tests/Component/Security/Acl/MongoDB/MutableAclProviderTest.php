@@ -79,7 +79,8 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         try {
             $provider->findAcl($oid);
             $this->fail('ACL has not been properly deleted.');
-        } catch (AclNotFoundException $notFound) { }
+        } catch (AclNotFoundException $notFound) {
+        }
     }
 
     public function testDeleteAclDeletesChildren()
@@ -94,7 +95,8 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         try {
             $provider->findAcl(new ObjectIdentity(1, 'Foo'));
             $this->fail('Child-ACLs have not been deleted.');
-        } catch (AclNotFoundException $notFound) { }
+        } catch (AclNotFoundException $notFound) {
+        }
     }
 
     public function testFindAclsAddsPropertyListener()
@@ -131,16 +133,16 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
     {
         $provider = $this->getProvider();
         $this->importAcls($provider, array(
-            'main' => array(
-                'object_identifier' => '1',
-                'class_type' => 'foo',
-                'parent_acl' => 'parent',
-            ),
-            'parent' => array(
-                'object_identifier' => '1',
-                'class_type' => 'anotherFoo',
-            )
-        ));
+                                          'main' => array(
+                                              'object_identifier' => '1',
+                                              'class_type' => 'foo',
+                                              'parent_acl' => 'parent',
+                                          ),
+                                          'parent' => array(
+                                              'object_identifier' => '1',
+                                              'class_type' => 'anotherFoo',
+                                          )
+                                     ));
 
         $propertyChanges = $this->getField($provider, 'propertyChanges');
         $this->assertEquals(0, count($propertyChanges));
@@ -245,12 +247,11 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
             $this->con, new PermissionGrantingStrategy(), array(),
         );
         $provider = $this->getMockBuilder('Symfony\Component\Security\Acl\MongoDB\MutableAclProvider')
-            ->setConstructorArgs($args)
-            ->getMock();
+                ->setConstructorArgs($args)
+                ->getMock();
         $provider
-            ->expects($this->never())
-            ->method('updateObjectIdentity')
-        ;
+                ->expects($this->never())
+                ->method('updateObjectIdentity');
         $acl = new Acl(1, new ObjectIdentity(1, 'Foo'), new PermissionGrantingStrategy(), array(), true);
         $propertyChanges = $this->getField($provider, 'propertyChanges');
         $propertyChanges->offsetSet($acl, array());
@@ -279,7 +280,8 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         try {
             $provider->updateAcl($acl1);
             $this->fail('Provider failed to detect a concurrent modification.');
-        } catch (ConcurrentModificationException $ex) { }
+        } catch (ConcurrentModificationException $ex) {
+        }
     }
 
     public function testUpdateAcl()
@@ -341,7 +343,8 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
      * @throws \InvalidArgumentException
      * @throws Exception
      */
-    protected function importAcls(AclProvider $provider, array $data) {
+    protected function importAcls(AclProvider $provider, array $data)
+    {
         $aclIds = $parentAcls = array();
 
 
@@ -416,7 +419,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         if (!class_exists('Doctrine\MongoDB\Connection')) {
             $this->markTestSkipped('Doctrine2 MongoDB is required for this test');
         }
-        $database='aclTest';
+        $database = 'aclTest';
         $mongo = new \Doctrine\MongoDB\Connection();
         $this->con = $mongo->selectDatabase($database);
     }

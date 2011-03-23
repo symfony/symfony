@@ -235,6 +235,16 @@ class Response
     }
 
     /**
+     * Retrieves status message for the current web response.
+     *
+     * @return string Status message
+     */
+    public function getStatusMessage()
+    {
+        return $this->statusText;
+    }
+
+    /**
      * Sets response charset.
      *
      * @param string $charset Character set
@@ -718,6 +728,11 @@ class Response
     public function isServerError()
     {
         return $this->statusCode >= 500 && $this->statusCode < 600;
+    }
+
+    public function isError()
+    {
+        return $this->statusCode >= 400 && $this->statusCode < 600;
     }
 
     public function isOk()

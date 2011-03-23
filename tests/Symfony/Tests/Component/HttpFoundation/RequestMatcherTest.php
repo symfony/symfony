@@ -50,8 +50,15 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
     {
         $matcher = new RequestMatcher();
 
-        $matcher->matchHost('.*\.example\.com');
         $request = Request::create('', 'get', array(), array(), array(), array('HTTP_HOST' => 'foo.example.com'));
+
+        $matcher->matchHost('.*\.example\.com');
+        $this->assertTrue($matcher->matches($request));
+
+        $matcher->matchHost('\.example\.com$');
+        $this->assertTrue($matcher->matches($request));
+
+        $matcher->matchHost('^.*\.example\.com$');
         $this->assertTrue($matcher->matches($request));
 
         $matcher->matchMethod('.*\.sensio\.com');
@@ -62,11 +69,39 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
     {
         $matcher = new RequestMatcher();
 
-        $matcher->matchPath('/admin/.*');
         $request = Request::create('/admin/foo');
+
+        $matcher->matchPath('/admin/.*');
+        $this->assertTrue($matcher->matches($request));
+
+        $matcher->matchPath('/admin');
+        $this->assertTrue($matcher->matches($request));
+
+        $matcher->matchPath('^/admin/.*$');
         $this->assertTrue($matcher->matches($request));
 
         $matcher->matchMethod('/blog/.*');
         $this->assertFalse($matcher->matches($request));
     }
+
+    public function testAttributes()
+    {
+        $matcher = new RequestMatcher();
+
+        $request = Request::create('/admin/foo');
+        $request->attributes->set('foo', 'foo_bar');
+
+        $matcher->matchAttribute('foo', 'foo_.*');
+        $this->assertTrue($matcher->matches($request));
+
+        $matcher->matchAttribute('foo', 'foo');
+        $this->assertTrue($matcher->matches($request));
+
+        $matcher->matchAttribute('foo', '^foo_bar$');
+        $this->assertTrue($matcher->matches($request));
+
+        $matcher->matchAttribute('foo', 'babar');
+        $this->assertFalse($matcher->matches($request));
+    }
 }
+

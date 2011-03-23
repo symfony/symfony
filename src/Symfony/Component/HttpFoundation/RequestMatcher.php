@@ -100,16 +100,16 @@ class RequestMatcher implements RequestMatcherInterface
         }
 
         foreach ($this->attributes as $key => $pattern) {
-            if (!preg_match('#^'.$pattern.'$#', $request->attributes->get($key))) {
+            if (!preg_match('#'.str_replace('#', '\\#', $pattern).'#', $request->attributes->get($key))) {
                 return false;
             }
         }
 
-        if (null !== $this->path && !preg_match('#^'.$this->path.'$#', $request->getPathInfo())) {
+        if (null !== $this->path && !preg_match('#'.str_replace('#', '\\#', $this->path).'#', $request->getPathInfo())) {
             return false;
         }
 
-        if (null !== $this->host && !preg_match('#^'.$this->host.'$#', $request->getHost())) {
+        if (null !== $this->host && !preg_match('#'.str_replace('#', '\\#', $this->host).'#', $request->getHost())) {
             return false;
         }
 

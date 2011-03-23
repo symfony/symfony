@@ -77,13 +77,13 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         foreach ($children as $child) {
             $childId = $child['_id'];
             $removable[(string)$childId] = $childId;
-            foreach($child['ancestors'] as $ancestor) {
+            foreach ($child['ancestors'] as $ancestor) {
                 $removable[(string)$ancestor] = $ancestor;
             }
         }
 
         $query = array(
-            '_id' => array('$in'=>$removable),
+            '_id' => array('$in' => $removable),
         );
         $this->connection->selectCollection($this->options['oid_table_name'])->remove($query);
         $this->deleteAccessControlEntries($removable);
@@ -92,13 +92,13 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         // TODO maybe just use the id for the key in the loadedAcls
         foreach ($removable as $mongoId) {
             $id = (string)$mongoId;
-            foreach($this->loadedAcls as $type) {
+            foreach ($this->loadedAcls as $type) {
                 foreach ($type as $identifier) {
                     if ($id == $identifier->getId()) {
                         $oid = $identifier->getObjectIdentity();
                         // evict the ACL from any caches
                         if (null !== $this->aclCache) {
-                            $this->aclCache->evictFromCacheByIdentity();
+                            $this->aclCache->evictFromCacheByIdentity($oid);
                         }
                         $this->propertyChanges->offsetUnset($this->loadedAcls[$oid->getType()][$oid->getIdentifier()]);
                         unset($this->loadedAcls[$oid->getType()][$oid->getIdentifier()]);
@@ -278,7 +278,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
                 $propertyChanges['aces'] = new \SplObjectStorage();
             }
 
-            $acePropertyChanges = $propertyChanges['aces']->contains($ace)? $propertyChanges['aces']->offsetGet($ace) : array();
+            $acePropertyChanges = $propertyChanges['aces']->contains($ace) ? $propertyChanges['aces']->offsetGet($ace) : array();
 
             if (isset($acePropertyChanges[$propertyName])) {
                 $oldValue = $acePropertyChanges[$propertyName][0];
@@ -306,7 +306,6 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     }
 
 
-
     /**
      * Creates the ACL for the passed object identity
      *
@@ -315,17 +314,16 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      * @param ObjectIdentityInterface $parent
      * @return void
      */
-    protected function createObjectIdentity(ObjectIdentityInterface $oid, $entriesInheriting=false, ObjectIdentityInterface $parent=null)
+    protected function createObjectIdentity(ObjectIdentityInterface $oid, $entriesInheriting = false, ObjectIdentityInterface $parent = null)
     {
-        // TODO are entriesInheriting and parent necessary?
-        $data['identifier']        = $oid->getIdentifier();
-        $data['type']              = $oid->getType();
+        $data['identifier'] = $oid->getIdentifier();
+        $data['type'] = $oid->getType();
         $data['entriesInheriting'] = $entriesInheriting;
 
-        if($parent) {
+        if ($parent) {
             $ancestors = array();
             $parentDocument = $this->getObjectIdentity($parent);
-            if( isset($parent['ancestors'])) {
+            if (isset($parent['ancestors'])) {
                 $ancestors = $parentDocument['ancestors'];
             }
             $ancestors[] = $parentDocument['_id'];
@@ -405,7 +403,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         list($old, $new) = $changes;
 
         $currentIds = array();
-        for ($i=0,$c=count($new); $i<$c; $i++) {
+        for ($i = 0, $c = count($new); $i < $c; $i++) {
             $ace = $new[$i];
 
             if (null === $ace->getId()) {
@@ -424,7 +422,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             }
         }
 
-        for ($i=0,$c=count($old); $i<$c; $i++) {
+        for ($i = 0, $c = count($old); $i < $c; $i++) {
             $ace = $old[$i];
 
             if (!isset($currentIds[$ace->getId()])) {
@@ -444,7 +442,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     protected function getSecurityIdentityQuery(SecurityIdentityInterface $sid)
     {
         if ($sid instanceof UserSecurityIdentity) {
-            return array('username' => $sid->getUsername(),'class' => $sid->getClass());
+            return array('username' => $sid->getUsername(), 'class' => $sid->getClass());
         } else if ($sid instanceof RoleSecurityIdentity) {
             return array('role' => $sid->getRole());
         } else {
@@ -534,7 +532,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             $criteria = array(
                 '_id' => new \MongoId($ace->getId()),
             );
-            $this->connection->selectCollection($this->options['entry_table_name'])->update($criteria, array('$set'=>$update));
+            $this->connection->selectCollection($this->options['entry_table_name'])->update($criteria, array('$set' => $update));
         }
     }
 }

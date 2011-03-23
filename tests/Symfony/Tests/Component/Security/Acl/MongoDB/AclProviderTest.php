@@ -24,7 +24,7 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             $this->fail('Provider did not throw an expected exception.');
         } catch (\Exception $ex) {
             $this->assertInstanceOf('Symfony\Component\Security\Acl\Exception\AclNotFoundException', $ex);
-            $this->assertEquals('There is no ACL for the given object identity.',$ex->getMessage());
+            $this->assertEquals('There is no ACL for the given object identity.', $ex->getMessage());
         }
     }
 
@@ -151,10 +151,10 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             $query['identifier'] = $data[2];
             $query['type'] = $classes[$classId]['classType'];
             $parentId = $data[3];
-            if($parentId) {
+            if ($parentId) {
                 $parent = $this->oids[$parentId];
-                if( isset($parent['ancestors'])) {
-                  $ancestors = $parent['ancestors'];
+                if (isset($parent['ancestors'])) {
+                    $ancestors = $parent['ancestors'];
                 }
                 $ancestors[] = $parent['_id'];
                 $query['ancestors'] = $ancestors;
@@ -164,7 +164,7 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             $this->oidCollection->insert($query);
             $this->oids[$id] = $query;
         }
-        
+
         $fields = array('id', 'class', 'objectIdentity', 'fieldName', 'aceOrder', 'securityIdentity', 'mask', 'granting', 'grantingStrategy', 'auditSuccess', 'auditFailure');
         $this->entryCollection = $this->con->selectCollection($options['entry_table_name']);
         foreach ($this->getEntryData() as $data) {
@@ -177,7 +177,7 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
                 '$id' => $this->oids[$oid]['_id'],
             );
             $sid = $query['securityIdentity'];
-            if($sid) {
+            if ($sid) {
                 $query['securityIdentity'] = $sids[$sid];
             }
             $this->entryCollection->insert($query);
@@ -227,9 +227,9 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('id' => 1, 'class' => 'SomeClass', 'username' => 'john.doe'),
-            array('id' => 2, 'class' => 'MyClass',   'username' => 'john.doe@foo.com'),
-            array('id' => 3, 'class' => 'FooClass',  'username' => '123'),
-            array('id' => 4, 'class' => 'MooClass',  'username' => 'ROLE_USER'),
+            array('id' => 2, 'class' => 'MyClass', 'username' => 'john.doe@foo.com'),
+            array('id' => 3, 'class' => 'FooClass', 'username' => '123'),
+            array('id' => 4, 'class' => 'MooClass', 'username' => 'ROLE_USER'),
             array('id' => 5, 'role' => 'ROLE_USER'),
             array('id' => 6, 'role' => 'IS_AUTHENTICATED_FULLY'),
         );

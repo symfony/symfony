@@ -19,26 +19,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
-class DateTimeToTimestampTransformer implements DataTransformerInterface
+class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
 {
-    private $inputTimezone;
-
-    private $outputTimezone;
-
-    public function __construct($outputTimezone = null, $inputTimezone = null)
-    {
-        if (is_null($inputTimezone)) {
-            $inputTimezone = date_default_timezone_get();
-        }
-
-        if (is_null($outputTimezone)) {
-            $outputTimezone = date_default_timezone_get();
-        }
-
-        $this->inputTimezone = $inputTimezone;
-        $this->outputTimezone = $outputTimezone;
-    }
-
     /**
      * Transforms a DateTime object into a timestamp in the configured timezone
      *

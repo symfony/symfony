@@ -69,7 +69,7 @@ class DateTimeType extends AbstractType
         }
 
         $builder->setClientTransformer(new DataTransformerChain(array(
-                new DateTimeToArrayTransformer($options['user_timezone'], $options['data_timezone'], $parts),
+                new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], $parts),
                 new ArrayToPartsTransformer(array(
                     'date' => array('year', 'month', 'day'),
                     'time' => $timeParts,
@@ -80,7 +80,7 @@ class DateTimeType extends AbstractType
 
         if ($options['input'] === 'string') {
             $builder->setNormTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['data_timezone'], 'Y-m-d H:i:s', $options['data_timezone'])
+                new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], 'Y-m-d H:i:s')
             ));
         } else if ($options['input'] === 'timestamp') {
             $builder->setNormTransformer(new ReversedTransformer(
@@ -99,8 +99,8 @@ class DateTimeType extends AbstractType
             'template' => 'datetime',
             'input' => 'datetime',
             'with_seconds' => false,
-            'data_timezone' => date_default_timezone_get(),
-            'user_timezone' => date_default_timezone_get(),
+            'data_timezone' => null,
+            'user_timezone' => null,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference' => false,

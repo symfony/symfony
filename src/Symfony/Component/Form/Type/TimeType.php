@@ -51,7 +51,7 @@ class TimeType extends AbstractType
 
         if ($options['input'] === 'string') {
             $builder->setNormTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['data_timezone'], 'H:i:s', $options['data_timezone'])
+                new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], 'H:i:s')
             ));
         } else if ($options['input'] === 'timestamp') {
             $builder->setNormTransformer(new ReversedTransformer(
@@ -64,7 +64,7 @@ class TimeType extends AbstractType
         }
 
         $builder
-            ->setClientTransformer(new DateTimeToArrayTransformer($options['user_timezone'], $options['data_timezone'], $parts, $options['widget'] === 'text'))
+            ->setClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], $parts, $options['widget'] === 'text'))
             ->setRendererVar('widget', $options['widget'])
             ->setRendererVar('with_seconds', $options['with_seconds']);
     }
@@ -80,8 +80,8 @@ class TimeType extends AbstractType
             'input' => 'datetime',
             'with_seconds' => false,
             'pattern' => null,
-            'data_timezone' => date_default_timezone_get(),
-            'user_timezone' => date_default_timezone_get(),
+            'data_timezone' => null,
+            'user_timezone' => null,
             'csrf_protection' => false,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects

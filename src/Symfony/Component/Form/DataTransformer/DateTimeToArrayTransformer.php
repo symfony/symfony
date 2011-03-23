@@ -27,31 +27,18 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class DateTimeToArrayTransformer extends BaseDateTimeTransformer
 {
-
-    private $inputTimezone;
-
-    private $outputTimezone;
-
     private $pad;
 
     private $fields;
 
-    public function __construct($outputTimezone = null, $inputTimezone = null, $fields = null, $pad = false)
+    public function __construct($inputTimezone = null, $outputTimezone = null, $fields = null, $pad = false)
     {
-        if (is_null($inputTimezone)) {
-            $inputTimezone = date_default_timezone_get();
-        }
-
-        if (is_null($outputTimezone)) {
-            $outputTimezone = date_default_timezone_get();
-        }
+        parent::__construct($inputTimezone, $outputTimezone);
 
         if (is_null($fields)) {
             $fields = array('year', 'month', 'day', 'hour', 'minute', 'second');
         }
 
-        $this->inputTimezone = $inputTimezone;
-        $this->outputTimezone = $outputTimezone;
         $this->fields = $fields;
         $this->pad =$pad;
     }

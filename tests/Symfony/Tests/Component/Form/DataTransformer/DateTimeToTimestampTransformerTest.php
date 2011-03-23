@@ -36,7 +36,7 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
 
     public function testTransform_differentTimezones()
     {
-        $transformer = new DateTimeToTimestampTransformer('America/New_York', 'Asia/Hong_Kong');
+        $transformer = new DateTimeToTimestampTransformer('Asia/Hong_Kong', 'America/New_York');
 
         $input = new \DateTime('2010-02-03 04:05:06 America/New_York');
         $output = $input->format('U');
@@ -86,7 +86,7 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
 
     public function testReverseTransform_differentTimezones()
     {
-        $reverseTransformer = new DateTimeToTimestampTransformer('America/New_York', 'Asia/Hong_Kong');
+        $reverseTransformer = new DateTimeToTimestampTransformer('Asia/Hong_Kong', 'America/New_York');
 
         $output = new \DateTime('2010-02-03 04:05:06 America/New_York');
         $input = $output->format('U');

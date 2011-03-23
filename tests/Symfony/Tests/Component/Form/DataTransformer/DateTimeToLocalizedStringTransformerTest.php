@@ -113,7 +113,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
 
     public function testTransform_differentTimezones()
     {
-        $transformer = new DateTimeToLocalizedStringTransformer('Asia/Hong_Kong', 'America/New_York');
+        $transformer = new DateTimeToLocalizedStringTransformer('America/New_York', 'Asia/Hong_Kong');
 
         $input = new \DateTime('2010-02-03 04:05:06 America/New_York');
 
@@ -210,7 +210,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
 
     public function testReverseTransform_differentTimezones()
     {
-        $transformer = new DateTimeToLocalizedStringTransformer('Asia/Hong_Kong', 'America/New_York');
+        $transformer = new DateTimeToLocalizedStringTransformer('America/New_York', 'Asia/Hong_Kong');
 
         $dateTime = new \DateTime('2010-02-03 04:05:00 Asia/Hong_Kong');
         $dateTime->setTimezone(new \DateTimeZone('America/New_York'));

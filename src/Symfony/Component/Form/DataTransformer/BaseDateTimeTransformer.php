@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\DataTransformer;
 
 abstract class BaseDateTimeTransformer implements DataTransformerInterface
 {
-    
     protected static $formats = array(
         \IntlDateFormatter::NONE,
         \IntlDateFormatter::FULL,
@@ -21,4 +20,14 @@ abstract class BaseDateTimeTransformer implements DataTransformerInterface
         \IntlDateFormatter::MEDIUM,
         \IntlDateFormatter::SHORT,
     );
+
+    protected $inputTimezone;
+
+    protected $outputTimezone;
+
+    public function __construct($inputTimezone = null, $outputTimezone = null)
+    {
+        $this->inputTimezone = $inputTimezone ?: date_default_timezone_get();
+        $this->outputTimezone = $outputTimezone ?: date_default_timezone_get();
+    }
 }

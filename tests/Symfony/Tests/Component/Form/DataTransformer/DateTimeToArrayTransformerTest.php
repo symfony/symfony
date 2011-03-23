@@ -100,7 +100,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
     public function testTransform_differentTimezones()
     {
-        $transformer = new DateTimeToArrayTransformer('Asia/Hong_Kong', 'America/New_York');
+        $transformer = new DateTimeToArrayTransformer('America/New_York', 'Asia/Hong_Kong');
 
         $input = new \DateTime('2010-02-03 04:05:06 America/New_York');
 
@@ -273,7 +273,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
     public function testReverseTransform_differentTimezones()
     {
-        $transformer = new DateTimeToArrayTransformer('Asia/Hong_Kong', 'America/New_York');
+        $transformer = new DateTimeToArrayTransformer('America/New_York', 'Asia/Hong_Kong');
 
         $input = array(
             'year' => '2010',
@@ -292,7 +292,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
     public function testReverseTransformToDifferentTimezone()
     {
-        $transformer = new DateTimeToArrayTransformer('UTC', 'Asia/Hong_Kong');
+        $transformer = new DateTimeToArrayTransformer('Asia/Hong_Kong', 'UTC');
 
         $input = array(
             'year' => '2010',

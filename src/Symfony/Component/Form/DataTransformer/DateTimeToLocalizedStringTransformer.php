@@ -27,24 +27,13 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 {
-
-    private $inputTimezone;
-
-    private $outputTimezone;
-    
     private $dateFormat;
 
     private $timeFormat;
 
-    public function __construct($outputTimezone = null, $inputTimezone = null, $dateFormat = null, $timeFormat = null)
+    public function __construct($inputTimezone = null, $outputTimezone = null, $dateFormat = null, $timeFormat = null)
     {
-        if (is_null($inputTimezone)) {
-            $inputTimezone = date_default_timezone_get();
-        }
-
-        if (is_null($outputTimezone)) {
-            $outputTimezone = date_default_timezone_get();
-        }
+        parent::__construct($inputTimezone, $outputTimezone);
 
         if (is_null($dateFormat)) {
             $dateFormat = \IntlDateFormatter::MEDIUM;
@@ -61,9 +50,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         if (!in_array($timeFormat, self::$formats, true)) {
             throw new \InvalidArgumentException(sprintf('The value $timeFormat is expected to be one of "%s". Is "%s"', implode('", "', self::$formats), $timeFormat));
         }
-        
-        $this->inputTimezone = $inputTimezone;
-        $this->outputTimezone = $outputTimezone;
+
         $this->dateFormat = $dateFormat;
         $this->timeFormat = $timeFormat;
     }

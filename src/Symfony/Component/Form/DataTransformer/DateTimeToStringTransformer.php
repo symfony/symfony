@@ -19,28 +19,15 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
-class DateTimeToStringTransformer implements DataTransformerInterface
+class DateTimeToStringTransformer extends BaseDateTimeTransformer
 {
-
-    private $inputTimezone;
-
-    private $outputTimezone;
-
     private $format;
-    
-    public function __construct($outputTimezone = null, $format = 'Y-m-d H:i:s', $inputTimezone = null)
+
+    public function __construct($inputTimezone = null, $outputTimezone = null, $format = 'Y-m-d H:i:s')
     {
-        if (is_null($inputTimezone)) {
-            $inputTimezone = date_default_timezone_get();
-        }
-        
-        if (is_null($outputTimezone)) {
-            $outputTimezone = date_default_timezone_get();
-        }
+        parent::__construct($inputTimezone, $outputTimezone);
 
         $this->format = $format;
-        $this->inputTimezone = $inputTimezone;
-        $this->outputTimezone = $outputTimezone;
     }
 
     /**

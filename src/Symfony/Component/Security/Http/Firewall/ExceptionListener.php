@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
@@ -25,6 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Events;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -36,19 +36,15 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ExceptionListener
 {
     private $context;
-    private $accessDeniedHandler;
     private $authenticationEntryPoint;
     private $authenticationTrustResolver;
-    private $errorPage;
     private $logger;
 
-    public function __construct(SecurityContextInterface $context, AuthenticationTrustResolverInterface $trustResolver, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $context, AuthenticationTrustResolverInterface $trustResolver, AuthenticationEntryPointInterface $authenticationEntryPoint = null, LoggerInterface $logger = null)
     {
         $this->context = $context;
-        $this->accessDeniedHandler = $accessDeniedHandler;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
         $this->authenticationTrustResolver = $trustResolver;
-        $this->errorPage = $errorPage;
         $this->logger = $logger;
     }
 
@@ -78,11 +74,9 @@ class ExceptionListener
             }
 
             try {
-                $response = $this->startAuthentication($request, $exception);
+                $event->setResponse($this->startAuthentication($request, $exception));
             } catch (\Exception $e) {
                 $event->setException($e);
-
-                return;
             }
         } elseif ($exception instanceof AccessDeniedException) {
             $token = $this->context->getToken();
@@ -92,50 +86,18 @@ class ExceptionListener
                 }
 
                 try {
-                    $response = $this->startAuthentication($request, new InsufficientAuthenticationException('Full authentication is required to access this resource.', $token, 0, $exception));
+                    $event->setResponse($this->startAuthentication($request, new InsufficientAuthenticationException('Full authentication is required to access this resource.', $token, 0, $exception)));
                 } catch (\Exception $e) {
                     $event->setException($e);
-
-                    return;
                 }
             } else {
                 if (null !== $this->logger) {
                     $this->logger->info('Access is denied (and user is neither anonymous, nor remember-me)');
                 }
 
-                try {
-                    if (null !== $this->accessDeniedHandler) {
-                        $response = $this->accessDeniedHandler->handle($request, $exception);
-
-                        if (!$response instanceof Response) {
-                            return;
-                        }
-                    } else {
-                        if (null === $this->errorPage) {
-                            return;
-                        }
-
-                        $subRequest = Request::create($this->errorPage);
-                        $subRequest->attributes->set(SecurityContextInterface::ACCESS_DENIED_ERROR, $exception);
-
-                        $response = $event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
-                        $response->setStatusCode(403);
-                    }
-                } catch (\Exception $e) {
-                    if (null !== $this->logger) {
-                        $this->logger->err(sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage()));
-                    }
-
-                    $event->setException(new \RuntimeException('Exception thrown when handling an exception.', 0, $e));
-
-                    return;
-                }
+                $event->setException(new AccessDeniedHttpException('Forbidden', null, 0, $e));
             }
-        } else {
-            return;
         }
-
-        $event->setResponse($response);
     }
 
     private function startAuthentication(Request $request, AuthenticationException $authException)

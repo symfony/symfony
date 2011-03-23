@@ -65,7 +65,6 @@ class SecurityExtension extends Extension
         $loader->load('collectors.xml');
 
         // set some global scalars
-        $container->setParameter('security.access.denied_url', $config['access_denied_url']);
         $container->setParameter('security.authentication.session_strategy.strategy', $config['session_fixation_strategy']);
 
         $this->createFirewalls($config, $container);

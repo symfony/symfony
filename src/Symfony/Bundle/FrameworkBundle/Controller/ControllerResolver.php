@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\Controller\ControllerResolver as BaseController
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\ClassLoader\ClassNotFoundException;
 
 /**
  * ControllerResolver.
@@ -69,7 +70,7 @@ class ControllerResolver extends BaseControllerResolver
         list($class, $method) = explode('::', $controller);
 
         if (!class_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
+            throw new ClassNotFoundException($class);
         }
 
         $controller = new $class();

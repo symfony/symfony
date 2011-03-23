@@ -206,15 +206,21 @@ class UniversalClassLoader
     /**
      * Finds the path to the file where the class is defined.
      *
-     * @param string $class The name of the class
+     * If $returnPaths is true, this will return the path to the file if
+     * found OR an array of paths where it looked for the class.
      *
-     * @return string|null The path, if found
+     * @param string  $class The name of the class
+     * @param Boolean $returnPaths Whether to return an array of potential paths
+     *
+     * @return string|null|array The path, if found, or an array of potential paths
      */
-    protected function findFile($class)
+    protected function findFile($class, $returnPaths = false)
     {
         if ('\\' == $class[0]) {
             $class = substr($class, 1);
         }
+
+        $paths = array();
 
         if (false !== $pos = strrpos($class, '\\')) {
             // namespaced class name
@@ -227,6 +233,7 @@ class UniversalClassLoader
                         if (file_exists($file)) {
                             return $file;
                         }
+                        $paths[] = $file;
                     }
                 }
             }
@@ -236,6 +243,7 @@ class UniversalClassLoader
                 if (file_exists($file)) {
                     return $file;
                 }
+                $paths[] = $file;
             }
         } else {
             // PEAR-like class name
@@ -243,9 +251,10 @@ class UniversalClassLoader
                 foreach ($dirs as $dir) {
                     if (0 === strpos($class, $prefix)) {
                         $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
-                        if (file_exists($file)) {
+                        if (!$returnPaths && file_exists($file)) {
                             return $file;
                         }
+                        $paths[] = $file;
                     }
                 }
             }
@@ -255,7 +264,26 @@ class UniversalClassLoader
                 if (file_exists($file)) {
                     return $file;
                 }
+                $paths[] = $file;
             }
         }
+
+        if ($returnPaths) {
+            return $paths;
+        }
+    }
+
+    /**
+     * Given a class name, this returns all of the paths that the autoloader
+     * will look to find that file.
+     *
+     * If the class exists at a specific path, it will return just that path.
+     *
+     * @param  string $class The class name
+     * @return array
+     */
+    public function getPotentialPathsForClass($class)
+    {
+        return (array) $this->findFile($class, true);
     }
 }

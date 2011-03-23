@@ -9,10 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\DataTransformer;
+namespace Symfony\Bridge\Doctrine\Form\DataTransformer;
 
-use Symfony\Component\Form\ChoiceList\EntityChoiceList;
+use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\DataTransformer\TransformationFailedException;
+use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 

@@ -9,17 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Type;
+namespace Symfony\Bridge\Doctrine\Form;
 
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\ChoiceList\EntityChoiceList;
-use Symfony\Component\Form\EventListener\MergeCollectionListener;
-use Symfony\Component\Form\DataTransformer\EntitiesToArrayTransformer;
+use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
+use Symfony\Bridge\Doctrine\Form\EventListener\MergeCollectionListener;
+use Symfony\Bridge\Doctrine\Form\DataTransformer\EntitiesToArrayTransformer;
+use Symfony\Bridge\Doctrine\Form\DataTransformer\EntityToIdTransformer;
 use Symfony\Component\Form\DataTransformer\ArrayToChoicesTransformer;
-use Symfony\Component\Form\DataTransformer\EntityToIdTransformer;
 use Symfony\Component\Form\DataTransformer\ScalarToChoicesTransformer;
 use Symfony\Component\Form\DataTransformer\DataTransformerChain;
+use Symfony\Component\Form\Type\AbstractType;
 use Doctrine\ORM\EntityManager;
 
 class EntityType extends AbstractType

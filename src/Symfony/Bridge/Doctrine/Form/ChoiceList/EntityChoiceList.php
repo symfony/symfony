@@ -9,19 +9,26 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\ChoiceList;
+namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
 use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\ChoiceList\DefaultChoiceList;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\NoResultException;
 
 class EntityChoiceList extends DefaultChoiceList
 {
+    /**
+     * @var Doctrine\ORM\EntityManager
+     */
     private $em;
 
+    /**
+     * @var Doctrine\ORM\Mapping\ClassMetadata
+     */
     private $class;
 
     /**

@@ -9,13 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Form\Type;
-
-require_once __DIR__.'/TestCase.php';
+namespace Symfony\Tests\Bridge\Doctrine\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 
-abstract class DoctrineOrmTestCase extends TestCase
+abstract class DoctrineOrmTestCase extends \Symfony\Tests\Component\Form\Type\TestCase
 {
     protected function setUp()
     {

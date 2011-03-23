@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\EventListener;
+namespace Symfony\Bridge\Doctrine\Form\EventListener;
 
 use Symfony\Component\Form\Events;
 use Symfony\Component\Form\Event\FilterDataEvent;

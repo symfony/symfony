@@ -9,23 +9,25 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Form\Type;
+namespace Symfony\Tests\Bridge\Doctrine\Form\Type;
 
 require_once __DIR__.'/DoctrineOrmTestCase.php';
 require_once __DIR__.'/../Fixtures/SingleIdentEntity.php';
 require_once __DIR__.'/../Fixtures/CompositeIdentEntity.php';
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Tests\Component\Form\Fixtures\SingleIdentEntity;
-use Symfony\Tests\Component\Form\Fixtures\CompositeIdentEntity;
+use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity;
+use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeIdentEntity;
+use Symfony\Bridge\Doctrine\Form\DoctrineTypeLoader;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Collections\ArrayCollection;
 
 class EntityTypeTest extends DoctrineOrmTestCase
 {
-    const SINGLE_IDENT_CLASS = 'Symfony\Tests\Component\Form\Fixtures\SingleIdentEntity';
+    const SINGLE_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity';
 
-    const COMPOSITE_IDENT_CLASS = 'Symfony\Tests\Component\Form\Fixtures\CompositeIdentEntity';
+    const COMPOSITE_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeIdentEntity';
 
     protected function setUp()
     {
@@ -36,6 +38,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         }
 
         $this->em = $this->createTestEntityManager();
+        $this->chainLoader->addLoader(new DoctrineTypeLoader($this->em));
 
         $schemaTool = new SchemaTool($this->em);
         $classes = array(

@@ -104,7 +104,7 @@ class RequestListener
             if (null !== $this->logger) {
                 $this->logger->err($message);
             }
-            throw new NotFoundHttpException('Not Found', $message, 0, $e);
+            throw new NotFoundHttpException($message, $e);
         } catch (MethodNotAllowedException $e) {
             $message = sprintf('No route found for "%s %s": Method Not Allowed (Allow: %s)', $request->getMethod(), $request->getPathInfo(), strtoupper(implode(', ', $e->getAllowedMethods())));
             if (null !== $this->logger) {

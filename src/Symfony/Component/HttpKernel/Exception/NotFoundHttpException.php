@@ -21,16 +21,12 @@ class NotFoundHttpException extends HttpException
     /**
      * Constructor.
      *
-     * WARNING: The status message will be sent as a response header
-     * regardless of debug mode.
-     *
-     * @param string    $statusMessage The HTTP response status message
-     * @param string    $message       The internal exception message
-     * @param integer   $code          The internal exception code
-     * @param Exception $previous      The previous exception
+     * @param string    $message  The internal exception message
+     * @param Exception $previous The previous exception
+     * @param integer   $code     The internal exception code
      */
-    public function __construct($statusMessage = 'Not Found', $message = null, $code = 0, \Exception $previous = null)
+    public function __construct($message = null, \Exception $previous = null, $code = 0)
     {
-        parent::__construct(404, $statusMessage, array(), $message ?: $statusMessage, $code, $previous);
+        parent::__construct(404, $message, $previous, array(), $code);
     }
 }

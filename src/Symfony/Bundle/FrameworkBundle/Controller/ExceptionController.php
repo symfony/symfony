@@ -29,13 +29,10 @@ class ExceptionController extends ContainerAware
      * @param FlattenException     $exception A FlattenException instance
      * @param DebugLoggerInterface $logger    A DebugLoggerInterface instance
      * @param string               $format    The format to use for rendering (html, xml, ...)
-     * @param integer              $code      An HTTP response code
-     * @param string               $message   An HTTP response status message
-     * @param array                $headers   HTTP response headers
      *
      * @throws \InvalidArgumentException When the exception template does not exist
      */
-    public function showAction(FlattenException $exception, DebugLoggerInterface $logger = null, $format = 'html', $code = 500, $message = null, array $headers = array())
+    public function showAction(FlattenException $exception, DebugLoggerInterface $logger = null, $format = 'html')
     {
         $this->container->get('request')->setRequestFormat($format);
 
@@ -60,19 +57,20 @@ class ExceptionController extends ContainerAware
             $template = 'FrameworkBundle:Exception:'.$name.'.html.twig';
         }
 
+        $code = $exception->getStatusCode();
         $response = $templating->renderResponse(
             $template,
             array(
                 'status_code'    => $code,
-                'status_text'    => $message ?: Response::$statusTexts[$code],
+                'status_text'    => Response::$statusTexts[$code],
                 'exception'      => $exception,
                 'logger'         => $logger,
                 'currentContent' => $currentContent,
             )
         );
 
-        $response->setStatusCode($code, $message);
-        $response->headers->replace($headers);
+        $response->setStatusCode($code);
+        $response->headers->replace($exception->getHeaders());
 
         return $response;
     }

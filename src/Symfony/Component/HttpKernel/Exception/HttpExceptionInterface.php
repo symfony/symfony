@@ -26,13 +26,6 @@ interface HttpExceptionInterface
     function getStatusCode();
 
     /**
-     * Return the status message.
-     *
-     * @return string An HTTP response status message
-     */
-    function getStatusMessage();
-
-    /**
      * Returns response headers.
      *
      * @return array Response headers

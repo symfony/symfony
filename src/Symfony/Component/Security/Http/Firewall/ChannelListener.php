@@ -52,7 +52,7 @@ class ChannelListener implements ListenerInterface
                 $this->logger->debug('Redirecting to HTTPS');
             }
 
-            $response = $this->authenticationEntryPoint->start($event, $request);
+            $response = $this->authenticationEntryPoint->start($request);
 
             $event->setResponse($response);
 
@@ -64,7 +64,7 @@ class ChannelListener implements ListenerInterface
                 $this->logger->debug('Redirecting to HTTP');
             }
 
-            $response = $this->authenticationEntryPoint->start($event, $request);
+            $response = $this->authenticationEntryPoint->start($request);
 
             $event->setResponse($response);
         }

@@ -85,9 +85,9 @@ class BasicAuthenticationListener implements ListenerInterface
                 return;
             }
 
-            $event->setProcessed();
+            $response = $this->authenticationEntryPoint->start($request, $failed);
 
-            return $this->authenticationEntryPoint->start($event, $request, $failed);
+            $event->setResponse($response);
         }
     }
 }

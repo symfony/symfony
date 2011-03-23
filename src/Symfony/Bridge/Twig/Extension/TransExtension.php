@@ -9,19 +9,20 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\TwigBundle\Extension;
+namespace Symfony\Bridge\Twig\Extension;
 
-use Symfony\Bundle\TwigBundle\TokenParser\TransTokenParser;
-use Symfony\Bundle\TwigBundle\TokenParser\TransChoiceTokenParser;
+use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
+use Symfony\Bridge\Twig\TokenParser\TransChoiceTokenParser;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
+ * Provides integration of the Translation component with Twig.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class TransExtension extends \Twig_Extension
 {
-    protected $translator;
+    private $translator;
 
     public function __construct(TranslatorInterface $translator)
     {

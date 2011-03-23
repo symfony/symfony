@@ -66,20 +66,8 @@ class TemplatingExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'url'   => new \Twig_Function_Method($this, 'getUrl'),
-            'path'  => new \Twig_Function_Method($this, 'getPath'),
             'asset' => new \Twig_Function_Method($this, 'getAssetUrl'),
         );
-    }
-
-    public function getPath($name, array $parameters = array())
-    {
-        return $this->container->get('router')->generate($name, $parameters, false);
-    }
-
-    public function getUrl($name, array $parameters = array())
-    {
-        return $this->container->get('router')->generate($name, $parameters, true);
     }
 
     public function getAssetUrl($location, $packageName = null)

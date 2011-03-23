@@ -43,6 +43,11 @@
             <argument type="service" id="service_container" />
         </service>
 
+        <service id="twig.extension.routing" class="Symfony\Bridge\Twig\Extension\RoutingExtension" public="false">
+            <tag name="twig.extension" />
+            <argument type="service" id="router" />
+        </service>
+
         <service id="twig.extension.form" class="Symfony\Bundle\TwigBundle\Extension\FormExtension" public="false">
             <tag name="twig.extension" />
             <argument>%twig.form.resources%</argument>

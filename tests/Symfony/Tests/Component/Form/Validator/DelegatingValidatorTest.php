@@ -235,6 +235,28 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array($this->getFormError()), $grandChild->getErrors());
     }
 
+    public function testDataErrorsOnGrandChild2()
+    {
+        $parent = $this->getForm('author');
+        $child = $this->getForm('address');
+        $grandChild = $this->getForm('street');
+
+        $parent->add($child);
+        $child->add($grandChild);
+
+        $this->delegate->expects($this->once())
+            ->method('validate')
+            ->will($this->returnValue(array(
+                $this->getConstraintViolation('children[address].data.street.constrainedProp')
+            )));
+
+        $this->validator->validate($parent);
+
+        $this->assertFalse($parent->hasErrors());
+        $this->assertFalse($child->hasErrors());
+        $this->assertEquals(array($this->getFormError()), $grandChild->getErrors());
+    }
+
     public function testDataErrorsOnParentIfNoChildFound()
     {
         $parent = $this->getForm('author');

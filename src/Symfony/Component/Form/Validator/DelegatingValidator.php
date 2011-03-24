@@ -35,7 +35,9 @@ class DelegatingValidator implements FormValidatorInterface
             $mapping = array();
             $forms = array();
 
-            $this->buildMapping($form, $mapping, $forms);
+            $this->buildFormPathMapping($form, $mapping);
+            $this->buildDataPathMapping($form, $mapping);
+            $this->buildNamePathMapping($form, $forms);
             $this->resolveMappingPlaceholders($mapping, $forms);
 
             // Validate the form in group "Default"
@@ -61,15 +63,14 @@ class DelegatingValidator implements FormValidatorInterface
         }
     }
 
-    private function buildMapping(FormInterface $form, array &$mapping,
-            array &$forms, $namePath = '', $formPath = '', $dataPath = 'data')
+    private function buildFormPathMapping(FormInterface $form, array &$mapping, $formPath = '', $namePath = '')
     {
-        if ($namePath) {
-            $namePath .= '.';
-        }
-
         if ($formPath) {
             $formPath .= '.';
+        }
+
+        if ($namePath) {
+            $namePath .= '.';
         }
 
         $iterator = new VirtualFormIterator($form->getChildren());
@@ -86,22 +87,70 @@ class DelegatingValidator implements FormValidatorInterface
                 $nestedFormPath .= '.data.' . $parts[1];
             }
 
-            $nestedDataPath = $dataPath . '.' . $path;
+            $nestedDataPath = $formPath . 'data.' . $path;
 
             if ($child->hasChildren()) {
-                $this->buildMapping($child, $mapping, $forms, $nestedNamePath, $nestedFormPath, $nestedDataPath);
+                $this->buildFormPathMapping($child, $mapping, $nestedFormPath, $nestedNamePath);
+                $this->buildDataPathMapping($child, $mapping, $nestedDataPath, $nestedNamePath);
             } else {
                 $mapping['/^'.preg_quote($nestedFormPath, '/').'(?!\w)/'] = $child;
                 $mapping['/^'.preg_quote($nestedDataPath, '/').'(?!\w)/'] = $child;
             }
-
-            $forms[$nestedNamePath] = $child;
         }
 
         foreach ($form->getAttribute('error_mapping') as $nestedDataPath => $nestedNamePath)
         {
             $mapping['/^'.preg_quote($formPath . 'data.' . $nestedDataPath).'(?!\w)/'] = $namePath . $nestedNamePath;
+        }
+    }
+
+    private function buildDataPathMapping(FormInterface $form, array &$mapping, $dataPath = 'data', $namePath = '')
+    {
+        if ($namePath) {
+            $namePath .= '.';
+        }
+
+        $iterator = new VirtualFormIterator($form->getChildren());
+        $iterator = new \RecursiveIteratorIterator($iterator);
+
+        foreach ($iterator as $child) {
+            $path = (string)$child->getAttribute('property_path');
+
+            $nestedNamePath = $namePath . $child->getName();
+            $nestedDataPath = $dataPath . '.' . $path;
+
+            if ($child->hasChildren()) {
+                $this->buildDataPathMapping($child, $mapping, $nestedDataPath, $nestedNamePath);
+            } else {
+                $mapping['/^'.preg_quote($nestedDataPath, '/').'(?!\w)/'] = $child;
+            }
+        }
+
+        foreach ($form->getAttribute('error_mapping') as $nestedDataPath => $nestedNamePath)
+        {
             $mapping['/^'.preg_quote($dataPath . '.' . $nestedDataPath).'(?!\w)/'] = $namePath . $nestedNamePath;
+        }
+    }
+
+    private function buildNamePathMapping(FormInterface $form, array &$forms, $namePath = '')
+    {
+        if ($namePath) {
+            $namePath .= '.';
+        }
+
+        $iterator = new VirtualFormIterator($form->getChildren());
+        $iterator = new \RecursiveIteratorIterator($iterator);
+
+        foreach ($iterator as $child) {
+            $path = (string)$child->getAttribute('property_path');
+
+            $nestedNamePath = $namePath . $child->getName();
+            $forms[$nestedNamePath] = $child;
+
+            if ($child->hasChildren()) {
+                $this->buildNamePathMapping($child, $forms, $nestedNamePath);
+            }
+
         }
     }
 

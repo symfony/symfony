@@ -106,8 +106,10 @@ class Form implements \IteratorAggregate, FormInterface
     private $readOnly = false;
     private $dispatcher;
     private $attributes;
+    private $types;
 
-    public function __construct($name, EventDispatcherInterface $dispatcher,
+    public function __construct($name, array $types,
+        EventDispatcherInterface $dispatcher,
         FormRendererInterface $renderer = null, DataTransformerInterface $clientTransformer = null,
         DataTransformerInterface $normTransformer = null,
         DataMapperInterface $dataMapper = null, array $validators = array(),
@@ -121,6 +123,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         $this->name = (string)$name;
+        $this->types = $types;
         $this->dispatcher = $dispatcher;
         $this->renderer = $renderer;
         $this->clientTransformer = $clientTransformer;
@@ -152,6 +155,11 @@ class Form implements \IteratorAggregate, FormInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    public function getTypes()
+    {
+        return $this->types;
     }
 
     /**

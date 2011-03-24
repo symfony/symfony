@@ -37,7 +37,7 @@ class FormFactory implements FormFactoryInterface
         // TODO $type can be FQN of a type class
 
         $builder = null;
-        $hierarchy = array();
+        $types = array();
 
         // TESTME
         if (null === $name && preg_match('/\w+$/', $type, $matches)) {
@@ -47,7 +47,7 @@ class FormFactory implements FormFactoryInterface
         while (null !== $type) {
             // TODO check if type exists
             $type = $this->typeLoader->getType($type);
-            array_unshift($hierarchy, $type);
+            array_unshift($types, $type);
             $options = array_merge($type->getDefaultOptions($options), $options);
             $builder = $builder ?: $type->createBuilder($options);
             $type = $type->getParent($options);
@@ -56,9 +56,10 @@ class FormFactory implements FormFactoryInterface
         // TODO check if instance exists
 
         $builder->setName($name);
+        $builder->setTypes($types);
         $builder->setFormFactory($this);
 
-        foreach ($hierarchy as $type) {
+        foreach ($types as $type) {
             $type->configure($builder, $options);
         }
 

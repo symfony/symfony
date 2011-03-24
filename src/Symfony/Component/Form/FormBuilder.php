@@ -48,6 +48,8 @@ class FormBuilder
 
     private $attributes = array();
 
+    private $types = array();
+
     private $parent;
 
     private $dataClass;
@@ -308,6 +310,18 @@ class FormBuilder
         return $this->dataMapper;
     }
 
+    public function setTypes(array $types)
+    {
+        $this->types = $types;
+
+        return $this;
+    }
+
+    public function getTypes()
+    {
+        return $this->types;
+    }
+
     /**
      * Adds a new field to this group. A field must have a unique name within
      * the group. Otherwise the existing field is overwritten.
@@ -462,6 +476,7 @@ class FormBuilder
     {
         $instance = new Form(
             $this->getName(),
+            $this->getTypes(),
             $this->buildDispatcher(),
             $this->buildRenderer(),
             $this->getClientTransformer(),

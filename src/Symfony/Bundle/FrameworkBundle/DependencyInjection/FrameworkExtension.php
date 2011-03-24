@@ -340,12 +340,12 @@ class FrameworkExtension extends Extension
 
         $packages = array();
         foreach ($config['packages'] as $name => $package) {
-            $packages[$name] = new Definition('Symfony\\Component\\Templating\\Asset\\AssetPackage', array(
+            $packages[$name] = new Definition('%templating.asset_package.class%', array(
                 $package['base_urls'],
                 $package['version'],
             ));
         }
-        $container->setParameter('templating.assets.packages', $packages);
+        $container->getDefinition('templating.helper.assets')->setArgument(3, $packages);
 
         if (!empty($config['loaders'])) {
             $loaders = array_map(function($loader) { return new Reference($loader); }, $config['loaders']);

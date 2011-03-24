@@ -74,4 +74,13 @@ class PhpEngineTheme implements FormThemeInterface
 
         return $template;
     }
+
+    public function attributes(array $attribs)
+    {
+        $html = '';
+        foreach ($attribs as $k => $v) {
+            $html .= $this->engine->escape($k) . '="' . $this->engine->escape($v) .'" ';
+        }
+        return $html;
+    }
 }

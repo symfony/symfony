@@ -1,0 +1,18 @@
+{% extends "widgets.html.twig" %}
+
+{% block row %}
+{% spaceless %}
+    <div>
+        {{ renderer.label }}
+        {{ renderer.errors }}
+        {{ renderer.widget }}
+    </div>
+{% endspaceless %}
+{% endblock row %}
+
+{% block form__widget %}
+{% spaceless %}
+    {{ block('rows') }}
+    {{ renderer.rest }}
+{% endspaceless %}
+{% endblock form__widget %}

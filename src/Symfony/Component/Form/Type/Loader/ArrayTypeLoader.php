@@ -25,13 +25,8 @@ class ArrayTypeLoader implements TypeLoaderInterface
     public function __construct(array $types)
     {
         foreach ($types as $type) {
-            $this->addType($type);
+            $this->types[$type->getName()] = $type;
         }
-    }
-
-    private function addType(FormTypeInterface $type)
-    {
-        $this->types[$type->getName()] = $type;
     }
 
     public function getType($name)

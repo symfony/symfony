@@ -20,59 +20,48 @@ use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\File\TemporaryStorage;
 use Doctrine\ORM\EntityManager;
 
-class DefaultTypeLoader implements TypeLoaderInterface
+class DefaultTypeLoader extends ArrayTypeLoader
 {
-    private $types = array();
-
     public function __construct(
             FormThemeFactoryInterface $themeFactory, $template = null, ValidatorInterface $validator = null,
             CsrfProviderInterface $csrfProvider = null, TemporaryStorage $storage = null)
     {
-        $this->addType(new Type\FieldType($validator, $themeFactory, $template));
-        $this->addType(new Type\FormType());
-        $this->addType(new Type\BirthdayType());
-        $this->addType(new Type\CheckboxType());
-        $this->addType(new Type\ChoiceType());
-        $this->addType(new Type\CollectionType());
-        $this->addType(new Type\CountryType());
+        $types = array(
+            new Type\FieldType($validator, $themeFactory, $template),
+            new Type\FormType(),
+            new Type\BirthdayType(),
+            new Type\CheckboxType(),
+            new Type\ChoiceType(),
+            new Type\CollectionType(),
+            new Type\CountryType(),
+            new Type\DateType(),
+            new Type\DateTimeType(),
+            new Type\HiddenType(),
+            new Type\IntegerType(),
+            new Type\LanguageType(),
+            new Type\LocaleType(),
+            new Type\MoneyType(),
+            new Type\NumberType(),
+            new Type\PasswordType(),
+            new Type\PercentType(),
+            new Type\RadioType(),
+            new Type\RepeatedType(),
+            new Type\TextareaType(),
+            new Type\TextType(),
+            new Type\TimeType(),
+            new Type\TimezoneType(),
+            new Type\UrlType(),
+        );
+
         if ($csrfProvider) {
             // TODO Move to a Symfony\Bridge\FormSecurity
-            $this->addType(new Type\CsrfType($csrfProvider));
+            $types[] = new Type\CsrfType($csrfProvider);
         }
-        $this->addType(new Type\DateType());
-        $this->addType(new Type\DateTimeType());
+
         if ($storage) {
-            $this->addType(new Type\FileType($storage));
+            $types[] = new Type\FileType($storage);
         }
-        $this->addType(new Type\HiddenType());
-        $this->addType(new Type\IntegerType());
-        $this->addType(new Type\LanguageType());
-        $this->addType(new Type\LocaleType());
-        $this->addType(new Type\MoneyType());
-        $this->addType(new Type\NumberType());
-        $this->addType(new Type\PasswordType());
-        $this->addType(new Type\PercentType());
-        $this->addType(new Type\RadioType());
-        $this->addType(new Type\RepeatedType());
-        $this->addType(new Type\TextareaType());
-        $this->addType(new Type\TextType());
-        $this->addType(new Type\TimeType());
-        $this->addType(new Type\TimezoneType());
-        $this->addType(new Type\UrlType());
-    }
 
-    private function addType(FormTypeInterface $type)
-    {
-        $this->types[$type->getName()] = $type;
-    }
-
-    public function getType($name)
-    {
-        return $this->types[$name];
-    }
-
-    public function hasType($name)
-    {
-        return isset($this->types[$name]);
+        parent::__construct($types);
     }
 }

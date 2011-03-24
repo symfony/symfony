@@ -304,6 +304,10 @@ class Form implements \IteratorAggregate, FormInterface
             $clientData = (string)$clientData;
         }
 
+        // Initialize errors in the very beginning so that we don't lose any
+        // errors added during listeners
+        $this->errors = array();
+
         $event = new DataEvent($this, $clientData);
         $this->dispatcher->dispatch(Events::preBind, $event);
 
@@ -368,7 +372,6 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         $this->bound = true;
-        $this->errors = array();
         $this->data = $appData;
         $this->normData = $normData;
         $this->clientData = $clientData;

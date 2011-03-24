@@ -276,17 +276,6 @@ class FormTest extends TestCase
         $this->assertTrue($form->isBound());
     }
 
-    public function testHasNoErrorsIfOnlyFieldHasErrors()
-    {
-        $builder = $this->factory->createBuilder('form', 'author');
-        $builder->add('firstName', 'field');
-        $form = $builder->getForm();
-
-        $form->bind(array('firstName' => 'Bernhard'));
-
-        $this->assertFalse($form->hasErrors());
-    }
-
     public function testSetDataUpdatesAllFieldsFromTransformedData()
     {
         $originalAuthor = new Author();

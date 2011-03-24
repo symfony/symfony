@@ -56,6 +56,8 @@ class Configuration
                             ->scalarNode('level')->defaultValue('DEBUG')->end()
                             ->booleanNode('bubble')->defaultFalse()->end()
                             ->scalarNode('path')->end() // stream specific
+                            ->scalarNode('ident')->end() // syslog specific
+                            ->scalarNode('facility')->end() // syslog specific
                             ->scalarNode('action_level')->end() // fingerscrossed specific
                             ->scalarNode('buffer_size')->end() // fingerscrossed specific
                             ->scalarNode('handler')->end() // fingerscrossed specific

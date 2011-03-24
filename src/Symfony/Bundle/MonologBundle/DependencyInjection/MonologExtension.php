@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Parameter;
  * MonologExtension is an extension for the Monolog library.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ * @author Christophe Coevoet <stof@notk.org>
  */
 class MonologExtension extends Extension
 {
@@ -31,14 +32,6 @@ class MonologExtension extends Extension
 
     /**
      * Loads the Monolog configuration.
-     *
-     * Usage example:
-     *
-     *      monolog:
-     *          handlers:
-     *              myhandler:
-     *                  level: info
-     *                  path: path/to/some.log
      *
      * @param array            $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
@@ -109,6 +102,22 @@ class MonologExtension extends Extension
                 new Reference($nestedHandlerId),
                 $handler['action_level'],
                 isset($handler['buffer_size']) ? $handler['buffer_size'] : 0,
+                $handler['bubble'],
+            ));
+            break;
+
+        case 'syslog':
+            if (!isset($handler['ident'])) {
+                $handler['ident'] = false;
+            }
+            if (!isset($handler['facility'])) {
+                $handler['facility'] = 'user';
+            }
+
+            $definition->setArguments(array(
+                $handler['ident'],
+                $handler['facility'],
+                $handler['level'],
                 $handler['bubble'],
             ));
             break;

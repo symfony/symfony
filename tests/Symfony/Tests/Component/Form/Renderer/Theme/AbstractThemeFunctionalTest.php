@@ -25,11 +25,16 @@ abstract class AbstractThemeFunctionalTest extends \PHPUnit_Framework_TestCase
     /** @var FormFactory */
     private $factory;
 
-    abstract protected function createTheme();
+    abstract protected function createThemeFactory();
+
+    protected function getTemplate()
+    {
+    }
 
     public function setUp()
     {
-        $theme = $this->createTheme();
+        $themeFactory = $this->createThemeFactory();
+        $template = $this->getTemplate();
         $csrfProvider = new DefaultCsrfProvider('foo');
         $validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
         $storage = new \Symfony\Component\HttpFoundation\File\TemporaryStorage('foo', 1, \sys_get_temp_dir());
@@ -37,7 +42,7 @@ abstract class AbstractThemeFunctionalTest extends \PHPUnit_Framework_TestCase
         // ok more than 2 lines, see DefaultFormFactory.php for proposed simplication
         $typeLoader = new DefaultTypeLoader();
         $this->factory = new FormFactory($typeLoader);
-        $typeLoader->initialize($this->factory, $theme, $csrfProvider, $validator , $storage);
+        $typeLoader->initialize($this->factory, $themeFactory, $template, $csrfProvider, $validator , $storage);
         // this is the relevant bit about your own forms:
         $typeLoader->addType(new MyTestFormConfig());
         $typeLoader->addType(new MyTestSubFormConfig());

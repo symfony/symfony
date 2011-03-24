@@ -18,7 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
-    protected $theme;
+    protected $themeFactory;
 
     protected $csrfProvider;
 
@@ -36,7 +36,10 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->theme = $this->getMock('Symfony\Component\Form\Renderer\Theme\FormThemeInterface');
+        $this->themeFactory = $this->getMock('Symfony\Component\Form\Renderer\Theme\FormThemeFactoryInterface');
+        $this->themeFactory->expects($this->any())
+            ->method('create')
+            ->will($this->returnValue($this->getMock('Symfony\Component\Form\Renderer\Theme\FormThemeInterface')));
         $this->csrfProvider = $this->getMock('Symfony\Component\Form\CsrfProvider\CsrfProviderInterface');
         $this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
@@ -49,7 +52,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             ->getMock();
         $loader = new DefaultTypeLoader();
         $this->factory = new FormFactory($loader);
-        $loader->initialize($this->factory, $this->theme, $this->csrfProvider,
+        $loader->initialize($this->factory, $this->themeFactory, null, $this->csrfProvider,
                 $this->validator, $this->storage, $this->em);
 
         $this->builder = new FormBuilder($this->dispatcher);

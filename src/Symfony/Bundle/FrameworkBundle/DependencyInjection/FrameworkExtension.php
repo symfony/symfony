@@ -408,10 +408,10 @@ class FrameworkExtension extends Extension
             $container->setAlias('templating', 'templating.engine.delegating');
         }
 
-        $container->setAlias('form.theme', 'form.theme.default');
+        $container->setAlias('form.theme.factory', 'form.theme.factory.default');
         foreach ($config['engines'] as $engine) {
-            if ($container->hasDefinition('form.theme.' . $engine)) {
-                $container->setAlias('form.theme', 'form.theme.' . $engine);
+            if ($container->hasDefinition('form.theme.factory.' . $engine)) {
+                $container->setAlias('form.theme.factory', 'form.theme.factory.' . $engine);
             }
         }
     }

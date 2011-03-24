@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Form;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Bundle\FrameworkBundle\Form\PhpEngineTheme;
+use Symfony\Bundle\FrameworkBundle\Form\PhpEngineThemeFactory;
 use Symfony\Component\Form\Type\AbstractFieldType;
 use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\CsrfProvider\DefaultCsrfProvider;
@@ -25,7 +25,7 @@ use Symfony\Tests\Component\Form\Renderer\Theme\AbstractThemeFunctionalTest;
  */
 class PhpEngineThemeFunctionalTest extends AbstractThemeFunctionalTest
 {
-    protected function createTheme()
+    protected function createThemeFactory()
     {
         $parser = new \Symfony\Component\Templating\TemplateNameParser();
         $loader = new \Symfony\Component\Templating\Loader\FilesystemLoader(__DIR__ . '/../../Resources/views/Form/%name%');
@@ -37,6 +37,6 @@ class PhpEngineThemeFunctionalTest extends AbstractThemeFunctionalTest
                 )
             )
         ));
-        return new PhpEngineTheme($engine);
+        return new PhpEngineThemeFactory($engine);
     }
 }

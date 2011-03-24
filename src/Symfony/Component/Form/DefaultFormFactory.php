@@ -16,10 +16,11 @@ use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Type;
 use Symfony\Component\Form\Type\FormTypeInterface;
-use Symfony\Component\Form\Renderer\Theme\FormThemeInterface;
+use Symfony\Component\Form\Type\AbstractFieldType;
 use Symfony\Component\Form\Type\Loader\TypeLoaderInterface;
 use Symfony\Component\Form\Type\Loader\DefaultTypeLoader;
-use Symfony\Component\Form\Type\AbstractFieldType;
+use Symfony\Component\Form\Renderer\Theme\FormThemeFactoryInterface;
+use Symfony\Component\Form\Renderer\Theme\PhpThemeFactory;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\CsrfProvider\DefaultCsrfProvider;
 use Doctrine\ORM\EntityManager;
@@ -47,21 +48,21 @@ class DefaultFormFactory extends FormFactory
     {
         $csrfProvider = new DefaultCsrfProvider($csrfSecret);
         $tempStorage = new TemporaryStorage($storageSecret);
-        $defaultTheme = new PhpTheme($charset);
-        return self::createInstance($defaultTheme, $validator, $csrfProvider, $tempStorage, $entityManager);
+        $defaultThemeFactory = new PhpThemeFactory($charset);
+        return self::createInstance($defaultThemeFactory, $validator, $csrfProvider, $tempStorage, $entityManager);
     }
 
     /**
      * Factory method to simplify creation of a default form factory.
-     * 
-     * @param FormThemeInterface $theme
+     *
+     * @param FormThemeFactoryInterface $themeFactory
      * @param ValidatorInterface $validator
      * @param CsrfProviderInterface $crsfProvider
      * @param TemporaryStorage $tempStorage
      * @param \Doctrine\ORM\EntityManager $entityManager
      * @return DefaultFormFactory
      */
-    public static function createInstance(FormThemeInterface $theme,
+    public static function createInstance(FormThemeFactoryInterface $themeFactory,
             ValidatorInterface $validator,
             CsrfProviderInterface $crsfProvider,
             TemporaryStorage $tempStorage,
@@ -69,7 +70,7 @@ class DefaultFormFactory extends FormFactory
     {
         $typeLoader = new DefaultTypeLoader();
         $factory = new self($typeLoader);
-        $typeLoader->initialize($factory, $theme, $crsfProvider, $validator, $tempStorage, $entityManager);
+        $typeLoader->initialize($factory, $themeFactory, null, $crsfProvider, $validator, $tempStorage, $entityManager);
 
         return $factory;
     }

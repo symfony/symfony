@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Type;
 use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Renderer\ThemeRenderer;
-use Symfony\Component\Form\Renderer\Theme\FormThemeInterface;
+use Symfony\Component\Form\Renderer\Theme\FormThemeFactoryInterface;
 use Symfony\Component\Form\Renderer\Plugin\FieldPlugin;
 use Symfony\Component\Form\EventListener\TrimListener;
 use Symfony\Component\Form\EventListener\ValidationListener;
@@ -26,14 +26,17 @@ use Symfony\Component\Validator\ValidatorInterface;
 
 class FieldType extends AbstractType
 {
-    private $theme;
-
     private $validator;
 
-    public function __construct(FormThemeInterface $theme, ValidatorInterface $validator)
+    private $themeFactory;
+
+    private $template;
+
+    public function __construct(ValidatorInterface $validator, FormThemeFactoryInterface $themeFactory, $template = null)
     {
-        $this->theme = $theme;
         $this->validator = $validator;
+        $this->themeFactory = $themeFactory;
+        $this->template = $template;
     }
 
     public function configure(FormBuilder $builder, array $options)
@@ -52,6 +55,9 @@ class FieldType extends AbstractType
             ? null
             : (array)$options['validation_groups'];
 
+        $renderer = new ThemeRenderer($this->themeFactory, $this->template);
+        $renderer->setBlock($options['template']);
+
         $builder->setRequired($options['required'])
             ->setReadOnly($options['read_only'])
             ->setErrorBubbling($options['error_bubbling'])
@@ -60,7 +66,7 @@ class FieldType extends AbstractType
             ->setAttribute('validation_groups', $options['validation_groups'])
             ->setAttribute('error_mapping', $options['error_mapping'])
             ->setData($options['data'])
-            ->setRenderer(new ThemeRenderer($this->theme, $options['template']))
+            ->setRenderer($renderer)
             ->addRendererPlugin(new FieldPlugin())
             ->addValidator(new DefaultValidator())
             ->addValidator(new DelegatingValidator($this->validator));

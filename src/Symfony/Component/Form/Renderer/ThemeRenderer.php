@@ -13,13 +13,16 @@ namespace Symfony\Component\Form\Renderer;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Renderer\Theme\FormThemeInterface;
+use Symfony\Component\Form\Renderer\Theme\FormThemeFactoryInterface;
 use Symfony\Component\Form\Renderer\Plugin\FormRendererPluginInterface;
 
 class ThemeRenderer implements FormRendererInterface, \ArrayAccess
 {
     private $form;
 
-    private $template;
+    private $block;
+
+    private $themeFactory;
 
     private $theme;
 
@@ -36,16 +39,17 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess
      * Row implicitly includes widget, however certain rendering mechanisms
      * have to skip widget rendering when a row is rendered.
      *
-     * @var bool
+     * @var Boolean
      */
     private $rendered = false;
 
     private $children = array();
 
-    public function __construct(FormThemeInterface $theme, $template)
+    public function __construct(FormThemeFactoryInterface $themeFactory, $template = null)
     {
-        $this->theme = $theme;
-        $this->template = $template;
+        $this->themeFactory = $themeFactory;
+
+        $this->setTemplate($template);
     }
 
     public function __clone()
@@ -86,6 +90,11 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess
         $this->children = $renderers;
     }
 
+    public function setTemplate($template)
+    {
+        $this->setTheme($this->themeFactory->create($template));
+    }
+
     public function setTheme(FormThemeInterface $theme)
     {
         $this->theme = $theme;
@@ -94,6 +103,16 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess
     public function getTheme()
     {
         return $this->theme;
+    }
+
+    public function setBlock($block)
+    {
+        $this->block = $block;
+    }
+
+    public function getBlock()
+    {
+        return $this->block;
     }
 
     public function addPlugin(FormRendererPluginInterface $plugin)
@@ -162,7 +181,7 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess
      * Renders the label of the given form
      *
      * @param FormInterface $form  The form to render the label for
-     * @param array $params          Additional variables passed to the template
+     * @param array $params          Additional variables passed to the block
      */
     public function getLabel($label = null, array $vars = array())
     {
@@ -178,11 +197,11 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess
         return $this->render('enctype', $this->vars);
     }
 
-    protected function render($block, array $vars = array())
+    protected function render($part, array $vars = array())
     {
         $this->initialize();
 
-        return $this->theme->render($this->template, $block, array_replace(
+        return $this->theme->render($this->block, $part, array_replace(
             $this->vars,
             $vars
         ));

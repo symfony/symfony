@@ -312,7 +312,11 @@ class EntityChoiceField extends ChoiceField
             return $qb->andWhere($where)->getQuery()->getSingleResult();
         }
 
-        return $this->getOption('em')->find($this->getOption('class'), $key);
+        if (!$entity = $this->getOption('em')->find($this->getOption('class'), $key)) {
+          throw new NoResultException;
+        }
+        
+        return $entity;
     }
 
     /**

@@ -21,6 +21,8 @@ namespace Symfony\Component\CssSelector;
  * which is copyright Infrae and distributed under the BSD license.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class Parser
 {
@@ -35,6 +37,8 @@ class Parser
      * @return string
      *
      * @throws SyntaxError When got None for xpath expression
+     *
+     * @api
      */
     static public function cssToXpath($cssExpr, $prefix = 'descendant-or-self::')
     {

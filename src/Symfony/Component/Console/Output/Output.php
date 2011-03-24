@@ -24,6 +24,8 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
  *  * quiet: -q (no output)
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 abstract class Output implements OutputInterface
 {
@@ -44,6 +46,8 @@ abstract class Output implements OutputInterface
      * @param integer                   $verbosity  The verbosity level (self::VERBOSITY_QUIET, self::VERBOSITY_NORMAL, self::VERBOSITY_VERBOSE)
      * @param Boolean                   $decorated  Whether to decorate messages or not (null for auto-guessing)
      * @param OutputFormatterInterface  $formatter  Output formatter instance
+     *
+     * @api
      */
     public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
     {
@@ -60,6 +64,8 @@ abstract class Output implements OutputInterface
      * Sets output formatter.
      *
      * @param   OutputFormatterInterface    $formatter
+     *
+     * @api
      */
     public function setFormatter(OutputFormatterInterface $formatter)
     {
@@ -70,6 +76,8 @@ abstract class Output implements OutputInterface
      * Returns current output formatter instance.
      *
      * @return  OutputFormatterInterface
+     *
+     * @api
      */
     public function getFormatter()
     {
@@ -80,6 +88,8 @@ abstract class Output implements OutputInterface
      * Sets the decorated flag.
      *
      * @param Boolean $decorated Whether to decorated the messages or not
+     *
+     * @api
      */
     public function setDecorated($decorated)
     {
@@ -90,6 +100,8 @@ abstract class Output implements OutputInterface
      * Gets the decorated flag.
      *
      * @return Boolean true if the output will decorate messages, false otherwise
+     *
+     * @api
      */
     public function isDecorated()
     {
@@ -100,6 +112,8 @@ abstract class Output implements OutputInterface
      * Sets the verbosity of the output.
      *
      * @param integer $level The level of verbosity
+     *
+     * @api
      */
     public function setVerbosity($level)
     {
@@ -110,6 +124,8 @@ abstract class Output implements OutputInterface
      * Gets the current verbosity of the output.
      *
      * @return integer The current level of verbosity
+     *
+     * @api
      */
     public function getVerbosity()
     {
@@ -121,6 +137,8 @@ abstract class Output implements OutputInterface
      *
      * @param string|array $messages The message as an array of lines of a single string
      * @param integer      $type     The type of output
+     *
+     * @api
      */
     public function writeln($messages, $type = 0)
     {
@@ -135,6 +153,8 @@ abstract class Output implements OutputInterface
      * @param integer      $type     The type of output
      *
      * @throws \InvalidArgumentException When unknown output type is given
+     *
+     * @api
      */
     public function write($messages, $newline = false, $type = 0)
     {

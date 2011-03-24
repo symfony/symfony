@@ -11,15 +11,15 @@
 
 namespace Symfony\Tests\Component\Form\Renderer\Theme;
 
-use Symfony\Component\Form\Renderer\Theme\PhpThemeEngine;
+use Symfony\Component\Form\Renderer\Theme\PhpTheme;
 
 /**
  * Test theme template files shipped with framework bundle.
  */
-class PhpThemeEngineFunctionalTest extends AbstractThemeEngineFunctionalTest
+class PhpThemeFunctionalTest extends AbstractThemeFunctionalTest
 {
-    protected function createEngine()
+    protected function createTheme()
     {
-        return new PhpThemeEngine();
+        return new PhpTheme();
     }
 }

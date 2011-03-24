@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Renderer;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Renderer\Theme\FormThemeEngineInterface;
+use Symfony\Component\Form\Renderer\Theme\FormThemeInterface;
 use Symfony\Component\Form\Renderer\Plugin\FormRendererPluginInterface;
 
 class ThemeRenderer implements FormRendererInterface, \ArrayAccess
@@ -21,7 +21,7 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess
 
     private $template;
 
-    private $engine;
+    private $theme;
 
     private $vars = array();
 
@@ -42,9 +42,9 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess
 
     private $children = array();
 
-    public function __construct(FormThemeEngineInterface $engine, $template)
+    public function __construct(FormThemeInterface $theme, $template)
     {
-        $this->engine = $engine;
+        $this->theme = $theme;
         $this->template = $template;
     }
 
@@ -86,14 +86,14 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess
         $this->children = $renderers;
     }
 
-    public function setEngine(FormThemeEngineInterface $engine)
+    public function setTheme(FormThemeInterface $theme)
     {
-        $this->engine = $engine;
+        $this->theme = $theme;
     }
 
-    public function getEngine()
+    public function getTheme()
     {
-        return $this->engine;
+        return $this->theme;
     }
 
     public function addPlugin(FormRendererPluginInterface $plugin)
@@ -182,7 +182,7 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess
     {
         $this->initialize();
 
-        return $this->engine->render($this->template, $block, array_replace(
+        return $this->theme->render($this->template, $block, array_replace(
             $this->vars,
             $vars
         ));

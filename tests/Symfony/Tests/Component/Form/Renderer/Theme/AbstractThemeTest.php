@@ -11,18 +11,18 @@
 
 namespace Symfony\Tests\Component\Form\Renderer\Theme;
 
-use Symfony\Component\Form\Renderer\Theme\PhpThemeEngine;
+use Symfony\Component\Form\Renderer\Theme\PhpTheme;
 
-abstract class AbstractThemeEngineTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
 {
     private $theme;
 
     public function setUp()
     {
-        $this->theme = $this->createEngine();
+        $this->theme = $this->createTheme();
     }
 
-    abstract protected function createEngine();
+    abstract protected function createTheme();
 
     public function testTextWidgetDefault()
     {

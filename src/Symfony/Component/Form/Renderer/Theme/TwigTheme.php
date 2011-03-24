@@ -15,7 +15,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Exception\FormException;
 
-class TwigThemeEngine implements FormThemeEngineInterface
+class TwigTheme implements FormThemeInterface
 {
     private $environment;
     private $templates;

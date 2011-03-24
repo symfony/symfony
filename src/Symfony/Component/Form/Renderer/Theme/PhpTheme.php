@@ -19,7 +19,7 @@ namespace Symfony\Component\Form\Renderer\Theme;
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
-class PhpThemeEngine implements FormThemeEngineInterface
+class PhpTheme implements FormThemeInterface
 {
     /**
      * Charset to be used with htmlentities.
@@ -40,7 +40,7 @@ class PhpThemeEngine implements FormThemeEngineInterface
         } else if (method_exists($this, $section)) {
             $method = $section;
         } else {
-            throw new \BadMethodCallException("PhpThemeEngine does not support to render the form block method '" . $method . "'.");
+            throw new \BadMethodCallException("PhpTheme does not support to render the form block method '" . $method . "'.");
         }
 
         return $this->$method($parameters);

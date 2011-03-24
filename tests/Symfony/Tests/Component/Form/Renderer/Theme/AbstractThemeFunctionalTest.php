@@ -20,16 +20,16 @@ use Symfony\Component\Form\FormFactory;
 /**
  * Test theme template files shipped with framework bundle.
  */
-abstract class AbstractThemeEngineFunctionalTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractThemeFunctionalTest extends \PHPUnit_Framework_TestCase
 {
     /** @var FormFactory */
     private $factory;
 
-    abstract protected function createEngine();
+    abstract protected function createTheme();
 
     public function setUp()
     {
-        $theme = $this->createEngine();
+        $theme = $this->createTheme();
         $csrfProvider = new DefaultCsrfProvider('foo');
         $validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
         $storage = new \Symfony\Component\HttpFoundation\File\TemporaryStorage('foo', 1, \sys_get_temp_dir());

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Renderer\Theme;
 
-interface FormThemeEngineInterface
+interface FormThemeInterface
 {
     function render($field, $section, array $parameters);
 }

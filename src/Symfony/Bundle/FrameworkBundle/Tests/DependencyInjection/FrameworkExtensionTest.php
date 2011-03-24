@@ -61,8 +61,8 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('full');
 
-        $this->assertTrue($container->hasAlias('form.theme.engine'), '->registerTemplatingConfiguration() aliases a form.theme.engine service.');
-        $this->assertEquals('form.theme.engine.templating.php', (string)$container->getAlias('form.theme.engine'));
+        $this->assertTrue($container->hasAlias('form.theme'), '->registerTemplatingConfiguration() aliases a form.theme service.');
+        $this->assertEquals('form.theme.twig', (string)$container->getAlias('form.theme'));
     }
 
     /**

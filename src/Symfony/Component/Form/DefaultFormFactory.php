@@ -16,7 +16,7 @@ use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Type;
 use Symfony\Component\Form\Type\FormTypeInterface;
-use Symfony\Component\Form\Renderer\Theme\FormThemeEngineInterface;
+use Symfony\Component\Form\Renderer\Theme\FormThemeInterface;
 use Symfony\Component\Form\Type\Loader\TypeLoaderInterface;
 use Symfony\Component\Form\Type\Loader\DefaultTypeLoader;
 use Symfony\Component\Form\Type\AbstractFieldType;
@@ -47,21 +47,21 @@ class DefaultFormFactory extends FormFactory
     {
         $csrfProvider = new DefaultCsrfProvider($csrfSecret);
         $tempStorage = new TemporaryStorage($storageSecret);
-        $defaultTheme = new PhpThemeEngine($charset);
+        $defaultTheme = new PhpTheme($charset);
         return self::createInstance($defaultTheme, $validator, $csrfProvider, $tempStorage, $entityManager);
     }
 
     /**
      * Factory method to simplify creation of a default form factory.
      * 
-     * @param FormThemeEngineInterface $theme
+     * @param FormThemeInterface $theme
      * @param ValidatorInterface $validator
      * @param CsrfProviderInterface $crsfProvider
      * @param TemporaryStorage $tempStorage
      * @param \Doctrine\ORM\EntityManager $entityManager
      * @return DefaultFormFactory
      */
-    public static function createInstance(FormThemeEngineInterface $theme,
+    public static function createInstance(FormThemeInterface $theme,
             ValidatorInterface $validator,
             CsrfProviderInterface $crsfProvider,
             TemporaryStorage $tempStorage,

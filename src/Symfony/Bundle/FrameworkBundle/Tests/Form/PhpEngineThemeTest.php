@@ -12,19 +12,19 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Form;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Bundle\FrameworkBundle\Form\PhpTemplatingThemeEngine;
+use Symfony\Bundle\FrameworkBundle\Form\PhpEngineTheme;
 use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
 use Symfony\Component\Templating\PhpEngine;
-use Symfony\Tests\Component\Form\Renderer\Theme\AbstractThemeEngineTest;
+use Symfony\Tests\Component\Form\Renderer\Theme\AbstractThemeTest;
 
-class PhpTemplatingThemeEngineTest extends AbstractThemeEngineTest
+class PhpEngineThemeTest extends AbstractThemeTest
 {
-    protected function createEngine()
+    protected function createTheme()
     {
         $parser = new TemplateNameParser();
         $loader = new FilesystemLoader(__DIR__ . '/../../Resources/views/Form/%name%');
         $engine = new PhpEngine($parser, $loader, array());
-        return new PhpTemplatingThemeEngine($engine);
+        return new PhpEngineTheme($engine);
     }
 }

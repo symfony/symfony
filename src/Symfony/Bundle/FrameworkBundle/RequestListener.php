@@ -110,7 +110,7 @@ class RequestListener
             if (null !== $this->logger) {
                 $this->logger->err($message);
             }
-            throw new MethodNotAllowedHttpException($e->getAllowedMethods(), $message, $e, 0);
+            throw new MethodNotAllowedHttpException($e->getAllowedMethods(), $message, $e);
         }
     }
 }

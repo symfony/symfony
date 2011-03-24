@@ -15,6 +15,8 @@ namespace Symfony\Component\DomCrawler\Field;
  * FileFormField represents a file form field (an HTML file input tag).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class FileFormField extends FormField
 {
@@ -39,6 +41,8 @@ class FileFormField extends FormField
      * Sets the value of the field.
      *
      * @param string $value The value of the field
+     *
+     * @api
      */
     public function upload($value)
     {

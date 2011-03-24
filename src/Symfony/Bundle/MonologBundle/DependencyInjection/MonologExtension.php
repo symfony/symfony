@@ -65,6 +65,34 @@ class MonologExtension extends Extension
                 }
             }
         }
+
+        $this->addClassesToCompile(array(
+            'Monolog\\Formatter\\FormatterInterface',
+            'Monolog\\Formatter\\LineFormatter',
+            'Monolog\\Handler\\HandlerInterface',
+            'Monolog\\Handler\\AbstractHandler',
+            'Monolog\\Handler\\StreamHandler',
+            'Monolog\\Handler\\FingersCrossedHandler',
+            'Monolog\\Handler\\TestHandler',
+            'Monolog\\Logger',
+            'Symfony\\Bundle\\MonologBundle\\Logger\\Logger',
+            'Symfony\\Bundle\\MonologBundle\\Logger\\DebugHandler',
+        ));
+    }
+
+    /**
+     * Returns the base path for the XSD files.
+     *
+     * @return string The XSD base path
+     */
+    public function getXsdValidationBasePath()
+    {
+        return __DIR__.'/../Resources/config/schema';
+    }
+
+    public function getNamespace()
+    {
+        return 'http://symfony.com/schema/dic/monolog';
     }
 
     private function buildHandler(ContainerBuilder $container, $name, array $handler)
@@ -140,21 +168,6 @@ class MonologExtension extends Extension
         $container->setDefinition($handlerId, $definition);
 
         return $handlerId;
-    }
-
-    /**
-     * Returns the base path for the XSD files.
-     *
-     * @return string The XSD base path
-     */
-    public function getXsdValidationBasePath()
-    {
-        return __DIR__.'/../Resources/config/schema';
-    }
-
-    public function getNamespace()
-    {
-        return 'http://symfony.com/schema/dic/monolog';
     }
 
     private function getHandlerId($name)

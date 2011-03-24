@@ -17,6 +17,8 @@ namespace Symfony\Component\EventDispatcher;
  * manager.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @api
  */
 interface EventDispatcherInterface
 {
@@ -28,6 +30,8 @@ interface EventDispatcherInterface
      *                          invoked on listeners.
      * @param Event $event The event to pass to the event handlers/listeners.
      *                     If not supplied, an empty Event instance is created.
+     *
+     * @api
      */
     function dispatch($eventName, Event $event = null);
 
@@ -39,6 +43,8 @@ interface EventDispatcherInterface
      * @param integer $priority The higher this value, the earlier an event
      *                          listener will be triggered in the chain.
      *                          Defaults to 0.
+     *
+     * @api
      */
     function addListener($eventNames, $listener, $priority = 0);
 
@@ -75,6 +81,8 @@ interface EventDispatcherInterface
      *
      * @return array The event listeners for the specified event, or all event
      *               listeners by event name.
+     *
+     * @api
      */
     function getListeners($eventName = null);
 
@@ -85,6 +93,8 @@ interface EventDispatcherInterface
      *
      * @return Boolean TRUE if the specified event has any listeners, FALSE
      *                 otherwise.
+     *
+     * @api
      */
     function hasListeners($eventName = null);
 }

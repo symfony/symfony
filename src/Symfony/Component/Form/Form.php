@@ -799,7 +799,7 @@ class Form implements \IteratorAggregate, FormInterface
             }
 
             if (null === $groups) {
-                $groups = array(null);
+                $groups = array('Default');
             }
 
             $propertyPath = $context->getPropertyPath();

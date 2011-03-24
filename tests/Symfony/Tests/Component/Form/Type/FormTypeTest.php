@@ -495,8 +495,8 @@ class FormTest extends TestCase
         $form = $this->factory->create('form', 'author');
 
         $graphWalker->expects($this->once())
-        ->method('walkReference')
-        ->with($object, null, 'path.data', true);
+            ->method('walkReference')
+            ->with($object, 'Default', 'path.data', true);
 
         $form->setData($object);
         $form->validateData($context);

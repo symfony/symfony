@@ -114,7 +114,7 @@ class Tokenizer
      *
      * @return array
      */
-    protected function tokenizeEscapedString($s, $pos)
+    private function tokenizeEscapedString($s, $pos)
     {
         $quote = $s[$pos];
 
@@ -150,7 +150,7 @@ class Tokenizer
      *
      * @return string
      */
-    protected function unescapeStringLiteral($literal)
+    private function unescapeStringLiteral($literal)
     {
         return preg_replace_callback('#(\\\\(?:[A-Fa-f0-9]{1,6}(?:\r\n|\s)?|[^A-Fa-f0-9]))#', function ($matches) use ($literal)
         {
@@ -177,7 +177,7 @@ class Tokenizer
      *
      * @return array
      */
-    protected function tokenizeSymbol($s, $pos)
+    private function tokenizeSymbol($s, $pos)
     {
         $start = $pos;
 

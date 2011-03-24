@@ -29,12 +29,12 @@ class Parser
      * Optionally, a prefix can be added to the resulting XPath
      * expression with the $prefix parameter.
      *
-     * @throws SyntaxError When got None for xpath expression
-     *
      * @param  mixed  $cssExpr The CSS expression.
      * @param  string $prefix  An optional prefix for the XPath expression.
      *
      * @return string
+     *
+     * @throws SyntaxError When got None for xpath expression
      */
     static public function cssToXpath($cssExpr, $prefix = 'descendant-or-self::')
     {
@@ -103,7 +103,7 @@ class Parser
      *
      * @return Node\NodeInterface
      */
-    protected function parseSelectorGroup($stream)
+    private function parseSelectorGroup($stream)
     {
         $result = array();
         while (true) {
@@ -132,7 +132,7 @@ class Parser
      *
      * @return Node\NodeInterface
      */
-    protected function parseSelector($stream)
+    private function parseSelector($stream)
     {
         $result = $this->parseSimpleSelector($stream);
 
@@ -168,7 +168,7 @@ class Parser
      *
      * @return Node\NodeInterface
      */
-    protected function parseSimpleSelector($stream)
+    private function parseSimpleSelector($stream)
     {
         $peek = $stream->peek();
         if ('*' != $peek && !$peek->isType('Symbol')) {
@@ -277,7 +277,7 @@ class Parser
      *
      * @return Node\AttribNode
      */
-    protected function parseAttrib($selector, $stream)
+    private function parseAttrib($selector, $stream)
     {
         $attrib = $stream->next();
         if ($stream->peek() == '|') {

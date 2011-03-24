@@ -195,7 +195,11 @@ class OutputFormatter implements OutputFormatterInterface
             return '';
         }
 
-        if ('style' == $match[1]) {
+        if (!isset($match[1])) {
+            $match[1] = '';
+        }
+
+        if ('' == $match[1]) {
             $style = new OutputFormatterStyle();
         } else {
             if (!isset($this->styles[strtolower($match[1])])) {

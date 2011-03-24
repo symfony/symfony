@@ -62,5 +62,10 @@
             <tag name="form.guesser" />
             <argument type="service" id="doctrine.orm.default_entity_manager" />
         </service>
+        
+        <service id="form.type.entity" class="Symfony\Bridge\Doctrine\Form\EntityType">
+            <tag name="form.type" alias="entity" />
+            <argument type="service" id="doctrine.orm.default_entity_manager" />
+        </service>
     </services>
 </container>

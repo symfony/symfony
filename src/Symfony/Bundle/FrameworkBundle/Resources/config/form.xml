@@ -126,10 +126,6 @@
         <service id="form.type.datetime" class="Symfony\Component\Form\Type\DateTimeType">
             <tag name="form.type" alias="datetime" />
         </service>
-        <service id="form.type.entity" class="Symfony\Component\Form\Type\EntityType">
-            <tag name="form.type" alias="entity" />
-            <argument type="service" id="doctrine.orm.default_entity_manager" />
-        </service>
         <service id="form.type.file" class="Symfony\Component\Form\Type\FileType">
             <tag name="form.type" alias="file" />
             <argument type="service" id="file.temporary_storage" />

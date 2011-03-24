@@ -18,7 +18,7 @@ use Symfony\Component\Form\FieldBuilder;
 use Symfony\Component\Form\CsrfProvider\DefaultCsrfProvider;
 use Symfony\Component\Form\Type\Loader\DefaultTypeLoader;
 use Symfony\Component\Form\FormFactory;
-use Symfony\Tests\Component\Form\Renderer\ThemeEngine\AbstractThemeEngineFunctionalTest;
+use Symfony\Tests\Component\Form\Renderer\Theme\AbstractThemeEngineFunctionalTest;
 
 /**
  * Test theme template files shipped with framework bundle.

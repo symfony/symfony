@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Renderer\ThemeEngine;
+namespace Symfony\Component\Form\Renderer\Theme;
 
 /**
  * Default Php Theme that renders a form without a dependency on a template engine.

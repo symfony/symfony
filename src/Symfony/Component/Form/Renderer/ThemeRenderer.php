@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Renderer;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Renderer\ThemeEngine\FormThemeEngineInterface;
+use Symfony\Component\Form\Renderer\Theme\FormThemeEngineInterface;
 use Symfony\Component\Form\Renderer\Plugin\FormRendererPluginInterface;
 
 class ThemeRenderer implements FormRendererInterface, \ArrayAccess

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Renderer\ThemeEngine;
+namespace Symfony\Component\Form\Renderer\Theme;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
@@ -18,34 +18,34 @@ use Symfony\Component\Form\Exception\FormException;
 class TwigThemeEngine implements FormThemeEngineInterface
 {
     private $environment;
-    private $themes;
-    private $themesByBlock;
+    private $templates;
+    private $templatesByBlock;
 
-    public function __construct(\Twig_Environment $environment, $themes)
+    public function __construct(\Twig_Environment $environment, $templates)
     {
         $this->environment = $environment;
-        $this->themes = (array)$themes;
+        $this->templates = (array)$templates;
     }
 
     private function initialize()
     {
-        if (!$this->themesByBlock) {
-            $this->themesByBlock = array();
+        if (!$this->templatesByBlock) {
+            $this->templatesByBlock = array();
 
-            foreach ($this->themes as $theme) {
-                $theme = $this->environment->loadTemplate($theme);
+            foreach ($this->templates as $template) {
+                $template = $this->environment->loadTemplate($template);
 
-                foreach ($this->getBlockNames($theme) as $blockName) {
-                    $this->themesByBlock[$blockName] = $theme;
+                foreach ($this->getBlockNames($template) as $blockName) {
+                    $this->templatesByBlock[$blockName] = $template;
                 }
             }
         }
     }
 
-    private function getBlockNames(\Twig_Template $theme)
+    private function getBlockNames(\Twig_Template $template)
     {
-        $names = $theme->getBlockNames();
-        $parent = $theme;
+        $names = $template->getBlockNames();
+        $parent = $template;
 
         while (false !== $parent = $parent->getParent(array())) {
             $names = array_merge($names, $parent->getBlockNames());
@@ -58,14 +58,14 @@ class TwigThemeEngine implements FormThemeEngineInterface
     {
         $this->initialize();
 
-        if (isset($this->themesByBlock[$field.'__'.$section])) {
+        if (isset($this->templatesByBlock[$field.'__'.$section])) {
             $blockName = $field.'__'.$section;
-        } else if (isset($this->themesByBlock[$section])) {
+        } else if (isset($this->templatesByBlock[$section])) {
             $blockName = $section;
         } else {
             throw new FormException(sprintf('The form theme is missing the "%s" block', $section));
         }
 
-        return $this->themesByBlock[$blockName]->renderBlock($blockName, $parameters);
+        return $this->templatesByBlock[$blockName]->renderBlock($blockName, $parameters);
     }
 }

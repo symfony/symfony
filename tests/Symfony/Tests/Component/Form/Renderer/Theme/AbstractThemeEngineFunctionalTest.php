@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Form\Renderer\ThemeEngine;
+namespace Symfony\Tests\Component\Form\Renderer\Theme;
 
 use Symfony\Component\Form\Type\AbstractType;
 use Symfony\Component\Form\FormBuilder;

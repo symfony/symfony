@@ -16,7 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Form\PhpTemplatingThemeEngine;
 use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
 use Symfony\Component\Templating\PhpEngine;
-use Symfony\Tests\Component\Form\Renderer\ThemeEngine\AbstractThemeEngineTest;
+use Symfony\Tests\Component\Form\Renderer\Theme\AbstractThemeEngineTest;
 
 class PhpTemplatingThemeEngineTest extends AbstractThemeEngineTest
 {

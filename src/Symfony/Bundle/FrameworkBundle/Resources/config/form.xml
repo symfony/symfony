@@ -11,8 +11,8 @@
         <parameter key="form.type.loader.tagged.class">Symfony\Bundle\FrameworkBundle\Form\ContainerAwareTypeLoader</parameter>
         <parameter key="form.guesser.validator.class">Symfony\Component\Form\Type\Guesser\ValidatorTypeGuesser</parameter>
         <parameter key="form.csrf_provider.class">Symfony\Component\Form\CsrfProvider\SessionCsrfProvider</parameter>
-        <parameter key="form.theme.engine.twig.class">Symfony\Component\Form\Renderer\ThemeEngine\TwigThemeEngine</parameter>
-        <parameter key="form.theme.engine.php.class">Symfony\Component\Form\Renderer\ThemeEngine\PhpThemeEngine</parameter>
+        <parameter key="form.theme.engine.twig.class">Symfony\Component\Form\Renderer\Theme\TwigThemeEngine</parameter>
+        <parameter key="form.theme.engine.php.class">Symfony\Component\Form\Renderer\Theme\PhpThemeEngine</parameter>
         <parameter key="form.theme.engine.templating.php.class">Symfony\Bundle\FrameworkBundle\Form\PhpTemplatingThemeEngine</parameter>
         <parameter key="form.theme">TwigBundle::div_layout.html.twig</parameter>
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>

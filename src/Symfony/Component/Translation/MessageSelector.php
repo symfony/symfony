@@ -15,6 +15,8 @@ namespace Symfony\Component\Translation;
  * MessageSelector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class MessageSelector
 {
@@ -41,6 +43,8 @@ class MessageSelector
      * @param  integer $number The number of items represented for the message
      * @param  string $locale The locale to use for choosing
      * @return string
+     *
+     * @api
      */
     public function choose($message, $number, $locale)
     {

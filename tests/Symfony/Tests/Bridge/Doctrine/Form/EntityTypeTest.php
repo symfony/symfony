@@ -29,16 +29,13 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
     const COMPOSITE_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeIdentEntity';
 
+    private $em;
+
     protected function setUp()
     {
-        parent::setUp();
-
-        if (!$this->chainLoader->hasType('entity')) {
-            $this->markTestSkipped('No entity type.');
-        }
-
         $this->em = $this->createTestEntityManager();
-        $this->chainLoader->addLoader(new DoctrineTypeLoader($this->em));
+
+        parent::setUp();
 
         $schemaTool = new SchemaTool($this->em);
         $classes = array(
@@ -55,6 +52,14 @@ class EntityTypeTest extends DoctrineOrmTestCase
             $schemaTool->createSchema($classes);
         } catch(\Exception $e) {
         }
+    }
+
+    protected function getTypeLoaders()
+    {
+        $loaders = parent::getTypeLoaders();
+        $loaders[] = new DoctrineTypeLoader($this->em);
+
+        return $loaders;
     }
 
     protected function persist(array $entities)

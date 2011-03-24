@@ -14,6 +14,7 @@ namespace Symfony\Tests\Component\Form\Type;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Type\Loader\DefaultTypeLoader;
+use Symfony\Component\Form\Type\Loader\TypeLoaderChain;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class TestCase extends \PHPUnit_Framework_TestCase
@@ -26,15 +27,13 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
     protected $storage;
 
-    protected $em;
-
     protected $factory;
 
     protected $builder;
 
     protected $dispatcher;
 
-    protected $chainLoader;
+    protected $typeLoader;
 
     protected function setUp()
     {
@@ -49,15 +48,22 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         $this->storage = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\TemporaryStorage')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $loader = new DefaultTypeLoader($this->themeFactory, null,
-                $this->validator, $this->csrfProvider, $this->storage);
-        $this->chainLoader = new \Symfony\Component\Form\Type\Loader\TypeLoaderChain();
-        $this->chainLoader->addLoader($loader);
-        $this->factory = new FormFactory($this->chainLoader);
+
+        $this->typeLoader = new TypeLoaderChain();
+
+        // TODO should be passed to chain constructor instead
+        foreach ($this->getTypeLoaders() as $loader) {
+            $this->typeLoader->addLoader($loader);
+        }
+
+        $this->factory = new FormFactory($this->typeLoader);
 
         $this->builder = new FormBuilder($this->dispatcher);
+    }
+
+    protected function getTypeLoaders()
+    {
+        return array(new DefaultTypeLoader($this->themeFactory, null,
+                $this->validator, $this->csrfProvider, $this->storage));
     }
 }

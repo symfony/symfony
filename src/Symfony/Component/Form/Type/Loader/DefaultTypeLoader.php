@@ -18,7 +18,6 @@ use Symfony\Component\Form\Renderer\Theme\FormThemeFactoryInterface;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\File\TemporaryStorage;
-use Doctrine\ORM\EntityManager;
 
 class DefaultTypeLoader extends ArrayTypeLoader
 {

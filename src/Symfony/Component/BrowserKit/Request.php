@@ -15,6 +15,8 @@ namespace Symfony\Component\BrowserKit;
  * Request object.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class Request
 {
@@ -36,6 +38,8 @@ class Request
      * @param array  $cookies    An array of cookies
      * @param array  $server     An array of server parameters
      * @param string $content    The raw body data
+     *
+     * @api
      */
     public function __construct($uri, $method, array $parameters = array(), array $files = array(), array $cookies = array(), array $server = array(), $content = null)
     {
@@ -52,6 +56,8 @@ class Request
      * Gets the request URI.
      *
      * @return string The request URI
+     *
+     * @api
      */
     public function getUri()
     {
@@ -62,6 +68,8 @@ class Request
      * Gets the request HTTP method.
      *
      * @return string The request HTTP method
+     *
+     * @api
      */
     public function getMethod()
     {
@@ -72,6 +80,8 @@ class Request
      * Gets the request parameters.
      *
      * @return array The request parameters
+     *
+     * @api
      */
     public function getParameters()
     {
@@ -82,6 +92,8 @@ class Request
      * Gets the request server files.
      *
      * @return array The request files
+     *
+     * @api
      */
     public function getFiles()
     {
@@ -92,6 +104,8 @@ class Request
      * Gets the request cookies.
      *
      * @return array The request cookies
+     *
+     * @api
      */
     public function getCookies()
     {
@@ -102,6 +116,8 @@ class Request
      * Gets the request server parameters.
      *
      * @return array The request server parameters
+     *
+     * @api
      */
     public function getServer()
     {
@@ -112,6 +128,8 @@ class Request
      * Gets the request raw body data.
      *
      * @return string The request raw body data.
+     *
+     * @api
      */
     public function getContent()
     {

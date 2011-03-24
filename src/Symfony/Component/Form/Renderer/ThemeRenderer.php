@@ -154,6 +154,8 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess
 
     public function getVars()
     {
+        $this->initialize();
+
         return $this->vars;
     }
 
@@ -215,22 +217,22 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess
             $vars
         ));
     }
- 
+
     public function offsetGet($name)
     {
         return $this->children[$name];
     }
- 
+
     public function offsetExists($name)
     {
         return isset($this->children[$name]);
     }
- 
+
     public function offsetSet($name, $value)
     {
         throw new \BadMethodCallException('Not supported');
     }
- 
+
     public function offsetUnset($name)
     {
         throw new \BadMethodCallException('Not supported');

@@ -62,8 +62,8 @@ class PhpProcess extends Process
      */
     public function run($callback = null)
     {
-        if (null === $this->commandline) {
-            $this->commandline = $this->getPhpBinary();
+        if (null === $this->getCommandLine()) {
+            $this->setCommandLine($this->getPhpBinary());
         }
 
         return parent::run($callback);

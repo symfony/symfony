@@ -284,6 +284,11 @@ class Process
         $this->stderr .= $line;
     }
 
+    public function getCommandLine()
+    {
+        return $this->commandline;
+    }
+
     public function setCommandLine($commandline)
     {
         $this->commandline = $commandline;

@@ -115,6 +115,8 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      * Returns the bundle name (the class short name).
      *
      * @return string The Bundle name
+     *
+     * @throws RuntimeException If the bundle class name does not end with "Bundle"
      */
     final public function getName()
     {
@@ -122,10 +124,14 @@ abstract class Bundle extends ContainerAware implements BundleInterface
             return $this->name;
         }
 
-        $name = get_class($this);
-        $pos = strrpos($name, '\\');
+        $fqcn = get_class($this);
+        $name = false === ($pos = strrpos($fqcn, '\\')) ? $fqcn : substr($fqcn, $pos + 1);
 
-        return $this->name = false === $pos ? $name :  substr($name, $pos + 1);
+        if ('Bundle' != substr($name, -6)) {
+            throw new \RuntimeException(sprintf('The bundle class name "%s" must end with "Bundle" to be valid.', $name));
+        }
+
+        return $this->name = substr($name, 0, -6);
     }
 
     /**

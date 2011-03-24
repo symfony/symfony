@@ -19,6 +19,8 @@ namespace Symfony\Component\Process;
  * print $p->getOutput()."\n";
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class PhpProcess extends Process
 {
@@ -30,6 +32,8 @@ class PhpProcess extends Process
      * @param array   $env     The environment variables
      * @param integer $timeout The timeout in seconds
      * @param array   $options An array of options for proc_open
+     *
+     * @api
      */
     public function __construct($script, $cwd = null, array $env = array(), $timeout = 60, array $options = array())
     {
@@ -38,6 +42,8 @@ class PhpProcess extends Process
 
     /**
      * Sets the path to the PHP binary to use.
+     *
+     * @api
      */
     public function setPhpBinary($php)
     {
@@ -51,6 +57,8 @@ class PhpProcess extends Process
      *                                       output available on STDOUT or STDERR
      *
      * @return integer The exit status code
+     *
+     * @api
      */
     public function run($callback = null)
     {

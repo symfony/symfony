@@ -16,6 +16,8 @@ namespace Symfony\Component\Process;
  * start independent PHP processes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class Process
 {
@@ -41,6 +43,8 @@ class Process
      * @param array   $options     An array of options for proc_open
      *
      * @throws \RuntimeException When proc_open is not installed
+     *
+     * @api
      */
     public function __construct($commandline, $cwd = null, array $env = array(), $stdin = null, $timeout = 60, array $options = array())
     {
@@ -75,6 +79,8 @@ class Process
      * @return integer The exit status code
      *
      * @throws \RuntimeException When process can't be launch or is stopped
+     *
+     * @api
      */
     public function run($callback = null)
     {
@@ -165,6 +171,8 @@ class Process
      * to the run() method.
      *
      * @return string The process output
+     *
+     * @api
      */
     public function getOutput()
     {
@@ -178,6 +186,8 @@ class Process
      * to the run() method.
      *
      * @return string The process error output
+     *
+     * @api
      */
     public function getErrorOutput()
     {
@@ -188,6 +198,8 @@ class Process
      * Returns the exit code returned by the process.
      *
      * @return integer The exit status code
+     *
+     * @api
      */
     public function getExitCode()
     {
@@ -198,6 +210,8 @@ class Process
      * Checks if the process ended successfully.
      *
      * @return Boolean true if the process ended successfully, false otherwise
+     *
+     * @api
      */
     public function isSuccessful()
     {
@@ -210,6 +224,8 @@ class Process
      * It always returns false on Windows.
      *
      * @return Boolean
+     *
+     * @api
      */
     public function hasBeenSignaled()
     {
@@ -222,6 +238,8 @@ class Process
      * It is only meaningful if hasBeenSignaled() returns true.
      *
      * @return integer
+     *
+     * @api
      */
     public function getTermSignal()
     {
@@ -234,6 +252,8 @@ class Process
      * It always returns false on Windows.
      *
      * @return Boolean
+     *
+     * @api
      */
     public function hasBeenStopped()
     {
@@ -246,6 +266,8 @@ class Process
      * It is only meaningful if hasBeenStopped() returns true.
      *
      * @return integer
+     *
+     * @api
      */
     public function getStopSignal()
     {

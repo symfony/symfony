@@ -171,7 +171,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $definition = $container->getDefinition('doctrine.orm.default_configuration');
         $calls = array_values($definition->getMethodCalls());
-        $this->assertEquals(array('YamlBundle' => 'Fixtures\Bundles\YamlBundle\Entity'), $calls[0][1][0]);
+        $this->assertEquals(array('Yaml' => 'Fixtures\Bundles\YamlBundle\Entity'), $calls[0][1][0]);
         $this->assertEquals('doctrine.orm.default_metadata_cache', (string) $calls[1][1][0]);
         $this->assertEquals('doctrine.orm.default_query_cache', (string) $calls[2][1][0]);
         $this->assertEquals('doctrine.orm.default_result_cache', (string) $calls[3][1][0]);
@@ -366,7 +366,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $definition = $container->getDefinition('doctrine.orm.default_configuration');
         $this->assertDICDefinitionMethodCallOnce($definition, 'setEntityNamespaces',
-            array(array('YamlBundle' => 'Fixtures\Bundles\YamlBundle\Entity'))
+            array(array('Yaml' => 'Fixtures\Bundles\YamlBundle\Entity'))
         );
     }
 

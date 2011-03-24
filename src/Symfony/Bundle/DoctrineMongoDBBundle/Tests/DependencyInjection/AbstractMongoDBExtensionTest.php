@@ -229,8 +229,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
         $definition = $container->getDefinition('doctrine.odm.mongodb.default_configuration');
         $calls = $definition->getMethodCalls();
-        $this->assertTrue(isset($calls[0][1][0]['YamlBundle']));
-        $this->assertEquals('DoctrineMongoDBBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle\Document', $calls[0][1][0]['YamlBundle']);
+        $this->assertTrue(isset($calls[0][1][0]['Yaml']));
+        $this->assertEquals('DoctrineMongoDBBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle\Document', $calls[0][1][0]['Yaml']);
     }
 
     public function testYamlBundleMappingDetection()

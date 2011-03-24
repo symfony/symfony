@@ -53,6 +53,9 @@ abstract class AbstractDoctrineExtension extends Extension
                 if (!isset($mappingConfig['prefix'])) {
                     $mappingConfig['prefix'] = false;
                 }
+                if (!isset($mappingConfig['alias'])) {
+                    $mappingConfig['alias'] = false;
+                }
 
                 $mappingConfig['dir'] = $container->getParameterBag()->resolveValue($mappingConfig['dir']);
                 // a bundle configuration is detected by realizing that the specified dir is not absolute and existing
@@ -101,7 +104,7 @@ abstract class AbstractDoctrineExtension extends Extension
      */
     protected function setMappingDriverAlias($mappingConfig, $mappingName)
     {
-        if (isset($mappingConfig['alias'])) {
+        if ($mappingConfig['alias']) {
             $this->aliasMap[$mappingConfig['alias']] = $mappingConfig['prefix'];
         } else {
             $this->aliasMap[$mappingName] = $mappingConfig['prefix'];
@@ -164,6 +167,9 @@ abstract class AbstractDoctrineExtension extends Extension
 
         if (!$bundleConfig['prefix']) {
             $bundleConfig['prefix'] = $bundle->getNamespaceName().'\\'.$this->getMappingObjectDefaultName();
+        }
+        if (!$bundleConfig['alias']) {
+            $bundleConfig['alias'] = substr($bundle->getShortName(), 0, -6);
         }
         return $bundleConfig;
     }

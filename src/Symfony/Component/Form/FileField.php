@@ -88,9 +88,9 @@ class FileField extends Form
                     throw new FormException('A PHP extension stopped the file upload (UPLOAD_ERR_EXTENSION)');
                 case UPLOAD_ERR_OK:
                 default:
+                    $data['original_name'] = $data['file']->getName();
                     $data['file']->move($this->getTmpDir());
                     $data['file']->rename($this->getTmpName($data['token']));
-                    $data['original_name'] = $data['file']->getName();
                     $data['file'] = '';
                     break;
             }

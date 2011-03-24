@@ -30,13 +30,11 @@ use Symfony\Bundle\TwigBundle\TwigEngine;
  */
 class WebDebugToolbarListener
 {
-    protected $kernel;
     protected $templating;
     protected $interceptRedirects;
 
-    public function __construct(HttpKernel $kernel, TwigEngine $templating, $interceptRedirects = false)
+    public function __construct(TwigEngine $templating, $interceptRedirects = false)
     {
-        $this->kernel = $kernel;
         $this->templating = $templating;
         $this->interceptRedirects = $interceptRedirects;
     }
@@ -48,7 +46,7 @@ class WebDebugToolbarListener
         }
 
         $response = $event->getResponse();
-	$request = $event->getRequest();
+        $request = $event->getRequest();
 
         if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects) {
             // keep current flashes for one more request

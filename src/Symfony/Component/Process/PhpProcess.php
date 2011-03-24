@@ -41,7 +41,7 @@ class PhpProcess extends Process
      */
     public function setPhpBinary($php)
     {
-        $this->commandline = $php;
+        $this->setCommandLine($php);
     }
 
     /**
@@ -68,7 +68,7 @@ class PhpProcess extends Process
      *
      * @throws \RuntimeException When defined PHP_PATH is not executable or not found
      */
-    static public function getPhpBinary()
+    private function getPhpBinary()
     {
         if (getenv('PHP_PATH')) {
             if (!is_executable($php = getenv('PHP_PATH'))) {

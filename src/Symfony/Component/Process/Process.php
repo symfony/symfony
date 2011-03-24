@@ -19,16 +19,16 @@ namespace Symfony\Component\Process;
  */
 class Process
 {
-    protected $commandline;
-    protected $cwd;
-    protected $env;
-    protected $stdin;
-    protected $timeout;
-    protected $options;
-    protected $exitcode;
-    protected $status;
-    protected $stdout;
-    protected $stderr;
+    private $commandline;
+    private $cwd;
+    private $env;
+    private $stdin;
+    private $timeout;
+    private $options;
+    private $exitcode;
+    private $status;
+    private $stdout;
+    private $stderr;
 
     /**
      * Constructor.
@@ -260,5 +260,10 @@ class Process
     public function addErrorOutput($line)
     {
         $this->stderr .= $line;
+    }
+
+    public function setCommandLine($commandline)
+    {
+        $this->commandline = $commandline;
     }
 }

@@ -15,6 +15,10 @@ use Symfony\Component\Form\Renderer\Plugin\FieldPlugin;
 
 class FieldPluginTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        $this->markTestSkipped('Move me to Type tests');
+    }
 
     public function testSetUp()
     {
@@ -89,7 +93,7 @@ class FieldPluginTest extends \PHPUnit_Framework_TestCase
         $renderer->expects($this->at(10))
                 ->method('setVar')
                 ->with($this->equalTo('label'), $this->equalTo('The name'));
-        
+
 
         $plugin = new FieldPlugin();
         $plugin->setUp($form, $renderer);

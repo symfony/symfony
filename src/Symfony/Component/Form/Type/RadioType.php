@@ -11,25 +11,35 @@
 
 namespace Symfony\Component\Form\Type;
 
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\DataTransformer\BooleanToStringTransformer;
-use Symfony\Component\Form\Renderer\Plugin\CheckedPlugin;
-use Symfony\Component\Form\Renderer\Plugin\ParentNamePlugin;
+use Symfony\Component\Form\Renderer\FormRendererInterface;
 
 class RadioType extends AbstractType
 {
     public function configure(FormBuilder $builder, array $options)
     {
         $builder->setClientTransformer(new BooleanToStringTransformer())
-            ->addRendererPlugin(new CheckedPlugin())
-            ->addRendererPlugin(new ParentNamePlugin())
-            ->setRendererVar('value', $options['value']);
+            ->setAttribute('value', $options['value']);
+    }
+
+    public function buildRenderer(FormRendererInterface $renderer, FormInterface $form)
+    {
+        $renderer->setBlock('radio');
+        $renderer->setVar('value', $form->getAttribute('value'));
+        $renderer->setVar('checked', (bool)$form->getData());
+
+        if ($renderer->hasParent()) {
+            $renderer->setVar('name', function () use ($renderer) {
+                $renderer->setVar('name', $renderer->getParent()->getVar('name'));
+            });
+        }
     }
 
     public function getDefaultOptions(array $options)
     {
         return array(
-            'template' => 'radio',
             'value' => null,
         );
     }

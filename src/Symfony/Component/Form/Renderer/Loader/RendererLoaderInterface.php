@@ -9,12 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Renderer\Plugin;
+namespace Symfony\Component\Form\Renderer\Loader;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Renderer\FormRendererInterface;
 
-interface FormRendererPluginInterface
+interface RendererLoaderInterface
 {
-    function setUp(FormInterface $form, FormRendererInterface $renderer);
+    function getRenderer($name, FormInterface $form);
+
+    function hasRenderer($name);
 }

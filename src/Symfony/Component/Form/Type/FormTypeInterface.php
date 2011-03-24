@@ -12,10 +12,14 @@
 namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Renderer\FormRendererInterface;
 
 interface FormTypeInterface
 {
     function configure(FormBuilder $builder, array $options);
+
+    function buildRenderer(FormRendererInterface $renderer, FormInterface $form);
 
     function createBuilder(array $options);
 

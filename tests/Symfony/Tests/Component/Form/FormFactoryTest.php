@@ -20,12 +20,15 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 {
     private $typeLoader;
 
+    private $rendererLoader;
+
     private $factory;
 
     protected function setUp()
     {
         $this->typeLoader = $this->getMock('Symfony\Component\Form\Type\Loader\TypeLoaderInterface');
-        $this->factory = new FormFactory($this->typeLoader);
+        $this->rendererLoader = $this->getMock('Symfony\Component\Form\Renderer\Loader\RendererLoaderInterface');
+        $this->factory = new FormFactory($this->typeLoader, $this->rendererLoader);
     }
 
     public function testCreateBuilderForPropertyCreatesFieldWithHighestConfidence()
@@ -184,7 +187,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     {
         return $this->getMockBuilder('Symfony\Component\Form\FormFactory')
             ->setMethods($methods)
-            ->setConstructorArgs(array($this->typeLoader, $guessers))
+            ->setConstructorArgs(array($this->typeLoader, $this->rendererLoader, $guessers))
             ->getMock();
     }
 }

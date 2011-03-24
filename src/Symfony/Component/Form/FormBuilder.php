@@ -13,9 +13,6 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\DataMapper\DataMapperInterface;
 use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
-use Symfony\Component\Form\Renderer\ThemeRenderer;
-use Symfony\Component\Form\Renderer\FormRendererInterface;
-use Symfony\Component\Form\Renderer\Plugin\FormRendererPluginInterface;
 use Symfony\Component\Form\Validator\FormValidatorInterface;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -35,10 +32,6 @@ class FormBuilder
     private $readOnly;
 
     private $required;
-
-    private $renderer;
-
-    private $rendererVars = array();
 
     private $clientTransformer;
 
@@ -232,50 +225,6 @@ class FormBuilder
     public function getClientTransformer()
     {
         return $this->clientTransformer;
-    }
-
-    /**
-     * Sets the renderer
-     *
-     * @param FormRendererInterface $renderer
-     */
-    public function setRenderer(FormRendererInterface $renderer)
-    {
-        $this->renderer = $renderer;
-
-        return $this;
-    }
-
-    public function addRendererPlugin(FormRendererPluginInterface $plugin)
-    {
-        $this->rendererVars[] = $plugin;
-
-        return $this;
-    }
-
-    public function setRendererVar($name, $value)
-    {
-        $this->rendererVars[$name] = $value;
-
-        return $this;
-    }
-
-    protected function buildRenderer()
-    {
-        foreach ($this->rendererVars as $name => $value) {
-            if (!$this->renderer) {
-                throw new FormException('A renderer must be set in order to add renderer variables or plugins');
-            }
-
-            if ($value instanceof FormRendererPluginInterface) {
-                $this->renderer->addPlugin($value);
-                continue;
-            }
-
-            $this->renderer->setVar($name, $value);
-        }
-
-        return $this->renderer;
     }
 
     public function setAttribute($name, $value)
@@ -478,7 +427,6 @@ class FormBuilder
             $this->getName(),
             $this->getTypes(),
             $this->buildDispatcher(),
-            $this->buildRenderer(),
             $this->getClientTransformer(),
             $this->getNormTransformer(),
             $this->getDataMapper(),

@@ -59,21 +59,21 @@ class ChoiceTypeTest extends TestCase
 
         $form->bind(0);
 
-        $this->assertTrue($form->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $form->getClientData()));
-        $this->assertTrue($form->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $form->getClientData()));
-        $this->assertFalse($form->getRenderer()->getVar('choice_list')->isChoiceSelected('', $form->getClientData()));
+        $this->assertTrue($form->getAttribute('choice_list')->isChoiceSelected(0, $form->getClientData()));
+        $this->assertTrue($form->getAttribute('choice_list')->isChoiceSelected('0', $form->getClientData()));
+        $this->assertFalse($form->getAttribute('choice_list')->isChoiceSelected('', $form->getClientData()));
 
         $form->bind('0');
 
-        $this->assertTrue($form->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $form->getClientData()));
-        $this->assertTrue($form->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $form->getClientData()));
-        $this->assertFalse($form->getRenderer()->getVar('choice_list')->isChoiceSelected('', $form->getClientData()));
+        $this->assertTrue($form->getAttribute('choice_list')->isChoiceSelected(0, $form->getClientData()));
+        $this->assertTrue($form->getAttribute('choice_list')->isChoiceSelected('0', $form->getClientData()));
+        $this->assertFalse($form->getAttribute('choice_list')->isChoiceSelected('', $form->getClientData()));
 
         $form->bind('');
 
-        $this->assertFalse($form->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $form->getClientData()));
-        $this->assertFalse($form->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $form->getClientData()));
-        $this->assertTrue($form->getRenderer()->getVar('choice_list')->isChoiceSelected('', $form->getClientData()));
+        $this->assertFalse($form->getAttribute('choice_list')->isChoiceSelected(0, $form->getClientData()));
+        $this->assertFalse($form->getAttribute('choice_list')->isChoiceSelected('0', $form->getClientData()));
+        $this->assertTrue($form->getAttribute('choice_list')->isChoiceSelected('', $form->getClientData()));
     }
 
     public function testIsChoiceSelectedDifferentiatesBetweenZeroAndEmpty_stringZero()
@@ -87,21 +87,21 @@ class ChoiceTypeTest extends TestCase
 
         $form->bind(0);
 
-        $this->assertTrue($form->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $form->getClientData()));
-        $this->assertTrue($form->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $form->getClientData()));
-        $this->assertFalse($form->getRenderer()->getVar('choice_list')->isChoiceSelected('', $form->getClientData()));
+        $this->assertTrue($form->getAttribute('choice_list')->isChoiceSelected(0, $form->getClientData()));
+        $this->assertTrue($form->getAttribute('choice_list')->isChoiceSelected('0', $form->getClientData()));
+        $this->assertFalse($form->getAttribute('choice_list')->isChoiceSelected('', $form->getClientData()));
 
         $form->bind('0');
 
-        $this->assertTrue($form->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $form->getClientData()));
-        $this->assertTrue($form->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $form->getClientData()));
-        $this->assertFalse($form->getRenderer()->getVar('choice_list')->isChoiceSelected('', $form->getClientData()));
+        $this->assertTrue($form->getAttribute('choice_list')->isChoiceSelected(0, $form->getClientData()));
+        $this->assertTrue($form->getAttribute('choice_list')->isChoiceSelected('0', $form->getClientData()));
+        $this->assertFalse($form->getAttribute('choice_list')->isChoiceSelected('', $form->getClientData()));
 
         $form->bind('');
 
-        $this->assertFalse($form->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $form->getClientData()));
-        $this->assertFalse($form->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $form->getClientData()));
-        $this->assertTrue($form->getRenderer()->getVar('choice_list')->isChoiceSelected('', $form->getClientData()));
+        $this->assertFalse($form->getAttribute('choice_list')->isChoiceSelected(0, $form->getClientData()));
+        $this->assertFalse($form->getAttribute('choice_list')->isChoiceSelected('0', $form->getClientData()));
+        $this->assertTrue($form->getAttribute('choice_list')->isChoiceSelected('', $form->getClientData()));
     }
 
     /**
@@ -139,6 +139,8 @@ class ChoiceTypeTest extends TestCase
      */
     public function testClosureShouldReturnArray()
     {
+        $this->markTestSkipped('Should be moved to ChoiceListTest');
+
         $form = $this->factory->create('choice', 'name', array(
             'choices' => function () { return 'foobar'; },
         ));

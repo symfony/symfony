@@ -15,6 +15,10 @@ use Symfony\Component\Form\Renderer\Plugin\ChoicePlugin;
 
 class ChoicePluginTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        $this->markTestSkipped('Move me to Type tests');
+    }
 
     public function testSetUp()
     {
@@ -27,7 +31,6 @@ class ChoicePluginTest extends \PHPUnit_Framework_TestCase
               ->will($this->returnValue('somethingelse'));
 
         $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
-        
         $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
 
         $renderer->expects($this->at(0))

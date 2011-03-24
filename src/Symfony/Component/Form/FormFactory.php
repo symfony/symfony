@@ -17,14 +17,17 @@ use Symfony\Component\Form\Type\Guesser\TypeGuesserInterface;
 use Symfony\Component\Form\Type\Guesser\Guess;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Renderer\Loader\RendererLoaderInterface;
 
 class FormFactory implements FormFactoryInterface
 {
     private $typeLoader;
 
+    private $rendererLoader;
+
     private $guessers = array();
 
-    public function __construct(TypeLoaderInterface $typeLoader, array $guessers = array())
+    public function __construct(TypeLoaderInterface $typeLoader, RendererLoaderInterface $rendererLoader, array $guessers = array())
     {
         foreach ($guessers as $guesser) {
             if (!$guesser instanceof TypeGuesserInterface) {
@@ -33,6 +36,7 @@ class FormFactory implements FormFactoryInterface
         }
         $this->typeLoader = $typeLoader;
         $this->guessers = $guessers;
+        $this->rendererLoader = $rendererLoader;
     }
 
     public function createBuilder($type, $name = null, array $options = array())
@@ -129,6 +133,13 @@ class FormFactory implements FormFactoryInterface
     public function createForProperty($class, $property, array $options = array())
     {
         return $this->createBuilderForProperty($class, $property, $options)->getForm();
+    }
+
+    public function createRenderer(FormInterface $form, $name = null)
+    {
+        // TODO if $name === null, use default renderer
+
+        return $this->rendererLoader->getRenderer($name, $form);
     }
 
     /**

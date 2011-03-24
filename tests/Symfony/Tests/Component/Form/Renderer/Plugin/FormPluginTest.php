@@ -15,6 +15,10 @@ use Symfony\Component\Form\Renderer\Plugin\FormPlugin;
 
 class FormPluginTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        $this->markTestSkipped('Move me to Type tests');
+    }
 
     public function testSetUp()
     {
@@ -29,7 +33,7 @@ class FormPluginTest extends \PHPUnit_Framework_TestCase
         $renderer->expects($this->at(1))
                 ->method('setVar')
                 ->with($this->equalTo('multipart'), $this->equalTo(false));
-        
+
 
         $plugin = new FormPlugin();
         $plugin->setUp($form, $renderer);

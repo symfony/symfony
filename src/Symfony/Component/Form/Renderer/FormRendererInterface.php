@@ -11,21 +11,8 @@
 
 namespace Symfony\Component\Form\Renderer;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Renderer\Plugin\FormRendererPluginInterface;
-
 interface FormRendererInterface
 {
-    function setForm(FormInterface $form);
-
-    /**
-     * Has this renderer a specific var?
-     *
-     * @param string $name
-     * @return bool
-     */
-    function hasVar($name);
-
     /**
      * Set a renderer variable that is used to render a relevant part of the attached field.
      *
@@ -34,21 +21,6 @@ interface FormRendererInterface
      * @return void
      */
     function setVar($name, $value);
-
-    /**
-     * Get a renderer variable
-     *
-     * @param string $name
-     * @return mixed
-     */
-    function getVar($name);
-
-    /**
-     * Get all variables as key value pairs
-     *
-     * @return array
-     */
-    function getVars();
 
     /**
      * Set an arbitrary attribute to be rendered with the primary input element of the widget.
@@ -65,6 +37,4 @@ interface FormRendererInterface
      * @return void
      */
     function setAttribute($name, $value);
-
-    function addPlugin(FormRendererPluginInterface $plugin);
 }

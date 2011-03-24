@@ -15,6 +15,10 @@ use Symfony\Component\Form\Renderer\Plugin\CheckedPlugin;
 
 class CheckedPluginTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        $this->markTestSkipped('Move me to Type tests');
+    }
 
     public function testSetUpTrue()
     {
@@ -22,7 +26,7 @@ class CheckedPluginTest extends \PHPUnit_Framework_TestCase
         $form->expects($this->once())
               ->method('getData')
               ->will($this->returnValue(1));
-        
+
         $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
         $renderer->expects($this->once())
                 ->method('setVar')
@@ -47,5 +51,5 @@ class CheckedPluginTest extends \PHPUnit_Framework_TestCase
         $plugin = new CheckedPlugin();
         $plugin->setUp($form, $renderer);
     }
-    
+
 }

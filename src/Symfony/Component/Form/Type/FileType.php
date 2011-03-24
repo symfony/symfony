@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Type;
 
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\EventListener\FixFileUploadListener;
@@ -18,6 +19,7 @@ use Symfony\Component\Form\DataTransformer\DataTransformerChain;
 use Symfony\Component\Form\DataTransformer\ReversedTransformer;
 use Symfony\Component\Form\DataTransformer\FileToStringTransformer;
 use Symfony\Component\Form\DataTransformer\FileToArrayTransformer;
+use Symfony\Component\Form\Renderer\FormRendererInterface;
 use Symfony\Component\HttpFoundation\File\TemporaryStorage;
 
 class FileType extends AbstractType
@@ -44,9 +46,13 @@ class FileType extends AbstractType
             ->add('file', 'field')
             ->add('token', 'hidden')
             ->add('name', 'hidden');
+    }
 
-        $builder->setRendererVar('multipart', true)
-            ->get('file')->setRendererVar('type', 'file');
+    public function buildRenderer(FormRendererInterface $renderer, FormInterface $form)
+    {
+        $renderer->setBlock('file');
+        $renderer->setVar('multipart', true);
+        $renderer['file']->setVar('type', 'file');
     }
 
     public function getDefaultOptions(array $options)

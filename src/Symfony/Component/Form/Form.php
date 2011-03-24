@@ -101,7 +101,6 @@ class Form implements \IteratorAggregate, FormInterface
     private $clientTransformer;
     private $synchronized = true;
     private $validators;
-    private $renderer;
     private $readOnly = false;
     private $dispatcher;
     private $attributes;
@@ -109,7 +108,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     public function __construct($name, array $types,
         EventDispatcherInterface $dispatcher,
-        FormRendererInterface $renderer = null, DataTransformerInterface $clientTransformer = null,
+        DataTransformerInterface $clientTransformer = null,
         DataTransformerInterface $normTransformer = null,
         DataMapperInterface $dataMapper = null, array $validators = array(),
         $required = false, $readOnly = false, $errorBubbling = false,
@@ -124,7 +123,6 @@ class Form implements \IteratorAggregate, FormInterface
         $this->name = (string)$name;
         $this->types = $types;
         $this->dispatcher = $dispatcher;
-        $this->renderer = $renderer;
         $this->clientTransformer = $clientTransformer;
         $this->normTransformer = $normTransformer;
         $this->validators = $validators;
@@ -133,10 +131,6 @@ class Form implements \IteratorAggregate, FormInterface
         $this->readOnly = $readOnly;
         $this->attributes = $attributes;
         $this->errorBubbling = $errorBubbling;
-
-        if ($renderer) {
-            $renderer->setForm($this);
-        }
 
         $this->setData(null);
     }
@@ -543,16 +537,6 @@ class Form implements \IteratorAggregate, FormInterface
     public function getClientTransformer()
     {
         return $this->clientTransformer;
-    }
-
-    /**
-     * Returns the renderer
-     *
-     * @return FormRendererInterface
-     */
-    public function getRenderer()
-    {
-        return $this->renderer;
     }
 
     /**

@@ -15,6 +15,10 @@ use Symfony\Component\Form\Renderer\Plugin\PasswordValuePlugin;
 
 class PasswordValuePluginTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        $this->markTestSkipped('Move me to Type tests');
+    }
 
     public function testIsSubmittedSetUp()
     {

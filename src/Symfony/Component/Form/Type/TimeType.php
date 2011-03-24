@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Form\Type;
 
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\ChoiceList\PaddedChoiceList;
 use Symfony\Component\Form\DataTransformer\ReversedTransformer;
 use Symfony\Component\Form\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\DataTransformer\DateTimeToArrayTransformer;
+use Symfony\Component\Form\Renderer\FormRendererInterface;
 
 class TimeType extends AbstractType
 {
@@ -65,8 +67,15 @@ class TimeType extends AbstractType
 
         $builder
             ->setClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], $parts, $options['widget'] === 'text'))
-            ->setRendererVar('widget', $options['widget'])
-            ->setRendererVar('with_seconds', $options['with_seconds']);
+            ->setAttribute('widget', $options['widget'])
+            ->setAttribute('with_seconds', $options['with_seconds']);
+    }
+
+    public function buildRenderer(FormRendererInterface $renderer, FormInterface $form)
+    {
+        $renderer->setBlock('time');
+        $renderer->setVar('widget', $form->getAttribute('widget'));
+        $renderer->setVar('with_seconds', $form->getAttribute('with_seconds'));
     }
 
     public function getDefaultOptions(array $options)

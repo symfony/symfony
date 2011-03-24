@@ -13,9 +13,9 @@ namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\Renderer\ThemeRenderer;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Renderer\FormRendererInterface;
 use Symfony\Component\Form\Renderer\Theme\FormThemeFactoryInterface;
-use Symfony\Component\Form\Renderer\Plugin\FieldPlugin;
 use Symfony\Component\Form\EventListener\TrimListener;
 use Symfony\Component\Form\EventListener\ValidationListener;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
@@ -28,15 +28,9 @@ class FieldType extends AbstractType
 {
     private $validator;
 
-    private $themeFactory;
-
-    private $template;
-
-    public function __construct(ValidatorInterface $validator, FormThemeFactoryInterface $themeFactory, $template = null)
+    public function __construct(ValidatorInterface $validator)
     {
         $this->validator = $validator;
-        $this->themeFactory = $themeFactory;
-        $this->template = $template;
     }
 
     public function configure(FormBuilder $builder, array $options)
@@ -55,9 +49,6 @@ class FieldType extends AbstractType
             ? null
             : (array)$options['validation_groups'];
 
-        $renderer = new ThemeRenderer($this->themeFactory, $this->template);
-        $renderer->setBlock($options['template']);
-
         $builder->setRequired($options['required'])
             ->setReadOnly($options['read_only'])
             ->setErrorBubbling($options['error_bubbling'])
@@ -66,8 +57,6 @@ class FieldType extends AbstractType
             ->setAttribute('validation_groups', $options['validation_groups'])
             ->setAttribute('error_mapping', $options['error_mapping'])
             ->setData($options['data'])
-            ->setRenderer($renderer)
-            ->addRendererPlugin(new FieldPlugin())
             ->addValidator(new DefaultValidator())
             ->addValidator(new DelegatingValidator($this->validator));
 
@@ -76,10 +65,43 @@ class FieldType extends AbstractType
         }
     }
 
+    public function buildRenderer(FormRendererInterface $renderer, FormInterface $form)
+    {
+        $renderer->setBlock('field');
+        $renderer->setVar('renderer', $renderer);
+        $renderer->setVar('id', function () use ($renderer, $form) {
+            if ($renderer->hasParent()) {
+                $parentId = $renderer->getParent()->getVar('id');
+
+                return sprintf('%s_%s', $parentId, $form->getName());
+            }
+
+            return $form->getName();
+        });
+        $renderer->setVar('name', function () use ($renderer, $form) {
+            if ($renderer->hasParent()) {
+                $parentName = $renderer->getParent()->getVar('name');
+
+                return sprintf('%s[%s]', $parentName, $form->getName());
+            }
+
+            return $form->getName();
+        });
+        $renderer->setVar('errors', $form->getErrors());
+        $renderer->setVar('value', $form->getClientData());
+        $renderer->setVar('disabled', $form->isReadOnly());
+        $renderer->setVar('required', $form->isRequired());
+        $renderer->setVar('class', null);
+        $renderer->setVar('max_length', null);
+        $renderer->setVar('size', null);
+        $renderer->setVar('label', ucfirst(strtolower(str_replace('_', ' ', $form->getName()))));
+        $renderer->setVar('multipart', false);
+    }
+
     public function getDefaultOptions(array $options)
     {
         return array(
-            'template' => 'text',
+            'template' => 'text', // TODO remove me
             'data' => null,
             'trim' => true,
             'required' => true,

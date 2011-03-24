@@ -12,6 +12,8 @@
 namespace Symfony\Tests\Component\Form\Renderer\Theme;
 
 use Symfony\Component\Form\Renderer\Theme\PhpTheme;
+use Symfony\Component\Form\Renderer\ThemeRenderer;
+use Symfony\Component\Form\ChoiceList\DefaultChoiceList;
 
 abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,6 +21,7 @@ abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        $this->form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
         $this->themeFactory = $this->createThemeFactory();
     }
 
@@ -61,7 +64,7 @@ abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
             'required' => true,
             'size' => 20,
             'attr' => array('accesskey' => 'G', 'title' => 'Foo'),
-            'renderer' => new \Symfony\Component\Form\Renderer\ThemeRenderer($this->themeFactory, null),
+            'renderer' => new ThemeRenderer($this->form, $this->themeFactory, null),
         ));
 
         $this->assertEquals('test', $input->getAttribute('value'));
@@ -78,7 +81,7 @@ abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
 
     public function testChoiceWidgetDefaults()
     {
-        $choiceList = new \Symfony\Component\Form\ChoiceList\DefaultChoiceList(array(
+        $choiceList = new DefaultChoiceList(array(
             'foo' => 'Foo',
             'bar' => 'Bar',
             'baz' => 'Baz',

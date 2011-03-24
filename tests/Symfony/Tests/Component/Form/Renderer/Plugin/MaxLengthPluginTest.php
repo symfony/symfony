@@ -15,11 +15,14 @@ use Symfony\Component\Form\Renderer\Plugin\MaxLengthPlugin;
 
 class MaxLengthPluginTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        $this->markTestSkipped('Move me to Type tests');
+    }
 
     public function testSetUp()
     {
         $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
-        
         $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
         $renderer->expects($this->once())
                 ->method('setVar')

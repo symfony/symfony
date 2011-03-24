@@ -13,11 +13,18 @@ namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Renderer\FormRendererInterface;
 
 abstract class AbstractType implements FormTypeInterface
 {
     public function configure(FormBuilder $builder, array $options)
     {
+    }
+
+    public function buildRenderer(FormRendererInterface $renderer, FormInterface $form)
+    {
+        $renderer->setBlock($this->getName());
     }
 
     public function createBuilder(array $options)

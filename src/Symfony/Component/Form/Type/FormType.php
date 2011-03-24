@@ -12,10 +12,10 @@
 namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\Renderer\Theme\FormThemeInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Renderer\FormRendererInterface;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\DataMapper\PropertyPathMapper;
-use Symfony\Component\Form\Renderer\Plugin\FormPlugin;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class FormType extends AbstractType
@@ -23,7 +23,6 @@ class FormType extends AbstractType
     public function configure(FormBuilder $builder, array $options)
     {
         $builder->setAttribute('virtual', $options['virtual'])
-            ->addRendererPlugin(new FormPlugin())
             ->setDataClass($options['data_class'])
             ->setDataMapper(new PropertyPathMapper(
                 $options['data_class'],
@@ -39,6 +38,20 @@ class FormType extends AbstractType
 
             $builder->add($options['csrf_field_name'], 'csrf', $csrfOptions);
         }
+    }
+
+    public function buildRenderer(FormRendererInterface $renderer, FormInterface $form)
+    {
+        $renderer->setBlock('form');
+        $renderer->setVar('multipart', function () use ($renderer) {
+            foreach ($renderer as $child) {
+                if ($child->getVar('multipart')) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
     }
 
     public function getDefaultOptions(array $options)

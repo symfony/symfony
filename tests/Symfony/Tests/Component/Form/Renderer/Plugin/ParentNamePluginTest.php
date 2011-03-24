@@ -15,6 +15,10 @@ use Symfony\Component\Form\Renderer\Plugin\ParentNamePlugin;
 
 class ParentNamePluginTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        $this->markTestSkipped('Move me to Type tests');
+    }
 
     public function testSetUpHasParent()
     {
@@ -48,7 +52,6 @@ class ParentNamePluginTest extends \PHPUnit_Framework_TestCase
 
     public function testSetUpNoParent()
     {
-        
         $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
         $form->expects($this->never())
               ->method('getParent');

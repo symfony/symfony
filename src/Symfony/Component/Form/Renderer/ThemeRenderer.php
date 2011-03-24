@@ -14,7 +14,6 @@ namespace Symfony\Component\Form\Renderer;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Renderer\Theme\FormThemeInterface;
 use Symfony\Component\Form\Renderer\Theme\FormThemeFactoryInterface;
-use Symfony\Component\Form\Renderer\Plugin\FormRendererPluginInterface;
 
 class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAggregate
 {
@@ -26,11 +25,7 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAgg
 
     private $theme;
 
-    private $vars = array();
-
-    private $changes = array();
-
-    private $initialized = false;
+    private $vars;
 
     /**
      * Is the form attached to this renderer rendered?
@@ -43,44 +38,26 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAgg
      */
     private $rendered = false;
 
-    public function __construct(FormThemeFactoryInterface $themeFactory, $template = null)
-    {
-        $this->themeFactory = $themeFactory;
+    private $children = array();
 
-        $this->setTemplate($template);
-    }
-
-    public function __clone()
-    {
-        foreach ($this->changes as $key => $change) {
-            if (is_object($change)) {
-                $this->changes[$key] = clone $change;
-            }
-        }
-    }
-
-    private function initialize()
-    {
-        if (!$this->initialized) {
-            $this->initialized = true;
-
-            // Make sure that plugins and set variables are applied in the
-            // order they were added
-            foreach ($this->changes as $key => $value) {
-                if ($value instanceof FormRendererPluginInterface) {
-                    $value->setUp($this->form, $this);
-                } else {
-                    $this->vars[$key] = $value;
-                }
-            }
-
-            $this->changes = array();
-        }
-    }
-
-    public function setForm(FormInterface $form)
+    public function __construct(FormInterface $form, FormThemeFactoryInterface $themeFactory, $template = null, ThemeRenderer $parent = null)
     {
         $this->form = $form;
+        $this->themeFactory = $themeFactory;
+        $this->parent = $parent;
+        $this->vars = new RendererVarBag();
+
+        if (null !== $template) {
+            $this->setTemplate($template);
+        }
+
+        foreach ((array)$form->getTypes() as $type) {
+            $type->buildRenderer($this, $form);
+        }
+
+        foreach ($form as $key => $child) {
+            $this->children[$key] = new self($child, $themeFactory, null, $parent);
+        }
     }
 
     public function setTemplate($template)
@@ -108,19 +85,9 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAgg
         return $this->block;
     }
 
-    public function addPlugin(FormRendererPluginInterface $plugin)
-    {
-        $this->initialized = false;
-        $this->changes[] = $plugin;
-    }
-
     public function setVar($name, $value)
     {
-        if ($this->initialized) {
-            $this->vars[$name] = $value;
-        } else {
-            $this->changes[$name] = $value;
-        }
+        $this->vars[$name] = $value;
     }
 
     public function setAttribute($name, $value)
@@ -136,8 +103,6 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAgg
 
     public function getVar($name)
     {
-        $this->initialize();
-
         // TODO exception handling
         if (isset($this->vars[$name])) {
             return $this->vars[$name];
@@ -203,12 +168,20 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAgg
 
     protected function render($part, array $vars = array())
     {
-        $this->initialize();
-
         return $this->theme->render($this->block, $part, array_replace(
             $this->vars,
             $vars
         ));
+    }
+
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    public function getChildren()
+    {
+        return $this->children;
     }
 
     public function offsetGet($name)

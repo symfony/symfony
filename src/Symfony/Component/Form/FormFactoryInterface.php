@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\FormInterface;
+
 interface FormFactoryInterface
 {
     function createBuilder($type, $name = null, array $options = array());
@@ -20,4 +22,6 @@ interface FormFactoryInterface
     function create($type, $name = null, array $options = array());
 
     function createForProperty($class, $property, array $options = array());
+
+    function createRenderer(FormInterface $form, $name = null);
 }

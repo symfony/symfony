@@ -12,10 +12,10 @@
 namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ChoiceList\DefaultChoiceList;
 use Symfony\Component\Form\EventListener\FixRadioInputListener;
-use Symfony\Component\Form\Renderer\Plugin\ChoicePlugin;
-use Symfony\Component\Form\Renderer\Plugin\SelectMultipleNamePlugin;
+use Symfony\Component\Form\Renderer\FormRendererInterface;
 use Symfony\Component\Form\DataTransformer\ScalarToChoicesTransformer;
 use Symfony\Component\Form\DataTransformer\ArrayToChoicesTransformer;
 
@@ -38,9 +38,7 @@ class ChoiceType extends AbstractType
             }
         }
 
-        $builder->addRendererPlugin(new ChoicePlugin($options['choice_list']))
-            ->setRendererVar('multiple', $options['multiple'])
-            ->setRendererVar('expanded', $options['expanded']);
+        $builder->setAttribute('choice_list', $options['choice_list']);
 
         if ($options['multiple'] && $options['expanded']) {
             $builder->setClientTransformer(new ArrayToChoicesTransformer($options['choice_list']));
@@ -50,16 +48,32 @@ class ChoiceType extends AbstractType
             $builder->setClientTransformer(new ScalarToChoicesTransformer($options['choice_list']));
             $builder->addEventSubscriber(new FixRadioInputListener(), 10);
         }
+    }
 
-        if ($options['multiple'] && !$options['expanded']) {
-            $builder->addRendererPlugin(new SelectMultipleNamePlugin());
+    public function buildRenderer(FormRendererInterface $renderer, FormInterface $form)
+    {
+        $choiceList = $form->getAttribute('choice_list');
+
+        $renderer->setBlock('choice');
+        $renderer->setVar('multiple', $form->getAttribute('multiple'));
+        $renderer->setVar('expanded', $form->getAttribute('expanded'));
+        $renderer->setVar('choices', $choiceList->getOtherChoices());
+        $renderer->setVar('preferred_choices', $choiceList->getPreferredChoices());
+        $renderer->setVar('separator', '-------------------');
+        $renderer->setVar('choice_list', $choiceList);
+        $renderer->setVar('empty_value', '');
+
+        if ($renderer->getVar('multiple') && !$renderer->getVar('expanded')) {
+            // Add "[]" to the name in case a select tag with multiple options is
+            // displayed. Otherwise only one of the selected options is sent in the
+            // POST request.
+            $renderer->setVar('name', $renderer->getVar('name').'[]');
         }
     }
 
     public function getDefaultOptions(array $options)
     {
         $defaultOptions = array(
-            'template' => 'choice',
             'multiple' => false,
             'expanded' => false,
             'choices' => array(),

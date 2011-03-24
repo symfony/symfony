@@ -78,6 +78,19 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         }
         not_baz5:
 
+        // baz.baz6
+        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/?$#x', $pathinfo, $matches)) {
+            if (isset($this->context['method']) && !in_array(strtolower($this->context['method']), array('put'))) {
+                $allow = array_merge($allow, array('put'));
+                goto not_bazbaz6;
+            }
+            if (substr($pathinfo, -1) !== '/') {
+                return array('_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction', 'url' => $this->context['base_url'].$pathinfo.'/', 'permanent' => true, '_route' => 'baz.baz6');
+            }
+            return array_merge($this->mergeDefaults($matches, array ()), array('_route' => 'baz.baz6'));
+        }
+        not_bazbaz6:
+
         throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new NotFoundException();
     }
 }

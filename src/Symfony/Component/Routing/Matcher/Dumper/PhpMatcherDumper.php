@@ -85,6 +85,8 @@ class PhpMatcherDumper extends MatcherDumper
 
             $conditions = implode(' && ', $conditions);
 
+            $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);
+            
             $code[] = <<<EOF
         // $name
         if ($conditions) {
@@ -95,7 +97,7 @@ EOF;
                 $code[] = <<<EOF
             if (isset(\$this->context['method']) && !in_array(strtolower(\$this->context['method']), array('$req'))) {
                 \$allow = array_merge(\$allow, array('$req'));
-                goto not_$name;
+                goto $gotoname;
             }
 EOF;
             }
@@ -117,7 +119,7 @@ EOF
 
             if ($req) {
                 $code[] = <<<EOF
-        not_$name:
+        $gotoname:
 EOF;
             }
 

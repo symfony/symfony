@@ -48,6 +48,7 @@
         <!-- Themes -->
         <service id="form.theme.factory.twig" class="%form.theme.factory.twig.class%">
             <argument type="service" id="twig" />
+            <argument>%form.theme.template%</argument>
         </service>
 
         <service id="form.theme.factory.default" class="%form.theme.factory.php.class%">

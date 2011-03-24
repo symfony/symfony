@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Renderer\Theme;
 
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * Creates TwigTheme instances
@@ -25,9 +26,23 @@ class TwigThemeFactory implements FormThemeFactoryInterface
      */
     private $environment;
 
-    public function __construct(\Twig_Environment $environment)
+    /**
+     * @var array
+     */
+    private $fallbackTemplates;
+
+    public function __construct(\Twig_Environment $environment, $fallbackTemplates = null)
     {
+        if (empty($fallbackTemplates)) {
+            $fallbackTemplates = array();
+        } else if (!is_array($fallbackTemplates)) {
+            // Don't use type casting, because then objects (Twig_Template)
+            // are converted to arrays
+            $fallbackTemplates = array($fallbackTemplates);
+        }
+
         $this->environment = $environment;
+        $this->fallbackTemplates = $fallbackTemplates;
     }
 
     /**
@@ -39,6 +54,12 @@ class TwigThemeFactory implements FormThemeFactoryInterface
             throw new FormException('Twig themes expect a template');
         }
 
-        return new TwigTheme($this->environment, $template);
+        if (!is_string($template) && !$template instanceof \Twig_Template) {
+            throw new UnexpectedTypeException($template, 'string or Twig_Template');
+        }
+
+        $templates = array_merge($this->fallbackTemplates, array($template));
+
+        return new TwigTheme($this->environment, $templates);
     }
 }

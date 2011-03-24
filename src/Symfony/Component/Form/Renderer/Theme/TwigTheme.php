@@ -23,8 +23,25 @@ class TwigTheme implements FormThemeInterface
 
     public function __construct(\Twig_Environment $environment, $templates)
     {
+        if (empty($templates)) {
+            $templates = array();
+        } else if (!is_array($templates)) {
+            // Don't use type casting, because then objects (Twig_Template)
+            // are converted to arrays
+            $templates = array($templates);
+        }
+
         $this->environment = $environment;
-        $this->templates = (array)$templates;
+        $this->templates = array();
+
+        foreach ($templates as $template) {
+            // Remove duplicate template names
+            if (!is_string($template)) {
+                $this->templates[] = $template;
+            } else if (!isset($this->templates[$template])) {
+                $this->templates[$template] = $template;
+            }
+        }
     }
 
     private function initialize()
@@ -32,8 +49,10 @@ class TwigTheme implements FormThemeInterface
         if (!$this->templatesByBlock) {
             $this->templatesByBlock = array();
 
-            foreach ($this->templates as $template) {
-                $template = $this->environment->loadTemplate($template);
+            foreach ($this->templates as $key => $template) {
+                if (!$template instanceof \Twig_Template) {
+                    $this->templates[$key] = $template = $this->environment->loadTemplate($template);
+                }
 
                 foreach ($this->getBlockNames($template) as $blockName) {
                     $this->templatesByBlock[$blockName] = $template;

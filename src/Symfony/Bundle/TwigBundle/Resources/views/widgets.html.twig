@@ -7,6 +7,12 @@
 {% endspaceless %}
 {% endblock rows %}
 
+{% block enctype %}
+{% spaceless %}
+    {% if multipart %}enctype="multipart/form-data"{% endif %}
+{% endspaceless %}
+{% endblock enctype %}
+
 {% block errors %}
 {% spaceless %}
     {% if errors|length > 0 %}

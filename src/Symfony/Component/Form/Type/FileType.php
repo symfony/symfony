@@ -45,7 +45,8 @@ class FileType extends AbstractType
             ->add('token', 'hidden')
             ->add('name', 'hidden');
 
-        $builder->get('file')->setRendererVar('type', 'file');
+        $builder->setRendererVar('multipart', true)
+            ->get('file')->setRendererVar('type', 'file');
     }
 
     public function getDefaultOptions(array $options)

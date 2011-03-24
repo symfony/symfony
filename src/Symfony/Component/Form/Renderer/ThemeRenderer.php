@@ -130,6 +130,12 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess
         }
     }
 
+    public function setAttribute($name, $value)
+    {
+        // handling through $this->changes not necessary
+        $this->vars['attr'][$name] = $value;
+    }
+
     public function hasVar($name)
     {
         return array_key_exists($name, $this->vars);
@@ -140,7 +146,10 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess
         $this->initialize();
 
         // TODO exception handling
-        return $this->vars[$name];
+        if (isset($this->vars[$name])) {
+            return $this->vars[$name];
+        }
+        return null;
     }
 
     public function getVars()
@@ -206,22 +215,22 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess
             $vars
         ));
     }
-
+ 
     public function offsetGet($name)
     {
         return $this->children[$name];
     }
-
+ 
     public function offsetExists($name)
     {
         return isset($this->children[$name]);
     }
-
+ 
     public function offsetSet($name, $value)
     {
         throw new \BadMethodCallException('Not supported');
     }
-
+ 
     public function offsetUnset($name)
     {
         throw new \BadMethodCallException('Not supported');

@@ -69,9 +69,12 @@ class PhpTheme implements FormThemeInterface
                 $html .= 'multiple="multiple" ';
             }
             $html .= '>' . PHP_EOL;
+            if (!$attr['required']) {
+                $html .= '<option value="">' . $this->escape($attr['empty_value']) .'</option>';
+            }
             if (count($attr['preferred_choices']) > 0) {
                 $html .= $this->choice_list($attr['preferred_choices'], $attr['choice_list'], $attr['value']);
-                $html .= '<option disabled="disabled">' .  $attr['separator'] . '</option>' . PHP_EOL;
+                $html .= '<option disabled="disabled">' .  $this->escape($attr['separator']) . '</option>' . PHP_EOL;
             }
             $html .= $this->choice_list($attr['choices'], $attr['choice_list'], $attr['value']);
             $html .= '</select>' . PHP_EOL;
@@ -298,6 +301,12 @@ class PhpTheme implements FormThemeInterface
         if (isset($attr['max_length']) && $attr['max_length'] > 0) {
             $html .= 'maxlength="' . $this->escape($attr['max_length']) . '" ';
         }
+        if (isset($attr['attr'])) {
+            foreach ($attr['attr'] as $k => $v) {
+                $html .= $this->escape($k).'="'.$this->escape($v).'" ';
+            }
+        }
+
         return $html;
     }
 

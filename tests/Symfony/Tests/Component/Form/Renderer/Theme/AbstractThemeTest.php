@@ -15,14 +15,14 @@ use Symfony\Component\Form\Renderer\Theme\PhpTheme;
 
 abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
 {
-    private $theme;
+    private $themeFactory;
 
     public function setUp()
     {
-        $this->theme = $this->createTheme();
+        $this->themeFactory = $this->createThemeFactory();
     }
 
-    abstract protected function createTheme();
+    abstract protected function createThemeFactory();
 
     public function testTextWidgetDefault()
     {
@@ -59,7 +59,9 @@ abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
             'max_length' => 128,
             'disabled' => true,
             'required' => true,
-            'size' => 20
+            'size' => 20,
+            'attr' => array('accesskey' => 'G', 'title' => 'Foo'),
+            'renderer' => new \Symfony\Component\Form\Renderer\ThemeRenderer($this->themeFactory, null),
         ));
 
         $this->assertEquals('test', $input->getAttribute('value'));
@@ -68,6 +70,10 @@ abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($input->hasAttribute('disabled'));
         $this->assertTrue($input->hasAttribute('required'));
         $this->assertEquals('20', $input->getAttribute('size'));
+        $this->assertTrue($input->hasAttribute('accesskey'));
+        $this->assertEquals('G', $input->getAttribute('accesskey'));
+        $this->assertTrue($input->hasAttribute('title'));
+        $this->assertEquals('Foo', $input->getAttribute('title'));
     }
 
     public function testChoiceWidgetDefaults()
@@ -85,16 +91,17 @@ abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
             'class' => 'foo',
             'disabled' => false,
             'required' => false,
+            'empty_value' => '---',
             'expanded' => false,
             'multiple' => true,
             'preferred_choices' => $choiceList->getPreferredChoices(),
             'choices' => $choiceList->getOtherChoices(),
             'choice_list' => $choiceList,
-            'separator' => '---'
+            'separator' => '---',
         ));
 
         $this->assertXpathNodeValue($input, '//select/option[@selected="selected"]', 'Foo');
-        $this->assertXpathMatches($input, '//select/option', 4);
+        $this->assertXpathMatches($input, '//select/option', 5);
         $this->assertXpathNodeValue($input, '//select/option[@disabled="disabled"]', '---');
         $this->assertXpathMatches($input, '//select[@multiple="multiple"]', 1);
     }
@@ -116,7 +123,7 @@ abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
 
     protected function renderAsDomElement($field, $section, $parameters)
     {
-        $html = $this->theme->render($field, $section, $parameters);
+        $html = $this->themeFactory->create()->render($field, $section, $parameters);
         $dom = new \DomDocument('UTF-8');
         $dom->loadXml($html);
         return $dom->documentElement;

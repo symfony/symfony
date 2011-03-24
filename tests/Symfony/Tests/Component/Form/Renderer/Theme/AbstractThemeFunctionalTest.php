@@ -40,12 +40,13 @@ abstract class AbstractThemeFunctionalTest extends \PHPUnit_Framework_TestCase
         $storage = new \Symfony\Component\HttpFoundation\File\TemporaryStorage('foo', 1, \sys_get_temp_dir());
 
         // ok more than 2 lines, see DefaultFormFactory.php for proposed simplication
-        $typeLoader = new DefaultTypeLoader();
-        $this->factory = new FormFactory($typeLoader);
-        $typeLoader->initialize($this->factory, $themeFactory, $template, $csrfProvider, $validator , $storage);
-        // this is the relevant bit about your own forms:
-        $typeLoader->addType(new MyTestFormConfig());
-        $typeLoader->addType(new MyTestSubFormConfig());
+        $chainLoader = new \Symfony\Component\Form\Type\Loader\TypeLoaderChain();
+        $chainLoader->addLoader(new DefaultTypeLoader($themeFactory, $template, $validator, $csrfProvider , $storage));
+        $chainLoader->addLoader(new \Symfony\Component\Form\Type\Loader\ArrayTypeLoader(array(
+            new MyTestFormConfig(),
+            new MyTestSubFormConfig()
+        )));
+        $this->factory = new FormFactory($chainLoader);
     }
 
     public function testFullFormRendering()

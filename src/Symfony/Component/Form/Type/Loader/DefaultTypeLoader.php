@@ -24,10 +24,9 @@ class DefaultTypeLoader implements TypeLoaderInterface
 {
     private $types = array();
 
-    public function initialize(FormFactoryInterface $factory,
-            FormThemeFactoryInterface $themeFactory, $template,
-            CsrfProviderInterface $csrfProvider, ValidatorInterface $validator,
-            TemporaryStorage $storage, EntityManager $em = null)
+    public function __construct(
+            FormThemeFactoryInterface $themeFactory, $template = null, ValidatorInterface $validator = null,
+            CsrfProviderInterface $csrfProvider = null, TemporaryStorage $storage = null)
     {
         $this->addType(new Type\FieldType($validator, $themeFactory, $template));
         $this->addType(new Type\FormType());
@@ -36,10 +35,15 @@ class DefaultTypeLoader implements TypeLoaderInterface
         $this->addType(new Type\ChoiceType());
         $this->addType(new Type\CollectionType());
         $this->addType(new Type\CountryType());
-        $this->addType(new Type\CsrfType($csrfProvider));
+        if ($csrfProvider) {
+            // TODO Move to a Symfony\Bridge\FormSecurity
+            $this->addType(new Type\CsrfType($csrfProvider));
+        }
         $this->addType(new Type\DateType());
         $this->addType(new Type\DateTimeType());
-        $this->addType(new Type\FileType($storage));
+        if ($storage) {
+            $this->addType(new Type\FileType($storage));
+        }
         $this->addType(new Type\HiddenType());
         $this->addType(new Type\IntegerType());
         $this->addType(new Type\LanguageType());
@@ -55,13 +59,9 @@ class DefaultTypeLoader implements TypeLoaderInterface
         $this->addType(new Type\TimeType());
         $this->addType(new Type\TimezoneType());
         $this->addType(new Type\UrlType());
-
-        if (null !== $em) {
-            $this->addType(new Type\EntityType($em));
-        }
     }
 
-    public function addType(FormTypeInterface $type)
+    private function addType(FormTypeInterface $type)
     {
         $this->types[$type->getName()] = $type;
     }

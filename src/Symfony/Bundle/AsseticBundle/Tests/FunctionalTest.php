@@ -50,11 +50,8 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
     {
         $kernel = new TestKernel('test', $debug);
         $kernel->boot();
-        $container = $kernel->getContainer();
 
-        $names = $container->get('assetic.asset_manager')->getNames();
-
-        $this->assertEquals($count, count($names));
+        $this->assertEquals($count, count($kernel->getContainer()->get('assetic.asset_manager')->getNames()));
     }
 
     /**
@@ -64,12 +61,9 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
     {
         $kernel = new TestKernel('test', $debug);
         $kernel->boot();
-        $container = $kernel->getContainer();
-
-        $routes = $container->get('router')->getRouteCollection()->all();
 
         $matches = 0;
-        foreach (array_keys($routes) as $name) {
+        foreach (array_keys($kernel->getContainer()->get('router')->getRouteCollection()->all()) as $name) {
             if (0 === strpos($name, 'assetic_')) {
                 ++$matches;
             }
@@ -110,9 +104,10 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
 
     public function provideDebugAndAssetCount()
     {
+        // totals include assets defined in both php and twig templates
         return array(
-            array(true, 5),
-            array(false, 2),
+            array(true, 8),
+            array(false, 3),
         );
     }
 }

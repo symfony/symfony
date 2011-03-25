@@ -67,26 +67,20 @@ class FieldType extends AbstractType
 
     public function buildRenderer(FormRendererInterface $renderer, FormInterface $form)
     {
+        if ($renderer->hasParent()) {
+            $parentId = $renderer->getParent()->getVar('id');
+            $parentName = $renderer->getParent()->getVar('name');
+            $id = sprintf('%s_%s', $parentId, $form->getName());
+            $name = sprintf('%s[%s]', $parentName, $form->getName());
+        } else {
+            $id = $form->getName();
+            $name = $form->getName();
+        }
+
         $renderer->setBlock('field');
         $renderer->setVar('renderer', $renderer);
-        $renderer->setVar('id', function () use ($renderer, $form) {
-            if ($renderer->hasParent()) {
-                $parentId = $renderer->getParent()->getVar('id');
-
-                return sprintf('%s_%s', $parentId, $form->getName());
-            }
-
-            return $form->getName();
-        });
-        $renderer->setVar('name', function () use ($renderer, $form) {
-            if ($renderer->hasParent()) {
-                $parentName = $renderer->getParent()->getVar('name');
-
-                return sprintf('%s[%s]', $parentName, $form->getName());
-            }
-
-            return $form->getName();
-        });
+        $renderer->setVar('id', $id);
+        $renderer->setVar('name', $name);
         $renderer->setVar('errors', $form->getErrors());
         $renderer->setVar('value', $form->getClientData());
         $renderer->setVar('disabled', $form->isReadOnly());

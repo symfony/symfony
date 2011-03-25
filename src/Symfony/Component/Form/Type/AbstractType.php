@@ -24,7 +24,10 @@ abstract class AbstractType implements FormTypeInterface
 
     public function buildRenderer(FormRendererInterface $renderer, FormInterface $form)
     {
-        $renderer->setBlock($this->getName());
+    }
+
+    public function buildRendererBottomUp(FormRendererInterface $renderer, FormInterface $form)
+    {
     }
 
     public function createBuilder(array $options)

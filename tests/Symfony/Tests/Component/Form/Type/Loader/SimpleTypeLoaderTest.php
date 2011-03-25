@@ -64,6 +64,8 @@ class TestType implements FormTypeInterface
 
     function buildRenderer(FormRendererInterface $renderer, FormInterface $form) {}
 
+    function buildRendererBottomUp(FormRendererInterface $renderer, FormInterface $form) {}
+
     function createBuilder(array $options) {}
 
     function getDefaultOptions(array $options) {}

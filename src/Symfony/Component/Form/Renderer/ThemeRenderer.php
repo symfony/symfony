@@ -51,12 +51,18 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAgg
             $this->setTemplate($template);
         }
 
-        foreach ((array)$form->getTypes() as $type) {
+        $types = (array)$form->getTypes();
+
+        foreach ($types as $type) {
             $type->buildRenderer($this, $form);
         }
 
         foreach ($form as $key => $child) {
             $this->children[$key] = new self($child, $themeFactory, null, $parent);
+        }
+
+        foreach ($types as $type) {
+            $type->buildRendererBottomUp($this, $form);
         }
     }
 

@@ -40,18 +40,19 @@ class FormType extends AbstractType
         }
     }
 
-    public function buildRenderer(FormRendererInterface $renderer, FormInterface $form)
+    public function buildRendererBottomUp(FormRendererInterface $renderer, FormInterface $form)
     {
-        $renderer->setBlock('form');
-        $renderer->setVar('multipart', function () use ($renderer) {
-            foreach ($renderer as $child) {
-                if ($child->getVar('multipart')) {
-                    return true;
-                }
-            }
+        $multipart = false;
 
-            return false;
-        });
+        foreach ($renderer as $child) {
+            if ($child->getVar('multipart')) {
+                $multipart = true;
+                break;
+            }
+        }
+
+        $renderer->setBlock('form');
+        $renderer->setVar('multipart', $multipart);
     }
 
     public function getDefaultOptions(array $options)

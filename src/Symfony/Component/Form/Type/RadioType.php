@@ -31,9 +31,7 @@ class RadioType extends AbstractType
         $renderer->setVar('checked', (bool)$form->getData());
 
         if ($renderer->hasParent()) {
-            $renderer->setVar('name', function () use ($renderer) {
-                $renderer->setVar('name', $renderer->getParent()->getVar('name'));
-            });
+            $renderer->setVar('name', $renderer->getParent()->getVar('name'));
         }
     }
 

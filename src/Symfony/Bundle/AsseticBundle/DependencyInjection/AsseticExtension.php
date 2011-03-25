@@ -45,8 +45,6 @@ class AsseticExtension extends Extension
         $container->setParameter('assetic.use_controller', $config['use_controller']);
         $container->setParameter('assetic.read_from', $config['read_from']);
         $container->setParameter('assetic.write_to', $config['write_to']);
-        $container->setParameter('assetic.default_javascripts_output', $config['default_javascripts_output']);
-        $container->setParameter('assetic.default_stylesheets_output', $config['default_stylesheets_output']);
 
         if (isset($config['closure'])) {
             $container->setParameter('assetic.google_closure_compiler_jar', $config['closure']);

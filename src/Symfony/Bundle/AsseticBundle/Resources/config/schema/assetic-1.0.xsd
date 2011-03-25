@@ -17,8 +17,6 @@
         <xsd:attribute name="write-to" type="xsd:string" />
         <xsd:attribute name="closure" type="xsd:string" />
         <xsd:attribute name="yui" type="xsd:string" />
-        <xsd:attribute name="default-javascripts-output" type="xsd:string" />
-        <xsd:attribute name="default-stylesheets-output" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="bundle">

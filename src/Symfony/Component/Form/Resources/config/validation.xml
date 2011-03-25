@@ -7,7 +7,7 @@
   <class name="Symfony\Component\Form\Field">
     <getter property="transformationSuccessful">
       <constraint name="AssertTrue">
-        <option name="message">This value is invalid</option>
+        <option name="message"><value>This value is invalid</value></option>
       </constraint>
     </getter>
   </class>

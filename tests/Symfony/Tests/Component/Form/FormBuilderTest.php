@@ -74,7 +74,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildNoTypeNoDataClass()
     {
-        $this->setExpectedException('Symfony\Component\Form\Exception\FormException', 'The data class must be set to automatically create fields');
+        $this->setExpectedException('Symfony\Component\Form\Exception\FormException', 'The data class must be set to automatically create children');
         $this->builder->build("foo");
     }
 

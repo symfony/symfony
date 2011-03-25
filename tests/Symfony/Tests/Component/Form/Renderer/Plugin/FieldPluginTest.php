@@ -18,28 +18,28 @@ class FieldPluginTest extends \PHPUnit_Framework_TestCase
 
     public function testSetUp()
     {
-        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
-        $field->expects($this->any())
+        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        $form->expects($this->any())
               ->method('getClientData')
               ->will($this->returnValue('bar'));
 
-        $field->expects($this->any())
+        $form->expects($this->any())
               ->method('hasParent')
               ->will($this->returnValue(false));
 
-        $field->expects($this->any())
+        $form->expects($this->any())
               ->method('getName')
               ->will($this->returnValue('The_Name'));
 
-        $field->expects($this->any())
+        $form->expects($this->any())
               ->method('getErrors')
               ->will($this->returnValue('someerrors'));
 
-        $field->expects($this->any())
+        $form->expects($this->any())
               ->method('isDisabled')
               ->will($this->returnValue(false));
 
-        $field->expects($this->any())
+        $form->expects($this->any())
               ->method('isRequired')
               ->will($this->returnValue(true));
 
@@ -92,7 +92,7 @@ class FieldPluginTest extends \PHPUnit_Framework_TestCase
         
 
         $plugin = new FieldPlugin();
-        $plugin->setUp($field, $renderer);
+        $plugin->setUp($form, $renderer);
     }
 
 }

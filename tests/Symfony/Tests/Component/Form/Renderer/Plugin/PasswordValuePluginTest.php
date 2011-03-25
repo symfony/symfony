@@ -18,12 +18,12 @@ class PasswordValuePluginTest extends \PHPUnit_Framework_TestCase
 
     public function testIsSubmittedSetUp()
     {
-        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
-        $field->expects($this->any())
+        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        $form->expects($this->any())
               ->method('getClientData')
               ->will($this->returnValue('pAs5w0rd'));
 
-        $field->expects($this->any())
+        $form->expects($this->any())
               ->method('isBound')
               ->will($this->returnValue(true));
 
@@ -33,17 +33,17 @@ class PasswordValuePluginTest extends \PHPUnit_Framework_TestCase
                 ->with($this->equalTo('value'), $this->equalTo('pAs5w0rd'));
 
         $plugin = new PasswordValuePlugin(false);
-        $plugin->setUp($field, $renderer);
+        $plugin->setUp($form, $renderer);
     }
 
     public function testIsNotSubmittedSetUp()
     {
-        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
-        $field->expects($this->any())
+        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        $form->expects($this->any())
               ->method('getClientData')
               ->will($this->returnValue('pAs5w0rd'));
 
-        $field->expects($this->any())
+        $form->expects($this->any())
               ->method('isBound')
               ->will($this->returnValue(false));
 
@@ -53,6 +53,6 @@ class PasswordValuePluginTest extends \PHPUnit_Framework_TestCase
                 ->with($this->equalTo('value'), $this->equalTo(''));
 
         $plugin = new PasswordValuePlugin(false);
-        $plugin->setUp($field, $renderer);
+        $plugin->setUp($form, $renderer);
     }
 }

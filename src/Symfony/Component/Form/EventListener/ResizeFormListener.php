@@ -59,7 +59,7 @@ class ResizeFormListener implements EventSubscriberInterface
 
     public function preSetData(DataEvent $event)
     {
-        $form = $event->getField();
+        $form = $event->getForm();
         $collection = $event->getData();
 
         if (null === $collection) {
@@ -70,7 +70,7 @@ class ResizeFormListener implements EventSubscriberInterface
             throw new UnexpectedTypeException($collection, 'array or \Traversable');
         }
 
-        foreach ($form as $name => $field) {
+        foreach ($form as $name => $child) {
             if (!$this->resizeOnBind || '$$name$$' != $name) {
                 $form->remove($name);
             }
@@ -89,14 +89,14 @@ class ResizeFormListener implements EventSubscriberInterface
             return;
         }
 
-        $form = $event->getField();
+        $form = $event->getForm();
         $data = $event->getData();
 
         if (null === $data) {
             $data = array();
         }
 
-        foreach ($form as $name => $field) {
+        foreach ($form as $name => $child) {
             if (!isset($data[$name]) && '$$name$$' != $name) {
                 $form->remove($name);
             }
@@ -117,10 +117,10 @@ class ResizeFormListener implements EventSubscriberInterface
             return;
         }
 
-        $form = $event->getField();
+        $form = $event->getForm();
         $collection = $event->getData();
 
-        foreach ($collection as $name => $field) {
+        foreach ($collection as $name => $child) {
             if (!$form->has($name)) {
                 unset($collection[$name]);
             }

@@ -25,7 +25,7 @@ class MoneyPatternPlugin implements FormRendererPluginInterface
         $this->currency = $currency;
     }
 
-    public function setUp(FormInterface $field, FormRendererInterface $renderer)
+    public function setUp(FormInterface $form, FormRendererInterface $renderer)
     {
         $renderer->setVar('money_pattern', self::getPattern($this->currency));
     }

@@ -121,9 +121,9 @@ abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($matches, $nodeList->length);
     }
 
-    protected function renderAsDomElement($field, $section, $parameters)
+    protected function renderAsDomElement($form, $section, $parameters)
     {
-        $html = $this->themeFactory->create()->render($field, $section, $parameters);
+        $html = $this->themeFactory->create()->render($form, $section, $parameters);
         $dom = new \DomDocument('UTF-8');
         $dom->loadXml($html);
         return $dom->documentElement;

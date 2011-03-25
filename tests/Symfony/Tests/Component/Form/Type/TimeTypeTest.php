@@ -19,7 +19,7 @@ class TimeTypeTest extends DateTimeTestCase
 {
     public function testSubmit_dateTime()
     {
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'input' => 'datetime',
@@ -30,17 +30,17 @@ class TimeTypeTest extends DateTimeTestCase
             'minute' => '4',
         );
 
-        $field->bind($input);
+        $form->bind($input);
 
         $dateTime = new \DateTime('1970-01-01 03:04:00 UTC');
 
-        $this->assertEquals($dateTime, $field->getData());
-        $this->assertEquals($input, $field->getClientData());
+        $this->assertEquals($dateTime, $form->getData());
+        $this->assertEquals($input, $form->getClientData());
     }
 
     public function testSubmit_string()
     {
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'input' => 'string',
@@ -51,15 +51,15 @@ class TimeTypeTest extends DateTimeTestCase
             'minute' => '4',
         );
 
-        $field->bind($input);
+        $form->bind($input);
 
-        $this->assertEquals('03:04:00', $field->getData());
-        $this->assertEquals($input, $field->getClientData());
+        $this->assertEquals('03:04:00', $form->getData());
+        $this->assertEquals($input, $form->getClientData());
     }
 
     public function testSubmit_timestamp()
     {
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'input' => 'timestamp',
@@ -70,17 +70,17 @@ class TimeTypeTest extends DateTimeTestCase
             'minute' => '4',
         );
 
-        $field->bind($input);
+        $form->bind($input);
 
         $dateTime = new \DateTime('1970-01-01 03:04:00 UTC');
 
-        $this->assertEquals($dateTime->format('U'), $field->getData());
-        $this->assertEquals($input, $field->getClientData());
+        $this->assertEquals($dateTime->format('U'), $form->getData());
+        $this->assertEquals($input, $form->getClientData());
     }
 
     public function testSubmit_array()
     {
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'input' => 'array',
@@ -96,29 +96,29 @@ class TimeTypeTest extends DateTimeTestCase
             'minute' => '4',
         );
 
-        $field->bind($input);
+        $form->bind($input);
 
-        $this->assertEquals($data, $field->getData());
-        $this->assertEquals($input, $field->getClientData());
+        $this->assertEquals($data, $form->getData());
+        $this->assertEquals($input, $form->getClientData());
     }
 
     public function testSetData_withSeconds()
     {
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'input' => 'datetime',
             'with_seconds' => true,
         ));
 
-        $field->setData(new \DateTime('03:04:05 UTC'));
+        $form->setData(new \DateTime('03:04:05 UTC'));
 
-        $this->assertEquals(array('hour' => 3, 'minute' => 4, 'second' => 5), $field->getClientData());
+        $this->assertEquals(array('hour' => 3, 'minute' => 4, 'second' => 5), $form->getClientData());
     }
 
     public function testSetData_differentTimezones()
     {
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'data_timezone' => 'America/New_York',
             'user_timezone' => 'Pacific/Tahiti',
             // don't do this test with DateTime, because it leads to wrong results!
@@ -128,7 +128,7 @@ class TimeTypeTest extends DateTimeTestCase
 
         $dateTime = new \DateTime('03:04:05 America/New_York');
 
-        $field->setData($dateTime->format('H:i:s'));
+        $form->setData($dateTime->format('H:i:s'));
 
         $dateTime = clone $dateTime;
         $dateTime->setTimezone(new \DateTimeZone('Pacific/Tahiti'));
@@ -139,261 +139,261 @@ class TimeTypeTest extends DateTimeTestCase
             'second' => (int)$dateTime->format('s')
         );
 
-        $this->assertEquals($displayedData, $field->getClientData());
+        $this->assertEquals($displayedData, $form->getClientData());
     }
 
     public function testIsHourWithinRange_returnsTrueIfWithin()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'hours' => array(6, 7),
         ));
 
-        $field->bind(array('hour' => '06', 'minute' => '12'));
+        $form->bind(array('hour' => '06', 'minute' => '12'));
 
-        $this->assertTrue($field->isHourWithinRange());
+        $this->assertTrue($form->isHourWithinRange());
     }
 
     public function testIsHourWithinRange_returnsTrueIfEmpty()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'hours' => array(6, 7),
         ));
 
-        $field->bind(array('hour' => '', 'minute' => '06'));
+        $form->bind(array('hour' => '', 'minute' => '06'));
 
-        $this->assertTrue($field->isHourWithinRange());
+        $this->assertTrue($form->isHourWithinRange());
     }
 
     public function testIsHourWithinRange_returnsFalseIfNotContained()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'hours' => array(6, 7),
         ));
 
-        $field->bind(array('hour' => '08', 'minute' => '12'));
+        $form->bind(array('hour' => '08', 'minute' => '12'));
 
-        $this->assertFalse($field->isHourWithinRange());
+        $this->assertFalse($form->isHourWithinRange());
     }
 
     public function testIsMinuteWithinRange_returnsTrueIfWithin()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'minutes' => array(6, 7),
         ));
 
-        $field->bind(array('hour' => '06', 'minute' => '06'));
+        $form->bind(array('hour' => '06', 'minute' => '06'));
 
-        $this->assertTrue($field->isMinuteWithinRange());
+        $this->assertTrue($form->isMinuteWithinRange());
     }
 
     public function testIsMinuteWithinRange_returnsTrueIfEmpty()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'minutes' => array(6, 7),
         ));
 
-        $field->bind(array('hour' => '06', 'minute' => ''));
+        $form->bind(array('hour' => '06', 'minute' => ''));
 
-        $this->assertTrue($field->isMinuteWithinRange());
+        $this->assertTrue($form->isMinuteWithinRange());
     }
 
     public function testIsMinuteWithinRange_returnsFalseIfNotContained()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'minutes' => array(6, 7),
         ));
 
-        $field->bind(array('hour' => '06', 'minute' => '08'));
+        $form->bind(array('hour' => '06', 'minute' => '08'));
 
-        $this->assertFalse($field->isMinuteWithinRange());
+        $this->assertFalse($form->isMinuteWithinRange());
     }
 
     public function testIsSecondWithinRange_returnsTrueIfWithin()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'seconds' => array(6, 7),
             'with_seconds' => true,
         ));
 
-        $field->bind(array('hour' => '04', 'minute' => '05', 'second' => '06'));
+        $form->bind(array('hour' => '04', 'minute' => '05', 'second' => '06'));
 
-        $this->assertTrue($field->isSecondWithinRange());
+        $this->assertTrue($form->isSecondWithinRange());
     }
 
     public function testIsSecondWithinRange_returnsTrueIfEmpty()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'seconds' => array(6, 7),
             'with_seconds' => true,
         ));
 
-        $field->bind(array('hour' => '06', 'minute' => '06', 'second' => ''));
+        $form->bind(array('hour' => '06', 'minute' => '06', 'second' => ''));
 
-        $this->assertTrue($field->isSecondWithinRange());
+        $this->assertTrue($form->isSecondWithinRange());
     }
 
     public function testIsSecondWithinRange_returnsTrueIfNotWithSeconds()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'seconds' => array(6, 7),
         ));
 
-        $field->bind(array('hour' => '06', 'minute' => '06'));
+        $form->bind(array('hour' => '06', 'minute' => '06'));
 
-        $this->assertTrue($field->isSecondWithinRange());
+        $this->assertTrue($form->isSecondWithinRange());
     }
 
     public function testIsSecondWithinRange_returnsFalseIfNotContained()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'seconds' => array(6, 7),
             'with_seconds' => true,
         ));
 
-        $field->bind(array('hour' => '04', 'minute' => '05', 'second' => '08'));
+        $form->bind(array('hour' => '04', 'minute' => '05', 'second' => '08'));
 
-        $this->assertFalse($field->isSecondWithinRange());
+        $this->assertFalse($form->isSecondWithinRange());
     }
 
     public function testIsPartiallyFilled_returnsFalseIfCompletelyEmpty()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'widget' => 'choice',
         ));
 
-        $field->bind(array(
+        $form->bind(array(
             'hour' => '',
             'minute' => '',
         ));
 
-        $this->assertFalse($field->isPartiallyFilled());
+        $this->assertFalse($form->isPartiallyFilled());
     }
 
     public function testIsPartiallyFilled_returnsFalseIfCompletelyEmpty_withSeconds()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'widget' => 'choice',
             'with_seconds' => true,
         ));
 
-        $field->bind(array(
+        $form->bind(array(
             'hour' => '',
             'minute' => '',
             'second' => '',
         ));
 
-        $this->assertFalse($field->isPartiallyFilled());
+        $this->assertFalse($form->isPartiallyFilled());
     }
 
     public function testIsPartiallyFilled_returnsFalseIfCompletelyFilled()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'widget' => 'choice',
         ));
 
-        $field->bind(array(
+        $form->bind(array(
             'hour' => '0',
             'minute' => '0',
         ));
 
-        $this->assertFalse($field->isPartiallyFilled());
+        $this->assertFalse($form->isPartiallyFilled());
     }
 
     public function testIsPartiallyFilled_returnsFalseIfCompletelyFilled_withSeconds()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'widget' => 'choice',
             'with_seconds' => true,
         ));
 
-        $field->bind(array(
+        $form->bind(array(
             'hour' => '0',
             'minute' => '0',
             'second' => '0',
         ));
 
-        $this->assertFalse($field->isPartiallyFilled());
+        $this->assertFalse($form->isPartiallyFilled());
     }
 
     public function testIsPartiallyFilled_returnsTrueIfChoiceAndHourEmpty()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'widget' => 'choice',
             'with_seconds' => true,
         ));
 
-        $field->bind(array(
+        $form->bind(array(
             'hour' => '',
             'minute' => '0',
             'second' => '0',
         ));
 
-        $this->assertTrue($field->isPartiallyFilled());
+        $this->assertTrue($form->isPartiallyFilled());
     }
 
     public function testIsPartiallyFilled_returnsTrueIfChoiceAndMinuteEmpty()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'widget' => 'choice',
             'with_seconds' => true,
         ));
 
-        $field->bind(array(
+        $form->bind(array(
             'hour' => '0',
             'minute' => '',
             'second' => '0',
         ));
 
-        $this->assertTrue($field->isPartiallyFilled());
+        $this->assertTrue($form->isPartiallyFilled());
     }
 
     public function testIsPartiallyFilled_returnsTrueIfChoiceAndSecondsEmpty()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'name', array(
             'widget' => 'choice',
             'with_seconds' => true,
         ));
 
-        $field->bind(array(
+        $form->bind(array(
             'hour' => '0',
             'minute' => '0',
             'second' => '',
         ));
 
-        $this->assertTrue($field->isPartiallyFilled());
+        $this->assertTrue($form->isPartiallyFilled());
     }
 }

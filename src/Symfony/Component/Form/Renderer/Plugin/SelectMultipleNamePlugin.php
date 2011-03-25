@@ -16,7 +16,7 @@ use Symfony\Component\Form\Renderer\FormRendererInterface;
 
 class SelectMultipleNamePlugin implements FormRendererPluginInterface
 {
-    public function setUp(FormInterface $field, FormRendererInterface $renderer)
+    public function setUp(FormInterface $form, FormRendererInterface $renderer)
     {
         // Add "[]" to the name in case a select tag with multiple options is
         // displayed. Otherwise only one of the selected options is sent in the

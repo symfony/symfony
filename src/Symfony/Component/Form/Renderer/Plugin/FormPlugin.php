@@ -26,8 +26,8 @@ class FormPlugin implements FormRendererPluginInterface
         $fields = array();
         $multipart = false;
 
-        foreach ($form as $name => $field) {
-            $fields[$name] = $field->getRenderer();
+        foreach ($form as $name => $child) {
+            $fields[$name] = $child->getRenderer();
             $multipart = $multipart || $fields[$name]->getVar('multipart');
         }
 

@@ -28,12 +28,12 @@ class ParentNamePluginTest extends \PHPUnit_Framework_TestCase
               ->method('getRenderer')
               ->will($this->returnValue($parentRenderer));
 
-        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
-        $field->expects($this->once())
+        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        $form->expects($this->once())
               ->method('getParent')
               ->will($this->returnValue($parentField));
 
-        $field->expects($this->once())
+        $form->expects($this->once())
               ->method('hasParent')
               ->will($this->returnValue(true));
 
@@ -43,17 +43,17 @@ class ParentNamePluginTest extends \PHPUnit_Framework_TestCase
                 ->with($this->equalTo('name'), $this->equalTo('parentName'));
 
         $plugin = new ParentNamePlugin();
-        $plugin->setUp($field, $renderer);
+        $plugin->setUp($form, $renderer);
     }
 
     public function testSetUpNoParent()
     {
         
-        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
-        $field->expects($this->never())
+        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        $form->expects($this->never())
               ->method('getParent');
 
-        $field->expects($this->once())
+        $form->expects($this->once())
               ->method('hasParent')
               ->will($this->returnValue(false));
 
@@ -62,6 +62,6 @@ class ParentNamePluginTest extends \PHPUnit_Framework_TestCase
                 ->method('setVar');
 
         $plugin = new ParentNamePlugin();
-        $plugin->setUp($field, $renderer);
+        $plugin->setUp($form, $renderer);
     }
 }

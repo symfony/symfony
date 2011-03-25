@@ -16,10 +16,10 @@ use Symfony\Component\Form\Renderer\FormRendererInterface;
 
 class ParentNamePlugin implements FormRendererPluginInterface
 {
-    public function setUp(FormInterface $field, FormRendererInterface $renderer)
+    public function setUp(FormInterface $form, FormRendererInterface $renderer)
     {
-        if ($field->hasParent()) {
-            $parentRenderer = $field->getParent()->getRenderer();
+        if ($form->hasParent()) {
+            $parentRenderer = $form->getParent()->getRenderer();
             $renderer->setVar('name', $parentRenderer->getVar('name'));
         }
     }

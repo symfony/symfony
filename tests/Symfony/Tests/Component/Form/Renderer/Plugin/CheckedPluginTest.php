@@ -18,8 +18,8 @@ class CheckedPluginTest extends \PHPUnit_Framework_TestCase
 
     public function testSetUpTrue()
     {
-        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
-        $field->expects($this->once())
+        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        $form->expects($this->once())
               ->method('getData')
               ->will($this->returnValue(1));
         
@@ -29,13 +29,13 @@ class CheckedPluginTest extends \PHPUnit_Framework_TestCase
                 ->with($this->equalTo('checked'), $this->equalTo(true));
 
         $plugin = new CheckedPlugin();
-        $plugin->setUp($field, $renderer);
+        $plugin->setUp($form, $renderer);
     }
 
     public function testSetUpFalse()
     {
-        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
-        $field->expects($this->once())
+        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        $form->expects($this->once())
               ->method('getData')
               ->will($this->returnValue(0));
 
@@ -45,7 +45,7 @@ class CheckedPluginTest extends \PHPUnit_Framework_TestCase
                 ->with($this->equalTo('checked'), $this->equalTo(false));
 
         $plugin = new CheckedPlugin();
-        $plugin->setUp($field, $renderer);
+        $plugin->setUp($form, $renderer);
     }
     
 }

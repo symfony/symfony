@@ -24,7 +24,7 @@ class ChoicePlugin implements FormRendererPluginInterface
         $this->choiceList = $choiceList;
     }
 
-    public function setUp(FormInterface $field, FormRendererInterface $renderer)
+    public function setUp(FormInterface $form, FormRendererInterface $renderer)
     {
         $choiceList = $this->choiceList;
 

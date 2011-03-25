@@ -50,58 +50,58 @@ class ChoiceTypeTest extends TestCase
 
     public function testIsChoiceSelectedDifferentiatesBetweenZeroAndEmpty_integerZero()
     {
-        $field = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', 'name', array(
             'choices' => array(
                 0 => 'Foo',
                 '' => 'Bar',
             )
         ));
 
-        $field->bind(0);
+        $form->bind(0);
 
-        $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $field->getClientData()));
-        $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $field->getClientData()));
-        $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected('', $field->getClientData()));
+        $this->assertTrue($form->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $form->getClientData()));
+        $this->assertTrue($form->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $form->getClientData()));
+        $this->assertFalse($form->getRenderer()->getVar('choice_list')->isChoiceSelected('', $form->getClientData()));
 
-        $field->bind('0');
+        $form->bind('0');
 
-        $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $field->getClientData()));
-        $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $field->getClientData()));
-        $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected('', $field->getClientData()));
+        $this->assertTrue($form->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $form->getClientData()));
+        $this->assertTrue($form->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $form->getClientData()));
+        $this->assertFalse($form->getRenderer()->getVar('choice_list')->isChoiceSelected('', $form->getClientData()));
 
-        $field->bind('');
+        $form->bind('');
 
-        $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $field->getClientData()));
-        $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $field->getClientData()));
-        $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected('', $field->getClientData()));
+        $this->assertFalse($form->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $form->getClientData()));
+        $this->assertFalse($form->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $form->getClientData()));
+        $this->assertTrue($form->getRenderer()->getVar('choice_list')->isChoiceSelected('', $form->getClientData()));
     }
 
     public function testIsChoiceSelectedDifferentiatesBetweenZeroAndEmpty_stringZero()
     {
-        $field = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', 'name', array(
             'choices' => array(
                 '0' => 'Foo',
                 '' => 'Bar',
             )
         ));
 
-        $field->bind(0);
+        $form->bind(0);
 
-        $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $field->getClientData()));
-        $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $field->getClientData()));
-        $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected('', $field->getClientData()));
+        $this->assertTrue($form->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $form->getClientData()));
+        $this->assertTrue($form->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $form->getClientData()));
+        $this->assertFalse($form->getRenderer()->getVar('choice_list')->isChoiceSelected('', $form->getClientData()));
 
-        $field->bind('0');
+        $form->bind('0');
 
-        $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $field->getClientData()));
-        $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $field->getClientData()));
-        $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected('', $field->getClientData()));
+        $this->assertTrue($form->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $form->getClientData()));
+        $this->assertTrue($form->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $form->getClientData()));
+        $this->assertFalse($form->getRenderer()->getVar('choice_list')->isChoiceSelected('', $form->getClientData()));
 
-        $field->bind('');
+        $form->bind('');
 
-        $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $field->getClientData()));
-        $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $field->getClientData()));
-        $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected('', $field->getClientData()));
+        $this->assertFalse($form->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $form->getClientData()));
+        $this->assertFalse($form->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $form->getClientData()));
+        $this->assertTrue($form->getRenderer()->getVar('choice_list')->isChoiceSelected('', $form->getClientData()));
     }
 
     /**
@@ -109,7 +109,7 @@ class ChoiceTypeTest extends TestCase
      */
     public function testConfigureChoicesWithNonArray()
     {
-        $field = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', 'name', array(
             'choices' => new \ArrayObject(),
         ));
     }
@@ -139,12 +139,12 @@ class ChoiceTypeTest extends TestCase
      */
     public function testClosureShouldReturnArray()
     {
-        $field = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', 'name', array(
             'choices' => function () { return 'foobar'; },
         ));
 
         // trigger closure
-        $field->getRenderer()->getVar('choices');
+        $form->getRenderer()->getVar('choices');
     }
 
     /**
@@ -152,16 +152,16 @@ class ChoiceTypeTest extends TestCase
      */
     public function testSubmitSingleNonExpanded($choices)
     {
-        $field = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', 'name', array(
             'multiple' => false,
             'expanded' => false,
             'choices' => $choices,
         ));
 
-        $field->bind('b');
+        $form->bind('b');
 
-        $this->assertEquals('b', $field->getData());
-        $this->assertEquals('b', $field->getClientData());
+        $this->assertEquals('b', $form->getData());
+        $this->assertEquals('b', $form->getClientData());
     }
 
     /**
@@ -169,16 +169,16 @@ class ChoiceTypeTest extends TestCase
      */
     public function testSubmitMultipleNonExpanded($choices)
     {
-        $field = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', 'name', array(
             'multiple' => true,
             'expanded' => false,
             'choices' => $choices,
         ));
 
-        $field->bind(array('a', 'b'));
+        $form->bind(array('a', 'b'));
 
-        $this->assertEquals(array('a', 'b'), $field->getData());
-        $this->assertEquals(array('a', 'b'), $field->getClientData());
+        $this->assertEquals(array('a', 'b'), $form->getData());
+        $this->assertEquals(array('a', 'b'), $form->getClientData());
     }
 
     /**
@@ -186,25 +186,25 @@ class ChoiceTypeTest extends TestCase
      */
     public function testSubmitSingleExpanded($choices)
     {
-        $field = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', 'name', array(
             'multiple' => false,
             'expanded' => true,
             'choices' => $choices,
         ));
 
-        $field->bind('b');
+        $form->bind('b');
 
-        $this->assertSame('b', $field->getData());
-        $this->assertSame(false, $field['a']->getData());
-        $this->assertSame(true, $field['b']->getData());
-        $this->assertSame(false, $field['c']->getData());
-        $this->assertSame(false, $field['d']->getData());
-        $this->assertSame(false, $field['e']->getData());
-        $this->assertSame('', $field['a']->getClientData());
-        $this->assertSame('1', $field['b']->getClientData());
-        $this->assertSame('', $field['c']->getClientData());
-        $this->assertSame('', $field['d']->getClientData());
-        $this->assertSame('', $field['e']->getClientData());
+        $this->assertSame('b', $form->getData());
+        $this->assertSame(false, $form['a']->getData());
+        $this->assertSame(true, $form['b']->getData());
+        $this->assertSame(false, $form['c']->getData());
+        $this->assertSame(false, $form['d']->getData());
+        $this->assertSame(false, $form['e']->getData());
+        $this->assertSame('', $form['a']->getClientData());
+        $this->assertSame('1', $form['b']->getClientData());
+        $this->assertSame('', $form['c']->getClientData());
+        $this->assertSame('', $form['d']->getClientData());
+        $this->assertSame('', $form['e']->getClientData());
     }
 
     /**
@@ -212,25 +212,25 @@ class ChoiceTypeTest extends TestCase
      */
     public function testSubmitSingleExpandedNumericChoices($choices)
     {
-        $field = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', 'name', array(
             'multiple' => false,
             'expanded' => true,
             'choices' => $choices,
         ));
 
-        $field->bind('1');
+        $form->bind('1');
 
-        $this->assertSame(1, $field->getData());
-        $this->assertSame(false, $field[0]->getData());
-        $this->assertSame(true, $field[1]->getData());
-        $this->assertSame(false, $field[2]->getData());
-        $this->assertSame(false, $field[3]->getData());
-        $this->assertSame(false, $field[4]->getData());
-        $this->assertSame('', $field[0]->getClientData());
-        $this->assertSame('1', $field[1]->getClientData());
-        $this->assertSame('', $field[2]->getClientData());
-        $this->assertSame('', $field[3]->getClientData());
-        $this->assertSame('', $field[4]->getClientData());
+        $this->assertSame(1, $form->getData());
+        $this->assertSame(false, $form[0]->getData());
+        $this->assertSame(true, $form[1]->getData());
+        $this->assertSame(false, $form[2]->getData());
+        $this->assertSame(false, $form[3]->getData());
+        $this->assertSame(false, $form[4]->getData());
+        $this->assertSame('', $form[0]->getClientData());
+        $this->assertSame('1', $form[1]->getClientData());
+        $this->assertSame('', $form[2]->getClientData());
+        $this->assertSame('', $form[3]->getClientData());
+        $this->assertSame('', $form[4]->getClientData());
     }
 
     /**
@@ -238,25 +238,25 @@ class ChoiceTypeTest extends TestCase
      */
     public function testSubmitMultipleExpanded($choices)
     {
-        $field = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', 'name', array(
             'multiple' => true,
             'expanded' => true,
             'choices' => $choices,
         ));
 
-        $field->bind(array('a' => 'a', 'b' => 'b'));
+        $form->bind(array('a' => 'a', 'b' => 'b'));
 
-        $this->assertSame(array('a', 'b'), $field->getData());
-        $this->assertSame(true, $field['a']->getData());
-        $this->assertSame(true, $field['b']->getData());
-        $this->assertSame(false, $field['c']->getData());
-        $this->assertSame(false, $field['d']->getData());
-        $this->assertSame(false, $field['e']->getData());
-        $this->assertSame('1', $field['a']->getClientData());
-        $this->assertSame('1', $field['b']->getClientData());
-        $this->assertSame('', $field['c']->getClientData());
-        $this->assertSame('', $field['d']->getClientData());
-        $this->assertSame('', $field['e']->getClientData());
+        $this->assertSame(array('a', 'b'), $form->getData());
+        $this->assertSame(true, $form['a']->getData());
+        $this->assertSame(true, $form['b']->getData());
+        $this->assertSame(false, $form['c']->getData());
+        $this->assertSame(false, $form['d']->getData());
+        $this->assertSame(false, $form['e']->getData());
+        $this->assertSame('1', $form['a']->getClientData());
+        $this->assertSame('1', $form['b']->getClientData());
+        $this->assertSame('', $form['c']->getClientData());
+        $this->assertSame('', $form['d']->getClientData());
+        $this->assertSame('', $form['e']->getClientData());
     }
 
     /**
@@ -264,24 +264,24 @@ class ChoiceTypeTest extends TestCase
      */
     public function testSubmitMultipleExpandedNumericChoices($choices)
     {
-        $field = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', 'name', array(
             'multiple' => true,
             'expanded' => true,
             'choices' => $choices,
         ));
 
-        $field->bind(array(1 => 1, 2 => 2));
+        $form->bind(array(1 => 1, 2 => 2));
 
-        $this->assertSame(array(1, 2), $field->getData());
-        $this->assertSame(false, $field[0]->getData());
-        $this->assertSame(true, $field[1]->getData());
-        $this->assertSame(true, $field[2]->getData());
-        $this->assertSame(false, $field[3]->getData());
-        $this->assertSame(false, $field[4]->getData());
-        $this->assertSame('', $field[0]->getClientData());
-        $this->assertSame('1', $field[1]->getClientData());
-        $this->assertSame('1', $field[2]->getClientData());
-        $this->assertSame('', $field[3]->getClientData());
-        $this->assertSame('', $field[4]->getClientData());
+        $this->assertSame(array(1, 2), $form->getData());
+        $this->assertSame(false, $form[0]->getData());
+        $this->assertSame(true, $form[1]->getData());
+        $this->assertSame(true, $form[2]->getData());
+        $this->assertSame(false, $form[3]->getData());
+        $this->assertSame(false, $form[4]->getData());
+        $this->assertSame('', $form[0]->getClientData());
+        $this->assertSame('1', $form[1]->getClientData());
+        $this->assertSame('1', $form[2]->getClientData());
+        $this->assertSame('', $form[3]->getClientData());
+        $this->assertSame('', $form[4]->getClientData());
     }
 }

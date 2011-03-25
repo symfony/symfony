@@ -18,7 +18,7 @@ class MoneyPatternPluginTest extends \PHPUnit_Framework_TestCase
 
     public function testSetUpEur()
     {
-        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
         
         $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
         $renderer->expects($this->once())
@@ -26,7 +26,7 @@ class MoneyPatternPluginTest extends \PHPUnit_Framework_TestCase
                 ->with($this->equalTo('money_pattern'), $this->equalTo('€ {{ widget }}'));
 
         $plugin = new MoneyPatternPlugin('EUR');
-        $plugin->setUp($field, $renderer);
+        $plugin->setUp($form, $renderer);
     }
     
 }

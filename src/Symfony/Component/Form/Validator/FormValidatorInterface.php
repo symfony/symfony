@@ -15,5 +15,5 @@ use Symfony\Component\Form\FormInterface;
 
 interface FormValidatorInterface
 {
-    function validate(FormInterface $field);
+    function validate(FormInterface $form);
 }

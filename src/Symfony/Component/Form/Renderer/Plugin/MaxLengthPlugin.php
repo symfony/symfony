@@ -23,7 +23,7 @@ class MaxLengthPlugin implements FormRendererPluginInterface
         $this->maxLength = $maxLength;
     }
 
-    public function setUp(FormInterface $field, FormRendererInterface $renderer)
+    public function setUp(FormInterface $form, FormRendererInterface $renderer)
     {
         $renderer->setVar('max_length', $this->maxLength);
     }

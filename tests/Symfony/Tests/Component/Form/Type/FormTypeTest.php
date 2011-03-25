@@ -613,13 +613,13 @@ class FormTest extends TestCase
 
     protected function getMockForm($key)
     {
-        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
 
-        $field->expects($this->any())
+        $form->expects($this->any())
         ->method('getName')
         ->will($this->returnValue($key));
 
-        return $field;
+        return $form;
     }
 
     protected function getMockTransformer()

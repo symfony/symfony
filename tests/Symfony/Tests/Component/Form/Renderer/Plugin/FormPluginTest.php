@@ -18,7 +18,7 @@ class FormPluginTest extends \PHPUnit_Framework_TestCase
 
     public function testSetUp()
     {
-        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
 
         $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
 
@@ -32,7 +32,7 @@ class FormPluginTest extends \PHPUnit_Framework_TestCase
         
 
         $plugin = new FormPlugin();
-        $plugin->setUp($field, $renderer);
+        $plugin->setUp($form, $renderer);
     }
 
 }

@@ -54,7 +54,7 @@ class FormBuilder
 
     private $dataClass;
 
-    private $fields = array();
+    private $children = array();
 
     private $dataMapper;
 
@@ -354,7 +354,7 @@ class FormBuilder
      * $form->add($locationGroup);
      * </code>
      *
-     * @param FormInterface|string $field
+     * @param FormInterface|string $form
      * @return FormInterface
      */
     public function add($name, $type = null, array $options = array())
@@ -367,7 +367,7 @@ class FormBuilder
             throw new UnexpectedTypeException($type, 'string');
         }
 
-        $this->fields[$name] = array(
+        $this->children[$name] = array(
             'type' => $type,
             'options' => $options,
         );
@@ -385,7 +385,7 @@ class FormBuilder
             );
         } else {
             if (!$this->dataClass) {
-                throw new FormException('The data class must be set to automatically create fields');
+                throw new FormException('The data class must be set to automatically create children');
             }
 
             $builder = $this->getFormFactory()->createBuilderForProperty(
@@ -395,7 +395,7 @@ class FormBuilder
             );
         }
 
-        $this->fields[$name] = $builder;
+        $this->children[$name] = $builder;
 
         $builder->setParent($this);
 
@@ -404,17 +404,17 @@ class FormBuilder
 
     public function get($name)
     {
-        if (!isset($this->fields[$name])) {
+        if (!isset($this->children[$name])) {
             throw new FormException(sprintf('The field "%s" does not exist', $name));
         }
 
-        $field = $this->fields[$name];
+        $child = $this->children[$name];
 
-        if ($field instanceof FormBuilder) {
-            return $field;
+        if ($child instanceof FormBuilder) {
+            return $child;
         }
 
-        return $this->build($name, $field['type'], $field['options']);
+        return $this->build($name, $child['type'], $child['options']);
     }
 
     /**
@@ -424,13 +424,13 @@ class FormBuilder
      */
     public function remove($name)
     {
-        if (isset($this->fields[$name])) {
+        if (isset($this->children[$name])) {
             // field might still be lazy
-            if ($this->fields[$name] instanceof FormInterface) {
-                $this->fields[$name]->setParent(null);
+            if ($this->children[$name] instanceof FormInterface) {
+                $this->children[$name]->setParent(null);
             }
 
-            unset($this->fields[$name]);
+            unset($this->children[$name]);
         }
     }
 
@@ -442,22 +442,22 @@ class FormBuilder
      */
     public function has($name)
     {
-        return isset($this->fields[$name]);
+        return isset($this->children[$name]);
     }
 
     protected function buildChildren()
     {
-        $fields = array();
+        $children = array();
 
-        foreach ($this->fields as $name => $builder) {
+        foreach ($this->children as $name => $builder) {
             if (!$builder instanceof FormBuilder) {
                 $builder = $this->build($name, $builder['type'], $builder['options']);
             }
 
-            $fields[$builder->getName()] = $builder->getForm();
+            $children[$builder->getName()] = $builder->getForm();
         }
 
-        return $fields;
+        return $children;
     }
 
     public function setDataClass($class)
@@ -489,8 +489,8 @@ class FormBuilder
             $this->getAttributes()
         );
 
-        foreach ($this->buildChildren() as $field) {
-            $instance->add($field);
+        foreach ($this->buildChildren() as $child) {
+            $instance->add($child);
         }
 
         if ($this->getData()) {

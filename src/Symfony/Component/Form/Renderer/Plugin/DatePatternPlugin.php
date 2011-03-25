@@ -23,7 +23,7 @@ class DatePatternPlugin implements FormRendererPluginInterface
         $this->formatter = $formatter;
     }
 
-    public function setUp(FormInterface $field, FormRendererInterface $renderer)
+    public function setUp(FormInterface $form, FormRendererInterface $renderer)
     {
         $renderer->setVar('date_pattern', $this->getPattern());
     }

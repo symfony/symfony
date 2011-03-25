@@ -16,8 +16,8 @@ use Symfony\Component\Form\FormInterface;
 
 class CheckedPlugin implements FormRendererPluginInterface
 {
-    public function setUp(FormInterface $field, FormRendererInterface $renderer)
+    public function setUp(FormInterface $form, FormRendererInterface $renderer)
     {
-        $renderer->setVar('checked', (bool)$field->getData());
+        $renderer->setVar('checked', (bool)$form->getData());
     }
 }

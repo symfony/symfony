@@ -24,8 +24,8 @@ class CallbackValidator implements FormValidatorInterface
         $this->callback = $callback;
     }
 
-    public function validate(FormInterface $field)
+    public function validate(FormInterface $form)
     {
-        return call_user_func($this->callback, $field);
+        return call_user_func($this->callback, $form);
     }
 }

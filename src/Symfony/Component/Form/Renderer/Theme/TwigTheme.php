@@ -73,12 +73,12 @@ class TwigTheme implements FormThemeInterface
         return array_unique($names);
     }
 
-    public function render($field, $section, array $parameters)
+    public function render($form, $section, array $parameters)
     {
         $this->initialize();
 
-        if (isset($this->templatesByBlock[$field.'__'.$section])) {
-            $blockName = $field.'__'.$section;
+        if (isset($this->templatesByBlock[$form.'__'.$section])) {
+            $blockName = $form.'__'.$section;
         } else if (isset($this->templatesByBlock[$section])) {
             $blockName = $section;
         } else {

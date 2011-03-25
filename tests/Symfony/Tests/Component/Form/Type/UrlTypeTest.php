@@ -19,47 +19,47 @@ class UrlTypeTest extends LocalizedTestCase
 {
     public function testSubmitAddsDefaultProtocolIfNoneIsIncluded()
     {
-        $field = $this->factory->create('url', 'name');
+        $form = $this->factory->create('url', 'name');
 
-        $field->bind('www.domain.com');
+        $form->bind('www.domain.com');
 
-        $this->assertSame('http://www.domain.com', $field->getData());
-        $this->assertSame('http://www.domain.com', $field->getClientData());
+        $this->assertSame('http://www.domain.com', $form->getData());
+        $this->assertSame('http://www.domain.com', $form->getClientData());
     }
 
     public function testSubmitAddsNoDefaultProtocolIfAlreadyIncluded()
     {
-        $field = $this->factory->create('url', 'name', array(
+        $form = $this->factory->create('url', 'name', array(
             'default_protocol' => 'http',
         ));
 
-        $field->bind('ftp://www.domain.com');
+        $form->bind('ftp://www.domain.com');
 
-        $this->assertSame('ftp://www.domain.com', $field->getData());
-        $this->assertSame('ftp://www.domain.com', $field->getClientData());
+        $this->assertSame('ftp://www.domain.com', $form->getData());
+        $this->assertSame('ftp://www.domain.com', $form->getClientData());
     }
 
     public function testSubmitAddsNoDefaultProtocolIfEmpty()
     {
-        $field = $this->factory->create('url', 'name', array(
+        $form = $this->factory->create('url', 'name', array(
             'default_protocol' => 'http',
         ));
 
-        $field->bind('');
+        $form->bind('');
 
-        $this->assertSame(null, $field->getData());
-        $this->assertSame('', $field->getClientData());
+        $this->assertSame(null, $form->getData());
+        $this->assertSame('', $form->getClientData());
     }
 
     public function testSubmitAddsNoDefaultProtocolIfSetToNull()
     {
-        $field = $this->factory->create('url', 'name', array(
+        $form = $this->factory->create('url', 'name', array(
             'default_protocol' => null,
         ));
 
-        $field->bind('www.domain.com');
+        $form->bind('www.domain.com');
 
-        $this->assertSame('www.domain.com', $field->getData());
-        $this->assertSame('www.domain.com', $field->getClientData());
+        $this->assertSame('www.domain.com', $form->getData());
+        $this->assertSame('www.domain.com', $form->getClientData());
     }
 }

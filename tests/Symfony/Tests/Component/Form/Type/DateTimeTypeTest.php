@@ -21,7 +21,7 @@ class DateTimeTypeTest extends DateTimeTestCase
 {
     public function testSubmit_dateTime()
     {
-        $field = $this->factory->create('datetime', 'name', array(
+        $form = $this->factory->create('datetime', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'date_widget' => 'choice',
@@ -29,7 +29,7 @@ class DateTimeTypeTest extends DateTimeTestCase
             'input' => 'datetime',
         ));
 
-        $field->bind(array(
+        $form->bind(array(
             'date' => array(
                 'day' => '2',
                 'month' => '6',
@@ -43,12 +43,12 @@ class DateTimeTypeTest extends DateTimeTestCase
 
         $dateTime = new \DateTime('2010-06-02 03:04:00 UTC');
 
-        $this->assertDateTimeEquals($dateTime, $field->getData());
+        $this->assertDateTimeEquals($dateTime, $form->getData());
     }
 
     public function testSubmit_string()
     {
-        $field = $this->factory->create('datetime', 'name', array(
+        $form = $this->factory->create('datetime', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'input' => 'string',
@@ -56,7 +56,7 @@ class DateTimeTypeTest extends DateTimeTestCase
             'time_widget' => 'choice',
         ));
 
-        $field->bind(array(
+        $form->bind(array(
             'date' => array(
                 'day' => '2',
                 'month' => '6',
@@ -68,12 +68,12 @@ class DateTimeTypeTest extends DateTimeTestCase
             ),
         ));
 
-        $this->assertEquals('2010-06-02 03:04:00', $field->getData());
+        $this->assertEquals('2010-06-02 03:04:00', $form->getData());
     }
 
     public function testSubmit_timestamp()
     {
-        $field = $this->factory->create('datetime', 'name', array(
+        $form = $this->factory->create('datetime', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'input' => 'timestamp',
@@ -81,7 +81,7 @@ class DateTimeTypeTest extends DateTimeTestCase
             'time_widget' => 'choice',
         ));
 
-        $field->bind(array(
+        $form->bind(array(
             'date' => array(
                 'day' => '2',
                 'month' => '6',
@@ -95,12 +95,12 @@ class DateTimeTypeTest extends DateTimeTestCase
 
         $dateTime = new \DateTime('2010-06-02 03:04:00 UTC');
 
-        $this->assertEquals($dateTime->format('U'), $field->getData());
+        $this->assertEquals($dateTime->format('U'), $form->getData());
     }
 
     public function testSubmit_withSeconds()
     {
-        $field = $this->factory->create('datetime', 'name', array(
+        $form = $this->factory->create('datetime', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'date_widget' => 'choice',
@@ -109,7 +109,7 @@ class DateTimeTypeTest extends DateTimeTestCase
             'with_seconds' => true,
         ));
 
-        $field->setData(new \DateTime('2010-06-02 03:04:05 UTC'));
+        $form->setData(new \DateTime('2010-06-02 03:04:05 UTC'));
 
         $input = array(
             'date' => array(
@@ -124,14 +124,14 @@ class DateTimeTypeTest extends DateTimeTestCase
             ),
         );
 
-        $field->bind($input);
+        $form->bind($input);
 
-        $this->assertDateTimeEquals(new \DateTime('2010-06-02 03:04:05 UTC'), $field->getData());
+        $this->assertDateTimeEquals(new \DateTime('2010-06-02 03:04:05 UTC'), $form->getData());
     }
 
     public function testSubmit_differentTimezones()
     {
-        $field = $this->factory->create('datetime', 'name', array(
+        $form = $this->factory->create('datetime', 'name', array(
             'data_timezone' => 'America/New_York',
             'user_timezone' => 'Pacific/Tahiti',
             'date_widget' => 'choice',
@@ -143,7 +143,7 @@ class DateTimeTypeTest extends DateTimeTestCase
 
         $dateTime = new \DateTime('2010-06-02 03:04:05 Pacific/Tahiti');
 
-        $field->bind(array(
+        $form->bind(array(
             'date' => array(
                 'day' => (int)$dateTime->format('d'),
                 'month' => (int)$dateTime->format('m'),
@@ -158,6 +158,6 @@ class DateTimeTypeTest extends DateTimeTestCase
 
         $dateTime->setTimezone(new \DateTimeZone('America/New_York'));
 
-        $this->assertEquals($dateTime->format('Y-m-d H:i:s'), $field->getData());
+        $this->assertEquals($dateTime->format('Y-m-d H:i:s'), $form->getData());
     }
 }

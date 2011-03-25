@@ -7,19 +7,19 @@ use Symfony\Component\Form\FormInterface;
 
 class DataEvent extends Event
 {
-    private $field;
+    private $form;
 
     protected $data;
 
-    public function __construct(FormInterface $field, $data)
+    public function __construct(FormInterface $form, $data)
     {
-        $this->field = $field;
+        $this->form = $form;
         $this->data = $data;
     }
 
-    public function getField()
+    public function getForm()
     {
-        return $this->field;
+        return $this->form;
     }
 
     public function getData()

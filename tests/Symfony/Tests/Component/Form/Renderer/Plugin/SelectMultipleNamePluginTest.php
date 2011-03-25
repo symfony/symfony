@@ -18,7 +18,7 @@ class SelectMultipleNamePluginTest extends \PHPUnit_Framework_TestCase
 
     public function testSetUp()
     {
-        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
         
         $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
         $renderer->expects($this->once())
@@ -31,6 +31,6 @@ class SelectMultipleNamePluginTest extends \PHPUnit_Framework_TestCase
                 ->with($this->equalTo('name'), $this->equalTo('multiname[]'));
 
         $plugin = new SelectMultipleNamePlugin();
-        $plugin->setUp($field, $renderer);
+        $plugin->setUp($form, $renderer);
     }
 }

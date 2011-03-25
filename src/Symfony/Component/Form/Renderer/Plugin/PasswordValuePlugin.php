@@ -23,11 +23,11 @@ class PasswordValuePlugin implements FormRendererPluginInterface
         $this->alwaysEmpty = $alwaysEmpty;
     }
 
-    public function setUp(FormInterface $field, FormRendererInterface $renderer)
+    public function setUp(FormInterface $form, FormRendererInterface $renderer)
     {
-        $value = $this->alwaysEmpty || !$field->isBound()
+        $value = $this->alwaysEmpty || !$form->isBound()
                 ? ''
-                : $field->getClientData();
+                : $form->getClientData();
 
         $renderer->setVar('value', $value);
     }

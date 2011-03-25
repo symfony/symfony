@@ -23,14 +23,14 @@ class FieldPlugin implements FormRendererPluginInterface
      *
      *     <field action="..." method="post" {{ field.render.enctype }}>
      *
-     * @param Form $field   The field for which to render the encoding type
+     * @param Form $form   The field for which to render the encoding type
      */
-    public function setUp(FormInterface $field, FormRendererInterface $renderer)
+    public function setUp(FormInterface $form, FormRendererInterface $renderer)
     {
-        $fieldKey = $field->getName();
+        $fieldKey = $form->getName();
 
-        if ($field->hasParent()) {
-            $parentRenderer = $field->getParent()->getRenderer();
+        if ($form->hasParent()) {
+            $parentRenderer = $form->getParent()->getRenderer();
             $parentId = $parentRenderer->getVar('id');
             $parentName = $parentRenderer->getVar('name');
             $id = sprintf('%s_%s', $parentId, $fieldKey);
@@ -43,14 +43,14 @@ class FieldPlugin implements FormRendererPluginInterface
         $renderer->setVar('renderer', $renderer);
         $renderer->setVar('id', $id);
         $renderer->setVar('name', $name);
-        $renderer->setVar('errors', $field->getErrors());
-        $renderer->setVar('value', $field->getClientData());
-        $renderer->setVar('disabled', $field->isReadOnly());
-        $renderer->setVar('required', $field->isRequired());
+        $renderer->setVar('errors', $form->getErrors());
+        $renderer->setVar('value', $form->getClientData());
+        $renderer->setVar('disabled', $form->isReadOnly());
+        $renderer->setVar('required', $form->isRequired());
         $renderer->setVar('class', null);
         $renderer->setVar('max_length', null);
         $renderer->setVar('size', null);
-        $renderer->setVar('label', ucfirst(strtolower(str_replace('_', ' ', $field->getName()))));
+        $renderer->setVar('label', ucfirst(strtolower(str_replace('_', ' ', $form->getName()))));
         $renderer->setVar('multipart', false);
         $renderer->setVar('attr', array());
     }

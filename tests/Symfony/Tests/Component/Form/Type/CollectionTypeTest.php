@@ -20,146 +20,146 @@ class CollectionFormTest extends TestCase
 {
     public function testContainsOnlyCsrfTokenByDefault()
     {
-        $field = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', 'emails', array(
             'type' => 'field',
             'csrf_field_name' => 'abc',
         ));
 
-        $this->assertTrue($field->has('abc'));
-        $this->assertEquals(1, count($field));
+        $this->assertTrue($form->has('abc'));
+        $this->assertEquals(1, count($form));
     }
 
     public function testSetDataAdjustsSize()
     {
-        $field = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', 'emails', array(
             'type' => 'field',
         ));
-        $field->setData(array('foo@foo.com', 'foo@bar.com'));
+        $form->setData(array('foo@foo.com', 'foo@bar.com'));
 
-        $this->assertTrue($field[0] instanceof Form);
-        $this->assertTrue($field[1] instanceof Form);
-        $this->assertEquals(2, count($field));
-        $this->assertEquals('foo@foo.com', $field[0]->getData());
-        $this->assertEquals('foo@bar.com', $field[1]->getData());
+        $this->assertTrue($form[0] instanceof Form);
+        $this->assertTrue($form[1] instanceof Form);
+        $this->assertEquals(2, count($form));
+        $this->assertEquals('foo@foo.com', $form[0]->getData());
+        $this->assertEquals('foo@bar.com', $form[1]->getData());
 
-        $field->setData(array('foo@baz.com'));
-        $this->assertTrue($field[0] instanceof Form);
-        $this->assertFalse(isset($field[1]));
-        $this->assertEquals(1, count($field));
-        $this->assertEquals('foo@baz.com', $field[0]->getData());
+        $form->setData(array('foo@baz.com'));
+        $this->assertTrue($form[0] instanceof Form);
+        $this->assertFalse(isset($form[1]));
+        $this->assertEquals(1, count($form));
+        $this->assertEquals('foo@baz.com', $form[0]->getData());
     }
 
     public function testSetDataAdjustsSizeIfModifiable()
     {
-        $field = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', 'emails', array(
             'type' => 'field',
             'modifiable' => true,
         ));
-        $field->setData(array('foo@foo.com', 'foo@bar.com'));
+        $form->setData(array('foo@foo.com', 'foo@bar.com'));
 
-        $this->assertTrue($field[0] instanceof Form);
-        $this->assertTrue($field[1] instanceof Form);
-        $this->assertTrue($field['$$name$$'] instanceof Form);
-        $this->assertEquals(3, count($field));
+        $this->assertTrue($form[0] instanceof Form);
+        $this->assertTrue($form[1] instanceof Form);
+        $this->assertTrue($form['$$name$$'] instanceof Form);
+        $this->assertEquals(3, count($form));
 
-        $field->setData(array('foo@baz.com'));
-        $this->assertTrue($field[0] instanceof Form);
-        $this->assertFalse(isset($field[1]));
-        $this->assertTrue($field['$$name$$'] instanceof Form);
-        $this->assertEquals(2, count($field));
+        $form->setData(array('foo@baz.com'));
+        $this->assertTrue($form[0] instanceof Form);
+        $this->assertFalse(isset($form[1]));
+        $this->assertTrue($form['$$name$$'] instanceof Form);
+        $this->assertEquals(2, count($form));
     }
 
     public function testThrowsExceptionIfObjectIsNotTraversable()
     {
-        $field = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', 'emails', array(
             'type' => 'field',
         ));
         $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
-        $field->setData(new \stdClass());
+        $form->setData(new \stdClass());
     }
 
     public function testModifiableCollectionsContainExtraForm()
     {
-        $field = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', 'emails', array(
             'type' => 'field',
             'modifiable' => true,
         ));
-        $field->setData(array('foo@bar.com'));
+        $form->setData(array('foo@bar.com'));
 
-        $this->assertTrue($field['0'] instanceof Form);
-        $this->assertTrue($field['$$name$$'] instanceof Form);
-        $this->assertEquals(2, count($field));
+        $this->assertTrue($form['0'] instanceof Form);
+        $this->assertTrue($form['$$name$$'] instanceof Form);
+        $this->assertEquals(2, count($form));
     }
 
     public function testNotResizedIfBoundWithMissingData()
     {
-        $field = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', 'emails', array(
             'type' => 'field',
         ));
-        $field->setData(array('foo@foo.com', 'bar@bar.com'));
-        $field->bind(array('foo@bar.com'));
+        $form->setData(array('foo@foo.com', 'bar@bar.com'));
+        $form->bind(array('foo@bar.com'));
 
-        $this->assertTrue($field->has('0'));
-        $this->assertTrue($field->has('1'));
-        $this->assertEquals('foo@bar.com', $field[0]->getData());
-        $this->assertEquals(null, $field[1]->getData());
+        $this->assertTrue($form->has('0'));
+        $this->assertTrue($form->has('1'));
+        $this->assertEquals('foo@bar.com', $form[0]->getData());
+        $this->assertEquals(null, $form[1]->getData());
     }
 
     public function testResizedIfBoundWithMissingDataAndModifiable()
     {
-        $field = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', 'emails', array(
             'type' => 'field',
             'modifiable' => true,
         ));
-        $field->setData(array('foo@foo.com', 'bar@bar.com'));
-        $field->bind(array('foo@bar.com'));
+        $form->setData(array('foo@foo.com', 'bar@bar.com'));
+        $form->bind(array('foo@bar.com'));
 
-        $this->assertTrue($field->has('0'));
-        $this->assertFalse($field->has('1'));
-        $this->assertEquals('foo@bar.com', $field[0]->getData());
+        $this->assertTrue($form->has('0'));
+        $this->assertFalse($form->has('1'));
+        $this->assertEquals('foo@bar.com', $form[0]->getData());
     }
 
     public function testNotResizedIfBoundWithExtraData()
     {
-        $field = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', 'emails', array(
             'type' => 'field',
         ));
-        $field->setData(array('foo@bar.com'));
-        $field->bind(array('foo@foo.com', 'bar@bar.com'));
+        $form->setData(array('foo@bar.com'));
+        $form->bind(array('foo@foo.com', 'bar@bar.com'));
 
-        $this->assertTrue($field->has('0'));
-        $this->assertFalse($field->has('1'));
-        $this->assertEquals('foo@foo.com', $field[0]->getData());
+        $this->assertTrue($form->has('0'));
+        $this->assertFalse($form->has('1'));
+        $this->assertEquals('foo@foo.com', $form[0]->getData());
     }
 
     public function testResizedUpIfBoundWithExtraDataAndModifiable()
     {
-        $field = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', 'emails', array(
             'type' => 'field',
             'modifiable' => true,
         ));
-        $field->setData(array('foo@bar.com'));
-        $field->bind(array('foo@foo.com', 'bar@bar.com'));
+        $form->setData(array('foo@bar.com'));
+        $form->bind(array('foo@foo.com', 'bar@bar.com'));
 
-        $this->assertTrue($field->has('0'));
-        $this->assertTrue($field->has('1'));
-        $this->assertEquals('foo@foo.com', $field[0]->getData());
-        $this->assertEquals('bar@bar.com', $field[1]->getData());
-        $this->assertEquals(array('foo@foo.com', 'bar@bar.com'), $field->getData());
+        $this->assertTrue($form->has('0'));
+        $this->assertTrue($form->has('1'));
+        $this->assertEquals('foo@foo.com', $form[0]->getData());
+        $this->assertEquals('bar@bar.com', $form[1]->getData());
+        $this->assertEquals(array('foo@foo.com', 'bar@bar.com'), $form->getData());
     }
 
     public function testResizedDownIfBoundWithLessDataAndModifiable()
     {
-        $field = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', 'emails', array(
             'type' => 'field',
             'modifiable' => true,
         ));
-        $field->setData(array('foo@bar.com', 'bar@bar.com'));
-        $field->bind(array('foo@foo.com'));
+        $form->setData(array('foo@bar.com', 'bar@bar.com'));
+        $form->bind(array('foo@foo.com'));
 
-        $this->assertTrue($field->has('0'));
-        $this->assertFalse($field->has('1'));
-        $this->assertEquals('foo@foo.com', $field[0]->getData());
-        $this->assertEquals(array('foo@foo.com'), $field->getData());
+        $this->assertTrue($form->has('0'));
+        $this->assertFalse($form->has('1'));
+        $this->assertEquals('foo@foo.com', $form[0]->getData());
+        $this->assertEquals(array('foo@foo.com'), $form->getData());
     }
 }

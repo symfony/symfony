@@ -19,11 +19,11 @@ class IntegerTypeTest extends LocalizedTestCase
 {
     public function testSubmitCastsToInteger()
     {
-        $field = $this->factory->create('integer', 'name');
+        $form = $this->factory->create('integer', 'name');
 
-        $field->bind('1.678');
+        $form->bind('1.678');
 
-        $this->assertSame(1, $field->getData());
-        $this->assertSame('1', $field->getClientData());
+        $this->assertSame(1, $form->getData());
+        $this->assertSame('1', $form->getClientData());
     }
 }

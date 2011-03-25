@@ -33,10 +33,10 @@ class PhpTheme implements FormThemeInterface
         $this->charset = $charset;
     }
 
-    public function render($field, $section, array $parameters)
+    public function render($form, $section, array $parameters)
     {
-        if (method_exists($this, $field.'_'.$section)) {
-            $method = $field.'_'.$section;
+        if (method_exists($this, $form.'_'.$section)) {
+            $method = $form.'_'.$section;
         } else if (method_exists($this, $section)) {
             $method = $section;
         } else {
@@ -154,8 +154,8 @@ class PhpTheme implements FormThemeInterface
     protected function form_widget($attr)
     {
         $html = '<div>' . $attr['renderer']->getErrors();
-        foreach ($attr['fields'] as $field) {
-            $html .= $field->getRow();
+        foreach ($attr['fields'] as $form) {
+            $html .= $form->getRow();
         }
         $html .= $attr['renderer']->getRest();
         return $html;
@@ -215,8 +215,8 @@ class PhpTheme implements FormThemeInterface
     protected function repeated_row($attr)
     {
         $html = '';
-        foreach ($attr['fields'] as $field) {
-            $html .= $field->getRow();
+        foreach ($attr['fields'] as $form) {
+            $html .= $form->getRow();
         }
         return $html;
     }
@@ -224,9 +224,9 @@ class PhpTheme implements FormThemeInterface
     protected function rest($attr)
     {
         $html = '';
-        foreach ($attr['fields'] as $field) {
-            if (!$field->isRendered()) {
-                $html .= $field->getRow();
+        foreach ($attr['fields'] as $form) {
+            if (!$form->isRendered()) {
+                $html .= $form->getRow();
             }
         }
         return $html;

@@ -26,7 +26,7 @@ class ChoicePluginTest extends \PHPUnit_Framework_TestCase
               ->method('getPreferredChoices')
               ->will($this->returnValue('somethingelse'));
 
-        $field = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
         
         $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
 
@@ -51,6 +51,6 @@ class ChoicePluginTest extends \PHPUnit_Framework_TestCase
                 ->with($this->equalTo('empty_value'), $this->equalTo(''));
 
         $plugin = new ChoicePlugin($choice);
-        $plugin->setUp($field, $renderer);
+        $plugin->setUp($form, $renderer);
     }
 }

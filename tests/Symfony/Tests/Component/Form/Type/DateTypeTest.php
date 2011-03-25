@@ -27,61 +27,61 @@ class DateTypeTest extends DateTimeTestCase
 
     public function testSubmit_fromInput_dateTime()
     {
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
             'input' => 'datetime',
         ));
 
-        $field->bind('2.6.2010');
+        $form->bind('2.6.2010');
 
-        $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $field->getData());
-        $this->assertEquals('02.06.2010', $field->getClientData());
+        $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
+        $this->assertEquals('02.06.2010', $form->getClientData());
     }
 
     public function testSubmit_fromInput_string()
     {
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
             'input' => 'string',
         ));
 
-        $field->bind('2.6.2010');
+        $form->bind('2.6.2010');
 
-        $this->assertEquals('2010-06-02', $field->getData());
-        $this->assertEquals('02.06.2010', $field->getClientData());
+        $this->assertEquals('2010-06-02', $form->getData());
+        $this->assertEquals('02.06.2010', $form->getClientData());
     }
 
     public function testSubmit_fromInput_timestamp()
     {
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
             'input' => 'timestamp',
         ));
 
-        $field->bind('2.6.2010');
+        $form->bind('2.6.2010');
 
         $dateTime = new \DateTime('2010-06-02 UTC');
 
-        $this->assertEquals($dateTime->format('U'), $field->getData());
-        $this->assertEquals('02.06.2010', $field->getClientData());
+        $this->assertEquals($dateTime->format('U'), $form->getData());
+        $this->assertEquals('02.06.2010', $form->getClientData());
     }
 
     public function testSubmit_fromInput_raw()
     {
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
             'input' => 'array',
         ));
 
-        $field->bind('2.6.2010');
+        $form->bind('2.6.2010');
 
         $output = array(
             'day' => '2',
@@ -89,13 +89,13 @@ class DateTypeTest extends DateTimeTestCase
             'year' => '2010',
         );
 
-        $this->assertEquals($output, $field->getData());
-        $this->assertEquals('02.06.2010', $field->getClientData());
+        $this->assertEquals($output, $form->getData());
+        $this->assertEquals('02.06.2010', $form->getClientData());
     }
 
     public function testSubmit_fromChoice()
     {
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
@@ -107,17 +107,17 @@ class DateTypeTest extends DateTimeTestCase
             'year' => '2010',
         );
 
-        $field->bind($text);
+        $form->bind($text);
 
         $dateTime = new \DateTime('2010-06-02 UTC');
 
-        $this->assertDateTimeEquals($dateTime, $field->getData());
-        $this->assertEquals($text, $field->getClientData());
+        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertEquals($text, $form->getClientData());
     }
 
     public function testSubmit_fromChoice_empty()
     {
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
@@ -130,15 +130,15 @@ class DateTypeTest extends DateTimeTestCase
             'year' => '',
         );
 
-        $field->bind($text);
+        $form->bind($text);
 
-        $this->assertSame(null, $field->getData());
-        $this->assertEquals($text, $field->getClientData());
+        $this->assertSame(null, $form->getData());
+        $this->assertEquals($text, $form->getClientData());
     }
 
     public function testSetData_differentTimezones()
     {
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'America/New_York',
             'user_timezone' => 'Pacific/Tahiti',
             // don't do this test with DateTime, because it leads to wrong results!
@@ -146,197 +146,197 @@ class DateTypeTest extends DateTimeTestCase
             'widget' => 'text',
         ));
 
-        $field->setData('2010-06-02');
+        $form->setData('2010-06-02');
 
-        $this->assertEquals('01.06.2010', $field->getClientData());
+        $this->assertEquals('01.06.2010', $form->getClientData());
     }
 
     public function testIsYearWithinRange_returnsTrueIfWithin()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
             'years' => array(2010, 2011),
         ));
 
-        $field->bind('2.6.2010');
+        $form->bind('2.6.2010');
 
-        $this->assertTrue($field->isYearWithinRange());
+        $this->assertTrue($form->isYearWithinRange());
     }
 
     public function testIsYearWithinRange_returnsTrueIfEmpty()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
             'years' => array(2010, 2011),
         ));
 
-        $field->bind('');
+        $form->bind('');
 
-        $this->assertTrue($field->isYearWithinRange());
+        $this->assertTrue($form->isYearWithinRange());
     }
 
     public function testIsYearWithinRange_returnsTrueIfEmpty_choice()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
             'years' => array(2010, 2011),
         ));
 
-        $field->bind(array(
+        $form->bind(array(
             'day' => '1',
             'month' => '2',
             'year' => '',
         ));
 
-        $this->assertTrue($field->isYearWithinRange());
+        $this->assertTrue($form->isYearWithinRange());
     }
 
     public function testIsYearWithinRange_returnsFalseIfNotContained()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
             'years' => array(2010, 2012),
         ));
 
-        $field->bind('2.6.2011');
+        $form->bind('2.6.2011');
 
-        $this->assertFalse($field->isYearWithinRange());
+        $this->assertFalse($form->isYearWithinRange());
     }
 
     public function testIsMonthWithinRange_returnsTrueIfWithin()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
             'months' => array(6, 7),
         ));
 
-        $field->bind('2.6.2010');
+        $form->bind('2.6.2010');
 
-        $this->assertTrue($field->isMonthWithinRange());
+        $this->assertTrue($form->isMonthWithinRange());
     }
 
     public function testIsMonthWithinRange_returnsTrueIfEmpty()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
             'months' => array(6, 7),
         ));
 
-        $field->bind('');
+        $form->bind('');
 
-        $this->assertTrue($field->isMonthWithinRange());
+        $this->assertTrue($form->isMonthWithinRange());
     }
 
     public function testIsMonthWithinRange_returnsTrueIfEmpty_choice()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
             'months' => array(6, 7),
         ));
 
-        $field->bind(array(
+        $form->bind(array(
             'day' => '1',
             'month' => '',
             'year' => '2011',
         ));
 
-        $this->assertTrue($field->isMonthWithinRange());
+        $this->assertTrue($form->isMonthWithinRange());
     }
 
     public function testIsMonthWithinRange_returnsFalseIfNotContained()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
             'months' => array(6, 8),
         ));
 
-        $field->bind('2.7.2010');
+        $form->bind('2.7.2010');
 
-        $this->assertFalse($field->isMonthWithinRange());
+        $this->assertFalse($form->isMonthWithinRange());
     }
 
     public function testIsDayWithinRange_returnsTrueIfWithin()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
             'days' => array(6, 7),
         ));
 
-        $field->bind('6.6.2010');
+        $form->bind('6.6.2010');
 
-        $this->assertTrue($field->isDayWithinRange());
+        $this->assertTrue($form->isDayWithinRange());
     }
 
     public function testIsDayWithinRange_returnsTrueIfEmpty()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
             'days' => array(6, 7),
         ));
 
-        $field->bind('');
+        $form->bind('');
 
-        $this->assertTrue($field->isDayWithinRange());
+        $this->assertTrue($form->isDayWithinRange());
     }
 
     public function testIsDayWithinRange_returnsTrueIfEmpty_choice()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
             'days' => array(6, 7),
         ));
 
-        $field->bind(array(
+        $form->bind(array(
             'day' => '',
             'month' => '1',
             'year' => '2011',
         ));
 
-        $this->assertTrue($field->isDayWithinRange());
+        $this->assertTrue($form->isDayWithinRange());
     }
 
     public function testIsDayWithinRange_returnsFalseIfNotContained()
@@ -345,87 +345,87 @@ class DateTypeTest extends DateTimeTestCase
 
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
             'days' => array(6, 8),
         ));
 
-        $field->bind('7.6.2010');
+        $form->bind('7.6.2010');
 
-        $this->assertFalse($field->isDayWithinRange());
+        $this->assertFalse($form->isDayWithinRange());
     }
 
     public function testIsPartiallyFilled_returnsFalseIfInput()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
         ));
 
-        $field->bind('7.6.2010');
+        $form->bind('7.6.2010');
 
-        $this->assertFalse($field->isPartiallyFilled());
+        $this->assertFalse($form->isPartiallyFilled());
     }
 
     public function testIsPartiallyFilled_returnsFalseIfChoiceAndCompletelyEmpty()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
         ));
 
-        $field->bind(array(
+        $form->bind(array(
             'day' => '',
             'month' => '',
             'year' => '',
         ));
 
-        $this->assertFalse($field->isPartiallyFilled());
+        $this->assertFalse($form->isPartiallyFilled());
     }
 
     public function testIsPartiallyFilled_returnsFalseIfChoiceAndCompletelyFilled()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
         ));
 
-        $field->bind(array(
+        $form->bind(array(
             'day' => '2',
             'month' => '6',
             'year' => '2010',
         ));
 
-        $this->assertFalse($field->isPartiallyFilled());
+        $this->assertFalse($form->isPartiallyFilled());
     }
 
     public function testIsPartiallyFilled_returnsTrueIfChoiceAndDayEmpty()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
         ));
 
-        $field->bind(array(
+        $form->bind(array(
             'day' => '',
             'month' => '6',
             'year' => '2010',
         ));
 
-        $this->assertTrue($field->isPartiallyFilled());
+        $this->assertTrue($form->isPartiallyFilled());
     }
 }

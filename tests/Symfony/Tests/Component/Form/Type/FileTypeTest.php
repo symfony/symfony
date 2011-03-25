@@ -22,7 +22,7 @@ class FileTypeTest extends TestCase
 
     protected static $tmpDir;
 
-    protected $field;
+    protected $form;
 
     public static function setUpBeforeClass()
     {
@@ -33,7 +33,7 @@ class FileTypeTest extends TestCase
     {
         parent::setUp();
 
-        $this->field = $this->factory->create('file', 'file');
+        $this->form = $this->factory->create('file', 'file');
     }
 
     protected function tearDown()
@@ -81,7 +81,7 @@ class FileTypeTest extends TestCase
              ->method('getPath')
              ->will($this->returnValue($tmpDir.'/original_name.jpg'));
 
-        $this->field->bind(array(
+        $this->form->bind(array(
             'file' => $file,
             'token' => '',
             'name' => '',
@@ -92,8 +92,8 @@ class FileTypeTest extends TestCase
             'file' => $file,
             'token' => $generatedToken,
             'name' => 'original_name.jpg',
-        ), $this->field->getClientData());
-        $this->assertEquals($tmpDir.'/original_name.jpg', $this->field->getData());
+        ), $this->form->getClientData());
+        $this->assertEquals($tmpDir.'/original_name.jpg', $this->form->getData());
     }
 
     public function testSubmitKeepsUploadedFilesOnErrors()
@@ -107,7 +107,7 @@ class FileTypeTest extends TestCase
             ->with($this->equalTo('123456'))
             ->will($this->returnValue($tmpDir));
 
-        $this->field->bind(array(
+        $this->form->bind(array(
             'file' => null,
             'token' => '123456',
             'name' => 'original_name.jpg',
@@ -121,8 +121,8 @@ class FileTypeTest extends TestCase
             'file' => $file,
             'token' => '123456',
             'name' => 'original_name.jpg',
-        ), $this->field->getClientData());
-        $this->assertEquals($tmpPath, $this->field->getData());
+        ), $this->form->getClientData());
+        $this->assertEquals($tmpPath, $this->form->getData());
     }
 
     public function testSubmitEmpty()
@@ -130,7 +130,7 @@ class FileTypeTest extends TestCase
         $this->storage->expects($this->never())
             ->method('getTempDir');
 
-        $this->field->bind(array(
+        $this->form->bind(array(
             'file' => '',
             'token' => '',
             'name' => '',
@@ -140,8 +140,8 @@ class FileTypeTest extends TestCase
             'file' => '',
             'token' => '',
             'name' => '',
-        ), $this->field->getClientData());
-        $this->assertEquals(null, $this->field->getData());
+        ), $this->form->getClientData());
+        $this->assertEquals(null, $this->form->getData());
     }
 
     public function testSubmitEmptyKeepsExistingFiles()
@@ -153,8 +153,8 @@ class FileTypeTest extends TestCase
         $this->storage->expects($this->never())
             ->method('getTempDir');
 
-        $this->field->setData($tmpPath);
-        $this->field->bind(array(
+        $this->form->setData($tmpPath);
+        $this->form->bind(array(
             'file' => '',
             'token' => '',
             'name' => '',
@@ -164,7 +164,7 @@ class FileTypeTest extends TestCase
             'file' => $file,
             'token' => '',
             'name' => '',
-        ), $this->field->getClientData());
-        $this->assertEquals($tmpPath, $this->field->getData());
+        ), $this->form->getClientData());
+        $this->assertEquals($tmpPath, $this->form->getData());
     }
 }

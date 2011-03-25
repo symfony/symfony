@@ -16,5 +16,5 @@ use Symfony\Component\Form\Renderer\FormRendererInterface;
 
 interface FormRendererPluginInterface
 {
-    function setUp(FormInterface $field, FormRendererInterface $renderer);
+    function setUp(FormInterface $form, FormRendererInterface $renderer);
 }

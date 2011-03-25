@@ -123,15 +123,15 @@ class ResourceWatcherTest extends \PHPUnit_Framework_TestCase
 
         $listener1
             ->expects($this->once())
-            ->method('handles')
+            ->method('supports')
             ->will($this->returnValue(true));
         $listener2
             ->expects($this->exactly(2))
-            ->method('handles')
+            ->method('supports')
             ->will($this->onConsecutiveCalls(false, false));
         $listener3
             ->expects($this->exactly(2))
-            ->method('handles')
+            ->method('supports')
             ->will($this->onConsecutiveCalls(true, true));
 
         $listener1

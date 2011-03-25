@@ -33,9 +33,9 @@ interface EventListenerInterface
     function getCallback();
 
     /**
-     * Checks whether listener can handle provided resource event.
+     * Checks whether listener supports provided resource event.
      *
      * @param   Event   $event
      */
-    function handles(Event $event);
+    function supports(Event $event);
 }

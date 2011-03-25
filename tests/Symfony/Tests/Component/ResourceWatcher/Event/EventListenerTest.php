@@ -32,26 +32,26 @@ class EventListenerTest extends \PHPUnit_Framework_TestCase
 
         $listener = new EventListener($res, $cb, Event::CREATED);
 
-        $this->assertTrue($listener->handles(new Event(1, $res, $type = Event::CREATED)));
-        $this->assertFalse($listener->handles(new Event(1, $res, $type = Event::MODIFIED)));
-        $this->assertFalse($listener->handles(new Event(1, $res, $type = Event::DELETED)));
+        $this->assertTrue($listener->supports(new Event(1, $res, $type = Event::CREATED)));
+        $this->assertFalse($listener->supports(new Event(1, $res, $type = Event::MODIFIED)));
+        $this->assertFalse($listener->supports(new Event(1, $res, $type = Event::DELETED)));
 
         $listener = new EventListener($res, $cb, Event::CREATED | Event::DELETED);
 
-        $this->assertTrue($listener->handles(new Event(1, $res, $type = Event::CREATED)));
-        $this->assertFalse($listener->handles(new Event(1, $res, $type = Event::MODIFIED)));
-        $this->assertTrue($listener->handles(new Event(1, $res, $type = Event::DELETED)));
+        $this->assertTrue($listener->supports(new Event(1, $res, $type = Event::CREATED)));
+        $this->assertFalse($listener->supports(new Event(1, $res, $type = Event::MODIFIED)));
+        $this->assertTrue($listener->supports(new Event(1, $res, $type = Event::DELETED)));
 
         $listener = new EventListener($res, $cb, Event::ALL);
 
-        $this->assertTrue($listener->handles(new Event(1, $res, $type = Event::CREATED)));
-        $this->assertTrue($listener->handles(new Event(1, $res, $type = Event::MODIFIED)));
-        $this->assertTrue($listener->handles(new Event(1, $res, $type = Event::DELETED)));
+        $this->assertTrue($listener->supports(new Event(1, $res, $type = Event::CREATED)));
+        $this->assertTrue($listener->supports(new Event(1, $res, $type = Event::MODIFIED)));
+        $this->assertTrue($listener->supports(new Event(1, $res, $type = Event::DELETED)));
 
         $listener = new EventListener($res, $cb, Event::DELETED);
 
-        $this->assertFalse($listener->handles(new Event(1, $res, $type = Event::CREATED)));
-        $this->assertFalse($listener->handles(new Event(1, $res, $type = Event::MODIFIED)));
-        $this->assertTrue($listener->handles(new Event(1, $res, $type = Event::DELETED)));
+        $this->assertFalse($listener->supports(new Event(1, $res, $type = Event::CREATED)));
+        $this->assertFalse($listener->supports(new Event(1, $res, $type = Event::MODIFIED)));
+        $this->assertTrue($listener->supports(new Event(1, $res, $type = Event::DELETED)));
     }
 }

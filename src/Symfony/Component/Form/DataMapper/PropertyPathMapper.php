@@ -91,7 +91,7 @@ class PropertyPathMapper implements DataMapperInterface
 
     public function mapFormToData(FormInterface $form, &$data)
     {
-        if ($form->getAttribute('property_path') !== null) {
+        if ($form->getAttribute('property_path') !== null && $form->isSynchronized()) {
             $propertyPath = $form->getAttribute('property_path');
 
             // If the data is identical to the value in $data, we are

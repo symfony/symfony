@@ -7,13 +7,13 @@
   <class name="Symfony\Component\Form\Field">
     <getter property="transformationSuccessful">
       <constraint name="AssertTrue">
-        <option name="message"><value>This value is invalid</value></option>
+        <option name="message">This value is invalid</option>
       </constraint>
     </getter>
   </class>
 
   <class name="Symfony\Component\Form\Form">
-    <constraint name="Callback">validateData</constraint>
+    <constraint name="Callback"><value>validateData</value></constraint>
     <property name="fields">
       <constraint name="Valid" />
     </property>

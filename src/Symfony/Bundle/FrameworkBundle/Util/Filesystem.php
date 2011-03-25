@@ -91,8 +91,12 @@ class Filesystem
      */
     public function remove($files)
     {
-        if (!is_array($files)) {
+        if (!is_array($files) && !$files instanceof \Traversable) {
             $files = array($files);
+        }
+        
+        if($files instanceof \Traversable) {
+            $files = iterator_to_array($files);
         }
 
         $files = array_reverse($files);

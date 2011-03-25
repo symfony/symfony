@@ -1,4 +1,4 @@
-doctrine:
+symfony_doctrine:
     dbal:
         default_connection: default
         connections:

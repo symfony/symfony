@@ -1,6 +1,6 @@
 <?php
 
-$container->loadFromExtension('framework', array(
+$container->loadFromExtension('symfony_framework', array(
     'csrf_protection' => array(
         'enabled'    => true,
         'field_name' => '_csrf',

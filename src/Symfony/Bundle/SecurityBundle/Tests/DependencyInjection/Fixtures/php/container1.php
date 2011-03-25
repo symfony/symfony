@@ -1,6 +1,6 @@
 <?php
 
-$container->loadFromExtension('security', array(
+$container->loadFromExtension('symfony_security', array(
     'encoders' => array(
         'JMS\FooBundle\Entity\User1' => 'plaintext',
         'JMS\FooBundle\Entity\User2' => array(

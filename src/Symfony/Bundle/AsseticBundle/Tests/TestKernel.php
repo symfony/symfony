@@ -24,9 +24,9 @@ class TestKernel extends Kernel
     public function registerBundles()
     {
         return array(
-            new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
-            new \Symfony\Bundle\TwigBundle\TwigBundle(),
-            new \Symfony\Bundle\AsseticBundle\AsseticBundle(),
+            new \Symfony\Bundle\FrameworkBundle\SymfonyFrameworkBundle(),
+            new \Symfony\Bundle\TwigBundle\SymfonyTwigBundle(),
+            new \Symfony\Bundle\AsseticBundle\SymfonyAsseticBundle(),
             new \Symfony\Bundle\AsseticBundle\Tests\TestBundle\TestBundle(),
         );
     }

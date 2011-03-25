@@ -11,14 +11,14 @@
 
 namespace Symfony\Bundle\AsseticBundle\Tests\DependencyInjection;
 
-use Symfony\Bundle\AsseticBundle\DependencyInjection\AsseticExtension;
+use Symfony\Bundle\AsseticBundle\DependencyInjection\SymfonyAsseticExtension;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\HttpFoundation\Request;
 
-class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
+class SymfonyAsseticExtensionTest extends \PHPUnit_Framework_TestCase
 {
     private $kernel;
     private $container;
@@ -64,7 +64,7 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->container->setParameter('kernel.debug', $debug);
 
-        $extension = new AsseticExtension();
+        $extension = new SymfonyAsseticExtension();
         $extension->load(array(array()), $this->container);
 
         $this->assertFalse($this->container->has('assetic.filter.yui_css'), '->load() does not load the yui_css filter when a yui value is not provided');
@@ -83,7 +83,7 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testYuiConfig()
     {
-        $extension = new AsseticExtension();
+        $extension = new SymfonyAsseticExtension();
         $extension->load(array(array('yui' => '/path/to/yuicompressor.jar')), $this->container);
 
         $this->assertTrue($this->container->has('assetic.filter.yui_css'), '->load() loads the yui_css filter when a yui value is provided');
@@ -97,7 +97,7 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testUseController($bool, $includes, $omits)
     {
-        $extension = new AsseticExtension();
+        $extension = new SymfonyAsseticExtension();
         $extension->load(array(array('use_controller' => $bool)), $this->container);
 
         foreach ($includes as $id) {
@@ -121,7 +121,7 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testClosure()
     {
-        $extension = new AsseticExtension();
+        $extension = new SymfonyAsseticExtension();
         $extension->load(array(array('closure' => '/path/to/closure.jar')), $this->container);
 
         $this->assertSaneContainer($this->getDumpedContainer());
@@ -130,7 +130,7 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
     private function getDumpedContainer()
     {
         static $i = 0;
-        $class = 'AsseticExtensionTestContainer'.$i++;
+        $class = 'SymfonyAsseticExtensionTestContainer'.$i++;
 
         $this->container->compile();
 

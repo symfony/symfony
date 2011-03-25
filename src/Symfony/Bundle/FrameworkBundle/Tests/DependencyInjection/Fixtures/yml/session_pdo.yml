@@ -1,4 +1,4 @@
-framework:
+symfony_framework:
     session:
         storage_id:      pdo
         pdo.db_table:    table

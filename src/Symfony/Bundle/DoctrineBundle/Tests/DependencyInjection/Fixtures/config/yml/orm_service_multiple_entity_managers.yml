@@ -1,7 +1,7 @@
 parameters:
   doctrine.orm.proxy_namespace: Proxies
 
-doctrine:
+symfony_doctrine:
     dbal:
         default_connection: conn1
         connections:

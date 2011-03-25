@@ -1,2 +1,2 @@
-doctrine_mongo_db:
+symfony_doctrine_mongo_db:
   auto_generate_proxy_classes: false

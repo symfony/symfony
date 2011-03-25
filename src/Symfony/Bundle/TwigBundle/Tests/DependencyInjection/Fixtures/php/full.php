@@ -1,6 +1,6 @@
 <?php
 
-$container->loadFromExtension('twig', array(
+$container->loadFromExtension('symfony_twig', array(
     'form' => array(
         'resources' => array(
             'MyBundle::form.html.twig',

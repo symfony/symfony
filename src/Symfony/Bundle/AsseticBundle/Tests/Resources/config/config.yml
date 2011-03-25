@@ -1,4 +1,4 @@
-framework:
+symfony_framework:
     charset:       UTF-8
     error_handler: null
     csrf_protection:
@@ -12,10 +12,10 @@ framework:
         lifetime:       3600
         auto_start:     false
 
-twig:
+symfony_twig:
     debug:            %kernel.debug%
     strict_variables: %kernel.debug%
 
-assetic:
+symfony_assetic:
     use_controller: true
     read_from:      "%kernel.root_dir%/web"

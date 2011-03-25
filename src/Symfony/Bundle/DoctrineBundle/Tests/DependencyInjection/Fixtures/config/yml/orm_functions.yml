@@ -1,4 +1,4 @@
-doctrine:
+symfony_doctrine:
     dbal: ~
     orm:
         entity_managers:

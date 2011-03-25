@@ -1,4 +1,4 @@
-security:
+symfony_security:
     firewalls:
         main:
             form_login:

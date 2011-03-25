@@ -1,4 +1,4 @@
-twig:
+symfony_twig:
     form:
         resources:
             - MyBundle::form.html.twig

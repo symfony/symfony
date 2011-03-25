@@ -2,7 +2,7 @@
 
 $this->load('merge_import.php', $container);
 
-$container->loadFromExtension('security', array(
+$container->loadFromExtension('symfony_security', array(
     'providers' => array(
         'default' => array('id' => 'foo'),
     ),

@@ -13,7 +13,7 @@ namespace Symfony\Bundle\DoctrineMongoDBBundle\Tests;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection\DoctrineMongoDBExtension;
+use Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection\SymfonyDoctrineMongoDBExtension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class ContainerTest extends TestCase
@@ -27,7 +27,7 @@ class ContainerTest extends TestCase
             'kernel.cache_dir'   => sys_get_temp_dir(),
             'kernel.debug'       => false,
         )));
-        $loader = new DoctrineMongoDBExtension();
+        $loader = new SymfonyDoctrineMongoDBExtension();
         $container->registerExtension($loader);
 
         $configs = array();

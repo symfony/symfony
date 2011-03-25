@@ -125,7 +125,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function fullConfigurationProvider()
     {
       $yaml = Yaml::load(__DIR__.'/Fixtures/config/yml/full.yml');
-      $yaml = $yaml['doctrine_mongo_db'];
+      $yaml = $yaml['symfony_doctrine_mongo_db'];
 
        return array(
            array($yaml),

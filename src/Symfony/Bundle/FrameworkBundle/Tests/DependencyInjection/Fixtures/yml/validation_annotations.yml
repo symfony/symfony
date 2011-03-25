@@ -1,4 +1,4 @@
-framework:
+symfony_framework:
     validation:
         enabled:     true
         annotations:

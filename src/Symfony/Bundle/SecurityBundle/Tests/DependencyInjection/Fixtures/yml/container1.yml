@@ -1,4 +1,4 @@
-security:
+symfony_security:
     encoders:
         JMS\FooBundle\Entity\User1: plaintext
         JMS\FooBundle\Entity\User2:

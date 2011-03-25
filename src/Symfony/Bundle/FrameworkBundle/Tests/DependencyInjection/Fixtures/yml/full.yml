@@ -1,4 +1,4 @@
-framework:
+symfony_framework:
     csrf_protection:
         enabled:    true
         field_name: _csrf

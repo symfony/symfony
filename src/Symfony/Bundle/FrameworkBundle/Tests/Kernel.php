@@ -48,7 +48,7 @@ class Kernel extends BaseKernel
     public function registerBundles()
     {
         return array(
-            new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
+            new \Symfony\Bundle\FrameworkBundle\SymfonyFrameworkBundle(),
             new \TestBundle\Sensio\FooBundle\SensioFooBundle(),
             new \TestBundle\Sensio\Cms\FooBundle\SensioCmsFooBundle(),
             new \TestBundle\FooBundle\FooBundle(),

@@ -1,6 +1,6 @@
 <?php
 
-$container->loadFromExtension('framework', array(
+$container->loadFromExtension('symfony_framework', array(
     'validation' => array(
         'enabled'     => true,
         'annotations' => array(

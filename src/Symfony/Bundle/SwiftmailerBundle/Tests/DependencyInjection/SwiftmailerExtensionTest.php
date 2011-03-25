@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SwiftmailerBundle\Tests\DependencyInjection;
 
 use Symfony\Bundle\SwiftmailerBundle\Tests\TestCase;
-use Symfony\Bundle\SwiftmailerBundle\DependencyInjection\SwiftmailerExtension;
+use Symfony\Bundle\SwiftmailerBundle\DependencyInjection\SymfonySwiftmailerExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class SwiftmailerExtensionTest extends TestCase
@@ -21,7 +21,7 @@ class SwiftmailerExtensionTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
-        $loader = new SwiftmailerExtension();
+        $loader = new SymfonySwiftmailerExtension();
 
         $loader->load(array(array()), $container);
         $this->assertEquals('Swift_Mailer', $container->getParameter('swiftmailer.class'), '->mailerLoad() loads the swiftmailer.xml file if not already loaded');
@@ -39,7 +39,7 @@ class SwiftmailerExtensionTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
-        $loader = new SwiftmailerExtension();
+        $loader = new SymfonySwiftmailerExtension();
 
         $loader->load(array(array('spool' => array())), $container);
         $this->assertEquals('swiftmailer.transport.spool', (string) $container->getAlias('swiftmailer.transport'));

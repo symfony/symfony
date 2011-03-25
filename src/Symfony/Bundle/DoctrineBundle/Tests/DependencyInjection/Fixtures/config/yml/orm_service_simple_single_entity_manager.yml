@@ -1,4 +1,4 @@
-doctrine:
+symfony_doctrine:
     dbal: ~
     orm:
         default_entity_manager: default

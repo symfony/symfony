@@ -1,4 +1,4 @@
-doctrine_mongo_db:
+symfony_doctrine_mongo_db:
   connections:
     default:
       server: mongodb://localhost:27017

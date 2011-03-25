@@ -14,7 +14,7 @@ namespace Symfony\Bundle\DoctrineBundle\Tests;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use Symfony\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
+use Symfony\Bundle\DoctrineBundle\DependencyInjection\SymfonyDoctrineExtension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class TestCase extends \PHPUnit_Framework_TestCase
@@ -55,7 +55,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
             'kernel.cache_dir'   => sys_get_temp_dir(),
             'kernel.root_dir'    => __DIR__ . "/../../../../" // src dir
         )));
-        $loader = new DoctrineExtension();
+        $loader = new SymfonyDoctrineExtension();
         $container->registerExtension($loader);
         $loader->load(array(array(
             'dbal' => array(

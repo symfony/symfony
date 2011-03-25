@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\EventListener;
 
 use Symfony\Component\Form\Events;
 use Symfony\Component\Form\Event\DataEvent;
+use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -52,6 +53,7 @@ class ResizeFormListener implements EventSubscriberInterface
         return array(
             Events::preSetData,
             Events::preBind,
+            Events::filterBoundNormData,
         );
     }
 
@@ -107,5 +109,23 @@ class ResizeFormListener implements EventSubscriberInterface
                 )));
             }
         }
+    }
+
+    public function filterBoundNormData(FilterDataEvent $event)
+    {
+        if (!$this->resizeOnBind) {
+            return;
+        }
+
+        $form = $event->getField();
+        $collection = $event->getData();
+
+        foreach ($collection as $name => $field) {
+            if (!$form->has($name)) {
+                unset($collection[$name]);
+            }
+        }
+
+        $event->setData($collection);
     }
 }

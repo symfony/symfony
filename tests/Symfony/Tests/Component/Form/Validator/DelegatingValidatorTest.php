@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\Form\Validator\DelegatingValidator;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ExecutionContext;
 
 class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -40,6 +41,22 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         $this->params = array('foo' => 'bar');
     }
 
+    protected function getMockGraphWalker()
+    {
+        return $this->getMockBuilder('Symfony\Component\Validator\GraphWalker')
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
+    protected function getMockMetadataFactory()
+    {
+        return $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
+    }
+
+    protected function getMockTransformer()
+    {
+        return $this->getMock('Symfony\Component\Form\DataTransformer\DataTransformerInterface', array(), array(), '', false, false);
+    }
 
     protected function getConstraintViolation($propertyPath)
     {
@@ -63,7 +80,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function getForm($name, $propertyPath = null)
     {
-        return $this->getBuilder($name, $propertyPath)->getForm();
+        return $this->getBuilder($name, $propertyPath)->getForm('author');
     }
 
     public function testFormErrorsOnForm()
@@ -282,7 +299,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
             ->setAttribute('error_mapping', array(
                 'passwordPlain' => 'password',
             ))
-            ->getForm();
+            ->getForm('author');
         $child = $this->getForm('password');
 
         $parent->add($child);
@@ -305,7 +322,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
             ->setAttribute('error_mapping', array(
                 'address.streetName' => 'address.street',
             ))
-            ->getForm();
+            ->getForm('author');
         $child = $this->getForm('address');
         $grandChild = $this->getForm('street');
 
@@ -332,7 +349,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
             ->setAttribute('error_mapping', array(
                 'streetName' => 'street',
             ))
-            ->getForm();
+            ->getForm('author');
         $grandChild = $this->getForm('street');
 
         $parent->add($child);
@@ -358,7 +375,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
             ->setAttribute('error_mapping', array(
                 'streetName' => 'street',
             ))
-            ->getForm();
+            ->getForm('author');
         $grandChild = $this->getForm('street');
 
         $parent->add($child);
@@ -383,10 +400,10 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
             ->setAttribute('error_mapping', array(
                 'streetName' => 'street',
             ))
-            ->getForm();
+            ->getForm('author');
         $child = $this->getBuilder('address')
             ->setAttribute('virtual', true)
-            ->getForm();
+            ->getForm('author');
         $grandChild = $this->getForm('street');
 
         $parent->add($child);
@@ -403,5 +420,88 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($parent->hasErrors());
         $this->assertFalse($child->hasErrors());
         $this->assertEquals(array($this->getFormError()), $grandChild->getErrors());
+    }
+
+    public function testValidateFormData()
+    {
+        $graphWalker = $this->getMockGraphWalker();
+        $metadataFactory = $this->getMockMetadataFactory();
+        $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
+        $object = $this->getMock('\stdClass');
+        $form = $this->getBuilder('author')
+            ->setAttribute('validation_groups', array('group1', 'group2'))
+            ->getForm('author');
+
+        $graphWalker->expects($this->at(0))
+            ->method('walkReference')
+            ->with($object, 'group1', 'data', true);
+        $graphWalker->expects($this->at(1))
+            ->method('walkReference')
+            ->with($object, 'group2', 'data', true);
+
+        $form->setData($object);
+
+        DelegatingValidator::validateFormData($form, $context);
+    }
+
+    public function testValidateFormDataAppendsPropertyPath()
+    {
+        $graphWalker = $this->getMockGraphWalker();
+        $metadataFactory = $this->getMockMetadataFactory();
+        $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
+        $context->setPropertyPath('path');
+        $object = $this->getMock('\stdClass');
+        $form = $this->getForm('author');
+
+        $graphWalker->expects($this->once())
+            ->method('walkReference')
+            ->with($object, 'Default', 'path.data', true);
+
+        $form->setData($object);
+
+        DelegatingValidator::validateFormData($form, $context);
+    }
+
+    public function testValidateFormDataSetsCurrentPropertyToData()
+    {
+        $graphWalker = $this->getMockGraphWalker();
+        $metadataFactory = $this->getMockMetadataFactory();
+        $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
+        $object = $this->getMock('\stdClass');
+        $form = $this->getForm('author');
+        $test = $this;
+
+        $graphWalker->expects($this->once())
+            ->method('walkReference')
+            ->will($this->returnCallback(function () use ($context, $test) {
+                $test->assertEquals('data', $context->getCurrentProperty());
+            }));
+
+        $form->setData($object);
+
+        DelegatingValidator::validateFormData($form, $context);
+    }
+
+    public function testValidateFormDataDoesNotWalkScalars()
+    {
+        $graphWalker = $this->getMockGraphWalker();
+        $metadataFactory = $this->getMockMetadataFactory();
+        $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
+        $clientTransformer = $this->getMockTransformer();
+
+        $form = $this->getBuilder('author')
+            ->setClientTransformer($clientTransformer)
+            ->getForm('author');
+
+        $graphWalker->expects($this->never())
+            ->method('walkReference');
+
+        $clientTransformer->expects($this->atLeastOnce())
+            ->method('reverseTransform')
+            ->will($this->returnValue('foobar'));
+
+        $form->bind(array('foo' => 'bar')); // reverse transformed to "foobar"
+
+        DelegatingValidator::validateFormData($form, $context);
     }
 }

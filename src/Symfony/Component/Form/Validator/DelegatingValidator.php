@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\VirtualFormIterator;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Validator\ValidatorInterface;
+use Symfony\Component\Validator\ExecutionContext;
 
 class DelegatingValidator implements FormValidatorInterface
 {
@@ -163,6 +164,55 @@ class DelegatingValidator implements FormValidatorInterface
                 }
 
                 $mapping[$pattern] = $forms[$form];
+            }
+        }
+    }
+
+    /**
+     * Validates the data of a form
+     *
+     * This method is called automatically during the validation process.
+     *
+     * @param FormInterface $form        The validated form
+     * @param ExecutionContext $context  The current validation context
+     */
+    public static function validateFormData(FormInterface $form, ExecutionContext $context)
+    {
+        if (is_object($form->getData()) || is_array($form->getData())) {
+            $groups = null;
+
+            $child = $form;
+            if ($form->hasAttribute('validation_groups')) {
+                $groups = $form->getAttribute('validation_groups');
+            }
+
+            while (!$groups && $child->hasParent()) {
+                $child = $child->getParent();
+                if ($form->hasAttribute('validation_groups')) {
+                    $groups = $form->getAttribute('validation_groups');
+                }
+            }
+
+            if (null === $groups) {
+                $groups = array('Default');
+            }
+
+            $propertyPath = $context->getPropertyPath();
+            $graphWalker = $context->getGraphWalker();
+
+            // The Execute constraint is called on class level, so we need to
+            // set the property manually
+            $context->setCurrentProperty('data');
+
+            // Adjust the property path accordingly
+            if (!empty($propertyPath)) {
+                $propertyPath .= '.';
+            }
+
+            $propertyPath .= 'data';
+
+            foreach ($groups as $group) {
+                $graphWalker->walkReference($form->getData(), $group, $propertyPath, true);
             }
         }
     }

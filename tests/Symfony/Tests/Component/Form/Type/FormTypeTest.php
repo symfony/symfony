@@ -451,87 +451,6 @@ class FormTest extends TestCase
         $this->assertEquals($object, $form->getData());
     }
 
-    public function testValidateData()
-    {
-        $graphWalker = $this->getMockGraphWalker();
-        $metadataFactory = $this->getMockMetadataFactory();
-        $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
-        $object = $this->getMock('\stdClass');
-        $form = $this->factory->create('form', 'author', array('validation_groups' => array(
-            'group1',
-            'group2',
-        )));
-
-        $graphWalker->expects($this->exactly(2))
-        ->method('walkReference')
-        ->with($object,
-        // should test for groups - PHPUnit limitation
-        $this->anything(),
-                'data',
-        true);
-
-        $form->setData($object);
-        $form->validateData($context);
-    }
-
-    public function testValidateDataAppendsPropertyPath()
-    {
-        $graphWalker = $this->getMockGraphWalker();
-        $metadataFactory = $this->getMockMetadataFactory();
-        $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
-        $context->setPropertyPath('path');
-        $object = $this->getMock('\stdClass');
-        $form = $this->factory->create('form', 'author');
-
-        $graphWalker->expects($this->once())
-            ->method('walkReference')
-            ->with($object, 'Default', 'path.data', true);
-
-        $form->setData($object);
-        $form->validateData($context);
-    }
-
-    public function testValidateDataSetsCurrentPropertyToData()
-    {
-        $graphWalker = $this->getMockGraphWalker();
-        $metadataFactory = $this->getMockMetadataFactory();
-        $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
-        $object = $this->getMock('\stdClass');
-        $form = $this->factory->create('form', 'author');
-        $test = $this;
-
-        $graphWalker->expects($this->once())
-        ->method('walkReference')
-        ->will($this->returnCallback(function () use ($context, $test) {
-            $test->assertEquals('data', $context->getCurrentProperty());
-        }));
-
-        $form->setData($object);
-        $form->validateData($context);
-    }
-
-    public function testValidateDataDoesNotWalkScalars()
-    {
-        $graphWalker = $this->getMockGraphWalker();
-        $metadataFactory = $this->getMockMetadataFactory();
-        $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
-        $clientTransformer = $this->getMockTransformer();
-
-        $builder = $this->factory->createBuilder('form', 'author');
-        $builder->setClientTransformer($clientTransformer);
-        $form = $builder->getForm();
-
-        $graphWalker->expects($this->never())
-        ->method('walkReference');
-
-        $clientTransformer->expects($this->atLeastOnce())
-        ->method('reverseTransform')
-        ->will($this->returnValue('foobar'));
-
-        $form->bind(array('foo' => 'bar')); // reverse transformed to "foobar"
-        $form->validateData($context);
-    }
-
     public function testSubformDoesntCallSetters()
     {
         $author = new FormTest_AuthorWithoutRefSetter(new Author());
@@ -716,18 +635,6 @@ class FormTest extends TestCase
     protected function getMockCsrfProvider()
     {
         return $this->getMock('Symfony\Component\Form\CsrfProvider\CsrfProviderInterface');
-    }
-
-    protected function getMockGraphWalker()
-    {
-        return $this->getMockBuilder('Symfony\Component\Validator\GraphWalker')
-        ->disableOriginalConstructor()
-        ->getMock();
-    }
-
-    protected function getMockMetadataFactory()
-    {
-        return $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
     }
 
     protected function getPostRequest(array $values = array(), array $files = array())

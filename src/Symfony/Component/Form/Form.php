@@ -13,7 +13,6 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\FileBag;
-use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\Exception\FormException;
@@ -780,48 +779,5 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         $this->bind($data);
-    }
-
-    /**
-     * Validates the data of this form
-     *
-     * This method is called automatically during the validation process.
-     *
-     * @param ExecutionContext $context  The current validation context
-     * @deprecated
-     */
-    public function validateData(ExecutionContext $context)
-    {
-        if (is_object($this->getData()) || is_array($this->getData())) {
-            $groups = $this->getAttribute('validation_groups');
-            $child = $this;
-
-            while (!$groups && $child->hasParent()) {
-                $child = $child->getParent();
-                $groups = $child->getAttribute('validation_groups');
-            }
-
-            if (null === $groups) {
-                $groups = array('Default');
-            }
-
-            $propertyPath = $context->getPropertyPath();
-            $graphWalker = $context->getGraphWalker();
-
-            // The Execute constraint is called on class level, so we need to
-            // set the property manually
-            $context->setCurrentProperty('data');
-
-            // Adjust the property path accordingly
-            if (!empty($propertyPath)) {
-                $propertyPath .= '.';
-            }
-
-            $propertyPath .= 'data';
-
-            foreach ($groups as $group) {
-                $graphWalker->walkReference($this->getData(), $group, $propertyPath, true);
-            }
-        }
     }
 }

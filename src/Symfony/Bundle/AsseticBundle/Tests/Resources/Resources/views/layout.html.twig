@@ -11,3 +11,9 @@
         <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
 {% endblock %}
+
+{% block content %}
+    {% image 'logo.png' %}
+        <img src="{{ asset_url }}">
+    {% endimage %}
+{% endblock %}

@@ -25,6 +25,7 @@ class AsseticHelper extends Helper
     protected $debug;
     protected $defaultJavascriptsOutput;
     protected $defaultStylesheetsOutput;
+    protected $defaultImageOutput;
 
     /**
      * Constructor.
@@ -33,13 +34,60 @@ class AsseticHelper extends Helper
      * @param Boolean      $debug                    The debug mode
      * @param string       $defaultJavascriptsOutput The default {@link javascripts()} output string
      * @param string       $defaultStylesheetsOutput The default {@link stylesheets()} output string
+     * @param string       $defaultImageOutput       The default {@link image()} output string
      */
-    public function __construct(AssetFactory $factory, $debug = false, $defaultJavascriptsOutput = 'js/*.js', $defaultStylesheetsOutput = 'css/*.css')
+    public function __construct(AssetFactory $factory, $debug = false, $defaultJavascriptsOutput = 'js/*.js', $defaultStylesheetsOutput = 'css/*.css', $defaultImageOutput = 'images/*')
     {
         $this->factory = $factory;
         $this->debug = $debug;
         $this->defaultJavascriptsOutput = $defaultJavascriptsOutput;
         $this->defaultStylesheetsOutput = $defaultStylesheetsOutput;
+        $this->defaultImageOutput = $defaultImageOutput;
+    }
+
+    /**
+     * Returns an array of javascript urls.
+     *
+     * This convenience method wraps {@link assets()} and provides a default
+     * output string.
+     */
+    public function javascripts($inputs = array(), $filters = array(), array $options = array())
+    {
+        if (!isset($options['output'])) {
+            $options['output'] = $this->defaultJavascriptsOutput;
+        }
+
+        return $this->getAssetUrls($inputs, $filters, $options);
+    }
+
+    /**
+     * Returns an array of stylesheet urls.
+     *
+     * This convenience method wraps {@link assets()} and provides a default
+     * output string.
+     */
+    public function stylesheets($inputs = array(), $filters = array(), array $options = array())
+    {
+        if (!isset($options['output'])) {
+            $options['output'] = $this->defaultStylesheetsOutput;
+        }
+
+        return $this->getAssetUrls($inputs, $filters, $options);
+    }
+
+    /**
+     * Returns an array of one image url.
+     *
+     * This convenience method wraps {@link assets()} and provides a default
+     * output string.
+     */
+    public function image($inputs = array(), $filters = array(), array $options = array())
+    {
+        if (!isset($options['output'])) {
+            $options['output'] = $this->defaultImageOutput;
+        }
+
+        return $this->getAssetUrls($inputs, $filters, $options, true);
     }
 
     /**
@@ -57,10 +105,11 @@ class AsseticHelper extends Helper
      * @param array|string $inputs  An array or comma-separated list of input strings
      * @param array|string $filters An array or comma-separated list of filter names
      * @param array        $options An array of options
+     * @param Boolean      $single  Use only the last input string
      *
      * @return array An array of URLs for the asset
      */
-    public function assets($inputs = array(), $filters = array(), array $options = array())
+    private function getAssetUrls($inputs = array(), $filters = array(), array $options = array(), $single = false)
     {
         $explode = function($value)
         {
@@ -79,6 +128,10 @@ class AsseticHelper extends Helper
             $options['debug'] = $this->debug;
         }
 
+        if ($single && 1 < count($inputs)) {
+            $inputs = array_slice($inputs, -1);
+        }
+
         $coll = $this->factory->createAsset($inputs, $filters, $options);
 
         if (!$options['debug']) {
@@ -91,36 +144,6 @@ class AsseticHelper extends Helper
         }
 
         return $urls;
-    }
-
-    /**
-     * Returns an array of javascript urls.
-     *
-     * This convenience method wraps {@link assets()} and provides a default
-     * output string.
-     */
-    public function javascripts($inputs = array(), $filters = array(), array $options = array())
-    {
-        if (!isset($options['output'])) {
-            $options['output'] = $this->defaultJavascriptsOutput;
-        }
-
-        return $this->assets($inputs, $filters, $options);
-    }
-
-    /**
-     * Returns an array of stylesheet urls.
-     *
-     * This convenience method wraps {@link assets()} and provides a default
-     * output string.
-     */
-    public function stylesheets($inputs = array(), $filters = array(), array $options = array())
-    {
-        if (!isset($options['output'])) {
-            $options['output'] = $this->defaultStylesheetsOutput;
-        }
-
-        return $this->assets($inputs, $filters, $options);
     }
 
     public function getName()

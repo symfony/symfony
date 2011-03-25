@@ -15,7 +15,7 @@ use Assetic\Extension\Twig\AsseticExtension;
 use Assetic\Factory\AssetFactory;
 
 /**
- * Assetic integration.
+ * The Static extension is used when use_controllers is disabled.
  *
  * @author Kris Wallsmith <kris.wallsmith@symfony.com>
  */
@@ -24,9 +24,9 @@ class StaticExtension extends AsseticExtension
     public function getTokenParsers()
     {
         return array(
-            new StaticTokenParser($this->factory, $this->debug),
-            new StaticTokenParser($this->factory, $this->debug, $this->defaultJavascriptsOutput, 'javascripts'),
-            new StaticTokenParser($this->factory, $this->debug, $this->defaultStylesheetsOutput, 'stylesheets'),
+            new StaticTokenParser($this->factory, 'javascripts', 'js/*.js', $this->debug),
+            new StaticTokenParser($this->factory, 'stylesheets', 'css/*.css', $this->debug),
+            new StaticTokenParser($this->factory, 'image', 'images/*', $this->debug, true),
         );
     }
 }

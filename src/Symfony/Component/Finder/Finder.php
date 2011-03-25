@@ -41,6 +41,7 @@ class Finder implements \IteratorAggregate
     private $ignoreVCS   = true;
     private $dirs        = array();
     private $dates       = array();
+    private $iterators   = array();
 
     /**
      * Restricts the matching to directories only.
@@ -356,7 +357,7 @@ class Finder implements \IteratorAggregate
             throw new \LogicException('You must call the in() method before iterating over a Finder.');
         }
 
-        if (1 === count($this->dirs)) {
+        if (1 === count($this->dirs) && 0 === count($this->iterators)) {
             return $this->searchInDirectory($this->dirs[0]);
         }
 
@@ -365,7 +366,35 @@ class Finder implements \IteratorAggregate
             $iterator->append($this->searchInDirectory($dir));
         }
 
+        foreach ($this->iterators as $it) {
+            $iterator->append($it);
+        }
+
         return $iterator;
+    }
+
+    /**
+     * Appends an existing set of files/directories to the finder.
+     *
+     * The set can be another Finder, an Iterator, an IteratorAggregate, or even a plain array.
+     *
+     * @param mixed $iterator
+     */
+    public function append($iterator)
+    {
+        if ($iterator instanceof \IteratorAggregate) {
+            $this->iterators[] = $iterator->getIterator();
+        } elseif ($iterator instanceof \Iterator) {
+            $this->iterators[] = $iterator;
+        } elseif ($iterator instanceof \Traversable || is_array($iterator)) {
+            $it = new \ArrayIterator();
+            foreach ($iterator as $file) {
+                $it->append($file instanceof \SplFileInfo ? $file : new \SplFileInfo($file));
+            }
+            $this->iterators[] = $it;
+        } else {
+            throw new \InvalidArgumentException('Finder::append() method wrong argument type.');
+        }
     }
 
     private function searchInDirectory($dir)

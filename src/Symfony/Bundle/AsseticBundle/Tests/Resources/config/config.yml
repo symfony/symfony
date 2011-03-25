@@ -19,3 +19,4 @@ twig:
 assetic:
     use_controller: true
     read_from:      "%kernel.root_dir%/web"
+    bundles:        [TestBundle]

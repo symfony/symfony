@@ -40,6 +40,8 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
 
     function getErrors();
 
+    function setData($data);
+
     function getData();
 
     function getClientData();
@@ -47,7 +49,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     function getRenderer();
 
     function isBound();
-    
+
     /**
      * Returns the name by which the form is identified in forms.
      *
@@ -99,6 +101,8 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @return boolean
      */
     function isEmpty();
+
+    function isSynchronized();
 
     /**
      * Writes posted data into the form

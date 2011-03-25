@@ -17,11 +17,11 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
- * Validator for Execute constraint
+ * Validator for Callback constraint
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class ExecuteValidator extends ConstraintValidator
+class CallbackValidator extends ConstraintValidator
 {
     public function isValid($object, Constraint $constraint)
     {
@@ -40,7 +40,7 @@ class ExecuteValidator extends ConstraintValidator
 
         foreach ($methods as $method) {
             if (!method_exists($object, $method)) {
-                throw new ConstraintDefinitionException(sprintf('Method "%s" targeted by Execute constraint does not exist', $method));
+                throw new ConstraintDefinitionException(sprintf('Method "%s" targeted by Callback constraint does not exist', $method));
             }
 
             $object->$method($context);

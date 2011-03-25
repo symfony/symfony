@@ -102,13 +102,10 @@ class Filesystem
             }
 
             if (is_dir($file) && !is_link($file)) {
-                $fp = opendir($file);
-                while (false !== $item = readdir($fp)) {
-                    if (!in_array($item, array('.', '..'))) {
-                        $this->remove($file.'/'.$item);
-                    }
-                }
-                closedir($fp);
+                $fi = new FilesystemIterator($file);
+                foreach($fi as $item) {
+                	$this->remove($item->getPathname());
+                }           
 
                 rmdir($file);
             } else {

@@ -104,7 +104,7 @@ class Filesystem
             if (is_dir($file) && !is_link($file)) {
                 $fi = new FilesystemIterator($file);
                 foreach($fi as $item) {
-                	$this->remove($item->getPathname());
+                    $this->remove($item->getPathname());
                 }           
 
                 rmdir($file);

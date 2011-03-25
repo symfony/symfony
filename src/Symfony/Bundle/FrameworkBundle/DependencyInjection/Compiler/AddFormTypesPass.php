@@ -29,16 +29,17 @@ class AddFormTypesPass implements CompilerPassInterface
         }
 
         // Builds an array with service IDs as keys and tag aliases as values
-        $types = array_map(function ($arguments) {
-            if (!isset($arguments[0]['alias'])) {
-                // TODO throw exception
-            }
+        $types = array();
+        $tags = $container->findTaggedServiceIds('form.type');
 
-            return $arguments[0]['alias'];
-        }, $container->findTaggedServiceIds('form.type'));
+        foreach ($tags as $serviceId => $arguments) {
+            $alias = isset($arguments[0]['alias'])
+                ? $arguments[0]['alias']
+                : $serviceId;
 
-        // Flip, because we want tag aliases (= type identifiers) as keys
-        $types = array_flip($types);
+            // Flip, because we want tag aliases (= type identifiers) as keys
+            $types[$alias] = $serviceId;
+        }
 
         $container->getDefinition('form.type.loader.tagged')->setArgument(1, $types);
     }

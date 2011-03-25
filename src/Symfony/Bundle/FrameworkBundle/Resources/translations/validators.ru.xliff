@@ -8,7 +8,7 @@
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true</source>
-                <target>Значение должно быть точным</target>
+                <target>Значение должно быть истинным</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}</source>
@@ -40,7 +40,7 @@
             </trans-unit>
             <trans-unit id="10">
                 <source>This value is not a valid date</source>
-                <target>Значение даты недопустимо</target>
+                <target>Значение не является правильной датой</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid datetime</source>

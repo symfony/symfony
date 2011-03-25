@@ -18,6 +18,7 @@ use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
 use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
 use Symfony\Component\Security\Acl\Model\AclProviderInterface;
+use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Permission\PermissionMapInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityRetrievalStrategyInterface;
@@ -77,8 +78,14 @@ class AclVoter implements VoterInterface
                 } else {
                     $field = null;
                 }
+                
+                if ($object instanceof ObjectIdentityInterface) {
+                    $oid = $object;
+                } else {
+                    $oid = $this->objectIdentityRetrievalStrategy->getObjectIdentity($object);
+                }
 
-                if (null === $oid = $this->objectIdentityRetrievalStrategy->getObjectIdentity($object)) {
+                if (null === $oid) {
                     if (null !== $this->logger) {
                         $this->logger->debug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable? 'grant access' : 'abstain'));
                     }

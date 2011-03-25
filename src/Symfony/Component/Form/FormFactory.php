@@ -15,6 +15,7 @@ use Symfony\Component\Form\Type\FormTypeInterface;
 use Symfony\Component\Form\Type\Loader\TypeLoaderInterface;
 use Symfony\Component\Form\Type\Guesser\TypeGuesserInterface;
 use Symfony\Component\Form\Type\Guesser\Guess;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class FormFactory implements FormFactoryInterface
 {
@@ -22,14 +23,15 @@ class FormFactory implements FormFactoryInterface
 
     private $guessers = array();
 
-    public function __construct(TypeLoaderInterface $typeLoader)
+    public function __construct(TypeLoaderInterface $typeLoader, array $guessers = array())
     {
+        foreach ($guessers as $guesser) {
+            if (!$guesser instanceof TypeGuesserInterface) {
+                throw new UnexpectedTypeException($guesser, 'Symfony\Component\Form\Type\Guesser\TypeGuesserInterface');
+            }
+        }
         $this->typeLoader = $typeLoader;
-    }
-
-    public function addGuesser(TypeGuesserInterface $guesser)
-    {
-        $this->guessers[] = $guesser;
+        $this->guessers = $guessers;
     }
 
     public function createBuilder($type, $name = null, array $options = array())

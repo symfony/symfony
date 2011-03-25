@@ -50,9 +50,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                 Guess::HIGH_CONFIDENCE
             )));
 
-        $factory = $this->createMockFactory(array('createBuilder'));
-        $factory->addGuesser($guesser1);
-        $factory->addGuesser($guesser2);
+        $factory = $this->createMockFactory(array('createBuilder'), array($guesser1, $guesser2));
 
         $factory->expects($this->once())
             ->method('createBuilder')
@@ -72,8 +70,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                 ->with('Application\Author', 'firstName')
                 ->will($this->returnValue(null));
 
-        $factory = $this->createMockFactory(array('createBuilder'));
-        $factory->addGuesser($guesser);
+        $factory = $this->createMockFactory(array('createBuilder'), array($guesser));
 
         $factory->expects($this->once())
             ->method('createBuilder')
@@ -97,8 +94,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                     Guess::MEDIUM_CONFIDENCE
                 )));
 
-        $factory = $this->createMockFactory(array('createBuilder'));
-        $factory->addGuesser($guesser);
+        $factory = $this->createMockFactory(array('createBuilder'), array($guesser));
 
         $factory->expects($this->once())
             ->method('createBuilder')
@@ -134,9 +130,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                     Guess::HIGH_CONFIDENCE
                 )));
 
-        $factory = $this->createMockFactory(array('createBuilder'));
-        $factory->addGuesser($guesser1);
-        $factory->addGuesser($guesser2);
+        $factory = $this->createMockFactory(array('createBuilder'), array($guesser1, $guesser2));
 
         $factory->expects($this->once())
             ->method('createBuilder')
@@ -171,9 +165,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                     Guess::HIGH_CONFIDENCE
                 )));
 
-        $factory = $this->createMockFactory(array('createBuilder'));
-        $factory->addGuesser($guesser1);
-        $factory->addGuesser($guesser2);
+        $factory = $this->createMockFactory(array('createBuilder'), array($guesser1, $guesser2));
 
         $factory->expects($this->once())
             ->method('createBuilder')
@@ -188,11 +180,11 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('builderInstance', $builder);
     }
 
-    private function createMockFactory(array $methods = array())
+    private function createMockFactory(array $methods = array(), array $guessers = array())
     {
         return $this->getMockBuilder('Symfony\Component\Form\FormFactory')
             ->setMethods($methods)
-            ->setConstructorArgs(array($this->typeLoader))
+            ->setConstructorArgs(array($this->typeLoader, $guessers))
             ->getMock();
     }
 }

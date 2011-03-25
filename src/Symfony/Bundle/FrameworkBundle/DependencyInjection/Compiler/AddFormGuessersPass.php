@@ -16,8 +16,8 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Adds all services with the tag "form.guesser" as calls to the "addGuesser"
- * method of the "form.factory" service
+ * Adds all services with the tag "form.guesser" as constructor argument of the
+ * "form.factory" service
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
@@ -29,10 +29,12 @@ class AddFormGuessersPass implements CompilerPassInterface
             return;
         }
 
-        $definition = $container->getDefinition('form.factory');
+        $guessers = array();
 
         foreach ($container->findTaggedServiceIds('form.guesser') as $serviceId => $tag) {
-            $definition->addMethodCall('addGuesser', array(new Reference($serviceId)));
+            $guessers[] = new Reference($serviceId);
         }
+
+        $container->getDefinition('form.factory')->setArgument(1, $guessers);
     }
 }

@@ -151,7 +151,7 @@ class ResourceWatcher
 
             if (isset($this->listeners[$trackingId])) {
                 foreach ($this->listeners[$trackingId] as $listener) {
-                    if ($listener->handles($event)) {
+                    if ($listener->supports($event)) {
                         call_user_func($listener->getCallback(), $event);
                     }
                 }

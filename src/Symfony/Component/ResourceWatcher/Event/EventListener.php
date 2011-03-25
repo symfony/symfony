@@ -65,11 +65,11 @@ class EventListener implements EventListenerInterface
     }
 
     /**
-     * Checks whether listener can handle provided resource event.
+     * Checks whether listener supports provided resource event.
      *
      * @param   Event   $event
      */
-    public function handles(Event $event)
+    public function supports(Event $event)
     {
         return 0 !== ($this->eventsMask & $event->getType());
     }

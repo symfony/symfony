@@ -32,9 +32,9 @@ class CsvFileLoader extends ArrayLoader implements LoaderInterface
         $messages = array();
         
         try {
-        	$file = new \SplFileObject($resource, 'rb');
+            $file = new \SplFileObject($resource, 'rb');
         } catch(\RuntimeException $e) {
-        	throw new \InvalidArgumentException(sprintf('Error opening file "%s".', $resource));
+            throw new \InvalidArgumentException(sprintf('Error opening file "%s".', $resource));
         }
         
         $file->setFlags(\SplFileObject::READ_CSV | \SplFileObject::SKIP_EMPTY);

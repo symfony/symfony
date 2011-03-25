@@ -16,6 +16,8 @@ use Symfony\Component\ResourceWatcher\Event\Event;
 use Symfony\Component\ResourceWatcher\Event\EventListener;
 use Symfony\Component\ResourceWatcher\Event\EventListenerInterface;
 use Symfony\Component\ResourceWatcher\Tracker\TrackerInterface;
+use Symfony\Component\ResourceWatcher\Tracker\InotifyTracker;
+use Symfony\Component\ResourceWatcher\Tracker\RecursiveIteratorTracker;
 
 /**
  * Resources changes watcher.
@@ -33,9 +35,17 @@ class ResourceWatcher
      *
      * @param   TrackerInterface  $tracker
      */
-    public function __construct(TrackerInterface $tracker)
+    public function __construct(TrackerInterface $tracker = null)
     {
-        $this->tracker = $tracker;
+        if (null !== $tracker) {
+            $this->tracker = $tracker;
+        } else {
+            if (function_exists('inotify_init')) {
+                $this->tracker = new InotifyTracker();
+            } else {
+                $this->tracker = new RecursiveIteratorTracker();
+            }
+        }
     }
 
     /**

@@ -35,6 +35,7 @@ class RepeatedType extends AbstractType
             'first_name' => 'first',
             'second_name' => 'second',
             'csrf_protection' => false,
+            'error_bubbling' => false,
         );
     }
 

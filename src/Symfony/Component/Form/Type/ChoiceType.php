@@ -65,6 +65,7 @@ class ChoiceType extends AbstractType
             'choices' => array(),
             'preferred_choices' => array(),
             'csrf_protection' => false,
+            'choice_list' => null,
         );
 
         $options = array_replace($defaultOptions, $options);

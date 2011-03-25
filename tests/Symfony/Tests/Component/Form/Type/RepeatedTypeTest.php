@@ -25,7 +25,7 @@ class RepeatedTypeTest extends TestCase
         parent::setUp();
 
         $this->form = $this->factory->create('repeated', 'name', array(
-            'prototype' => $this->factory->create('field', 'foo'),
+            'type' => 'field',
         ));
         $this->form->setData(null);
     }

@@ -104,6 +104,12 @@ class DateTimeType extends AbstractType
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference' => false,
+            'date_pattern' => null,
+            'date_widget' => null,
+            'date_format' => null,
+            'time_pattern' => null,
+            'time_widget' => null,
+            'time_format' => null,
         );
     }
 

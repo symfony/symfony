@@ -112,7 +112,7 @@ class MyTestFormConfig extends AbstractType
     {
         $builder->setDataClass('Symfony\Bundle\FrameworkBundle\Tests\Form\MyTestObject');
         $builder->add('field0', 'my.sub_form');
-        $builder->add('field1', 'text', array('max_length' => 127, 'id' => 'foo'));
+        $builder->add('field1', 'text', array('max_length' => 127));
         $builder->add('field2', 'date');
         $builder->add('field5', 'time');
         $builder->add('field3', 'choice', array(
@@ -144,7 +144,7 @@ class MyTestFormConfig extends AbstractType
         $builder->add('field15', 'password');
         $builder->add('field16', 'percent');
         $builder->add('field17', 'radio');
-        $builder->add('field18', 'repeated', array('identifier' => 'password'));
+        $builder->add('field18', 'repeated', array('type' => 'password'));
         $builder->add('emails', 'collection', array(
             'type' => 'text',
         ));

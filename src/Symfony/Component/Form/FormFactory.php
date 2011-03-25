@@ -15,6 +15,7 @@ use Symfony\Component\Form\Type\FormTypeInterface;
 use Symfony\Component\Form\Type\Loader\TypeLoaderInterface;
 use Symfony\Component\Form\Type\Guesser\TypeGuesserInterface;
 use Symfony\Component\Form\Type\Guesser\Guess;
+use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class FormFactory implements FormFactoryInterface
@@ -40,6 +41,8 @@ class FormFactory implements FormFactoryInterface
 
         $builder = null;
         $types = array();
+        $knownOptions = array();
+        $passedOptions = array_keys($options);
 
         // TESTME
         if (null === $name && preg_match('/\w+$/', $type, $matches)) {
@@ -50,9 +53,20 @@ class FormFactory implements FormFactoryInterface
             // TODO check if type exists
             $type = $this->typeLoader->getType($type);
             array_unshift($types, $type);
-            $options = array_merge($type->getDefaultOptions($options), $options);
-            $builder = $builder ?: $type->createBuilder($options);
+            $defaultOptions = $type->getDefaultOptions($options);
+            $options = array_merge($defaultOptions, $options);
+            $knownOptions = array_merge($knownOptions, array_keys($defaultOptions));
             $type = $type->getParent($options);
+        }
+
+        $diff = array_diff($passedOptions, $knownOptions);
+
+        if (count($diff) > 0) {
+            throw new FormException(sprintf('The options "%s" do not exist', implode('", "', $diff)));
+        }
+
+        for ($i = 0, $l = count($types); $i < $l && !$builder; ++$i) {
+            $builder = $types[$i]->createBuilder($options);
         }
 
         // TODO check if instance exists

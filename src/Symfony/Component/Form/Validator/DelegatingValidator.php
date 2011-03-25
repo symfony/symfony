@@ -74,6 +74,11 @@ class DelegatingValidator implements FormValidatorInterface
             $namePath .= '.';
         }
 
+        foreach ($form->getAttribute('error_mapping') as $nestedDataPath => $nestedNamePath)
+        {
+            $mapping['/^'.preg_quote($formPath . 'data.' . $nestedDataPath).'(?!\w)/'] = $namePath . $nestedNamePath;
+        }
+
         $iterator = new VirtualFormIterator($form->getChildren());
         $iterator = new \RecursiveIteratorIterator($iterator);
 
@@ -93,15 +98,10 @@ class DelegatingValidator implements FormValidatorInterface
             if ($child->hasChildren()) {
                 $this->buildFormPathMapping($child, $mapping, $nestedFormPath, $nestedNamePath);
                 $this->buildDataPathMapping($child, $mapping, $nestedDataPath, $nestedNamePath);
-            } else {
-                $mapping['/^'.preg_quote($nestedFormPath, '/').'(?!\w)/'] = $child;
-                $mapping['/^'.preg_quote($nestedDataPath, '/').'(?!\w)/'] = $child;
             }
-        }
 
-        foreach ($form->getAttribute('error_mapping') as $nestedDataPath => $nestedNamePath)
-        {
-            $mapping['/^'.preg_quote($formPath . 'data.' . $nestedDataPath).'(?!\w)/'] = $namePath . $nestedNamePath;
+            $mapping['/^'.preg_quote($nestedFormPath, '/').'(?!\w)/'] = $child;
+            $mapping['/^'.preg_quote($nestedDataPath, '/').'(?!\w)/'] = $child;
         }
     }
 
@@ -109,6 +109,11 @@ class DelegatingValidator implements FormValidatorInterface
     {
         if ($namePath) {
             $namePath .= '.';
+        }
+
+        foreach ($form->getAttribute('error_mapping') as $nestedDataPath => $nestedNamePath)
+        {
+            $mapping['/^'.preg_quote($dataPath . '.' . $nestedDataPath).'(?!\w)/'] = $namePath . $nestedNamePath;
         }
 
         $iterator = new VirtualFormIterator($form->getChildren());
@@ -125,11 +130,6 @@ class DelegatingValidator implements FormValidatorInterface
             } else {
                 $mapping['/^'.preg_quote($nestedDataPath, '/').'(?!\w)/'] = $child;
             }
-        }
-
-        foreach ($form->getAttribute('error_mapping') as $nestedDataPath => $nestedNamePath)
-        {
-            $mapping['/^'.preg_quote($dataPath . '.' . $nestedDataPath).'(?!\w)/'] = $namePath . $nestedNamePath;
         }
     }
 

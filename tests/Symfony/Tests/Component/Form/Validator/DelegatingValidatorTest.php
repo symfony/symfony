@@ -15,6 +15,7 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\Form\Validator\DelegatingValidator;
+use Symfony\Component\Form\DataTransformer\TransformationFailedException;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ExecutionContext;
 
@@ -158,6 +159,28 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array($this->getFormError()), $grandChild->getErrors());
     }
 
+    public function testFormErrorsOnChildWithChildren()
+    {
+        $parent = $this->getForm('author');
+        $child = $this->getForm('address');
+        $grandChild = $this->getForm('street');
+
+        $parent->add($child);
+        $child->add($grandChild);
+
+        $this->delegate->expects($this->once())
+            ->method('validate')
+            ->will($this->returnValue(array(
+                $this->getConstraintViolation('children[address].constrainedProp')
+            )));
+
+        $this->validator->validate($parent);
+
+        $this->assertFalse($parent->hasErrors());
+        $this->assertEquals(array($this->getFormError()), $child->getErrors());
+        $this->assertFalse($grandChild->hasErrors());
+    }
+
     public function testFormErrorsOnParentIfNoChildFound()
     {
         $parent = $this->getForm('author');
@@ -228,6 +251,28 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($parent->hasErrors());
         $this->assertEquals(array($this->getFormError()), $child->getErrors());
+    }
+
+    public function testDataErrorsOnChildWithChildren()
+    {
+        $parent = $this->getForm('author');
+        $child = $this->getForm('address');
+        $grandChild = $this->getForm('street');
+
+        $parent->add($child);
+        $child->add($grandChild);
+
+        $this->delegate->expects($this->once())
+            ->method('validate')
+            ->will($this->returnValue(array(
+                $this->getConstraintViolation('data.address.constrainedProp')
+            )));
+
+        $this->validator->validate($parent);
+
+        $this->assertFalse($parent->hasErrors());
+        $this->assertEquals(array($this->getFormError()), $child->getErrors());
+        $this->assertFalse($grandChild->hasErrors());
     }
 
     public function testDataErrorsOnGrandChild()

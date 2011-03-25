@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineMongoDBBundle\Command;
+namespace Symfony\Bundle\DoctrineFixturesBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,6 +19,7 @@ use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Finder\Finder;
 use Symfony\Bundle\FrameworkBundle\Util\Filesystem;
 use Symfony\Bundle\DoctrineAbstractBundle\Common\DataFixtures\Loader as DataFixturesLoader;
+use Symfony\Bundle\DoctrineMongoDBBundle\Command\DoctrineODMCommand;
 use Doctrine\Common\DataFixtures\Executor\MongoDBExecutor;
 use Doctrine\Common\DataFixtures\Purger\MongoDBPurger;
 use Doctrine\ODM\MongoDB\DocumentManager;

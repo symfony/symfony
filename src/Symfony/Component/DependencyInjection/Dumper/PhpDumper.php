@@ -652,7 +652,7 @@ EOF;
      */
     private function startClass($class, $baseClass)
     {
-        $bagClass = $this->container->isFrozen() ? '' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
+        $bagClass = $this->container->isFrozen() ? 'use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
 
         return <<<EOF
 <?php
@@ -721,8 +721,7 @@ EOF;
      */
     public function __construct()
     {
-        \$this->parameters = \$this->getDefaultParameters();
-
+        \$this->parameterBag = new FrozenParameterBag(\$this->getDefaultParameters());
         \$this->services =
         \$this->scopedServices =
         \$this->scopeStacks = array();
@@ -772,11 +771,11 @@ EOF;
     {
         \$name = strtolower(\$name);
 
-        if (!array_key_exists(\$name, \$this->parameters)) {
+        if (!\$this->hasParameter(\$name)) {
             throw new \InvalidArgumentException(sprintf('The parameter "%s" must be defined.', \$name));
         }
 
-        return \$this->parameters[\$name];
+        return \$this->parameterBag->get(\$name);
     }
 
     /**
@@ -784,7 +783,7 @@ EOF;
      */
     public function hasParameter(\$name)
     {
-        return array_key_exists(strtolower(\$name), \$this->parameters);
+        return parent::hasParameter(strtolower(\$name));
     }
 
     /**

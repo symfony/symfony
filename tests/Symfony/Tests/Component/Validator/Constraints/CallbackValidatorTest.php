@@ -14,10 +14,23 @@ namespace Symfony\Tests\Component\Validator;
 use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
-use Symfony\Component\Validator\Constraints\Execute;
-use Symfony\Component\Validator\Constraints\ExecuteValidator;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\CallbackValidator;
 
-class ExecuteValidatorTest_Object
+class CallbackValidatorTest_Class
+{
+    public static function validateStatic($object, ExecutionContext $context)
+    {
+        $context->setCurrentClass('Foo');
+        $context->setCurrentProperty('bar');
+        $context->setGroup('mygroup');
+        $context->setPropertyPath('foo.bar');
+
+        $context->addViolation('Static message', array('parameter'), 'invalidValue');
+    }
+}
+
+class CallbackValidatorTest_Object
 {
     public function validateOne(ExecutionContext $context)
     {
@@ -35,7 +48,7 @@ class ExecuteValidatorTest_Object
     }
 }
 
-class ExecuteValidatorTest extends \PHPUnit_Framework_TestCase
+class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
 {
     protected $validator;
     protected $walker;
@@ -52,20 +65,20 @@ class ExecuteValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->setGroup('InitialGroup');
         $this->context->setPropertyPath('initial.property.path');
 
-        $this->validator = new ExecuteValidator();
+        $this->validator = new CallbackValidator();
         $this->validator->initialize($this->context);
     }
 
     public function testNullIsValid()
     {
-        $this->assertTrue($this->validator->isValid(null, new Execute('foo')));
+        $this->assertTrue($this->validator->isValid(null, new Callback(array('foo'))));
     }
 
-    public function testExecuteSingleMethod()
+    public function testCallbackSingleMethod()
     {
-        $object = new ExecuteValidatorTest_Object();
+        $object = new CallbackValidatorTest_Object();
 
-        $this->assertTrue($this->validator->isValid($object, new Execute('validateOne')));
+        $this->assertTrue($this->validator->isValid($object, new Callback(array('validateOne'))));
 
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
@@ -83,11 +96,35 @@ class ExecuteValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('initial.property.path', $this->context->getPropertyPath());
     }
 
-    public function testExecuteMultipleMethods()
+    public function testCallbackSingleStaticMethod()
     {
-        $object = new ExecuteValidatorTest_Object();
+        $object = new CallbackValidatorTest_Object();
 
-        $this->assertTrue($this->validator->isValid($object, new Execute(array(
+        $this->assertTrue($this->validator->isValid($object, new Callback(array(
+            array(__NAMESPACE__.'\CallbackValidatorTest_Class', 'validateStatic')
+        ))));
+
+        $violations = new ConstraintViolationList();
+        $violations->add(new ConstraintViolation(
+            'Static message',
+            array('parameter'),
+            'Root',
+            'foo.bar',
+            'invalidValue'
+        ));
+
+        $this->assertEquals($violations, $this->context->getViolations());
+        $this->assertEquals('InitialClass', $this->context->getCurrentClass());
+        $this->assertEquals('initialProperty', $this->context->getCurrentProperty());
+        $this->assertEquals('InitialGroup', $this->context->getGroup());
+        $this->assertEquals('initial.property.path', $this->context->getPropertyPath());
+    }
+
+    public function testCallbackMultipleMethods()
+    {
+        $object = new CallbackValidatorTest_Object();
+
+        $this->assertTrue($this->validator->isValid($object, new Callback(array(
             'validateOne', 'validateTwo'
         ))));
 
@@ -110,5 +147,35 @@ class ExecuteValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertEquals($violations, $this->context->getViolations());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\UnexpectedTypeException
+     */
+    public function testExpectCallbackArray()
+    {
+        $object = new CallbackValidatorTest_Object();
+
+        $this->validator->isValid($object, new Callback('foobar'));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     */
+    public function testExpectValidMethods()
+    {
+        $object = new CallbackValidatorTest_Object();
+
+        $this->validator->isValid($object, new Callback(array('foobar')));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     */
+    public function testExpectValidCallbacks()
+    {
+        $object = new CallbackValidatorTest_Object();
+
+        $this->validator->isValid($object, new Callback(array(array('foo', 'bar'))));
     }
 }

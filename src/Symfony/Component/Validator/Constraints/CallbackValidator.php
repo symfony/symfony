@@ -17,11 +17,11 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
- * Validator for Execute constraint
+ * Validator for Callback constraint
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class ExecuteValidator extends ConstraintValidator
+class CallbackValidator extends ConstraintValidator
 {
     public function isValid($object, Constraint $constraint)
     {
@@ -29,7 +29,13 @@ class ExecuteValidator extends ConstraintValidator
             return true;
         }
 
-        $methods = (array)$constraint->methods;
+        // has to be an array so that we can differentiate between callables
+        // and method names
+        if (!is_array($constraint->methods)) {
+            throw new UnexpectedTypeException($constraint->methods, 'array');
+        }
+
+        $methods = $constraint->methods;
         $context = $this->context;
 
         // save context state
@@ -39,11 +45,19 @@ class ExecuteValidator extends ConstraintValidator
         $propertyPath = $context->getPropertyPath();
 
         foreach ($methods as $method) {
-            if (!method_exists($object, $method)) {
-                throw new ConstraintDefinitionException(sprintf('Method "%s" targeted by Execute constraint does not exist', $method));
-            }
+            if (is_array($method)) {
+                if (!is_callable($method)) {
+                    throw new ConstraintDefinitionException(sprintf('"%s::%s" targeted by Callback constraint is not a valid callable', $method[0], $method[1]));
+                }
 
-            $object->$method($context);
+                call_user_func($method, $object, $context);
+            } else {
+                if (!method_exists($object, $method)) {
+                    throw new ConstraintDefinitionException(sprintf('Method "%s" targeted by Callback constraint does not exist', $method));
+                }
+
+                $object->$method($context);
+            }
 
             // restore context state
             $context->setCurrentClass($currentClass);

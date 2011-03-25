@@ -23,10 +23,10 @@ class Kernel extends BaseKernel
         $this->rootDir = sys_get_temp_dir().'/sf2_'.rand(1, 9999);
         if (!is_dir($this->rootDir)) {
             if (false === @mkdir($this->rootDir)) {
-                die(sprintf('Unable to create a temporary directory (%s)', $this->rootDir));
+                exit(sprintf('Unable to create a temporary directory (%s)', $this->rootDir));
             }
         } elseif (!is_writable($this->rootDir)) {
-            die(sprintf('Unable to write in a temporary directory (%s)', $this->rootDir));
+            exit(sprintf('Unable to write in a temporary directory (%s)', $this->rootDir));
         }
 
         parent::__construct('env', true);

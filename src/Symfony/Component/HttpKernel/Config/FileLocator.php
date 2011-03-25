@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class FileLocator extends BaseFileLocator
 {
-    protected $kernel;
+    private $kernel;
 
     /**
      * Constructor.

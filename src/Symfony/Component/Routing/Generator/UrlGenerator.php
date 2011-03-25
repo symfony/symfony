@@ -21,10 +21,11 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class UrlGenerator implements UrlGeneratorInterface
 {
-    protected $routes;
     protected $defaults;
     protected $context;
-    protected $cache;
+
+    private $routes;
+    private $cache;
 
     /**
      * Constructor.

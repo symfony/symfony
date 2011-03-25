@@ -21,9 +21,9 @@ namespace Symfony\Component\CssSelector;
  */
 class Token
 {
-    protected $type;
-    protected $value;
-    protected $position;
+    private $type;
+    private $value;
+    private $position;
 
     /**
      * Constructor.

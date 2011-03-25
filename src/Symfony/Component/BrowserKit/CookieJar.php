@@ -15,6 +15,8 @@ namespace Symfony\Component\BrowserKit;
  * CookieJar.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class CookieJar
 {
@@ -24,6 +26,8 @@ class CookieJar
      * Sets a cookie.
      *
      * @param Cookie $cookie A Cookie instance
+     *
+     * @api
      */
     public function set(Cookie $cookie)
     {
@@ -36,6 +40,8 @@ class CookieJar
      * @param string $name The cookie name
      *
      * @return Cookie|null A Cookie instance or null if the cookie does not exist
+     *
+     * @api
      */
     public function get($name)
     {
@@ -48,6 +54,8 @@ class CookieJar
      * Removes a cookie by name.
      *
      * @param string $name The cookie name
+     *
+     * @api
      */
     public function expire($name)
     {
@@ -56,6 +64,8 @@ class CookieJar
 
     /**
      * Removes all the cookies from the jar.
+     *
+     * @api
      */
     public function clear()
     {
@@ -94,7 +104,7 @@ class CookieJar
      *
      * @return array An array of cookie values
      */
-    public function getValues($uri)
+    public function allValues($uri)
     {
         $this->flushExpiredCookies();
 

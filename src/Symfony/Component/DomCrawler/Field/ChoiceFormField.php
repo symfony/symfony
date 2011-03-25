@@ -17,6 +17,8 @@ namespace Symfony\Component\DomCrawler\Field;
  * It is constructed from a HTML select tag, or a HTML checkbox, or radio inputs.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class ChoiceFormField extends FormField
 {
@@ -55,6 +57,8 @@ class ChoiceFormField extends FormField
      * Ticks a checkbox.
      *
      * @throws \InvalidArgumentException When value type provided is not correct
+     *
+     * @api
      */
     public function tick()
     {
@@ -69,6 +73,8 @@ class ChoiceFormField extends FormField
      * Ticks a checkbox.
      *
      * @throws \InvalidArgumentException When value type provided is not correct
+     *
+     * @api
      */
     public function untick()
     {

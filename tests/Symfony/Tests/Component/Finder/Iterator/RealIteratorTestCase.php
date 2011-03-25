@@ -13,7 +13,7 @@ namespace Symfony\Tests\Component\Finder\Iterator;
 
 require_once __DIR__.'/IteratorTestCase.php';
 
-class RealIteratorTestCase extends IteratorTestCase
+abstract class RealIteratorTestCase extends IteratorTestCase
 {
     static protected $files;
 

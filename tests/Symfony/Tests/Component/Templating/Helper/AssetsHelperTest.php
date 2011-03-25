@@ -74,4 +74,10 @@ class AssetsHelperTest extends \PHPUnit_Framework_TestCase
         $helper = new AssetsHelper('/bar', 'http://www.example.com/foo', 'abcd');
         $this->assertEquals('http://www.example.com/foo/foo.js?abcd', $helper->getUrl('foo.js'), '->getUrl() appends the version if defined');
     }
+
+    public function testGetUrlLeavesProtocolRelativePathsUntouched()
+    {
+        $helper = new AssetsHelper(null, 'http://foo.com');
+        $this->assertEquals('//bar.com/asset', $helper->getUrl('//bar.com/asset'));
+    }
 }

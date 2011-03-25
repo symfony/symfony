@@ -18,13 +18,13 @@ namespace Symfony\Component\Routing;
  */
 class Route
 {
-    protected $pattern;
-    protected $defaults;
-    protected $requirements;
-    protected $options;
-    protected $compiled;
+    private $pattern;
+    private $defaults;
+    private $requirements;
+    private $options;
+    private $compiled;
 
-    static protected $compilers = array();
+    static private $compilers = array();
 
     /**
      * Constructor.
@@ -240,7 +240,7 @@ class Route
         return $this->compiled = static::$compilers[$class]->compile($this);
     }
 
-    protected function sanitizeRequirement($key, $regex)
+    private function sanitizeRequirement($key, $regex)
     {
         if (is_array($regex)) {
             throw new \InvalidArgumentException(sprintf('Routing requirements must be a string, array given for "%s"', $key));

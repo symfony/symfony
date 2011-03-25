@@ -18,7 +18,7 @@ namespace Symfony\Component\Config\Resource;
  */
 class FileResource implements ResourceInterface
 {
-    protected $resource;
+    private $resource;
 
     /**
      * Constructor.

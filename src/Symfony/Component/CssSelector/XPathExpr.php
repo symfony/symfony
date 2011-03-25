@@ -21,11 +21,11 @@ namespace Symfony\Component\CssSelector;
  */
 class XPathExpr
 {
-    protected $prefix;
-    protected $path;
-    protected $element;
-    protected $condition;
-    protected $starPrefix;
+    private $prefix;
+    private $path;
+    private $element;
+    private $condition;
+    private $starPrefix;
 
     /**
      * Constructor.

@@ -18,8 +18,8 @@ namespace Symfony\Component\Config\Resource;
  */
 class DirectoryResource implements ResourceInterface
 {
-    protected $resource;
-    protected $filterRegexList;
+    private $resource;
+    private $filterRegexList;
 
     /**
      * Constructor.

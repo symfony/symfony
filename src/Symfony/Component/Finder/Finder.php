@@ -24,6 +24,8 @@ namespace Symfony\Component\Finder;
  * $finder = $finder->files()->name('*.php')->in(__DIR__);
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class Finder implements \IteratorAggregate
 {
@@ -44,6 +46,8 @@ class Finder implements \IteratorAggregate
      * Restricts the matching to directories only.
      *
      * @return Finder The current Finder instance
+     *
+     * @api
      */
     public function directories()
     {
@@ -56,6 +60,8 @@ class Finder implements \IteratorAggregate
      * Restricts the matching to files only.
      *
      * @return Finder The current Finder instance
+     *
+     * @api
      */
     public function files()
     {
@@ -78,6 +84,8 @@ class Finder implements \IteratorAggregate
      *
      * @see Symfony\Component\Finder\Iterator\DepthRangeFilterIterator
      * @see Symfony\Component\Finder\Comparator\NumberComparator
+     *
+     * @api
      */
     public function depth($level)
     {
@@ -103,6 +111,8 @@ class Finder implements \IteratorAggregate
      * @see strtotime
      * @see Symfony\Component\Finder\Iterator\DateRangeFilterIterator
      * @see Symfony\Component\Finder\Comparator\DateComparator
+     *
+     * @api
      */
     public function date($date)
     {
@@ -125,6 +135,8 @@ class Finder implements \IteratorAggregate
      * @return Finder The current Finder instance
      *
      * @see Symfony\Component\Finder\Iterator\FilenameFilterIterator
+     *
+     * @api
      */
     public function name($pattern)
     {
@@ -141,6 +153,8 @@ class Finder implements \IteratorAggregate
      * @return Finder The current Finder instance
      *
      * @see Symfony\Component\Finder\Iterator\FilenameFilterIterator
+     *
+     * @api
      */
     public function notName($pattern)
     {
@@ -162,6 +176,8 @@ class Finder implements \IteratorAggregate
      *
      * @see Symfony\Component\Finder\Iterator\SizeRangeFilterIterator
      * @see Symfony\Component\Finder\Comparator\NumberComparator
+     *
+     * @api
      */
     public function size($size)
     {
@@ -178,6 +194,8 @@ class Finder implements \IteratorAggregate
      * @return Finder The current Finder instance
      *
      * @see Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator
+     *
+     * @api
      */
     public function exclude($dir)
     {
@@ -192,6 +210,8 @@ class Finder implements \IteratorAggregate
      * @return Finder The current Finder instance
      *
      * @see Symfony\Component\Finder\Iterator\IgnoreVcsFilterIterator
+     *
+     * @api
      */
     public function ignoreVCS($ignoreVCS)
     {
@@ -212,6 +232,8 @@ class Finder implements \IteratorAggregate
      * @return Finder The current Finder instance
      *
      * @see Symfony\Component\Finder\Iterator\SortableIterator
+     *
+     * @api
      */
     public function sort(\Closure $closure)
     {
@@ -228,6 +250,8 @@ class Finder implements \IteratorAggregate
      * @return Finder The current Finder instance
      *
      * @see Symfony\Component\Finder\Iterator\SortableIterator
+     *
+     * @api
      */
     public function sortByName()
     {
@@ -244,6 +268,8 @@ class Finder implements \IteratorAggregate
      * @return Finder The current Finder instance
      *
      * @see Symfony\Component\Finder\Iterator\SortableIterator
+     *
+     * @api
      */
     public function sortByType()
     {
@@ -263,6 +289,8 @@ class Finder implements \IteratorAggregate
      * @return Finder The current Finder instance
      *
      * @see Symfony\Component\Finder\Iterator\CustomFilterIterator
+     *
+     * @api
      */
     public function filter(\Closure $closure)
     {
@@ -275,6 +303,8 @@ class Finder implements \IteratorAggregate
      * Forces the following of symlinks.
      *
      * @return Finder The current Finder instance
+     *
+     * @api
      */
     public function followLinks()
     {
@@ -291,6 +321,8 @@ class Finder implements \IteratorAggregate
      * @return Finder The current Finder instance
      *
      * @throws \InvalidArgumentException if one of the directory does not exist
+     *
+     * @api
      */
     public function in($dirs)
     {

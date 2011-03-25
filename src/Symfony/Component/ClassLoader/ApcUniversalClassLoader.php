@@ -17,6 +17,8 @@ require_once __DIR__.'/UniversalClassLoader.php';
  * Class loader utilizing APC to remember where files are.
  *
  * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ *
+ * @api
  */
 class ApcUniversalClassLoader extends UniversalClassLoader
 {
@@ -26,6 +28,8 @@ class ApcUniversalClassLoader extends UniversalClassLoader
      * Constructor.
      *
      * @param string $prefix A prefix to create a namespace in APC
+     *
+     * @api
      */
     public function __construct($prefix)
     {

@@ -42,7 +42,7 @@ class YamlFileLoader extends FileLoader
     {
         $path = $this->locator->locate($file);
 
-        $config = $this->loadFile($path);
+        $config = Yaml::load($path);
 
         $collection = new RouteCollection();
         $collection->addResource(new FileResource($path));
@@ -63,7 +63,7 @@ class YamlFileLoader extends FileLoader
             if (isset($config['resource'])) {
                 $type = isset($config['type']) ? $config['type'] : null;
                 $prefix = isset($config['prefix']) ? $config['prefix'] : null;
-                $this->currentDir = dirname($path);
+                $this->setCurrentDir(dirname($path));
                 $collection->addCollection($this->import($config['resource'], $type), $prefix);
             } elseif (isset($config['pattern'])) {
                 $this->parseRoute($collection, $name, $config, $path);
@@ -111,18 +111,6 @@ class YamlFileLoader extends FileLoader
         $route = new Route($config['pattern'], $defaults, $requirements, $options);
 
         $collection->add($name, $route);
-    }
-
-    /**
-     * Loads a Yaml file.
-     *
-     * @param string $file A Yaml file path
-     *
-     * @return array
-     */
-    protected function loadFile($file)
-    {
-        return Yaml::load($file);
     }
 
     /**

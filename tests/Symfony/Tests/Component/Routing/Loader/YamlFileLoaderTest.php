@@ -95,27 +95,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testParseRouteThrowsExceptionWithMissingPattern()
     {
-        $loader = new CustomYamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $loader->load('incomplete.yml');
     }
 }
-
-class CustomYamlFileLoader extends YamlFileLoader
-{
-    public function load($file, $type = null)
-    {
-        $path = $this->locator->locate($file);
-
-        $config = $this->loadFile($path);
-
-        $collection = new RouteCollection();
-        $collection->addResource(new FileResource($path));
-
-        foreach ($config as $name => $config) {
-            $this->parseRoute($collection, $name, $config, $path);
-        }
-
-        return $collection;
-    }
-}
-

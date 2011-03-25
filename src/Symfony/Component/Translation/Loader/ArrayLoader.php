@@ -17,11 +17,15 @@ use Symfony\Component\Translation\MessageCatalogue;
  * ArrayLoader loads translations from a PHP array.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class ArrayLoader implements LoaderInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @api
      */
     public function load($resource, $locale, $domain = 'messages')
     {

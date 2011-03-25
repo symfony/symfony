@@ -47,11 +47,11 @@ class PhpMatcherDumper extends MatcherDumper
         ;
     }
 
-    protected function addMatcher()
+    private function addMatcher()
     {
         $code = array();
 
-        foreach ($this->routes->all() as $name => $route) {
+        foreach ($this->getRoutes()->all() as $name => $route) {
             $compiledRoute = $route->compile();
 
             $conditions = array();
@@ -85,6 +85,8 @@ class PhpMatcherDumper extends MatcherDumper
 
             $conditions = implode(' && ', $conditions);
 
+            $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);
+            
             $code[] = <<<EOF
         // $name
         if ($conditions) {
@@ -95,7 +97,7 @@ EOF;
                 $code[] = <<<EOF
             if (isset(\$this->context['method']) && !in_array(strtolower(\$this->context['method']), array('$req'))) {
                 \$allow = array_merge(\$allow, array('$req'));
-                goto not_$name;
+                goto $gotoname;
             }
 EOF;
             }
@@ -117,7 +119,7 @@ EOF
 
             if ($req) {
                 $code[] = <<<EOF
-        not_$name:
+        $gotoname:
 EOF;
             }
 
@@ -139,7 +141,7 @@ $code
 EOF;
     }
 
-    protected function startClass($class, $baseClass)
+    private function startClass($class, $baseClass)
     {
         return <<<EOF
 <?php
@@ -159,7 +161,7 @@ class $class extends $baseClass
 EOF;
     }
 
-    protected function addConstructor()
+    private function addConstructor()
     {
         return <<<EOF
     /**
@@ -174,7 +176,7 @@ EOF;
 EOF;
     }
 
-    protected function endClass()
+    private function endClass()
     {
         return <<<EOF
 }

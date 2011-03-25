@@ -20,8 +20,8 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  */
 class RouteCollection
 {
-    protected $routes;
-    protected $resources;
+    private $routes;
+    private $resources;
 
     /**
      * Constructor.

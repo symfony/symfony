@@ -18,7 +18,7 @@ namespace Symfony\Component\Routing\Annotation;
  */
 class Routes
 {
-    protected $routes;
+    private $routes;
 
     /**
      * Constructor.

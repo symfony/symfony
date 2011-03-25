@@ -11,7 +11,7 @@
 
 function bailout($message)
 {
-    die($message."\n");
+    exit($message."\n");
 }
 
 function check_dir($source)

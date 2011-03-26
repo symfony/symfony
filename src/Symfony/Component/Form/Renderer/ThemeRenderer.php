@@ -16,7 +16,7 @@ use Symfony\Component\Form\Renderer\Theme\FormThemeInterface;
 use Symfony\Component\Form\Renderer\Theme\FormThemeFactoryInterface;
 use Symfony\Component\Form\Renderer\Plugin\FormRendererPluginInterface;
 
-class ThemeRenderer implements FormRendererInterface, \ArrayAccess
+class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAggregate
 {
     private $form;
 
@@ -236,5 +236,14 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess
     public function offsetUnset($name)
     {
         throw new \BadMethodCallException('Not supported');
+    }
+
+    public function getIterator()
+    {
+        if (isset($this->vars['fields'])) {
+            $this->rendered = true;
+            return new \ArrayIterator($this->vars['fields']);
+        }
+        return new \ArrayIterator(array());
     }
 }

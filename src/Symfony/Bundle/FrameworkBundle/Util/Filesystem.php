@@ -87,16 +87,14 @@ class Filesystem
     /**
      * Removes files or directories.
      *
-     * @param mixed $files  A filename or an array of files to remove
+     * @param mixed $files A filename, an array of files, or a \Traversable instance to remove
      */
     public function remove($files)
     {
-        if (!is_array($files) && !$files instanceof \Traversable) {
-            $files = array($files);
-        }
-        
-        if($files instanceof \Traversable) {
+        if ($files instanceof \Traversable) {
             $files = iterator_to_array($files);
+        } elseif (!is_array($files)) {
+            $files = array($files);
         }
 
         $files = array_reverse($files);
@@ -107,6 +105,7 @@ class Filesystem
 
             if (is_dir($file) && !is_link($file)) {
                 $this->remove(new \FilesystemIterator($file));
+
                 rmdir($file);
             } else {
                 unlink($file);

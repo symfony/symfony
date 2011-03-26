@@ -360,6 +360,52 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($this->getToken(), new FieldVote(new \stdClass(), 'foo'), array('VIEW')));
     }
+    
+    public function testWhenReceivingAnObjectIdentityInterfaceWeDontRetrieveANewObjectIdentity()
+    {
+        list($voter, $provider, $permissionMap, $oidStrategy, $sidStrategy) = $this->getVoter();
+        
+        $oid = new ObjectIdentity('someID','someType');
+        
+        $permissionMap
+            ->expects($this->once())
+            ->method('contains')
+            ->will($this->returnValue(true))
+        ;
+        $permissionMap
+            ->expects($this->once())
+            ->method('getMasks')
+            ->with($this->equalTo('VIEW'))
+            ->will($this->returnValue($masks = array(1, 2, 3)))
+        ;
+
+        $oidStrategy
+            ->expects($this->never())
+            ->method('getObjectIdentity')
+        ;
+
+        $sidStrategy
+            ->expects($this->once())
+            ->method('getSecurityIdentities')
+            ->will($this->returnValue($sids = array(new UserSecurityIdentity('johannes', 'Foo'), new RoleSecurityIdentity('ROLE_FOO'))))
+        ;
+
+        $provider
+            ->expects($this->once())
+            ->method('findAcl')
+            ->with($this->equalTo($oid), $this->equalTo($sids))
+            ->will($this->returnValue($acl = $this->getMock('Symfony\Component\Security\Acl\Model\AclInterface')))
+        ;
+
+        $acl
+            ->expects($this->once())
+            ->method('isGranted')
+            ->with($this->identicalTo($masks), $this->equalTo($sids), $this->isFalse())
+            ->will($this->throwException(new NoAceFoundException('No ACE')))
+        ;
+
+        $voter->vote($this->getToken(), $oid, array('VIEW'));
+    }
 
     protected function getToken()
     {

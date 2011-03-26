@@ -47,6 +47,7 @@ class RememberMeListener implements ListenerInterface
      * @param RememberMeServicesInterface $rememberMeServices
      * @param AuthenticationManagerInterface $authenticationManager
      * @param LoggerInterface $logger
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(SecurityContext $securityContext, RememberMeServicesInterface $rememberMeServices, AuthenticationManagerInterface $authenticationManager, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {

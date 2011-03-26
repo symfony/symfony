@@ -115,7 +115,7 @@ class Filesystem
         $currentUmask = umask();
         umask($umask);
 
-        foreach ($this->toIterator(files) as $file) {
+        foreach ($this->toIterator($files) as $file) {
             chmod($file, $mode);
         }
 

@@ -42,8 +42,12 @@ class ThemeRendererTest extends \PHPUnit_Framework_TestCase
         $renderer = new ThemeRenderer($themeFactory);
         $renderer->setVar('fields', array('foo' => 'baz', 'bar' => 'baz'));
 
+        $this->assertFalse($renderer->isRendered());
+
         foreach ($renderer AS $child) {
             $this->assertEquals('baz', $child);
         }
+
+        $this->assertTrue($renderer->isRendered());
     }
 }

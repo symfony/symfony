@@ -240,6 +240,8 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAgg
 
     public function getIterator()
     {
+        $this->initialize();
+
         if (isset($this->vars['fields'])) {
             $this->rendered = true;
             return new \ArrayIterator($this->vars['fields']);

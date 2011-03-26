@@ -78,14 +78,10 @@ class AclVoter implements VoterInterface
                 } else {
                     $field = null;
                 }
-                
+
                 if ($object instanceof ObjectIdentityInterface) {
                     $oid = $object;
-                } else {
-                    $oid = $this->objectIdentityRetrievalStrategy->getObjectIdentity($object);
-                }
-
-                if (null === $oid) {
+                } else if (null === $oid = $this->objectIdentityRetrievalStrategy->getObjectIdentity($object)) {
                     if (null !== $this->logger) {
                         $this->logger->debug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable? 'grant access' : 'abstain'));
                     }

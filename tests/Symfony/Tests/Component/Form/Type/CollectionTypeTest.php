@@ -54,6 +54,7 @@ class CollectionFormTest extends TestCase
         $form = $this->factory->create('collection', 'emails', array(
             'type' => 'field',
             'modifiable' => true,
+            'prototype' => true,
         ));
         $form->setData(array('foo@foo.com', 'foo@bar.com'));
 
@@ -83,6 +84,7 @@ class CollectionFormTest extends TestCase
         $form = $this->factory->create('collection', 'emails', array(
             'type' => 'field',
             'modifiable' => true,
+            'prototype' => true,
         ));
         $form->setData(array('foo@bar.com'));
 
@@ -146,6 +148,17 @@ class CollectionFormTest extends TestCase
         $this->assertEquals('foo@foo.com', $form[0]->getData());
         $this->assertEquals('bar@bar.com', $form[1]->getData());
         $this->assertEquals(array('foo@foo.com', 'bar@bar.com'), $form->getData());
+    }
+
+    public function testModifableButNoPrototype()
+    {
+        $form = $this->factory->create('collection', 'emails', array(
+            'type' => 'field',
+            'modifiable' => true,
+            'prototype' => false,
+        ));
+
+        $this->assertFalse($form->has('$$name$$'));
     }
 
     public function testResizedDownIfBoundWithLessDataAndModifiable()

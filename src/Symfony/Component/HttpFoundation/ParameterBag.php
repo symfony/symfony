@@ -78,6 +78,12 @@ class ParameterBag
      */
     public function get($key, $default = null)
     {
+        // no strict compare - is normal
+        if (($a = strpos($key, '[')) && ($b = strpos($key, ']'))) {
+            $arrayKey = substr($key, 0, $a);
+		$subArrayKey  = substr($key, $a+1, -1);
+		return array_key_exists($arrayKey, $this->parameters) && array_key_exists($subArrayKey, $this->parameters[$arrayKey]) ? $this->parameters[$arrayKey][$subArrayKey] : $default;
+        }
         return array_key_exists($key, $this->parameters) ? $this->parameters[$key] : $default;
     }
 

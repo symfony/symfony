@@ -26,7 +26,7 @@ class CsrfType extends AbstractType
         $this->csrfProvider = $csrfProvider;
     }
 
-    public function configure(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilder $builder, array $options)
     {
         $csrfProvider = $options['csrf_provider'];
         $pageId = $options['page_id'];

@@ -87,7 +87,7 @@ class FormFactory implements FormFactoryInterface
         $builder->setFormFactory($this);
 
         foreach ($types as $type) {
-            $type->configure($builder, $options);
+            $type->buildForm($builder, $options);
         }
 
         return $builder;

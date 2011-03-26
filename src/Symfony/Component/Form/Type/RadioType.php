@@ -18,7 +18,7 @@ use Symfony\Component\Form\Renderer\FormRendererInterface;
 
 class RadioType extends AbstractType
 {
-    public function configure(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilder $builder, array $options)
     {
         $builder->setClientTransformer(new BooleanToStringTransformer())
             ->setAttribute('value', $options['value']);

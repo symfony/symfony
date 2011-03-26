@@ -32,7 +32,7 @@ class EntityType extends AbstractType
         $this->em = $em;
     }
 
-    public function configure(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilder $builder, array $options)
     {
         $transformers = array();
 

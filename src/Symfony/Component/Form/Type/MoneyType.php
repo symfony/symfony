@@ -20,7 +20,7 @@ class MoneyType extends AbstractType
 {
     private static $patterns = array();
 
-    public function configure(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilder $builder, array $options)
     {
         $builder->setClientTransformer(new MoneyToLocalizedStringTransformer($options['precision'], $options['grouping'], null, $options['divisor']))
             ->setAttribute('currency', $options['currency']);

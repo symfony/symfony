@@ -17,7 +17,7 @@ use Symfony\Component\Form\Renderer\FormRendererInterface;
 
 class TextType extends AbstractType
 {
-    public function configure(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilder $builder, array $options)
     {
         $builder->setAttribute('max_length', $options['max_length']);
     }

@@ -31,7 +31,7 @@ class FileType extends AbstractType
         $this->storage = $storage;
     }
 
-    public function configure(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilder $builder, array $options)
     {
         if ($options['type'] === 'string') {
             $builder->setNormTransformer(new DataTransformerChain(array(

@@ -16,7 +16,7 @@ use Symfony\Component\Form\DataTransformer\PercentToLocalizedStringTransformer;
 
 class PercentType extends AbstractType
 {
-    public function configure(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilder $builder, array $options)
     {
         $builder->setClientTransformer(new PercentToLocalizedStringTransformer($options['precision'], $options['type']));
     }

@@ -16,7 +16,7 @@ use Symfony\Component\Form\EventListener\FixUrlProtocolListener;
 
 class UrlType extends AbstractType
 {
-    public function configure(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilder $builder, array $options)
     {
         $builder->addEventSubscriber(new FixUrlProtocolListener($options['default_protocol']));
     }

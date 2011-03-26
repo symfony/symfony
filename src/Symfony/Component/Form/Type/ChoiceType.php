@@ -21,7 +21,7 @@ use Symfony\Component\Form\DataTransformer\ArrayToChoicesTransformer;
 
 class ChoiceType extends AbstractType
 {
-    public function configure(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilder $builder, array $options)
     {
         if ($options['expanded']) {
             $choices = array_replace(

@@ -16,7 +16,7 @@ use Symfony\Component\Form\DataTransformer\ValueToDuplicatesTransformer;
 
 class RepeatedType extends AbstractType
 {
-    public function configure(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilder $builder, array $options)
     {
         $builder->setClientTransformer(new ValueToDuplicatesTransformer(array(
                 $options['first_name'],

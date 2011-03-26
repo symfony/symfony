@@ -17,7 +17,7 @@ use Symfony\Component\Form\Renderer\FormRendererInterface;
 
 interface FormTypeInterface
 {
-    function configure(FormBuilder $builder, array $options);
+    function buildForm(FormBuilder $builder, array $options);
 
     function buildRenderer(FormRendererInterface $renderer, FormInterface $form);
 

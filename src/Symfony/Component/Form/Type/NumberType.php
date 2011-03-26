@@ -16,7 +16,7 @@ use Symfony\Component\Form\DataTransformer\NumberToLocalizedStringTransformer;
 
 class NumberType extends AbstractType
 {
-    public function configure(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilder $builder, array $options)
     {
         $builder->setClientTransformer(new NumberToLocalizedStringTransformer($options['precision'], $options['grouping'], $options['rounding_mode']));
     }

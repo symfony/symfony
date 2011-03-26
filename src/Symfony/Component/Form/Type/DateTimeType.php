@@ -21,7 +21,7 @@ use Symfony\Component\Form\DataTransformer\ArrayToPartsTransformer;
 
 class DateTimeType extends AbstractType
 {
-    public function configure(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilder $builder, array $options)
     {
         // Only pass a subset of the options to children
         $dateOptions = array_intersect_key($options, array_flip(array(

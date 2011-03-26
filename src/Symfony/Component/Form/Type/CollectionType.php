@@ -16,7 +16,7 @@ use Symfony\Component\Form\EventListener\ResizeFormListener;
 
 class CollectionType extends AbstractType
 {
-    public function configure(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilder $builder, array $options)
     {
         if ($options['modifiable'] && $options['prototype']) {
             $builder->add('$$name$$', $options['type'], array(

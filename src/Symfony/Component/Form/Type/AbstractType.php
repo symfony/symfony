@@ -18,7 +18,7 @@ use Symfony\Component\Form\Renderer\FormRendererInterface;
 
 abstract class AbstractType implements FormTypeInterface
 {
-    public function configure(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilder $builder, array $options)
     {
     }
 

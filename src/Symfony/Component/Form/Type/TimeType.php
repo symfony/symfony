@@ -22,7 +22,7 @@ use Symfony\Component\Form\Renderer\FormRendererInterface;
 
 class TimeType extends AbstractType
 {
-    public function configure(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilder $builder, array $options)
     {
         $hourOptions = $minuteOptions = $secondOptions = array();
         $child = $options['widget'] === 'text' ? 'text' : 'choice';

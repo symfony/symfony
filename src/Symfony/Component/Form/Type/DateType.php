@@ -24,7 +24,7 @@ use Symfony\Component\Form\DataTransformer\ReversedTransformer;
 
 class DateType extends AbstractType
 {
-    public function configure(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilder $builder, array $options)
     {
         $formatter = new \IntlDateFormatter(
             \Locale::getDefault(),

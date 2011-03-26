@@ -33,7 +33,7 @@ class FieldType extends AbstractType
         $this->validator = $validator;
     }
 
-    public function configure(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilder $builder, array $options)
     {
         if (false === $options['property_path']) {
             $options['property_path'] = $builder->getName();

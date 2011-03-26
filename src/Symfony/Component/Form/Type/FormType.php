@@ -20,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class FormType extends AbstractType
 {
-    public function configure(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilder $builder, array $options)
     {
         $builder->setAttribute('virtual', $options['virtual'])
             ->setDataClass($options['data_class'])

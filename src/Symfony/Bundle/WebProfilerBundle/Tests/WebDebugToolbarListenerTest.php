@@ -14,6 +14,7 @@ namespace Symfony\Bundle\WebProfilerBundle\Tests;
 use Symfony\Bundle\WebProfilerBundle\WebDebugToolbarListener;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -55,7 +56,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         foreach (array(301, 302) as $statusCode) {
             $response = new Response('Some content', $statusCode);
             $response->headers->set('X-Debug-Token', 'xxxxxxxx');
-            $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), Kernel::MASTER_REQUEST, $response);
+            $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
 
             $listener = new WebDebugToolbarListener($this->getTemplatingMock('Redirection'), true);
             $listener->onCoreResponse($event);
@@ -70,7 +71,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         $response = new Response('<html><head></head><body></body></html>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
 
-        $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), Kernel::MASTER_REQUEST, $response);
+        $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
 
         $listener = new WebDebugToolbarListener($this->getTemplatingMock());
         $listener->onCoreResponse($event);
@@ -86,7 +87,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         foreach (array(301, 302) as $statusCode) {
             $response = new Response('<html><head></head><body></body></html>', $statusCode);
             $response->headers->set('X-Debug-Token', 'xxxxxxxx');
-            $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), Kernel::MASTER_REQUEST, $response);
+            $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
 
             $listener = new WebDebugToolbarListener($this->getTemplatingMock());
             $listener->onCoreResponse($event);
@@ -102,7 +103,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
     {
         $response = new Response('<html><head></head><body></body></html>');
 
-        $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), Kernel::MASTER_REQUEST, $response);
+        $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
 
         $listener = new WebDebugToolbarListener($this->getTemplatingMock());
         $listener->onCoreResponse($event);
@@ -118,7 +119,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         $response = new Response('<html><head></head><body></body></html>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
 
-        $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), Kernel::SUB_REQUEST, $response);
+        $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::SUB_REQUEST, $response);
 
         $listener = new WebDebugToolbarListener($this->getTemplatingMock());
         $listener->onCoreResponse($event);
@@ -134,7 +135,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         $response = new Response('<div>Some content</div>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
 
-        $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), Kernel::MASTER_REQUEST, $response);
+        $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
 
         $listener = new WebDebugToolbarListener($this->getTemplatingMock());
         $listener->onCoreResponse($event);
@@ -150,7 +151,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         $response = new Response('<html><head></head><body></body></html>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
 
-        $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(true), Kernel::MASTER_REQUEST, $response);
+        $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(true), HttpKernelInterface::MASTER_REQUEST, $response);
 
         $listener = new WebDebugToolbarListener($this->getTemplatingMock());
         $listener->onCoreResponse($event);
@@ -166,7 +167,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         $response = new Response('<html><head></head><body></body></html>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
 
-        $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(false, 'json'), Kernel::MASTER_REQUEST, $response);
+        $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(false, 'json'), HttpKernelInterface::MASTER_REQUEST, $response);
 
         $listener = new WebDebugToolbarListener($this->getTemplatingMock());
         $listener->onCoreResponse($event);

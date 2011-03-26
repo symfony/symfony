@@ -57,11 +57,11 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
             $response->headers->set('X-Debug-Token', 'xxxxxxxx');
             $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), Kernel::MASTER_REQUEST, $response);
 
-            $listener = new WebDebugToolbarListener($this->getTemplatingMock(), true);
+            $listener = new WebDebugToolbarListener($this->getTemplatingMock('Redirection'), true);
             $listener->onCoreResponse($event);
 
             $this->assertEquals(200, $response->getStatusCode());
-            $this->assertRegExp('/The redirect was intercepted/', $response->getContent());
+            $this->assertEquals('Redirection', $response->getContent());
         }
     }
 

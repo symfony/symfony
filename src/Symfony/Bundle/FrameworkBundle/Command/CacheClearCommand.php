@@ -132,7 +132,7 @@ namespace $namespace
     }
 }
 EOF;
-        $this->container->get('filesystem')->mkdirs($warmupDir);
+        $this->container->get('filesystem')->mkdir($warmupDir);
         file_put_contents($file = $warmupDir.'/kernel.tmp', $code);
         require_once $file;
         @unlink($file);

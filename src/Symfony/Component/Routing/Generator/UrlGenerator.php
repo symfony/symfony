@@ -63,7 +63,7 @@ class UrlGenerator implements UrlGeneratorInterface
      *
      * @throws \InvalidArgumentException When route doesn't exist
      */
-    public function generate($name, array $parameters, $absolute = false)
+    public function generate($name, array $parameters = array(), $absolute = false)
     {
         if (null === $route = $this->routes->get($name)) {
             throw new \InvalidArgumentException(sprintf('Route "%s" does not exist.', $name));

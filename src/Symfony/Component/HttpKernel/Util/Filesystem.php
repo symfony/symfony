@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Util;
+namespace Symfony\Component\HttpKernel\Util;
 
 /**
  * Provides basic utility to manipulate the file system.
@@ -25,19 +25,13 @@ class Filesystem
      *
      * By default, if the target already exists, it is not overridden.
      *
-     * To override existing files, pass the "override" option.
-     *
      * @param string $originFile  The original filename
      * @param string $targetFile  The target filename
-     * @param array  $options     An array of options
+     * @param array  $override    Whether to override an existing file or not
      */
-    public function copy($originFile, $targetFile, $options = array())
+    public function copy($originFile, $targetFile, $override = false)
     {
-        if (!array_key_exists('override', $options)) {
-            $options['override'] = false;
-        }
-
-        $this->mkdirs(dirname($targetFile));
+        $this->mkdir(dirname($targetFile));
 
         $mostRecent = false;
         if (file_exists($targetFile)) {
@@ -46,7 +40,7 @@ class Filesystem
             $mostRecent = $statOrigin['mtime'] > $statTarget['mtime'];
         }
 
-        if ($options['override'] || !file_exists($targetFile) || $mostRecent) {
+        if ($override || !file_exists($targetFile) || $mostRecent) {
             copy($originFile, $targetFile);
         }
     }
@@ -54,32 +48,33 @@ class Filesystem
     /**
      * Creates a directory recursively.
      *
-     * @param  string $path  The directory path
-     * @param  int    $mode  The directory mode
+     * @param  string|array|\Traversable $dirs The directory path
+     * @param  int                       $mode The directory mode
      *
      * @return Boolean true if the directory has been created, false otherwise
      */
-    public function mkdirs($path, $mode = 0777)
+    public function mkdir($dirs, $mode = 0777)
     {
-        if (is_dir($path)) {
-            return true;
+        $ret = false;
+        foreach ($this->toIterator($dirs) as $dir) {
+            if (is_dir($dir)) {
+                continue;
+            }
+
+            $ret = @mkdir($dir, $mode, true) && $ret;
         }
 
-        return @mkdir($path, $mode, true);
+        return $ret;
     }
 
     /**
      * Creates empty files.
      *
-     * @param mixed $files  The filename, or an array of filenames
+     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to remove
      */
     public function touch($files)
     {
-        if (!is_array($files)) {
-            $files = array($files);
-        }
-
-        foreach ($files as $file) {
+        foreach ($this->toIterator($files) as $file) {
             touch($file);
         }
     }
@@ -87,14 +82,11 @@ class Filesystem
     /**
      * Removes files or directories.
      *
-     * @param mixed $files  A filename or an array of files to remove
+     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to remove
      */
     public function remove($files)
     {
-        if (!is_array($files)) {
-            $files = array($files);
-        }
-
+        $files = iterator_to_array($this->toIterator($files));
         $files = array_reverse($files);
         foreach ($files as $file) {
             if (!file_exists($file)) {
@@ -102,13 +94,7 @@ class Filesystem
             }
 
             if (is_dir($file) && !is_link($file)) {
-                $fp = opendir($file);
-                while (false !== $item = readdir($fp)) {
-                    if (!in_array($item, array('.', '..'))) {
-                        $this->remove($file.'/'.$item);
-                    }
-                }
-                closedir($fp);
+                $this->remove(new \FilesystemIterator($file));
 
                 rmdir($file);
             } else {
@@ -120,20 +106,16 @@ class Filesystem
     /**
      * Change mode for an array of files or directories.
      *
-     * @param array   $files  An array of files or directories
-     * @param integer $mode   The new mode
-     * @param integer $umask  The mode mask (octal)
+     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to remove
+     * @param integer                   $mode  The new mode
+     * @param integer                   $umask The mode mask (octal)
      */
     public function chmod($files, $mode, $umask = 0000)
     {
         $currentUmask = umask();
         umask($umask);
 
-        if (!is_array($files)) {
-            $files = array($files);
-        }
-
-        foreach ($files as $file) {
+        foreach ($this->toIterator($files) as $file) {
             chmod($file, $mode);
         }
 
@@ -215,7 +197,7 @@ class Filesystem
             $target = $targetDir.'/'.str_replace($originDir.DIRECTORY_SEPARATOR, '', $file->getPathname());
 
             if (is_dir($file)) {
-                $this->mkdirs($target);
+                $this->mkdir($target);
             } else if (is_file($file)) {
                 $this->copy($file, $target, $options);
             } else if (is_link($file)) {
@@ -224,5 +206,14 @@ class Filesystem
                 throw new \RuntimeException(sprintf('Unable to guess "%s" file type.', $file));
             }
         }
+    }
+
+    private function toIterator($files)
+    {
+        if (!$files instanceof \Traversable) {
+            $files = new \ArrayObject(is_array($files) ? $files : array($files));
+        }
+
+        return $files;
     }
 }

@@ -18,7 +18,7 @@ class CollectionType extends AbstractType
 {
     public function configure(FormBuilder $builder, array $options)
     {
-        if ($options['modifiable']) {
+        if ($options['modifiable'] && $options['prototype']) {
             $builder->add('$$name$$', $options['type'], array(
                 'property_path' => null,
                 'required' => false,
@@ -36,6 +36,7 @@ class CollectionType extends AbstractType
         return array(
             'template' => 'collection',
             'modifiable' => false,
+            'prototype'  => false,
             'type' => 'text',
         );
     }

@@ -37,26 +37,28 @@ class PhpEngineTheme implements FormThemeInterface
     /**
      * @var string
      */
-    private $template;
+    private $templateDir;
 
     /**
      * @param PhpEngine $engine
      */
-    public function __construct(PhpEngine $engine, $template = null)
+    public function __construct(PhpEngine $engine, $templateDir = null)
     {
         $this->engine = $engine;
-        $this->template = $template;
+        $this->templateDir = $templateDir;
     }
 
-    public function render($field, $section, array $parameters)
+    public function render(array $blocks, $section, array $parameters)
     {
-        if ($template = $this->lookupTemplate($field."_".$section)) {
-            return $this->engine->render($template, $parameters);
-        } else if ($template = $this->lookupTemplate($section)) {
-            return $this->engine->render($template, $parameters);
-        } else {
-            throw new FormException(sprintf('The form theme is missing the "%s" template file.', $section));
+        foreach ($blocks as &$block) {
+            $block = $block.'_'.$section;
+
+            if ($template = $this->lookupTemplate($block)) {
+                return $this->engine->render($template, $parameters);
+            }
         }
+
+        throw new FormException(sprintf('The form theme is missing the "%s" template files', implode('", "', $blocks)));
     }
 
     protected function lookupTemplate($templateName)
@@ -65,7 +67,12 @@ class PhpEngineTheme implements FormThemeInterface
             return self::$cache[$templateName];
         }
 
-        $template = (($this->template) ? ($this->template.":") : "") . $templateName.'.html.php';
+        $template = $templateName.'.html.php';
+
+        if ($this->templateDir) {
+            $template = $this->templateDir . ':' . $template;
+        }
+
         if (!$this->engine->exists($template)) {
             $template = false;
         }

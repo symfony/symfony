@@ -16,7 +16,8 @@
         <parameter key="form.theme.factory.twig.class">Symfony\Component\Form\Renderer\Theme\TwigThemeFactory</parameter>
         <parameter key="form.theme.factory.php.class">Symfony\Component\Form\Renderer\Theme\PhpThemeFactory</parameter>
         <parameter key="form.theme.factory.phpengine.class">Symfony\Bundle\FrameworkBundle\Form\PhpEngineThemeFactory</parameter>
-        <parameter key="form.theme.template">TwigBundle::div_layout.html.twig</parameter>
+        <parameter key="form.theme.template.twig">TwigBundle::div_layout.html.twig</parameter>
+        <parameter key="form.theme.template.phpengine">FrameworkBundle:Form</parameter>
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
         <parameter key="form.csrf_protection.enabled">true</parameter>
         <parameter key="form.csrf_protection.field_name">_token</parameter>
@@ -82,7 +83,7 @@
         <!-- Themes -->
         <service id="form.theme.factory.twig" class="%form.theme.factory.twig.class%">
             <argument type="service" id="twig" />
-            <argument>%form.theme.template%</argument>
+            <argument>%form.theme.template.twig%</argument>
         </service>
 
         <service id="form.theme.factory.default" class="%form.theme.factory.php.class%">
@@ -91,6 +92,7 @@
 
         <service id="form.theme.factory.php" class="%form.theme.factory.phpengine.class%">
             <argument type="service" id="templating.engine.php" />
+            <argument>%form.theme.template.phpengine%</argument>
         </service>
         
         <!-- TemporaryStorage - where should we put this? -->
@@ -129,8 +131,6 @@
         <service id="form.type.field" class="Symfony\Component\Form\Type\FieldType">
             <tag name="form.type" alias="field" />
             <argument type="service" id="validator" />
-            <argument type="service" id="form.theme.factory" />
-            <argument>%form.theme.template%</argument>
         </service>
         <service id="form.type.form" class="Symfony\Component\Form\Type\FormType">
             <tag name="form.type" alias="form" />

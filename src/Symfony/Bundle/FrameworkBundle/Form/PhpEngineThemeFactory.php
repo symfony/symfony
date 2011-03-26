@@ -26,16 +26,22 @@ class PhpEngineThemeFactory implements FormThemeFactoryInterface
      */
     private $engine;
 
-    public function __construct(PhpEngine $engine)
+    /**
+     * @var string
+     */
+    private $defaultTemplateDir;
+
+    public function __construct(PhpEngine $engine, $defaultTemplateDir = null)
     {
         $this->engine = $engine;
+        $this->defaultTemplateDir = $defaultTemplateDir;
     }
 
     /**
      * @see Symfony\Component\Form\Renderer\Theme\FormThemeFactoryInterface::create()
      */
-    public function create($template = null)
+    public function create($templateDir = null)
     {
-        return new PhpEngineTheme($this->engine, $template);
+        return new PhpEngineTheme($this->engine, $templateDir ?: $this->defaultTemplateDir);
     }
 }

@@ -120,7 +120,13 @@ class HttpKernel implements HttpKernelInterface
             }
 
             if (!$response instanceof Response) {
-                throw new \LogicException(sprintf('The controller must return a response (%s given).', $this->varToString($response)));
+                $msg = sprintf('The controller must return a response (%s given).', $this->varToString($response));
+
+                // the user may have forgotten to return something
+                if (null === $response) {
+                    $msg .= ' Did you forget to add a return statement somewhere in your controller?';
+                }
+                throw new \LogicException($msg);
             }
         }
 
@@ -185,6 +191,10 @@ class HttpKernel implements HttpKernelInterface
 
         if (is_resource($var)) {
             return '[resource]';
+        }
+
+        if (null === $var) {
+            return 'null';
         }
 
         return str_replace("\n", '', var_export((string) $var, true));

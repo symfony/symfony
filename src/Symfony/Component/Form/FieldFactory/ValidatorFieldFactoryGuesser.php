@@ -108,7 +108,7 @@ class ValidatorFieldFactoryGuesser implements FieldFactoryGuesserInterface
     public function guessClassForConstraint(Constraint $constraint)
     {
         switch (get_class($constraint)) {
-            case 'Symfony\Component\Validator\Constraints\AssertType':
+            case 'Symfony\Component\Validator\Constraints\Type':
                 switch ($constraint->type) {
                     case 'boolean':
                     case 'bool':

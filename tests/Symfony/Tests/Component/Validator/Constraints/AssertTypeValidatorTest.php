@@ -11,10 +11,10 @@
 
 namespace Symfony\Tests\Component\Validator;
 
-use Symfony\Component\Validator\Constraints\AssertType;
-use Symfony\Component\Validator\Constraints\AssertTypeValidator;
+use Symfony\Component\Validator\Constraints\Type;
+use Symfony\Component\Validator\Constraints\TypeValidator;
 
-class AssertTypeValidatorTest extends \PHPUnit_Framework_TestCase
+class TypeValidatorTest extends \PHPUnit_Framework_TestCase
 {
     protected static $file;
 
@@ -22,22 +22,22 @@ class AssertTypeValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->validator = new AssertTypeValidator();
+        $this->validator = new TypeValidator();
     }
 
     public function testNullIsValid()
     {
-        $this->assertTrue($this->validator->isValid(null, new AssertType(array('type' => 'integer'))));
+        $this->assertTrue($this->validator->isValid(null, new Type(array('type' => 'integer'))));
     }
 
     public function testEmptyIsValidIfString()
     {
-        $this->assertTrue($this->validator->isValid('', new AssertType(array('type' => 'string'))));
+        $this->assertTrue($this->validator->isValid('', new Type(array('type' => 'string'))));
     }
 
     public function testEmptyIsInvalidIfNoString()
     {
-        $this->assertFalse($this->validator->isValid('', new AssertType(array('type' => 'integer'))));
+        $this->assertFalse($this->validator->isValid('', new Type(array('type' => 'integer'))));
     }
 
     /**
@@ -45,7 +45,7 @@ class AssertTypeValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidValues($value, $type)
     {
-        $constraint = new AssertType(array('type' => $type));
+        $constraint = new Type(array('type' => $type));
 
         $this->assertTrue($this->validator->isValid($value, $constraint));
     }
@@ -79,7 +79,7 @@ class AssertTypeValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidValues($value, $type)
     {
-        $constraint = new AssertType(array('type' => $type));
+        $constraint = new Type(array('type' => $type));
 
         $this->assertFalse($this->validator->isValid($value, $constraint));
     }
@@ -112,7 +112,7 @@ class AssertTypeValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testMessageIsSet()
     {
-        $constraint = new AssertType(array(
+        $constraint = new Type(array(
             'type' => 'numeric',
             'message' => 'myMessage'
         ));

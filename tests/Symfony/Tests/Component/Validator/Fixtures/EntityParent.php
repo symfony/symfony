@@ -8,7 +8,7 @@ class EntityParent
     private $internal;
 
     /**
-     * @validation:NotNull
+     * @assert:NotNull
      */
     protected $other;
 }

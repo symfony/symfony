@@ -49,13 +49,20 @@ class FormFactory implements FormFactoryInterface
         $passedOptions = array_keys($options);
 
         // TESTME
-        if (null === $name && preg_match('/\w+$/', $type, $matches)) {
-            $name = $matches[0];
+        if (null === $name) {
+            $typeAsString = is_object($type) ? get_class($type) : $type;
+
+            if (preg_match('/\w+$/', $typeAsString, $matches)) {
+                $name = $matches[0];
+            }
         }
 
         while (null !== $type) {
             // TODO check if type exists
-            $type = $this->typeLoader->getType($type);
+            if (!$type instanceof FormTypeInterface) {
+                $type = $this->typeLoader->getType($type);
+            }
+
             array_unshift($types, $type);
             $defaultOptions = $type->getDefaultOptions($options);
             $options = array_merge($defaultOptions, $options);

@@ -6,9 +6,7 @@
 
     <parameters>
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
-        <parameter key="form.type.loader.chain.class">Symfony\Component\Form\Type\Loader\TypeLoaderChain</parameter>
-        <parameter key="form.type.loader.simple.class">Symfony\Component\Form\Type\Loader\SimpleTypeLoader</parameter>
-        <parameter key="form.type.loader.tagged.class">Symfony\Bundle\FrameworkBundle\Form\ContainerAwareTypeLoader</parameter>
+        <parameter key="form.type.loader.class">Symfony\Bundle\FrameworkBundle\Form\ContainerAwareTypeLoader</parameter>
         <parameter key="form.guesser.validator.class">Symfony\Component\Form\Type\Guesser\ValidatorTypeGuesser</parameter>
         <parameter key="form.csrf_provider.class">Symfony\Component\Form\CsrfProvider\SessionCsrfProvider</parameter>
         <parameter key="form.renderer.factory.loader.class">Symfony\Bundle\FrameworkBundle\Form\ContainerAwareRendererFactoryLoader</parameter>
@@ -33,7 +31,7 @@
 
         <!-- FormFactory -->
         <service id="form.factory" class="%form.factory.class%">
-            <argument type="service" id="form.type.loader.chain" />
+            <argument type="service" id="form.type.loader" />
             <argument type="service" id="form.renderer.factory.loader" />
             <!--
             All services with tag "form.guesser" are inserted here by 
@@ -103,17 +101,8 @@
             <argument>%file.temporary_storage.directory%</argument>
         </service>
         
-        <!-- TypeLoaderChain -->
-        <service id="form.type.loader.chain" class="%form.type.loader.chain.class%">
-            <!--
-            All services with tag "form.type.loader" are inserted here by 
-            AddFormTypeLoadersPass
-            -->
-        </service>
-        
         <!-- ContainerAwareTypeLoader -->
-        <service id="form.type.loader.tagged" class="%form.type.loader.tagged.class%">
-            <tag name="form.type.loader" />
+        <service id="form.type.loader" class="%form.type.loader.class%">
             <argument type="service" id="service_container" />
             <!--
             All services with tag "form.type" are inserted here by 
@@ -122,11 +111,6 @@
             <argument type="collection" />
         </service>
         
-        <!-- SimpleTypeLoader -->
-        <service id="form.type.loader.simple" class="%form.type.loader.simple.class%">
-            <tag name="form.type.loader" />
-        </service>
-
         <!-- FieldTypes -->
         <service id="form.type.field" class="Symfony\Component\Form\Type\FieldType">
             <tag name="form.type" alias="field" />

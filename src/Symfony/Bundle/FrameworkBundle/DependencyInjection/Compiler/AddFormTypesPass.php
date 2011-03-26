@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
  * Adds all services with the tag "form.type" as argument
- * to the "form.type.loader.tagged" service
+ * to the "form.type.loader" service
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
@@ -24,7 +24,7 @@ class AddFormTypesPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('form.type.loader.tagged')) {
+        if (!$container->hasDefinition('form.type.loader')) {
             return;
         }
 
@@ -41,6 +41,6 @@ class AddFormTypesPass implements CompilerPassInterface
             $types[$alias] = $serviceId;
         }
 
-        $container->getDefinition('form.type.loader.tagged')->setArgument(1, $types);
+        $container->getDefinition('form.type.loader')->setArgument(1, $types);
     }
 }

@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConstraintValidatorsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddFormTypesPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddFormTypeLoadersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddFormGuessersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddFormRendererFactoriesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TemplatingPass;
@@ -80,7 +79,6 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new TemplatingPass());
         $container->addCompilerPass(new AddConstraintValidatorsPass());
         $container->addCompilerPass(new AddFormTypesPass());
-        $container->addCompilerPass(new AddFormTypeLoadersPass());
         $container->addCompilerPass(new AddFormGuessersPass());
         $container->addCompilerPass(new AddFormRendererFactoriesPass());
         $container->addCompilerPass(new AddClassesToCachePass());

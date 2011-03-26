@@ -42,11 +42,9 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAgg
 
     private $children = array();
 
-    public function __construct(FormThemeFactoryInterface $themeFactory, $template = null)
+    public function __construct(FormThemeFactoryInterface $themeFactory)
     {
         $this->themeFactory = $themeFactory;
-
-        $this->setTemplate($template);
     }
 
     public function setParent(self $parent)
@@ -71,6 +69,10 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAgg
 
     public function getTheme()
     {
+        if (!$this->theme && $this->parent) {
+            return $this->parent->getTheme();
+        }
+
         return $this->theme;
     }
 
@@ -166,7 +168,7 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAgg
 
     protected function render($part, array $vars = array())
     {
-        return $this->theme->render($this->blockHistory, $part, array_replace(
+        return $this->getTheme()->render($this->blockHistory, $part, array_replace(
             $this->vars,
             $vars
         ));

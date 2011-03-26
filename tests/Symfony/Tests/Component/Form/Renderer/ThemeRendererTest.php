@@ -17,11 +17,7 @@ class ThemeRendererTest extends \PHPUnit_Framework_TestCase
 {
     protected function createThemeFactory()
     {
-        $themeFactory = $this->getMock('Symfony\Component\Form\Renderer\Theme\FormThemeFactoryInterface');
-        $themeFactory->expects($this->once())
-                     ->method('create')
-                     ->will($this->returnValue($this->getMock('Symfony\Component\Form\Renderer\Theme\FormThemeInterface')));
-        return $themeFactory;
+        return $this->getMock('Symfony\Component\Form\Renderer\Theme\FormThemeFactoryInterface');
     }
 
     public function testArrayAccess()

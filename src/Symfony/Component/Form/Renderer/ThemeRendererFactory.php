@@ -30,9 +30,11 @@ class ThemeRendererFactory implements FormRendererFactoryInterface
 
     public function create(FormInterface $form, ThemeRenderer $parent = null)
     {
-        $renderer = new ThemeRenderer($this->themeFactory, $this->defaultTemplate);
+        $renderer = new ThemeRenderer($this->themeFactory);
 
-        if ($parent) {
+        if (!$parent) {
+            $renderer->setTemplate($this->defaultTemplate);
+        } else {
             $renderer->setParent($parent);
         }
 

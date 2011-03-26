@@ -36,7 +36,7 @@ class CollectionType extends AbstractType
         return array(
             'template' => 'collection',
             'modifiable' => false,
-            'prototype'  => false,
+            'prototype'  => true,
             'type' => 'text',
         );
     }

@@ -23,7 +23,7 @@ class PhpTheme implements FormThemeInterface
 {
     /**
      * Charset to be used with htmlentities.
-     * 
+     *
      * @var string
      */
     private $charset;
@@ -33,17 +33,21 @@ class PhpTheme implements FormThemeInterface
         $this->charset = $charset;
     }
 
-    public function render($form, $section, array $parameters)
+    public function render(array $blocks, $section, array $parameters)
     {
-        if (method_exists($this, $form.'_'.$section)) {
-            $method = $form.'_'.$section;
-        } else if (method_exists($this, $section)) {
-            $method = $section;
-        } else {
-            throw new \BadMethodCallException("PhpTheme does not support to render the form block method '" . $method . "'.");
+        foreach ($blocks as $block) {
+            $method = $block.'_'.$section;
+
+            if (method_exists($this, $method)) {
+                return $this->$method($parameters);
+            }
         }
 
-        return $this->$method($parameters);
+        $blocks = array_map(function ($block) use ($section) {
+            return $block.'_'.$section;
+        }, $blocks);
+
+        throw new \BadMethodCallException(sprintf('PhpTheme does not support the form block methods "%s"', implode('", "', $blocks)));
     }
 
     protected function checkbox_widget($attr)

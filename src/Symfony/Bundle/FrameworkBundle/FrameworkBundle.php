@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConstraintVal
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddFormTypesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddFormTypeLoadersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddFormGuessersPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddFormRendererFactoriesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TemplatingPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RoutingResolverPass;
@@ -81,6 +82,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new AddFormTypesPass());
         $container->addCompilerPass(new AddFormTypeLoadersPass());
         $container->addCompilerPass(new AddFormGuessersPass());
+        $container->addCompilerPass(new AddFormRendererFactoriesPass());
         $container->addCompilerPass(new AddClassesToCachePass());
         $container->addCompilerPass(new AddClassesToAutoloadMapPass());
         $container->addCompilerPass(new TranslatorPass());

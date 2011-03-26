@@ -19,13 +19,13 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAgg
 {
     private $form;
 
-    private $block;
+    private $blockHistory = array();
 
     private $themeFactory;
 
     private $theme;
 
-    private $vars;
+    private $vars = array();
 
     /**
      * Is the form attached to this renderer rendered?
@@ -38,32 +38,25 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAgg
      */
     private $rendered = false;
 
+    private $parent;
+
     private $children = array();
 
-    public function __construct(FormInterface $form, FormThemeFactoryInterface $themeFactory, $template = null, ThemeRenderer $parent = null)
+    public function __construct(FormThemeFactoryInterface $themeFactory, $template = null)
     {
-        $this->form = $form;
         $this->themeFactory = $themeFactory;
+
+        $this->setTemplate($template);
+    }
+
+    public function setParent(self $parent)
+    {
         $this->parent = $parent;
-        $this->vars = new RendererVarBag();
+    }
 
-        if (null !== $template) {
-            $this->setTemplate($template);
-        }
-
-        $types = (array)$form->getTypes();
-
-        foreach ($types as $type) {
-            $type->buildRenderer($this, $form);
-        }
-
-        foreach ($form as $key => $child) {
-            $this->children[$key] = new self($child, $themeFactory, null, $parent);
-        }
-
-        foreach ($types as $type) {
-            $type->buildRendererBottomUp($this, $form);
-        }
+    public function setChildren(array $children)
+    {
+        $this->children = $children;
     }
 
     public function setTemplate($template)
@@ -83,12 +76,14 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAgg
 
     public function setBlock($block)
     {
-        $this->block = $block;
+        array_unshift($this->blockHistory, $block);
     }
 
     public function getBlock()
     {
-        return $this->block;
+        reset($this->blockHistory);
+
+        return current($this->block);
     }
 
     public function setVar($name, $value)
@@ -98,7 +93,6 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAgg
 
     public function setAttribute($name, $value)
     {
-        // handling through $this->changes not necessary
         $this->vars['attr'][$name] = $value;
     }
 
@@ -109,17 +103,15 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAgg
 
     public function getVar($name)
     {
-        // TODO exception handling
-        if (isset($this->vars[$name])) {
-            return $this->vars[$name];
+        if (!isset($this->vars[$name])) {
+            return null;
         }
-        return null;
+
+        return $this->vars[$name];
     }
 
     public function getVars()
     {
-        $this->initialize();
-
         return $this->vars;
     }
 
@@ -174,7 +166,7 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAgg
 
     protected function render($part, array $vars = array())
     {
-        return $this->theme->render($this->block, $part, array_replace(
+        return $this->theme->render($this->blockHistory, $part, array_replace(
             $this->vars,
             $vars
         ));
@@ -185,21 +177,29 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAgg
         return $this->parent;
     }
 
+    public function hasParent()
+    {
+        return null !== $this->parent;
+    }
+
     public function getChildren()
     {
         return $this->children;
     }
 
+    public function hasChildren()
+    {
+        return count($this->children) > 0;
+    }
+
     public function offsetGet($name)
     {
-        $this->initialize();
-        return $this->vars['fields'][$name];
+        return $this->children[$name];
     }
 
     public function offsetExists($name)
     {
-        $this->initialize();
-        return isset($this->vars['fields'][$name]);
+        return isset($this->children[$name]);
     }
 
     public function offsetSet($name, $value)
@@ -214,12 +214,12 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAgg
 
     public function getIterator()
     {
-        $this->initialize();
-
-        if (isset($this->vars['fields'])) {
+        if (isset($this->children)) {
             $this->rendered = true;
-            return new \ArrayIterator($this->vars['fields']);
+
+            return new \ArrayIterator($this->children);
         }
+
         return new \ArrayIterator(array());
     }
 }

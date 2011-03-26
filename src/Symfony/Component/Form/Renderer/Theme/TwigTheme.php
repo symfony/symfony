@@ -73,18 +73,22 @@ class TwigTheme implements FormThemeInterface
         return array_unique($names);
     }
 
-    public function render($form, $section, array $parameters)
+    public function render(array $blocks, $section, array $parameters)
     {
         $this->initialize();
 
-        if (isset($this->templatesByBlock[$form.'__'.$section])) {
-            $blockName = $form.'__'.$section;
-        } else if (isset($this->templatesByBlock[$section])) {
-            $blockName = $section;
-        } else {
-            throw new FormException(sprintf('The form theme is missing the "%s" block', $section));
+        foreach ($blocks as $block) {
+            $blockName = $block.'__'.$section;
+
+            if (isset($this->templatesByBlock[$blockName])) {
+                return $this->templatesByBlock[$blockName]->renderBlock($blockName, $parameters);
+            }
         }
 
-        return $this->templatesByBlock[$blockName]->renderBlock($blockName, $parameters);
+        $blocks = array_map(function ($block) use ($section) {
+            return $block.'__'.$section;
+        }, $blocks);
+
+        throw new FormException(sprintf('The form theme is missing the "%s" blocks', implode('", "', $blocks)));
     }
 }

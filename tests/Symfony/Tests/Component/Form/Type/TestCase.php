@@ -35,7 +35,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
     protected $typeLoader;
 
-    protected $rendererLoader;
+    protected $rendererFactoryLoader;
 
     protected function setUp()
     {
@@ -46,7 +46,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         $this->csrfProvider = $this->getMock('Symfony\Component\Form\CsrfProvider\CsrfProviderInterface');
         $this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->rendererLoader = $this->getMock('Symfony\Component\Form\Renderer\Loader\RendererLoaderInterface');
+        $this->rendererFactoryLoader = $this->getMock('Symfony\Component\Form\Renderer\Loader\FormRendererFactoryLoaderInterface');
 
         $this->storage = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\TemporaryStorage')
             ->disableOriginalConstructor()
@@ -59,7 +59,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             $this->typeLoader->addLoader($loader);
         }
 
-        $this->factory = new FormFactory($this->typeLoader, $this->rendererLoader);
+        $this->factory = new FormFactory($this->typeLoader, $this->rendererFactoryLoader);
 
         $this->builder = new FormBuilder($this->dispatcher);
     }

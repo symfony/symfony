@@ -1,19 +1,19 @@
-{% block rows %}
+{% block field__rows %}
 {% spaceless %}
     {{ renderer.errors }}
     {% for field in fields %}
         {{ field.row }}
     {% endfor %}
 {% endspaceless %}
-{% endblock rows %}
+{% endblock field__rows %}
 
-{% block enctype %}
+{% block field__enctype %}
 {% spaceless %}
     {% if multipart %}enctype="multipart/form-data"{% endif %}
 {% endspaceless %}
-{% endblock enctype %}
+{% endblock field__enctype %}
 
-{% block errors %}
+{% block field__errors %}
 {% spaceless %}
     {% if errors|length > 0 %}
     <ul>
@@ -23,9 +23,9 @@
     </ul>
     {% endif %}  	
 {% endspaceless %}
-{% endblock errors %}
+{% endblock field__errors %}
 
-{% block rest %}
+{% block field__rest %}
 {% spaceless %}
     {% for field in fields %}
         {% if not field.rendered %}
@@ -33,13 +33,13 @@
         {% endif %}
     {% endfor %}
 {% endspaceless %}
-{% endblock rest %}
+{% endblock field__rest %}
 
-{% block label %}
+{% block field__label %}
 {% spaceless %}
     <label for="{{ id }}">{% trans label %}</label>
 {% endspaceless %}
-{% endblock label %}
+{% endblock field__label %}
 
 {% block attributes %}
 {% spaceless %}
@@ -48,31 +48,31 @@
 {% endspaceless %}
 {% endblock attributes %}
 
-{% block widget %}
+{% block field__widget %}
 {% spaceless %}
     {% set type = type|default('text') %}
     <input type="{{ type }}" {{ block('attributes') }} value="{{ value }}" />
 {% endspaceless %}
-{% endblock widget %}
+{% endblock field__widget %}
 
 {% block text__widget %}
 {% spaceless %}
     {% set type = type|default('text') %}
-    {{ block('widget') }}
+    {{ block('field__widget') }}
 {% endspaceless %}
 {% endblock text__widget %}
 
 {% block password__widget %}
 {% spaceless %}
     {% set type = type|default('password') %}
-    {{ block('widget') }}
+    {{ block('field__widget') }}
 {% endspaceless %}
 {% endblock password__widget %}
 
 {% block hidden__widget %}
 {% spaceless %}
     {% set type = type|default('hidden') %}
-    {{ block('widget') }}
+    {{ block('field__widget') }}
 {% endspaceless %}
 {% endblock hidden__widget %}
 
@@ -170,34 +170,34 @@
 {% block number__widget %}
 {% spaceless %}
     {% set type = type|default('number') %}
-    {{ block('widget') }}
+    {{ block('field__widget') }}
 {% endspaceless %}
 {% endblock number__widget %}
 
 {% block integer__widget %}
 {% spaceless %}
     {% set type = type|default('number') %}
-    {{ block('widget') }}
+    {{ block('field__widget') }}
 {% endspaceless %}
 {% endblock integer__widget %}
 
 {% block money__widget %}
 {% spaceless %}
-    {{ money_pattern|replace({ '{{ widget }}': block('widget') })|raw }}
+    {{ money_pattern|replace({ '{{ widget }}': block('field__widget') })|raw }}
 {% endspaceless %}
 {% endblock money__widget %}
 
 {% block url__widget %}
 {% spaceless %}
     {% set type = type|default('url') %}
-    {{ block('widget') }}
+    {{ block('field__widget') }}
 {% endspaceless %}
 {% endblock url__widget %}
 
 {% block percent__widget %}
 {% spaceless %}
     {% set type = type|default('text') %}
-    {{ block('widget') }} %
+    {{ block('field__widget') }} %
 {% endspaceless %}
 {% endblock percent__widget %}
 
@@ -217,6 +217,6 @@
 
 {% block repeated__row %}
 {% spaceless %}
-    {{ block('rows') }}
+    {{ block('field__rows') }}
 {% endspaceless %}
 {% endblock repeated__row %}

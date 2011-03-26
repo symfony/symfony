@@ -48,9 +48,8 @@ class FileType extends AbstractType
             ->add('name', 'hidden');
     }
 
-    public function buildRenderer(FormRendererInterface $renderer, FormInterface $form)
+    public function buildRendererBottomUp(FormRendererInterface $renderer, FormInterface $form)
     {
-        $renderer->setBlock('file');
         $renderer->setVar('multipart', true);
         $renderer['file']->setVar('type', 'file');
     }

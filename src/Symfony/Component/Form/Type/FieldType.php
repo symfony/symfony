@@ -77,7 +77,6 @@ class FieldType extends AbstractType
             $name = $form->getName();
         }
 
-        $renderer->setBlock('field');
         $renderer->setVar('renderer', $renderer);
         $renderer->setVar('id', $id);
         $renderer->setVar('name', $name);
@@ -90,6 +89,7 @@ class FieldType extends AbstractType
         $renderer->setVar('size', null);
         $renderer->setVar('label', ucfirst(strtolower(str_replace('_', ' ', $form->getName()))));
         $renderer->setVar('multipart', false);
+        $renderer->setVar('attr', array());
     }
 
     public function getDefaultOptions(array $options)

@@ -38,7 +38,9 @@ class ChoiceType extends AbstractType
             }
         }
 
-        $builder->setAttribute('choice_list', $options['choice_list']);
+        $builder->setAttribute('choice_list', $options['choice_list'])
+            ->setAttribute('multiple', $options['multiple'])
+            ->setAttribute('expanded', $options['expanded']);
 
         if ($options['multiple'] && $options['expanded']) {
             $builder->setClientTransformer(new ArrayToChoicesTransformer($options['choice_list']));
@@ -54,7 +56,6 @@ class ChoiceType extends AbstractType
     {
         $choiceList = $form->getAttribute('choice_list');
 
-        $renderer->setBlock('choice');
         $renderer->setVar('multiple', $form->getAttribute('multiple'));
         $renderer->setVar('expanded', $form->getAttribute('expanded'));
         $renderer->setVar('choices', $choiceList->getOtherChoices());

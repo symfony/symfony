@@ -26,7 +26,6 @@ class RadioType extends AbstractType
 
     public function buildRenderer(FormRendererInterface $renderer, FormInterface $form)
     {
-        $renderer->setBlock('radio');
         $renderer->setVar('value', $form->getAttribute('value'));
         $renderer->setVar('checked', (bool)$form->getData());
 

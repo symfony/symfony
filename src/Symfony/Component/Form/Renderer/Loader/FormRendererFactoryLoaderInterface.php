@@ -11,11 +11,9 @@
 
 namespace Symfony\Component\Form\Renderer\Loader;
 
-use Symfony\Component\Form\FormInterface;
-
-interface RendererLoaderInterface
+interface FormRendererFactoryLoaderInterface
 {
-    function getRenderer($name, FormInterface $form);
+    function getRendererFactory($name);
 
-    function hasRenderer($name);
+    function hasRendererFactory($name);
 }

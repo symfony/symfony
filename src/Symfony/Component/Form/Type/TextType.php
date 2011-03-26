@@ -25,7 +25,6 @@ class TextType extends AbstractType
     public function buildRenderer(FormRendererInterface $renderer, FormInterface $form)
     {
         $renderer->setVar('max_length', $form->getAttribute('max_length'));
-        $renderer->setBlock('text');
     }
 
     public function getParent(array $options)

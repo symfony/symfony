@@ -26,19 +26,24 @@ class ThemeRendererTest extends \PHPUnit_Framework_TestCase
 
     public function testArrayAccess()
     {
+        $fields = array(
+            'foo' => $this->getMock('Symfony\Tests\Component\Form\FormInterface'),
+            'bar' => $this->getMock('Symfony\Tests\Component\Form\FormInterface'),
+        );
+
         $themeFactory = $this->createThemeFactory();
         $renderer = new ThemeRenderer($themeFactory);
-        $renderer->setVar('fields', array('foo' => 'baz', 'bar' => 'baz'));
+        $renderer->setChildren($fields);
 
         $this->assertTrue(isset($renderer['foo']));
         $this->assertTrue(isset($renderer['bar']));
-        $this->assertEquals('baz', $renderer['bar']);
+        $this->assertSame($fields['bar'], $renderer['bar']);
     }
 
     public function testIterator()
     {
         $themeFactory = $this->createThemeFactory();
-        
+
         $renderer = new ThemeRenderer($themeFactory);
         $renderer->setVar('fields', array('foo' => 'baz', 'bar' => 'baz'));
 

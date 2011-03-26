@@ -39,7 +39,7 @@ abstract class AbstractThemeFunctionalTest extends \PHPUnit_Framework_TestCase
         $template = $this->getTemplate();
         $csrfProvider = new DefaultCsrfProvider('foo');
         $validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
-        $rendererLoader = $this->getMock('Symfony\Component\Form\Renderer\Loader\RendererLoaderInterface');
+        $rendererFactoryLoader = $this->getMock('Symfony\Component\Form\Renderer\Loader\FormRendererFactoryLoaderInterface');
         $storage = new \Symfony\Component\HttpFoundation\File\TemporaryStorage('foo', 1, \sys_get_temp_dir());
 
         // ok more than 2 lines, see DefaultFormFactory.php for proposed simplication
@@ -49,7 +49,7 @@ abstract class AbstractThemeFunctionalTest extends \PHPUnit_Framework_TestCase
             new MyTestFormConfig(),
             new MyTestSubFormConfig()
         )));
-        $this->factory = new FormFactory($loaderChain, $rendererLoader);
+        $this->factory = new FormFactory($loaderChain, $rendererFactoryLoader);
     }
 
     public function testFullFormRendering()

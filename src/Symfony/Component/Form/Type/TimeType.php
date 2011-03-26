@@ -73,7 +73,6 @@ class TimeType extends AbstractType
 
     public function buildRenderer(FormRendererInterface $renderer, FormInterface $form)
     {
-        $renderer->setBlock('time');
         $renderer->setVar('widget', $form->getAttribute('widget'));
         $renderer->setVar('with_seconds', $form->getAttribute('with_seconds'));
     }

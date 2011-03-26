@@ -28,7 +28,6 @@ class MoneyType extends AbstractType
 
     public function buildRenderer(FormRendererInterface $renderer, FormInterface $form)
     {
-        $renderer->setBlock('money');
         $renderer->setVar('money_pattern', self::getPattern($form->getAttribute('currency')));
     }
 

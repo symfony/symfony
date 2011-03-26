@@ -1,6 +1,6 @@
 {% extends "TwigBundle::widgets.html.twig" %}
 
-{% block row %}
+{% block field__row %}
 {% spaceless %}
     <tr>
         <td>{{ renderer.label }}</td>
@@ -10,13 +10,13 @@
         </td>
     </tr>
 {% endspaceless %}
-{% endblock row %}
+{% endblock field__row %}
 
 {% block form__errors %}
 {% spaceless %}
     <tr>
         <td colspan="2">
-            {{ block('errors') }}
+            {{ block('field__errors') }}
         </td>
     </tr>
 {% endspaceless %}
@@ -29,7 +29,7 @@
 {% block form__widget %}
 {% spaceless %}
     <table>
-    {{ block('rows') }}
+    {{ block('field__rows') }}
     {{ renderer.rest }}
     </table>
 {% endspaceless %}

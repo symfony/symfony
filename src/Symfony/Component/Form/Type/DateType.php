@@ -77,9 +77,8 @@ class DateType extends AbstractType
             ->setAttribute('widget', $options['widget']);
     }
 
-    public function buildRenderer(FormRendererInterface $renderer, FormInterface $form)
+    public function buildRendererBottomUp(FormRendererInterface $renderer, FormInterface $form)
     {
-        $renderer->setBlock('date');
         $renderer->setVar('widget', $form->getAttribute('widget'));
 
         if ($renderer->hasChildren()) {

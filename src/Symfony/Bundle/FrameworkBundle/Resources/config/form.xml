@@ -11,6 +11,8 @@
         <parameter key="form.type.loader.tagged.class">Symfony\Bundle\FrameworkBundle\Form\ContainerAwareTypeLoader</parameter>
         <parameter key="form.guesser.validator.class">Symfony\Component\Form\Type\Guesser\ValidatorTypeGuesser</parameter>
         <parameter key="form.csrf_provider.class">Symfony\Component\Form\CsrfProvider\SessionCsrfProvider</parameter>
+        <parameter key="form.renderer.factory.loader.class">Symfony\Bundle\FrameworkBundle\Form\ContainerAwareRendererFactoryLoader</parameter>
+        <parameter key="form.renderer.factory.theme.class">Symfony\Component\Form\Renderer\ThemeRendererFactory</parameter>
         <parameter key="form.theme.factory.twig.class">Symfony\Component\Form\Renderer\Theme\TwigThemeFactory</parameter>
         <parameter key="form.theme.factory.php.class">Symfony\Component\Form\Renderer\Theme\PhpThemeFactory</parameter>
         <parameter key="form.theme.factory.phpengine.class">Symfony\Bundle\FrameworkBundle\Form\PhpEngineThemeFactory</parameter>
@@ -31,6 +33,7 @@
         <!-- FormFactory -->
         <service id="form.factory" class="%form.factory.class%">
             <argument type="service" id="form.type.loader.chain" />
+            <argument type="service" id="form.renderer.factory.loader" />
             <!--
             All services with tag "form.guesser" are inserted here by 
             AddFormGuessersPass
@@ -48,6 +51,32 @@
         <service id="form.csrf_provider" class="%form.csrf_provider.class%">
             <argument type="service" id="session" />
             <argument>%form.csrf_protection.secret%</argument>
+        </service>
+        
+        <!-- RendererFactoryLoader -->
+        <service id="form.renderer.factory.loader" class="%form.renderer.factory.loader.class%">
+            <argument type="service" id="service_container" />
+            <!--
+            All services with tag "form.renderer.factory" are inserted here by 
+            AddFormRendererFactoriesPass
+            -->
+            <argument type="collection" />
+        </service>
+        
+        <!-- RendererFactories -->
+        <service id="form.renderer.factory.twig" class="%form.renderer.factory.theme.class%">
+            <tag name="form.renderer.factory" alias="twig" />
+            <argument type="service" id="form.theme.factory.twig" />
+        </service>
+        
+        <service id="form.renderer.factory.default" class="%form.renderer.factory.theme.class%">
+            <tag name="form.renderer.factory" alias="default" />
+            <argument type="service" id="form.theme.factory.default" />
+        </service>
+        
+        <service id="form.renderer.factory.php" class="%form.renderer.factory.theme.class%">
+            <tag name="form.renderer.factory" alias="php" />
+            <argument type="service" id="form.theme.factory.php" />
         </service>
         
         <!-- Themes -->

@@ -24,8 +24,6 @@ class PasswordType extends AbstractType
 
     public function buildRenderer(FormRendererInterface $renderer, FormInterface $form)
     {
-        $renderer->setBlock('password');
-
         if ($form->getAttribute('always_empty') || !$form->isBound()) {
             $renderer->setVar('value', '');
         }

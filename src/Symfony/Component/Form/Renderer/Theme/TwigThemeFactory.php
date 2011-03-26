@@ -50,15 +50,17 @@ class TwigThemeFactory implements FormThemeFactoryInterface
      */
     public function create($template = null)
     {
-        if ($template === null) {
-            throw new FormException('Twig themes expect a template');
-        }
-
-        if (!is_string($template) && !$template instanceof \Twig_Template) {
+        if (null !== $template && !is_string($template) && !$template instanceof \Twig_Template) {
             throw new UnexpectedTypeException($template, 'string or Twig_Template');
         }
 
-        $templates = array_merge($this->fallbackTemplates, array($template));
+        $templates = $template
+            ? array_merge($this->fallbackTemplates, array($template))
+            : $this->fallbackTemplates;
+
+        if (count($templates) === 0) {
+            throw new FormException('Twig themes either need default templates or templates passed during creation');
+        }
 
         return new TwigTheme($this->environment, $templates);
     }

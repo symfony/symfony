@@ -11,16 +11,9 @@
 
 namespace Symfony\Component\Form\Renderer;
 
-class RendererVarBag extends \ArrayObject
+use Symfony\Component\Form\FormInterface;
+
+interface FormRendererFactoryInterface
 {
-    public function offsetGet($name)
-    {
-        $value = parent::offsetGet($name);
-
-        if (is_callable($value)) {
-            $value = $value();
-        }
-
-        return $value;
-    }
+    function create(FormInterface $form);
 }

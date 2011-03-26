@@ -21,7 +21,6 @@ abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
         $this->themeFactory = $this->createThemeFactory();
     }
 
@@ -64,7 +63,7 @@ abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
             'required' => true,
             'size' => 20,
             'attr' => array('accesskey' => 'G', 'title' => 'Foo'),
-            'renderer' => new ThemeRenderer($this->form, $this->themeFactory, null),
+            'renderer' => new ThemeRenderer($this->themeFactory, null),
         ));
 
         $this->assertEquals('test', $input->getAttribute('value'));
@@ -124,9 +123,9 @@ abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($matches, $nodeList->length);
     }
 
-    protected function renderAsDomElement($form, $section, $parameters)
+    protected function renderAsDomElement($block, $section, $parameters)
     {
-        $html = $this->themeFactory->create()->render($form, $section, $parameters);
+        $html = $this->themeFactory->create()->render(array($block), $section, $parameters);
         $dom = new \DomDocument('UTF-8');
         $dom->loadXml($html);
         return $dom->documentElement;

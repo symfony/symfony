@@ -18,8 +18,6 @@ interface FormRendererInterface
 {
     function setForm(FormInterface $form);
 
-    function setChildren(array $renderers);
-
     /**
      * Has this renderer a specific var?
      *

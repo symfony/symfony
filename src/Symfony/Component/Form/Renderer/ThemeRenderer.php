@@ -43,8 +43,6 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess
      */
     private $rendered = false;
 
-    private $children = array();
-
     public function __construct(FormThemeFactoryInterface $themeFactory, $template = null)
     {
         $this->themeFactory = $themeFactory;
@@ -83,11 +81,6 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess
     public function setForm(FormInterface $form)
     {
         $this->form = $form;
-    }
-
-    public function setChildren(array $renderers)
-    {
-        $this->children = $renderers;
     }
 
     public function setTemplate($template)
@@ -220,12 +213,14 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess
 
     public function offsetGet($name)
     {
-        return $this->children[$name];
+        $this->initialize();
+        return $this->vars['fields'][$name];
     }
 
     public function offsetExists($name)
     {
-        return isset($this->children[$name]);
+        $this->initialize();
+        return isset($this->vars['fields'][$name]);
     }
 
     public function offsetSet($name, $value)

@@ -91,8 +91,12 @@ class Filesystem
      */
     public function remove($files)
     {
-        if (!is_array($files)) {
+        if (!is_array($files) && !$files instanceof \Traversable) {
             $files = array($files);
+        }
+        
+        if($files instanceof \Traversable) {
+            $files = iterator_to_array($files);
         }
 
         $files = array_reverse($files);
@@ -102,14 +106,7 @@ class Filesystem
             }
 
             if (is_dir($file) && !is_link($file)) {
-                $fp = opendir($file);
-                while (false !== $item = readdir($fp)) {
-                    if (!in_array($item, array('.', '..'))) {
-                        $this->remove($file.'/'.$item);
-                    }
-                }
-                closedir($fp);
-
+                $this->remove(new \FilesystemIterator($file));
                 rmdir($file);
             } else {
                 unlink($file);

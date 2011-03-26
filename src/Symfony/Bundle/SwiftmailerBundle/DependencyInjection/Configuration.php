@@ -41,7 +41,7 @@ class Configuration
                 ->scalarNode('transport')
                     ->defaultValue('smtp')
                     ->validate()
-                        ->ifNotInArray(array ('smtp', 'mail', 'sendmail', 'gmail'))
+                        ->ifNotInArray(array ('smtp', 'mail', 'sendmail', 'gmail', null))
                         ->thenInvalid('The %s transport is not supported')
                     ->end()
                 ->end()

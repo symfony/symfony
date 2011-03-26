@@ -923,7 +923,9 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $this->request('GET', '/', array(), array(), true);
         $this->assertEquals("Hello World! My name is Bobby.", $this->response->getContent());
-        $this->assertEquals(100, $this->response->getTtl());
+
+        // check for 100 or 99 as the test can be executed after a second change
+        $this->assertTrue(in_array($this->response->getTtl(), array(99, 100)));
     }
 
     public function testEsiCacheForceValidation()

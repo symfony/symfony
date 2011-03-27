@@ -103,7 +103,7 @@ class FieldType extends AbstractType
             'max_length' => null,
             'property_path' => null,
             'by_reference' => true,
-            'validation_groups' => true,
+            'validation_groups' => null,
             'error_bubbling' => false,
             'error_mapping' => array(),
         );

@@ -61,7 +61,6 @@ class FormType extends AbstractType
             'csrf_field_name' => '_token',
             'csrf_provider' => null,
             'csrf_page_id' => get_class($this),
-            'validation_groups' => null,
             'virtual' => false,
             // Errors in forms bubble by default, so that form errors will
             // end up as global errors in the root form

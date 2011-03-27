@@ -19,7 +19,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class TwigThemeFactory implements FormThemeFactoryInterface
+class TwigThemeFactory implements ThemeFactoryInterface
 {
     /**
      * @var Twig_Environment
@@ -46,7 +46,7 @@ class TwigThemeFactory implements FormThemeFactoryInterface
     }
 
     /**
-     * @see Symfony\Component\Form\Renderer\Theme\FormThemeFactoryInterface::create()
+     * @see Symfony\Component\Form\Renderer\Theme\ThemeFactoryInterface::create()
      */
     public function create($template = null)
     {

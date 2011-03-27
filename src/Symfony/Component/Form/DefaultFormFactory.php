@@ -19,7 +19,7 @@ use Symfony\Component\Form\Type\FormTypeInterface;
 use Symfony\Component\Form\Type\AbstractFieldType;
 use Symfony\Component\Form\Type\Loader\TypeLoaderInterface;
 use Symfony\Component\Form\Type\Loader\DefaultTypeLoader;
-use Symfony\Component\Form\Renderer\Theme\FormThemeFactoryInterface;
+use Symfony\Component\Form\Renderer\Theme\ThemeFactoryInterface;
 use Symfony\Component\Form\Renderer\Theme\PhpThemeFactory;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\CsrfProvider\DefaultCsrfProvider;
@@ -55,14 +55,14 @@ class DefaultFormFactory extends FormFactory
     /**
      * Factory method to simplify creation of a default form factory.
      *
-     * @param FormThemeFactoryInterface $themeFactory
+     * @param ThemeFactoryInterface $themeFactory
      * @param ValidatorInterface $validator
      * @param CsrfProviderInterface $crsfProvider
      * @param TemporaryStorage $tempStorage
      * @param \Doctrine\ORM\EntityManager $entityManager
      * @return DefaultFormFactory
      */
-    public static function createInstance(FormThemeFactoryInterface $themeFactory,
+    public static function createInstance(ThemeFactoryInterface $themeFactory,
             ValidatorInterface $validator,
             CsrfProviderInterface $crsfProvider,
             TemporaryStorage $tempStorage,

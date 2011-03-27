@@ -26,7 +26,7 @@ use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
 use Symfony\Component\Form\DataTransformer\TransformationFailedException;
 use Symfony\Component\Form\DataMapper\DataMapperInterface;
 use Symfony\Component\Form\Validator\FormValidatorInterface;
-use Symfony\Component\Form\Renderer\FormRendererInterface;
+use Symfony\Component\Form\Renderer\ThemeRendererInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

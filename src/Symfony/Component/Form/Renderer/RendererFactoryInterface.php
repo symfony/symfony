@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Renderer;
 
 use Symfony\Component\Form\FormInterface;
 
-interface FormRendererFactoryInterface
+interface RendererFactoryInterface
 {
     function create(FormInterface $form);
 }

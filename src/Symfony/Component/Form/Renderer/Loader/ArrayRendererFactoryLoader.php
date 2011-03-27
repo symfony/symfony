@@ -13,17 +13,17 @@ namespace Symfony\Component\Form\Renderer\Loader;
 
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Renderer\FormRendererFactoryInterface;
+use Symfony\Component\Form\Renderer\RendererFactoryInterface;
 
-class ArrayRendererFactoryLoader implements FormRendererFactoryLoaderInterface
+class ArrayRendererFactoryLoader implements RendererFactoryLoaderInterface
 {
     private $factories;
 
     public function __construct(array $factories)
     {
         foreach ($factories as $factory) {
-            if (!$factory instanceof FormRendererFactoryInterface) {
-                throw new UnexpectedTypeException($factory, 'Symfony\Component\Form\Renderer\FormRendererFactoryInterface');
+            if (!$factory instanceof RendererFactoryInterface) {
+                throw new UnexpectedTypeException($factory, 'Symfony\Component\Form\Renderer\RendererFactoryInterface');
             }
         }
 

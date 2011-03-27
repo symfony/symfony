@@ -31,7 +31,7 @@ class PasswordValuePluginTest extends \PHPUnit_Framework_TestCase
               ->method('isBound')
               ->will($this->returnValue(true));
 
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\ThemeRendererInterface');
         $renderer->expects($this->once())
                 ->method('setVar')
                 ->with($this->equalTo('value'), $this->equalTo('pAs5w0rd'));
@@ -51,7 +51,7 @@ class PasswordValuePluginTest extends \PHPUnit_Framework_TestCase
               ->method('isBound')
               ->will($this->returnValue(false));
 
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\ThemeRendererInterface');
         $renderer->expects($this->once())
                 ->method('setVar')
                 ->with($this->equalTo('value'), $this->equalTo(''));

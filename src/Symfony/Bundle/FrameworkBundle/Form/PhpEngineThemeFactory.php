@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Form;
 
-use Symfony\Component\Form\Renderer\Theme\FormThemeFactoryInterface;
+use Symfony\Component\Form\Renderer\Theme\ThemeFactoryInterface;
 use Symfony\Component\Templating\PhpEngine;
 
 /**
@@ -19,7 +19,7 @@ use Symfony\Component\Templating\PhpEngine;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class PhpEngineThemeFactory implements FormThemeFactoryInterface
+class PhpEngineThemeFactory implements ThemeFactoryInterface
 {
     /**
      * @var PhpEngine
@@ -38,7 +38,7 @@ class PhpEngineThemeFactory implements FormThemeFactoryInterface
     }
 
     /**
-     * @see Symfony\Component\Form\Renderer\Theme\FormThemeFactoryInterface::create()
+     * @see Symfony\Component\Form\Renderer\Theme\ThemeFactoryInterface::create()
      */
     public function create($templateDir = null)
     {

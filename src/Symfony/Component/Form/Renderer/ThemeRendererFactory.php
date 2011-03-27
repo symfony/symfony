@@ -14,15 +14,15 @@ namespace Symfony\Component\Form\Renderer;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Renderer\ThemeRenderer;
-use Symfony\Component\Form\Renderer\Theme\FormThemeFactoryInterface;
+use Symfony\Component\Form\Renderer\Theme\ThemeFactoryInterface;
 
-class ThemeRendererFactory implements FormRendererFactoryInterface
+class ThemeRendererFactory implements RendererFactoryInterface
 {
     private $themeFactory;
 
     private $defaultTemplate;
 
-    public function __construct(FormThemeFactoryInterface $themeFactory, $defaultTemplate = null)
+    public function __construct(ThemeFactoryInterface $themeFactory, $defaultTemplate = null)
     {
         $this->themeFactory = $themeFactory;
         $this->defaultTemplate = $defaultTemplate;

@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Type;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\DataTransformer\BooleanToStringTransformer;
-use Symfony\Component\Form\Renderer\FormRendererInterface;
+use Symfony\Component\Form\Renderer\ThemeRendererInterface;
 
 class CheckboxType extends AbstractType
 {
@@ -24,7 +24,7 @@ class CheckboxType extends AbstractType
             ->setAttribute('value', $options['value']);
     }
 
-    public function buildRenderer(FormRendererInterface $renderer, FormInterface $form)
+    public function buildRenderer(ThemeRendererInterface $renderer, FormInterface $form)
     {
         $renderer->setVar('value', $form->getAttribute('value'));
         $renderer->setVar('checked', (bool)$form->getData());

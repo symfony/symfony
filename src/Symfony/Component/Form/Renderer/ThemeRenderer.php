@@ -12,10 +12,10 @@
 namespace Symfony\Component\Form\Renderer;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Renderer\Theme\FormThemeInterface;
-use Symfony\Component\Form\Renderer\Theme\FormThemeFactoryInterface;
+use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
+use Symfony\Component\Form\Renderer\Theme\ThemeFactoryInterface;
 
-class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAggregate
+class ThemeRenderer implements ThemeRendererInterface, \ArrayAccess, \IteratorAggregate
 {
     private $blockHistory = array();
 
@@ -40,7 +40,7 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAgg
 
     private $children = array();
 
-    public function __construct(FormThemeFactoryInterface $themeFactory)
+    public function __construct(ThemeFactoryInterface $themeFactory)
     {
         $this->themeFactory = $themeFactory;
     }
@@ -60,7 +60,7 @@ class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAgg
         $this->setTheme($this->themeFactory->create($template));
     }
 
-    public function setTheme(FormThemeInterface $theme)
+    public function setTheme(ThemeInterface $theme)
     {
         $this->theme = $theme;
     }

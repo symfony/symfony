@@ -39,14 +39,14 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->themeFactory = $this->getMock('Symfony\Component\Form\Renderer\Theme\FormThemeFactoryInterface');
+        $this->themeFactory = $this->getMock('Symfony\Component\Form\Renderer\Theme\ThemeFactoryInterface');
         $this->themeFactory->expects($this->any())
             ->method('create')
-            ->will($this->returnValue($this->getMock('Symfony\Component\Form\Renderer\Theme\FormThemeInterface')));
+            ->will($this->returnValue($this->getMock('Symfony\Component\Form\Renderer\Theme\ThemeInterface')));
         $this->csrfProvider = $this->getMock('Symfony\Component\Form\CsrfProvider\CsrfProviderInterface');
         $this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->rendererFactoryLoader = $this->getMock('Symfony\Component\Form\Renderer\Loader\FormRendererFactoryLoaderInterface');
+        $this->rendererFactoryLoader = $this->getMock('Symfony\Component\Form\Renderer\Loader\RendererFactoryLoaderInterface');
 
         $this->storage = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\TemporaryStorage')
             ->disableOriginalConstructor()

@@ -12,10 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\Form;
 
 use Symfony\Component\Form\Exception\FormException;
-use Symfony\Component\Form\Renderer\Loader\FormRendererFactoryLoaderInterface;
+use Symfony\Component\Form\Renderer\Loader\RendererFactoryLoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ContainerAwareRendererFactoryLoader implements FormRendererFactoryLoaderInterface
+class ContainerAwareRendererFactoryLoader implements RendererFactoryLoaderInterface
 {
     private $container;
 

@@ -18,7 +18,7 @@ use Symfony\Component\Form\Exception\FormException;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class PhpThemeFactory implements FormThemeFactoryInterface
+class PhpThemeFactory implements ThemeFactoryInterface
 {
     /**
      * @var string
@@ -31,7 +31,7 @@ class PhpThemeFactory implements FormThemeFactoryInterface
     }
 
     /**
-     * @see Symfony\Component\Form\Renderer\Theme\FormThemeFactoryInterface::create()
+     * @see Symfony\Component\Form\Renderer\Theme\ThemeFactoryInterface::create()
      */
     public function create($template = null)
     {

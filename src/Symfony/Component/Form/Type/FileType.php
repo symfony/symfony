@@ -19,7 +19,7 @@ use Symfony\Component\Form\DataTransformer\DataTransformerChain;
 use Symfony\Component\Form\DataTransformer\ReversedTransformer;
 use Symfony\Component\Form\DataTransformer\FileToStringTransformer;
 use Symfony\Component\Form\DataTransformer\FileToArrayTransformer;
-use Symfony\Component\Form\Renderer\FormRendererInterface;
+use Symfony\Component\Form\Renderer\ThemeRendererInterface;
 use Symfony\Component\HttpFoundation\File\TemporaryStorage;
 
 class FileType extends AbstractType
@@ -48,7 +48,7 @@ class FileType extends AbstractType
             ->add('name', 'hidden');
     }
 
-    public function buildRendererBottomUp(FormRendererInterface $renderer, FormInterface $form)
+    public function buildRendererBottomUp(ThemeRendererInterface $renderer, FormInterface $form)
     {
         $renderer->setVar('multipart', true);
         $renderer['file']->setVar('type', 'file');

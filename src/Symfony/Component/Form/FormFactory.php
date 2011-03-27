@@ -17,7 +17,7 @@ use Symfony\Component\Form\Type\Guesser\TypeGuesserInterface;
 use Symfony\Component\Form\Type\Guesser\Guess;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Renderer\Loader\FormRendererFactoryLoaderInterface;
+use Symfony\Component\Form\Renderer\Loader\RendererFactoryLoaderInterface;
 
 class FormFactory implements FormFactoryInterface
 {
@@ -27,7 +27,7 @@ class FormFactory implements FormFactoryInterface
 
     private $guessers = array();
 
-    public function __construct(TypeLoaderInterface $typeLoader, FormRendererFactoryLoaderInterface $rendererFactoryLoader, array $guessers = array())
+    public function __construct(TypeLoaderInterface $typeLoader, RendererFactoryLoaderInterface $rendererFactoryLoader, array $guessers = array())
     {
         foreach ($guessers as $guesser) {
             if (!$guesser instanceof TypeGuesserInterface) {

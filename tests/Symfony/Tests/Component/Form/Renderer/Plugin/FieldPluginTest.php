@@ -48,7 +48,7 @@ class FieldPluginTest extends \PHPUnit_Framework_TestCase
               ->will($this->returnValue(true));
 
 
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\ThemeRendererInterface');
 
         $renderer->expects($this->at(0))
                 ->method('setVar')

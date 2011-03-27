@@ -22,7 +22,7 @@ class ParentNamePluginTest extends \PHPUnit_Framework_TestCase
 
     public function testSetUpHasParent()
     {
-        $parentRenderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
+        $parentRenderer = $this->getMock('Symfony\Component\Form\Renderer\ThemeRendererInterface');
         $parentRenderer->expects($this->once())
                 ->method('getVar')
                 ->will($this->returnValue("parentName"));
@@ -41,7 +41,7 @@ class ParentNamePluginTest extends \PHPUnit_Framework_TestCase
               ->method('hasParent')
               ->will($this->returnValue(true));
 
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\ThemeRendererInterface');
         $renderer->expects($this->once())
                 ->method('setVar')
                 ->with($this->equalTo('name'), $this->equalTo('parentName'));
@@ -60,7 +60,7 @@ class ParentNamePluginTest extends \PHPUnit_Framework_TestCase
               ->method('hasParent')
               ->will($this->returnValue(false));
 
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\ThemeRendererInterface');
         $renderer->expects($this->never())
                 ->method('setVar');
 

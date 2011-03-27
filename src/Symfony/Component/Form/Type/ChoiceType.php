@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ChoiceList\DefaultChoiceList;
 use Symfony\Component\Form\EventListener\FixRadioInputListener;
-use Symfony\Component\Form\Renderer\FormRendererInterface;
+use Symfony\Component\Form\Renderer\ThemeRendererInterface;
 use Symfony\Component\Form\DataTransformer\ScalarToChoicesTransformer;
 use Symfony\Component\Form\DataTransformer\ArrayToChoicesTransformer;
 
@@ -52,7 +52,7 @@ class ChoiceType extends AbstractType
         }
     }
 
-    public function buildRenderer(FormRendererInterface $renderer, FormInterface $form)
+    public function buildRenderer(ThemeRendererInterface $renderer, FormInterface $form)
     {
         $choiceList = $form->getAttribute('choice_list');
 

@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Renderer\FormRendererInterface;
+use Symfony\Component\Form\Renderer\ThemeRendererInterface;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\DataMapper\PropertyPathMapper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -36,7 +36,7 @@ class FormType extends AbstractType
         }
     }
 
-    public function buildRendererBottomUp(FormRendererInterface $renderer, FormInterface $form)
+    public function buildRendererBottomUp(ThemeRendererInterface $renderer, FormInterface $form)
     {
         $multipart = false;
 

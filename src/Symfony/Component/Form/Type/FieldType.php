@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Type;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Renderer\FormRendererInterface;
+use Symfony\Component\Form\Renderer\ThemeRendererInterface;
 use Symfony\Component\Form\EventListener\TrimListener;
 use Symfony\Component\Form\Validator\DefaultValidator;
 use Symfony\Component\Form\Validator\DelegatingValidator;
@@ -63,7 +63,7 @@ class FieldType extends AbstractType
         }
     }
 
-    public function buildRenderer(FormRendererInterface $renderer, FormInterface $form)
+    public function buildRenderer(ThemeRendererInterface $renderer, FormInterface $form)
     {
         if ($renderer->hasParent()) {
             $parentId = $renderer->getParent()->getVar('id');

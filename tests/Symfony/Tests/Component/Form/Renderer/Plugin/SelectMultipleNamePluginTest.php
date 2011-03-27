@@ -23,7 +23,7 @@ class SelectMultipleNamePluginTest extends \PHPUnit_Framework_TestCase
     public function testSetUp()
     {
         $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\ThemeRendererInterface');
         $renderer->expects($this->once())
                 ->method('getVar')
                 ->with($this->equalTo('name'))

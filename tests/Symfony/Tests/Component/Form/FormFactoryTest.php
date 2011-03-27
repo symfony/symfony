@@ -27,7 +27,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->typeLoader = $this->getMock('Symfony\Component\Form\Type\Loader\TypeLoaderInterface');
-        $this->rendererFactoryLoader = $this->getMock('Symfony\Component\Form\Renderer\Loader\FormRendererFactoryLoaderInterface');
+        $this->rendererFactoryLoader = $this->getMock('Symfony\Component\Form\Renderer\Loader\RendererFactoryLoaderInterface');
         $this->factory = new FormFactory($this->typeLoader, $this->rendererFactoryLoader);
     }
 

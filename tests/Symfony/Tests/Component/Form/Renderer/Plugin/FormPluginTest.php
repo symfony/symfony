@@ -24,7 +24,7 @@ class FormPluginTest extends \PHPUnit_Framework_TestCase
     {
         $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
 
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\ThemeRendererInterface');
 
         $renderer->expects($this->at(0))
                 ->method('setVar')

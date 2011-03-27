@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\ChoiceList\PaddedChoiceList;
 use Symfony\Component\Form\ChoiceList\MonthChoiceList;
-use Symfony\Component\Form\Renderer\FormRendererInterface;
+use Symfony\Component\Form\Renderer\ThemeRendererInterface;
 use Symfony\Component\Form\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\DataTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\DataTransformer\DateTimeToStringTransformer;
@@ -77,7 +77,7 @@ class DateType extends AbstractType
             ->setAttribute('widget', $options['widget']);
     }
 
-    public function buildRendererBottomUp(FormRendererInterface $renderer, FormInterface $form)
+    public function buildRendererBottomUp(ThemeRendererInterface $renderer, FormInterface $form)
     {
         $renderer->setVar('widget', $form->getAttribute('widget'));
 

@@ -27,7 +27,7 @@ class CheckedPluginTest extends \PHPUnit_Framework_TestCase
               ->method('getData')
               ->will($this->returnValue(1));
 
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\ThemeRendererInterface');
         $renderer->expects($this->once())
                 ->method('setVar')
                 ->with($this->equalTo('checked'), $this->equalTo(true));
@@ -43,7 +43,7 @@ class CheckedPluginTest extends \PHPUnit_Framework_TestCase
               ->method('getData')
               ->will($this->returnValue(0));
 
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\FormRendererInterface');
+        $renderer = $this->getMock('Symfony\Component\Form\Renderer\ThemeRendererInterface');
         $renderer->expects($this->once())
                 ->method('setVar')
                 ->with($this->equalTo('checked'), $this->equalTo(false));

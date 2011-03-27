@@ -17,8 +17,6 @@ use Symfony\Component\Form\Renderer\Theme\FormThemeFactoryInterface;
 
 class ThemeRenderer implements FormRendererInterface, \ArrayAccess, \IteratorAggregate
 {
-    private $form;
-
     private $blockHistory = array();
 
     private $themeFactory;

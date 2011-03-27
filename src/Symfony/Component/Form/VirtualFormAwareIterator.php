@@ -19,7 +19,7 @@ namespace Symfony\Component\Form;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class VirtualFormIterator extends \ArrayIterator implements \RecursiveIterator
+class VirtualFormAwareIterator extends \ArrayIterator implements \RecursiveIterator
 {
     public function getChildren()
     {

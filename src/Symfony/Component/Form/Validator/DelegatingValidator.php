@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Validator;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\VirtualFormIterator;
+use Symfony\Component\Form\VirtualFormAwareIterator;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ExecutionContext;
@@ -79,7 +79,7 @@ class DelegatingValidator implements FormValidatorInterface
             $mapping['/^'.preg_quote($formPath . 'data.' . $nestedDataPath).'(?!\w)/'] = $namePath . $nestedNamePath;
         }
 
-        $iterator = new VirtualFormIterator($form->getChildren());
+        $iterator = new VirtualFormAwareIterator($form->getChildren());
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $child) {
@@ -116,7 +116,7 @@ class DelegatingValidator implements FormValidatorInterface
             $mapping['/^'.preg_quote($dataPath . '.' . $nestedDataPath).'(?!\w)/'] = $namePath . $nestedNamePath;
         }
 
-        $iterator = new VirtualFormIterator($form->getChildren());
+        $iterator = new VirtualFormAwareIterator($form->getChildren());
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $child) {
@@ -139,7 +139,7 @@ class DelegatingValidator implements FormValidatorInterface
             $namePath .= '.';
         }
 
-        $iterator = new VirtualFormIterator($form->getChildren());
+        $iterator = new VirtualFormAwareIterator($form->getChildren());
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $child) {

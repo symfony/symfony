@@ -93,6 +93,12 @@ class PhpProcess extends Process
             }
         }
 
+        if ($php = getenv('PHP_PEAR_PHP_BIN')) {
+            if (is_executable($php)) {
+                return $php;
+            }
+        }
+
         throw new \RuntimeException('Unable to find the PHP executable.');
     }
 }

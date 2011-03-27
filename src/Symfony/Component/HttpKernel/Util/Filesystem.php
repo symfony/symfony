@@ -55,7 +55,7 @@ class Filesystem
      */
     public function mkdir($dirs, $mode = 0777)
     {
-        $ret = false;
+        $ret = true;
         foreach ($this->toIterator($dirs) as $dir) {
             if (is_dir($dir)) {
                 continue;

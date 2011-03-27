@@ -255,12 +255,9 @@ class Form implements \IteratorAggregate, FormInterface
         $this->dispatcher->dispatch(Events::filterSetData, $event);
         $appData = $event->getData();
 
-        // Fix data if empty
-        if (!$this->clientTransformer) {
-            // Treat data as strings unless a value transformer exists
-            if (is_scalar($appData)) {
-                $appData = (string)$appData;
-            }
+        // Treat data as strings unless a value transformer exists
+        if (!$this->clientTransformer && !$this->normTransformer && is_scalar($appData)) {
+            $appData = (string)$appData;
         }
 
         // Synchronize representations - must not change the content!

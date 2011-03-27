@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Validator;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\VirtualFormAwareIterator;
+use Symfony\Component\Form\Util\VirtualFormAwareIterator;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ExecutionContext;

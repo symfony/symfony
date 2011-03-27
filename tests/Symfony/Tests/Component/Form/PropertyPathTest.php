@@ -14,7 +14,7 @@ namespace Symfony\Tests\Component\Form;
 require_once __DIR__ . '/Fixtures/Author.php';
 require_once __DIR__ . '/Fixtures/Magician.php';
 
-use Symfony\Component\Form\PropertyPath;
+use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Tests\Component\Form\Fixtures\Author;
 use Symfony\Tests\Component\Form\Fixtures\Magician;
 

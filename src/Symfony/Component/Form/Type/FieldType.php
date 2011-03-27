@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Type;
 
-use Symfony\Component\Form\PropertyPath;
+use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Renderer\FormRendererInterface;

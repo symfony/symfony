@@ -13,7 +13,7 @@ namespace Symfony\Tests\Component\Form\Validator;
 
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\PropertyPath;
+use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Validator\DelegatingValidator;
 use Symfony\Component\Form\DataTransformer\TransformationFailedException;
 use Symfony\Component\Validator\ConstraintViolation;

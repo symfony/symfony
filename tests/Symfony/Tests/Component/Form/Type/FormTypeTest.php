@@ -20,7 +20,7 @@ use Symfony\Component\Form\Field;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\DataError;
 use Symfony\Component\Form\HiddenField;
-use Symfony\Component\Form\PropertyPath;
+use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\DataTransformer\CallbackTransformer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;

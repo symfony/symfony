@@ -17,7 +17,7 @@ require_once __DIR__ . '/../Fixtures/FixedDataTransformer.php';
 require_once __DIR__ . '/../Fixtures/FixedFilterListener.php';
 
 use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
-use Symfony\Component\Form\PropertyPath;
+use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\DataTransformer\TransformationFailedException;

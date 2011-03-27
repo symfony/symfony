@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form;
+namespace Symfony\Component\Form\Util;
 
 /**
  * Iterator that traverses fields of a field group

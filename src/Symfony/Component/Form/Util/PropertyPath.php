@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form;
+namespace Symfony\Component\Form\Util;
 
 use Symfony\Component\Form\Exception\InvalidPropertyPathException;
 use Symfony\Component\Form\Exception\InvalidPropertyException;

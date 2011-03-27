@@ -89,7 +89,7 @@
             <argument type="service" id="logger" on-invalid="null" />
         </service>
         <service id="doctrine.odm.mongodb.data_collector" class="%doctrine.odm.mongodb.data_collector_class%" public="false">
-            <tag name="data_collector" template="DoctrineMongoDBBundle:Collector:mongodb" id="mongodb" />
+            <tag name="data_collector" template="DoctrineMongoDB:Collector:mongodb" id="mongodb" />
             <argument type="service" id="doctrine.odm.mongodb.logger" />
         </service>
 

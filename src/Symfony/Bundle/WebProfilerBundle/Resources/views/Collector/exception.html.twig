@@ -1,4 +1,4 @@
-{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+{% extends 'WebProfiler:Profiler:layout.html.twig' %}
 
 {% block head %}
     <link href="{{ asset('bundles/framework/css/exception.css') }}" rel="stylesheet" type="text/css" media="screen" />
@@ -25,6 +25,6 @@
             <em>No exception was thrown and uncaught during the request.</em>
         </p>
     {% else %}
-        {% render 'WebProfilerBundle:Exception:show' with { 'exception': collector.exception, 'format': 'html' } %}
+        {% render 'WebProfiler:Exception:show' with { 'exception': collector.exception, 'format': 'html' } %}
     {% endif %}
 {% endblock %}

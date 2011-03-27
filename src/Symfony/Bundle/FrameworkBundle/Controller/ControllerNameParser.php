@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /**
  * ControllerNameParser converts controller from the short notation a:b:c
- * (BlogBundle:Post:index) to a fully-qualified class::method string
+ * (Blog:Post:index) to a fully-qualified class::method string
  * (Bundle\BlogBundle\Controller\PostController::indexAction).
  *
  * @author Fabien Potencier <fabien@symfony.com>

@@ -39,7 +39,7 @@ class ProfilerController extends ContainerAware
         $profiler = $this->container->get('profiler')->loadFromToken($token);
 
         if ($profiler->isEmpty()) {
-            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:notfound.html.twig', array('token' => $token));
+            return $this->container->get('templating')->renderResponse('WebProfiler:Profiler:notfound.html.twig', array('token' => $token));
         }
 
         if (!$profiler->has($panel)) {
@@ -156,7 +156,7 @@ class ProfilerController extends ContainerAware
             // the profiler is not enabled
         }
 
-        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:toolbar.html.twig', array(
+        return $this->container->get('templating')->renderResponse('WebProfiler:Profiler:toolbar.html.twig', array(
             'position'     => $position,
             'profiler'     => $profiler,
             'templates'    => $this->getTemplates($profiler),
@@ -180,7 +180,7 @@ class ProfilerController extends ContainerAware
         $limit = $session->get('_profiler_search_limit');
         $token = $session->get('_profiler_search_token');
 
-        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:search.html.twig', array(
+        return $this->container->get('templating')->renderResponse('WebProfiler:Profiler:search.html.twig', array(
             'token'    => $token,
             'ip'       => $ip,
             'url'      => $url,
@@ -205,7 +205,7 @@ class ProfilerController extends ContainerAware
         $url = $session->get('_profiler_search_url');
         $limit = $session->get('_profiler_search_limit');
 
-        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:results.html.twig', array(
+        return $this->container->get('templating')->renderResponse('WebProfiler:Profiler:results.html.twig', array(
             'token'    => $token,
             'profiler' => $profiler,
             'tokens'   => $profiler->find($ip, $url, $limit),

@@ -16,6 +16,7 @@ use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
 use Symfony\Component\Form\Validator\FormValidatorInterface;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Type\FormTypeInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -312,8 +313,8 @@ class FormBuilder
             throw new UnexpectedTypeException($name, 'string');
         }
 
-        if (null !== $type && !is_string($type)) {
-            throw new UnexpectedTypeException($type, 'string');
+        if (null !== $type && !is_string($type) && !$type instanceof FormTypeInterface) {
+            throw new UnexpectedTypeException($type, 'string or Symfony\Component\Form\Type\FormTypeInterface');
         }
 
         $this->children[$name] = array(

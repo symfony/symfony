@@ -59,6 +59,13 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->builder->has('foo'));
     }
 
+    public function testAddFormType()
+    {
+        $this->assertFalse($this->builder->has('foo'));
+        $this->builder->add('foo', $this->getMock('Symfony\Component\Form\Type\FormTypeInterface'));
+        $this->assertTrue($this->builder->has('foo'));
+    }
+
     public function testRemove()
     {
         $this->builder->add('foo', 'text');

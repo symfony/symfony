@@ -78,8 +78,8 @@ class PhpProcess extends Process
      */
     private function getPhpBinary()
     {
-        if (getenv('PHP_PATH')) {
-            if (!is_executable($php = getenv('PHP_PATH'))) {
+        if ($php = getenv('PHP_PATH')) {
+            if (!is_executable($php)) {
                 throw new \RuntimeException('The defined PHP_PATH environment variable is not a valid PHP executable.');
             }
 

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Renderer;
 
-interface ThemeRendererInterface
+interface ThemeRendererInterface extends RendererInterface
 {
     /**
      * Set a renderer variable that is used to render a relevant part of the attached field.

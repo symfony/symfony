@@ -164,12 +164,17 @@ class ThemeRenderer implements ThemeRendererInterface, \ArrayAccess, \IteratorAg
         return $this->render('enctype', $this->vars);
     }
 
-    protected function render($part, array $vars = array())
+    protected function renderPart($part, array $vars = array())
     {
         return $this->getTheme()->render($this->blockHistory, $part, array_replace(
             $this->vars,
             $vars
         ));
+    }
+
+    public function render(array $vars = array())
+    {
+        return $this->getWidget($vars);
     }
 
     public function getParent()

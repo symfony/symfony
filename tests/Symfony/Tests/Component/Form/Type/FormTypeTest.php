@@ -376,51 +376,62 @@ class FormTypeTest extends TestCase
         $form->setData(new Author());
     }
 
-    public function testSetDataToNullCreatesObjectIfClassAvailable()
+    public function testBindWithEmptyDataCreatesObjectIfClassAvailable()
     {
         $form = $this->factory->create('form', 'author', array(
             'data_class' => 'Symfony\Tests\Component\Form\Fixtures\Author',
         ));
+        $form->add($this->factory->create('field', 'firstName'));
 
-        $form->setData(null);
+        $form->bind(array('firstName' => 'Bernhard'));
 
-        $this->assertEquals(new Author(), $form->getData());
+        $author = new Author();
+        $author->firstName = 'Bernhard';
+
+        $this->assertEquals($author, $form->getData());
     }
 
     /*
      * We need something to write the field values into
      */
-    public function testSetDataToNullStoresArrayIfNoClassAvailable()
+    public function testBindWithEmptyDataStoresArrayIfNoClassAvailable()
     {
         $form = $this->factory->create('form', 'author');
+        $form->add($this->factory->create('field', 'firstName'));
 
-        $form->setData(null);
+        $form->bind(array('firstName' => 'Bernhard'));
 
-        $this->assertSame(array(), $form->getData());
+        $this->assertSame(array('firstName' => 'Bernhard'), $form->getData());
     }
 
-    public function testSetDataToNullUsesEmptyData()
+    public function testBindWithEmptyDataUsesEmptyData()
     {
         $author = new Author();
+
         $form = $this->factory->create('form', 'author', array(
             'empty_data' => $author,
         ));
+        $form->add($this->factory->create('field', 'firstName'));
 
-        $form->setData(null);
+        $form->bind(array('firstName' => 'Bernhard'));
 
         $this->assertSame($author, $form->getData());
+        $this->assertEquals('Bernhard', $author->firstName);
     }
 
-    public function testSetDataToNullAcceptsClosureEmptyData()
+    public function testBindWithEmptyDataAcceptsClosureEmptyData()
     {
         $author = new Author();
+
         $form = $this->factory->create('form', 'author', array(
             'empty_data' => function () use ($author) { return $author; },
         ));
+        $form->add($this->factory->create('field', 'firstName'));
 
-        $form->setData(null);
+        $form->bind(array('firstName' => 'Bernhard'));
 
         $this->assertSame($author, $form->getData());
+        $this->assertEquals('Bernhard', $author->firstName);
     }
 
     public function testSubmitUpdatesTransformedDataFromAllFields()

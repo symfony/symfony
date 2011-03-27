@@ -257,14 +257,6 @@ class Form implements \IteratorAggregate, FormInterface
 
         // Fix data if empty
         if (!$this->clientTransformer) {
-            if (null === $appData && !$this->normTransformer) {
-                $appData = $this->emptyData;
-
-                if ($appData instanceof \Closure) {
-                    $appData = $appData->__invoke();
-                }
-            }
-
             // Treat data as strings unless a value transformer exists
             if (is_scalar($appData)) {
                 $appData = (string)$appData;
@@ -345,6 +337,15 @@ class Form implements \IteratorAggregate, FormInterface
             // Merge form data from children into existing client data
             if ($this->dataMapper) {
                 $clientData = $this->getClientData();
+
+                // Create new structure to write the values into
+                if (null === $clientData || '' === $clientData) {
+                    $clientData = $this->emptyData;
+
+                    if ($clientData instanceof \Closure) {
+                        $clientData = $clientData->__invoke();
+                    }
+                }
 
                 $this->dataMapper->mapFormsToData($this->children, $clientData);
             }

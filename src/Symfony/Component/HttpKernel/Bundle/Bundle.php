@@ -61,10 +61,10 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      */
     public function build(ContainerBuilder $container)
     {
-        $class = $this->getNamespace().'\\DependencyInjection\\'.str_replace('Bundle', 'Extension', $this->getName());
+        $class = $this->getNamespace().'\\DependencyInjection\\'.$this->getName().'Extension';
         if (class_exists($class)) {
             $extension = new $class();
-            $alias = Container::underscore(str_replace('Bundle', '', $this->getName()));
+            $alias = Container::underscore($this->getName());
             if ($alias !== $extension->getAlias()) {
                 throw new \LogicException(sprintf('The extension alias for the default extension of a bundle must be the underscored version of the bundle name ("%s" vs "%s")', $alias, $extension->getAlias()));
             }

@@ -101,7 +101,6 @@ class DateType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'template' => 'date',
             'years' => range(date('Y') - 5, date('Y') + 5),
             'months' => range(1, 12),
             'days' => range(1, 31),

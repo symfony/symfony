@@ -24,7 +24,6 @@ class PercentType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'template' => 'percent',
             'precision' => 0,
             'type' => 'fractional',
         );

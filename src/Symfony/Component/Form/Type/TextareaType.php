@@ -15,13 +15,6 @@ use Symfony\Component\Form\FormBuilder;
 
 class TextareaType extends AbstractType
 {
-    public function getDefaultOptions(array $options)
-    {
-        return array(
-            'template' => 'textarea',
-        );
-    }
-
     public function getParent(array $options)
     {
         return 'field';

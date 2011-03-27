@@ -56,7 +56,6 @@ class FormType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'template' => 'form',
             'data_constructor' => null,
             'csrf_protection' => true,
             'csrf_field_name' => '_token',

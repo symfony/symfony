@@ -96,7 +96,6 @@ class DateTimeType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'template' => 'datetime',
             'input' => 'datetime',
             'with_seconds' => false,
             'data_timezone' => null,

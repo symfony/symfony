@@ -57,7 +57,6 @@ class FileType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'template' => 'file',
             'type' => 'string',
             'csrf_protection' => false,
         );

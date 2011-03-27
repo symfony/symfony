@@ -80,7 +80,6 @@ class TimeType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'template' => 'time',
             'hours' => range(0, 23),
             'minutes' => range(0, 59),
             'seconds' => range(0, 59),

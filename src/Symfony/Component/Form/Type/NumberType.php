@@ -24,7 +24,6 @@ class NumberType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'template' => 'number',
             // default precision is locale specific (usually around 3)
             'precision' => null,
             'grouping' => false,

@@ -34,7 +34,6 @@ class CollectionType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'template' => 'collection',
             'modifiable' => false,
             'prototype'  => true,
             'type' => 'text',

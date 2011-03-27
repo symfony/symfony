@@ -95,7 +95,6 @@ class FieldType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'template' => 'text', // TODO remove me
             'data' => null,
             'data_class' => null,
             'trim' => true,

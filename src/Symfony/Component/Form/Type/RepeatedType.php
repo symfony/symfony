@@ -29,7 +29,6 @@ class RepeatedType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'template' => 'repeated',
             'type' => 'text',
             'options' => array(),
             'first_name' => 'first',

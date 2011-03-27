@@ -18,7 +18,6 @@ class HiddenType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'template' => 'hidden',
             // Pass errors to the parent
             'error_bubbling' => true,
         );

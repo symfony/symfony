@@ -1,7 +1,7 @@
 {% block field__rows %}
 {% spaceless %}
     {{ renderer.errors }}
-    {% for field in fields %}
+    {% for field in renderer %}
         {{ field.row }}
     {% endfor %}
 {% endspaceless %}
@@ -27,7 +27,7 @@
 
 {% block field__rest %}
 {% spaceless %}
-    {% for field in fields %}
+    {% for field in renderer %}
         {% if not field.rendered %}
             {{ field.row }}
         {% endif %}
@@ -105,7 +105,7 @@
 {% block choice__widget %}
 {% spaceless %}
     {% if expanded %}
-        {% for choice, field in fields %}
+        {% for choice, field in renderer %}
             {{ field.widget }}
             {{ field.label(choice_list.label(choice)) }}
         {% endfor %}
@@ -140,10 +140,10 @@
 
 {% block date_time__widget %}
 {% spaceless %}
-    {{ fields.date.errors }}
-    {{ fields.time.errors }}
-    {{ fields.date.widget }}
-    {{ fields.time.widget }}
+    {{ renderer.date.errors }}
+    {{ renderer.time.errors }}
+    {{ renderer.date.widget }}
+    {{ renderer.time.widget }}
 {% endspaceless %}
 {% endblock date_time__widget %}
 
@@ -153,9 +153,9 @@
         {{ block('text__widget') }}
     {% else %}
         {{ date_pattern|replace({ 
-            '{{ year }}': fields.year.widget, 
-            '{{ month }}': fields.month.widget, 
-            '{{ day }}': fields.day.widget 
+            '{{ year }}': renderer.year.widget, 
+            '{{ month }}': renderer.month.widget, 
+            '{{ day }}': renderer.day.widget 
         })|raw }}
     {% endif %}
 {% endspaceless %}
@@ -163,7 +163,7 @@
 
 {% block time__widget %}
 {% spaceless %}
-    {{ fields.hour.widget({ 'size': '1' }) }}:{{ fields.minute.widget({ 'size': '1' }) }}{% if with_seconds %}:{{ fields.second.widget({ 'size': '1' }) }}{% endif %}
+    {{ renderer.hour.widget({ 'size': '1' }) }}:{{ renderer.minute.widget({ 'size': '1' }) }}{% if with_seconds %}:{{ renderer.second.widget({ 'size': '1' }) }}{% endif %}
 {% endspaceless %}
 {% endblock time__widget %}
 
@@ -203,9 +203,9 @@
 
 {% block file__widget %}
 {% spaceless %}
-    {{ fields.file.widget }}
-    {{ fields.token.widget }}
-    {{ fields.name.widget }}
+    {{ renderer.file.widget }}
+    {{ renderer.token.widget }}
+    {{ renderer.name.widget }}
 {% endspaceless %}
 {% endblock file__widget %}
 

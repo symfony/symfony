@@ -52,7 +52,6 @@ class FormType extends AbstractType
         }
 
         $renderer->setVar('multipart', $multipart);
-        $renderer->setVar('fields', $renderer->getChildren());
     }
 
     public function getDefaultOptions(array $options)

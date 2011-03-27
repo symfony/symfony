@@ -10,8 +10,8 @@
     />
 <?php else: ?>
     <?php echo str_replace(array('{{ year }}', '{{ month }}', '{{ day }}'), array(
-        $fields['year']->getWidget(),
-        $fields['month']->getWidget(),
-        $fields['day']->getWidget(),
+        $renderer['year']->getWidget(),
+        $renderer['month']->getWidget(),
+        $renderer['day']->getWidget(),
     ), $date_pattern) ?>
 <?php endif ?>

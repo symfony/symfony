@@ -38,16 +38,18 @@ class ThemeRendererTest extends \PHPUnit_Framework_TestCase
 
     public function testIterator()
     {
-        $themeFactory = $this->createThemeFactory();
+        $fields = array(
+            'foo' => $this->getMock('Symfony\Tests\Component\Form\FormInterface'),
+            'bar' => $this->getMock('Symfony\Tests\Component\Form\FormInterface'),
+        );
 
+        $themeFactory = $this->createThemeFactory();
         $renderer = new ThemeRenderer($themeFactory);
-        $renderer->setVar('fields', array('foo' => 'baz', 'bar' => 'baz'));
+        $renderer->setChildren($fields);
 
         $this->assertFalse($renderer->isRendered());
 
-        foreach ($renderer AS $child) {
-            $this->assertEquals('baz', $child);
-        }
+        $this->assertEquals($fields, iterator_to_array($renderer));
 
         $this->assertTrue($renderer->isRendered());
     }

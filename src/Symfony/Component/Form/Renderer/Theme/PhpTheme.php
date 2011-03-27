@@ -64,7 +64,7 @@ class PhpTheme implements FormThemeInterface
     {
         if ($attr['expanded']) {
             $html = '';
-            foreach ($attr['fields'] as $choice => $child) {
+            foreach ($attr['renderer'] as $choice => $child) {
                 $html .= $child->getWidget() . $child->getLabel() . PHP_EOL;
             }
         } else {
@@ -122,19 +122,19 @@ class PhpTheme implements FormThemeInterface
             return $this->text_widget($attr);
         } else {
             return str_replace(array('{{ year }}', '{{ month }}', '{{ day }}'), array(
-                $attr['fields']['year']->getWidget(),
-                $attr['fields']['month']->getWidget(),
-                $attr['fields']['day']->getWidget(),
+                $attr['renderer']['year']->getWidget(),
+                $attr['renderer']['month']->getWidget(),
+                $attr['renderer']['day']->getWidget(),
             ), $attr['date_pattern']);
         }
     }
 
     protected function datetime_widget($attr)
     {
-        return $attr['fields']['date']->getWidget() . " " . $attr['fields']['time']->getWidget() . PHP_EOL;
+        return $attr['renderer']['date']->getWidget() . " " . $attr['renderer']['time']->getWidget() . PHP_EOL;
     }
 
-    protected function errors($attr)
+    protected function field_errors($attr)
     {
         $html = '';
         if ($attr['errors']) {
@@ -149,17 +149,17 @@ class PhpTheme implements FormThemeInterface
 
     protected function file_widget($attr)
     {
-        $html = '<input type="file" ' . $this->attributes($attr['fields']['file']->getVars()) . '/>' . PHP_EOL;
-        $html .= $attr['fields']['token']->getWidget();
-        $html .= $attr['fields']['name']->getWidget();
+        $html = '<input type="file" ' . $this->attributes($attr['renderer']['file']->getVars()) . '/>' . PHP_EOL;
+        $html .= $attr['renderer']['token']->getWidget();
+        $html .= $attr['renderer']['name']->getWidget();
         return $html;
     }
 
     protected function form_widget($attr)
     {
         $html = '<div>' . $attr['renderer']->getErrors();
-        foreach ($attr['fields'] as $form) {
-            $html .= $form->getRow();
+        foreach ($attr['renderer'] as $child) {
+            $html .= $child->getRow();
         }
         $html .= $attr['renderer']->getRest();
         return $html;
@@ -181,7 +181,7 @@ class PhpTheme implements FormThemeInterface
         return $this->number_widget($attr);
     }
 
-    protected function label($attr)
+    protected function field_label($attr)
     {
         return '<label for="' . $this->escape($attr['id']) . '">'.$this->escape($attr['label']) . '</label>' . PHP_EOL;
     }
@@ -219,24 +219,24 @@ class PhpTheme implements FormThemeInterface
     protected function repeated_row($attr)
     {
         $html = '';
-        foreach ($attr['fields'] as $form) {
-            $html .= $form->getRow();
+        foreach ($attr['renderer'] as $child) {
+            $html .= $child->getRow();
         }
         return $html;
     }
 
-    protected function rest($attr)
+    protected function field_rest($attr)
     {
         $html = '';
-        foreach ($attr['fields'] as $form) {
-            if (!$form->isRendered()) {
-                $html .= $form->getRow();
+        foreach ($attr['renderer'] as $child) {
+            if (!$child->isRendered()) {
+                $html .= $child->getRow();
             }
         }
         return $html;
     }
 
-    protected function row($attr)
+    protected function field_row($attr)
     {
         return '<div>' . $attr['renderer']->getLabel() . $attr['renderer']->getErrors() . $attr['renderer']->getWidget() . '</div>' . PHP_EOL;
     }
@@ -265,10 +265,10 @@ class PhpTheme implements FormThemeInterface
 
     protected function time_widget($attr)
     {
-        $html = $attr['fields']['hour']->getWidget(array('size' => 1));
-        $html .=  ':' .$attr['fields']['minute']->getWidget(array('size' => 1));
+        $html = $attr['renderer']['hour']->getWidget(array('size' => 1));
+        $html .=  ':' .$attr['renderer']['minute']->getWidget(array('size' => 1));
         if ($attr['with_seconds']) {
-            $html .=  ':' .$attr['fields']['second']->getWidget(array('size' => 1));
+            $html .=  ':' .$attr['renderer']['second']->getWidget(array('size' => 1));
         }
         return $html . PHP_EOL;
     }

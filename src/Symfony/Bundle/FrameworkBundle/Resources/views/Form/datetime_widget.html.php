@@ -1,3 +1,3 @@
-<?php echo $fields['date']->getWidget() ?>
+<?php echo $renderer['date']->getWidget() ?>
 <?php /* keep space */ ?>
-<?php echo $fields['time']->getWidget() ?>
+<?php echo $renderer['time']->getWidget() ?>

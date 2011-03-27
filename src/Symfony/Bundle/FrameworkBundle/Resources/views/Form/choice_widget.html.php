@@ -1,5 +1,5 @@
 <?php if ($expanded): ?>
-    <?php foreach ($fields as $choice => $child): ?>
+    <?php foreach ($renderer as $choice => $child): ?>
         <?php echo $child->getWidget() ?>
         <?php echo $child->getLabel() ?>
     <?php endforeach ?>

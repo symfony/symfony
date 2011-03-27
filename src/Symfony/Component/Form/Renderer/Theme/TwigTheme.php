@@ -73,9 +73,11 @@ class TwigTheme implements FormThemeInterface
         return array_unique($names);
     }
 
-    public function render(array $blocks, $section, array $parameters)
+    public function render($blocks, $section, array $parameters)
     {
         $this->initialize();
+
+        $blocks = (array)$blocks;
 
         foreach ($blocks as $block) {
             $blockName = $block.'__'.$section;

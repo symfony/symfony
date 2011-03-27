@@ -33,8 +33,10 @@ class PhpTheme implements FormThemeInterface
         $this->charset = $charset;
     }
 
-    public function render(array $blocks, $section, array $parameters)
+    public function render($blocks, $section, array $parameters)
     {
+        $blocks = (array)$blocks;
+
         foreach ($blocks as $block) {
             $method = $block.'_'.$section;
 

@@ -48,8 +48,10 @@ class PhpEngineTheme implements FormThemeInterface
         $this->templateDir = $templateDir;
     }
 
-    public function render(array $blocks, $section, array $parameters)
+    public function render($blocks, $section, array $parameters)
     {
+        $blocks = (array)$blocks;
+
         foreach ($blocks as &$block) {
             $block = $block.'_'.$section;
 

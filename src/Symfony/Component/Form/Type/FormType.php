@@ -23,7 +23,6 @@ class FormType extends AbstractType
     public function buildForm(FormBuilder $builder, array $options)
     {
         $builder->setAttribute('virtual', $options['virtual'])
-            ->setDataClass($options['data_class'])
             ->setDataMapper(new PropertyPathMapper(
                 $options['data_class'],
                 $options['data_constructor']
@@ -58,7 +57,6 @@ class FormType extends AbstractType
     {
         return array(
             'template' => 'form',
-            'data_class' => null,
             'data_constructor' => null,
             'csrf_protection' => true,
             'csrf_field_name' => '_token',

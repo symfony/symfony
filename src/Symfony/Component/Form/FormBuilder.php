@@ -54,9 +54,10 @@ class FormBuilder
 
     private $errorBubbling = false;
 
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(EventDispatcherInterface $dispatcher, $dataClass = null)
     {
         $this->dispatcher = $dispatcher;
+        $this->dataClass = $dataClass;
     }
 
     public function setFormFactory(FormFactoryInterface $factory)
@@ -408,18 +409,6 @@ class FormBuilder
         }
 
         return $children;
-    }
-
-    public function setDataClass($class)
-    {
-        $this->dataClass = $class;
-
-        return $this;
-    }
-
-    public function getDataClass()
-    {
-        return $this->dataClass;
     }
 
     public function getForm()

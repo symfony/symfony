@@ -97,6 +97,7 @@ class FieldType extends AbstractType
         return array(
             'template' => 'text', // TODO remove me
             'data' => null,
+            'data_class' => null,
             'trim' => true,
             'required' => true,
             'read_only' => false,
@@ -111,7 +112,7 @@ class FieldType extends AbstractType
 
     public function createBuilder(array $options)
     {
-        return new FormBuilder(new EventDispatcher());
+        return new FormBuilder(new EventDispatcher(), $options['data_class']);
     }
 
     public function getParent(array $options)

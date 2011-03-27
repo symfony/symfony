@@ -19,12 +19,14 @@ use Symfony\Component\Form\Type\Guesser\TypeGuess;
 
 class FormBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    private $dispatcher;
+
     private $builder;
 
     public function setUp()
     {
-        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->builder = new FormBuilder($dispatcher);
+        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->builder = new FormBuilder($this->dispatcher);
     }
 
     public function testAddNameNoString()
@@ -41,7 +43,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testAddWithGuessFluent()
     {
-        $this->builder->setDataClass('stdClass');
+        $this->builder = new FormBuilder($this->dispatcher, 'stdClass');
         $builder = $this->builder->add('foo');
         $this->assertSame($builder, $this->builder);
     }
@@ -120,9 +122,9 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
                 ->method('createBuilderForProperty')
                 ->with($this->equalTo('stdClass'), $this->equalTo($expectedName), $this->equalTo($expectedOptions))
                 ->will($this->returnValue($this->getFormBuilder()));
-        $this->builder->setFormFactory($factory);
 
-        $this->builder->setDataClass('stdClass');
+        $this->builder = new FormBuilder($this->dispatcher, 'stdClass');
+        $this->builder->setFormFactory($factory);
         $this->builder->add($expectedName, null, $expectedOptions);
         $builder = $this->builder->get($expectedName);
 

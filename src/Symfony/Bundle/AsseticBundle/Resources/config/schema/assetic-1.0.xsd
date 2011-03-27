@@ -10,16 +10,26 @@
     <xsd:complexType name="config">
         <xsd:sequence>
             <xsd:element name="bundle" type="bundle" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="filter" type="filter" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="debug" type="xsd:string" />
         <xsd:attribute name="use-controller" type="xsd:string" />
         <xsd:attribute name="read-from" type="xsd:string" />
         <xsd:attribute name="write-to" type="xsd:string" />
         <xsd:attribute name="closure" type="xsd:string" />
+        <xsd:attribute name="java" type="xsd:string" />
+        <xsd:attribute name="node" type="xsd:string" />
+        <xsd:attribute name="sass" type="xsd:string" />
         <xsd:attribute name="yui" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="bundle">
-        <xsd:attribute name="name" type="xsd:string" />
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+    </xsd:complexType>
+
+    <xsd:complexType name="filter">
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="resource" type="xsd:string" />
+        <xsd:anyAttribute namespace="##any" processContents="lax" />
     </xsd:complexType>
 </xsd:schema>

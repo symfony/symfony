@@ -48,7 +48,7 @@ class CsrfType extends AbstractType
         return array(
             'csrf_provider' => $this->csrfProvider,
             'page_id' => null,
-            'property_path' => null,
+            'property_path' => false,
         );
     }
 

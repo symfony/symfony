@@ -57,11 +57,18 @@ class FieldTypeTest extends TestCase
         $this->assertEquals(null, $form->getAttribute('property_path'));
     }
 
+    public function testGetPropertyPath_pathIsFalse()
+    {
+        $form = $this->factory->create('field', 'title', array('property_path' => false));
+
+        $this->assertEquals(null, $form->getAttribute('property_path'));
+    }
+
     public function testGetPropertyPath_pathIsNull()
     {
         $form = $this->factory->create('field', 'title', array('property_path' => null));
 
-        $this->assertEquals(null, $form->getAttribute('property_path'));
+        $this->assertEquals(new PropertyPath('title'), $form->getAttribute('property_path'));
     }
 
     public function testPassRequiredAsOption()

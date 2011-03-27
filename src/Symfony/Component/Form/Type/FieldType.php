@@ -35,11 +35,11 @@ class FieldType extends AbstractType
 
     public function buildForm(FormBuilder $builder, array $options)
     {
-        if (false === $options['property_path']) {
+        if (null === $options['property_path']) {
             $options['property_path'] = $builder->getName();
         }
 
-        if (null === $options['property_path'] || '' === $options['property_path']) {
+        if (false === $options['property_path'] || '' === $options['property_path']) {
             $options['property_path'] = null;
         } else {
             $options['property_path'] = new PropertyPath($options['property_path']);
@@ -101,7 +101,7 @@ class FieldType extends AbstractType
             'required' => true,
             'read_only' => false,
             'max_length' => null,
-            'property_path' => false,
+            'property_path' => null,
             'by_reference' => true,
             'validation_groups' => true,
             'error_bubbling' => false,

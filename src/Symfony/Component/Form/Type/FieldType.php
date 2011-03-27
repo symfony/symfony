@@ -52,6 +52,7 @@ class FieldType extends AbstractType
         $builder->setRequired($options['required'])
             ->setReadOnly($options['read_only'])
             ->setErrorBubbling($options['error_bubbling'])
+            ->setEmptyData($options['empty_data'])
             ->setAttribute('by_reference', $options['by_reference'])
             ->setAttribute('property_path', $options['property_path'])
             ->setAttribute('validation_groups', $options['validation_groups'])
@@ -94,7 +95,7 @@ class FieldType extends AbstractType
 
     public function getDefaultOptions(array $options)
     {
-        return array(
+        $defaultOptions = array(
             'data' => null,
             'data_class' => null,
             'trim' => true,
@@ -107,6 +108,17 @@ class FieldType extends AbstractType
             'error_bubbling' => false,
             'error_mapping' => array(),
         );
+
+        if (!empty($options['data_class'])) {
+            $class = $options['data_class'];
+            $defaultOptions['empty_data'] = function () use ($class) {
+                return new $class();
+            };
+        } else {
+            $defaultOptions['empty_data'] = null;
+        }
+
+        return $defaultOptions;
     }
 
     public function createBuilder(array $options)

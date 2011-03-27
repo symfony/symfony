@@ -23,31 +23,9 @@ class PropertyPathMapper implements DataMapperInterface
      */
     private $dataClass;
 
-    /**
-     * Stores the constructor closure for creating new domain object instances
-     * @var \Closure
-     */
-    private $dataConstructor;
-
-    public function __construct($dataClass = null, $dataConstructor = null)
+    public function __construct($dataClass = null)
     {
         $this->dataClass = $dataClass;
-        $this->dataConstructor = $dataConstructor;
-    }
-
-    public function createEmptyData()
-    {
-        if ($this->dataConstructor) {
-            $constructor = $this->dataConstructor;
-
-            return $constructor();
-        } else if ($this->dataClass) {
-            $class = $this->dataClass;
-
-            return new $class();
-        }
-
-        return array();
     }
 
     public function mapDataToForms($data, array $forms)

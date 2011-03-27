@@ -82,7 +82,7 @@ class TestSetDataBeforeConfigureForm extends Form
     }
 }
 
-class FormTest extends TestCase
+class FormTypeTest extends TestCase
 {
     protected $form;
 
@@ -381,35 +381,46 @@ class FormTest extends TestCase
         $form = $this->factory->create('form', 'author', array(
             'data_class' => 'Symfony\Tests\Component\Form\Fixtures\Author',
         ));
+
         $form->setData(null);
 
         $this->assertEquals(new Author(), $form->getData());
     }
 
-    public function testSetDataToNullUsesDataConstructorOption()
-    {
-        $author = new Author();
-        $form = $this->factory->create('form', 'author', array(
-            'data_constructor' => function () use ($author) {
-        return $author;
-            }
-            ));
-
-            $form->setData(null);
-
-            $this->assertSame($author, $form->getData());
-    }
-
     /*
      * We need something to write the field values into
      */
-    public function testSetDataToNullCreatesArrayIfNoDataClassOrConstructor()
+    public function testSetDataToNullStoresArrayIfNoClassAvailable()
     {
-        $author = new Author();
         $form = $this->factory->create('form', 'author');
+
         $form->setData(null);
 
         $this->assertSame(array(), $form->getData());
+    }
+
+    public function testSetDataToNullUsesEmptyData()
+    {
+        $author = new Author();
+        $form = $this->factory->create('form', 'author', array(
+            'empty_data' => $author,
+        ));
+
+        $form->setData(null);
+
+        $this->assertSame($author, $form->getData());
+    }
+
+    public function testSetDataToNullAcceptsClosureEmptyData()
+    {
+        $author = new Author();
+        $form = $this->factory->create('form', 'author', array(
+            'empty_data' => function () use ($author) { return $author; },
+        ));
+
+        $form->setData(null);
+
+        $this->assertSame($author, $form->getData());
     }
 
     public function testSubmitUpdatesTransformedDataFromAllFields()

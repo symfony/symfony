@@ -112,7 +112,7 @@ class Form implements \IteratorAggregate, FormInterface
         DataTransformerInterface $normTransformer = null,
         DataMapperInterface $dataMapper = null, array $validators = array(),
         $required = false, $readOnly = false, $errorBubbling = false,
-        array $attributes = array())
+        $emptyData = null, array $attributes = array())
     {
         foreach ($validators as $validator) {
             if (!$validator instanceof FormValidatorInterface) {
@@ -131,6 +131,7 @@ class Form implements \IteratorAggregate, FormInterface
         $this->readOnly = $readOnly;
         $this->attributes = $attributes;
         $this->errorBubbling = $errorBubbling;
+        $this->emptyData = $emptyData;
 
         $this->setData(null);
     }
@@ -256,8 +257,12 @@ class Form implements \IteratorAggregate, FormInterface
 
         // Fix data if empty
         if (!$this->clientTransformer) {
-            if (empty($appData) && !$this->normTransformer && $this->dataMapper) {
-                $appData = $this->dataMapper->createEmptyData();
+            if (null === $appData && !$this->normTransformer) {
+                $appData = $this->emptyData;
+
+                if ($appData instanceof \Closure) {
+                    $appData = $appData->__invoke();
+                }
             }
 
             // Treat data as strings unless a value transformer exists

@@ -15,8 +15,6 @@ use Symfony\Component\Form\FormInterface;
 
 interface DataMapperInterface
 {
-    function createEmptyData();
-
     function mapDataToForms($data, array $forms);
 
     function mapDataToForm($data, FormInterface $form);

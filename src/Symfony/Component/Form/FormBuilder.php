@@ -54,6 +54,8 @@ class FormBuilder
 
     private $errorBubbling = false;
 
+    private $emptyData = null;
+
     public function __construct(EventDispatcherInterface $dispatcher, $dataClass = null)
     {
         $this->dispatcher = $dispatcher;
@@ -273,6 +275,18 @@ class FormBuilder
         return $this->types;
     }
 
+    public function setEmptyData($emptyData)
+    {
+        $this->emptyData = $emptyData;
+
+        return $this;
+    }
+
+    public function getEmptyData()
+    {
+        return $this->emptyData;
+    }
+
     /**
      * Adds a new field to this group. A field must have a unique name within
      * the group. Otherwise the existing field is overwritten.
@@ -424,6 +438,7 @@ class FormBuilder
             $this->getRequired(),
             $this->getReadOnly(),
             $this->getErrorBubbling(),
+            $this->getEmptyData(),
             $this->getAttributes()
         );
 

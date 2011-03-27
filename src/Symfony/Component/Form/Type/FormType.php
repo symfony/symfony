@@ -23,10 +23,7 @@ class FormType extends AbstractType
     public function buildForm(FormBuilder $builder, array $options)
     {
         $builder->setAttribute('virtual', $options['virtual'])
-            ->setDataMapper(new PropertyPathMapper(
-                $options['data_class'],
-                $options['data_constructor']
-            ));
+            ->setDataMapper(new PropertyPathMapper($options['data_class']));
 
         if ($options['csrf_protection']) {
             $csrfOptions = array('page_id' => $options['csrf_page_id']);
@@ -55,8 +52,7 @@ class FormType extends AbstractType
 
     public function getDefaultOptions(array $options)
     {
-        return array(
-            'data_constructor' => null,
+        $defaultOptions = array(
             'csrf_protection' => true,
             'csrf_field_name' => '_token',
             'csrf_provider' => null,
@@ -66,6 +62,12 @@ class FormType extends AbstractType
             // end up as global errors in the root form
             'error_bubbling' => true,
         );
+
+        if (empty($options['data_class'])) {
+            $defaultOptions['empty_data'] = array();
+        }
+
+        return $defaultOptions;
     }
 
     public function getParent(array $options)

@@ -14,8 +14,6 @@ namespace Symfony\Bundle\AsseticBundle\Command;
 use Assetic\Asset\AssetInterface;
 use Assetic\Factory\LazyAssetManager;
 use Symfony\Bundle\FrameworkBundle\Command\Command;
-use Symfony\Bundle\AsseticBundle\Event\WriteEvent;
-use Symfony\Bundle\AsseticBundle\Events;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -45,10 +43,6 @@ class DumpCommand extends Command
         }
 
         $am = $this->container->get('assetic.asset_manager');
-
-        // notify an event so custom stream wrappers can be registered lazily
-        $writeEvent = new WriteEvent($basePath);
-        $this->container->get('event_dispatcher')->dispatch(Events::onAsseticWrite, $writeEvent);
 
         if ($input->getOption('watch')) {
             return $this->watch($am, $basePath, $output, $this->container->getParameter('kernel.debug'));

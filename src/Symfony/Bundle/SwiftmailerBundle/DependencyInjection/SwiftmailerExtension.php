@@ -95,7 +95,7 @@ class SwiftmailerExtension extends Extension
 
         if ($config['logging']) {
             $container->findDefinition('swiftmailer.transport')->addMethodCall('registerPlugin', array(new Reference('swiftmailer.plugin.messagelogger')));
-            $container->findDefinition('data_collector.swiftmailer')->addTag('data_collector', array('template' => 'SwiftmailerBundle:Collector:swiftmailer', 'id' => 'swiftmailer'));
+            $container->findDefinition('data_collector.swiftmailer')->addTag('data_collector', array('template' => 'Swiftmailer:Collector:swiftmailer', 'id' => 'swiftmailer'));
         }
 
         if (isset($config['delivery_address']) && $config['delivery_address']) {

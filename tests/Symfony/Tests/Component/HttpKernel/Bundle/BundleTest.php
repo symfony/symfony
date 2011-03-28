@@ -24,13 +24,25 @@ class BundleTest extends \PHPUnit_Framework_TestCase
         $cmd = new FooCommand();
         $app = $this->getMock('Symfony\Component\Console\Application');
         $app->expects($this->once())->method('add')->with($this->equalTo($cmd));
-        
+
         $bundle = new ExtensionPresentBundle();
         $bundle->registerCommands($app);
-        
+
         $bundle2 = new ExtensionAbsentBundle();
-        
+
         $this->assertNull($bundle2->registerCommands($app));
-        
+    }
+
+    public function testGetName()
+    {
+        $bundle = new ExtensionPresentBundle();
+        $this->assertEquals('ExtensionPresent', $bundle->getName(), '->getName() rtrims "Bundle"');
+    }
+
+    public function testInvalidBundleName()
+    {
+        $this->setExpectedException('RuntimeException');
+        $bundle = $this->getMockForAbstractClass('Symfony\\Component\\HttpKernel\\Bundle\\Bundle');
+        $bundle->getName();
     }
 }

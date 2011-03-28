@@ -1,4 +1,4 @@
-{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+{% extends 'WebProfiler:Profiler:layout.html.twig' %}
 
 {% block toolbar %}
     {% set icon %}
@@ -7,5 +7,5 @@
     {% set text %}
         {{ '%.0f'|format(collector.memory / 1024) }} KB
     {% endset %}
-    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': false } %}
+    {% include 'WebProfiler:Profiler:toolbar_item.html.twig' with { 'link': false } %}
 {% endblock %}

@@ -25,7 +25,7 @@
         </service>
 
         <service id="data_collector.doctrine" class="%doctrine.data_collector.class%" public="false">
-            <tag name="data_collector" template="DoctrineBundle:Collector:db" id="db" />
+            <tag name="data_collector" template="Doctrine:Collector:db" id="db" />
             <argument type="service" id="doctrine.dbal.logger" />
         </service>
 

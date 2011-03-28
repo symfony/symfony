@@ -22,9 +22,9 @@ final class User implements AdvancedUserInterface
 {
     private $username;
     private $password;
-    private $userNonExpired;
+    private $accountNonExpired;
     private $credentialsNonExpired;
-    private $userNonLocked;
+    private $accountNonLocked;
     private $roles;
 
     public function __construct($username, $password, array $roles = array(), $enabled = true, $userNonExpired = true, $credentialsNonExpired = true, $userNonLocked = true)

@@ -31,17 +31,17 @@ class AsseticHelperTest extends \PHPUnit_Framework_TestCase
     public function testUrls($debug, $count, $message)
     {
         $helper = new AsseticHelper(new AssetFactory('/foo', $debug), $debug);
-        $urls = $helper->assets(array('js/jquery.js', 'js/jquery.plugin.js'));
+        $urls = $helper->javascripts(array('js/jquery.js', 'js/jquery.plugin.js'));
 
-        $this->assertInternalType('array', $urls, '->assets() returns an array');
+        $this->assertInternalType('array', $urls, '->javascripts() returns an array');
         $this->assertEquals($count, count($urls), $message);
     }
 
     public function getDebugAndCount()
     {
         return array(
-            array(false, 1, '->assets() returns one url when not in debug mode'),
-            array(true, 2, '->assets() returns many urls when in debug mode'),
+            array(false, 1, '->javascripts() returns one url when not in debug mode'),
+            array(true, 2, '->javascripts() returns many urls when in debug mode'),
         );
     }
 }

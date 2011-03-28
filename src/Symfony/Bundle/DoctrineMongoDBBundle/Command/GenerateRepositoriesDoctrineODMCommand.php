@@ -34,9 +34,9 @@ class GenerateRepositoriesDoctrineODMCommand extends DoctrineODMCommand
             ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to initialize the repositories in.')
             ->addOption('document', null, InputOption::VALUE_OPTIONAL, 'The document class to generate the repository for (shortname without namespace).')
             ->setHelp(<<<EOT
-The <info>doctrine:generate:repositories</info> command generates the configured document repository classes from your mapping information:
+The <info>doctrine:mongodb:generate:repositories</info> command generates the configured document repository classes from your mapping information:
 
-  <info>./app/console doctrine:generate:repositories</info>
+  <info>./app/console doctrine:mongodb:generate:repositories</info>
 EOT
         );
     }
@@ -58,7 +58,7 @@ EOT
                 }
 
                 if ($metadata->customRepositoryClassName) {
-                    if (strpos($metadata->customRepositoryClassName, $foundBundle->getName()) === false) {
+                    if (strpos($metadata->customRepositoryClassName, $foundBundle->getNamespace()) === false) {
                         throw new \RuntimeException(
                             "Repository " . $metadata->customRepositoryClassName . " and bundle don't have a common namespace, ".
                             "generation failed because the target directory cannot be detected.");

@@ -12,6 +12,7 @@
 namespace Symfony\Tests\Component\Routing\Loader;
 
 use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\PhpFileLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -31,4 +32,15 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($loader->supports('foo.php', 'php'), '->supports() checks the resource type if specified');
         $this->assertFalse($loader->supports('foo.php', 'foo'), '->supports() checks the resource type if specified');
     }
+
+    public function testLoadWithRoute()
+    {
+        $loader = new PhpFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $routeCollection = $loader->load('validpattern.php');
+        $routes = $routeCollection->all();
+
+        $this->assertEquals(1, count($routes), 'One route is loaded');
+        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+    }
 }
+

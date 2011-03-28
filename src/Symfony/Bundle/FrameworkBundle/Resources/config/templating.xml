@@ -29,19 +29,19 @@
 
         <service id="templating.locator" class="%templating.locator.class%" public="false">
             <argument type="service" id="file_locator" />
-            <argument>%kernel.root_dir%</argument>
+            <argument>%kernel.root_dir%/Resources</argument>
         </service>
 
         <service id="templating.locator.cached" class="%templating.locator.cached.class%" public="false">
             <argument>%kernel.cache_dir%</argument>
             <argument type="service" id="file_locator" />
-            <argument>%kernel.root_dir%</argument>
+            <argument>%kernel.root_dir%/Resources</argument>
         </service>
 
         <service id="templating.cache_warmer.template_paths" class="%templating.cache_warmer.template_paths.class%" public="false">
             <argument type="service" id="kernel" />
             <argument type="service" id="templating.name_parser" />
-            <argument>%kernel.root_dir%/views</argument>
+            <argument>%kernel.root_dir%/Resources</argument>
         </service>
 
         <service id="templating.loader.filesystem" class="%templating.loader.filesystem.class%" public="false">

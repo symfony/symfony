@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 /**
  * ExceptionDataCollector.
@@ -28,8 +29,13 @@ class ExceptionDataCollector extends DataCollector
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         if (null !== $exception) {
+            $flattenException = FlattenException::create($exception);
+            if ($exception instanceof HttpExceptionInterface) {
+                $flattenException->setStatusCode($exception->getStatusCode());
+            }
+
             $this->data = array(
-                'exception' => FlattenException::create($exception),
+                'exception' => $flattenException,
             );
         }
     }
@@ -72,6 +78,16 @@ class ExceptionDataCollector extends DataCollector
     public function getCode()
     {
         return $this->data['exception']->getCode();
+    }
+
+    /**
+     * Gets the status code.
+     *
+     * @return integer The status code
+     */
+    public function getStatusCode()
+    {
+        return $this->data['exception']->getStatusCode();
     }
 
     /**

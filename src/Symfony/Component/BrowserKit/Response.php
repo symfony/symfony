@@ -15,6 +15,8 @@ namespace Symfony\Component\BrowserKit;
  * Response object.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class Response
 {
@@ -31,6 +33,8 @@ class Response
      * @param string  $content The content of the response
      * @param integer $status  The response status code
      * @param array   $headers An array of headers
+     *
+     * @api
      */
     public function __construct($content = '', $status = 200, array $headers = array())
     {
@@ -48,7 +52,6 @@ class Response
     {
         $headers = '';
         foreach ($this->headers as $name => $value) {
-            
             if (is_string($value)) {
                 $headers .= $this->buildHeader($name, $value);
             } else {
@@ -78,6 +81,8 @@ class Response
      * Gets the response content.
      *
      * @return string The response content
+     *
+     * @api
      */
     public function getContent()
     {
@@ -88,6 +93,8 @@ class Response
      * Gets the response status code.
      *
      * @return integer The response status code
+     *
+     * @api
      */
     public function getStatus()
     {
@@ -98,6 +105,8 @@ class Response
      * Gets the response headers.
      *
      * @return array The response headers
+     *
+     * @api
      */
     public function getHeaders()
     {

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Routing\Generator\Dumper;
 
+use Symfony\Component\Routing\RouteCollection;
+
 /**
  * GeneratorDumperInterface is the interface that all generator dumper classes must implement.
  *
@@ -31,4 +33,11 @@ interface GeneratorDumperInterface
      * @return string A PHP class representing the generator class
      */
     function dump(array $options = array());
+
+    /**
+     * Gets the routes to dump.
+     *
+     * @return RouteCollection A RouteCollection instance
+     */
+    function getRoutes();
 }

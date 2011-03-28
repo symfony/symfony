@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
-use Symfony\Component\Security\Core\User\UserInterface;
-
 /**
  * TokenInterface is the interface for the user authentication information.
  *
@@ -22,7 +20,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 interface TokenInterface extends \Serializable
 {
     /**
-     * Returns a string representation ofthe Token.
+     * Returns a string representation of the Token.
      *
      * This is only to be used for debugging purposes.
      *
@@ -67,7 +65,7 @@ interface TokenInterface extends \Serializable
     function getUsername();
 
     /**
-     * Checks if the user is authenticated or not.
+     * Returns whether the user is authenticated or not.
      *
      * @return Boolean true if the token has been authenticated, false otherwise
      */
@@ -109,7 +107,7 @@ interface TokenInterface extends \Serializable
     function hasAttribute($name);
 
     /**
-     * Returns a attribute value.
+     * Returns an attribute value.
      *
      * @param string $name The attribute name
      *
@@ -120,7 +118,7 @@ interface TokenInterface extends \Serializable
     function getAttribute($name);
 
     /**
-     * Sets a attribute.
+     * Sets an attribute.
      *
      * @param string $name  The attribute name
      * @param mixed  $value The attribute value

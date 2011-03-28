@@ -15,7 +15,7 @@ use Assetic\Extension\Twig\AsseticExtension;
 use Assetic\Factory\AssetFactory;
 
 /**
- * Assetic integration.
+ * The dynamic extension is used when use_controllers is enabled.
  *
  * @author Kris Wallsmith <kris.wallsmith@symfony.com>
  */
@@ -24,9 +24,9 @@ class DynamicExtension extends AsseticExtension
     public function getTokenParsers()
     {
         return array(
-            new DynamicTokenParser($this->factory, $this->debug),
-            new DynamicTokenParser($this->factory, $this->debug, $this->defaultJavascriptsOutput, 'javascripts'),
-            new DynamicTokenParser($this->factory, $this->debug, $this->defaultStylesheetsOutput, 'stylesheets'),
+            new DynamicTokenParser($this->factory, 'javascripts', 'js/*.js', $this->debug),
+            new DynamicTokenParser($this->factory, 'stylesheets', 'css/*.css', $this->debug),
+            new DynamicTokenParser($this->factory, 'image', 'images/*', $this->debug, true),
         );
     }
 }

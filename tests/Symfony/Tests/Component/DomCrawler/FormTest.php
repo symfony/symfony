@@ -155,42 +155,40 @@ class FormTest extends \PHPUnit_Framework_TestCase
     {
         $form = $this->createForm('<form><input type="text" name="foo" value="foo" /><input type="submit" /></form>');
 
-        $this->assertEquals('foo', $form['foo']->getValue(), '->__offsetGet() returns the value of a form field');
+        $this->assertEquals('foo', $form['foo']->getValue(), '->offsetGet() returns the value of a form field');
 
         $form['foo'] = 'bar';
 
-        $this->assertEquals('bar', $form['foo']->getValue(), '->__offsetSet() changes the value of a form field');
+        $this->assertEquals('bar', $form['foo']->getValue(), '->offsetSet() changes the value of a form field');
 
         try {
             $form['foobar'] = 'bar';
-            $this->pass('->__offsetSet() throws an \InvalidArgumentException exception if the field does not exist');
+            $this->fail('->offsetSet() throws an \InvalidArgumentException exception if the field does not exist');
         } catch (\InvalidArgumentException $e) {
-            $this->assertTrue(true, '->__offsetSet() throws an \InvalidArgumentException exception if the field does not exist');
+            $this->assertTrue(true, '->offsetSet() throws an \InvalidArgumentException exception if the field does not exist');
         }
 
         try {
             $form['foobar'];
-            $this->pass('->__offsetSet() throws an \InvalidArgumentException exception if the field does not exist');
+            $this->fail('->offsetSet() throws an \InvalidArgumentException exception if the field does not exist');
         } catch (\InvalidArgumentException $e) {
-            $this->assertTrue(true, '->__offsetSet() throws an \InvalidArgumentException exception if the field does not exist');
+            $this->assertTrue(true, '->offsetSet() throws an \InvalidArgumentException exception if the field does not exist');
         }
     }
 
-    /**
-     * @expectedException LogicException
-     */
     public function testOffsetUnset()
     {
         $form = $this->createForm('<form><input type="text" name="foo" value="foo" /><input type="submit" /></form>');
         unset($form['foo']);
+        $this->assertFalse(isset($form['foo']), '->offsetUnset() removes a field');
     }
 
-    public function testOffsetIsset()
+    public function testOffsetExists()
     {
         $form = $this->createForm('<form><input type="text" name="foo" value="foo" /><input type="submit" /></form>');
 
-        $this->assertTrue(isset($form['foo']), '->offsetIsset() return true if the field exists');
-        $this->assertFalse(isset($form['bar']), '->offsetIsset() return false if the field does not exist');
+        $this->assertTrue(isset($form['foo']), '->offsetExists() return true if the field exists');
+        $this->assertFalse(isset($form['bar']), '->offsetExists() return false if the field does not exist');
     }
 
     public function testGetValues()
@@ -358,6 +356,13 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($form->has('bar'), '->has() returns true if a field is in the form');
     }
 
+    public function testRemove()
+    {
+        $form = $this->createForm('<form method="post"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $form->remove('bar');
+        $this->assertFalse($form->has('bar'), '->remove() removes a field');
+    }
+
     public function testGet()
     {
         $form = $this->createForm('<form method="post"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
@@ -381,16 +386,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Symfony\\Component\\DomCrawler\\Field\\InputFormField', get_class($fields['bar']), '->all() return an array of form field objects');
     }
 
-    protected function createForm($form, $method = null, $host = null, $path = '/')
-    {
-        $dom = new \DOMDocument();
-        $dom->loadHTML('<html>'.$form.'</html>');
-
-        $nodes = $dom->getElementsByTagName('input');
-
-        return new Form($nodes->item($nodes->length - 1), $method, $host, $path);
-    }
-
     public function testBase()
     {
         $dom = new \DOMDocument();
@@ -399,5 +394,15 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $nodes = $dom->getElementsByTagName('input');
         $form = new Form($nodes->item($nodes->length - 1), null, 'http://www.bar.com/foobar/', '/', 'http://www.foo.com/');
         $this->assertEquals('http://www.foo.com/foo.php', $form->getUri());
+    }
+
+    protected function createForm($form, $method = null, $host = null, $path = '/')
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('<html>'.$form.'</html>');
+
+        $nodes = $dom->getElementsByTagName('input');
+
+        return new Form($nodes->item($nodes->length - 1), $method, $host, $path);
     }
 }

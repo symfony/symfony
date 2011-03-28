@@ -67,6 +67,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * @param AuthenticationManagerInterface $authenticationManager An AuthenticationManagerInterface instance
      * @param array                          $options               An array of options for the processing of a successful, or failed authentication attempt
      * @param LoggerInterface                $logger                A LoggerInterface instance
+     * @param EventDispatcherInterface       $dispatcher            An EventDispatcherInterface instance
      */
     public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -174,7 +175,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         $this->securityContext->setToken(null);
 
         if (null !== $this->failureHandler) {
-            return $this->failureHandler->onAuthenticationFailure($event, $request, $failed);
+            return $this->failureHandler->onAuthenticationFailure($request, $failed);
         }
 
         if (null === $this->options['failure_path']) {
@@ -189,7 +190,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             $subRequest = Request::create($this->options['failure_path']);
             $subRequest->attributes->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed);
 
-            return $event->getSubject()->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+            return $event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
         }
 
         if (null !== $this->logger) {
@@ -219,7 +220,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         }
 
         if (null !== $this->successHandler) {
-            $response = $this->successHandler->onAuthenticationSuccess($event, $request, $token);
+            $response = $this->successHandler->onAuthenticationSuccess($request, $token);
         } else {
             $path = $this->determineTargetUrl($request);
             $response = new RedirectResponse(0 !== strpos($path, 'http') ? $request->getUriForPath($path) : $path, 302);

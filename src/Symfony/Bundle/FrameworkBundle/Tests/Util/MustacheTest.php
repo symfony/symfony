@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Util;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Util\Mustache;
-use Symfony\Bundle\FrameworkBundle\Util\Filesystem;
+use Symfony\Component\HttpKernel\Util\Filesystem;
 
 class MustacheTest extends TestCase
 {

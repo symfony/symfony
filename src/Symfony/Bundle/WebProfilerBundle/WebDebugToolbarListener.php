@@ -30,13 +30,11 @@ use Symfony\Bundle\TwigBundle\TwigEngine;
  */
 class WebDebugToolbarListener
 {
-    protected $kernel;
     protected $templating;
     protected $interceptRedirects;
 
-    public function __construct(HttpKernel $kernel, TwigEngine $templating, $interceptRedirects = false)
+    public function __construct(TwigEngine $templating, $interceptRedirects = false)
     {
-        $this->kernel = $kernel;
         $this->templating = $templating;
         $this->interceptRedirects = $interceptRedirects;
     }
@@ -48,16 +46,13 @@ class WebDebugToolbarListener
         }
 
         $response = $event->getResponse();
-	$request = $event->getRequest();
+        $request = $event->getRequest();
 
         if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects) {
             // keep current flashes for one more request
             $request->getSession()->setFlashes($request->getSession()->getFlashes());
 
-            $response->setContent(
-                sprintf('<html><head></head><body><h1>This Request redirects to<br /><a href="%1$s">%1$s</a>.</h1><h4>The redirect was intercepted by the web debug toolbar to help debugging.<br/>For more information, see the "intercept-redirects" option of the Profiler.</h4></body></html>',
-                $response->headers->get('Location'))
-            );
+            $response->setContent($this->templating->render('WebProfilerBundle:Profiler:toolbar_redirect.html.twig', array('location' => $response->headers->get('Location'))));
             $response->setStatusCode(200);
             $response->headers->remove('Location');
         }

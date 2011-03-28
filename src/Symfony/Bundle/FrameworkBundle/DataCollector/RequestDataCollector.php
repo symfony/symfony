@@ -43,7 +43,13 @@ class RequestDataCollector extends BaseRequestDataCollector
         if (isset($this->controllers[$request])) {
             $controller = $this->controllers[$request];
             if (is_array($controller)) {
-                $this->data['controller'] = array(get_class($controller[0]), $controller[1]);
+                $r = new \ReflectionMethod($controller[0], $controller[1]);
+                $this->data['controller'] = array(
+                    'class'  => get_class($controller[0]),
+                    'method' => $controller[1],
+                    'file'   => $r->getFilename(),
+                    'line'   => $r->getStartLine(),
+                );
             } elseif ($controller instanceof \Closure) {
                 $this->data['controller'] = 'Closure';
             } else {

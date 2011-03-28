@@ -27,5 +27,5 @@ interface UrlGeneratorInterface
      *
      * @return string The generated URL
      */
-    function generate($name, array $parameters, $absolute = false);
+    function generate($name, array $parameters = array(), $absolute = false);
 }

@@ -1,0 +1,19 @@
+{% extends '::base.html.twig' %}
+
+{% block stylesheets %}
+    {% stylesheets 'stylesheet1.css' 'stylesheet2.css' '@TestBundle/Resources/css/bundle.css' %}
+        <link href="{{ asset_url }}" type="text/css" rel="stylesheet" />
+    {% endstylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+    {% javascripts 'javascript1.js' 'javascript2.js' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
+{% block content %}
+    {% image 'logo.png' %}
+        <img src="{{ asset_url }}">
+    {% endimage %}
+{% endblock %}

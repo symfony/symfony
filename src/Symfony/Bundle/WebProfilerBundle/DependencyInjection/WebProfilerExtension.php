@@ -46,8 +46,6 @@ class WebProfilerExtension extends Extension
      */
     protected function doConfigLoad(array $config, ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-
         if (isset($config['toolbar'])) {
             if ($config['toolbar']) {
                 if (!$container->hasDefinition('debug.toolbar')) {

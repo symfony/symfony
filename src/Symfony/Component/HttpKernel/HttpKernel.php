@@ -85,7 +85,7 @@ class HttpKernel implements HttpKernelInterface
      * @throws \LogicException If one of the listener does not behave as expected
      * @throws NotFoundHttpException When controller cannot be found
      */
-    protected function handleRaw(Request $request, $type = self::MASTER_REQUEST)
+    private function handleRaw(Request $request, $type = self::MASTER_REQUEST)
     {
         // request
         $event = new GetResponseEvent($this, $request, $type);
@@ -120,7 +120,13 @@ class HttpKernel implements HttpKernelInterface
             }
 
             if (!$response instanceof Response) {
-                throw new \LogicException(sprintf('The controller must return a response (%s given).', $this->varToString($response)));
+                $msg = sprintf('The controller must return a response (%s given).', $this->varToString($response));
+
+                // the user may have forgotten to return something
+                if (null === $response) {
+                    $msg .= ' Did you forget to add a return statement somewhere in your controller?';
+                }
+                throw new \LogicException($msg);
             }
         }
 
@@ -138,7 +144,7 @@ class HttpKernel implements HttpKernelInterface
      *
      * @throws \RuntimeException if the passed object is not a Response instance
      */
-    protected function filterResponse(Response $response, Request $request, $type)
+    private function filterResponse(Response $response, Request $request, $type)
     {
         $event = new FilterResponseEvent($this, $request, $type, $response);
 
@@ -156,7 +162,7 @@ class HttpKernel implements HttpKernelInterface
      *
      * @return Response A Response instance
      */
-    protected function handleException(\Exception $e, $request, $type)
+    private function handleException(\Exception $e, $request, $type)
     {
         $event = new GetResponseForExceptionEvent($this, $request, $type, $e);
         $this->dispatcher->dispatch(Events::onCoreException, $event);
@@ -168,7 +174,7 @@ class HttpKernel implements HttpKernelInterface
         return $this->filterResponse($event->getResponse(), $request, $type);
     }
 
-    protected function varToString($var)
+    private function varToString($var)
     {
         if (is_object($var)) {
             return sprintf('[object](%s)', get_class($var));
@@ -185,6 +191,10 @@ class HttpKernel implements HttpKernelInterface
 
         if (is_resource($var)) {
             return '[resource]';
+        }
+
+        if (null === $var) {
+            return 'null';
         }
 
         return str_replace("\n", '', var_export((string) $var, true));

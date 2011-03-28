@@ -47,10 +47,10 @@ class PhpGeneratorDumper extends GeneratorDumper
         ;
     }
 
-    protected function addGenerator()
+    private function addGenerator()
     {
         $methods = array();
-        foreach ($this->routes->all() as $name => $route) {
+        foreach ($this->getRoutes()->all() as $name => $route) {
             $compiledRoute = $route->compile();
 
             $variables = str_replace("\n", '', var_export($compiledRoute->getVariables(), true));
@@ -64,7 +64,7 @@ class PhpGeneratorDumper extends GeneratorDumper
             $escapedName = str_replace('.', '__', $name);
 
             $methods[] = <<<EOF
-    protected function get{$escapedName}RouteInfo()
+    private function get{$escapedName}RouteInfo()
     {
         \$defaults = \$this->defaults;
 $defaultsMerge
@@ -79,7 +79,7 @@ EOF
 
         return <<<EOF
 
-    public function generate(\$name, array \$parameters, \$absolute = false)
+    public function generate(\$name, array \$parameters = array(), \$absolute = false)
     {
         if (!isset(self::\$declaredRouteNames[\$name])) {
             throw new \InvalidArgumentException(sprintf('Route "%s" does not exist.', \$name));
@@ -96,10 +96,10 @@ $methods
 EOF;
     }
 
-    protected function startClass($class, $baseClass)
+    private function startClass($class, $baseClass)
     {
         $routes = array();
-        foreach ($this->routes->all() as $name => $route) {
+        foreach ($this->getRoutes()->all() as $name => $route) {
             $routes[] = "       '$name' => true,";
         }
         $routes  = implode("\n", $routes);
@@ -115,7 +115,7 @@ EOF;
  */
 class $class extends $baseClass
 {
-    static protected \$declaredRouteNames = array(
+    static private \$declaredRouteNames = array(
 $routes
     );
 
@@ -123,7 +123,7 @@ $routes
 EOF;
     }
 
-    protected function addConstructor()
+    private function addConstructor()
     {
         return <<<EOF
     /**
@@ -138,7 +138,7 @@ EOF;
 EOF;
     }
 
-    protected function endClass()
+    private function endClass()
     {
         return <<<EOF
 }

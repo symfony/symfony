@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class LoggerDataCollector extends DataCollector
 {
-    protected $logger;
+    private $logger;
 
     public function __construct($logger = null)
     {

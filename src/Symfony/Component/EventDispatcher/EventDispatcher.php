@@ -35,6 +35,8 @@ namespace Symfony\Component\EventDispatcher;
  * @author  Roman Borschel <roman@code-factory.org>
  * @author  Bernhard Schussek <bschussek@gmail.com>
  * @author  Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class EventDispatcher implements EventDispatcherInterface
 {
@@ -43,6 +45,8 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * @see EventDispatcherInterface::dispatch
+     *
+     * @api
      */
     public function dispatch($eventName, Event $event = null)
     {
@@ -65,6 +69,8 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * @see EventDispatcherInterface::getListeners
+     *
+     * @api
      */
     public function getListeners($eventName = null)
     {
@@ -77,7 +83,7 @@ class EventDispatcher implements EventDispatcherInterface
         }
 
         $sorted = array();
-        foreach ($this->listeners as $eventName => $listeners) {
+        foreach (array_keys($this->listeners) as $eventName) {
             if (!isset($this->sorted[$eventName])) {
                 $this->sortListeners($eventName);
             }
@@ -92,6 +98,8 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * @see EventDispatcherInterface::hasListeners
+     *
+     * @api
      */
     public function hasListeners($eventName = null)
     {
@@ -100,19 +108,20 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * @see EventDispatcherInterface::addListener
+     *
+     * @api
      */
     public function addListener($eventNames, $listener, $priority = 0)
     {
-        $hash = spl_object_hash($listener);
         foreach ((array) $eventNames as $eventName) {
             if (!isset($this->listeners[$eventName][$priority])) {
                 if (!isset($this->listeners[$eventName])) {
                     $this->listeners[$eventName] = array();
                 }
-                $this->listeners[$eventName][$priority] = array();
+                $this->listeners[$eventName][$priority] = new \SplObjectStorage();
             }
 
-            $this->listeners[$eventName][$priority][$hash] = $listener;
+            $this->listeners[$eventName][$priority]->attach($listener);
             unset($this->sorted[$eventName]);
         }
     }
@@ -127,10 +136,9 @@ class EventDispatcher implements EventDispatcherInterface
                 continue;
             }
 
-            $hash = spl_object_hash($listener);
             foreach (array_keys($this->listeners[$eventName]) as $priority) {
-                if (isset($this->listeners[$eventName][$priority][$hash])) {
-                    unset($this->listeners[$eventName][$priority][$hash], $this->sorted[$eventName]);
+                if (isset($this->listeners[$eventName][$priority][$listener])) {
+                    unset($this->listeners[$eventName][$priority][$listener], $this->sorted[$eventName]);
                 }
             }
         }
@@ -180,10 +188,13 @@ class EventDispatcher implements EventDispatcherInterface
     private function sortListeners($eventName)
     {
         $this->sorted[$eventName] = array();
-
         if (isset($this->listeners[$eventName])) {
             krsort($this->listeners[$eventName]);
-            $this->sorted[$eventName] = array_values(call_user_func_array('array_merge', $this->listeners[$eventName]));
+            foreach ($this->listeners[$eventName] as $listeners) {
+                foreach ($listeners as $listener) {
+                    $this->sorted[$eventName][] = $listener;
+                }
+            }
         }
     }
 }

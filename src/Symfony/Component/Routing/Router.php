@@ -22,14 +22,14 @@ use Symfony\Component\Config\ConfigCache;
  */
 class Router implements RouterInterface
 {
-    protected $matcher;
-    protected $generator;
-    protected $options;
-    protected $defaults;
-    protected $context;
-    protected $loader;
-    protected $collection;
-    protected $resource;
+    private $matcher;
+    private $generator;
+    private $options;
+    private $defaults;
+    private $context;
+    private $loader;
+    private $collection;
+    private $resource;
 
     /**
      * Constructor.

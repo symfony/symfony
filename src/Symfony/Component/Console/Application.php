@@ -41,6 +41,8 @@ use Symfony\Component\Console\Helper\DialogHelper;
  *     $app->run();
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class Application
 {
@@ -60,6 +62,8 @@ class Application
      *
      * @param string  $name    The name of the application
      * @param string  $version The version of the application
+     *
+     * @api
      */
     public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN')
     {
@@ -98,6 +102,8 @@ class Application
      * @return integer 0 if everything went fine, or an error code
      *
      * @throws \Exception When doRun returns Exception
+     *
+     * @api
      */
     public function run(InputInterface $input = null, OutputInterface $output = null)
     {
@@ -194,6 +200,8 @@ class Application
      * Set a helper set to be used with the command.
      *
      * @param HelperSet $helperSet The helper set
+     *
+     * @api
      */
     public function setHelperSet(HelperSet $helperSet)
     {
@@ -204,6 +212,8 @@ class Application
      * Get the helper set associated with the command.
      *
      * @return HelperSet The HelperSet instance associated with this command
+     *
+     * @api
      */
     public function getHelperSet()
     {
@@ -250,6 +260,8 @@ class Application
      * Sets whether to catch exceptions or not during commands execution.
      *
      * @param Boolean $boolean Whether to catch exceptions or not during commands execution
+     *
+     * @api
      */
     public function setCatchExceptions($boolean)
     {
@@ -260,6 +272,8 @@ class Application
      * Sets whether to automatically exit after a command execution or not.
      *
      * @param Boolean $boolean Whether to automatically exit after a command execution or not
+     *
+     * @api
      */
     public function setAutoExit($boolean)
     {
@@ -270,6 +284,8 @@ class Application
      * Gets the name of the application.
      *
      * @return string The application name
+     *
+     * @api
      */
     public function getName()
     {
@@ -280,6 +296,8 @@ class Application
      * Sets the application name.
      *
      * @param string $name The application name
+     *
+     * @api
      */
     public function setName($name)
     {
@@ -290,6 +308,8 @@ class Application
      * Gets the application version.
      *
      * @return string The application version
+     *
+     * @api
      */
     public function getVersion()
     {
@@ -300,6 +320,8 @@ class Application
      * Sets the application version.
      *
      * @param string $version The application version
+     *
+     * @api
      */
     public function setVersion($version)
     {
@@ -310,6 +332,8 @@ class Application
      * Returns the long version of the application.
      *
      * @return string The long application version
+     *
+     * @api
      */
     public function getLongVersion()
     {
@@ -326,6 +350,8 @@ class Application
      * @param string $name The command name
      *
      * @return Command The newly created command
+     *
+     * @api
      */
     public function register($name)
     {
@@ -336,6 +362,8 @@ class Application
      * Adds an array of command objects.
      *
      * @param Command[] $commands An array of commands
+     *
+     * @api
      */
     public function addCommands(array $commands)
     {
@@ -352,6 +380,8 @@ class Application
      * @param Command $command A Command object
      *
      * @return Command The registered command
+     *
+     * @api
      */
     public function add(Command $command)
     {
@@ -374,6 +404,8 @@ class Application
      * @return Command A Command object
      *
      * @throws \InvalidArgumentException When command name given does not exist
+     *
+     * @api
      */
     public function get($name)
     {
@@ -401,6 +433,8 @@ class Application
      * @param string $name The command name or alias
      *
      * @return Boolean true if the command exists, false otherwise
+     *
+     * @api
      */
     public function has($name)
     {
@@ -461,6 +495,8 @@ class Application
      * @return Command A Command instance
      *
      * @throws \InvalidArgumentException When command name is incorrect or ambiguous
+     *
+     * @api
      */
     public function find($name)
     {
@@ -513,6 +549,8 @@ class Application
      * @param  string  $namespace A namespace name
      *
      * @return array An array of Command instances
+     *
+     * @api
      */
     public function all($namespace = null)
     {

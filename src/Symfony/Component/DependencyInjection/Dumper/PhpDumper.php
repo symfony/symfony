@@ -375,6 +375,10 @@ EOF;
      */
     private function isSimpleInstance($id, $definition)
     {
+        if (!$this->container->isFrozen() && count($this->container->getInterfaceInjectors()) > 0) {
+            return false;
+        }
+
         foreach (array_merge(array($definition), $this->getInlinedDefinitions($definition)) as $sDefinition) {
             if ($definition !== $sDefinition && !$this->hasReference($id, $sDefinition->getMethodCalls())) {
                 continue;
@@ -813,7 +817,7 @@ EOF;
     /**
      * Exports parameters.
      *
-     * @param string $parameters
+     * @param array $parameters
      * @param integer $indent
      * @return string
      */
@@ -910,7 +914,7 @@ EOF;
      * Returns the inline definition
      *
      * @param Definition $definition
-     * @return string
+     * @return array
      */
     private function getInlinedDefinitions(Definition $definition)
     {
@@ -980,7 +984,7 @@ EOF;
     /**
      * Dumps values.
      *
-     * @param string $value
+     * @param array $value
      * @param boolean $interpolate
      * @return string
      */

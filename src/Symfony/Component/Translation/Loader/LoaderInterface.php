@@ -17,6 +17,8 @@ use Symfony\Component\Translation\MessageCatalogue;
  * LoaderInterface is the interface implemented by all translation loaders.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 interface LoaderInterface
 {
@@ -28,6 +30,8 @@ interface LoaderInterface
      * @param  string $domain   The domain
      *
      * @return MessageCatalogue A MessageCatalogue instance
+     *
+     * @api
      */
     function load($resource, $locale, $domain = 'messages');
 }

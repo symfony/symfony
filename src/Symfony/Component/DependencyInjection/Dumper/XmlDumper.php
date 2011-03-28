@@ -245,7 +245,7 @@ class XmlDumper extends Dumper
     /**
      * Converts parameters.
      *
-     * @param string $parameters
+     * @param array $parameters
      * @param string $type
      * @param DOMElement $parent
      * @return void

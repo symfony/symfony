@@ -262,6 +262,29 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertEquals($paths, $ref);
     }
 
+    public function testAppendWithAFinder()
+    {
+        $finder = new Finder();
+        $finder->files()->in(self::$tmpDir.'/foo');
+
+        $finder1 = new Finder();
+        $finder1->directories()->in(self::$tmpDir);
+
+        $finder->append($finder1);
+
+        $this->assertIterator($this->toAbsolute(array('foo', 'foo/bar.tmp', 'toto')), $finder->getIterator());
+    }
+
+    public function testAppendWithAnArray()
+    {
+        $finder = new Finder();
+        $finder->files()->in(self::$tmpDir.'/foo');
+
+        $finder->append($this->toAbsolute(array('foo', 'toto')));
+
+        $this->assertIterator($this->toAbsolute(array('foo', 'foo/bar.tmp', 'toto')), $finder->getIterator());
+    }
+
     protected function toAbsolute($files)
     {
         $f = array();

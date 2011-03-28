@@ -23,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class EventDataCollector extends DataCollector
 {
-    protected $dispatcher;
+    private $dispatcher;
 
     public function setEventDispatcher(EventDispatcherInterface $dispatcher)
     {

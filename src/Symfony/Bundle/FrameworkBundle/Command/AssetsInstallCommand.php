@@ -52,7 +52,7 @@ class AssetsInstallCommand extends Command
         $filesystem = $this->container->get('filesystem');
 
         // Create the bundles directory otherwise symlink will fail.
-        $filesystem->mkdirs($input->getArgument('target').'/bundles/', 0777);
+        $filesystem->mkdir($input->getArgument('target').'/bundles/', 0777);
 
         foreach ($this->container->get('kernel')->getBundles() as $bundle) {
             if (is_dir($originDir = $bundle->getPath().'/Resources/public')) {
@@ -65,7 +65,7 @@ class AssetsInstallCommand extends Command
                 if ($input->getOption('symlink')) {
                     $filesystem->symlink($originDir, $targetDir);
                 } else {
-                    $filesystem->mkdirs($targetDir, 0777);
+                    $filesystem->mkdir($targetDir, 0777);
                     $filesystem->mirror($originDir, $targetDir);
                 }
             }

@@ -18,7 +18,7 @@ namespace Symfony\Component\HttpKernel\Debug;
  */
 class ErrorHandler
 {
-    protected $levels = array(
+    private $levels = array(
         E_WARNING           => 'Warning',
         E_NOTICE            => 'Notice',
         E_USER_ERROR        => 'User Error',
@@ -28,7 +28,7 @@ class ErrorHandler
         E_RECOVERABLE_ERROR => 'Catchable Fatal Error',
     );
 
-    protected $level;
+    private $level;
 
     /**
      * Constructor.

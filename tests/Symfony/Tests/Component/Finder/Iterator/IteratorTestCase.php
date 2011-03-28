@@ -13,7 +13,7 @@ namespace Symfony\Tests\Component\Finder\Iterator;
 
 require_once __DIR__.'/Iterator.php';
 
-class IteratorTestCase extends \PHPUnit_Framework_TestCase
+abstract class IteratorTestCase extends \PHPUnit_Framework_TestCase
 {
     protected function assertIterator($expected, \Iterator $iterator)
     {

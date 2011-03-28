@@ -16,7 +16,6 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
  * RetryAuthenticationEntryPoint redirects URL based on the configured scheme.
@@ -36,7 +35,7 @@ class RetryAuthenticationEntryPoint implements AuthenticationEntryPointInterface
         $this->httpsPort = $httpsPort;
     }
 
-    public function start(GetResponseEvent $event, Request $request, AuthenticationException $authException = null)
+    public function start(Request $request, AuthenticationException $authException = null)
     {
         $scheme = $request->isSecure() ? 'http' : 'https';
         if ('http' === $scheme && 80 != $this->httpPort) {

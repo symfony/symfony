@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ConfigDataCollector extends DataCollector
 {
-    protected $kernel;
+    private $kernel;
 
     /**
      * Constructor.

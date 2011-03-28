@@ -21,8 +21,8 @@ namespace Symfony\Component\Config;
  */
 class ConfigCache
 {
-    protected $debug;
-    protected $file;
+    private $debug;
+    private $file;
 
     /**
      * Constructor.

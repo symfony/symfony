@@ -10,9 +10,10 @@
  */
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper;
+
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper;
 
-class TemplateTest extends \PHPUnit_Framework_TestCase
+class CodeHelperTest extends \PHPUnit_Framework_TestCase
 {
     protected static $helper;
 
@@ -54,5 +55,4 @@ class TemplateTest extends \PHPUnit_Framework_TestCase
             array('Method', '<abbr title="Method">Method</abbr>()')
         );
     }
-    
 }

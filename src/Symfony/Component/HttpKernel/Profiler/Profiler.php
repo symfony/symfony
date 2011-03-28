@@ -24,18 +24,18 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  */
 class Profiler
 {
-    protected $storage;
-    protected $collectors;
-    protected $logger;
-    protected $enabled;
-    protected $token;
-    protected $parent;
-    protected $data;
-    protected $ip;
-    protected $url;
-    protected $time;
-    protected $empty;
-    protected $children;
+    private $storage;
+    private $collectors;
+    private $logger;
+    private $enabled;
+    private $token;
+    private $parent;
+    private $data;
+    private $ip;
+    private $url;
+    private $time;
+    private $empty;
+    private $children;
 
     /**
      * Constructor.

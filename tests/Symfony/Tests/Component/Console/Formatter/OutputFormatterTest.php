@@ -93,7 +93,7 @@ class FormatterStyleTest extends \PHPUnit_Framework_TestCase
         $formatter = new OutputFormatter(true);
 
         $this->assertEquals(
-            "\033[34;41msome text\033[0m", $formatter->format('<fg=blue;bg=red>some text</style>')
+            "\033[34;41msome text\033[0m", $formatter->format('<fg=blue;bg=red>some text</>')
         );
     }
 

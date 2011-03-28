@@ -8,7 +8,7 @@
         <parameter key="twig.class">Twig_Environment</parameter>
         <parameter key="twig.loader.class">Symfony\Bundle\TwigBundle\Loader\FilesystemLoader</parameter>
         <parameter key="templating.engine.twig.class">Symfony\Bundle\TwigBundle\TwigEngine</parameter>
-        <parameter key="templating.cache_warmer.templates_cache.class">Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheCacheWarmer</parameter>
+        <parameter key="twig.cache_warmer.class">Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheCacheWarmer</parameter>
     </parameters>
 
     <services>
@@ -17,7 +17,7 @@
             <argument>%twig.options%</argument>
         </service>
 
-        <service id="templating.cache_warmer.templates_cache" class="%templating.cache_warmer.templates_cache.class%" public="false">
+        <service id="twig.cache_warmer" class="%twig.cache_warmer.class%" public="false">
             <argument type="service" id="service_container" />
             <argument>%kernel.root_dir%/views</argument>
         </service>
@@ -33,7 +33,7 @@
             <argument type="service" id="templating.globals" />
         </service>
 
-        <service id="twig.extension.trans" class="Symfony\Bundle\TwigBundle\Extension\TransExtension" public="false">
+        <service id="twig.extension.trans" class="Symfony\Bridge\Twig\Extension\TranslationExtension" public="false">
             <tag name="twig.extension" />
             <argument type="service" id="translator" />
         </service>
@@ -41,6 +41,15 @@
         <service id="twig.extension.helpers" class="Symfony\Bundle\TwigBundle\Extension\TemplatingExtension" public="false">
             <tag name="twig.extension" />
             <argument type="service" id="service_container" />
+        </service>
+
+        <service id="twig.extension.routing" class="Symfony\Bridge\Twig\Extension\RoutingExtension" public="false">
+            <tag name="twig.extension" />
+            <argument type="service" id="router" />
+        </service>
+
+        <service id="twig.extension.yaml" class="Symfony\Bridge\Twig\Extension\YamlExtension" public="false">
+            <tag name="twig.extension" />
         </service>
 
         <service id="twig.extension.form" class="Symfony\Bundle\TwigBundle\Extension\FormExtension" public="false">

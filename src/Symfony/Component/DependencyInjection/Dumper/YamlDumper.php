@@ -245,7 +245,7 @@ class YamlDumper extends Dumper
     /**
      * Prepares parameters
      *
-     * @param string $parameters
+     * @param array $parameters
      * @return array
      */
     private function prepareParameters($parameters)

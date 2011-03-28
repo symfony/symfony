@@ -30,10 +30,10 @@
 
         <orm default-entity-manager="em2" auto-generate-proxy-classes="true">
             <entity-manager name="em1" metadata-cache-driver="xcache" connection="conn1">
-                <mapping name="YamlBundle" />
+                <mapping name="Yaml" />
             </entity-manager>
             <entity-manager name="em2" connection="conn2" metadata-cache-driver="apc">
-                <mapping name="YamlBundle" />
+                <mapping name="Yaml" />
             </entity-manager>
         </orm>
     </config>

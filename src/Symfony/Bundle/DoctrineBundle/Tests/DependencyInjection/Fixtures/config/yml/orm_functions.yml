@@ -4,7 +4,7 @@ doctrine:
         entity_managers:
             default:
                 mappings:
-                    YamlBundle: ~
+                    Yaml: ~
                 dql:
                     string_functions:
                         test_string: Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestStringFunction

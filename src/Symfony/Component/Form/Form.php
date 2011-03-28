@@ -808,9 +808,13 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         if (!$this->isCsrfProtected()) {
             return true;
         } else {
-            $token = $this->get($this->getOption('csrf_field_name'))->getDisplayedData();
+            $token  = $this->get($this->getOption('csrf_field_name'))->getDisplayedData();
+            $result = $this->getOption('csrf_provider')->isCsrfTokenValid(get_class($this), $token);
+            $token  = $this->getOption('csrf_provider')->generateCsrfToken(get_class($this));
 
-            return $this->getOption('csrf_provider')->isCsrfTokenValid(get_class($this), $token);
+            $this->get($this->getOption('csrf_field_name'))->setData($token);
+
+            return $result;
         }
     }
 

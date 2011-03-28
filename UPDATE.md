@@ -55,6 +55,9 @@ PR8 to PR9
 * Bundle logical names lose their `Bundle` suffix:
 
     *Controllers*: `BlogBundle:Post:show` -> `Blog:Post:show`
+
     *Templates*:   `BlogBundle:Post:show.html.twig` -> `Blog:Post:show.html.twig`
+
     *Resources*:   `@BlogBundle/Resources/config/blog.xml` -> `@Blog/Resources/config/blog.xml`
+
     *Doctrine*:    `$em->find('BlogBundle:Post', $id)` -> `$em->find('Blog:Post', $id)`

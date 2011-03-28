@@ -18,8 +18,6 @@ namespace Symfony\Component\DomCrawler\Field;
  * specialized classes (cf. FileFormField and ChoiceFormField).
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class InputFormField extends FormField
 {
@@ -30,7 +28,7 @@ class InputFormField extends FormField
      */
     protected function initialize()
     {
-        if ('input' != $this->node->nodeName) {
+        if ('input' != $this->node->nodeName && 'button' != $this->node->nodeName) {
             throw new \LogicException(sprintf('An InputFormField can only be created from an input tag (%s given).', $this->node->nodeName));
         }
 

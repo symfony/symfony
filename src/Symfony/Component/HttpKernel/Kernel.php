@@ -239,7 +239,7 @@ abstract class Kernel implements KernelInterface
         $isResource = 0 === strpos($path, 'Resources');
 
         $files = array();
-        if (true === $isResource && null !== $dir && file_exists($file = $dir.'/'.$bundle.'/'.substr($path, 10))) {
+        if (true === $isResource && null !== $dir && file_exists($file = $dir.'/'.$bundle.'Bundle/'.substr($path, 10))) {
             if ($first) {
                 return $file;
             }

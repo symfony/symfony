@@ -52,7 +52,7 @@ class WebDebugToolbarListener
             // keep current flashes for one more request
             $request->getSession()->setFlashes($request->getSession()->getFlashes());
 
-            $response->setContent($this->templating->render('WebProfilerBundle:Profiler:toolbar_redirect.html.twig', array('location' => $response->headers->get('Location'))));
+            $response->setContent($this->templating->render('WebProfiler:Profiler:toolbar_redirect.html.twig', array('location' => $response->headers->get('Location'))));
             $response->setStatusCode(200);
             $response->headers->remove('Location');
         }

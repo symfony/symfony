@@ -49,12 +49,12 @@ class ExceptionController extends ContainerAware
         if ($this->container->get('kernel')->isDebug() && 'html' == $format) {
             $name = 'exception_full';
         }
-        $template = 'FrameworkBundle:Exception:'.$name.'.'.$format.'.twig';
+        $template = 'Framework:Exception:'.$name.'.'.$format.'.twig';
 
         $templating = $this->container->get('templating');
         if (!$templating->exists($template)) {
             $this->container->get('request')->setRequestFormat('html');
-            $template = 'FrameworkBundle:Exception:'.$name.'.html.twig';
+            $template = 'Framework:Exception:'.$name.'.html.twig';
         }
 
         $code = $exception->getStatusCode();

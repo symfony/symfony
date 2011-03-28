@@ -8,7 +8,7 @@
 
     <twig:config auto-reload="true" autoescape="true" base-template-class="stdClass" cache="/tmp" cache-warmer="true" charset="ISO-8859-1" debug="true" strict-variables="true">
         <twig:form>
-            <twig:resource>MyBundle::form.html.twig</twig:resource>
+            <twig:resource>My::form.html.twig</twig:resource>
         </twig:form>
         <twig:global key="foo" id="bar" type="service" />
         <twig:global key="pi">3.14</twig:global>

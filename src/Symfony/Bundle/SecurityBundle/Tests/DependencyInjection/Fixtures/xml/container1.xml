@@ -28,7 +28,7 @@
         </provider>
 
         <provider name="doctrine">
-            <entity class="SecurityBundle:User" property="username" />
+            <entity class="Security:User" property="username" />
         </provider>
 
         <provider name="service" id="user.manager" />

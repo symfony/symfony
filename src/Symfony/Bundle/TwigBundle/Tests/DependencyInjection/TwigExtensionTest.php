@@ -35,7 +35,7 @@ class TwigExtensionTest extends TestCase
 
         $this->assertEquals('Twig_Environment', $container->getParameter('twig.class'), '->load() loads the twig.xml file');
         $this->assertFalse($container->getDefinition('twig.cache_warmer')->hasTag('kernel.cache_warmer'), '->load() does not enable cache warming by default');
-        $this->assertContains('TwigBundle::form.html.twig', $container->getParameter('twig.form.resources'), '->load() includes default template for form resources');
+        $this->assertContains('Twig::form.html.twig', $container->getParameter('twig.form.resources'), '->load() includes default template for form resources');
 
         // Twig options
         $options = $container->getParameter('twig.options');
@@ -65,8 +65,8 @@ class TwigExtensionTest extends TestCase
 
         // Form resources
         $resources = $container->getParameter('twig.form.resources');
-        $this->assertContains('TwigBundle::form.html.twig', $resources, '->load() includes default template for form resources');
-        $this->assertContains('MyBundle::form.html.twig', $resources, '->load() merges new templates into form resources');
+        $this->assertContains('Twig::form.html.twig', $resources, '->load() includes default template for form resources');
+        $this->assertContains('My::form.html.twig', $resources, '->load() merges new templates into form resources');
 
         // Globals
         $calls = $container->getDefinition('twig')->getMethodCalls();

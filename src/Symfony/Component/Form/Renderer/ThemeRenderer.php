@@ -124,24 +124,24 @@ class ThemeRenderer implements ThemeRendererInterface, \ArrayAccess, \IteratorAg
     {
         $this->rendered = true;
 
-        return $this->render('widget', $vars);
+        return $this->renderPart('widget', $vars);
     }
 
     public function getErrors(array $vars = array())
     {
-        return $this->render('errors', $vars);
+        return $this->renderPart('errors', $vars);
     }
 
     public function getRow(array $vars = array())
     {
         $this->rendered = true;
 
-        return $this->render('row', $vars);
+        return $this->renderPart('row', $vars);
     }
 
     public function getRest(array $vars = array())
     {
-        return $this->render('rest', $vars);
+        return $this->renderPart('rest', $vars);
     }
 
     /**
@@ -156,12 +156,12 @@ class ThemeRenderer implements ThemeRendererInterface, \ArrayAccess, \IteratorAg
             $vars['label'] = $label;
         }
 
-        return $this->render('label', $vars);
+        return $this->renderPart('label', $vars);
     }
 
     public function getEnctype()
     {
-        return $this->render('enctype', $this->vars);
+        return $this->renderPart('enctype', $this->vars);
     }
 
     protected function renderPart($part, array $vars = array())

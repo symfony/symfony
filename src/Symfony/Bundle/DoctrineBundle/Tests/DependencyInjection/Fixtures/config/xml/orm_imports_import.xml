@@ -12,7 +12,7 @@
             default-entity-manager="default"
         >
             <entity-manager name="default" metadata-cache-driver="apc">
-                <mapping name="YamlBundle" />
+                <mapping name="Yaml" />
             </entity-manager>
         </orm>
     </config>

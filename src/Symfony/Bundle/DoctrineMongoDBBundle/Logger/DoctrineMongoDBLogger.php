@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\DoctrineMongoDBBundle\Logger;
 
+use Doctrine\MongoDB\GridFSFile;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /**
@@ -269,6 +270,8 @@ class DoctrineMongoDBLogger
                 $formatted = 'new MaxKey()';
             } elseif ($value instanceof \MongoBinData) {
                 $formatted = 'new BinData("'.$value->bin.'", "'.$value->type.'")';
+            } elseif ($value instanceof \MongoGridFSFile || $value instanceof GridFSFile) {
+                $formatted = 'new MongoGridFSFile("'.$value->getFilename().'")';
             } elseif ($value instanceof \stdClass) {
                 $formatted = static::bsonEncode((array) $value);
             } else {

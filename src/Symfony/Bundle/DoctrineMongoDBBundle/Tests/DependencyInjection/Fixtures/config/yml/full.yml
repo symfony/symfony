@@ -26,7 +26,7 @@ doctrine_mongo_db:
     document_managers:
         dm1:
             mappings:
-                FooBundle:   annotations
+                Foo: annotations
             metadata_cache_driver:
                 type:                  memcache
                 class:                 fooClass
@@ -37,7 +37,7 @@ doctrine_mongo_db:
             connection:       dm2_connection
             database:         db1
             mappings:
-                BarBundle:
+                Bar:
                     type:   yml
                     dir:    %kernel.cache_dir%
                     prefix: prefix_val

@@ -20,7 +20,7 @@ use Symfony\Component\Translation\TranslatorInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TransExtension extends \Twig_Extension
+class TranslationExtension extends \Twig_Extension
 {
     private $translator;
 

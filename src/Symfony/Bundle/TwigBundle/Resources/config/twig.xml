@@ -33,7 +33,7 @@
             <argument type="service" id="templating.globals" />
         </service>
 
-        <service id="twig.extension.trans" class="Symfony\Bridge\Twig\Extension\TransExtension" public="false">
+        <service id="twig.extension.trans" class="Symfony\Bridge\Twig\Extension\TranslationExtension" public="false">
             <tag name="twig.extension" />
             <argument type="service" id="translator" />
         </service>

@@ -9,13 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Bridge\Twig;
+namespace Symfony\Tests\Bridge\Twig\Extension;
 
-use Symfony\Bridge\Twig\Extension\TransExtension;
+use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\MessageSelector;
+use Symfony\Tests\Bridge\Twig\TestCase;
 
-class TransTest extends TestCase
+class TranslationExtensionTest extends TestCase
 {
     protected function setUp()
     {
@@ -33,7 +34,7 @@ class TransTest extends TestCase
             print $template."\n";
             $loader = new \Twig_Loader_Array(array('index' => $template));
             $twig = new \Twig_Environment($loader, array('debug' => true, 'cache' => false));
-            $twig->addExtension(new TransExtension(new Translator('en', new MessageSelector())));
+            $twig->addExtension(new TranslationExtension(new Translator('en', new MessageSelector())));
 
             echo $twig->compile($twig->parse($twig->tokenize($twig->getLoader()->getSource('index'), 'index')))."\n\n";
             $this->assertEquals($expected, $this->getTemplate($template)->render($variables));
@@ -84,7 +85,7 @@ class TransTest extends TestCase
     {
         $loader = new \Twig_Loader_Array(array('index' => $template));
         $twig = new \Twig_Environment($loader, array('debug' => true, 'cache' => false));
-        $twig->addExtension(new TransExtension(new Translator('en', new MessageSelector())));
+        $twig->addExtension(new TranslationExtension(new Translator('en', new MessageSelector())));
 
         return $twig->loadTemplate('index');
     }

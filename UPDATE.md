@@ -42,7 +42,7 @@ PR8 to PR9
 
     After:
         app/Resources/views/base.html.twig
-        app/AcmeDemoBundle/Resources/views/base.html.twig
+        app/Resources/AcmeDemo/views/base.html.twig
 
 * Namespace for validators has changed from `validation` to `assert`:
 

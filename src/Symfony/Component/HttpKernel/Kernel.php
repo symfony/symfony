@@ -520,10 +520,10 @@ abstract class Kernel implements KernelInterface
             $dir = $container->getParameter(sprintf('kernel.%s_dir', $name));
             if (!is_dir($dir)) {
                 if (false === @mkdir($dir, 0777, true)) {
-                    exit(sprintf("Unable to create the %s directory (%s)\n", $name, dirname($dir)));
+                    throw new \RuntimeException(sprintf("Unable to create the %s directory (%s)\n", $name, dirname($dir)));
                 }
             } elseif (!is_writable($dir)) {
-                exit(sprintf("Unable to write in the %s directory (%s)\n", $name, $dir));
+                throw new \RuntimeException(sprintf("Unable to write in the %s directory (%s)\n", $name, $dir));
             }
         }
 

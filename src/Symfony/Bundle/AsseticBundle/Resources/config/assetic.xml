@@ -7,28 +7,18 @@
     <parameters>
         <parameter key="assetic.asset_factory.class">Symfony\Bundle\AsseticBundle\Factory\AssetFactory</parameter>
         <parameter key="assetic.asset_manager.class">Assetic\Factory\LazyAssetManager</parameter>
-        <parameter key="assetic.filter_manager.class">Symfony\Bundle\AsseticBundle\FilterManager</parameter>
+        <parameter key="assetic.asset_manager_cache_warmer.class">Symfony\Bundle\AsseticBundle\CacheWarmer\AssetManagerCacheWarmer</parameter>
         <parameter key="assetic.cached_formula_loader.class">Assetic\Factory\Loader\CachedFormulaLoader</parameter>
         <parameter key="assetic.config_cache.class">Assetic\Cache\ConfigCache</parameter>
-        <parameter key="assetic.asset_manager_cache_warmer.class">Symfony\Bundle\AsseticBundle\CacheWarmer\AssetManagerCacheWarmer</parameter>
         <parameter key="assetic.directory_resource.class">Symfony\Bundle\AsseticBundle\Factory\Resource\DirectoryResource</parameter>
+        <parameter key="assetic.filter_manager.class">Symfony\Bundle\AsseticBundle\FilterManager</parameter>
 
-        <parameter key="assetic.filter.coffee.class">Assetic\Filter\CoffeeScriptFilter</parameter>
-        <parameter key="assetic.filter.cssrewrite.class">Assetic\Filter\CssRewriteFilter</parameter>
-        <parameter key="assetic.filter.google_closure_compiler_api.class">Assetic\Filter\GoogleClosure\CompilerApiFilter</parameter>
-        <parameter key="assetic.filter.google_closure_compiler_jar.class">Assetic\Filter\GoogleClosure\CompilerJarFilter</parameter>
-        <parameter key="assetic.filter.less.class">Assetic\Filter\LessFilter</parameter>
-        <parameter key="assetic.filter.sass.class">Assetic\Filter\Sass\SassFilter</parameter>
-        <parameter key="assetic.filter.scss.class">Assetic\Filter\Sass\ScssFilter</parameter>
-        <parameter key="assetic.filter.sprockets.class">Assetic\Filter\SprocketsFilter</parameter>
-        <parameter key="assetic.filter.stylus.class">Assetic\Filter\StylusFilter</parameter>
-
-        <parameter key="assetic.java_bin">/usr/bin/java</parameter>
-        <parameter key="assetic.sass_bin">/usr/bin/sass</parameter>
-        <parameter key="assetic.node_bin">/usr/bin/node</parameter>
-        <parameter key="assetic.node_paths" type="collection"></parameter>
-        <parameter key="assetic.sprocketize_bin">/usr/bin/sprocketize</parameter>
-        <parameter key="assetic.coffee_bin">/usr/bin/coffee</parameter>
+        <parameter key="assetic.closure.jar" />
+        <parameter key="assetic.java.bin">/usr/bin/java</parameter>
+        <parameter key="assetic.node.bin">/usr/bin/node</parameter>
+        <parameter key="assetic.node.paths" type="collection"></parameter>
+        <parameter key="assetic.sass.bin">/usr/bin/sass</parameter>
+        <parameter key="assetic.yui.jar" />
 
         <parameter key="assetic.cache_dir">%kernel.cache_dir%/assetic</parameter>
     </parameters>
@@ -43,52 +33,13 @@
             <argument type="service" id="assetic.asset_factory" />
             <argument type="collection"></argument>
         </service>
+
         <service id="assetic.asset_factory" class="%assetic.asset_factory.class%" public="false">
             <argument type="service" id="kernel" />
             <argument>%assetic.read_from%</argument>
             <argument>%assetic.debug%</argument>
             <call method="setFilterManager"><argument type="service" id="assetic.filter_manager" /></call>
         </service>
-
-        <!-- filters -->
-        <service id="assetic.filter.cssrewrite" class="%assetic.filter.cssrewrite.class%">
-            <tag name="assetic.filter" alias="cssrewrite" />
-        </service>
-        <service id="assetic.filter.less" class="%assetic.filter.less.class%">
-            <tag name="assetic.filter" alias="less" />
-            <argument>%assetic.read_from%</argument>
-            <argument>%assetic.node_bin%</argument>
-            <argument>%assetic.node_paths%</argument>
-        </service>
-        <service id="assetic.filter.sass" class="%assetic.filter.sass.class%">
-            <tag name="assetic.filter" alias="sass" />
-            <argument>%assetic.sass_bin%</argument>
-        </service>
-        <service id="assetic.filter.scss" class="%assetic.filter.scss.class%">
-            <tag name="assetic.filter" alias="scss" />
-            <argument>%assetic.sass_bin%</argument>
-        </service>
-        <service id="assetic.filter.google_closure_compiler" class="%assetic.filter.google_closure_compiler_api.class%">
-            <tag name="assetic.filter" alias="closure" />
-        </service>
-        <service id="assetic.filter.sprockets" class="%assetic.filter.sprockets.class%">
-            <tag name="assetic.filter" alias="sprockets" />
-            <argument>%assetic.read_from%</argument>
-            <argument>%assetic.sprocketize_bin%</argument>
-        </service>
-        <service id="assetic.filter.coffee" class="%assetic.filter.coffee.class%">
-            <tag name="assetic.filter" alias="coffee" />
-            <argument>%assetic.coffee_bin%</argument>
-            <argument>%assetic.node_bin%</argument>
-        </service>
-        <service id="assetic.filter.stylus" class="%assetic.filter.stylus.class%">
-            <tag name="assetic.filter" alias="stylus" />
-            <argument>%assetic.read_from%</argument>
-            <argument>%assetic.node_bin%</argument>
-            <argument>%assetic.node_paths%</argument>
-        </service>
-
-        <!-- other -->
         <service id="assetic.config_cache" class="%assetic.config_cache.class%" public="false">
             <argument>%assetic.cache_dir%/config</argument>
         </service>

@@ -13,7 +13,9 @@ namespace Symfony\Bundle\AsseticBundle;
 
 use Symfony\Bundle\AsseticBundle\DependencyInjection\Compiler\AssetFactoryPass;
 use Symfony\Bundle\AsseticBundle\DependencyInjection\Compiler\AssetManagerPass;
+use Symfony\Bundle\AsseticBundle\DependencyInjection\Compiler\CheckYuiFilterPass;
 use Symfony\Bundle\AsseticBundle\DependencyInjection\Compiler\FilterManagerPass;
+use Symfony\Bundle\AsseticBundle\DependencyInjection\Compiler\CheckClosureFilterPass;
 use Symfony\Bundle\AsseticBundle\DependencyInjection\Compiler\TemplatingPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -29,6 +31,8 @@ class AsseticBundle extends Bundle
     {
         parent::build($container);
 
+        $container->addCompilerPass(new CheckClosureFilterPass());
+        $container->addCompilerPass(new CheckYuiFilterPass());
         $container->addCompilerPass(new TemplatingPass());
         $container->addCompilerPass(new AssetFactoryPass());
         $container->addCompilerPass(new AssetManagerPass());

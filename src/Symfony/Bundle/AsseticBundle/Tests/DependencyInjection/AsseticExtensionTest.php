@@ -12,10 +12,13 @@
 namespace Symfony\Bundle\AsseticBundle\Tests\DependencyInjection;
 
 use Symfony\Bundle\AsseticBundle\DependencyInjection\AsseticExtension;
+use Symfony\Bundle\AsseticBundle\DependencyInjection\Compiler\CheckYuiFilterPass;
+use Symfony\Bundle\AsseticBundle\DependencyInjection\Compiler\CheckClosureFilterPass;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Scope;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
 
 class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
@@ -81,15 +84,31 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testYuiConfig()
+    /**
+     * @dataProvider getFilterNames
+     */
+    public function testFilterConfigs($filter)
     {
-        $extension = new AsseticExtension();
-        $extension->load(array(array('yui' => '/path/to/yuicompressor.jar')), $this->container);
+        $config = array('filters' => array($filter => array()));
 
-        $this->assertTrue($this->container->has('assetic.filter.yui_css'), '->load() loads the yui_css filter when a yui value is provided');
-        $this->assertTrue($this->container->has('assetic.filter.yui_js'), '->load() loads the yui_js filter when a yui value is provided');
+        $extension = new AsseticExtension();
+        $extension->load(array($config), $this->container);
 
         $this->assertSaneContainer($this->getDumpedContainer());
+    }
+
+    public function getFilterNames()
+    {
+        $data = array();
+
+        $finder = new Finder();
+        $finder->files()->name('*.xml')->in(__DIR__.'/../../Resources/config/filters');
+
+        foreach ($finder as $file) {
+            $data[] = array($file->getBasename('.xml'));
+        }
+
+        return $data;
     }
 
     /**
@@ -119,12 +138,52 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testClosure()
+    /**
+     * @dataProvider getClosureJarAndExpected
+     */
+    public function testClosureCompilerPass($jar, $expected)
     {
+        $this->container->addCompilerPass(new CheckClosureFilterPass());
+
+        $config = array(
+            'closure' => $jar,
+            'filters' => array(
+                'closure' => array(),
+            ),
+        );
+
         $extension = new AsseticExtension();
-        $extension->load(array(array('closure' => '/path/to/closure.jar')), $this->container);
+        $extension->load(array($config), $this->container);
 
         $this->assertSaneContainer($this->getDumpedContainer());
+
+        $this->assertTrue($this->container->getDefinition($expected)->hasTag('assetic.filter'));
+    }
+
+    public function getClosureJarAndExpected()
+    {
+        return array(
+            array(null, 'assetic.filter.closure.api'),
+            array('/path/to/closure.jar', 'assetic.filter.closure.jar'),
+        );
+    }
+
+    public function testInvalidYuiConfig()
+    {
+        $this->setExpectedException('RuntimeException');
+
+        $this->container->addCompilerPass(new CheckYuiFilterPass());
+
+        $config = array(
+            'filters' => array(
+                'yui_js' => array(),
+            ),
+        );
+
+        $extension = new AsseticExtension();
+        $extension->load(array($config), $this->container);
+
+        $this->getDumpedContainer();
     }
 
     private function getDumpedContainer()

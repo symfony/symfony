@@ -6,7 +6,7 @@
 
   <class name="Symfony\Component\Form\Field">
     <getter property="transformationSuccessful">
-      <constraint name="AssertTrue">
+      <constraint name="True">
         <option name="message">This value is invalid</option>
       </constraint>
     </getter>
@@ -18,17 +18,17 @@
       <constraint name="Valid" />
     </property>
     <getter property="submittedWithExtraFields">
-      <constraint name="AssertFalse">
+      <constraint name="False">
         <option name="message">This form should not contain extra fields</option>
       </constraint>
     </getter>
     <getter property="postMaxSizeReached">
-      <constraint name="AssertFalse">
+      <constraint name="False">
         <option name="message">The uploaded file was too large. Please try to upload a smaller file</option>
       </constraint>
     </getter>
     <getter property="csrfTokenValid">
-      <constraint name="AssertTrue">
+      <constraint name="False">
         <option name="message">The CSRF token is invalid. Please try to resubmit the form</option>
       </constraint>
     </getter>

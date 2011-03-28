@@ -265,7 +265,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testAppendWithAFinder()
     {
         $finder = new Finder();
-        $finder->files()->in(self::$tmpDir.'/foo');
+        $finder->files()->in(self::$tmpDir.DIRECTORY_SEPARATOR.'foo');
 
         $finder1 = new Finder();
         $finder1->directories()->in(self::$tmpDir);
@@ -278,7 +278,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testAppendWithAnArray()
     {
         $finder = new Finder();
-        $finder->files()->in(self::$tmpDir.'/foo');
+        $finder->files()->in(self::$tmpDir.DIRECTORY_SEPARATOR.'foo');
 
         $finder->append($this->toAbsolute(array('foo', 'toto')));
 

@@ -270,7 +270,7 @@ class DoctrineMongoDBLogger
                 $formatted = 'new MaxKey()';
             } elseif ($value instanceof \MongoBinData) {
                 $formatted = 'new BinData("'.$value->bin.'", "'.$value->type.'")';
-            } elseif($value instanceof \MongoGridFSFile || $value instanceof GridFSFile) {
+            } elseif ($value instanceof \MongoGridFSFile || $value instanceof GridFSFile) {
                 $formatted = 'new MongoGridFSFile("'.$value->getFilename().'")';
             } elseif ($value instanceof \stdClass) {
                 $formatted = static::bsonEncode((array) $value);

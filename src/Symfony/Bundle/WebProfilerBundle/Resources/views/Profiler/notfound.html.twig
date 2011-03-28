@@ -1,8 +1,8 @@
-{% extends 'WebProfilerBundle:Profiler:base.html.twig' %}
+{% extends 'WebProfiler:Profiler:base.html.twig' %}
 
 {% block body %}
     <div id="content">
-        {% include 'WebProfilerBundle:Profiler:header.html.twig' only %}
+        {% include 'WebProfiler:Profiler:header.html.twig' only %}
        
         <div id="resume">
             <p>
@@ -23,8 +23,8 @@
                     </div>
                 </div>
                 <div id="navigation">
-                    {% render 'WebProfilerBundle:Profiler:searchBar' with { 'token': token } %}
-                    {% include 'WebProfilerBundle:Profiler:admin.html.twig' with { 'token': token } only %}
+                    {% render 'WebProfiler:Profiler:searchBar' with { 'token': token } %}
+                    {% include 'WebProfiler:Profiler:admin.html.twig' with { 'token': token } only %}
                 </div>
             </div>
         </div>

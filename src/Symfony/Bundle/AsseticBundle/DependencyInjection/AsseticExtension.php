@@ -34,6 +34,8 @@ class AsseticExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
+        $parameterBag = $container->getParameterBag();
+
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('assetic.xml');
         $loader->load('templating_twig.xml');
@@ -45,20 +47,29 @@ class AsseticExtension extends Extension
         $container->setParameter('assetic.use_controller', $config['use_controller']);
         $container->setParameter('assetic.read_from', $config['read_from']);
         $container->setParameter('assetic.write_to', $config['write_to']);
-        $container->setParameter('assetic.default_javascripts_output', $config['default_javascripts_output']);
-        $container->setParameter('assetic.default_stylesheets_output', $config['default_stylesheets_output']);
 
-        if (isset($config['closure'])) {
-            $container->setParameter('assetic.google_closure_compiler_jar', $config['closure']);
-            $loader->load('google_closure_compiler.xml');
+        $container->setParameter('assetic.closure.jar', $config['closure']);
+        $container->setParameter('assetic.java.bin', $config['java']);
+        $container->setParameter('assetic.node.bin', $config['node']);
+        $container->setParameter('assetic.sass.bin', $config['sass']);
+        $container->setParameter('assetic.yui.jar', $config['yui']);
+
+        // register filters
+        foreach ($config['filters'] as $name => $filter) {
+            if (isset($filter['resource'])) {
+                $loader->load($parameterBag->resolveValue($filter['resource']));
+                unset($filter['resource']);
+            } else {
+                $loader->load('filters/'.$name.'.xml');
+            }
+
+            foreach ($filter as $key => $value) {
+                $container->setParameter('assetic.filter.'.$name.'.'.$key, $value);
+            }
         }
 
-        if (isset($config['yui'])) {
-            $container->setParameter('assetic.yui_jar', $config['yui']);
-            $loader->load('yui_compressor.xml');
-        }
-
-        if ($container->getParameterBag()->resolveValue($container->getParameterBag()->get('assetic.use_controller'))) {
+        // choose dynamic or static
+        if ($parameterBag->resolveValue($parameterBag->get('assetic.use_controller'))) {
             $loader->load('controller.xml');
             $container->setParameter('assetic.twig_extension.class', '%assetic.twig_extension.dynamic.class%');
         } else {
@@ -66,11 +77,8 @@ class AsseticExtension extends Extension
             $container->setParameter('assetic.twig_extension.class', '%assetic.twig_extension.static.class%');
         }
 
-        if ($container->hasParameter('assetic.less.compress')) {
-            $container->getDefinition('assetic.filter.less')->addMethodCall('setCompress', array('%assetic.less.compress%'));
-        }
-
-        $this->registerFormulaResources($container, $container->getParameterBag()->resolveValue($config['bundles']));
+        // register config resources
+        self::registerFormulaResources($container, $parameterBag->resolveValue($config['bundles']));
     }
 
     static protected function processConfigs(array $configs, $debug, array $bundles)

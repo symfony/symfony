@@ -129,6 +129,27 @@ class HttpCache implements HttpKernelInterface
     }
 
     /**
+     * Gets the Kernel instance
+     *
+     * @return Symfony\Component\HttpKernel\HttpKernelInterface An HttpKernelInterface instance
+     */
+    public function getKernel()
+    {
+        return $this->kernel;
+    }
+
+
+    /**
+     * Gets the Esi instance
+     *
+     * @return Symfony\Component\HttpKernel\HttpCache\Esi An Esi instance
+     */
+    public function getEsi()
+    {
+        return $this->esi;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)

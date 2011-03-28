@@ -11,31 +11,31 @@
 
 namespace Symfony\Tests\Component\Validator;
 
-use Symfony\Component\Validator\Constraints\AssertTrue;
-use Symfony\Component\Validator\Constraints\AssertTrueValidator;
+use Symfony\Component\Validator\Constraints\True;
+use Symfony\Component\Validator\Constraints\TrueValidator;
 
-class AssertTrueValidatorTest extends \PHPUnit_Framework_TestCase
+class TrueValidatorTest extends \PHPUnit_Framework_TestCase
 {
     protected $validator;
 
     protected function setUp()
     {
-        $this->validator = new AssertTrueValidator();
+        $this->validator = new TrueValidator();
     }
 
     public function testNullIsValid()
     {
-        $this->assertTrue($this->validator->isValid(null, new AssertTrue()));
+        $this->assertTrue($this->validator->isValid(null, new True()));
     }
 
     public function testTrueIsValid()
     {
-        $this->assertTrue($this->validator->isValid(true, new AssertTrue()));
+        $this->assertTrue($this->validator->isValid(true, new True()));
     }
 
     public function testFalseIsInvalid()
     {
-        $constraint = new AssertTrue(array(
+        $constraint = new True(array(
             'message' => 'myMessage'
         ));
 

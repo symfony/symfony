@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-class AssertTrue extends \Symfony\Component\Validator\Constraint
+class False extends \Symfony\Component\Validator\Constraint
 {
-    public $message = 'This value should be true';
+    public $message = 'This value should be false';
 
     /**
      * {@inheritDoc}

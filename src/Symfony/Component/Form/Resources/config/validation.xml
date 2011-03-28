@@ -18,7 +18,7 @@
 
   <class name="Symfony\Component\Form\RepeatedField">
     <getter property="firstEqualToSecond">
-      <constraint name="AssertTrue">
+      <constraint name="True">
         <option name="message">The two values should be equal</option>
       </constraint>
     </getter>
@@ -26,22 +26,22 @@
 
   <class name="Symfony\Component\Form\DateField">
     <getter property="partiallyFilled">
-      <constraint name="AssertFalse">
+      <constraint name="False">
         <option name="message">The date is not fully selected</option>
       </constraint>
     </getter>
     <getter property="yearWithinRange">
-      <constraint name="AssertTrue">
+      <constraint name="True">
         <option name="message">The year is invalid</option>
       </constraint>
     </getter>
     <getter property="monthWithinRange">
-      <constraint name="AssertTrue">
+      <constraint name="True">
         <option name="message">The month is invalid</option>
       </constraint>
     </getter>
     <getter property="dayWithinRange">
-      <constraint name="AssertTrue">
+      <constraint name="True">
         <option name="message">The day is invalid</option>
       </constraint>
     </getter>
@@ -49,22 +49,22 @@
 
   <class name="Symfony\Component\Form\TimeField">
     <getter property="partiallyFilled">
-      <constraint name="AssertFalse">
+      <constraint name="False">
         <option name="message">The time is not fully selected</option>
       </constraint>
     </getter>
     <getter property="hourWithinRange">
-      <constraint name="AssertTrue">
+      <constraint name="True">
         <option name="message">The hour is invalid</option>
       </constraint>
     </getter>
     <getter property="minuteWithinRange">
-      <constraint name="AssertTrue">
+      <constraint name="True">
         <option name="message">The minutes are invalid</option>
       </constraint>
     </getter>
     <getter property="secondWithinRange">
-      <constraint name="AssertTrue">
+      <constraint name="True">
         <option name="message">The seconds are invalid</option>
       </constraint>
     </getter>
@@ -72,17 +72,17 @@
 
   <class name="Symfony\Component\Form\FileField">
     <getter property="iniSizeExceeded">
-      <constraint name="AssertFalse">
+      <constraint name="False">
         <option name="message">The file is too large. Please upload a smaller file</option>
       </constraint>
     </getter>
     <getter property="formSizeExceeded">
-      <constraint name="AssertFalse">
+      <constraint name="False">
         <option name="message">The file is too large. Please upload a smaller file</option>
       </constraint>
     </getter>
     <getter property="uploadComplete">
-      <constraint name="AssertTrue">
+      <constraint name="True">
         <option name="message">The file was only partially uploaded. Please try again</option>
       </constraint>
     </getter>

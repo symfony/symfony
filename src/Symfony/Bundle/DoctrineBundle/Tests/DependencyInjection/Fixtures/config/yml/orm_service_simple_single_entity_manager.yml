@@ -5,7 +5,7 @@ doctrine:
         entity_managers:
             default:
                 mappings:
-                    YamlBundle: ~
+                    Yaml: ~
                 metadata_cache_driver:
                     type: memcache
                     class: Doctrine\Common\Cache\MemcacheCache

@@ -25,7 +25,7 @@ class AnnotationLoader implements LoaderInterface
     public function __construct(array $paths = null)
     {
         if (null === $paths) {
-            $paths = array('validation' => 'Symfony\\Component\\Validator\\Constraints\\');
+            $paths = array('assert' => 'Symfony\\Component\\Validator\\Constraints\\');
         }
 
         $this->reader = new AnnotationReader();

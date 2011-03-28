@@ -30,7 +30,7 @@ class AssetFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testBundleNotation()
     {
-        $input = '@MyBundle/Resources/css/main.css';
+        $input = '@My/Resources/css/main.css';
 
         $this->kernel->expects($this->once())
             ->method('locateResource')
@@ -47,7 +47,7 @@ class AssetFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $this->kernel->expects($this->once())
             ->method('locateResource')
-            ->with('@MyBundle/Resources/css/')
+            ->with('@My/Resources/css/')
             ->will($this->returnValue('/path/to/bundle/Resources/css/'));
 
         $this->factory->createAsset($input);
@@ -56,8 +56,8 @@ class AssetFactoryTest extends \PHPUnit_Framework_TestCase
     public function getGlobs()
     {
         return array(
-            array('@MyBundle/Resources/css/*'),
-            array('@MyBundle/Resources/css/*/*.css'),
+            array('@My/Resources/css/*'),
+            array('@My/Resources/css/*/*.css'),
         );
     }
 }

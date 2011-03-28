@@ -41,7 +41,7 @@ class Controller extends ContainerAware
     /**
      * Forwards the request to another controller.
      *
-     * @param  string  $controller The controller name (a string like BlogBundle:Post:index)
+     * @param  string  $controller The controller name (a string like Blog:Post:index)
      * @param  array   $path       An array of path parameters
      * @param  array   $query      An array of query parameters
      *

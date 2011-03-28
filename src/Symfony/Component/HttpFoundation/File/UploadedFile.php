@@ -138,7 +138,7 @@ class UploadedFile extends File
 
         $newPath = $directory . DIRECTORY_SEPARATOR . $filename;
 
-        if (!move_uploaded_file($this->getPath(), $newPath)) {
+        if (!@move_uploaded_file($this->getPath(), $newPath)) {
             throw new FileException(sprintf('Could not move file %s to %s', $this->getPath(), $newPath));
         }
 

@@ -44,8 +44,8 @@ class ProfilerListener
     {
         $this->container = $container;
         $this->matcher = $matcher;
-        $this->onlyException = $onlyException;
-        $this->onlyMasterRequests = $onlyMasterRequests;
+        $this->onlyException = (Boolean) $onlyException;
+        $this->onlyMasterRequests = (Boolean) $onlyMasterRequests;
     }
 
     /**

@@ -29,6 +29,6 @@
             </app:package>
         </app:templating>
         <app:translator enabled="true" fallback="fr" />
-        <app:validation enabled="true" />
+        <app:validation enabled="true" cache="apc" />
     </app:config>
 </container>

@@ -55,5 +55,6 @@ $container->loadFromExtension('framework', array(
     ),
     'validation' => array(
         'enabled' => true,
+        'cache'   => 'apc',
     ),
 ));

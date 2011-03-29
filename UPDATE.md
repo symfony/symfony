@@ -16,8 +16,13 @@ PR8 to PR9
 
 * The HTTP exceptions classes signatures have changed:
 
-    Before: throw new NotFoundHttpException('Not Found', $message, 0, $e);
-    After:  throw new NotFoundHttpException($message, $e);
+    Before:
+
+        throw new NotFoundHttpException('Not Found', $message, 0, $e);
+
+    After:
+
+        throw new NotFoundHttpException($message, $e);
 
 * The RequestMatcher class does not add `^` and `$` anymore to regexp.
 
@@ -37,17 +42,24 @@ PR8 to PR9
   work anyway):
 
     Before:
+
         app/views/base.html.twig
         app/views/AcmeDemoBundle/base.html.twig
 
     After:
+
         app/Resources/views/base.html.twig
         app/Resources/AcmeDemo/views/base.html.twig
 
 * Namespace for validators has changed from `validation` to `assert`:
 
-    Before: @validation:NotNull
-    After:  @assert:NotNull
+    Before:
+
+        @validation:NotNull
+
+    After:
+
+        @assert:NotNull
 
     Moreover, the `Assert` prefix used for some constraints has been removed
     (`AssertTrue` to `True`).

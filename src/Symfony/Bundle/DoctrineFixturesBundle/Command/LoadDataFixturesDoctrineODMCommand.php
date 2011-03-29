@@ -38,23 +38,23 @@ class LoadDataFixturesDoctrineODMCommand extends DoctrineODMCommand
     protected function configure()
     {
         $this
-            ->setName('doctrine:mongodb:data:load')
+            ->setName('doctrine:mongodb:fixtures:load')
             ->setDescription('Load data fixtures to your database.')
             ->addOption('fixtures', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The directory or file to load data fixtures from.')
             ->addOption('append', null, InputOption::VALUE_OPTIONAL, 'Whether or not to append the data fixtures.', false)
             ->addOption('dm', null, InputOption::VALUE_REQUIRED, 'The document manager to use for this command.')
             ->setHelp(<<<EOT
-The <info>doctrine:mongodb:data:load</info> command loads data fixtures from your bundles:
+The <info>doctrine:mongodb:fixtures:load</info> command loads data fixtures from your bundles:
 
-  <info>./app/console doctrine:mongodb:data:load</info>
+  <info>./app/console doctrine:mongodb:fixtures:load</info>
 
 You can also optionally specify the path to fixtures with the <info>--fixtures</info> option:
 
-  <info>./app/console doctrine:mongodb:data:load --fixtures=/path/to/fixtures1 --fixtures=/path/to/fixtures2</info>
+  <info>./app/console doctrine:mongodb:fixtures:load --fixtures=/path/to/fixtures1 --fixtures=/path/to/fixtures2</info>
 
 If you want to append the fixtures instead of flushing the database first you can use the <info>--append</info> option:
 
-  <info>./app/console doctrine:mongodb:data:load --append</info>
+  <info>./app/console doctrine:mongodb:fixtures:load --append</info>
 EOT
         );
     }

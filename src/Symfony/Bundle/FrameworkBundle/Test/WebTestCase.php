@@ -55,20 +55,34 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function getPhpUnitXmlDir()
     {
-        $dir = getcwd();
+        $dir = null;
         if (!isset($_SERVER['argv']) || false === strpos($_SERVER['argv'][0], 'phpunit')) {
             throw new \RuntimeException('You must override the WebTestCase::createKernel() method.');
         }
 
-        // find the --configuration flag from PHPUnit
-        $cli = implode(' ', $_SERVER['argv']);
-        if (preg_match('/\-\-configuration[= ]+([^ ]+)/', $cli, $matches)) {
-            $dir = realpath($matches[1]);
-        } elseif (preg_match('/\-c +([^ ]+)/', $cli, $matches)) {
-            $dir = realpath($matches[1]);
-        } elseif (file_exists(getcwd().'/phpunit.xml') || file_exists(getcwd().'/phpunit.xml.dist')) {
-            $dir = getcwd();
-        } else {
+        // Find a configuration flag from cli
+        $possibleCliFlags = array('-c', '--configuration');
+        foreach ($possibleCliFlags as $possibleCliFlag) {
+            $flagArgIndex = array_search($possibleCliFlag, $_SERVER['argv']);
+            if ($flagArgIndex !== false) {
+                $dir = $_SERVER['argv'][$flagArgIndex + 1];
+                break;
+            }
+        }
+
+        // Find configuration file in current directory
+        if ($dir === null) {
+            $possiblePHPUnitFilenames = array('phpunit.xml', 'phpunit.xml.dist');
+            foreach ($possiblePHPUnitFilenames as $possiblePHPUnitFilename) {
+                if (file_exists(getcwd() . DIRECTORY_SEPARATOR . $possiblePHPUnitFilename)) {
+                    $dir = getcwd();
+                    break;
+                }
+            }
+        }
+
+        // Can't continue
+        if ($dir === null) {
             throw new \RuntimeException('Unable to guess the Kernel directory.');
         }
 

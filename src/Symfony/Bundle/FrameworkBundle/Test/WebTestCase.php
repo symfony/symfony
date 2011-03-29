@@ -60,25 +60,9 @@ abstract class WebTestCase extends BaseWebTestCase
             throw new \RuntimeException('You must override the WebTestCase::createKernel() method.');
         }
 
-        // Find a configuration flag from cli
-        $possibleCliFlags = array('-c', '--configuration');
-        foreach ($possibleCliFlags as $possibleCliFlag) {
-            $flagArgIndex = array_search($possibleCliFlag, $_SERVER['argv']);
-            if ($flagArgIndex !== false) {
-                $dir = $_SERVER['argv'][$flagArgIndex + 1];
-                break;
-            }
-        }
-
-        // Find configuration file in current directory
-        if ($dir === null) {
-            $possiblePHPUnitFilenames = array('phpunit.xml', 'phpunit.xml.dist');
-            foreach ($possiblePHPUnitFilenames as $possiblePHPUnitFilename) {
-                if (file_exists(getcwd() . DIRECTORY_SEPARATOR . $possiblePHPUnitFilename)) {
-                    $dir = getcwd();
-                    break;
-                }
-            }
+        $dir = $this->getPhpUnitCliConfigArgument();
+        if ($dir === null && $this->doesPhpUnitConfigFileExistInCwd()) {
+            $dir = getcwd();
         }
 
         // Can't continue
@@ -91,6 +75,43 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         return $dir;
+    }
+
+    /**
+     * Finds the value of configuration flag from cli
+     *
+     * PHPUnit will use the last configuration argument on the command line, so this only returns
+     * the last configuration argument
+     *
+     * @return string The value of the phpunit cli configuration option
+     */
+    private function getPhpUnitCliConfigArgument()
+    {
+        $dir = null;
+        
+        foreach (array_reverse($_SERVER['argv']) as $argIndex=>$testArg) {
+            if ($testArg === '-c' || $testArg === '--configuration') {
+                $dir = realpath($_SERVER['argv'][$argIndex + 1]);
+                break;
+            } else if (strpos($testArg, '--configuration=') === 0) {
+                $argPath = substr($testArg, strlen('--configuration='));
+                $dir = realpath($argPath);
+                break;
+            }
+        }
+
+        return $dir;
+    }
+
+    /**
+     * Finds whether a phpunit configuration file exists in current directory
+     *
+     * @return Boolean true if a phpunit configuration file exists in current directory, false if not
+     */
+    private function doesPhpUnitConfigFileExistInCwd()
+    {
+        return (file_exists(getcwd() . DIRECTORY_SEPARATOR . 'phpunit.xml') ||
+                file_exists(getcwd() . DIRECTORY_SEPARATOR . 'phpunit.xml.dist'));
     }
 
     /**

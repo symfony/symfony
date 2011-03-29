@@ -74,7 +74,7 @@ EOF
         }
 
         if ($input->getOption('xml')) {
-            $output->writeln($this->command->asXml(), Output::OUTPUT_RAW);
+            $output->writeln($this->command->asXml(), OutputInterface::OUTPUT_RAW);
         } else {
             $output->writeln($this->command->asText());
         }

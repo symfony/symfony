@@ -61,7 +61,9 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         $dir = $this->getPhpUnitCliConfigArgument();
-        if ($dir === null && $this->doesPhpUnitConfigFileExistInCwd()) {
+        if ($dir === null && 
+            (file_exists(getcwd() . DIRECTORY_SEPARATOR . 'phpunit.xml') ||
+            file_exists(getcwd() . DIRECTORY_SEPARATOR . 'phpunit.xml.dist'))) {
             $dir = getcwd();
         }
 
@@ -101,17 +103,6 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         return $dir;
-    }
-
-    /**
-     * Finds whether a phpunit configuration file exists in current directory
-     *
-     * @return Boolean true if a phpunit configuration file exists in current directory, false if not
-     */
-    private function doesPhpUnitConfigFileExistInCwd()
-    {
-        return (file_exists(getcwd() . DIRECTORY_SEPARATOR . 'phpunit.xml') ||
-                file_exists(getcwd() . DIRECTORY_SEPARATOR . 'phpunit.xml.dist'));
     }
 
     /**

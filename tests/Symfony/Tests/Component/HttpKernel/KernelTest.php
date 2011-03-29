@@ -308,7 +308,7 @@ EOF;
      */
     public function testLocateResourceThrowsExceptionWhenNameIsNotValid()
     {
-        $this->getKernelForInvalidLocateResource()->locateResource('foo');
+        $this->getKernelForInvalidLocateResource()->locateResource('Foo');
     }
 
     /**
@@ -316,7 +316,7 @@ EOF;
      */
     public function testLocateResourceThrowsExceptionWhenNameIsUnsafe()
     {
-        $this->getKernelForInvalidLocateResource()->locateResource('@foo/../bar');
+        $this->getKernelForInvalidLocateResource()->locateResource('@Foo/../bar');
     }
 
     /**
@@ -324,7 +324,7 @@ EOF;
      */
     public function testLocateResourceThrowsExceptionWhenBundleDoesNotExist()
     {
-        $this->getKernelForInvalidLocateResource()->locateResource('@foo/config/routing.xml');
+        $this->getKernelForInvalidLocateResource()->locateResource('@Foo/config/routing.xml');
     }
 
     public function testLocateResourceReturnsTheFirstThatMatches()
@@ -412,12 +412,12 @@ EOF;
         $kernel
             ->expects($this->once())
             ->method('getBundle')
-            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/fooBundle', null, null, 'foo'))))
+            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/FooBundle', null, null, 'Foo'))))
         ;
 
         $this->assertEquals(
-            __DIR__.'/Fixtures/Resources/fooBundle/foo.txt',
-            $kernel->locateResource('@foo/Resources/foo.txt', __DIR__.'/Fixtures/Resources')
+            __DIR__.'/Fixtures/Resources/FooBundle/foo.txt',
+            $kernel->locateResource('@Foo/Resources/foo.txt', __DIR__.'/Fixtures/Resources')
         );
     }
 
@@ -443,16 +443,16 @@ EOF;
         $kernel
             ->expects($this->exactly(2))
             ->method('getBundle')
-            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/fooBundle', null, null, 'foo'))))
+            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/FooBundle', null, null, 'Foo'))))
         ;
 
         $this->assertEquals(
-            __DIR__.'/Fixtures/Resources/fooBundle/',
-            $kernel->locateResource('@foo/Resources/', __DIR__.'/Fixtures/Resources')
+            __DIR__.'/Fixtures/Resources/FooBundle/',
+            $kernel->locateResource('@Foo/Resources/', __DIR__.'/Fixtures/Resources')
         );
         $this->assertEquals(
-            __DIR__.'/Fixtures/Resources/fooBundle',
-            $kernel->locateResource('@foo/Resources', __DIR__.'/Fixtures/Resources')
+            __DIR__.'/Fixtures/Resources/FooBundle',
+            $kernel->locateResource('@Foo/Resources', __DIR__.'/Fixtures/Resources')
         );
 
         $kernel = $this->getKernel();

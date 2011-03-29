@@ -333,7 +333,7 @@ EOF;
         $kernel
             ->expects($this->once())
             ->method('getBundle')
-            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1'))))
+            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle'))))
         ;
 
         $this->assertEquals(__DIR__.'/Fixtures/Bundle1Bundle/foo.txt', $kernel->locateResource('@Bundle1/foo.txt'));
@@ -341,12 +341,12 @@ EOF;
 
     public function testLocateResourceReturnsTheFirstThatMatchesWithParent()
     {
-        $parent = $this->getBundle(__DIR__.'/Fixtures/Bundle1', null, 'ParentAA');
-        $child = $this->getBundle(__DIR__.'/Fixtures/Bundle2', 'ParentAA', 'ChildAA');
+        $parent = $this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle');
+        $child = $this->getBundle(__DIR__.'/Fixtures/Bundle2Bundle');
 
         $kernel = $this->getKernel();
         $kernel
-            ->expects($this->any())
+            ->expects($this->exactly(2))
             ->method('getBundle')
             ->will($this->returnValue(array($child, $parent)))
         ;
@@ -355,22 +355,22 @@ EOF;
         $this->assertEquals(__DIR__.'/Fixtures/Bundle1Bundle/bar.txt', $kernel->locateResource('@ParentAA/bar.txt'));
     }
 
-    public function testLocateResourceReturnsTheAllMatches()
+    public function testLocateResourceReturnsAllMatches()
     {
+        $parent = $this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle');
+        $child = $this->getBundle(__DIR__.'/Fixtures/Bundle2Bundle');
+
         $kernel = $this->getKernel();
         $kernel
             ->expects($this->once())
             ->method('getBundle')
-            ->will($this->returnValue(array(
-                $this->getBundle(__DIR__.'/Fixtures/Bundle1'),
-                $this->getBundle(__DIR__.'/Fixtures/Bundle2')
-            )))
+            ->will($this->returnValue(array($child, $parent)))
         ;
 
         $this->assertEquals(array(
-            __DIR__.'/Fixtures/Bundle1Bundle/foo.txt',
-            __DIR__.'/Fixtures/Bundle2Bundle/foo.txt'),
-            $kernel->locateResource('@Bundle2/foo.txt', null, false));
+            __DIR__.'/Fixtures/Bundle2Bundle/foo.txt',
+            __DIR__.'/Fixtures/Bundle1Bundle/foo.txt'),
+            $kernel->locateResource('@Bundle1/foo.txt', null, false));
     }
 
     public function testLocateResourceReturnsAllMatchesBis()
@@ -381,7 +381,7 @@ EOF;
             ->method('getBundle')
             ->will($this->returnValue(array(
                 $this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle'),
-                $this->getBundle(__DIR__.'/foobar')
+                $this->getBundle(__DIR__.'/Foobar')
             )))
         ;
 
@@ -397,7 +397,7 @@ EOF;
         $kernel
             ->expects($this->once())
             ->method('getBundle')
-            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1'))))
+            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle'))))
         ;
 
         $this->assertEquals(
@@ -427,13 +427,34 @@ EOF;
         $kernel
             ->expects($this->once())
             ->method('getBundle')
-            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1'))))
+            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle', null, null, 'Bundle1'))))
         ;
 
         $this->assertEquals(array(
             __DIR__.'/Fixtures/Resources/Bundle1Bundle/foo.txt',
             __DIR__.'/Fixtures/Bundle1Bundle/Resources/foo.txt'),
             $kernel->locateResource('@Bundle1/Resources/foo.txt', __DIR__.'/Fixtures/Resources', false)
+        );
+    }
+
+    public function testLocateResourceOverrideBundleAndResourcesFolders()
+    {
+        $parent = $this->getBundle(__DIR__.'/Fixtures/BaseBundle', null, 'Base', 'Base');
+        $child = $this->getBundle(__DIR__.'/Fixtures/ChildBundle', 'Parent', 'Child', 'Child');
+
+        $kernel = $this->getKernel();
+        $kernel
+            ->expects($this->once())
+            ->method('getBundle')
+            ->will($this->returnValue(array($child, $parent)))
+        ;
+
+        $this->assertEquals(array(
+            __DIR__.'/Fixtures/Resources/ChildBundle/foo.txt',
+            __DIR__.'/Fixtures/ChildBundle/Resources/foo.txt',
+            __DIR__.'/Fixtures/BaseBundle/Resources/foo.txt',
+            ),
+            $kernel->locateResource('@Child/Resources/foo.txt', __DIR__.'/Fixtures/Resources', false)
         );
     }
 
@@ -455,10 +476,11 @@ EOF;
             $kernel->locateResource('@Foo/Resources', __DIR__.'/Fixtures/Resources')
         );
 
+        $kernel = $this->getKernel();
         $kernel
-            ->expects($this->any())
+            ->expects($this->exactly(2))
             ->method('getBundle')
-            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1'))))
+            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle', null, null, 'Bundle1'))))
         ;
 
         $this->assertEquals(

@@ -88,10 +88,10 @@ abstract class WebTestCase extends BaseWebTestCase
     private function getPhpUnitCliConfigArgument()
     {
         $dir = null;
-        
-        foreach (array_reverse($_SERVER['argv']) as $argIndex=>$testArg) {
+        $reversedArgs = array_reverse($_SERVER['argv']);
+        foreach ($reversedArgs as $argIndex=>$testArg) {
             if ($testArg === '-c' || $testArg === '--configuration') {
-                $dir = realpath($_SERVER['argv'][$argIndex + 1]);
+                $dir = realpath($reversedArgs[$argIndex - 1]);
                 break;
             } else if (strpos($testArg, '--configuration=') === 0) {
                 $argPath = substr($testArg, strlen('--configuration='));

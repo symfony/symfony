@@ -75,11 +75,11 @@
         </p>
     {% endif %}
 
-    <h2>Requests Headers</h2>
+    <h2>Request Headers</h2>
 
     {% include 'WebProfiler:Profiler:bag.html.twig' with { 'bag': collector.requestheaders } only %}
 
-    <h2>Requests Server Parameters</h2>
+    <h2>Request Server Parameters</h2>
 
     {% include 'WebProfiler:Profiler:bag.html.twig' with { 'bag': collector.requestserver } only %}
 
@@ -87,7 +87,7 @@
 
     {% include 'WebProfiler:Profiler:bag.html.twig' with { 'bag': collector.responseheaders } only %}
 
-    <h2>Response Session Attributes</h2>
+    <h2>Session Attributes</h2>
 
     {% if collector.sessionattributes|length %}
         <table>
@@ -105,7 +105,7 @@
         </table>
     {% else %}
         <p>
-            <em>No request session attributes</em>
+            <em>No session attributes</em>
         </p>
     {% endif %}
 

@@ -22,6 +22,15 @@ use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
 {
     /**
+     * Returns whether this guesser is supported on the current OS
+     *
+     * @return Boolean
+     */
+    static public function isSupported()
+    {
+        return !strstr(PHP_OS, 'WIN');
+    }
+    /**
      * Guesses the mime type of the file with the given path
      *
      * @see MimeTypeGuesserInterface::guess()

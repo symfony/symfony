@@ -341,8 +341,8 @@ EOF;
 
     public function testLocateResourceReturnsTheFirstThatMatchesWithParent()
     {
-        $parent = $this->getBundle(__DIR__.'/Fixtures/Bundle1', null, 'ParentAABundle');
-        $child = $this->getBundle(__DIR__.'/Fixtures/Bundle2', 'ParentAABundle', 'ChildAABundle');
+        $parent = $this->getBundle(__DIR__.'/Fixtures/Bundle1', null, 'ParentAA');
+        $child = $this->getBundle(__DIR__.'/Fixtures/Bundle2', 'ParentAA', 'ChildAA');
 
         $kernel = $this->getKernel();
         $kernel

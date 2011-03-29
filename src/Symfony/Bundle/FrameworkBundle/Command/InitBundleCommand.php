@@ -107,8 +107,9 @@ EOT
         $filesystem->mirror(__DIR__.'/../Resources/skeleton/bundle/'.$input->getOption('format'), $targetDir);
 
         Mustache::renderDir($targetDir, array(
-            'namespace' => $namespace,
-            'bundle'    => $bundle,
+            'namespace'   => $namespace,
+            'bundle'      => $bundle,
+            'bundleShort' => preg_replace('/Bundle$/', '', $bundle),
         ));
 
         rename($targetDir.'/Bundle.php', $targetDir.'/'.$bundle.'.php');

@@ -291,6 +291,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->children()
                         ->booleanNode('enabled')->end()
+                        ->scalarNode('cache')->end()
                         ->arrayNode('annotations')
                             ->canBeUnset()
                             ->treatNullLike(array())

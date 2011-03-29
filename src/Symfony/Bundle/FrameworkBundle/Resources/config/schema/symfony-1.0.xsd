@@ -128,6 +128,7 @@
         </xsd:sequence>
 
         <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="annotations" type="xsd:boolean" />
     </xsd:complexType>
 

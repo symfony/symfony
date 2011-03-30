@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\ClassLoader;
 
-require_once __DIR__.'/ClassLoaderInterface.php';
-
 /**
  * A class loader that uses a mapping file to look up paths.
  *
@@ -20,7 +18,7 @@ require_once __DIR__.'/ClassLoaderInterface.php';
  *
  * @api
  */
-class MapFileClassLoader implements ClassLoaderInterface
+class MapFileClassLoader
 {
     private $map = array();
 

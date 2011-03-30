@@ -9,8 +9,8 @@
     <config>
         <orm default-entity-manager="default">
             <entity-manager name="default">
-                <mapping name="AnnotationsBundle" />
-                <mapping name="YamlBundle" dir="Resources/config/doctrine/metadata" alias="yml" />
+                <mapping name="Annotations" />
+                <mapping name="Yaml" dir="Resources/config/doctrine/metadata" alias="yml" />
                 <mapping name="manual" type="xml" prefix="Fixtures\Bundles\XmlBundle"
                     dir="%kernel.root_dir%/../src/Symfony/Bundle/DoctrineBundle/Tests/DependencyInjection/Fixtures/Bundles/XmlBundle/Resources/config/doctrine/metadata"
                     alias="TestAlias"

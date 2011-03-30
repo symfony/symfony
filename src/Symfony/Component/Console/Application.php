@@ -170,9 +170,9 @@ class Application
         }
 
         if (true === $input->hasParameterOption(array('--quiet', '-q'))) {
-            $output->setVerbosity(Output::VERBOSITY_QUIET);
+            $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
         } elseif (true === $input->hasParameterOption(array('--verbose', '-v'))) {
-            $output->setVerbosity(Output::VERBOSITY_VERBOSE);
+            $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
         }
 
         if (true === $input->hasParameterOption(array('--version', '-V'))) {
@@ -723,7 +723,7 @@ class Application
             }
             $output->writeln("\n");
 
-            if (Output::VERBOSITY_VERBOSE === $output->getVerbosity()) {
+            if (OutputInterface::VERBOSITY_VERBOSE === $output->getVerbosity()) {
                 $output->writeln('</comment>Exception trace:</comment>');
 
                 // exception related properties

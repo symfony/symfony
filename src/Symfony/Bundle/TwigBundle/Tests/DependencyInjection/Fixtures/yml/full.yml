@@ -1,7 +1,7 @@
 twig:
     form:
         resources:
-            - MyBundle::form.html.twig
+            - My::form.html.twig
     extensions:
         - twig.extension.debug
         - twig.extension.text

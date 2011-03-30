@@ -36,7 +36,7 @@ class ApcUniversalClassLoader extends UniversalClassLoader
         $this->prefix = $prefix;
     }
 
-    protected function findFile($class)
+    public function findFile($class)
     {
         if (false === $file = apc_fetch($this->prefix.$class)) {
             apc_store($this->prefix.$class, $file = parent::findFile($class));

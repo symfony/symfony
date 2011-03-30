@@ -4,10 +4,10 @@ doctrine:
         entity_managers:
             em1:
                 mappings:
-                    AnnotationsBundle: ~
+                    Annotations: ~
             em2:
                 mappings:
-                    YamlBundle:
+                    Yaml:
                         dir: Resources/config/doctrine/metadata
                         alias: yml
                     manual:

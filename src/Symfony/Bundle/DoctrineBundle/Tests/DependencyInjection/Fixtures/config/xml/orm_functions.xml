@@ -10,7 +10,7 @@
         <dbal />
         <orm default-entity-manager="default">
             <entity-manager name="default">
-                <mapping name="YamlBundle" />
+                <mapping name="Yaml" />
                 <dql>
                     <string-function name="test_string" class="Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestStringFunction" />
                     <numeric-function name="test_numeric" class="Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestNumericFunction" />

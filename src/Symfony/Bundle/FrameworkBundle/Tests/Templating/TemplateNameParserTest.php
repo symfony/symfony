@@ -46,11 +46,11 @@ class TemplateNameParserTest extends TestCase
     public function getLogicalNameToTemplateProvider()
     {
         return array(
-            array('FooBundle:Post:index.html.php', new TemplateReference('FooBundle', 'Post', 'index', 'html', 'php')),
-            array('FooBundle:Post:index.html.twig', new TemplateReference('FooBundle', 'Post', 'index', 'html', 'twig')),
-            array('FooBundle:Post:index.xml.php', new TemplateReference('FooBundle', 'Post', 'index', 'xml', 'php')),
-            array('SensioFooBundle:Post:index.html.php', new TemplateReference('SensioFooBundle', 'Post', 'index', 'html', 'php')),
-            array('SensioCmsFooBundle:Post:index.html.php', new TemplateReference('SensioCmsFooBundle', 'Post', 'index', 'html', 'php')),
+            array('Foo:Post:index.html.php', new TemplateReference('Foo', 'Post', 'index', 'html', 'php')),
+            array('Foo:Post:index.html.twig', new TemplateReference('Foo', 'Post', 'index', 'html', 'twig')),
+            array('Foo:Post:index.xml.php', new TemplateReference('Foo', 'Post', 'index', 'xml', 'php')),
+            array('SensioFoo:Post:index.html.php', new TemplateReference('SensioFoo', 'Post', 'index', 'html', 'php')),
+            array('SensioCmsFoo:Post:index.html.php', new TemplateReference('SensioCmsFoo', 'Post', 'index', 'html', 'php')),
             array(':Post:index.html.php', new TemplateReference('', 'Post', 'index', 'html', 'php')),
             array('::index.html.php', new TemplateReference('', '', 'index', 'html', 'php')),
         );
@@ -68,11 +68,11 @@ class TemplateNameParserTest extends TestCase
     public function getInvalidLogicalNameProvider()
     {
         return array(
-            array('BarBundle:Post:index.html.php'),
-            array('FooBundle:Post:index'),
+            array('Bar:Post:index.html.php'),
+            array('Foo:Post:index'),
             array('FooBundle:Post'),
-            array('FooBundle:Post:foo:bar'),
-            array('FooBundle:Post:index.foo.bar.foobar'),
+            array('Foo:Post:foo:bar'),
+            array('Foo:Post:index.foo.bar.foobar'),
         );
     }
 

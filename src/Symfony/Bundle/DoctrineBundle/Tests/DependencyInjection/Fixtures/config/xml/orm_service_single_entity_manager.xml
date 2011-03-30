@@ -32,7 +32,7 @@
                     <port>11211</port>
                     <instance-class>Memcache</instance-class>
                 </metadata-cache-driver>
-                <mapping name="YamlBundle" />
+                <mapping name="Yaml" />
             </entity-manager>
         </orm>
     </config>

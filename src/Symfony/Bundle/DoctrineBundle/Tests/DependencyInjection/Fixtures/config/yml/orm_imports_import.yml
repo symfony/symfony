@@ -6,4 +6,4 @@ doctrine:
             default:
                 metadata_cache_driver: apc
                 mappings:
-                    YamlBundle: ~
+                    Yaml: ~

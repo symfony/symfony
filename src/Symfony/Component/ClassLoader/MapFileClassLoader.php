@@ -61,4 +61,22 @@ class MapFileClassLoader
             require $this->map[$class];
         }
     }
+
+    /**
+     * Finds the path to the file where the class is defined.
+     *
+     * @param string $class The name of the class
+     *
+     * @return string|null The path, if found
+     */
+    public function findFile($class)
+    {
+        if ('\\' === $class[0]) {
+            $class = substr($class, 1);
+        }
+
+        if (isset($this->map[$class])) {
+            return $this->map[$class];
+        }
+    }
 }

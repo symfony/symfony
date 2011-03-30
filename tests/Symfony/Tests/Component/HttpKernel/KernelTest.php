@@ -306,7 +306,7 @@ EOF;
     public function testInitializeBundles()
     {
         $parent = $this->getBundle(null, null, 'ParentABundle');
-        $child = $this->getBundle(null, 'ParentABundle', 'ChildABundle');
+        $child = $this->getBundle(null, 'ParentA', 'ChildABundle');
 
         $kernel = $this->getKernel();
         $kernel
@@ -317,14 +317,14 @@ EOF;
         $kernel->initializeBundles();
 
         $map = $kernel->getBundleMap();
-        $this->assertEquals(array($child, $parent), $map['ParentABundle']);
+        $this->assertEquals(array($child, $parent), $map['ParentA']);
     }
 
     public function testInitializeBundlesSupportInheritanceCascade()
     {
         $grandparent = $this->getBundle(null, null, 'GrandParentBBundle');
-        $parent = $this->getBundle(null, 'GrandParentBBundle', 'ParentBBundle');
-        $child = $this->getBundle(null, 'ParentBBundle', 'ChildBBundle');
+        $parent = $this->getBundle(null, 'GrandParentB', 'ParentBBundle');
+        $child = $this->getBundle(null, 'ParentB', 'ChildBBundle');
 
         $kernel = $this->getKernel();
         $kernel
@@ -336,9 +336,9 @@ EOF;
         $kernel->initializeBundles();
 
         $map = $kernel->getBundleMap();
-        $this->assertEquals(array($child, $parent, $grandparent), $map['GrandParentBBundle']);
-        $this->assertEquals(array($child, $parent), $map['ParentBBundle']);
-        $this->assertEquals(array($child), $map['ChildBBundle']);
+        $this->assertEquals(array($child, $parent, $grandparent), $map['GrandParentB']);
+        $this->assertEquals(array($child, $parent), $map['ParentB']);
+        $this->assertEquals(array($child), $map['ChildB']);
     }
 
     /**
@@ -359,9 +359,9 @@ EOF;
 
     public function testInitializeBundlesSupportsArbitraryBundleRegistrationOrder()
     {
-        $grandparent = $this->getBundle(null, null, 'GrandParentCCundle');
-        $parent = $this->getBundle(null, 'GrandParentCCundle', 'ParentCCundle');
-        $child = $this->getBundle(null, 'ParentCCundle', 'ChildCCundle');
+        $grandparent = $this->getBundle(null, null, 'GrandParentCBundle');
+        $parent = $this->getBundle(null, 'GrandParentC', 'ParentCBundle');
+        $child = $this->getBundle(null, 'ParentC', 'ChildC1Bundle');
 
         $kernel = $this->getKernel();
         $kernel
@@ -373,9 +373,9 @@ EOF;
         $kernel->initializeBundles();
 
         $map = $kernel->getBundleMap();
-        $this->assertEquals(array($child, $parent, $grandparent), $map['GrandParentCCundle']);
-        $this->assertEquals(array($child, $parent), $map['ParentCCundle']);
-        $this->assertEquals(array($child), $map['ChildCCundle']);
+        $this->assertEquals(array($child, $parent, $grandparent), $map['GrandParentC']);
+        $this->assertEquals(array($child, $parent), $map['ParentC']);
+        $this->assertEquals(array($child), $map['ChildC1']);
     }
 
     /**
@@ -383,9 +383,9 @@ EOF;
      */
     public function testInitializeBundlesThrowsExceptionWhenABundleIsDirectlyExtendedByTwoBundles()
     {
-        $parent = $this->getBundle(null, null, 'ParentCBundle');
-        $child1 = $this->getBundle(null, 'ParentCBundle', 'ChildC1Bundle');
-        $child2 = $this->getBundle(null, 'ParentCBundle', 'ChildC2Bundle');
+        $parent = $this->getBundle(null, null, 'ParentC1Bundle');
+        $child1 = $this->getBundle(null, 'ParentC1', 'ChildC2Bundle');
+        $child2 = $this->getBundle(null, 'ParentC1', 'ChildC3Bundle');
 
         $kernel = $this->getKernel();
         $kernel
@@ -415,35 +415,31 @@ EOF;
 
     protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null)
     {
-        $bundle = $this
-            ->getMockBuilder('Symfony\Tests\Component\HttpKernel\BundleForTest')
-            ->setMethods(array('getPath', 'getParent', 'getName'))
-            ->disableOriginalConstructor()
-        ;
-
-        if ($className) {
-            $bundle->setMockClassName($className);
+        if (null === $className) {
+            $className = 'Test'.rand(11111, 99999).'Bundle';
         }
 
-        $bundle = $bundle->getMockForAbstractClass();
+        if (null === $bundleName) {
+            $bundleName = substr($className, 0, -6);
+        }
 
-        $bundle
-            ->expects($this->any())
+        $bundle = $this->getMockBuilder('Symfony\Tests\Component\HttpKernel\BundleForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getPath', 'getParent', 'getName'))
+            ->setMockClassName($className)
+            ->getMockForAbstractClass();
+
+        $bundle->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue(is_null($bundleName) ? get_class($bundle) : $bundleName))
-        ;
+            ->will($this->returnValue($bundleName));
 
-        $bundle
-            ->expects($this->any())
+        $bundle->expects($this->any())
             ->method('getPath')
-            ->will($this->returnValue(strtr($dir, '\\', '/')))
-        ;
+            ->will($this->returnValue(strtr($dir, '\\', '/')));
 
-        $bundle
-            ->expects($this->any())
+        $bundle->expects($this->any())
             ->method('getParent')
-            ->will($this->returnValue($parent))
-        ;
+            ->will($this->returnValue($parent));
 
         return $bundle;
     }

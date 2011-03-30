@@ -33,7 +33,11 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertAttributeEquals('application/octet-stream', 'mimeType', $file);
-        $this->assertEquals('image/gif', $file->getMimeType());
+        if (extension_loaded('fileinfo')) {
+            $this->assertEquals('image/gif', $file->getMimeType());
+        } else {
+            $this->assertEquals('application/octet-stream', $file->getMimeType());
+        }
     }
 
     public function testFileUploadsWithUnknownMimeType()

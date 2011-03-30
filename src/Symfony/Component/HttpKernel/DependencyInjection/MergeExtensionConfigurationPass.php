@@ -25,7 +25,7 @@ class MergeExtensionConfigurationPass extends BaseMergeExtensionConfigurationPas
     {
         foreach ($container->getParameter('kernel.bundles') as $bundleName => $bundleClass) {
             $bundleRefl = new \ReflectionClass($bundleClass);
-            $extClass = $bundleRefl->getNamespaceName().'\\DependencyInjection\\'.substr($bundleName, 0, -6).'Extension';
+            $extClass = $bundleRefl->getNamespaceName().'\\DependencyInjection\\'.$bundleName.'Extension';
 
             if (class_exists($extClass)) {
                 $ext = new $extClass();

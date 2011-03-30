@@ -134,7 +134,7 @@ EOF
         }
         $output->writeln(sprintf('<comment>Options</comment>      %s', $options));
         $output->write('<comment>Regex</comment>        ');
-        $output->writeln(preg_replace('/^             /', '', preg_replace('/^/m', '             ', $route->getRegex())), Output::OUTPUT_RAW);
+        $output->writeln(preg_replace('/^             /', '', preg_replace('/^/m', '             ', $route->getRegex())), OutputInterface::OUTPUT_RAW);
 
         $tokens = '';
         foreach ($route->getTokens() as $token) {

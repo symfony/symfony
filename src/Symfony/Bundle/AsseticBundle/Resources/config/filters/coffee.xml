@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="assetic.filter.coffee.class">Assetic\Filter\CoffeeScriptFilter</parameter>
+        <parameter key="assetic.filter.coffee.bin">/usr/bin/coffee</parameter>
+        <parameter key="assetic.filter.coffee.node">%assetic.node.bin%</parameter>
+    </parameters>
+
+    <services>
+        <service id="assetic.filter.coffee" class="%assetic.filter.coffee.class%">
+            <tag name="assetic.filter" alias="coffee" />
+            <argument>%assetic.filter.coffee.bin%</argument>
+            <argument>%assetic.filter.coffee.node%</argument>
+        </service>
+    </services>
+</container>

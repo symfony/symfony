@@ -20,6 +20,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
  * sections are normalized, and merged.
  *
  * @author Christophe Coevoet <stof@notk.org>
+ * @author Kris Wallsmith <kris@symfony.com>
  */
 class Configuration
 {
@@ -41,10 +42,11 @@ class Configuration
                 ->booleanNode('use_controller')->defaultValue($debug)->end()
                 ->scalarNode('read_from')->defaultValue('%kernel.root_dir%/../web')->end()
                 ->scalarNode('write_to')->defaultValue('%assetic.read_from%')->end()
-                ->scalarNode('closure')->end()
-                ->scalarNode('yui')->end()
-                ->scalarNode('default_javascripts_output')->defaultValue('js/*.js')->end()
-                ->scalarNode('default_stylesheets_output')->defaultValue('css/*.css')->end()
+                ->scalarNode('closure')->defaultNull()->end()
+                ->scalarNode('java')->defaultNull()->end()
+                ->scalarNode('node')->defaultNull()->end()
+                ->scalarNode('sass')->defaultNull()->end()
+                ->scalarNode('yui')->defaultNull()->end()
             ->end()
             ->fixXmlConfig('bundle')
             ->children()
@@ -52,15 +54,24 @@ class Configuration
                     ->defaultValue($bundles)
                     ->requiresAtLeastOneElement()
                     ->beforeNormalization()
-                        ->ifTrue(function($v){ return !is_array($v); })
-                        ->then(function($v){ return array($v); })
+                        ->ifTrue(function($v) { return !is_array($v); })
+                        ->then(function($v) { return array($v); })
                     ->end()
                     ->prototype('scalar')
                         ->beforeNormalization()
                             ->ifTrue(function($v) { return is_array($v) && isset($v['name']); })
-                            ->then(function($v){ return $v['name']; })
+                            ->then(function($v) { return $v['name']; })
                         ->end()
                     ->end()
+                ->end()
+            ->end()
+            ->fixXmlConfig('filter')
+            ->children()
+                ->arrayNode('filters')
+                    ->addDefaultsIfNotSet()
+                    ->requiresAtLeastOneElement()
+                    ->useAttributeAsKey('name')
+                    ->prototype('array')->end()
                 ->end()
             ->end()
         ;

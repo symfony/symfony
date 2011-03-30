@@ -65,6 +65,6 @@ EOF
 
         $dumper = new ApacheMatcherDumper($router->getRouteCollection());
 
-        $output->writeln($dumper->dump($dumpOptions), Output::OUTPUT_RAW);
+        $output->writeln($dumper->dump($dumpOptions), OutputInterface::OUTPUT_RAW);
     }
 }

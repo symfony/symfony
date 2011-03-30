@@ -1,7 +1,7 @@
 <?php $view->extend('::base.html.php') ?>
 
 <?php $view['slots']->start('stylesheets') ?>
-    <?php foreach($view['assetic']->stylesheets('stylesheet1.css, stylesheet2.css, @TestBundle/Resources/css/bundle.css') as $url): ?>
+    <?php foreach($view['assetic']->stylesheets('stylesheet1.css, stylesheet2.css, @Test/Resources/css/bundle.css') as $url): ?>
         <link href="<?php echo $view->escape($url) ?>" type="text/css" rel="stylesheet" />
     <?php endforeach; ?>
 <?php $view['slots']->stop() ?>

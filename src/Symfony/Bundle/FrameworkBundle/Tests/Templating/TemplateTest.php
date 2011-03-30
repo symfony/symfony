@@ -40,8 +40,8 @@ class TemplateTest extends TestCase
     public function getTemplateToPathProvider()
     {
         return array(
-            array(new TemplateReference('FooBundle', 'Post', 'index', 'html', 'php'), '@FooBundle/Resources/views/Post/index.html.php'),
-            array(new TemplateReference('FooBundle', '', 'index', 'html', 'twig'), '@FooBundle/Resources/views/index.html.twig'),
+            array(new TemplateReference('Foo', 'Post', 'index', 'html', 'php'), '@Foo/Resources/views/Post/index.html.php'),
+            array(new TemplateReference('Foo', '', 'index', 'html', 'twig'), '@Foo/Resources/views/index.html.twig'),
             array(new TemplateReference('', 'Post', 'index', 'html', 'php'), 'views/Post/index.html.php'),
             array(new TemplateReference('', '', 'index', 'html', 'php'), 'views/index.html.php'),
         );

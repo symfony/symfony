@@ -119,7 +119,8 @@ class DateField extends HybridField
         $this->formatter = new \IntlDateFormatter(
             \Locale::getDefault(),
             self::$intlFormats[$this->getOption('format')],
-            \IntlDateFormatter::NONE
+            \IntlDateFormatter::NONE,
+            \DateTimeZone::UTC
         );
 
         if ($this->getOption('type') === self::STRING) {
@@ -206,7 +207,7 @@ class DateField extends HybridField
             $choices = array();
 
             foreach ($months as $month) {
-                $choices[$month] = $this->formatter->format(gmmktime(0, 0, 0, $month));
+                $choices[$month] = $this->formatter->format(gmmktime(0, 0, 0, $month, 1));
             }
 
             $this->formatter->setPattern($pattern);

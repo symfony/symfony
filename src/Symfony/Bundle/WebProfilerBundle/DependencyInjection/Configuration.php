@@ -31,7 +31,7 @@ class Configuration
     public function getConfigTree()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('swiftmailer');
+        $rootNode = $treeBuilder->root('web_profiler');
 
         $rootNode
             ->children()

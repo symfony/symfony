@@ -74,8 +74,10 @@ class FrameworkExtension extends Extension
             if (false === $config['error_handler']) {
                 $container->getDefinition('error_handler')->setMethodCalls(array());
             } else {
-                $container->getDefinition('error_handler')->addMethodCall('register', array());
-                $container->setParameter('error_handler.level', $config['error_handler']);
+                $container
+                    ->getDefinition('error_handler')->addMethodCall('register', array())
+                    ->setParameter(0, $config['error_handler'])
+                ;
             }
         }
 

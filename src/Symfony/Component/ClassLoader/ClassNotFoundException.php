@@ -38,6 +38,8 @@ class ClassNotFoundException extends \Exception
         // create an array of "potential paths" for this file
         $autoloaders = spl_autoload_functions();
         $paths = array();
+        $universalAutoloaders = 0;
+        $otherAutoloaders = 0;
         foreach ($autoloaders as $autoloader) {
             // check to see if the callable is an object:method callable
             if (is_array($autoloader) && is_object($autoloader[0])) {
@@ -45,25 +47,54 @@ class ClassNotFoundException extends \Exception
 
                 if ($obj instanceof UniversalClassLoader) {
                     $paths = array_merge($paths, $obj->getLoadTrace($class));
+                    $universalAutoloaders++;
+                } else {
+                    $otherAutoloaders++;
                 }
             }
         }
 
+        return $this->constructMessage($class, $paths, $universalAutoloaders, $otherAutoloaders);
+    }
+
+    /**
+     * Builds the actual message from all of the debug information
+     *
+     * @param string  $class The name of the class that cannot be found
+     * @param array   $paths The array of paths looked in
+     * @param integer $universalAutoloaders The number of universal autoloaders
+     * @param integer $otherAutoloaders The number of other autoloaders
+     *
+     * @return string
+     */
+    private function constructMessage($class, $paths, $universalAutoloaders, $otherAutoloaders)
+    {
+        // no universal autoloaders means that we know nothing
+        if (0 == $universalAutoloaders) {
+            return sprintf('Class "%s" could not be autoloaded.', $class);
+        }
+
+        // there is a mixture of autoloaders, keep the message simple
+        if ($otherAutoloaders > 0) {
+            return sprintf('Class "%s" could not be autoloaded by the UniversalClassLoader or "%s" other autoloader(s).', $class, $otherAutoloaders);
+        }
+
+        // there are only universal autoloaders - return debug paths
         if (0 == count($paths)) {
-            return sprintf('Class "%s" could not be found - check the class name or your autoloader configuration.', $class);
+            return sprintf('Class "%s" could not be autoloaded: No possible paths could be found for the class or namespace. Check the class name or your autoloader configuration.', $class);
         } elseif (1 == count($paths)) {
             $path = $paths[0];
 
             // the file doesn't exist at the one possible path
             if (!file_exists($path)) {
-                return sprintf('Class "%s" could not be found at "%s" - the file does not exist.', $class, $path);
+                return sprintf('Class "%s" could not be autoloaded at "%s" - that file does not exist. If this path is not correct, check your autoloader configuration.', $class, $path);
             }
 
             // the file exists, but the class is not in it
-            return sprintf('The file "%s" was loaded, but the class "%s" was not found in it.', $path, $class);
+            return sprintf('Class "%s" could not be autoloaded: The file "%s" was included, but the class was not found. Check the class name and namespace in that file.', $class, $path);
         }
 
         // the class was looked for in multiple locations
-        return sprintf('Class "%s" could not be found, but was searched for in the following locations: %s.', $class, implode(', ', $paths));
+        return sprintf('Class "%s" could not be autoloaded, but was searched for in the following locations: %s.', $class, implode(', ', $paths));
     }
 }

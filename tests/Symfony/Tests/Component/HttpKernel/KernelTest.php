@@ -444,7 +444,7 @@ EOF;
 
         $kernel = $this->getKernel();
         $kernel
-            ->expects($this->once())
+            ->expects($this->exactly(4))
             ->method('getBundle')
             ->will($this->returnValue(array($child, $parent)))
         ;
@@ -454,8 +454,25 @@ EOF;
             __DIR__.'/Fixtures/ChildBundle/Resources/foo.txt',
             __DIR__.'/Fixtures/BaseBundle/Resources/foo.txt',
             ),
-            $kernel->locateResource('@Child/Resources/foo.txt', __DIR__.'/Fixtures/Resources', false)
+            $kernel->locateResource('@Base/Resources/foo.txt', __DIR__.'/Fixtures/Resources', false)
         );
+
+        $this->assertEquals(
+            __DIR__.'/Fixtures/Resources/ChildBundle/foo.txt',
+            $kernel->locateResource('@Base/Resources/foo.txt', __DIR__.'/Fixtures/Resources')
+        );
+
+        try {
+            $kernel->locateResource('@Base/Resources/hide.txt', __DIR__.'/Fixtures/Resources', false);
+            $this->fail('Hidden resources should raise an exception when returning an array of matching paths');
+        } catch (\RuntimeException $e) {
+        }
+
+        try {
+            $kernel->locateResource('@Base/Resources/hide.txt', __DIR__.'/Fixtures/Resources', true);
+            $this->fail('Hidden resources should raise an exception when returning the first matching path');
+        } catch (\RuntimeException $e) {
+        }
     }
 
     public function testLocateResourceOnDirectories()

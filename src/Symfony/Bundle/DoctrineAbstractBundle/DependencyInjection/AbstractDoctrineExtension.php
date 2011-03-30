@@ -153,7 +153,7 @@ abstract class AbstractDoctrineExtension extends Extension
         }
 
         if (!$bundleConfig['dir']) {
-            if (in_array($bundleConfig['type'], array('annotation', 'static-php'))) {
+            if (in_array($bundleConfig['type'], array('annotation', 'staticphp'))) {
                 $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingObjectDefaultName();
             } else {
                 $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingResourceConfigDirectory();
@@ -236,7 +236,7 @@ abstract class AbstractDoctrineExtension extends Extension
 
         if (!in_array($mappingConfig['type'], array('xml', 'yml', 'annotation', 'php', 'staticphp'))) {
             throw new \InvalidArgumentException("Can only configure 'xml', 'yml', 'annotation', 'php' or ".
-                "'static-php' through the DoctrineBundle. Use your own bundle to configure other metadata drivers. " .
+                "'staticphp' through the DoctrineBundle. Use your own bundle to configure other metadata drivers. " .
                 "You can register them by adding a a new driver to the ".
                 "'" . $this->getObjectManagerElementName($objectManagerName . ".metadata_driver")."' service definition."
             );

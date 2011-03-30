@@ -40,6 +40,7 @@ class Configuration
                     ->children()
                         ->scalarNode('priority')->defaultValue('INFO')->end()
                         ->scalarNode('path')->defaultValue('%kernel.logs_dir%/%kernel.environment%.log')->end()
+                        ->scalarNode('format')->defaultValue("%%timestamp%% %%priorityName%%: %%message%%\n")->end()
                         ->booleanNode('log_errors')->defaultFalse()->end()
                     ->end()
                 ->end()

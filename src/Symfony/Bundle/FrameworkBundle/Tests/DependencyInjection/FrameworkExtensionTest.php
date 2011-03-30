@@ -104,8 +104,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('full');
 
         $this->assertTrue($container->hasDefinition('templating.name_parser'), '->registerTemplatingConfiguration() loads templating.xml');
-        $this->assertEquals('SomeVersionScheme', $container->getParameter('templating.assets.version'));
-        $this->assertEquals(array('http://cdn.example.com'), $container->getParameter('templating.assets.base_urls'));
+        $arguments = $container->getDefinition('templating.helper.assets')->getArguments();
+        $this->assertEquals('SomeVersionScheme', $arguments[2]);
+        $this->assertEquals(array('http://cdn.example.com'), $arguments[1]);
 
         $this->assertTrue($container->getDefinition('templating.cache_warmer.template_paths')->hasTag('kernel.cache_warmer'), '->registerTemplatingConfiguration() tags templating cache warmer if cache warming is set');
         $this->assertEquals('templating.locator.cached', (string) $container->getAlias('templating.locator'), '->registerTemplatingConfiguration() changes templating.locator alias to cached if cache warming is set');

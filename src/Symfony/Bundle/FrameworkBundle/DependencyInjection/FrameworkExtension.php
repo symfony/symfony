@@ -330,14 +330,6 @@ class FrameworkExtension extends Extension
             $loader->load('templating_debug.xml');
         }
 
-        if (isset($config['assets_version'])) {
-            $container->setParameter('templating.assets.version', $config['assets_version']);
-        }
-
-        if (isset($config['assets_base_urls'])) {
-            $container->setParameter('templating.assets.base_urls', $config['assets_base_urls']);
-        }
-
         $packages = array();
         foreach ($config['packages'] as $name => $package) {
             $packages[$name] = new Definition('%templating.asset_package.class%', array(
@@ -345,7 +337,12 @@ class FrameworkExtension extends Extension
                 $package['version'],
             ));
         }
-        $container->getDefinition('templating.helper.assets')->setArgument(3, $packages);
+        $container
+            ->getDefinition('templating.helper.assets')
+            ->setArgument(1, isset($config['assets_base_urls']) ? $config['assets_base_urls'] : array())
+            ->setArgument(2, $config['assets_version'])
+            ->setArgument(3, $packages)
+        ;
 
         if (!empty($config['loaders'])) {
             $loaders = array_map(function($loader) { return new Reference($loader); }, $config['loaders']);

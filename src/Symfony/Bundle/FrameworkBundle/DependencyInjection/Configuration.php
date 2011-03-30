@@ -174,7 +174,7 @@ class Configuration
                 ->arrayNode('templating')
                     ->canBeUnset()
                     ->children()
-                        ->scalarNode('assets_version')->end()
+                        ->scalarNode('assets_version')->defaultValue(null)->end()
                     ->end()
                     ->fixXmlConfig('assets_base_url')
                     ->children()

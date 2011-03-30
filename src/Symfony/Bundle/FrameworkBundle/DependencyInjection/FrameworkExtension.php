@@ -295,9 +295,7 @@ class FrameworkExtension extends Extension
             $container->setParameter('session.class', $config['class']);
         }
 
-        if (isset($config['default_locale'])) {
-            $container->setParameter('session.default_locale', $config['default_locale']);
-        }
+        $container->getDefinition('session')->setArgument(1, $config['default_locale']);
 
         $container->setAlias('session.storage', 'session.storage.'.$config['storage_id']);
 

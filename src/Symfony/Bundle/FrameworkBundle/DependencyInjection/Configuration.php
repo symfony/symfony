@@ -143,11 +143,11 @@ class Configuration
                             }
                             return $v;
                         })
-                    ->end()                    
+                    ->end()
                     ->children()
                         ->booleanNode('auto_start')->end()
                         ->scalarNode('class')->end()
-                        ->scalarNode('default_locale')->end()
+                        ->scalarNode('default_locale')->defaultValue('en')->end()
                         ->scalarNode('storage_id')->defaultValue('native')->end()
                         // NativeSessionStorage options
                         ->scalarNode('name')->end()

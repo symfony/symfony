@@ -236,22 +236,16 @@ abstract class Kernel implements KernelInterface
         $name = substr($name, 1);
         list($bundleName, $path) = explode('/', $name, 2);
 
-        $isResource = 0 === strpos($path, 'Resources');
+        $isResource = 0 === strpos($path, 'Resources') && null !== $dir;
         
-        $files = array();
-        if (true === $isResource && null !== $dir) {
-            $resourcePath = substr($path, 9);
-            foreach ($this->getBundle($bundleName, false) as $bundle) {
-                if (file_exists($file = $dir.'/'.$bundle->getName().'Bundle'.$resourcePath)) {
-                    if ($first) {
-                        return $file;
-                    }
-                    $files[] = $file;
-                }
-            }
-        }
-
         foreach ($this->getBundle($bundleName, false) as $bundle) {
+            if ($isResource && file_exists($file = $dir.'/'.$bundle->getName().'Bundle/'.$path)) {
+                if ($first) {
+                    return $file;
+                }
+                $files[] = $file;
+            }
+
             if (file_exists($file = $bundle->getPath().'/'.$path)) {
                 if ($first) {
                     return $file;

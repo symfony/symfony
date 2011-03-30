@@ -29,14 +29,6 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
  */
 abstract class Output implements OutputInterface
 {
-    const VERBOSITY_QUIET   = 0;
-    const VERBOSITY_NORMAL  = 1;
-    const VERBOSITY_VERBOSE = 2;
-
-    const OUTPUT_NORMAL = 0;
-    const OUTPUT_RAW = 1;
-    const OUTPUT_PLAIN = 2;
-
     private $verbosity;
     private $formatter;
 
@@ -168,12 +160,12 @@ abstract class Output implements OutputInterface
 
         foreach ($messages as $message) {
             switch ($type) {
-                case Output::OUTPUT_NORMAL:
+                case OutputInterface::OUTPUT_NORMAL:
                     $message = $this->formatter->format($message);
                     break;
-                case Output::OUTPUT_RAW:
+                case OutputInterface::OUTPUT_RAW:
                     break;
-                case Output::OUTPUT_PLAIN:
+                case OutputInterface::OUTPUT_PLAIN:
                     $message = strip_tags($this->formatter->format($message));
                     break;
                 default:

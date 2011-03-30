@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\ClassLoader;
 
+require_once __DIR__.'/ClassLoaderInterface.php';
+
 /**
  * UniversalClassLoader implements a "universal" autoloader for PHP 5.3.
  *
@@ -54,7 +56,7 @@ namespace Symfony\Component\ClassLoader;
  *
  * @api
  */
-class UniversalClassLoader
+class UniversalClassLoader implements ClassLoaderInterface
 {
     private $namespaces = array();
     private $prefixes = array();
@@ -210,7 +212,7 @@ class UniversalClassLoader
      *
      * @return string|null The path, if found
      */
-    protected function findFile($class)
+    public function findFile($class)
     {
         if ('\\' == $class[0]) {
             $class = substr($class, 1);

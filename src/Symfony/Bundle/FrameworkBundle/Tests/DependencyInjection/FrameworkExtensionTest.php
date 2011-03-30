@@ -131,7 +131,8 @@ abstract class FrameworkExtensionTest extends TestCase
             '->registerTranslatorConfiguration() finds FrameworkExtension translation resources'
         );
 
-        $this->assertEquals('fr', $container->getParameter('translator.fallback_locale'));
+        $calls = $container->getDefinition('translator.real')->getMethodCalls();
+        $this->assertEquals('fr', $calls[0][1][0]);
     }
 
     /**

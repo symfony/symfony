@@ -255,7 +255,7 @@ class Configuration
                     ->canBeUnset()
                     ->children()
                         ->booleanNode('enabled')->defaultTrue()->end()
-                        ->scalarNode('fallback')->end()
+                        ->scalarNode('fallback')->defaultValue('en')->end()
                     ->end()
                 ->end()
             ->end()

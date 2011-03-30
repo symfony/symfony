@@ -64,12 +64,34 @@ class TemplatingExtension extends \Twig_Extension
     {
         return array(
             'asset' => new \Twig_Function_Method($this, 'getAssetUrl'),
+            'assets_version' => new \Twig_Function_Method($this, 'getAssetsVersion'),
         );
     }
 
-    public function getAssetUrl($location, $packageName = null)
+    /**
+     * Returns the public path of an asset
+     *
+     * Absolute paths (i.e. http://...) are returned unmodified.
+     *
+     * @param string $path        A public path
+     * @param string $packageName The name of the asset package to use
+     *
+     * @return string A public path which takes into account the base path and URL path
+     */
+    public function getAssetUrl($path, $packageName = null)
     {
-        return $this->container->get('templating.helper.assets')->getUrl($location, $packageName);
+        return $this->container->get('templating.helper.assets')->getUrl($path, $packageName);
+    }
+
+    /**
+     * Returns the version of the assets in a package
+     *
+     * @param string $packageName
+     * @return int
+     */
+    public function getAssetsVersion($packageName = null)
+    {
+        return $this->container->get('templating.helper.assets')->getVersion($packageName);
     }
 
     /**

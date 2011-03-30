@@ -155,6 +155,10 @@ class UploadedFile extends File
             return parent::move($directory, $name);
         }
 
+        if (null === $name) {
+            $name = $this->originalName;
+        }
+
         $this->doMove($directory, $name);
     }
 }

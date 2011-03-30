@@ -97,7 +97,7 @@ EOF;
      */
     public function offsetSet($offset, $value)
     {
-        if (is_null($offset)) {
+        if (null === $offset) {
             $this->violations[] = $value;
         } else {
             $this->violations[$offset] = $value;

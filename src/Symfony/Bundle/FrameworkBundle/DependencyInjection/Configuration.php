@@ -30,7 +30,7 @@ class Configuration
                 ->scalarNode('charset')->end()
                 ->scalarNode('document_root')->end()
                 ->scalarNode('error_handler')->end()
-                ->scalarNode('exception_controller')->end()
+                ->scalarNode('exception_controller')->defaultValue('Symfony\\Bundle\\FrameworkBundle\\Controller\\ExceptionController::showAction')->end()
                 ->scalarNode('ide')->end()
                 ->booleanNode('test')->end()
             ->end()

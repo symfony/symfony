@@ -81,9 +81,7 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (isset($config['exception_controller'])) {
-            $container->setParameter('exception_listener.controller', $config['exception_controller']);
-        }
+        $container->getDefinition('exception_listener')->setArgument(0, $config['exception_controller']);
 
         $pattern = '';
         if (isset($config['ide'])) {

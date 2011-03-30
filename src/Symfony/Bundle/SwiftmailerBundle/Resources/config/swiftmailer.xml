@@ -12,8 +12,6 @@
 
         <parameter key="swiftmailer.transport.failover.class">Swift_Transport_FailoverTransport</parameter>
 
-        <parameter key="swiftmailer.init_file">%swiftmailer.base_dir%/swift_init.php</parameter>
-
         <parameter key="swiftmailer.plugin.redirecting.class">Swift_Plugins_RedirectingPlugin</parameter>
         <parameter key="swiftmailer.plugin.blackhole.class">Swift_Plugins_BlackholePlugin</parameter>
         <parameter key="swiftmailer.plugin.messagelogger.class">Symfony\Bundle\SwiftmailerBundle\Logger\MessageLogger</parameter>

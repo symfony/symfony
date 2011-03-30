@@ -18,7 +18,7 @@ class StaticMethodLoader implements LoaderInterface
 {
     protected $methodName;
 
-    public function __construct($methodName)
+    public function __construct($methodName = 'loadValidatorMetadata')
     {
         $this->methodName = $methodName;
     }

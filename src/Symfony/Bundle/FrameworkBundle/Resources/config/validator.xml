@@ -14,7 +14,6 @@
         <parameter key="validator.mapping.loader.yaml_file_loader.class">Symfony\Component\Validator\Mapping\Loader\YamlFileLoader</parameter>
         <parameter key="validator.mapping.loader.xml_files_loader.class">Symfony\Component\Validator\Mapping\Loader\XmlFilesLoader</parameter>
         <parameter key="validator.mapping.loader.yaml_files_loader.class">Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader</parameter>
-        <parameter key="validator.mapping.loader.static_method_loader.method_name">loadValidatorMetadata</parameter>
         <parameter key="validator.validator_factory.class">Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory</parameter>
         <parameter key="validator.annotations.namespaces" type="collection">
             <parameter key="validation">Symfony\Component\Validator\Constraints\</parameter>
@@ -44,9 +43,7 @@
             </argument>
         </service>
 
-        <service id="validator.mapping.loader.static_method_loader" class="%validator.mapping.loader.static_method_loader.class%" public="false">
-            <argument>%validator.mapping.loader.static_method_loader.method_name%</argument>
-        </service>
+        <service id="validator.mapping.loader.static_method_loader" class="%validator.mapping.loader.static_method_loader.class%" public="false" />
 
     </services>
 </container>

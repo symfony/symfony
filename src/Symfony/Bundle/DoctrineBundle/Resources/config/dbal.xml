@@ -14,7 +14,6 @@
         <parameter key="doctrine.dbal.connection_factory_class">Symfony\Bundle\DoctrineBundle\ConnectionFactory</parameter>
         <parameter key="doctrine.dbal.events.mysql_session_init.class">Doctrine\DBAL\Event\Listeners\MysqlSessionInit</parameter>
         <parameter key="doctrine.dbal.events.oracle_session_init.class">Doctrine\DBAL\Event\Listeners\OracleSessionInit</parameter>
-        <parameter key="doctrine.dbal.logging">0</parameter>
     </parameters>
 
     <services>

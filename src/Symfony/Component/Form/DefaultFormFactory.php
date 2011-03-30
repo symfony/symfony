@@ -14,6 +14,8 @@ namespace Symfony\Component\Form;
 use Symfony\Component\HttpFoundation\File\TemporaryStorage;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\Renderer\Loader\ArrayRendererFactoryLoader;
+use Symfony\Component\Form\Renderer\ThemeRendererFactory;
 use Symfony\Component\Form\Type;
 use Symfony\Component\Form\Type\FormTypeInterface;
 use Symfony\Component\Form\Type\AbstractFieldType;
@@ -23,7 +25,6 @@ use Symfony\Component\Form\Renderer\Theme\ThemeFactoryInterface;
 use Symfony\Component\Form\Renderer\Theme\PhpThemeFactory;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\CsrfProvider\DefaultCsrfProvider;
-use Doctrine\ORM\EntityManager;
 
 /**
  * Default Form Factory simplifies the construction and usage of the form component in a non-dependency injection context.
@@ -41,15 +42,16 @@ class DefaultFormFactory extends FormFactory
      * @param string $csrfSecret
      * @param string $storageSecret
      * @param string $charset
-     * @param \Doctrine\ORM\EntityManager $entityManager
+     *
      * @return DefaultFormFactory
      */
-    public static function createDefault(ValidatorInterface $validator, $csrfSecret, $storageSecret, $charset = 'UTF-8', $entityManager = null)
+    public static function createDefault(ValidatorInterface $validator, $csrfSecret, $storageSecret, $charset = 'UTF-8')
     {
         $csrfProvider = new DefaultCsrfProvider($csrfSecret);
         $tempStorage = new TemporaryStorage($storageSecret);
         $defaultThemeFactory = new PhpThemeFactory($charset);
-        return self::createInstance($defaultThemeFactory, $validator, $csrfProvider, $tempStorage, $entityManager);
+
+        return self::createInstance($defaultThemeFactory, $validator, $csrfProvider, $tempStorage);
     }
 
     /**
@@ -59,20 +61,17 @@ class DefaultFormFactory extends FormFactory
      * @param ValidatorInterface $validator
      * @param CsrfProviderInterface $crsfProvider
      * @param TemporaryStorage $tempStorage
-     * @param \Doctrine\ORM\EntityManager $entityManager
+     *
      * @return DefaultFormFactory
      */
     public static function createInstance(ThemeFactoryInterface $themeFactory,
             ValidatorInterface $validator,
             CsrfProviderInterface $crsfProvider,
-            TemporaryStorage $tempStorage,
-            $entityManager = null)
+            TemporaryStorage $tempStorage)
     {
-        $typeLoader = new DefaultTypeLoader();
-        $factory = new self($typeLoader);
-        $typeLoader->initialize($factory, $themeFactory, null, $crsfProvider, $validator, $tempStorage, $entityManager);
+        $typeLoader = new DefaultTypeLoader($themeFactory, null, $validator, $crsfProvider, $tempStorage);
 
-        return $factory;
+        return new self($typeLoader, $themeFactory);
     }
 
     /**
@@ -82,11 +81,13 @@ class DefaultFormFactory extends FormFactory
 
     /**
      * @param TypeLoaderInterface $typeLoader
+     * @param ThemeFactoryInterface $themeFactory
      */
-    public function __construct(TypeLoaderInterface $typeLoader)
+    public function __construct(TypeLoaderInterface $typeLoader, ThemeFactoryInterface $themeFactory)
     {
         $this->typeLoader = $typeLoader;
-        parent::__construct($typeLoader);
+
+        parent::__construct($typeLoader, new ArrayRendererFactoryLoader(array('php' => new ThemeRendererFactory($themeFactory))));
     }
 
     /**

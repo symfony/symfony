@@ -206,21 +206,16 @@ class UniversalClassLoader
     /**
      * Finds the path to the file where the class is defined.
      *
-     * If $returnPaths is true, this will return the path to the file if
-     * found OR an array of paths where it looked for the class.
+     * @param string $class The name of the class
+     * @param array  $checked Each path checked is pushed onto this array
      *
-     * @param string  $class The name of the class
-     * @param Boolean $returnPaths Whether to return an array of potential paths
-     *
-     * @return string|null|array The path, if found, or an array of potential paths
+     * @return string|null The path, if found
      */
-    protected function findFile($class, $returnPaths = false)
+    protected function findFile($class, &$checked = array())
     {
         if ('\\' == $class[0]) {
             $class = substr($class, 1);
         }
-
-        $paths = array();
 
         if (false !== $pos = strrpos($class, '\\')) {
             // namespaced class name
@@ -229,61 +224,53 @@ class UniversalClassLoader
                 foreach ($dirs as $dir) {
                     if (0 === strpos($namespace, $ns)) {
                         $className = substr($class, $pos + 1);
-                        $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $className).'.php';
+                        $checked[] = $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $className).'.php';
                         if (file_exists($file)) {
                             return $file;
                         }
-                        $paths[] = $file;
                     }
                 }
             }
 
             foreach ($this->namespaceFallback as $dir) {
-                $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
+                $checked[] = $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
                 if (file_exists($file)) {
                     return $file;
                 }
-                $paths[] = $file;
             }
         } else {
             // PEAR-like class name
             foreach ($this->prefixes as $prefix => $dirs) {
                 foreach ($dirs as $dir) {
                     if (0 === strpos($class, $prefix)) {
-                        $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
-                        if (!$returnPaths && file_exists($file)) {
+                        $checked[] = $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
+                        if (file_exists($file)) {
                             return $file;
                         }
-                        $paths[] = $file;
                     }
                 }
             }
 
             foreach ($this->prefixFallback as $dir) {
-                $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
+                $checked[] = $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
                 if (file_exists($file)) {
                     return $file;
                 }
-                $paths[] = $file;
             }
-        }
-
-        if ($returnPaths) {
-            return $paths;
         }
     }
 
     /**
-     * Given a class name, this returns all of the paths that the autoloader
-     * will look to find that file.
-     *
-     * If the class exists at a specific path, it will return just that path.
+     * Returns the file paths checked for the supplied class.
      *
      * @param  string $class The class name
-     * @return array
+     * @return array An array of filesystem paths
      */
-    public function getPotentialPathsForClass($class)
+    public function getLoadTrace($class)
     {
-        return (array) $this->findFile($class, true);
+        $paths = array();
+        $this->findFile($class, $paths);
+
+        return $paths;
     }
 }

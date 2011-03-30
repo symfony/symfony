@@ -27,6 +27,12 @@ class ClassNotFoundException extends \Exception
         parent::__construct($this->generateMessage($class), $code, $previous);
     }
 
+    /**
+     * Attempts to generate as helpful of a message as possible.
+     *
+     * @param  $class The class name that could not be found
+     * @return string
+     */
     private function generateMessage($class)
     {
         // create an array of "potential paths" for this file
@@ -38,17 +44,17 @@ class ClassNotFoundException extends \Exception
                 $obj = $autoloader[0];
 
                 if ($obj instanceof UniversalClassLoader) {
-                    $paths = array_merge($paths, $obj->getPotentialPathsForClass($class));
+                    $paths = array_merge($paths, $obj->getLoadTrace($class));
                 }
             }
         }
 
         if (0 == count($paths)) {
-            return sprintf('Class "%s" could not be found - check the class name or autoloader.', $class);
+            return sprintf('Class "%s" could not be found - check the class name or your autoloader configuration.', $class);
         } elseif (1 == count($paths)) {
             $path = $paths[0];
 
-            // the file doesn't exist
+            // the file doesn't exist at the one possible path
             if (!file_exists($path)) {
                 return sprintf('Class "%s" could not be found at "%s" - the file does not exist.', $class, $path);
             }
@@ -58,6 +64,6 @@ class ClassNotFoundException extends \Exception
         }
 
         // the class was looked for in multiple locations
-        return sprintf('Class "%s" could not be found, but was looked for in the following locations: %s.', $class, implode(', ', $paths));
+        return sprintf('Class "%s" could not be found, but was searched for in the following locations: %s.', $class, implode(', ', $paths));
     }
 }

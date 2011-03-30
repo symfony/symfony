@@ -160,4 +160,30 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
             ),
         );
     }
+
+    public function testGetLoadTrace()
+    {
+        $loader = new UniversalClassLoader();
+        $loader->registerNamespace('Foo\\Bar', '/path/to/namespace');
+        $loader->registerNamespaceFallback('/path/to/namespace-fallback');
+
+        $loader->registerPrefix('Foo_Bar', '/path/to/prefix');
+        $loader->registerPrefixFallback('/path/to/prefix-fallback');
+
+        // test namespaces
+        $paths = $loader->getLoadTrace('Foo\Bar\Baz');
+        $expected = array(
+            '/path/to/namespace/Foo/Bar/Baz.php',
+            '/path/to/namespace-fallback/Foo/Bar/Baz.php',
+        );
+        $this->assertEquals($expected, $paths);
+
+        // test prefixes
+        $paths = $loader->getLoadTrace('Foo_Bar_Baz');
+        $expected = array(
+            '/path/to/prefix/Foo/Bar/Baz.php',
+            '/path/to/prefix-fallback/Foo/Bar/Baz.php',
+        );
+        $this->assertEquals($expected, $paths);
+    }
 }

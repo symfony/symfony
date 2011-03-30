@@ -23,7 +23,6 @@
   <services>
     <service id="swiftmailer.mailer" class="%swiftmailer.class%" public="false">
       <argument type="service" id="swiftmailer.transport" />
-      <file>%swiftmailer.init_file%</file>
     </service>
 
     <service id="swiftmailer.transport.sendmail" class="%swiftmailer.transport.sendmail.class%" public="false">

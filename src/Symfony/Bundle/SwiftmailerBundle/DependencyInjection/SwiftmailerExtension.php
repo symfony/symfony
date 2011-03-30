@@ -46,7 +46,7 @@ class SwiftmailerExtension extends Extension
         $container->setAlias('mailer', 'swiftmailer.mailer');
 
         $r = new \ReflectionClass('Swift_Message');
-        $container->setParameter('swiftmailer.base_dir', dirname(dirname(dirname($r->getFilename()))));
+        $container->getDefinition('swiftmailer.mailer')->setFile(dirname(dirname(dirname($r->getFilename()))));
 
         $configuration = new Configuration();
         $processor = new Processor();

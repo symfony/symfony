@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\ClassLoader;
 
-require_once __DIR__.'/ClassLoaderInterface.php';
 require_once __DIR__.'/UniversalClassLoader.php';
 
 /**

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\ClassLoader;
 
-require_once __DIR__.'/ClassLoaderInterface.php';
-
 /**
  * UniversalClassLoader implements a "universal" autoloader for PHP 5.3.
  *
@@ -56,7 +54,7 @@ require_once __DIR__.'/ClassLoaderInterface.php';
  *
  * @api
  */
-class UniversalClassLoader implements ClassLoaderInterface
+class UniversalClassLoader
 {
     private $namespaces = array();
     private $prefixes = array();

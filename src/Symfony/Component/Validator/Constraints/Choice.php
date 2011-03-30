@@ -25,7 +25,7 @@ class Choice extends \Symfony\Component\Validator\Constraint
     /**
      * {@inheritDoc}
      */
-    public function defaultOption()
+    public function getDefaultOption()
     {
         return 'choices';
     }
@@ -33,7 +33,7 @@ class Choice extends \Symfony\Component\Validator\Constraint
     /**
      * {@inheritDoc}
      */
-    public function targets()
+    public function getTargets()
     {
         return self::PROPERTY_CONSTRAINT;
     }

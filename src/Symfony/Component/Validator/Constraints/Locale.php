@@ -18,7 +18,7 @@ class Locale extends \Symfony\Component\Validator\Constraint
     /**
      * {@inheritDoc}
      */
-    public function targets()
+    public function getTargets()
     {
         return self::PROPERTY_CONSTRAINT;
     }

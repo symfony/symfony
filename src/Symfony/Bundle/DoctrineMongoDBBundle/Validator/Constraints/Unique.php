@@ -24,12 +24,12 @@ class Unique extends Constraint
     public $path;
     public $documentManager;
 
-    public function defaultOption()
+    public function getDefaultOption()
     {
         return 'path';
     }
 
-    public function requiredOptions()
+    public function getRequiredOptions()
     {
         return array('path');
     }
@@ -39,7 +39,7 @@ class Unique extends Constraint
         return 'doctrine_odm.mongodb.unique';
     }
 
-    public function targets()
+    public function getTargets()
     {
         return Constraint::CLASS_CONSTRAINT;
     }

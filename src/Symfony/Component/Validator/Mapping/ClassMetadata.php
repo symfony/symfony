@@ -96,7 +96,7 @@ class ClassMetadata extends ElementMetadata
      */
     public function addConstraint(Constraint $constraint)
     {
-        if (!in_array(Constraint::CLASS_CONSTRAINT, (array)$constraint->targets())) {
+        if (!in_array(Constraint::CLASS_CONSTRAINT, (array)$constraint->getTargets())) {
             throw new ConstraintDefinitionException(sprintf(
                 'The constraint %s cannot be put on classes',
                 get_class($constraint)

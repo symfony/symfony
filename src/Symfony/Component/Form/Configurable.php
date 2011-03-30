@@ -44,7 +44,7 @@ abstract class Configurable
      * The names of the required options
      * @var array
      */
-    private $requiredOptions = array();
+    private $getRequiredOptions = array();
 
     /**
      * Reads, validates and stores the given options
@@ -63,7 +63,7 @@ abstract class Configurable
         }
 
         // check required options
-        if ($diff = array_diff_key($this->requiredOptions, $this->options)) {
+        if ($diff = array_diff_key($this->getRequiredOptions, $this->options)) {
             throw new MissingOptionsException(sprintf('%s requires the following options: \'%s\'.', get_class($this), implode('", "', array_keys($diff))), array_keys($diff));
         }
     }
@@ -117,7 +117,7 @@ abstract class Configurable
     protected function addRequiredOption($name, array $allowedValues = array())
     {
         $this->knownOptions[$name] = true;
-        $this->requiredOptions[$name] = true;
+        $this->getRequiredOptions[$name] = true;
 
         // only test if the option is set, otherwise an error will be thrown
         // anyway

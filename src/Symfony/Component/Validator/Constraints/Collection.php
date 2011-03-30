@@ -19,7 +19,7 @@ class Collection extends \Symfony\Component\Validator\Constraint
     public $extraFieldsMessage = 'The fields {{ fields }} were not expected';
     public $missingFieldsMessage = 'The fields {{ fields }} are missing';
 
-    public function requiredOptions()
+    public function getRequiredOptions()
     {
         return array('fields');
     }
@@ -27,7 +27,7 @@ class Collection extends \Symfony\Component\Validator\Constraint
     /**
      * {@inheritDoc}
      */
-    public function targets()
+    public function getTargets()
     {
         return self::PROPERTY_CONSTRAINT;
     }

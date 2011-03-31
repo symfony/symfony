@@ -122,7 +122,7 @@ class FileTypeTest extends TestCase
             'token' => '123456',
             'name' => 'original_name.jpg',
         ), $this->form->getClientData());
-        $this->assertEquals($tmpPath, $this->form->getData());
+        $this->assertEquals(realpath($tmpPath), realpath($this->form->getData()));
     }
 
     public function testSubmitEmpty()
@@ -165,6 +165,6 @@ class FileTypeTest extends TestCase
             'token' => '',
             'name' => '',
         ), $this->form->getClientData());
-        $this->assertEquals($tmpPath, $this->form->getData());
+        $this->assertEquals(realpath($tmpPath), realpath($this->form->getData()));
     }
 }

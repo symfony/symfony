@@ -82,4 +82,12 @@ class TemplateReference implements TemplateReferenceInterface
     {
         return $this->parameters['name'];
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getLogicalName()
+    {
+        return $this->parameters['name'];
+    }
 }

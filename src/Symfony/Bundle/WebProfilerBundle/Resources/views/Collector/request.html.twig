@@ -17,11 +17,7 @@
             <span style="margin: 0; padding: 0; color: #979696;">|</span>
             <span{{ not collector.route ? ' style="color:#a33"' : '' }}>{{ collector.route ? collector.route : 'NONE' }}</span>
             <span style="margin: 0; padding: 0; color: #979696;">|</span>
-            <span>{{ collector.format }}</span>
-            <span style="margin: 0; padding: 0; color: #979696;">|</span>
             <span style="color: {{ 200 == collector.statuscode ? '#759e1a' : '#a33' }}">{{ collector.statuscode }}</span>
-            <span style="margin: 0; padding: 0; color: #979696;">|</span>
-            <span>{{ collector.contenttype }}</span>
         {% endspaceless %}
     {% endset %}
     {% include 'WebProfiler:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}

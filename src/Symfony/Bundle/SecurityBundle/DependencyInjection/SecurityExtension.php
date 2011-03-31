@@ -67,6 +67,10 @@ class SecurityExtension extends Extension
         // set some global scalars
         $container->setParameter('security.access.denied_url', $config['access_denied_url']);
         $container->setParameter('security.authentication.session_strategy.strategy', $config['session_fixation_strategy']);
+        $container->setParameter('security.access.decision_manager.strategy', $config['access_decision_manager']['strategy']);
+        $container->setParameter('security.access.decision_manager.allow_if_all_abstain', $config['access_decision_manager']['allow_if_all_abstain']);
+        $container->setParameter('security.access.decision_manager.allow_if_equal_granted_denied', $config['access_decision_manager']['allow_if_equal_granted_denied']);
+        $container->setParameter('security.access.always_authenticate_before_granting', $config['always_authenticate_before_granting']);
 
         $this->createFirewalls($config, $container);
         $this->createAuthorization($config, $container);
@@ -111,9 +115,17 @@ class SecurityExtension extends Extension
             $container->setAlias('security.acl.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']));
         }
 
-        if (isset($config['cache'])) {
-            $container->setAlias('security.acl.cache', sprintf('security.acl.cache.%s', $config['cache']));
+        if (isset($config['cache']['id'])) {
+            $container->setAlias('security.acl.cache', $config['cache']['id']);
         }
+        $container->setParameter('security.acl.cache.doctrine.prefix', $config['cache']['prefix']);
+
+        $container->setParameter('security.acl.dbal.class_table_name', $config['tables']['class']);
+        $container->setParameter('security.acl.dbal.entry_table_name', $config['tables']['entry']);
+        $container->setParameter('security.acl.dbal.oid_table_name', $config['tables']['object_identity']);
+        $container->setParameter('security.acl.dbal.oid_ancestors_table_name', $config['tables']['object_identity_ancestors']);
+        $container->setParameter('security.acl.dbal.sid_table_name', $config['tables']['security_identity']);
+        $container->setParameter('security.acl.voter.allow_if_object_identity_unavailable', $config['voter']['allow_if_object_identity_unavailable']);
     }
 
     /**

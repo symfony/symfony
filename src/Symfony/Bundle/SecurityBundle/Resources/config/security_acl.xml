@@ -5,24 +5,17 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="security.acl.dbal.class_table_name">acl_classes</parameter>
-        <parameter key="security.acl.dbal.entry_table_name">acl_entries</parameter>
-        <parameter key="security.acl.dbal.oid_table_name">acl_object_identities</parameter>
-        <parameter key="security.acl.dbal.oid_ancestors_table_name">acl_object_identity_ancestors</parameter>
-        <parameter key="security.acl.dbal.sid_table_name">acl_security_identities</parameter>
         <parameter key="security.acl.dbal.provider.class">Symfony\Component\Security\Acl\Dbal\MutableAclProvider</parameter>
 
         <parameter key="security.acl.permission_granting_strategy.class">Symfony\Component\Security\Acl\Domain\PermissionGrantingStrategy</parameter>
 
         <parameter key="security.acl.voter.class">Symfony\Component\Security\Acl\Voter\AclVoter</parameter>
-        <parameter key="security.acl.voter.allow_if_object_identity_unavailable">true</parameter>
         <parameter key="security.acl.permission.map.class">Symfony\Component\Security\Acl\Permission\BasicPermissionMap</parameter>
 
         <parameter key="security.acl.object_identity_retrieval_strategy.class">Symfony\Component\Security\Acl\Domain\ObjectIdentityRetrievalStrategy</parameter>
         <parameter key="security.acl.security_identity_retrieval_strategy.class">Symfony\Component\Security\Acl\Domain\SecurityIdentityRetrievalStrategy</parameter>
 
         <parameter key="security.acl.cache.doctrine.class">Symfony\Component\Security\Acl\Domain\DoctrineAclCache</parameter>
-        <parameter key="security.acl.cache.doctrine.prefix">sf2_acl_</parameter>
 
         <parameter key="security.acl.collection_cache.class">Symfony\Component\Security\Acl\Domain\AclCollectionCache</parameter>
     </parameters>

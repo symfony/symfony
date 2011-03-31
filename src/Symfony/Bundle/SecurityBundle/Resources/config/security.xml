@@ -6,7 +6,6 @@
 
     <parameters>
         <parameter key="security.context.class">Symfony\Component\Security\Core\SecurityContext</parameter>
-        <parameter key="security.context.always_authenticate">false</parameter>
 
         <parameter key="security.user_checker.class">Symfony\Component\Security\Core\User\UserChecker</parameter>
 
@@ -26,12 +25,8 @@
         <parameter key="security.authentication.manager.class">Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager</parameter>
 
         <parameter key="security.authentication.session_strategy.class">Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy</parameter>
-        <parameter key="security.authentication.session_strategy.strategy">migrate</parameter>
 
         <parameter key="security.access.decision_manager.class">Symfony\Component\Security\Core\Authorization\AccessDecisionManager</parameter>
-        <parameter key="security.access.decision_manager.strategy">affirmative</parameter>
-        <parameter key="security.access.decision_manager.allow_if_all_abstain">false</parameter>
-        <parameter key="security.access.decision_manager.allow_if_equal_granted_denied">true</parameter>
 
         <parameter key="security.access.simple_role_voter.class">Symfony\Component\Security\Core\Authorization\Voter\RoleVoter</parameter>
         <parameter key="security.access.authenticated_voter.class">Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter</parameter>
@@ -49,7 +44,7 @@
         <service id="security.context" class="%security.context.class%">
             <argument type="service" id="security.authentication.manager" />
             <argument type="service" id="security.access.decision_manager" />
-            <argument>%security.context.always_authenticate%</argument>
+            <argument>%security.access.always_authenticate_before_granting%</argument>
         </service>
 
         <!-- Authentication related services -->

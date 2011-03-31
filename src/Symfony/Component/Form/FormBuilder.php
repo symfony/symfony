@@ -56,8 +56,9 @@ class FormBuilder
 
     private $emptyData = null;
 
-    public function __construct(EventDispatcherInterface $dispatcher, $dataClass = null)
+    public function __construct($name, EventDispatcherInterface $dispatcher, $dataClass = null)
     {
+        $this->name = $name;
         $this->dispatcher = $dispatcher;
         $this->dataClass = $dataClass;
     }
@@ -72,13 +73,6 @@ class FormBuilder
     public function getFormFactory()
     {
         return $this->factory;
-    }
-
-    public function setName($name)
-    {
-        $this->name = $name;
-
-        return $this;
     }
 
     public function getName()

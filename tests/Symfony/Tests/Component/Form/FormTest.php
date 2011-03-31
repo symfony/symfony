@@ -26,7 +26,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->builder = new FormBuilder($this->dispatcher);
+        $this->builder = new FormBuilder('name', $this->dispatcher);
         $this->form = $this->builder->getForm();
     }
 

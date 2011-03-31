@@ -26,7 +26,18 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->builder = new FormBuilder($this->dispatcher);
+        $this->builder = new FormBuilder('name', $this->dispatcher);
+    }
+
+    /**
+     * Changing the name is not allowed, otherwise the name and property path
+     * are not synchronized anymore
+     *
+     * @see FieldType::buildForm
+     */
+    public function testNoSetName()
+    {
+        $this->assertFalse(method_exists($this->builder, 'setName'));
     }
 
     public function testAddNameNoString()
@@ -38,19 +49,19 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
     public function testAddTypeNoString()
     {
         $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
-        $this->builder->add("foo", 1234);
+        $this->builder->add('foo', 1234);
     }
 
     public function testAddWithGuessFluent()
     {
-        $this->builder = new FormBuilder($this->dispatcher, 'stdClass');
+        $this->builder = new FormBuilder('name', $this->dispatcher, 'stdClass');
         $builder = $this->builder->add('foo');
         $this->assertSame($builder, $this->builder);
     }
 
     public function testAddIsFluent()
     {
-        $builder = $this->builder->add("foo", "text", array("bar" => "baz"));
+        $builder = $this->builder->add('foo', 'text', array('bar' => 'baz'));
         $this->assertSame($builder, $this->builder);
     }
 
@@ -84,7 +95,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
     public function testBuildNoTypeNoDataClass()
     {
         $this->setExpectedException('Symfony\Component\Form\Exception\FormException', 'The data class must be set to automatically create children');
-        $this->builder->build("foo");
+        $this->builder->build('foo');
     }
 
     public function testGetUnknown()
@@ -123,7 +134,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
                 ->with($this->equalTo('stdClass'), $this->equalTo($expectedName), $this->equalTo($expectedOptions))
                 ->will($this->returnValue($this->getFormBuilder()));
 
-        $this->builder = new FormBuilder($this->dispatcher, 'stdClass');
+        $this->builder = new FormBuilder('name', $this->dispatcher, 'stdClass');
         $this->builder->setFormFactory($factory);
         $this->builder->add($expectedName, null, $expectedOptions);
         $builder = $this->builder->get($expectedName);

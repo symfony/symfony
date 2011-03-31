@@ -77,12 +77,11 @@ class FormFactory implements FormFactoryInterface
         }
 
         for ($i = 0, $l = count($types); $i < $l && !$builder; ++$i) {
-            $builder = $types[$i]->createBuilder($options);
+            $builder = $types[$i]->createBuilder($name, $options);
         }
 
         // TODO check if instance exists
 
-        $builder->setName($name);
         $builder->setTypes($types);
         $builder->setFormFactory($this);
 

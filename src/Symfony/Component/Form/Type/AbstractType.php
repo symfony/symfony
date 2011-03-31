@@ -30,7 +30,7 @@ abstract class AbstractType implements FormTypeInterface
     {
     }
 
-    public function createBuilder(array $options)
+    public function createBuilder($name, array $options)
     {
         return null;
     }

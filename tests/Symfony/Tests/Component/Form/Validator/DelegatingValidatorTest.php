@@ -71,8 +71,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function getBuilder($name, $propertyPath = null)
     {
-        $builder = new FormBuilder($this->dispatcher);
-        $builder->setName($name);
+        $builder = new FormBuilder($name, $this->dispatcher);
         $builder->setAttribute('property_path', new PropertyPath($propertyPath ?: $name));
         $builder->setAttribute('error_mapping', array());
 

@@ -118,9 +118,9 @@ class FieldType extends AbstractType
         return $defaultOptions;
     }
 
-    public function createBuilder(array $options)
+    public function createBuilder($name, array $options)
     {
-        return new FormBuilder(new EventDispatcher(), $options['data_class']);
+        return new FormBuilder($name, new EventDispatcher(), $options['data_class']);
     }
 
     public function getParent(array $options)

@@ -23,7 +23,7 @@ interface FormTypeInterface
 
     function buildRendererBottomUp(ThemeRendererInterface $renderer, FormInterface $form);
 
-    function createBuilder(array $options);
+    function createBuilder($name, array $options);
 
     function getDefaultOptions(array $options);
 

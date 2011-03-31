@@ -80,7 +80,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('full');
 
         $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
-        $this->assertEquals('fr', $container->getParameter('session.default_locale'));
+        $arguments = $container->getDefinition('session')->getArguments();
+        $this->assertEquals('fr', $arguments[1]);
         $this->assertTrue($container->getDefinition('session')->hasMethodCall('start'));
         $this->assertEquals('Session', $container->getParameter('session.class'));
         $this->assertEquals('session.storage.native', (string) $container->getAlias('session.storage'));
@@ -111,8 +112,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('full');
 
         $this->assertTrue($container->hasDefinition('templating.name_parser'), '->registerTemplatingConfiguration() loads templating.xml');
-        $this->assertEquals('SomeVersionScheme', $container->getParameter('templating.assets.version'));
-        $this->assertEquals(array('http://cdn.example.com'), $container->getParameter('templating.assets.base_urls'));
+        $arguments = $container->getDefinition('templating.helper.assets')->getArguments();
+        $this->assertEquals('SomeVersionScheme', $arguments[2]);
+        $this->assertEquals(array('http://cdn.example.com'), $arguments[1]);
 
         $this->assertTrue($container->getDefinition('templating.cache_warmer.template_paths')->hasTag('kernel.cache_warmer'), '->registerTemplatingConfiguration() tags templating cache warmer if cache warming is set');
         $this->assertEquals('templating.locator.cached', (string) $container->getAlias('templating.locator'), '->registerTemplatingConfiguration() changes templating.locator alias to cached if cache warming is set');
@@ -137,7 +139,8 @@ abstract class FrameworkExtensionTest extends TestCase
             '->registerTranslatorConfiguration() finds FrameworkExtension translation resources'
         );
 
-        $this->assertEquals('fr', $container->getParameter('translator.fallback_locale'));
+        $calls = $container->getDefinition('translator.real')->getMethodCalls();
+        $this->assertEquals('fr', $calls[0][1][0]);
     }
 
     /**
@@ -177,7 +180,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('validator.mapping.loader.annotation_loader'), '->registerValidationConfiguration() defines the annotation loader');
 
         $namespaces = $container->getParameter('validator.annotations.namespaces');
-        $this->assertEquals('Symfony\\Component\\Validator\\Constraints\\', $namespaces['validation'], '->registerValidationConfiguration() loads the default "validation" namespace');
+        $this->assertEquals('Symfony\\Component\\Validator\\Constraints\\', $namespaces['assert'], '->registerValidationConfiguration() loads the default "assert" prefix');
         $this->assertEquals('Application\\Validator\\Constraints\\', $namespaces['app'], '->registerValidationConfiguration() loads custom validation namespaces');
     }
 

@@ -74,14 +74,14 @@ class FrameworkExtension extends Extension
             if (false === $config['error_handler']) {
                 $container->getDefinition('error_handler')->setMethodCalls(array());
             } else {
-                $container->getDefinition('error_handler')->addMethodCall('register', array());
-                $container->setParameter('error_handler.level', $config['error_handler']);
+                $container
+                    ->getDefinition('error_handler')->addMethodCall('register', array())
+                    ->setParameter(0, $config['error_handler'])
+                ;
             }
         }
 
-        if (isset($config['exception_controller'])) {
-            $container->setParameter('exception_listener.controller', $config['exception_controller']);
-        }
+        $container->getDefinition('exception_listener')->setArgument(0, $config['exception_controller']);
 
         $pattern = '';
         if (isset($config['ide'])) {
@@ -293,9 +293,7 @@ class FrameworkExtension extends Extension
             $container->setParameter('session.class', $config['class']);
         }
 
-        if (isset($config['default_locale'])) {
-            $container->setParameter('session.default_locale', $config['default_locale']);
-        }
+        $container->getDefinition('session')->setArgument(1, $config['default_locale']);
 
         $container->setAlias('session.storage', 'session.storage.'.$config['storage_id']);
 
@@ -330,14 +328,6 @@ class FrameworkExtension extends Extension
             $loader->load('templating_debug.xml');
         }
 
-        if (isset($config['assets_version'])) {
-            $container->setParameter('templating.assets.version', $config['assets_version']);
-        }
-
-        if (isset($config['assets_base_urls'])) {
-            $container->setParameter('templating.assets.base_urls', $config['assets_base_urls']);
-        }
-
         $packages = array();
         foreach ($config['packages'] as $name => $package) {
             $packages[$name] = new Definition('%templating.asset_package.class%', array(
@@ -345,7 +335,12 @@ class FrameworkExtension extends Extension
                 $package['version'],
             ));
         }
-        $container->getDefinition('templating.helper.assets')->setArgument(3, $packages);
+        $container
+            ->getDefinition('templating.helper.assets')
+            ->setArgument(1, isset($config['assets_base_urls']) ? $config['assets_base_urls'] : array())
+            ->setArgument(2, $config['assets_version'])
+            ->setArgument(3, $packages)
+        ;
 
         if (!empty($config['loaders'])) {
             $loaders = array_map(function($loader) { return new Reference($loader); }, $config['loaders']);
@@ -426,7 +421,8 @@ class FrameworkExtension extends Extension
     {
         if (!empty($config['enabled'])) {
             // Use the "real" translator instead of the identity default
-            $container->setDefinition('translator', $container->findDefinition('translator.real'));
+            $container->setDefinition('translator', $translator = $container->findDefinition('translator.real'));
+            $translator->addMethodCall('setFallbackLocale', array($config['fallback']));
 
             // Discover translation directories
             $dirs = array();
@@ -453,10 +449,6 @@ class FrameworkExtension extends Extension
                 }
             }
             $container->setParameter('translation.resources', $resources);
-        }
-
-        if (isset($config['fallback'])) {
-            $container->setParameter('translator.fallback_locale', $config['fallback']);
         }
     }
 

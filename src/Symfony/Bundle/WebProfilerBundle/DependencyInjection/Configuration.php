@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\ZendBundle\DependencyInjection;
+namespace Symfony\Bundle\WebProfilerBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
@@ -19,7 +19,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
  * This information is solely responsible for how the different configuration
  * sections are normalized, and merged.
  *
- * @author Christophe Coevoet <stof@notk.org>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Configuration
 {
@@ -31,19 +31,12 @@ class Configuration
     public function getConfigTree()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('zend');
+        $rootNode = $treeBuilder->root('web_profiler');
 
         $rootNode
             ->children()
-                ->arrayNode('logger')
-                    ->canBeUnset()
-                    ->children()
-                        ->scalarNode('priority')->defaultValue('INFO')->end()
-                        ->scalarNode('path')->defaultValue('%kernel.logs_dir%/%kernel.environment%.log')->end()
-                        ->scalarNode('format')->defaultValue("%%timestamp%% %%priorityName%%: %%message%%\n")->end()
-                        ->booleanNode('log_errors')->defaultFalse()->end()
-                    ->end()
-                ->end()
+                ->booleanNode('toolbar')->defaultFalse()->end()
+                ->scalarNode('intercept_redirects')->defaultFalse()->end()
             ->end()
         ;
 

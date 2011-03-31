@@ -6,7 +6,7 @@
 
     <!--
     <route id="homepage" pattern="/">
-        <default key="_controller">{{ bundle }}:Default:denied</default>
+        <default key="_controller">{{ bundleShort }}:Default:index</default>
     </route>
     //-->
 </routes>

@@ -49,17 +49,15 @@ class ZendExtension extends Extension
 
             $config = $config['logger'];
 
-            $container->setParameter('zend.logger.priority', is_int($config['priority']) ? $config['priority'] : constant('\\Zend\\Log\\Logger::'.strtoupper($config['priority'])));
-            $container->setParameter('zend.logger.path', $config['path']);
+            $container->getDefinition('zend.logger.filter')->setArgument(0, is_int($config['priority']) ? $config['priority'] : constant('\\Zend\\Log\\Logger::'.strtoupper($config['priority'])));
+            $container->getDefinition('zend.logger.writer.filesystem')->setArgument(0, $config['path']);
 
             $definition = $container->findDefinition('zend.logger');
             if ($config['log_errors']) {
                 $container->findDefinition('zend.logger')->addMethodCall('registerErrorHandler');
-            } else {
-                if ($definition->hasMethodCall('registerErrorHandler')) {
-                    $container->findDefinition('zend.logger')->removeMethodCall('registerErrorHandler');
-                }
             }
+
+            $container->getDefinition('zend.formatter.filesystem')->setArgument(0, $config['format']);
 
             $this->addClassesToCompile(array(
                 'Zend\\Log\\Factory',

@@ -123,34 +123,34 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testSerialize()
     {
-        $options = array('foo' => 'bar');
-        $this->session = new Session($this->storage, $options);
+        $defaultLocale = 'en';
+        $this->session = new Session($this->storage, $defaultLocale);
 
-        $compare = serialize(array($this->storage, $options));
+        $compare = serialize(array($this->storage, $defaultLocale));
 
         $this->assertSame($compare, $this->session->serialize());
 
         $this->session->unserialize($compare);
 
-        $_options = new \ReflectionProperty(get_class($this->session), 'options');
-        $_options->setAccessible(true);
+        $_defaultLocale = new \ReflectionProperty(get_class($this->session), 'defaultLocale');
+        $_defaultLocale->setAccessible(true);
 
         $_storage = new \ReflectionProperty(get_class($this->session), 'storage');
         $_storage->setAccessible(true);
 
-        $this->assertEquals($_options->getValue($this->session), $options, 'options match');
+        $this->assertEquals($_defaultLocale->getValue($this->session), $defaultLocale, 'options match');
         $this->assertEquals($_storage->getValue($this->session), $this->storage, 'storage match');
     }
 
     public function testSave()
     {
         $this->storage = new ArraySessionStorage();
-        $options = array('foo' => 'bar');
-        $this->session = new Session($this->storage, $options);
+        $defaultLocale = 'fr';
+        $this->session = new Session($this->storage, $defaultLocale);
         $this->session->set('foo', 'bar');
 
         $this->session->save();
-        $compare = array('_symfony2' => array('_flash' => array() ,'_locale' => 'en', 'foo' => 'bar'));
+        $compare = array('_symfony2' => array('_flash' => array(), '_locale' => 'fr', 'foo' => 'bar'));
 
         $r = new \ReflectionObject($this->storage);
         $p = $r->getProperty('data');
@@ -161,15 +161,15 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testLocale()
     {
-        $this->assertSame('en', $this->session->getLocale(),'default locale is en');
+        $this->assertSame('en', $this->session->getLocale(), 'default locale is en');
 
         $this->session->set('_locale','de');
 
-        $this->assertSame('de', $this->session->getLocale(),'locale is de');
+        $this->assertSame('de', $this->session->getLocale(), 'locale is de');
 
         $this->session = $this->getSession();
         $this->session->setLocale('fr');
-        $this->assertSame('fr', $this->session->getLocale(),'locale is fr');
+        $this->assertSame('fr', $this->session->getLocale(), 'locale is fr');
     }
 
     public function testGetId()

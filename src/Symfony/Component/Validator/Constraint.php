@@ -58,12 +58,12 @@ abstract class Constraint
      * existing properties in this class. The values should be the value for these
      * properties.
      *
-     * Alternatively you can override the method defaultOption() to return the
+     * Alternatively you can override the method getDefaultOption() to return the
      * name of an existing property. If no associative array is passed, this
      * property is set instead.
      *
      * You can force that certain options are set by overriding
-     * requiredOptions() to return the names of these options. If any
+     * getRequiredOptions() to return the names of these options. If any
      * option is not set here, an exception is thrown.
      *
      * @param mixed $options The options (as associative array)
@@ -73,15 +73,15 @@ abstract class Constraint
      * @throws InvalidOptionsException       When you pass the names of non-existing
      *                                       options
      * @throws MissingOptionsException       When you don't pass any of the options
-     *                                       returned by requiredOptions()
+     *                                       returned by getRequiredOptions()
      * @throws ConstraintDefinitionException When you don't pass an associative
-     *                                       array, but defaultOption() returns
+     *                                       array, but getDefaultOption() returns
      *                                       NULL
      */
     public function __construct($options = null)
     {
         $invalidOptions = array();
-        $missingOptions = array_flip((array)$this->requiredOptions());
+        $missingOptions = array_flip((array)$this->getRequiredOptions());
 
         if (is_array($options) && count($options) == 1 && isset($options['value'])) {
             $options = $options['value'];
@@ -97,7 +97,7 @@ abstract class Constraint
                 }
             }
         } else if (null !== $options && ! (is_array($options) && count($options) === 0)) {
-            $option = $this->defaultOption();
+            $option = $this->getDefaultOption();
 
             if (null === $option) {
                 throw new ConstraintDefinitionException(
@@ -158,7 +158,7 @@ abstract class Constraint
      * @return string
      * @see __construct()
      */
-    public function defaultOption()
+    public function getDefaultOption()
     {
         return null;
     }
@@ -171,7 +171,7 @@ abstract class Constraint
      * @return array
      * @see __construct()
      */
-    public function requiredOptions()
+    public function getRequiredOptions()
     {
         return array();
     }
@@ -187,7 +187,7 @@ abstract class Constraint
      */
     public function validatedBy()
     {
-        return get_class($this) . 'Validator';
+        return get_class($this).'Validator';
     }
 
     /**
@@ -199,5 +199,5 @@ abstract class Constraint
      *
      * @return string|array  One or more constant values
      */
-    abstract public function targets();
+    abstract public function getTargets();
 }

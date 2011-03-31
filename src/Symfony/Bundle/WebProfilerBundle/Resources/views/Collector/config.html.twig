@@ -6,16 +6,18 @@
     {% endset %}
     {% include 'WebProfiler:Profiler:toolbar_item.html.twig' with { 'link': false, 'text': collector.symfonyversion } %}
 
-    {% set text %}
-        {% spaceless %}
-            <span>PHP {{ collector.phpversion }}</span>
-            <span style="margin: 0; padding: 0; color: #979696;">|</span>
-            <span style="color: {{ collector.hasxdebug ? '#759e1a' : '#a33' }}">xdebug</span>
-            <span style="margin: 0; padding: 0; color: #979696">|</span>
-            <span style="color: {{ collector.hasaccelerator ? '#759e1a' : '#a33' }}">accel</span>
-        {% endspaceless %}
-    {% endset %}
-    {% include 'WebProfiler:Profiler:toolbar_item.html.twig' with { 'link': false, 'icon': '' } %}
+    {% if verbose %}
+        {% set text %}
+            {% spaceless %}
+                <span>PHP {{ collector.phpversion }}</span>
+                <span style="margin: 0; padding: 0; color: #979696;">|</span>
+                <span style="color: {{ collector.hasxdebug ? '#759e1a' : '#a33' }}">xdebug</span>
+                <span style="margin: 0; padding: 0; color: #979696">|</span>
+                <span style="color: {{ collector.hasaccelerator ? '#759e1a' : '#a33' }}">accel</span>
+            {% endspaceless %}
+        {% endset %}
+        {% include 'WebProfiler:Profiler:toolbar_item.html.twig' with { 'link': false, 'icon': '' } %}
+    {% endif %}
 
     {% set icon %}
         <img width="21" height="28" alt="Environment" style="border-width: 0; vertical-align: middle; margin-right: 5px;" src="data:image/png;base64,
@@ -23,12 +25,14 @@
     {% endset %}
     {% set text %}
         {% spaceless %}
-            <span>{{ collector.appname }}</span>
-            <span style="margin: 0; padding: 0; color: #979696;">|</span>
-            <span>{{ collector.env }}</span>
-            <span style="margin: 0; padding: 0; color: #979696;">|</span>
-            <span>{{ collector.debug ? 'debug' : 'no-debug' }}</span>
-            <span style="margin: 0; padding: 0; color: #979696;">|</span>
+            {% if verbose %}
+                <span>{{ collector.appname }}</span>
+                <span style="margin: 0; padding: 0; color: #979696;">|</span>
+                <span>{{ collector.env }}</span>
+                <span style="margin: 0; padding: 0; color: #979696;">|</span>
+                <span>{{ collector.debug ? 'debug' : 'no-debug' }}</span>
+                <span style="margin: 0; padding: 0; color: #979696;">|</span>
+            {% endif %}
             <span>
                 {% if profiler_url %}
                     <a style="color: #2f2f2f" href="{{ profiler_url }}">{{ collector.token }}</a>

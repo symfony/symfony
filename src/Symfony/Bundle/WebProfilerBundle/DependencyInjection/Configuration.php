@@ -35,6 +35,7 @@ class Configuration
 
         $rootNode
             ->children()
+                ->booleanNode('verbose')->defaultTrue()->end()
                 ->booleanNode('toolbar')->defaultFalse()->end()
                 ->scalarNode('intercept_redirects')->defaultFalse()->end()
             ->end()

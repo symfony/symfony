@@ -35,7 +35,7 @@ class TemplateReference extends BaseTemplateReference
      * Returns the path to the template
      *  - as a path when the template is not part of a bundle
      *  - as a resource when the template is part of a bundle
-     * 
+     *
      * @return string A path to the template or a resource
      */
     public function getPath()
@@ -44,6 +44,17 @@ class TemplateReference extends BaseTemplateReference
         $path = (empty($controller) ? '' : $controller.'/').$this->get('name').'.'.$this->get('format').'.'.$this->get('engine');
 
         return empty($this->parameters['bundle']) ? 'views/'.$path : '@'.$this->get('bundle').'/Resources/views/'.$path;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLogicalName()
+    {
+        $parts = sprintf('%s:%s:', $this->get('bundle'), $this->get('controller'));
+        $elements = sprintf('%s.%s.%s', $this->get('name'), $this->get('format'), $this->get('engine'));
+
+        return $parts . $elements;
     }
 
 }

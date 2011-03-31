@@ -18,8 +18,4 @@ use Symfony\Component\Form\Renderer\Theme\PhpThemeFactory;
  */
 class PhpThemeFunctionalTest extends AbstractThemeFunctionalTest
 {
-    protected function createThemeFactory()
-    {
-        return new PhpThemeFactory();
-    }
 }

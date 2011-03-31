@@ -69,7 +69,7 @@ class DefaultFormFactory extends FormFactory
             CsrfProviderInterface $crsfProvider,
             TemporaryStorage $tempStorage)
     {
-        $typeLoader = new DefaultTypeLoader($themeFactory, null, $validator, $crsfProvider, $tempStorage);
+        $typeLoader = new DefaultTypeLoader($validator, $crsfProvider, $tempStorage);
 
         return new self($typeLoader, $themeFactory);
     }

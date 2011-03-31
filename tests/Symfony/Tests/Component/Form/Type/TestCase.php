@@ -66,7 +66,6 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
     protected function getTypeLoaders()
     {
-        return array(new DefaultTypeLoader($this->themeFactory, null,
-                $this->validator, $this->csrfProvider, $this->storage));
+        return array(new DefaultTypeLoader($this->validator, $this->csrfProvider, $this->storage));
     }
 }

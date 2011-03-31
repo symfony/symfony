@@ -16,7 +16,7 @@
         <parameter key="validator.mapping.loader.yaml_files_loader.class">Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader</parameter>
         <parameter key="validator.validator_factory.class">Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory</parameter>
         <parameter key="validator.annotations.namespaces" type="collection">
-            <parameter key="validation">Symfony\Component\Validator\Constraints\</parameter>
+            <parameter key="assert">Symfony\Component\Validator\Constraints\</parameter>
         </parameter>
     </parameters>
 

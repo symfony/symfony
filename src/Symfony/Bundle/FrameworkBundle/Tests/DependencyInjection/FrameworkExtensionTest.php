@@ -172,7 +172,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('validator.mapping.loader.annotation_loader'), '->registerValidationConfiguration() defines the annotation loader');
 
         $namespaces = $container->getParameter('validator.annotations.namespaces');
-        $this->assertEquals('Symfony\\Component\\Validator\\Constraints\\', $namespaces['validation'], '->registerValidationConfiguration() loads the default "validation" namespace');
+        $this->assertEquals('Symfony\\Component\\Validator\\Constraints\\', $namespaces['assert'], '->registerValidationConfiguration() loads the default "assert" prefix');
         $this->assertEquals('Application\\Validator\\Constraints\\', $namespaces['app'], '->registerValidationConfiguration() loads custom validation namespaces');
     }
 

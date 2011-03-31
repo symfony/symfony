@@ -76,7 +76,7 @@ class FrameworkExtension extends Extension
             } else {
                 $container
                     ->getDefinition('error_handler')->addMethodCall('register', array())
-                    ->setParameter(0, $config['error_handler'])
+                    ->setArgument(0, $config['error_handler'])
                 ;
             }
         }

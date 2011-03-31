@@ -82,7 +82,7 @@ abstract class Extension implements ExtensionInterface
      */
     public function getNamespace()
     {
-        return 'http://symfony.com/schema/dic/'.$this->getAlias();
+        return 'http://example.org/schema/dic/'.$this->getAlias();
     }
 
     /**

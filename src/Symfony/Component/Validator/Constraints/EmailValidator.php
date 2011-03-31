@@ -28,7 +28,7 @@ class EmailValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        $value = (string)$value;
+        $value = (string) $value;
 
         if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));

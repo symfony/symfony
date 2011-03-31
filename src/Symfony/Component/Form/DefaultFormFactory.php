@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\File\TemporaryStorage;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Renderer\Loader\ArrayRendererFactoryLoader;
+use Symfony\Component\Form\Renderer\Loader\RendererFactoryLoaderInterface;
 use Symfony\Component\Form\Renderer\ThemeRendererFactory;
 use Symfony\Component\Form\Type;
 use Symfony\Component\Form\Type\FormTypeInterface;
@@ -49,29 +50,29 @@ class DefaultFormFactory extends FormFactory
     {
         $csrfProvider = new DefaultCsrfProvider($csrfSecret);
         $tempStorage = new TemporaryStorage($storageSecret);
-        $defaultThemeFactory = new PhpThemeFactory($charset);
+        $rendererFactoryLoader = new ArrayRendererFactoryLoader(array('php' => new ThemeRendererFactory(new PhpThemeFactory($charset))));
 
-        return self::createInstance($defaultThemeFactory, $validator, $csrfProvider, $tempStorage);
+        return self::createInstance($rendererFactoryLoader, $validator, $csrfProvider, $tempStorage);
     }
 
     /**
      * Factory method to simplify creation of a default form factory.
      *
-     * @param ThemeFactoryInterface $themeFactory
+     * @param RendererFactoryLoaderInterface $rendererFactoryLoader
      * @param ValidatorInterface $validator
      * @param CsrfProviderInterface $crsfProvider
      * @param TemporaryStorage $tempStorage
      *
      * @return DefaultFormFactory
      */
-    public static function createInstance(ThemeFactoryInterface $themeFactory,
+    public static function createInstance(RendererFactoryLoaderInterface $rendererFactoryLoader,
             ValidatorInterface $validator,
             CsrfProviderInterface $crsfProvider,
             TemporaryStorage $tempStorage)
     {
         $typeLoader = new DefaultTypeLoader($validator, $crsfProvider, $tempStorage);
 
-        return new self($typeLoader, $themeFactory);
+        return new self($typeLoader, $rendererFactoryLoader);
     }
 
     /**
@@ -81,13 +82,13 @@ class DefaultFormFactory extends FormFactory
 
     /**
      * @param TypeLoaderInterface $typeLoader
-     * @param ThemeFactoryInterface $themeFactory
+     * @param RendererFactoryLoaderInterface $rendererFactoryLoader
      */
-    public function __construct(TypeLoaderInterface $typeLoader, ThemeFactoryInterface $themeFactory)
+    public function __construct(TypeLoaderInterface $typeLoader, RendererFactoryLoaderInterface $rendererFactoryLoader)
     {
         $this->typeLoader = $typeLoader;
 
-        parent::__construct($typeLoader, new ArrayRendererFactoryLoader(array('php' => new ThemeRendererFactory($themeFactory))));
+        parent::__construct($typeLoader, $rendererFactoryLoader);
     }
 
     /**

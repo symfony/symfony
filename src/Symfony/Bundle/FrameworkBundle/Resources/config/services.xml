@@ -7,7 +7,7 @@
     <parameters>
         <parameter key="event_dispatcher.class">Symfony\Bundle\FrameworkBundle\ContainerAwareEventDispatcher</parameter>
         <parameter key="http_kernel.class">Symfony\Bundle\FrameworkBundle\HttpKernel</parameter>
-        <parameter key="error_handler.class">Symfony\Component\HttpKernel\Debug\ErrorHandler</parameter>
+        <parameter key="error_handler.class">Symfony\Bundle\FrameworkBundle\Debug\ErrorHandler</parameter>
         <parameter key="filesystem.class">Symfony\Component\HttpKernel\Util\Filesystem</parameter>
         <parameter key="cache_warmer.class">Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate</parameter>
         <parameter key="cache_warmer.autoloader_map.class">Symfony\Bundle\FrameworkBundle\CacheWarmer\ClassMapCacheWarmer</parameter>
@@ -21,6 +21,7 @@
 
         <service id="error_handler" class="%error_handler.class%">
             <argument /> <!-- level (null by default) -->
+            <argument type="service" id="service_container"></argument>
         </service>
 
         <service id="http_kernel" class="%http_kernel.class%">

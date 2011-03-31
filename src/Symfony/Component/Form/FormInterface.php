@@ -114,4 +114,8 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     function hasAttribute($name);
 
     function getAttribute($name);
+
+    function getRoot();
+
+    function isRoot();
 }

@@ -208,74 +208,6 @@ class FormTypeTest extends TestCase
         $this->assertEquals($file, $form['image']['file']->getData());
     }
 
-    public function testSupportsArrayAccess()
-    {
-        $builder = $this->factory->createBuilder('form', 'author');
-        $builder->add('firstName', 'field');
-        $form = $builder->getForm();
-
-        $this->assertEquals($form->get('firstName'), $form['firstName']);
-        $this->assertTrue(isset($form['firstName']));
-    }
-
-    /**
-     * @expectedException BadMethodCallException
-     */
-    public function testSupportsUnset()
-    {
-        $form = $this->factory->create('form', 'author');
-
-        unset($form['firstName']);
-    }
-
-    public function testDoesNotSupportAddingFields()
-    {
-        $form = $this->factory->create('form', 'author');
-
-        $this->setExpectedException('LogicException');
-
-        $form[] = $this->getMockForm('lastName');
-    }
-
-    public function testSupportsCountable()
-    {
-        $builder = $this->factory->createBuilder('form', 'group', array(
-            'csrf_protection' => false,
-        ));
-        $builder->add('firstName', 'field');
-        $builder->add('lastName', 'field');
-        $form = $builder->getForm();
-
-        $this->assertEquals(2, count($form));
-    }
-
-    public function testSupportsIterable()
-    {
-        $builder = $this->factory->createBuilder('form', 'group', array(
-            'csrf_protection' => false,
-        ));
-        $builder->add('field1', 'field');
-        $builder->add('field2', 'field');
-        $builder->add('field3', 'field');
-        $form = $builder->getForm();
-
-        $expected = array(
-            'field1' => $form->get('field1'),
-            'field2' => $form->get('field2'),
-            'field3' => $form->get('field3'),
-        );
-
-        $this->assertEquals($expected, iterator_to_array($form));
-    }
-
-    public function testIsBound()
-    {
-        $form = $this->factory->create('form', 'author');
-        $this->assertFalse($form->isBound());
-        $form->bind(array('firstName' => 'Bernhard'));
-        $this->assertTrue($form->isBound());
-    }
-
     public function testSetDataUpdatesAllFieldsFromTransformedData()
     {
         $originalAuthor = new Author();
@@ -585,26 +517,6 @@ class FormTypeTest extends TestCase
         // the new reference was inserted into the array
         $author = $form->getData();
         $this->assertSame($ref2, $author['referenceCopy']);
-    }
-
-    public function testIsEmptyReturnsTrueIfAllFieldsAreEmpty()
-    {
-        $builder = $this->factory->createBuilder('form', 'name');
-        $builder->add('foo', 'field', array('data' => ''));
-        $builder->add('bar', 'field', array('data' => null));
-        $form = $builder->getForm();
-
-        $this->assertTrue($form->isEmpty());
-    }
-
-    public function testIsEmptyReturnsFalseIfAnyFieldIsFilled()
-    {
-        $builder = $this->factory->createBuilder('form', 'name');
-        $builder->add('foo', 'field', array('data' => 'baz'));
-        $builder->add('bar', 'field', array('data' => null));
-        $form = $builder->getForm();
-
-        $this->assertFalse($form->isEmpty());
     }
 
     /**

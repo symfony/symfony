@@ -423,8 +423,8 @@ class FormBuilder
     {
         $instance = new Form(
             $this->getName(),
-            $this->getTypes(),
             $this->buildDispatcher(),
+            $this->getTypes(),
             $this->getClientTransformer(),
             $this->getNormTransformer(),
             $this->getDataMapper(),

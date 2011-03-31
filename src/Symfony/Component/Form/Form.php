@@ -75,39 +75,132 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class Form implements \IteratorAggregate, FormInterface
 {
     /**
-     * Contains all the children of this group
+     * The name of this form
+     * @var string
+     */
+    private $name;
+
+    /**
+     * The parent fo this form
+     * @var FormInterface
+     */
+    private $parent;
+
+    /**
+     * The children of this form
      * @var array
      */
     private $children = array();
 
+    /**
+     * The mapper for mapping data to children and back
+     * @var DataMapper\DataMapperInterface
+     */
     private $dataMapper;
+
+    /**
+     * The errors of this form
+     * @var array
+     */
     private $errors = array();
+
+    /**
+     * Whether added errors should bubble up to the parent
+     * @var Boolean
+     */
     private $errorBubbling;
-    private $name = '';
-    private $parent;
+
+    /**
+     * Whether this form is bound
+     * @var Boolean
+     */
     private $bound = false;
+
+    /**
+     * Whether this form may not be empty
+     * @var Boolean
+     */
     private $required;
+
+    /**
+     * The form data in application format
+     * @var mixed
+     */
     private $data;
+
+    /**
+     * The form data in normalized format
+     * @var mixed
+     */
     private $normData;
+
+    /**
+     * The form data in client format
+     * @var mixed
+     */
     private $clientData;
 
     /**
-     * Contains the names of bound values who don't belong to any children
+     * The names of bound values that don't belong to any children
      * @var array
      */
     private $extraData = array();
 
+    /**
+     * The transformer for transforming from application to normalized format
+     * and back
+     * @var DataTransformer\DataTransformerInterface
+     */
     private $normTransformer;
+
+    /**
+     * The transformer for transforming from normalized to client format and
+     * back
+     * @var DataTransformer\DataTransformerInterface
+     */
     private $clientTransformer;
+
+    /**
+     * Whether the data in application, normalized and client format is
+     * synchronized. Data may not be synchronized if transformation errors
+     * occur.
+     * @var Boolean
+     */
     private $synchronized = true;
+
+    /**
+     * The validators attached to this form
+     * @var array
+     */
     private $validators;
+
+    /**
+     * Whether this form may only be read, but not bound
+     * @var Boolean
+     */
     private $readOnly = false;
+
+    /**
+     * The dispatcher for distributing events of this form
+     * @var Symfony\Component\EventDispatcher\EventDispatcherInterface
+     */
     private $dispatcher;
+
+    /**
+     * Key-value store for arbitrary attributes attached to this form
+     * @var array
+     */
     private $attributes;
+
+    /**
+     * The FormTypeInterface instances used to create this form
+     * @var array
+     */
     private $types;
 
-    public function __construct($name, array $types,
+    public function __construct($name,
         EventDispatcherInterface $dispatcher,
+        array $types = array(),
         DataTransformerInterface $clientTransformer = null,
         DataTransformerInterface $normTransformer = null,
         DataMapperInterface $dataMapper = null, array $validators = array(),
@@ -383,6 +476,40 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
+     * Binds a request to the form
+     *
+     * If the request was a POST request, the data is bound to the form,
+     * transformed and written into the form data (an object or an array).
+     * You can set the form data by passing it in the second parameter
+     * of this method or by passing it in the "data" option of the form's
+     * constructor.
+     *
+     * @param Request $request    The request to bind to the form
+     * @param array|object $data  The data from which to read default values
+     *                            and where to write bound values
+     */
+    public function bindRequest(Request $request)
+    {
+        // Store the bound data in case of a post request
+        switch ($request->getMethod()) {
+            case 'POST':
+            case 'PUT':
+                $data = array_replace_recursive(
+                    $request->request->get($this->getName(), array()),
+                    $request->files->get($this->getName(), array())
+                );
+                break;
+            case 'GET':
+                $data = $request->query->get($this->getName(), array());
+                break;
+            default:
+                throw new FormException(sprintf('The request method "%s" is not supported', $request->getMethod()));
+        }
+
+        $this->bind($data);
+    }
+
+    /**
      * Returns the data in the format needed for the underlying object.
      *
      * @return mixed
@@ -484,7 +611,6 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function isValid()
     {
-        // TESTME
         if (!$this->isBound() || $this->hasErrors()) {
             return false;
         }
@@ -620,7 +746,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @param string $name The offset of the value to get
      *
-     * @return Field A form child instance
+     * @return FormInterface  A form instance
      */
     public function offsetGet($name)
     {
@@ -628,28 +754,24 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Throws an exception saying that values cannot be set (implements the \ArrayAccess interface).
+     * Adds a child to the form (implements the \ArrayAccess interface).
      *
-     * @param string $offset (ignored)
-     * @param string $value (ignored)
-     *
-     * @throws \LogicException
+     * @param string $name Ignored. The name of the child is used.
+     * @param FormInterface $child  The child to be added
      */
     public function offsetSet($name, $child)
     {
-        throw new \BadMethodCallException('offsetSet() is not supported');
+        $this->add($child);
     }
 
     /**
-     * Throws an exception saying that values cannot be unset (implements the \ArrayAccess interface).
+     * Removes the child with the given name from the form (implements the \ArrayAccess interface).
      *
-     * @param string $name
-     *
-     * @throws \LogicException
+     * @param string $name  The name of the child to be removed
      */
     public function offsetUnset($name)
     {
-        throw new \BadMethodCallException('offsetUnset() is not supported');
+        $this->remove($name);
     }
 
     /**
@@ -732,39 +854,5 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         return $this->clientTransformer->reverseTransform($value);
-    }
-
-    /**
-     * Binds a request to the form
-     *
-     * If the request was a POST request, the data is bound to the form,
-     * transformed and written into the form data (an object or an array).
-     * You can set the form data by passing it in the second parameter
-     * of this method or by passing it in the "data" option of the form's
-     * constructor.
-     *
-     * @param Request $request    The request to bind to the form
-     * @param array|object $data  The data from which to read default values
-     *                            and where to write bound values
-     */
-    public function bindRequest(Request $request)
-    {
-        // Store the bound data in case of a post request
-        switch ($request->getMethod()) {
-            case 'POST':
-            case 'PUT':
-                $data = array_replace_recursive(
-                    $request->request->get($this->getName(), array()),
-                    $request->files->get($this->getName(), array())
-                );
-                break;
-            case 'GET':
-                $data = $request->query->get($this->getName(), array());
-                break;
-            default:
-                throw new FormException(sprintf('The request method "%s" is not supported', $request->getMethod()));
-        }
-
-        $this->bind($data);
     }
 }

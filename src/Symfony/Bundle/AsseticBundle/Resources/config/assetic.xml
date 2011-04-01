@@ -13,13 +13,7 @@
         <parameter key="assetic.directory_resource.class">Symfony\Bundle\AsseticBundle\Factory\Resource\DirectoryResource</parameter>
         <parameter key="assetic.filter_manager.class">Symfony\Bundle\AsseticBundle\FilterManager</parameter>
 
-        <parameter key="assetic.closure.jar" />
-        <parameter key="assetic.java.bin">/usr/bin/java</parameter>
-        <parameter key="assetic.node.bin">/usr/bin/node</parameter>
         <parameter key="assetic.node.paths" type="collection"></parameter>
-        <parameter key="assetic.sass.bin">/usr/bin/sass</parameter>
-        <parameter key="assetic.yui.jar" />
-
         <parameter key="assetic.cache_dir">%kernel.cache_dir%/assetic</parameter>
     </parameters>
 
@@ -40,9 +34,11 @@
             <argument>%assetic.debug%</argument>
             <call method="setFilterManager"><argument type="service" id="assetic.filter_manager" /></call>
         </service>
+
         <service id="assetic.config_cache" class="%assetic.config_cache.class%" public="false">
             <argument>%assetic.cache_dir%/config</argument>
         </service>
+
         <service id="assetic.asset_manager_cache_warmer" class="%assetic.asset_manager_cache_warmer.class%" public="false">
             <tag name="kernel.cache_warmer" priority="10" />
             <argument type="service" id="assetic.asset_manager" />

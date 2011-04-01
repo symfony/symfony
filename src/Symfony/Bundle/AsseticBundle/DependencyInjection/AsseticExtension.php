@@ -48,11 +48,9 @@ class AsseticExtension extends Extension
         $container->setParameter('assetic.read_from', $config['read_from']);
         $container->setParameter('assetic.write_to', $config['write_to']);
 
-        $container->setParameter('assetic.closure.jar', $config['closure']);
         $container->setParameter('assetic.java.bin', $config['java']);
         $container->setParameter('assetic.node.bin', $config['node']);
         $container->setParameter('assetic.sass.bin', $config['sass']);
-        $container->setParameter('assetic.yui.jar', $config['yui']);
 
         // register filters
         foreach ($config['filters'] as $name => $filter) {

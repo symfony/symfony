@@ -19,7 +19,7 @@
             <argument type="service" id="service_container" />
         </service>
 
-        <service id="error_handler" class="%error_handler.class%" public="false">
+        <service id="error_handler" class="%error_handler.class%">
             <argument /> <!-- level (null by default) -->
         </service>
 

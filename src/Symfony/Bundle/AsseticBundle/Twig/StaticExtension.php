@@ -15,7 +15,7 @@ use Assetic\Extension\Twig\AsseticExtension;
 use Assetic\Factory\AssetFactory;
 
 /**
- * The Static extension is used when use_controllers is disabled.
+ * The static extension is used when use_controllers is disabled.
  *
  * @author Kris Wallsmith <kris.wallsmith@symfony.com>
  */

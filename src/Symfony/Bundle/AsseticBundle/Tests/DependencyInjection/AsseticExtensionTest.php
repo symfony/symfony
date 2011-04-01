@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Scope;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
 
 class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
@@ -87,28 +86,33 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getFilterNames
      */
-    public function testFilterConfigs($filter)
+    public function testFilterConfigs($name, $config = array())
     {
-        $config = array('filters' => array($filter => array()));
-
         $extension = new AsseticExtension();
-        $extension->load(array($config), $this->container);
+        $extension->load(array(array('filters' => array($name => $config))), $this->container);
 
         $this->assertSaneContainer($this->getDumpedContainer());
     }
 
     public function getFilterNames()
     {
-        $data = array();
-
-        $finder = new Finder();
-        $finder->files()->name('*.xml')->in(__DIR__.'/../../Resources/config/filters');
-
-        foreach ($finder as $file) {
-            $data[] = array($file->getBasename('.xml'));
-        }
-
-        return $data;
+        return array(
+            array('closure', array('jar' => '/path/to/closure.jar')),
+            array('coffee'),
+            array('cssrewrite'),
+            array('jpegtran'),
+            array('jpegoptim'),
+            array('less'),
+            array('lessphp'),
+            array('optipng'),
+            array('pngout'),
+            array('sass'),
+            array('scss'),
+            array('sprockets'),
+            array('stylus'),
+            array('yui_css', array('jar' => '/path/to/yuicompressor.jar')),
+            array('yui_js', array('jar' => '/path/to/yuicompressor.jar')),
+        );
     }
 
     /**
@@ -145,19 +149,18 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->container->addCompilerPass(new CheckClosureFilterPass());
 
-        $config = array(
-            'closure' => $jar,
-            'filters' => array(
-                'closure' => array(),
-            ),
-        );
-
         $extension = new AsseticExtension();
-        $extension->load(array($config), $this->container);
+        $extension->load(array(array(
+            'filters' => array(
+                'closure' => array('jar' => $jar),
+            ),
+        )), $this->container);
 
-        $this->assertSaneContainer($this->getDumpedContainer());
+        $container = $this->getDumpedContainer();
+        $this->assertSaneContainer($container);
 
         $this->assertTrue($this->container->getDefinition($expected)->hasTag('assetic.filter'));
+        $this->assertNotEmpty($container->getParameter('assetic.filter.closure.java'));
     }
 
     public function getClosureJarAndExpected()
@@ -170,18 +173,16 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidYuiConfig()
     {
-        $this->setExpectedException('RuntimeException');
+        $this->setExpectedException('RuntimeException', 'assetic.filters.yui_js');
 
         $this->container->addCompilerPass(new CheckYuiFilterPass());
 
-        $config = array(
+        $extension = new AsseticExtension();
+        $extension->load(array(array(
             'filters' => array(
                 'yui_js' => array(),
             ),
-        );
-
-        $extension = new AsseticExtension();
-        $extension->load(array($config), $this->container);
+        )), $this->container);
 
         $this->getDumpedContainer();
     }

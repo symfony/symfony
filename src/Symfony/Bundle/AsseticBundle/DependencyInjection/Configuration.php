@@ -42,11 +42,9 @@ class Configuration
                 ->booleanNode('use_controller')->defaultValue($debug)->end()
                 ->scalarNode('read_from')->defaultValue('%kernel.root_dir%/../web')->end()
                 ->scalarNode('write_to')->defaultValue('%assetic.read_from%')->end()
-                ->scalarNode('closure')->defaultNull()->end()
-                ->scalarNode('java')->defaultNull()->end()
-                ->scalarNode('node')->defaultNull()->end()
-                ->scalarNode('sass')->defaultNull()->end()
-                ->scalarNode('yui')->defaultNull()->end()
+                ->scalarNode('java')->defaultValue('/usr/bin/java')->end()
+                ->scalarNode('node')->defaultValue('/usr/bin/node')->end()
+                ->scalarNode('sass')->defaultValue('/usr/bin/sass')->end()
             ->end()
 
             // bundles

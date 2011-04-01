@@ -137,7 +137,7 @@ EOF;
         require_once $file;
         @unlink($file);
 
-        $class = "$namespace\\$class"; 
+        $class = "$namespace\\$class";
 
         return new $class($parent->getEnvironment(), $debug);
     }

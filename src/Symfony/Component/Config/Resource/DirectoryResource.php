@@ -19,36 +19,18 @@ namespace Symfony\Component\Config\Resource;
 class DirectoryResource implements ResourceInterface
 {
     private $resource;
-    private $filterRegexList;
+    private $pattern;
 
     /**
      * Constructor.
      *
      * @param string $resource The file path to the resource
+     * @param string $pattern  A pattern to restrict monitored files
      */
-    public function __construct($resource)
+    public function __construct($resource, $pattern = null)
     {
         $this->resource = $resource;
-    }
-
-    /**
-     * Set a list of filter regex (to restrict the list of monitored files)
-     *
-     * @param array $filterRegexList An array of regular expressions
-     */
-    public function setFilterRegexList(array $filterRegexList)
-    {
-        $this->filterRegexList = $filterRegexList;
-    }
-
-    /**
-     * Returns the list of filter regex
-     *
-     * @return array An array of regular expressions
-     */
-    public function getFilterRegexList()
-    {
-        return $this->filterRegexList;
+        $this->pattern = $pattern;
     }
 
     /**
@@ -87,22 +69,16 @@ class DirectoryResource implements ResourceInterface
         $newestMTime = filemtime($this->resource);
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->resource), \RecursiveIteratorIterator::SELF_FIRST) as $file) {
             // if regex filtering is enabled only check matching files
-            if (isset($this->filterRegexList) && $file->isFile()) {
-                $regexMatched = false;
-                foreach ($this->filterRegexList as $regex) {
-                    if (preg_match($regex, $file->__toString())) {
-                        $regexMatched = true;
-                    }
-                }
-                if (!$regexMatched) {
-                  continue;
-                }
+            if ($this->pattern && $file->isFile() && !preg_match($this->pattern, $file->getBasename())) {
+                continue;
             }
+
             // always monitor directories for changes, except the .. entries
             // (otherwise deleted files wouldn't get detected)
             if ($file->isDir() && '/..' === substr($file, -3)) {
                 continue;
             }
+
             $newestMTime = max($file->getMTime(), $newestMTime);
         }
 

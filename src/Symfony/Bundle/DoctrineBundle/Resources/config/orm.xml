@@ -57,7 +57,7 @@
         
         <service id="form.field_factory.doctrine_guesser" class="%form.field_factory.doctrine_guesser.class%" public="false">
         	<tag name="form.field_factory.guesser" />
-            <argument type="service" id="doctrine.orm.default_entity_manager" />
+            <argument type="service" id="doctrine.orm.entity_manager" />
         </service>
     </services>
 </container>

@@ -103,8 +103,15 @@ class AsseticExtension extends Extension
         // bundle views/ directories
         foreach ($bundles as $name) {
             $rc = new \ReflectionClass($map[$name]);
+            if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/' .$name. '/views')) {
+                foreach (array('twig', 'php') as $engine) {
+                    $container->setDefinition(
+                        'assetic.'.$engine.'_directory_resource.'.$name,
+                        self::createDirectoryResourceDefinition($name, $dir, $engine)
+                    );
+                }
+            }
             if (is_dir($dir = dirname($rc->getFileName()).'/Resources/views')) {
-                // FIXME: must also look for templates in %kernel.root_dir%/Resources/%bundle%/views
                 foreach (array('twig', 'php') as $engine) {
                     $container->setDefinition(
                         'assetic.'.$engine.'_directory_resource.'.$name,

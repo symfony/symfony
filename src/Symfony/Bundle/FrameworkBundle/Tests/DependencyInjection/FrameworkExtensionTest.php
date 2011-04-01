@@ -127,7 +127,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertContains(
             realpath(__DIR__.'/../../Resources/translations/validators.fr.xliff'),
-            array_map(function($resource) { return $resource[1]; }, $container->getParameter('translation.resources')),
+            array_map(function($resource) { return realpath($resource[1]); }, $container->getParameter('translation.resources')),
             '->registerTranslatorConfiguration() finds FrameworkExtension translation resources'
         );
 

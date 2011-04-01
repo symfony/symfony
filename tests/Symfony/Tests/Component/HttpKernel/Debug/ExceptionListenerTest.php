@@ -13,7 +13,6 @@ namespace Symfony\Tests\Component\HttpKernel\Debug;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Debug\ExceptionListener;
-use Symfony\Component\HttpKernel\Debug\ErrorException;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpFoundation\Request;
@@ -90,7 +89,7 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
     public function provider()
     {
         $request = new Request();
-        $exception = new ErrorException('foo');
+        $exception = new \ErrorException('foo');
         $event = new GetResponseForExceptionEvent(new TestKernel(), $request, 'foo', $exception);
         $event2 = new GetResponseForExceptionEvent(new TestKernelThatThrowsException(), $request, 'foo', $exception);
 

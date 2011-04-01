@@ -11,3 +11,7 @@
         <script src="<?php echo $view->escape($url) ?>"></script>
     <?php endforeach; ?>
 <?php $view['slots']->stop() ?>
+
+<?php foreach ($view['assetic']->image('logo.png') as $url): ?>
+    <img src="<?php echo $view->escape($url) ?>">
+<?php endforeach; ?>

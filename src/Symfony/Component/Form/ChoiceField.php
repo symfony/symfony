@@ -119,8 +119,8 @@ class ChoiceField extends HybridField
     {
         if (!$this->choices) {
             $this->choices = $this->getInitializedChoices();
-
-            if (!$this->isRequired()) {
+            if (!$this->isRequired() && !($this->isMultipleChoice() && $this->isExpanded())) {
++                // Add an empty choice only if the field is not required AND it is NOT multiple+expanded (checkboxes)
                 $this->choices = array('' => $this->getOption('empty_value')) + $this->choices;
             }
         }

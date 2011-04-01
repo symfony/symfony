@@ -45,5 +45,13 @@
         <service id="validator.mapping.loader.annotation_loader" class="%validator.mapping.loader.annotation_loader.class%" public="false">
             <argument /> <!-- namespaces -->
         </service>
+
+        <service id="validator.mapping.loader.xml_files_loader" class="%validator.mapping.loader.xml_files_loader.class%" public="false">
+            <argument /> <!-- mapping files -->
+        </service>
+
+        <service id="validator.mapping.loader.yaml_files_loader" class="%validator.mapping.loader.yaml_files_loader.class%" public="false">
+            <argument /> <!-- mapping files -->
+        </service>
     </services>
 </container>

@@ -460,38 +460,15 @@ class FrameworkExtension extends Extension
 
         $loader->load('validator.xml');
 
-        $xmlMappingFiles = array();
-        $yamlMappingFiles = array();
+        $container
+            ->getDefinition('validator.mapping.loader.xml_files_loader')
+            ->setArgument(0, $this->getValidatorXmlMappingFiles($container))
+        ;
 
-        // Include default entries from the framework
-        $xmlMappingFiles[] = __DIR__.'/../../../Component/Form/Resources/config/validation.xml';
-
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            if (file_exists($file = dirname($reflection->getFilename()).'/Resources/config/validation.xml')) {
-                $xmlMappingFiles[] = realpath($file);
-            }
-            if (file_exists($file = dirname($reflection->getFilename()).'/Resources/config/validation.yml')) {
-                $yamlMappingFiles[] = realpath($file);
-            }
-        }
-
-        $xmlFilesLoader = new Definition('%validator.mapping.loader.xml_files_loader.class%', array($xmlMappingFiles));
-        $xmlFilesLoader->setPublic(false);
-
-        $yamlFilesLoader = new Definition('%validator.mapping.loader.yaml_files_loader.class%', array($yamlMappingFiles));
-        $yamlFilesLoader->setPublic(false);
-
-        $container->setDefinition('validator.mapping.loader.xml_files_loader', $xmlFilesLoader);
-        $container->setDefinition('validator.mapping.loader.yaml_files_loader', $yamlFilesLoader);
-
-        foreach ($xmlMappingFiles as $file) {
-            $container->addResource(new FileResource($file));
-        }
-
-        foreach ($yamlMappingFiles as $file) {
-            $container->addResource(new FileResource($file));
-        }
+        $container
+            ->getDefinition('validator.mapping.loader.yaml_files_loader')
+            ->setArgument(0, $this->getValidatorYamlMappingFiles($container))
+        ;
 
         if (isset($config['annotations'])) {
             $namespaces = array('assert' => 'Symfony\\Component\\Validator\\Constraints\\');
@@ -511,6 +488,37 @@ class FrameworkExtension extends Extension
             array_unshift($arguments[0], new Reference('validator.mapping.loader.annotation_loader'));
             $loaderChain->setArguments($arguments);
         }
+    }
+
+    private function getValidatorXmlMappingFiles(ContainerBuilder $container)
+    {
+        $files = array(__DIR__.'/../../../Component/Form/Resources/config/validation.xml');
+        $container->addResource(new FileResource($files[0]));
+
+        foreach ($container->getParameter('kernel.bundles') as $bundle) {
+            $reflection = new \ReflectionClass($bundle);
+            if (file_exists($file = dirname($reflection->getFilename()).'/Resources/config/validation.xml')) {
+                $files[] = realpath($file);
+                $container->addResource(new FileResource($file));
+            }
+        }
+
+        return $files;
+    }
+
+    private function getValidatorYamlMappingFiles(ContainerBuilder $container)
+    {
+        $files = array();
+
+        foreach ($container->getParameter('kernel.bundles') as $bundle) {
+            $reflection = new \ReflectionClass($bundle);
+            if (file_exists($file = dirname($reflection->getFilename()).'/Resources/config/validation.yml')) {
+                $yamlMappingFiles[] = realpath($file);
+                $container->addResource(new FileResource($file));
+            }
+        }
+
+        return $files;
     }
 
     /**

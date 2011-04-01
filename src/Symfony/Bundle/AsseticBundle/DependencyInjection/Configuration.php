@@ -48,6 +48,8 @@ class Configuration
                 ->scalarNode('sass')->defaultNull()->end()
                 ->scalarNode('yui')->defaultNull()->end()
             ->end()
+
+            // bundles
             ->fixXmlConfig('bundle')
             ->children()
                 ->arrayNode('bundles')
@@ -65,13 +67,21 @@ class Configuration
                     ->end()
                 ->end()
             ->end()
+
+            // filters
             ->fixXmlConfig('filter')
             ->children()
                 ->arrayNode('filters')
                     ->addDefaultsIfNotSet()
                     ->requiresAtLeastOneElement()
                     ->useAttributeAsKey('name')
-                    ->prototype('array')->end()
+                    ->prototype('variable')
+                        ->treatNullLike(array())
+                        ->validate()
+                            ->ifTrue(function($v) { return !is_array($v); })
+                            ->thenInvalid('The assetic.filters config %s must be either null or an array.')
+                        ->end()
+                    ->end()
                 ->end()
             ->end()
         ;

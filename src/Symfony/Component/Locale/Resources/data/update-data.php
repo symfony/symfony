@@ -155,7 +155,7 @@ if ($GLOBALS['argc'] !== 2) {
     bailout(<<<MESSAGE
 Usage: php update-data.php [icu-data-directory]
 
-Updates the ICU resources in Symfony2 from the given ICU data directory. You
+Updates the ICU resources in Symfony2000 from the given ICU data directory. You
 can checkout the ICU data directory via SVN:
 
     $ svn co http://source.icu-project.org/repos/icu/icu/trunk/source/data icu-data

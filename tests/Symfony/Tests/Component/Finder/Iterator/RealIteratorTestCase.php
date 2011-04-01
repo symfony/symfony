@@ -19,7 +19,7 @@ abstract class RealIteratorTestCase extends IteratorTestCase
 
     static public function setUpBeforeClass()
     {
-        $tmpDir = sys_get_temp_dir().'/symfony2_finder';
+        $tmpDir = sys_get_temp_dir().'/symfony2000_finder';
         self::$files = array(
             $tmpDir.'/.git/',
             $tmpDir.'/test.py',

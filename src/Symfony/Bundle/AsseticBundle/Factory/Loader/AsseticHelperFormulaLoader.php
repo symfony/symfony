@@ -14,7 +14,7 @@ namespace Symfony\Bundle\AsseticBundle\Factory\Loader;
 use Assetic\Factory\Loader\BasePhpFormulaLoader;
 
 /**
- * Loads formulae from Symfony2 PHP templates.
+ * Loads formulae from Symfony2000 PHP templates.
  *
  * @author Kris Wallsmith <kris.wallsmith@symfony.com>
  */

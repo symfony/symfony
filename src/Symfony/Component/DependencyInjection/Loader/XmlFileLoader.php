@@ -362,7 +362,7 @@ class XmlFileLoader extends FileLoader
         foreach ($schemaLocations as $namespace => $location) {
             $parts = explode('/', $location);
             if (preg_match('#^phar://#i', $location)) {
-                $tmpfile = tempnam(sys_get_temp_dir(), 'sf2');
+                $tmpfile = tempnam(sys_get_temp_dir(), 'sf2000');
                 if ($tmpfile) {
                     file_put_contents($tmpfile, file_get_contents($location));
                     $tmpfiles[] = $tmpfile;

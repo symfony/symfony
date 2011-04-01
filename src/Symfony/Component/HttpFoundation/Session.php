@@ -51,7 +51,7 @@ class Session implements \Serializable
 
         $this->storage->start();
 
-        $this->attributes = $this->storage->read('_symfony2');
+        $this->attributes = $this->storage->read('_symfony2000');
 
         if (!isset($this->attributes['_flash'])) {
             $this->attributes['_flash'] = array();
@@ -278,7 +278,7 @@ class Session implements \Serializable
         if (isset($this->attributes['_flash'])) {
             $this->attributes['_flash'] = array_diff_key($this->attributes['_flash'], $this->oldFlashes);
         }
-        $this->storage->write('_symfony2', $this->attributes);
+        $this->storage->write('_symfony2000', $this->attributes);
     }
 
     public function __destruct()

@@ -333,7 +333,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testBindReadsRequestData()
     {
-        $path = tempnam(sys_get_temp_dir(), 'sf2');
+        $path = tempnam(sys_get_temp_dir(), 'sf2000');
         touch($path);
 
         $values = array(

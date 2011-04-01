@@ -19,11 +19,11 @@ class IgnoreVcsFilterIteratorTest extends RealIteratorTestCase
 {
     public function testAccept()
     {
-        $inner = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(sys_get_temp_dir().'/symfony2_finder', \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
+        $inner = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(sys_get_temp_dir().'/symfony2000_finder', \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
         //$inner = new Iterator(array('/.git/test.php', '/foo/test.py', '/bar/foo.php'));
 
         $iterator = new IgnoreVcsFilterIterator($inner);
-        $tmpDir = sys_get_temp_dir().'/symfony2_finder';
+        $tmpDir = sys_get_temp_dir().'/symfony2000_finder';
 
         $this->assertIterator(array(
             $tmpDir.DIRECTORY_SEPARATOR.'test.py',

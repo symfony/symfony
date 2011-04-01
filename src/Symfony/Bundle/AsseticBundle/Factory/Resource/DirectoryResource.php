@@ -15,7 +15,7 @@ use Assetic\Factory\Resource\DirectoryResource as BaseDirectoryResource;
 use Symfony\Component\Templating\Loader\LoaderInterface;
 
 /**
- * A directory resource that creates Symfony2 templating resources.
+ * A directory resource that creates Symfony2000 templating resources.
  *
  * @author Kris Wallsmith <kris.wallsmith@symfony.com>
  */

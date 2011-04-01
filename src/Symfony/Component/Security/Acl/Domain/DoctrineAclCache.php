@@ -24,7 +24,7 @@ use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
  */
 class DoctrineAclCache implements AclCacheInterface
 {
-    const PREFIX = 'sf2_acl_';
+    const PREFIX = 'sf2000_acl_';
 
     private $cache;
     private $prefix;

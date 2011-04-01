@@ -48,20 +48,20 @@ class TranslationExtensionTest extends TestCase
         return array(
             // trans tag
             array('{% trans "Hello" %}', 'Hello'),
-            array('{% trans "Hello %name%" %}', 'Hello Symfony2', array('name' => 'Symfony2')),
-            array('{% trans name %}', 'Symfony2', array('name' => 'Symfony2')),
-            array('{% trans hello with { \'%name%\': \'Symfony2\' } %}', 'Hello Symfony2', array('hello' => 'Hello %name%')),
-            array('{% set vars = { \'%name%\': \'Symfony2\' } %}{% trans hello with vars %}', 'Hello Symfony2', array('hello' => 'Hello %name%')),
+            array('{% trans "Hello %name%" %}', 'Hello Symfony2000', array('name' => 'Symfony2000')),
+            array('{% trans name %}', 'Symfony2000', array('name' => 'Symfony2000')),
+            array('{% trans hello with { \'%name%\': \'Symfony2000\' } %}', 'Hello Symfony2000', array('hello' => 'Hello %name%')),
+            array('{% set vars = { \'%name%\': \'Symfony2000\' } %}{% trans hello with vars %}', 'Hello Symfony2000', array('hello' => 'Hello %name%')),
 
             array('{% trans %}Hello{% endtrans %}', 'Hello'),
-            array('{% trans %}%name%{% endtrans %}', 'Symfony2', array('name' => 'Symfony2')),
+            array('{% trans %}%name%{% endtrans %}', 'Symfony2000', array('name' => 'Symfony2000')),
 
             array('{% trans "Hello" from elsewhere %}', 'Hello'),
             array('{% trans from elsewhere %}Hello{% endtrans %}', 'Hello'),
 
-            array('{% trans %}Hello %name%{% endtrans %}', 'Hello Symfony2', array('name' => 'Symfony2')),
-            array('{% trans with { \'%name%\': \'Symfony2\' } %}Hello %name%{% endtrans %}', 'Hello Symfony2'),
-            array('{% set vars = { \'%name%\': \'Symfony2\' } %}{% trans with vars %}Hello %name%{% endtrans %}', 'Hello Symfony2'),
+            array('{% trans %}Hello %name%{% endtrans %}', 'Hello Symfony2000', array('name' => 'Symfony2000')),
+            array('{% trans with { \'%name%\': \'Symfony2000\' } %}Hello %name%{% endtrans %}', 'Hello Symfony2000'),
+            array('{% set vars = { \'%name%\': \'Symfony2000\' } %}{% trans with vars %}Hello %name%{% endtrans %}', 'Hello Symfony2000'),
 
             // transchoice
             array('{% transchoice count from "messages" %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
@@ -69,15 +69,15 @@ class TranslationExtensionTest extends TestCase
             array('{% transchoice count %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
                 'There is 5 apples', array('count' => 5)),
             array('{% transchoice count %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtranschoice %}',
-                'There is 5 apples (Symfony2)', array('count' => 5, 'name' => 'Symfony2')),
-            array('{% transchoice count with { \'%name%\': \'Symfony2\' } %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtranschoice %}',
-                'There is 5 apples (Symfony2)', array('count' => 5)),
+                'There is 5 apples (Symfony2000)', array('count' => 5, 'name' => 'Symfony2000')),
+            array('{% transchoice count with { \'%name%\': \'Symfony2000\' } %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtranschoice %}',
+                'There is 5 apples (Symfony2000)', array('count' => 5)),
 
             // trans filter
             array('{{ "Hello"|trans }}', 'Hello'),
-            array('{{ name|trans }}', 'Symfony2', array('name' => 'Symfony2')),
-            array('{{ hello|trans({ \'%name%\': \'Symfony2\' }) }}', 'Hello Symfony2', array('hello' => 'Hello %name%')),
-            array('{% set vars = { \'%name%\': \'Symfony2\' } %}{{ hello|trans(vars) }}', 'Hello Symfony2', array('hello' => 'Hello %name%')),
+            array('{{ name|trans }}', 'Symfony2000', array('name' => 'Symfony2000')),
+            array('{{ hello|trans({ \'%name%\': \'Symfony2000\' }) }}', 'Hello Symfony2000', array('hello' => 'Hello %name%')),
+            array('{% set vars = { \'%name%\': \'Symfony2000\' } %}{{ hello|trans(vars) }}', 'Hello Symfony2000', array('hello' => 'Hello %name%')),
         );
     }
 

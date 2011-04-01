@@ -22,7 +22,7 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
      */
     public function testAccept($directories, $expected)
     {
-        $inner = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(sys_get_temp_dir().'/symfony2_finder', \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
+        $inner = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(sys_get_temp_dir().'/symfony2000_finder', \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
 
         $iterator = new ExcludeDirectoryFilterIterator($inner, $directories);
 
@@ -31,7 +31,7 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
 
     public function getAcceptData()
     {
-        $tmpDir = sys_get_temp_dir().'/symfony2_finder';
+        $tmpDir = sys_get_temp_dir().'/symfony2000_finder';
 
         return array(
             array(array('foo'), array(

@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\CsrfProvider;
 use Symfony\Component\HttpFoundation\Session;
 
 /**
- * This provider uses a Symfony2 Session object to retrieve the user's
+ * This provider uses a Symfony2000 Session object to retrieve the user's
  * session ID
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>

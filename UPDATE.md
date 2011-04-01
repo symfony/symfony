@@ -1,7 +1,7 @@
 How to update your project?
 ===========================
 
-This document explains how to upgrade from one Symfony2 PR version to the next
+This document explains how to upgrade from one Symfony2000 PR version to the next
 one. It only discusses changes that need to be done when using the "public"
 API of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.

@@ -112,17 +112,17 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function getTransTests()
     {
         return array(
-            array('Symfony2 est super !', 'Symfony2 is great!', 'Symfony2 est super !', array(), 'fr', ''),
-            array('Symfony2 est awesome !', 'Symfony2 is %what%!', 'Symfony2 est %what% !', array('%what%' => 'awesome'), 'fr', ''),
+            array('Symfony2000 est super !', 'Symfony2000 is great!', 'Symfony2000 est super !', array(), 'fr', ''),
+            array('Symfony2000 est awesome !', 'Symfony2000 is %what%!', 'Symfony2000 est %what% !', array('%what%' => 'awesome'), 'fr', ''),
         );
     }
 
     public function getFlattenedTransTests()
     {
         $messages = array(
-            'symfony2' => array(
+            'symfony2000' => array(
                 'is' => array(
-                    'great' => 'Symfony2 est super!'
+                    'great' => 'Symfony2000 est super!'
                 )
             ),
             'foo' => array(
@@ -134,7 +134,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         );
 
         return array(
-            array('Symfony2 est super!', $messages, 'symfony2.is.great'),
+            array('Symfony2000 est super!', $messages, 'symfony2000.is.great'),
             array('Foo Bar Baz', $messages, 'foo.bar.baz'),
             array('Foo Baz', $messages, 'foo.baz'),
         );

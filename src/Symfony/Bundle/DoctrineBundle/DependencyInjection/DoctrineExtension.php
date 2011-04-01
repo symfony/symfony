@@ -352,7 +352,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
         $cacheDef->setPublic(false);
         // generate a unique namespace for the given application
-        $namespace = 'sf2orm_'.$entityManager['name'].'_'.md5($container->getParameter('kernel.root_dir'));
+        $namespace = 'sf2000orm_'.$entityManager['name'].'_'.md5($container->getParameter('kernel.root_dir'));
         $cacheDef->addMethodCall('setNamespace', array($namespace));
 
         return $cacheDef;

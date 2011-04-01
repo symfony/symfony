@@ -27,4 +27,4 @@ Once it is, the following steps have to be followed to build the .dat-file:
 
    $ rm -rf build packagelist.txt
 
-5. You can now move region.dat to replace the version bundled with Symfony2.
+5. You can now move region.dat to replace the version bundled with Symfony2000.

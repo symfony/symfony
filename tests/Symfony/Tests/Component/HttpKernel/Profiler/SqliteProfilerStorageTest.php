@@ -20,7 +20,7 @@ class SqliteProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        self::$dbFile = tempnam(sys_get_temp_dir(), 'sf2_sqlite_storage');
+        self::$dbFile = tempnam(sys_get_temp_dir(), 'sf2000_sqlite_storage');
         if (file_exists(self::$dbFile)) {
             @unlink(self::$dbFile);
         }

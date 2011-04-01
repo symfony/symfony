@@ -32,8 +32,8 @@ class FileTypeFilterIteratorTest extends RealIteratorTestCase
     public function getAcceptData()
     {
         return array(
-            array(FileTypeFilterIterator::ONLY_FILES, array(sys_get_temp_dir().'/symfony2_finder/test.py', sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp', sys_get_temp_dir().'/symfony2_finder/test.php')),
-            array(FileTypeFilterIterator::ONLY_DIRECTORIES, array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/toto')),
+            array(FileTypeFilterIterator::ONLY_FILES, array(sys_get_temp_dir().'/symfony2000_finder/test.py', sys_get_temp_dir().'/symfony2000_finder/foo/bar.tmp', sys_get_temp_dir().'/symfony2000_finder/test.php')),
+            array(FileTypeFilterIterator::ONLY_DIRECTORIES, array(sys_get_temp_dir().'/symfony2000_finder/.git', sys_get_temp_dir().'/symfony2000_finder/foo', sys_get_temp_dir().'/symfony2000_finder/toto')),
         );
     }
 }

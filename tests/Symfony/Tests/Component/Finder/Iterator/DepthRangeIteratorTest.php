@@ -46,6 +46,6 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
 
     protected function getAbsolutePath($path)
     {
-        return sys_get_temp_dir().'/symfony2_finder'.str_replace('/', DIRECTORY_SEPARATOR, $path);
+        return sys_get_temp_dir().'/symfony2000_finder'.str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
 }

@@ -22,7 +22,7 @@
         <parameter key="security.acl.security_identity_retrieval_strategy.class">Symfony\Component\Security\Acl\Domain\SecurityIdentityRetrievalStrategy</parameter>
 
         <parameter key="security.acl.cache.doctrine.class">Symfony\Component\Security\Acl\Domain\DoctrineAclCache</parameter>
-        <parameter key="security.acl.cache.doctrine.prefix">sf2_acl_</parameter>
+        <parameter key="security.acl.cache.doctrine.prefix">sf2000_acl_</parameter>
 
         <parameter key="security.acl.collection_cache.class">Symfony\Component\Security\Acl\Domain\AclCollectionCache</parameter>
     </parameters>

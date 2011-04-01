@@ -20,7 +20,7 @@ class Kernel extends BaseKernel
 {
     public function __construct()
     {
-        $this->rootDir = sys_get_temp_dir().'/sf2_'.rand(1, 9999);
+        $this->rootDir = sys_get_temp_dir().'/sf2000_'.rand(1, 9999);
         if (!is_dir($this->rootDir)) {
             if (false === @mkdir($this->rootDir)) {
                 exit(sprintf('Unable to create a temporary directory (%s)', $this->rootDir));

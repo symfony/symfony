@@ -33,7 +33,7 @@ class SizeRangeFilterIteratorTest extends RealIteratorTestCase
     public function getAcceptData()
     {
         return array(
-            array(array(new NumberComparator('< 1K'), new NumberComparator('> 0.5K')), array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/test.php', sys_get_temp_dir().'/symfony2_finder/toto')),
+            array(array(new NumberComparator('< 1K'), new NumberComparator('> 0.5K')), array(sys_get_temp_dir().'/symfony2000_finder/.git', sys_get_temp_dir().'/symfony2000_finder/foo', sys_get_temp_dir().'/symfony2000_finder/test.php', sys_get_temp_dir().'/symfony2000_finder/toto')),
         );
     }
 }

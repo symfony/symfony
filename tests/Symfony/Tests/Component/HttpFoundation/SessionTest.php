@@ -150,7 +150,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session->set('foo', 'bar');
 
         $this->session->save();
-        $compare = array('_symfony2' => array('_flash' => array(), '_locale' => 'fr', 'foo' => 'bar'));
+        $compare = array('_symfony2000' => array('_flash' => array(), '_locale' => 'fr', 'foo' => 'bar'));
 
         $r = new \ReflectionObject($this->storage);
         $p = $r->getProperty('data');

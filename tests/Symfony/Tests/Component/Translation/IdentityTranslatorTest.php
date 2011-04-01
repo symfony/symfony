@@ -47,8 +47,8 @@ class IdentityTranslatorTest extends \PHPUnit_Framework_TestCase
     public function getTransTests()
     {
         return array(
-            array('Symfony2 is great!', 'Symfony2 is great!', array()),
-            array('Symfony2 is awesome!', 'Symfony2 is %what%!', array('%what%' => 'awesome')),
+            array('Symfony2000 is great!', 'Symfony2000 is great!', array()),
+            array('Symfony2000 is awesome!', 'Symfony2000 is %what%!', array('%what%' => 'awesome')),
         );
     }
 

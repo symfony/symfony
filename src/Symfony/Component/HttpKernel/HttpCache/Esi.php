@@ -75,7 +75,7 @@ class Esi
     public function addSurrogateEsiCapability(Request $request)
     {
         $current = $request->headers->get('Surrogate-Capability');
-        $new = 'symfony2="ESI/1.0"';
+        $new = 'symfony2000="ESI/1.0"';
 
         $request->headers->set('Surrogate-Capability', $current ? $current.', '.$new : $new);
     }

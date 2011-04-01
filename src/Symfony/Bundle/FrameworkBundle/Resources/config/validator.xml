@@ -10,8 +10,6 @@
         <parameter key="validator.mapping.loader.loader_chain.class">Symfony\Component\Validator\Mapping\Loader\LoaderChain</parameter>
         <parameter key="validator.mapping.loader.static_method_loader.class">Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader</parameter>
         <parameter key="validator.mapping.loader.annotation_loader.class">Symfony\Component\Validator\Mapping\Loader\AnnotationLoader</parameter>
-        <parameter key="validator.mapping.loader.xml_file_loader.class">Symfony\Component\Validator\Mapping\Loader\XmlFileLoader</parameter>
-        <parameter key="validator.mapping.loader.yaml_file_loader.class">Symfony\Component\Validator\Mapping\Loader\YamlFileLoader</parameter>
         <parameter key="validator.mapping.loader.xml_files_loader.class">Symfony\Component\Validator\Mapping\Loader\XmlFilesLoader</parameter>
         <parameter key="validator.mapping.loader.yaml_files_loader.class">Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader</parameter>
         <parameter key="validator.validator_factory.class">Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory</parameter>

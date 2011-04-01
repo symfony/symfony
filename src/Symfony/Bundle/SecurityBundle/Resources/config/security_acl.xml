@@ -33,13 +33,7 @@
         <service id="security.acl.dbal.provider" class="%security.acl.dbal.provider.class%" public="false">
             <argument type="service" id="security.acl.dbal.connection" />
             <argument type="service" id="security.acl.permission_granting_strategy" />
-            <argument type="collection">
-                <argument key="class_table_name">%security.acl.dbal.class_table_name%</argument>
-                <argument key="entry_table_name">%security.acl.dbal.entry_table_name%</argument>
-                <argument key="oid_table_name">%security.acl.dbal.oid_table_name%</argument>
-                <argument key="oid_ancestors_table_name">%security.acl.dbal.oid_ancestors_table_name%</argument>
-                <argument key="sid_table_name">%security.acl.dbal.sid_table_name%</argument>
-            </argument>
+            <argument /> <!-- Table collection -->
             <argument type="service" id="security.acl.cache" on-invalid="null" />
         </service>
 
@@ -54,7 +48,6 @@
         <service id="security.acl.cache.doctrine" class="%security.acl.cache.doctrine.class%" public="false">
             <argument type="service" id="security.acl.cache.doctrine_cache_impl" />
             <argument type="service" id="security.acl.permission_granting_strategy" />        
-            <argument>%security.acl.cache.doctrine.prefix%</argument>
         </service>
 
         <service id="security.acl.cache.doctrine.cache_impl" alias="doctrine.orm.default_result_cache" public="false" />
@@ -67,7 +60,6 @@
             <argument type="service" id="security.acl.security_identity_retrieval_strategy" />
             <argument type="service" id="security.acl.permission.map" />
             <argument type="service" id="logger" on-invalid="null" />
-            <argument>%security.acl.voter.allow_if_object_identity_unavailable%</argument>
             <tag name="security.voter" priority="255" />
         </service>
     </services>

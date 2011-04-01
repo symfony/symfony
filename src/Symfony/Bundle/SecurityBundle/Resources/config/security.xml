@@ -58,7 +58,7 @@
         </service>
 
         <service id="security.authentication.session_strategy" class="%security.authentication.session_strategy.class%" public="false">
-            <argument>%security.authentication.session_strategy.strategy%</argument>
+            <argument /> <!-- Strategy -->
         </service>
 
         <service id="security.encoder_factory.generic" class="%security.encoder_factory.generic.class%" public="false">
@@ -73,9 +73,6 @@
         <!-- Authorization related services -->
         <service id="security.access.decision_manager" class="%security.access.decision_manager.class%" public="false">
             <argument type="collection"></argument>
-            <argument>%security.access.decision_manager.strategy%</argument>
-            <argument>%security.access.decision_manager.allow_if_all_abstain%</argument>
-            <argument>%security.access.decision_manager.allow_if_equal_granted_denied%</argument>
         </service>
 
         <service id="security.role_hierarchy" class="%security.role_hierarchy.class%" public="false">

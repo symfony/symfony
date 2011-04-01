@@ -24,9 +24,9 @@ class StaticExtension extends AsseticExtension
     public function getTokenParsers()
     {
         return array(
-            new StaticTokenParser($this->factory, 'javascripts', 'js/*.js', $this->debug),
-            new StaticTokenParser($this->factory, 'stylesheets', 'css/*.css', $this->debug),
-            new StaticTokenParser($this->factory, 'image', 'images/*', $this->debug, true),
+            new StaticTokenParser($this->factory, 'javascripts', 'js/*.js', $this->debug, false, array('package')),
+            new StaticTokenParser($this->factory, 'stylesheets', 'css/*.css', $this->debug, false, array('package')),
+            new StaticTokenParser($this->factory, 'image', 'images/*', $this->debug, true, array('package')),
         );
     }
 }

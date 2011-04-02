@@ -33,7 +33,7 @@ class DateType extends AbstractType
         );
 
         if ($options['widget'] === 'text') {
-            $builder->setClientTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $options['format'], \IntlDateFormatter::NONE));
+            $builder->appendClientTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $options['format'], \IntlDateFormatter::NONE));
         } else {
             // Only pass a subset of the options to children
             $yearOptions = array(
@@ -55,19 +55,19 @@ class DateType extends AbstractType
             $builder->add('year', 'choice', $yearOptions)
                 ->add('month', 'choice', $monthOptions)
                 ->add('day', 'choice', $dayOptions)
-                ->setClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], array('year', 'month', 'day')));
+                ->appendClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], array('year', 'month', 'day')));
         }
 
         if ($options['input'] === 'string') {
-            $builder->setNormTransformer(new ReversedTransformer(
+            $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], 'Y-m-d')
             ));
         } else if ($options['input'] === 'timestamp') {
-            $builder->setNormTransformer(new ReversedTransformer(
+            $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToTimestampTransformer($options['data_timezone'], $options['data_timezone'])
             ));
         } else if ($options['input'] === 'array') {
-            $builder->setNormTransformer(new ReversedTransformer(
+            $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], array('year', 'month', 'day'))
             ));
         }

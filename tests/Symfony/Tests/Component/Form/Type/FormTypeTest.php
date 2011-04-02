@@ -378,7 +378,7 @@ class FormTypeTest extends TestCase
 
         $builder = $this->factory->createBuilder('form', 'author');
         $builder->add('referenceCopy', 'form');
-        $builder->get('referenceCopy')->setClientTransformer(new CallbackTransformer(
+        $builder->get('referenceCopy')->appendClientTransformer(new CallbackTransformer(
         function () {},
         function ($value) { // reverseTransform
             return 'foobar';
@@ -404,7 +404,7 @@ class FormTypeTest extends TestCase
         $builder = $this->factory->createBuilder('form', 'author');
         $builder->setData($author);
         $builder->add('referenceCopy', 'form');
-        $builder->get('referenceCopy')->setClientTransformer(new CallbackTransformer(
+        $builder->get('referenceCopy')->appendClientTransformer(new CallbackTransformer(
         function () {},
         function ($value) use ($ref2) { // reverseTransform
             return $ref2;

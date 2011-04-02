@@ -34,9 +34,9 @@ class FormBuilder
 
     private $required;
 
-    private $clientTransformer;
+    private $clientTransformers = array();
 
-    private $normalizationTransformer;
+    private $normTransformers = array();
 
     private $validators = array();
 
@@ -186,43 +186,74 @@ class FormBuilder
         return $this;
     }
 
-    protected function buildDispatcher()
-    {
-        return $this->dispatcher;
-    }
-
     /**
-     * Sets the DataTransformer.
+     * Appends a transformer to the normalization transformer chain
      *
      * @param DataTransformerInterface $clientTransformer
      */
-    public function setNormTransformer(DataTransformerInterface $normalizationTransformer = null)
+    public function appendNormTransformer(DataTransformerInterface $normTransformer = null)
     {
-        $this->normalizationTransformer = $normalizationTransformer;
+        $this->normTransformers[] = $normTransformer;
 
         return $this;
     }
 
-    public function getNormTransformer()
-    {
-        return $this->normalizationTransformer;
-    }
-
     /**
-     * Sets the DataTransformer.
+     * Prepends a transformer to the client transformer chain
      *
      * @param DataTransformerInterface $clientTransformer
      */
-    public function setClientTransformer(DataTransformerInterface $clientTransformer = null)
+    public function prependNormTransformer(DataTransformerInterface $normTransformer = null)
     {
-        $this->clientTransformer = $clientTransformer;
+        array_unshift($this->normTransformers, $normTransformer);
 
         return $this;
     }
 
-    public function getClientTransformer()
+    public function resetNormTransformers()
     {
-        return $this->clientTransformer;
+        $this->normTransformers = array();
+
+        return $this;
+    }
+
+    public function getNormTransformers()
+    {
+        return $this->normTransformers;
+    }
+
+    /**
+     * Appends a transformer to the client transformer chain
+     *
+     * @param DataTransformerInterface $clientTransformer
+     */
+    public function appendClientTransformer(DataTransformerInterface $clientTransformer = null)
+    {
+        $this->clientTransformers[] = $clientTransformer;
+
+        return $this;
+    }
+
+    /**
+     * Prepends a transformer to the client transformer chain
+     *
+     * @param DataTransformerInterface $clientTransformer
+     */
+    public function prependClientTransformer(DataTransformerInterface $clientTransformer = null)
+    {
+        array_unshift($this->clientTransformers, $clientTransformer);
+
+        return $this;
+    }
+
+    public function resetClientTransformers()
+    {
+        $this->clientTransformers = array();
+    }
+
+    public function getClientTransformers()
+    {
+        return $this->clientTransformers;
     }
 
     public function setAttribute($name, $value)
@@ -406,6 +437,11 @@ class FormBuilder
         return isset($this->children[$name]);
     }
 
+    protected function buildDispatcher()
+    {
+        return $this->dispatcher;
+    }
+
     protected function buildChildren()
     {
         $children = array();
@@ -427,8 +463,8 @@ class FormBuilder
             $this->getName(),
             $this->buildDispatcher(),
             $this->getTypes(),
-            $this->getClientTransformer(),
-            $this->getNormTransformer(),
+            $this->getClientTransformers(),
+            $this->getNormTransformers(),
             $this->getDataMapper(),
             $this->getValidators(),
             $this->getRequired(),

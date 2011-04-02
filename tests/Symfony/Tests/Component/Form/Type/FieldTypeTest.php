@@ -248,8 +248,8 @@ class FieldTypeTest extends TestCase
 
         $builder = $this->factory->createBuilder('field', 'title');
         $builder->addEventSubscriber($filter);
-        $builder->setClientTransformer($clientTransformer);
-        $builder->setNormTransformer($normTransformer);
+        $builder->appendClientTransformer($clientTransformer);
+        $builder->appendNormTransformer($normTransformer);
 
         $form = $builder->getForm();
         $form->bind(0);
@@ -280,8 +280,8 @@ class FieldTypeTest extends TestCase
         ));
 
         $builder = $this->factory->createBuilder('field', 'title');
-        $builder->setNormTransformer($normTransformer);
-        $builder->setClientTransformer($clientTransformer);
+        $builder->appendNormTransformer($normTransformer);
+        $builder->appendClientTransformer($clientTransformer);
         $form = $builder->getForm();
 
         $form->setData(0);
@@ -299,7 +299,7 @@ class FieldTypeTest extends TestCase
         ));
 
         $builder = $this->factory->createBuilder('field', 'title');
-        $builder->setClientTransformer($clientTransformer);
+        $builder->appendClientTransformer($clientTransformer);
         $form = $builder->getForm();
 
         $form->bind(' a ');
@@ -318,7 +318,7 @@ class FieldTypeTest extends TestCase
         $builder = $this->factory->createBuilder('field', 'title', array(
             'trim' => false,
         ));
-        $builder->setClientTransformer($clientTransformer);
+        $builder->appendClientTransformer($clientTransformer);
         $form = $builder->getForm();
 
         $form->bind(' a ');
@@ -347,7 +347,7 @@ class FieldTypeTest extends TestCase
         $builder = $this->factory->createBuilder('field', 'title', array(
             'trim' => false,
         ));
-        $builder->setClientTransformer($clientTransformer);
+        $builder->appendClientTransformer($clientTransformer);
         $form = $builder->getForm();
 
         $clientTransformer->expects($this->once())

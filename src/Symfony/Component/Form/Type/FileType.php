@@ -34,12 +34,12 @@ class FileType extends AbstractType
     public function buildForm(FormBuilder $builder, array $options)
     {
         if ($options['type'] === 'string') {
-            $builder->setNormTransformer(new DataTransformerChain(array(
+            $builder->appendNormTransformer(new DataTransformerChain(array(
                 new ReversedTransformer(new FileToStringTransformer()),
                 new FileToArrayTransformer(),
             )));
         } else {
-            $builder->setNormTransformer(new FileToArrayTransformer());
+            $builder->appendNormTransformer(new FileToArrayTransformer());
         }
 
         $builder->addEventSubscriber(new FixFileUploadListener($this->storage), 10)

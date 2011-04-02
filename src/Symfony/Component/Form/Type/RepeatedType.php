@@ -18,7 +18,7 @@ class RepeatedType extends AbstractType
 {
     public function buildForm(FormBuilder $builder, array $options)
     {
-        $builder->setClientTransformer(new ValueToDuplicatesTransformer(array(
+        $builder->appendClientTransformer(new ValueToDuplicatesTransformer(array(
                 $options['first_name'],
                 $options['second_name'],
             )))

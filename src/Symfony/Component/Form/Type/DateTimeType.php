@@ -68,7 +68,7 @@ class DateTimeType extends AbstractType
             $timeParts[] = 'second';
         }
 
-        $builder->setClientTransformer(new DataTransformerChain(array(
+        $builder->appendClientTransformer(new DataTransformerChain(array(
                 new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], $parts),
                 new ArrayToPartsTransformer(array(
                     'date' => array('year', 'month', 'day'),
@@ -79,15 +79,15 @@ class DateTimeType extends AbstractType
             ->add('time', 'time', $timeOptions);
 
         if ($options['input'] === 'string') {
-            $builder->setNormTransformer(new ReversedTransformer(
+            $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], 'Y-m-d H:i:s')
             ));
         } else if ($options['input'] === 'timestamp') {
-            $builder->setNormTransformer(new ReversedTransformer(
+            $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToTimestampTransformer($options['data_timezone'], $options['data_timezone'])
             ));
         } else if ($options['input'] === 'array') {
-            $builder->setNormTransformer(new ReversedTransformer(
+            $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], $parts)
             ));
         }

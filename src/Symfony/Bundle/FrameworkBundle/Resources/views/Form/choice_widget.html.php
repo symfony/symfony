@@ -7,7 +7,7 @@
     <select
         id="<?php echo $id ?>"
         name="<?php echo $name ?>"
-        <?php if ($disabled): ?> disabled="disabled"<?php endif ?>
+        <?php if ($read_only): ?> disabled="disabled"<?php endif ?>
         <?php if ($multiple): ?> multiple="multiple"<?php endif ?>
         <?php if ($class): ?> class="<?php echo $class ?>"<?php endif ?>
         <?php if (isset($attr)): echo $renderer->getTheme()->attributes($attr); endif; ?>

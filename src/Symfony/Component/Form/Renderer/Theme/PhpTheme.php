@@ -252,7 +252,7 @@ class PhpTheme implements ThemeInterface
     {
         $html = '<textarea id="' . $this->escape($attr['id']) . "' " .
                 'name="' . $this->escape($attr['name']) . "' ";
-        if ($attr['disabled']) {
+        if ($attr['read_only']) {
             $html .= 'disabled="disabled" ';
         }
         if ($attr['required']) {
@@ -292,7 +292,7 @@ class PhpTheme implements ThemeInterface
         if ($attr['value']) {
             $html .= 'value="' . $this->escape($attr['value']) .'" ';
         }
-        if ($attr['disabled']) {
+        if ($attr['read_only']) {
             $html .= 'disabled="disabled" ';
         }
         if ($attr['required']) {

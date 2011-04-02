@@ -80,7 +80,7 @@ class FieldType extends AbstractType
         $renderer->setVar('name', $name);
         $renderer->setVar('errors', $form->getErrors());
         $renderer->setVar('value', $form->getClientData());
-        $renderer->setVar('disabled', $form->isReadOnly());
+        $renderer->setVar('read_only', $form->isReadOnly());
         $renderer->setVar('required', $form->isRequired());
         $renderer->setVar('class', null);
         $renderer->setVar('max_length', null);

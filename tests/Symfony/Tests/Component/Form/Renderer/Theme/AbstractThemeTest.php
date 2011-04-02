@@ -34,7 +34,7 @@ abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
             'value' => '',
             'class' => '',
             'max_length' => null,
-            'disabled' => false,
+            'read_only' => false,
             'required' => false,
             'size' => null
         ));
@@ -47,7 +47,7 @@ abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($input->hasAttribute('class'), "No class attribute by default.");
         $this->assertFalse($input->hasAttribute('maxlength'), "has no maxlength attribute.");
         $this->assertFalse($input->hasAttribute('size'), "has no size attribute");
-        $this->assertFalse($input->hasAttribute('disabled'));
+        $this->assertFalse($input->hasAttribute('read_only'));
         $this->assertFalse($input->hasAttribute('required'));
     }
 
@@ -59,7 +59,7 @@ abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
             'value' => 'test',
             'class' => 'foo',
             'max_length' => 128,
-            'disabled' => true,
+            'read_only' => true,
             'required' => true,
             'size' => 20,
             'attr' => array('accesskey' => 'G', 'title' => 'Foo'),
@@ -91,7 +91,7 @@ abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
             'name' => 'foo',
             'value' => 'foo',
             'class' => 'foo',
-            'disabled' => false,
+            'read_only' => false,
             'required' => false,
             'empty_value' => '---',
             'expanded' => false,

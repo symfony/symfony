@@ -47,10 +47,6 @@ class ChoicePluginTest extends \PHPUnit_Framework_TestCase
 
         $renderer->expects($this->at(3))
                 ->method('setVar')
-                ->with($this->equalTo('choice_list'), $this->equalTo($choice));
-
-        $renderer->expects($this->at(4))
-                ->method('setVar')
                 ->with($this->equalTo('empty_value'), $this->equalTo(''));
 
         $plugin = new ChoicePlugin($choice);

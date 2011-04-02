@@ -13,15 +13,9 @@ namespace Symfony\Component\Form\ChoiceList;
 
 interface ChoiceListInterface
 {
-    function getLabel($choice);
-
     function getChoices();
 
     function getOtherChoices();
 
     function getPreferredChoices();
-
-    function isChoiceGroup($choice);
-
-    function isChoiceSelected($choice, $displayedData);
 }

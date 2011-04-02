@@ -43,16 +43,6 @@ class DefaultChoiceList implements ChoiceListInterface
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function getLabel($choice)
-    {
-        $choices = $this->getChoices();
-
-        return isset($choices[$choice]) ? $choices[$choice] : null;
-    }
-
-    /**
      * Returns the choices
      *
      * If the choices were given as a closure, the closure is executed on
@@ -81,22 +71,6 @@ class DefaultChoiceList implements ChoiceListInterface
     public function getPreferredChoices()
     {
         return array_intersect_key($this->getChoices(), $this->preferredChoices);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isChoiceGroup($choice)
-    {
-        return is_array($choice) || $choice instanceof \Traversable;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isChoiceSelected($choice, $displayedData)
-    {
-        return in_array((string) $choice, (array) $displayedData, true);
     }
 
     /**

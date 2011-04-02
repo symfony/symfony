@@ -80,11 +80,16 @@ abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
 
     public function testChoiceWidgetDefaults()
     {
-        $choiceList = new DefaultChoiceList(array(
+        $factory = $this->getMock('Symfony\Component\Form\Renderer\Theme\ThemeFactoryInterface');
+        $renderer = new ThemeRenderer($factory);
+        $renderer->setVar('choices', array(
             'foo' => 'Foo',
             'bar' => 'Bar',
+        ));
+        $renderer->setVar('preferred_choices', array(
             'baz' => 'Baz',
-        ), array('baz'));
+        ));
+        $renderer->setVar('value', 'foo');
 
         $input = $this->renderAsDomElement('choice', 'widget', array(
             'id' => 'foo',
@@ -96,9 +101,9 @@ abstract class AbstractThemeTest extends \PHPUnit_Framework_TestCase
             'empty_value' => '---',
             'expanded' => false,
             'multiple' => true,
-            'preferred_choices' => $choiceList->getPreferredChoices(),
-            'choices' => $choiceList->getOtherChoices(),
-            'choice_list' => $choiceList,
+            'renderer' => $renderer,
+            'choices' => $renderer->getVar('choices'),
+            'preferred_choices' => $renderer->getVar('preferred_choices'),
             'separator' => '---',
         ));
 

@@ -8,7 +8,6 @@
         <parameter key="assetic.filter.closure.api.class">Assetic\Filter\GoogleClosure\CompilerApiFilter</parameter>
         <parameter key="assetic.filter.closure.jar.class">Assetic\Filter\GoogleClosure\CompilerJarFilter</parameter>
         <parameter key="assetic.filter.closure.java">%assetic.java.bin%</parameter>
-        <parameter key="assetic.filter.closure.jar">%assetic.closure.jar%</parameter>
     </parameters>
 
     <services>

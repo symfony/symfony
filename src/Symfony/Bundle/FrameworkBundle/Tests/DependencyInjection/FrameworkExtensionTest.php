@@ -135,7 +135,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertContains(
             realpath(__DIR__.'/../../Resources/translations/validators.fr.xliff'),
-            array_map(function($resource) { return $resource[1]; }, $container->getParameter('translation.resources')),
+            array_map(function($resource) { return realpath($resource[1]); }, $container->getParameter('translation.resources')),
             '->registerTranslatorConfiguration() finds FrameworkExtension translation resources'
         );
 
@@ -169,8 +169,6 @@ abstract class FrameworkExtensionTest extends TestCase
             array_map('realpath', $xmlFiles),
             '->registerValidationConfiguration() adds Form validation.xml to XML loader'
         );
-
-        $this->assertFalse($container->hasDefinition('validator.mapping.loader.annotation_loader'), '->registerValidationConfiguration() does not define the annotation loader unless needed');
     }
 
     public function testValidationAnnotations()
@@ -179,9 +177,9 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('validator.mapping.loader.annotation_loader'), '->registerValidationConfiguration() defines the annotation loader');
 
-        $namespaces = $container->getParameter('validator.annotations.namespaces');
-        $this->assertEquals('Symfony\\Component\\Validator\\Constraints\\', $namespaces['assert'], '->registerValidationConfiguration() loads the default "assert" prefix');
-        $this->assertEquals('Application\\Validator\\Constraints\\', $namespaces['app'], '->registerValidationConfiguration() loads custom validation namespaces');
+        $arguments = $container->getDefinition('validator.mapping.loader.annotation_loader')->getArguments();
+        $this->assertEquals('Symfony\\Component\\Validator\\Constraints\\', $arguments[0]['assert'], '->registerValidationConfiguration() loads the default "assert" prefix');
+        $this->assertEquals('Application\\Validator\\Constraints\\', $arguments[0]['app'], '->registerValidationConfiguration() loads custom validation namespaces');
     }
 
     protected function createContainer()

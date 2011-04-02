@@ -32,11 +32,11 @@ class XmlFileLoader extends FileLoader
             $xml = $this->parseFile($this->file);
 
             foreach ($xml->namespace as $namespace) {
-                $this->namespaces[(string)$namespace['prefix']] = trim((string)$namespace);
+                $this->namespaces[(string) $namespace['prefix']] = trim((string) $namespace);
             }
 
             foreach ($xml->class as $class) {
-                $this->classes[(string)$class['name']] = $class;
+                $this->classes[(string) $class['name']] = $class;
             }
         }
 
@@ -49,13 +49,13 @@ class XmlFileLoader extends FileLoader
 
             foreach ($xml->property as $property) {
                 foreach ($this->parseConstraints($property->constraint) as $constraint) {
-                    $metadata->addPropertyConstraint((string)$property['name'], $constraint);
+                    $metadata->addPropertyConstraint((string) $property['name'], $constraint);
                 }
             }
 
             foreach ($xml->getter as $getter) {
                 foreach ($this->parseConstraints($getter->constraint) as $constraint) {
-                    $metadata->addGetterConstraint((string)$getter['property'], $constraint);
+                    $metadata->addGetterConstraint((string) $getter['property'], $constraint);
                 }
             }
 
@@ -87,7 +87,7 @@ class XmlFileLoader extends FileLoader
                 } else {
                     $options = array();
                 }
-            } else if (strlen((string)$node) > 0) {
+            } else if (strlen((string) $node) > 0) {
                 $options = trim($node);
             } else {
                 $options = null;
@@ -124,7 +124,7 @@ class XmlFileLoader extends FileLoader
             }
 
             if (isset($node['key'])) {
-                $values[(string)$node['key']] = $value;
+                $values[(string) $node['key']] = $value;
             } else {
                 $values[] = $value;
             }
@@ -157,7 +157,7 @@ class XmlFileLoader extends FileLoader
                 $value = trim($node);
             }
 
-            $options[(string)$node['name']] = $value;
+            $options[(string) $node['name']] = $value;
         }
 
         return $options;

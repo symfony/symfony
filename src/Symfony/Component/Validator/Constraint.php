@@ -81,7 +81,7 @@ abstract class Constraint
     public function __construct($options = null)
     {
         $invalidOptions = array();
-        $missingOptions = array_flip((array)$this->getRequiredOptions());
+        $missingOptions = array_flip((array) $this->getRequiredOptions());
 
         if (is_array($options) && count($options) == 1 && isset($options['value'])) {
             $options = $options['value'];
@@ -127,7 +127,7 @@ abstract class Constraint
             );
         }
 
-        $this->groups = (array)$this->groups;
+        $this->groups = (array) $this->groups;
     }
 
     /**

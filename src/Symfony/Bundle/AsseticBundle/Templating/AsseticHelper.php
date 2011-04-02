@@ -24,6 +24,7 @@ abstract class AsseticHelper extends Helper
 {
     protected $factory;
     protected $debug;
+    protected $inputs;
 
     /**
      * Constructor.
@@ -35,6 +36,20 @@ abstract class AsseticHelper extends Helper
     {
         $this->factory = $factory;
         $this->debug = $debug;
+        $this->inputs = array();
+    }
+
+    /**
+     * Adds an asset to an array.
+     *
+     * @param string $input An input string
+     * @param string $type  The asset type
+     */
+    public function add($input = null, $type = 'js')
+    {
+        if ($input && $type) {
+            $this->inputs[$type] = trim($input);
+        }
     }
 
     /**
@@ -42,11 +57,15 @@ abstract class AsseticHelper extends Helper
      */
     public function javascripts($inputs = array(), $filters = array(), array $options = array())
     {
+        if (!$inputs || is_array($inputs) && count($inputs)) {
+            $options['output'] = 'js/*';
+        }
+
         if (!isset($options['output'])) {
             $options['output'] = 'js/*';
         }
 
-        return $this->getAssetUrls($inputs, $filters, $options);
+        return $this->getAssetUrls($inputs, $filters, $options, 'js');
     }
 
     /**
@@ -58,7 +77,7 @@ abstract class AsseticHelper extends Helper
             $options['output'] = 'css/*';
         }
 
-        return $this->getAssetUrls($inputs, $filters, $options);
+        return $this->getAssetUrls($inputs, $filters, $options, 'css');
     }
 
     /**
@@ -72,7 +91,7 @@ abstract class AsseticHelper extends Helper
 
         $options['single'] = true;
 
-        return $this->getAssetUrls($inputs, $filters, $options);
+        return $this->getAssetUrls($inputs, $filters, $options, 'images');
     }
 
     /**
@@ -90,10 +109,11 @@ abstract class AsseticHelper extends Helper
      * @param array|string $inputs  An array or comma-separated list of input strings
      * @param array|string $filters An array or comma-separated list of filter names
      * @param array        $options An array of options
+     * @param string       $type    The type of the assets
      *
      * @return array An array of URLs for the asset
      */
-    private function getAssetUrls($inputs = array(), $filters = array(), array $options = array())
+    private function getAssetUrls($inputs = array(), $filters = array(), array $options = array(), $type = 'js')
     {
         $explode = function($value)
         {
@@ -102,6 +122,10 @@ abstract class AsseticHelper extends Helper
 
         if (!is_array($inputs)) {
             $inputs = $explode($inputs);
+        }
+
+        if (count($inputs) === 0 && isset($this->inputs[$type])) {
+            $inuts = $this->inputs[$type];
         }
 
         if (!is_array($filters)) {
@@ -131,6 +155,10 @@ abstract class AsseticHelper extends Helper
             $urls[] = $this->getAssetUrl($leaf, array_replace($options, array(
                 'name' => $options['name'].'_'.count($urls),
             )));
+        }
+
+        if (isset($options['single']) && $options['single']) {
+            return 0 > count($urls) ? $urls[0] : null;
         }
 
         return $urls;

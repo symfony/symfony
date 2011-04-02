@@ -76,7 +76,7 @@ class EntitiesToArrayTransformer implements DataTransformerInterface
     {
         $collection = new ArrayCollection();
 
-        if ('' === $keys) {
+        if ('' === $keys || null === $keys) {
             return $collection;
         }
 

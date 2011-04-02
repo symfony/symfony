@@ -16,7 +16,7 @@ namespace Symfony\Component\Form\ChoiceList;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class TimeZoneChoiceList extends DefaultChoiceList
+class TimezoneChoiceList extends DefaultChoiceList
 {
     /**
      * Stores the available timezone choices
@@ -24,9 +24,13 @@ class TimeZoneChoiceList extends DefaultChoiceList
      */
     protected static $timezones = array();
 
+    public function __construct()
+    {
+        parent::__construct(array());
+    }
 
     /**
-     * Returns the timezone choices
+     * Loads the timezone choices
      *
      * The choices are generated from the ICU function
      * \DateTimeZone::listIdentifiers(). They are cached during a single request,
@@ -35,8 +39,10 @@ class TimeZoneChoiceList extends DefaultChoiceList
      *
      * @return array  The timezone choices
      */
-    public function __construct(array $preferredChoices = array())
+    protected function load()
     {
+        parent::load();
+
         if (count(self::$timezones) == 0) {
             foreach (\DateTimeZone::listIdentifiers() as $timezone) {
                 $parts = explode('/', $timezone);
@@ -60,6 +66,6 @@ class TimeZoneChoiceList extends DefaultChoiceList
             }
         }
 
-        parent::__construct(self::$timezones, $preferredChoices);
+        $this->choices = self::$timezones;
     }
 }

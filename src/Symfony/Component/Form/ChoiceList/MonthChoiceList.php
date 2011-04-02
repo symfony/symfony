@@ -13,6 +13,8 @@ namespace Symfony\Component\Form\ChoiceList;
 
 class MonthChoiceList extends PaddedChoiceList
 {
+    private $formatter;
+
     /**
      * Generates an array of localized month choices
      *
@@ -20,26 +22,29 @@ class MonthChoiceList extends PaddedChoiceList
      * @return array          The localized months respecting the configured
      *                        locale and date format
      */
-    public function __construct(\IntlDateFormatter $formatter, array $months, array $preferredChoices = array())
+    public function __construct(\IntlDateFormatter $formatter, array $months)
     {
-        $pattern = $formatter->getPattern();
+        parent::__construct($months, 2, '0', STR_PAD_LEFT);
+
+        $this->formatter = $formatter;
+    }
+
+    protected function load()
+    {
+        parent::load();
+
+        $pattern = $this->formatter->getPattern();
 
         if (preg_match('/M+/', $pattern, $matches)) {
-            $formatter->setPattern($matches[0]);
-            $choices = array();
+            $this->formatter->setPattern($matches[0]);
 
-            foreach ($months as $month) {
-                $choices[$month] = $formatter->format(gmmktime(0, 0, 0, $month));
+            foreach ($this->choices as $choice => $value) {
+                $this->choices[$choice] = $this->formatter->format(gmmktime(0, 0, 0, $choice));
             }
 
             // I'd like to clone the formatter above, but then we get a
             // segmentation fault, so let's restore the old state instead
-            $formatter->setPattern($pattern);
-
-            DefaultChoiceList::__construct($choices, $preferredChoices);
-        } else {
-            parent::__construct($months, 2, '0', STR_PAD_LEFT, $preferredChoices);
+            $this->formatter->setPattern($pattern);
         }
-
     }
 }

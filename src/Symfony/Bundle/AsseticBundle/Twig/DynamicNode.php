@@ -28,7 +28,7 @@ class DynamicNode extends AsseticNode
         return new \Twig_Node_Expression_Function(
             new \Twig_Node_Expression_Name('path', $body->getLine()),
             new \Twig_Node(array(
-                new \Twig_Node_Expression_Constant('assetic_'.$this->getAttribute('asset_name'), $body->getLine()),
+                new \Twig_Node_Expression_Constant('assetic_'.$this->getAttribute('name'), $body->getLine()),
             )),
             $body->getLine()
         );

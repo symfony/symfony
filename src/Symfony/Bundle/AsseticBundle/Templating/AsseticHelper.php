@@ -162,7 +162,7 @@ abstract class AsseticHelper extends Helper
         }
 
         if (isset($options['single']) && $options['single']) {
-            return 0 > count($urls) ? $urls[0] : null;
+            return count($urls) > 0 ? $urls[0] : null;
         }
 
         return $urls;

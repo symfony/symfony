@@ -18,7 +18,9 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\EventListener\FixRadioInputListener;
 use Symfony\Component\Form\Renderer\ThemeRendererInterface;
+use Symfony\Component\Form\DataTransformer\ScalarToChoiceTransformer;
 use Symfony\Component\Form\DataTransformer\ScalarToBooleanChoicesTransformer;
+use Symfony\Component\Form\DataTransformer\ArrayToChoicesTransformer;
 use Symfony\Component\Form\DataTransformer\ArrayToBooleanChoicesTransformer;
 
 class ChoiceType extends AbstractType
@@ -55,14 +57,21 @@ class ChoiceType extends AbstractType
             ->setAttribute('multiple', $options['multiple'])
             ->setAttribute('expanded', $options['expanded']);
 
-        if ($options['multiple'] && $options['expanded']) {
-            $builder->appendClientTransformer(new ArrayToBooleanChoicesTransformer($options['choice_list']));
+        if ($options['expanded']) {
+            if ($options['multiple']) {
+                $builder->appendClientTransformer(new ArrayToBooleanChoicesTransformer($options['choice_list']));
+            } else {
+                $builder->appendClientTransformer(new ScalarToBooleanChoicesTransformer($options['choice_list']));
+                $builder->addEventSubscriber(new FixRadioInputListener(), 10);
+            }
+        } else {
+            if ($options['multiple']) {
+                $builder->appendClientTransformer(new ArrayToChoicesTransformer());
+            } else {
+                $builder->appendClientTransformer(new ScalarToChoiceTransformer());
+            }
         }
 
-        if (!$options['multiple'] && $options['expanded']) {
-            $builder->appendClientTransformer(new ScalarToBooleanChoicesTransformer($options['choice_list']));
-            $builder->addEventSubscriber(new FixRadioInputListener(), 10);
-        }
     }
 
     public function buildRenderer(ThemeRendererInterface $renderer, FormInterface $form)

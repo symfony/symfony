@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Renderer;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Form\Renderer\Theme\ThemeFactoryInterface;
+use Symfony\Component\Form\Util\ChoiceUtil;
 
 class ThemeRenderer implements ThemeRendererInterface, \ArrayAccess, \IteratorAggregate
 {
@@ -250,28 +251,14 @@ class ThemeRenderer implements ThemeRendererInterface, \ArrayAccess, \IteratorAg
 
     public function isChoiceSelected($choice)
     {
-        $choice = $this->toValidArrayKey($choice);
-        $choices = array_flip((array)$this->vars['value']);
+        $choice = ChoiceUtil::toValidChoice($choice);
 
-        return array_key_exists($choice, $choices);
-    }
-
-    /**
-     * Returns a valid array key for the given value
-     *
-     * @return integer|string $value  An integer if the value can be transformed
-     *                                to one, a string otherwise
-     */
-    private function toValidArrayKey($value)
-    {
-        if ((string)(int)$value === (string)$value) {
-            return (int)$value;
+        // The value should already have been converted by value transformers,
+        // otherwise we had to do the conversion on every call of this method
+        if (is_array($this->vars['value'])) {
+            return false !== array_search($choice, $this->vars['value'], true);
         }
 
-        if (is_bool($value)) {
-            return (int)$value;
-        }
-
-        return (string)$value;
+        return $choice === $this->vars['value'];
     }
 }

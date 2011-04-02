@@ -250,16 +250,28 @@ class ThemeRenderer implements ThemeRendererInterface, \ArrayAccess, \IteratorAg
 
     public function isChoiceSelected($choice)
     {
-        $choice = $this->toChoice($choice);
-        $choices = array_map(array($this, 'toChoice'), (array)$this->vars['value']);
+        $choice = $this->toValidArrayKey($choice);
+        $choices = array_flip((array)$this->vars['value']);
 
-        return in_array($choice, $choices, true);
+        return array_key_exists($choice, $choices);
     }
 
-    private function toChoice($choice)
+    /**
+     * Returns a valid array key for the given value
+     *
+     * @return integer|string $value  An integer if the value can be transformed
+     *                                to one, a string otherwise
+     */
+    private function toValidArrayKey($value)
     {
-        return (string)(int)$choice === (string)$choice
-            ? (int)$choice
-            : (string)$choice;
+        if ((string)(int)$value === (string)$value) {
+            return (int)$value;
+        }
+
+        if (is_bool($value)) {
+            return (int)$value;
+        }
+
+        return (string)$value;
     }
 }

@@ -380,6 +380,10 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function bind($clientData)
     {
+        if ($this->readOnly) {
+            return;
+        }
+
         if (is_scalar($clientData) || null === $clientData) {
             $clientData = (string)$clientData;
         }

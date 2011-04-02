@@ -145,6 +145,18 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->form->bind(array());
     }
 
+    public function testBindIsIgnoredIfReadOnly()
+    {
+        $form = $this->getBuilder()
+            ->setReadOnly(true)
+            ->setData('initial')
+            ->getForm();
+
+        $form->bind('new');
+
+        $this->assertEquals('initial', $form->getData());
+    }
+
     public function testNeverRequiredIfParentNotRequired()
     {
         $parent = $this->getBuilder()->setRequired(false)->getForm();

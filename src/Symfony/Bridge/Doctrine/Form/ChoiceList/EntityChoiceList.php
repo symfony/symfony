@@ -14,12 +14,12 @@ namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\ChoiceList\DefaultChoiceList;
+use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\NoResultException;
 
-class EntityChoiceList extends DefaultChoiceList
+class EntityChoiceList extends ArrayChoiceList
 {
     /**
      * @var Doctrine\ORM\EntityManager
@@ -81,7 +81,7 @@ class EntityChoiceList extends DefaultChoiceList
 
     private $propertyPath;
 
-    public function __construct(EntityManager $em, $class, $property = null, $queryBuilder = null, $choices = null, array $preferredChoices = array())
+    public function __construct(EntityManager $em, $class, $property = null, $queryBuilder = null, $choices = array())
     {
         // If a query builder was passed, it must be a closure or QueryBuilder
         // instance
@@ -109,14 +109,7 @@ class EntityChoiceList extends DefaultChoiceList
             $this->propertyPath = new PropertyPath($property);
         }
 
-        parent::__construct($choices, $preferredChoices);
-
-        // The entities can be passed directly in the "choices" option.
-        // In this case, initializing the entity cache is a cheap operation
-        // so do it now!
-        if (is_array($choices) && count($choices) > 0) {
-            $this->initializeChoices();
-        }
+        parent::__construct($choices);
     }
 
     /**
@@ -138,10 +131,12 @@ class EntityChoiceList extends DefaultChoiceList
      *
      * @return array  An array of choices
      */
-    protected function getInitializedChoices($choices)
+    protected function load()
     {
-        if ($choices) {
-            $entities = parent::getInitializedChoices($choices);
+        parent::load();
+
+        if ($this->choices) {
+            $entities = $this->choices;
         } else if ($qb = $this->queryBuilder) {
             $entities = $qb->getQuery()->execute();
         } else {
@@ -149,7 +144,7 @@ class EntityChoiceList extends DefaultChoiceList
         }
 
         $propertyPath = null;
-        $choices = array();
+        $this->choices = array();
         $this->entities = array();
 
         foreach ($entities as $key => $entity) {
@@ -164,18 +159,16 @@ class EntityChoiceList extends DefaultChoiceList
             if (count($this->identifier) > 1) {
                 // When the identifier consists of multiple field, use
                 // naturally ordered keys to refer to the choices
-                $choices[$key] = $value;
+                $this->choices[$key] = $value;
                 $this->entities[$key] = $entity;
             } else {
                 // When the identifier is a single field, index choices by
                 // entity ID for performance reasons
                 $id = current($this->getIdentifierValues($entity));
-                $choices[$id] = $value;
+                $this->choices[$id] = $value;
                 $this->entities[$id] = $entity;
             }
         }
-
-        return $choices;
     }
 
     public function getIdentifier()
@@ -194,9 +187,8 @@ class EntityChoiceList extends DefaultChoiceList
      */
     public function getEntities()
     {
-        if (!$this->entities) {
-            // indirectly initializes the entities property
-            $this->initializeChoices();
+        if (!$this->loaded) {
+            $this->load();
         }
 
         return $this->entities;
@@ -219,6 +211,10 @@ class EntityChoiceList extends DefaultChoiceList
      */
     public function getEntity($key)
     {
+        if (!$this->loaded) {
+            $this->load();
+        }
+
         try {
             if (count($this->identifier) > 1) {
                 // $key is a collection index
@@ -247,7 +243,7 @@ class EntityChoiceList extends DefaultChoiceList
      * @param  string $property     The name of the property
      * @return \ReflectionProperty  The reflection instsance
      */
-    protected function getReflProperty($property)
+    private function getReflProperty($property)
     {
         if (!isset($this->reflProperties[$property])) {
             $this->reflProperties[$property] = new \ReflectionProperty($this->class, $property);

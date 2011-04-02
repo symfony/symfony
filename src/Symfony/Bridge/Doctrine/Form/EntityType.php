@@ -83,8 +83,7 @@ class EntityType extends AbstractType
                 $options['class'],
                 $options['property'],
                 $options['query_builder'],
-                $options['choices'],
-                $options['preferred_choices']
+                $options['choices']
             );
         }
 

@@ -13,7 +13,9 @@ namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\ChoiceList\DefaultChoiceList;
+use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\EventListener\FixRadioInputListener;
 use Symfony\Component\Form\Renderer\ThemeRendererInterface;
 use Symfony\Component\Form\DataTransformer\ScalarToChoicesTransformer;
@@ -23,13 +25,23 @@ class ChoiceType extends AbstractType
 {
     public function buildForm(FormBuilder $builder, array $options)
     {
-        if ($options['expanded']) {
-            $choices = array_replace(
-                $options['choice_list']->getPreferredChoices(),
-                $options['choice_list']->getOtherChoices()
-            );
+        if (!$options['choices'] && !$options['choice_list']) {
+            throw new FormException('Either the option "choices" or "choice_list" is required');
+        }
 
-            foreach ($choices as $choice => $value) {
+        if (!is_array($options['choices']) && !$options['choices'] instanceof \Closure) {
+            throw new UnexpectedTypeException($options['choices'], 'array or \Closure');
+        }
+
+        if (!$options['choice_list']) {
+            $options['choice_list'] = new ArrayChoiceList($options['choices']);
+        }
+
+        if ($options['expanded']) {
+            // Load choices already if expanded
+            $options['choices'] = $options['choice_list']->getChoices();
+
+            foreach ($options['choices'] as $choice => $value) {
                 if ($options['multiple']) {
                     $builder->add((string)$choice, 'checkbox', array('value' => $choice));
                 } else {
@@ -39,6 +51,7 @@ class ChoiceType extends AbstractType
         }
 
         $builder->setAttribute('choice_list', $options['choice_list'])
+            ->setAttribute('preferred_choices', $options['preferred_choices'])
             ->setAttribute('multiple', $options['multiple'])
             ->setAttribute('expanded', $options['expanded']);
 
@@ -54,12 +67,13 @@ class ChoiceType extends AbstractType
 
     public function buildRenderer(ThemeRendererInterface $renderer, FormInterface $form)
     {
-        $choiceList = $form->getAttribute('choice_list');
+        $choices = $form->getAttribute('choice_list')->getChoices();
+        $preferred = array_flip($form->getAttribute('preferred_choices'));
 
         $renderer->setVar('multiple', $form->getAttribute('multiple'));
         $renderer->setVar('expanded', $form->getAttribute('expanded'));
-        $renderer->setVar('choices', $choiceList->getOtherChoices());
-        $renderer->setVar('preferred_choices', $choiceList->getPreferredChoices());
+        $renderer->setVar('preferred_choices', array_intersect_key($choices, $preferred));
+        $renderer->setVar('choices', array_diff_key($choices, $preferred));
         $renderer->setVar('separator', '-------------------');
         $renderer->setVar('empty_value', '');
 
@@ -73,25 +87,14 @@ class ChoiceType extends AbstractType
 
     public function getDefaultOptions(array $options)
     {
-        $defaultOptions = array(
+        return array(
             'multiple' => false,
             'expanded' => false,
+            'choice_list' => null,
             'choices' => array(),
             'preferred_choices' => array(),
             'csrf_protection' => false,
-            'choice_list' => null,
         );
-
-        $options = array_replace($defaultOptions, $options);
-
-        if (!isset($options['choice_list'])) {
-            $defaultOptions['choice_list'] = new DefaultChoiceList(
-                $options['choices'],
-                $options['preferred_choices']
-            );
-        }
-
-        return $defaultOptions;
     }
 
     public function getParent(array $options)

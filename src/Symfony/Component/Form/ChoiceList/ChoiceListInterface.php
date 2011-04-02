@@ -14,8 +14,4 @@ namespace Symfony\Component\Form\ChoiceList;
 interface ChoiceListInterface
 {
     function getChoices();
-
-    function getOtherChoices();
-
-    function getPreferredChoices();
 }

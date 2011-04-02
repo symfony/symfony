@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Bridge\Doctrine\Form\Type;
+namespace Symfony\Tests\Bridge\Doctrine\Form;
 
 use Doctrine\ORM\EntityManager;
 

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Bridge\Doctrine\Form\Type;
+namespace Symfony\Tests\Bridge\Doctrine\Form;
 
 require_once __DIR__.'/DoctrineOrmTestCase.php';
 require_once __DIR__.'/../Fixtures/SingleIdentEntity.php';
@@ -117,25 +117,6 @@ class EntityTypeTest extends DoctrineOrmTestCase
         ));
 
         $field->bind('2');
-    }
-
-    /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
-     */
-    public function testChoicesMustBeManaged()
-    {
-        $entity1 = new SingleIdentEntity(1, 'Foo');
-        $entity2 = new SingleIdentEntity(2, 'Bar');
-
-        // no persist here!
-
-        $field = $this->factory->create('entity', 'name', array(
-            'multiple' => false,
-            'em' => $this->em,
-            'class' => self::SINGLE_IDENT_CLASS,
-            'choices' => array($entity1, $entity2),
-            'property' => 'name',
-        ));
     }
 
     public function testSetDataSingle_null()

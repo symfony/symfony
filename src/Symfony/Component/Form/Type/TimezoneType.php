@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\ChoiceList\TimeZoneChoiceList;
+use Symfony\Component\Form\ChoiceList\TimezoneChoiceList;
 
 class TimezoneType extends AbstractType
 {
@@ -25,7 +25,7 @@ class TimezoneType extends AbstractType
         $options = array_replace($defaultOptions, $options);
 
         if (!isset($options['choice_list'])) {
-            $defaultOptions['choice_list'] = new TimeZoneChoiceList($options['preferred_choices']);
+            $defaultOptions['choice_list'] = new TimezoneChoiceList();
         }
 
         return $defaultOptions;

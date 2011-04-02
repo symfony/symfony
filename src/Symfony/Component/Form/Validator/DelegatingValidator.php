@@ -181,20 +181,25 @@ class DelegatingValidator implements FormValidatorInterface
         if (is_object($form->getData()) || is_array($form->getData())) {
             $groups = null;
 
-            $child = $form;
             if ($form->hasAttribute('validation_groups')) {
                 $groups = $form->getAttribute('validation_groups');
             }
 
-            while (!$groups && $child->hasParent()) {
-                $child = $child->getParent();
-                if ($form->hasAttribute('validation_groups')) {
-                    $groups = $form->getAttribute('validation_groups');
+            $currentForm = $form;
+            while (!$groups && $currentForm->hasParent()) {
+                $currentForm = $currentForm->getParent();
+
+                if ($currentForm->hasAttribute('validation_groups')) {
+                    $groups = $currentForm->getAttribute('validation_groups');
                 }
             }
 
             if (null === $groups) {
                 $groups = array('Default');
+            }
+
+            if (!is_array($groups)) {
+                $groups = array($groups);
             }
 
             $propertyPath = $context->getPropertyPath();

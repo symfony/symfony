@@ -69,7 +69,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         return new FormError($this->message, $this->params);
     }
 
-    protected function getBuilder($name, $propertyPath = null)
+    protected function getBuilder($name = 'name', $propertyPath = null)
     {
         $builder = new FormBuilder($name, $this->dispatcher);
         $builder->setAttribute('property_path', new PropertyPath($propertyPath ?: $name));
@@ -78,14 +78,19 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         return $builder;
     }
 
-    protected function getForm($name, $propertyPath = null)
+    protected function getForm($name = 'name', $propertyPath = null)
     {
-        return $this->getBuilder($name, $propertyPath)->getForm('author');
+        return $this->getBuilder($name, $propertyPath)->getForm();
+    }
+
+    protected function getMockForm()
+    {
+        return $this->getMock('Symfony\Tests\Component\Form\FormInterface');
     }
 
     public function testFormErrorsOnForm()
     {
-        $form = $this->getForm('author');
+        $form = $this->getForm();
 
         $this->delegate->expects($this->once())
             ->method('validate')
@@ -100,7 +105,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testFormErrorsOnChild()
     {
-        $parent = $this->getForm('author');
+        $parent = $this->getForm();
         $child = $this->getForm('firstName');
 
         $parent->add($child);
@@ -119,7 +124,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testFormErrorsOnChildLongPropertyPath()
     {
-        $parent = $this->getForm('author');
+        $parent = $this->getForm();
         $child = $this->getForm('street', 'address.street');
 
         $parent->add($child);
@@ -138,7 +143,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testFormErrorsOnGrandChild()
     {
-        $parent = $this->getForm('author');
+        $parent = $this->getForm();
         $child = $this->getForm('address');
         $grandChild = $this->getForm('street');
 
@@ -160,7 +165,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testFormErrorsOnChildWithChildren()
     {
-        $parent = $this->getForm('author');
+        $parent = $this->getForm();
         $child = $this->getForm('address');
         $grandChild = $this->getForm('street');
 
@@ -182,7 +187,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testFormErrorsOnParentIfNoChildFound()
     {
-        $parent = $this->getForm('author');
+        $parent = $this->getForm();
         $child = $this->getForm('firstName');
 
         $parent->add($child);
@@ -201,7 +206,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testDataErrorsOnForm()
     {
-        $form = $this->getForm('author');
+        $form = $this->getForm();
 
         $this->delegate->expects($this->once())
             ->method('validate')
@@ -216,7 +221,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testDataErrorsOnChild()
     {
-        $parent = $this->getForm('author');
+        $parent = $this->getForm();
         $child = $this->getForm('firstName');
 
         $parent->add($child);
@@ -235,7 +240,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testDataErrorsOnChildLongPropertyPath()
     {
-        $parent = $this->getForm('author');
+        $parent = $this->getForm();
         $child = $this->getForm('street', 'address.street');
 
         $parent->add($child);
@@ -254,7 +259,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testDataErrorsOnChildWithChildren()
     {
-        $parent = $this->getForm('author');
+        $parent = $this->getForm();
         $child = $this->getForm('address');
         $grandChild = $this->getForm('street');
 
@@ -276,7 +281,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testDataErrorsOnGrandChild()
     {
-        $parent = $this->getForm('author');
+        $parent = $this->getForm();
         $child = $this->getForm('address');
         $grandChild = $this->getForm('street');
 
@@ -298,7 +303,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testDataErrorsOnGrandChild2()
     {
-        $parent = $this->getForm('author');
+        $parent = $this->getForm();
         $child = $this->getForm('address');
         $grandChild = $this->getForm('street');
 
@@ -320,7 +325,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testDataErrorsOnParentIfNoChildFound()
     {
-        $parent = $this->getForm('author');
+        $parent = $this->getForm();
         $child = $this->getForm('firstName');
 
         $parent->add($child);
@@ -339,11 +344,11 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testMappedError()
     {
-        $parent = $this->getBuilder('author')
+        $parent = $this->getBuilder()
             ->setAttribute('error_mapping', array(
                 'passwordPlain' => 'password',
             ))
-            ->getForm('author');
+            ->getForm();
         $child = $this->getForm('password');
 
         $parent->add($child);
@@ -362,11 +367,11 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testMappedNestedError()
     {
-        $parent = $this->getBuilder('author')
+        $parent = $this->getBuilder()
             ->setAttribute('error_mapping', array(
                 'address.streetName' => 'address.street',
             ))
-            ->getForm('author');
+            ->getForm();
         $child = $this->getForm('address');
         $grandChild = $this->getForm('street');
 
@@ -388,12 +393,12 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testNestedMappingUsingForm()
     {
-        $parent = $this->getForm('author');
+        $parent = $this->getForm();
         $child = $this->getBuilder('address')
             ->setAttribute('error_mapping', array(
                 'streetName' => 'street',
             ))
-            ->getForm('author');
+            ->getForm();
         $grandChild = $this->getForm('street');
 
         $parent->add($child);
@@ -414,12 +419,12 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testNestedMappingUsingData()
     {
-        $parent = $this->getForm('author');
+        $parent = $this->getForm();
         $child = $this->getBuilder('address')
             ->setAttribute('error_mapping', array(
                 'streetName' => 'street',
             ))
-            ->getForm('author');
+            ->getForm();
         $grandChild = $this->getForm('street');
 
         $parent->add($child);
@@ -440,14 +445,14 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testNestedMappingVirtualForm()
     {
-        $parent = $this->getBuilder('author')
+        $parent = $this->getBuilder()
             ->setAttribute('error_mapping', array(
                 'streetName' => 'street',
             ))
-            ->getForm('author');
+            ->getForm();
         $child = $this->getBuilder('address')
             ->setAttribute('virtual', true)
-            ->getForm('author');
+            ->getForm();
         $grandChild = $this->getForm('street');
 
         $parent->add($child);
@@ -472,9 +477,9 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         $metadataFactory = $this->getMockMetadataFactory();
         $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
         $object = $this->getMock('\stdClass');
-        $form = $this->getBuilder('author')
+        $form = $this->getBuilder()
             ->setAttribute('validation_groups', array('group1', 'group2'))
-            ->getForm('author');
+            ->getForm();
 
         $graphWalker->expects($this->at(0))
             ->method('walkReference')
@@ -488,6 +493,31 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         DelegatingValidator::validateFormData($form, $context);
     }
 
+    public function testValidateFormDataUsesInheritedValidationGroup()
+    {
+        $graphWalker = $this->getMockGraphWalker();
+        $metadataFactory = $this->getMockMetadataFactory();
+        $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
+        $context->setPropertyPath('path');
+        $object = $this->getMock('\stdClass');
+
+        $parent = $this->getBuilder()
+            ->setAttribute('validation_groups', 'group')
+            ->getForm();
+        $child = $this->getBuilder()
+            ->setAttribute('validation_groups', null)
+            ->getForm();
+        $parent->add($child);
+
+        $child->setData($object);
+
+        $graphWalker->expects($this->once())
+            ->method('walkReference')
+            ->with($object, 'group', 'path.data', true);
+
+        DelegatingValidator::validateFormData($child, $context);
+    }
+
     public function testValidateFormDataAppendsPropertyPath()
     {
         $graphWalker = $this->getMockGraphWalker();
@@ -495,7 +525,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
         $context->setPropertyPath('path');
         $object = $this->getMock('\stdClass');
-        $form = $this->getForm('author');
+        $form = $this->getForm();
 
         $graphWalker->expects($this->once())
             ->method('walkReference')
@@ -512,7 +542,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         $metadataFactory = $this->getMockMetadataFactory();
         $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
         $object = $this->getMock('\stdClass');
-        $form = $this->getForm('author');
+        $form = $this->getForm();
         $test = $this;
 
         $graphWalker->expects($this->once())
@@ -533,9 +563,9 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
         $clientTransformer = $this->getMockTransformer();
 
-        $form = $this->getBuilder('author')
+        $form = $this->getBuilder()
             ->setClientTransformer($clientTransformer)
-            ->getForm('author');
+            ->getForm();
 
         $graphWalker->expects($this->never())
             ->method('walkReference');
@@ -547,5 +577,18 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         $form->bind(array('foo' => 'bar')); // reverse transformed to "foobar"
 
         DelegatingValidator::validateFormData($form, $context);
+    }
+
+    public function testValidateIgnoresNonRoot()
+    {
+        $form = $this->getMockForm();
+        $form->expects($this->once())
+            ->method('isRoot')
+            ->will($this->returnValue(false));
+
+        $this->delegate->expects($this->never())
+            ->method('validate');
+
+        $this->validator->validate($form);
     }
 }

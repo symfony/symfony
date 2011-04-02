@@ -53,53 +53,56 @@ class ThemeRendererTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->renderer->isRendered());
     }
 
-    public function testIsChoiceSelected_intZeroIsNotEmptyString()
+    public function considersEqualProvider()
     {
-        $this->renderer->setVar('choices', array(
-            0 => 'foo',
-            '' => 'bar',
-        ));
-
-        $this->renderer->setVar('value', 0);
-
-        $this->assertTrue($this->renderer->isChoiceSelected(0));
-        $this->assertFalse($this->renderer->isChoiceSelected(''));
+        return array(
+            // the first argument given here must be a valid array key
+            //     = integers and non-integer strings
+            array(0, '0'),
+            array(0, false),
+            array(1, true),
+        );
     }
 
-    public function testIsChoiceSelected_emptyStringIsNotIntZero()
+    public function considersUnequalProvider()
     {
-        $this->renderer->setVar('choices', array(
-            0 => 'foo',
-            '' => 'bar',
-        ));
-
-        $this->renderer->setVar('value', '');
-
-        $this->assertFalse($this->renderer->isChoiceSelected(0));
-        $this->assertTrue($this->renderer->isChoiceSelected(''));
+        return array(
+            // the first argument given here must be a valid array key
+            //     = integers and non-integer strings
+            array(0, ''),
+            array('', 0),
+            array('', false),
+            array('', '0'),
+        );
     }
 
-    public function testIsChoiceSelected_intZeroEqualsStringZero()
+    /**
+     * @dataProvider considersEqualProvider
+     */
+    public function testIsChoiceConsidersEqual($choice, $otherChoice)
     {
         $this->renderer->setVar('choices', array(
-            0 => 'foo',
+            $choice => 'foo',
         ));
 
-        $this->renderer->setVar('value', 0);
+        $this->renderer->setVar('value', $choice);
 
-        $this->assertTrue($this->renderer->isChoiceSelected(0));
-        $this->assertTrue($this->renderer->isChoiceSelected('0'));
+        $this->assertTrue($this->renderer->isChoiceSelected($choice));
+        $this->assertTrue($this->renderer->isChoiceSelected($otherChoice));
     }
 
-    public function testIsChoiceSelected_stringZeroEqualsIntZero()
+    /**
+     * @dataProvider considersUnequalProvider
+     */
+    public function testIsChoiceConsidersUnequal($choice, $otherChoice)
     {
         $this->renderer->setVar('choices', array(
-            0 => 'foo',
+            $choice => 'foo',
         ));
 
-        $this->renderer->setVar('value', '0');
+        $this->renderer->setVar('value', $choice);
 
-        $this->assertTrue($this->renderer->isChoiceSelected(0));
-        $this->assertTrue($this->renderer->isChoiceSelected('0'));
+        $this->assertTrue($this->renderer->isChoiceSelected($choice));
+        $this->assertFalse($this->renderer->isChoiceSelected($otherChoice));
     }
 }

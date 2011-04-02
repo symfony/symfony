@@ -42,7 +42,7 @@ abstract class AsseticHelper extends Helper
     /**
      * Adds an asset to an array.
      *
-     * @param string $input An input string
+     * @param string $input The asset input
      * @param string $type  The asset type
      */
     public function add($input = null, $type = 'js')
@@ -65,7 +65,9 @@ abstract class AsseticHelper extends Helper
             $options['output'] = 'js/*';
         }
 
-        return $this->getAssetUrls($inputs, $filters, $options, 'js');
+        $options['type'] = 'js';
+
+        return $this->getAssetUrls($inputs, $filters, $options);
     }
 
     /**
@@ -77,7 +79,9 @@ abstract class AsseticHelper extends Helper
             $options['output'] = 'css/*';
         }
 
-        return $this->getAssetUrls($inputs, $filters, $options, 'css');
+        $options['type'] = 'css';
+
+        return $this->getAssetUrls($inputs, $filters, $options);
     }
 
     /**
@@ -90,8 +94,9 @@ abstract class AsseticHelper extends Helper
         }
 
         $options['single'] = true;
+        $options['type'] = 'image';
 
-        return $this->getAssetUrls($inputs, $filters, $options, 'images');
+        return $this->getAssetUrls($inputs, $filters, $options);
     }
 
     /**
@@ -109,11 +114,10 @@ abstract class AsseticHelper extends Helper
      * @param array|string $inputs  An array or comma-separated list of input strings
      * @param array|string $filters An array or comma-separated list of filter names
      * @param array        $options An array of options
-     * @param string       $type    The type of the assets
      *
      * @return array An array of URLs for the asset
      */
-    private function getAssetUrls($inputs = array(), $filters = array(), array $options = array(), $type = 'js')
+    private function getAssetUrls($inputs = array(), $filters = array(), array $options = array())
     {
         $explode = function($value)
         {
@@ -124,8 +128,8 @@ abstract class AsseticHelper extends Helper
             $inputs = $explode($inputs);
         }
 
-        if (count($inputs) === 0 && isset($this->inputs[$type])) {
-            $inuts = $this->inputs[$type];
+        if (count($inputs) === 0 && isset($options['type']) && isset($this->inputs[$options['type']])) {
+            $inuts = $this->inputs[$options['type']];
         }
 
         if (!is_array($filters)) {

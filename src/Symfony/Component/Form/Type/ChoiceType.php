@@ -18,8 +18,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\EventListener\FixRadioInputListener;
 use Symfony\Component\Form\Renderer\ThemeRendererInterface;
-use Symfony\Component\Form\DataTransformer\ScalarToChoicesTransformer;
-use Symfony\Component\Form\DataTransformer\ArrayToChoicesTransformer;
+use Symfony\Component\Form\DataTransformer\ScalarToBooleanChoicesTransformer;
+use Symfony\Component\Form\DataTransformer\ArrayToBooleanChoicesTransformer;
 
 class ChoiceType extends AbstractType
 {
@@ -56,11 +56,11 @@ class ChoiceType extends AbstractType
             ->setAttribute('expanded', $options['expanded']);
 
         if ($options['multiple'] && $options['expanded']) {
-            $builder->setClientTransformer(new ArrayToChoicesTransformer($options['choice_list']));
+            $builder->setClientTransformer(new ArrayToBooleanChoicesTransformer($options['choice_list']));
         }
 
         if (!$options['multiple'] && $options['expanded']) {
-            $builder->setClientTransformer(new ScalarToChoicesTransformer($options['choice_list']));
+            $builder->setClientTransformer(new ScalarToBooleanChoicesTransformer($options['choice_list']));
             $builder->addEventSubscriber(new FixRadioInputListener(), 10);
         }
     }

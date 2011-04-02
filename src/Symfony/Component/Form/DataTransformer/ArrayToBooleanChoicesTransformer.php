@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\DataTransformer;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
-class ArrayToChoicesTransformer implements DataTransformerInterface
+class ArrayToBooleanChoicesTransformer implements DataTransformerInterface
 {
     private $choiceList;
 

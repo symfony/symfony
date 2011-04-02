@@ -17,8 +17,8 @@ use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeCollectionListener;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\EntitiesToArrayTransformer;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\EntityToIdTransformer;
-use Symfony\Component\Form\DataTransformer\ArrayToChoicesTransformer;
-use Symfony\Component\Form\DataTransformer\ScalarToChoicesTransformer;
+use Symfony\Component\Form\DataTransformer\ArrayToBooleanChoicesTransformer;
+use Symfony\Component\Form\DataTransformer\ScalarToBooleanChoicesTransformer;
 use Symfony\Component\Form\DataTransformer\DataTransformerChain;
 use Symfony\Component\Form\Type\AbstractType;
 use Doctrine\ORM\EntityManager;
@@ -42,13 +42,13 @@ class EntityType extends AbstractType
             $transformers[] = new EntitiesToArrayTransformer($options['choice_list']);
 
             if ($options['expanded']) {
-                $transformers[] = new ArrayToChoicesTransformer($options['choice_list']);
+                $transformers[] = new ArrayToBooleanChoicesTransformer($options['choice_list']);
             }
         } else {
             $transformers[] = new EntityToIdTransformer($options['choice_list']);
 
             if ($options['expanded']) {
-                $transformers[] = new ScalarToChoicesTransformer($options['choice_list']);
+                $transformers[] = new ScalarToBooleanChoicesTransformer($options['choice_list']);
             }
         }
 

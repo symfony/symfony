@@ -29,7 +29,7 @@ class Configuration
      *
      * @param Boolean $debug    Wether to use the debug mode
      * @param array   $bundles  An array of bundle names
-     * 
+     *
      * @return \Symfony\Component\Config\Definition\ArrayNode The config tree
      */
     public function getConfigTree($debug, array $bundles)
@@ -47,6 +47,7 @@ class Configuration
                 ->scalarNode('node')->defaultNull()->end()
                 ->scalarNode('sass')->defaultNull()->end()
                 ->scalarNode('yui')->defaultNull()->end()
+                ->scalarNode('lessc_inc')->defaultNull()->end()
             ->end()
             ->fixXmlConfig('bundle')
             ->children()

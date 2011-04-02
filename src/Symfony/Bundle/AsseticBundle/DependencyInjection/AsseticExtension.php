@@ -53,6 +53,9 @@ class AsseticExtension extends Extension
         $container->setParameter('assetic.node.bin', $config['node']);
         $container->setParameter('assetic.sass.bin', $config['sass']);
         $container->setParameter('assetic.yui.jar', $config['yui']);
+        if (isset($config['lessc_inc'])) {
+            $container->setParameter('assetic.lessc_inc.php', $config['lessc_inc']);
+        }
 
         // register filters
         foreach ($config['filters'] as $name => $filter) {

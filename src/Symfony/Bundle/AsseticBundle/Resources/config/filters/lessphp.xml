@@ -6,11 +6,13 @@
 
     <parameters>
         <parameter key="assetic.filter.lessphp.class">Assetic\Filter\LessphpFilter</parameter>
+        <parameter key="assetic.filter.lessphp.lessc_inc">%assetic.lessc_inc.php%</parameter>
     </parameters>
 
     <services>
         <service id="assetic.filter.lessphp" class="%assetic.filter.lessphp.class%">
             <tag name="assetic.filter" alias="lessphp" />
+            <file>%assetic.filter.lessphp.lessc_inc%</file>
             <argument>%assetic.read_from%</argument>
         </service>
     </services>

@@ -19,6 +19,7 @@
         <parameter key="assetic.node.paths" type="collection"></parameter>
         <parameter key="assetic.sass.bin">/usr/bin/sass</parameter>
         <parameter key="assetic.yui.jar" />
+        <parameter key="assetic.lessc_inc.php">%kernel.root_dir%/../vendor/lessphp/lessc.inc.php</parameter>
 
         <parameter key="assetic.cache_dir">%kernel.cache_dir%/assetic</parameter>
     </parameters>

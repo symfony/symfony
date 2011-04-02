@@ -12,11 +12,18 @@
 namespace Symfony\Tests\Component\Form;
 
 require_once __DIR__.'/Fixtures/FixedDataTransformer.php';
+require_once __DIR__.'/Fixtures/FixedFilterListener.php';
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\DataTransformer\TransformationFailedException;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Tests\Component\Form\Fixtures\FixedDataTransformer;
+use Symfony\Tests\Component\Form\Fixtures\FixedFilterListener;
 
 class FormTest extends \PHPUnit_Framework_TestCase
 {
@@ -390,9 +397,262 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->form->isBound());
     }
 
-    protected function getBuilder($name = 'name')
+    public function testAddMapsClientDataToForm()
     {
-        return new FormBuilder($name, $this->dispatcher);
+        $mapper = $this->getDataMapper();
+        $form = $this->getBuilder()
+            ->setDataMapper($mapper)
+            ->setClientTransformer(new FixedDataTransformer(array(
+                '' => '',
+                'foo' => 'bar',
+            )))
+            ->setData('foo')
+            ->getForm();
+
+        $child = $this->getBuilder()->getForm();
+        $mapper->expects($this->once())
+            ->method('mapDataToForm')
+            ->with('bar', $child);
+
+        $form->add($child);
+    }
+
+    public function testSetDataMapsClientDataToChildren()
+    {
+        $mapper = $this->getDataMapper();
+        $child1 = $this->getBuilder('firstName')->getForm();
+        $child2 = $this->getBuilder('lastName')->getForm();
+        $form = $this->getBuilder()
+            ->setDataMapper($mapper)
+            ->setClientTransformer(new FixedDataTransformer(array(
+                '' => '',
+                'foo' => 'bar',
+            )))
+            ->getForm();
+
+        $form->add($child1);
+        $form->add($child2);
+
+        $mapper->expects($this->once())
+            ->method('mapDataToForms')
+            ->with('bar', array('firstName' => $child1, 'lastName' => $child2));
+
+        $form->setData('foo');
+    }
+
+    public function testBindMapsBoundChildrenOntoExistingClientData()
+    {
+        $test = $this;
+        $mapper = $this->getDataMapper();
+        $child1 = $this->getBuilder('firstName')->getForm();
+        $child2 = $this->getBuilder('lastName')->getForm();
+        $form = $this->getBuilder()
+            ->setDataMapper($mapper)
+            ->setClientTransformer(new FixedDataTransformer(array(
+                '' => '',
+                'foo' => 'bar',
+            )))
+            ->setData('foo')
+            ->getForm();
+
+        $form->add($child1);
+        $form->add($child2);
+
+        $mapper->expects($this->once())
+            ->method('mapFormsToData')
+            ->with(array('firstName' => $child1, 'lastName' => $child2), 'bar')
+            ->will($this->returnCallback(function ($children, $bar) use ($test) {
+                $test->assertEquals('Bernhard', $children['firstName']->getData());
+                $test->assertEquals('Schussek', $children['lastName']->getData());
+            }));
+
+        $form->bind(array(
+            'firstName' => 'Bernhard',
+            'lastName' => 'Schussek',
+        ));
+    }
+
+    public function testSetDataExecutesTransformationChain()
+    {
+        // use real event dispatcher now
+        $form = $this->getBuilder('name', new EventDispatcher())
+            ->addEventSubscriber(new FixedFilterListener(array(
+                'filterSetData' => array(
+                    'app' => 'filtered',
+                ),
+            )))
+            ->setNormTransformer(new FixedDataTransformer(array(
+                '' => '',
+                'filtered' => 'norm',
+            )))
+            ->setClientTransformer(new FixedDataTransformer(array(
+                '' => '',
+                'norm' => 'client',
+            )))
+            ->getForm();
+
+        $form->setData('app');
+
+        $this->assertEquals('filtered', $form->getData());
+        $this->assertEquals('norm', $form->getNormData());
+        $this->assertEquals('client', $form->getClientData());
+    }
+
+    public function testBindExecutesTransformationChain()
+    {
+        // use real event dispatcher now
+        $form = $this->getBuilder('name', new EventDispatcher())
+            ->addEventSubscriber(new FixedFilterListener(array(
+                'filterBoundClientData' => array(
+                    'client' => 'filteredclient',
+                ),
+                'filterBoundNormData' => array(
+                    'norm' => 'filterednorm',
+                ),
+            )))
+            ->setClientTransformer(new FixedDataTransformer(array(
+                '' => '',
+                // direction is reversed!
+                'norm' => 'filteredclient',
+                'filterednorm' => 'cleanedclient'
+            )))
+            ->setNormTransformer(new FixedDataTransformer(array(
+                '' => '',
+                // direction is reversed!
+                'app' => 'filterednorm',
+            )))
+            ->getForm();
+
+        $form->setData('app');
+
+        $this->assertEquals('app', $form->getData());
+        $this->assertEquals('filterednorm', $form->getNormData());
+        $this->assertEquals('cleanedclient', $form->getClientData());
+    }
+
+    public function testIsSynchronizedByDefault()
+    {
+        $this->assertTrue($this->form->isSynchronized());
+    }
+
+    public function testIsSynchronizedAfterBinding()
+    {
+        $this->form->bind('foobar');
+
+        $this->assertTrue($this->form->isSynchronized());
+    }
+
+    public function testIsNotSynchronizedIfTransformationFailed()
+    {
+        $transformer = $this->getDataTransformer();
+        $transformer->expects($this->once())
+            ->method('reverseTransform')
+            ->will($this->throwException(new TransformationFailedException()));
+
+        $form = $this->getBuilder()
+            ->setClientTransformer($transformer)
+            ->getForm();
+
+        $form->bind('foobar');
+
+        $this->assertFalse($form->isSynchronized());
+    }
+
+    public function testBindValidatesAfterTransformation()
+    {
+        $test = $this;
+        $validator = $this->getFormValidator();
+        $form = $this->getBuilder()
+            ->addValidator($validator)
+            ->getForm();
+
+        $validator->expects($this->once())
+            ->method('validate')
+            ->with($form)
+            ->will($this->returnCallback(function ($form) use ($test) {
+                $test->assertEquals('foobar', $form->getData());
+            }));
+
+        $form->bind('foobar');
+    }
+
+    public function requestMethodProvider()
+    {
+        return array(
+            array('POST'),
+            array('PUT'),
+        );
+    }
+
+    /**
+     * @dataProvider requestMethodProvider
+     */
+    public function testBindPostOrPutRequest($method)
+    {
+        $path = tempnam(sys_get_temp_dir(), 'sf2');
+        touch($path);
+
+        $values = array(
+            'author' => array(
+                'name' => 'Bernhard',
+                'image' => array('filename' => 'foobar.png'),
+            ),
+        );
+
+        $files = array(
+            'author' => array(
+                'error' => array('image' => UPLOAD_ERR_OK),
+                'name' => array('image' => 'upload.png'),
+                'size' => array('image' => 123),
+                'tmp_name' => array('image' => $path),
+                'type' => array('image' => 'image/png'),
+            ),
+        );
+
+        $request = new Request(array(), $values, array(), array(), $files, array(
+            'REQUEST_METHOD' => $method,
+        ));
+
+        $form = $this->getBuilder('author')->getForm();
+        $form->add($this->getBuilder('name')->getForm());
+        $form->add($this->getBuilder('image')->getForm());
+
+        $form->bindRequest($request);
+
+        $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
+
+        $this->assertEquals('Bernhard', $form['name']->getData());
+        $this->assertEquals($file, $form['image']->getData());
+
+        unlink($path);
+    }
+
+    public function testBindGetRequest()
+    {
+        $values = array(
+            'author' => array(
+                'firstName' => 'Bernhard',
+                'lastName' => 'Schussek',
+            ),
+        );
+
+        $request = new Request($values, array(), array(), array(), array(), array(
+            'REQUEST_METHOD' => 'GET',
+        ));
+
+        $form = $this->getBuilder('author')->getForm();
+        $form->add($this->getBuilder('firstName')->getForm());
+        $form->add($this->getBuilder('lastName')->getForm());
+
+        $form->bindRequest($request);
+
+        $this->assertEquals('Bernhard', $form['firstName']->getData());
+        $this->assertEquals('Schussek', $form['lastName']->getData());
+    }
+
+    protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null)
+    {
+        return new FormBuilder($name, $dispatcher ?: $this->dispatcher);
     }
 
     protected function getMockForm($name = 'name')
@@ -426,5 +686,20 @@ class FormTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(false));
 
         return $form;
+    }
+
+    protected function getDataMapper()
+    {
+        return $this->getMock('Symfony\Component\Form\DataMapper\DataMapperInterface');
+    }
+
+    protected function getDataTransformer()
+    {
+        return $this->getMock('Symfony\Component\Form\DataTransformer\DataTransformerInterface');
+    }
+
+    protected function getFormValidator()
+    {
+        return $this->getMock('Symfony\Component\Form\Validator\FormValidatorInterface');
     }
 }

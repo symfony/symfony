@@ -250,6 +250,8 @@ class FormBuilder
     public function setDataMapper(DataMapperInterface $dataMapper)
     {
         $this->dataMapper = $dataMapper;
+
+        return $this;
     }
 
     public function getDataMapper()

@@ -170,73 +170,6 @@ class FormTypeTest extends TestCase
         $form->bind(array());
     }
 
-    public function testBindReadsRequestData()
-    {
-        $path = tempnam(sys_get_temp_dir(), 'sf2');
-        touch($path);
-
-        $values = array(
-            'author' => array(
-                'name' => 'Bernhard',
-                'image' => array('filename' => 'foobar.png'),
-        ),
-        );
-
-        $files = array(
-            'author' => array(
-                'error' => array('image' => array('file' => UPLOAD_ERR_OK)),
-                'name' => array('image' => array('file' => 'upload.png')),
-                'size' => array('image' => array('file' => 123)),
-                'tmp_name' => array('image' => array('file' => $path)),
-                'type' => array('image' => array('file' => 'image/png')),
-        ),
-        );
-
-        $builder = $this->factory->createBuilder('form', 'author');
-        $builder->add('name', 'field');
-        $builder->add('image', 'form');
-        $builder->get('image')->add('file', 'field');
-        $builder->get('image')->add('filename', 'field');
-        $form = $builder->getForm();
-
-        $form->bindRequest($this->getPostRequest($values, $files));
-
-        $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
-
-        $this->assertEquals('Bernhard', $form['name']->getData());
-        $this->assertEquals('foobar.png', $form['image']['filename']->getData());
-        $this->assertEquals($file, $form['image']['file']->getData());
-    }
-
-    public function testSetDataUpdatesAllFieldsFromTransformedData()
-    {
-        $originalAuthor = new Author();
-        $transformedAuthor = new Author();
-        $transformedAuthor->firstName = 'Foo';
-        $transformedAuthor->setLastName('Bar');
-
-        $transformer = $this->getMockTransformer();
-        $transformer->expects($this->at(0))
-        ->method('transform')
-        ->with($this->equalTo(null))
-        ->will($this->returnValue(''));
-        $transformer->expects($this->at(1))
-        ->method('transform')
-        ->with($this->equalTo($originalAuthor))
-        ->will($this->returnValue($transformedAuthor));
-
-        $builder = $this->factory->createBuilder('form', 'author');
-        $builder->setClientTransformer($transformer);
-        $builder->add('firstName', 'field');
-        $builder->add('lastName', 'field');
-        $form = $builder->getForm();
-
-        $form->setData($originalAuthor);
-
-        $this->assertEquals('Foo', $form['firstName']->getData());
-        $this->assertEquals('Bar', $form['lastName']->getData());
-    }
-
     /**
      * The use case for this test are groups whose fields should be mapped
      * directly onto properties of the form's object.
@@ -364,37 +297,6 @@ class FormTypeTest extends TestCase
 
         $this->assertSame($author, $form->getData());
         $this->assertEquals('Bernhard', $author->firstName);
-    }
-
-    public function testSubmitUpdatesTransformedDataFromAllFields()
-    {
-        $originalAuthor = new Author();
-        $transformedAuthor = new Author();
-
-        $transformer = $this->getMockTransformer();
-        $transformer->expects($this->at(0))
-        ->method('transform')
-        ->with($this->equalTo(null))
-        ->will($this->returnValue(''));
-        $transformer->expects($this->at(1))
-        ->method('transform')
-        ->with($this->equalTo($originalAuthor))
-        ->will($this->returnValue($transformedAuthor));
-
-        $builder = $this->factory->createBuilder('form', 'author');
-        $builder->setClientTransformer($transformer);
-        $builder->add('firstName', 'field');
-        $builder->add('lastName', 'field');
-        $builder->setData($originalAuthor);
-        $form = $builder->getForm();
-
-        $form->bind(array(
-            'firstName' => 'Foo',
-            'lastName' => 'Bar',
-        ));
-
-        $this->assertEquals('Foo', $transformedAuthor->firstName);
-        $this->assertEquals('Bar', $transformedAuthor->getLastName());
     }
 
     public function testGetDataReturnsObject()

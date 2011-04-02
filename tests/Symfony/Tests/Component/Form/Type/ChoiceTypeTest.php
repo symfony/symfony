@@ -48,62 +48,6 @@ class ChoiceTypeTest extends TestCase
         4 => 'Roman',
     );
 
-    public function testIsChoiceSelectedDifferentiatesBetweenZeroAndEmpty_integerZero()
-    {
-        $form = $this->factory->create('choice', 'name', array(
-            'choices' => array(
-                0 => 'Foo',
-                '' => 'Bar',
-            )
-        ));
-
-        $form->bind(0);
-
-        $this->assertTrue($form->getAttribute('choice_list')->isChoiceSelected(0, $form->getClientData()));
-        $this->assertTrue($form->getAttribute('choice_list')->isChoiceSelected('0', $form->getClientData()));
-        $this->assertFalse($form->getAttribute('choice_list')->isChoiceSelected('', $form->getClientData()));
-
-        $form->bind('0');
-
-        $this->assertTrue($form->getAttribute('choice_list')->isChoiceSelected(0, $form->getClientData()));
-        $this->assertTrue($form->getAttribute('choice_list')->isChoiceSelected('0', $form->getClientData()));
-        $this->assertFalse($form->getAttribute('choice_list')->isChoiceSelected('', $form->getClientData()));
-
-        $form->bind('');
-
-        $this->assertFalse($form->getAttribute('choice_list')->isChoiceSelected(0, $form->getClientData()));
-        $this->assertFalse($form->getAttribute('choice_list')->isChoiceSelected('0', $form->getClientData()));
-        $this->assertTrue($form->getAttribute('choice_list')->isChoiceSelected('', $form->getClientData()));
-    }
-
-    public function testIsChoiceSelectedDifferentiatesBetweenZeroAndEmpty_stringZero()
-    {
-        $form = $this->factory->create('choice', 'name', array(
-            'choices' => array(
-                '0' => 'Foo',
-                '' => 'Bar',
-            )
-        ));
-
-        $form->bind(0);
-
-        $this->assertTrue($form->getAttribute('choice_list')->isChoiceSelected(0, $form->getClientData()));
-        $this->assertTrue($form->getAttribute('choice_list')->isChoiceSelected('0', $form->getClientData()));
-        $this->assertFalse($form->getAttribute('choice_list')->isChoiceSelected('', $form->getClientData()));
-
-        $form->bind('0');
-
-        $this->assertTrue($form->getAttribute('choice_list')->isChoiceSelected(0, $form->getClientData()));
-        $this->assertTrue($form->getAttribute('choice_list')->isChoiceSelected('0', $form->getClientData()));
-        $this->assertFalse($form->getAttribute('choice_list')->isChoiceSelected('', $form->getClientData()));
-
-        $form->bind('');
-
-        $this->assertFalse($form->getAttribute('choice_list')->isChoiceSelected(0, $form->getClientData()));
-        $this->assertFalse($form->getAttribute('choice_list')->isChoiceSelected('0', $form->getClientData()));
-        $this->assertTrue($form->getAttribute('choice_list')->isChoiceSelected('', $form->getClientData()));
-    }
-
     /**
      * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
      */

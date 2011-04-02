@@ -79,24 +79,24 @@ class PhpTheme implements ThemeInterface
                 $html .= '<option value="">' . $this->escape($attr['empty_value']) .'</option>';
             }
             if (count($attr['preferred_choices']) > 0) {
-                $html .= $this->choice_list($attr['preferred_choices'], $attr['choice_list'], $attr['value']);
+                $html .= $this->choice_list($attr['renderer'], $attr['preferred_choices']);
                 $html .= '<option disabled="disabled">' .  $this->escape($attr['separator']) . '</option>' . PHP_EOL;
             }
-            $html .= $this->choice_list($attr['choices'], $attr['choice_list'], $attr['value']);
+            $html .= $this->choice_list($attr['renderer'], $attr['choices']);
             $html .= '</select>' . PHP_EOL;
         }
         return $html;
     }
 
-    protected function choice_list($choices, $choiceList, $value)
+    protected function choice_list($renderer, $choices)
     {
         $html = '';
         foreach ($choices as $choice => $label) {
-            if ($choiceList->isChoiceGroup($label)) {
+            if ($renderer->isChoiceGroup($label)) {
                 $html .= '<optgroup label="' . $this->escape($choice) .'">' . PHP_EOL;
                 foreach ($label as $nestedChoice => $nestedLabel) {
                     $html .= '<option value="' . $nestedChoice . '"' .
-                             (($choiceList->isChoiceSelected($nestedChoice, $value)) ? ' selected="selected"' : '') .
+                             (($renderer->isChoiceSelected($nestedChoice)) ? ' selected="selected"' : '') .
                              '>';
                     $html .= $this->escape($nestedLabel);
                     $html .= '</option>' . PHP_EOL;
@@ -104,7 +104,7 @@ class PhpTheme implements ThemeInterface
                 $html .= '</optgroup>' . PHP_EOL;
             } else {
                 $html .= '<option value="' . $choice . '"' .
-                         (($choiceList->isChoiceSelected($choice, $value)) ? ' selected="selected"' : '') .
+                         (($renderer->isChoiceSelected($choice)) ? ' selected="selected"' : '') .
                          '>';
                 $html .= $this->escape($label);
                 $html .= '</option>' . PHP_EOL;

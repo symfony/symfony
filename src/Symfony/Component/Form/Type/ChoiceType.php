@@ -61,7 +61,6 @@ class ChoiceType extends AbstractType
         $renderer->setVar('choices', $choiceList->getOtherChoices());
         $renderer->setVar('preferred_choices', $choiceList->getPreferredChoices());
         $renderer->setVar('separator', '-------------------');
-        $renderer->setVar('choice_list', $choiceList);
         $renderer->setVar('empty_value', '');
 
         if ($renderer->getVar('multiple') && !$renderer->getVar('expanded')) {

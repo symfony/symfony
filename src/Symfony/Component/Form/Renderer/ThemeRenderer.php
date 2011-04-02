@@ -23,7 +23,12 @@ class ThemeRenderer implements ThemeRendererInterface, \ArrayAccess, \IteratorAg
 
     private $theme;
 
-    private $vars = array();
+    private $vars = array(
+        'value' => null,
+        'choices' => array(),
+        'preferred_choices' => array(),
+        'attr' => array(),
+    );
 
     /**
      * Is the form attached to this renderer rendered?
@@ -226,5 +231,35 @@ class ThemeRenderer implements ThemeRendererInterface, \ArrayAccess, \IteratorAg
         }
 
         return new \ArrayIterator(array());
+    }
+
+    public function getChoiceLabel($choice)
+    {
+        return isset($this->vars['choices'][$choice])
+            ? $this->vars['choices'][$choice]
+            : (isset($this->vars['preferred_choices'][$choice])
+                ? $this->cars['preferred_choices'][$choice]
+                : null
+            );
+    }
+
+    public function isChoiceGroup($choice)
+    {
+        return is_array($choice) || $choice instanceof \Traversable;
+    }
+
+    public function isChoiceSelected($choice)
+    {
+        $choice = $this->toChoice($choice);
+        $choices = array_map(array($this, 'toChoice'), (array)$this->vars['value']);
+
+        return in_array($choice, $choices, true);
+    }
+
+    private function toChoice($choice)
+    {
+        return (string)(int)$choice === (string)$choice
+            ? (int)$choice
+            : (string)$choice;
     }
 }

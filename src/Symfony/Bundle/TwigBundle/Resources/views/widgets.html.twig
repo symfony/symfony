@@ -89,14 +89,14 @@
 {% block options %}
 {% spaceless %}
     {% for choice, label in options %}
-        {% if choice_list.isChoiceGroup(label) %}
+        {% if renderer.choiceGroup(label) %}
             <optgroup label="{{ choice }}">
                 {% for nestedChoice, nestedLabel in label %}
-                    <option value="{{ nestedChoice }}"{% if choice_list.isChoiceSelected(nestedChoice, value) %} selected="selected"{% endif %}>{{ nestedLabel }}</option>
+                    <option value="{{ nestedChoice }}"{% if renderer.choiceSelected(nestedChoice) %} selected="selected"{% endif %}>{{ nestedLabel }}</option>
                 {% endfor %}
             </optgroup>
         {% else %}
-            <option value="{{ choice }}"{% if choice_list.isChoiceSelected(choice, value) %} selected="selected"{% endif %}>{{ label }}</option>
+            <option value="{{ choice }}"{% if renderer.choiceSelected(choice) %} selected="selected"{% endif %}>{{ label }}</option>
         {% endif %}
     {% endfor %}
 {% endspaceless %}
@@ -107,7 +107,7 @@
     {% if expanded %}
         {% for choice, field in renderer %}
             {{ field.widget }}
-            {{ field.label(choice_list.label(choice)) }}
+            {{ field.label(renderer.choiceLabel(choice)) }}
         {% endfor %}
     {% else %}
     <select {{ block('attributes') }}{% if multiple %} multiple="multiple"{% endif %}>

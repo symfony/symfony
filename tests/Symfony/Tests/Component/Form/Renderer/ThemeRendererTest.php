@@ -15,9 +15,14 @@ use Symfony\Component\Form\Renderer\ThemeRenderer;
 
 class ThemeRendererTest extends \PHPUnit_Framework_TestCase
 {
-    protected function createThemeFactory()
+    private $themeFactory;
+
+    private $renderer;
+
+    protected function setUp()
     {
-        return $this->getMock('Symfony\Component\Form\Renderer\Theme\ThemeFactoryInterface');
+        $this->themeFactory = $this->getMock('Symfony\Component\Form\Renderer\Theme\ThemeFactoryInterface');
+        $this->renderer = new ThemeRenderer($this->themeFactory);
     }
 
     public function testArrayAccess()
@@ -27,13 +32,11 @@ class ThemeRendererTest extends \PHPUnit_Framework_TestCase
             'bar' => $this->getMock('Symfony\Tests\Component\Form\FormInterface'),
         );
 
-        $themeFactory = $this->createThemeFactory();
-        $renderer = new ThemeRenderer($themeFactory);
-        $renderer->setChildren($fields);
+        $this->renderer->setChildren($fields);
 
-        $this->assertTrue(isset($renderer['foo']));
-        $this->assertTrue(isset($renderer['bar']));
-        $this->assertSame($fields['bar'], $renderer['bar']);
+        $this->assertTrue(isset($this->renderer['foo']));
+        $this->assertTrue(isset($this->renderer['bar']));
+        $this->assertSame($fields['bar'], $this->renderer['bar']);
     }
 
     public function testIterator()
@@ -43,14 +46,60 @@ class ThemeRendererTest extends \PHPUnit_Framework_TestCase
             'bar' => $this->getMock('Symfony\Tests\Component\Form\FormInterface'),
         );
 
-        $themeFactory = $this->createThemeFactory();
-        $renderer = new ThemeRenderer($themeFactory);
-        $renderer->setChildren($fields);
+        $this->renderer->setChildren($fields);
 
-        $this->assertFalse($renderer->isRendered());
+        $this->assertFalse($this->renderer->isRendered());
+        $this->assertEquals($fields, iterator_to_array($this->renderer));
+        $this->assertTrue($this->renderer->isRendered());
+    }
 
-        $this->assertEquals($fields, iterator_to_array($renderer));
+    public function testIsChoiceSelected_intZeroIsNotEmptyString()
+    {
+        $this->renderer->setVar('choices', array(
+            0 => 'foo',
+            '' => 'bar',
+        ));
 
-        $this->assertTrue($renderer->isRendered());
+        $this->renderer->setVar('value', 0);
+
+        $this->assertTrue($this->renderer->isChoiceSelected(0));
+        $this->assertFalse($this->renderer->isChoiceSelected(''));
+    }
+
+    public function testIsChoiceSelected_emptyStringIsNotIntZero()
+    {
+        $this->renderer->setVar('choices', array(
+            0 => 'foo',
+            '' => 'bar',
+        ));
+
+        $this->renderer->setVar('value', '');
+
+        $this->assertFalse($this->renderer->isChoiceSelected(0));
+        $this->assertTrue($this->renderer->isChoiceSelected(''));
+    }
+
+    public function testIsChoiceSelected_intZeroEqualsStringZero()
+    {
+        $this->renderer->setVar('choices', array(
+            0 => 'foo',
+        ));
+
+        $this->renderer->setVar('value', 0);
+
+        $this->assertTrue($this->renderer->isChoiceSelected(0));
+        $this->assertTrue($this->renderer->isChoiceSelected('0'));
+    }
+
+    public function testIsChoiceSelected_stringZeroEqualsIntZero()
+    {
+        $this->renderer->setVar('choices', array(
+            0 => 'foo',
+        ));
+
+        $this->renderer->setVar('value', '0');
+
+        $this->assertTrue($this->renderer->isChoiceSelected(0));
+        $this->assertTrue($this->renderer->isChoiceSelected('0'));
     }
 }

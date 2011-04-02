@@ -10,6 +10,7 @@
         <parameter key="assetic.asset_manager_cache_warmer.class">Symfony\Bundle\AsseticBundle\CacheWarmer\AssetManagerCacheWarmer</parameter>
         <parameter key="assetic.cached_formula_loader.class">Assetic\Factory\Loader\CachedFormulaLoader</parameter>
         <parameter key="assetic.config_cache.class">Assetic\Cache\ConfigCache</parameter>
+        <parameter key="assetic.coalescing_directory_resource.class">Assetic\Factory\Resource\CoalescingDirectoryResource</parameter>
         <parameter key="assetic.directory_resource.class">Symfony\Bundle\AsseticBundle\Factory\Resource\DirectoryResource</parameter>
         <parameter key="assetic.filter_manager.class">Symfony\Bundle\AsseticBundle\FilterManager</parameter>
 

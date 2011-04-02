@@ -67,6 +67,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     public function testFormatIntl($pattern, $timestamp, $expected)
     {
         $this->skipIfIntlExtensionIsNotLoaded();
+        $this->skipIfICUVersionIsTooOld();
         $formatter = $this->createIntlFormatter($pattern);
         $this->assertSame($expected, $formatter->format($timestamp));
     }
@@ -354,6 +355,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     public function testFormatWithDefaultTimezoneIntl()
     {
         $this->skipIfIntlExtensionIsNotLoaded();
+        $this->skipIfICUVersionIsTooOld();
         $formatter = new \IntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
         $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
 
@@ -670,6 +672,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     public function testParseDifferencesIntl($pattern, $value, $stubExpected, $intlExpected)
     {
         $this->skipIfIntlExtensionIsNotLoaded();
+        $this->skipIfICUVersionIsTooOld();
         $formatter = $this->createIntlFormatter($pattern);
         $this->assertSame($intlExpected, $formatter->parse($value));
     }

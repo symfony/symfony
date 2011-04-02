@@ -406,7 +406,7 @@ class Form implements \IteratorAggregate, FormInterface
         $clientData = $event->getData();
 
         if (count($this->children) > 0) {
-            if (empty($clientData)) {
+            if (null === $clientData || '' === $clientData) {
                 $clientData = array();
             }
 
@@ -428,21 +428,24 @@ class Form implements \IteratorAggregate, FormInterface
                 }
             }
 
-            // Merge form data from children into existing client data
+            // If we have a data mapper, use old client data and merge
+            // data from the children into it later
             if ($this->dataMapper) {
                 $clientData = $this->getClientData();
-
-                // Create new structure to write the values into
-                if (null === $clientData || '' === $clientData) {
-                    $clientData = $this->emptyData;
-
-                    if ($clientData instanceof \Closure) {
-                        $clientData = $clientData->__invoke();
-                    }
-                }
-
-                $this->dataMapper->mapFormsToData($this->children, $clientData);
             }
+        }
+
+        if (null === $clientData || '' === $clientData) {
+            $clientData = $this->emptyData;
+
+            if ($clientData instanceof \Closure) {
+                $clientData = $clientData->__invoke($this);
+            }
+        }
+
+        // Merge form data from children into existing client data
+        if (count($this->children) > 0 && $this->dataMapper) {
+            $this->dataMapper->mapFormsToData($this->children, $clientData);
         }
 
         try {

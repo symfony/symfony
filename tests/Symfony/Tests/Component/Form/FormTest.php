@@ -409,81 +409,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->form->isBound());
     }
 
-    public function testAddMapsClientDataToForm()
-    {
-        $mapper = $this->getDataMapper();
-        $form = $this->getBuilder()
-            ->setDataMapper($mapper)
-            ->setClientTransformer(new FixedDataTransformer(array(
-                '' => '',
-                'foo' => 'bar',
-            )))
-            ->setData('foo')
-            ->getForm();
-
-        $child = $this->getBuilder()->getForm();
-        $mapper->expects($this->once())
-            ->method('mapDataToForm')
-            ->with('bar', $child);
-
-        $form->add($child);
-    }
-
-    public function testSetDataMapsClientDataToChildren()
-    {
-        $mapper = $this->getDataMapper();
-        $child1 = $this->getBuilder('firstName')->getForm();
-        $child2 = $this->getBuilder('lastName')->getForm();
-        $form = $this->getBuilder()
-            ->setDataMapper($mapper)
-            ->setClientTransformer(new FixedDataTransformer(array(
-                '' => '',
-                'foo' => 'bar',
-            )))
-            ->getForm();
-
-        $form->add($child1);
-        $form->add($child2);
-
-        $mapper->expects($this->once())
-            ->method('mapDataToForms')
-            ->with('bar', array('firstName' => $child1, 'lastName' => $child2));
-
-        $form->setData('foo');
-    }
-
-    public function testBindMapsBoundChildrenOntoExistingClientData()
-    {
-        $test = $this;
-        $mapper = $this->getDataMapper();
-        $child1 = $this->getBuilder('firstName')->getForm();
-        $child2 = $this->getBuilder('lastName')->getForm();
-        $form = $this->getBuilder()
-            ->setDataMapper($mapper)
-            ->setClientTransformer(new FixedDataTransformer(array(
-                '' => '',
-                'foo' => 'bar',
-            )))
-            ->setData('foo')
-            ->getForm();
-
-        $form->add($child1);
-        $form->add($child2);
-
-        $mapper->expects($this->once())
-            ->method('mapFormsToData')
-            ->with(array('firstName' => $child1, 'lastName' => $child2), 'bar')
-            ->will($this->returnCallback(function ($children, $bar) use ($test) {
-                $test->assertEquals('Bernhard', $children['firstName']->getData());
-                $test->assertEquals('Schussek', $children['lastName']->getData());
-            }));
-
-        $form->bind(array(
-            'firstName' => 'Bernhard',
-            'lastName' => 'Schussek',
-        ));
-    }
-
     public function testSetDataExecutesTransformationChain()
     {
         // use real event dispatcher now
@@ -568,6 +493,138 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form->bind('foobar');
 
         $this->assertFalse($form->isSynchronized());
+    }
+
+    public function testEmptyDataCreatedBeforeTransforming()
+    {
+        $form = $this->getBuilder()
+            ->setEmptyData('foo')
+            ->setClientTransformer(new FixedDataTransformer(array(
+                '' => '',
+                // direction is reversed!
+                'bar' => 'foo',
+            )))
+            ->getForm();
+
+        $form->bind('');
+
+        $this->assertEquals('bar', $form->getData());
+    }
+
+    public function testEmptyDataFromClosure()
+    {
+        $test = $this;
+        $form = $this->getBuilder()
+            ->setEmptyData(function ($form) use ($test) {
+                // the form instance is passed to the closure to allow use
+                // of form data when creating the empty value
+                $test->assertInstanceOf('Symfony\Component\Form\FormInterface', $form);
+
+                return 'foo';
+            })
+            ->setClientTransformer(new FixedDataTransformer(array(
+                '' => '',
+                // direction is reversed!
+                'bar' => 'foo',
+            )))
+            ->getForm();
+
+        $form->bind('');
+
+        $this->assertEquals('bar', $form->getData());
+    }
+
+    public function testAddMapsClientDataToForm()
+    {
+        $mapper = $this->getDataMapper();
+        $form = $this->getBuilder()
+            ->setDataMapper($mapper)
+            ->setClientTransformer(new FixedDataTransformer(array(
+                '' => '',
+                'foo' => 'bar',
+            )))
+            ->setData('foo')
+            ->getForm();
+
+        $child = $this->getBuilder()->getForm();
+        $mapper->expects($this->once())
+            ->method('mapDataToForm')
+            ->with('bar', $child);
+
+        $form->add($child);
+    }
+
+    public function testSetDataMapsClientDataToChildren()
+    {
+        $mapper = $this->getDataMapper();
+        $form = $this->getBuilder()
+            ->setDataMapper($mapper)
+            ->setClientTransformer(new FixedDataTransformer(array(
+                '' => '',
+                'foo' => 'bar',
+            )))
+            ->getForm();
+
+        $form->add($child1 = $this->getBuilder('firstName')->getForm());
+        $form->add($child2 = $this->getBuilder('lastName')->getForm());
+
+        $mapper->expects($this->once())
+            ->method('mapDataToForms')
+            ->with('bar', array('firstName' => $child1, 'lastName' => $child2));
+
+        $form->setData('foo');
+    }
+
+    public function testBindMapsBoundChildrenOntoExistingClientData()
+    {
+        $test = $this;
+        $mapper = $this->getDataMapper();
+        $form = $this->getBuilder()
+            ->setDataMapper($mapper)
+            ->setClientTransformer(new FixedDataTransformer(array(
+                '' => '',
+                'foo' => 'bar',
+            )))
+            ->setData('foo')
+            ->getForm();
+
+        $form->add($child1 = $this->getBuilder('firstName')->getForm());
+        $form->add($child2 = $this->getBuilder('lastName')->getForm());
+
+        $mapper->expects($this->once())
+            ->method('mapFormsToData')
+            ->with(array('firstName' => $child1, 'lastName' => $child2), 'bar')
+            ->will($this->returnCallback(function ($children, $bar) use ($test) {
+                $test->assertEquals('Bernhard', $children['firstName']->getData());
+                $test->assertEquals('Schussek', $children['lastName']->getData());
+            }));
+
+        $form->bind(array(
+            'firstName' => 'Bernhard',
+            'lastName' => 'Schussek',
+        ));
+    }
+
+    public function testBindMapsBoundChildrenOntoEmptyData()
+    {
+        $test = $this;
+        $mapper = $this->getDataMapper();
+        $object = new \stdClass();
+        $form = $this->getBuilder()
+            ->setDataMapper($mapper)
+            ->setEmptyData($object)
+            ->setData(null)
+            ->getForm();
+
+        $form->add($child = $this->getBuilder('name')->getForm());
+
+        $mapper->expects($this->once())
+            ->method('mapFormsToData')
+            ->with(array('name' => $child), $object);
+
+        $form->bind(array(
+            'name' => 'Bernhard',
+        ));
     }
 
     public function testBindValidatesAfterTransformation()

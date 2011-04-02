@@ -129,7 +129,7 @@ abstract class AsseticHelper extends Helper
         }
 
         if (count($inputs) === 0 && isset($options['type']) && isset($this->inputs[$options['type']])) {
-            $inuts = $this->inputs[$options['type']];
+            $inputs = $this->inputs[$options['type']];
         }
 
         if (!is_array($filters)) {

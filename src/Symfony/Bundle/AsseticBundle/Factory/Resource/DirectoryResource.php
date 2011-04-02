@@ -44,6 +44,8 @@ class DirectoryResource extends BaseDirectoryResource
 
     public function getIterator()
     {
-        return new DirectoryResourceIterator($this->loader, $this->bundle, $this->path, $this->getInnerIterator());
+        return is_dir($this->path)
+            ? new DirectoryResourceIterator($this->loader, $this->bundle, $this->path, $this->getInnerIterator())
+            : new \EmptyIterator();
     }
 }

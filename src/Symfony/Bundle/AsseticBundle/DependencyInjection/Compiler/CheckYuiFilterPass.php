@@ -25,12 +25,12 @@ class CheckYuiFilterPass implements CompilerPassInterface
     {
         if ($container->hasDefinition('assetic.filter.yui_css') &&
             !$container->getParameterBag()->resolveValue($container->getParameter('assetic.filter.yui_css.jar'))) {
-            throw new \RuntimeException('The Assetic "yui_css" configuration requires a "jar" value.');
+            throw new \RuntimeException('The "assetic.filters.yui_css" configuration requires a "jar" value.');
         }
 
         if ($container->hasDefinition('assetic.filter.yui_js') &&
             !$container->getParameterBag()->resolveValue($container->getParameter('assetic.filter.yui_js.jar'))) {
-            throw new \RuntimeException('The Assetic "yui_js" configuration requires a "jar" value.');
+            throw new \RuntimeException('The "assetic.filters.yui_js" configuration requires a "jar" value.');
         }
     }
 }

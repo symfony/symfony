@@ -38,7 +38,7 @@ class UrlValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        $value = (string)$value;
+        $value = (string) $value;
 
         $pattern = sprintf(self::PATTERN, implode('|', $constraint->protocols));
 

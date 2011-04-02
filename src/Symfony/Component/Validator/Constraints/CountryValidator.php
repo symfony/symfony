@@ -32,7 +32,7 @@ class CountryValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        $value = (string)$value;
+        $value = (string) $value;
 
         if (!in_array($value, \Symfony\Component\Locale\Locale::getCountries())) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));

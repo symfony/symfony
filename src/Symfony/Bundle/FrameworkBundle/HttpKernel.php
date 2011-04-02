@@ -120,6 +120,7 @@ class HttpKernel extends BaseHttpKernel
         } else {
             $options['attributes']['_controller'] = $controller;
             $options['attributes']['_format'] = $request->getRequestFormat();
+            $options['attributes']['_route'] = '_internal';
             $subRequest = $request->duplicate($options['query'], null, $options['attributes']);
         }
 

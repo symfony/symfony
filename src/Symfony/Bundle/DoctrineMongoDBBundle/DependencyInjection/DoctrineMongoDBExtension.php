@@ -311,6 +311,9 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
 
     protected function loadConstraints(ContainerBuilder $container)
     {
+        // FIXME: the validator.annotations.namespaces parameter does not exist anymore
+        // and anyway, it was not available in the FrameworkExtension code
+        // as each bundle is isolated from the others
         if ($container->hasParameter('validator.annotations.namespaces')) {
             $container->setParameter('validator.annotations.namespaces', array_merge(
                 $container->getParameter('validator.annotations.namespaces'),

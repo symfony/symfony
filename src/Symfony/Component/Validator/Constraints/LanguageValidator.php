@@ -32,7 +32,7 @@ class LanguageValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        $value = (string)$value;
+        $value = (string) $value;
 
         if (!in_array($value, \Symfony\Component\Locale\Locale::getLanguages())) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));

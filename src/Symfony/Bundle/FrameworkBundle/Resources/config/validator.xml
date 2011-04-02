@@ -10,14 +10,9 @@
         <parameter key="validator.mapping.loader.loader_chain.class">Symfony\Component\Validator\Mapping\Loader\LoaderChain</parameter>
         <parameter key="validator.mapping.loader.static_method_loader.class">Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader</parameter>
         <parameter key="validator.mapping.loader.annotation_loader.class">Symfony\Component\Validator\Mapping\Loader\AnnotationLoader</parameter>
-        <parameter key="validator.mapping.loader.xml_file_loader.class">Symfony\Component\Validator\Mapping\Loader\XmlFileLoader</parameter>
-        <parameter key="validator.mapping.loader.yaml_file_loader.class">Symfony\Component\Validator\Mapping\Loader\YamlFileLoader</parameter>
         <parameter key="validator.mapping.loader.xml_files_loader.class">Symfony\Component\Validator\Mapping\Loader\XmlFilesLoader</parameter>
         <parameter key="validator.mapping.loader.yaml_files_loader.class">Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader</parameter>
         <parameter key="validator.validator_factory.class">Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory</parameter>
-        <parameter key="validator.annotations.namespaces" type="collection">
-            <parameter key="assert">Symfony\Component\Validator\Constraints\</parameter>
-        </parameter>
     </parameters>
 
     <services>
@@ -45,5 +40,16 @@
 
         <service id="validator.mapping.loader.static_method_loader" class="%validator.mapping.loader.static_method_loader.class%" public="false" />
 
+        <service id="validator.mapping.loader.annotation_loader" class="%validator.mapping.loader.annotation_loader.class%" public="false">
+            <argument /> <!-- namespaces -->
+        </service>
+
+        <service id="validator.mapping.loader.xml_files_loader" class="%validator.mapping.loader.xml_files_loader.class%" public="false">
+            <argument /> <!-- mapping files -->
+        </service>
+
+        <service id="validator.mapping.loader.yaml_files_loader" class="%validator.mapping.loader.yaml_files_loader.class%" public="false">
+            <argument /> <!-- mapping files -->
+        </service>
     </services>
 </container>

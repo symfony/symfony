@@ -52,21 +52,21 @@ class TimeType extends AbstractType
         }
 
         if ($options['input'] === 'string') {
-            $builder->setNormTransformer(new ReversedTransformer(
+            $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], 'H:i:s')
             ));
         } else if ($options['input'] === 'timestamp') {
-            $builder->setNormTransformer(new ReversedTransformer(
+            $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToTimestampTransformer($options['data_timezone'], $options['data_timezone'])
             ));
         } else if ($options['input'] === 'array') {
-            $builder->setNormTransformer(new ReversedTransformer(
+            $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], $parts)
             ));
         }
 
         $builder
-            ->setClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], $parts, $options['widget'] === 'text'))
+            ->appendClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], $parts, $options['widget'] === 'text'))
             ->setAttribute('widget', $options['widget'])
             ->setAttribute('with_seconds', $options['with_seconds']);
     }

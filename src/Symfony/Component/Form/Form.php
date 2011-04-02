@@ -59,14 +59,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * a checkbox field uses a Boolean value both for internal processing as for
  * storage in the object. In these cases you simply need to set a value
  * transformer to convert between formats (2) and (3). You can do this by
- * calling setClientTransformer() in the configure() method.
+ * calling appendClientTransformer() in the configure() method.
  *
  * In some cases though it makes sense to make format (1) configurable. To
  * demonstrate this, let's extend our above date field to store the value
  * either as "Y-m-d" string or as timestamp. Internally we still want to
  * use a DateTime object for processing. To convert the data from string/integer
  * to DateTime you can set a normalization transformer by calling
- * setNormTransformer() in configure(). The normalized data is then
+ * appendNormTransformer() in configure(). The normalized data is then
  * converted to the displayed data as described before.
  *
  * @author Fabien Potencier <fabien@symfony.com>
@@ -151,14 +151,14 @@ class Form implements \IteratorAggregate, FormInterface
      * and back
      * @var DataTransformer\DataTransformerInterface
      */
-    private $normTransformer;
+    private $normTransformers;
 
     /**
      * The transformer for transforming from normalized to client format and
      * back
      * @var DataTransformer\DataTransformerInterface
      */
-    private $clientTransformer;
+    private $clientTransformers;
 
     /**
      * Whether the data in application, normalized and client format is
@@ -198,15 +198,25 @@ class Form implements \IteratorAggregate, FormInterface
      */
     private $types;
 
-    public function __construct($name,
-        EventDispatcherInterface $dispatcher,
-        array $types = array(),
-        DataTransformerInterface $clientTransformer = null,
-        DataTransformerInterface $normTransformer = null,
+    public function __construct($name, EventDispatcherInterface $dispatcher,
+        array $types = array(), array $clientTransformers = array(),
+        array $normTransformers = array(),
         DataMapperInterface $dataMapper = null, array $validators = array(),
         $required = false, $readOnly = false, $errorBubbling = false,
         $emptyData = null, array $attributes = array())
     {
+        foreach ($clientTransformers as $transformer) {
+            if (!$transformer instanceof DataTransformerInterface) {
+                throw new UnexpectedTypeException($transformer, 'Symfony\Component\Form\DataTransformer\DataTransformerInterface');
+            }
+        }
+
+        foreach ($normTransformers as $transformer) {
+            if (!$transformer instanceof DataTransformerInterface) {
+                throw new UnexpectedTypeException($transformer, 'Symfony\Component\Form\DataTransformer\DataTransformerInterface');
+            }
+        }
+
         foreach ($validators as $validator) {
             if (!$validator instanceof FormValidatorInterface) {
                 throw new UnexpectedTypeException($validator, 'Symfony\Component\Form\Validator\FormValidatorInterface');
@@ -216,8 +226,8 @@ class Form implements \IteratorAggregate, FormInterface
         $this->name = (string)$name;
         $this->types = $types;
         $this->dispatcher = $dispatcher;
-        $this->clientTransformer = $clientTransformer;
-        $this->normTransformer = $normTransformer;
+        $this->clientTransformers = $clientTransformers;
+        $this->normTransformers = $normTransformers;
         $this->validators = $validators;
         $this->dataMapper = $dataMapper;
         $this->required = $required;
@@ -349,7 +359,7 @@ class Form implements \IteratorAggregate, FormInterface
         $appData = $event->getData();
 
         // Treat data as strings unless a value transformer exists
-        if (!$this->clientTransformer && !$this->normTransformer && is_scalar($appData)) {
+        if (!$this->clientTransformers && !$this->normTransformers && is_scalar($appData)) {
             $appData = (string)$appData;
         }
 
@@ -658,21 +668,21 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns the DataTransformer.
      *
-     * @return DataTransformerInterface
+     * @return array
      */
-    public function getNormTransformer()
+    public function getNormTransformers()
     {
-        return $this->normTransformer;
+        return $this->normTransformers;
     }
 
     /**
      * Returns the DataTransformer.
      *
-     * @return DataTransformerInterface
+     * @return array
      */
-    public function getClientTransformer()
+    public function getClientTransformers()
     {
-        return $this->clientTransformer;
+        return $this->clientTransformers;
     }
 
     /**
@@ -809,11 +819,11 @@ class Form implements \IteratorAggregate, FormInterface
      */
     private function appToNorm($value)
     {
-        if (null === $this->normTransformer) {
-            return $value;
+        foreach ($this->normTransformers as $transformer) {
+            $value = $transformer->transform($value);
         }
 
-        return $this->normTransformer->transform($value);
+        return $value;
     }
 
     /**
@@ -824,11 +834,11 @@ class Form implements \IteratorAggregate, FormInterface
      */
     private function normToApp($value)
     {
-        if (null === $this->normTransformer) {
-            return $value;
+        for ($i = count($this->normTransformers) - 1; $i >= 0; --$i) {
+            $value = $this->normTransformers[$i]->reverseTransform($value);
         }
 
-        return $this->normTransformer->reverseTransform($value);
+        return $value;
     }
 
     /**
@@ -839,13 +849,17 @@ class Form implements \IteratorAggregate, FormInterface
      */
     private function normToClient($value)
     {
-        if (null === $this->clientTransformer) {
+        if (!$this->clientTransformers) {
             // Scalar values should always be converted to strings to
             // facilitate differentiation between empty ("") and zero (0).
             return null === $value || is_scalar($value) ? (string)$value : $value;
         }
 
-        return $this->clientTransformer->transform($value);
+        foreach ($this->clientTransformers as $transformer) {
+            $value = $transformer->transform($value);
+        }
+
+        return $value;
     }
 
     /**
@@ -856,10 +870,14 @@ class Form implements \IteratorAggregate, FormInterface
      */
     private function clientToNorm($value)
     {
-        if (null === $this->clientTransformer) {
+        if (!$this->clientTransformers) {
             return '' === $value ? null : $value;
         }
 
-        return $this->clientTransformer->reverseTransform($value);
+        for ($i = count($this->clientTransformers) - 1; $i >= 0; --$i) {
+            $value = $this->clientTransformers[$i]->reverseTransform($value);
+        }
+
+        return $value;
     }
 }

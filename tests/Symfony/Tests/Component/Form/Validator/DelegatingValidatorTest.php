@@ -564,7 +564,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         $clientTransformer = $this->getMockTransformer();
 
         $form = $this->getBuilder()
-            ->setClientTransformer($clientTransformer)
+            ->appendClientTransformer($clientTransformer)
             ->getForm();
 
         $graphWalker->expects($this->never())

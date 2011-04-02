@@ -17,9 +17,6 @@ use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeCollectionListener;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\EntitiesToArrayTransformer;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\EntityToIdTransformer;
-use Symfony\Component\Form\DataTransformer\ArrayToBooleanChoicesTransformer;
-use Symfony\Component\Form\DataTransformer\ScalarToBooleanChoicesTransformer;
-use Symfony\Component\Form\DataTransformer\DataTransformerChain;
 use Symfony\Component\Form\Type\AbstractType;
 use Doctrine\ORM\EntityManager;
 
@@ -34,28 +31,11 @@ class EntityType extends AbstractType
 
     public function buildForm(FormBuilder $builder, array $options)
     {
-        $transformers = array();
-
         if ($options['multiple']) {
-            $builder->addEventSubscriber(new MergeCollectionListener());
-
-            $transformers[] = new EntitiesToArrayTransformer($options['choice_list']);
-
-            if ($options['expanded']) {
-                $transformers[] = new ArrayToBooleanChoicesTransformer($options['choice_list']);
-            }
+            $builder->addEventSubscriber(new MergeCollectionListener())
+                ->prependClientTransformer(new EntitiesToArrayTransformer($options['choice_list']));
         } else {
-            $transformers[] = new EntityToIdTransformer($options['choice_list']);
-
-            if ($options['expanded']) {
-                $transformers[] = new ScalarToBooleanChoicesTransformer($options['choice_list']);
-            }
-        }
-
-        if (count($transformers) > 1) {
-            $builder->setClientTransformer(new DataTransformerChain($transformers));
-        } else {
-            $builder->setClientTransformer(current($transformers));
+            $builder->prependClientTransformer(new EntityToIdTransformer($options['choice_list']));
         }
     }
 

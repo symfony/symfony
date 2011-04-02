@@ -56,11 +56,11 @@ class ChoiceType extends AbstractType
             ->setAttribute('expanded', $options['expanded']);
 
         if ($options['multiple'] && $options['expanded']) {
-            $builder->setClientTransformer(new ArrayToBooleanChoicesTransformer($options['choice_list']));
+            $builder->appendClientTransformer(new ArrayToBooleanChoicesTransformer($options['choice_list']));
         }
 
         if (!$options['multiple'] && $options['expanded']) {
-            $builder->setClientTransformer(new ScalarToBooleanChoicesTransformer($options['choice_list']));
+            $builder->appendClientTransformer(new ScalarToBooleanChoicesTransformer($options['choice_list']));
             $builder->addEventSubscriber(new FixRadioInputListener(), 10);
         }
     }

@@ -16,6 +16,7 @@ use Symfony\Bundle\AsseticBundle\DependencyInjection\Compiler\CheckYuiFilterPass
 use Symfony\Bundle\AsseticBundle\DependencyInjection\Compiler\CheckClosureFilterPass;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\HttpFoundation\Request;
@@ -52,11 +53,14 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
         $this->container = new ContainerBuilder();
         $this->container->addScope(new Scope('request'));
         $this->container->register('request', 'Symfony\\Component\\HttpFoundation\\Request')->setScope('request');
+        $this->container->register('templating.helper.assets', $this->getMockClass('Symfony\\Component\\Templating\\Helper\\AssetsHelper'));
+        $this->container->register('templating.helper.router', $this->getMockClass('Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\RouterHelper'))
+            ->addArgument(new Definition($this->getMockClass('Symfony\\Component\\Routing\\RouterInterface')));
         $this->container->register('twig', 'Twig_Environment');
+        $this->container->setParameter('kernel.bundles', array());
+        $this->container->setParameter('kernel.cache_dir', __DIR__);
         $this->container->setParameter('kernel.debug', false);
         $this->container->setParameter('kernel.root_dir', __DIR__);
-        $this->container->setParameter('kernel.cache_dir', __DIR__);
-        $this->container->setParameter('kernel.bundles', array());
     }
 
     /**

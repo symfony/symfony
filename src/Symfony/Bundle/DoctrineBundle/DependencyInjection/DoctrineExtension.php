@@ -151,7 +151,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             $config['default_entity_manager'] = reset($entityManagers);
         }
 
-        $options = array('default_entity_manager', 'auto_generate_proxy_classes', 'proxy_dir', 'proxy_namespace', 'hydrators');
+        $options = array('default_entity_manager', 'auto_generate_proxy_classes', 'proxy_dir', 'proxy_namespace');
         foreach ($options as $key) {
             $container->setParameter('doctrine.orm.'.$key, $config[$key]);
         }
@@ -197,7 +197,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             $ormConfigDef->addMethodCall($method, array($arg));
         }
 
-        foreach ($container->getParameter('doctrine.orm.hydrators') as $name => $class) {
+        foreach ($entityManager['hydrators'] as $name => $class) {
             $ormConfigDef->addMethodCall('addCustomHydrationMode', array ($name, $class));
         }
 

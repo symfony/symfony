@@ -22,9 +22,9 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class XmlEncoder extends AbstractEncoder
 {
-    protected $dom;
-    protected $format;
-    protected $rootNodeName = 'response';
+    private $dom;
+    private $format;
+    private $rootNodeName = 'response';
 
     /**
      * {@inheritdoc}
@@ -84,7 +84,7 @@ class XmlEncoder extends AbstractEncoder
      * @param SimpleXmlElement $node xml to parse
      * @return array
      */
-    protected function parseXml($node)
+    private function parseXml($node)
     {
         $data = array();
         foreach ($node->children() as $key => $subnode) {
@@ -126,7 +126,7 @@ class XmlEncoder extends AbstractEncoder
      * @param array|object $data data
      * @return bool
      */
-    protected function buildXml($parentNode, $data)
+    private function buildXml($parentNode, $data)
     {
         $append = true;
 
@@ -183,7 +183,7 @@ class XmlEncoder extends AbstractEncoder
      * @param  $nodename
      * @return void
      */
-    protected function appendNode($parentNode, $data, $nodeName, $key = null)
+    private function appendNode($parentNode, $data, $nodeName, $key = null)
     {
         $node = $this->dom->createElement($nodeName);
         if (null !== $key) {
@@ -204,7 +204,7 @@ class XmlEncoder extends AbstractEncoder
      * @param mixed $val
      * @return Boolean
      */
-    protected function selectNodeType($node, $val)
+    private function selectNodeType($node, $val)
     {
         if (is_array($val)) {
             return $this->buildXml($node, $val);
@@ -234,7 +234,7 @@ class XmlEncoder extends AbstractEncoder
      * @param string $val
      * @return Boolean
      */
-    protected function appendXMLString($node, $val)
+    final protected function appendXMLString($node, $val)
     {
         if (strlen($val) > 0) {
             $frag = $this->dom->createDocumentFragment();
@@ -251,7 +251,7 @@ class XmlEncoder extends AbstractEncoder
      * @param string $val
      * @return Boolean
      */
-    protected function appendText($node, $val)
+    final protected function appendText($node, $val)
     {
         $nodeText = $this->dom->createTextNode($val);
         $node->appendChild($nodeText);
@@ -264,7 +264,7 @@ class XmlEncoder extends AbstractEncoder
      * @param string $val
      * @return Boolean
      */
-    protected function appendCData($node, $val)
+    final protected function appendCData($node, $val)
     {
         $nodeText = $this->dom->createCDATASection($val);
         $node->appendChild($nodeText);
@@ -277,7 +277,7 @@ class XmlEncoder extends AbstractEncoder
      * @param DOMDocumentFragment $fragment
      * @return Boolean
      */
-    protected function appendDocumentFragment($node, $fragment)
+    final protected function appendDocumentFragment($node, $fragment)
     {
         if ($fragment instanceof \DOMDocumentFragment) {
             $node->appendChild($fragment);
@@ -292,7 +292,7 @@ class XmlEncoder extends AbstractEncoder
      * @param string $name
      * @return Boolean
      */
-    protected function isElementNameValid($name)
+    final protected function isElementNameValid($name)
     {
         return $name &&
             false === strpos($name, ' ') &&

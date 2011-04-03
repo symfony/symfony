@@ -21,7 +21,6 @@ use Symfony\Component\Console\Output\StreamOutput;
 class CommandTester
 {
     private $command;
-    private $display;
     private $input;
     private $output;
 
@@ -64,13 +63,7 @@ class CommandTester
             $this->output->setVerbosity($options['verbosity']);
         }
 
-        $code = $this->command->run($this->input, $this->output);
-
-        rewind($this->output->getStream());
-
-        $this->display = stream_get_contents($this->output->getStream());
-
-        return $code;
+        return $this->command->run($this->input, $this->output);
     }
 
     /**
@@ -80,7 +73,9 @@ class CommandTester
      */
     public function getDisplay()
     {
-        return $this->display;
+        rewind($this->output->getStream());
+
+        return stream_get_contents($this->output->getStream());
     }
 
     /**

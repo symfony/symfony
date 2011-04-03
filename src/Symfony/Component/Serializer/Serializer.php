@@ -28,8 +28,8 @@ use Symfony\Component\Serializer\Encoder\EncoderInterface;
  */
 class Serializer implements SerializerInterface
 {
-    protected $normalizers = array();
-    protected $encoders = array();
+    private $normalizers = array();
+    private $encoders = array();
     private $normalizerCache = array();
 
     /**

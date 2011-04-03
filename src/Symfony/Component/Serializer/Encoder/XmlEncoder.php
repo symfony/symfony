@@ -79,6 +79,76 @@ class XmlEncoder extends AbstractEncoder
     }
 
     /**
+     * @param DOMNode $node
+     * @param string $val
+     * @return Boolean
+     */
+    final protected function appendXMLString($node, $val)
+    {
+        if (strlen($val) > 0) {
+            $frag = $this->dom->createDocumentFragment();
+            $frag->appendXML($val);
+            $node->appendChild($frag);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param DOMNode $node
+     * @param string $val
+     * @return Boolean
+     */
+    final protected function appendText($node, $val)
+    {
+        $nodeText = $this->dom->createTextNode($val);
+        $node->appendChild($nodeText);
+
+        return true;
+    }
+
+    /**
+     * @param DOMNode $node
+     * @param string $val
+     * @return Boolean
+     */
+    final protected function appendCData($node, $val)
+    {
+        $nodeText = $this->dom->createCDATASection($val);
+        $node->appendChild($nodeText);
+
+        return true;
+    }
+
+    /**
+     * @param DOMNode $node
+     * @param DOMDocumentFragment $fragment
+     * @return Boolean
+     */
+    final protected function appendDocumentFragment($node, $fragment)
+    {
+        if ($fragment instanceof \DOMDocumentFragment) {
+            $node->appendChild($fragment);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks the name is avalid xml element name
+     * @param string $name
+     * @return Boolean
+     */
+    final protected function isElementNameValid($name)
+    {
+        return $name &&
+            false === strpos($name, ' ') &&
+            preg_match('#^[\pL_][\pL0-9._-]*$#ui', $name);
+    }
+
+    /**
      * Parse the input SimpleXmlElement into an array
      *
      * @param SimpleXmlElement $node xml to parse
@@ -227,75 +297,5 @@ class XmlEncoder extends AbstractEncoder
         }
 
         return true;
-    }
-
-    /**
-     * @param DOMNode $node
-     * @param string $val
-     * @return Boolean
-     */
-    final protected function appendXMLString($node, $val)
-    {
-        if (strlen($val) > 0) {
-            $frag = $this->dom->createDocumentFragment();
-            $frag->appendXML($val);
-            $node->appendChild($frag);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param DOMNode $node
-     * @param string $val
-     * @return Boolean
-     */
-    final protected function appendText($node, $val)
-    {
-        $nodeText = $this->dom->createTextNode($val);
-        $node->appendChild($nodeText);
-
-        return true;
-    }
-
-    /**
-     * @param DOMNode $node
-     * @param string $val
-     * @return Boolean
-     */
-    final protected function appendCData($node, $val)
-    {
-        $nodeText = $this->dom->createCDATASection($val);
-        $node->appendChild($nodeText);
-
-        return true;
-    }
-
-    /**
-     * @param DOMNode $node
-     * @param DOMDocumentFragment $fragment
-     * @return Boolean
-     */
-    final protected function appendDocumentFragment($node, $fragment)
-    {
-        if ($fragment instanceof \DOMDocumentFragment) {
-            $node->appendChild($fragment);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks the name is avalid xml element name
-     * @param string $name
-     * @return Boolean
-     */
-    final protected function isElementNameValid($name)
-    {
-        return $name &&
-            false === strpos($name, ' ') &&
-            preg_match('#^[\pL_][\pL0-9._-]*$#ui', $name);
     }
 }

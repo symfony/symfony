@@ -32,9 +32,13 @@ class Serializer implements SerializerInterface
     protected $encoders = array();
     private $normalizerCache = array();
 
-    public function isStructuredType($val)
+    /**
+     * @param mixed $value value to test
+     * @return Boolean whether the type is a structured type (array + objects)
+     */
+    public function isStructuredType($value)
     {
-        return null !== $val && !is_scalar($val);
+        return null !== $value && !is_scalar($value);
     }
 
     /**

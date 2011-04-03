@@ -26,6 +26,7 @@ interface EncoderInterface
      * @param mixed $data data to encode
      * @param string $format format to encode to
      * @return string
+     * @api
      */
     function encode($data, $format);
 
@@ -35,6 +36,7 @@ interface EncoderInterface
      * @param string $data data to decode
      * @param string $format format to decode from
      * @return mixed
+     * @api
      */
     function decode($data, $format);
 
@@ -42,6 +44,7 @@ interface EncoderInterface
      * Sets the owning Serializer object
      *
      * @param SerializerInterface $serializer
+     * @api
      */
     function setSerializer(SerializerInterface $serializer);
 
@@ -49,6 +52,7 @@ interface EncoderInterface
      * Gets the owning Serializer object
      *
      * @return SerializerInterface
+     * @api
      */
     function getSerializer();
 }

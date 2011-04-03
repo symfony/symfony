@@ -77,3 +77,14 @@ PR8 to PR9
     *Resources*:   `@BlogBundle/Resources/config/blog.xml` -> `@Blog/Resources/config/blog.xml`
 
     *Doctrine*:    `$em->find('BlogBundle:Post', $id)` -> `$em->find('Blog:Post', $id)`
+
+* Assetic filters must be now explicitly loaded:
+
+    assetic:
+        filters:
+            cssrewrite: ~
+            yui_css:
+                jar: "/path/to/yuicompressor.jar"
+            my_filter:
+                resource: "%kernel.root_dir%/config/my_filter.xml"
+                foo:      bar

@@ -30,7 +30,7 @@ class Serializer implements SerializerInterface
 {
     protected $normalizers = array();
     protected $encoders = array();
-    protected $normalizerCache = array();
+    private $normalizerCache = array();
 
     public function isStructuredType($val)
     {

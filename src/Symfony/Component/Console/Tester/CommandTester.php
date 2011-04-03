@@ -46,6 +46,8 @@ class CommandTester
      *
      * @param array $input   An array of arguments and options
      * @param array $options An array of options
+     *
+     * @return integer The command exit code
      */
     public function execute(array $input, array $options = array())
     {
@@ -62,11 +64,13 @@ class CommandTester
             $this->output->setVerbosity($options['verbosity']);
         }
 
-        $this->command->run($this->input, $this->output);
+        $code = $this->command->run($this->input, $this->output);
 
         rewind($this->output->getStream());
 
-        return $this->display = stream_get_contents($this->output->getStream());
+        $this->display = stream_get_contents($this->output->getStream());
+
+        return $code;
     }
 
     /**

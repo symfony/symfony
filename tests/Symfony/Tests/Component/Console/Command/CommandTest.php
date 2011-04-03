@@ -205,8 +205,11 @@ class CommandTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('The "--bar" option does not exist.', $e->getMessage(), '->run() throws a \InvalidArgumentException when the input does not validate the current InputDefinition');
         }
 
-        $this->assertEquals('interact called'.PHP_EOL.'execute called'.PHP_EOL, $tester->execute(array(), array('interactive' => true)), '->run() calls the interact() method if the input is interactive');
-        $this->assertEquals('execute called'.PHP_EOL, $tester->execute(array(), array('interactive' => false)), '->run() does not call the interact() method if the input is not interactive');
+        $tester->execute(array(), array('interactive' => true));
+        $this->assertEquals('interact called'.PHP_EOL.'execute called'.PHP_EOL, $tester->getDisplay(), '->run() calls the interact() method if the input is interactive');
+
+        $tester->execute(array(), array('interactive' => false));
+        $this->assertEquals('execute called'.PHP_EOL, $tester->getDisplay(), '->run() does not call the interact() method if the input is not interactive');
 
         $command = new Command('foo');
         try {

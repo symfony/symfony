@@ -21,6 +21,35 @@ namespace Symfony\Component\Serializer\Normalizer;
  */
 interface NormalizableInterface
 {
+    /**
+     * Normalizes the object into an array of scalars|arrays.
+     *
+     * It is important to understand that the normalize() call should normalize
+     * recursively all child objects of the implementor.
+     *
+     * @param NormalizerInterface $normalizer The normalizer is given so that you
+     *   can use it to normalize objects contained within this object, eventually
+     *   grabbing the serializer from it to access other normalizers.
+     * @param string|null $format The format is optionally given to be able to normalize differently
+     *   based on different output formats.
+     * @param array|null $properties If provided, this is a (subset) list of
+     *   properties that should be exported from the object.
+     * @return array|scalar
+     */
     function normalize(NormalizerInterface $normalizer, $format, $properties = null);
+
+    /**
+     * Denormalizes the object back from an array of scalars|arrays.
+     *
+     * It is important to understand that the normalize() call should denormalize
+     * recursively all child objects of the implementor.
+     *
+     * @param NormalizerInterface $normalizer The normalizer is given so that you
+     *   can use it to denormalize objects contained within this object, eventually
+     *   grabbing the serializer from it to access other normalizers.
+     * @param array|scalar $data The data from which to re-create the object.
+     * @param string|null $format The format is optionally given to be able to denormalize differently
+     *   based on different input formats.
+     */
     function denormalize(NormalizerInterface $normalizer, $data, $format = null);
 }

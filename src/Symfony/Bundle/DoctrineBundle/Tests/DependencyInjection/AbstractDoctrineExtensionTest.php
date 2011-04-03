@@ -669,6 +669,21 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertDICDefinitionMethodCallOnce($definition, 'addCustomDatetimeFunction', array('test_datetime', 'Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestDatetimeFunction'));
     }
 
+    public function testAddCustomHydrationMode()
+    {
+        $container = $this->getContainer(array('YamlBundle'));
+
+        $loader = new DoctrineExtension();
+        $container->registerExtension($loader);
+        $this->loadFromFile($container, 'orm_hydration_mode');
+        $container->getCompilerPassConfig()->setOptimizationPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
+        $container->compile();
+
+        $definition = $container->getDefinition('doctrine.orm.default_configuration');
+        $this->assertDICDefinitionMethodCallOnce($definition, 'addCustomHydrationMode', array('test_hydrator', 'Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestHydrator'));
+    }
+
     protected function getContainer($bundles = 'YamlBundle', $vendor = null)
     {
         if (!is_array($bundles)) {

@@ -131,17 +131,26 @@ class Serializer implements SerializerInterface
         return $this->encoders[$format]->decode($data, $format);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function addNormalizer(NormalizerInterface $normalizer)
     {
         $this->normalizers[] = $normalizer;
         $normalizer->setSerializer($this);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getNormalizers()
     {
         return $this->normalizers;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function removeNormalizer(NormalizerInterface $normalizer)
     {
         unset($this->normalizers[array_search($normalizer, $this->normalizers, true)]);

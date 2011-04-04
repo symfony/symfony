@@ -1,4 +1,4 @@
-{% extends 'WebProfiler:Profiler:layout.html.twig' %}
+{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
 
 {% block toolbar %}
     {% set icon %}
@@ -7,7 +7,7 @@
     {% set text %}
         <span>{{ collector.querycount }}</span>
     {% endset %}
-    {% include 'WebProfiler:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
+    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
 {% endblock %}
 
 {% block menu %}

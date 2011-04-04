@@ -91,7 +91,7 @@ class WebDebugToolbarListener
         $content = $response->getContent();
 
         if (false !== $pos = $posrFunction($content, '</body>')) {
-            $toolbar = "\n".str_replace("\n", '', $this->templating->render('WebProfiler:Profiler:toolbar_js.html.twig', array('token' => $response->headers->get('X-Debug-Token'))))."\n";
+            $toolbar = "\n".str_replace("\n", '', $this->templating->render('WebProfilerBundle:Profiler:toolbar_js.html.twig', array('token' => $response->headers->get('X-Debug-Token'))))."\n";
             $content = $substrFunction($content, 0, $pos).$toolbar.$substrFunction($content, $pos);
             $response->setContent($content);
         }

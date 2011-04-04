@@ -108,16 +108,6 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
 
     protected function listenerToString($listener)
     {
-        if (is_object($listener)) {
-            if ($listener instanceof \Closure) {
-                return 'Closure';
-            }
-
-            return get_class($listener);
-        }
-
-        if (is_array($listener)) {
-            return is_object($listener[0]) ? get_class($listener[0]) : implode('::', $listener);
-        }
+        return $listener instanceof \Closure ? 'Closure' : get_class($listener);
     }
 }

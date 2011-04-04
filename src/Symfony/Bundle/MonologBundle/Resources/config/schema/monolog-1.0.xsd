@@ -17,7 +17,7 @@
     <xsd:complexType name="handler">
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="processor" type="processor" />
-        </xsd:all>
+        </xsd:choice>
         <xsd:attribute name="type" type="xsd:string" use="required" />
         <xsd:attribute name="level" type="level" />
         <xsd:attribute name="bubble" type="xsd:boolean" />

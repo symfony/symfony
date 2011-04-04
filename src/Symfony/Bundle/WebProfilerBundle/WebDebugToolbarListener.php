@@ -48,6 +48,11 @@ class WebDebugToolbarListener
         $response = $event->getResponse();
         $request = $event->getRequest();
 
+        // do not capture redirects or modify XML HTTP Requests
+        if ($request->isXmlHttpRequest()) {
+            return;
+        }
+
         if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects) {
             // keep current flashes for one more request
             $request->getSession()->setFlashes($request->getSession()->getFlashes());
@@ -61,7 +66,6 @@ class WebDebugToolbarListener
             || '3' === substr($response->getStatusCode(), 0, 1)
             || ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))
             || 'html' !== $request->getRequestFormat()
-            || $request->isXmlHttpRequest()
         ) {
             return;
         }

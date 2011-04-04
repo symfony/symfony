@@ -60,7 +60,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
         );
 
         if ($event->isPropagationStopped() && null !== $this->logger) {
-            $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s"', $this->listenerToString($listener), $eventName));
+            $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s"', $listenerString, $eventName));
 
             $skippedListeners = $this->getListeners($eventName);
             $skipped = false;
@@ -71,7 +71,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
                 }
 
                 if ($skippedListener === $listener) {
-                    $skipped = false;
+                    $skipped = true;
                 }
             }
         }

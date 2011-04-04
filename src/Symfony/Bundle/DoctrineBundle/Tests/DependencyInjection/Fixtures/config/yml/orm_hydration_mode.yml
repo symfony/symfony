@@ -6,4 +6,4 @@ doctrine:
                 hydrators:
                     test_hydrator: Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestHydrator
                 mappings:
-                    Yaml: ~
+                    YamlBundle: ~

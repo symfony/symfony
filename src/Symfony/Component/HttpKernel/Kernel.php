@@ -501,35 +501,50 @@ abstract class Kernel implements KernelInterface
     {
         $parameterBag = new ParameterBag($this->getKernelParameters());
 
-        $container = new ContainerBuilder($parameterBag);
-        $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass());
-        foreach ($this->bundles as $bundle) {
-            $bundle->build($container);
+        try {
+            $container = new ContainerBuilder($parameterBag);
+            $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass());
+            foreach ($this->bundles as $bundle) {
+                $bundle->build($container);
 
-            if ($this->debug) {
-                $container->addObjectResource($bundle);
-            }
-        }
-        $container->addObjectResource($this);
-
-        if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
-            $container->merge($cont);
-        }
-
-        foreach (array('cache', 'logs') as $name) {
-            $dir = $container->getParameter(sprintf('kernel.%s_dir', $name));
-            if (!is_dir($dir)) {
-                if (false === @mkdir($dir, 0777, true)) {
-                    exit(sprintf("Unable to create the %s directory (%s)\n", $name, dirname($dir)));
+                if ($this->debug) {
+                    $container->addObjectResource($bundle);
                 }
-            } elseif (!is_writable($dir)) {
-                exit(sprintf("Unable to write in the %s directory (%s)\n", $name, $dir));
             }
-        }
+            $container->addObjectResource($this);
 
-        $container->compile();
+            if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
+                $container->merge($cont);
+            }
+
+            foreach (array('cache', 'logs') as $name) {
+                $dir = $container->getParameter(sprintf('kernel.%s_dir', $name));
+                if (!is_dir($dir)) {
+                    if (false === @mkdir($dir, 0777, true)) {
+                        throw new \RuntimeException(sprintf("Unable to create the %s directory (%s)\n", $name, dirname($dir)));
+                    }
+                } elseif (!is_writable($dir)) {
+                    throw new \RuntimeException(sprintf("Unable to write in the %s directory (%s)\n", $name, $dir));
+                }
+            }
+
+            $container->compile();
+        } catch (\Exception $e) {
+            $this->handleContainerBuilderException($e, $container);
+        }
 
         return $container;
+    }
+
+    /**
+     * Handles an exception
+     *
+     * @param \Exception       $exception The exception
+     * @param ContainerBuilder $container The service container
+     */
+    protected function handleContainerBuilderException(\Exception $exception, ContainerBuilder $container)
+    {
+        throw $exception;
     }
 
     /**

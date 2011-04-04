@@ -31,7 +31,6 @@
         <ul class="alt">
             {% for log in collector.logs %}
                 <li class="{{ cycle(['odd', 'even'], loop.index) }}{% if 'ERR' == log.priorityName or 'ERROR' == log.priorityName %} error{% endif %}">
-                    {{ log.priorityName }}
                     {{ log.message }}
                 </li>
             {% endfor %}

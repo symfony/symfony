@@ -11,6 +11,7 @@
 
     <services>
         <service id="profiler" class="%profiler.class%" scope="request">
+            <tag name="monolog.logger" channel="profiler" />
             <argument type="service" id="profiler.storage" />
             <argument type="service" id="logger" on-invalid="null" />
         </service>

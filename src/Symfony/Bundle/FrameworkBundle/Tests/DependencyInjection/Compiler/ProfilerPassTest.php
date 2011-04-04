@@ -22,7 +22,7 @@ class ProfilerPassTest extends \PHPUnit_Framework_TestCase
      * an exception (both are needed if the template is specified). Thus,
      * a fully-valid tag looks something like this:
      *
-     *     <tag name="data_collector" template="Your:Collector:templatename" id="your_collector_name" />
+     *     <tag name="data_collector" template="YourBundle:Collector:templatename" id="your_collector_name" />
      */
     public function testTemplateNoIdThrowsException()
     {

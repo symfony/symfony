@@ -37,6 +37,15 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         }
     }
 
+    protected function skipIfICUVersionIsTooOld()
+    {
+        if ($this->isLowerThanIcuVersion('4.0')) {
+            $this->markTestSkipped(
+              'Please upgrade ICU version to 4+'
+            );
+        }
+    }
+
     protected function isGreaterOrEqualThanIcuVersion($version)
     {
         $version = $this->normalizeIcuVersion($version);

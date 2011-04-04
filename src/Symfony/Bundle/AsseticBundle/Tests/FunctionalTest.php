@@ -106,7 +106,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
     {
         // totals include assets defined in both php and twig templates
         return array(
-            array(true, 8),
+            array(true, 6),
             array(false, 3),
         );
     }

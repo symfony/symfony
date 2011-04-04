@@ -75,7 +75,7 @@ class TemplatingExtension extends \Twig_Extension
     /**
      * Returns the Response content for a given controller or URI.
      *
-     * @param string $controller A controller name to execute (a string like Blog:Post:index), or a relative URI
+     * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
      * @param array  $attributes An array of request attributes
      * @param array  $options    An array of options
      *
@@ -100,7 +100,7 @@ class TemplatingExtension extends \Twig_Extension
     public function getTokenParsers()
     {
         return array(
-            // {% render 'Blog:Post:list' with { 'limit': 2 }, { 'alt': 'Blog:Post:error' } %}
+            // {% render 'BlogBundle:Post:list' with { 'limit': 2 }, { 'alt': 'BlogBundle:Post:error' } %}
             new RenderTokenParser(),
 
             // {% include 'sometemplate.php' with { 'something' : 'something2' } %}

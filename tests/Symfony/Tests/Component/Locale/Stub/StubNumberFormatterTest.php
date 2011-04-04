@@ -134,6 +134,7 @@ class StubNumberFormatterTest extends LocaleTestCase
     public function testFormatCurrencyWithCurrencyStyleIntl($value, $currency, $expected)
     {
         $this->skipIfIntlExtensionIsNotLoaded();
+        $this->skipIfICUVersionIsTooOld();
         $formatter = $this->getIntlFormatterWithCurrencyStyle();
         $this->assertEquals($expected, $formatter->formatCurrency($value, $currency));
     }
@@ -181,6 +182,7 @@ class StubNumberFormatterTest extends LocaleTestCase
     public function testFormatCurrencyWithCurrencyStyleSwissRoundingIntl($value, $currency, $symbol, $expected)
     {
         $this->skipIfIntlExtensionIsNotLoaded();
+        $this->skipIfICUVersionIsTooOld();
         $formatter = $this->getIntlFormatterWithCurrencyStyle();
         $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
     }
@@ -660,6 +662,7 @@ class StubNumberFormatterTest extends LocaleTestCase
     public function testParseIntl($value, $expected, $message = '')
     {
         $this->skipIfIntlExtensionIsNotLoaded();
+        $this->skipIfICUVersionIsTooOld();
         $formatter = $this->getIntlFormatterWithDecimalStyle();
         $parsedValue = $formatter->parse($value, \NumberFormatter::TYPE_DOUBLE);
         $this->assertSame($expected, $parsedValue, $message);

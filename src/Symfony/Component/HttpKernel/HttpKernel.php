@@ -171,7 +171,11 @@ class HttpKernel implements HttpKernelInterface
             throw $e;
         }
 
-        return $this->filterResponse($event->getResponse(), $request, $type);
+        try {
+            return $this->filterResponse($event->getResponse(), $request, $type);
+        } catch (\Exception $e) {
+            return $event->getResponse();
+        }
     }
 
     private function varToString($var)

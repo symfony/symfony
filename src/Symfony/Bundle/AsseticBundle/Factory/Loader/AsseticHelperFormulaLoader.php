@@ -23,18 +23,18 @@ class AsseticHelperFormulaLoader extends BasePhpFormulaLoader
     protected function registerPrototypes()
     {
         return array(
-            '$view[\'assetic\']->assets(*)'           => array(),
             '$view[\'assetic\']->javascripts(*)'      => array('output' => 'js/*.js'),
             '$view[\'assetic\']->stylesheets(*)'      => array('output' => 'css/*.css'),
-            '$view["assetic"]->assets(*)'             => array(),
+            '$view[\'assetic\']->image(*)'            => array('output' => 'images/*', 'single' => true),
             '$view["assetic"]->javascripts(*)'        => array('output' => 'js/*.js'),
             '$view["assetic"]->stylesheets(*)'        => array('output' => 'css/*.css'),
-            '$view->get(\'assetic\')->assets(*)'      => array(),
+            '$view["assetic"]->image(*)'              => array('output' => 'images/*', 'single' => true),
             '$view->get(\'assetic\')->javascripts(*)' => array('output' => 'js/*.js'),
             '$view->get(\'assetic\')->stylesheets(*)' => array('output' => 'css/*.css'),
-            '$view->get("assetic")->assets(*)'        => array(),
+            '$view->get(\'assetic\')->image(*)'       => array('output' => 'images/*', 'single' => true),
             '$view->get("assetic")->javascripts(*)'   => array('output' => 'js/*.js'),
             '$view->get("assetic")->stylesheets(*)'   => array('output' => 'css/*.css'),
+            '$view->get("assetic")->image(*)'         => array('output' => 'images/*', 'single' => true),
         );
     }
 
@@ -56,6 +56,12 @@ class Helper
     }
 
     public function stylesheets()
+    {
+        global $_call;
+        $_call = func_get_args();
+    }
+
+    public function image()
     {
         global $_call;
         $_call = func_get_args();

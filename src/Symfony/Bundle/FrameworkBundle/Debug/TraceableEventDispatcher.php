@@ -95,7 +95,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
             foreach ($this->getListeners($name) as $listener) {
                 $listener = $this->listenerToString($listener);
                 if (!isset($this->called[$name.'.'.$listener])) {
-                    $notCalled[] = array(
+                    $notCalled[$name.'.'.$listener] = array(
                         'class' => $listener,
                         'event' => $name,
                     );

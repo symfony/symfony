@@ -6,8 +6,18 @@ one. It only discusses changes that need to be done when using the "public"
 API of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.
 
-PR8 to PR10
+PR9 to PR10
 -----------
+
+* Bundle logical names earned back their `Bundle` suffix:
+
+    *Controllers*: `Blog:Post:show` -> `BlogBundle:Post:show`
+
+    *Templates*:   `Blog:Post:show.html.twig` -> `BlogBundle:Post:show.html.twig`
+
+    *Resources*:   `@Blog/Resources/config/blog.xml` -> `@BlogBundle/Resources/config/blog.xml`
+
+    *Doctrine*:    `$em->find('Blog:Post', $id)` -> `$em->find('BlogBundle:Post', $id)`
 
 * Namespace for validators has changed from `validation` to `assert` (it was
   announced for PR9 but it was not the case then):

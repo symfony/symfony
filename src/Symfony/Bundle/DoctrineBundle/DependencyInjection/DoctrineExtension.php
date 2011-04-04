@@ -197,6 +197,10 @@ class DoctrineExtension extends AbstractDoctrineExtension
             $ormConfigDef->addMethodCall($method, array($arg));
         }
 
+        foreach ($entityManager['hydrators'] as $name => $class) {
+            $ormConfigDef->addMethodCall('addCustomHydrationMode', array ($name, $class));
+        }
+
         if (!empty($entityManager['dql'])) {
             foreach ($entityManager['dql']['string_functions'] as $name => $function) {
                 $ormConfigDef->addMethodCall('addCustomStringFunction', array ($name, $function));

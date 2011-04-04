@@ -177,7 +177,7 @@ abstract class FrameworkExtensionTest extends TestCase
     protected function createContainer()
     {
         return new ContainerBuilder(new ParameterBag(array(
-            'kernel.bundles'          => array('Framework' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
+            'kernel.bundles'          => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
             'kernel.cache_dir'        => __DIR__,
             'kernel.compiled_classes' => array(),
             'kernel.debug'            => false,

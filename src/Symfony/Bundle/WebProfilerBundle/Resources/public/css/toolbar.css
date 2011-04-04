@@ -21,3 +21,8 @@ build: 56
     font: 11px Verdana, Arial, sans-serif;
     color: #000;
 }
+
+.sf-toolbarreset abbr {
+    border-bottom: 1px dotted #000000;
+    cursor: help;
+}

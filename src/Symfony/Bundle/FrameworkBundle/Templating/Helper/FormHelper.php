@@ -115,7 +115,7 @@ class FormHelper extends Helper
     public function row(/*FieldInterface*/ $field, $template = null)
     {
         if (null === $template) {
-            $template = 'Framework:Form:field_row.html.php';
+            $template = 'FrameworkBundle:Form:field_row.html.php';
         }
 
         return $this->engine->render($template, array(
@@ -126,7 +126,7 @@ class FormHelper extends Helper
     public function label(/*FieldInterface */$field, $label = false, array $parameters = array(), $template = null)
     {
         if (null === $template) {
-            $template = 'Framework:Form:label.html.php';
+            $template = 'FrameworkBundle:Form:label.html.php';
         }
 
         return $this->engine->render($template, array(
@@ -139,7 +139,7 @@ class FormHelper extends Helper
     public function errors(/*FieldInterface */$field, array $parameters = array(), $template = null)
     {
         if (null === $template) {
-            $template = 'Framework:Form:errors.html.php';
+            $template = 'FrameworkBundle:Form:errors.html.php';
         }
 
         return $this->engine->render($template, array(
@@ -151,7 +151,7 @@ class FormHelper extends Helper
     public function hidden(/*FormInterface */$form, array $parameters = array(), $template = null)
     {
         if (null === $template) {
-            $template = 'Framework:Form:hidden.html.php';
+            $template = 'FrameworkBundle:Form:hidden.html.php';
         }
 
         return $this->engine->render($template, array(
@@ -186,7 +186,7 @@ class FormHelper extends Helper
         } while (null === $template && false !== $currentFqClassName);
 
         if (null === $template && $field instanceof FormInterface) {
-            $template = 'Framework:Form:form.html.php';
+            $template = 'FrameworkBundle:Form:form.html.php';
         }
 
         self::$cache[$fqClassName] = $template;

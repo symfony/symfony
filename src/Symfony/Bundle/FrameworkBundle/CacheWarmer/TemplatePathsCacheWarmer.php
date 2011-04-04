@@ -51,7 +51,7 @@ class TemplatePathsCacheWarmer extends CacheWarmer
         $templates = array();
 
         foreach ($this->kernel->getBundles() as $name => $bundle) {
-            $templates += $this->findTemplatesIn($this->rootDir.'/'.$name.'Bundle/views', $name);
+            $templates += $this->findTemplatesIn($this->rootDir.'/'.$name.'/views', $name);
             $templates += $this->findTemplatesIn($bundle->getPath().'/Resources/views', $name);
         }
 

@@ -86,7 +86,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'document_managers' => array(
                 'dm1' => array(
                     'mappings' => array(
-                        'Foo' => array(
+                        'FooBundle'     => array(
                             'type' => 'annotations',
                         ),
                     ),
@@ -103,7 +103,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'connection' => 'dm2_connection',
                     'database' => 'db1',
                     'mappings' => array(
-                        'Bar' => array(
+                        'BarBundle' => array(
                             'type'      => 'yml',
                             'dir'       => '%kernel.cache_dir%',
                             'prefix'    => 'prefix_val',

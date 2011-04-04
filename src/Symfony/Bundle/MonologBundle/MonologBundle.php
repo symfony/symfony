@@ -9,23 +9,25 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\ZendBundle;
+namespace Symfony\Bundle\MonologBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Bundle\ZendBundle\DependencyInjection\Compiler\ZendLoggerWriterPass;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\LoggerChannelPass;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\DebugHandlerPass;
 
 /**
  * Bundle.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class ZendBundle extends Bundle
+class MonologBundle extends Bundle
 {
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
 
-        $container->addCompilerPass(new ZendLoggerWriterPass());
+        $container->addCompilerPass(new LoggerChannelPass());
+        $container->addCompilerPass(new DebugHandlerPass());
     }
 }

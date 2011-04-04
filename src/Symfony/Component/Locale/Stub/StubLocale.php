@@ -73,7 +73,7 @@ class StubLocale
      * @return array                     The country names with their codes as keys
      * @throws InvalidArgumentException  When the locale is different than 'en'
      */
-    static public function getDisplayCountries($locale = 'en')
+    static public function getDisplayCountries($locale)
     {
         return self::getStubData($locale, 'countries', 'region');
     }

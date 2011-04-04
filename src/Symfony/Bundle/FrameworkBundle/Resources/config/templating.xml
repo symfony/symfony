@@ -48,7 +48,7 @@
 
         <service id="templating.loader.cache" class="%templating.loader.cache.class%" public="false">
             <argument type="service" id="templating.loader.wrapped" />
-            <argument>%templating.loader.cache.path%</argument>
+            <argument /> <!-- cache path -->
             <call method="setDebugger"><argument type="service" id="templating.debugger" on-invalid="ignore" /></call>
         </service>
 

@@ -63,11 +63,11 @@ class Configuration
                     ->children()
                         ->arrayNode('resources')
                             ->addDefaultsIfNotSet()
-                            ->defaultValue(array('Twig::form.html.twig'))
+                            ->defaultValue(array('TwigBundle::form.html.twig'))
                             ->validate()
                                 ->always()
                                 ->then(function($v){
-                                    return array_merge(array('Twig::form.html.twig'), $v);
+                                    return array_merge(array('TwigBundle::form.html.twig'), $v);
                                 })
                             ->end()
                             ->prototype('scalar')->end()

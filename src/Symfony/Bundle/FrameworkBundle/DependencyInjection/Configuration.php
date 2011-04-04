@@ -31,7 +31,7 @@ class Configuration
                 ->scalarNode('document_root')->end()
                 ->scalarNode('error_handler')->end()
                 ->scalarNode('exception_controller')->defaultValue('Symfony\\Bundle\\FrameworkBundle\\Controller\\ExceptionController::showAction')->end()
-                ->scalarNode('ide')->end()
+                ->scalarNode('ide')->defaultNull()->end()
                 ->booleanNode('test')->end()
             ->end()
         ;

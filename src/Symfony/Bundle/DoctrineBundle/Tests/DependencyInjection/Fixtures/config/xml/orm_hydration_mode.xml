@@ -11,7 +11,7 @@
         <orm default-entity-manager="default">
             <entity-manager name="default">
                 <hydrator name="test_hydrator" class="Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestHydrator" />
-                <mapping name="Yaml" />
+                <mapping name="YamlBundle" />
             </entity-manager>
         </orm>
     </config>

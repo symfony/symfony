@@ -500,9 +500,9 @@ abstract class Kernel implements KernelInterface
     protected function buildContainer()
     {
         $parameterBag = new ParameterBag($this->getKernelParameters());
+        $container = new ContainerBuilder($parameterBag);
 
         try {
-            $container = new ContainerBuilder($parameterBag);
             $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass());
             foreach ($this->bundles as $bundle) {
                 $bundle->build($container);

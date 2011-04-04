@@ -66,6 +66,3 @@ install_git swiftmailer git://github.com/swiftmailer/swiftmailer.git origin/4.1
 
 # Twig
 install_git twig git://github.com/fabpot/Twig.git
-
-# Zend Framework
-install_git zend git://github.com/zendframework/zf2.git

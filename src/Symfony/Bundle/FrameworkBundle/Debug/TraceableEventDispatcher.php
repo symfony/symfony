@@ -54,10 +54,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
             $this->logger->debug(sprintf('Notified event "%s" to listener "%s"', $eventName, $listenerString));
         }
 
-        $this->called[$eventName.'.'.$listenerString] = array(
-            'class' => $listenerString,
-            'event' => $eventName,
-        );
+        $this->called[$eventName.'.'.$listenerString] = $this->getListenerInfo($listener, $eventName);
 
         if ($event->isPropagationStopped() && null !== $this->logger) {
             $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s"', $this->listenerToString($listener), $eventName));
@@ -93,12 +90,9 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
         $notCalled = array();
         foreach (array_keys($this->getListeners()) as $name) {
             foreach ($this->getListeners($name) as $listener) {
-                $listener = $this->listenerToString($listener);
-                if (!isset($this->called[$name.'.'.$listener])) {
-                    $notCalled[$name.'.'.$listener] = array(
-                        'class' => $listener,
-                        'event' => $name,
-                    );
+                $listenerString = $this->listenerToString($listener);
+                if (!isset($this->called[$name.'.'.$listenerString])) {
+                    $notCalled[$name.'.'.$listenerString] = $this->getListenerInfo($listener, $name);
                 }
             }
         }
@@ -108,16 +102,33 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
 
     protected function listenerToString($listener)
     {
-        if (is_object($listener)) {
-            if ($listener instanceof \Closure) {
-                return 'Closure';
+        return $listener instanceof \Closure ? 'Closure' : get_class($listener);
+    }
+
+    protected function getListenerInfo($listener, $eventName)
+    {
+        $info = array('event' => $eventName);
+        if ($listener instanceof \Closure) {
+            $info += array('type' => 'Closure');
+        } else {
+            $info += array(
+                'type'  => 'Method',
+                'class' => $class = get_class($listener)
+            );
+            try {
+                $r = new \ReflectionMethod($class, $eventName);
+                $info += array(
+                    'file'  => $r->getFileName(),
+                    'line'  => $r->getStartLine()
+                );
+            } catch (\ReflectionException $e) {
+                $info += array(
+                    'file'  => null,
+                    'line'  => null
+                );
             }
-
-            return get_class($listener);
         }
 
-        if (is_array($listener)) {
-            return is_object($listener[0]) ? get_class($listener[0]) : implode('::', $listener);
-        }
+        return $info;
     }
 }

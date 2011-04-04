@@ -13,12 +13,12 @@
     <table>
         <tr>
             <th>Event name</th>
-            <th>Class</th>
+            <th>Listener</th>
         </tr>
-        {% for elements in collector.calledlisteners %}
+        {% for listener in collector.calledlisteners %}
             <tr>
-                <td><code>{{ elements.event }}</code></td>
-                <td><code>{{ elements.class|abbr_class }}</code></td>
+                <td><code>{{ listener.event }}</code></td>
+                <td><code>{% include 'WebProfilerBundle:Collector:listener.html.twig' with { 'listener': listener } only %}</code></td>
             </tr>
         {% endfor %}
     </table>
@@ -29,12 +29,12 @@
         <table>
             <tr>
                 <th>Event name</th>
-                <th>Class</th>
+                <th>Listener</th>
             </tr>
-            {% for elements in collector.notcalledlisteners %}
+            {% for listener in collector.notcalledlisteners %}
                 <tr>
-                    <td><code>{{ elements.event }}</code></td>
-                    <td><code>{{ elements.class|abbr_class }}</code></td>
+                    <td><code>{{ listener.event }}</code></td>
+                    <td><code>{% include 'WebProfilerBundle:Collector:listener.html.twig' with { 'listener': listener } only %}</code></td>
                 </tr>
             {% endfor %}
         </table>

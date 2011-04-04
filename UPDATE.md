@@ -19,6 +19,10 @@ PR9 to PR10
 
     *Doctrine*:    `$em->find('Blog:Post', $id)` -> `$em->find('BlogBundle:Post', $id)`
 
+* `ZendBundle` has been replaced by `MonologBundle`. Have a look at the
+  changes made to Symfony SE to see how to upgrade your projects:
+  https://github.com/symfony/symfony-standard/pull/30/files
+
 * Almost all core bundles parameters have been removed. You should use the
   settings exposed by the bundle extension configuration instead.
 

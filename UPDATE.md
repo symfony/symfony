@@ -19,6 +19,11 @@ PR9 to PR10
 
     *Doctrine*:    `$em->find('Blog:Post', $id)` -> `$em->find('BlogBundle:Post', $id)`
 
+* Almost all core bundles parameters have been removed. You should use the
+  settings exposed by the bundle extension configuration instead.
+
+* Some core bundles service names changed for better consistency.
+
 * Namespace for validators has changed from `validation` to `assert` (it was
   announced for PR9 but it was not the case then):
 
@@ -32,6 +37,9 @@ PR9 to PR10
 
     Moreover, the `Assert` prefix used for some constraints has been removed
     (`AssertTrue` to `True`).
+
+* `ApplicationTester::getDisplay()` and `CommandTester::getDisplay()` method
+  now return the command exit code
 
 PR8 to PR9
 ----------

@@ -357,10 +357,10 @@ class FrameworkExtension extends Extension
         if (isset($config['cache'])) {
             // Wrap the existing loader with cache (must happen after loaders are registered)
             $container->setDefinition('templating.loader.wrapped', $container->findDefinition('templating.loader'));
-            $container->setDefinition('templating.loader', $container->getDefinition('templating.loader.cache'));
-            $container->setParameter('templating.loader.cache.path', $config['cache']);
-        } else {
-            $container->setParameter('templating.loader.cache.path', null);
+            $loaderCache = $container->getDefinition('templating.loader.cache');
+            $loaderCache->setArgument(1, $config['cache']);
+
+            $container->setDefinition('templating.loader', $loaderCache);
         }
 
         if ($config['cache_warmer']) {

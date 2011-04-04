@@ -117,7 +117,8 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertEquals($container->getDefinition('templating.loader'), $container->getDefinition('templating.loader.cache'), '->registerTemplatingConfiguration() configures the loader to use cache');
 
-        $this->assertEquals('/path/to/cache', $container->getParameter('templating.loader.cache.path'));
+        $arguments = $container->getDefinition('templating.loader.cache')->getArguments();
+        $this->assertEquals('/path/to/cache', $arguments[1]);
 
         $this->assertEquals(array('php', 'twig'), $container->getParameter('templating.engines'), '->registerTemplatingConfiguration() sets a templating.engines parameter');
     }

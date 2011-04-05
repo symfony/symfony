@@ -1,5 +1,7 @@
 {% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
 
+{% from _self import display_listener %}
+
 {% block menu %}
 <span class="label">
     <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/events.png') }}" alt="Events" /></span>
@@ -18,7 +20,7 @@
         {% for listener in collector.calledlisteners %}
             <tr>
                 <td><code>{{ listener.event }}</code></td>
-                <td><code>{% include 'WebProfilerBundle:Collector:listener.html.twig' with { 'listener': listener } only %}</code></td>
+                <td><code>{{ display_listener(listener) }}</code></td>
             </tr>
         {% endfor %}
     </table>
@@ -34,9 +36,18 @@
             {% for listener in collector.notcalledlisteners %}
                 <tr>
                     <td><code>{{ listener.event }}</code></td>
-                    <td><code>{% include 'WebProfilerBundle:Collector:listener.html.twig' with { 'listener': listener } only %}</code></td>
+                    <td><code>{{ display_listener(listener) }}</code></td>
                 </tr>
             {% endfor %}
         </table>
     {% endif %}
 {% endblock %}
+
+{% macro display_listener(listener) %}
+    {% if listener.type == "Closure" %}
+        Closure
+    {% else %}
+        {% set link = listener.file|file_link(listener.line) %}
+        {{ listener.class|abbr_class }}::{% if link %}<a href="{{ link }}">{{ listener.event }}</a>{% else %}{{ listener.event }}{% endif %}
+    {% endif %}
+{% endmacro %}

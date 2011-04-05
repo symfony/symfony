@@ -1,6 +1,0 @@
-{% if listener.type == "Closure" %}
-    Closure
-{% else %}
-    {% set link = listener.file|file_link(listener.line) %}
-    {{ listener.class|abbr_class }}::{% if link %}<a href="{{ link }}">{{ listener.event }}</a>{% else %}{{ listener.event }}{% endif %}
-{% endif %}

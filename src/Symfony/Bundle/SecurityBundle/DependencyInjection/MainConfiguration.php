@@ -4,6 +4,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * This class contains the configuration information for the following tags:
@@ -16,31 +17,26 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class Configuration
+class MainConfiguration implements ConfigurationInterface
 {
-    /**
-     * Generates the configuration tree.
-     *
-     * @return \Symfony\Component\Config\Definition\ArrayNode The config tree
-     */
-    public function getFactoryConfigTree()
-    {
-        $tb = new TreeBuilder();
+    private $factories;
 
-        return $tb
-            ->root('security')
-                ->ignoreExtraKeys()
-                ->fixXmlConfig('factory', 'factories')
-                ->children()
-                    ->arrayNode('factories')
-                        ->prototype('scalar')->end()
-                    ->end()
-                ->end()
-            ->end()
-            ->buildTree();
+    /**
+     * Constructor.
+     *
+     * @param array $factories 
+     */
+    public function __construct(array $factories)
+    {
+        $this->factories = $factories;
     }
 
-    public function getMainConfigTree(array $factories)
+    /**
+     * Generates the configuration tree builder.
+     *
+     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+     */
+    public function getConfigTreeBuilder()
     {
         $tb = new TreeBuilder();
         $rootNode = $tb->root('security');
@@ -69,11 +65,11 @@ class Configuration
         $this->addAclSection($rootNode);
         $this->addEncodersSection($rootNode);
         $this->addProvidersSection($rootNode);
-        $this->addFirewallsSection($rootNode, $factories);
+        $this->addFirewallsSection($rootNode, $this->factories);
         $this->addAccessControlSection($rootNode);
         $this->addRoleHierarchySection($rootNode);
 
-        return $tb->buildTree();
+        return $tb;
     }
 
     private function addAclSection(ArrayNodeDefinition $rootNode)

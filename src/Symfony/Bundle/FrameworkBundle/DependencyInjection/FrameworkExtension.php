@@ -15,12 +15,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Definition\Processor;
 
 /**
  * FrameworkExtension.
@@ -56,9 +56,8 @@ class FrameworkExtension extends Extension
         }
 
         $processor = new Processor();
-        $configuration = new Configuration();
-
-        $config = $processor->process($configuration->getConfigTree($container->getParameter('kernel.debug')), $configs);
+        $configuration = new Configuration($container->getParameter('kernel.debug'));
+        $config = $processor->processConfiguration($configuration, $configs);
 
         $container->setParameter('kernel.cache_warmup', $config['cache_warmer']);
 

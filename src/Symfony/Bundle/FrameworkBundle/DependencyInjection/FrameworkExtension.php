@@ -194,6 +194,7 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('profiler_listener')
             ->setArgument(2, $config['only_exceptions'])
+            ->setArgument(3, $config['only_master_requests'])
         ;
 
         // Choose storage class based on the DSN

@@ -100,6 +100,12 @@ fieldset
     border:none;
 }
 
+abbr
+{
+    border-bottom: 1px dotted #000000;
+    cursor: help;
+}
+
 .clear
 {
     clear:both;
@@ -321,8 +327,7 @@ table th.value
     font-size:14px;
     padding-bottom:20px;
 }
-
-.sf-toolbarreset {
+#sf-toolbar {
     border-top: 0;
     padding: 0;
 }

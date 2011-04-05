@@ -327,7 +327,8 @@ table th.value
     font-size:14px;
     padding-bottom:20px;
 }
-#sf-toolbar {
+
+.sf-toolbarreset {
     border-top: 0;
     padding: 0;
 }

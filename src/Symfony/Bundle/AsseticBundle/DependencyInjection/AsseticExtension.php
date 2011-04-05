@@ -61,6 +61,11 @@ class AsseticExtension extends Extension
                 $loader->load('filters/'.$name.'.xml');
             }
 
+            if (isset($filter['file'])) {
+                $container->getDefinition('assetic.filter.'.$name)->setFile($filter['file']);
+                unset($filter['file']);
+            }
+
             foreach ($filter as $key => $value) {
                 $container->setParameter('assetic.filter.'.$name.'.'.$key, $value);
             }

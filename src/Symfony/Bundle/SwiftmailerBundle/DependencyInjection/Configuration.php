@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SwiftmailerBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * This class contains the configuration information for the bundle
@@ -22,16 +23,26 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
  *
  * @author Christophe Coevoet <stof@notk.org>
  */
-class Configuration
+class Configuration implements ConfigurationInterface
 {
+    private $debug;
+
     /**
-     * Generates the configuration tree.
+     * Constructor.
      *
-     * @param Boolean $kernelDebug
-     * 
-     * @return \Symfony\Component\Config\Definition\ArrayNode The config tree
+     * @param Boolean $debug The kernel.debug value
      */
-    public function getConfigTree($kernelDebug)
+    public function __construct($debug)
+    {
+        $this->debug = (Boolean) $debug;
+    }
+    
+    /**
+     * Generates the configuration tree builder.
+     *
+     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+     */
+    public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('swiftmailer');
@@ -71,10 +82,10 @@ class Configuration
                 ->end()
                 ->scalarNode('delivery_address')->end()
                 ->booleanNode('disable_delivery')->end()
-                ->booleanNode('logging')->defaultValue($kernelDebug)->end()
+                ->booleanNode('logging')->defaultValue($this->debug)->end()
             ->end()
         ;
 
-        return $treeBuilder->buildTree();
+        return $treeBuilder;
     }
 }

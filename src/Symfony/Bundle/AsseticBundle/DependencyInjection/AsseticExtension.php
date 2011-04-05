@@ -99,11 +99,9 @@ class AsseticExtension extends Extension
      */
     static protected function processConfigs(array $configs, $debug, array $bundles)
     {
-        $configuration = new Configuration();
-        $tree = $configuration->getConfigTree($debug, $bundles);
-
         $processor = new Processor();
-        return $processor->process($tree, $configs);
+        $configuration = new Configuration($debug, $bundles);
+        return $processor->processConfiguration($configuration, $configs);
     }
 
     /**

@@ -47,6 +47,9 @@ class Crawler extends \SplObjectStorage
 
         if ($base) {
             $this->base = $base;
+
+            // Remove the base from the uri if it contains it
+            $this->uri = stristr($this->uri, $base).'/';
         }
     }
 
@@ -224,11 +227,11 @@ class Crawler extends \SplObjectStorage
     {
         foreach ($this as $i => $node) {
             if ($i == $position) {
-                return new static($node, $this->uri);
+                return new static($node, $this->uri, $this->base);
             }
         }
 
-        return new static(null, $this->uri);
+        return new static(null, $this->uri, $this->base);
     }
 
     /**
@@ -279,7 +282,7 @@ class Crawler extends \SplObjectStorage
             }
         }
 
-        return new static($nodes, $this->uri);
+        return new static($nodes, $this->uri, $this->base);
     }
 
     /**
@@ -321,7 +324,7 @@ class Crawler extends \SplObjectStorage
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        return new static($this->sibling($this->getNode(0)->parentNode->firstChild), $this->uri);
+        return new static($this->sibling($this->getNode(0)->parentNode->firstChild), $this->uri, $this->base);
     }
 
     /**
@@ -339,7 +342,7 @@ class Crawler extends \SplObjectStorage
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        return new static($this->sibling($this->getNode(0)), $this->uri);
+        return new static($this->sibling($this->getNode(0)), $this->uri, $this->base);
     }
 
     /**
@@ -355,7 +358,7 @@ class Crawler extends \SplObjectStorage
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        return new static($this->sibling($this->getNode(0), 'previousSibling'), $this->uri);
+        return new static($this->sibling($this->getNode(0), 'previousSibling'), $this->uri, $this->base);
     }
 
     /**
@@ -382,7 +385,7 @@ class Crawler extends \SplObjectStorage
             }
         }
 
-        return new static($nodes, $this->uri);
+        return new static($nodes, $this->uri, $this->base);
     }
 
     /**
@@ -400,7 +403,7 @@ class Crawler extends \SplObjectStorage
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        return new static($this->sibling($this->getNode(0)->firstChild), $this->uri);
+        return new static($this->sibling($this->getNode(0)->firstChild), $this->uri, $this->base);
     }
 
     /**
@@ -498,7 +501,7 @@ class Crawler extends \SplObjectStorage
 
         $domxpath = new \DOMXPath($document);
 
-        return new static($domxpath->query($xpath), $this->uri, $this->base);
+        return new static($domxpath->query($xpath), $this->uri, $this->base, $this->base);
     }
 
     /**

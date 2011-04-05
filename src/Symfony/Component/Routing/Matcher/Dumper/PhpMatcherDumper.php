@@ -57,6 +57,7 @@ class PhpMatcherDumper extends MatcherDumper
             $conditions = array();
 
             $hasTrailingSlash = false;
+            $matches = false;
             if (!count($compiledRoute->getVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#', $compiledRoute->getRegex(), $m)) {
                 if (substr($m['url'], -1) === '/') {
                     $conditions[] = sprintf("rtrim(\$pathinfo, '/') === '%s'", rtrim(str_replace('\\', '', $m['url']), '/'));
@@ -64,8 +65,6 @@ class PhpMatcherDumper extends MatcherDumper
                 } else {
                     $conditions[] = sprintf("\$pathinfo === '%s'", str_replace('\\', '', $m['url']));
                 }
-
-                $matches = 'array()';
             } else {
                 if ($compiledRoute->getStaticPrefix()) {
                     $conditions[] = sprintf("0 === strpos(\$pathinfo, '%s')", $compiledRoute->getStaticPrefix());
@@ -80,13 +79,13 @@ class PhpMatcherDumper extends MatcherDumper
                     $conditions[] = sprintf("preg_match('%s', \$pathinfo, \$matches)", $regex);
                 }
 
-                $matches = '$matches';
+                $matches = true;
             }
 
             $conditions = implode(' && ', $conditions);
 
             $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);
-            
+
             $code[] = <<<EOF
         // $name
         if ($conditions) {
@@ -111,16 +110,21 @@ EOF
             , $name);
             }
 
-            $code[] = sprintf(<<<EOF
-            return array_merge(\$this->mergeDefaults($matches, %s), array('_route' => '%s'));
-        }
-EOF
-            , str_replace("\n", '', var_export($compiledRoute->getDefaults(), true)), $name);
+            // optimize parameters array
+            if (true === $matches && $compiledRoute->getDefaults()) {
+                $code[] = sprintf("            return array_merge(\$this->mergeDefaults(\$matches, %s), array('_route' => '%s'));"
+                    , str_replace("\n", '', var_export($compiledRoute->getDefaults(), true)), $name);
+            } elseif (true === $matches) {
+                $code[] = sprintf("            \$matches['_route'] = '%s';\n            return \$matches;", $name);
+            } elseif ($compiledRoute->getDefaults()) {
+                $code[] = sprintf('            return %s;', str_replace("\n", '', var_export(array_merge($compiledRoute->getDefaults(), array('_route' => $name)), true)));
+            } else {
+                $code[] = sprintf("            return array('_route' => '%s');", $name);
+            }
+            $code[] = "        }";
 
             if ($req) {
-                $code[] = <<<EOF
-        $gotoname:
-EOF;
+                $code[] = "        $gotoname:";
             }
 
             $code[] = '';

@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Matcher\Exception\NotFoundException;
  * This class has been auto-generated
  * by the Symfony Routing Component.
  */
-class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
+class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\RedirectableUrlMatcher
 {
     /**
      * Constructor.
@@ -51,21 +51,30 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         }
 
         // baz3
-        if ($pathinfo === '/test/baz3/') {
+        if (rtrim($pathinfo, '/') === '/test/baz3') {
+            if (substr($pathinfo, -1) !== '/') {
+                return $this->redirect($pathinfo.'/', 'baz3');
+            }
             return array('_route' => 'baz3');
         }
 
         // baz4
-        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/$#x', $pathinfo, $matches)) {
+        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/?$#x', $pathinfo, $matches)) {
+            if (substr($pathinfo, -1) !== '/') {
+                return $this->redirect($pathinfo.'/', 'baz4');
+            }
             $matches['_route'] = 'baz4';
             return $matches;
         }
 
         // baz5
-        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/$#x', $pathinfo, $matches)) {
+        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/?$#x', $pathinfo, $matches)) {
             if (isset($this->context['method']) && !in_array(strtolower($this->context['method']), array('post'))) {
                 $allow = array_merge($allow, array('post'));
                 goto not_baz5;
+            }
+            if (substr($pathinfo, -1) !== '/') {
+                return $this->redirect($pathinfo.'/', 'baz5');
             }
             $matches['_route'] = 'baz5';
             return $matches;
@@ -73,10 +82,13 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         not_baz5:
 
         // baz.baz6
-        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/$#x', $pathinfo, $matches)) {
+        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/?$#x', $pathinfo, $matches)) {
             if (isset($this->context['method']) && !in_array(strtolower($this->context['method']), array('put'))) {
                 $allow = array_merge($allow, array('put'));
                 goto not_bazbaz6;
+            }
+            if (substr($pathinfo, -1) !== '/') {
+                return $this->redirect($pathinfo.'/', 'baz.baz6');
             }
             $matches['_route'] = 'baz.baz6';
             return $matches;

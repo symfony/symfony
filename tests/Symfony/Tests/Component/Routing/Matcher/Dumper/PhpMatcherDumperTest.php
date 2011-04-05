@@ -76,5 +76,6 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
 
         $dumper = new PhpMatcherDumper($collection);
         $this->assertStringEqualsFile(self::$fixturesPath.'/dumper/url_matcher1.php', $dumper->dump(), '->dump() dumps basic routes to the correct PHP file.');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/dumper/url_matcher2.php', $dumper->dump(array('base_class' => 'Symfony\Tests\Component\Routing\Fixtures\RedirectableUrlMatcher')), '->dump() dumps basic routes to the correct PHP file.');
     }
 }

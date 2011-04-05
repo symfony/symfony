@@ -296,7 +296,9 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      */
     private function getArrayKeysFromString($str)
     {
-        if (!strpos($str, '[') || !strpos($str, ']')) return null;
+        if (!strpos($str, '[') || !strpos($str, ']')) {
+            return null;
+        }
         $out = array();
         preg_match('#([^\[\]]+)\[#Uis', $str, $firstMatches);
         preg_match_all('#\[([^\[\]]+)\]#Uis', $str, $matches, PREG_SET_ORDER);

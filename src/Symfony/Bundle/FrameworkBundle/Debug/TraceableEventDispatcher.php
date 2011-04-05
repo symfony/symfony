@@ -48,23 +48,21 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     {
         parent::triggerListener($listener, $eventName, $event);
 
-        $listenerString = $this->listenerToString($listener);
-
         if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Notified event "%s" to listener "%s"', $eventName, $listenerString));
+            $this->logger->debug(sprintf('Notified event "%s" to listener "%s"', $eventName, get_class($listener)));
         }
 
-        $this->called[$eventName.'.'.$listenerString] = $this->getListenerInfo($listener, $eventName);
+        $this->called[$eventName.'.'.get_class($listener)] = $this->getListenerInfo($listener, $eventName);
 
         if ($event->isPropagationStopped() && null !== $this->logger) {
-            $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s"', $listenerString, $eventName));
+            $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s"', get_class($listener), $eventName));
 
             $skippedListeners = $this->getListeners($eventName);
             $skipped = false;
 
             foreach ($skippedListeners as $skippedListener) {
                 if ($skipped) {
-                    $this->logger->debug(sprintf('Listener "%s" was not called for event "%s"', $this->listenerToString($skippedListener), $eventName));
+                    $this->logger->debug(sprintf('Listener "%s" was not called for event "%s"', get_class($skippedListener), $eventName));
                 }
 
                 if ($skippedListener === $listener) {
@@ -90,19 +88,13 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
         $notCalled = array();
         foreach (array_keys($this->getListeners()) as $name) {
             foreach ($this->getListeners($name) as $listener) {
-                $listenerString = $this->listenerToString($listener);
-                if (!isset($this->called[$name.'.'.$listenerString])) {
-                    $notCalled[$name.'.'.$listenerString] = $this->getListenerInfo($listener, $name);
+                if (!isset($this->called[$name.'.'.get_class($listener)])) {
+                    $notCalled[$name.'.'.get_class($listener)] = $this->getListenerInfo($listener, $name);
                 }
             }
         }
 
         return $notCalled;
-    }
-
-    protected function listenerToString($listener)
-    {
-        return $listener instanceof \Closure ? 'Closure' : get_class($listener);
     }
 
     protected function getListenerInfo($listener, $eventName)

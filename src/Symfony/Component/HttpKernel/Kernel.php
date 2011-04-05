@@ -243,12 +243,11 @@ abstract class Kernel implements KernelInterface
         $overridePath = substr($path, 9);
         $resourceBundle = null;
         $bundles = $this->getBundle($bundleName, false);
-        
+
         foreach ($bundles as $bundle) {
             if ($isResource && file_exists($file = $dir.'/'.$bundle->getName().$overridePath)) {
                 if (null !== $resourceBundle) {
-                    throw new \RuntimeException(sprintf('"%s" resource is hidden by a resource from the "%s" derived bundle. ' .
-                        'Create a "%s" file to override the bundle resource.',
+                    throw new \RuntimeException(sprintf('"%s" resource is hidden by a resource from the "%s" derived bundle. Create a "%s" file to override the bundle resource.',
                         $file,
                         $resourceBundle,
                         $dir.'/'.$bundles[0]->getName().$overridePath

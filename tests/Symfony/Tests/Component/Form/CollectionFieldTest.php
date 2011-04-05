@@ -160,4 +160,19 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo@foo.com', $field[0]->getData());
         $this->assertEquals(array('foo@foo.com'), $field->getData());
     }
+
+    public function testRemovesFirstElementIfSubmittedWithoutFirstElementAndModifiable()
+    {
+        $field = new CollectionField('emails', array(
+            'prototype' => new TestField(),
+            'modifiable' => true,
+        ));
+        $field->setData(array('foo@bar.com', 'bar@bar.com'));
+        $field->submit(array('1' => 'bar@bar.com'));
+
+        $this->assertFalse($field->has('0'));
+        $this->assertTrue($field->has('1'));
+        $this->assertEquals('bar@bar.com', $field[1]->getData());
+        $this->assertEquals(array(1 => 'bar@bar.com'), $field->getData());
+    }
 }

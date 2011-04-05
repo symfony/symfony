@@ -82,7 +82,7 @@ class CollectionField extends Form
         }
 
         foreach ($this as $name => $field) {
-            if (!$this->getOption('modifiable') || '$$key$$' != $name) {
+            if (!$this->getOption('modifiable') || '$$key$$' !== $name) {
                 $this->remove($name);
             }
         }
@@ -103,7 +103,7 @@ class CollectionField extends Form
         }
 
         foreach ($this as $name => $field) {
-            if (!isset($data[$name]) && $this->getOption('modifiable') && '$$key$$' != $name) {
+            if (!isset($data[$name]) && $this->getOption('modifiable') && '$$key$$' !== $name) {
                 $this->remove($name);
                 $this->removedFields[] = $name;
             }

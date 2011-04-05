@@ -13,6 +13,7 @@ namespace Symfony\Bundle\DoctrineBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * This class contains the configuration information for the bundle
@@ -22,28 +23,34 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
  *
  * @author Christophe Coevoet <stof@notk.org>
  */
-class Configuration
+class Configuration implements ConfigurationInterface
 {
-    private $kernelDebug;
+    private $debug;
 
     /**
-     * Generates the configuration tree.
+     * Constructor
      *
-     * @param Boolean $kernelDebug
-     *
-     * @return \Symfony\Component\Config\Definition\ArrayNode The config tree
+     * @param Boolean $debug Wether to use the debug mode
      */
-    public function getConfigTree($kernelDebug)
+    public function  __construct($debug)
     {
-        $this->kernelDebug = (bool) $kernelDebug;
-
+        $this->debug = (Boolean) $debug;
+    }
+    
+    /**
+     * Generates the configuration tree builder.
+     *
+     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+     */
+    public function getConfigTreeBuilder()
+    {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('doctrine');
 
         $this->addDbalSection($rootNode);
         $this->addOrmSection($rootNode);
 
-        return $treeBuilder->buildTree();
+        return $treeBuilder;
     }
 
     private function addDbalSection(ArrayNodeDefinition $node)
@@ -98,7 +105,7 @@ class Configuration
                     ->scalarNode('unix_socket')->end()
                     ->scalarNode('platform_service')->end()
                     ->scalarNode('charset')->end()
-                    ->booleanNode('logging')->defaultValue($this->kernelDebug)->end()
+                    ->booleanNode('logging')->defaultValue($this->debug)->end()
                 ->end()
                 ->fixXmlConfig('driver_class', 'driverClass')
                 ->children()

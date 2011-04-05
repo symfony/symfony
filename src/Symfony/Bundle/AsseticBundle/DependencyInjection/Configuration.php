@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\AsseticBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * This class contains the configuration information for the bundle
@@ -22,24 +23,36 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
  * @author Christophe Coevoet <stof@notk.org>
  * @author Kris Wallsmith <kris@symfony.com>
  */
-class Configuration
+class Configuration implements ConfigurationInterface
 {
+    private $bundles;
+    private $debug;
+
     /**
-     * Generates the configuration tree.
+     * Constructor
      *
      * @param Boolean $debug    Wether to use the debug mode
      * @param array   $bundles  An array of bundle names
-     * 
-     * @return \Symfony\Component\Config\Definition\ArrayNode The config tree
      */
-    public function getConfigTree($debug, array $bundles)
+    public function __construct($debug, array $bundles)
     {
-        $tree = new TreeBuilder();
+        $this->debug = (Boolean) $debug;
+        $this->bundles = $bundles;
+    }
 
-        $tree->root('assetic')
+    /**
+     * Generates the configuration tree builder.
+     *
+     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+     */
+    public function getConfigTreeBuilder()
+    {
+        $builder = new TreeBuilder();
+
+        $builder->root('assetic')
             ->children()
-                ->booleanNode('debug')->defaultValue($debug)->end()
-                ->booleanNode('use_controller')->defaultValue($debug)->end()
+                ->booleanNode('debug')->defaultValue($this->debug)->end()
+                ->booleanNode('use_controller')->defaultValue($this->debug)->end()
                 ->scalarNode('read_from')->defaultValue('%kernel.root_dir%/../web')->end()
                 ->scalarNode('write_to')->defaultValue('%assetic.read_from%')->end()
                 ->scalarNode('java')->defaultValue('/usr/bin/java')->end()
@@ -51,7 +64,7 @@ class Configuration
             ->fixXmlConfig('bundle')
             ->children()
                 ->arrayNode('bundles')
-                    ->defaultValue($bundles)
+                    ->defaultValue($this->bundles)
                     ->requiresAtLeastOneElement()
                     ->beforeNormalization()
                         ->ifTrue(function($v) { return !is_array($v); })
@@ -84,6 +97,6 @@ class Configuration
             ->end()
         ;
 
-        return $tree->buildTree();
+        return $builder;
     }
 }

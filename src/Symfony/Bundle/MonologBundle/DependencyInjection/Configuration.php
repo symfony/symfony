@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\MonologBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * This class contains the configuration information for the bundle
@@ -22,14 +23,14 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author Christophe Coevoet <stof@notk.org>
  */
-class Configuration
+class Configuration implements ConfigurationInterface
 {
     /**
-     * Generates the configuration tree.
+     * Generates the configuration tree builder.
      *
-     * @return \Symfony\Component\Config\Definition\NodeInterface
+     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
      */
-    public function getConfigTree()
+    public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('monolog');
@@ -82,7 +83,7 @@ class Configuration
             ->append($this->getProcessorsNode())
         ;
 
-        return $treeBuilder->buildTree();
+        return $treeBuilder;
     }
 
     private function getProcessorsNode()

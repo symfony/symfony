@@ -19,11 +19,12 @@ namespace Symfony\Component\Config\Definition;
 class Processor
 {
     /**
-     * Processes a node tree.
+     * Processes an array of configurations.
      *
-     * @param NodeInterface $configTree The node tree to process
-     * @param array $configs An array of configuration items
-     * @return Boolean
+     * @param NodeInterface $configTree The node tree describing the configuration
+     * @param array         $configs    An array of configuration items to process
+     * 
+     * @return array The processed configuration
      */
     public function process(NodeInterface $configTree, array $configs)
     {
@@ -36,6 +37,19 @@ class Processor
         }
 
         return $configTree->finalize($currentConfig);
+    }
+
+    /**
+     * Processes an array of configurations.
+     *
+     * @param ConfigurationInterface $configuration  The configuration class
+     * @param array                  $configs        An array of configuration items to process
+     *
+     * @return array The processed configuration
+     */
+    public function processConfiguration(ConfigurationInterface $configuration, array $configs)
+    {
+        return $this->process($configuration->getConfigTreeBuilder()->buildTree(), $configs);
     }
 
     /**

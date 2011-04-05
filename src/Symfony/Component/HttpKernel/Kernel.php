@@ -235,7 +235,8 @@ abstract class Kernel implements KernelInterface
         if (false !== strpos($name, '..')) {
             throw new \RuntimeException(sprintf('File name "%s" contains invalid characters (..).', $name));
         }
-
+        
+        $dir = null !== $dir ? strtr($dir, '\\', '/') : null;
         $name = substr($name, 1);
         list($bundleName, $path) = explode('/', $name, 2);
 

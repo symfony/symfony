@@ -83,15 +83,13 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('exception_listener')->setArgument(0, $config['exception_controller']);
 
-        $pattern = '';
-        if (isset($config['ide'])) {
-            $patterns = array(
-                'textmate' => 'txmt://open?url=file://%%f&line=%%l',
-                'macvim'   => 'mvim://open?url=file://%%f&line=%%l',
-            );
-            $pattern = isset($patterns[$config['ide']]) ? $patterns[$config['ide']] : $config['ide'];
-        }
-        $container->setParameter('debug.file_link_format', $pattern);
+        $links = array(
+            'textmate' => 'txmt://open?url=file://%f&line=%l',
+            'macvim'   => 'mvim://open?url=file://%f&line=%l',
+        );
+
+        $link = isset($links[$config['ide']]) ? $links[$config['ide']] : $config['ide'];
+        $container->setParameter('debug.file_link_format', str_replace('%', '%%', $link));
 
         if (!empty($config['test'])) {
             $loader->load('test.xml');

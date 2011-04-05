@@ -5,9 +5,9 @@ http://developer.yahoo.com/yui/license.html
 version: 3.1.2
 build: 56
 */
-.sf-toolbarreset html{color:#000;background:#FFF;}.sf-toolbarreset body,.sf-toolbarreset div,.sf-toolbarreset dl,.sf-toolbarreset dt,.sf-toolbarreset dd,.sf-toolbarreset ul,.sf-toolbarreset ol,.sf-toolbarreset li,.sf-toolbarreset h1,.sf-toolbarreset h2,.sf-toolbarreset h3,.sf-toolbarreset h4,.sf-toolbarreset h5,.sf-toolbarreset h6,.sf-toolbarreset pre,.sf-toolbarreset code,.sf-toolbarreset form,.sf-toolbarreset fieldset,.sf-toolbarreset legend,.sf-toolbarreset input,.sf-toolbarreset textarea,.sf-toolbarreset p,.sf-toolbarreset blockquote,.sf-toolbarreset th,.sf-toolbarreset td{margin:0;padding:0;}.sf-toolbarreset table{border-collapse:collapse;border-spacing:0;}.sf-toolbarreset fieldset,.sf-toolbarreset img{border:0;}.sf-toolbarreset address,.sf-toolbarreset caption,.sf-toolbarreset cite,.sf-toolbarreset code,.sf-toolbarreset dfn,.sf-toolbarreset em,.sf-toolbarreset strong,.sf-toolbarreset th,.sf-toolbarreset var{font-style:normal;font-weight:normal;}.sf-toolbarreset li{list-style:none;}.sf-toolbarreset caption,.sf-toolbarreset th{text-align:left;}.sf-toolbarreset h1,.sf-toolbarreset h2,.sf-toolbarreset h3,.sf-toolbarreset h4,.sf-toolbarreset h5,.sf-toolbarreset h6{font-size:100%;font-weight:normal;}.sf-toolbarreset q:before,.sf-toolbarreset q:after{content:'';}.sf-toolbarreset abbr,.sf-toolbarreset acronym{border:0;font-variant:normal;}.sf-toolbarreset sup{vertical-align:text-top;}.sf-toolbarreset sub{vertical-align:text-bottom;}.sf-toolbarreset input,.sf-toolbarreset textarea,.sf-toolbarreset select{font-family:inherit;font-size:inherit;font-weight:inherit;}.sf-toolbarreset input,.sf-toolbarreset textarea,.sf-toolbarreset select{*font-size:100%;}.sf-toolbarreset legend{color:#000;}
+#sf-toolbar div,#sf-toolbar dl,#sf-toolbar dt,#sf-toolbar dd,#sf-toolbar ul,#sf-toolbar ol,#sf-toolbar li,#sf-toolbar h1,#sf-toolbar h2,#sf-toolbar h3,#sf-toolbar h4,#sf-toolbar h5,#sf-toolbar h6,#sf-toolbar pre,#sf-toolbar code,#sf-toolbar form,#sf-toolbar fieldset,#sf-toolbar legend,#sf-toolbar input,#sf-toolbar textarea,#sf-toolbar p,#sf-toolbar blockquote,#sf-toolbar th,#sf-toolbar td{margin:0;padding:0;}#sf-toolbar table{border-collapse:collapse;border-spacing:0;}#sf-toolbar fieldset,#sf-toolbar img{border:0;}#sf-toolbar address,#sf-toolbar caption,#sf-toolbar cite,#sf-toolbar code,#sf-toolbar dfn,#sf-toolbar em,#sf-toolbar strong,#sf-toolbar th,#sf-toolbar var{font-style:normal;font-weight:normal;}#sf-toolbar li{list-style:none;}#sf-toolbar caption,#sf-toolbar th{text-align:left;}#sf-toolbar h1,#sf-toolbar h2,#sf-toolbar h3,#sf-toolbar h4,#sf-toolbar h5,#sf-toolbar h6{font-size:100%;font-weight:normal;}#sf-toolbar q:before,#sf-toolbar q:after{content:'';}#sf-toolbar abbr,#sf-toolbar acronym{border:0;font-variant:normal;}#sf-toolbar sup{vertical-align:text-top;}#sf-toolbar sub{vertical-align:text-bottom;}#sf-toolbar input,#sf-toolbar textarea,#sf-toolbar select{font-family:inherit;font-size:inherit;font-weight:inherit;}#sf-toolbar input,#sf-toolbar textarea,#sf-toolbar select{*font-size:100%;}#sf-toolbar legend{color:#000;}
 
-.sf-toolbarreset {
+#sf-toolbar {
     background: #cbcbcb;
     background-image: -moz-linear-gradient(-90deg, #e8e8e8, #cbcbcb);
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#e8e8e8), to(#cbcbcb));
@@ -20,4 +20,9 @@ build: 56
     margin: 0;
     font: 11px Verdana, Arial, sans-serif;
     color: #000;
+}
+
+#sf-toolbar abbr {
+    border-bottom: 1px dotted #000000;
+    cursor: help;
 }

@@ -154,6 +154,30 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     {
         return $this->options['check_path'] === $request->getPathInfo();
     }
+    
+    /**
+     * Get the parameters from request
+     * Support of two nesting level
+     *
+     * @param Request $request
+     * @param string $key 
+     * @return mixed
+     */
+    protected function getRequestValue(Request $request, $key)
+    {
+        if ($newKeys = $this->getArrayKeysFromString($key)) {
+            $firstKey = array_shift($newKeys);
+            $array = $request->get($firstKey);
+
+            foreach ($newKeys as $newKey) {
+                $array = array_key_exists($newKey, $array) ? $array[$newKey] : null;
+                if (!is_array($array)) {
+                    return $array;
+                }
+            }
+        }
+        return $request->get($key);
+    }
 
     /**
      * Performs authentication.
@@ -262,5 +286,24 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         }
 
         return $this->options['default_target_path'];
+    }
+    
+    /**
+     * Get array keys from string like this "users[form][password]" => output array('users', 'form', 'password')
+     *
+     * @param string $str
+     * @return array
+     */
+    private function getArrayKeysFromString($str)
+    {
+        if (!strpos($str, '[') || !strpos($str, ']')) return null;
+        $out = array();
+        preg_match('#([^\[\]]+)\[#Uis', $str, $firstMatches);
+        preg_match_all('#\[([^\[\]]+)\]#Uis', $str, $matches, PREG_SET_ORDER);
+        array_unshift($matches, $firstMatches);
+        foreach ($matches as $match) {
+            $out[] = $match[1];
+        }
+        return $out;
     }
 }

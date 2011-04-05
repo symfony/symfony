@@ -63,15 +63,15 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
         }
 
         if (null !== $this->csrfProvider) {
-            $csrfToken = $request->get($this->options['csrf_parameter']);
+            $csrfToken = $this->getRequestValue($request, $this->options['csrf_parameter']);
 
             if (false === $this->csrfProvider->isCsrfTokenValid($this->options['csrf_page_id'], $csrfToken)) {
                 throw new InvalidCsrfTokenException('Invalid CSRF token.');
             }
         }
 
-        $username = trim($request->get($this->options['username_parameter']));
-        $password = $request->get($this->options['password_parameter']);
+        $username = trim($this->getRequestValue($request, $this->options['username_parameter']));
+        $password = $this->getRequestValue($request, $this->options['password_parameter']);
 
         $request->getSession()->set(SecurityContextInterface::LAST_USERNAME, $username);
 

@@ -53,9 +53,7 @@ class PhpMatcherDumper extends MatcherDumper
 
         foreach ($this->getRoutes()->all() as $name => $route) {
             $compiledRoute = $route->compile();
-
             $conditions = array();
-
             $hasTrailingSlash = false;
             $matches = false;
             if (!count($compiledRoute->getVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#', $compiledRoute->getRegex(), $m)) {
@@ -72,12 +70,10 @@ class PhpMatcherDumper extends MatcherDumper
 
                 $regex = $compiledRoute->getRegex();
                 if ($pos = strpos($regex, '/$')) {
-                    $regex = substr($regex, 0, $pos) . '/?$' . substr($regex, $pos+2);
-                    $conditions[] = sprintf("preg_match('%s', \$pathinfo, \$matches)", $regex);
+                    $regex = substr($regex, 0, $pos).'/?$'.substr($regex, $pos + 2);
                     $hasTrailingSlash = true;
-                } else {
-                    $conditions[] = sprintf("preg_match('%s', \$pathinfo, \$matches)", $regex);
                 }
+                $conditions[] = sprintf("preg_match('%s', \$pathinfo, \$matches)", $regex);
 
                 $matches = true;
             }
@@ -107,7 +103,7 @@ EOF;
                 return array('_controller' => 'Symfony\\Bundle\\FrameworkBundle\\Controller\\RedirectController::urlRedirectAction', 'url' => \$this->context['base_url'].\$pathinfo.'/', 'permanent' => true, '_route' => '%s');
             }
 EOF
-            , $name);
+                , $name);
             }
 
             // optimize parameters array

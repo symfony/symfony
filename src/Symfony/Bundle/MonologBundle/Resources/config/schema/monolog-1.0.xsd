@@ -23,7 +23,7 @@
         <xsd:attribute name="bubble" type="xsd:boolean" />
         <xsd:attribute name="path" type="xsd:string" />
         <xsd:attribute name="id" type="xsd:string" />
-        <xsd:attribute name="name" type="xsd:string" use="required">
+        <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="ident" type="xsd:string" />
         <xsd:attribute name="facility" type="xsd:string" />
         <xsd:attribute name="action-level" type="level" />

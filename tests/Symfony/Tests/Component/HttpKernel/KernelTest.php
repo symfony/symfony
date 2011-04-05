@@ -303,6 +303,213 @@ EOF;
         $this->assertEquals($expected, $kernel->serialize());
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLocateResourceThrowsExceptionWhenNameIsNotValid()
+    {
+        $this->getKernelForInvalidLocateResource()->locateResource('Foo');
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testLocateResourceThrowsExceptionWhenNameIsUnsafe()
+    {
+        $this->getKernelForInvalidLocateResource()->locateResource('@FooBundle/../bar');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLocateResourceThrowsExceptionWhenBundleDoesNotExist()
+    {
+        $this->getKernelForInvalidLocateResource()->locateResource('@FooBundle/config/routing.xml');
+    }
+
+    public function testLocateResourceReturnsTheFirstThatMatches()
+    {
+        $kernel = $this->getKernel();
+        $kernel
+            ->expects($this->once())
+            ->method('getBundle')
+            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle'))))
+        ;
+
+        $this->assertEquals(__DIR__.'/Fixtures/Bundle1Bundle/foo.txt', $kernel->locateResource('@Bundle1Bundle/foo.txt'));
+    }
+
+    public function testLocateResourceReturnsTheFirstThatMatchesWithParent()
+    {
+        $parent = $this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle');
+        $child = $this->getBundle(__DIR__.'/Fixtures/Bundle2Bundle');
+
+        $kernel = $this->getKernel();
+        $kernel
+            ->expects($this->exactly(2))
+            ->method('getBundle')
+            ->will($this->returnValue(array($child, $parent)))
+        ;
+
+        $this->assertEquals(__DIR__.'/Fixtures/Bundle2Bundle/foo.txt', $kernel->locateResource('@ParentAABundle/foo.txt'));
+        $this->assertEquals(__DIR__.'/Fixtures/Bundle1Bundle/bar.txt', $kernel->locateResource('@ParentAABundle/bar.txt'));
+    }
+
+    public function testLocateResourceReturnsAllMatches()
+    {
+        $parent = $this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle');
+        $child = $this->getBundle(__DIR__.'/Fixtures/Bundle2Bundle');
+
+        $kernel = $this->getKernel();
+        $kernel
+            ->expects($this->once())
+            ->method('getBundle')
+            ->will($this->returnValue(array($child, $parent)))
+        ;
+
+        $this->assertEquals(array(
+            __DIR__.'/Fixtures/Bundle2Bundle/foo.txt',
+            __DIR__.'/Fixtures/Bundle1Bundle/foo.txt'),
+            $kernel->locateResource('@Bundle1Bundle/foo.txt', null, false));
+    }
+
+    public function testLocateResourceReturnsAllMatchesBis()
+    {
+        $kernel = $this->getKernel();
+        $kernel
+            ->expects($this->once())
+            ->method('getBundle')
+            ->will($this->returnValue(array(
+                $this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle'),
+                $this->getBundle(__DIR__.'/Foobar')
+            )))
+        ;
+
+        $this->assertEquals(
+            array(__DIR__.'/Fixtures/Bundle1Bundle/foo.txt'),
+            $kernel->locateResource('@Bundle1Bundle/foo.txt', null, false)
+        );
+    }
+
+    public function testLocateResourceIgnoresDirOnNonResource()
+    {
+        $kernel = $this->getKernel();
+        $kernel
+            ->expects($this->once())
+            ->method('getBundle')
+            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle'))))
+        ;
+
+        $this->assertEquals(
+            __DIR__.'/Fixtures/Bundle1Bundle/foo.txt',
+            $kernel->locateResource('@Bundle1Bundle/foo.txt', __DIR__.'/Fixtures')
+        );
+    }
+
+    public function testLocateResourceReturnsTheDirOneForResources()
+    {
+        $kernel = $this->getKernel();
+        $kernel
+            ->expects($this->once())
+            ->method('getBundle')
+            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/FooBundle', null, null, 'FooBundle'))))
+        ;
+
+        $this->assertEquals(
+            __DIR__.'/Fixtures/Resources/FooBundle/foo.txt',
+            $kernel->locateResource('@FooBundle/Resources/foo.txt', __DIR__.'/Fixtures/Resources')
+        );
+    }
+
+    public function testLocateResourceReturnsTheDirOneForResourcesAndBundleOnes()
+    {
+        $kernel = $this->getKernel();
+        $kernel
+            ->expects($this->once())
+            ->method('getBundle')
+            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle', null, null, 'Bundle1Bundle'))))
+        ;
+
+        $this->assertEquals(array(
+            __DIR__.'/Fixtures/Resources/Bundle1Bundle/foo.txt',
+            __DIR__.'/Fixtures/Bundle1Bundle/Resources/foo.txt'),
+            $kernel->locateResource('@Bundle1Bundle/Resources/foo.txt', __DIR__.'/Fixtures/Resources', false)
+        );
+    }
+
+    public function testLocateResourceOverrideBundleAndResourcesFolders()
+    {
+        $parent = $this->getBundle(__DIR__.'/Fixtures/BaseBundle', null, 'BaseBundle', 'BaseBundle');
+        $child = $this->getBundle(__DIR__.'/Fixtures/ChildBundle', 'ParentBundle', 'ChildBundle', 'ChildBundle');
+
+        $kernel = $this->getKernel();
+        $kernel
+            ->expects($this->exactly(4))
+            ->method('getBundle')
+            ->will($this->returnValue(array($child, $parent)))
+        ;
+
+        $this->assertEquals(array(
+            __DIR__.'/Fixtures/Resources/ChildBundle/foo.txt',
+            __DIR__.'/Fixtures/ChildBundle/Resources/foo.txt',
+            __DIR__.'/Fixtures/BaseBundle/Resources/foo.txt',
+            ),
+            $kernel->locateResource('@BaseBundle/Resources/foo.txt', __DIR__.'/Fixtures/Resources', false)
+        );
+
+        $this->assertEquals(
+            __DIR__.'/Fixtures/Resources/ChildBundle/foo.txt',
+            $kernel->locateResource('@BaseBundle/Resources/foo.txt', __DIR__.'/Fixtures/Resources')
+        );
+
+        try {
+            $kernel->locateResource('@BaseBundle/Resources/hide.txt', __DIR__.'/Fixtures/Resources', false);
+            $this->fail('Hidden resources should raise an exception when returning an array of matching paths');
+        } catch (\RuntimeException $e) {
+        }
+
+        try {
+            $kernel->locateResource('@BaseBundle/Resources/hide.txt', __DIR__.'/Fixtures/Resources', true);
+            $this->fail('Hidden resources should raise an exception when returning the first matching path');
+        } catch (\RuntimeException $e) {
+        }
+    }
+
+    public function testLocateResourceOnDirectories()
+    {
+        $kernel = $this->getKernel();
+        $kernel
+            ->expects($this->exactly(2))
+            ->method('getBundle')
+            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/FooBundle', null, null, 'FooBundle'))))
+        ;
+
+        $this->assertEquals(
+            __DIR__.'/Fixtures/Resources/FooBundle/',
+            $kernel->locateResource('@FooBundle/Resources/', __DIR__.'/Fixtures/Resources')
+        );
+        $this->assertEquals(
+            __DIR__.'/Fixtures/Resources/FooBundle',
+            $kernel->locateResource('@FooBundle/Resources', __DIR__.'/Fixtures/Resources')
+        );
+
+        $kernel = $this->getKernel();
+        $kernel
+            ->expects($this->exactly(2))
+            ->method('getBundle')
+            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle', null, null, 'Bundle1Bundle'))))
+        ;
+
+        $this->assertEquals(
+            __DIR__.'/Fixtures/Bundle1Bundle/Resources/',
+            $kernel->locateResource('@Bundle1Bundle/Resources/')
+        );
+        $this->assertEquals(
+            __DIR__.'/Fixtures/Bundle1Bundle/Resources',
+            $kernel->locateResource('@Bundle1Bundle/Resources')
+        );
+    }
+
     public function testInitializeBundles()
     {
         $parent = $this->getBundle(null, null, 'ParentABundle');
@@ -455,6 +662,15 @@ EOF;
             ->setMethods(array('getBundle', 'registerBundles'))
             ->disableOriginalConstructor()
             ->getMock()
+        ;
+    }
+
+    protected function getKernelForInvalidLocateResource()
+    {
+        return $this
+            ->getMockBuilder('Symfony\Component\HttpKernel\Kernel')
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass()
         ;
     }
 }

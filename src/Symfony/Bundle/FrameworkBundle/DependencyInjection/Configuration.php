@@ -90,6 +90,7 @@ class Configuration
                     ->canBeUnset()
                     ->children()
                         ->booleanNode('only_exceptions')->defaultValue(false)->end()
+                        ->booleanNode('only_master_requests')->defaultValue(false)->end()
                         ->scalarNode('dsn')->defaultValue('sqlite:%kernel.cache_dir%/profiler.db')->end()
                         ->scalarNode('username')->defaultValue('')->end()
                         ->scalarNode('password')->defaultValue('')->end()

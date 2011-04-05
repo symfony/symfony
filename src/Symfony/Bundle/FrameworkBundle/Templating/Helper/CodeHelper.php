@@ -31,7 +31,7 @@ class CodeHelper extends Helper
      */
     public function __construct($fileLinkFormat, $rootDir)
     {
-        $this->fileLinkFormat = null !== $fileLinkFormat ? $fileLinkFormat : ini_get('xdebug.file_link_format');
+        $this->fileLinkFormat = empty($fileLinkFormat) ? ini_get('xdebug.file_link_format') : $fileLinkFormat;
         $this->rootDir = str_replace('\\', '/', $rootDir).'/';
     }
 

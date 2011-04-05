@@ -83,14 +83,6 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('exception_listener')->setArgument(0, $config['exception_controller']);
 
-        $links = array(
-            'textmate' => 'txmt://open?url=file://%f&line=%l',
-            'macvim'   => 'mvim://open?url=file://%f&line=%l',
-        );
-
-        $link = isset($links[$config['ide']]) ? $links[$config['ide']] : $config['ide'];
-        $container->setParameter('debug.file_link_format', str_replace('%', '%%', $link));
-
         if (!empty($config['test'])) {
             $loader->load('test.xml');
             $config['session']['storage_id'] = 'array';
@@ -117,7 +109,7 @@ class FrameworkExtension extends Extension
         }
 
         if (isset($config['templating'])) {
-            $this->registerTemplatingConfiguration($config['templating'], $container, $loader);
+            $this->registerTemplatingConfiguration($config['templating'], $config['ide'], $container, $loader);
         }
 
         if (isset($config['translator'])) {
@@ -317,10 +309,20 @@ class FrameworkExtension extends Extension
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
      */
-    private function registerTemplatingConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerTemplatingConfiguration(array $config, $ide, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('templating.xml');
         $loader->load('templating_php.xml');
+
+        $links = array(
+            'textmate' => 'txmt://open?url=file://%f&line=%l',
+            'macvim'   => 'mvim://open?url=file://%f&line=%l',
+        );
+
+        $container
+            ->getDefinition('templating.helper.code')
+            ->setArgument(0, str_replace('%', '%%', isset($links[$ide]) ? $links[$ide] : $ide))
+        ;
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('templating_debug.xml');

@@ -62,7 +62,7 @@
 
         <service id="templating.helper.code" class="%templating.helper.code.class%">
             <tag name="templating.helper" alias="code" />
-            <argument>%debug.file_link_format%</argument>
+            <argument /> <!-- file link format -->
             <argument>%kernel.root_dir%</argument>
         </service>
 

@@ -6,6 +6,14 @@ one. It only discusses changes that need to be done when using the "public"
 API of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.
 
+PR10 to PR11
+------------
+
+* Extension configuration classes should now implement the
+`Symfony\Component\Config\Definition\ConfigurationInterface` interface. Note that
+the BC is kept but implementing this interface in your extensions will allow for
+further developments.
+
 PR9 to PR10
 -----------
 

@@ -61,9 +61,9 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         $dir = $this->getPhpUnitCliConfigArgument();
-        if ($dir === null && 
-            (file_exists(getcwd() . DIRECTORY_SEPARATOR . 'phpunit.xml') ||
-            file_exists(getcwd() . DIRECTORY_SEPARATOR . 'phpunit.xml.dist'))) {
+        if ($dir === null &&
+            (file_exists(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml') ||
+            file_exists(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml.dist'))) {
             $dir = getcwd();
         }
 
@@ -95,7 +95,7 @@ abstract class WebTestCase extends BaseWebTestCase
             if ($testArg === '-c' || $testArg === '--configuration') {
                 $dir = realpath($reversedArgs[$argIndex - 1]);
                 break;
-            } else if (strpos($testArg, '--configuration=') === 0) {
+            } elseif (strpos($testArg, '--configuration=') === 0) {
                 $argPath = substr($testArg, strlen('--configuration='));
                 $dir = realpath($argPath);
                 break;

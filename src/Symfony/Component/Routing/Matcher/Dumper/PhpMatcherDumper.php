@@ -39,15 +39,19 @@ class PhpMatcherDumper extends MatcherDumper
             'base_class' => 'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
         ), $options);
 
+        // trailing slash support is only enabled if we know how to redirect the user
+        $interfaces = class_implements($options['base_class']);
+        $supportsTrailingSlash = isset($interfaces['Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface']);
+
         return
             $this->startClass($options['class'], $options['base_class']).
             $this->addConstructor().
-            $this->addMatcher().
+            $this->addMatcher($supportsTrailingSlash).
             $this->endClass()
         ;
     }
 
-    private function addMatcher()
+    private function addMatcher($supportsTrailingSlash)
     {
         $code = array();
 
@@ -57,7 +61,7 @@ class PhpMatcherDumper extends MatcherDumper
             $hasTrailingSlash = false;
             $matches = false;
             if (!count($compiledRoute->getVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#', $compiledRoute->getRegex(), $m)) {
-                if (substr($m['url'], -1) === '/') {
+                if ($supportsTrailingSlash && substr($m['url'], -1) === '/') {
                     $conditions[] = sprintf("rtrim(\$pathinfo, '/') === '%s'", rtrim(str_replace('\\', '', $m['url']), '/'));
                     $hasTrailingSlash = true;
                 } else {
@@ -69,7 +73,7 @@ class PhpMatcherDumper extends MatcherDumper
                 }
 
                 $regex = $compiledRoute->getRegex();
-                if ($pos = strpos($regex, '/$')) {
+                if ($supportsTrailingSlash && $pos = strpos($regex, '/$')) {
                     $regex = substr($regex, 0, $pos).'/?$'.substr($regex, $pos + 2);
                     $hasTrailingSlash = true;
                 }
@@ -100,7 +104,7 @@ EOF;
             if ($hasTrailingSlash) {
                 $code[] = sprintf(<<<EOF
             if (substr(\$pathinfo, -1) !== '/') {
-                return array('_controller' => 'Symfony\\Bundle\\FrameworkBundle\\Controller\\RedirectController::urlRedirectAction', 'url' => \$this->context['base_url'].\$pathinfo.'/', 'permanent' => true, '_route' => '%s');
+                return \$this->redirect(\$pathinfo.'/', '%s');
             }
 EOF
                 , $name);

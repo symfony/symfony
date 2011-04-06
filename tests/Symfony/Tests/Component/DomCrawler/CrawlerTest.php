@@ -462,6 +462,26 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * Tests that when the $uri contains $base, the base is removed from the uri
+     *
+     * @return null
+     */
+    public function testUriRemovesBase()
+    {
+        $crawler = new Crawler(NULL, 'http://example.com/');
+        $this->assertSame('http://example.com/', $crawler->getUri());
+        $this->assertSame(NULL, $crawler->getBase());
+
+        $crawler = new Crawler(NULL, 'http://example.com/', 'http://example.com/');
+        $this->assertSame('/', $crawler->getUri());
+        $this->assertSame('http://example.com/', $crawler->getBase());
+        
+        $crawler->addHtmlContent('<html><base href="http://example.com/" /><div class="foo"></html>', 'UTF-8');
+        $this->assertSame('/', $crawler->getUri());
+        $this->assertSame('http://example.com/', $crawler->getBase());
+    }
+
     public function createTestCrawler($uri = null)
     {
         $dom = new \DOMDocument();

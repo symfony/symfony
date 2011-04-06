@@ -369,6 +369,7 @@ abstract class Kernel implements KernelInterface
      *
      * @throws \LogicException if two bundles share a common name
      * @throws \LogicException if a bundle tries to extend a non-registered bundle
+     * @throws \LogicException if a bundle tries to extend itself
      * @throws \LogicException if two bundles extend the same ancestor
      */
     protected function initializeBundles()
@@ -388,6 +389,9 @@ abstract class Kernel implements KernelInterface
             if ($parentName = $bundle->getParent()) {
                 if (isset($directChildren[$parentName])) {
                     throw new \LogicException(sprintf('Bundle "%s" is directly extended by two bundles "%s" and "%s".', $parentName, $name, $directChildren[$parentName]));
+                }
+                if ($parentName == $name) {
+                    throw new \LogicException(sprintf('Bundle "%s" can not extend itself.', $name));
                 }
                 $directChildren[$parentName] = $name;
             } else {

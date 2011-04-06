@@ -15,12 +15,12 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Type\Loader\DefaultTypeLoader;
 use Symfony\Component\Form\Type\Loader\TypeLoaderChain;
+use Symfony\Component\Form\Renderer\ThemeRendererFactory;
+use Symfony\Component\Form\Renderer\Loader\ArrayRendererFactoryLoader;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
-    protected $themeFactory;
-
     protected $csrfProvider;
 
     protected $validator;
@@ -35,18 +35,23 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
     protected $typeLoader;
 
+    protected $themeFactory;
+
     protected $rendererFactoryLoader;
 
     protected function setUp()
     {
+        $this->csrfProvider = $this->getMock('Symfony\Component\Form\CsrfProvider\CsrfProviderInterface');
+        $this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
+        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
         $this->themeFactory = $this->getMock('Symfony\Component\Form\Renderer\Theme\ThemeFactoryInterface');
         $this->themeFactory->expects($this->any())
             ->method('create')
             ->will($this->returnValue($this->getMock('Symfony\Component\Form\Renderer\Theme\ThemeInterface')));
-        $this->csrfProvider = $this->getMock('Symfony\Component\Form\CsrfProvider\CsrfProviderInterface');
-        $this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
-        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->rendererFactoryLoader = $this->getMock('Symfony\Component\Form\Renderer\Loader\RendererFactoryLoaderInterface');
+        $this->rendererFactoryLoader = new ArrayRendererFactoryLoader(array(
+            'stub' => new ThemeRendererFactory($this->themeFactory),
+        ));
 
         $this->storage = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\TemporaryStorage')
             ->disableOriginalConstructor()
@@ -67,5 +72,10 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     protected function getTypeLoaders()
     {
         return array(new DefaultTypeLoader($this->validator, $this->csrfProvider, $this->storage));
+    }
+
+    public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)
+    {
+        self::assertEquals($expected->format('c'), $actual->format('c'));
     }
 }

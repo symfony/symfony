@@ -18,7 +18,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class ChoiceTypeTest extends TestCase
 {
-    protected $choices = array(
+    private $choices = array(
         'a' => 'Bernhard',
         'b' => 'Fabien',
         'c' => 'Kris',
@@ -26,7 +26,13 @@ class ChoiceTypeTest extends TestCase
         'e' => 'Roman',
     );
 
-    protected $preferredChoices = array('d', 'e');
+    private $numericChoices = array(
+        0 => 'Bernhard',
+        1 => 'Fabien',
+        2 => 'Kris',
+        3 => 'Jon',
+        4 => 'Roman',
+    );
 
     protected $groupedChoices = array(
         'Symfony' => array(
@@ -40,68 +46,22 @@ class ChoiceTypeTest extends TestCase
         )
     );
 
-    protected $numericChoices = array(
-        0 => 'Bernhard',
-        1 => 'Fabien',
-        2 => 'Kris',
-        3 => 'Jon',
-        4 => 'Roman',
-    );
-
     /**
      * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
      */
-    public function testConfigureChoicesWithNonArray()
+    public function testChoicesOptionExpectsArray()
     {
         $form = $this->factory->create('choice', 'name', array(
             'choices' => new \ArrayObject(),
         ));
     }
 
-    public function getChoicesVariants()
-    {
-        $choices = $this->choices;
-
-        return array(
-            array($choices),
-            array(function () use ($choices) { return $choices; }),
-        );
-    }
-
-    public function getNumericChoicesVariants()
-    {
-        $choices = $this->numericChoices;
-
-        return array(
-            array($choices),
-            array(function () use ($choices) { return $choices; }),
-        );
-    }
-
-    /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testClosureShouldReturnArray()
-    {
-        $this->markTestSkipped('Should be moved to ChoiceListTest');
-
-        $form = $this->factory->create('choice', 'name', array(
-            'choices' => function () { return 'foobar'; },
-        ));
-
-        // trigger closure
-        $form->getRenderer()->getVar('choices');
-    }
-
-    /**
-     * @dataProvider getChoicesVariants
-     */
-    public function testSubmitSingleNonExpanded($choices)
+    public function testBindSingleNonExpanded()
     {
         $form = $this->factory->create('choice', 'name', array(
             'multiple' => false,
             'expanded' => false,
-            'choices' => $choices,
+            'choices' => $this->choices,
         ));
 
         $form->bind('b');
@@ -110,15 +70,12 @@ class ChoiceTypeTest extends TestCase
         $this->assertEquals('b', $form->getClientData());
     }
 
-    /**
-     * @dataProvider getChoicesVariants
-     */
-    public function testSubmitMultipleNonExpanded($choices)
+    public function testBindMultipleNonExpanded()
     {
         $form = $this->factory->create('choice', 'name', array(
             'multiple' => true,
             'expanded' => false,
-            'choices' => $choices,
+            'choices' => $this->choices,
         ));
 
         $form->bind(array('a', 'b'));
@@ -127,15 +84,12 @@ class ChoiceTypeTest extends TestCase
         $this->assertEquals(array('a', 'b'), $form->getClientData());
     }
 
-    /**
-     * @dataProvider getChoicesVariants
-     */
-    public function testSubmitSingleExpanded($choices)
+    public function testBindSingleExpanded()
     {
         $form = $this->factory->create('choice', 'name', array(
             'multiple' => false,
             'expanded' => true,
-            'choices' => $choices,
+            'choices' => $this->choices,
         ));
 
         $form->bind('b');
@@ -153,15 +107,12 @@ class ChoiceTypeTest extends TestCase
         $this->assertSame('', $form['e']->getClientData());
     }
 
-    /**
-     * @dataProvider getNumericChoicesVariants
-     */
-    public function testSubmitSingleExpandedNumericChoices($choices)
+    public function testBindSingleExpandedNumericChoices()
     {
         $form = $this->factory->create('choice', 'name', array(
             'multiple' => false,
             'expanded' => true,
-            'choices' => $choices,
+            'choices' => $this->numericChoices,
         ));
 
         $form->bind('1');
@@ -179,15 +130,12 @@ class ChoiceTypeTest extends TestCase
         $this->assertSame('', $form[4]->getClientData());
     }
 
-    /**
-     * @dataProvider getChoicesVariants
-     */
-    public function testSubmitMultipleExpanded($choices)
+    public function testBindMultipleExpanded()
     {
         $form = $this->factory->create('choice', 'name', array(
             'multiple' => true,
             'expanded' => true,
-            'choices' => $choices,
+            'choices' => $this->choices,
         ));
 
         $form->bind(array('a' => 'a', 'b' => 'b'));
@@ -205,15 +153,12 @@ class ChoiceTypeTest extends TestCase
         $this->assertSame('', $form['e']->getClientData());
     }
 
-    /**
-     * @dataProvider getNumericChoicesVariants
-     */
-    public function testSubmitMultipleExpandedNumericChoices($choices)
+    public function testBindMultipleExpandedNumericChoices()
     {
         $form = $this->factory->create('choice', 'name', array(
             'multiple' => true,
             'expanded' => true,
-            'choices' => $choices,
+            'choices' => $this->numericChoices,
         ));
 
         $form->bind(array(1 => 1, 2 => 2));
@@ -229,5 +174,103 @@ class ChoiceTypeTest extends TestCase
         $this->assertSame('1', $form[2]->getClientData());
         $this->assertSame('', $form[3]->getClientData());
         $this->assertSame('', $form[4]->getClientData());
+    }
+
+    /*
+     * We need this functionality to create choice fields for boolean types,
+     * e.g. false => 'No', true => 'Yes'
+     */
+    public function testSetDataSingleNonExpandedAcceptsBoolean()
+    {
+        $form = $this->factory->create('choice', 'name', array(
+            'multiple' => false,
+            'expanded' => false,
+            'choices' => $this->numericChoices,
+        ));
+
+        $form->setData(false);
+
+        $this->assertEquals(false, $form->getData());
+        $this->assertEquals('0', $form->getClientData());
+    }
+
+    public function testSetDataMultipleNonExpandedAcceptsBoolean()
+    {
+        $form = $this->factory->create('choice', 'name', array(
+            'multiple' => true,
+            'expanded' => false,
+            'choices' => $this->numericChoices,
+        ));
+
+        $form->setData(array(false, true));
+
+        $this->assertEquals(array(false, true), $form->getData());
+        $this->assertEquals(array('0', '1'), $form->getClientData());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testRequiresChoicesOrChoiceListOption()
+    {
+        $this->factory->create('choice', 'name');
+    }
+
+    public function testPassMultipleToRenderer()
+    {
+        $form = $this->factory->create('choice', 'name', array(
+            'multiple' => true,
+            'choices' => $this->choices,
+        ));
+        $renderer = $this->factory->createRenderer($form, 'stub');
+
+        $this->assertTrue($renderer->getVar('multiple'));
+    }
+
+    public function testPassExpandedToRenderer()
+    {
+        $form = $this->factory->create('choice', 'name', array(
+            'expanded' => true,
+            'choices' => $this->choices,
+        ));
+        $renderer = $this->factory->createRenderer($form, 'stub');
+
+        $this->assertTrue($renderer->getVar('expanded'));
+    }
+
+    public function testPassChoicesToRenderer()
+    {
+        $choices = array('a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D');
+        $form = $this->factory->create('choice', 'name', array(
+            'choices' => $choices,
+        ));
+        $renderer = $this->factory->createRenderer($form, 'stub');
+
+        $this->assertSame($choices, $renderer->getVar('choices'));
+    }
+
+    public function testPassPreferredChoicesToRenderer()
+    {
+        $choices = array('a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D');
+        $form = $this->factory->create('choice', 'name', array(
+            'choices' => $choices,
+            'preferred_choices' => array('b', 'd'),
+        ));
+        $renderer = $this->factory->createRenderer($form, 'stub');
+
+        $this->assertSame(array('a' => 'A', 'c' => 'C'), $renderer->getVar('choices'));
+        $this->assertSame(array('b' => 'B', 'd' => 'D'), $renderer->getVar('preferred_choices'));
+    }
+
+    public function testAdjustNameForMultipleNonExpanded()
+    {
+        $form = $this->factory->create('choice', 'name', array(
+            'multiple' => true,
+            'expanded' => false,
+            'choices' => $this->choices,
+        ));
+        $renderer = $this->factory->createRenderer($form, 'stub');
+
+        $this->assertSame('name[]', $renderer->getVar('name'));
     }
 }

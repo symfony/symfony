@@ -20,12 +20,11 @@ class LanguageTypeTest extends TestCase
 {
     public function testCountriesAreSelectable()
     {
-        $this->markTestSkipped('fix me');
-
         \Locale::setDefault('de_AT');
 
-        $form = $this->factory->create('language', 'language');
-        $choices = $form->getRenderer()->getVar('choices');
+        $form = $this->factory->create('language');
+        $renderer = $this->factory->createRenderer($form, 'stub');
+        $choices = $renderer->getVar('choices');
 
         $this->assertArrayHasKey('en', $choices);
         $this->assertEquals('Englisch', $choices['en']);
@@ -41,10 +40,9 @@ class LanguageTypeTest extends TestCase
 
     public function testMultipleLanguagesIsNotIncluded()
     {
-        $this->markTestSkipped('fix me');
-
         $form = $this->factory->create('language', 'language');
-        $choices = $form->getRenderer()->getVar('choices');
+        $renderer = $this->factory->createRenderer($form, 'stub');
+        $choices = $renderer->getVar('choices');
 
         $this->assertArrayNotHasKey('mul', $choices);
     }

@@ -54,7 +54,7 @@ class FormBuilder
 
     private $errorBubbling = false;
 
-    private $emptyData = null;
+    private $emptyData = '';
 
     public function __construct($name, EventDispatcherInterface $dispatcher, $dataClass = null)
     {

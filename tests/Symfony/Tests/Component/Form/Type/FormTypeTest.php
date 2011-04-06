@@ -61,50 +61,15 @@ class FormTest_AuthorWithoutRefSetter
     }
 }
 
-class TestSetDataBeforeConfigureForm extends Form
-{
-    protected $testCase;
-    protected $object;
-
-    public function __construct($testCase, $name, $object, $validator)
-    {
-        $this->testCase = $testCase;
-        $this->object = $object;
-
-        parent::__construct($name, $object, $validator);
-    }
-
-    protected function configure()
-    {
-        $this->testCase->assertEquals($this->object, $this->getData());
-
-        parent::configure();
-    }
-}
-
 class FormTypeTest extends TestCase
 {
-    protected $form;
-
-    public static function setUpBeforeClass()
-    {
-        @session_start();
-    }
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->form = $this->factory->create('form', 'author');
-    }
-
     public function testCsrfProtectionByDefault()
     {
-        $builder =  $this->factory->create('form', 'author', array(
+        $form =  $this->factory->create('form', 'author', array(
             'csrf_field_name' => 'csrf',
         ));
 
-        $this->assertTrue($builder->has('csrf'));
+        $this->assertTrue($form->has('csrf'));
     }
 
     public function testCsrfProtectionCanBeDisabled()
@@ -118,7 +83,9 @@ class FormTypeTest extends TestCase
 
     public function testValidationGroupNullByDefault()
     {
-        $this->assertNull($this->form->getAttribute('validation_groups'));
+        $form =  $this->factory->create('form');
+
+        $this->assertNull($form->getAttribute('validation_groups'));
     }
 
     public function testValidationGroupsCanBeSetToString()
@@ -148,163 +115,11 @@ class FormTypeTest extends TestCase
         $form = $builder->getForm();
 
         $this->validator->expects($this->once())
-        ->method('validate')
-        ->with($this->equalTo($form));
+            ->method('validate')
+            ->with($this->equalTo($form));
 
         // specific data is irrelevant
         $form->bind(array());
-    }
-
-    public function testBindDoesNotValidateArrays()
-    {
-        $builder = $this->factory->createBuilder('form', 'author');
-        $builder->add('firstName', 'field');
-        $form = $builder->getForm();
-
-        // only the form is validated
-        $this->validator->expects($this->once())
-        ->method('validate')
-        ->with($this->equalTo($form));
-
-        // specific data is irrelevant
-        $form->bind(array());
-    }
-
-    /**
-     * The use case for this test are groups whose fields should be mapped
-     * directly onto properties of the form's object.
-     *
-     * Example:
-     *
-     * <code>
-     * $dateRangeField = $this->factory->create('form', 'dateRange');
-     * $dateRangeField->add(new DateField('startDate'));
-     * $dateRangeField->add(new DateField('endDate'));
-     * $form->add($dateRangeField);
-     * </code>
-     *
-     * If $dateRangeField is not virtual, the property "dateRange" must be
-     * present on the form's object. In this property, an object or array
-     * with the properties "startDate" and "endDate" is expected.
-     *
-     * If $dateRangeField is virtual though, it's children are mapped directly
-     * onto the properties "startDate" and "endDate" of the form's object.
-     */
-    public function testSetDataSkipsVirtualForms()
-    {
-        $author = new Author();
-        $author->firstName = 'Foo';
-        $author->setLastName('Bar');
-
-        $builder = $this->factory->createBuilder('form', 'author');
-        $builder->setData($author);
-        $builder->add('personalData', 'form', array(
-            'virtual' => true,
-        ));
-        // both fields are in the nested group but receive the object of the
-        // top-level group because the nested group is virtual
-        $builder->get('personalData')->add('firstName', 'field');
-        $builder->get('personalData')->add('lastName', 'field');
-        $form = $builder->getForm();
-
-        $this->assertEquals('Foo', $form['personalData']['firstName']->getData());
-        $this->assertEquals('Bar', $form['personalData']['lastName']->getData());
-    }
-
-    public function testSetDataThrowsAnExceptionIfArgumentIsNotObjectOrArray()
-    {
-        $form = $this->factory->create('form', 'author');
-
-        $this->setExpectedException('InvalidArgumentException');
-
-        $form->setData('foobar');
-    }
-
-    /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
-     */
-    public function testSetDataMatchesAgainstDataClass_fails()
-    {
-        $form = $this->factory->create('form', 'author', array(
-            'data_class' => 'Symfony\Tests\Component\Form\Fixtures\Author',
-        ));
-
-        $form->setData(new \stdClass());
-    }
-
-    public function testSetDataMatchesAgainstDataClass_succeeds()
-    {
-        $form = $this->factory->create('form', 'author', array(
-            'data_class' => 'Symfony\Tests\Component\Form\Fixtures\Author',
-        ));
-
-        $form->setData(new Author());
-    }
-
-    public function testBindWithEmptyDataCreatesObjectIfClassAvailable()
-    {
-        $form = $this->factory->create('form', 'author', array(
-            'data_class' => 'Symfony\Tests\Component\Form\Fixtures\Author',
-        ));
-        $form->add($this->factory->create('field', 'firstName'));
-
-        $form->bind(array('firstName' => 'Bernhard'));
-
-        $author = new Author();
-        $author->firstName = 'Bernhard';
-
-        $this->assertEquals($author, $form->getData());
-    }
-
-    /*
-     * We need something to write the field values into
-     */
-    public function testBindWithEmptyDataStoresArrayIfNoClassAvailable()
-    {
-        $form = $this->factory->create('form', 'author');
-        $form->add($this->factory->create('field', 'firstName'));
-
-        $form->bind(array('firstName' => 'Bernhard'));
-
-        $this->assertSame(array('firstName' => 'Bernhard'), $form->getData());
-    }
-
-    public function testBindWithEmptyDataUsesEmptyData()
-    {
-        $author = new Author();
-
-        $form = $this->factory->create('form', 'author', array(
-            'empty_data' => $author,
-        ));
-        $form->add($this->factory->create('field', 'firstName'));
-
-        $form->bind(array('firstName' => 'Bernhard'));
-
-        $this->assertSame($author, $form->getData());
-        $this->assertEquals('Bernhard', $author->firstName);
-    }
-
-    public function testBindWithEmptyDataAcceptsClosureEmptyData()
-    {
-        $author = new Author();
-
-        $form = $this->factory->create('form', 'author', array(
-            'empty_data' => function () use ($author) { return $author; },
-        ));
-        $form->add($this->factory->create('field', 'firstName'));
-
-        $form->bind(array('firstName' => 'Bernhard'));
-
-        $this->assertSame($author, $form->getData());
-        $this->assertEquals('Bernhard', $author->firstName);
-    }
-
-    public function testGetDataReturnsObject()
-    {
-        $form = $this->factory->create('form', 'author');
-        $object = new \stdClass();
-        $form->setData($object);
-        $this->assertEquals($object, $form->getData());
     }
 
     public function testSubformDoesntCallSetters()
@@ -421,62 +236,21 @@ class FormTypeTest extends TestCase
         $this->assertSame($ref2, $author['referenceCopy']);
     }
 
-    /**
-     * Create a group containing two fields, "visibleField" and "hiddenField"
-     *
-     * @return Form
-     */
-    protected function getGroupWithBothVisibleAndHiddenField()
+    public function testPassMultipartFalseToRenderer()
     {
-        $form = $this->factory->create('form', 'testGroup');
+        $form = $this->factory->create('form');
+        $renderer = $this->factory->createRenderer($form, 'stub');
 
-        // add a visible field
-        $visibleField = $this->getMockForm('visibleField');
-        $visibleField->expects($this->once())
-        ->method('isHidden')
-        ->will($this->returnValue(false));
-        $form->add($visibleField);
-
-        // add a hidden field
-        $hiddenField = $this->getMockForm('hiddenField');
-        $hiddenField->expects($this->once())
-        ->method('isHidden')
-        ->will($this->returnValue(true));
-        $form->add($hiddenField);
-
-        return $form;
+        $this->assertFalse($renderer->getVar('multipart'));
     }
 
-    protected function getMockForm($key)
+    public function testPassMultipartTrueIfAnyChildIsMultipartToRenderer()
     {
-        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        $form = $this->factory->create('form');
+        $form->add($this->factory->create('text'));
+        $form->add($this->factory->create('file'));
+        $renderer = $this->factory->createRenderer($form, 'stub');
 
-        $form->expects($this->any())
-        ->method('getName')
-        ->will($this->returnValue($key));
-
-        return $form;
-    }
-
-    protected function getMockTransformer()
-    {
-        return $this->getMock('Symfony\Component\Form\DataTransformer\DataTransformerInterface', array(), array(), '', false, false);
-    }
-
-    protected function getMockValidator()
-    {
-        return $this->getMock('Symfony\Component\Validator\ValidatorInterface');
-    }
-
-    protected function getMockCsrfProvider()
-    {
-        return $this->getMock('Symfony\Component\Form\CsrfProvider\CsrfProviderInterface');
-    }
-
-    protected function getPostRequest(array $values = array(), array $files = array())
-    {
-        $server = array('REQUEST_METHOD' => 'POST');
-
-        return new Request(array(), $values, array(), array(), $files, $server);
+        $this->assertTrue($renderer->getVar('multipart'));
     }
 }

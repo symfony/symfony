@@ -20,12 +20,11 @@ class CountryTypeTest extends TestCase
 {
     public function testCountriesAreSelectable()
     {
-        $this->markTestSkipped('Fix me');
-
         \Locale::setDefault('de_AT');
 
-        $form = $this->factory->create('country', 'country');
-        $choices = $form->getRenderer()->getVar('choices');
+        $form = $this->factory->create('country');
+        $renderer = $this->factory->createRenderer($form, 'stub');
+        $choices = $renderer->getVar('choices');
 
         $this->assertArrayHasKey('DE', $choices);
         $this->assertEquals('Deutschland', $choices['DE']);
@@ -41,10 +40,9 @@ class CountryTypeTest extends TestCase
 
     public function testUnknownCountryIsNotIncluded()
     {
-        $this->markTestSkipped('Fix me');
-
         $form = $this->factory->create('country', 'country');
-        $choices = $form->getRenderer()->getVar('choices');
+        $renderer = $this->factory->createRenderer($form, 'stub');
+        $choices = $renderer->getVar('choices');
 
         $this->assertArrayNotHasKey('ZZ', $choices);
     }

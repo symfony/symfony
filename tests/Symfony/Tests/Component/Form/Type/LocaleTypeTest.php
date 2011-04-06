@@ -20,12 +20,11 @@ class LocaleTypeTest extends TestCase
 {
     public function testLocalesAreSelectable()
     {
-        $this->markTestSkipped('Fix me');
-
         \Locale::setDefault('de_AT');
 
-        $form = $this->factory->create('locale', 'locale');
-        $choices = $form->getRenderer()->getVar('choices');
+        $form = $this->factory->create('locale');
+        $renderer = $this->factory->createRenderer($form, 'stub');
+        $choices = $renderer->getVar('choices');
 
         $this->assertArrayHasKey('en', $choices);
         $this->assertEquals('Englisch', $choices['en']);

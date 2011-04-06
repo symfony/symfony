@@ -659,7 +659,7 @@ EOF;
         $bundle
             ->expects($this->any())
             ->method('getPath')
-            ->will($this->returnValue(strtr($dir, '\\', '/')))
+            ->will($this->returnValue($dir))
         ;
 
         $bundle

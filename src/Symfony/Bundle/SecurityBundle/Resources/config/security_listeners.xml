@@ -125,6 +125,7 @@
             <argument /> <!-- Provider-shared Key -->
             <argument /> <!-- Entry Point -->
             <argument type="service" id="logger" on-invalid="null" />
+            <argument type="service" id="event_dispatcher" on-invalid="null"/>
         </service>
 
         <service id="security.authentication.listener.digest" class="%security.authentication.listener.digest.class%" public="false" abstract="true">

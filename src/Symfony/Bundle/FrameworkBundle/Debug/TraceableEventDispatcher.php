@@ -26,6 +26,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
 {
     protected $logger;
     protected $called;
+    protected $container;
 
     /**
      * Constructor.
@@ -37,8 +38,64 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     {
         parent::__construct($container);
 
+        $this->container = $container;
         $this->logger = $logger;
         $this->called = array();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws \RuntimeException if the listener method is not callable
+     */
+    public function addListener($eventNames, $listener, $priority = 0)
+    {
+        if (!$listener instanceof \Closure) {
+            foreach ((array) $eventNames as $method) {
+                if (!is_callable(array($listener, $method))) {
+                    $msg = sprintf('The event method "%s()" is not callable on the class "%s"', $method, get_class($listener));
+                    if (null !== $this->logger) {
+                        $this->logger->err($msg);
+                    }
+                    throw new \RuntimeException($msg);
+                }
+            }
+        }
+        parent::addListener($eventNames, $listener, $priority);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws \RuntimeException if the service does not exist
+     * @throws \RuntimeException if the listener service method is not callable
+     */
+    public function addListenerService($eventNames, $serviceId, $priority = 0)
+    {
+        $error = null;
+
+        if (!$this->container->has($serviceId)) {
+            $error = sprintf('The container has no service "%s"', $serviceId);
+        } else {
+            $listener = $this->container->get($serviceId);
+            if (!$listener instanceof \Closure) {
+                foreach ((array) $eventNames as $method) {
+                    if (!is_callable(array($listener, $method))) {
+                        $error = sprintf('The event method "%s()" is not callable on the service "%s"', $method, $serviceId);
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (null !== $error) {
+            if (null !== $this->logger) {
+                $this->logger->err($error);
+            }
+            throw new \RuntimeException($error);
+        }
+
+        parent::addListenerService($eventNames, $serviceId, $priority);
     }
 
     /**
@@ -103,22 +160,21 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
         if ($listener instanceof \Closure) {
             $info += array('type' => 'Closure');
         } else {
-            $info += array(
-                'type'  => 'Method',
-                'class' => $class = get_class($listener)
-            );
+            $class = get_class($listener);
             try {
                 $r = new \ReflectionMethod($class, $eventName);
-                $info += array(
-                    'file'  => $r->getFileName(),
-                    'line'  => $r->getStartLine()
-                );
+                $file = $r->getFileName();
+                $line = $r->getStartLine();
             } catch (\ReflectionException $e) {
-                $info += array(
-                    'file'  => null,
-                    'line'  => null
-                );
+                $file = null;
+                $line = null;
             }
+            $info += array(
+                'type'  => 'Method',
+                'class' => $class,
+                'file'  => $file,
+                'line'  => $line
+            );
         }
 
         return $info;

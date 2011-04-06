@@ -11,14 +11,16 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Events;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\Events;
 
 /**
  * BasicAuthenticationListener implements Basic HTTP authentication.
@@ -33,8 +35,9 @@ class BasicAuthenticationListener implements ListenerInterface
     private $authenticationEntryPoint;
     private $logger;
     private $ignoreFailure;
+    private $dispatcher;
 
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -45,6 +48,7 @@ class BasicAuthenticationListener implements ListenerInterface
         $this->providerKey = $providerKey;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
         $this->logger = $logger;
+        $this->dispatcher = $dispatcher;
         $this->ignoreFailure = false;
     }
 
@@ -73,6 +77,12 @@ class BasicAuthenticationListener implements ListenerInterface
 
         try {
             $token = $this->authenticationManager->authenticate(new UsernamePasswordToken($username, $request->server->get('PHP_AUTH_PW'), $this->providerKey));
+
+            if (null !== $this->dispatcher) {
+                $loginEvent = new InteractiveLoginEvent($request, $token);
+                $this->dispatcher->dispatch(Events::onSecurityInteractiveLogin, $loginEvent);
+            }
+
             $this->securityContext->setToken($token);
         } catch (AuthenticationException $failed) {
             $this->securityContext->setToken(null);

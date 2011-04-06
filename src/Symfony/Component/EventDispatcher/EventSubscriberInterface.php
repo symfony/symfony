@@ -37,9 +37,9 @@ namespace Symfony\Component\EventDispatcher;
 interface EventSubscriberInterface
 {
     /**
-     * Returns an array of events this subscriber wants to listen to.
+     * Returns an array of event names this subscriber wants to listen to.
      *
-     * @return array
+     * @return array The event names to listen to
      */
     static function getSubscribedEvents();
 }

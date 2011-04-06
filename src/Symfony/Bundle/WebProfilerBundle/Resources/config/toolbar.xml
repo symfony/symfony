@@ -13,6 +13,7 @@
             <tag name="kernel.listener" event="onCoreResponse" priority="-128" />
             <argument type="service" id="templating.engine.twig" />
             <argument /> <!-- intercept_redirects -->
+            <argument /> <!-- verbose -->
         </service>
     </services>
 </container>

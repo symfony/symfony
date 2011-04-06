@@ -15,12 +15,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Definition\Processor;
 
 /**
  * FrameworkExtension.
@@ -56,9 +56,8 @@ class FrameworkExtension extends Extension
         }
 
         $processor = new Processor();
-        $configuration = new Configuration();
-
-        $config = $processor->process($configuration->getConfigTree($container->getParameter('kernel.debug')), $configs);
+        $configuration = new Configuration($container->getParameter('kernel.debug'));
+        $config = $processor->processConfiguration($configuration, $configs);
 
         $container->setParameter('kernel.cache_warmup', $config['cache_warmer']);
 
@@ -83,19 +82,11 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('exception_listener')->setArgument(0, $config['exception_controller']);
 
-        $pattern = '';
-        if (isset($config['ide'])) {
-            $patterns = array(
-                'textmate' => 'txmt://open?url=file://%%f&line=%%l',
-                'macvim'   => 'mvim://open?url=file://%%f&line=%%l',
-            );
-            $pattern = isset($patterns[$config['ide']]) ? $patterns[$config['ide']] : $config['ide'];
-        }
-        $container->setParameter('debug.file_link_format', $pattern);
-
         if (!empty($config['test'])) {
             $loader->load('test.xml');
-            $config['session']['storage_id'] = 'array';
+            if (isset($config['session'])) {
+                $config['session']['storage_id'] = 'array';
+            }
         }
 
         if (isset($config['csrf_protection'])) {
@@ -119,7 +110,7 @@ class FrameworkExtension extends Extension
         }
 
         if (isset($config['templating'])) {
-            $this->registerTemplatingConfiguration($config['templating'], $container, $loader);
+            $this->registerTemplatingConfiguration($config['templating'], $config['ide'], $container, $loader);
         }
 
         if (isset($config['translator'])) {
@@ -204,6 +195,7 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('profiler_listener')
             ->setArgument(2, $config['only_exceptions'])
+            ->setArgument(3, $config['only_master_requests'])
         ;
 
         // Choose storage class based on the DSN
@@ -319,10 +311,20 @@ class FrameworkExtension extends Extension
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
      */
-    private function registerTemplatingConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerTemplatingConfiguration(array $config, $ide, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('templating.xml');
         $loader->load('templating_php.xml');
+
+        $links = array(
+            'textmate' => 'txmt://open?url=file://%f&line=%l',
+            'macvim'   => 'mvim://open?url=file://%f&line=%l',
+        );
+
+        $container
+            ->getDefinition('templating.helper.code')
+            ->setArgument(0, str_replace('%', '%%', isset($links[$ide]) ? $links[$ide] : $ide))
+        ;
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('templating_debug.xml');
@@ -494,6 +496,15 @@ class FrameworkExtension extends Extension
             $arguments = $loaderChain->getArguments();
             array_unshift($arguments[0], new Reference('validator.mapping.loader.annotation_loader'));
             $loaderChain->setArguments($arguments);
+        }
+
+        if (isset($config['cache'])) {
+            $container->getDefinition('validator.mapping.class_metadata_factory')
+                ->setArgument(1, new Reference('validator.mapping.cache.'.$config['cache']));
+            $container->setParameter(
+                'validator.mapping.cache.prefix',
+                'validator_'.md5($container->getParameter('kernel.root_dir'))
+            );
         }
     }
 

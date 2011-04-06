@@ -39,8 +39,7 @@ class TwigExtension extends Extension
 
         $processor = new Processor();
         $configuration = new Configuration();
-
-        $config = $processor->process($configuration->getConfigTree(), $configs);
+        $config = $processor->processConfiguration($configuration, $configs);
 
         $container->setParameter('twig.form.resources', $config['form']['resources']);
 

@@ -459,7 +459,6 @@ class Form implements \IteratorAggregate, FormInterface
             }
         }
 
-
         // Merge form data from children into existing client data
         if (count($this->children) > 0 && $this->dataMapper) {
             $this->dataMapper->mapFormsToData($this->children, $clientData);

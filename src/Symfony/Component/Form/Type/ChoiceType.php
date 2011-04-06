@@ -92,6 +92,9 @@ class ChoiceType extends AbstractType
 
     public function getDefaultOptions(array $options)
     {
+        $multiple = isset($options['multiple']) && $options['multiple'];
+        $expanded = isset($options['expanded']) && $options['expanded'];
+
         return array(
             'multiple' => false,
             'expanded' => false,
@@ -99,6 +102,7 @@ class ChoiceType extends AbstractType
             'choices' => array(),
             'preferred_choices' => array(),
             'csrf_protection' => false,
+            'empty_data' => $multiple || $expanded ? array() : '',
         );
     }
 

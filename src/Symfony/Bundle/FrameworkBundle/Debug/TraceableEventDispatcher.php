@@ -24,9 +24,9 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements TraceableEventDispatcherInterface
 {
-    protected $logger;
-    protected $called;
-    protected $container;
+    private $logger;
+    private $called;
+    private $container;
 
     /**
      * Constructor.

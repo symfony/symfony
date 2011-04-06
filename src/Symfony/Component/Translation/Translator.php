@@ -120,15 +120,7 @@ class Translator implements TranslatorInterface
      */
     public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
     {
-        if (!isset($locale)) {
-            $locale = $this->getLocale();
-        }
-
-        if (!isset($this->catalogues[$locale])) {
-            $this->loadCatalogue($locale);
-        }
-
-        return strtr($this->catalogues[$locale]->get($id, $domain), $parameters);
+        return strtr($this->catalogues[getLocaleWithCatalogue($locale)]->get($id, $domain), $parameters);
     }
 
     /**
@@ -138,14 +130,7 @@ class Translator implements TranslatorInterface
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
     {
-        if (!isset($locale)) {
-            $locale = $this->getLocale();
-        }
-
-        if (!isset($this->catalogues[$locale])) {
-            $this->loadCatalogue($locale);
-        }
-
+        $locale = getLocaleWithCatalogue($locale);
         return strtr($this->selector->choose($this->catalogues[$locale]->get($id, $domain), (int) $number, $locale), $parameters);
     }
 
@@ -163,6 +148,18 @@ class Translator implements TranslatorInterface
         }
 
         $this->optimizeCatalogue($locale);
+    }
+
+    private function getLocaleWithCatalogue($locale = null)
+    {
+        if (!isset($locale)) {
+            $locale = $this->getLocale();
+        }
+
+        if (!isset($this->catalogues[$locale])) {
+            $this->loadCatalogue($locale);
+        }
+        return $locale;
     }
 
     private function optimizeCatalogue($locale)

@@ -25,7 +25,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('cache_warmer')->end()
+                ->scalarNode('cache_warmer')->defaultFalse()->end()
             ->end();
         ;
 

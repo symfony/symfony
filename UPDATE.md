@@ -77,13 +77,13 @@ PR8 to PR9
 
     Before:
 
-        profiler:
-            pattern:  /_profiler/.*
+        pattern:  /_profiler.*
+        pattern:  /login
 
     After:
 
-        profiler:
-            pattern:  ^/_profiler
+        pattern:  ^/_profiler
+        pattern:  ^/login$
 
 * Global templates under `app/` moved to a new location (old directory did not
   work anyway):

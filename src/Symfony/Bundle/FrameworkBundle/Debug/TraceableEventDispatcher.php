@@ -48,30 +48,25 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     {
         parent::triggerListener($listener, $eventName, $event);
 
-        $listenerString = $this->listenerToString($listener, $eventName);
-
         if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Notified event "%s" to listener "%s"', $eventName, $listenerString));
+            $this->logger->debug(sprintf('Notified event "%s" to listener "%s"', $eventName, get_class($listener)));
         }
 
-        $this->called[$eventName.'.'.$listenerString] = array(
-            'class' => $listenerString,
-            'event' => $eventName,
-        );
+        $this->called[$eventName.'.'.get_class($listener)] = $this->getListenerInfo($listener, $eventName);
 
         if ($event->isPropagationStopped() && null !== $this->logger) {
-            $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s"', $this->listenerToString($listener, $eventName), $eventName));
+            $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s"', get_class($listener), $eventName));
 
             $skippedListeners = $this->getListeners($eventName);
             $skipped = false;
 
             foreach ($skippedListeners as $skippedListener) {
                 if ($skipped) {
-                    $this->logger->debug(sprintf('Listener "%s" was not called for event "%s"', $this->listenerToString($skippedListener, $eventName), $eventName));
+                    $this->logger->debug(sprintf('Listener "%s" was not called for event "%s"', get_class($skippedListener), $eventName));
                 }
 
                 if ($skippedListener === $listener) {
-                    $skipped = false;
+                    $skipped = true;
                 }
             }
         }
@@ -94,12 +89,8 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
 
         foreach (array_keys($this->getListeners()) as $name) {
             foreach ($this->getListeners($name) as $listener) {
-                $listener = $this->listenerToString($listener);
-                if (!isset($this->called[$name.'.'.$listener])) {
-                    $notCalled[] = array(
-                        'class' => $listener,
-                        'event' => $name,
-                    );
+                if (!isset($this->called[$name.'.'.get_class($listener)])) {
+                    $notCalled[$name.'.'.get_class($listener)] = $this->getListenerInfo($listener, $name);
                 }
             }
         }
@@ -107,18 +98,30 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
         return $notCalled;
     }
 
-    protected function listenerToString($listener)
+    protected function getListenerInfo($listener, $eventName)
     {
-        if (is_object($listener)) {
-            if ($listener instanceof \Closure) {
-                return 'Closure';
+        $info = array('event' => $eventName);
+        if ($listener instanceof \Closure) {
+            $info += array('type' => 'Closure');
+        } else {
+            $info += array(
+                'type'  => 'Method',
+                'class' => $class = get_class($listener)
+            );
+            try {
+                $r = new \ReflectionMethod($class, $eventName);
+                $info += array(
+                    'file'  => $r->getFileName(),
+                    'line'  => $r->getStartLine()
+                );
+            } catch (\ReflectionException $e) {
+                $info += array(
+                    'file'  => null,
+                    'line'  => null
+                );
             }
-
-            return get_class($listener);
         }
 
-        if (is_array($listener)) {
-            return is_object($listener[0]) ? get_class($listener[0]) : implode('::', $listener);
-        }
+        return $info;
     }
 }

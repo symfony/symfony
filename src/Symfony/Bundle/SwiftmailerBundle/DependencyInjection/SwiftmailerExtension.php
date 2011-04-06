@@ -48,9 +48,9 @@ class SwiftmailerExtension extends Extension
         $r = new \ReflectionClass('Swift_Message');
         $container->getDefinition('swiftmailer.mailer')->setFile(dirname(dirname(dirname($r->getFilename()))).'/swift_init.php');
 
-        $configuration = new Configuration();
         $processor = new Processor();
-        $config = $processor->process($configuration->getConfigTree($container->getParameter('kernel.debug')), $configs);
+        $configuration = new Configuration($container->getParameter('kernel.debug'));
+        $config = $processor->processConfiguration($configuration, $configs);
 
         if (null === $config['transport']) {
             $transport = 'null';

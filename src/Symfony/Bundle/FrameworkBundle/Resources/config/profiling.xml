@@ -30,6 +30,7 @@
             <argument type="service" id="service_container" />
             <argument type="service" id="profiler.request_matcher" on-invalid="null" />
             <argument /> <!-- Only exceptions? -->
+            <argument /> <!-- Only master requests? -->
         </service>
     </services>
 </container>

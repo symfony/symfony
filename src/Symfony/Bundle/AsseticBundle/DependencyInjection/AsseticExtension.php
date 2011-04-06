@@ -61,6 +61,11 @@ class AsseticExtension extends Extension
                 $loader->load('filters/'.$name.'.xml');
             }
 
+            if (isset($filter['file'])) {
+                $container->getDefinition('assetic.filter.'.$name)->setFile($filter['file']);
+                unset($filter['file']);
+            }
+
             foreach ($filter as $key => $value) {
                 $container->setParameter('assetic.filter.'.$name.'.'.$key, $value);
             }
@@ -94,11 +99,9 @@ class AsseticExtension extends Extension
      */
     static protected function processConfigs(array $configs, $debug, array $bundles)
     {
-        $configuration = new Configuration();
-        $tree = $configuration->getConfigTree($debug, $bundles);
-
         $processor = new Processor();
-        return $processor->process($tree, $configs);
+        $configuration = new Configuration($debug, $bundles);
+        return $processor->processConfiguration($configuration, $configs);
     }
 
     /**

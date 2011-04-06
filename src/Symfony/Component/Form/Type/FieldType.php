@@ -54,6 +54,7 @@ class FieldType extends AbstractType
             ->setAttribute('property_path', $options['property_path'])
             ->setAttribute('validation_groups', $options['validation_groups'])
             ->setAttribute('error_mapping', $options['error_mapping'])
+            ->setAttribute('max_length', $options['max_length'])
             ->setData($options['data'])
             ->addValidator(new DefaultValidator())
             ->addValidator(new DelegatingValidator($this->validator));
@@ -83,7 +84,7 @@ class FieldType extends AbstractType
         $renderer->setVar('read_only', $form->isReadOnly());
         $renderer->setVar('required', $form->isRequired());
         $renderer->setVar('class', null);
-        $renderer->setVar('max_length', null);
+        $renderer->setVar('max_length', $form->getAttribute('max_length'));
         $renderer->setVar('size', null);
         $renderer->setVar('label', ucfirst(strtolower(str_replace('_', ' ', $form->getName()))));
         $renderer->setVar('multipart', false);
@@ -112,7 +113,7 @@ class FieldType extends AbstractType
                 return new $class();
             };
         } else {
-            $defaultOptions['empty_data'] = null;
+            $defaultOptions['empty_data'] = '';
         }
 
         return $defaultOptions;

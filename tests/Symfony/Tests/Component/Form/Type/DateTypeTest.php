@@ -11,12 +11,12 @@
 
 namespace Symfony\Tests\Component\Form\Type;
 
-require_once __DIR__ . '/DateTimeTestCase.php';
+require_once __DIR__ . '/LocalizedTestCase.php';
 
 use Symfony\Component\Form\DateField;
 use Symfony\Component\Form\FormContext;
 
-class DateTypeTest extends DateTimeTestCase
+class DateTypeTest extends LocalizedTestCase
 {
     protected function setUp()
     {
@@ -25,7 +25,7 @@ class DateTypeTest extends DateTimeTestCase
         \Locale::setDefault('de_AT');
     }
 
-    public function testSubmit_fromInput_dateTime()
+    public function testSubmitFromInputDateTime()
     {
         $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
@@ -40,7 +40,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertEquals('02.06.2010', $form->getClientData());
     }
 
-    public function testSubmit_fromInput_string()
+    public function testSubmitFromInputString()
     {
         $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
@@ -55,7 +55,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertEquals('02.06.2010', $form->getClientData());
     }
 
-    public function testSubmit_fromInput_timestamp()
+    public function testSubmitFromInputTimestamp()
     {
         $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
@@ -72,7 +72,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertEquals('02.06.2010', $form->getClientData());
     }
 
-    public function testSubmit_fromInput_raw()
+    public function testSubmitFromInputRaw()
     {
         $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
@@ -93,7 +93,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertEquals('02.06.2010', $form->getClientData());
     }
 
-    public function testSubmit_fromChoice()
+    public function testSubmitFromChoice()
     {
         $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
@@ -115,7 +115,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertEquals($text, $form->getClientData());
     }
 
-    public function testSubmit_fromChoice_empty()
+    public function testSubmitFromChoiceEmpty()
     {
         $form = $this->factory->create('date', 'name', array(
             'data_timezone' => 'UTC',
@@ -151,7 +151,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertEquals('01.06.2010', $form->getClientData());
     }
 
-    public function testIsYearWithinRange_returnsTrueIfWithin()
+    public function testIsYearWithinRangeReturnsTrueIfWithin()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
@@ -167,7 +167,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertTrue($form->isYearWithinRange());
     }
 
-    public function testIsYearWithinRange_returnsTrueIfEmpty()
+    public function testIsYearWithinRangeReturnsTrueIfEmpty()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
@@ -183,7 +183,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertTrue($form->isYearWithinRange());
     }
 
-    public function testIsYearWithinRange_returnsTrueIfEmpty_choice()
+    public function testIsYearWithinRangeReturnsTrueIfEmptyChoice()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
@@ -203,7 +203,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertTrue($form->isYearWithinRange());
     }
 
-    public function testIsYearWithinRange_returnsFalseIfNotContained()
+    public function testIsYearWithinRangeReturnsFalseIfNotContained()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
@@ -219,7 +219,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertFalse($form->isYearWithinRange());
     }
 
-    public function testIsMonthWithinRange_returnsTrueIfWithin()
+    public function testIsMonthWithinRangeReturnsTrueIfWithin()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
@@ -235,7 +235,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertTrue($form->isMonthWithinRange());
     }
 
-    public function testIsMonthWithinRange_returnsTrueIfEmpty()
+    public function testIsMonthWithinRangeReturnsTrueIfEmpty()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
@@ -251,7 +251,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertTrue($form->isMonthWithinRange());
     }
 
-    public function testIsMonthWithinRange_returnsTrueIfEmpty_choice()
+    public function testIsMonthWithinRangeReturnsTrueIfEmptyChoice()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
@@ -271,7 +271,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertTrue($form->isMonthWithinRange());
     }
 
-    public function testIsMonthWithinRange_returnsFalseIfNotContained()
+    public function testIsMonthWithinRangeReturnsFalseIfNotContained()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
@@ -287,7 +287,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertFalse($form->isMonthWithinRange());
     }
 
-    public function testIsDayWithinRange_returnsTrueIfWithin()
+    public function testIsDayWithinRangeReturnsTrueIfWithin()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
@@ -303,7 +303,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertTrue($form->isDayWithinRange());
     }
 
-    public function testIsDayWithinRange_returnsTrueIfEmpty()
+    public function testIsDayWithinRangeReturnsTrueIfEmpty()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
@@ -319,7 +319,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertTrue($form->isDayWithinRange());
     }
 
-    public function testIsDayWithinRange_returnsTrueIfEmpty_choice()
+    public function testIsDayWithinRangeReturnsTrueIfEmptyChoice()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
@@ -339,7 +339,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertTrue($form->isDayWithinRange());
     }
 
-    public function testIsDayWithinRange_returnsFalseIfNotContained()
+    public function testIsDayWithinRangeReturnsFalseIfNotContained()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
@@ -357,7 +357,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertFalse($form->isDayWithinRange());
     }
 
-    public function testIsPartiallyFilled_returnsFalseIfInput()
+    public function testIsPartiallyFilledReturnsFalseIfInput()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
@@ -372,7 +372,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertFalse($form->isPartiallyFilled());
     }
 
-    public function testIsPartiallyFilled_returnsFalseIfChoiceAndCompletelyEmpty()
+    public function testIsPartiallyFilledReturnsFalseIfChoiceAndCompletelyEmpty()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
@@ -391,7 +391,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertFalse($form->isPartiallyFilled());
     }
 
-    public function testIsPartiallyFilled_returnsFalseIfChoiceAndCompletelyFilled()
+    public function testIsPartiallyFilledReturnsFalseIfChoiceAndCompletelyFilled()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
@@ -410,7 +410,7 @@ class DateTypeTest extends DateTimeTestCase
         $this->assertFalse($form->isPartiallyFilled());
     }
 
-    public function testIsPartiallyFilled_returnsTrueIfChoiceAndDayEmpty()
+    public function testIsPartiallyFilledReturnsTrueIfChoiceAndDayEmpty()
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
@@ -427,5 +427,33 @@ class DateTypeTest extends DateTimeTestCase
         ));
 
         $this->assertTrue($form->isPartiallyFilled());
+    }
+
+    public function testPassDatePatternToRenderer()
+    {
+        $form = $this->factory->create('date');
+        $renderer = $this->factory->createRenderer($form, 'stub');
+
+        $this->assertSame('{{ day }}.{{ month }}.{{ year }}', $renderer->getVar('date_pattern'));
+    }
+
+    public function testDontPassDatePatternIfText()
+    {
+        $form = $this->factory->create('date', 'name', array(
+            'widget' => 'text',
+        ));
+        $renderer = $this->factory->createRenderer($form, 'stub');
+
+        $this->assertNull($renderer->getVar('date_pattern'));
+    }
+
+    public function testPassWidgetToRenderer()
+    {
+        $form = $this->factory->create('date', 'name', array(
+            'widget' => 'text',
+        ));
+        $renderer = $this->factory->createRenderer($form, 'stub');
+
+        $this->assertSame('text', $renderer->getVar('widget'));
     }
 }

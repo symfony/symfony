@@ -13,10 +13,15 @@ namespace Symfony\Tests\Component\Form\Type;
 
 require_once __DIR__ . '/LocalizedTestCase.php';
 
-abstract class DateTimeTestCase extends LocalizedTestCase
+class MoneyTypeTest extends LocalizedTestCase
 {
-    public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)
+    public function testPassMoneyPatternToRenderer()
     {
-        self::assertEquals($expected->format('c'), $actual->format('c'));
+        \Locale::setDefault('de_DE');
+
+        $form = $this->factory->create('money');
+        $renderer = $this->factory->createRenderer($form, 'stub');
+
+        $this->assertSame('{{ widget }} €', $renderer->getVar('money_pattern'));
     }
 }

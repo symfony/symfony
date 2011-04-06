@@ -119,7 +119,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         $field->bind('2');
     }
 
-    public function testSetDataSingle_null()
+    public function testSetDataSingleNull()
     {
         $field = $this->factory->create('entity', 'name', array(
             'multiple' => false,
@@ -132,7 +132,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         $this->assertEquals('', $field->getClientData());
     }
 
-    public function testSetDataMultipleExpanded_null()
+    public function testSetDataMultipleExpandedNull()
     {
         $field = $this->factory->create('entity', 'name', array(
             'multiple' => true,
@@ -146,7 +146,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         $this->assertEquals(array(), $field->getClientData());
     }
 
-    public function testSetDataMultipleNonExpanded_null()
+    public function testSetDataMultipleNonExpandedNull()
     {
         $field = $this->factory->create('entity', 'name', array(
             'multiple' => true,
@@ -160,7 +160,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         $this->assertEquals(array(), $field->getClientData());
     }
 
-    public function testSubmitSingleExpanded_null()
+    public function testSubmitSingleExpandedNull()
     {
         $field = $this->factory->create('entity', 'name', array(
             'multiple' => false,
@@ -174,7 +174,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         $this->assertEquals(array(), $field->getClientData());
     }
 
-    public function testSubmitSingleNonExpanded_null()
+    public function testSubmitSingleNonExpandedNull()
     {
         $field = $this->factory->create('entity', 'name', array(
             'multiple' => false,
@@ -188,7 +188,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         $this->assertEquals('', $field->getClientData());
     }
 
-    public function testSubmitMultiple_null()
+    public function testSubmitMultipleNull()
     {
         $field = $this->factory->create('entity', 'name', array(
             'multiple' => true,
@@ -201,7 +201,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         $this->assertEquals(array(), $field->getClientData());
     }
 
-    public function testSubmitSingleNonExpanded_singleIdentifier()
+    public function testSubmitSingleNonExpandedSingleIdentifier()
     {
         $entity1 = new SingleIdentEntity(1, 'Foo');
         $entity2 = new SingleIdentEntity(2, 'Bar');
@@ -223,7 +223,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         $this->assertEquals(2, $field->getClientData());
     }
 
-    public function testSubmitSingleNonExpanded_compositeIdentifier()
+    public function testSubmitSingleNonExpandedCompositeIdentifier()
     {
         $entity1 = new CompositeIdentEntity(10, 20, 'Foo');
         $entity2 = new CompositeIdentEntity(30, 40, 'Bar');
@@ -246,7 +246,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         $this->assertEquals(1, $field->getClientData());
     }
 
-    public function testSubmitMultipleNonExpanded_singleIdentifier()
+    public function testSubmitMultipleNonExpandedSingleIdentifier()
     {
         $entity1 = new SingleIdentEntity(1, 'Foo');
         $entity2 = new SingleIdentEntity(2, 'Bar');
@@ -271,7 +271,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         $this->assertEquals(array(1, 3), $field->getClientData());
     }
 
-    public function testSubmitMultipleNonExpanded_singleIdentifier_existingData()
+    public function testSubmitMultipleNonExpandedSingleIdentifier_existingData()
     {
         $entity1 = new SingleIdentEntity(1, 'Foo');
         $entity2 = new SingleIdentEntity(2, 'Bar');
@@ -302,7 +302,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         $this->assertEquals(array(1, 3), $field->getClientData());
     }
 
-    public function testSubmitMultipleNonExpanded_compositeIdentifier()
+    public function testSubmitMultipleNonExpandedCompositeIdentifier()
     {
         $entity1 = new CompositeIdentEntity(10, 20, 'Foo');
         $entity2 = new CompositeIdentEntity(30, 40, 'Bar');
@@ -328,7 +328,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         $this->assertEquals(array(0, 2), $field->getClientData());
     }
 
-    public function testSubmitMultipleNonExpanded_compositeIdentifier_existingData()
+    public function testSubmitMultipleNonExpandedCompositeIdentifier_existingData()
     {
         $entity1 = new CompositeIdentEntity(10, 20, 'Foo');
         $entity2 = new CompositeIdentEntity(30, 40, 'Bar');
@@ -440,7 +440,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         $this->assertEquals(2, $field->getClientData());
     }
 
-    public function testDisallowChoicesThatAreNotIncluded_choices_singleIdentifier()
+    public function testDisallowChoicesThatAreNotIncluded_choicesSingleIdentifier()
     {
         $entity1 = new SingleIdentEntity(1, 'Foo');
         $entity2 = new SingleIdentEntity(2, 'Bar');
@@ -461,7 +461,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         $this->assertNull($field->getData());
     }
 
-    public function testDisallowChoicesThatAreNotIncluded_choices_compositeIdentifier()
+    public function testDisallowChoicesThatAreNotIncluded_choicesCompositeIdentifier()
     {
         $entity1 = new CompositeIdentEntity(10, 20, 'Foo');
         $entity2 = new CompositeIdentEntity(30, 40, 'Bar');
@@ -482,7 +482,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         $this->assertNull($field->getData());
     }
 
-    public function testDisallowChoicesThatAreNotIncluded_queryBuilder_singleIdentifier()
+    public function testDisallowChoicesThatAreNotIncludedQueryBuilderSingleIdentifier()
     {
         $entity1 = new SingleIdentEntity(1, 'Foo');
         $entity2 = new SingleIdentEntity(2, 'Bar');
@@ -506,7 +506,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         $this->assertNull($field->getData());
     }
 
-    public function testDisallowChoicesThatAreNotIncluded_queryBuilderAsClosure_singleIdentifier()
+    public function testDisallowChoicesThatAreNotIncludedQueryBuilderAsClosureSingleIdentifier()
     {
         $entity1 = new SingleIdentEntity(1, 'Foo');
         $entity2 = new SingleIdentEntity(2, 'Bar');
@@ -530,7 +530,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
         $this->assertNull($field->getData());
     }
 
-    public function testDisallowChoicesThatAreNotIncluded_queryBuilderAsClosure_compositeIdentifier()
+    public function testDisallowChoicesThatAreNotIncludedQueryBuilderAsClosureCompositeIdentifier()
     {
         $entity1 = new CompositeIdentEntity(10, 20, 'Foo');
         $entity2 = new CompositeIdentEntity(30, 40, 'Bar');

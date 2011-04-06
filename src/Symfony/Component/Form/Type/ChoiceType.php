@@ -31,10 +31,6 @@ class ChoiceType extends AbstractType
             throw new FormException('Either the option "choices" or "choice_list" is required');
         }
 
-        if (!is_array($options['choices']) && !$options['choices'] instanceof \Closure) {
-            throw new UnexpectedTypeException($options['choices'], 'array or \Closure');
-        }
-
         if (!$options['choice_list']) {
             $options['choice_list'] = new ArrayChoiceList($options['choices']);
         }

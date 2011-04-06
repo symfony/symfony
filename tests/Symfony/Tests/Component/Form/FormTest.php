@@ -245,35 +245,35 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->form, $this->form->getRoot());
     }
 
-    public function testIsEmptyIfEmptyArray()
+    public function testEmptyIfEmptyArray()
     {
         $this->form->setData(array());
 
         $this->assertTrue($this->form->isEmpty());
     }
 
-    public function testIsEmptyIfNull()
+    public function testEmptyIfNull()
     {
         $this->form->setData(null);
 
         $this->assertTrue($this->form->isEmpty());
     }
 
-    public function testIsEmptyIfEmptyString()
+    public function testEmptyIfEmptyString()
     {
         $this->form->setData('');
 
         $this->assertTrue($this->form->isEmpty());
     }
 
-    public function testIsNotEmptyIfText()
+    public function testNotEmptyIfText()
     {
         $this->form->setData('foobar');
 
         $this->assertFalse($this->form->isEmpty());
     }
 
-    public function testIsNotEmptyIfChildNotEmpty()
+    public function testNotEmptyIfChildNotEmpty()
     {
         $child = $this->getMockForm();
         $child->expects($this->once())
@@ -397,14 +397,14 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->form->getChildren(), iterator_to_array($this->form));
     }
 
-    public function testIsBound()
+    public function testBound()
     {
         $this->form->bind('foobar');
 
         $this->assertTrue($this->form->isBound());
     }
 
-    public function testIsNotBound()
+    public function testNotBound()
     {
         $this->assertFalse($this->form->isBound());
     }
@@ -469,6 +469,67 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form->setData('first');
 
         $this->assertEquals('third', $form->getNormData());
+    }
+
+    /*
+     * When there is no data transformer, the data must have the same format
+     * in all three representations
+     */
+    public function testSetDataConvertsScalarToStringIfNoTransformer()
+    {
+        $form = $this->getBuilder()->getForm();
+
+        $form->setData(1);
+
+        $this->assertSame('1', $form->getData());
+        $this->assertSame('1', $form->getNormData());
+        $this->assertSame('1', $form->getClientData());
+    }
+
+    /*
+     * Data in client format should, if possible, always be a string to
+     * facilitate differentiation between '0' and ''
+     */
+    public function testSetDataConvertsScalarToStringIfOnlyNormTransformer()
+    {
+        $form = $this->getBuilder()
+            ->appendNormTransformer(new FixedDataTransformer(array(
+                '' => '',
+                1 => 23,
+            )))
+            ->getForm();
+
+        $form->setData(1);
+
+        $this->assertSame(1, $form->getData());
+        $this->assertSame(23, $form->getNormData());
+        $this->assertSame('23', $form->getClientData());
+    }
+
+    /*
+     * NULL remains NULL in app and norm format to remove the need to treat
+     * empty values and NULL explicitely in the application
+     */
+    public function testSetDataConvertsNullToStringIfNoTransformer()
+    {
+        $form = $this->getBuilder()->getForm();
+
+        $form->setData(null);
+
+        $this->assertNull($form->getData());
+        $this->assertNull($form->getNormData());
+        $this->assertSame('', $form->getClientData());
+    }
+
+    public function testBindConvertsEmptyToNullIfNoTransformer()
+    {
+        $form = $this->getBuilder()->getForm();
+
+        $form->bind('');
+
+        $this->assertNull($form->getData());
+        $this->assertNull($form->getNormData());
+        $this->assertSame('', $form->getClientData());
     }
 
     public function testBindExecutesTransformationChain()
@@ -539,19 +600,19 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('third', $form->getData());
     }
 
-    public function testIsSynchronizedByDefault()
+    public function testSynchronizedByDefault()
     {
         $this->assertTrue($this->form->isSynchronized());
     }
 
-    public function testIsSynchronizedAfterBinding()
+    public function testSynchronizedAfterBinding()
     {
         $this->form->bind('foobar');
 
         $this->assertTrue($this->form->isSynchronized());
     }
 
-    public function testIsNotSynchronizedIfTransformationFailed()
+    public function testNotSynchronizedIfTransformationFailed()
     {
         $transformer = $this->getDataTransformer();
         $transformer->expects($this->once())
@@ -789,6 +850,15 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('Bernhard', $form['firstName']->getData());
         $this->assertEquals('Schussek', $form['lastName']->getData());
+    }
+
+    public function testBindResetsErrors()
+    {
+        $form = $this->getBuilder()->getForm();
+        $form->addError(new FormError('Error!'));
+        $form->bind('foobar');
+
+        $this->assertSame(array(), $form->getErrors());
     }
 
     protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null)

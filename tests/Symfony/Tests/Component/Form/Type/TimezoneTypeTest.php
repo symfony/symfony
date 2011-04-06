@@ -19,10 +19,9 @@ class TimezoneTypeTest extends TestCase
 {
     public function testTimezonesAreSelectable()
     {
-        $this->markTestSkipped('Fix me');
-
-        $form = $this->factory->create('timezone', 'timezone');
-        $choices = $form->getRenderer()->getVar('choices');
+        $form = $this->factory->create('timezone');
+        $renderer = $this->factory->createRenderer($form, 'stub');
+        $choices = $renderer->getVar('choices');
 
         $this->assertArrayHasKey('Africa', $choices);
         $this->assertArrayHasKey('Africa/Kinshasa', $choices['Africa']);

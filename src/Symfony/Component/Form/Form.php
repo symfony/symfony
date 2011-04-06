@@ -141,6 +141,12 @@ class Form implements \IteratorAggregate, FormInterface
     private $clientData;
 
     /**
+     * Data used for the client data when no value is bound
+     * @var mixed
+     */
+    private $emptyData = '';
+
+    /**
      * The names of bound values that don't belong to any children
      * @var array
      */
@@ -452,6 +458,7 @@ class Form implements \IteratorAggregate, FormInterface
                 $clientData = $clientData->__invoke($this);
             }
         }
+
 
         // Merge form data from children into existing client data
         if (count($this->children) > 0 && $this->dataMapper) {

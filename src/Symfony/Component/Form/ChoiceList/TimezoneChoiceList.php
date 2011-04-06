@@ -16,7 +16,7 @@ namespace Symfony\Component\Form\ChoiceList;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class TimezoneChoiceList extends DefaultChoiceList
+class TimezoneChoiceList extends ArrayChoiceList
 {
     /**
      * Stores the available timezone choices

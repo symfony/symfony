@@ -11,11 +11,11 @@
 
 namespace Symfony\Tests\Component\Form\Type;
 
-require_once __DIR__ . '/DateTimeTestCase.php';
+require_once __DIR__ . '/LocalizedTestCase.php';
 
 use Symfony\Component\Form\TimeField;
 
-class TimeTypeTest extends DateTimeTestCase
+class TimeTypeTest extends LocalizedTestCase
 {
     public function testSubmit_dateTime()
     {

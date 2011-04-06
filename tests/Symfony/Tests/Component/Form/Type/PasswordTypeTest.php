@@ -17,43 +17,30 @@ use Symfony\Component\Form\PasswordField;
 
 class PasswordTypeTest extends TestCase
 {
-    public function testGetDisplayedData_beforeSubmit()
+    public function testEmptyIfNotBound()
     {
-        $this->markTestSkipped('fix me');
+        $form = $this->factory->create('password');
+        $form->setData('pAs5w0rd');
+        $renderer = $this->factory->createRenderer($form, 'stub');
 
-        $form = $this->factory->create('password', 'name');
-        $form->setData('before');
-
-        $this->assertSame('', $form->getRenderer()->getVar('value'));
+        $this->assertSame('', $renderer->getVar('value'));
     }
 
-    public function testGetDisplayedData_afterSubmit()
+    public function testEmptyIfBound()
     {
-        $this->markTestSkipped('fix me');
+        $form = $this->factory->create('password');
+        $form->bind('pAs5w0rd');
+        $renderer = $this->factory->createRenderer($form, 'stub');
 
-        $form = $this->factory->create('password', 'name');
-        $form->bind('after');
-
-        $this->assertSame('', $form->getRenderer()->getVar('value'));
+        $this->assertSame('', $renderer->getVar('value'));
     }
 
-    public function testGetDisplayedDataWithAlwaysEmptyDisabled_beforeSubmit()
+    public function testNotEmptyIfBoundAndNotAlwaysEmpty()
     {
-        $this->markTestSkipped('fix me');
+        $form = $this->factory->create('password', null, array('always_empty' => false));
+        $form->bind('pAs5w0rd');
+        $renderer = $this->factory->createRenderer($form, 'stub');
 
-        $form = $this->factory->create('password', 'name', array('always_empty' => false));
-        $form->setData('before');
-
-        $this->assertSame('', $form->getRenderer()->getVar('value'));
-    }
-
-    public function testGetDisplayedDataWithAlwaysEmptyDisabled_afterSubmit()
-    {
-        $this->markTestSkipped('fix me');
-
-        $form = $this->factory->create('password', 'name', array('always_empty' => false));
-        $form->bind('after');
-
-        $this->assertSame('after', $form->getRenderer()->getVar('value'));
+        $this->assertSame('pAs5w0rd', $renderer->getVar('value'));
     }
 }

@@ -23,6 +23,8 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Http\Events as SecurityEvents;
+use Symfony\Component\Security\Http\Event\ReadContextFromSessionEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -78,6 +80,11 @@ class ContextListener implements ListenerInterface
             }
 
             $this->context->setToken($token);
+
+            if (null !== $this->dispatcher) {
+                $readContextEvent = new ReadContextFromSessionEvent($request, $this->context);
+                $this->dispatcher->dispatch(SecurityEvents::onSecurityReadContextFromSession, $readContextEvent);
+            }
         }
     }
 

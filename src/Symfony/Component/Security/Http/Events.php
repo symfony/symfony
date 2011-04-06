@@ -15,5 +15,7 @@ final class Events
 {
     const onSecurityInteractiveLogin = 'onSecurityInteractiveLogin';
 
+    const onSecurityReadContextFromSession = 'onSecurityReadContextFromSession';
+
     const onSecuritySwitchUser = 'onSecuritySwitchUser';
 }

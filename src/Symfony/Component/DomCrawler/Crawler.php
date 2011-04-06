@@ -48,9 +48,48 @@ class Crawler extends \SplObjectStorage
         if ($base) {
             $this->base = $base;
 
-            // Remove the base from the uri if it contains it
-            $this->uri = stristr($this->uri, $base).'/';
+            $this->adjustUriForBase();
         }
+    }
+
+    /**
+     * Getter for $uri
+     *
+     * @return string
+     */
+    public function getUri()
+    {
+        return $this->uri;
+    }
+
+    /**
+     * Getter for host
+     *
+     * @return string
+     */
+    public function getHost()
+    {
+        return $this->host;
+    }
+
+    /**
+     * Getter for path
+     *
+     * @return string
+     */
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    /**
+     * Getter for base
+     *
+     * @return string
+     */
+    public function getBase()
+    {
+        return $this->base;
     }
 
     /**
@@ -135,6 +174,8 @@ class Crawler extends \SplObjectStorage
 
         if (count($base)) {
             $this->base = current($base);
+
+            $this->adjustUriForBase();
         }
     }
 
@@ -211,6 +252,22 @@ class Crawler extends \SplObjectStorage
             $this->attach($node->documentElement);
         } else {
             $this->attach($node);
+        }
+    }
+
+    /**
+     * Replaces the uri of this crawler if a base was found
+     *
+     * @return string
+     */
+    protected function adjustUriForBase()
+    {
+        // Remove the base from the uri if it contains it
+        $this->uri = preg_replace('/'.preg_quote($this->base, '/').'/i', '', $this->uri);
+
+        // If the base equaled the uri, make it root
+        if ( ! $this->uri) {
+            $this->uri = '/';
         }
     }
 

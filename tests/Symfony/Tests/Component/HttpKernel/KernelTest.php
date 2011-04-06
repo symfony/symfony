@@ -620,6 +620,22 @@ EOF;
         $kernel->initializeBundles();
     }
 
+    /**
+     * @expectedException \LogicException
+     */
+    public function testInitializeBundleThrowsExceptionWhenABundleExtendsItself()
+    {
+        $circularRef = $this->getBundle(null, 'CircularRefBundle', 'CircularRefBundle');
+
+        $kernel = $this->getKernel();
+        $kernel
+            ->expects($this->once())
+            ->method('registerBundles')
+            ->will($this->returnValue(array($circularRef)))
+        ;
+        $kernel->initializeBundles();
+    }
+
     protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null)
     {
         $bundle = $this

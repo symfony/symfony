@@ -129,8 +129,10 @@ class ProfilerController extends ContainerAware
     {
         $request = $this->container->get('request');
 
-        // keep current flashes for one more request
-        $request->getSession()->setFlashes($request->getSession()->getFlashes());
+        if ($session = $request->getSession()) {
+            // keep current flashes for one more request
+            $session->setFlashes($request->getSession()->getFlashes());
+        }
 
         if (null === $token) {
             return new Response();
@@ -175,17 +177,20 @@ class ProfilerController extends ContainerAware
         $profiler = $this->container->get('profiler');
         $profiler->disable();
 
-        $session = $this->container->get('request')->getSession();
-        $ip = $session->get('_profiler_search_ip');
-        $url = $session->get('_profiler_search_url');
+        if (!$session = $this->container->get('request')->getSession()) {
+            return new Response(null, 200);
+        }
+
+        $ip    = $session->get('_profiler_search_ip');
+        $url   = $session->get('_profiler_search_url');
         $limit = $session->get('_profiler_search_limit');
         $token = $session->get('_profiler_search_token');
 
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:search.html.twig', array(
-            'token'    => $token,
-            'ip'       => $ip,
-            'url'      => $url,
-            'limit'    => $limit,
+            'token' => $token,
+            'ip'    => $ip,
+            'url'   => $url,
+            'limit' => $limit,
         ));
     }
 
@@ -201,9 +206,12 @@ class ProfilerController extends ContainerAware
 
         $pofiler = $profiler->loadFromToken($token);
 
-        $session = $this->container->get('request')->getSession();
-        $ip = $session->get('_profiler_search_ip');
-        $url = $session->get('_profiler_search_url');
+        if (!$session = $this->container->get('request')->getSession()) {
+            throw new \RuntimeException('To access to search, activate the session in your configuration.');
+        }
+
+        $ip    = $session->get('_profiler_search_ip');
+        $url   = $session->get('_profiler_search_url');
         $limit = $session->get('_profiler_search_limit');
 
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:results.html.twig', array(

@@ -295,4 +295,54 @@ class Process
     {
         $this->commandline = $commandline;
     }
+
+    public function getTimeout()
+    {
+        return $this->timeout;
+    }
+
+    public function setTimeout($timeout)
+    {
+        $this->timeout = $timeout;
+    }
+
+    public function getWorkingDirectory()
+    {
+        return $this->cwd;
+    }
+
+    public function setWorkingDirectory($cwd)
+    {
+        $this->cwd = $cwd;
+    }
+
+    public function getEnv()
+    {
+        return $this->env;
+    }
+
+    public function setEnv(array $env)
+    {
+        $this->env = $env;
+    }
+
+    public function getStdin()
+    {
+        return $this->stdin;
+    }
+
+    public function setStdin($stdin)
+    {
+        $this->stdin = $stdin;
+    }
+
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    public function setOptions(array $options)
+    {
+        $this->options = $options;
+    }
 }

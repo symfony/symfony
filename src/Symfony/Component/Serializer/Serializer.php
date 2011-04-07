@@ -28,13 +28,17 @@ use Symfony\Component\Serializer\Encoder\EncoderInterface;
  */
 class Serializer implements SerializerInterface
 {
-    protected $normalizers = array();
-    protected $encoders = array();
-    protected $normalizerCache = array();
+    private $normalizers = array();
+    private $encoders = array();
+    private $normalizerCache = array();
 
-    public function isStructuredType($val)
+    /**
+     * @param mixed $value value to test
+     * @return Boolean whether the type is a structured type (array + objects)
+     */
+    public function isStructuredType($value)
     {
-        return null !== $val && !is_scalar($val);
+        return null !== $value && !is_scalar($value);
     }
 
     /**
@@ -127,17 +131,26 @@ class Serializer implements SerializerInterface
         return $this->encoders[$format]->decode($data, $format);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function addNormalizer(NormalizerInterface $normalizer)
     {
         $this->normalizers[] = $normalizer;
         $normalizer->setSerializer($this);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getNormalizers()
     {
         return $this->normalizers;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function removeNormalizer(NormalizerInterface $normalizer)
     {
         unset($this->normalizers[array_search($normalizer, $this->normalizers, true)]);

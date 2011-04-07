@@ -113,7 +113,12 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertEquals('templating.engine.delegating', (string) $container->getAlias('templating'), '->registerTemplatingConfiguration() configures delegating loader if multiple engines are provided');
 
-        $this->assertEquals('templating.loader.chain', (string) $container->getAlias('templating.loader'), '->registerTemplatingConfiguration() configures loader chain if multiple loaders are provided');
+        $this->assertEquals($container->getDefinition('templating.loader.chain'), $container->getDefinition('templating.loader.wrapped'), '->registerTemplatingConfiguration() configures loader chain if multiple loaders are provided');
+
+        $this->assertEquals($container->getDefinition('templating.loader'), $container->getDefinition('templating.loader.cache'), '->registerTemplatingConfiguration() configures the loader to use cache');
+
+        $arguments = $container->getDefinition('templating.loader.cache')->getArguments();
+        $this->assertEquals('/path/to/cache', $arguments[1]);
 
         $this->assertEquals(array('php', 'twig'), $container->getParameter('templating.engines'), '->registerTemplatingConfiguration() sets a templating.engines parameter');
     }
@@ -177,7 +182,7 @@ abstract class FrameworkExtensionTest extends TestCase
     protected function createContainer()
     {
         return new ContainerBuilder(new ParameterBag(array(
-            'kernel.bundles'          => array('Framework' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
+            'kernel.bundles'          => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
             'kernel.cache_dir'        => __DIR__,
             'kernel.compiled_classes' => array(),
             'kernel.debug'            => false,

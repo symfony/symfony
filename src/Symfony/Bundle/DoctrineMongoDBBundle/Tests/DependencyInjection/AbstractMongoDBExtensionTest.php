@@ -225,20 +225,20 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $container = $this->getContainer();
         $loader = new DoctrineMongoDBExtension();
 
-        $loader->load(array(array('document_managers' => array('default' => array('mappings' => array('Yaml' => array()))))), $container);
+        $loader->load(array(array('document_managers' => array('default' => array('mappings' => array('YamlBundle' => array()))))), $container);
 
         $definition = $container->getDefinition('doctrine.odm.mongodb.default_configuration');
         $calls = $definition->getMethodCalls();
-        $this->assertTrue(isset($calls[0][1][0]['Yaml']));
-        $this->assertEquals('DoctrineMongoDBBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle\Document', $calls[0][1][0]['Yaml']);
+        $this->assertTrue(isset($calls[0][1][0]['YamlBundle']));
+        $this->assertEquals('DoctrineMongoDBBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle\Document', $calls[0][1][0]['YamlBundle']);
     }
 
     public function testYamlBundleMappingDetection()
     {
         $container = $this->getContainer();
-        $loader = new DoctrineMongoDBExtension();
+        $loader = new DoctrineMongoDBExtension('YamlBundle');
 
-        $loader->load(array(array('document_managers' => array('default' => array('mappings' => array('Yaml' => array()))))), $container);
+        $loader->load(array(array('document_managers' => array('default' => array('mappings' => array('YamlBundle' => array()))))), $container);
 
         $calls = $container->getDefinition('doctrine.odm.mongodb.default_metadata_driver')->getMethodCalls();
         $this->assertEquals('doctrine.odm.mongodb.default_yml_metadata_driver', (string) $calls[0][1][0]);
@@ -250,7 +250,7 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $container = $this->getContainer('XmlBundle');
         $loader = new DoctrineMongoDBExtension();
 
-        $loader->load(array(array('document_managers' => array('default' => array('mappings' => array('Xml' => array()))))), $container);
+        $loader->load(array(array('document_managers' => array('default' => array('mappings' => array('XmlBundle' => array()))))), $container);
 
         $calls = $container->getDefinition('doctrine.odm.mongodb.default_metadata_driver')->getMethodCalls();
         $this->assertEquals('doctrine.odm.mongodb.default_xml_metadata_driver', (string) $calls[0][1][0]);
@@ -262,7 +262,7 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $container = $this->getContainer('AnnotationsBundle');
         $loader = new DoctrineMongoDBExtension();
 
-        $loader->load(array(array('document_managers' => array('default' => array('mappings' => array('Annotations' => array()))))), $container);
+        $loader->load(array(array('document_managers' => array('default' => array('mappings' => array('AnnotationsBundle' => array()))))), $container);
 
         $calls = $container->getDefinition('doctrine.odm.mongodb.default_metadata_driver')->getMethodCalls();
         $this->assertEquals('doctrine.odm.mongodb.default_annotation_metadata_driver', (string) $calls[0][1][0]);
@@ -352,8 +352,9 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
     {
         require_once __DIR__.'/Fixtures/Bundles/'.$bundle.'/'.$bundle.'.php';
 
+
         return new ContainerBuilder(new ParameterBag(array(
-            'kernel.bundles'     => array(substr($bundle, 0, -6) => 'DoctrineMongoDBBundle\\Tests\\DependencyInjection\\Fixtures\\Bundles\\'.$bundle.'\\'.$bundle),
+            'kernel.bundles'     => array($bundle => 'DoctrineMongoDBBundle\\Tests\\DependencyInjection\\Fixtures\\Bundles\\'.$bundle.'\\'.$bundle),
             'kernel.cache_dir'   => sys_get_temp_dir(),
             'kernel.debug'       => false,
         )));

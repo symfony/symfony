@@ -21,7 +21,6 @@ use Symfony\Component\Console\Output\StreamOutput;
 class ApplicationTester
 {
     private $application;
-    private $display;
     private $input;
     private $output;
 
@@ -46,6 +45,8 @@ class ApplicationTester
      *
      * @param array $input   An array of arguments and options
      * @param array $options An array of options
+     *
+     * @return integer The command exit code
      */
     public function run(array $input, $options = array())
     {
@@ -62,11 +63,7 @@ class ApplicationTester
             $this->output->setVerbosity($options['verbosity']);
         }
 
-        $this->application->run($this->input, $this->output);
-
-        rewind($this->output->getStream());
-
-        return $this->display = stream_get_contents($this->output->getStream());
+        return $this->application->run($this->input, $this->output);
     }
 
     /**
@@ -76,7 +73,9 @@ class ApplicationTester
      */
     public function getDisplay()
     {
-        return $this->display;
+        rewind($this->output->getStream());
+
+        return stream_get_contents($this->output->getStream());
     }
 
     /**

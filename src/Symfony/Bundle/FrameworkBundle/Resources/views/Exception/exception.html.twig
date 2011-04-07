@@ -25,7 +25,7 @@
                         <ul>
                             {% for i, previous in exception.previouses %}
                                 <li>
-                                    {{ previous.class|abbr_class }} <a href="#traces_link_{{ i + 1 }}" onclick="toggle('traces_{{ i + 1 }}', 'traces');">&raquo;</a>
+                                    {{ previous.class|abbr_class }} <a href="#traces_link_{{ i + 1 }}" onclick="toggle('traces_{{ i + 1 }}', 'traces'); switchIcons('icon_traces_{{ i + 1 }}_open', 'icon_traces_{{ i + 1 }}_close');">&raquo;</a>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -41,7 +41,7 @@
     </div>
 
     {% for position, e in exception.toarray %}
-        {% include 'Framework:Exception:traces.html.twig' with { 'exception': e, 'position': position, 'count': previous_count } only %}
+        {% include 'FrameworkBundle:Exception:traces.html.twig' with { 'exception': e, 'position': position, 'count': previous_count } only %}
     {% endfor %}
 
     {% if logger %}
@@ -68,7 +68,7 @@
             </div>
 
             <div id="logs">
-                {% include 'Framework:Exception:logs.html.twig' with { 'logs': logger.logs } only %}
+                {% include 'FrameworkBundle:Exception:logs.html.twig' with { 'logs': logger.logs } only %}
             </div>
 
         </div>

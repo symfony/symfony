@@ -17,8 +17,8 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Bundle\DoctrineAbstractBundle\DependencyInjection\AbstractDoctrineExtension;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Bundle\DoctrineAbstractBundle\DependencyInjection\AbstractDoctrineExtension;
 
 /**
  * Doctrine MongoDB ODM extension.
@@ -40,7 +40,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
 
         $processor = new Processor();
         $configuration = new Configuration($container->getParameter('kernel.debug'));
-        $config = $processor->process($configuration->getConfigTree(), $configs);
+        $config = $processor->processConfiguration($configuration, $configs);
 
         // can't currently default this correctly in Configuration
         if (!isset($config['metadata_cache_driver'])) {

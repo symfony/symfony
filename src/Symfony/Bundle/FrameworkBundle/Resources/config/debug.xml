@@ -10,6 +10,7 @@
 
     <services>
         <service id="debug.event_dispatcher" class="%debug.event_dispatcher.class%">
+            <tag name="monolog.logger" channel="event" />
             <argument type="service" id="service_container" />
             <argument type="service" id="logger" on-invalid="null" />
         </service>

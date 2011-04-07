@@ -7,6 +7,8 @@
     <parameters>
         <parameter key="validator.class">Symfony\Component\Validator\Validator</parameter>
         <parameter key="validator.mapping.class_metadata_factory.class">Symfony\Component\Validator\Mapping\ClassMetadataFactory</parameter>
+        <parameter key="validator.mapping.cache.apc.class">Symfony\Component\Validator\Mapping\Cache\ApcCache</parameter>
+        <parameter key="validator.mapping.cache.prefix" />
         <parameter key="validator.mapping.loader.loader_chain.class">Symfony\Component\Validator\Mapping\Loader\LoaderChain</parameter>
         <parameter key="validator.mapping.loader.static_method_loader.class">Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader</parameter>
         <parameter key="validator.mapping.loader.annotation_loader.class">Symfony\Component\Validator\Mapping\Loader\AnnotationLoader</parameter>
@@ -23,6 +25,11 @@
 
         <service id="validator.mapping.class_metadata_factory" class="%validator.mapping.class_metadata_factory.class%" public="false">
             <argument type="service" id="validator.mapping.loader.loader_chain" />
+            <argument>null</argument>
+        </service>
+
+        <service id="validator.mapping.cache.apc" class="%validator.mapping.cache.apc.class%" public="false">
+            <argument>%validator.mapping.cache.prefix%</argument>
         </service>
 
         <service id="validator.validator_factory" class="%validator.validator_factory.class%" public="false">

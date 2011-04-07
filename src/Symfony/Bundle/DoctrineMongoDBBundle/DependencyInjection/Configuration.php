@@ -4,13 +4,14 @@ namespace Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * FrameworkExtension configuration structure.
  *
  * @author Ryan Weaver <ryan@thatsquality.com>
  */
-class Configuration
+class Configuration implements ConfigurationInterface
 {
     private $debug;
 
@@ -25,11 +26,11 @@ class Configuration
     }
 
     /**
-     * Generates the configuration tree.
+     * Generates the configuration tree builder.
      *
-     * @return \Symfony\Component\Config\Definition\ArrayNode The config tree
+     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
      */
-    public function getConfigTree()
+    public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('doctrine_mongo_db');
@@ -49,7 +50,7 @@ class Configuration
             ->end()
         ;
 
-        return $treeBuilder->buildTree();
+        return $treeBuilder;
     }
 
     /**

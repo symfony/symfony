@@ -59,7 +59,7 @@ class MonologExtensionTest extends TestCase
 
         $loader->load(array(array('handlers' => array(
             'custom' => array('type' => 'stream', 'path' => '/tmp/symfony.log', 'bubble' => true, 'level' => 'ERROR'),
-            'main' => array('type' => 'fingerscrossed', 'action_level' => 'ERROR', 'handler' => 'nested'),
+            'main' => array('type' => 'fingers_crossed', 'action_level' => 'ERROR', 'handler' => 'nested'),
             'nested' => array('type' => 'stream')
         ))), $container);
         $this->assertTrue($container->hasDefinition('monolog.logger'));
@@ -76,7 +76,7 @@ class MonologExtensionTest extends TestCase
         $this->assertDICConstructorArguments($handler, array('/tmp/symfony.log', \Monolog\Logger::ERROR, true));
 
         $handler = $container->getDefinition('monolog.handler.main');
-        $this->assertDICDefinitionClass($handler, '%monolog.handler.fingerscrossed.class%');
+        $this->assertDICDefinitionClass($handler, '%monolog.handler.fingers_crossed.class%');
         $this->assertDICConstructorArguments($handler, array(new Reference('monolog.handler.nested'), \Monolog\Logger::ERROR, 0, false));
     }
 
@@ -88,7 +88,7 @@ class MonologExtensionTest extends TestCase
         $loader->load(array(
             array('handlers' => array(
                 'custom' => array('type' => 'stream', 'path' => '/tmp/symfony.log', 'bubble' => true, 'level' => 'ERROR'),
-                'main' => array('type' => 'fingerscrossed', 'action_level' => 'ERROR', 'handler' => 'nested'),
+                'main' => array('type' => 'fingers_crossed', 'action_level' => 'ERROR', 'handler' => 'nested'),
                 'nested' => array('type' => 'stream')
             )),
             array('handlers' => array(
@@ -109,7 +109,7 @@ class MonologExtensionTest extends TestCase
         $this->assertDICConstructorArguments($handler, array('/tmp/symfony.log', \Monolog\Logger::WARNING, true));
 
         $handler = $container->getDefinition('monolog.handler.main');
-        $this->assertDICDefinitionClass($handler, '%monolog.handler.fingerscrossed.class%');
+        $this->assertDICDefinitionClass($handler, '%monolog.handler.fingers_crossed.class%');
         $this->assertDICConstructorArguments($handler, array(new Reference('monolog.handler.nested'), \Monolog\Logger::ERROR, 0, false));
     }
 
@@ -121,7 +121,7 @@ class MonologExtensionTest extends TestCase
         $loader->load(array(
             array('handlers' => array(
                 'custom' => array('type' => 'stream', 'path' => '/tmp/symfony.log', 'bubble' => true, 'level' => 'ERROR'),
-                'main' => array('type' => 'fingerscrossed', 'action_level' => 'ERROR', 'handler' => 'nested'),
+                'main' => array('type' => 'fingers_crossed', 'action_level' => 'ERROR', 'handler' => 'nested'),
                 'nested' => array('type' => 'stream')
             )),
             array('handlers' => array(
@@ -158,7 +158,7 @@ class MonologExtensionTest extends TestCase
             )),
             array('handlers' => array(
                 'custom' => array('type' => 'stream', 'path' => '/tmp/symfony.log', 'bubble' => true, 'level' => 'WARNING'),
-                'first' => array('type' => 'rotatingfile', 'path' => '/tmp/monolog.log', 'bubble' => true, 'level' => 'ERROR', 'priority' => 3),
+                'first' => array('type' => 'rotating_file', 'path' => '/tmp/monolog.log', 'bubble' => true, 'level' => 'ERROR', 'priority' => 3),
                 'last' => array('type' => 'stream', 'path' => '/tmp/last.log', 'bubble' => true, 'level' => 'ERROR', 'priority' => -3),
             ))
         ), $container);
@@ -180,7 +180,7 @@ class MonologExtensionTest extends TestCase
         $this->assertDICConstructorArguments($handler, array(new Reference('monolog.handler.nested'), 0, \Monolog\Logger::INFO, false));
 
         $handler = $container->getDefinition('monolog.handler.first');
-        $this->assertDICDefinitionClass($handler, '%monolog.handler.rotatingfile.class%');
+        $this->assertDICDefinitionClass($handler, '%monolog.handler.rotating_file.class%');
         $this->assertDICConstructorArguments($handler, array('/tmp/monolog.log', 0, \Monolog\Logger::ERROR, true));
 
         $handler = $container->getDefinition('monolog.handler.last');
@@ -196,7 +196,7 @@ class MonologExtensionTest extends TestCase
         $container = new ContainerBuilder();
         $loader = new MonologExtension();
 
-        $loader->load(array(array('handlers' => array('main' => array('type' => 'fingerscrossed')))), $container);
+        $loader->load(array(array('handlers' => array('main' => array('type' => 'fingers_crossed')))), $container);
     }
 
     /**

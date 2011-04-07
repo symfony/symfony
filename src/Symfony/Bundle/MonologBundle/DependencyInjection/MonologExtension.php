@@ -124,7 +124,7 @@ class MonologExtension extends Extension
             ));
             break;
 
-        case 'rotatingfile':
+        case 'rotating_file':
             if (!isset($handler['path'])) {
                 $handler['path'] = '%kernel.logs_dir%/%kernel.environment%.log';
             }
@@ -137,7 +137,7 @@ class MonologExtension extends Extension
             ));
             break;
 
-        case 'fingerscrossed':
+        case 'fingers_crossed':
             if (!isset($handler['action_level'])) {
                 $handler['action_level'] = 'WARNING';
             }

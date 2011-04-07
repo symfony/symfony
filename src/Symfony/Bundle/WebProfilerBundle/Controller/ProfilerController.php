@@ -237,7 +237,10 @@ class ProfilerController extends ContainerAware
 
         $request = $this->container->get('request');
 
-        $session = $request->getSession();
+        if (null === $session = $request->getSession()) {
+            throw new \RuntimeException('To access to search, activate the session in your configuration.');
+        }
+
         $session->set('_profiler_search_ip', $ip = preg_replace('/[^\d\.]/', '', $request->query->get('ip')));
         $session->set('_profiler_search_url', $url = $request->query->get('url'));
         $session->set('_profiler_search_limit', $limit = $request->query->get('limit'));

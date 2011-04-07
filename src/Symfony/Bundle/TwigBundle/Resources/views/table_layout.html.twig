@@ -1,25 +1,23 @@
 {% extends "TwigBundle::widgets.html.twig" %}
 
 {% block field__row %}
-{% spaceless %}
     <tr>
-        <td>{{ renderer.label }}</td>
         <td>
-        {{ renderer.errors }}
-        {{ renderer.widget }}
+            {{ form_label(context) }}
+        </td>
+        <td>
+            {{ form_errors(context) }}
+            {{ form_widget(context) }}
         </td>
     </tr>
-{% endspaceless %}
 {% endblock field__row %}
 
 {% block form__errors %}
-{% spaceless %}
     <tr>
         <td colspan="2">
             {{ block('field__errors') }}
         </td>
     </tr>
-{% endspaceless %}
 {% endblock form__errors %}
 
 {% block repeated__errors %}
@@ -27,10 +25,8 @@
 {% endblock repeated__errors %}
 
 {% block form__widget %}
-{% spaceless %}
     <table>
-    {{ block('field__rows') }}
-    {{ renderer.rest }}
+        {{ block('field__rows') }}
+        {{ form_rest(context) }}
     </table>
-{% endspaceless %}
 {% endblock form__widget %}

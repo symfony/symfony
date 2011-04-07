@@ -1,10 +1,10 @@
 <input type="file"
-    id="<?php echo $renderer['file']->getVar('id') ?>"
-    name="<?php echo $renderer['file']->getVar('name') ?>"
-    <?php if ($renderer['file']->getVar('disabled')): ?>disabled="disabled"<?php endif ?>
-    <?php if ($renderer['file']->getVar('required')): ?>required="required"<?php endif ?>
-    <?php if ($renderer['file']->getVar('class')): ?>class="<?php echo $renderer['file']->getVar('class') ?>"<?php endif ?>
+    id="<?php echo $context['file']->get('id') ?>"
+    name="<?php echo $context['file']->get('name') ?>"
+    <?php if ($context['file']->get('disabled')): ?>disabled="disabled"<?php endif ?>
+    <?php if ($context['file']->get('required')): ?>required="required"<?php endif ?>
+    <?php if ($context['file']->get('class')): ?>class="<?php echo $context['file']->get('class') ?>"<?php endif ?>
 />
 
-<?php echo $renderer['token']->getWidget() ?>
-<?php echo $renderer['name']->getWidget() ?>
+<?php echo $view['form']->widget($context['token']) ?>
+<?php echo $view['form']->widget($context['name']) ?>

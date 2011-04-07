@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Renderer\ThemeRendererInterface;
+use Symfony\Component\Form\TemplateContext;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\DataMapper\PropertyPathMapper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -36,18 +36,18 @@ class FormType extends AbstractType
         }
     }
 
-    public function buildRendererBottomUp(ThemeRendererInterface $renderer, FormInterface $form)
+    public function buildVariablesBottomUp(TemplateContext $variables, FormInterface $form)
     {
         $multipart = false;
 
-        foreach ($renderer as $child) {
-            if ($child->getVar('multipart')) {
+        foreach ($variables as $child) {
+            if ($child->get('multipart')) {
                 $multipart = true;
                 break;
             }
         }
 
-        $renderer->setVar('multipart', $multipart);
+        $variables->set('multipart', $multipart);
     }
 
     public function getDefaultOptions(array $options)

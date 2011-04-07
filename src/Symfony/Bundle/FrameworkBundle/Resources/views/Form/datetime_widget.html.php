@@ -1,3 +1,3 @@
-<?php echo $renderer['date']->getWidget() ?>
+<?php echo $form['form']->widget($context['date']) ?>
 <?php /* keep space */ ?>
-<?php echo $renderer['time']->getWidget() ?>
+<?php echo $form['form']->widget($context['time']) ?>

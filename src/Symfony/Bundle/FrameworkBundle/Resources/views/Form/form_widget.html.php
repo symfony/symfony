@@ -1,8 +1,8 @@
 <div>
-    <?php echo $renderer->getErrors() ?>
-    <?php foreach ($renderer as $field): ?>
-        <?php echo $field->getRow(); ?>
+    <?php echo $view['form']->errors($context); ?>
+    <?php foreach ($context->getChildren() as $context): ?>
+        <?php echo $view['form']->row($context); ?>
     <?php endforeach; ?>
-    <?php echo $renderer->getRest() ?>
+    <?php echo $view['form']->rest($context) ?>
 </div>
 

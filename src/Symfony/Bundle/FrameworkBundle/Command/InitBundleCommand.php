@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Bundle\FrameworkBundle\Util\Mustache;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Initializes a new bundle.
@@ -35,7 +36,8 @@ class InitBundleCommand extends Command
                 new InputArgument('namespace', InputArgument::REQUIRED, 'The namespace of the bundle to create'),
                 new InputArgument('dir', InputArgument::REQUIRED, 'The directory where to create the bundle'),
                 new InputArgument('bundleName', InputArgument::OPTIONAL, 'The optional bundle name'),
-                new InputOption('format', '', InputOption::VALUE_REQUIRED, 'Use the format for configuration files (php, xml, or yml)', 'yml')
+                new InputOption('format', '', InputOption::VALUE_REQUIRED, 'Use the format for configuration files (php, xml, or yml)', 'yml'),
+                new InputOption('use-doctrine', '', InputOption::VALUE_NONE, 'Add newly created bundle to the Doctrine ORM mapping')
             ))
             ->setHelp(<<<EOT
 The <info>init:bundle</info> command generates a new bundle with a basic skeleton.
@@ -113,9 +115,20 @@ EOT
 
         rename($targetDir.'/Bundle.php', $targetDir.'/'.$bundle.'.php');
 
+        if ($input->getOption('use-doctrine')) {
+            $configuration = Yaml::load($this->container->getParameter('kernel.root_dir').'/config/config.yml');
+            $configuration['doctrine']['orm']['mappings'][$bundle] = null;
+            file_put_contents($this->container->getParameter('kernel.root_dir').'/config/config.yml', Yaml::dump($configuration, 4));
+        }
+
         $output->writeln('<comment>Summary of actions</comment>');
         $output->writeln(sprintf('- The bundle "<info>%s</info>" was created at "<info>%s</info>" and is using the namespace "<info>%s</info>".', $bundle, $targetDir, $namespace));
         $output->writeln(sprintf('- The bundle contains a sample controller, a sample template and a sample routing file.'));
+
+        if ($input->getOption('use-doctrine'))
+        {
+            $output->writeln(sprintf('- Your new bundle has been registered in the ORM mapping, entities will be automatically detected'));
+        }
 
         $output->writeln('');
         $output->writeln('<comment>Follow-up actions</comment>');

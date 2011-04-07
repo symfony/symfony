@@ -41,9 +41,9 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('handlers')
                     ->canBeUnset()
-                    ->performNoDeepMerging()
                     ->useAttributeAsKey('name')
                     ->prototype('array')
+                        ->canBeUnset()
                         ->children()
                             ->scalarNode('type')
                                 ->isRequired()
@@ -54,19 +54,21 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                             ->scalarNode('id')->end()
+                            ->scalarNode('priority')->defaultValue(0)->end()
                             ->scalarNode('level')->defaultValue('DEBUG')->end()
                             ->booleanNode('bubble')->defaultFalse()->end()
-                            ->scalarNode('path')->end() // stream specific
-                            ->scalarNode('ident')->end() // syslog specific
-                            ->scalarNode('facility')->end() // syslog specific
-                            ->scalarNode('action_level')->end() // fingerscrossed specific
-                            ->scalarNode('buffer_size')->end() // fingerscrossed specific
-                            ->scalarNode('handler')->end() // fingerscrossed specific
+                            ->scalarNode('path')->end() // stream and rotating
+                            ->scalarNode('ident')->end() // syslog
+                            ->scalarNode('facility')->end() // syslog
+                            ->scalarNode('max_files')->end() // rotating
+                            ->scalarNode('action_level')->end() // fingerscrossed
+                            ->scalarNode('buffer_size')->end() // fingerscrossed and buffer
+                            ->scalarNode('handler')->end() // fingerscrossed and buffer
                             ->scalarNode('formatter')->end()
                         ->end()
                         ->append($this->getProcessorsNode())
                         ->validate()
-                            ->ifTrue(function($v) { return 'fingerscrossed' === $v['type'] && !isset($v['handler']); })
+                            ->ifTrue(function($v) { return ('fingerscrossed' === $v['type'] || 'buffer' === $v['type']) && 1 !== count($v['handler']); })
                             ->thenInvalid('The handler has to be specified to use a FingersCrossedHandler')
                         ->end()
                         ->validate()

@@ -8,6 +8,8 @@
         <parameter key="monolog.logger.class">Symfony\Bundle\MonologBundle\Logger\Logger</parameter>
         <parameter key="monolog.handler.stream.class">Monolog\Handler\StreamHandler</parameter>
         <parameter key="monolog.handler.fingerscrossed.class">Monolog\Handler\FingersCrossedHandler</parameter>
+        <parameter key="monolog.handler.buffer.class">Monolog\Handler\BufferHandler</parameter>
+        <parameter key="monolog.handler.rotatingfile.class">Monolog\Handler\RotatingFileHandler</parameter>
         <parameter key="monolog.handler.syslog.class">Monolog\Handler\SyslogHandler</parameter>
         <parameter key="monolog.handler.null.class">Monolog\Handler\NullHandler</parameter>
         <parameter key="monolog.handler.test.class">Monolog\Handler\TestHandler</parameter>

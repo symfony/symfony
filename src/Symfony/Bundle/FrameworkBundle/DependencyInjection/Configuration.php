@@ -4,34 +4,45 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * FrameworkExtension configuration structure.
  *
  * @author Jeremy Mikola <jmikola@gmail.com>
  */
-class Configuration
+class Configuration implements ConfigurationInterface
 {
+    private $debug;
+
     /**
-     * Generates the configuration tree.
+     * Constructor
      *
-     * @param boolean $kernelDebug The kernel.debug DIC parameter
-     *
-     * @return \Symfony\Component\Config\Definition\ArrayNode The config tree
+     * @param Boolean $debug Wether to use the debug mode
      */
-    public function getConfigTree($kernelDebug)
+    public function  __construct($debug)
+    {
+        $this->debug = (Boolean) $debug;
+    }
+
+    /**
+     * Generates the configuration tree builder.
+     *
+     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+     */
+    public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('framework');
 
         $rootNode
             ->children()
-                ->scalarNode('cache_warmer')->defaultValue(!$kernelDebug)->end()
+                ->scalarNode('cache_warmer')->defaultValue(!$this->debug)->end()
                 ->scalarNode('charset')->end()
                 ->scalarNode('document_root')->end()
                 ->scalarNode('error_handler')->end()
                 ->scalarNode('exception_controller')->defaultValue('Symfony\\Bundle\\FrameworkBundle\\Controller\\ExceptionController::showAction')->end()
-                ->scalarNode('ide')->end()
+                ->scalarNode('ide')->defaultNull()->end()
                 ->booleanNode('test')->end()
             ->end()
         ;
@@ -45,7 +56,7 @@ class Configuration
         $this->addTranslatorSection($rootNode);
         $this->addValidationSection($rootNode);
 
-        return $treeBuilder->buildTree();
+        return $treeBuilder;
     }
 
     private function addCsrfProtectionSection(ArrayNodeDefinition $rootNode)
@@ -90,6 +101,7 @@ class Configuration
                     ->canBeUnset()
                     ->children()
                         ->booleanNode('only_exceptions')->defaultValue(false)->end()
+                        ->booleanNode('only_master_requests')->defaultValue(false)->end()
                         ->scalarNode('dsn')->defaultValue('sqlite:%kernel.cache_dir%/profiler.db')->end()
                         ->scalarNode('username')->defaultValue('')->end()
                         ->scalarNode('password')->defaultValue('')->end()
@@ -279,6 +291,7 @@ class Configuration
                     ->end()
                     ->children()
                         ->booleanNode('enabled')->end()
+                        ->scalarNode('cache')->end()
                         ->arrayNode('annotations')
                             ->canBeUnset()
                             ->treatNullLike(array())

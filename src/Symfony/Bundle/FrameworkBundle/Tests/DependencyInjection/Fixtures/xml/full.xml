@@ -12,7 +12,7 @@
         <app:profiler only-exceptions="true" />
         <app:router cache-warmer="true" resource="%kernel.root_dir%/config/routing.xml" type="xml" />
         <app:session auto-start="true" class="Session" default-locale="fr" storage-id="native" name="_SYMFONY" lifetime="86400" path="/" domain="example.com" secure="true" httponly="true" />
-        <app:templating assets-version="SomeVersionScheme" cache-warmer="true">
+        <app:templating assets-version="SomeVersionScheme" cache-warmer="true" cache="/path/to/cache" >
             <app:loader>loader.foo</app:loader>
             <app:loader>loader.bar</app:loader>
             <app:engine id="php" />
@@ -29,6 +29,6 @@
             </app:package>
         </app:templating>
         <app:translator enabled="true" fallback="fr" />
-        <app:validation enabled="true" />
+        <app:validation enabled="true" cache="apc" />
     </app:config>
 </container>

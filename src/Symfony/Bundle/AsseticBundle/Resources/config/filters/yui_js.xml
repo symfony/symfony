@@ -7,7 +7,7 @@
     <parameters>
         <parameter key="assetic.filter.yui_js.class">Assetic\Filter\Yui\JsCompressorFilter</parameter>
         <parameter key="assetic.filter.yui_js.java">%assetic.java.bin%</parameter>
-        <parameter key="assetic.filter.yui_js.jar">%assetic.yui.jar%</parameter>
+        <parameter key="assetic.filter.yui_js.jar" />
     </parameters>
 
     <services>

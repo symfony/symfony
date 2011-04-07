@@ -23,7 +23,7 @@ class ContainerTest extends TestCase
         require_once __DIR__.'/DependencyInjection/Fixtures/Bundles/YamlBundle/YamlBundle.php';
 
         $container = new ContainerBuilder(new ParameterBag(array(
-            'kernel.bundles'     => array('Yaml' => 'DoctrineMongoDBBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle\YamlBundle'),
+            'kernel.bundles'     => array('YamlBundle' => 'DoctrineMongoDBBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle\YamlBundle'),
             'kernel.cache_dir'   => sys_get_temp_dir(),
             'kernel.debug'       => false,
         )));
@@ -31,7 +31,7 @@ class ContainerTest extends TestCase
         $container->registerExtension($loader);
 
         $configs = array();
-        $configs[] = array('connections' => array('default' => array()), 'document_managers' => array('default' => array('mappings' => array('Yaml' => array()))));
+        $configs[] = array('connections' => array('default' => array()), 'document_managers' => array('default' => array('mappings' => array('YamlBundle' => array()))));
         $loader->load($configs, $container);
 
         return $container;

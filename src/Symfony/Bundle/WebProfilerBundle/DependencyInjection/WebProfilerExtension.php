@@ -39,15 +39,18 @@ class WebProfilerExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration();
         $processor = new Processor();
-        $config = $processor->process($configuration->getConfigTree(), $configs);
+        $configuration = new Configuration();
+        $config = $processor->processConfiguration($configuration, $configs);
 
         if ($config['toolbar']) {
             $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
             $loader->load('toolbar.xml');
 
-            $container->getDefinition('web_profiler.debug.toolbar')->setArgument(1, $config['intercept_redirects']);
+            $container->getDefinition('web_profiler.debug.toolbar')
+                ->setArgument(1, $config['intercept_redirects'])
+                ->setArgument(2, $config['verbose'])
+            ;
         }
     }
 

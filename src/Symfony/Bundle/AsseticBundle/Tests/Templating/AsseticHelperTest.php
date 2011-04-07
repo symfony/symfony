@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\AsseticBundle\Tests\Templating;
 
 use Assetic\Asset\AssetCollection;
+use Assetic\Asset\AssetInterface;
 use Assetic\Asset\StringAsset;
 use Assetic\Factory\AssetFactory;
 use Symfony\Bundle\AsseticBundle\Templating\AsseticHelper;
@@ -30,7 +31,7 @@ class AsseticHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testUrls($debug, $count, $message)
     {
-        $helper = new AsseticHelper(new AssetFactory('/foo', $debug), $debug);
+        $helper = new AsseticHelperForTest(new AssetFactory('/foo', $debug), $debug);
         $urls = $helper->javascripts(array('js/jquery.js', 'js/jquery.plugin.js'));
 
         $this->assertInternalType('array', $urls, '->javascripts() returns an array');
@@ -43,5 +44,13 @@ class AsseticHelperTest extends \PHPUnit_Framework_TestCase
             array(false, 1, '->javascripts() returns one url when not in debug mode'),
             array(true, 2, '->javascripts() returns many urls when in debug mode'),
         );
+    }
+}
+
+class AsseticHelperForTest extends AsseticHelper
+{
+    protected function getAssetUrl(AssetInterface $asset, $options = array())
+    {
+        return $asset->getTargetUrl();
     }
 }

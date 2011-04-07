@@ -4,20 +4,21 @@ namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * TwigExtension configuration structure.
  *
  * @author Jeremy Mikola <jmikola@gmail.com>
  */
-class Configuration
+class Configuration implements ConfigurationInterface
 {
     /**
-     * Generates the configuration tree.
+     * Generates the configuration tree builder.
      *
-     * @return \Symfony\Component\Config\Definition\ArrayNode The config tree
+     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
      */
-    public function getConfigTree()
+    public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('twig');
@@ -33,7 +34,7 @@ class Configuration
         $this->addGlobalsSection($rootNode);
         $this->addTwigOptions($rootNode);
 
-        return $treeBuilder->buildTree();
+        return $treeBuilder;
     }
 
     private function addExtensionsSection(ArrayNodeDefinition $rootNode)
@@ -63,11 +64,11 @@ class Configuration
                     ->children()
                         ->arrayNode('resources')
                             ->addDefaultsIfNotSet()
-                            ->defaultValue(array('Twig::form.html.twig'))
+                            ->defaultValue(array('TwigBundle::form.html.twig'))
                             ->validate()
                                 ->always()
                                 ->then(function($v){
-                                    return array_merge(array('Twig::form.html.twig'), $v);
+                                    return array_merge(array('TwigBundle::form.html.twig'), $v);
                                 })
                             ->end()
                             ->prototype('scalar')->end()

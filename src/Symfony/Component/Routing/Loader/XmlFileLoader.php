@@ -57,7 +57,7 @@ class XmlFileLoader extends FileLoader
                     $type = (string) $node->getAttribute('type');
                     $prefix = (string) $node->getAttribute('prefix');
                     $this->setCurrentDir(dirname($path));
-                    $collection->addCollection($this->import($resource, ('' !== $type ? $type : null)), $prefix);
+                    $collection->addCollection($this->import($resource, ('' !== $type ? $type : null), false, $file), $prefix);
                     break;
                 default:
                     throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));

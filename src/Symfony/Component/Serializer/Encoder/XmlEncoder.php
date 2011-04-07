@@ -22,9 +22,9 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class XmlEncoder extends AbstractEncoder
 {
-    protected $dom;
-    protected $format;
-    protected $rootNodeName = 'response';
+    private $dom;
+    private $format;
+    private $rootNodeName = 'response';
 
     /**
      * {@inheritdoc}
@@ -79,12 +79,82 @@ class XmlEncoder extends AbstractEncoder
     }
 
     /**
+     * @param DOMNode $node
+     * @param string $val
+     * @return Boolean
+     */
+    final protected function appendXMLString($node, $val)
+    {
+        if (strlen($val) > 0) {
+            $frag = $this->dom->createDocumentFragment();
+            $frag->appendXML($val);
+            $node->appendChild($frag);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param DOMNode $node
+     * @param string $val
+     * @return Boolean
+     */
+    final protected function appendText($node, $val)
+    {
+        $nodeText = $this->dom->createTextNode($val);
+        $node->appendChild($nodeText);
+
+        return true;
+    }
+
+    /**
+     * @param DOMNode $node
+     * @param string $val
+     * @return Boolean
+     */
+    final protected function appendCData($node, $val)
+    {
+        $nodeText = $this->dom->createCDATASection($val);
+        $node->appendChild($nodeText);
+
+        return true;
+    }
+
+    /**
+     * @param DOMNode $node
+     * @param DOMDocumentFragment $fragment
+     * @return Boolean
+     */
+    final protected function appendDocumentFragment($node, $fragment)
+    {
+        if ($fragment instanceof \DOMDocumentFragment) {
+            $node->appendChild($fragment);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks the name is avalid xml element name
+     * @param string $name
+     * @return Boolean
+     */
+    final protected function isElementNameValid($name)
+    {
+        return $name &&
+            false === strpos($name, ' ') &&
+            preg_match('#^[\pL_][\pL0-9._-]*$#ui', $name);
+    }
+
+    /**
      * Parse the input SimpleXmlElement into an array
      *
      * @param SimpleXmlElement $node xml to parse
      * @return array
      */
-    protected function parseXml($node)
+    private function parseXml($node)
     {
         $data = array();
         foreach ($node->children() as $key => $subnode) {
@@ -126,7 +196,7 @@ class XmlEncoder extends AbstractEncoder
      * @param array|object $data data
      * @return bool
      */
-    protected function buildXml($parentNode, $data)
+    private function buildXml($parentNode, $data)
     {
         $append = true;
 
@@ -183,7 +253,7 @@ class XmlEncoder extends AbstractEncoder
      * @param  $nodename
      * @return void
      */
-    protected function appendNode($parentNode, $data, $nodeName, $key = null)
+    private function appendNode($parentNode, $data, $nodeName, $key = null)
     {
         $node = $this->dom->createElement($nodeName);
         if (null !== $key) {
@@ -204,7 +274,7 @@ class XmlEncoder extends AbstractEncoder
      * @param mixed $val
      * @return Boolean
      */
-    protected function selectNodeType($node, $val)
+    private function selectNodeType($node, $val)
     {
         if (is_array($val)) {
             return $this->buildXml($node, $val);
@@ -227,75 +297,5 @@ class XmlEncoder extends AbstractEncoder
         }
 
         return true;
-    }
-
-    /**
-     * @param DOMNode $node
-     * @param string $val
-     * @return Boolean
-     */
-    protected function appendXMLString($node, $val)
-    {
-        if (strlen($val) > 0) {
-            $frag = $this->dom->createDocumentFragment();
-            $frag->appendXML($val);
-            $node->appendChild($frag);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param DOMNode $node
-     * @param string $val
-     * @return Boolean
-     */
-    protected function appendText($node, $val)
-    {
-        $nodeText = $this->dom->createTextNode($val);
-        $node->appendChild($nodeText);
-
-        return true;
-    }
-
-    /**
-     * @param DOMNode $node
-     * @param string $val
-     * @return Boolean
-     */
-    protected function appendCData($node, $val)
-    {
-        $nodeText = $this->dom->createCDATASection($val);
-        $node->appendChild($nodeText);
-
-        return true;
-    }
-
-    /**
-     * @param DOMNode $node
-     * @param DOMDocumentFragment $fragment
-     * @return Boolean
-     */
-    protected function appendDocumentFragment($node, $fragment)
-    {
-        if ($fragment instanceof \DOMDocumentFragment) {
-            $node->appendChild($fragment);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks the name is avalid xml element name
-     * @param string $name
-     * @return Boolean
-     */
-    protected function isElementNameValid($name)
-    {
-        return $name &&
-            false === strpos($name, ' ') &&
-            preg_match('#^[\pL_][\pL0-9._-]*$#ui', $name);
     }
 }

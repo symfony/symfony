@@ -16,8 +16,8 @@
         <parameter key="router.options.generator_class">Symfony\Component\Routing\Generator\UrlGenerator</parameter>
         <parameter key="router.options.generator_base_class">Symfony\Component\Routing\Generator\UrlGenerator</parameter>
         <parameter key="router.options.generator_dumper_class">Symfony\Component\Routing\Generator\Dumper\PhpGeneratorDumper</parameter>
-        <parameter key="router.options.matcher_class">Symfony\Component\Routing\Matcher\UrlMatcher</parameter>
-        <parameter key="router.options.matcher_base_class">Symfony\Component\Routing\Matcher\UrlMatcher</parameter>
+        <parameter key="router.options.matcher_class">Symfony\Bundle\FrameworkBundle\Routing\RedirectableUrlMatcher</parameter>
+        <parameter key="router.options.matcher_base_class">Symfony\Bundle\FrameworkBundle\Routing\RedirectableUrlMatcher</parameter>
         <parameter key="router.options.matcher_dumper_class">Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper</parameter>
         <parameter key="router.cache_warmer.class">Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer</parameter>
         <parameter key="router.options.matcher.cache_class">%kernel.name%%kernel.environment%UrlMatcher</parameter>
@@ -48,6 +48,7 @@
         </service>
 
         <service id="routing.loader.real" class="%routing.loader.class%">
+            <tag name="monolog.logger" channel="router" />
             <argument type="service" id="controller_name_converter" />
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="routing.resolver" />

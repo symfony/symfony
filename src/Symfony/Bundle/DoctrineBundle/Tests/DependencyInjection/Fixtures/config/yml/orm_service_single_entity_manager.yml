@@ -17,7 +17,7 @@ doctrine:
             default:
                 connection: default
                 mappings:
-                    Yaml: ~
+                    YamlBundle: ~
                 metadata_cache_driver:
                     type: memcache
                     class: Doctrine\Common\Cache\MemcacheCache

@@ -90,6 +90,9 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $actual = $container->getParameterBag()->all();
         $expected = array('foo' => 'bar', 'values' => array(true, false), 'bar' => '%foo%', 'foo_bar' => new Reference('foo_bar'), 'mixedcase' => array('MixedCaseKey' => 'value'), 'imported_from_ini' => true, 'imported_from_xml' => true);
         $this->assertEquals(array_keys($expected), array_keys($actual), '->load() imports and merges imported files');
+
+        // Bad import throws no exception due to ignore_errors value.
+        $loader->load('services4_bad_import.yml');
     }
 
     public function testLoadServices()

@@ -24,9 +24,9 @@ class DynamicExtension extends AsseticExtension
     public function getTokenParsers()
     {
         return array(
-            new DynamicTokenParser($this->factory, 'javascripts', 'js/*.js', $this->debug),
-            new DynamicTokenParser($this->factory, 'stylesheets', 'css/*.css', $this->debug),
-            new DynamicTokenParser($this->factory, 'image', 'images/*', $this->debug, true),
+            new DynamicTokenParser($this->factory, 'javascripts', 'js/*.js', $this->debug, false, array('package')),
+            new DynamicTokenParser($this->factory, 'stylesheets', 'css/*.css', $this->debug, false, array('package')),
+            new DynamicTokenParser($this->factory, 'image', 'images/*', $this->debug, true, array('package')),
         );
     }
 }

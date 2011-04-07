@@ -1,11 +1,11 @@
-{% extends 'WebProfiler:Profiler:base.html.twig' %}
+{% extends 'WebProfilerBundle:Profiler:base.html.twig' %}
 
 {% block body %}
 
-    {% render 'WebProfiler:Profiler:toolbar' with { 'token': token, 'position': 'normal' } %}
+    {% render 'WebProfilerBundle:Profiler:toolbar' with { 'token': token, 'position': 'normal' } %}
 
     <div id="content">
-        {% include 'WebProfiler:Profiler:header.html.twig' only %}
+        {% include 'WebProfilerBundle:Profiler:header.html.twig' only %}
 
         {% if not profiler.isempty %}
             <div id="resume">
@@ -39,8 +39,8 @@
                             {% endfor %}
                         </ul>
                     {% endif %}
-                    {% render 'WebProfiler:Profiler:searchBar' %}
-                    {% include 'WebProfiler:Profiler:admin.html.twig' with { 'token': token } only %}
+                    {% render 'WebProfilerBundle:Profiler:searchBar' %}
+                    {% include 'WebProfilerBundle:Profiler:admin.html.twig' with { 'token': token } only %}
                 </div>
             </div>
         </div>

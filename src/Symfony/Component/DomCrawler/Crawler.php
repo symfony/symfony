@@ -238,7 +238,7 @@ class Crawler extends \SplObjectStorage
      *
      * Example:
      *
-     *     $crawler->filter('h1')->each(function ($i, $node)
+     *     $crawler->filter('h1')->each(function ($node, $i)
      *     {
      *       return $node->nodeValue;
      *     });

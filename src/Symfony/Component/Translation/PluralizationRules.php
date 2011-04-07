@@ -31,10 +31,9 @@ class PluralizationRules
      */
     static public function get($number, $locale)
     {
-        if ("pt_BR" == $locale) {
-            // temporary set a locale for brasilian
-            $locale = "xbr";
-        }
+        // temporary set a locale for brasilian
+        $locale = self::brasilianLocaleConvert($locale);
+
 
         if (strlen($locale) > 3) {
             $locale = substr($locale, 0, -strlen(strrchr($locale, '_')));
@@ -197,11 +196,9 @@ class PluralizationRules
      */
     static public function set($rule, $locale)
     {
-        if ("pt_BR" == $locale) {
-            // temporary set a locale for brasilian
-            $locale = "xbr";
-        }
-
+        // temporary set a locale for brasilian
+        $locale = self::brasilianLocaleConvert($locale);
+        
         if (strlen($locale) > 3) {
             $locale = substr($locale, 0, -strlen(strrchr($locale, '_')));
         }
@@ -211,6 +208,12 @@ class PluralizationRules
         }
 
         self::$rules[$locale] = $rule;
+    }
+
+    static private function brasilianLocaleConvert($locale) 
+    {
+        // temporary set a locale for brasilian
+        return 'pt_BR' === $locale ? 'xbr' : $locale;
     }
 
     // @codeCoverageIgnoreEnd

@@ -30,7 +30,7 @@ interface ThemeRendererInterface extends RendererInterface
      * Warning: Do not attempt to overwrite id, name, class, size or maxlength, disabled or requried attributes with this setting.
      * They have their own renderer variables that should be set through {@setVar()}.
      *
-     * Important: This is a convenience method, all variables set have to accessible through {@getVar('attr')}
+     * Important: This is a convenience method, all variables set have to be accessed through {@getVar('attr')}
      *
      * @param string $name
      * @param string $value

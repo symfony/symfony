@@ -178,7 +178,7 @@ class ProfilerController extends ContainerAware
         $profiler->disable();
 
         if (!$session = $this->container->get('request')->getSession()) {
-            return new Response(null, 200);
+            return new Response();
         }
 
         $ip    = $session->get('_profiler_search_ip');

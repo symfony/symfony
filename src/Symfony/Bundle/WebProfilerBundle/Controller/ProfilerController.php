@@ -129,9 +129,9 @@ class ProfilerController extends ContainerAware
     {
         $request = $this->container->get('request');
 
-        if ($session = $request->getSession()) {
+        if (null !== $session = $request->getSession()) {
             // keep current flashes for one more request
-            $session->setFlashes($request->getSession()->getFlashes());
+            $session->setFlashes($session->getFlashes());
         }
 
         if (null === $token) {
@@ -177,7 +177,7 @@ class ProfilerController extends ContainerAware
         $profiler = $this->container->get('profiler');
         $profiler->disable();
 
-        if (!$session = $this->container->get('request')->getSession()) {
+        if (null === $session = $this->container->get('request')->getSession()) {
             return new Response();
         }
 
@@ -206,7 +206,7 @@ class ProfilerController extends ContainerAware
 
         $pofiler = $profiler->loadFromToken($token);
 
-        if (!$session = $this->container->get('request')->getSession()) {
+        if (null === $session = $this->container->get('request')->getSession()) {
             throw new \RuntimeException('To access to search, activate the session in your configuration.');
         }
 

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\TwigBundle\Node;
+namespace Symfony\Bridge\Twig\Node;
 
 /**
  * 

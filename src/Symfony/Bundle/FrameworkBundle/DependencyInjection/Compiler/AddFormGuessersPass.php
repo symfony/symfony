@@ -35,6 +35,6 @@ class AddFormGuessersPass implements CompilerPassInterface
             $guessers[] = new Reference($serviceId);
         }
 
-        $container->getDefinition('form.factory')->setArgument(2, $guessers);
+        $container->getDefinition('form.factory')->setArgument(1, $guessers);
     }
 }

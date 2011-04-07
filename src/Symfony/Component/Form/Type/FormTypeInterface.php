@@ -13,15 +13,15 @@ namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Renderer\ThemeRendererInterface;
+use Symfony\Component\Form\TemplateContext;
 
 interface FormTypeInterface
 {
     function buildForm(FormBuilder $builder, array $options);
 
-    function buildRenderer(ThemeRendererInterface $renderer, FormInterface $form);
+    function buildVariables(TemplateContext $variables, FormInterface $form);
 
-    function buildRendererBottomUp(ThemeRendererInterface $renderer, FormInterface $form);
+    function buildVariablesBottomUp(TemplateContext $variables, FormInterface $form);
 
     function createBuilder($name, array $options);
 

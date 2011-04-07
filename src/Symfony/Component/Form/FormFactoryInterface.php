@@ -23,5 +23,5 @@ interface FormFactoryInterface
 
     function createForProperty($class, $property, array $options = array());
 
-    function createRenderer(FormInterface $form, $name = null);
+    function createTemplateContext(FormInterface $form);
 }

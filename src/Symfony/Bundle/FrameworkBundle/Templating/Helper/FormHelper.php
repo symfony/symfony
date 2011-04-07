@@ -12,12 +12,12 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Form\FieldInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+use Symfony\Component\Form\TemplateContext;
+use Symfony\Component\Form\Exception\FormException;
 
 /**
- * Form is a factory that wraps Form instances.
+ *
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
@@ -33,77 +33,24 @@ class FormHelper extends Helper
         $this->engine = $engine;
     }
 
-    public function getName()
+    public function attributes(array $attribs)
     {
-        return 'form';
-    }
-
-    public function attributes($attributes)
-    {
-        if ($attributes instanceof \Traversable) {
-            $attributes = iterator_to_array($attributes);
+        $html = '';
+        foreach ($attribs as $k => $v) {
+            $html .= $this->engine->escape($k).'="'.$this->engine->escape($v).'" ';
         }
 
-        return implode('', array_map(array($this, 'attributesCallback'), array_keys($attributes), array_values($attributes)));
+        return $html;
     }
 
-    private function attribute($name, $value)
+    public function enctype(TemplateContext $context)
     {
-        return sprintf('%s="%s"', $name, true === $value ? $name : $value);
+        return $this->renderTemplate($context, 'enctype');
     }
 
-    /**
-     * Prepares an attribute key and value for HTML representation.
-     *
-     * It removes empty attributes, except for the value one.
-     *
-     * @param  string $name   The attribute name
-     * @param  string $value  The attribute value
-     *
-     * @return string The HTML representation of the HTML key attribute pair.
-     */
-    private function attributesCallback($name, $value)
+    public function widget(TemplateContext $context, array $parameters = array(), $template = null)
     {
-        if (false === $value || null === $value || ('' === $value && 'value' != $name)) {
-            return '';
-        }
-
-        return ' '.$this->attribute($name, $value);
-    }
-
-    /**
-     * Renders the form tag.
-     *
-     * This method only renders the opening form tag.
-     * You need to close it after the form rendering.
-     *
-     * This method takes into account the multipart widgets.
-     *
-     * @param  string $url         The URL for the action
-     * @param  array  $attributes  An array of HTML attributes
-     *
-     * @return string An HTML representation of the opening form tag
-     */
-    public function enctype(/*Form */$form)
-    {
-        return $form->isMultipart() ? ' enctype="multipart/form-data"' : '';
-    }
-
-    public function render(/*FieldInterface */$field, array $attributes = array(), array $parameters = array(), $template = null)
-    {
-        if (null === $template) {
-            $template = $this->lookupTemplate($field);
-
-            if (null === $template) {
-                throw new \RuntimeException(sprintf('Unable to find a template to render the "%s" widget.', $field->getKey()));
-            }
-        }
-
-        return trim($this->engine->render($template, array(
-            'field'  => $field,
-            'attr'   => $attributes,
-            'params' => $parameters,
-        )));
+        return trim($this->renderTemplate($context, 'widget', $parameters, $template));
     }
 
     /**
@@ -112,85 +59,68 @@ class FormHelper extends Helper
      * @param  FieldInterface $field
      * @return string
      */
-    public function row(/*FieldInterface*/ $field, $template = null)
+    public function row(TemplateContext $context, $template = null)
     {
-        if (null === $template) {
-            $template = 'FrameworkBundle:Form:field_row.html.php';
-        }
-
-        return $this->engine->render($template, array(
-            'field' => $field,
-        ));
+        return $this->renderTemplate($context, 'row', array(), $template);
     }
 
-    public function label(/*FieldInterface */$field, $label = false, array $parameters = array(), $template = null)
+    public function label(TemplateContext $context, $label = null, array $parameters = array(), $template = null)
     {
-        if (null === $template) {
-            $template = 'FrameworkBundle:Form:label.html.php';
-        }
-
-        return $this->engine->render($template, array(
-            'field'  => $field,
-            'params' => $parameters,
-            'label'  => $label ? $label : ucfirst(strtolower(str_replace('_', ' ', $field->getKey())))
-        ));
+        return $this->renderTemplate($context, 'label', null === $label ? array() : array('label' => $label));
     }
 
-    public function errors(/*FieldInterface */$field, array $parameters = array(), $template = null)
+    public function errors(TemplateContext $context, array $parameters = array(), $template = null)
     {
-        if (null === $template) {
-            $template = 'FrameworkBundle:Form:errors.html.php';
-        }
-
-        return $this->engine->render($template, array(
-            'field'  => $field,
-            'params' => $parameters,
-        ));
+        return $this->renderTemplate($context, 'errors', array(), $template);
     }
 
-    public function hidden(/*FormInterface */$form, array $parameters = array(), $template = null)
+    public function rest(TemplateContext $context, array $parameters = array(), $template = null)
     {
-        if (null === $template) {
-            $template = 'FrameworkBundle:Form:hidden.html.php';
-        }
-
-        return $this->engine->render($template, array(
-            'field'  => $form,
-            'params' => $parameters,
-        ));
+        return $this->renderTemplate($context, 'rest', array(), $template);
     }
 
-    protected function lookupTemplate(/*FieldInterface */$field)
+    protected function renderTemplate(TemplateContext $context, $section, array $variables = array(), array $resources = null)
     {
-        $fqClassName = get_class($field);
-        $template = null;
+        $blocks = $context->get('types');
+        foreach ($blocks as &$block) {
+            $block = $block.'_'.$section;
 
-        if (isset(self::$cache[$fqClassName])) {
-            return self::$cache[$fqClassName];
-        }
+            if ($template = $this->lookupTemplate($block)) {
+                if ('widget' === $section) {
+                    $context->set('is_rendered', true);
+                }
 
-        // find a template for the given class or one of its parents
-        $currentFqClassName = $fqClassName;
-
-        do {
-            $parts = explode('\\', $currentFqClassName);
-            $className = array_pop($parts);
-
-            $underscoredName = strtolower(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), array('\\1_\\2', '\\1_\\2'), strtr($className, '_', '.')));
-
-            if ($this->engine->exists($guess = 'FrameworkBundle:Form:'.$underscoredName.'.html.php')) {
-                $template = $guess;
+                return $this->engine->render($template, array_merge($context->all(), $variables));
             }
-
-            $currentFqClassName = get_parent_class($currentFqClassName);
-        } while (null === $template && false !== $currentFqClassName);
-
-        if (null === $template && $field instanceof FormInterface) {
-            $template = 'FrameworkBundle:Form:form.html.php';
         }
 
-        self::$cache[$fqClassName] = $template;
+        throw new FormException(sprintf('Unable to render form as none of the following blocks exist: "%s".', implode('", "', $blocks)));
+    }
+
+    protected function lookupTemplate($templateName)
+    {
+        if (isset(self::$cache[$templateName])) {
+            return self::$cache[$templateName];
+        }
+
+        $template = $templateName.'.html.php';
+/*
+        if ($this->templateDir) {
+            $template = $this->templateDir.':'.$template;
+        }
+*/
+$template = 'FrameworkBundle:Form:'.$template;
+        if (!$this->engine->exists($template)) {
+            $template = false;
+        }
+
+        self::$cache[$templateName] = $template;
 
         return $template;
+    }
+
+    public function getName()
+    {
+        return 'form';
     }
 }

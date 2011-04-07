@@ -1,1 +1,1 @@
-<?php echo $renderer->getTheme()->render('number', 'widget', $renderer->getVars()) ?> %
+<?php echo $view['form']->widget('number', 'widget', $context) ?> %

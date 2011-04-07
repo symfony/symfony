@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Type;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\DataTransformer\BooleanToStringTransformer;
-use Symfony\Component\Form\Renderer\ThemeRendererInterface;
+use Symfony\Component\Form\TemplateContext;
 
 class RadioType extends AbstractType
 {
@@ -24,13 +24,13 @@ class RadioType extends AbstractType
             ->setAttribute('value', $options['value']);
     }
 
-    public function buildRenderer(ThemeRendererInterface $renderer, FormInterface $form)
+    public function buildVariables(TemplateContext $variables, FormInterface $form)
     {
-        $renderer->setVar('value', $form->getAttribute('value'));
-        $renderer->setVar('checked', (bool)$form->getData());
+        $variables->set('value', $form->getAttribute('value'));
+        $variables->set('checked', (bool)$form->getData());
 
-        if ($renderer->hasParent()) {
-            $renderer->setVar('name', $renderer->getParent()->getVar('name'));
+        if ($variables->hasParent()) {
+            $variables->set('name', $variables->getParent()->get('name'));
         }
     }
 

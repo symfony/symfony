@@ -97,6 +97,6 @@ class Cookie
      */
     public function isCleared()
     {
-        return $this->expire < time();
+        return $this->expire < $_SERVER['REQUEST_TIME'];
     }
 }

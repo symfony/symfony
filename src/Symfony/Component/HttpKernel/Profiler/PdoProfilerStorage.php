@@ -101,7 +101,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
             ':ip'           => $ip,
             ':url'          => $url,
             ':time'         => $time,
-            ':created_at'   => time(),
+            ':created_at'   => $_SERVER['REQUEST_TIME'],
         );
         try {
             $this->exec($db, 'INSERT INTO sf_profiler_data (token, parent, data, ip, url, time, created_at) VALUES (:token, :parent, :data, :ip, :url, :time, :created_at)', $args);
@@ -146,7 +146,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
     protected function cleanup()
     {
         $db = $this->initDb();
-        $this->exec($db, 'DELETE FROM sf_profiler_data WHERE created_at < :time', array(':time' => time() - $this->lifetime));
+        $this->exec($db, 'DELETE FROM sf_profiler_data WHERE created_at < :time', array(':time' => $_SERVER['REQUEST_TIME'] - $this->lifetime));
         $this->close($db);
     }
 

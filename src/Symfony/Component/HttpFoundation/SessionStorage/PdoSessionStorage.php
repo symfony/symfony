@@ -130,7 +130,7 @@ class PdoSessionStorage extends NativeSessionStorage
         $dbTimeCol = $this->options['db_time_col'];
 
         // delete the record associated with this id
-        $sql = 'DELETE FROM '.$dbTable.' WHERE '.$dbTimeCol.' < '.(time() - $lifetime);
+        $sql = 'DELETE FROM '.$dbTable.' WHERE '.$dbTimeCol.' < '.($_SERVER['REQUEST_TIME'] - $lifetime);
 
         try {
             $this->db->query($sql);
@@ -179,7 +179,7 @@ class PdoSessionStorage extends NativeSessionStorage
             $stmt = $this->db->prepare($sql);
             $stmt->bindParam(1, $id, \PDO::PARAM_STR);
             $stmt->bindValue(2, '', \PDO::PARAM_STR);
-            $stmt->bindValue(3, time(), \PDO::PARAM_INT);
+            $stmt->bindValue(3, $_SERVER['REQUEST_TIME'], \PDO::PARAM_INT);
             $stmt->execute();
 
             return '';
@@ -206,7 +206,7 @@ class PdoSessionStorage extends NativeSessionStorage
         $dbIdCol   = $this->options['db_id_col'];
         $dbTimeCol = $this->options['db_time_col'];
 
-        $sql = 'UPDATE '.$dbTable.' SET '.$dbDataCol.' = ?, '.$dbTimeCol.' = '.time().' WHERE '.$dbIdCol.'= ?';
+        $sql = 'UPDATE '.$dbTable.' SET '.$dbDataCol.' = ?, '.$dbTimeCol.' = '.$_SERVER['REQUEST_TIME'].' WHERE '.$dbIdCol.'= ?';
 
         try {
             $stmt = $this->db->prepare($sql);

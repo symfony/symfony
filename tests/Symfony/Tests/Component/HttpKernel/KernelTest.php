@@ -668,7 +668,7 @@ EOF;
         $bundle
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue(is_null($bundleName) ? get_class($bundle) : $bundleName))
+            ->will($this->returnValue(null === $bundleName ? get_class($bundle) : $bundleName))
         ;
 
         $bundle

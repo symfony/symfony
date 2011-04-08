@@ -31,20 +31,20 @@ class TemplateNameParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getLogicalNameToTemplateProvider
      */
-    public function testParse($name, $ref, $refname)
+    public function testParse($name, $ref)
     {
         $template = $this->parser->parse($name);
 
         $this->assertEquals($template->getSignature(), $ref->getSignature());
-        $this->assertEquals($template->getLogicalName(), $refname);
+        $this->assertEquals($template->getLogicalName(), $name);
     }
 
     public function getLogicalNameToTemplateProvider()
     {
         return array(
-            array('/path/to/section/name.engine', new TemplateReference('/path/to/section/name.engine', 'engine'), '/path/to/section/name.engine'),
-            array('name.engine', new TemplateReference('name.engine', 'engine'), 'name.engine'),
-            array('name', new TemplateReference('name'), 'name'),
+            array('/path/to/section/name.engine', new TemplateReference('/path/to/section/name.engine', 'engine')),
+            array('name.engine', new TemplateReference('name.engine', 'engine')),
+            array('name', new TemplateReference('name')),
         );
     }
 }

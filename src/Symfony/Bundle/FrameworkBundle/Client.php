@@ -87,8 +87,8 @@ class Client extends BaseClient
      */
     protected function doRequest($request)
     {
-        $returnValue = $this->kernel->handle($request);
         $this->kernel->shutdown();
+        $returnValue = $this->kernel->handle($request);
 
         return $returnValue;
     }

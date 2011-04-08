@@ -42,8 +42,8 @@ class DoctrineMongoDBLoggerTest extends \PHPUnit_Framework_TestCase
             ),
             // find
             array(
-                array('db' => 'foo', 'collection' => 'bar', 'find' => true, 'query' => array(), 'fields' => array()),
-                array('use foo;', 'db.bar.find();'),
+                array('db' => 'foo', 'collection' => 'bar', 'find' => true, 'query' => array('foo' => null), 'fields' => array()),
+                array('use foo;', 'db.bar.find({ "foo": null });'),
             ),
         );
     }

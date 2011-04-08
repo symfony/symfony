@@ -55,10 +55,20 @@ class CachedTemplateLocator extends TemplateLocator
     {
         $key = $template->getSignature();
 
-        if (!isset($this->templates[$key])) {
-            return parent::locate($template, $currentPath, $first);
-        }
+        $path = $this->getCachedTemplatePath($key);
 
-        return $this->templates[$key];
+        return $path === null ? parent::locate($template) : $path;
+    }
+
+    /**
+     * Returns the template path from the cache
+     * 
+     * @param string $key The template signature
+     * 
+     * @return string|null The path when it is present in the call, false otherwise
+     */
+    protected function getCachedTemplatePath($key)
+    {
+        return isset($this->templates[$key]) ? $this->templates[$key] : null;
     }
 }

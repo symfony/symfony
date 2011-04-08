@@ -53,7 +53,10 @@ class CombinedSelectorNode implements NodeInterface
      */
     public function __toString()
     {
-        $comb = $this->combinator == ' ' ? '<followed>' : $this->combinator;
+        $comb = $this->$this->combinator;
+        if (' ' == $this->combinator) {
+            $comb = '<followed>';
+        }
 
         return sprintf('%s[%s %s %s]', __CLASS__, $this->selector, $comb, $this->subselector);
     }

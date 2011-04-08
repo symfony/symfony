@@ -43,7 +43,8 @@ abstract class AbstractDoctrineExtension extends Extension
     protected function loadMappingInformation(array $objectManager, ContainerBuilder $container)
     {
         if (isset($objectManager['mappings'])) {
-            foreach ($objectManager['mappings'] as $mappingName => $mappingConfig) {
+            $mappings = $objectManager['mappings'];
+            foreach ($mappings as $mappingName => $mappingConfig) {
                 if (!isset($mappingConfig['dir'])) {
                     $mappingConfig['dir'] = false;
                 }
@@ -65,7 +66,8 @@ abstract class AbstractDoctrineExtension extends Extension
 
                 if ($mappingConfig['is_bundle']) {
                     $bundle = null;
-                    foreach ($container->getParameter('kernel.bundles') as $name => $class) {
+                    $kernelBundles = $container->getParameter('kernel.bundles');
+                    foreach ($kernelBundles as $name => $class) {
                         if ($mappingName === $name) {
                             $bundle = new \ReflectionClass($class);
 

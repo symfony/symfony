@@ -29,7 +29,8 @@ class AssetFactoryPass implements CompilerPassInterface
         }
 
         $factory = $container->getDefinition('assetic.asset_factory');
-        foreach ($container->findTaggedServiceIds('assetic.factory_worker') as $id => $attr) {
+        $taggedServicesIds = $container->findTaggedServiceIds('assetic.factory_worker');
+        foreach ($taggedServicesIds as $id => $attr) {
             $factory->addMethodCall('addWorker', array(new Reference($id)));
         }
     }

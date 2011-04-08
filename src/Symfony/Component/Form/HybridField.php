@@ -42,7 +42,7 @@ class HybridField extends Form
      */
     public function setFieldMode($mode)
     {
-        if (count($this) > 0 && $mode === self::FIELD) {
+        if (count($this) > 0 && self::FIELD === $this->mode) {
             throw new FormException('Switching to mode FIELD is not allowed after adding nested fields');
         }
 
@@ -81,7 +81,7 @@ class HybridField extends Form
      */
     public function add($field)
     {
-        if ($this->mode === self::FIELD) {
+        if (self::FIELD === $this->mode) {
             throw new FormException('You cannot add nested fields while in mode FIELD');
         }
 
@@ -93,7 +93,7 @@ class HybridField extends Form
      */
     public function getDisplayedData()
     {
-        if ($this->mode === self::FORM) {
+        if (self::FORM === $this->mode) {
             return parent::getDisplayedData();
         }
 
@@ -105,7 +105,7 @@ class HybridField extends Form
      */
     public function setData($data)
     {
-        if ($this->mode === self::FORM) {
+        if (self::FORM === $this->mode) {
             parent::setData($data);
         } else {
             Field::setData($data);
@@ -117,7 +117,7 @@ class HybridField extends Form
      */
     public function submit($data)
     {
-        if ($this->mode === self::FORM) {
+        if (self::FORM === $this->mode) {
             parent::submit($data);
         } else {
             Field::submit($data);
@@ -129,7 +129,7 @@ class HybridField extends Form
      */
     public function isEmpty()
     {
-        if ($this->mode === self::FORM) {
+        if (self::FORM === $this->mode) {
             return parent::isEmpty();
         }
 

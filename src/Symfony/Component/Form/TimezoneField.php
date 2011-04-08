@@ -62,7 +62,7 @@ class TimezoneField extends ChoiceField
      */
     protected static function getTimezoneChoices()
     {
-        if (count(self::$timezones) == 0) {
+        if (0 === count(self::$timezones)) {
             foreach (\DateTimeZone::listIdentifiers() as $timezone) {
                 $parts = explode('/', $timezone);
 

@@ -31,7 +31,8 @@ class AssetManagerPass implements CompilerPassInterface
         $am = $container->getDefinition('assetic.asset_manager');
 
         // add assets
-        foreach ($container->findTaggedServiceIds('assetic.asset') as $id => $attributes) {
+        $taggedServicesIds = $container->findTaggedServiceIds('assetic.asset');
+        foreach ($taggedServicesIds as $id => $attributes) {
             foreach ($attributes as $attr) {
                 if (isset($attr['alias'])) {
                     $am->addMethodCall('set', array($attr['alias'], new Reference($id)));
@@ -41,7 +42,8 @@ class AssetManagerPass implements CompilerPassInterface
 
         // add loaders
         $loaders = array();
-        foreach ($container->findTaggedServiceIds('assetic.formula_loader') as $id => $attributes) {
+        $taggedServicesIds = $container->findTaggedServiceIds('assetic.formula_loader');
+        foreach ($taggedServicesIds as $id => $attributes) {
             foreach ($attributes as $attr) {
                 if (isset($attr['alias'])) {
                     $loaders[$attr['alias']] = new Reference($id);
@@ -51,7 +53,8 @@ class AssetManagerPass implements CompilerPassInterface
         $am->setArgument(1, $loaders);
 
         // add resources
-        foreach ($container->findTaggedServiceIds('assetic.formula_resource') as $id => $attributes) {
+        $taggedServicesIds = $container->findTaggedServiceIds('assetic.formula_resource');
+        foreach ($taggedServicesIds as $id => $attributes) {
             foreach ($attributes as $attr) {
                 if (isset($attr['loader'])) {
                     $am->addMethodCall('addResource', array(new Reference($id), $attr['loader']));

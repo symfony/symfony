@@ -84,11 +84,12 @@ class TimeField extends Form
         $this->addOption('hours', range(0, 23));
         $this->addOption('minutes', range(0, 59));
         $this->addOption('seconds', range(0, 59));
+        
+        $timezone = date_default_timezone_get();
+        $this->addOption('data_timezone', $timezone);
+        $this->addOption('user_timezone', $timezone);
 
-        $this->addOption('data_timezone', date_default_timezone_get());
-        $this->addOption('user_timezone', date_default_timezone_get());
-
-        if ($this->getOption('widget') == self::INPUT) {
+        if (self::INPUT == $this->getOption('widget')) {
             $this->add(new TextField('hour', array('max_length' => 2)));
             $this->add(new TextField('minute', array('max_length' => 2)));
 
@@ -146,7 +147,7 @@ class TimeField extends Form
             'output_timezone' => $this->getOption('user_timezone'),
             // if the field is rendered as choice field, the values should be trimmed
             // of trailing zeros to render the selected choices correctly
-            'pad' => $this->getOption('widget') == self::INPUT,
+            'pad' => self::INPUT === $this->getOption('widget'),
             'fields' => $fields,
         )));
     }

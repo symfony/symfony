@@ -83,7 +83,7 @@ class ControllerNameParser
         }
 
         // just one log, return it as the exception
-        if (1 == count($logs)) {
+        if (1 === count($logs)) {
             throw new \InvalidArgumentException($logs[0]);
         }
 

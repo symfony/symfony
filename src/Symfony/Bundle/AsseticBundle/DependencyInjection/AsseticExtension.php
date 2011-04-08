@@ -121,11 +121,13 @@ class AsseticExtension extends Extension
         }
 
         $am = $container->getDefinition('assetic.asset_manager');
+        
+        $engines = array('twig', 'php');
 
         // bundle views/ directories and kernel overrides
         foreach ($bundles as $name) {
             $rc = new \ReflectionClass($map[$name]);
-            foreach (array('twig', 'php') as $engine) {
+            foreach ($engines as $engine) {
                 $container->setDefinition(
                     'assetic.'.$engine.'_directory_resource.'.$name,
                     self::createDirectoryResourceDefinition($name, $engine, array(
@@ -137,7 +139,7 @@ class AsseticExtension extends Extension
         }
 
         // kernel views/ directory
-        foreach (array('twig', 'php') as $engine) {
+        foreach ($engines as $engine) {
             $container->setDefinition(
                 'assetic.'.$engine.'_directory_resource.kernel',
                 self::createDirectoryResourceDefinition('', $engine, array(
@@ -172,7 +174,7 @@ class AsseticExtension extends Extension
                 ->setPublic(false);
         }
 
-        if (1 == count($dirResources)) {
+        if (1 === count($dirResources)) {
             // no need to coalesce
             $definition = $dirResources[0];
         } else {

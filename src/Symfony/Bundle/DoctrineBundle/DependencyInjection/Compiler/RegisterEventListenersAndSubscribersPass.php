@@ -13,7 +13,8 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $this->container = $container;
-        foreach ($container->getDefinitions() as $id => $definition) {
+        $definitions = $container->getDefinitions();
+        foreach ($definitions as $id => $definition) {
             if ('%doctrine.dbal.event_manager_class%' !== $definition->getClass()) {
                 continue;
             }

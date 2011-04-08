@@ -58,12 +58,13 @@ class DialogHelper extends Helper
         while ($answer && !in_array(strtolower($answer[0]), array('y', 'n'))) {
             $answer = $this->ask($output, $question);
         }
-
+        
+        $yes = 'y' === strtolower($answer[0]);
         if (false === $default) {
-            return $answer && 'y' == strtolower($answer[0]);
+            return $answer && $yes;
         }
 
-        return !$answer || 'y' == strtolower($answer[0]);
+        return !$answer || $yes;
         // @codeCoverageIgnoreEnd
     }
 

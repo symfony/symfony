@@ -29,7 +29,8 @@ class FilterManagerPass implements CompilerPassInterface
         }
 
         $mapping = array();
-        foreach ($container->findTaggedServiceIds('assetic.filter') as $id => $attributes) {
+        $taggedServicesIds = $container->findTaggedServiceIds('assetic.filter');
+        foreach ($taggedServicesIds as $id => $attributes) {
             foreach ($attributes as $attr) {
                 if (isset($attr['alias'])) {
                     $mapping[$attr['alias']] = $id;

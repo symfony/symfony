@@ -778,7 +778,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
                 $template = $violation->getMessageTemplate();
                 $parameters = $violation->getMessageParameters();
 
-                if ($iterator->current() == 'data') {
+                if ('data' == $iterator->current()) {
                     $iterator->next(); // point at the first data element
                     $error = new DataError($template, $parameters);
                 } else {
@@ -915,7 +915,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
         // If the data is identical to the value in $objectOrArray, we are
         // dealing with a reference
-        if ($this->getPropertyPath() !== null) {
+        if (null !== $this->getPropertyPath()) {
             $isReference = $this->getData() === $this->getPropertyPath()->getValue($objectOrArray);
         }
 

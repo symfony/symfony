@@ -63,7 +63,8 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $kernel->boot();
 
         $matches = 0;
-        foreach (array_keys($kernel->getContainer()->get('router')->getRouteCollection()->all()) as $name) {
+        $names = array_keys($kernel->getContainer()->get('router')->getRouteCollection()->all());
+        foreach ($names as $name) {
             if (0 === strpos($name, 'assetic_')) {
                 ++$matches;
             }

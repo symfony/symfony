@@ -97,7 +97,7 @@ class FunctionNode implements NodeInterface
         }
 
         $xpath->addStarPrefix();
-        if ($a == 0) {
+        if (0 == $a) {
             if ($last) {
                 $b = sprintf('last() - %s', $b);
             }
@@ -118,7 +118,7 @@ class FunctionNode implements NodeInterface
             $bNeg = sprintf('+%s', -$b);
         }
 
-        if ($a != 1) {
+        if (1 != $a) {
             $expr = array(sprintf('(position() %s) mod %s = 0', $bNeg, $a));
         } else {
             $expr = array();
@@ -166,7 +166,7 @@ class FunctionNode implements NodeInterface
      */
     protected function _xpath_nth_of_type($xpath, $expr)
     {
-        if ($xpath->getElement() == '*') {
+        if ('*' == $xpath->getElement()) {
             throw new SyntaxError('*:nth-of-type() is not implemented');
         }
 
@@ -263,24 +263,24 @@ class FunctionNode implements NodeInterface
         if (false === strpos($s, 'n')) {
             // Just a b
 
-            return array(0, intval((string) $s));
+            return array(0, (int)(string)$s);
         }
 
         list($a, $b) = explode('n', $s);
         if (!$a) {
             $a = 1;
         } elseif ('-' == $a || '+' == $a) {
-            $a = intval($a.'1');
+            $a = (int)($a.'1');
         } else {
-            $a = intval($a);
+            $a = (int)$a;
         }
 
         if (!$b) {
             $b = 0;
         } elseif ('-' == $b || '+' == $b) {
-            $b = intval($b.'1');
+            $b = (int)($b.'1');
         } else {
-            $b = intval($b);
+            $b = (int)($b);
         }
 
         return array($a, $b);

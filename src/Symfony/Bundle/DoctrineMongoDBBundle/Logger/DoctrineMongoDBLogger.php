@@ -283,7 +283,7 @@ class DoctrineMongoDBLogger
             $parts['"'.$key.'"'] = $formatted;
         }
 
-        if (0 == count($parts)) {
+        if (0 === count($parts)) {
             return $array ? '[ ]' : '{ }';
         }
 

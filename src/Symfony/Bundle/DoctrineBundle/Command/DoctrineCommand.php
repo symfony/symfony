@@ -70,8 +70,8 @@ abstract class DoctrineCommand extends Command
     {
         $entityGenerator = new EntityGenerator();
 
-        if (version_compare(\Doctrine\ORM\Version::VERSION, "2.0.2-DEV") >= 0) {
-            $entityGenerator->setAnnotationPrefix("orm:");
+        if (version_compare(\Doctrine\ORM\Version::VERSION, '2.0.2-DEV') >= 0) {
+            $entityGenerator->setAnnotationPrefix('orm:');
         }
         $entityGenerator->setGenerateAnnotations(false);
         $entityGenerator->setGenerateStubMethods(true);
@@ -129,7 +129,7 @@ abstract class DoctrineCommand extends Command
             $cmf->setEntityManager($em);
             $metadatas = $cmf->getAllMetadata();
             foreach ($metadatas as $metadata) {
-                if (strpos($metadata->name, $namespace) === 0) {
+                if (0 === strpos($metadata->name, $namespace)) {
                     $bundleMetadatas[$metadata->name] = $metadata;
                 }
             }
@@ -141,16 +141,17 @@ abstract class DoctrineCommand extends Command
     protected function findBundle($bundleName)
     {
         $foundBundle = false;
-        foreach ($this->getApplication()->getKernel()->getBundles() as $bundle) {
+        $bundles = $this->getApplication()->getKernel()->getBundles();
+        foreach ($bundles as $bundle) {
             /* @var $bundle Bundle */
-            if (strtolower($bundleName) == strtolower($bundle->getName())) {
+            if (strtolower($bundleName) === strtolower($bundle->getName())) {
                 $foundBundle = $bundle;
                 break;
             }
         }
 
         if (!$foundBundle) {
-            throw new \InvalidArgumentException("No bundle " . $bundleName . " was found.");
+            throw new \InvalidArgumentException('No bundle ' . $bundleName . ' was found.');
         }
 
         return $foundBundle;
@@ -165,10 +166,10 @@ abstract class DoctrineCommand extends Command
     protected function findBasePathForBundle($bundle)
     {
         $path = str_replace('\\', '/', $bundle->getNamespace());
-        $destination = str_replace('/'.$path, "", $bundle->getPath(), $c);
+        $destination = str_replace('/'.$path, '', $bundle->getPath(), $c);
 
-        if ($c != 1) {
-            throw new \RuntimeException("Something went terribly wrong.");
+        if ($c !== 1) {
+            throw new \RuntimeException('Something went terribly wrong.');
         }
 
         return $destination;

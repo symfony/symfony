@@ -53,10 +53,10 @@ class ControllerResolver extends BaseControllerResolver
     {
         if (false === strpos($controller, '::')) {
             $count = substr_count($controller, ':');
-            if (2 == $count) {
+            if (2 === $count) {
                 // controller in the a:b:c notation then
                 $controller = $this->parser->parse($controller);
-            } elseif (1 == $count) {
+            } elseif (1 === $count) {
                 // controller in the service:method notation
                 list($service, $method) = explode(':', $controller);
 

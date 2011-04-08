@@ -79,7 +79,8 @@ EOT
             $paths = is_array($dirOrFile) ? $dirOrFile : array($dirOrFile);
         } else {
             $paths = array();
-            foreach ($this->getApplication()->getKernel()->getBundles() as $bundle) {
+            $bundles = $this->getApplication()->getKernel()->getBundles();
+            foreach ($bundles as $bundle) {
                 $paths[] = $bundle->getPath().'/DataFixtures/ORM';
             }
         }

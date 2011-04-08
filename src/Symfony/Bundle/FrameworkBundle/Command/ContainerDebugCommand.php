@@ -78,7 +78,7 @@ EOF
         $this->containerBuilder = $this->getContainerBuilder();
         $serviceIds = $this->filterServices($this->containerBuilder->getServiceIds(), $filter);
 
-        if (1 == count($serviceIds) && false === strpos($filter, '*')) {
+        if (1 === count($serviceIds) && false === strpos($filter, '*')) {
             $this->outputService($output, $serviceIds[0]);
         } else {
             $showPrivate = $input->getOption('show-private');

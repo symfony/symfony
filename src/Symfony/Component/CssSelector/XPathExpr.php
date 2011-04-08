@@ -157,7 +157,7 @@ class XPathExpr
      */
     public function addNameTest()
     {
-        if ($this->element == '*') {
+        if ('*' == $this->element) {
             // We weren't doing a test anyway
             return;
         }

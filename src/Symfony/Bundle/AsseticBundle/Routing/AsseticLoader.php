@@ -60,13 +60,14 @@ class AsseticLoader extends Loader
         }
 
         // routes
-        foreach ($this->am->getNames() as $name) {
-            $asset = $this->am->get($name);
+        $names = $this->am->getNames();
+        $defaults = array(
+            '_controller' => 'assetic.controller:render',
+        );
 
-            $defaults = array(
-                '_controller' => 'assetic.controller:render',
-                'name'        => $name,
-            );
+        foreach ($names as $name) {
+            $asset = $this->am->get($name);
+            $defaults['name'] = $name;
 
             if ($extension = pathinfo($asset->getTargetUrl(), PATHINFO_EXTENSION)) {
                 $defaults['_format'] = $extension;

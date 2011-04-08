@@ -199,7 +199,7 @@ class OutputFormatter implements OutputFormatterInterface
             $match[1] = '';
         }
 
-        if ('' == $match[1]) {
+        if ('' === $match[1]) {
             $style = new OutputFormatterStyle();
         } else {
             if (!isset($this->styles[strtolower($match[1])])) {
@@ -229,9 +229,9 @@ class OutputFormatter implements OutputFormatterInterface
         foreach ($matches as $match) {
             array_shift($match);
 
-            if ('fg' == $match[0]) {
+            if ('fg' === $match[0]) {
                 $style->setForeground($match[1]);
-            } elseif ('bg' == $match[0]) {
+            } elseif ('bg' === $match[0]) {
                 $style->setBackground($match[1]);
             } else {
                 $style->setOption($match[1]);

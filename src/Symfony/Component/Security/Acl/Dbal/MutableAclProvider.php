@@ -242,7 +242,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
                 if (null === $propertyChanges['parentAcl'][1]) {
                     $sets[] = 'parent_object_identity_id = NULL';
                 } else {
-                    $sets[] = 'parent_object_identity_id = '.intval($propertyChanges['parentAcl'][1]->getId());
+                    $sets[] = 'parent_object_identity_id = '.(int)$propertyChanges['parentAcl'][1]->getId();
                 }
 
                 $this->regenerateAncestorRelations($acl);
@@ -428,8 +428,8 @@ QUERY;
             $query,
             $this->options['entry_table_name'],
             $classId,
-            null === $objectIdentityId? 'NULL' : intval($objectIdentityId),
-            null === $field? 'NULL' : $this->connection->quote($field),
+            null === $objectIdentityId ? 'NULL' : (int)$objectIdentityId,
+            null === $field ? 'NULL' : $this->connection->quote($field),
             $aceOrder,
             $securityIdentityId,
             $mask,
@@ -540,7 +540,7 @@ QUERY;
             $classId,
             null === $oid ?
                 $this->connection->getDatabasePlatform()->getIsNullExpression('object_identity_id')
-                : 'object_identity_id = '.intval($oid),
+                : 'object_identity_id = '.(int)$oid,
             null === $field ?
                 $this->connection->getDatabasePlatform()->getIsNullExpression('field_name')
                 : 'field_name = '.$this->connection->quote($field),
@@ -778,7 +778,7 @@ QUERY;
 
                     $aceIdProperty = new \ReflectionProperty('Symfony\Component\Security\Acl\Domain\Entry', 'id');
                     $aceIdProperty->setAccessible(true);
-                    $aceIdProperty->setValue($ace, intval($aceId));
+                    $aceIdProperty->setValue($ace, (int)$aceId);
                 } else {
                     $currentIds[$ace->getId()] = true;
                 }
@@ -836,7 +836,7 @@ QUERY;
 
                 $aceIdProperty = new \ReflectionProperty($ace, 'id');
                 $aceIdProperty->setAccessible(true);
-                $aceIdProperty->setValue($ace, intval($aceId));
+                $aceIdProperty->setValue($ace, (int)$aceId);
             } else {
                 $currentIds[$ace->getId()] = true;
             }

@@ -68,7 +68,8 @@ class ValueTransformerChain implements ValueTransformerInterface
      */
     public function reverseTransform($value)
     {
-        for ($i = count($this->transformers) - 1; $i >= 0; --$i) {
+        $count = count($this->transformers) - 1;
+        for ($i = $count; $i >= 0; --$i) {
             $value = $this->transformers[$i]->reverseTransform($value);
         }
 

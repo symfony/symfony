@@ -579,7 +579,8 @@ class Application
     {
         $abbrevs = array();
         foreach ($names as $name) {
-            for ($len = strlen($name) - 1; $len > 0; --$len) {
+            $length = strlen($name) - 1;
+            for ($len = $length; $len > 0; --$len) {
                 $abbrev = substr($name, 0, $len);
                 if (!isset($abbrevs[$abbrev])) {
                     $abbrevs[$abbrev] = array($name);

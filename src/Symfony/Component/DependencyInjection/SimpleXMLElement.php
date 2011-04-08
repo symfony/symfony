@@ -104,15 +104,15 @@ class SimpleXMLElement extends \SimpleXMLElement
             case 'null' === $lowercaseValue:
                 return null;
             case ctype_digit($value):
-                return '0' == $value[0] ? octdec($value) : intval($value);
+                return '0' == $value[0] ? octdec($value) : (int)$value;
             case 'true' === $lowercaseValue:
                 return true;
             case 'false' === $lowercaseValue:
                 return false;
             case is_numeric($value):
-                return '0x' == $value[0].$value[1] ? hexdec($value) : floatval($value);
+                return '0x' == $value[0].$value[1] ? hexdec($value) : (float)$value;
             case preg_match('/^(-|\+)?[0-9,]+(\.[0-9]+)?$/', $value):
-                return floatval(str_replace(',', '', $value));
+                return (float)str_replace(',', '', $value);
             default:
                 return $value;
         }

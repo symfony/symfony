@@ -233,7 +233,7 @@ abstract class AbstractDoctrineExtension extends Extension
         }
 
         if (!file_exists($mappingConfig['dir'])) {
-            throw new \InvalidArgumentException("Specified non-existing directory '" . $mappingConfig['dir'] . "' as mapping source.");
+            throw new \InvalidArgumentException('Specified non-existing directory \'' . $mappingConfig['dir'] . '\' as mapping source.');
         }
 
         if (!in_array($mappingConfig['type'], array('xml', 'yml', 'annotation', 'php', 'staticphp'))) {

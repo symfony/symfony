@@ -82,7 +82,8 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
         }
 
         $result = 0;
-        for ($i = 0; $i < strlen($password1); $i++) {
+        $length = strlen($password1);
+        for ($i = 0; $i < $length; $i++) {
             $result |= ord($password1[$i]) ^ ord($password2[$i]);
         }
 

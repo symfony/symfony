@@ -136,17 +136,17 @@ class CodeHelper extends Helper
     public function fileExcerpt($file, $line)
     {
         if (is_readable($file)) {
-            $code = highlight_file($file, true);
             // remove main code/span tags
-            $code = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);
-            $content = preg_split('#<br />#', $code);
+            $content = explode('<br />', preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', highlight_file($file, true)));
 
             $lines = array();
-            for ($i = max($line - 3, 1), $max = min($line + 3, count($content)); $i <= $max; $i++) {
+            $min = max($line - 3, 1);
+            $max = min($line + 3, count($content));
+            for ($i = $min; $i <= $max; $i++) {
                 $lines[] = '<li'.($i == $line ? ' class="selected"' : '').'><code>'.self::fixCodeMarkup($content[$i - 1]).'</code></li>';
             }
 
-            return '<ol start="'.max($line - 3, 1).'">'.implode("\n", $lines).'</ol>';
+            return '<ol start="'.$min.'">'.implode("\n", $lines).'</ol>';
         }
     }
 
@@ -162,14 +162,12 @@ class CodeHelper extends Helper
     public function formatFile($file, $line, $text = null)
     {
         if (null === $text) {
-            $file = trim($file);
-            $fileStr = $file;
+            $fileStr = trim($file);
             if (0 === strpos($fileStr, $this->rootDir)) {
-                $fileStr = str_replace($this->rootDir, '', str_replace('\\', '/', $fileStr));
-                $fileStr = sprintf('<abbr title="%s">kernel.root_dir</abbr>/%s', $this->rootDir, $fileStr);
+                $fileStr = sprintf('<abbr title="%s">kernel.root_dir</abbr>/%s', $this->rootDir, str_replace($this->rootDir, '', str_replace('\\', '/', $fileStr)));
             }
 
-            $text = "$fileStr line $line";
+            $text = $fileStr.' line '.$line;
         }
 
         if (false !== $link = $this->getFileLink($file, $line)) {

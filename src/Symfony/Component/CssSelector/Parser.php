@@ -240,7 +240,7 @@ class Parser
                     if ($peek->isType('String')) {
                         $selector = $stream->next();
                     } elseif ($peek->isType('Symbol') && is_int($peek)) {
-                        $selector = intval($stream->next());
+                        $selector = (int)$stream->next();
                     } else {
                         // FIXME: parseSimpleSelector, or selector, or...?
                         $selector = $this->parseSimpleSelector($stream);

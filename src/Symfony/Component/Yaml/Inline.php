@@ -351,26 +351,26 @@ class Inline
             case 0 === strpos($scalar, '!str'):
                 return (string) substr($scalar, 5);
             case 0 === strpos($scalar, '! '):
-                return intval(self::parseScalar(substr($scalar, 2)));
+                return (int)self::parseScalar(substr($scalar, 2));
             case 0 === strpos($scalar, '!!php/object:'):
                 return unserialize(substr($scalar, 13));
             case ctype_digit($scalar):
                 $raw = $scalar;
-                $cast = intval($scalar);
-                return '0' == $scalar[0] ? octdec($scalar) : (((string) $raw == (string) $cast) ? $cast : $raw);
+                $cast = (int)$scalar;
+                return '0' == $scalar[0] ? octdec($scalar) : (((string) $raw === (string) $cast) ? $cast : $raw);
             case in_array(strtolower($scalar), $trueValues):
                 return true;
             case in_array(strtolower($scalar), $falseValues):
                 return false;
             case is_numeric($scalar):
-                return '0x' == $scalar[0].$scalar[1] ? hexdec($scalar) : floatval($scalar);
-            case 0 == strcasecmp($scalar, '.inf'):
-            case 0 == strcasecmp($scalar, '.NaN'):
+                return '0x' == $scalar[0].$scalar[1] ? hexdec($scalar) : (float)$scalar;
+            case 0 === strcasecmp($scalar, '.inf'):
+            case 0 === strcasecmp($scalar, '.NaN'):
                 return -log(0);
-            case 0 == strcasecmp($scalar, '-.inf'):
+            case 0 === strcasecmp($scalar, '-.inf'):
                 return log(0);
             case preg_match('/^(-|\+)?[0-9,]+(\.[0-9]+)?$/', $scalar):
-                return floatval(str_replace(',', '', $scalar));
+                return (float)str_replace(',', '', $scalar);
             case preg_match(self::getTimestampRegex(), $scalar):
                 return strtotime($scalar);
             default:

@@ -55,6 +55,15 @@ class TemplateLocatorTest extends TestCase
         $locator->locate($template);
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testThrowsAnExceptionWhenTemplateIsNotATemplateReferenceInterface()
+    {
+        $locator = new TemplateLocator($this->getFileLocator(), '/path/to/fallback');
+        $locator->locate('template');
+    }
+
     protected function getFileLocator()
     {
         return $this

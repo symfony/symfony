@@ -30,7 +30,7 @@ class TemplateReference implements TemplateReferenceInterface
 
     public function __toString()
     {
-        return json_encode($this->parameters);
+        return $this->getLogicalName();
     }
 
     /**

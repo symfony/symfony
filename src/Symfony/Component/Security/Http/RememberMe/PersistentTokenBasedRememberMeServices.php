@@ -76,7 +76,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
             throw new CookieTheftException('This token was already used. The account is possibly compromised.');
         }
 
-        if ($persistentToken->getLastUsed()->getTimestamp() + $this->options['lifetime'] < $_SERVER['REQUEST_TIME']) {
+        if ($persistentToken->getLastUsed()->getTimestamp() + $this->options['lifetime'] < time()) {
             throw new AuthenticationException('The cookie has expired.');
         }
 
@@ -87,7 +87,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
             new Cookie(
                 $this->options['name'],
                 $this->encodeCookie(array($series, $tokenValue)),
-                $_SERVER['REQUEST_TIME'] + $this->options['lifetime'],
+                time() + $this->options['lifetime'],
                 $this->options['path'],
                 $this->options['domain'],
                 $this->options['secure'],
@@ -120,7 +120,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
             new Cookie(
                 $this->options['name'],
                 $this->encodeCookie(array($series, $tokenValue)),
-                $_SERVER['REQUEST_TIME'] + $this->options['lifetime'],
+                time() + $this->options['lifetime'],
                 $this->options['path'],
                 $this->options['domain'],
                 $this->options['secure'],

@@ -370,7 +370,7 @@ class Response
             return $age;
         }
 
-        return max($_SERVER['REQUEST_TIME'] - $this->getDate()->format('U'), 0);
+        return max(time() - $this->getDate()->format('U'), 0);
     }
 
     /**

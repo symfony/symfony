@@ -292,7 +292,7 @@ class Profiler
 
         $this->ip     = $request->server->get('REMOTE_ADDR');
         $this->url    = $request->getUri();
-        $this->time   = $_SERVER['REQUEST_TIME'];
+        $this->time   = time();
 
         $data = base64_encode(serialize($this->collectors));
 

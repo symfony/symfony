@@ -34,7 +34,9 @@ class TemplateReference implements TemplateReferenceInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the template signature
+     *
+     * @return string A UID for the template
      */
     public function getSignature()
     {
@@ -42,7 +44,14 @@ class TemplateReference implements TemplateReferenceInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Sets a template parameter.
+     *
+     * @param string $name   The parameter name
+     * @param string $value  The parameter value
+     *
+     * @return TemplateReferenceInterface The TemplateReferenceInterface instance
+     *
+     * @throws  \InvalidArgumentException if the parameter is not defined
      */
     public function set($name, $value)
     {
@@ -56,7 +65,13 @@ class TemplateReference implements TemplateReferenceInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Gets a template parameter.
+     *
+     * @param string $name The parameter name
+     *
+     * @return string The parameter value
+     *
+     * @throws  \InvalidArgumentException if the parameter is not defined
      */
     public function get($name)
     {
@@ -68,7 +83,9 @@ class TemplateReference implements TemplateReferenceInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Gets the template parameters.
+     *
+     * @return array An array of parameters
      */
     public function all()
     {
@@ -76,7 +93,11 @@ class TemplateReference implements TemplateReferenceInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the path to the template.
+     *
+     * By default, it just returns the template name.
+     *
+     * @return string A path to the template or a resource
      */
     public function getPath()
     {
@@ -84,7 +105,9 @@ class TemplateReference implements TemplateReferenceInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the template name
+     *
+     * @return string The template name
      */
     public function getLogicalName()
     {

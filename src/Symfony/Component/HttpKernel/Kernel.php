@@ -443,7 +443,7 @@ abstract class Kernel implements KernelInterface
     protected function initializeContainer()
     {
         $class = $this->getContainerClass();
-        $cache = new ConfigCache($this->getCacheDir().'/'.$class.'.php', $this->debug);
+        $cache = new ConfigCache($this->getCacheDir().'/'.$class.'.php.cache', $this->debug);
         $fresh = true;
         if (!$cache->isFresh()) {
             $container = $this->buildContainer();

@@ -32,7 +32,7 @@ class ClassCollectionLoader
      *
      * @throws \InvalidArgumentException When class can't be loaded
      */
-    static public function load($classes, $cacheDir, $name, $autoReload, $adaptive = false, $extension = '.php')
+    static public function load($classes, $cacheDir, $name, $autoReload, $adaptive = false, $extension = '.php.cache')
     {
         // each $name can only be loaded once per PHP process
         if (isset(self::$loaded[$name])) {

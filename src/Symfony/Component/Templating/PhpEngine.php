@@ -82,7 +82,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         $parameters = array_replace($this->getGlobals(), $parameters);
         // render
         if (false === $content = $this->evaluate($storage, $parameters)) {
-            throw new \RuntimeException(sprintf('The template "%s" cannot be rendered.', json_encode($name)));
+            throw new \RuntimeException(sprintf('The template "%s" cannot be rendered.', $this->parser->parse($name)->getLogicalName()));
         }
 
         // decorator

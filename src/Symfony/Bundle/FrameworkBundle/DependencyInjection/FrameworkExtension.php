@@ -297,6 +297,13 @@ class FrameworkExtension extends Extension
         }
         $container->setParameter('session.storage.'.$config['storage_id'].'.options', $options);
 
+        //does session save path exist?
+        if ('native' == $config['storage_id'] && isset($config['save_path']) && '' != $config['save_path']) {
+            if (!file_exists($config['save_path'])) {
+                throw new \InvalidArgumentException(sprintf('The session save_path "%s" must exist and be writable by server.', $config['save_path']));
+            }
+        }
+
         $this->addClassesToCompile(array(
             'Symfony\\Component\\HttpFoundation\\Session',
             'Symfony\\Component\\HttpFoundation\\SessionStorage\\SessionStorageInterface',

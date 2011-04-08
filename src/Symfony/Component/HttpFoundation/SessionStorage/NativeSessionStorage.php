@@ -50,7 +50,7 @@ class NativeSessionStorage implements SessionStorageInterface
             'domain'        => $cookieDefaults['domain'],
             'secure'        => $cookieDefaults['secure'],
             'httponly'      => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
-            'save_path'     => '' == session_save_path() ? sys_get_temp_dir() : session_save_path(),
+            'save_path'     => session_save_path(),
         ), $options);
 
         session_name($this->options['name']);
@@ -80,12 +80,7 @@ class NativeSessionStorage implements SessionStorageInterface
             session_id($this->options['id']);
         }
 
-        //does session save path exist?
-        if (!file_exists($this->options['save_path'])) {
-            throw new \InvalidArgumentException(sprintf('The session save_path "%s" must exist and be writable by server.', $this->options['save_path']));
-        }
         session_save_path($this->options['save_path']);
-
         session_start();
 
         self::$sessionStarted = true;

@@ -33,6 +33,7 @@ class NativeSessionStorage implements SessionStorageInterface
      *  * domain:   Cookie domain
      *  * secure:   Cookie secure
      *  * httponly: Cookie http only
+     *  * save_path: The directory used for session storage
      *
      * The default values for most options are those returned by the session_get_cookie_params() function
      *
@@ -49,6 +50,7 @@ class NativeSessionStorage implements SessionStorageInterface
             'domain'        => $cookieDefaults['domain'],
             'secure'        => $cookieDefaults['secure'],
             'httponly'      => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
+            'save_path'     => '' == session_save_path() ? sys_get_temp_dir() : session_save_path(),
         ), $options);
 
         session_name($this->options['name']);
@@ -77,6 +79,12 @@ class NativeSessionStorage implements SessionStorageInterface
         if (!ini_get('session.use_cookies') && $this->options['id'] && $this->options['id'] != session_id()) {
             session_id($this->options['id']);
         }
+
+        //does session save path exist?
+        if (!file_exists($this->options['save_path'])) {
+            throw new \InvalidArgumentException(sprintf('The session save_path "%s" must exist and be writable by server.', $this->options['save_path']));
+        }
+        session_save_path($this->options['save_path']);
 
         session_start();
 

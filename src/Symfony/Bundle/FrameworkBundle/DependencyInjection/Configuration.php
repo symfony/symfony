@@ -168,6 +168,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('domain')->end()
                         ->booleanNode('secure')->end()
                         ->booleanNode('httponly')->end()
+                        ->scalarNode('save_path')->end()
                         // PdoSessionStorage options
                         ->scalarNode('db_table')->end()
                         ->scalarNode('db_id_col')->end()

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Process;
 
-use Symfony\Component\Process\Exception\ExecutableNotFoundException;
+use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * An executable finder specifically designed for the PHP executable.
@@ -32,7 +32,7 @@ class PhpExecutableFinder
     {
         if ($php = getenv('PHP_PATH')) {
             if (!is_executable($php)) {
-                throw new \RuntimeException('The defined PHP_PATH environment variable is not a valid PHP executable.');
+                throw new RuntimeException('The defined PHP_PATH environment variable is not a valid PHP executable.');
             }
 
             return $php;

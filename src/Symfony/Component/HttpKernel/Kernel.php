@@ -243,6 +243,7 @@ abstract class Kernel implements KernelInterface
         $overridePath = substr($path, 9);
         $resourceBundle = null;
         $bundles = $this->getBundle($bundleName, false);
+        $files = array();
 
         foreach ($bundles as $bundle) {
             if ($isResource && file_exists($file = $dir.'/'.$bundle->getName().$overridePath)) {

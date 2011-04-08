@@ -21,7 +21,7 @@ class CachedTemplateLocatorTest extends TestCase
     public function testLocateACachedTemplate()
     {
         $template = new TemplateReference('bundle', 'controller', 'name', 'format', 'engine');
-        
+
         $locator = $this
             ->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\Loader\CachedTemplateLocator')
             ->setMethods(array('getCachedTemplatePath'))
@@ -32,10 +32,25 @@ class CachedTemplateLocatorTest extends TestCase
         $locator
             ->expects($this->once())
             ->method('getCachedTemplatePath')
-            ->with($template->getSignature())
+            ->with($template)
             ->will($this->returnValue('/cached/path/to/template'))
         ;
 
         $this->assertEquals('/cached/path/to/template', $locator->locate($template));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testThrowsAnExceptionWhenTemplateIsNotATemplateReferenceInterface()
+    {
+        $locator = $this
+            ->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\Loader\CachedTemplateLocator')
+            ->setMethods(array('getCacheTemplatePath'))
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+
+        $locator->locate('template');
     }
 }

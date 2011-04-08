@@ -49,13 +49,16 @@ class CachedTemplateLocator extends TemplateLocator
      *
      * @return string The full path for the file
      *
+     * @throws \InvalidArgumentException When the template is not an instance of TemplateReferenceInterface
      * @throws \InvalidArgumentException When file is not found
      */
     public function locate($template, $currentPath = null, $first = true)
     {
-        $key = $template->getSignature();
+        if (!$template instanceof TemplateReferenceInterface) {
+            throw new \InvalidArgumentException("The template must be an instance of TemplateReferenceInterface.");
+        }
 
-        $path = $this->getCachedTemplatePath($key);
+        $path = $this->getCachedTemplatePath($template);
 
         return $path === null ? parent::locate($template) : $path;
     }
@@ -63,12 +66,13 @@ class CachedTemplateLocator extends TemplateLocator
     /**
      * Returns the template path from the cache
      * 
-     * @param string $key The template signature
+     * @param TemplateReferenceInterface $template The template
      * 
-     * @return string|null The path when it is present in the call, false otherwise
+     * @return string|null The path when it is present in the cache, false otherwise
      */
-    protected function getCachedTemplatePath($key)
+    protected function getCachedTemplatePath(TemplateReferenceInterface $template)
     {
+        $key = $template->getSignature();
         return isset($this->templates[$key]) ? $this->templates[$key] : null;
     }
 }

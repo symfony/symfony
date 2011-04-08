@@ -89,6 +89,9 @@ beta1 to beta2
 
       app/Resources/translations/catalogue.fr.xml
 
+* In cache:clear command, the --without-debug option became --with-debug.
+  Now you have to force the debug kernel if you really need it.
+
 PR12 to beta1
 -------------
 

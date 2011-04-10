@@ -65,6 +65,16 @@ class AsseticController
 
         $response->setContent($asset->dump());
 
+        // content-type
+        switch (pathinfo($asset->getTargetUrl(), PATHINFO_EXTENSION)) {
+        case 'css':
+            $response->headers->set('Content-Type', 'text/css; charset=UTF-8');
+            break;
+        case 'js':
+            $response->headers->set('Content-Type', 'text/javascript; charset=UTF-8');
+            break;
+        }
+
         return $response;
     }
 

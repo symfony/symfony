@@ -59,12 +59,12 @@ class DialogHelper extends Helper
             $answer = $this->ask($output, $question);
         }
         
-        $yes = 'y' === strtolower($answer[0]);
+        $isAYes = 'y' === strtolower($answer[0]);
         if (false === $default) {
-            return $answer && $yes;
+            return $answer && isAYes;
         }
 
-        return !$answer || $yes;
+        return !$answer || isAYes;
         // @codeCoverageIgnoreEnd
     }
 

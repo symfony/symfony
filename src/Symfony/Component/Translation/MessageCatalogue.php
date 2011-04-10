@@ -138,17 +138,15 @@ class MessageCatalogue implements MessageCatalogueInterface
      */
     public function addCatalogue(MessageCatalogueInterface $catalogue)
     {
-        if ($catalogue->getLocale() !== $this->locale) {
+        if ($this->locale !== $catalogue->getLocale()) {
             throw new \LogicException(sprintf('Cannot add a catalogue for locale "%s" as the current locale for this catalogue is "%s"', $catalogue->getLocale(), $this->locale));
         }
 
         foreach ($catalogue->all() as $domain => $messages) {
             $this->add($messages, $domain);
         }
-
-        foreach ($catalogue->getResources() as $resource) {
-            $this->addResource($resource);
-        }
+        
+        $this->addResourcesFromCatalogue($catalogue);
     }
 
     /**
@@ -165,7 +163,11 @@ class MessageCatalogue implements MessageCatalogueInterface
                 }
             }
         }
-
+        $this->addResourcesFromCatalogue($catalogue);
+    }
+    
+    private function addResourcesFromCatalogue(MessageCatalogueInterface $catalogue) 
+    {
         foreach ($catalogue->getResources() as $resource) {
             $this->addResource($resource);
         }

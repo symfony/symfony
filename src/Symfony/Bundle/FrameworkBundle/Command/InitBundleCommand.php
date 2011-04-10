@@ -66,6 +66,7 @@ EOT
         }
 
         // validate namespace
+        $namespace = strtr($namespace, '/', '\\');
         if (preg_match('/[^A-Za-z0-9_\\\-]/', $namespace)) {
             throw new \InvalidArgumentException('The namespace contains invalid characters.');
         }
@@ -95,8 +96,6 @@ EOT
         $dir = '/' === substr($dir, -1, 1) ? $dir : $dir.'/';
 
         $targetDir = $dir.strtr($namespace, '\\', '/');
-
-
 
         if (file_exists($targetDir)) {
             throw new \RuntimeException(sprintf('Bundle "%s" already exists.', $bundle));

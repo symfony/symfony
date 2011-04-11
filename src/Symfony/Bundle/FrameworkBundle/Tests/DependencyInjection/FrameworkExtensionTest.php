@@ -104,9 +104,14 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('full');
 
         $this->assertTrue($container->hasDefinition('templating.name_parser'), '->registerTemplatingConfiguration() loads templating.xml');
+
         $arguments = $container->getDefinition('templating.helper.assets')->getArguments();
-        $this->assertEquals('SomeVersionScheme', $arguments[2]);
-        $this->assertEquals(array('http://cdn.example.com'), $arguments[1]);
+        $this->assertEquals(array('basic' => array('//basic1.example.com', '//basic2.example.com', '//basic3.example.com', '//basic4.example.com'), 'default' => array('//default.example.com')), $arguments[1]);
+        $this->assertEquals(array('basic' => 'basic1', 'default' => '1.0.0'), $arguments[2]);
+
+        $arguments = $container->getDefinition('templating.helper.assets.configurator')->getArguments();
+        $this->assertEquals(array('images' => array('http://images1.example.com', 'http://images2.example.com', 'http://images3.example.com', 'http://images4.example.com')), $arguments[1]);
+        $this->assertEquals(array('images' => array('https://asdf.cloudfront.net')), $arguments[2]);
 
         $this->assertTrue($container->getDefinition('templating.cache_warmer.template_paths')->hasTag('kernel.cache_warmer'), '->registerTemplatingConfiguration() tags templating cache warmer if cache warming is set');
         $this->assertEquals('templating.locator.cached', (string) $container->getAlias('templating.locator'), '->registerTemplatingConfiguration() changes templating.locator alias to cached if cache warming is set');
@@ -184,6 +189,7 @@ abstract class FrameworkExtensionTest extends TestCase
         return new ContainerBuilder(new ParameterBag(array(
             'kernel.bundles'          => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
             'kernel.cache_dir'        => __DIR__,
+            'kernel.charset'          => 'UTF-8',
             'kernel.compiled_classes' => array(),
             'kernel.debug'            => false,
             'kernel.environment'      => 'test',

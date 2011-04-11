@@ -30,22 +30,32 @@ $container->loadFromExtension('framework', array(
         'httponly'       => true,
     ),
     'templating' => array(
-        'assets_version'   => 'SomeVersionScheme',
-        'assets_base_urls' => 'http://cdn.example.com',
-        'cache'            => '/path/to/cache',
+        'assets_version'   => '1.0.0',
+        'assets_base_urls' => '//default.example.com',
         'cache_warmer'     => true,
+        'cache'            => '/path/to/cache',
         'engines'          => array('php', 'twig'),
         'loader'           => array('loader.foo', 'loader.bar'),
-        'packages'         => array(
+        'packages' => array(
+            'basic' => array(
+                'version' => 'basic1',
+                'base_urls' => array(
+                    '//basic1.example.com',
+                    '//basic2.example.com',
+                    '//basic3.example.com',
+                    '//basic4.example.com',
+                ),
+            ),
             'images' => array(
-                'version'   => '1.0.0',
-                'base_urls' => array('http://images1.example.com', 'http://images2.example.com'),
-            ),
-            'foo' => array(
-                'version' => '1.0.0',
-            ),
-            'bar' => array(
-                'base_urls' => array('http://bar1.example.com', 'http://bar2.example.com'),
+                'base_urls' => array(
+                    'ssl' => 'https://asdf.cloudfront.net',
+                    'http' => array(
+                        'http://images1.example.com',
+                        'http://images2.example.com',
+                        'http://images3.example.com',
+                        'http://images4.example.com',
+                    ),
+                ),
             ),
         ),
     ),

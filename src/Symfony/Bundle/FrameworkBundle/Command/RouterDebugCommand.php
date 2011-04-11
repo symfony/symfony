@@ -161,6 +161,10 @@ EOF
             return sprintf('object(%s)', get_class($value));
         }
 
+        if (is_string($value)) {
+            return $value;
+        }
+
         return preg_replace("/\n\s*/s", '', var_export($value, true));
     }
 }

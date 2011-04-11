@@ -11,7 +11,6 @@
 
 namespace Symfony\Tests\Component\Templating\Helper;
 
-use Symfony\Component\Templating\Asset\AssetPackage;
 use Symfony\Component\Templating\Helper\AssetsHelper;
 
 class AssetsHelperTest extends \PHPUnit_Framework_TestCase
@@ -20,7 +19,6 @@ class AssetsHelperTest extends \PHPUnit_Framework_TestCase
     {
         $helper = new AssetsHelper('foo', 'http://www.example.com', 'abcd');
         $this->assertEquals('/foo/', $helper->getBasePath(), '__construct() takes a base path as its first argument');
-        $this->assertEquals(new AssetPackage('http://www.example.com', 'abcd'), $helper->getPackage(), '->__construct() creates a default asset package');
     }
 
     public function testGetSetBasePath()
@@ -79,5 +77,17 @@ class AssetsHelperTest extends \PHPUnit_Framework_TestCase
     {
         $helper = new AssetsHelper(null, 'http://foo.com');
         $this->assertEquals('//bar.com/asset', $helper->getUrl('//bar.com/asset'));
+    }
+
+    public function testGetPackageVersion()
+    {
+        $helper = new AssetsHelper(null, null, array('js' => '1.0.0'));
+        $this->assertEquals('1.0.0', $helper->getVersion('js'), '->getVersion() returns a package version');
+    }
+
+    public function testGetDefaultVersion()
+    {
+        $helper = new AssetsHelper(null, null, '1.0.0');
+        $this->assertEquals('1.0.0', $helper->getVersion(), '->getVersion() returns the default version');
     }
 }

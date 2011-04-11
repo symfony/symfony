@@ -172,7 +172,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      */
     public function offsetGet($name)
     {
-        return $this->$name = $this->get($name);
+        return $this->get($name);
     }
 
     /**
@@ -211,7 +211,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * @param Helper[] $helpers An array of helper
      */
-    public function addHelpers(array $helpers = array())
+    public function addHelpers(array $helpers)
     {
         foreach ($helpers as $alias => $helper) {
             $this->set($helper, is_int($alias) ? null : $alias);

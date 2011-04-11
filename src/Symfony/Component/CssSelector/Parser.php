@@ -119,7 +119,7 @@ class Parser
             }
         }
 
-        if (count($result) == 1) {
+        if (1 === count($result)) {
             return $result[0];
         }
 
@@ -139,12 +139,13 @@ class Parser
     private function parseSelector($stream)
     {
         $result = $this->parseSimpleSelector($stream);
-
+        
+        $symbols = array('+', '>', '~');
         while (true) {
             $peek = $stream->peek();
             if (',' == $peek || null === $peek) {
                 return $result;
-            } elseif (in_array($peek, array('+', '>', '~'))) {
+            } elseif (in_array($peek, $symbols)) {
                 // A combinator
                 $combinator = (string) $stream->next();
             } else {
@@ -152,7 +153,7 @@ class Parser
             }
             $consumed = count($stream->getUsed());
             $nextSelector = $this->parseSimpleSelector($stream);
-            if ($consumed == count($stream->getUsed())) {
+            if ($consumed === count($stream->getUsed())) {
                 throw new SyntaxError(sprintf("Expected selector, got '%s'", $stream->peek()));
             }
 

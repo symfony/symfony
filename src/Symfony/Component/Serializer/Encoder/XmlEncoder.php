@@ -53,11 +53,13 @@ class XmlEncoder extends AbstractEncoder
      */
     public function decode($data, $format)
     {
-        $xml = simplexml_load_string($data);
-        if (!$xml->count()) {
-            return (string) $xml;
+        $xml = \DOMDocument::loadXML($data);
+        if (!$xml->documentElement->hasChildNodes()) {
+            return "";
+        } elseif ($xml->documentElement->childNodes->length == 1 && $xml->documentElement->firstChild instanceof \DOMText) {
+            return trim((string)$xml->documentElement->firstChild->wholeText);
         }
-        return $this->parseXml($xml);
+        return $this->parseXml($xml->documentElement);
     }
 
     /**
@@ -149,41 +151,62 @@ class XmlEncoder extends AbstractEncoder
     }
 
     /**
-     * Parse the input SimpleXmlElement into an array
+     * Parse the input DOMElement into an array
      *
-     * @param SimpleXmlElement $node xml to parse
+     * @param DOMElement $node xml to parse
      * @return array
      */
     private function parseXml($node)
     {
         $data = array();
-        foreach ($node->children() as $key => $subnode) {
-            if ($subnode->count()) {
-                $value = $this->parseXml($subnode);
-                if ($subnode->attributes()) {
-                    foreach ($subnode->attributes() as $attrkey => $attr) {
-                        $value['@'.$attrkey] = (string) $attr;
-                    }
-                }
-            } else {
-                $value = (string) $subnode;
+        foreach ($node->childNodes as $subnode) {
+            //When xml is "beautiful" (with tabs and newlines...), tabs and newline are considered as text but we do not want them
+            if ($subnode instanceof DOMText && trim($subnode->wholeText) === "") {
+                continue;
             }
-            if ($key === 'item') {
-                if (isset($subnode['key'])) {
-                    $data[(string)$subnode['key']] = $value;
+            if (!$subnode->hasChildNodes()) {
+                $value = "";
+            } elseif ($subnode->childNodes->length == 1 && $subnode->firstChild instanceof \DOMText) {
+                $value = trim((string)$subnode->firstChild->wholeText);
+            } else {
+                $value = $this->parseXml($subnode);
+            }
+            
+            if ($subnode->hasAttributes()) {
+                if (is_string($value) && $value !== "") {
+                    $value = array('#' => $value);
+                } elseif (is_string($value)) {
+                    $value = array();
+                }
+                foreach($subnode->attributes as $attrKey => $attr) {
+                    $value['@'.$attrKey] = (string) $attr->value;
+                }
+            }
+            
+            if ($subnode->tagName === 'item') {
+                if (isset($value['@key'])) {
+                    $key = $value['@key'];
+                    $tmp = $value['#'];
+                    unset($value['@key']);
+                    unset($value['#']);
+                    if (!empty($value)) {
+                        $data[$key] = array_merge(array('#' => $tmp), $value);
+                    } else {
+                        $data[$key] = $tmp;
+                    }
                 } elseif (isset($data['item'])) {
                     $tmp = $data['item'];
                     unset($data['item']);
                     $data[] = $tmp;
                     $data[] = $value;
                 }
-            } elseif (key_exists($key, $data)) {
-                if (false === is_array($data[$key])) {
-                    $data[$key] = array($data[$key]);
+            } elseif (key_exists($subnode->tagName, $data)) {
+                if ((false === is_array($data[$subnode->tagName])) || (false === isset($data[$subnode->tagName][0]))) {
+                    $data[$subnode->tagName] = array($data[$subnode->tagName]);
                 }
-                $data[$key][] = $value;
+                $data[$subnode->tagName][] = $value;
             } else {
-                $data[$key] = $value;
+                $data[$subnode->tagName] = $value;
             }
         }
         return $data;
@@ -205,6 +228,8 @@ class XmlEncoder extends AbstractEncoder
                 //Ah this is the magic @ attribute types.
                 if (0 === strpos($key, "@") && is_scalar($data) && $this->isElementNameValid($attributeName = substr($key,1))) {
                     $parentNode->setAttribute($attributeName, $data);
+                } elseif ($key === '#') {
+                    $append = $this->selectNodeType($parentNode, $data);
                 } elseif (is_array($data) && false === is_numeric($key)) {
                     /**
                     * Is this array fully numeric keys?

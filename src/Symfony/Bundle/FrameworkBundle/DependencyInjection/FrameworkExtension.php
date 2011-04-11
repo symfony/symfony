@@ -425,7 +425,6 @@ class FrameworkExtension extends Extension
             $container->register('templating.helper.assets.configurator')
                 ->setClass('Symfony\\Bundle\\FrameworkBundle\\DependencyInjection\\Configurator\\AssetsHelperConfigurator')
                 ->setScope('request')
-                ->setPublic(false)
                 ->addArgument(new Reference('request'))
                 ->addArgument($httpUrls)
                 ->addArgument($sslUrls)

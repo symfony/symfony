@@ -260,7 +260,7 @@ class ArgvInput extends Input
      */
     public function hasParameterOption($values)
     {
-        if (!is_array($values)) {
+        if ((array)$values !== $values) {
             $values = array($values);
         }
 
@@ -285,7 +285,7 @@ class ArgvInput extends Input
      */
     public function getParameterOption($values, $default = false)
     {
-        if (!is_array($values)) {
+        if ((array)$values !== $values) {
             $values = array($values);
         }
 

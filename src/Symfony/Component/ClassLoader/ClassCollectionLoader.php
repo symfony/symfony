@@ -145,7 +145,7 @@ class ClassCollectionLoader
                 $output .= $token[1];
 
                 // namespace name and whitespaces
-                while (($t = array_shift($tokens)) && is_array($t) && in_array($t[0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
+                while (($t = array_shift($tokens)) && (array)$t === $t && in_array($t[0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
                     $output .= $t[1];
                 }
                 if (is_string($t) && '{' === $t) {

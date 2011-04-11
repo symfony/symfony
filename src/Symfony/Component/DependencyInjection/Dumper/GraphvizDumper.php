@@ -143,7 +143,7 @@ class GraphvizDumper extends Dumper
                 }
 
                 $edges[] = array('name' => $name, 'required' => $required, 'to' => $argument);
-            } elseif (is_array($argument)) {
+            } elseif ((array)$argument === $argument) {
                 $edges = array_merge($edges, $this->findEdges($id, $argument, $required, $name));
             }
         }

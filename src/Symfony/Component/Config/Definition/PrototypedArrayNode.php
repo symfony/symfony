@@ -87,7 +87,7 @@ class PrototypedArrayNode extends ArrayNode
      */
     public function setDefaultValue($value)
     {
-        if (!is_array($value)) {
+        if ((array)$value !== $value) {
             throw new \InvalidArgumentException($this->getPath().': the default value of an array node has to be an array.');
         }
 
@@ -183,8 +183,8 @@ class PrototypedArrayNode extends ArrayNode
 
         $normalized = array();
         foreach ($value as $k => $v) {
-            if (null !== $this->keyAttribute && is_array($v)) {
-                if (!isset($v[$this->keyAttribute]) && is_int($k)) {
+            if (null !== $this->keyAttribute && (array)$v === $v) {
+                if (!isset($v[$this->keyAttribute]) && (int)$k === $k) {
                     $msg = sprintf('The attribute "%s" must be set for path "%s".', $this->keyAttribute, $this->getPath());
                     throw new InvalidConfigurationException($msg);
                 } else if (isset($v[$this->keyAttribute])) {

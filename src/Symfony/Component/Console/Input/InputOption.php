@@ -152,7 +152,7 @@ class InputOption
         if ($this->isArray()) {
             if (null === $default) {
                 $default = array();
-            } elseif (!is_array($default)) {
+            } elseif ((array)$default !== $default) {
                 throw new \LogicException('A default value for an array option must be an array.');
             }
         }

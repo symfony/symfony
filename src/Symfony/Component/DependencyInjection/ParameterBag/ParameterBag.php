@@ -122,7 +122,7 @@ class ParameterBag implements ParameterBagInterface
      */
     public function resolveValue($value)
     {
-        if (is_array($value)) {
+        if ((array)$value === $value) {
             $args = array();
             foreach ($value as $k => $v) {
                 $args[$this->resolveValue($k)] = $this->resolveValue($v);

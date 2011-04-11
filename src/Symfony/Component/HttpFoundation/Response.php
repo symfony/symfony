@@ -647,7 +647,7 @@ class Response
             return array();
         }
 
-        return is_array($vary) ? $vary : preg_split('/[\s,]+/', $vary);
+        return (array)$vary === $vary ? $vary : preg_split('/[\s,]+/', $vary);
     }
 
     /**

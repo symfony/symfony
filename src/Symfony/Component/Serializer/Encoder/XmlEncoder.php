@@ -178,7 +178,7 @@ class XmlEncoder extends AbstractEncoder
                     $data[] = $value;
                 }
             } elseif (key_exists($key, $data)) {
-                if (false === is_array($data[$key])) {
+                if ((array)$data[$key] !== $data[$key]) {
                     $data[$key] = array($data[$key]);
                 }
                 $data[$key][] = $value;
@@ -200,12 +200,12 @@ class XmlEncoder extends AbstractEncoder
     {
         $append = true;
 
-        if (is_array($data) || $data instanceof \Traversable) {
+        if ((array)$data === $data || $data instanceof \Traversable) {
             foreach ($data as $key => $data) {
                 //Ah this is the magic @ attribute types.
                 if (0 === strpos($key, "@") && is_scalar($data) && $this->isElementNameValid($attributeName = substr($key,1))) {
                     $parentNode->setAttribute($attributeName, $data);
-                } elseif (is_array($data) && false === is_numeric($key)) {
+                } elseif ((array)$data === $data && false === is_numeric($key)) {
                     /**
                     * Is this array fully numeric keys?
                     */
@@ -276,7 +276,7 @@ class XmlEncoder extends AbstractEncoder
      */
     private function selectNodeType($node, $val)
     {
-        if (is_array($val)) {
+        if ((array)$val === $val) {
             return $this->buildXml($node, $val);
         } elseif ($val instanceof \SimpleXMLElement) {
             $child = $this->dom->importNode(dom_import_simplexml($val), true);

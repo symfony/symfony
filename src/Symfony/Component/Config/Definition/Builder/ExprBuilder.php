@@ -96,7 +96,7 @@ class ExprBuilder
      */
     public function ifArray()
     {
-        $this->ifPart = function($v) { return is_array($v); };
+        $this->ifPart = function($v) { return (array)$v === $v; };
 
         return $this;
     }

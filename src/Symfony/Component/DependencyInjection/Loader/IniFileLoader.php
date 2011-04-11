@@ -40,7 +40,7 @@ class IniFileLoader extends FileLoader
             throw new \InvalidArgumentException(sprintf('The %s file is not valid.', $file));
         }
 
-        if (isset($result['parameters']) && is_array($result['parameters'])) {
+        if (isset($result['parameters']) && (array)$result['parameters'] === $result['parameters']) {
             foreach ($result['parameters'] as $key => $value) {
                 $this->container->setParameter($key, $value);
             }

@@ -194,7 +194,7 @@ class Request
 
         $queryString = isset($components['query']) ? html_entity_decode($components['query']) : '';
         parse_str($queryString, $qs);
-        if (is_array($qs)) {
+        if ((array)$qs === $qs) {
             $query = array_replace($qs, $query);
         }
 
@@ -620,7 +620,7 @@ class Request
             static::initializeFormats();
         }
 
-        static::$formats[$format] = is_array($mimeTypes) ? $mimeTypes : array($mimeTypes);
+        static::$formats[$format] = (array)$mimeTypes === $mimeTypes ? $mimeTypes : array($mimeTypes);
     }
 
     /**

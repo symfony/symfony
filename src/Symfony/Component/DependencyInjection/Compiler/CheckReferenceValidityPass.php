@@ -81,7 +81,7 @@ class CheckReferenceValidityPass implements CompilerPassInterface
     private function validateReferences(array $arguments)
     {
         foreach ($arguments as $argument) {
-            if (is_array($argument)) {
+            if ((array)$argument === $argument) {
                 $this->validateReferences($argument);
             } elseif ($argument instanceof Reference) {
                 $targetDefinition = $this->getDefinition((string) $argument);

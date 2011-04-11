@@ -175,7 +175,7 @@ class FlattenException
         foreach ($args as $key => $value) {
             if (is_object($value)) {
                 $result[$key] = array('object', get_class($value));
-            } elseif (is_array($value)) {
+            } elseif ((array)$value === $value) {
                 $result[$key] = array('array', $this->flattenArgs($value));
             } elseif (null === $value) {
                 $result[$key] = array('null', null);

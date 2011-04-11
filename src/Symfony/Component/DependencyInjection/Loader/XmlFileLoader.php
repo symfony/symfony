@@ -460,7 +460,7 @@ EOF
             }
 
             $values = static::convertDomElementToArray($node);
-            if (!is_array($values)) {
+            if ((array)$values !== $values) {
                 $values = array();
             }
 
@@ -499,8 +499,9 @@ EOF
         $nodeValue = false;
         foreach ($element->childNodes as $node) {
             if ($node instanceof \DOMText) {
-                if (trim($node->nodeValue)) {
-                    $nodeValue = trim($node->nodeValue);
+                $node->nodeValue = trim($node->nodeValue);
+                if ($node->nodeValue) {
+                    $nodeValue = $node->nodeValue;
                     $empty = false;
                 }
             } elseif (!$node instanceof \DOMComment) {
@@ -512,7 +513,7 @@ EOF
 
                 $key = $node->localName;
                 if (isset($config[$key])) {
-                    if (!is_array($config[$key]) || !is_int(key($config[$key]))) {
+                    if ((array)$config[$key] !== $config[$key] || !is_int(key($config[$key]))) {
                         $config[$key] = array($config[$key]);
                     }
                     $config[$key][] = $value;
@@ -526,7 +527,7 @@ EOF
 
         if (false !== $nodeValue) {
             $value = SimpleXMLElement::phpize($nodeValue);
-            if (count($config)) {
+            if (0 !== count($config)) {
                 $config['value'] = $value;
             } else {
                 $config = $value;

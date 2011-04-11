@@ -41,7 +41,7 @@ class FormatterHelper extends Helper
      */
     public function formatBlock($messages, $style, $large = false)
     {
-        if (!is_array($messages)) {
+        if ((array)$messages !== $messages) {
             $messages = array($messages);
         }
 

@@ -127,7 +127,8 @@ class EntityChoiceField extends ChoiceField
         // The entities can be passed directly in the "choices" option.
         // In this case, initializing the entity cache is a cheap operation
         // so do it now!
-        if (is_array($this->getOption('choices')) && count($this->getOption('choices')) > 0) {
+        $choices = $this->getOption('choices');
+        if ((array)$choices === $choices) && 0 !== count($choices)) {
             $this->initializeChoices();
         }
 
@@ -428,7 +429,7 @@ class EntityChoiceField extends ChoiceField
         }
 
         if (0 === count($notFound)) {
-            if (is_array($keyOrKeys)) {
+            if ((array)$keyOrKeys === $keyOrKeys) {
                 $result = new ArrayCollection();
 
                 // optimize this into a SELECT WHERE IN query

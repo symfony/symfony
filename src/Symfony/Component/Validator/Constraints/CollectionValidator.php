@@ -24,7 +24,7 @@ class CollectionValidator extends ConstraintValidator
             return true;
         }
 
-        if (!is_array($value) && !($value instanceof \Traversable && $value instanceof \ArrayAccess)) {
+        if ((array)$value !== $value && !($value instanceof \Traversable && $value instanceof \ArrayAccess)) {
             throw new UnexpectedTypeException($value, 'array or Traversable and ArrayAccess');
         }
 
@@ -43,7 +43,7 @@ class CollectionValidator extends ConstraintValidator
             if (array_key_exists($field, $value)) {
                 // cannot simply cast to array, because then the object is converted to an
                 // array instead of wrapped inside
-                $constraints = is_array($constraints) ? $constraints : array($constraints);
+                $constraints = (array)$constraints === $constraints ? $constraints : array($constraints);
 
                 foreach ($constraints as $constr) {
                     $walker->walkConstraint($constr, $value[$field], $group, $propertyPath.'['.$field.']');

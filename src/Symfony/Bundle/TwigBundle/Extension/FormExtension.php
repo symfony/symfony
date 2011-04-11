@@ -130,7 +130,7 @@ class FormExtension extends \Twig_Extension
      */
     public function renderField(FieldInterface $field, array $attributes = array(), array $parameters = array(), $resources = null)
     {
-        if (null !== $resources && !is_array($resources)) {
+        if (null !== $resources && (array)$resources !== $resources) {
             $resources = array($resources);
         }
 

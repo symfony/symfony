@@ -71,8 +71,7 @@ EOF
         $maxName = 4;
         $maxMethod = 6;
         foreach ($routes as $name => $route) {
-            $requirements = $route->getRequirements();
-            $method = isset($requirements['_method']) ? strtoupper(is_array($requirements['_method']) ? implode(', ', $requirements['_method']) : $requirements['_method']) : 'ANY';
+            $method = self::getRequirementsMethod($route);
 
             if (strlen($name) > $maxName) {
                 $maxName = strlen($name);
@@ -88,10 +87,17 @@ EOF
         $format1  = '%-'.($maxName + 19).'s %-'.($maxMethod + 19).'s %s';
         $output->writeln(sprintf($format1, '<comment>Name</comment>', '<comment>Method</comment>', '<comment>Pattern</comment>'));
         foreach ($routes as $name => $route) {
-            $requirements = $route->getRequirements();
-            $method = isset($requirements['_method']) ? strtoupper(is_array($requirements['_method']) ? implode(', ', $requirements['_method']) : $requirements['_method']) : 'ANY';
+            $method = self::getRequirementsMethod($route);
             $output->writeln(sprintf($format, $name, $method, $route->getPattern()));
         }
+    }
+    
+    static private function getRequirementsMethod($route)
+    {
+        $requirements = $route->getRequirements();
+
+        return isset($requirements['_method']) ? strtoupper((array)$requirements['_method'] === $requirements['_method'] 
+            ? implode(', ', $requirements['_method']) : $requirements['_method']) : 'ANY';
     }
 
     /**

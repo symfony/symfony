@@ -45,7 +45,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('extensions')
                     ->prototype('scalar')
                         ->beforeNormalization()
-                            ->ifTrue(function($v) { return is_array($v) && isset($v['id']); })
+                            ->ifTrue(function($v) { return (array)$v === $v && isset($v['id']); })
                             ->then(function($v){ return $v['id']; })
                         ->end()
                     ->end()
@@ -93,7 +93,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->beforeNormalization()
                             ->ifTrue(function($v){
-                                if (is_array($v)) {
+                                if ((array)$v === $v) {
                                     $keys = array_keys($v);
                                     sort($keys);
 

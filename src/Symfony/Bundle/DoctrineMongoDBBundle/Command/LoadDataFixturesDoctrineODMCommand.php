@@ -76,7 +76,7 @@ EOT
         $dm = $this->container->get($dmServiceName);
         $dirOrFile = $input->getOption('fixtures');
         if ($dirOrFile) {
-            $paths = is_array($dirOrFile) ? $dirOrFile : array($dirOrFile);
+            $paths = (array)$dirOrFile === $dirOrFile ? $dirOrFile : array($dirOrFile);
         } else {
             $paths = array();
             foreach ($this->container->get('kernel')->getBundles() as $bundle) {

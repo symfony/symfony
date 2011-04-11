@@ -74,7 +74,7 @@ class Crawler extends \SplObjectStorage
     {
         if ($node instanceof \DOMNodeList) {
             $this->addNodeList($node);
-        } elseif (is_array($node)) {
+        } elseif ((array)$node === $node) {
             $this->addNodes($node);
         } elseif (is_string($node)) {
             $this->addContent($node);
@@ -458,7 +458,7 @@ class Crawler extends \SplObjectStorage
      */
     public function extract($attributes)
     {
-        if (!is_array($attributes)) {
+        if ((array)$attributes !== $attributes) {
             $attributes = array($attributes);
         }
 

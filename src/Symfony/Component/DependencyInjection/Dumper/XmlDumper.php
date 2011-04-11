@@ -187,7 +187,7 @@ class XmlDumper extends Dumper
 
         if ($callable = $definition->getConfigurator()) {
             $configurator = $this->document->createElement('configurator');
-            if (is_array($callable)) {
+            if ((array)$callable === $callable) {
                 $configurator->setAttribute((is_object($callable[0]) && $callable[0] instanceof Reference ? 'service' : 'class'), $callable[0]);
                 $configurator->setAttribute('method', $callable[1]);
             } else {
@@ -259,7 +259,7 @@ class XmlDumper extends Dumper
                 $element->setAttribute($keyAttribute, $key);
             }
 
-            if (is_array($value)) {
+            if ((array)$value === $value) {
                 $element->setAttribute('type', 'collection');
                 $this->convertParameters($value, $type, $element, 'key');
             } else if (is_object($value) && $value instanceof Reference) {
@@ -295,7 +295,7 @@ class XmlDumper extends Dumper
     {
         $args = array();
         foreach ($arguments as $k => $v) {
-            if (is_array($v)) {
+            if ((array)$v === $v) {
                 $args[$k] = $this->escape($v);
             } elseif (is_string($v)) {
                 $args[$k] = str_replace('%', '%%', $v);

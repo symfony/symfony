@@ -100,11 +100,11 @@ abstract class AsseticHelper extends Helper
             return array_map('trim', explode(',', $value));
         };
 
-        if (!is_array($inputs)) {
+        if ((array)$inputs !== $inputs) {
             $inputs = $explode($inputs);
         }
 
-        if (!is_array($filters)) {
+        if ((array)$filters !== $filters) {
             $filters = $explode($filters);
         }
 

@@ -35,7 +35,7 @@ class ChoiceValidator extends ConstraintValidator
             return true;
         }
 
-        if ($constraint->multiple && !is_array($value)) {
+        if ($constraint->multiple && (array)$value !== $value) {
             throw new UnexpectedTypeException($value, 'array');
         }
 

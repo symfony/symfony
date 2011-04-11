@@ -118,12 +118,12 @@ class Parser
                         $parsed = $parser->parse($value);
 
                         $merged = array();
-                        if (!is_array($parsed)) {
+                        if ((array)$parsed !== $parsed) {
                             throw new ParserException(sprintf('YAML merge keys used with a scalar value instead of an array at line %s (%s)', $this->getRealCurrentLineNb() + 1, $this->currentLine));
                         } else if (isset($parsed[0])) {
                             // Numeric array, merge individual elements
                             foreach (array_reverse($parsed) as $parsedItem) {
-                                if (!is_array($parsedItem)) {
+                                if ((array)$parsedItem !== $parsedItem) {
                                     throw new ParserException(sprintf('Merge items must be arrays at line %s (%s).', $this->getRealCurrentLineNb() + 1, $parsedItem));
                                 }
                                 $merged = array_merge($parsedItem, $merged);
@@ -165,7 +165,7 @@ class Parser
                 // 1-liner followed by newline
                 if (2 == count($this->lines) && empty($this->lines[1])) {
                     $value = Inline::load($this->lines[0]);
-                    if (is_array($value)) {
+                    if ((array)$value === $value) {
                         $first = reset($value);
                         if (is_string($first) && '*' === substr($first, 0, 1)) {
                             $data = array();

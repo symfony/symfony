@@ -174,7 +174,7 @@ class Configuration implements ConfigurationInterface
         $node
             ->beforeNormalization()
                 // if scalar
-                ->ifTrue(function($v) { return !is_array($v); })
+                ->ifTrue(function($v) { return (array)$v !== $v; })
                 ->then(function($v) { return array('type' => $v); })
             ->end()
             ->children()

@@ -773,9 +773,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if ($callable = $definition->getConfigurator()) {
-            if (is_array($callable) && is_object($callable[0]) && $callable[0] instanceof Reference) {
+            if ((array)$callable === $callable && is_object($callable[0]) && $callable[0] instanceof Reference) {
                 $callable[0] = $this->get((string) $callable[0]);
-            } elseif (is_array($callable)) {
+            } elseif ((array)$callable === $callable) {
                 $callable[0] = $this->getParameterBag()->resolveValue($callable[0]);
             }
 
@@ -798,7 +798,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function resolveServices($value)
     {
-        if (is_array($value)) {
+        if ((array)$value === $value) {
             foreach ($value as &$v) {
                 $v = $this->resolveServices($v);
             }
@@ -838,7 +838,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $services = array();
 
-        if (is_array($value)) {
+        if ((array)$value === $value) {
             foreach ($value as $v) {
                 $services = array_unique(array_merge($services, self::getServiceConditionals($v)));
             }

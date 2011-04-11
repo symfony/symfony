@@ -242,7 +242,7 @@ class Route
 
     private function sanitizeRequirement($key, $regex)
     {
-        if (is_array($regex)) {
+        if ((array)$regex === $regex) {
             throw new \InvalidArgumentException(sprintf('Routing requirements must be a string, array given for "%s"', $key));
         }
 

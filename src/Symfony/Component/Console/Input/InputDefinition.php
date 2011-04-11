@@ -408,10 +408,12 @@ class InputDefinition
         // find the largest option or argument name
         $max = 0;
         foreach ($this->getOptions() as $option) {
-            $max = strlen($option->getName()) + 2 > $max ? strlen($option->getName()) + 2 : $max;
+            $length = strlen($option->getName()) + 2;
+            $max = $length > $max ? $length : $max;
         }
         foreach ($this->getArguments() as $argument) {
-            $max = strlen($argument->getName()) > $max ? strlen($argument->getName()) : $max;
+            $length = strlen($argument->getName());
+            $max = $length > $max ? $length : $max;
         }
         ++$max;
 
@@ -420,12 +422,12 @@ class InputDefinition
         if ($this->getArguments()) {
             $text[] = '<comment>Arguments:</comment>';
             foreach ($this->getArguments() as $argument) {
-                if (null !== $argument->getDefault() && (!is_array($argument->getDefault()) || count($argument->getDefault()))) {
-                    $default = sprintf('<comment> (default: %s)</comment>', is_array($argument->getDefault()) ? str_replace("\n", '', var_export($argument->getDefault(), true)): $argument->getDefault());
-                } else {
-                    $default = '';
+                $defaultArgument = $argument->getDefault();
+                $default = '';
+                if (null !== $defaultArgument && ((array)$defaultArgument !== $defaultArgument || count($defaultArgument))) {
+                    $default = sprintf('<comment> (default: %s)</comment>', (array)$defaultArgument === $defaultArgument 
+                        ? str_replace("\n", '', var_export($defaultArgument, true)) : $defaultArgument);
                 }
-
                 $text[] = sprintf(" <info>%-${max}s</info> %s%s", $argument->getName(), $argument->getDescription(), $default);
             }
 
@@ -436,12 +438,11 @@ class InputDefinition
             $text[] = '<comment>Options:</comment>';
 
             foreach ($this->getOptions() as $option) {
-                if ($option->acceptValue() && null !== $option->getDefault() && (!is_array($option->getDefault()) || count($option->getDefault()))) {
-                    $default = sprintf('<comment> (default: %s)</comment>', is_array($option->getDefault()) ? str_replace("\n", '', print_r($option->getDefault(), true)): $option->getDefault());
-                } else {
-                    $default = '';
+                $defaultOption = $option->getDefault();
+                $default = '';
+                if ($option->acceptValue() && null !== $defaultOption && ((array)$defaultOption !== $defaultOption || count($defaultOption))) {
+                    $default = sprintf('<comment> (default: %s)</comment>', (array)$defaultOption === $defaultOption ? str_replace("\n", '', print_r($defaultOption, true)) : $defaultOption);
                 }
-
                 $multiple = $option->isArray() ? '<comment> (multiple values allowed)</comment>' : '';
                 $text[] = sprintf(' %-'.$max.'s %s%s%s%s', '<info>--'.$option->getName().'</info>', $option->getShortcut() ? sprintf('(-%s) ', $option->getShortcut()) : '', $option->getDescription(), $default, $multiple);
             }
@@ -475,7 +476,8 @@ class InputDefinition
             $descriptionXML->appendChild($dom->createTextNode($argument->getDescription()));
 
             $argumentXML->appendChild($defaultsXML = $dom->createElement('defaults'));
-            $defaults = is_array($argument->getDefault()) ? $argument->getDefault() : ($argument->getDefault() ? array($argument->getDefault()) : array());
+            $defaultArgument = $argument->getDefault();
+            $defaults = (array)$defaultArgument === $defaultArgument ? $defaultArgument : ($defaultArgument ? array($defaultArgument) : array());
             foreach ($defaults as $default) {
                 $defaultsXML->appendChild($defaultXML = $dom->createElement('default'));
                 $defaultXML->appendChild($dom->createTextNode($default));
@@ -495,7 +497,8 @@ class InputDefinition
 
             if ($option->acceptValue()) {
                 $optionXML->appendChild($defaultsXML = $dom->createElement('defaults'));
-                $defaults = is_array($option->getDefault()) ? $option->getDefault() : ($option->getDefault() ? array($option->getDefault()) : array());
+                $defaultOption = $option->getDefault();
+                $defaults = (array)$defaultOption === $defaultOption ? $defaultOption : ($defaultOption ? array($defaultOption) : array());
                 foreach ($defaults as $default) {
                     $defaultsXML->appendChild($defaultXML = $dom->createElement('default'));
                     $defaultXML->appendChild($dom->createTextNode($default));

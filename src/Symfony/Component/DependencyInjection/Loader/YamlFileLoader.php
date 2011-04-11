@@ -242,7 +242,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['tags'])) {
-            if (!is_array($service['tags'])) {
+            if ((array)$service['tags'] !== $service['tags']) {
                 throw new \InvalidArgumentException(sprintf('Parameter "tags" must be an array for service "%s" in %s.', $id, $file));
             }
 
@@ -287,7 +287,7 @@ class YamlFileLoader extends FileLoader
             return $content;
         }
 
-        if (!is_array($content)) {
+        if ((array)$content !== $content) {
             throw new \InvalidArgumentException(sprintf('The service file "%s" is not valid.', $file));
         }
 
@@ -312,7 +312,7 @@ class YamlFileLoader extends FileLoader
      */
     private function resolveServices($value)
     {
-        if (is_array($value)) {
+        if ((array)$value === $value) {
             $value = array_map(array($this, 'resolveServices'), $value);
         } else if (is_string($value) &&  0 === strpos($value, '@')) {
             if (0 === strpos($value, '@?')) {
@@ -349,7 +349,7 @@ class YamlFileLoader extends FileLoader
                 continue;
             }
 
-            if (!is_array($values)) {
+            if ((array)$values !== $values) {
                 $values = array();
             }
 

@@ -27,7 +27,7 @@ class Routes
      */
     public function __construct(array $data)
     {
-        if (!isset($data['value']) || !is_array($data['value'])) {
+        if (!isset($data['value']) || (array)$data['value'] !== $data['value']) {
             throw new \LogicException('A @Routes annotation must have an array of @Route annotation as argument.');
         }
 

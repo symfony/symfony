@@ -76,7 +76,7 @@ class Inline
                 throw new Exception('Unable to dump PHP resources in a YAML file.');
             case is_object($value):
                 return '!!php/object:'.serialize($value);
-            case is_array($value):
+            case (array)$value === $value:
                 return self::dumpArray($value);
             case null === $value:
                 return 'null';

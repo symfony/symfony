@@ -49,7 +49,7 @@ class FileBag extends ParameterBag
      */
     public function set($key, $value)
     {
-        if (is_array($value) || $value instanceof UploadedFile) {
+        if ((array)$value === $value || $value instanceof UploadedFile) {
             parent::set($key, $this->convertFileInformation($value));
         }
     }
@@ -79,7 +79,7 @@ class FileBag extends ParameterBag
         }
 
         $file = $this->fixPhpFilesArray($file);
-        if (is_array($file)) {
+        if ((array)$file === $file) {
             $keys = array_keys($file);
             sort($keys);
 
@@ -114,14 +114,14 @@ class FileBag extends ParameterBag
      */
     protected function fixPhpFilesArray($data)
     {
-        if (!is_array($data)) {
+        if ((array)$data !== $data) {
             return $data;
         }
 
         $keys = array_keys($data);
         sort($keys);
 
-        if (self::$fileKeys != $keys || !isset($data['name']) || !is_array($data['name'])) {
+        if (self::$fileKeys != $keys || !isset($data['name']) || (array)$data['name'] !== $data['name']) {
             return $data;
         }
 

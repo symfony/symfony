@@ -75,7 +75,7 @@ class RequestMatcher implements RequestMatcherInterface
             {
                 return strtolower($m);
             },
-            is_array($method) ? $method : array($method)
+            (array)$method === $method ? $method : array($method)
         );
     }
 

@@ -89,7 +89,7 @@ class ControllerResolver implements ControllerResolverInterface
     {
         $attributes = $request->attributes->all();
 
-        if (is_array($controller)) {
+        if ((array)$controller === $controller) {
             $r = new \ReflectionMethod($controller[0], $controller[1]);
             $repr = sprintf('%s::%s()', get_class($controller[0]), $controller[1]);
         } else {

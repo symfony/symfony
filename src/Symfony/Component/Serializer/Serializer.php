@@ -97,7 +97,7 @@ class Serializer implements SerializerInterface
      */
     public function normalize($data, $format)
     {
-        if (is_array($data)) {
+        if ((array)$data === $data) {
             foreach ($data as $key => $val) {
                 $data[$key] = $this->isStructuredType($val) ? $this->normalize($val, $format) : $val;
             }

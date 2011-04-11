@@ -89,7 +89,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
     private function processArguments(array $arguments)
     {
         foreach ($arguments as $argument) {
-            if (is_array($argument)) {
+            if ((array)$argument === $argument) {
                 $this->processArguments($argument);
             } else if ($argument instanceof Reference) {
                 $this->graph->connect(

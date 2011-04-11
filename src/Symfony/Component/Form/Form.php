@@ -367,7 +367,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         // get transformed data and pass its values to child fields
         $data = $this->getTransformedData();
 
-        if (!empty($data) && !is_array($data) && !is_object($data)) {
+        if (!empty($data) && (array)$data !== $data && !is_object($data)) {
             throw new \InvalidArgumentException(sprintf('Expected argument of type object or array, %s given', gettype($data)));
         }
 
@@ -408,7 +408,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
             $data = array();
         }
 
-        if (!is_array($data)) {
+        if ((array)$data !== $data) {
             throw new UnexpectedTypeException($data, 'array');
         }
 
@@ -880,7 +880,8 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function validateData(ExecutionContext $context)
     {
-        if (is_object($this->getData()) || is_array($this->getData())) {
+        $data = $this->getData();
+        if (is_object($data) || (array)$data === $data) {
             $groups = $this->getValidationGroups();
             $propertyPath = $context->getPropertyPath();
             $graphWalker = $context->getGraphWalker();
@@ -952,7 +953,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     static protected function deepArrayUnion($array1, $array2)
     {
         foreach ($array2 as $key => $value) {
-            if (is_array($value) && isset($array1[$key]) && is_array($array1[$key])) {
+            if ((array)$value === $value && isset($array1[$key]) && (array)$array1[$key] === $array1[$key]) {
                 $array1[$key] = self::deepArrayUnion($array1[$key], $value);
             } else {
                 $array1[$key] = $value;

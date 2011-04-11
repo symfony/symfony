@@ -61,16 +61,17 @@ class ChoiceField extends HybridField
         parent::configure();
 
         $choices = $this->getOption('choices');
+        $preferredChoices = $this->getOption('preferred_choices');
 
-        if (!is_array($choices) && !$choices instanceof \Closure) {
+        if ((array)$choices !== $choices && !$choices instanceof \Closure) {
             throw new InvalidOptionsException('The choices option must be an array or a closure', array('choices'));
         }
 
-        if (!is_array($this->getOption('preferred_choices'))) {
+        if ((array)$preferredChoices !== $preferredChoices) {
             throw new InvalidOptionsException('The preferred_choices option must be an array', array('preferred_choices'));
         }
 
-        if (count($this->getOption('preferred_choices')) > 0) {
+        if (0 !== count($preferredChoices)) {
             $this->preferredChoices = array_flip($this->getOption('preferred_choices'));
         }
 
@@ -134,7 +135,7 @@ class ChoiceField extends HybridField
             $choices = $choices->__invoke();
         }
 
-        if (!is_array($choices)) {
+        if ((array)$choices !== $choices) {
             throw new InvalidOptionsException('The "choices" option must be an array or a closure returning an array', array('choices'));
         }
 
@@ -175,7 +176,7 @@ class ChoiceField extends HybridField
 
     public function isChoiceGroup($choice)
     {
-        return is_array($choice) || $choice instanceof \Traversable;
+        return (array)$choice === $choice || $choice instanceof \Traversable;
     }
 
     public function isChoiceSelected($choice)
@@ -285,7 +286,7 @@ class ChoiceField extends HybridField
             if ($this->isMultipleChoice()) {
                 $value = $choices;
             } else {
-                $value = count($choices) > 0 ? current($choices) : null;
+                $value = 0 !== count($choices) ? current($choices) : null;
             }
         }
 

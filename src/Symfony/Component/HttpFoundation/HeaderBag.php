@@ -119,7 +119,7 @@ class HeaderBag
     {
         $key = strtr(strtolower($key), '_', '-');
 
-        if (!is_array($values)) {
+        if ((array)$values !== $values) {
             $values = array($values);
         }
 

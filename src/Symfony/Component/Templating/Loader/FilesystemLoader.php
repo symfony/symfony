@@ -31,7 +31,7 @@ class FilesystemLoader extends Loader
      */
     public function __construct($templatePathPatterns)
     {
-        if (!is_array($templatePathPatterns)) {
+        if ((array)$templatePathPatterns !== $templatePathPatterns) {
             $templatePathPatterns = array($templatePathPatterns);
         }
 

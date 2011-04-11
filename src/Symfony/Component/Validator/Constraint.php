@@ -83,11 +83,11 @@ abstract class Constraint
         $invalidOptions = array();
         $missingOptions = array_flip((array) $this->getRequiredOptions());
 
-        if (is_array($options) && 1 === count($options) && isset($options['value'])) {
+        if ((array)$options === $options && 1 === count($options) && isset($options['value'])) {
             $options = $options['value'];
         }
 
-        if (is_array($options) && count($options) > 0 && is_string(key($options))) {
+        if ((array)$options === $options && 0 !== count($options) && is_string(key($options))) {
             foreach ($options as $option => $value) {
                 if (property_exists($this, $option)) {
                     $this->$option = $value;
@@ -96,7 +96,7 @@ abstract class Constraint
                     $invalidOptions[] = $option;
                 }
             }
-        } else if (null !== $options && ! (is_array($options) && 0 === count($options))) {
+        } else if (null !== $options && ! ((array)$options === $options && 0 === count($options))) {
             $option = $this->getDefaultOption();
 
             if (null === $option) {
@@ -113,14 +113,14 @@ abstract class Constraint
             }
         }
 
-        if (count($invalidOptions) > 0) {
+        if (0 !== count($invalidOptions)) {
             throw new InvalidOptionsException(
                 sprintf('The options "%s" do not exist in constraint %s', implode('", "', $invalidOptions), get_class($this)),
                 $invalidOptions
             );
         }
 
-        if (count($missingOptions) > 0) {
+        if (0 !== count($missingOptions)) {
             throw new MissingOptionsException(
                 sprintf('The options "%s" must be set for constraint %s', implode('", "', array_keys($missingOptions)), get_class($this)),
                 array_keys($missingOptions)

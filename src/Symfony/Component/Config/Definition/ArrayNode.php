@@ -222,7 +222,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      */
     protected function validateType($value)
     {
-        if (!is_array($value) && (!$this->allowFalse || false !== $value)) {
+        if ((array)$value !== $value && (!$this->allowFalse || false !== $value)) {
             throw new InvalidTypeException(sprintf(
                 'Invalid type for path "%s". Expected array, but got %s',
                 $this->getPath(),

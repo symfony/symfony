@@ -104,7 +104,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         $inputTimezone = $this->getOption('input_timezone');
         $outputTimezone = $this->getOption('output_timezone');
 
-        if (!is_array($value)) {
+        if ((array)$value !== $value) {
             throw new UnexpectedTypeException($value, 'array');
         }
 

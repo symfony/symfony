@@ -116,7 +116,7 @@ class YamlDumper extends Dumper
         }
 
         if ($callable = $definition->getConfigurator()) {
-            if (is_array($callable)) {
+            if ((array)$callable === $callable) {
                 if (is_object($callable[0]) && $callable[0] instanceof Reference) {
                     $callable = array($this->getServiceCall((string) $callable[0], $callable[0]), $callable[1]);
                 } else {
@@ -197,7 +197,7 @@ class YamlDumper extends Dumper
      */
     private function dumpValue($value)
     {
-        if (is_array($value)) {
+        if ((array)$value === $value) {
             $code = array();
             foreach ($value as $k => $v) {
                 $code[$k] = $this->dumpValue($v);
@@ -252,7 +252,7 @@ class YamlDumper extends Dumper
     {
         $filtered = array();
         foreach ($parameters as $key => $value) {
-            if (is_array($value)) {
+            if ((array)$value === $value) {
                 $value = $this->prepareParameters($value);
             } elseif ($value instanceof Reference) {
                 $value = '@'.$value;
@@ -274,7 +274,7 @@ class YamlDumper extends Dumper
     {
         $args = array();
         foreach ($arguments as $k => $v) {
-            if (is_array($v)) {
+            if ((array)$v === $v) {
                 $args[$k] = $this->escape($v);
             } elseif (is_string($v)) {
                 $args[$k] = str_replace('%', '%%', $v);

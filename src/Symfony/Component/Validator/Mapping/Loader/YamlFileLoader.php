@@ -37,7 +37,7 @@ class YamlFileLoader extends FileLoader
             }
 
             // not an array
-            if (!is_array($this->classes)) {
+            if ((array)$this->classes !== $this->classes) {
                 throw new \InvalidArgumentException(sprintf('The file "%s" must contain a YAML array.', $this->file));
             }
 
@@ -95,16 +95,16 @@ class YamlFileLoader extends FileLoader
         $values = array();
 
         foreach ($nodes as $name => $childNodes) {
-            if (is_numeric($name) && is_array($childNodes) && count($childNodes) == 1) {
+            if (is_numeric($name) && (array)$childNodes === $childNodes && count($childNodes) === 1) {
                 $options = current($childNodes);
 
-                if (is_array($options)) {
+                if ((array)$options === $options) {
                     $options = $this->parseNodes($options);
                 }
 
                 $values[] = $this->newConstraint(key($childNodes), $options);
             } else {
-                if (is_array($childNodes)) {
+                if ((array)$childNodes === $childNodes) {
                     $childNodes = $this->parseNodes($childNodes);
                 }
 

@@ -686,7 +686,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
     protected function getContainer($bundles = 'YamlBundle', $vendor = null)
     {
-        if (!is_array($bundles)) {
+        if ((array)$bundles !== $bundles) {
             $bundles = array($bundles);
         }
 

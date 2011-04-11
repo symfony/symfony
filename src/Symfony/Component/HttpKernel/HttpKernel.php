@@ -184,7 +184,7 @@ class HttpKernel implements HttpKernelInterface
             return sprintf('[object](%s)', get_class($var));
         }
 
-        if (is_array($var)) {
+        if ((array)$var === $var) {
             $a = array();
             foreach ($var as $k => $v) {
                 $a[] = sprintf('%s => %s', $k, $this->varToString($v));

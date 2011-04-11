@@ -236,7 +236,7 @@ class Acl implements AuditableAclInterface
             return true;
         }
 
-        if (!is_array($sids)) {
+        if ((array)$sids !== $sids) {
             $sids = array($sids);
         }
 

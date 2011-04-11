@@ -72,7 +72,7 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
      */
     private function resolveValue($value)
     {
-        if (is_array($value)) {
+        if ((array)$value === $value) {
             $resolved = array();
             foreach ($value as $k => $v) {
                 $resolved[$this->resolveValue($k)] = $this->resolveValue($v);

@@ -68,7 +68,7 @@ class Processor
     public static function normalizeKeys(array $config)
     {
         foreach ($config as $key => $value) {
-            if (is_array($value)) {
+            if ((array)$value === $value) {
                 $config[$key] = self::normalizeKeys($value);
             }
 

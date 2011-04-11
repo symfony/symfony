@@ -483,7 +483,7 @@ EOF;
             return '';
         }
 
-        if (is_array($callable)) {
+        if ((array)$callable === $callable) {
             if (is_object($callable[0]) && $callable[0] instanceof Reference) {
                 return sprintf("        %s->%s(\$%s);\n", $this->getServiceCall((string) $callable[0]), $callable[1], $variableName);
             }
@@ -825,7 +825,7 @@ EOF;
     {
         $php = array();
         foreach ($parameters as $key => $value) {
-            if (is_array($value)) {
+            if ((array)$value === $value) {
                 $value = $this->exportParameters($value, $indent + 4);
             } elseif ($value instanceof Variable) {
                 throw new \InvalidArgumentException(sprintf('you cannot dump a container with parameters that contain variable references. Variable "%s" found.', $value));
@@ -891,7 +891,7 @@ EOF;
     private function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior)
     {
         foreach ($arguments as $argument) {
-            if (is_array($argument)) {
+            if ((array)$argument === $argument) {
                 $this->getServiceCallsFromArguments($argument, $calls, $behavior);
             } else if ($argument instanceof Reference) {
                 $id = (string) $argument;
@@ -943,7 +943,7 @@ EOF;
     {
         $definitions = array();
         foreach ($arguments as $argument) {
-            if (is_array($argument)) {
+            if ((array)$argument === $argument) {
                 $definitions = array_merge($definitions, $this->getDefinitionsFromArguments($argument));
             } else if ($argument instanceof Definition) {
                 $definitions = array_merge(
@@ -967,7 +967,7 @@ EOF;
     private function hasReference($id, array $arguments)
     {
         foreach ($arguments as $argument) {
-            if (is_array($argument)) {
+            if ((array)$argument === $argument) {
                 if ($this->hasReference($id, $argument)) {
                     return true;
                 }
@@ -990,7 +990,7 @@ EOF;
      */
     private function dumpValue($value, $interpolate = true)
     {
-        if (is_array($value)) {
+        if ((array)$value === $value) {
             $code = array();
             foreach ($value as $k => $v) {
                 $code[] = sprintf('%s => %s', $this->dumpValue($k, $interpolate), $this->dumpValue($v, $interpolate));

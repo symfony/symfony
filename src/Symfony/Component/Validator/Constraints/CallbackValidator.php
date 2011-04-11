@@ -31,7 +31,7 @@ class CallbackValidator extends ConstraintValidator
 
         // has to be an array so that we can differentiate between callables
         // and method names
-        if (!is_array($constraint->methods)) {
+        if ((array)$constraint->methods !== $constraint->methods) {
             throw new UnexpectedTypeException($constraint->methods, 'array');
         }
 
@@ -45,7 +45,7 @@ class CallbackValidator extends ConstraintValidator
         $propertyPath = $context->getPropertyPath();
 
         foreach ($methods as $method) {
-            if (is_array($method)) {
+            if ((array)$method === $method) {
                 if (!is_callable($method)) {
                     throw new ConstraintDefinitionException(sprintf('"%s::%s" targeted by Callback constraint is not a valid callable', $method[0], $method[1]));
                 }

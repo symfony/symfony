@@ -187,7 +187,7 @@ class EsiTest extends \PHPUnit_Framework_TestCase
               ->method('getRequest')
               ->will($this->returnValue($request))
         ;
-        if (is_array($response)) {
+        if ((array)$response === $response) {
             $cache->expects($this->any())
                   ->method('handle')
                   ->will(call_user_func_array(array($this, 'onConsecutiveCalls'), $response))

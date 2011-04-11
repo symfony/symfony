@@ -327,7 +327,7 @@ class Finder implements \IteratorAggregate
      */
     public function in($dirs)
     {
-        if (!is_array($dirs)) {
+        if ((array)$dirs !== $dirs) {
             $dirs = array($dirs);
         }
 
@@ -386,7 +386,7 @@ class Finder implements \IteratorAggregate
             $this->iterators[] = $iterator->getIterator();
         } elseif ($iterator instanceof \Iterator) {
             $this->iterators[] = $iterator;
-        } elseif ($iterator instanceof \Traversable || is_array($iterator)) {
+        } elseif ($iterator instanceof \Traversable || (array)$iterator === $iterator) {
             $it = new \ArrayIterator();
             foreach ($iterator as $file) {
                 $it->append($file instanceof \SplFileInfo ? $file : new \SplFileInfo($file));

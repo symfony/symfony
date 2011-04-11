@@ -23,7 +23,7 @@ class AllValidator extends ConstraintValidator
             return true;
         }
 
-        if (!is_array($value) && !$value instanceof \Traversable) {
+        if ((array)$value !== $value && !$value instanceof \Traversable) {
             throw new UnexpectedTypeException($value, 'array or Traversable');
         }
 
@@ -33,7 +33,7 @@ class AllValidator extends ConstraintValidator
 
         // cannot simply cast to array, because then the object is converted to an
         // array instead of wrapped inside
-        $constraints = is_array($constraint->constraints) ? $constraint->constraints : array($constraint->constraints);
+        $constraints = (array)$constraint->constraints === $constraint->constraints ? $constraint->constraints : array($constraint->constraints);
 
         foreach ($value as $key => $element) {
             foreach ($constraints as $constr) {

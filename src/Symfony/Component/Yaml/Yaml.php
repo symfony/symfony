@@ -73,7 +73,7 @@ class Yaml
         $file = '';
 
         // if input is a file, process it
-        if (strpos($input, "\n") === false && is_file($input) && is_readable($input)) {
+        if (false === strpos($input, "\n") && is_file($input) && is_readable($input)) {
             $file = $input;
 
             ob_start();
@@ -81,11 +81,11 @@ class Yaml
             $content = ob_get_clean();
 
             // if an array is returned by the config file assume it's in plain php form else in YAML
-            $input = is_array($retval) ? $retval : $content;
+            $input = (array)$retval === $retval ? $retval : $content;
         }
 
         // if an array is returned by the config file assume it's in plain php form else in YAML
-        if (is_array($input)) {
+        if ((array)$input === $input) {
             return $input;
         }
 

@@ -117,7 +117,7 @@ EOF;
     {
         $filtered = array();
         foreach ($files as $key => $value) {
-            if (is_array($value)) {
+            if ((array)$value === $value) {
                 $filtered[$key] = $this->filterFiles($value);
             } elseif ($value instanceof UploadedFile) {
                 // create an already-moved uploaded file

@@ -48,7 +48,7 @@ class YamlExtension extends \Twig_Extension
             return '%Resource%';
         }
 
-        if (is_array($value) || is_object($value)) {
+        if ((array)$value === $value || is_object($value)) {
             return '%'.gettype($value).'% '.$this->encode($value);
         }
 

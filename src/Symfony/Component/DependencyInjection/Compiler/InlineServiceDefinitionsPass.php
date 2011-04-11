@@ -67,7 +67,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
     private function inlineArguments(ContainerBuilder $container, array $arguments)
     {
         foreach ($arguments as $k => $argument) {
-            if (is_array($argument)) {
+            if ((array)$argument === $argument) {
                 $arguments[$k] = $this->inlineArguments($container, $argument);
             } else if ($argument instanceof Reference) {
                 if (!$container->hasDefinition($id = (string) $argument)) {

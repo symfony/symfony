@@ -92,7 +92,7 @@ class HttpKernel extends BaseHttpKernel
             'comment'       => '',
         ), $options);
 
-        if (!is_array($options['alt'])) {
+        if ((array)$options['alt'] !== $options['alt']) {
             $options['alt'] = array($options['alt']);
         }
 

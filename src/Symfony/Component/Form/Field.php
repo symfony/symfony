@@ -297,7 +297,7 @@ class Field extends Configurable implements FieldInterface
      */
     public function submit($data)
     {
-        $this->transformedData = (is_array($data) || is_object($data)) ? $data : (string)$data;
+        $this->transformedData = ((array)$data === $data || is_object($data)) ? $data : (string)$data;
         $this->submitted = true;
         $this->errors = array();
 

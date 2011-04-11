@@ -25,7 +25,7 @@ class Collection extends \Symfony\Component\Validator\Constraint
     public function __construct($options = null)
     {
         // no known options set? $options is the fields array
-        if (is_array($options)
+        if ((array)$options === $options
             && !array_intersect(array_keys($options), array('groups', 'fields', 'allowExtraFields', 'allowMissingFields', 'extraFieldsMessage', 'missingFieldsMessage'))) {
             $options = array('fields' => $options);
         }

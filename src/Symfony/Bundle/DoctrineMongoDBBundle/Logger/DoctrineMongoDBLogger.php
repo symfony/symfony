@@ -256,7 +256,7 @@ class DoctrineMongoDBLogger
                 $formatted = $value;
             } elseif (is_scalar($value)) {
                 $formatted = '"'.$value.'"';
-            } elseif (is_array($value)) {
+            } elseif ((array)$value === $value) {
                 $formatted = static::bsonEncode($value);
             } elseif ($value instanceof \MongoId) {
                 $formatted = 'ObjectId("'.$value.'")';

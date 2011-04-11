@@ -56,7 +56,7 @@ class ArrayLoader implements LoaderInterface
             $subnode =& $messages;
         }
         foreach ($subnode as $key => $value) {
-            if (is_array($value)) {
+            if ((array)$value === $value) {
                 $nodePath = $path ? $path.'.'.$key : $key;
                 $this->flatten($messages, $value, $nodePath);
                 if (null === $path) {

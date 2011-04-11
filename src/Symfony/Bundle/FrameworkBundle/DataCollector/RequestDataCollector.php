@@ -42,7 +42,7 @@ class RequestDataCollector extends BaseRequestDataCollector
 
         if (isset($this->controllers[$request])) {
             $controller = $this->controllers[$request];
-            if (is_array($controller)) {
+            if ((array)$controller === $controller) {
                 $r = new \ReflectionMethod($controller[0], $controller[1]);
                 $this->data['controller'] = array(
                     'class'  => get_class($controller[0]),

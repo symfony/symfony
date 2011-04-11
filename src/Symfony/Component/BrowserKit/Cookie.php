@@ -128,15 +128,15 @@ class Cookie
         }
 
         foreach ($parts as $part) {
-            $part = trim($part);
+            $part = strtolower(trim($part));
 
-            if ('secure' === strtolower($part)) {
+            if ('secure' === $part) {
                 $values['secure'] = true;
 
                 continue;
             }
 
-            if ('httponly' === strtolower($part)) {
+            if ('httponly' === $part) {
                 $values['httponly'] = true;
 
                 continue;

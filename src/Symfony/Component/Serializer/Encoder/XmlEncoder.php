@@ -53,13 +53,11 @@ class XmlEncoder extends AbstractEncoder
      */
     public function decode($data, $format)
     {
-        $xml = \DOMDocument::loadXML($data);
-        if (!$xml->documentElement->hasChildNodes()) {
-            return "";
-        } elseif ($xml->documentElement->childNodes->length == 1 && $xml->documentElement->firstChild instanceof \DOMText) {
-            return trim((string)$xml->documentElement->firstChild->wholeText);
+        $xml = simplexml_load_string($data);
+        if (!$xml->count()) {
+            return (string) $xml;
         }
-        return $this->parseXml($xml->documentElement);
+        return $this->parseXml($xml);
     }
 
     /**
@@ -151,62 +149,48 @@ class XmlEncoder extends AbstractEncoder
     }
 
     /**
-     * Parse the input DOMElement into an array
+     * Parse the input SimpleXmlElement into an array
      *
-     * @param DOMElement $node xml to parse
+     * @param SimpleXmlElement $node xml to parse
      * @return array
      */
     private function parseXml($node)
     {
         $data = array();
-        foreach ($node->childNodes as $subnode) {
-            //When xml is "beautiful" (with tabs and newlines...), tabs and newline are considered as text but we do not want them
-            if ($subnode instanceof DOMText && trim($subnode->wholeText) === "") {
-                continue;
-            }
-            if (!$subnode->hasChildNodes()) {
-                $value = "";
-            } elseif ($subnode->childNodes->length == 1 && $subnode->firstChild instanceof \DOMText) {
-                $value = trim((string)$subnode->firstChild->wholeText);
-            } else {
+        foreach ($node->children() as $key => $subnode) {
+            if ($subnode->count()) {
                 $value = $this->parseXml($subnode);
-            }
-            
-            if ($subnode->hasAttributes()) {
-                if (is_string($value) && $value !== "") {
-                    $value = array('#' => $value);
-                } elseif (is_string($value)) {
-                    $value = array();
-                }
-                foreach($subnode->attributes as $attrKey => $attr) {
-                    $value['@'.$attrKey] = (string) $attr->value;
-                }
-            }
-            
-            if ($subnode->tagName === 'item') {
-                if (isset($value['@key'])) {
-                    $key = $value['@key'];
-                    $tmp = $value['#'];
-                    unset($value['@key']);
-                    unset($value['#']);
-                    if (!empty($value)) {
-                        $data[$key] = array_merge(array('#' => $tmp), $value);
-                    } else {
-                        $data[$key] = $tmp;
+                if ($subnode->attributes()) {
+                    foreach ($subnode->attributes() as $attrkey => $attr) {
+                        $value['@'.$attrkey] = (string) $attr;
                     }
+                }
+            } elseif ($subnode->attributes()) {
+                $value = array();
+                foreach ($subnode->attributes() as $attrkey => $attr) {
+                    $value['@'.$attrkey] = (string) $attr;
+                }
+                $value['#'] = (string) $subnode;
+            } else {
+                $value = (string) $subnode;
+            }
+            
+            if ($key === 'item') {
+                if (isset($value['@key'])) {
+                    $data[(string)$value['@key']] = $value['#'];
                 } elseif (isset($data['item'])) {
                     $tmp = $data['item'];
                     unset($data['item']);
                     $data[] = $tmp;
                     $data[] = $value;
                 }
-            } elseif (key_exists($subnode->tagName, $data)) {
-                if ((false === is_array($data[$subnode->tagName])) || (false === isset($data[$subnode->tagName][0]))) {
-                    $data[$subnode->tagName] = array($data[$subnode->tagName]);
+            } elseif (key_exists($key, $data)) {
+                if ((false === is_array($data[$key]))  || (false === isset($data[$key][0]))) {
+                    $data[$key] = array($data[$key]);
                 }
-                $data[$subnode->tagName][] = $value;
+                $data[$key][] = $value;
             } else {
-                $data[$subnode->tagName] = $value;
+                $data[$key] = $value;
             }
         }
         return $data;

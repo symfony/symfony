@@ -25,6 +25,7 @@ class Compiler
     private $currentPass;
     private $currentStartTime;
     private $log;
+    private $loggingFormatter;
     private $serviceReferenceGraph;
 
     /**
@@ -34,6 +35,7 @@ class Compiler
     {
         $this->passConfig = new PassConfig();
         $this->serviceReferenceGraph = new ServiceReferenceGraph();
+        $this->loggingFormatter = new LoggingFormatter();
         $this->log = array();
     }
 
@@ -58,6 +60,16 @@ class Compiler
     }
 
     /**
+     * Returns the logging formatter which can be used by compilation passes.
+     *
+     * @return LoggingFormatter
+     */
+    public function getLoggingFormatter()
+    {
+        return $this->loggingFormatter;
+    }
+
+    /**
      * Adds a pass to the PassConfig.
      *
      * @param CompilerPassInterface $pass A compiler pass
@@ -71,7 +83,7 @@ class Compiler
     /**
      * Adds a log message.
      *
-     * @param string $string The log message 
+     * @param string $string The log message
      */
     public function addLogMessage($string)
     {
@@ -91,7 +103,7 @@ class Compiler
     /**
      * Run the Compiler and process all Passes.
      *
-     * @param ContainerBuilder $container 
+     * @param ContainerBuilder $container
      */
     public function compile(ContainerBuilder $container)
     {

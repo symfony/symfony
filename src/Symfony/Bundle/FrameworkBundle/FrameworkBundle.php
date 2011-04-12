@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle;
 
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CompilerDebugDumpPass;
+
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConstraintValidatorsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddFieldFactoryGuessersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TemplatingPass;
@@ -82,5 +84,6 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new TranslatorPass());
         $container->addCompilerPass(new AddCacheWarmerPass());
         $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new CompilerDebugDumpPass(), PassConfig::TYPE_AFTER_REMOVING);
     }
 }

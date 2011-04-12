@@ -58,12 +58,14 @@ class UrlGenerator implements UrlGeneratorInterface
      * @param  string  $name       The name of the route
      * @param  array   $parameters An array of parameters
      * @param  Boolean $absolute   Whether to generate an absolute URL
+     * @param  mixed $secure       Whether to genereate a https URL (only for absolute URLs). 
+     *                             Can be either a boolean or null (security context of the current page is used)
      *
      * @return string The generated URL
      *
      * @throws \InvalidArgumentException When route doesn't exist
      */
-    public function generate($name, array $parameters = array(), $absolute = false)
+    public function generate($name, array $parameters = array(), $absolute = false, $secure = null)
     {
         if (null === $route = $this->routes->get($name)) {
             throw new \InvalidArgumentException(sprintf('Route "%s" does not exist.', $name));
@@ -127,8 +129,13 @@ class UrlGenerator implements UrlGeneratorInterface
         $url = (isset($this->context['base_url']) ? $this->context['base_url'] : '').$url;
 
         if ($absolute && isset($this->context['host'])) {
-            $isSecure = (isset($this->context['is_secure']) && $this->context['is_secure']);
+            if ($secure == null) {
+                $isSecure = (isset($this->context['is_secure']) && $this->context['is_secure']);
+            } else {
+                $isSecure = $secure;
+            }
             $port = isset($this->context['port']) ? $this->context['port'] : 80;
+            
             $urlBeginning = 'http'.($isSecure ? 's' : '').'://'.$this->context['host'];
             if (($isSecure && $port != 443) || (!$isSecure && $port != 80)) {
                 $urlBeginning .= ':'.$port;

@@ -24,8 +24,10 @@ interface UrlGeneratorInterface
      * @param  string  $name       The name of the route
      * @param  array   $parameters An array of parameters
      * @param  Boolean $absolute   Whether to generate an absolute URL
+     * @param  mixed $secure       Whether to genereate a https URL (only for absolute URLs). 
+     *                             Can be either a boolean or null (security context of the current page is used)
      *
      * @return string The generated URL
      */
-    function generate($name, array $parameters = array(), $absolute = false);
+    function generate($name, array $parameters = array(), $absolute = false, $secure = null);
 }

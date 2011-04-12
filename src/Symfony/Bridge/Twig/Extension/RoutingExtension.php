@@ -45,9 +45,9 @@ class RoutingExtension extends \Twig_Extension
         return $this->generator->generate($name, $parameters, false);
     }
 
-    public function getUrl($name, array $parameters = array())
+    public function getUrl($name, array $parameters = array(), $secure = null)
     {
-        return $this->generator->generate($name, $parameters, true);
+        return $this->generator->generate($name, $parameters, true, $secure);
     }
 
     /**

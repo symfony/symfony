@@ -186,4 +186,34 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->routeCollection->add('test', $route);
         $this->generator->generate('test', array('foo' => 'bar'), true);
     } 
+    
+    public function testGenerateSecureUrlViaParameter()
+    {
+        $this->routeCollection->add('test', new Route('/testing'));
+        $this->generator->setContext(array(
+            'base_url'=>'/app.php',
+            'method'=>'GET',
+            'host'=>'localhost',
+            'port'=>80,
+            'is_secure'=>false));
+
+        $url = $this->generator->generate('test', array('foo' => 'bar'), true, true);
+
+        $this->assertEquals('https://localhost/app.php/testing?foo=bar', $url);
+    }
+    
+    public function testGenerateUnsecureSecureUrlViaParameter()
+    {
+        $this->routeCollection->add('test', new Route('/testing'));
+        $this->generator->setContext(array(
+            'base_url'=>'/app.php',
+            'method'=>'GET',
+            'host'=>'localhost',
+            'port'=>80,
+            'is_secure'=>true));
+
+        $url = $this->generator->generate('test', array('foo' => 'bar'), true, false);
+
+        $this->assertEquals('http://localhost/app.php/testing?foo=bar', $url);
+    }
 }

@@ -82,7 +82,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         $parameters = array_replace($this->getGlobals(), $parameters);
         // render
         if (false === $content = $this->evaluate($storage, $parameters)) {
-            throw new \RuntimeException(sprintf('The template "%s" cannot be rendered.', $this->parser->parse($name)->getLogicalName()));
+            throw new \RuntimeException(sprintf('The template "%s" cannot be rendered.', $this->parser->parse($name)));
         }
 
         // decorator
@@ -172,7 +172,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      */
     public function offsetGet($name)
     {
-        return $this->$name = $this->get($name);
+        return $this->get($name);
     }
 
     /**
@@ -211,7 +211,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * @param Helper[] $helpers An array of helper
      */
-    public function addHelpers(array $helpers = array())
+    public function addHelpers(array $helpers)
     {
         foreach ($helpers as $alias => $helper) {
             $this->set($helper, is_int($alias) ? null : $alias);
@@ -496,7 +496,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         $storage = $this->loader->load($template);
 
         if (false === $storage) {
-            throw new \InvalidArgumentException(sprintf('The template "%s" does not exist.', is_string($name) ? $name : json_encode($name)));
+            throw new \InvalidArgumentException(sprintf('The template "%s" does not exist.', $template));
         }
 
         return $this->cache[$key] = $storage;

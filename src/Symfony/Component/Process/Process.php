@@ -60,7 +60,7 @@ class Process
         }
         $this->stdin = $stdin;
         $this->timeout = $timeout;
-        $this->options = array_merge($options, array('suppress_errors' => true, 'binary_pipes' => true, 'bypass_shell' => true));
+        $this->options = array_merge(array('suppress_errors' => true, 'binary_pipes' => true, 'bypass_shell' => true), $options);
     }
 
     /**

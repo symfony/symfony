@@ -169,7 +169,7 @@ class CodeHelper extends Helper
                 $fileStr = sprintf('<abbr title="%s">kernel.root_dir</abbr>/%s', $this->rootDir, $fileStr);
             }
 
-            $text = "$fileStr line $line";
+            $text = "$fileStr at line $line";
         }
 
         if (false !== $link = $this->getFileLink($file, $line)) {
@@ -196,8 +196,8 @@ class CodeHelper extends Helper
     {
         $that = $this;
 
-        return preg_replace_callback('/in (.*?)(?: on|at)? line (\d+)/', function ($match) use ($that) {
-            return 'in '.$that->formatFile($match[1], $match[2]);
+        return preg_replace_callback('/in (")?(.*?)\1(?: +(?:on|at))? +line (\d+)/', function ($match) use ($that) {
+            return 'in '.$that->formatFile($match[2], $match[3]);
         }, $text);
     }
 

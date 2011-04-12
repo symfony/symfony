@@ -30,6 +30,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     protected $allowNewKeys;
     protected $key;
     protected $removeKeyItem;
+    protected $value;
     protected $addDefaults;
     protected $nodeBuilder;
 
@@ -174,6 +175,38 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
+     * The name of the attribute which should be used as the scalar value.
+     *
+     * This is only relevant for XML configurations, and only in combination
+     * with a prototype based node.
+     *
+     * For example, if "value" is the valueAttribute, then:
+     *
+     *     array(
+     *         array('value' => 'foo')
+     *     )
+     *
+     * becomes
+     *
+     *     array('foo')
+     *
+     * @param string $attribute The name of the attribute to get a scalar value from
+     * @param string $prototype The type of prototype to create (i.e. "scalar" or "boolean")
+     *
+     * @return ArrayNodeDefinition
+     */
+    public function useAttributeAsValue($name, $prototype = 'scalar')
+    {
+        $this->value = $name;
+
+        if ($prototype) {
+            $this->prototype($prototype);
+        }
+
+        return $this;
+    }
+
+    /**
      * Sets whether the node can be unset.
      *
      * @param Boolean $allow
@@ -292,6 +325,10 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         } else {
             if (null !== $this->key) {
                 $node->setKeyAttribute($this->key, $this->removeKeyItem);
+            }
+
+            if (null != $this->value) {
+                $node->setValueAttribute($this->value);
             }
 
             if (true === $this->atLeastOne) {

@@ -26,6 +26,7 @@ class PrototypedArrayNode extends ArrayNode
     protected $prototype;
     protected $keyAttribute;
     protected $removeKeyAttribute;
+    protected $valueAttribute;
     protected $minNumberOfElements;
     protected $defaultValue;
 
@@ -77,6 +78,27 @@ class PrototypedArrayNode extends ArrayNode
     {
         $this->keyAttribute = $attribute;
         $this->removeKeyAttribute = $remove;
+    }
+
+    /**
+     * The name of the attribute which should be used as the scalar value.
+     *
+     * This is only relevant for XML configurations, and only in combination
+     * with a prototype based node.
+     *
+     * For example, if "value" is the valueAttribute, then:
+     *
+     *     array('value' => 'foo')
+     *
+     * becomes
+     *
+     *     'foo'
+     *
+     * @param string $attribute The name of the attribute to get a scalar value from
+     */
+    public function setValueAttribute($attribute)
+    {
+        $this->valueAttribute = $attribute;
     }
 
     /**
@@ -200,6 +222,15 @@ class PrototypedArrayNode extends ArrayNode
                     $msg = sprintf('Duplicate key "%s" for path "%s".', $k, $this->getPath());
                     throw new DuplicateKeyException($msg);
                 }
+            }
+
+            if (null !== $this->valueAttribute && is_array($v)) {
+                if (!isset($v[$this->valueAttribute])) {
+                    $msg = sprintf('The attribute "%s" must be set for path "%s".', $this->valueAttribute, $this->getPath());
+                    throw new InvalidConfigurationException($msg);
+                }
+
+                $v = $v[$this->valueAttribute];
             }
 
             $this->prototype->setName($k);

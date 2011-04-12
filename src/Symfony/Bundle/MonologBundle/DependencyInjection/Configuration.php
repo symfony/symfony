@@ -96,12 +96,7 @@ class Configuration implements ConfigurationInterface
         $node
             ->canBeUnset()
             ->performNoDeepMerging()
-            ->prototype('scalar')
-                ->beforeNormalization()
-                    ->ifTrue(function($v) { return is_array($v) && isset($v['callback']); })
-                    ->then(function($v){ return $v['callback']; })
-                ->end()
-            ->end()
+            ->useAttributeAsValue('callback')
         ;
 
         return $node;

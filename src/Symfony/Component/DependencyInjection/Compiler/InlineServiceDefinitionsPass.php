@@ -25,6 +25,9 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
 {
     private $repeatedPass;
     private $graph;
+    private $compiler;
+    private $formatter;
+    private $currentId;
 
     /**
      * {@inheritDoc}
@@ -41,9 +44,13 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $this->graph = $container->getCompiler()->getServiceReferenceGraph();
+        $this->compiler = $container->getCompiler();
+        $this->formatter = $this->compiler->getLoggingFormatter();
+        $this->graph = $this->compiler->getServiceReferenceGraph();
 
-        foreach ($container->getDefinitions() as $definition) {
+        foreach ($container->getDefinitions() as $id => $definition) {
+            $this->currentId = $id;
+
             $definition->setArguments(
                 $this->inlineArguments($container, $definition->getArguments())
             );
@@ -75,6 +82,8 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
                 }
 
                 if ($this->isInlinableDefinition($container, $id, $definition = $container->getDefinition($id))) {
+                    $this->compiler->addLogMessage($this->formatter->formatInlineDefinition($this, $id, $this->currentId));
+
                     if (ContainerInterface::SCOPE_PROTOTYPE !== $definition->getScope()) {
                         $arguments[$k] = $definition;
                     } else {

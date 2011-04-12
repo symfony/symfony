@@ -179,9 +179,27 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('Application\\Validator\\Constraints\\', $arguments[0]['app'], '->registerValidationConfiguration() loads custom validation namespaces');
     }
 
-    protected function createContainer()
+    public function testValidationPaths()
     {
-        return new ContainerBuilder(new ParameterBag(array(
+        require_once __DIR__ . "/Fixtures/TestBundle/TestBundle.php";
+        
+        $container = $this->createContainerFromFile('validation_annotations', array(
+            'kernel.bundles' => array('TestBundle' => 'Symfony\Bundle\FrameworkBundle\Tests\TestBundle'),
+        ));
+
+        $yamlArgs = $container->getDefinition('validator.mapping.loader.yaml_files_loader')->getArguments();
+        $this->assertEquals(1, count($yamlArgs[0]));
+        $this->assertStringEndsWith('TestBundle/Resources/config/validation.yml', $yamlArgs[0][0]);
+
+        $xmlArgs = $container->getDefinition('validator.mapping.loader.xml_files_loader')->getArguments();
+        $this->assertEquals(2, count($xmlArgs[0]));
+        $this->assertStringEndsWith('Component/Form/Resources/config/validation.xml', $xmlArgs[0][0]);
+        $this->assertStringEndsWith('TestBundle/Resources/config/validation.xml', $xmlArgs[0][1]);
+    }
+
+    protected function createContainer(array $data = array())
+    {
+        return new ContainerBuilder(new ParameterBag(array_merge(array(
             'kernel.bundles'          => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
             'kernel.cache_dir'        => __DIR__,
             'kernel.compiled_classes' => array(),
@@ -189,12 +207,12 @@ abstract class FrameworkExtensionTest extends TestCase
             'kernel.environment'      => 'test',
             'kernel.name'             => 'kernel',
             'kernel.root_dir'         => __DIR__,
-        )));
+        ), $data)));
     }
 
-    protected function createContainerFromFile($file)
+    protected function createContainerFromFile($file, $data = array())
     {
-        $container = $this->createContainer();
+        $container = $this->createContainer($data);
         $container->registerExtension(new FrameworkExtension());
         $this->loadFromFile($container, $file);
 

@@ -37,7 +37,7 @@ interface BundleInterface
      *
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    public function build(ContainerBuilder $container);
+    function build(ContainerBuilder $container);
 
     /**
      * Returns the bundle parent name.

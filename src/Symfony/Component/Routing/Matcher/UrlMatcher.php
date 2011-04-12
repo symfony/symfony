@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
+use Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Matcher\Exception\NotFoundException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -21,9 +23,10 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class UrlMatcher implements UrlMatcherInterface
 {
-    protected $routes;
     protected $defaults;
     protected $context;
+
+    private $routes;
 
     /**
      * Constructor.
@@ -52,38 +55,41 @@ class UrlMatcher implements UrlMatcherInterface
     /**
      * Tries to match a URL with a set of routes.
      *
-     * Returns false if no route matches the URL.
+     * @param  string $pathinfo The path info to be parsed
      *
-     * @param  string $url URL to be parsed
+     * @return array An array of parameters
      *
-     * @return array|false An array of parameters or false if no route matches
+     * @throws NotFoundException         If the resource could not be found
+     * @throws MethodNotAllowedException If the resource was found but the request method is not allowed
      */
-    public function match($url)
+    public function match($pathinfo)
     {
-        $url = $this->normalizeUrl($url);
+        $allow = array();
 
         foreach ($this->routes->all() as $name => $route) {
             $compiledRoute = $route->compile();
 
-            // check HTTP method requirement
-
-            if (isset($this->context['method']) && (($req = $route->getRequirement('_method')) && !preg_match(sprintf('#^(%s)$#xi', $req), $this->context['method']))) {
-                continue;
-            }
-
             // check the static prefix of the URL first. Only use the more expensive preg_match when it matches
-            if ('' !== $compiledRoute->getStaticPrefix() && 0 !== strpos($url, $compiledRoute->getStaticPrefix())) {
+            if ('' !== $compiledRoute->getStaticPrefix() && 0 !== strpos($pathinfo, $compiledRoute->getStaticPrefix())) {
                 continue;
             }
 
-            if (!preg_match($compiledRoute->getRegex(), $url, $matches)) {
+            if (!preg_match($compiledRoute->getRegex(), $pathinfo, $matches)) {
+                continue;
+            }
+
+            // check HTTP method requirement
+            if (isset($this->context['method']) && $route->getRequirement('_method') && ($req = explode('|', $route->getRequirement('_method'))) && !in_array(strtolower($this->context['method']), array_map('strtolower', $req))) {
+                $allow = array_merge($allow, $req);
                 continue;
             }
 
             return array_merge($this->mergeDefaults($matches, $route->getDefaults()), array('_route' => $name));
         }
 
-        return false;
+        throw 0 < count($allow)
+            ? new MethodNotAllowedException(array_unique(array_map('strtolower', $allow)))
+            : new NotFoundException();
     }
 
     protected function mergeDefaults($params, $defaults)
@@ -91,22 +97,10 @@ class UrlMatcher implements UrlMatcherInterface
         $parameters = array_merge($this->defaults, $defaults);
         foreach ($params as $key => $value) {
             if (!is_int($key)) {
-                // / are double-encoded as %2F is not valid in a URL (see UrlGenerator)
-                $parameters[$key] = str_replace('%2F', '/', urldecode($value));
+                $parameters[$key] = urldecode($value);
             }
         }
 
         return $parameters;
-    }
-
-    protected function normalizeUrl($url)
-    {
-        // remove the query string
-        if (false !== $pos = strpos($url, '?')) {
-            $url = substr($url, 0, $pos);
-        }
-
-        // remove multiple /
-        return preg_replace('#/+#', '/', $url);
     }
 }

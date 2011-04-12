@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Routing\Matcher\Dumper\ApacheMatcherDumper;
 
 /**
- * RouterDebugCommand.
+ * A console command for retrieving information about routes
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -85,7 +85,7 @@ EOF
         $format  = '%-'.$maxName.'s %-'.$maxMethod.'s %s';
 
         // displays the generated routes
-        $format1  = '%-'.($maxName + 9).'s %-'.($maxMethod + 9).'s %s';
+        $format1  = '%-'.($maxName + 19).'s %-'.($maxMethod + 19).'s %s';
         $output->writeln(sprintf($format1, '<comment>Name</comment>', '<comment>Method</comment>', '<comment>Pattern</comment>'));
         foreach ($routes as $name => $route) {
             $requirements = $route->getRequirements();
@@ -134,7 +134,7 @@ EOF
         }
         $output->writeln(sprintf('<comment>Options</comment>      %s', $options));
         $output->write('<comment>Regex</comment>        ');
-        $output->writeln(preg_replace('/^             /', '', preg_replace('/^/m', '             ', $route->getRegex())), Output::OUTPUT_RAW);
+        $output->writeln(preg_replace('/^             /', '', preg_replace('/^/m', '             ', $route->getRegex())), OutputInterface::OUTPUT_RAW);
 
         $tokens = '';
         foreach ($route->getTokens() as $token) {
@@ -159,6 +159,10 @@ EOF
     {
         if (is_object($value)) {
             return sprintf('object(%s)', get_class($value));
+        }
+
+        if (is_string($value)) {
+            return $value;
         }
 
         return preg_replace("/\n\s*/s", '', var_export($value, true));

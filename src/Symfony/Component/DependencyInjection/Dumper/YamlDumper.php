@@ -40,7 +40,7 @@ class YamlDumper extends Dumper
      *
      * @return string
      */
-    protected function addInterfaceInjectors()
+    private function addInterfaceInjectors()
     {
         if (!$this->container->getInterfaceInjectors()) {
             return '';
@@ -60,11 +60,11 @@ class YamlDumper extends Dumper
     /**
      * Adds a service
      *
-     * @param string $id 
-     * @param Definition $definition 
+     * @param string $id
+     * @param Definition $definition
      * @return string
      */
-    protected function addService($id, $definition)
+    private function addService($id, $definition)
     {
         $code = "  $id:\n";
         if ($definition->getClass()) {
@@ -103,6 +103,10 @@ class YamlDumper extends Dumper
             $code .= sprintf("    arguments: %s\n", Yaml::dump($this->dumpValue($definition->getArguments()), 0));
         }
 
+        if ($definition->getProperties()) {
+            $code .= sprintf("    properties: %s\n", Yaml::dump($this->dumpValue($definition->getProperties()), 0));
+        }
+
         if ($definition->getMethodCalls()) {
             $code .= sprintf("    calls:\n      %s\n", str_replace("\n", "\n      ", Yaml::dump($this->dumpValue($definition->getMethodCalls()), 1)));
         }
@@ -129,11 +133,11 @@ class YamlDumper extends Dumper
     /**
      * Adds a service alias
      *
-     * @param string $alias 
-     * @param string $id 
+     * @param string $alias
+     * @param string $id
      * @return void
      */
-    protected function addServiceAlias($alias, $id)
+    private function addServiceAlias($alias, $id)
     {
         if ($id->isPublic()) {
             return sprintf("  %s: @%s\n", $alias, $id);
@@ -147,7 +151,7 @@ class YamlDumper extends Dumper
      *
      * @return string
      */
-    protected function addServices()
+    private function addServices()
     {
         if (!$this->container->getDefinitions()) {
             return '';
@@ -170,7 +174,7 @@ class YamlDumper extends Dumper
      *
      * @return string
      */
-    protected function addParameters()
+    private function addParameters()
     {
         if (!$this->container->getParameterBag()->all()) {
             return '';
@@ -191,7 +195,7 @@ class YamlDumper extends Dumper
      * @param mixed $value
      * @throws \RuntimeException When trying to dump object or resource
      */
-    protected function dumpValue($value)
+    private function dumpValue($value)
     {
         if (is_array($value)) {
             $code = array();
@@ -214,11 +218,11 @@ class YamlDumper extends Dumper
     /**
      * Gets the service call.
      *
-     * @param string $id 
-     * @param Reference $reference 
+     * @param string $id
+     * @param Reference $reference
      * @return string
      */
-    protected function getServiceCall($id, Reference $reference = null)
+    private function getServiceCall($id, Reference $reference = null)
     {
         if (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
             return sprintf('@?%s', $id);
@@ -230,10 +234,10 @@ class YamlDumper extends Dumper
     /**
      * Gets parameter call.
      *
-     * @param string $id 
+     * @param string $id
      * @return string
      */
-    protected function getParameterCall($id)
+    private function getParameterCall($id)
     {
         return sprintf('%%%s%%', $id);
     }
@@ -241,10 +245,10 @@ class YamlDumper extends Dumper
     /**
      * Prepares parameters
      *
-     * @param string $parameters 
-     * @return array 
+     * @param array $parameters
+     * @return array
      */
-    protected function prepareParameters($parameters)
+    private function prepareParameters($parameters)
     {
         $filtered = array();
         foreach ($parameters as $key => $value) {
@@ -263,10 +267,10 @@ class YamlDumper extends Dumper
     /**
      * Escapes arguments
      *
-     * @param array $arguments 
+     * @param array $arguments
      * @return array
      */
-    protected function escape($arguments)
+    private function escape($arguments)
     {
         $args = array();
         foreach ($arguments as $k => $v) {

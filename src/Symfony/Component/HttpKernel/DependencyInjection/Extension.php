@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Extension\Extension as BaseExtension;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Container;
 
@@ -20,10 +20,10 @@ use Symfony\Component\DependencyInjection\Container;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class Extension extends BaseExtension
+abstract class Extension implements ExtensionInterface
 {
-    protected $classes = array();
-    protected $classMap = array();
+    private $classes = array();
+    private $classMap = array();
 
     /**
      * Gets the classes to cache.
@@ -40,7 +40,7 @@ abstract class Extension extends BaseExtension
      *
      * @param array $classes An array of classes
      */
-    protected function addClassesToCompile(array $classes)
+    public function addClassesToCompile(array $classes)
     {
         $this->classes = array_merge($this->classes, $classes);
     }
@@ -82,7 +82,7 @@ abstract class Extension extends BaseExtension
      */
     public function getNamespace()
     {
-        return false;
+        return 'http://example.org/schema/dic/'.$this->getAlias();
     }
 
     /**

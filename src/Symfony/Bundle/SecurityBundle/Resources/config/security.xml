@@ -6,9 +6,8 @@
 
     <parameters>
         <parameter key="security.context.class">Symfony\Component\Security\Core\SecurityContext</parameter>
-        <parameter key="security.context.always_authenticate">false</parameter>
 
-        <parameter key="security.account_checker.class">Symfony\Component\Security\Core\User\AccountChecker</parameter>
+        <parameter key="security.user_checker.class">Symfony\Component\Security\Core\User\UserChecker</parameter>
 
         <parameter key="security.encoder_factory.generic.class">Symfony\Component\Security\Core\Encoder\EncoderFactory</parameter>
         <parameter key="security.encoder.digest.class">Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder</parameter>
@@ -26,12 +25,8 @@
         <parameter key="security.authentication.manager.class">Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager</parameter>
 
         <parameter key="security.authentication.session_strategy.class">Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy</parameter>
-        <parameter key="security.authentication.session_strategy.strategy">migrate</parameter>
 
         <parameter key="security.access.decision_manager.class">Symfony\Component\Security\Core\Authorization\AccessDecisionManager</parameter>
-        <parameter key="security.access.decision_manager.strategy">affirmative</parameter>
-        <parameter key="security.access.decision_manager.allow_if_all_abstain">false</parameter>
-        <parameter key="security.access.decision_manager.allow_if_equal_granted_denied">true</parameter>
 
         <parameter key="security.access.simple_role_voter.class">Symfony\Component\Security\Core\Authorization\Voter\RoleVoter</parameter>
         <parameter key="security.access.authenticated_voter.class">Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter</parameter>
@@ -49,7 +44,7 @@
         <service id="security.context" class="%security.context.class%">
             <argument type="service" id="security.authentication.manager" />
             <argument type="service" id="security.access.decision_manager" />
-            <argument>%security.context.always_authenticate%</argument>
+            <argument>%security.access.always_authenticate_before_granting%</argument>
         </service>
 
         <!-- Authentication related services -->
@@ -63,7 +58,7 @@
         </service>
 
         <service id="security.authentication.session_strategy" class="%security.authentication.session_strategy.class%" public="false">
-            <argument>%security.authentication.session_strategy.strategy%</argument>
+            <argument /> <!-- Strategy -->
         </service>
 
         <service id="security.encoder_factory.generic" class="%security.encoder_factory.generic.class%" public="false">
@@ -72,15 +67,12 @@
 
         <service id="security.encoder_factory" alias="security.encoder_factory.generic"></service>
         
-        <service id="security.account_checker" class="%security.account_checker.class%" public="false" />
+        <service id="security.user_checker" class="%security.user_checker.class%" public="false" />
 
 
         <!-- Authorization related services -->
         <service id="security.access.decision_manager" class="%security.access.decision_manager.class%" public="false">
             <argument type="collection"></argument>
-            <argument>%security.access.decision_manager.strategy%</argument>
-            <argument>%security.access.decision_manager.allow_if_all_abstain%</argument>
-            <argument>%security.access.decision_manager.allow_if_equal_granted_denied%</argument>
         </service>
 
         <service id="security.role_hierarchy" class="%security.role_hierarchy.class%" public="false">
@@ -106,7 +98,7 @@
 
         <!-- Firewall related services -->
         <service id="security.firewall" class="%security.firewall.class%">
-            <tag name="kernel.listener" event="core.request" method="handle" priority="-128" />
+            <tag name="kernel.listener" event="onCoreRequest" priority="-128" />
             <argument type="service" id="security.firewall.map" />
             <argument type="service" id="event_dispatcher" />
         </service>
@@ -126,7 +118,7 @@
         <service id="security.user.provider.entity" class="%security.user.provider.entity.class%" abstract="true" public="false">
             <argument type="service" id="security.user.entity_manager" />
         </service>
-        <service id="security.user.entity_manager" alias="doctrine.orm.default_entity_manager" public="false" />
+        <service id="security.user.entity_manager" alias="doctrine.orm.entity_manager" public="false" />
 
         <service id="security.user.provider.in_memory" class="%security.user.provider.in_memory.class%" abstract="true" public="false" />
         <service id="security.user.provider.in_memory.user" class="%security.user.provider.in_memory.user.class%" abstract="true" public="false" />

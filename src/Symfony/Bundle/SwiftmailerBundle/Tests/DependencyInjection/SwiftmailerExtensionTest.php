@@ -20,23 +20,36 @@ class SwiftmailerExtensionTest extends TestCase
     public function testConfigLoad()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
         $loader = new SwiftmailerExtension();
 
         $loader->load(array(array()), $container);
-        $this->assertEquals('Swift_Mailer', $container->getParameter('swiftmailer.class'), '->mailerLoad() loads the swiftmailer.xml file if not already loaded');
+        $this->assertEquals('Swift_Mailer', $container->getParameter('swiftmailer.class'), '->load() loads the swiftmailer.xml file if not already loaded');
 
         $loader->load(array(array('transport' => 'sendmail')), $container);
-        $this->assertEquals('sendmail', $container->getParameter('swiftmailer.transport.name'), '->mailerLoad() overrides existing configuration options');
+        $this->assertEquals('sendmail', $container->getParameter('swiftmailer.transport.name'), '->load() overrides existing configuration options');
         $this->assertEquals('swiftmailer.transport.sendmail', (string) $container->getAlias('swiftmailer.transport'));
 
         $loader->load(array(array()), $container);
-        $this->assertEquals('smtp', $container->getParameter('swiftmailer.transport.name'), '->mailerLoad() provides default values for configuration options');
+        $this->assertEquals('smtp', $container->getParameter('swiftmailer.transport.name'), '->load() provides default values for configuration options');
         $this->assertEquals('swiftmailer.transport.smtp', (string) $container->getAlias('swiftmailer.transport'));
+    }
+
+    public function testNullTransport()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $loader = new SwiftmailerExtension();
+
+        $loader->load(array(array('transport' => null)), $container);
+        $this->assertEquals('null', $container->getParameter('swiftmailer.transport.name'), '->load() uses the "null" string transport when transport is null');
+        $this->assertEquals('swiftmailer.transport.null', (string) $container->getAlias('swiftmailer.transport'));
     }
 
     public function testSpool()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
         $loader = new SwiftmailerExtension();
 
         $loader->load(array(array('spool' => array())), $container);

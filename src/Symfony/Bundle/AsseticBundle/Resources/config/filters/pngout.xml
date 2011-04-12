@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="assetic.filter.pngout.class">Assetic\Filter\PngoutFilter</parameter>
+        <parameter key="assetic.filter.pngout.bin">/usr/bin/pngout</parameter>
+    </parameters>
+
+    <services>
+        <service id="assetic.filter.pngout" class="%assetic.filter.pngout.class%">
+            <tag name="assetic.filter" alias="pngout" />
+            <argument>%assetic.filter.pngout.bin%</argument>
+        </service>
+    </services>
+</container>

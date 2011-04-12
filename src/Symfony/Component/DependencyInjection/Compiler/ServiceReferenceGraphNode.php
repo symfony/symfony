@@ -23,10 +23,10 @@ use Symfony\Component\DependencyInjection\Alias;
  */
 class ServiceReferenceGraphNode
 {
-    protected $id;
-    protected $inEdges;
-    protected $outEdges;
-    protected $value;
+    private $id;
+    private $inEdges;
+    private $outEdges;
+    private $value;
 
     /**
      * Constructor.

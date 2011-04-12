@@ -19,23 +19,12 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class AuthenticationProviderManagerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testProviderAccessors()
-    {
-        $manager = new AuthenticationProviderManager();
-        $manager->add($provider = $this->getMock('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface'));
-        $this->assertSame(array($provider), $manager->all());
-
-        $manager->setProviders($providers = array($this->getMock('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')));
-        $this->assertSame($providers, $manager->all());
-    }
-
     /**
-     * @expectedException LogicException
+     * @expectedException InvalidArgumentException
      */
     public function testAuthenticateWithoutProviders()
     {
-        $manager = new AuthenticationProviderManager();
-        $manager->authenticate($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
+        new AuthenticationProviderManager(array());
     }
 
     public function testAuthenticateWhenNoProviderSupportsToken()
@@ -91,11 +80,16 @@ class AuthenticationProviderManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $token);
     }
 
-    public function testAuthenticateReturnsTokenForTheLastMatch()
+    public function testAuthenticateReturnsTokenOfTheFirstMatchingProvider()
     {
+        $second = $this->getMock('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface');
+        $second
+            ->expects($this->never())
+            ->method('supports')
+        ;
         $manager = new AuthenticationProviderManager(array(
-            $this->getAuthenticationProvider(true, $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')),
             $this->getAuthenticationProvider(true, $expected = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')),
+            $second,
         ));
 
         $token = $manager->authenticate($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));

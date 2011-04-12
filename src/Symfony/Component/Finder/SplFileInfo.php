@@ -18,8 +18,8 @@ namespace Symfony\Component\Finder;
  */
 class SplFileInfo extends \SplFileInfo
 {
-    protected $relativePath;
-    protected $relativePathname;
+    private $relativePath;
+    private $relativePathname;
 
     /**
      * Constructor

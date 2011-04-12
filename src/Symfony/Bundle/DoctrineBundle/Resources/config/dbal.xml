@@ -14,17 +14,17 @@
         <parameter key="doctrine.dbal.connection_factory_class">Symfony\Bundle\DoctrineBundle\ConnectionFactory</parameter>
         <parameter key="doctrine.dbal.events.mysql_session_init.class">Doctrine\DBAL\Event\Listeners\MysqlSessionInit</parameter>
         <parameter key="doctrine.dbal.events.oracle_session_init.class">Doctrine\DBAL\Event\Listeners\OracleSessionInit</parameter>
-        <parameter key="doctrine.dbal.logging">0</parameter>
     </parameters>
 
     <services>
         <service id="doctrine.dbal.logger.debug" class="%doctrine.dbal.logger.debug_class%" public="false" />
 
         <service id="doctrine.dbal.logger" class="%doctrine.dbal.logger_class%" public="false">
+            <tag name="monolog.logger" channel="doctrine" />
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
-        <service id="doctrine.data_collector" class="%doctrine.data_collector.class%" public="false">
+        <service id="data_collector.doctrine" class="%doctrine.data_collector.class%" public="false">
             <tag name="data_collector" template="DoctrineBundle:Collector:db" id="db" />
             <argument type="service" id="doctrine.dbal.logger" />
         </service>

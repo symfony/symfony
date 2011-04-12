@@ -6,6 +6,6 @@
                                       
 
 
-list [--xml] [-h|--help] [-q|--quiet] [-v|--verbose] [-V|--version] [-a|--ansi] [-n|--no-interaction] command [namespace]
+list [--xml] [namespace]
 
 

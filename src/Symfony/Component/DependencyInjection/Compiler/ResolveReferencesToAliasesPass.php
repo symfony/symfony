@@ -22,12 +22,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ResolveReferencesToAliasesPass implements CompilerPassInterface
 {
-    protected $container;
+    private $container;
 
     /**
      * Processes the ContainerBuilder to replace references to aliases with actual service references.
      *
-     * @param ContainerBuilder $container 
+     * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {
@@ -40,6 +40,7 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
 
             $definition->setArguments($this->processArguments($definition->getArguments()));
             $definition->setMethodCalls($this->processArguments($definition->getMethodCalls()));
+            $definition->setProperties($this->processArguments($definition->getProperties()));
         }
 
         foreach ($container->getAliases() as $id => $alias) {
@@ -56,7 +57,7 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
      * @param array $arguments An array of References
      * @return array An array of References
      */
-    protected function processArguments(array $arguments)
+    private function processArguments(array $arguments)
     {
         foreach ($arguments as $k => $argument) {
             if (is_array($argument)) {
@@ -79,7 +80,7 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
      * @param string $id The definition or alias id to resolve
      * @return string The definition id with aliases resolved
      */
-    protected function getDefinitionId($id)
+    private function getDefinitionId($id)
     {
         while ($this->container->hasAlias($id)) {
             $id = (string) $this->container->getAlias($id);

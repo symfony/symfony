@@ -18,8 +18,8 @@ namespace Symfony\Component\Finder\Comparator;
  */
 class Comparator
 {
-    protected $target;
-    protected $operator = '==';
+    private $target;
+    private $operator = '==';
 
     /**
      * Gets the target value.

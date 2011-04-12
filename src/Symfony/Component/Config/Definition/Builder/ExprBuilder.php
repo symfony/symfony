@@ -10,6 +10,7 @@
  */
 
 namespace Symfony\Component\Config\Definition\Builder;
+use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
 
 /**
  * This class builds an if expression.
@@ -19,24 +20,24 @@ namespace Symfony\Component\Config\Definition\Builder;
  */
 class ExprBuilder
 {
-    public $parent;
+    protected $node;
     public $ifPart;
     public $thenPart;
 
     /**
      * Constructor
      *
-     * @param Symfony\Component\Config\Definition\Builder\NodeBuilder $parent The parent node
+     * @param NodeDefinition $parent The related node
      */
-    public function __construct($parent)
+    public function __construct(NodeDefinition $node)
     {
-        $this->parent = $parent;
+        $this->node = $node;
     }
 
     /**
      * Mark the expression as being always used.
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function always()
     {
@@ -51,7 +52,7 @@ class ExprBuilder
      * The default one tests if the value is true.
      *
      * @param \Closure $closure
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function ifTrue(\Closure $closure = null)
     {
@@ -67,7 +68,7 @@ class ExprBuilder
     /**
      * Tests if the value is a string.
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function ifString()
     {
@@ -79,7 +80,7 @@ class ExprBuilder
     /**
      * Tests if the value is null.
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function ifNull()
     {
@@ -91,7 +92,7 @@ class ExprBuilder
     /**
      * Tests if the value is an array.
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function ifArray()
     {
@@ -105,7 +106,7 @@ class ExprBuilder
      *
      * @param array $array
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function ifInArray(array $array)
     {
@@ -119,7 +120,7 @@ class ExprBuilder
      *
      * @param array $array
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function ifNotInArray(array $array)
     {
@@ -133,7 +134,7 @@ class ExprBuilder
      *
      * @param \Closure $closure
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function then(\Closure $closure)
     {
@@ -145,7 +146,7 @@ class ExprBuilder
     /**
      * Sets a closure returning an empty array.
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function thenEmptyArray()
     {
@@ -161,7 +162,7 @@ class ExprBuilder
      *
      * @param string $message
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function thenInvalid($message)
     {
@@ -173,7 +174,7 @@ class ExprBuilder
     /**
      * Sets a closure unsetting this key of the array at validation time.
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function thenUnset()
     {
@@ -183,9 +184,9 @@ class ExprBuilder
     }
 
     /**
-     * Returns the parent node
+     * Returns the related node
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeDefinition
      */
     public function end()
     {
@@ -196,6 +197,26 @@ class ExprBuilder
             throw new \RuntimeException('You must specify a then part.');
         }
 
-        return $this->parent;
+        return $this->node;
+    }
+
+    /**
+     * Builds the expressions.
+     *
+     * @param array $expressions An array of ExprBuilder instances to build
+     *
+     * @return array
+     */
+    public static function buildExpressions(array $expressions)
+    {
+        foreach ($expressions as $k => $expr) {
+            if ($expr instanceof ExprBuilder) {
+                $expressions[$k] = function($v) use($expr) {
+                    return call_user_func($expr->ifPart, $v) ? call_user_func($expr->thenPart, $v) : $v;
+                };
+            }
+        }
+
+        return $expressions;
     }
 }

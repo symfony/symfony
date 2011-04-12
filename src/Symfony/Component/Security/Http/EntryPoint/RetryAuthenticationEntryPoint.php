@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Http\EntryPoint;
 
-use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,8 +26,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class RetryAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {
-    protected $httpPort;
-    protected $httpsPort;
+    private $httpPort;
+    private $httpsPort;
 
     public function __construct($httpPort = 80, $httpsPort = 443)
     {
@@ -36,7 +35,7 @@ class RetryAuthenticationEntryPoint implements AuthenticationEntryPointInterface
         $this->httpsPort = $httpsPort;
     }
 
-    public function start(EventInterface $event, Request $request, AuthenticationException $authException = null)
+    public function start(Request $request, AuthenticationException $authException = null)
     {
         $scheme = $request->isSecure() ? 'http' : 'https';
         if ('http' === $scheme && 80 != $this->httpPort) {
@@ -52,7 +51,7 @@ class RetryAuthenticationEntryPoint implements AuthenticationEntryPointInterface
             $qs = '?'.$qs;
         }
 
-        $url = $scheme.'://'.$request->getHost().$port.$request->getScriptName().$request->getPathInfo().$qs;
+        $url = $scheme.'://'.$request->getHost().$port.$request->getBaseUrl().$request->getPathInfo().$qs;
 
         return new RedirectResponse($url, 301);
     }

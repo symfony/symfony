@@ -17,12 +17,14 @@ namespace Symfony\Component\DomCrawler\Field;
  * It is constructed from a HTML select tag, or a HTML checkbox, or radio inputs.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class ChoiceFormField extends FormField
 {
-    protected $type;
-    protected $multiple;
-    protected $options;
+    private $type;
+    private $multiple;
+    private $options;
 
     /**
      * Returns true if the field should be included in the submitted values.
@@ -55,6 +57,8 @@ class ChoiceFormField extends FormField
      * Ticks a checkbox.
      *
      * @throws \InvalidArgumentException When value type provided is not correct
+     *
+     * @api
      */
     public function tick()
     {
@@ -69,6 +73,8 @@ class ChoiceFormField extends FormField
      * Ticks a checkbox.
      *
      * @throws \InvalidArgumentException When value type provided is not correct
+     *
+     * @api
      */
     public function untick()
     {

@@ -86,15 +86,20 @@ build: 56
 {
     font-size:12px;
     color:#868686;
-    padding-bottom:10px;
+    padding: 5px 4px;
     list-style-type:decimal;
-    margin-left:24px;
+    margin-left:20px;
+}
+
+/* fix for Opera not liking empty <li> */
+.sf-exceptionreset .traces li:after {
+    content: '\00A0'
 }
 
 .sf-exceptionreset #logs .traces em
 {
     font-style:normal;
-    color:#aacd4e;
+    color:#AA3333;
     font-weight: bold;
 }
 
@@ -184,7 +189,13 @@ build: 56
     padding-bottom:16px;
 }
 
-.sf-exceptionreset li a, 
+.sf-exceptionreset li a
+{
+    background:none;
+    color:#868686;
+    text-decoration:none;
+}
+
 .sf-exceptionreset li a:hover
 {
     background:none;
@@ -259,5 +270,4 @@ build: 56
 .sf-exceptionreset li .selected
 {
     background-color: #ffd;
-    padding: 4px 3px
 }

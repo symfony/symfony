@@ -18,8 +18,6 @@ namespace Symfony\Component\Finder\Comparator;
  */
 class DateComparator extends Comparator
 {
-    protected $target;
-    protected $comparison;
 
     /**
      * Constructor.

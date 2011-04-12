@@ -1,14 +1,18 @@
 {% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
 
 {% block toolbar %}
-<span style="white-space:nowrap; color:#2f2f2f; display:inline-block; min-height:24px; border-right:1px solid #cdcdcd; padding:5px 10px 5px 10px; ">
-    <img width="20" height="28" alt="Mongo" style="vertical-align: middle; margin-right: 10px;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAcCAYAAABh2p9gAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQRJREFUeNpi/P//PwM1ARMDlcGogZQDlpMnT7pxc3NbA9nhQKxOpL5rQLwJiPeBsI6Ozl+YBOOOHTv+AOllQNwtLS39F2owKYZ/gRq8G4i3ggxEToggWzvc3d2Pk+1lNL4fFAs6ODi8JzdS7mMRVyDVoAMHDsANdAPiOCC+jCQvQKqBQB/BDbwBxK5AHA3E/kB8nKJkA8TMQBwLxaBIKQbi70AvTADSBiSadwFXpCikpKQU8PDwkGTaly9fHFigkaKIJid4584dkiMFFI6jkTJII0WVmpHCAixZQEXWYhDeuXMnyLsVlEQKI45qFBQZ8eRECi4DBaAlDqle/8A48ip6gAADANdQY88Uc0oGAAAAAElFTkSuQmCC"/>
-    <span style="color: {{ collector.querycount < 10 ? '#000' : '#d22' }}">{{ collector.querycount }}</span>
-</span>
+    {% set icon %}
+        <img width="20" height="28" alt="Mongo" style="border-width: 0; vertical-align: middle; margin-right: 5px;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAcCAYAAABh2p9gAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQRJREFUeNpi/P//PwM1ARMDlcGogZQDlpMnT7pxc3NbA9nhQKxOpL5rQLwJiPeBsI6Ozl+YBOOOHTv+AOllQNwtLS39F2owKYZ/gRq8G4i3ggxEToggWzvc3d2Pk+1lNL4fFAs6ODi8JzdS7mMRVyDVoAMHDsANdAPiOCC+jCQvQKqBQB/BDbwBxK5AHA3E/kB8nKJkA8TMQBwLxaBIKQbi70AvTADSBiSadwFXpCikpKQU8PDwkGTaly9fHFigkaKIJid4584dkiMFFI6jkTJII0WVmpHCAixZQEXWYhDeuXMnyLsVlEQKI45qFBQZ8eRECi4DBaAlDqle/8A48ip6gAADANdQY88Uc0oGAAAAAElFTkSuQmCC"/>
+    {% endset %}
+    {% set text %}
+        <span>{{ collector.querycount }}</span>
+    {% endset %}
+    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
 {% endblock %}
 
 {% block menu %}
-<span class="picto">
+<span class="label">
+    <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/db.png') }}" alt="" /></span>
     <strong>Doctrine MongoDB</strong>
     <span class="count">
         <span>{{ collector.querycount }}</span>
@@ -20,15 +24,17 @@
     <h2>Queries</h2>
 
     {% if not collector.queries %}
-        <em>Query logging is disabled.</em>
+        <p>
+            <em>Query logging is disabled.</em>
+        <p>
     {% elseif not collector.querycount %}
         <p>
             <em>No queries.</em>
         </p>
     {% else %}
         <ul class="alt">
-            {% for i, query in collector.queries %}
-                <li class="{{ i is odd ? 'odd' : 'even' }}">
+            {% for query in collector.queries %}
+                <li class="{{ cycle(['odd', 'even'], loop.index) }}">
                     <div>
                         <code>{{ query }}</code>
                     </div>

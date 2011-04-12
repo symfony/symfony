@@ -15,10 +15,10 @@ use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
 
 use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Events;
 
 /**
  * LogoutListener logout users.
@@ -27,11 +27,11 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  */
 class LogoutListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $logoutPath;
-    protected $targetUrl;
-    protected $handlers;
-    protected $successHandler;
+    private $securityContext;
+    private $logoutPath;
+    private $targetUrl;
+    private $handlers;
+    private $successHandler;
 
     /**
      * Constructor
@@ -61,38 +61,20 @@ class LogoutListener implements ListenerInterface
     }
 
     /**
-     * Registers a core.security listener.
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
-    }
-
-    /**
      * Performs the logout if requested
      *
-     * @param EventInterface $event An EventInterface instance
+     * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public function handle(EventInterface $event)
+    public function handle(GetResponseEvent $event)
     {
-        $request = $event->get('request');
+        $request = $event->getRequest();
 
         if ($this->logoutPath !== $request->getPathInfo()) {
             return;
         }
 
         if (null !== $this->successHandler) {
-            $response = $this->successHandler->onLogoutSuccess($event, $request);
+            $response = $this->successHandler->onLogoutSuccess($request);
 
             if (!$response instanceof Response) {
                 throw new \RuntimeException('Logout Success Handler did not return a Response.');
@@ -110,8 +92,6 @@ class LogoutListener implements ListenerInterface
 
         $this->securityContext->setToken(null);
 
-        $event->setProcessed();
-
-        return $response;
+        $event->setResponse($response);
     }
 }

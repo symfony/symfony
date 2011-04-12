@@ -18,18 +18,18 @@ namespace Symfony\Component\Config\Definition\Builder;
  */
 class MergeBuilder
 {
-    public $parent;
+    protected $node;
     public $allowFalse;
     public $allowOverwrite;
 
     /**
      * Constructor
      *
-     * @param Symfony\Component\Config\Definition\Builder\NodeBuilder $parent The parent node
+     * @param NodeDefinition $node The related node
      */
-    public function __construct($parent)
+    public function __construct(NodeDefinition $node)
     {
-        $this->parent = $parent;
+        $this->node = $node;
         $this->allowFalse = false;
         $this->allowOverwrite = true;
     }
@@ -37,8 +37,8 @@ class MergeBuilder
     /**
      * Sets whether the node can be unset.
      *
-     * @param boolean $allow
-     * @return Symfony\Component\Config\Definition\Builder\MergeBuilder
+     * @param Boolean $allow
+     * @return MergeBuilder
      */
     public function allowUnset($allow = true)
     {
@@ -50,9 +50,9 @@ class MergeBuilder
     /**
      * Sets whether the node can be overwritten.
      *
-     * @param boolean $deny Whether the overwriting is forbidden or not
+     * @param Boolean $deny Whether the overwriting is forbidden or not
      *
-     * @return Symfony\Component\Config\Definition\Builder\MergeBuilder
+     * @return MergeBuilder
      */
     public function denyOverwrite($deny = true)
     {
@@ -62,12 +62,12 @@ class MergeBuilder
     }
 
     /**
-     * Returns the parent node.
+     * Returns the related node.
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeDefinition
      */
     public function end()
     {
-        return $this->parent;
+        return $this->node;
     }
 }

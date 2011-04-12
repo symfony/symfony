@@ -6,7 +6,6 @@
 
     <parameters>
         <parameter key="session.class">Symfony\Component\HttpFoundation\Session</parameter>
-        <parameter key="session.default_locale">en</parameter>
         <parameter key="session.storage.native.class">Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage</parameter>
         <parameter key="session.storage.native.options" type="collection" />
         <parameter key="session.storage.pdo.class">Symfony\Component\HttpFoundation\SessionStorage\PdoSessionStorage</parameter>
@@ -18,9 +17,7 @@
     <services>
         <service id="session" class="%session.class%">
             <argument type="service" id="session.storage" />
-            <argument type="collection">
-                <argument key="default_locale">%session.default_locale%</argument>
-            </argument>
+            <argument /> <!-- default locale -->
         </service>
 
         <service id="session.storage.native" class="%session.storage.native.class%" public="false">

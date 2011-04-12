@@ -13,20 +13,17 @@ namespace Symfony\Component\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventInterface;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
 /**
  * EsiListener adds a Surrogate-Control HTTP header when the Response needs to be parsed for ESI.
- *
- * The filter method must be connected to the core.response event.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class EsiListener
 {
-    protected $dispatcher;
-    protected $esi;
+    private $i;
+    private $esi;
 
     /**
      * Constructor.
@@ -41,17 +38,14 @@ class EsiListener
     /**
      * Filters the Response.
      *
-     * @param EventInterface $event    An EventInterface instance
-     * @param Response       $response A Response instance
+     * @param FilterResponseEvent $event  A FilterResponseEvent instance
      */
-    public function filter(EventInterface $event, Response $response)
+    public function onCoreResponse(FilterResponseEvent $event)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type') || null === $this->esi) {
-            return $response;
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType() || null === $this->esi) {
+            return;
         }
 
-        $this->esi->addSurrogateControl($response);
-
-        return $response;
+        $this->esi->addSurrogateControl($event->getResponse());
     }
 }

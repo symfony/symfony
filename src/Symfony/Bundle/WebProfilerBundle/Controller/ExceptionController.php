@@ -30,7 +30,7 @@ class ExceptionController extends BaseExceptionController
     public function showAction(FlattenException $exception, DebugLoggerInterface $logger = null, $format = 'html')
     {
         $template = $this->container->get('kernel')->isDebug() ? 'exception' : 'error';
-        $code = $this->getStatusCode($exception);
+        $code = $exception->getStatusCode();
 
         return $this->container->get('templating')->renderResponse(
             'FrameworkBundle:Exception:'.$template.'.html.twig',

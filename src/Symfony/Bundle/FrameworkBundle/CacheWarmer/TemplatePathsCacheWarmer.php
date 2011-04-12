@@ -23,8 +23,6 @@ use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
  */
 class TemplatePathsCacheWarmer extends CacheWarmer
 {
-    const TEMPLATES_PATH_IN_BUNDLE = '/Resources/views';
-
     protected $kernel;
     protected $rootDir;
     protected $parser;
@@ -49,14 +47,15 @@ class TemplatePathsCacheWarmer extends CacheWarmer
      * @param string $cacheDir The cache directory
      */
     public function warmUp($cacheDir)
-    {       
+    {
         $templates = array();
 
         foreach ($this->kernel->getBundles() as $name => $bundle) {
-            $templates += $this->findTemplatesIn($bundle->getPath().self::TEMPLATES_PATH_IN_BUNDLE, $name);
+            $templates += $this->findTemplatesIn($this->rootDir.'/'.$name.'/views', $name);
+            $templates += $this->findTemplatesIn($bundle->getPath().'/Resources/views', $name);
         }
 
-        $templates += $this->findTemplatesIn($this->rootDir);
+        $templates += $this->findTemplatesIn($this->rootDir.'/views');
 
         $this->writeCacheFile($cacheDir.'/templates.php', sprintf('<?php return %s;', var_export($templates, true)));
     }

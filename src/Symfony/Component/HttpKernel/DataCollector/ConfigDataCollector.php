@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ConfigDataCollector extends DataCollector
 {
-    protected $kernel;
+    private $kernel;
 
     /**
      * Constructor.
@@ -48,15 +48,16 @@ class ConfigDataCollector extends DataCollector
             'env'             => $this->kernel->getEnvironment(),
             'debug'           => $this->kernel->isDebug(),
             'php_version'     => PHP_VERSION,
-            'xdebug'          => extension_loaded('xdebug'),
-            'accel'           => (
-                (extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'))
-                ||
-                (extension_loaded('apc') && ini_get('apc.enabled'))
-                ||
-                (extension_loaded('xcache') && ini_get('xcache.cacher'))
-            ),
+            'xdebug_enabled'  => extension_loaded('xdebug'),
+            'eaccel_enabled'  => extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'),
+            'apc_enabled'     => extension_loaded('apc') && ini_get('apc.enabled'),
+            'xcache_enabled'  => extension_loaded('xcache') && ini_get('xcache.cacher'),
+            'bundles'         => array(),
         );
+
+        foreach ($this->kernel->getBundles() as $name => $bundle) {
+            $this->data['bundles'][$name] = $bundle->getPath();
+        }
     }
 
     /**
@@ -126,17 +127,52 @@ class ConfigDataCollector extends DataCollector
      */
     public function hasXDebug()
     {
-        return $this->data['xdebug'];
+        return $this->data['xdebug_enabled'];
     }
 
     /**
-     * Returns true if an accelerator is enabled.
+     * Returns true if EAccelerator is enabled.
      *
-     * @return Boolean true if an accelerator is enabled, false otherwise
+     * @return Boolean true if EAccelerator is enabled, false otherwise
+     */
+    public function hasEAccelerator()
+    {
+        return $this->data['eaccel_enabled'];
+    }
+
+    /**
+     * Returns true if APC is enabled.
+     *
+     * @return Boolean true if APC is enabled, false otherwise
+     */
+    public function hasApc()
+    {
+        return $this->data['apc_enabled'];
+    }
+
+    /**
+     * Returns true if XCache is enabled.
+     *
+     * @return Boolean true if XCache is enabled, false otherwise
+     */
+    public function hasXCache()
+    {
+        return $this->data['xcache_enabled'];
+    }
+
+    /**
+     * Returns true if any accelerator is enabled.
+     *
+     * @return Boolean true if any accelerator is enabled, false otherwise
      */
     public function hasAccelerator()
     {
-        return $this->data['accel'];
+        return $this->hasApc() || $this->hasEAccelerator() || $this->hasXCache();
+    }
+
+    public function getBundles()
+    {
+        return $this->data['bundles'];
     }
 
     /**

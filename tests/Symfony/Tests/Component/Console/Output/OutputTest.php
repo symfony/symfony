@@ -12,6 +12,7 @@
 namespace Symfony\Tests\Component\Console\Output;
 
 use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
 class OutputTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,14 +37,9 @@ class OutputTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '->setVerbosity() sets the verbosity');
     }
 
-    public function testSetStyle()
-    {
-        Output::setStyle('FOO', array('bg' => 'red', 'fg' => 'yellow', 'blink' => true));
-        $this->assertEquals(array('bg' => 'red', 'fg' => 'yellow', 'blink' => true), TestOutput::getStyle('foo'), '::setStyle() sets a new style');
-    }
-
     public function testWrite()
     {
+        $fooStyle = new OutputFormatterStyle('yellow', 'red', array('blink'));
         $output = new TestOutput(Output::VERBOSITY_QUIET);
         $output->writeln('foo');
         $this->assertEquals('', $output->output, '->writeln() outputs nothing if verbosity is set to VERBOSITY_QUIET');
@@ -66,6 +62,7 @@ class OutputTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("foo\n", $output->output, '->writeln() strips decoration tags if decoration is set to false');
 
         $output = new TestOutput();
+        $output->getFormatter()->setStyle('FOO', $fooStyle);
         $output->setDecorated(true);
         $output->writeln('<foo>foo</foo>');
         $this->assertEquals("\033[33;41;5mfoo\033[0m\n", $output->output, '->writeln() decorates the output');
@@ -78,13 +75,13 @@ class OutputTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('Unknown output type given (24)', $e->getMessage());
         }
 
-        try {
-            $output->writeln('<bar>foo</bar>');
-            $this->fail('->writeln() throws an \InvalidArgumentException when a style does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->writeln() throws an \InvalidArgumentException when a style does not exist');
-            $this->assertEquals('Unknown style "bar".', $e->getMessage());
-        }
+        $output->clear();
+        $output->write('<bar>foo</bar>');
+        $this->assertEquals('<bar>foo</bar>', $output->output, '->write() do nothing when a style does not exist');
+
+        $output->clear();
+        $output->writeln('<bar>foo</bar>');
+        $this->assertEquals("<bar>foo</bar>\n", $output->output, '->writeln() do nothing when a style does not exist');
     }
 }
 
@@ -92,9 +89,9 @@ class TestOutput extends Output
 {
     public $output = '';
 
-    static public function getStyle($name)
+    public function clear()
     {
-        return static::$styles[$name];
+        $this->output = '';
     }
 
     public function doWrite($message, $newline)

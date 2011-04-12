@@ -24,17 +24,18 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  */
 class Profiler
 {
-    protected $storage;
-    protected $collectors;
-    protected $logger;
-    protected $enabled;
-    protected $token;
-    protected $parent;
-    protected $data;
-    protected $ip;
-    protected $url;
-    protected $time;
-    protected $empty;
+    private $storage;
+    private $collectors;
+    private $logger;
+    private $enabled;
+    private $token;
+    private $parent;
+    private $data;
+    private $ip;
+    private $url;
+    private $time;
+    private $empty;
+    private $children;
 
     /**
      * Constructor.
@@ -142,13 +143,37 @@ class Profiler
         $this->token = $token;
 
         if (false !== $items = $this->storage->read($token)) {
-            list($data, $this->ip, $this->url, $this->time) = $items;
+            list($data, $this->parent, $this->ip, $this->url, $this->time) = $items;
             $this->set(unserialize(base64_decode($data)));
 
             $this->empty = false;
         } else {
             $this->empty = true;
         }
+    }
+
+    /**
+     * Sets the parent token
+     *
+     * @param string $parent The parent token
+     */
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
+    }
+
+    /**
+     * Returns an instance of the parent token
+     *
+     * @return Profiler
+     */
+    public function getParentToken()
+    {
+        if (null !== $this->parent) {
+            return $this->loadFromToken($this->parent);
+        }
+
+        return null;
     }
 
     /**
@@ -230,6 +255,23 @@ class Profiler
     }
 
     /**
+     * Finds children profilers.
+     *
+     * @return array An array of Profiler
+     */
+    public function getChildren()
+    {
+        if (null === $this->children) {
+            $this->children = array();
+            foreach ($this->storage->findChildren($this->token) as $token) {
+                $this->children[] = $this->loadFromToken($token['token']);
+            }
+        }
+
+        return $this->children;
+    }
+
+    /**
      * Collects data for the given Response.
      *
      * @param Request    $request   A Request instance
@@ -248,7 +290,6 @@ class Profiler
             $collector->collect($request, $response, $exception);
         }
 
-        $this->parent = '';
         $this->ip     = $request->server->get('REMOTE_ADDR');
         $this->url    = $request->getUri();
         $this->time   = time();

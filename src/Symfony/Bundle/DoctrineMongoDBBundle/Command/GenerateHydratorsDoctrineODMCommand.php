@@ -34,20 +34,20 @@ class GenerateHydratorsDoctrineODMCommand extends GenerateHydratorsCommand
             ->setName('doctrine:mongodb:generate:hydrators')
             ->addOption('dm', null, InputOption::VALUE_OPTIONAL, 'The document manager to use for this command.')
             ->setHelp(<<<EOT
-The <info>doctrine:generate:hydrators</info> command generates hydrator classes for your documents:
+The <info>doctrine:mongodb:generate:hydrators</info> command generates hydrator classes for your documents:
 
-  <info>./app/console doctrine:generate:hydrators</info>
+  <info>./app/console doctrine:mongodb:generate:hydrators</info>
 
 You can specify the document manager you want to generate the hydrators for:
 
-  <info>./app/console doctrine:generate:hydrators --dm=name</info>
+  <info>./app/console doctrine:mongodb:generate:hydrators --dm=name</info>
 EOT
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        DoctrineODMCommand::setApplicationDocumentManager($this->application, $input->getOption('dm'));
+        DoctrineODMCommand::setApplicationDocumentManager($this->getApplication(), $input->getOption('dm'));
 
         return parent::execute($input, $output);
     }

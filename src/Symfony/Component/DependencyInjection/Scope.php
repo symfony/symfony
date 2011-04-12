@@ -9,8 +9,8 @@ namespace Symfony\Component\DependencyInjection;
  */
 class Scope implements ScopeInterface
 {
-    protected $name;
-    protected $parentName;
+    private $name;
+    private $parentName;
 
     public function __construct($name, $parentName = ContainerInterface::SCOPE_CONTAINER)
     {

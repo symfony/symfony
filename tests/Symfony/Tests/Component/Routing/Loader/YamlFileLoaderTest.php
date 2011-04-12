@@ -51,4 +51,51 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $loader->load('nonvalid.yml');
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLoadThrowsExceptionIfArrayHasUnsupportedKeys()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader->load('nonvalidkeys.yml');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLoadThrowsExceptionWhenIncomplete()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader->load('incomplete.yml');
+    }
+
+    public function testLoadWithPattern()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $routeCollection = $loader->load('validpattern.yml');
+        $routes = $routeCollection->all();
+
+        $this->assertEquals(1, count($routes), 'One route is loaded');
+        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+    }
+
+    public function testLoadWithResource()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $routeCollection = $loader->load('validresource.yml');
+        $routes = $routeCollection->all();
+
+        $this->assertEquals(1, count($routes), 'One route is loaded');
+        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testParseRouteThrowsExceptionWithMissingPattern()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader->load('incomplete.yml');
+    }
 }

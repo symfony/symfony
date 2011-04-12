@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\HttpKernel\DataCollector;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Debug\EventDispatcherTraceableInterface;
+use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * EventDataCollector.
@@ -23,11 +23,11 @@ use Symfony\Component\HttpKernel\Debug\EventDispatcherTraceableInterface;
  */
 class EventDataCollector extends DataCollector
 {
-    protected $dispatcher;
+    private $dispatcher;
 
     public function setEventDispatcher(EventDispatcherInterface $dispatcher)
     {
-        if ($dispatcher instanceof EventDispatcherTraceableInterface) {
+        if ($dispatcher instanceof TraceableEventDispatcherInterface) {
             $this->dispatcher = $dispatcher;
         }
     }
@@ -48,7 +48,7 @@ class EventDataCollector extends DataCollector
      *
      * @return array An array of called listeners
      *
-     * @see EventDispatcherTraceableInterface
+     * @see TraceableEventDispatcherInterface
      */
     public function getCalledListeners()
     {
@@ -60,7 +60,7 @@ class EventDataCollector extends DataCollector
      *
      * @return array An array of not called listeners
      *
-     * @see EventDispatcherTraceableInterface
+     * @see TraceableEventDispatcherInterface
      */
     public function getNotCalledListeners()
     {

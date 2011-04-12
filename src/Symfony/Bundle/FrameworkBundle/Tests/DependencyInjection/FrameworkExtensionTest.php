@@ -42,7 +42,8 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('profiler'), '->registerProfilerConfiguration() loads profiling.xml');
         $this->assertTrue($container->hasDefinition('data_collector.config'), '->registerProfilerConfiguration() loads collectors.xml');
-        $this->assertTrue($container->getParameter('profiler_listener.only_exceptions'));
+        $arguments = $container->getDefinition('profiler_listener')->getArguments();
+        $this->assertTrue($arguments[2]);
     }
 
     public function testRouter()
@@ -71,11 +72,12 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('full');
 
         $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
-        $this->assertEquals('fr', $container->getParameter('session.default_locale'));
+        $arguments = $container->getDefinition('session')->getArguments();
+        $this->assertEquals('fr', $arguments[1]);
         $this->assertTrue($container->getDefinition('session')->hasMethodCall('start'));
         $this->assertEquals('Session', $container->getParameter('session.class'));
         $this->assertEquals('session.storage.native', (string) $container->getAlias('session.storage'));
-        
+
         $options = $container->getParameter('session.storage.native.options');
         $this->assertEquals('_SYMFONY', $options['name']);
         $this->assertEquals(86400, $options['lifetime']);
@@ -102,15 +104,21 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('full');
 
         $this->assertTrue($container->hasDefinition('templating.name_parser'), '->registerTemplatingConfiguration() loads templating.xml');
-        $this->assertEquals('SomeVersionScheme', $container->getParameter('templating.assets.version'));
-        $this->assertEquals('http://cdn.example.com', $container->getParameter('templating.assets.base_urls'));
+        $arguments = $container->getDefinition('templating.helper.assets')->getArguments();
+        $this->assertEquals('SomeVersionScheme', $arguments[2]);
+        $this->assertEquals(array('http://cdn.example.com'), $arguments[1]);
 
         $this->assertTrue($container->getDefinition('templating.cache_warmer.template_paths')->hasTag('kernel.cache_warmer'), '->registerTemplatingConfiguration() tags templating cache warmer if cache warming is set');
         $this->assertEquals('templating.locator.cached', (string) $container->getAlias('templating.locator'), '->registerTemplatingConfiguration() changes templating.locator alias to cached if cache warming is set');
 
         $this->assertEquals('templating.engine.delegating', (string) $container->getAlias('templating'), '->registerTemplatingConfiguration() configures delegating loader if multiple engines are provided');
 
-        $this->assertEquals('templating.loader.chain', (string) $container->getAlias('templating.loader'), '->registerTemplatingConfiguration() configures loader chain if multiple loaders are provided');
+        $this->assertEquals($container->getDefinition('templating.loader.chain'), $container->getDefinition('templating.loader.wrapped'), '->registerTemplatingConfiguration() configures loader chain if multiple loaders are provided');
+
+        $this->assertEquals($container->getDefinition('templating.loader'), $container->getDefinition('templating.loader.cache'), '->registerTemplatingConfiguration() configures the loader to use cache');
+
+        $arguments = $container->getDefinition('templating.loader.cache')->getArguments();
+        $this->assertEquals('/path/to/cache', $arguments[1]);
 
         $this->assertEquals(array('php', 'twig'), $container->getParameter('templating.engines'), '->registerTemplatingConfiguration() sets a templating.engines parameter');
     }
@@ -124,11 +132,12 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertContains(
             realpath(__DIR__.'/../../Resources/translations/validators.fr.xliff'),
-            array_map(function($resource) { return $resource[1]; }, $container->getParameter('translation.resources')),
+            array_map(function($resource) { return realpath($resource[1]); }, $container->getParameter('translation.resources')),
             '->registerTranslatorConfiguration() finds FrameworkExtension translation resources'
         );
 
-        $this->assertEquals('fr', $container->getParameter('translator.fallback_locale'));
+        $calls = $container->getDefinition('translator.real')->getMethodCalls();
+        $this->assertEquals('fr', $calls[0][1][0]);
     }
 
     /**
@@ -157,8 +166,6 @@ abstract class FrameworkExtensionTest extends TestCase
             array_map('realpath', $xmlFiles),
             '->registerValidationConfiguration() adds Form validation.xml to XML loader'
         );
-
-        $this->assertFalse($container->hasDefinition('validator.mapping.loader.annotation_loader'), '->registerValidationConfiguration() does not define the annotation loader unless needed');
     }
 
     public function testValidationAnnotations()
@@ -167,14 +174,32 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('validator.mapping.loader.annotation_loader'), '->registerValidationConfiguration() defines the annotation loader');
 
-        $namespaces = $container->getParameter('validator.annotations.namespaces');
-        $this->assertEquals('Symfony\\Component\\Validator\\Constraints\\', $namespaces['validation'], '->registerValidationConfiguration() loads the default "validation" namespace');
-        $this->assertEquals('Application\\Validator\\Constraints\\', $namespaces['app'], '->registerValidationConfiguration() loads custom validation namespaces');
+        $arguments = $container->getDefinition('validator.mapping.loader.annotation_loader')->getArguments();
+        $this->assertEquals('Symfony\\Component\\Validator\\Constraints\\', $arguments[0]['assert'], '->registerValidationConfiguration() loads the default "assert" prefix');
+        $this->assertEquals('Application\\Validator\\Constraints\\', $arguments[0]['app'], '->registerValidationConfiguration() loads custom validation namespaces');
     }
 
-    protected function createContainer()
+    public function testValidationPaths()
     {
-        return new ContainerBuilder(new ParameterBag(array(
+        require_once __DIR__ . "/Fixtures/TestBundle/TestBundle.php";
+        
+        $container = $this->createContainerFromFile('validation_annotations', array(
+            'kernel.bundles' => array('TestBundle' => 'Symfony\Bundle\FrameworkBundle\Tests\TestBundle'),
+        ));
+
+        $yamlArgs = $container->getDefinition('validator.mapping.loader.yaml_files_loader')->getArguments();
+        $this->assertEquals(1, count($yamlArgs[0]));
+        $this->assertStringEndsWith('TestBundle/Resources/config/validation.yml', $yamlArgs[0][0]);
+
+        $xmlArgs = $container->getDefinition('validator.mapping.loader.xml_files_loader')->getArguments();
+        $this->assertEquals(2, count($xmlArgs[0]));
+        $this->assertStringEndsWith('Component/Form/Resources/config/validation.xml', $xmlArgs[0][0]);
+        $this->assertStringEndsWith('TestBundle/Resources/config/validation.xml', $xmlArgs[0][1]);
+    }
+
+    protected function createContainer(array $data = array())
+    {
+        return new ContainerBuilder(new ParameterBag(array_merge(array(
             'kernel.bundles'          => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
             'kernel.cache_dir'        => __DIR__,
             'kernel.compiled_classes' => array(),
@@ -182,12 +207,12 @@ abstract class FrameworkExtensionTest extends TestCase
             'kernel.environment'      => 'test',
             'kernel.name'             => 'kernel',
             'kernel.root_dir'         => __DIR__,
-        )));
+        ), $data)));
     }
 
-    protected function createContainerFromFile($file)
+    protected function createContainerFromFile($file, $data = array())
     {
-        $container = $this->createContainer();
+        $container = $this->createContainer($data);
         $container->registerExtension(new FrameworkExtension());
         $this->loadFromFile($container, $file);
 

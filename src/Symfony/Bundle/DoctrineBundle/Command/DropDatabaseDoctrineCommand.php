@@ -16,7 +16,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
-use Symfony\Bundle\FrameworkBundle\Util\Filesystem;
+use Symfony\Component\HttpKernel\Util\Filesystem;
 use Doctrine\DBAL\Connection;
 
 /**
@@ -71,7 +71,9 @@ EOT
                 $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
             }
         } else {
+            $output->writeln('<error>ATTENTION:</error> This operation should not be executed in a production enviroment.' . PHP_EOL);
             $output->writeln(sprintf('<info>Would drop the database named <comment>%s</comment>.</info>', $name));
+            $output->writeln('Please run the operation with --force to execute');
             $output->writeln('<error>All data will be lost!</error>');
         }
     }

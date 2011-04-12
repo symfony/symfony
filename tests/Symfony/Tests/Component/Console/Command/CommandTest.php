@@ -168,7 +168,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command = new \TestCommand();
         $command->setApplication($application);
         $formatterHelper = new FormatterHelper();
-        $this->assertEquals($formatterHelper->getName(), $command->formatter->getName(), '->__get() returns the correct helper');
+        $this->assertEquals($formatterHelper->getName(), $command->getHelper('formatter')->getName(), '->__get() returns the correct helper');
     }
 
     public function testMergeApplicationDefinition()
@@ -179,17 +179,18 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command = new \TestCommand();
         $command->setApplication($application1);
         $command->setDefinition($definition = new InputDefinition(array(new InputArgument('bar'), new InputOption('foo'))));
-        $command->mergeApplicationDefinition();
+
+        $r = new \ReflectionObject($command);
+        $m = $r->getMethod('mergeApplicationDefinition');
+        $m->setAccessible(true);
+        $m->invoke($command);
         $this->assertTrue($command->getDefinition()->hasArgument('foo'), '->mergeApplicationDefinition() merges the application arguments and the command arguments');
         $this->assertTrue($command->getDefinition()->hasArgument('bar'), '->mergeApplicationDefinition() merges the application arguments and the command arguments');
         $this->assertTrue($command->getDefinition()->hasOption('foo'), '->mergeApplicationDefinition() merges the application options and the command options');
         $this->assertTrue($command->getDefinition()->hasOption('bar'), '->mergeApplicationDefinition() merges the application options and the command options');
 
-        $command->mergeApplicationDefinition();
+        $m->invoke($command);
         $this->assertEquals(3, $command->getDefinition()->getArgumentCount(), '->mergeApplicationDefinition() does not try to merge twice the application arguments and options');
-
-        $command = new \TestCommand();
-        $command->mergeApplicationDefinition();
     }
 
     public function testRun()
@@ -204,8 +205,11 @@ class CommandTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('The "--bar" option does not exist.', $e->getMessage(), '->run() throws a \InvalidArgumentException when the input does not validate the current InputDefinition');
         }
 
-        $this->assertEquals('interact called'.PHP_EOL.'execute called'.PHP_EOL, $tester->execute(array(), array('interactive' => true)), '->run() calls the interact() method if the input is interactive');
-        $this->assertEquals('execute called'.PHP_EOL, $tester->execute(array(), array('interactive' => false)), '->run() does not call the interact() method if the input is not interactive');
+        $tester->execute(array(), array('interactive' => true));
+        $this->assertEquals('interact called'.PHP_EOL.'execute called'.PHP_EOL, $tester->getDisplay(), '->run() calls the interact() method if the input is interactive');
+
+        $tester->execute(array(), array('interactive' => false));
+        $this->assertEquals('execute called'.PHP_EOL, $tester->getDisplay(), '->run() does not call the interact() method if the input is not interactive');
 
         $command = new Command('foo');
         try {

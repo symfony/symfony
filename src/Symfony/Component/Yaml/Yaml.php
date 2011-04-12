@@ -15,10 +15,12 @@ namespace Symfony\Component\Yaml;
  * Yaml offers convenience methods to load and dump YAML.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class Yaml
 {
-    static protected $spec = '1.2';
+    static private $spec = '1.2';
 
     /**
      * Sets the YAML specification version to use.
@@ -63,6 +65,8 @@ class Yaml
      * @return array The YAML converted to a PHP array
      *
      * @throws \InvalidArgumentException If the YAML is not valid
+     *
+     * @api
      */
     public static function load($input)
     {
@@ -106,6 +110,8 @@ class Yaml
      * @param integer $inline The level where you switch to inline YAML
      *
      * @return string A YAML string representing the original PHP array
+     *
+     * @api
      */
     public static function dump($array, $inline = 2)
     {

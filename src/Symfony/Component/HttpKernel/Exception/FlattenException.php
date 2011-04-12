@@ -20,17 +20,21 @@ namespace Symfony\Component\HttpKernel\Exception;
  */
 class FlattenException
 {
-    protected $message;
-    protected $code;
-    protected $previous;
-    protected $trace;
-    protected $class;
+    private $message;
+    private $code;
+    private $previous;
+    private $trace;
+    private $class;
+    private $statusCode;
+    private $headers;
 
-    static public function create(\Exception $exception)
+    static public function create(\Exception $exception, $statusCode = 500, array $headers = array())
     {
         $e = new static();
         $e->setMessage($exception->getMessage());
         $e->setCode($exception->getCode());
+        $e->setStatusCode($statusCode);
+        $e->setHeaders($headers);
         $e->setTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
         $e->setClass(get_class($exception));
         if ($exception->getPrevious()) {
@@ -45,13 +49,33 @@ class FlattenException
         $exceptions = array();
         foreach (array_merge(array($this), $this->getPreviouses()) as $exception) {
             $exceptions[] = array(
-                'message'  => $exception->getMessage(),
-                'class'    => $exception->getClass(),
-                'trace'    => $exception->getTrace(),
+                'message' => $exception->getMessage(),
+                'class'   => $exception->getClass(),
+                'trace'   => $exception->getTrace(),
             );
         }
 
         return $exceptions;
+    }
+
+    public function getStatusCode()
+    {
+        return $this->statusCode;
+    }
+
+    public function setStatusCode($code)
+    {
+        $this->statusCode = $code;
+    }
+
+    public function getHeaders()
+    {
+        return $this->headers;
+    }
+
+    public function setHeaders(array $headers)
+    {
+        $this->headers = $headers;
     }
 
     public function getClass()
@@ -145,7 +169,7 @@ class FlattenException
         }
     }
 
-    protected function flattenArgs($args)
+    private function flattenArgs($args)
     {
         $result = array();
         foreach ($args as $key => $value) {

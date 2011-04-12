@@ -1,136 +1,70 @@
 <?php
 
 /*
- * This file is part of the Symfony package.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * This software consists of voluntary contributions made by many individuals
+ * and is licensed under the LGPL. For more information, see
+ * <http://www.doctrine-project.org>.
  */
 
 namespace Symfony\Component\EventDispatcher;
 
 /**
- * Event.
+ * Event is the base class for classes containing event data.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ * This class contains no event data. It is used by events that do not pass
+ * state information to an event handler when an event is raised.
+ *
+ * You can call the method stopPropagation() to abort the execution of
+ * further listeners in your event listener.
+ *
+ * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link    www.doctrine-project.org
+ * @since   2.0
+ * @version $Revision: 3938 $
+ * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
+ * @author  Jonathan Wage <jonwage@gmail.com>
+ * @author  Roman Borschel <roman@code-factory.org>
+ * @author  Bernhard Schussek <bschussek@gmail.com>
  */
-class Event implements EventInterface
+class Event
 {
-    protected $processed = false;
-    protected $subject;
-    protected $name;
-    protected $parameters;
+    /**
+     * @var Boolean Whether no further event listeners should be triggered
+     */
+    private $propagationStopped = false;
 
     /**
-     * Constructs a new Event.
+     * Returns whether further event listeners should be triggered.
      *
-     * @param mixed   $subject      The subject
-     * @param string  $name         The event name
-     * @param array   $parameters   An array of parameters
+     * @see Event::stopPropagation
+     * @return Boolean Whether propagation was already stopped for this event.
      */
-    public function __construct($subject, $name, $parameters = array())
+    public function isPropagationStopped()
     {
-        $this->subject = $subject;
-        $this->name = $name;
-        $this->parameters = $parameters;
+        return $this->propagationStopped;
     }
 
     /**
-     * Returns the subject.
+     * Stops the propagation of the event to further event listeners.
      *
-     * @return mixed The subject
+     * If multiple event listeners are connected to the same event, no
+     * further event listener will be triggered once any trigger calls
+     * stopPropagation().
      */
-    public function getSubject()
+    public function stopPropagation()
     {
-        return $this->subject;
-    }
-
-    /**
-     * Returns the event name.
-     *
-     * @return string The event name
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Sets the processed flag to true.
-     *
-     * This method must be called by listeners when
-     * it has processed the event (it is only meaningful
-     * when the event has been notified with the notifyUntil()
-     * dispatcher method.
-     */
-    public function setProcessed()
-    {
-        $this->processed = true;
-    }
-
-    /**
-     * Returns whether the event has been processed by a listener or not.
-     *
-     * This method is only meaningful for events notified
-     * with notifyUntil().
-     *
-     * @return Boolean true if the event has been processed, false otherwise
-     */
-    public function isProcessed()
-    {
-        return $this->processed;
-    }
-
-    /**
-     * Returns the event parameters.
-     *
-     * @return array The event parameters
-     */
-    public function all()
-    {
-        return $this->parameters;
-    }
-
-    /**
-     * Returns true if the parameter exists.
-     *
-     * @param  string  $name  The parameter name
-     *
-     * @return Boolean true if the parameter exists, false otherwise
-     */
-    public function has($name)
-    {
-        return array_key_exists($name, $this->parameters);
-    }
-
-    /**
-     * Returns a parameter value.
-     *
-     * @param  string  $name  The parameter name
-     *
-     * @return mixed  The parameter value
-     *
-     * @throws \InvalidArgumentException When parameter doesn't exists for this event
-     */
-    public function get($name)
-    {
-        if (!array_key_exists($name, $this->parameters)) {
-            throw new \InvalidArgumentException(sprintf('The event "%s" has no "%s" parameter.', $this->name, $name));
-        }
-
-        return $this->parameters[$name];
-    }
-
-    /**
-     * Sets a parameter.
-     *
-     * @param string  $name   The parameter name
-     * @param mixed   $value  The parameter value
-     */
-    public function set($name, $value)
-    {
-        $this->parameters[$name] = $value;
+        $this->propagationStopped = true;
     }
 }

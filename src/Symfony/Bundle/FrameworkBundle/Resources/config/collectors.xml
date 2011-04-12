@@ -21,6 +21,7 @@
         </service>
 
         <service id="data_collector.request" class="%data_collector.request.class%" public="false">
+            <tag name="kernel.listener" event="onCoreController" />
             <tag name="data_collector" template="WebProfilerBundle:Collector:request" id="request" priority="255" />
         </service>
 
@@ -37,6 +38,7 @@
 
         <service id="data_collector.logger" class="%data_collector.logger.class%" public="false">
             <tag name="data_collector" template="WebProfilerBundle:Collector:logger" id="logger" priority="255" />
+            <tag name="monolog.logger" channel="profiler" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 

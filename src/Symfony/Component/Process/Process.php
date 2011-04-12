@@ -16,19 +16,21 @@ namespace Symfony\Component\Process;
  * start independent PHP processes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class Process
 {
-    protected $commandline;
-    protected $cwd;
-    protected $env;
-    protected $stdin;
-    protected $timeout;
-    protected $options;
-    protected $exitcode;
-    protected $status;
-    protected $stdout;
-    protected $stderr;
+    private $commandline;
+    private $cwd;
+    private $env;
+    private $stdin;
+    private $timeout;
+    private $options;
+    private $exitcode;
+    private $status;
+    private $stdout;
+    private $stderr;
 
     /**
      * Constructor.
@@ -41,6 +43,8 @@ class Process
      * @param array   $options     An array of options for proc_open
      *
      * @throws \RuntimeException When proc_open is not installed
+     *
+     * @api
      */
     public function __construct($commandline, $cwd = null, array $env = array(), $stdin = null, $timeout = 60, array $options = array())
     {
@@ -56,7 +60,7 @@ class Process
         }
         $this->stdin = $stdin;
         $this->timeout = $timeout;
-        $this->options = array_merge($options, array('suppress_errors' => true, 'binary_pipes' => true));
+        $this->options = array_merge(array('suppress_errors' => true, 'binary_pipes' => true, 'bypass_shell' => true), $options);
     }
 
     /**
@@ -66,8 +70,8 @@ class Process
      * some bytes from the output in real-time. It allows to have feedback
      * from the independent process during execution.
      *
-     * If you don't provide a callback, the STDOUT and STDERR are available only after
-     * the process is finished via the getOutput() and getErrorOutput() methods.
+     * The STDOUT and STDERR are also available after the process is finished
+     * via the getOutput() and getErrorOutput() methods.
      *
      * @param Closure|string|array $callback A PHP callback to run whenever there is some
      *                                       output available on STDOUT or STDERR
@@ -75,22 +79,26 @@ class Process
      * @return integer The exit status code
      *
      * @throws \RuntimeException When process can't be launch or is stopped
+     *
+     * @api
      */
     public function run($callback = null)
     {
-        if (null === $callback) {
-            $this->stdout = '';
-            $this->stderr = '';
-            $that = $this;
-            $callback = function ($type, $line) use ($that)
-            {
-                if ('out' == $type) {
-                    $that->addOutput($line);
-                } else {
-                    $that->addErrorOutput($line);
-                }
-            };
-        }
+        $this->stdout = '';
+        $this->stderr = '';
+        $that = $this;
+        $callback = function ($type, $line) use ($that, $callback)
+        {
+            if ('out' == $type) {
+                $that->addOutput($line);
+            } else {
+                $that->addErrorOutput($line);
+            }
+
+            if (null !== $callback) {
+                call_user_func($callback, $type, $line);
+            }
+        };
 
         $descriptors = array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', 'w'));
 
@@ -165,6 +173,8 @@ class Process
      * to the run() method.
      *
      * @return string The process output
+     *
+     * @api
      */
     public function getOutput()
     {
@@ -178,6 +188,8 @@ class Process
      * to the run() method.
      *
      * @return string The process error output
+     *
+     * @api
      */
     public function getErrorOutput()
     {
@@ -188,6 +200,8 @@ class Process
      * Returns the exit code returned by the process.
      *
      * @return integer The exit status code
+     *
+     * @api
      */
     public function getExitCode()
     {
@@ -198,6 +212,8 @@ class Process
      * Checks if the process ended successfully.
      *
      * @return Boolean true if the process ended successfully, false otherwise
+     *
+     * @api
      */
     public function isSuccessful()
     {
@@ -210,6 +226,8 @@ class Process
      * It always returns false on Windows.
      *
      * @return Boolean
+     *
+     * @api
      */
     public function hasBeenSignaled()
     {
@@ -222,6 +240,8 @@ class Process
      * It is only meaningful if hasBeenSignaled() returns true.
      *
      * @return integer
+     *
+     * @api
      */
     public function getTermSignal()
     {
@@ -234,6 +254,8 @@ class Process
      * It always returns false on Windows.
      *
      * @return Boolean
+     *
+     * @api
      */
     public function hasBeenStopped()
     {
@@ -246,6 +268,8 @@ class Process
      * It is only meaningful if hasBeenStopped() returns true.
      *
      * @return integer
+     *
+     * @api
      */
     public function getStopSignal()
     {
@@ -260,5 +284,65 @@ class Process
     public function addErrorOutput($line)
     {
         $this->stderr .= $line;
+    }
+
+    public function getCommandLine()
+    {
+        return $this->commandline;
+    }
+
+    public function setCommandLine($commandline)
+    {
+        $this->commandline = $commandline;
+    }
+
+    public function getTimeout()
+    {
+        return $this->timeout;
+    }
+
+    public function setTimeout($timeout)
+    {
+        $this->timeout = $timeout;
+    }
+
+    public function getWorkingDirectory()
+    {
+        return $this->cwd;
+    }
+
+    public function setWorkingDirectory($cwd)
+    {
+        $this->cwd = $cwd;
+    }
+
+    public function getEnv()
+    {
+        return $this->env;
+    }
+
+    public function setEnv(array $env)
+    {
+        $this->env = $env;
+    }
+
+    public function getStdin()
+    {
+        return $this->stdin;
+    }
+
+    public function setStdin($stdin)
+    {
+        $this->stdin = $stdin;
+    }
+
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    public function setOptions(array $options)
+    {
+        $this->options = $options;
     }
 }

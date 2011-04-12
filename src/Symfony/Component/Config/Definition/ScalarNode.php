@@ -37,7 +37,7 @@ class ScalarNode extends VariableNode
             throw new InvalidTypeException(sprintf(
                 'Invalid type for path "%s". Expected scalar, but got %s.',
                 $this->getPath(),
-                json_encode($value)
+                gettype($value)
             ));
         }
     }

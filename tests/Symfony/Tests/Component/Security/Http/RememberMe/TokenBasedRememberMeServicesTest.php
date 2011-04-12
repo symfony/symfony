@@ -2,6 +2,8 @@
 
 namespace Symfony\Tests\Component\Security\Http\RememberMe;
 
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
+
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Token;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -21,27 +23,21 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($service->autoLogin(new Request()));
     }
 
-    /**
-     * @expectedException Symfony\Component\Security\Core\Exception\AuthenticationException
-     * @expectedMessage The cookie is invalid.
-     */
     public function testAutoLoginThrowsExceptionOnInvalidCookie()
     {
-        $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo'));
+        $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => false, 'remember_me_parameter' => 'foo'));
         $request = new Request;
         $request->request->set('foo', 'true');
         $request->cookies->set('foo', 'foo');
 
-        $service->autoLogin($request);
+        $this->assertNull($service->autoLogin($request));
+        $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
-    /**
-     * @expectedException Symfony\Component\Security\Core\Exception\UsernameNotFoundException
-     */
     public function testAutoLoginThrowsExceptionOnNonExistentUser()
     {
         $userProvider = $this->getProvider();
-        $service = $this->getService($userProvider, array('name' => 'foo', 'always_remember_me' => true, 'lifetime' => 3600));
+        $service = $this->getService($userProvider, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600));
         $request = new Request;
         $request->cookies->set('foo', $this->getCookie('fooclass', 'foouser', time()+3600, 'foopass'));
 
@@ -51,21 +47,18 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
             ->will($this->throwException(new UsernameNotFoundException('user not found')))
         ;
 
-        $service->autoLogin($request);
+        $this->assertNull($service->autoLogin($request));
+        $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
-    /**
-     * @expectedException Symfony\Component\Security\Core\Exception\AuthenticationException
-     * @expectedMessage The cookie's hash is invalid.
-     */
     public function testAutoLoginDoesNotAcceptCookieWithInvalidHash()
     {
         $userProvider = $this->getProvider();
-        $service = $this->getService($userProvider, array('name' => 'foo', 'always_remember_me' => true, 'lifetime' => 3600));
+        $service = $this->getService($userProvider, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600));
         $request = new Request;
         $request->cookies->set('foo', base64_encode('class:'.base64_encode('foouser').':123456789:fooHash'));
 
-        $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user
             ->expects($this->once())
             ->method('getPassword')
@@ -79,21 +72,18 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($user))
         ;
 
-        $service->autoLogin($request);
+        $this->assertNull($service->autoLogin($request));
+        $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
-    /**
-     * @expectedException Symfony\Component\Security\Core\Exception\AuthenticationException
-     * @expectedMessage The cookie has expired.
-     */
     public function testAutoLoginDoesNotAcceptAnExpiredCookie()
     {
         $userProvider = $this->getProvider();
-        $service = $this->getService($userProvider, array('name' => 'foo', 'always_remember_me' => true, 'lifetime' => 3600));
+        $service = $this->getService($userProvider, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600));
         $request = new Request;
         $request->cookies->set('foo', $this->getCookie('fooclass', 'foouser', time() - 1, 'foopass'));
 
-        $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user
             ->expects($this->once())
             ->method('getPassword')
@@ -107,12 +97,13 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($user))
         ;
 
-        $service->autoLogin($request);
+        $this->assertNull($service->autoLogin($request));
+        $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
     public function testAutoLogin()
     {
-        $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user
             ->expects($this->once())
             ->method('getRoles')
@@ -150,11 +141,9 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $response = new Response();
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
-        $this->assertFalse($response->headers->hasCookie('foo'));
-
         $service->logout($request, $response, $token);
 
-        $cookie = $response->headers->getCookie('foo');
+        $cookie = $request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME);
         $this->assertTrue($cookie->isCleared());
         $this->assertNull($cookie->getPath());
         $this->assertNull($cookie->getDomain());
@@ -166,39 +155,15 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $response = new Response();
 
-        $this->assertFalse($response->headers->hasCookie('foo'));
-
         $service->loginFail($request, $response);
 
-        $cookie = $response->headers->getCookie('foo');
+        $cookie = $request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME);
         $this->assertTrue($cookie->isCleared());
         $this->assertEquals('/foo', $cookie->getPath());
         $this->assertEquals('foodomain.foo', $cookie->getDomain());
     }
 
-    public function testLoginSuccessDoesNotRenewRememberMeToken()
-    {
-        $service = $this->getService(null, array('name' => 'foo', 'domain' => 'myfoodomain.foo', 'path' => '/foo/path', 'secure' => true, 'httponly' => true, 'lifetime' => 3600));
-        $request = new Request;
-        $response = new Response;
-
-        $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
-        $user
-            ->expects($this->once())
-            ->method('getRoles')
-            ->will($this->returnValue(array('ROLE_FOO')))
-        ;
-
-        $token = new RememberMeToken($user, 'fookey', 'foo');
-
-        $this->assertFalse($response->headers->hasCookie('foo'));
-
-        $service->loginSuccess($request, $response, $token);
-
-        $this->assertFalse($response->headers->hasCookie('foo'));
-    }
-
-    public function testLoginSuccessIgnoresTokensWhichDoNotContainAnAccountInterfaceImplementation()
+    public function testLoginSuccessIgnoresTokensWhichDoNotContainAnUserInterfaceImplementation()
     {
         $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => true));
         $request = new Request;
@@ -224,7 +189,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $response = new Response;
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user
             ->expects($this->once())
             ->method('getPassword')

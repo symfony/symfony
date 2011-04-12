@@ -15,8 +15,8 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\EntryPoint\DigestAuthenticationEntryPoint;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Events;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
@@ -32,11 +32,11 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  */
 class DigestAuthenticationListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $provider;
-    protected $providerKey;
-    protected $authenticationEntryPoint;
-    protected $logger;
+    private $securityContext;
+    private $provider;
+    private $providerKey;
+    private $authenticationEntryPoint;
+    private $logger;
 
     public function __construct(SecurityContextInterface $securityContext, UserProviderInterface $provider, $providerKey, DigestAuthenticationEntryPoint $authenticationEntryPoint, LoggerInterface $logger = null)
     {
@@ -52,31 +52,13 @@ class DigestAuthenticationListener implements ListenerInterface
     }
 
     /**
-     *
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
-    }
-
-    /**
      * Handles digest authentication.
      *
-     * @param EventInterface $event An EventInterface instance
+     * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public function handle(EventInterface $event)
+    public function handle(GetResponseEvent $event)
     {
-        $request = $event->get('request');
+        $request = $event->getRequest();
 
         if (!$header = $request->server->get('PHP_AUTH_DIGEST')) {
             return;
@@ -85,11 +67,7 @@ class DigestAuthenticationListener implements ListenerInterface
         $digestAuth = new DigestData($header);
 
         if (null !== $token = $this->securityContext->getToken()) {
-            if ($token->isImmutable()) {
-                return;
-            }
-
-            if ($token instanceof UsernamePasswordToken && $token->isAuthenticated() && (string) $token === $digestAuth->getUsername()) {
+            if ($token instanceof UsernamePasswordToken && $token->isAuthenticated() && $token->getUsername() === $digestAuth->getUsername()) {
                 return;
             }
         }
@@ -143,7 +121,7 @@ class DigestAuthenticationListener implements ListenerInterface
         $this->securityContext->setToken(new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey));
     }
 
-    protected function fail(EventInterface $event, Request $request, AuthenticationException $authException)
+    private function fail(GetResponseEvent $event, Request $request, AuthenticationException $authException)
     {
         $this->securityContext->setToken(null);
 
@@ -151,15 +129,15 @@ class DigestAuthenticationListener implements ListenerInterface
             $this->logger->debug($authException);
         }
 
-        $this->authenticationEntryPoint->start($event, $request, $authException);
+        $event->setResponse($this->authenticationEntryPoint->start($request, $authException));
     }
 }
 
 class DigestData
 {
-    protected $elements;
-    protected $header;
-    protected $nonceExpiryTime;
+    private $elements;
+    private $header;
+    private $nonceExpiryTime;
 
     public function __construct($header)
     {

@@ -1,5 +1,6 @@
 doctrine:
     orm:
+        default_entity_manager: em2
         entity_managers:
             em1:
                 mappings:

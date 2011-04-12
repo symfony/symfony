@@ -16,16 +16,6 @@ class TestCommand extends Command
         ;
     }
 
-    public function mergeApplicationDefinition()
-    {
-        return parent::mergeApplicationDefinition();
-    }
-
-    public function getApplication()
-    {
-        return $this->application;
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('execute called');
@@ -35,10 +25,4 @@ class TestCommand extends Command
     {
         $output->writeln('interact called');
     }
-
-    public function getHelper($name)
-    {
-        return parent::getHelper($name);
-    }
-
 }

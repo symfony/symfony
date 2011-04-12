@@ -12,10 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\HttpFoundation;
 
 use Symfony\Bundle\FrameworkBundle\HttpFoundation\SessionListener;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
 /**
  * SessionListenerTest.
@@ -53,10 +53,12 @@ class SessionListenerTest extends \PHPUnit_Framework_TestCase
     {
         $request->setSession($this->session);
         $response = new Response();
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $event = new FilterResponseEvent($kernel, $request, $type, $response);
 
-        $this->assertSame($response, $this->listener->filter(new Event(
-            $this, 'core.response', array('request' => $request, 'request_type' => $type)
-        ), $response));
+        $this->listener->onCoreResponse($event);
+
+        $this->assertSame($response, $event->getResponse());
     }
 
     private function sessionMustNotBeSaved()

@@ -28,9 +28,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class EsiResponseCacheStrategy implements EsiResponseCacheStrategyInterface
 {
-    protected $cacheable = true;
-    protected $ttls = array();
-    protected $maxAges = array();
+    private $cacheable = true;
+    private $ttls = array();
+    private $maxAges = array();
 
     /**
      * Adds a Response.

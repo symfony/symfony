@@ -18,6 +18,7 @@ use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
 use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
 use Symfony\Component\Security\Acl\Model\AclProviderInterface;
+use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Permission\PermissionMapInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityRetrievalStrategyInterface;
@@ -32,12 +33,12 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
  */
 class AclVoter implements VoterInterface
 {
-    protected $aclProvider;
-    protected $permissionMap;
-    protected $objectIdentityRetrievalStrategy;
-    protected $securityIdentityRetrievalStrategy;
-    protected $allowIfObjectIdentityUnavailable;
-    protected $logger;
+    private $aclProvider;
+    private $permissionMap;
+    private $objectIdentityRetrievalStrategy;
+    private $securityIdentityRetrievalStrategy;
+    private $allowIfObjectIdentityUnavailable;
+    private $logger;
 
     public function __construct(AclProviderInterface $aclProvider, ObjectIdentityRetrievalStrategyInterface $oidRetrievalStrategy, SecurityIdentityRetrievalStrategyInterface $sidRetrievalStrategy, PermissionMapInterface $permissionMap, LoggerInterface $logger = null, $allowIfObjectIdentityUnavailable = true)
     {
@@ -78,7 +79,9 @@ class AclVoter implements VoterInterface
                     $field = null;
                 }
 
-                if (null === $oid = $this->objectIdentityRetrievalStrategy->getObjectIdentity($object)) {
+                if ($object instanceof ObjectIdentityInterface) {
+                    $oid = $object;
+                } else if (null === $oid = $this->objectIdentityRetrievalStrategy->getObjectIdentity($object)) {
                     if (null !== $this->logger) {
                         $this->logger->debug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable? 'grant access' : 'abstain'));
                     }

@@ -5,16 +5,15 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="debug.toolbar.class">Symfony\Bundle\WebProfilerBundle\WebDebugToolbarListener</parameter>
-        <parameter key="debug.toolbar.intercept_redirects">false</parameter>
+        <parameter key="web_profiler.debug.toolbar.class">Symfony\Bundle\WebProfilerBundle\WebDebugToolbarListener</parameter>
     </parameters>
 
     <services>
-        <service id="debug.toolbar" class="%debug.toolbar.class%">
-            <tag name="kernel.listener" event="core.response" method="handle" priority="-128" />
-            <argument type="service" id="http_kernel" />
+        <service id="web_profiler.debug.toolbar" class="%web_profiler.debug.toolbar.class%">
+            <tag name="kernel.listener" event="onCoreResponse" priority="-128" />
             <argument type="service" id="templating.engine.twig" />
-            <argument>%debug.toolbar.intercept_redirects%</argument>
+            <argument /> <!-- intercept_redirects -->
+            <argument /> <!-- verbose -->
         </service>
     </services>
 </container>

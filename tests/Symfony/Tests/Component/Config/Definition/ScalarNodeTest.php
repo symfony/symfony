@@ -1,6 +1,8 @@
 <?php
 
-namespace Symfony\Component\Config\Definition;
+namespace Symfony\Tests\Component\Config\Definition;
+
+use Symfony\Component\Config\Definition\ScalarNode;
 
 class ScalarNodeTest extends \PHPUnit_Framework_TestCase
 {

@@ -24,7 +24,7 @@ class ConfigDataCollectorTest extends \PHPUnit_Framework_TestCase
         $kernel = new KernelForTest('test',true);
         $c = new ConfigDataCollector($kernel);
         $c->collect(new Request(), new Response());
-        
+
         $this->assertSame('test',$c->getEnv());
         $this->assertTrue($c->isDebug());
         $this->assertSame('config',$c->getName());
@@ -32,27 +32,25 @@ class ConfigDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(PHP_VERSION,$c->getPhpVersion());
         $this->assertSame(Kernel::VERSION,$c->getSymfonyVersion());
         $this->assertNull($c->getToken());
-        
-        //if else clause because we dont know it
-        if(extension_loaded('xdebug')){
-            $this->assertTrue($c->hasXdebug());
-        }else{
-            $this->assertFalse($c->hasXdebug());
-        }        
 
-        //if else clause because we dont know it
-        if(((extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'))
+        // if else clause because we dont know it
+        if (extension_loaded('xdebug')) {
+            $this->assertTrue($c->hasXdebug());
+        } else {
+            $this->assertFalse($c->hasXdebug());
+        }
+
+        // if else clause because we dont know it
+        if (((extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'))
                 ||
                 (extension_loaded('apc') && ini_get('apc.enabled'))
                 ||
-                (extension_loaded('xcache') && ini_get('xcache.cacher')))){
-            $this->assertTrue($c->hasAccelerator());            
-        }else{
-            $this->assertFalse($c->hasAccelerator());                        
+                (extension_loaded('xcache') && ini_get('xcache.cacher')))) {
+            $this->assertTrue($c->hasAccelerator());
+        } else {
+            $this->assertFalse($c->hasAccelerator());
         }
-        
     }
-    
 }
 
 class KernelForTest extends Kernel
@@ -61,13 +59,17 @@ class KernelForTest extends Kernel
     {
         return 'testkernel';
     }
-    
-    public function registerRootDir() {
+
+    public function registerBundles()
+    {
     }
-    
-    public function registerBundles() {
+
+    public function getBundles()
+    {
+        return array();
     }
-    
-    public function registerContainerConfiguration(LoaderInterface $loader) {
+
+    public function registerContainerConfiguration(LoaderInterface $loader)
+    {
     }
 }

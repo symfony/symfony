@@ -124,12 +124,21 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('superpass', $user->getPassword());
     }
 
-    /**
-     * @covers Symfony\Component\Security\Core\User\User::__toString
-     */
-    public function testMagicToString()
+    public function testUsersAreEqual()
     {
-        $user = new User('fabien', 'superpass');
-        $this->assertEquals('fabien', (string) $user);
+        $user1 = new User('fabien', 'superpass', array('ROLE_USER'));
+        $user2 = clone $user1;
+
+        $this->assertTrue($user1->equals($user2));
+        $this->assertTrue($user2->equals($user1));
+    }
+
+    public function testUsersAreNotEqual()
+    {
+        $user1 = new User('fabien', 'superpass', array('ROLE_USER'));
+        $user2 = new User('fabien', 'superpass', array('ROLE_USER'), false);
+
+        $this->assertFalse($user1->equals($user2));
+        $this->assertFalse($user2->equals($user1));
     }
 }

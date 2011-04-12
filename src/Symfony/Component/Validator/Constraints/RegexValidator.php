@@ -27,7 +27,7 @@ class RegexValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        $value = (string)$value;
+        $value = (string) $value;
 
         if (
             ($constraint->match && !preg_match($constraint->pattern, $value))

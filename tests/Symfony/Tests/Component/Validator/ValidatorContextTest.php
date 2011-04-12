@@ -26,7 +26,7 @@ class ValidatorContextTest extends \PHPUnit_Framework_TestCase
     public function testSetClassMetadataFactory()
     {
         $factory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
-        $result = $this->context->classMetadataFactory($factory);
+        $result = $this->context->setClassMetadataFactory($factory);
 
         $this->assertSame($this->context, $result);
         $this->assertSame($factory, $this->context->getClassMetadataFactory());
@@ -35,7 +35,7 @@ class ValidatorContextTest extends \PHPUnit_Framework_TestCase
     public function testSetConstraintValidatorFactory()
     {
         $factory = $this->getMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
-        $result = $this->context->constraintValidatorFactory($factory);
+        $result = $this->context->setConstraintValidatorFactory($factory);
 
         $this->assertSame($this->context, $result);
         $this->assertSame($factory, $this->context->getConstraintValidatorFactory());
@@ -47,8 +47,8 @@ class ValidatorContextTest extends \PHPUnit_Framework_TestCase
         $validatorFactory = $this->getMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
 
         $validator = $this->context
-            ->classMetadataFactory($metadataFactory)
-            ->constraintValidatorFactory($validatorFactory)
+            ->setClassMetadataFactory($metadataFactory)
+            ->setConstraintValidatorFactory($validatorFactory)
             ->getValidator();
 
         $this->assertEquals(new Validator($metadataFactory, $validatorFactory), $validator);

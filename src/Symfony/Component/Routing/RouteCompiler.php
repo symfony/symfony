@@ -119,7 +119,7 @@ class RouteCompiler implements RouteCompilerInterface
      *
      * @throws \InvalidArgumentException When route can't be parsed
      */
-    protected function tokenize()
+    private function tokenize()
     {
         $this->tokens = array();
         $buffer = $this->route->getPattern();
@@ -212,7 +212,7 @@ class RouteCompiler implements RouteCompilerInterface
         $this->segments[] = preg_quote($separator, '#').'(?P<'.$variable.'>'.$requirement.')';
         $this->variables[$variable] = $name;
 
-        if (!$this->route->getDefault($variable)) {
+        if (null === $this->route->getDefault($variable)) {
             $this->firstOptional = count($this->segments);
         }
     }
@@ -221,7 +221,7 @@ class RouteCompiler implements RouteCompilerInterface
     {
     }
 
-    protected function getOptions()
+    private function getOptions()
     {
         $options = $this->route->getOptions();
 

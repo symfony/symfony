@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Provider;
 
-use Symfony\Component\Security\Core\User\AccountInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\User\AccountCheckerInterface;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -30,20 +30,20 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderInterface
 {
-    protected $userProvider;
-    protected $accountChecker;
-    protected $providerKey;
+    private $userProvider;
+    private $userChecker;
+    private $providerKey;
 
     /**
      * Constructor.
      *
      * @param UserProviderInterface   $userProvider   A UserProviderInterface instance
-     * @param AccountCheckerInterface $accountChecker An AccountCheckerInterface instance
+     * @param UserCheckerInterface $userChecker An UserCheckerInterface instance
      */
-    public function __construct(UserProviderInterface $userProvider, AccountCheckerInterface $accountChecker, $providerKey)
+    public function __construct(UserProviderInterface $userProvider, UserCheckerInterface $userChecker, $providerKey)
     {
         $this->userProvider = $userProvider;
-        $this->accountChecker = $accountChecker;
+        $this->userChecker = $userChecker;
         $this->providerKey = $providerKey;
     }
 
@@ -66,7 +66,7 @@ class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderIn
 */
         $user = $this->userProvider->loadUserByUsername($user);
 
-        $this->accountChecker->checkPostAuth($user);
+        $this->userChecker->checkPostAuth($user);
 
         $authenticatedToken = new PreAuthenticatedToken($user, $token->getCredentials(), $this->providerKey, $user->getRoles());
         $authenticatedToken->setAttributes($token->getAttributes());

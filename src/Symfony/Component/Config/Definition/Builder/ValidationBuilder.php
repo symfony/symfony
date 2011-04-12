@@ -18,17 +18,17 @@ namespace Symfony\Component\Config\Definition\Builder;
  */
 class ValidationBuilder
 {
-    public $parent;
+    protected $node;
     public $rules;
 
     /**
      * Constructor
      *
-     * @param Symfony\Component\Config\Definition\Builder\NodeBuilder $parent
+     * @param NodeDefinition $node The related node
      */
-    public function __construct($parent)
+    public function __construct(NodeDefinition $node)
     {
-        $this->parent = $parent;
+        $this->node = $node;
 
         $this->rules = array();
     }
@@ -38,7 +38,7 @@ class ValidationBuilder
      *
      * @param \Closure $closure
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder|Symfony\Component\Config\Definition\Builder\ValidationBuilder
+     * @return ExprBuilder|ValidationBuilder
      */
     public function rule(\Closure $closure = null)
     {
@@ -48,6 +48,6 @@ class ValidationBuilder
             return $this;
         }
 
-        return $this->rules[] = new ExprBuilder($this->parent);
+        return $this->rules[] = new ExprBuilder($this->node);
     }
 }

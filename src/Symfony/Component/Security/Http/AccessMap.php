@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class AccessMap
 {
-    protected $map = array();
+    private $map = array();
 
     /**
      * Constructor.

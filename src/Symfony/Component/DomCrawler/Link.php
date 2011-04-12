@@ -15,14 +15,16 @@ namespace Symfony\Component\DomCrawler;
  * Link represents an HTML link (an HTML a tag).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class Link
 {
-    protected $node;
-    protected $method;
-    protected $host;
-    protected $path;
-    protected $base;
+    private $node;
+    private $method;
+    private $host;
+    private $path;
+    private $base;
 
     /**
      * Constructor.
@@ -34,6 +36,8 @@ class Link
      * @param strin    $base    An optional base href for generating the uri
      *
      * @throws \LogicException if the node is not a link
+     *
+     * @api
      */
     public function __construct(\DOMNode $node, $method = 'get', $host = null, $path = '/', $base = null)
     {
@@ -64,11 +68,21 @@ class Link
      * @param Boolean $absolute Whether to return an absolute URI or not (this only works if a base URI has been provided)
      *
      * @return string The URI
+     *
+     * @api
      */
     public function getUri($absolute = true)
     {
         $uri = $this->node->getAttribute('href');
         $urlHaveScheme = 'http' === substr($uri, 0, 4);
+
+        if (!$uri) {
+            $uri = $this->path;
+        }
+
+        if ('#' === $uri[0]) {
+            $uri = $this->path.$uri;
+        }
 
         $path = $this->path;
         if ('?' !== substr($uri, 0, 1) && '/' !== substr($path, -1)) {
@@ -93,6 +107,8 @@ class Link
      * Gets the method associated with this link.
      *
      * @return string The method
+     *
+     * @api
      */
     public function getMethod()
     {

@@ -15,6 +15,8 @@ namespace Symfony\Component\Console\Input;
  * Represents a command line argument.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class InputArgument
 {
@@ -22,10 +24,10 @@ class InputArgument
     const OPTIONAL = 2;
     const IS_ARRAY = 4;
 
-    protected $name;
-    protected $mode;
-    protected $default;
-    protected $description;
+    private $name;
+    private $mode;
+    private $default;
+    private $description;
 
     /**
      * Constructor.
@@ -36,6 +38,8 @@ class InputArgument
      * @param mixed   $default     The default value (for self::OPTIONAL mode only)
      *
      * @throws \InvalidArgumentException When argument mode is not valid
+     *
+     * @api
      */
     public function __construct($name, $mode = null, $description = '', $default = null)
     {

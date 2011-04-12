@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class LoggerDataCollector extends DataCollector
 {
-    protected $logger;
+    private $logger;
 
     public function __construct($logger = null)
     {
@@ -48,7 +48,7 @@ class LoggerDataCollector extends DataCollector
      *
      * @return array An array of called events
      *
-     * @see EventDispatcherTraceableInterface
+     * @see TraceableEventDispatcherInterface
      */
     public function countErrors()
     {

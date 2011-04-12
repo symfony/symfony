@@ -36,7 +36,7 @@ class PhpFileLoader extends FileLoader
         $loader = $this;
 
         $path = $this->locator->locate($file);
-        $this->currentDir = dirname($path);
+        $this->setCurrentDir(dirname($path));
         $this->container->addResource(new FileResource($path));
 
         include $path;

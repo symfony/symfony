@@ -20,8 +20,8 @@ use Symfony\Component\Console\Command\Command;
  */
 class HelperSet
 {
-    protected $helpers;
-    protected $command;
+    private $helpers;
+    private $command;
 
     /**
      * @param Helper[] $helpers An array of helper.

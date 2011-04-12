@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="assetic.filter.lessphp.class">Assetic\Filter\LessphpFilter</parameter>
+    </parameters>
+
+    <services>
+        <service id="assetic.filter.lessphp" class="%assetic.filter.lessphp.class%">
+            <tag name="assetic.filter" alias="lessphp" />
+            <argument>%assetic.read_from%</argument>
+        </service>
+    </services>
+</container>

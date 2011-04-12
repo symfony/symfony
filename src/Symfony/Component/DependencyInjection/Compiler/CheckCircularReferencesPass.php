@@ -2,6 +2,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Exception\CircularReferenceException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -16,9 +17,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class CheckCircularReferencesPass implements CompilerPassInterface
 {
-    protected $currentId;
-    protected $currentNode;
-    protected $currentPath;
+    private $currentId;
+    private $currentPath;
 
     /**
      * Checks the ContainerBuilder object for circular references.
@@ -43,14 +43,14 @@ class CheckCircularReferencesPass implements CompilerPassInterface
      * @param array $edges An array of Nodes
      * @throws \RuntimeException When a circular reference is found.
      */
-    protected function checkOutEdges(array $edges)
+    private function checkOutEdges(array $edges)
     {
         foreach ($edges as $edge) {
             $node = $edge->getDestNode();
             $this->currentPath[] = $id = $node->getId();
 
             if ($this->currentId === $id) {
-                throw new \RuntimeException(sprintf('Circular reference detected for "%s", path: "%s".', $this->currentId, implode(' -> ', $this->currentPath)));
+                throw new CircularReferenceException($this->currentId, $this->currentPath);
             }
 
             $this->checkOutEdges($node->getOutEdges());

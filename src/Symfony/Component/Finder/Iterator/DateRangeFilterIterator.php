@@ -18,7 +18,7 @@ namespace Symfony\Component\Finder\Iterator;
  */
 class DateRangeFilterIterator extends \FilterIterator
 {
-    protected $comparators = array();
+    private $comparators = array();
 
     /**
      * Constructor.

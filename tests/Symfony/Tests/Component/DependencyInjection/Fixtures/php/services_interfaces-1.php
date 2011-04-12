@@ -2,6 +2,7 @@
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -33,9 +34,12 @@ class ProjectServiceContainer extends Container
     protected function getFooService()
     {
         $class = $this->getParameter('cla').'o'.$this->getParameter('ss');
-        return $this->services['foo'] = new $class();
+        $this->services['foo'] = $instance = new $class();
+
 
         $this->applyInterfaceInjectors($instance);
+
+        return $instance;
     }
 
     /**

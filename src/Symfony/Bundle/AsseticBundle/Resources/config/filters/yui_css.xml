@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="assetic.filter.yui_css.class">Assetic\Filter\Yui\CssCompressorFilter</parameter>
+        <parameter key="assetic.filter.yui_css.java">%assetic.java.bin%</parameter>
+        <parameter key="assetic.filter.yui_css.jar" />
+    </parameters>
+
+    <services>
+        <service id="assetic.filter.yui_css" class="%assetic.filter.yui_css.class%">
+            <tag name="assetic.filter" alias="yui_css" />
+            <argument>%assetic.filter.yui_css.jar%</argument>
+            <argument>%assetic.filter.yui_css.java%</argument>
+        </service>
+    </services>
+</container>

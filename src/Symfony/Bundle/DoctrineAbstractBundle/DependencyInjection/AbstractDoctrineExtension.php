@@ -37,25 +37,13 @@ abstract class AbstractDoctrineExtension extends Extension
     protected $drivers = array();
 
     /*
-     * @param array $entityManager A configured ORM entity manager.
-     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param array            $objectManager A configured object manager.
+     * @param ContainerBuilder $container     A ContainerBuilder instance
      */
-    protected function loadMappingInformation(array $objectManager, $container)
+    protected function loadMappingInformation(array $objectManager, ContainerBuilder $container)
     {
         if (isset($objectManager['mappings'])) {
-            // fix inconsistency between yaml and xml naming
-            if (isset($objectManager['mappings']['mapping'])) {
-                if (isset($objectManager['mappings']['mapping'][0])) {
-                    $objectManager['mappings'] = $objectManager['mappings']['mapping'];
-                } else {
-                    $objectManager['mappings'] = array($objectManager['mappings']['mapping']);
-                }
-            }
-
             foreach ($objectManager['mappings'] as $mappingName => $mappingConfig) {
-                if (is_string($mappingConfig)) {
-                    $mappingConfig = array('type' => $mappingConfig);
-                }
                 if (!isset($mappingConfig['dir'])) {
                     $mappingConfig['dir'] = false;
                 }
@@ -73,12 +61,6 @@ abstract class AbstractDoctrineExtension extends Extension
                 }
                 if (!isset($mappingConfig['is_bundle'])) {
                     $mappingConfig['is_bundle'] = !file_exists($mappingConfig['dir']);
-                }
-
-                if (isset($mappingConfig['name'])) {
-                    $mappingName = $mappingConfig['name'];
-                } else if ($mappingConfig === null) {
-                    $mappingConfig = array();
                 }
 
                 if ($mappingConfig['is_bundle']) {
@@ -129,7 +111,7 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Register the mapping driver configuration for later use with the object managers metadata driver chain.
      *
-     * @param array $mappingConfig
+     * @param array  $mappingConfig
      * @param string $mappingName
      * @return void
      */
@@ -153,11 +135,11 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @param array            $bundleConfig
      * @param \ReflectionClass $bundle
-     * @param Container        $container
+     * @param ContainerBuilder $container    A ContainerBuilder instance
      *
      * @return array|false
      */
-    protected function getMappingDriverBundleConfigDefaults(array $bundleConfig, \ReflectionClass $bundle, $container)
+    protected function getMappingDriverBundleConfigDefaults(array $bundleConfig, \ReflectionClass $bundle, ContainerBuilder $container)
     {
         $bundleDir = dirname($bundle->getFilename());
 
@@ -171,7 +153,7 @@ abstract class AbstractDoctrineExtension extends Extension
         }
 
         if (!$bundleConfig['dir']) {
-            if (in_array($bundleConfig['type'], array('annotation', 'static-php'))) {
+            if (in_array($bundleConfig['type'], array('annotation', 'staticphp'))) {
                 $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingObjectDefaultName();
             } else {
                 $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingResourceConfigDirectory();
@@ -189,10 +171,10 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Register all the collected mapping information with the object manager by registering the appropriate mapping drivers.
      *
-     * @param array $objectManager
-     * @param Container $container
+     * @param array            $objectManager
+     * @param ContainerBuilder $container     A ContainerBuilder instance
      */
-    protected function registerMappingDrivers($objectManager, $container)
+    protected function registerMappingDrivers($objectManager, ContainerBuilder $container)
     {
         // configure metadata driver for each bundle based on the type of mapping files found
         if ($container->hasDefinition($this->getObjectManagerElementName($objectManager['name'] . '_metadata_driver'))) {
@@ -238,7 +220,7 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Assertion if the specified mapping information is valid.
      *
-     * @param array $mappingConfig
+     * @param array  $mappingConfig
      * @param string $objectManagerName
      */
     protected function assertValidMappingConfiguration(array $mappingConfig, $objectManagerName)
@@ -254,7 +236,7 @@ abstract class AbstractDoctrineExtension extends Extension
 
         if (!in_array($mappingConfig['type'], array('xml', 'yml', 'annotation', 'php', 'staticphp'))) {
             throw new \InvalidArgumentException("Can only configure 'xml', 'yml', 'annotation', 'php' or ".
-                "'static-php' through the DoctrineBundle. Use your own bundle to configure other metadata drivers. " .
+                "'staticphp' through the DoctrineBundle. Use your own bundle to configure other metadata drivers. " .
                 "You can register them by adding a a new driver to the ".
                 "'" . $this->getObjectManagerElementName($objectManagerName . ".metadata_driver")."' service definition."
             );
@@ -264,8 +246,8 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Detects what metadata driver to use for the supplied directory.
      *
-     * @param string $dir A directory path
-     * @param ContainerBuilder $container A ContainerBuilder configuration
+     * @param string           $dir       A directory path
+     * @param ContainerBuilder $container A ContainerBuilder instance
      *
      * @return string|null A metadata driver short name, if one can be detected
      */

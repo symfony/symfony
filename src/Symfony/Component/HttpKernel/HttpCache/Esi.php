@@ -28,7 +28,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class Esi
 {
-    protected $contentTypes;
+    private $contentTypes;
 
     /**
      * Constructor.
@@ -212,7 +212,7 @@ class Esi
      *
      * @return string The response content for the include.
      */
-    protected function handleEsiIncludeTag($attributes)
+    private function handleEsiIncludeTag($attributes)
     {
         $options = array();
         preg_match_all('/(src|onerror|alt)="([^"]*?)"/', $attributes[1], $matches, PREG_SET_ORDER);

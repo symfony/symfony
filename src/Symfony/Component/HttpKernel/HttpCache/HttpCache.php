@@ -26,12 +26,12 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class HttpCache implements HttpKernelInterface
 {
-    protected $kernel;
-    protected $traces;
-    protected $store;
-    protected $request;
-    protected $esi;
-    protected $esiCacheStrategy;
+    private $kernel;
+    private $store;
+    private $request;
+    private $esi;
+    private $esiCacheStrategy;
+    private $traces;
 
     /**
      * Constructor.
@@ -126,6 +126,27 @@ class HttpCache implements HttpKernelInterface
     public function getRequest()
     {
         return $this->request;
+    }
+
+    /**
+     * Gets the Kernel instance
+     *
+     * @return Symfony\Component\HttpKernel\HttpKernelInterface An HttpKernelInterface instance
+     */
+    public function getKernel()
+    {
+        return $this->kernel;
+    }
+
+
+    /**
+     * Gets the Esi instance
+     *
+     * @return Symfony\Component\HttpKernel\HttpCache\Esi An Esi instance
+     */
+    public function getEsi()
+    {
+        return $this->esi;
     }
 
     /**
@@ -519,7 +540,7 @@ class HttpCache implements HttpKernelInterface
      *
      * @return Response A Response instance
      */
-    protected function restoreResponseBody(Request $request, Response $response)
+    private function restoreResponseBody(Request $request, Response $response)
     {
         if ('head' === strtolower($request->getMethod())) {
             $response->setContent('');
@@ -568,7 +589,7 @@ class HttpCache implements HttpKernelInterface
      *
      * @return Boolean true if the Request is private, false otherwise
      */
-    protected function isPrivateRequest(Request $request)
+    private function isPrivateRequest(Request $request)
     {
         foreach ($this->options['private_headers'] as $key) {
             $key = strtolower(str_replace('HTTP_', '', $key));
@@ -590,7 +611,7 @@ class HttpCache implements HttpKernelInterface
      *
      * @param string $event The event name
      */
-    protected function record(Request $request, $event)
+    private function record(Request $request, $event)
     {
         $path = $request->getPathInfo();
         if ($qs = $request->getQueryString()) {

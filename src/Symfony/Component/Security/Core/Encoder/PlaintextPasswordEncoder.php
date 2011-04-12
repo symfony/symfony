@@ -18,7 +18,7 @@ namespace Symfony\Component\Security\Core\Encoder;
  */
 class PlaintextPasswordEncoder extends BasePasswordEncoder
 {
-    protected $ignorePasswordCase;
+    private $ignorePasswordCase;
 
     public function __construct($ignorePasswordCase = false)
     {

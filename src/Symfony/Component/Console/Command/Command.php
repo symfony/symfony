@@ -22,19 +22,22 @@ use Symfony\Component\Console\Application;
  * Base class for all commands.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class Command
 {
-    protected $name;
-    protected $namespace;
-    protected $aliases;
-    protected $definition;
-    protected $help;
-    protected $application;
-    protected $description;
-    protected $ignoreValidationErrors;
-    protected $applicationDefinitionMerged;
-    protected $code;
+    private $application;
+    private $name;
+    private $namespace;
+    private $aliases;
+    private $definition;
+    private $help;
+    private $description;
+    private $ignoreValidationErrors;
+    private $applicationDefinitionMerged;
+    private $code;
+    private $synopsis;
 
     /**
      * Constructor.
@@ -42,6 +45,8 @@ class Command
      * @param string $name The name of the command
      *
      * @throws \LogicException When the command name is empty
+     *
+     * @api
      */
     public function __construct($name = null)
     {
@@ -65,10 +70,24 @@ class Command
      * Sets the application instance for this command.
      *
      * @param Application $application An Application instance
+     *
+     * @api
      */
     public function setApplication(Application $application = null)
     {
         $this->application = $application;
+    }
+
+    /**
+     * Gets the application instance for this command.
+     *
+     * @return Application An Application instance
+     *
+     * @api
+     */
+    public function getApplication()
+    {
+        return $this->application;
     }
 
     /**
@@ -134,9 +153,14 @@ class Command
      *
      * @see setCode()
      * @see execute()
+     *
+     * @api
      */
     public function run(InputInterface $input, OutputInterface $output)
     {
+        // force the creation of the synopsis before the merge with the app definition
+        $this->getSynopsis();
+
         // add the application arguments and options
         $this->mergeApplicationDefinition();
 
@@ -175,6 +199,8 @@ class Command
      * @return Command The current instance
      *
      * @see execute()
+     *
+     * @api
      */
     public function setCode(\Closure $code)
     {
@@ -186,7 +212,7 @@ class Command
     /**
      * Merges the application definition with the command definition.
      */
-    protected function mergeApplicationDefinition()
+    private function mergeApplicationDefinition()
     {
         if (null === $this->application || true === $this->applicationDefinitionMerged) {
             return;
@@ -208,6 +234,8 @@ class Command
      * @param array|Definition $definition An array of argument and option instances or a definition instance
      *
      * @return Command The current instance
+     *
+     * @api
      */
     public function setDefinition($definition)
     {
@@ -226,6 +254,8 @@ class Command
      * Gets the InputDefinition attached to this Command.
      *
      * @return InputDefinition An InputDefinition instance
+     *
+     * @api
      */
     public function getDefinition()
     {
@@ -241,6 +271,8 @@ class Command
      * @param mixed   $default     The default value (for InputArgument::OPTIONAL mode only)
      *
      * @return Command The current instance
+     *
+     * @api
      */
     public function addArgument($name, $mode = null, $description = '', $default = null)
     {
@@ -259,6 +291,8 @@ class Command
      * @param mixed   $default     The default value (must be null for InputOption::VALUE_REQUIRED or self::VALUE_NONE)
      *
      * @return Command The current instance
+     *
+     * @api
      */
     public function addOption($name, $shortcut = null, $mode = null, $description = '', $default = null)
     {
@@ -280,6 +314,8 @@ class Command
      * @return Command The current instance
      *
      * @throws \InvalidArgumentException When command name given is empty
+     *
+     * @api
      */
     public function setName($name)
     {
@@ -304,6 +340,8 @@ class Command
      * Returns the command namespace.
      *
      * @return string The command namespace
+     *
+     * @api
      */
     public function getNamespace()
     {
@@ -314,6 +352,8 @@ class Command
      * Returns the command name
      *
      * @return string The command name
+     *
+     * @api
      */
     public function getName()
     {
@@ -324,6 +364,8 @@ class Command
      * Returns the fully qualified command name.
      *
      * @return string The fully qualified command name
+     *
+     * @api
      */
     public function getFullName()
     {
@@ -336,6 +378,8 @@ class Command
      * @param string $description The description for the command
      *
      * @return Command The current instance
+     *
+     * @api
      */
     public function setDescription($description)
     {
@@ -348,6 +392,8 @@ class Command
      * Returns the description for the command.
      *
      * @return string The description for the command
+     *
+     * @api
      */
     public function getDescription()
     {
@@ -360,6 +406,8 @@ class Command
      * @param string $help The help for the command
      *
      * @return Command The current instance
+     *
+     * @api
      */
     public function setHelp($help)
     {
@@ -372,6 +420,8 @@ class Command
      * Returns the help for the command.
      *
      * @return string The help for the command
+     *
+     * @api
      */
     public function getHelp()
     {
@@ -406,6 +456,8 @@ class Command
      * @param array $aliases An array of aliases for the command
      *
      * @return Command The current instance
+     *
+     * @api
      */
     public function setAliases($aliases)
     {
@@ -418,6 +470,8 @@ class Command
      * Returns the aliases for the command.
      *
      * @return array An array of aliases for the command
+     *
+     * @api
      */
     public function getAliases()
     {
@@ -431,7 +485,11 @@ class Command
      */
     public function getSynopsis()
     {
-        return sprintf('%s %s', $this->getFullName(), $this->definition->getSynopsis());
+        if (null === $this->synopsis) {
+            $this->synopsis = trim(sprintf('%s %s', $this->getFullName(), $this->definition->getSynopsis()));
+        }
+
+        return $this->synopsis;
     }
 
     /**
@@ -442,22 +500,10 @@ class Command
      * @return mixed The helper value
      *
      * @throws \InvalidArgumentException if the helper is not defined
+     *
+     * @api
      */
-    protected function getHelper($name)
-    {
-        return $this->application->getHelperSet()->get($name);
-    }
-
-    /**
-     * Gets a helper instance by name.
-     *
-     * @param string $name The helper name
-     *
-     * @return mixed The helper value
-     *
-     * @throws \InvalidArgumentException if the helper is not defined
-     */
-    public function __get($name)
+    public function getHelper($name)
     {
         return $this->application->getHelperSet()->get($name);
     }

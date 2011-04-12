@@ -7,18 +7,14 @@
     <parameters>
         <parameter key="validator.class">Symfony\Component\Validator\Validator</parameter>
         <parameter key="validator.mapping.class_metadata_factory.class">Symfony\Component\Validator\Mapping\ClassMetadataFactory</parameter>
+        <parameter key="validator.mapping.cache.apc.class">Symfony\Component\Validator\Mapping\Cache\ApcCache</parameter>
+        <parameter key="validator.mapping.cache.prefix" />
         <parameter key="validator.mapping.loader.loader_chain.class">Symfony\Component\Validator\Mapping\Loader\LoaderChain</parameter>
         <parameter key="validator.mapping.loader.static_method_loader.class">Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader</parameter>
         <parameter key="validator.mapping.loader.annotation_loader.class">Symfony\Component\Validator\Mapping\Loader\AnnotationLoader</parameter>
-        <parameter key="validator.mapping.loader.xml_file_loader.class">Symfony\Component\Validator\Mapping\Loader\XmlFileLoader</parameter>
-        <parameter key="validator.mapping.loader.yaml_file_loader.class">Symfony\Component\Validator\Mapping\Loader\YamlFileLoader</parameter>
         <parameter key="validator.mapping.loader.xml_files_loader.class">Symfony\Component\Validator\Mapping\Loader\XmlFilesLoader</parameter>
         <parameter key="validator.mapping.loader.yaml_files_loader.class">Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader</parameter>
-        <parameter key="validator.mapping.loader.static_method_loader.method_name">loadValidatorMetadata</parameter>
         <parameter key="validator.validator_factory.class">Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory</parameter>
-        <parameter key="validator.annotations.namespaces" type="collection">
-            <parameter key="validation">Symfony\Component\Validator\Constraints\</parameter>
-        </parameter>
     </parameters>
 
     <services>
@@ -29,6 +25,11 @@
 
         <service id="validator.mapping.class_metadata_factory" class="%validator.mapping.class_metadata_factory.class%" public="false">
             <argument type="service" id="validator.mapping.loader.loader_chain" />
+            <argument>null</argument>
+        </service>
+
+        <service id="validator.mapping.cache.apc" class="%validator.mapping.cache.apc.class%" public="false">
+            <argument>%validator.mapping.cache.prefix%</argument>
         </service>
 
         <service id="validator.validator_factory" class="%validator.validator_factory.class%" public="false">
@@ -44,9 +45,18 @@
             </argument>
         </service>
 
-        <service id="validator.mapping.loader.static_method_loader" class="%validator.mapping.loader.static_method_loader.class%" public="false">
-            <argument>%validator.mapping.loader.static_method_loader.method_name%</argument>
+        <service id="validator.mapping.loader.static_method_loader" class="%validator.mapping.loader.static_method_loader.class%" public="false" />
+
+        <service id="validator.mapping.loader.annotation_loader" class="%validator.mapping.loader.annotation_loader.class%" public="false">
+            <argument /> <!-- namespaces -->
         </service>
 
+        <service id="validator.mapping.loader.xml_files_loader" class="%validator.mapping.loader.xml_files_loader.class%" public="false">
+            <argument /> <!-- mapping files -->
+        </service>
+
+        <service id="validator.mapping.loader.yaml_files_loader" class="%validator.mapping.loader.yaml_files_loader.class%" public="false">
+            <argument /> <!-- mapping files -->
+        </service>
     </services>
 </container>

@@ -11,9 +11,9 @@
 
 namespace Symfony\Tests\Component\Routing;
 
+use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 
 class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,30 +28,54 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
     {
         $collection = new RouteCollection();
 
+        // defaults and requirements
         $collection->add('foo', new Route(
             '/foo/{bar}',
             array('def' => 'test'),
             array('bar' => 'baz|symfony')
         ));
+        // method requirement
         $collection->add('bar', new Route(
             '/bar/{foo}',
             array(),
             array('_method' => 'GET|head')
         ));
+        // simple
         $collection->add('baz', new Route(
             '/test/baz'
         ));
+        // simple with extension
         $collection->add('baz2', new Route(
             '/test/baz.html'
         ));
+        // trailing slash
         $collection->add('baz3', new Route(
             '/test/baz3/'
         ));
+        // trailing slash with variable
         $collection->add('baz4', new Route(
             '/test/{foo}/'
+        ));
+        // trailing slash and method
+        $collection->add('baz5', new Route(
+            '/test/{foo}/',
+            array(),
+            array('_method' => 'post')
+        ));
+        // complex name
+        $collection->add('baz.baz6', new Route(
+            '/test/{foo}/',
+            array(),
+            array('_method' => 'put')
+        ));
+        // defaults without variable
+        $collection->add('foofoo', new Route(
+            '/foofoo',
+            array('def' => 'test')
         ));
 
         $dumper = new PhpMatcherDumper($collection);
         $this->assertStringEqualsFile(self::$fixturesPath.'/dumper/url_matcher1.php', $dumper->dump(), '->dump() dumps basic routes to the correct PHP file.');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/dumper/url_matcher2.php', $dumper->dump(array('base_class' => 'Symfony\Tests\Component\Routing\Fixtures\RedirectableUrlMatcher')), '->dump() dumps basic routes to the correct PHP file.');
     }
 }

@@ -5,11 +5,12 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="debug.event_dispatcher.class">Symfony\Bundle\FrameworkBundle\Debug\EventDispatcher</parameter>
+        <parameter key="debug.event_dispatcher.class">Symfony\Bundle\FrameworkBundle\Debug\TraceableEventDispatcher</parameter>
     </parameters>
 
     <services>
         <service id="debug.event_dispatcher" class="%debug.event_dispatcher.class%">
+            <tag name="monolog.logger" channel="event" />
             <argument type="service" id="service_container" />
             <argument type="service" id="logger" on-invalid="null" />
         </service>

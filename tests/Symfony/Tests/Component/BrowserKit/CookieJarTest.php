@@ -71,9 +71,9 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider provideGetValuesValues
+     * @dataProvider provideAllValuesValues
      */
-    public function testGetValues($uri, $values)
+    public function testAllValues($uri, $values)
     {
         $cookieJar = new CookieJar();
         $cookieJar->set($cookie1 = new Cookie('foo_nothing', 'foo'));
@@ -82,10 +82,10 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
         $cookieJar->set($cookie4 = new Cookie('foo_domain', 'foo', null, '/', 'example.com'));
         $cookieJar->set($cookie5 = new Cookie('foo_secure', 'foo', null, '/', '', true));
 
-        $this->assertEquals($values, array_keys($cookieJar->getValues($uri)), '->getValues() returns the cookie for a given URI');
+        $this->assertEquals($values, array_keys($cookieJar->allValues($uri)), '->allValues() returns the cookie for a given URI');
     }
 
-    public function provideGetValuesValues()
+    public function provideAllValuesValues()
     {
         return array(
             array('http://www.example.com/', array('foo_nothing', 'foo_domain')),

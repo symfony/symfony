@@ -1,0 +1,427 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Locale\Stub;
+
+use Symfony\Component\Locale\Exception\NotImplementedException;
+use Symfony\Component\Locale\Exception\MethodNotImplementedException;
+
+/**
+ * Provides a stub Locale for the 'en' locale.
+ *
+ * @author Eriksen Costa <eriksen.costa@infranology.com.br>
+ */
+class StubLocale
+{
+    const DEFAULT_LOCALE = null;
+
+    /** Locale method constants */
+    const ACTUAL_LOCALE = 0;
+    const VALID_LOCALE  = 1;
+
+    /** Language tags constants */
+    const LANG_TAG               = 'language';
+    const EXTLANG_TAG            = 'extlang';
+    const SCRIPT_TAG             = 'script';
+    const REGION_TAG             = 'region';
+    const VARIANT_TAG            = 'variant';
+    const GRANDFATHERED_LANG_TAG = 'grandfathered';
+    const PRIVATE_TAG            = 'private';
+
+    /**
+     * Caches the countries
+     * @var array
+     */
+    protected static $countries = array();
+
+    /**
+     * Caches the languages
+     * @var array
+     */
+    protected static $languages = array();
+
+    /**
+     * Caches the locales
+     * @var array
+     */
+    protected static $locales = array();
+
+    /**
+     * Caches the currencies
+     * @var array
+     */
+    protected static $currencies = array();
+
+    /**
+     * Caches the currencies names
+     * @var array
+     */
+    protected static $currenciesNames = array();
+
+    /**
+     * Returns the country names for a locale
+     *
+     * @param  string $locale            The locale to use for the country names
+     * @return array                     The country names with their codes as keys
+     * @throws InvalidArgumentException  When the locale is different than 'en'
+     */
+    static public function getDisplayCountries($locale = 'en')
+    {
+        return self::getStubData($locale, 'countries', 'region');
+    }
+
+    /**
+     * Returns all available country codes
+     *
+     * @return array  The country codes
+     */
+    static public function getCountries()
+    {
+        return array_keys(self::getDisplayCountries(self::getDefault()));
+    }
+
+    /**
+     * Returns the language names for a locale
+     *
+     * @param  string $locale            The locale to use for the language names
+     * @return array                     The language names with their codes as keys
+     * @throws InvalidArgumentException  When the locale is different than 'en'
+     */
+    static public function getDisplayLanguages($locale)
+    {
+        return self::getStubData($locale, 'languages', 'lang');
+    }
+
+    /**
+     * Returns all available language codes
+     *
+     * @return array  The language codes
+     */
+    static public function getLanguages()
+    {
+        return array_keys(self::getDisplayLanguages(self::getDefault()));
+    }
+
+    /**
+     * Returns the locale names for a locale
+     *
+     * @param  string $locale            The locale to use for the locale names
+     * @return array                     The locale names with their codes as keys
+     * @throws InvalidArgumentException  When the locale is different than 'en'
+     */
+    static public function getDisplayLocales($locale)
+    {
+        return self::getStubData($locale, 'locales', 'names');
+    }
+
+    /**
+     * Returns all available locale codes
+     *
+     * @return array  The locale codes
+     */
+    static public function getLocales()
+    {
+        return array_keys(self::getDisplayLocales(self::getDefault()));
+    }
+
+    /**
+     * Returns the currencies data
+     *
+     * @return array  The currencies data
+     */
+    static public function getCurrenciesData($locale)
+    {
+        return self::getStubData($locale, 'currencies', 'curr');
+    }
+
+    /**
+     *  Returns the currencies names for a locale
+     *
+     * @param  string $locale            The locale to use for the currencies names
+     * @return array                     The currencies names with their codes as keys
+     * @throws InvalidArgumentException  When the locale is different than 'en'
+     */
+    static public function getDisplayCurrencies($locale)
+    {
+        $currencies = self::getCurrenciesData($locale);
+
+        if (!empty(self::$currenciesNames)) {
+            return self::$currenciesNames;
+        }
+
+        foreach ($currencies as $code => $data) {
+            self::$currenciesNames[$code] = $data['name'];
+        }
+
+        return self::$currenciesNames;
+    }
+
+    /**
+     * Returns all available currencies codes
+     *
+     * @return array  The currencies codes
+     */
+    static public function getCurrencies()
+    {
+        return array_keys(self::getCurrenciesData(self::getDefault()));
+    }
+
+    /**
+     * Returns the best available locale based on HTTP "Accept-Language" header according to RFC 2616
+     *
+     * @param  string $header     The string containing the "Accept-Language" header value
+     * @return string             The corresponding locale code
+     * @see    http://www.php.net/manual/en/locale.acceptfromhttp.php
+     * @throws MethodNotImplementedException
+     */
+    static public function acceptFromHttp($header)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    /**
+     * Returns a correctly ordered and delimited locale code
+     *
+     * @param  array   $subtags   A keyed array where the keys identify the particular locale code subtag
+     * @return string             The corresponding locale code
+     * @see    http://www.php.net/manual/en/locale.composelocale.php
+     * @throws MethodNotImplementedException
+     */
+    static public function composeLocale(array $subtags)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    /**
+     * Checks if a language tag filter matches with locale
+     *
+     * @param  string   $langtag  The language tag to check
+     * @param  string   $locale   The language range to check against
+     * @return string             The corresponding locale code
+     * @see    http://www.php.net/manual/en/locale.filtermatches.php
+     * @throws MethodNotImplementedException
+     */
+    static public function filterMatches($langtag, $locale, $canonicalize = false)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    /**
+     * Returns the variants for the input locale
+     *
+     * @param  string   $locale   The locale to extract the variants from
+     * @return array              The locale variants
+     * @see    http://www.php.net/manual/en/locale.getallvariants.php
+     * @throws MethodNotImplementedException
+     */
+    static public function getAllVariants($locale)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    /**
+     * Returns the default locale
+     *
+     * @return string             The default locale code. Always returns 'en'
+     * @see    http://www.php.net/manual/en/locale.getdefault.php
+     * @throws MethodNotImplementedException
+     */
+    static public function getDefault()
+    {
+        return 'en';
+    }
+
+    /**
+     * Returns the localized display name for the locale language
+     *
+     * @param  string  $locale    The locale code to return the display language from
+     * @param  string  $inLocale  Optional format locale code to use to display the language name
+     * @return string             The localized language display name
+     * @see    http://www.php.net/manual/en/locale.getdisplaylanguage.php
+     * @throws MethodNotImplementedException
+     */
+    static public function getDisplayLanguage($locale, $inLocale = null)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    /**
+     * Returns the localized display name for the locale
+     *
+     * @param  string  $locale    The locale code to return the display locale name from
+     * @param  string  $inLocale  Optional format locale code to use to display the locale name
+     * @return string             The localized locale display name
+     * @see    http://www.php.net/manual/en/locale.getdisplayname.php
+     * @throws MethodNotImplementedException
+     */
+    static public function getDisplayName($locale, $inLocale = null)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    /**
+     * Returns the localized display name for the locale region
+     *
+     * @param  string  $locale    The locale code to return the display region from
+     * @param  string  $inLocale  Optional format locale code to use to display the region name
+     * @return string             The localized region display name
+     * @see    http://www.php.net/manual/en/locale.getdisplayregion.php
+     * @throws MethodNotImplementedException
+     */
+    static public function getDisplayRegion($locale, $inLocale = null)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    /**
+     * Returns the localized display name for the locale script
+     *
+     * @param  string  $locale    The locale code to return the display scrit from
+     * @param  string  $inLocale  Optional format locale code to use to display the script name
+     * @return string             The localized script display name
+     * @see    http://www.php.net/manual/en/locale.getdisplayscript.php
+     * @throws MethodNotImplementedException
+     */
+    static public function getDisplayScript($locale, $inLocale = null)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    /**
+     * Returns the localized display name for the locale variant
+     *
+     * @param  string  $locale    The locale code to return the display variant from
+     * @param  string  $inLocale  Optional format locale code to use to display the variant name
+     * @return string             The localized variant display name
+     * @see    http://www.php.net/manual/en/locale.getdisplayvariant.php
+     * @throws MethodNotImplementedException
+     */
+    static public function getDisplayVariant($locale, $inLocale = null)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    /**
+     * Returns the keywords for the locale
+     *
+     * @param  string  $locale    The locale code to extract the keywords from
+     * @return array              Associative array with the extracted variants
+     * @see    http://www.php.net/manual/en/locale.getkeywords.php
+     * @throws MethodNotImplementedException
+     */
+    static public function getKeywords($locale)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    /**
+     * Returns the primary language for the locale
+     *
+     * @param  string  $locale    The locale code to extract the language code from
+     * @return string|null        The extracted language code or null in case of error
+     * @see    http://www.php.net/manual/en/locale.getprimarylanguage.php
+     * @throws MethodNotImplementedException
+     */
+    static public function getPrimaryLanguage($locale)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    /**
+     * Returns the region for the locale
+     *
+     * @param  string  $locale    The locale code to extract the region code from
+     * @return string|null        The extracted region code or null if not present
+     * @see    http://www.php.net/manual/en/locale.getregion.php
+     * @throws MethodNotImplementedException
+     */
+    static public function getRegion($locale)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    /**
+     * Returns the script for the locale
+     *
+     * @param  string  $locale    The locale code to extract the script code from
+     * @return string|null        The extracted script code or null if not present
+     * @see    http://www.php.net/manual/en/locale.getscript.php
+     * @throws MethodNotImplementedException
+     */
+    static public function getScript($locale)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    /**
+     * Returns the closest language tag for the locale
+     *
+     * @param  array   $langtag       A list of the language tags to compare to locale
+     * @param  string  $locale        The locale to use as the language range when matching
+     * @param  bool    $canonicalize  If true, the arguments will be converted to canonical form before matching
+     * @param  string  $default       The locale to use if no match is found
+     * @see    http://www.php.net/manual/en/locale.lookup.php
+     * @throws RuntimeException       When the intl extension is not loaded
+     */
+    static public function lookup(array $langtag, $locale, $canonicalize = false, $default = null)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    /**
+     * Returns an associative array of locale identifier subtags
+     *
+     * @param  string  $locale    The locale code to extract the subtag array from
+     * @return array              Associative arrat with the extracted subtags
+     * @see    http://www.php.net/manual/en/locale.parselocale.php
+     * @throws MethodNotImplementedException
+     */
+    static public function parseLocale($locale)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    /**
+     * Sets the default runtime locale
+     *
+     * @param  string  $locale    The locale code
+     * @return bool               true on success or false on failure
+     * @see    http://www.php.net/manual/en/locale.parselocale.php
+     * @throws MethodNotImplementedException
+     */
+    static public function setDefault($locale)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    /**
+     * Returns the stub ICU data
+     *
+     * @param  string  $locale           The locale code
+     * @param  string  $cacheVariable    The name of a static attribute to cache the data to
+     * @param  string  $stubDataDir      The stub data directory name
+     * @return array
+     * @throws InvalidArgumentException  When the locale is different than 'en'
+     */
+    static private function getStubData($locale, $cacheVariable, $stubDataDir)
+    {
+        if ('en' != $locale) {
+            $message = 'Only the \'en\' locale is supported. '.NotImplementedException::INTL_INSTALL_MESSAGE;
+            throw new \InvalidArgumentException($message);
+        }
+
+        if (empty(self::${$cacheVariable})) {
+            self::${$cacheVariable} = include __DIR__.'/../Resources/data/stub/'.$stubDataDir.'/en.php';
+        }
+
+        return self::${$cacheVariable};
+    }
+}

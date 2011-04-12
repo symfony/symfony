@@ -26,7 +26,7 @@ namespace Symfony\Component\DependencyInjection;
  */
 class Variable
 {
-    protected $name;
+    private $name;
 
     /**
      * Constructor

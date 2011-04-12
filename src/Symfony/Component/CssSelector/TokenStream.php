@@ -21,11 +21,11 @@ namespace Symfony\Component\CssSelector;
  */
 class TokenStream
 {
-    protected $used;
-    protected $tokens;
-    protected $source;
-    protected $peeked;
-    protected $peeking;
+    private $used;
+    private $tokens;
+    private $source;
+    private $peeked;
+    private $peeking;
 
     /**
      * Constructor.

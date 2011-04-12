@@ -17,7 +17,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class EmailValidator extends ConstraintValidator
 {
-    const PATTERN = '/^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/i';
 
     public function isValid($value, Constraint $constraint)
     {
@@ -29,9 +28,9 @@ class EmailValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        $value = (string)$value;
+        $value = (string) $value;
 
-        if (!preg_match(self::PATTERN, $value)) {
+        if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;

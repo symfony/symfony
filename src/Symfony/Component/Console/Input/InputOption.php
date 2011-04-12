@@ -15,6 +15,8 @@ namespace Symfony\Component\Console\Input;
  * Represents a command line option.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class InputOption
 {
@@ -23,11 +25,11 @@ class InputOption
     const VALUE_OPTIONAL = 4;
     const VALUE_IS_ARRAY = 8;
 
-    protected $name;
-    protected $shortcut;
-    protected $mode;
-    protected $default;
-    protected $description;
+    private $name;
+    private $shortcut;
+    private $mode;
+    private $default;
+    private $description;
 
     /**
      * Constructor.
@@ -39,6 +41,8 @@ class InputOption
      * @param mixed   $default     The default value (must be null for self::VALUE_REQUIRED or self::VALUE_NONE)
      *
      * @throws \InvalidArgumentException If option mode is invalid or incompatible
+     *
+     * @api
      */
     public function __construct($name, $shortcut = null, $mode = null, $description = '', $default = null)
     {

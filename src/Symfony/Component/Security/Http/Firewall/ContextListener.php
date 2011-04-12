@@ -11,17 +11,19 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\EventDispatcher\EventInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Events;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\Exception\UnsupportedAccountException;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\SecurityContext;
-use Symfony\Component\Security\Core\User\AccountInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * ContextListener manages the SecurityContext persistence through a session.
@@ -31,12 +33,12 @@ use Symfony\Component\Security\Core\User\AccountInterface;
  */
 class ContextListener implements ListenerInterface
 {
-    protected $context;
-    protected $contextKey;
-    protected $logger;
-    protected $userProviders;
+    private $context;
+    private $contextKey;
+    private $logger;
+    private $userProviders;
 
-    public function __construct(SecurityContext $context, array $userProviders, $contextKey, LoggerInterface $logger = null)
+    public function __construct(SecurityContext $context, array $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         if (empty($contextKey)) {
             throw new \InvalidArgumentException('$contextKey must not be empty.');
@@ -45,38 +47,20 @@ class ContextListener implements ListenerInterface
         $this->context = $context;
         $this->userProviders = $userProviders;
         $this->contextKey = $contextKey;
-        $this->logger = $logger;
-    }
 
-    /**
-     * Registers a core.security listener to load the SecurityContext from the
-     * session.
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'read'), 0);
-        $dispatcher->connect('core.response', array($this, 'write'), 0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->disconnect('core.response', array($this, 'write'));
+        if (null !== $dispatcher) {
+            $dispatcher->addListener(Events::onCoreResponse, $this);
+        }
     }
 
     /**
      * Reads the SecurityContext from the session.
      *
-     * @param EventInterface $event An EventInterface instance
+     * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public function read(EventInterface $event)
+    public function handle(GetResponseEvent $event)
     {
-        $request = $event->get('request');
+        $request = $event->getRequest();
 
         $session = $request->hasSession() ? $request->getSession() : null;
 
@@ -89,7 +73,7 @@ class ContextListener implements ListenerInterface
 
             $token = unserialize($token);
 
-            if (null !== $token && false === $token->isImmutable()) {
+            if (null !== $token) {
                 $token = $this->refreshUser($token);
             }
 
@@ -100,29 +84,27 @@ class ContextListener implements ListenerInterface
     /**
      * Writes the SecurityContext to the session.
      *
-     * @param EventInterface $event An EventInterface instance
+     * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
-    public function write(EventInterface $event, Response $response)
+    public function onCoreResponse(FilterResponseEvent $event)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
-            return $response;
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+            return;
         }
 
         if (null === $token = $this->context->getToken()) {
-            return $response;
+            return;
         }
 
         if (null === $token || $token instanceof AnonymousToken) {
-            return $response;
+            return;
         }
 
         if (null !== $this->logger) {
             $this->logger->debug('Write SecurityContext in the session');
         }
 
-        $event->get('request')->getSession()->set('_security_'.$this->contextKey, serialize($token));
-
-        return $response;
+        $event->getRequest()->getSession()->set('_security_'.$this->contextKey, serialize($token));
     }
 
     /**
@@ -132,10 +114,10 @@ class ContextListener implements ListenerInterface
      *
      * @return TokenInterface|null
      */
-    protected function refreshUser(TokenInterface $token)
+    private function refreshUser(TokenInterface $token)
     {
         $user = $token->getUser();
-        if (!$user instanceof AccountInterface) {
+        if (!$user instanceof UserInterface) {
             return $token;
         }
 
@@ -145,25 +127,18 @@ class ContextListener implements ListenerInterface
 
         foreach ($this->userProviders as $provider) {
             try {
-                $cUser = $provider->loadUserByAccount($user);
-
-                $token->setRoles($cUser->getRoles());
-                $token->setUser($cUser);
-
-                if (false === $cUser->equals($user)) {
-                    $token->setAuthenticated(false);
-                }
+                $token->setUser($provider->loadUser($user));
 
                 if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('Username "%s" was reloaded from user provider.', $user));
+                    $this->logger->debug(sprintf('Username "%s" was reloaded from user provider.', $user->getUsername()));
                 }
 
                 return $token;
-            } catch (UnsupportedAccountException $unsupported) {
+            } catch (UnsupportedUserException $unsupported) {
                 // let's try the next user provider
             } catch (UsernameNotFoundException $notFound) {
                 if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('Username "%s" could not be found.', $user));
+                    $this->logger->debug(sprintf('Username "%s" could not be found.', $user->getUsername()));
                 }
 
                 return null;

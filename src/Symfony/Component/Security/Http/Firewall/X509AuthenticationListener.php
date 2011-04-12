@@ -16,6 +16,7 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterfac
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * X509 authentication listener.
@@ -24,12 +25,12 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
  */
 class X509AuthenticationListener extends AbstractPreAuthenticatedListener
 {
-    protected $userKey;
-    protected $credentialKey;
+    private $userKey;
+    private $credentialKey;
 
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, $userKey = 'SSL_CLIENT_S_DN_Email', $credentialKey = 'SSL_CLIENT_S_DN', LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, $userKey = 'SSL_CLIENT_S_DN_Email', $credentialKey = 'SSL_CLIENT_S_DN', LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
-        parent::__construct($securityContext, $authenticationManager, $providerKey, $logger);
+        parent::__construct($securityContext, $authenticationManager, $providerKey, $logger, $dispatcher);
 
         $this->userKey = $userKey;
         $this->credentialKey = $credentialKey;

@@ -33,15 +33,15 @@ class GenerateDocumentsDoctrineODMCommand extends DoctrineODMCommand
             ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to initialize the document or documents in.')
             ->addOption('document', null, InputOption::VALUE_OPTIONAL, 'The document class to initialize (shortname without namespace).')
             ->setHelp(<<<EOT
-The <info>doctrine:generate:documents</info> command generates document classes and method stubs from your mapping information:
+The <info>doctrine:mongodb:generate:documents</info> command generates document classes and method stubs from your mapping information:
 
 You have to limit generation of documents to an individual bundle:
 
-  <info>./app/console doctrine:generate:documents MyCustomBundle</info>
+  <info>./app/console doctrine:mongodb:generate:documents MyCustomBundle</info>
 
 Alternatively, you can limit generation to a single document within a bundle:
 
-  <info>./app/console doctrine:generate:documents "MyCustomBundle" --document="User"</info>
+  <info>./app/console doctrine:mongodb:generate:documents "MyCustomBundle" --document="User"</info>
 
 You have to specify the shortname (without namespace) of the document you want to filter for.
 EOT

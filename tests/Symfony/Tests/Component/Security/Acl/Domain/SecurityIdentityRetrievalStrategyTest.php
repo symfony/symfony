@@ -109,7 +109,7 @@ class SecurityIdentityRetrievalStrategyTest extends \PHPUnit_Framework_TestCase
 
     protected function getAccount($username, $class)
     {
-        $account = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface', array(), array(), $class);
+        $account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface', array(), array(), $class);
         $account
             ->expects($this->any())
             ->method('getUsername')

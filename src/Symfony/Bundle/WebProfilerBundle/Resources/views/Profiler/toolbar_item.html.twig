@@ -1,0 +1,9 @@
+{% if link %}
+    {% set icon %}
+        <a style="text-decoration: none; margin: 0; padding: 0;" href="{{ path('_profiler', { 'token': token, 'panel': name }) }}">{{ icon }}</a>
+    {% endset %}
+{% endif %}
+<span style="white-space:nowrap; color:#2f2f2f; display:inline-block; min-height:24px; border-right:1px solid #cdcdcd; padding:5px 7px 5px 4px; ">
+     {{ icon|default('') }}
+     {{ text|default('') }}
+</span>

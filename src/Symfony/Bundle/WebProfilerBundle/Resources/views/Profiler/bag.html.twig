@@ -6,7 +6,7 @@
     {% for key in bag.keys %}
         <tr>
             <th>{{ key }}</th>
-            <td>{{ bag.get(key)|dump }}</td>
+            <td>{{ bag.get(key)|yaml_dump }}</td>
         </tr>
     {% endfor %}
 </table>

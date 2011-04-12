@@ -25,10 +25,14 @@ class ContainerTest extends TestCase
         $container = new ContainerBuilder(new ParameterBag(array(
             'kernel.bundles'     => array('YamlBundle' => 'DoctrineMongoDBBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle\YamlBundle'),
             'kernel.cache_dir'   => sys_get_temp_dir(),
+            'kernel.debug'       => false,
         )));
         $loader = new DoctrineMongoDBExtension();
         $container->registerExtension($loader);
-        $loader->load(array('mappings' => array('YamlBundle' => array())), $container);
+
+        $configs = array();
+        $configs[] = array('connections' => array('default' => array()), 'document_managers' => array('default' => array('mappings' => array('YamlBundle' => array()))));
+        $loader->load($configs, $container);
 
         return $container;
     }

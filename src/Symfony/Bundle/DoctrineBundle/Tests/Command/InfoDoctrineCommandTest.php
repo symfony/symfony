@@ -7,6 +7,8 @@ use Symfony\Bundle\DoctrineBundle\Command\InfoDoctrineCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\StringInput;
 
+require_once __DIR__.'/../DependencyInjection/Fixtures/Bundles/YamlBundle/Entity/Test.php';
+
 class InfoDoctrineCommandTest extends TestCase
 {
     public function testAnnotationsBundle()
@@ -15,7 +17,7 @@ class InfoDoctrineCommandTest extends TestCase
         $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
         $output->expects($this->at(0))
                ->method('write')
-               ->with($this->equalTo("Found 1 entities mapped in entity manager 'default':"), $this->equalTo(true));
+               ->with($this->equalTo("Found <info>1</info> entities mapped in entity manager <info>default</info>:\n"), $this->equalTo(true));
         $output->expects($this->at(1))
                ->method('write')
                ->with($this->equalTo("<info>[OK]</info>   Fixtures\Bundles\YamlBundle\Entity\Test"), $this->equalTo(true));

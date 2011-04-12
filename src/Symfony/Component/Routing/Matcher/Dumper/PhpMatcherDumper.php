@@ -39,96 +39,119 @@ class PhpMatcherDumper extends MatcherDumper
             'base_class' => 'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
         ), $options);
 
+        // trailing slash support is only enabled if we know how to redirect the user
+        $interfaces = class_implements($options['base_class']);
+        $supportsTrailingSlash = isset($interfaces['Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface']);
+
         return
             $this->startClass($options['class'], $options['base_class']).
             $this->addConstructor().
-            $this->addMatcher().
+            $this->addMatcher($supportsTrailingSlash).
             $this->endClass()
         ;
     }
 
-    protected function addMatcher()
+    private function addMatcher($supportsTrailingSlash)
     {
         $code = array();
 
-        foreach ($this->routes->all() as $name => $route) {
+        foreach ($this->getRoutes()->all() as $name => $route) {
             $compiledRoute = $route->compile();
-
             $conditions = array();
-
-            if ($req = $route->getRequirement('_method')) {
-                $conditions[] = sprintf("isset(\$this->context['method']) && preg_match('#^(%s)$#xi', \$this->context['method'])", $req);
-            }
-
             $hasTrailingSlash = false;
+            $matches = false;
             if (!count($compiledRoute->getVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#', $compiledRoute->getRegex(), $m)) {
-                if (substr($m['url'], -1) === '/') {
-                    $conditions[] = sprintf("rtrim(\$url, '/') === '%s'", rtrim(str_replace('\\', '', $m['url']), '/'));
+                if ($supportsTrailingSlash && substr($m['url'], -1) === '/') {
+                    $conditions[] = sprintf("rtrim(\$pathinfo, '/') === '%s'", rtrim(str_replace('\\', '', $m['url']), '/'));
                     $hasTrailingSlash = true;
                 } else {
-                    $conditions[] = sprintf("\$url === '%s'", str_replace('\\', '', $m['url']));
+                    $conditions[] = sprintf("\$pathinfo === '%s'", str_replace('\\', '', $m['url']));
                 }
-
-                $matches = 'array()';
             } else {
                 if ($compiledRoute->getStaticPrefix()) {
-                    $conditions[] = sprintf("0 === strpos(\$url, '%s')", $compiledRoute->getStaticPrefix());
+                    $conditions[] = sprintf("0 === strpos(\$pathinfo, '%s')", $compiledRoute->getStaticPrefix());
                 }
 
                 $regex = $compiledRoute->getRegex();
-                if ($pos = strpos($regex, '/$')) {
-                    $regex = substr($regex, 0, $pos) . '/?$' . substr($regex, $pos+2);
-                    $conditions[] = sprintf("preg_match('%s', \$url, \$matches)", $regex);
+                if ($supportsTrailingSlash && $pos = strpos($regex, '/$')) {
+                    $regex = substr($regex, 0, $pos).'/?$'.substr($regex, $pos + 2);
                     $hasTrailingSlash = true;
-                } else {
-                    $conditions[] = sprintf("preg_match('%s', \$url, \$matches)", $regex);
                 }
+                $conditions[] = sprintf("preg_match('%s', \$pathinfo, \$matches)", $regex);
 
-                $matches = '$matches';
+                $matches = true;
             }
 
             $conditions = implode(' && ', $conditions);
 
+            $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);
+
             $code[] = <<<EOF
+        // $name
         if ($conditions) {
 EOF;
 
+            if ($req = $route->getRequirement('_method')) {
+                $req = implode('\', \'', array_map('strtolower', explode('|', $req)));
+                $code[] = <<<EOF
+            if (isset(\$this->context['method']) && !in_array(strtolower(\$this->context['method']), array('$req'))) {
+                \$allow = array_merge(\$allow, array('$req'));
+                goto $gotoname;
+            }
+EOF;
+            }
+
             if ($hasTrailingSlash) {
                 $code[] = sprintf(<<<EOF
-            if (substr(\$url, -1) !== '/') {
-                return array('_controller' => 'Symfony\\Bundle\\FrameworkBundle\\Controller\\RedirectController::urlRedirectAction', 'url' => \$this->context['base_url'].\$url.'/', 'permanent' => true, '_route' => '%s');
+            if (substr(\$pathinfo, -1) !== '/') {
+                return \$this->redirect(\$pathinfo.'/', '%s');
             }
 EOF
-            , $name);
+                , $name);
             }
 
-            $code[] = sprintf(<<<EOF
-            return array_merge(\$this->mergeDefaults($matches, %s), array('_route' => '%s'));
-        }
+            // optimize parameters array
+            if (true === $matches && $compiledRoute->getDefaults()) {
+                $code[] = sprintf("            return array_merge(\$this->mergeDefaults(\$matches, %s), array('_route' => '%s'));"
+                    , str_replace("\n", '', var_export($compiledRoute->getDefaults(), true)), $name);
+            } elseif (true === $matches) {
+                $code[] = sprintf("            \$matches['_route'] = '%s';\n            return \$matches;", $name);
+            } elseif ($compiledRoute->getDefaults()) {
+                $code[] = sprintf('            return %s;', str_replace("\n", '', var_export(array_merge($compiledRoute->getDefaults(), array('_route' => $name)), true)));
+            } else {
+                $code[] = sprintf("            return array('_route' => '%s');", $name);
+            }
+            $code[] = "        }";
 
-EOF
-            , str_replace("\n", '', var_export($compiledRoute->getDefaults(), true)), $name);
+            if ($req) {
+                $code[] = "        $gotoname:";
+            }
+
+            $code[] = '';
         }
 
         $code = implode("\n", $code);
 
         return <<<EOF
 
-    public function match(\$url)
+    public function match(\$pathinfo)
     {
-        \$url = \$this->normalizeUrl(\$url);
+        \$allow = array();
 
 $code
-        return false;
+        throw 0 < count(\$allow) ? new MethodNotAllowedException(array_unique(\$allow)) : new NotFoundException();
     }
 
 EOF;
     }
 
-    protected function startClass($class, $baseClass)
+    private function startClass($class, $baseClass)
     {
         return <<<EOF
 <?php
+
+use Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Matcher\Exception\NotFoundException;
 
 /**
  * $class
@@ -142,7 +165,7 @@ class $class extends $baseClass
 EOF;
     }
 
-    protected function addConstructor()
+    private function addConstructor()
     {
         return <<<EOF
     /**
@@ -157,7 +180,7 @@ EOF;
 EOF;
     }
 
-    protected function endClass()
+    private function endClass()
     {
         return <<<EOF
 }

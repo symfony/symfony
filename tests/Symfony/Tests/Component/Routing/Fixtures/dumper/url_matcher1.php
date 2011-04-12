@@ -1,5 +1,8 @@
 <?php
 
+use Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Matcher\Exception\NotFoundException;
+
 /**
  * ProjectUrlMatcher
  *
@@ -17,40 +20,74 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         $this->defaults = $defaults;
     }
 
-    public function match($url)
+    public function match($pathinfo)
     {
-        $url = $this->normalizeUrl($url);
+        $allow = array();
 
-        if (0 === strpos($url, '/foo') && preg_match('#^/foo/(?P<bar>baz|symfony)$#x', $url, $matches)) {
+        // foo
+        if (0 === strpos($pathinfo, '/foo') && preg_match('#^/foo/(?P<bar>baz|symfony)$#x', $pathinfo, $matches)) {
             return array_merge($this->mergeDefaults($matches, array (  'def' => 'test',)), array('_route' => 'foo'));
         }
 
-        if (isset($this->context['method']) && preg_match('#^(GET|head)$#xi', $this->context['method']) && 0 === strpos($url, '/bar') && preg_match('#^/bar/(?P<foo>[^/\.]+?)$#x', $url, $matches)) {
-            return array_merge($this->mergeDefaults($matches, array ()), array('_route' => 'bar'));
-        }
-
-        if ($url === '/test/baz') {
-            return array_merge($this->mergeDefaults(array(), array ()), array('_route' => 'baz'));
-        }
-
-        if ($url === '/test/baz.html') {
-            return array_merge($this->mergeDefaults(array(), array ()), array('_route' => 'baz2'));
-        }
-
-        if (rtrim($url, '/') === '/test/baz3') {
-            if (substr($url, -1) !== '/') {
-                return array('_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction', 'url' => $this->context['base_url'].$url.'/', 'permanent' => true, '_route' => 'baz3');
+        // bar
+        if (0 === strpos($pathinfo, '/bar') && preg_match('#^/bar/(?P<foo>[^/\.]+?)$#x', $pathinfo, $matches)) {
+            if (isset($this->context['method']) && !in_array(strtolower($this->context['method']), array('get', 'head'))) {
+                $allow = array_merge($allow, array('get', 'head'));
+                goto not_bar;
             }
-            return array_merge($this->mergeDefaults(array(), array ()), array('_route' => 'baz3'));
+            $matches['_route'] = 'bar';
+            return $matches;
+        }
+        not_bar:
+
+        // baz
+        if ($pathinfo === '/test/baz') {
+            return array('_route' => 'baz');
         }
 
-        if (0 === strpos($url, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/?$#x', $url, $matches)) {
-            if (substr($url, -1) !== '/') {
-                return array('_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction', 'url' => $this->context['base_url'].$url.'/', 'permanent' => true, '_route' => 'baz4');
+        // baz2
+        if ($pathinfo === '/test/baz.html') {
+            return array('_route' => 'baz2');
+        }
+
+        // baz3
+        if ($pathinfo === '/test/baz3/') {
+            return array('_route' => 'baz3');
+        }
+
+        // baz4
+        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/$#x', $pathinfo, $matches)) {
+            $matches['_route'] = 'baz4';
+            return $matches;
+        }
+
+        // baz5
+        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/$#x', $pathinfo, $matches)) {
+            if (isset($this->context['method']) && !in_array(strtolower($this->context['method']), array('post'))) {
+                $allow = array_merge($allow, array('post'));
+                goto not_baz5;
             }
-            return array_merge($this->mergeDefaults($matches, array ()), array('_route' => 'baz4'));
+            $matches['_route'] = 'baz5';
+            return $matches;
+        }
+        not_baz5:
+
+        // baz.baz6
+        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/$#x', $pathinfo, $matches)) {
+            if (isset($this->context['method']) && !in_array(strtolower($this->context['method']), array('put'))) {
+                $allow = array_merge($allow, array('put'));
+                goto not_bazbaz6;
+            }
+            $matches['_route'] = 'baz.baz6';
+            return $matches;
+        }
+        not_bazbaz6:
+
+        // foofoo
+        if ($pathinfo === '/foofoo') {
+            return array (  'def' => 'test',  '_route' => 'foofoo',);
         }
 
-        return false;
+        throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new NotFoundException();
     }
 }

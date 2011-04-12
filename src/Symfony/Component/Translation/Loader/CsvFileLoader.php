@@ -17,21 +17,30 @@ use Symfony\Component\Config\Resource\FileResource;
  * CsvFileLoader loads translations from CSV files.
  *
  * @author Saša Stamenković <umpirsky@gmail.com>
+ *
+ * @api
  */
 class CsvFileLoader extends ArrayLoader implements LoaderInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @api
      */
     public function load($resource, $locale, $domain = 'messages')
     {
         $messages = array();
-        $file = @fopen($resource, 'rb');
-        if (!$file) {
+        
+        try {
+            $file = new \SplFileObject($resource, 'rb');
+        } catch(\RuntimeException $e) {
             throw new \InvalidArgumentException(sprintf('Error opening file "%s".', $resource));
         }
+        
+        $file->setFlags(\SplFileObject::READ_CSV | \SplFileObject::SKIP_EMPTY);
+        $file->setCsvControl(';');
 
-        while (($data = fgetcsv($file, 0, ';')) !== false) {
+        foreach($file as $data) {
             if (substr($data[0], 0, 1) === '#') {
                 continue;
             }

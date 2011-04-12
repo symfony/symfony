@@ -16,8 +16,8 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface
 use Symfony\Component\Security\Http\AccessMap;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Events;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -28,11 +28,11 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class AccessListener implements ListenerInterface
 {
-    protected $context;
-    protected $accessDecisionManager;
-    protected $map;
-    protected $authManager;
-    protected $logger;
+    private $context;
+    private $accessDecisionManager;
+    private $map;
+    private $authManager;
+    private $logger;
 
     public function __construct(SecurityContext $context, AccessDecisionManagerInterface $accessDecisionManager, AccessMap $map, AuthenticationManagerInterface $authManager, LoggerInterface $logger = null)
     {
@@ -44,35 +44,17 @@ class AccessListener implements ListenerInterface
     }
 
     /**
-     * Registers a core.security listener to enforce authorization rules.
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
-    }
-
-    /**
      * Handles access authorization.
      *
-     * @param EventInterface $event An EventInterface instance
+     * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public function handle(EventInterface $event)
+    public function handle(GetResponseEvent $event)
     {
         if (null === $token = $this->context->getToken()) {
             throw new AuthenticationCredentialsNotFoundException('A Token was not found in the SecurityContext.');
         }
 
-        $request = $event->get('request');
+        $request = $event->getRequest();
 
         list($attributes, $channel) = $this->map->getPatterns($request);
 

@@ -65,17 +65,19 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
                 'Bar' => "Test",
                 '@Type' => 'test'
             ),
-            'föo_bär' => '',
-            "Bar" => array(1,2,3)
+            'föo_bär' => 'a',
+            "Bar" => array(1,2,3),
+            'a' => 'b',
         );
         $expected = '<?xml version="1.0"?>'."\n".
             '<response>'.
             '<foo-bar id="1" name="Bar"/>'.
             '<Foo Type="test"><Bar><![CDATA[Test]]></Bar></Foo>'.
-            '<föo_bär><![CDATA[]]></föo_bär>'.
+            '<föo_bär><![CDATA[a]]></föo_bär>'.
             '<Bar>1</Bar>'.
             '<Bar>2</Bar>'.
             '<Bar>3</Bar>'.
+            '<a><![CDATA[b]]></a>'.
             '</response>'."\n";
         $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
     }
@@ -84,16 +86,16 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
     {
         $obj = new ScalarDummy;
         $obj->xmlFoo = array(
-            'foo-bar' => '',
-            'foo_bar' => '',
-            'föo_bär' => '',
+            'foo-bar' => 'a',
+            'foo_bar' => 'a',
+            'föo_bär' => 'a',
         );
 
         $expected = '<?xml version="1.0"?>'."\n".
             '<response>'.
-            '<foo-bar><![CDATA[]]></foo-bar>'.
-            '<foo_bar><![CDATA[]]></foo_bar>'.
-            '<föo_bär><![CDATA[]]></föo_bär>'.
+            '<foo-bar><![CDATA[a]]></foo-bar>'.
+            '<foo_bar><![CDATA[a]]></foo_bar>'.
+            '<föo_bär><![CDATA[a]]></föo_bär>'.
             '</response>'."\n";
 
         $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));

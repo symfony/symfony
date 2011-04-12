@@ -21,10 +21,11 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class UrlGenerator implements UrlGeneratorInterface
 {
-    protected $routes;
     protected $defaults;
     protected $context;
-    protected $cache;
+
+    private $routes;
+    private $cache;
 
     /**
      * Constructor.
@@ -62,7 +63,7 @@ class UrlGenerator implements UrlGeneratorInterface
      *
      * @throws \InvalidArgumentException When route doesn't exist
      */
-    public function generate($name, array $parameters, $absolute = false)
+    public function generate($name, array $parameters = array(), $absolute = false)
     {
         if (null === $route = $this->routes->get($name)) {
             throw new \InvalidArgumentException(sprintf('Route "%s" does not exist.', $name));
@@ -98,8 +99,8 @@ class UrlGenerator implements UrlGeneratorInterface
                         throw new \InvalidArgumentException(sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $requirements[$token[3]], $tparams[$token[3]]));
                     }
 
-                    // %2F is not valid in a URL, so we double encode it
-                    $url = $token[1].str_replace('%2F', '%252F', urlencode($tparams[$token[3]])).$url;
+                    // %2F is not valid in a URL, so we don't encode it (which is fine as the requirements explicitely allowed it)
+                    $url = $token[1].str_replace('%2F', '/', urlencode($tparams[$token[3]])).$url;
                     $optional = false;
                 }
             } elseif ('text' === $token[0]) {

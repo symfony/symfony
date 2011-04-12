@@ -41,6 +41,7 @@ class TranslationExtension extends \Twig_Extension
     {
         return array(
             'trans' => new \Twig_Filter_Method($this, 'trans'),
+            'transchoice' => new \Twig_Filter_Method($this, 'transchoice'),
         );
     }
 
@@ -65,6 +66,11 @@ class TranslationExtension extends \Twig_Extension
     public function trans($message, array $arguments = array(), $domain = "messages")
     {
         return $this->translator->trans($message, $arguments, $domain);
+    }
+
+    public function transchoice($message, $count, array $arguments = array(), $domain = "messages")
+    {
+        return $this->translator->transChoice($message, $count, $arguments, $domain);
     }
 
     /**

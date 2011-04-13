@@ -15,8 +15,8 @@
         <app:templating assets-version="SomeVersionScheme" cache-warmer="true" cache="/path/to/cache" >
             <app:loader>loader.foo</app:loader>
             <app:loader>loader.bar</app:loader>
-            <app:engine id="php" />
-            <app:engine id="twig" />
+            <app:engine>php</app:engine>
+            <app:engine>twig</app:engine>
             <app:assets-base-url>http://cdn.example.com</app:assets-base-url>
             <app:package name="images" version="1.0.0">
                 <app:base-url>http://images1.example.com</app:base-url>

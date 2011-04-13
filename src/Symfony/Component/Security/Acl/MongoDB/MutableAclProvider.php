@@ -392,6 +392,49 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     }
 
     /**
+     * This processes changes on an ACE related property (classFieldAces, or objectFieldAces).
+     *
+     * @param string $name
+     * @param array $changes
+     * @return void
+     */
+    private function updateFieldAceProperty($name, array $changes)
+    {
+        $currentIds = array();
+        foreach ($changes[1] as $field => $new) {
+            for ($i = 0, $c = count($new); $i < $c; $i++) {
+                $ace = $new[$i];
+
+                if (null === $ace->getId()) {
+                    $sid = $this->getSecurityIdentityQuery($ace->getSecurityIdentity());
+
+                    $objectIdentityId = $name === 'classFieldAces' ? null : $ace->getAcl()->getId();
+
+                    $aceId = (string)$this->insertAccessControlEntry($objectIdentityId, $field, $i, $sid, $ace->getStrategy(), $ace->getMask(), $ace->isGranting(), $ace->isAuditSuccess(), $ace->isAuditFailure());
+                    $this->loadedAces[$aceId] = $ace;
+
+                    $aceIdProperty = new \ReflectionProperty('Symfony\Component\Security\Acl\Domain\Entry', 'id');
+                    $aceIdProperty->setAccessible(true);
+                    $aceIdProperty->setValue($ace, $aceId);
+                } else {
+                    $currentIds[$ace->getId()] = true;
+                }
+            }
+        }
+
+        foreach ($changes[0] as $old) {
+            for ($i = 0, $c = count($old); $i < $c; $i++) {
+                $ace = $old[$i];
+
+                if (!isset($currentIds[$ace->getId()])) {
+                    $this->deleteAccessControlEntry($ace->getId());
+                    unset($this->loadedAces[$ace->getId()]);
+                }
+            }
+        }
+    }
+
+    /**
      * This processes changes on an ACE related property (classAces, or objectAces).
      *
      * @param string $name

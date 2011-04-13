@@ -192,9 +192,9 @@ abstract class Kernel implements KernelInterface
 
         if (true === $first) {
             return $this->bundleMap[$name][0];
-        } elseif (false === $first) {
-            return $this->bundleMap[$name];
         }
+
+        return $this->bundleMap[$name];
     }
 
     /**

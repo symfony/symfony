@@ -41,9 +41,15 @@ class Cookie
             throw new \InvalidArgumentException('The cookie name cannot be empty');
         }
 
-        // check if the expiration is valid
-        if (!$expire instanceof \DateTime && !is_numeric($expire) && (strtotime($expire) === false || strtotime($expire) === -1)) {
-            throw new \InvalidArgumentException('The cookie expiration is not valid');
+        // convert expiration time to a Unix timestamp
+        if ($expire instanceof \DateTime) {
+            $expire = $expire->format('U');
+        } elseif (!is_numeric($expire)) {
+            $expire = strtotime($expire);
+
+            if (false === $expire || -1 === $expire) {
+                throw new \InvalidArgumentException('The cookie expiration time is not valid.');
+            }
         }
 
         $this->name = $name;

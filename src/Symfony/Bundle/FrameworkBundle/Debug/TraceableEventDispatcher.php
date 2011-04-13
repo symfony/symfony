@@ -67,40 +67,6 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
 
     /**
      * {@inheritDoc}
-     *
-     * @throws \RuntimeException if the service does not exist
-     * @throws \RuntimeException if the listener service method is not callable
-     */
-    public function addListenerService($eventNames, $serviceId, $priority = 0)
-    {
-        $error = null;
-
-        if (!$this->container->has($serviceId)) {
-            $error = sprintf('The container has no service "%s".', $serviceId);
-        } else {
-            $listener = $this->container->get($serviceId);
-            if (!$listener instanceof \Closure) {
-                foreach ((array) $eventNames as $method) {
-                    if (!is_callable(array($listener, $method))) {
-                        $error = sprintf('The event method "%s()" is not callable on the service "%s".', $method, $serviceId);
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (null !== $error) {
-            if (null !== $this->logger) {
-                $this->logger->err($error);
-            }
-            throw new \RuntimeException($error);
-        }
-
-        parent::addListenerService($eventNames, $serviceId, $priority);
-    }
-
-    /**
-     * {@inheritDoc}
      */
     protected function triggerListener($listener, $eventName, Event $event)
     {

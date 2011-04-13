@@ -74,9 +74,11 @@ class InterfaceInjector
             return;
         }
 
-        foreach ($this->calls as $callback) {
-            list($method, $arguments) = $callback;
-            $definition->addMethodCall($method, $arguments);
+        if ($definition->isInterfaceInjectionEnabled()) {
+            foreach ($this->calls as $callback) {
+                list($method, $arguments) = $callback;
+                $definition->addMethodCall($method, $arguments);
+            }
         }
 
         $this->processedDefinitions[] = $definition;

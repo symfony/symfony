@@ -31,6 +31,7 @@ class Definition
     private $public;
     private $synthetic;
     private $abstract;
+    private $interfaceInjectionEnabled;
 
     protected $arguments;
 
@@ -50,6 +51,7 @@ class Definition
         $this->public = true;
         $this->synthetic = false;
         $this->abstract = false;
+        $this->interfaceInjectionEnabled = true;
         $this->properties = array();
     }
 
@@ -505,6 +507,31 @@ class Definition
     public function isAbstract()
     {
         return $this->abstract;
+    }
+
+    /**
+     * Sets whether this definition allows interface injection
+     *
+     * @param Boolean $boolean
+     *
+     * @return Definition the current instance
+     */
+    public function setInterfaceInjectionEnabled($boolean)
+    {
+        $this->interfaceInjectionEnabled = (Boolean) $boolean;
+
+        return $this;
+    }
+
+    /**
+     * Whether this definition is synthetic, that is not constructed by the
+     * container, but dynamically injected.
+     *
+     * @return Boolean
+     */
+    public function isInterfaceInjectionEnabled()
+    {
+        return $this->interfaceInjectionEnabled;
     }
 
     /**

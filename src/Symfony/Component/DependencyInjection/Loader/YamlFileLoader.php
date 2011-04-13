@@ -203,6 +203,10 @@ class YamlFileLoader extends FileLoader
             $definition->setAbstract($service['abstract']);
         }
 
+        if (isset($service['interfaceInjectionEnabled'])) {
+            $definition->setInterfaceInjectionEnabled($service['interfaceInjectionEnabled']);
+        }
+
         if (isset($service['factory_class'])) {
             $definition->setFactoryClass($service['factory_class']);
         }

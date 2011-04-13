@@ -115,12 +115,7 @@ class AsseticExtension extends Extension
     static protected function registerFormulaResources(ContainerBuilder $container, array $bundles)
     {
         $map = $container->getParameter('kernel.bundles');
-
-        if ($diff = array_diff($bundles, array_keys($map))) {
-            throw new \InvalidArgumentException(sprintf('The following bundles are not registered: "%s"', implode('", "', $diff)));
-        }
-
-        $am = $container->getDefinition('assetic.asset_manager');
+        $am  = $container->getDefinition('assetic.asset_manager');
 
         // bundle views/ directories and kernel overrides
         foreach ($bundles as $name) {

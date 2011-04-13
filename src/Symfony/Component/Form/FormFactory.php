@@ -17,7 +17,6 @@ use Symfony\Component\Form\Type\Guesser\TypeGuesserInterface;
 use Symfony\Component\Form\Type\Guesser\Guess;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\TemplateContext;
 
 class FormFactory implements FormFactoryInterface
 {
@@ -136,11 +135,6 @@ class FormFactory implements FormFactoryInterface
     public function createForProperty($class, $property, array $options = array())
     {
         return $this->createBuilderForProperty($class, $property, $options)->getForm();
-    }
-
-    public function createTemplateContext(FormInterface $form)
-    {
-        return TemplateContext::create($form);
     }
 
     /**

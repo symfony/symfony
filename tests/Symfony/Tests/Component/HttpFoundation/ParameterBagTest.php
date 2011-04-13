@@ -57,6 +57,41 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getInvalidPaths
+     * @expectedException \InvalidArgumentException
+     * @covers Symfony\Component\HttpFoundation\ParameterBag::getDeep
+     */
+    public function testGetDeepWithInvalidPaths($path)
+    {
+        $bag = new ParameterBag(array('foo' => array('bar' => 'moo')));
+
+        $bag->getDeep($path);
+    }
+
+    public function getInvalidPaths()
+    {
+        return array(
+            array('foo[['),
+            array('foo[d'),
+            array('foo[bar]]'),
+            array('foo[bar]d'),
+        );
+    }
+
+    /**
+	 * @covers Symfony\Component\HttpFoundation\ParameterBag::getDeep
+     */
+    public function testGetDeep()
+    {
+        $bag = new ParameterBag(array('foo' => array('bar' => array('moo' => 'boo'))));
+
+        $this->assertEquals(array('moo' => 'boo'), $bag->getDeep('foo[bar]'));
+        $this->assertEquals('boo', $bag->getDeep('foo[bar][moo]'));
+        $this->assertEquals('default', $bag->getDeep('foo[bar][foo]', 'default'));
+        $this->assertEquals('default', $bag->getDeep('bar[moo][foo]', 'default'));
+    }
+
+    /**
      * @covers Symfony\Component\HttpFoundation\ParameterBag::set
      */
     public function testSet()

@@ -20,22 +20,43 @@ class AssetPackage implements AssetPackageInterface
 {
     private $baseUrls;
     private $version;
+    private $versionFormat;
 
     /**
      * Constructor.
      *
-     * @param array|string $baseUrls The domain URL or an array of domain URLs
-     * @param string       $version  The version
+     * @param string|array $baseUrls      The asset base URL(s)
+     * @param string       $version       The asset version string
+     * @param string       $versionFormat The format to use when adding version
      */
-    public function __construct($baseUrls = array(), $version = null)
+    public function __construct($baseUrls = array(), $version = null, $versionFormat = '%s?%s')
     {
-        $this->baseUrls = array();
+        $this->setBaseUrls((array) $baseUrls);
         $this->version = $version;
+        $this->versionFormat = $versionFormat;
+    }
 
+    public function getBaseUrl($path)
+    {
+        switch ($count = count($this->baseUrls)) {
+            case 0:
+            return '';
+
+            case 1:
+            return $this->baseUrls[0];
+
+            default:
+            return $this->baseUrls[fmod(hexdec(substr(md5($path), 0, 10)), $count)];
+        }
+    }
+
+    public function setBaseUrls(array $baseUrls = array())
+    {
         if (!is_array($baseUrls)) {
             $baseUrls = (array) $baseUrls;
         }
 
+        $this->baseUrls = array();
         foreach ($baseUrls as $baseUrl) {
             $this->baseUrls[] = rtrim($baseUrl, '/');
         }
@@ -46,18 +67,24 @@ class AssetPackage implements AssetPackageInterface
         return $this->version;
     }
 
-    public function getBaseUrl($path)
+    public function setVersion($version)
     {
-        $count = count($this->baseUrls);
+        $this->version = $version;
+    }
 
-        if (0 === $count) {
-            return '';
+    public function versionize($path)
+    {
+        if (null === $this->version) {
+            return $path;
         }
 
-        if (1 === $count) {
-            return $this->baseUrls[0];
+        if (strlen($path) && '/' == $path[0]) {
+            $prepend = '/';
+            $path = substr($path, 1);
+        } else {
+            $prepend = '';
         }
 
-        return $this->baseUrls[fmod(hexdec(substr(md5($path), 0, 10)), $count)];
+        return $prepend.sprintf($this->versionFormat, $path, $this->version);
     }
 }

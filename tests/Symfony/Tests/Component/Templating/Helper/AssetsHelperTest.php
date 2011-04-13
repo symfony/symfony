@@ -20,7 +20,7 @@ class AssetsHelperTest extends \PHPUnit_Framework_TestCase
     {
         $helper = new AssetsHelper('foo', 'http://www.example.com', 'abcd');
         $this->assertEquals('/foo/', $helper->getBasePath(), '__construct() takes a base path as its first argument');
-        $this->assertEquals(new AssetPackage('http://www.example.com', 'abcd'), $helper->getPackage(), '->__construct() creates a default asset package');
+        $this->assertEquals(new AssetPackage('http://www.example.com', 'abcd'), $helper->getPackage('default'), '->__construct() creates a default asset package');
     }
 
     public function testGetSetBasePath()
@@ -79,5 +79,58 @@ class AssetsHelperTest extends \PHPUnit_Framework_TestCase
     {
         $helper = new AssetsHelper(null, 'http://foo.com');
         $this->assertEquals('//bar.com/asset', $helper->getUrl('//bar.com/asset'));
+    }
+
+    public function testGetPackageVersion()
+    {
+        $helper = new AssetsHelper();
+        $helper->addPackage('js', new AssetPackage(array(), '1.0.0'));
+        $this->assertEquals('1.0.0', $helper->getVersion('js'), '->getVersion() returns a package version');
+    }
+
+    public function testGetDefaultVersion()
+    {
+        $helper = new AssetsHelper(null, null, '1.0.0');
+        $this->assertEquals('1.0.0', $helper->getVersion(), '->getVersion() returns the default version');
+    }
+
+    /**
+     * @dataProvider getVersionFormats
+     */
+    public function testVersionFormat($format, $expected)
+    {
+        $helper = new AssetsHelper('/subdir/', null, null, array(
+            'default' => new AssetPackage(array(), '1.0.0', $format),
+        ));
+
+        $this->assertEquals($expected, $helper->getUrl('images/logo.gif'));
+    }
+
+    public function getVersionFormats()
+    {
+        return array(
+            array('release-%2$s/%1$s', '/subdir/release-1.0.0/images/logo.gif'),
+            array('%s?%s', '/subdir/images/logo.gif?1.0.0'),
+        );
+    }
+
+    /**
+     * @dataProvider getRootRelativeVersionFormats
+     */
+    public function testRootRelativeVersionFormat($format, $expected)
+    {
+        $helper = new AssetsHelper('/subdir/', null, null, array(
+            'default' => new AssetPackage(array(), '1.0.0', $format),
+        ));
+
+        $this->assertEquals($expected, $helper->getUrl('/images/logo.gif'));
+    }
+
+    public function getRootRelativeVersionFormats()
+    {
+        return array(
+            array('release-%2$s/%1$s', '/release-1.0.0/images/logo.gif'),
+            array('%s?%s', '/images/logo.gif?1.0.0'),
+        );
     }
 }

@@ -12,25 +12,48 @@
 namespace Symfony\Component\Templating\Asset;
 
 /**
- * Asset package interface.
+ * An asset package.
  *
  * @author Kris Wallsmith <kris@symfony.com>
  */
 interface AssetPackageInterface
 {
     /**
-     * Returns the asset package version.
+     * Returns a base URL to use for the supplied path.
      *
-     * @return string The version string
+     * @param string $path A path
+     *
+     * @return string The base URL for that path
+     */
+    function getBaseUrl($path);
+
+    /**
+     * Sets the collection of base URLs.
+     *
+     * @param array $baseUrls An array of base URLs
+     */
+    function setBaseUrls(array $baseUrls = array());
+
+    /**
+     * Returns the package version.
+     *
+     * @return string|null The package version, if set
      */
     function getVersion();
 
     /**
-     * Returns a base URL for the supplied path.
+     * Sets the package version.
+     *
+     * @param string $version The package version
+     */
+    function setVersion($version);
+
+    /**
+     * Adds the package version to a path.
      *
      * @param string $path An asset path
      *
-     * @return string A base URL
+     * @return string The versionized path
      */
-    function getBaseUrl($path);
+    function versionize($path);
 }

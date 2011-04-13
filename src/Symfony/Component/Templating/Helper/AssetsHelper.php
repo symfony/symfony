@@ -15,94 +15,49 @@ use Symfony\Component\Templating\Asset\AssetPackage;
 use Symfony\Component\Templating\Asset\AssetPackageInterface;
 
 /**
- * AssetsHelper is the base class for all helper classes that manages assets.
+ * The assets helper.
  *
  * Usage:
  *
- * <code>
- *   <img src="<?php echo $view['assets']->getUrl('foo.png') ?>" />
- * </code>
+ *     <img src="<?php echo $view['assets']->getUrl('foo.png') ?>" />
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class AssetsHelper extends Helper implements AssetPackageInterface
+class AssetsHelper extends Helper
 {
-    protected $version;
-    protected $defaultPackage;
+    const DEFAULT_PACKAGE = 'default';
+
+    protected $basePath;
     protected $packages;
 
     /**
      * Constructor.
      *
      * @param string       $basePath The base path
-     * @param string|array $baseURLs The domain URL or an array of domain URLs
-     * @param string       $version  The version
-     * @param array        $packages Asset packages indexed by name
+     * @param string|array $baseURLs The default domain URL(s)
+     * @param string       $version  The default version string
+     * @param array        $packages An array of packages
      */
-    public function __construct($basePath = null, $baseUrls = array(), $version = null, $packages = array())
+    public function __construct($basePath = null, $baseUrls = null, $version = null, array $packages = array())
     {
+        if (!isset($packages[self::DEFAULT_PACKAGE])) {
+            $packages[self::DEFAULT_PACKAGE] = new AssetPackage();
+        }
+
+        if (null !== $baseUrls) {
+            $packages[self::DEFAULT_PACKAGE]->setBaseUrls((array) $baseUrls);
+        }
+
+        if (null !== $version) {
+            $packages[self::DEFAULT_PACKAGE]->setVersion($version);
+        }
+
         $this->setBasePath($basePath);
-        $this->defaultPackage = new AssetPackage($baseUrls, $version);
+
         $this->packages = array();
-
         foreach ($packages as $name => $package) {
-            $this->setPackage($name, $package);
+            $this->addPackage($name, $package);
         }
-    }
-
-    /**
-     * Adds an asset package to the helper.
-     *
-     * @param string                $name    The package name
-     * @param AssetPackageInterface $package The package
-     */
-    public function setPackage($name, AssetPackageInterface $package)
-    {
-        $this->packages[$name] = $package;
-    }
-
-    /**
-     * Returns an asset package.
-     *
-     * @param string $name The name of the package or null for the default package
-     *
-     * @return AssetPackageInterface An asset package
-     *
-     * @throws InvalidArgumentException If there is no package by that name
-     */
-    public function getPackage($name = null)
-    {
-        if (null === $name) {
-            return $this->defaultPackage;
-        }
-
-        if (!isset($this->packages[$name])) {
-            throw new \InvalidArgumentException(sprintf('There is no "%s" asset package.', $name));
-        }
-
-        return $this->packages[$name];
-    }
-
-    /**
-     * Gets the version to add to public URL.
-     *
-     * @param string $package A package name
-     *
-     * @return string The current version
-     */
-    public function getVersion($packageName = null)
-    {
-        return $this->getPackage($packageName)->getVersion();
-    }
-
-    /**
-     * Gets the base path.
-     *
-     * @return string The base path
-     */
-    public function getBasePath()
-    {
-        return $this->basePath;
     }
 
     /**
@@ -116,49 +71,109 @@ class AssetsHelper extends Helper implements AssetPackageInterface
             $basePath = '/'.$basePath;
         }
 
-        $this->basePath = rtrim($basePath, '/').'/';
+        if ('/' != substr($basePath, -1)) {
+            $basePath .= '/';
+        }
+
+        $this->basePath = $basePath;
+    }
+
+    /**
+     * Gets the base path.
+     *
+     * @return string The base path
+     */
+    public function getBasePath()
+    {
+        return $this->basePath;
+    }
+
+    /**
+     * Adds an asset package.
+     *
+     * @param string                $name    The package name
+     * @param AssetPackageInterface $package The package
+     */
+    public function addPackage($name, AssetPackageInterface $package)
+    {
+        $this->packages[$name] = $package;
+    }
+
+    /**
+     * Returns an asset package.
+     *
+     * @param string $name The package name
+     *
+     * @return AssetPackage The package
+     *
+     * @throws InvalidArgumentException If the package does not exist
+     */
+    public function getPackage($name = self::DEFAULT_PACKAGE)
+    {
+        if (!isset($this->packages[$name])) {
+            throw new \InvalidArgumentException(sprintf('There is no "%s" asset package.', $name));
+        }
+
+        return $this->packages[$name];
     }
 
     /**
      * Gets the base URL.
      *
-     * If multiple base URLs have been defined a random one will be picked for each asset.
-     * In other words: for one asset path the same base URL will always be picked among the available base URLs.
+     * If multiple base URLs have been defined a random one will be picked
+     * for each asset.
      *
-     * @param  string $path The path
+     * In other words: for one asset path the same base URL will always be
+     * picked among the available base URLs.
+     *
+     * @param string $path        The path
+     * @param string $packageName The asset package name
      *
      * @return string The base URL
      */
-    public function getBaseUrl($path, $packageName = null)
+    public function getBaseUrl($path, $packageName = self::DEFAULT_PACKAGE)
     {
         return $this->getPackage($packageName)->getBaseUrl($path);
     }
 
     /**
+     * Gets the version to add to public URL.
+     *
+     * @param string $package A package name
+     *
+     * @return string The current version
+     */
+    public function getVersion($packageName = self::DEFAULT_PACKAGE)
+    {
+        return $this->getPackage($packageName)->getVersion();
+    }
+
+    /**
      * Returns the public path.
      *
-     * Absolute paths (i.e. http://...) are returned unmodified.
+     * Absolute paths (i.e. http://...) and protocol-relative paths
+     * (i.e. //...) are returned unmodified.
      *
      * @param string $path        A public path
-     * @param string $packageName The name of the asset package to use
+     * @param string $package The name of the asset package to use
      *
      * @return string A public path which takes into account the base path and URL path
      */
-    public function getUrl($path, $packageName = null)
+    public function getUrl($path, $packageName = self::DEFAULT_PACKAGE)
     {
         if (false !== strpos($path, '://') || 0 === strpos($path, '//')) {
             return $path;
         }
 
         $package = $this->getPackage($packageName);
-        $base    = $package->getBaseUrl($path);
-        $version = $package->getVersion();
+        $base = $package->getBaseUrl($path);
+        $path = $package->versionize($path);
 
         if (0 !== strpos($path, '/')) {
             $path = $base ? '/'.$path : $this->basePath.$path;
         }
 
-        return $base.$path.($version ? '?'.$version : '');
+        return $base.$path;
     }
 
     /**

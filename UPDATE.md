@@ -10,9 +10,11 @@ PR10 to PR11
 ------------
 
 * Extension configuration classes should now implement the
-`Symfony\Component\Config\Definition\ConfigurationInterface` interface. Note that
-the BC is kept but implementing this interface in your extensions will allow for
-further developments.
+  `Symfony\Component\Config\Definition\ConfigurationInterface` interface. Note
+  that the BC is kept but implementing this interface in your extensions will
+  allow for further developments.
+
+* The "fingerscrossed" Monolog option has been renamed to "fingers_crossed".
 
 PR9 to PR10
 -----------

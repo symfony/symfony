@@ -230,14 +230,15 @@ class Definition
      * Sets the methods to call after service initialization.
      *
      * @param  array $calls An array of method calls
+     * @param  boolean $implicit If the method is added implicitly (via interface injection)
      *
      * @return Definition The current instance
      */
-    public function setMethodCalls(array $calls = array())
+    public function setMethodCalls(array $calls = array(), $implicit = false)
     {
         $this->calls = array();
         foreach ($calls as $call) {
-            $this->addMethodCall($call[0], $call[1]);
+            $this->addMethodCall($call[0], $call[1], $implicit);
         }
 
         return $this;
@@ -248,12 +249,13 @@ class Definition
      *
      * @param  string $method    The method name to call
      * @param  array  $arguments An array of arguments to pass to the method call
+     * @param  boolean $implicit If the method is added implicitly (via interface injection)
      *
      * @return Definition The current instance
      */
-    public function addMethodCall($method, array $arguments = array())
+    public function addMethodCall($method, array $arguments = array(), $implicit = false)
     {
-        $this->calls[] = array($method, $arguments);
+        $this->calls[] = array($method, $arguments, $implicit);
 
         return $this;
     }

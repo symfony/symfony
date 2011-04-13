@@ -29,7 +29,12 @@ class FileLoaderImportException extends \Exception
         if (null === $sourceResource) {
             $message = sprintf('Cannot import resource "%s".', $this->varToString($resource));
         } else {
-            $message = sprintf('Cannot import resource "%s" from "%s".', $this->varToString($resource), $this->varToString($sourceResource));
+            if (null === $previous) {
+                $message = sprintf('Cannot import resource "%s" from "%s".', $this->varToString($resource), $this->varToString($sourceResource));
+            } else {
+                $message = sprintf('Cannot import resource "%s" from "%s". The config file encountered ' .
+                    'the following error when trying to import: "%s".', $this->varToString($resource), $this->varToString($sourceResource), $previous->getMessage());
+            }
         }
 
         parent::__construct($message, $code, $previous);

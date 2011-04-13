@@ -8,7 +8,7 @@
 
     <config>
         <dbal default-connection="default">
-            <type name="test" class="Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType" />
+            <type name="test">Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType</type>
             <connection name="default" />
         </dbal>
     </config>

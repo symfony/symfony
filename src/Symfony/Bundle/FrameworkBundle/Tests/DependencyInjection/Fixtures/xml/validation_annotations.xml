@@ -8,7 +8,7 @@
 
     <app:config>
         <app:validation enabled="true" annotations="true">
-            <app:namespace prefix="app" namespace="Application\Validator\Constraints\" />
+            <app:namespace prefix="app">Application\Validator\Constraints\</app:namespace>
         </app:validation>
     </app:config>
 </container>

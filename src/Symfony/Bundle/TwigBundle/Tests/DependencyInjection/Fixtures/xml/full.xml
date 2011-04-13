@@ -12,7 +12,7 @@
         </twig:form>
         <twig:global key="foo" id="bar" type="service" />
         <twig:global key="pi">3.14</twig:global>
-        <twig:extension id="twig.extension.debug" />
-        <twig:extension id="twig.extension.text" />
+        <twig:extension>twig.extension.debug</twig:extension>
+        <twig:extension>twig.extension.text</twig:extension>
     </twig:config>
 </container>

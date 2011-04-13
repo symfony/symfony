@@ -19,6 +19,7 @@
             <xsd:element name="processor" type="processor" />
         </xsd:choice>
         <xsd:attribute name="type" type="xsd:string" use="required" />
+        <xsd:attribute name="priority" type="xsd:integer" />
         <xsd:attribute name="level" type="level" />
         <xsd:attribute name="bubble" type="xsd:boolean" />
         <xsd:attribute name="path" type="xsd:string" />
@@ -28,6 +29,7 @@
         <xsd:attribute name="facility" type="xsd:string" />
         <xsd:attribute name="action-level" type="level" />
         <xsd:attribute name="buffer-size" type="xsd:integer" />
+        <xsd:attribute name="max-files" type="xsd:integer" />
         <xsd:attribute name="handler" type="xsd:string" />
         <xsd:attribute name="formatter" type="xsd:string" />
     </xsd:complexType>

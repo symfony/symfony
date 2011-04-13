@@ -24,27 +24,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class ResolveInvalidReferencesPass implements CompilerPassInterface
 {
     private $container;
-    private $exceptions;
-
-    /**
-     * Constructor.
-     *
-     * @param array $exceptions An array of exceptions
-     */
-    public function __construct(array $exceptions = array('kernel', 'service_container', 'templating.loader.wrapped', 'pdo_connection'))
-    {
-        $this->exceptions = $exceptions;
-    }
-
-    /**
-     * Add an exception.
-     *
-     * @param string $id Exception identifier
-     */
-    public function addException($id)
-    {
-        $this->exceptions[] = $id;
-    }
 
     /**
      * Process the ContainerBuilder to resolve invalid references.
@@ -99,10 +78,6 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
                 $arguments[$k] = $this->processArguments($argument, $inMethodCall);
             } else if ($argument instanceof Reference) {
                 $id = (string) $argument;
-
-                if (in_array($id, $this->exceptions, true)) {
-                    continue;
-                }
 
                 $invalidBehavior = $argument->getInvalidBehavior();
                 $exists = $this->container->has($id);

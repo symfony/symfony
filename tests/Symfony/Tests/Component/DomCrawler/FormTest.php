@@ -343,7 +343,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 'chooses the path if the action attribute value is a sharp (#)',
                 '<form action="#" method="post"><input type="text" name="foo" value="foo" /><input type="submit" /></form>',
                 array(),
-                '/',
+                '/#',
             ),
         );
     }
@@ -389,20 +389,27 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testBase()
     {
         $dom = new \DOMDocument();
-        $dom->loadHTML('<html><form method="post" action="foo.php"><input type="text" name="bar" value="bar" /><input type="submit" /></form></html>');
+        $dom->loadHTML('<form method="post" action="foo.php"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
 
         $nodes = $dom->getElementsByTagName('input');
         $form = new Form($nodes->item($nodes->length - 1), null, 'http://www.bar.com/foobar/', '/', 'http://www.foo.com/');
         $this->assertEquals('http://www.foo.com/foo.php', $form->getUri());
     }
 
-    protected function createForm($form, $method = null, $host = null, $path = '/')
+    public function testUriWithAnchor()
+    {
+        $form = $this->createForm('<form action="#foo"><input type="submit" /></form>', null, 'http://example.com', '/id/123');
+
+        $this->assertEquals('http://example.com/id/123#foo', $form->getUri());
+    }
+
+    protected function createForm($form, $method = null, $host = null, $path = '/', $base = null)
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('<html>'.$form.'</html>');
 
         $nodes = $dom->getElementsByTagName('input');
 
-        return new Form($nodes->item($nodes->length - 1), $method, $host, $path);
+        return new Form($nodes->item($nodes->length - 1), $method, $host, $path, $base);
     }
 }

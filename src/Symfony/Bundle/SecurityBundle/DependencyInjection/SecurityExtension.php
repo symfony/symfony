@@ -119,16 +119,11 @@ class SecurityExtension extends Extension
         }
         $container->getDefinition('security.acl.cache.doctrine')->addArgument($config['cache']['prefix']);
 
-        $container
-            ->getDefinition('security.acl.dbal.provider')
-            ->setArgument(2, array(
-                'class_table_name' => $config['tables']['class'],
-                'entry_table_name' => $config['tables']['entry'],
-                'oid_table_name'   => $config['tables']['object_identity'],
-                'oid_ancestors_table_name' => $config['tables']['object_identity_ancestors'],
-                'sid_table_name' => $config['tables']['security_identity'],
-            ))
-        ;
+        $container->setParameter('security.acl.dbal.class_table_name', $config['tables']['class']);
+        $container->setParameter('security.acl.dbal.entry_table_name', $config['tables']['entry']);
+        $container->setParameter('security.acl.dbal.oid_table_name', $config['tables']['object_identity']);
+        $container->setParameter('security.acl.dbal.oid_ancestors_table_name', $config['tables']['object_identity_ancestors']);
+        $container->setParameter('security.acl.dbal.sid_table_name', $config['tables']['security_identity']);
 
         $container->getDefinition('security.acl.voter.basic_permissions')->addArgument($config['voter']['allow_if_object_identity_unavailable']);
     }

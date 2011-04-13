@@ -91,7 +91,7 @@ class RequestListener
             $parameters = $this->router->match($request->getPathInfo());
 
             if (null !== $this->logger) {
-                $this->logger->info(sprintf('Matched route "%s" (parameters: %s)', $parameters['_route'], json_encode($parameters)));
+                $this->logger->info(sprintf('Matched route "%s" (parameters: %s)', $parameters['_route'], $this->parametersToString($parameters)));
             }
 
             $request->attributes->add($parameters);
@@ -112,5 +112,15 @@ class RequestListener
             }
             throw new MethodNotAllowedHttpException($e->getAllowedMethods(), $message, $e);
         }
+    }
+
+    private function parametersToString(array $parameters)
+    {
+        $pieces = array();
+        foreach ($parameters as $key => $val) {
+            $pieces[] = sprintf('"%s": "%s"', $key, (is_string($val) ? $val : json_encode($val)));
+        }
+
+        return implode(', ', $pieces);
     }
 }

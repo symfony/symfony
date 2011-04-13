@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
+use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocator;
 
 /**
  * Computes the association between template names and their paths on the disk.
@@ -24,20 +25,23 @@ use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
 class TemplatePathsCacheWarmer extends CacheWarmer
 {
     protected $kernel;
-    protected $rootDir;
     protected $parser;
+    protected $rootDir;
+    protected $locator;
 
     /**
      * Constructor.
      *
      * @param KernelInterface      $kernel  A KernelInterface instance
      * @param TemplateNameParser   $parser  A TemplateNameParser instance
+     * @param TemplateLocator      $locator The template locator
      * @param string               $rootDir The directory where global templates can be stored
      */
-    public function __construct(KernelInterface $kernel, TemplateNameParser $parser, $rootDir)
+    public function __construct(KernelInterface $kernel, TemplateNameParser $parser, TemplateLocator $locator, $rootDir)
     {
         $this->kernel = $kernel;
         $this->parser = $parser;
+        $this->locator = $locator;
         $this->rootDir = $rootDir;
     }
 
@@ -51,7 +55,6 @@ class TemplatePathsCacheWarmer extends CacheWarmer
         $templates = array();
 
         foreach ($this->kernel->getBundles() as $name => $bundle) {
-            $templates += $this->findTemplatesIn($this->rootDir.'/'.$name.'/views', $name);
             $templates += $this->findTemplatesIn($bundle->getPath().'/Resources/views', $name);
         }
 
@@ -88,9 +91,9 @@ class TemplatePathsCacheWarmer extends CacheWarmer
                 $template = $this->parser->parseFromFilename($file->getRelativePathname());
                 if (false !== $template) {
                     if (null !== $bundle) {
-                      $template->set('bundle', $bundle);
-                    }
-                    $templates[$template->getSignature()] = $file->getRealPath();
+                        $template->set('bundle', $bundle);                        
+                    } 
+                    $templates[$template->getSignature()] = $this->locator->locate($template);
                 }
             }
         }

@@ -98,7 +98,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
             $this->reflected = new \ReflectionObject($this);
         }
 
-        return strtr(dirname($this->reflected->getFileName()), '\\', '/');
+        return dirname($this->reflected->getFileName());
     }
 
     /**

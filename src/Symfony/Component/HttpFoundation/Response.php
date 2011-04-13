@@ -458,6 +458,7 @@ class Response
      */
     public function setSharedMaxAge($value)
     {
+        $this->setPublic();
         $this->headers->addCacheControlDirective('s-maxage', $value);
     }
 

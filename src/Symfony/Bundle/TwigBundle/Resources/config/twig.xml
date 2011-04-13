@@ -52,9 +52,11 @@
             <tag name="twig.extension" />
         </service>
 
-        <service id="twig.extension.form" class="Symfony\Bundle\TwigBundle\Extension\FormExtension" public="false">
+        <service id="twig.extension.form" class="Symfony\Bridge\Twig\Extension\FormExtension" public="false">
             <tag name="twig.extension" />
-            <argument>%twig.form.resources%</argument>
+            <argument type="collection">
+                <argument>TwigBundle::table_layout.html.twig</argument>
+            </argument>
         </service>
 
         <service id="twig.extension.text" class="Twig_Extensions_Extension_Text" public="false" />

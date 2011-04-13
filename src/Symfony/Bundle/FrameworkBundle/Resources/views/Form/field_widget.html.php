@@ -6,5 +6,5 @@
     <?php if ($required): ?>required="required"<?php endif ?>
     <?php if ($max_length && $max_length > 0): ?>maxlength="<?php echo $max_length ?>"<?php endif; ?>
     <?php if ($size && $size > 0): ?>size="<?php echo $size ?>"<?php endif; ?>
-    <?php if (isset($attr)): echo $renderer->getTheme()->attributes($attr); endif; ?>
+    <?php if (isset($attr)): echo $view['form']->attributes($attr); endif; ?>
 />

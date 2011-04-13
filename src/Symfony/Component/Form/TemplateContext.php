@@ -9,20 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Renderer;
+namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
-use Symfony\Component\Form\Renderer\Theme\ThemeFactoryInterface;
 use Symfony\Component\Form\Util\ChoiceUtil;
 
-class ThemeRenderer implements ThemeRendererInterface, \ArrayAccess, \IteratorAggregate
+class TemplateContext implements \ArrayAccess, \IteratorAggregate
 {
-    private $blockHistory = array();
-
-    private $themeFactory;
-
-    private $theme;
+    static $cache;
 
     private $vars = array(
         'value' => null,
@@ -30,6 +24,10 @@ class ThemeRenderer implements ThemeRendererInterface, \ArrayAccess, \IteratorAg
         'preferred_choices' => array(),
         'attr' => array(),
     );
+
+    private $parent;
+
+    private $children = array();
 
     /**
      * Is the form attached to this renderer rendered?
@@ -42,72 +40,62 @@ class ThemeRenderer implements ThemeRendererInterface, \ArrayAccess, \IteratorAg
      */
     private $rendered = false;
 
-    private $parent;
-
-    private $children = array();
-
-    public function __construct(ThemeFactoryInterface $themeFactory)
+    static public function create(FormInterface $form)
     {
-        $this->themeFactory = $themeFactory;
-    }
-
-    public function setParent(self $parent)
-    {
-        $this->parent = $parent;
-    }
-
-    public function setChildren(array $children)
-    {
-        $this->children = $children;
-    }
-
-    public function setTemplate($template)
-    {
-        $this->setTheme($this->themeFactory->create($template));
-    }
-
-    public function setTheme(ThemeInterface $theme)
-    {
-        $this->theme = $theme;
-    }
-
-    public function getTheme()
-    {
-        if (!$this->theme && $this->parent) {
-            return $this->parent->getTheme();
+        if (null === self::$cache) {
+            self::$cache = new \SplObjectStorage();
         }
 
-        return $this->theme;
+        if (isset(self::$cache[$form])) {
+            return self::$cache[$form];
+        }
+
+        // populate the cache for the root form
+        $root = $form;
+        while ($root->getParent()) {
+            $root = $root->getParent();
+        }
+
+        self::$cache[$root] = new self($root);
+
+        return self::$cache[$form];
     }
 
-    public function setBlock($block)
+    private function __construct(FormInterface $form, self $parent = null)
     {
-        array_unshift($this->blockHistory, $block);
+        $this->parent = $parent;
+
+        $types = (array) $form->getTypes();
+        $children = array();
+
+        $this->set('context', $this);
+
+        foreach ($types as $type) {
+            $type->buildVariables($this, $form);
+        }
+
+        foreach ($form as $key => $child) {
+            $children[$key] = self::$cache[$child] = new self($child, $this);
+        }
+
+        $this->setChildren($children);
+
+        foreach ($types as $type) {
+            $type->buildVariablesBottomUp($this, $form);
+        }
     }
 
-    public function getBlock()
-    {
-        reset($this->blockHistory);
-
-        return current($this->block);
-    }
-
-    public function setVar($name, $value)
+    public function set($name, $value)
     {
         $this->vars[$name] = $value;
     }
 
-    public function setAttribute($name, $value)
-    {
-        $this->vars['attr'][$name] = $value;
-    }
-
-    public function hasVar($name)
+    public function has($name)
     {
         return array_key_exists($name, $this->vars);
     }
 
-    public function getVar($name)
+    public function get($name)
     {
         if (!isset($this->vars[$name])) {
             return null;
@@ -116,9 +104,14 @@ class ThemeRenderer implements ThemeRendererInterface, \ArrayAccess, \IteratorAg
         return $this->vars[$name];
     }
 
-    public function getVars()
+    public function all()
     {
         return $this->vars;
+    }
+
+    public function setAttribute($name, $value)
+    {
+        $this->vars['attr'][$name] = $value;
     }
 
     public function isRendered()
@@ -126,61 +119,14 @@ class ThemeRenderer implements ThemeRendererInterface, \ArrayAccess, \IteratorAg
         return $this->rendered;
     }
 
-    public function getWidget(array $vars = array())
+    public function setRendered()
     {
         $this->rendered = true;
-
-        return $this->renderPart('widget', $vars);
     }
 
-    public function getErrors(array $vars = array())
+    public function setParent(self $parent)
     {
-        return $this->renderPart('errors', $vars);
-    }
-
-    public function getRow(array $vars = array())
-    {
-        $this->rendered = true;
-
-        return $this->renderPart('row', $vars);
-    }
-
-    public function getRest(array $vars = array())
-    {
-        return $this->renderPart('rest', $vars);
-    }
-
-    /**
-     * Renders the label of the given form
-     *
-     * @param FormInterface $form  The form to render the label for
-     * @param array $params          Additional variables passed to the block
-     */
-    public function getLabel($label = null, array $vars = array())
-    {
-        if (null !== $label) {
-            $vars['label'] = $label;
-        }
-
-        return $this->renderPart('label', $vars);
-    }
-
-    public function getEnctype()
-    {
-        return $this->renderPart('enctype', $this->vars);
-    }
-
-    protected function renderPart($part, array $vars = array())
-    {
-        return $this->getTheme()->render($this->blockHistory, $part, array_replace(
-            $this->vars,
-            $vars
-        ));
-    }
-
-    public function render(array $vars = array())
-    {
-        return $this->getWidget($vars);
+        $this->parent = $parent;
     }
 
     public function getParent()
@@ -191,6 +137,11 @@ class ThemeRenderer implements ThemeRendererInterface, \ArrayAccess, \IteratorAg
     public function hasParent()
     {
         return null !== $this->parent;
+    }
+
+    public function setChildren(array $children)
+    {
+        $this->children = $children;
     }
 
     public function getChildren()
@@ -239,7 +190,7 @@ class ThemeRenderer implements ThemeRendererInterface, \ArrayAccess, \IteratorAg
         return isset($this->vars['choices'][$choice])
             ? $this->vars['choices'][$choice]
             : (isset($this->vars['preferred_choices'][$choice])
-                ? $this->cars['preferred_choices'][$choice]
+                ? $this->vars['preferred_choices'][$choice]
                 : null
             );
     }

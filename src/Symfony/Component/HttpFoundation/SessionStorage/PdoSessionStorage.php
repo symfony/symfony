@@ -15,6 +15,7 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
  * PdoSessionStorage.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Michael Williams <michael.williams@funsational.com>
  */
 class PdoSessionStorage extends NativeSessionStorage
 {
@@ -174,13 +175,7 @@ class PdoSessionStorage extends NativeSessionStorage
             }
 
             // session does not exist, create it
-            $sql = 'INSERT INTO '.$dbTable.'('.$dbIdCol.', '.$dbDataCol.', '.$dbTimeCol.') VALUES (?, ?, ?)';
-
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(1, $id, \PDO::PARAM_STR);
-            $stmt->bindValue(2, '', \PDO::PARAM_STR);
-            $stmt->bindValue(3, time(), \PDO::PARAM_INT);
-            $stmt->execute();
+            $this->createNewSession($id);
 
             return '';
         } catch (\PDOException $e) {
@@ -213,9 +208,40 @@ class PdoSessionStorage extends NativeSessionStorage
             $stmt->bindParam(1, $data, \PDO::PARAM_STR);
             $stmt->bindParam(2, $id, \PDO::PARAM_STR);
             $stmt->execute();
+
+            if (!$stmt->rowCount()) {
+                // No session exists in the database to update. This happens when we have called
+                // session_regenerate_id()
+                $this->createNewSession($id, $data);
+            }
         } catch (\PDOException $e) {
             throw new \RuntimeException(sprintf('PDOException was thrown when trying to manipulate session data: %s', $e->getMessage()), 0, $e);
         }
+
+        return true;
+    }
+
+    /**
+     * Creates a new session with the given $id and $data
+     *
+     * @param string $id
+     * @param string $data
+     */
+    private function createNewSession($id, $data = '')
+    {
+        // get table/column
+        $dbTable    = $this->options['db_table'];
+        $dbDataCol = $this->options['db_data_col'];
+        $dbIdCol   = $this->options['db_id_col'];
+        $dbTimeCol = $this->options['db_time_col'];
+
+        $sql = 'INSERT INTO '.$dbTable.'('.$dbIdCol.', '.$dbDataCol.', '.$dbTimeCol.') VALUES (?, ?, ?)';
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(1, $id, \PDO::PARAM_STR);
+        $stmt->bindValue(2, $data, \PDO::PARAM_STR);
+        $stmt->bindValue(3, time(), \PDO::PARAM_INT);
+        $stmt->execute();
 
         return true;
     }

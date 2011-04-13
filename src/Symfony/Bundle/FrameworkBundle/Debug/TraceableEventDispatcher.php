@@ -53,7 +53,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
         if (!$listener instanceof \Closure) {
             foreach ((array) $eventNames as $method) {
                 if (!is_callable(array($listener, $method))) {
-                    $msg = sprintf('The event method "%s()" is not callable on the class "%s"', $method, get_class($listener));
+                    $msg = sprintf('The event method "%s()" is not callable on the class "%s".', $method, get_class($listener));
                     if (null !== $this->logger) {
                         $this->logger->err($msg);
                     }
@@ -61,6 +61,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
                 }
             }
         }
+
         parent::addListener($eventNames, $listener, $priority);
     }
 
@@ -75,13 +76,13 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
         $error = null;
 
         if (!$this->container->has($serviceId)) {
-            $error = sprintf('The container has no service "%s"', $serviceId);
+            $error = sprintf('The container has no service "%s".', $serviceId);
         } else {
             $listener = $this->container->get($serviceId);
             if (!$listener instanceof \Closure) {
                 foreach ((array) $eventNames as $method) {
                     if (!is_callable(array($listener, $method))) {
-                        $error = sprintf('The event method "%s()" is not callable on the service "%s"', $method, $serviceId);
+                        $error = sprintf('The event method "%s()" is not callable on the service "%s".', $method, $serviceId);
                         break;
                     }
                 }
@@ -106,20 +107,20 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
         parent::triggerListener($listener, $eventName, $event);
 
         if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Notified event "%s" to listener "%s"', $eventName, get_class($listener)));
+            $this->logger->debug(sprintf('Notified event "%s" to listener "%s".', $eventName, get_class($listener)));
         }
 
         $this->called[$eventName.'.'.get_class($listener)] = $this->getListenerInfo($listener, $eventName);
 
         if ($event->isPropagationStopped() && null !== $this->logger) {
-            $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s"', get_class($listener), $eventName));
+            $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s".', get_class($listener), $eventName));
 
             $skippedListeners = $this->getListeners($eventName);
             $skipped = false;
 
             foreach ($skippedListeners as $skippedListener) {
                 if ($skipped) {
-                    $this->logger->debug(sprintf('Listener "%s" was not called for event "%s"', get_class($skippedListener), $eventName));
+                    $this->logger->debug(sprintf('Listener "%s" was not called for event "%s".', get_class($skippedListener), $eventName));
                 }
 
                 if ($skippedListener === $listener) {

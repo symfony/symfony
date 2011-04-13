@@ -2,8 +2,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset={{ _charset }}"/>
-        <title>{{ exception.message }} ({{ status_code }} {{ status_text }})</title>
-
+        <title>{% block title '' %}</title>
         <link href="{{ asset('bundles/framework/css/exception_layout.css') }}" rel="stylesheet" type="text/css" media="all" />
         <link href="{{ asset('bundles/framework/css/exception.css') }}" rel="stylesheet" type="text/css" media="all" />
     </head>
@@ -37,7 +36,6 @@
             </div>
 
             {% block body '' %}
-
         </div>
     </body>
 </html>

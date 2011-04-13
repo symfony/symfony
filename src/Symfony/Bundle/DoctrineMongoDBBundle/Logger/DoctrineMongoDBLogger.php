@@ -248,7 +248,9 @@ class DoctrineMongoDBLogger
                 $array = false;
             }
 
-            if (is_bool($value)) {
+            if (null === $value) {
+                $formatted = 'null';
+            } elseif (is_bool($value)) {
                 $formatted = $value ? 'true' : 'false';
             } elseif (is_numeric($value)) {
                 $formatted = $value;

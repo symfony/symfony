@@ -82,6 +82,61 @@ class ParameterBag
     }
 
     /**
+     * Returns a parameter by name allowing to specify a path with arbitrary depth.
+     *
+     * @param string $path   The path, e.g. foo[bar]
+     * @param mixed $default The default value
+     */
+    public function getDeep($path, $default = null)
+    {
+        if (false === $pos = strpos($path, '[')) {
+            return $this->get($path, $default);
+        }
+
+        $root = substr($path, 0, $pos);
+        if (!array_key_exists($root, $this->parameters)) {
+            return $default;
+        }
+
+        $value = $this->parameters[$root];
+        $currentKey = null;
+        for ($i=$pos,$c=strlen($path); $i<$c; $i++) {
+            $char = $path[$i];
+
+            if ('[' === $char) {
+                if (null !== $currentKey) {
+                    throw new \InvalidArgumentException(sprintf('Malformed path. Unexpected "[" at position %d.', $i));
+                }
+
+                $currentKey = '';
+            } else if (']' === $char) {
+                if (null === $currentKey) {
+                    throw new \InvalidArgumentException(sprintf('Malformed path. Unexpected "]" at position %d.', $i));
+                }
+
+                if (!is_array($value) || !array_key_exists($currentKey, $value)) {
+                    return $default;
+                }
+
+                $value = $value[$currentKey];
+                $currentKey = null;
+            } else {
+                if (null === $currentKey) {
+                    throw new \InvalidArgumentException(sprintf('Malformed path. Unexpected "%s" at position %d.', $char, $i));
+                }
+
+                $currentKey .= $char;
+            }
+        }
+
+        if (null !== $currentKey) {
+            throw new \InvalidArgumentException(sprintf('Malformed path. Path must end with "]".'));
+        }
+
+        return $value;
+    }
+
+    /**
      * Sets a parameter by name.
      *
      * @param string $key   The key

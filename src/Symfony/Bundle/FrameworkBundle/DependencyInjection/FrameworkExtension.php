@@ -368,6 +368,8 @@ class FrameworkExtension extends Extension
         if ($config['cache_warmer']) {
             $container->getDefinition('templating.cache_warmer.template_paths')->addTag('kernel.cache_warmer');
             $container->setAlias('templating.locator', 'templating.locator.cached');
+        } else {
+            $container->setAlias('templating.locator', 'templating.locator.uncached');
         }
 
         $this->addClassesToCompile(array(
@@ -531,7 +533,7 @@ class FrameworkExtension extends Extension
         foreach ($container->getParameter('kernel.bundles') as $bundle) {
             $reflection = new \ReflectionClass($bundle);
             if (file_exists($file = dirname($reflection->getFilename()).'/Resources/config/validation.yml')) {
-                $yamlMappingFiles[] = realpath($file);
+                $files[] = realpath($file);
                 $container->addResource(new FileResource($file));
             }
         }

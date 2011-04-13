@@ -47,10 +47,21 @@
         -->
         <service id="request" scope="request" synthetic="true" />
 
+        <service id="service_container" synthetic="true" />
+
+        <service id="kernel" synthetic="true" />
+
         <service id="filesystem" class="%filesystem.class%"></service>
 
         <service id="file_locator" class="%file_locator.class%">
             <argument type="service" id="kernel" />
         </service>
     </services>
+    <interfaces>
+        <interface class="Symfony\Component\DependencyInjection\ContainerAwareInterface">
+            <call method="setContainer">
+                <argument type="service" id="service_container" />
+            </call>
+        </interface>
+    </interfaces>
 </container>

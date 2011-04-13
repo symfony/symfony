@@ -33,7 +33,13 @@
         <service id="security.acl.dbal.provider" class="%security.acl.dbal.provider.class%" public="false">
             <argument type="service" id="security.acl.dbal.connection" />
             <argument type="service" id="security.acl.permission_granting_strategy" />
-            <argument /> <!-- Table collection -->
+            <argument type="collection">
+                <argument key="class_table_name">%security.acl.dbal.class_table_name%</argument>
+                <argument key="entry_table_name">%security.acl.dbal.entry_table_name%</argument>
+                <argument key="oid_table_name">%security.acl.dbal.oid_table_name%</argument>
+                <argument key="oid_ancestors_table_name">%security.acl.dbal.oid_ancestors_table_name%</argument>
+                <argument key="sid_table_name">%security.acl.dbal.sid_table_name%</argument>
+            </argument>
             <argument type="service" id="security.acl.cache" on-invalid="null" />
         </service>
 

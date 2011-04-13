@@ -327,6 +327,21 @@ EOF;
         $this->getKernelForInvalidLocateResource()->locateResource('@FooBundle/config/routing.xml');
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLocateResourceThrowsExceptionWhenResourceDoesNotExist()
+    {
+        $kernel = $this->getKernel();
+        $kernel
+            ->expects($this->once())
+            ->method('getBundle')
+            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle'))))
+        ;
+
+        $kernel->locateResource('@Bundle1Bundle/config/routing.xml');
+    }
+   
     public function testLocateResourceReturnsTheFirstThatMatches()
     {
         $kernel = $this->getKernel();
@@ -659,7 +674,7 @@ EOF;
         $bundle
             ->expects($this->any())
             ->method('getPath')
-            ->will($this->returnValue(strtr($dir, '\\', '/')))
+            ->will($this->returnValue($dir))
         ;
 
         $bundle

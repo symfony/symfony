@@ -55,13 +55,19 @@ class MonologExtension extends Extension
 
             $handlers = array();
             foreach ($config['handlers'] as $name => $handler) {
-                $handlers[] = $this->buildHandler($container, $name, $handler);
+                $handlers[] = array('id' => $this->buildHandler($container, $name, $handler), 'priority' => $handler['priority'] );
             }
 
             $handlers = array_reverse($handlers);
+            uasort($handlers, function($a, $b) {
+                if ($a['priority'] == $b['priority']) {
+                    return 0;
+                }
+                return $a['priority'] < $b['priority'] ? -1 : 1;
+            });
             foreach ($handlers as $handler) {
-                if (!in_array($handler, $this->nestedHandlers)) {
-                    $logger->addMethodCall('pushHandler', array(new Reference($handler)));
+                if (!in_array($handler['id'], $this->nestedHandlers)) {
+                    $logger->addMethodCall('pushHandler', array(new Reference($handler['id'])));
                 }
             }
         }
@@ -118,7 +124,20 @@ class MonologExtension extends Extension
             ));
             break;
 
-        case 'fingerscrossed':
+        case 'rotating_file':
+            if (!isset($handler['path'])) {
+                $handler['path'] = '%kernel.logs_dir%/%kernel.environment%.log';
+            }
+
+            $definition->setArguments(array(
+                $handler['path'],
+                isset($handler['max_files']) ? $handler['max_files'] : 0,
+                $handler['level'],
+                $handler['bubble'],
+            ));
+            break;
+
+        case 'fingers_crossed':
             if (!isset($handler['action_level'])) {
                 $handler['action_level'] = 'WARNING';
             }
@@ -130,6 +149,18 @@ class MonologExtension extends Extension
                 new Reference($nestedHandlerId),
                 $handler['action_level'],
                 isset($handler['buffer_size']) ? $handler['buffer_size'] : 0,
+                $handler['bubble'],
+            ));
+            break;
+
+        case 'buffer':
+            $nestedHandlerId = $this->getHandlerId($handler['handler']);
+            array_push($this->nestedHandlers, $nestedHandlerId);
+
+            $definition->setArguments(array(
+                new Reference($nestedHandlerId),
+                isset($handler['buffer_size']) ? $handler['buffer_size'] : 0,
+                $handler['level'],
                 $handler['bubble'],
             ));
             break;

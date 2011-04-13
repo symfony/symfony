@@ -165,12 +165,19 @@ class XmlEncoder extends AbstractEncoder
                         $value['@'.$attrkey] = (string) $attr;
                     }
                 }
+            } elseif ($subnode->attributes()) {
+                $value = array();
+                foreach ($subnode->attributes() as $attrkey => $attr) {
+                    $value['@'.$attrkey] = (string) $attr;
+                }
+                $value['#'] = (string) $subnode;
             } else {
                 $value = (string) $subnode;
             }
+            
             if ($key === 'item') {
-                if (isset($subnode['key'])) {
-                    $data[(string)$subnode['key']] = $value;
+                if (isset($value['@key'])) {
+                    $data[(string)$value['@key']] = $value['#'];
                 } elseif (isset($data['item'])) {
                     $tmp = $data['item'];
                     unset($data['item']);
@@ -178,7 +185,7 @@ class XmlEncoder extends AbstractEncoder
                     $data[] = $value;
                 }
             } elseif (key_exists($key, $data)) {
-                if (false === is_array($data[$key])) {
+                if ((false === is_array($data[$key]))  || (false === isset($data[$key][0]))) {
                     $data[$key] = array($data[$key]);
                 }
                 $data[$key][] = $value;
@@ -205,6 +212,8 @@ class XmlEncoder extends AbstractEncoder
                 //Ah this is the magic @ attribute types.
                 if (0 === strpos($key, "@") && is_scalar($data) && $this->isElementNameValid($attributeName = substr($key,1))) {
                     $parentNode->setAttribute($attributeName, $data);
+                } elseif ($key === '#') {
+                    $append = $this->selectNodeType($parentNode, $data);
                 } elseif (is_array($data) && false === is_numeric($key)) {
                     /**
                     * Is this array fully numeric keys?

@@ -60,9 +60,6 @@ class TemplateCacheCacheWarmer extends CacheWarmer
             foreach ($this->findTemplatesIn($bundle->getPath().'/Resources/views', $name) as $template) {
                 $twig->loadTemplate($template);
             }
-            foreach ($this->findTemplatesIn($this->rootDir.'/'.$name.'/views', $name) as $template) {
-                $twig->loadTemplate($template);
-            }
         }
 
         foreach ($this->findTemplatesIn($this->rootDir.'/views') as $template) {
@@ -100,7 +97,7 @@ class TemplateCacheCacheWarmer extends CacheWarmer
                     if (null !== $bundle) {
                       $template->set('bundle', $bundle);
                     }
-                    $templates[] = $template;
+                    $templates[] = $template->getLogicalName();
                 }
             }
         }

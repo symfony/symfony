@@ -60,7 +60,7 @@ class TwigExtension extends Extension
             }
         }
 
-        if (!empty($config['cache_warmer'])) {
+        if ($config['cache_warmer']) {
             $container->getDefinition('twig.cache_warmer')->addTag('kernel.cache_warmer');
         }
 

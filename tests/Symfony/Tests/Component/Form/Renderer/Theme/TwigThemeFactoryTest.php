@@ -39,7 +39,7 @@ class TwigThemeFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $template = $this->getMockBuilder('Twig_Template')
             ->disableOriginalConstructor()
-            ->getMock();
+            ->getMockForAbstractClass();
         $theme = $this->factory->create($template);
 
         $this->assertEquals(new TwigTheme($this->environment, $template), $theme);

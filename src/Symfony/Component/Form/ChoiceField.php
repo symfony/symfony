@@ -120,8 +120,10 @@ class ChoiceField extends HybridField
         if (!$this->choices) {
             $this->choices = $this->getInitializedChoices();
 
-            if (!$this->isRequired()) {
-                $this->choices = array('' => $this->getOption('empty_value')) + $this->choices;
+	    if (!$this->isRequired()) {
+		if(!$this->isExpanded()){
+	            $this->choices = array('' => $this->getOption('empty_value')) + $this->choices;
+		}
             }
         }
     }

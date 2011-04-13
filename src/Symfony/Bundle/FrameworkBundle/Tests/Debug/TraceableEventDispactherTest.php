@@ -26,45 +26,4 @@ class TraceableEventDispactherTest extends TestCase
         $dispatcher = new TraceableEventDispatcher($container);
         $dispatcher->addListener('onFooEvent', new \stdClass());
     }
-
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testThrowsAnExceptionWhenAListenerServiceIsNotFound()
-    {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $container
-            ->expects($this->once())
-            ->method('has')
-            ->with($this->equalTo('listener.service'))
-            ->will($this->returnValue(false))
-        ;
-
-        $dispatcher = new TraceableEventDispatcher($container);
-
-        $dispatcher->addListenerService('onFooEvent', 'listener.service');
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testThrowsAnExceptionWhenAListenerServiceMethodIsNotCallable()
-    {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $container
-            ->expects($this->once())
-            ->method('has')
-            ->with($this->equalTo('listener.service'))
-            ->will($this->returnValue(true))
-        ;
-        $container
-            ->expects($this->once())
-            ->method('get')
-            ->with($this->equalTo('listener.service'))
-            ->will($this->returnValue(new \stdClass()))
-        ;
-
-        $dispatcher = new TraceableEventDispatcher($container);
-        $dispatcher->addListenerService('onFooEvent', 'listener.service');
-    }
 }

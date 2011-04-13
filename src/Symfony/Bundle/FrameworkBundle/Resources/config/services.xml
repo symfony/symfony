@@ -57,4 +57,11 @@
             <argument type="service" id="kernel" />
         </service>
     </services>
+    <interfaces>
+        <interface class="Symfony\Component\DependencyInjection\ContainerAwareInterface">
+            <call method="setContainer">
+                <argument type="service" id="service_container" />
+            </call>
+        </interface>
+    </interfaces>
 </container>

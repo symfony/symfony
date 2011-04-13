@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\HttpFoundation;
+namespace Symfony\Bundle\FrameworkBundle\Tests\Test;
 
-use Symfony\Bundle\FrameworkBundle\HttpFoundation\SessionListener;
+use Symfony\Bundle\FrameworkBundle\Test\SessionListener;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -31,7 +31,7 @@ class SessionListenerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->listener = new SessionListener();
+        $this->listener = new SessionListener($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface'));
         $this->session  = $this->getSession();
     }
 

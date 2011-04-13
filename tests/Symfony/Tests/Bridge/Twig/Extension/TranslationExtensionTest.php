@@ -72,12 +72,20 @@ class TranslationExtensionTest extends TestCase
                 'There is 5 apples (Symfony2)', array('count' => 5, 'name' => 'Symfony2')),
             array('{% transchoice count with { \'%name%\': \'Symfony2\' } %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtranschoice %}',
                 'There is 5 apples (Symfony2)', array('count' => 5)),
+            array('{% transchoice count for "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples" from "messages" %}',
+                'There is one apple', array('count' => 1)),
+            array('{% set text = "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%)" %}{% transchoice count for text with { \'%name%\': \'Symfony2\', \'%count%\': count } %}',
+                'There is 5 apples (Symfony2)', array('count' => 5)),
 
             // trans filter
             array('{{ "Hello"|trans }}', 'Hello'),
             array('{{ name|trans }}', 'Symfony2', array('name' => 'Symfony2')),
             array('{{ hello|trans({ \'%name%\': \'Symfony2\' }) }}', 'Hello Symfony2', array('hello' => 'Hello %name%')),
             array('{% set vars = { \'%name%\': \'Symfony2\' } %}{{ hello|trans(vars) }}', 'Hello Symfony2', array('hello' => 'Hello %name%')),
+
+            // transchoice filter
+            array('{{ "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples"|transchoice(count, {\'%count%\': count}) }}', 'There is 5 apples', array('count' => 5)),
+            array('{{ text|transchoice(5, {\'%count%\': 5, \'%name%\': \'Symfony2\'}) }}', 'There is 5 apples (Symfony2)', array('text' => '{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%)')),
         );
     }
 

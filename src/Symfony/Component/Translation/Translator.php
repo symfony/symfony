@@ -120,7 +120,7 @@ class Translator implements TranslatorInterface
      */
     public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
     {
-        return strtr($this->catalogues[getLocaleWithCatalogue($locale)]->get($id, $domain), $parameters);
+        return strtr($this->catalogues[$this->getLocaleWithCatalogue($locale)]->get($id, $domain), $parameters);
     }
 
     /**
@@ -130,7 +130,7 @@ class Translator implements TranslatorInterface
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
     {
-        $locale = getLocaleWithCatalogue($locale);
+        $locale = $this->getLocaleWithCatalogue($locale);
         return strtr($this->selector->choose($this->catalogues[$locale]->get($id, $domain), (int) $number, $locale), $parameters);
     }
 

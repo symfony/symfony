@@ -76,7 +76,9 @@ class InterfaceInjector
 
         foreach ($this->calls as $callback) {
             list($method, $arguments) = $callback;
-            $definition->addMethodCall($method, $arguments);
+            if (!$definition->hasMethodCall($method)) {
+                $definition->addMethodCall($method, $arguments);
+            }
         }
 
         $this->processedDefinitions[] = $definition;

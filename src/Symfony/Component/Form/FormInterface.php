@@ -118,4 +118,6 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     function getRoot();
 
     function isRoot();
+
+    function getContext();
 }

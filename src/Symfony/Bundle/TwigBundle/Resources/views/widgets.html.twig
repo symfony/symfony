@@ -1,10 +1,8 @@
 {% block field__rows %}
-{% spaceless %}
-    {{ renderer.errors }}
-    {% for field in renderer %}
-        {{ field.row }}
+    {{ form_errors(context) }}
+    {% for context in context.children %}
+        {{ form_row(context) }}
     {% endfor %}
-{% endspaceless %}
 {% endblock field__rows %}
 
 {% block field__enctype %}
@@ -14,25 +12,21 @@
 {% endblock field__enctype %}
 
 {% block field__errors %}
-{% spaceless %}
     {% if errors|length > 0 %}
     <ul>
         {% for error in errors %}
             <li>{% trans error.messageTemplate with error.messageParameters from 'validators' %}</li>
         {% endfor %}
     </ul>
-    {% endif %}  	
-{% endspaceless %}
+    {% endif %}
 {% endblock field__errors %}
 
 {% block field__rest %}
-{% spaceless %}
-    {% for field in renderer %}
-        {% if not field.rendered %}
-            {{ field.row }}
+    {% for context in context.children %}
+        {% if not context.rendered %}
+            {{ form_widget(context) }}
         {% endif %}
     {% endfor %}
-{% endspaceless %}
 {% endblock field__rest %}
 
 {% block field__label %}
@@ -70,14 +64,12 @@
 {% endblock password__widget %}
 
 {% block hidden__widget %}
-{% spaceless %}
     {% set type = type|default('hidden') %}
     {{ block('field__widget') }}
-{% endspaceless %}
 {% endblock hidden__widget %}
 
 {% block hidden__row %}
-    {{ renderer.widget }}
+    {{ form_widget(context) }}
 {% endblock hidden__row %}
 
 {% block textarea__widget %}
@@ -89,14 +81,14 @@
 {% block options %}
 {% spaceless %}
     {% for choice, label in options %}
-        {% if renderer.choiceGroup(label) %}
+        {% if context.choiceGroup(label) %}
             <optgroup label="{{ choice }}">
                 {% for nestedChoice, nestedLabel in label %}
-                    <option value="{{ nestedChoice }}"{% if renderer.choiceSelected(nestedChoice) %} selected="selected"{% endif %}>{{ nestedLabel }}</option>
+                    <option value="{{ nestedChoice }}"{% if context.choiceSelected(nestedChoice) %} selected="selected"{% endif %}>{{ nestedLabel }}</option>
                 {% endfor %}
             </optgroup>
         {% else %}
-            <option value="{{ choice }}"{% if renderer.choiceSelected(choice) %} selected="selected"{% endif %}>{{ label }}</option>
+            <option value="{{ choice }}"{% if context.choiceSelected(choice) %} selected="selected"{% endif %}>{{ label }}</option>
         {% endif %}
     {% endfor %}
 {% endspaceless %}
@@ -105,9 +97,10 @@
 {% block choice__widget %}
 {% spaceless %}
     {% if expanded %}
-        {% for choice, field in renderer %}
-            {{ field.widget }}
-            {{ field.label(renderer.choiceLabel(choice)) }}
+        {% for choice, child in context %}
+            {{ form_widget(child) }}
+            {{ child.set('label', context.choiceLabel(choice)) }}
+            {{ form_label(child) }}
         {% endfor %}
     {% else %}
     <select {{ block('attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
@@ -140,10 +133,10 @@
 
 {% block date_time__widget %}
 {% spaceless %}
-    {{ renderer.date.errors }}
-    {{ renderer.time.errors }}
-    {{ renderer.date.widget }}
-    {{ renderer.time.widget }}
+    {{ form_errors(context.date) }}
+    {{ form_errors(context.time) }}
+    {{ form_widget(context.date) }}
+    {{ form_widget(context.time) }}
 {% endspaceless %}
 {% endblock date_time__widget %}
 
@@ -152,10 +145,10 @@
     {% if widget == 'text' %}
         {{ block('text__widget') }}
     {% else %}
-        {{ date_pattern|replace({ 
-            '{{ year }}': renderer.year.widget, 
-            '{{ month }}': renderer.month.widget, 
-            '{{ day }}': renderer.day.widget 
+        {{ date_pattern|replace({
+            '{{ year }}': form_widget(context.year),
+            '{{ month }}': form_widget(context.month),
+            '{{ day }}': form_widget(context.day),
         })|raw }}
     {% endif %}
 {% endspaceless %}
@@ -163,7 +156,7 @@
 
 {% block time__widget %}
 {% spaceless %}
-    {{ renderer.hour.widget({ 'size': '1' }) }}:{{ renderer.minute.widget({ 'size': '1' }) }}{% if with_seconds %}:{{ renderer.second.widget({ 'size': '1' }) }}{% endif %}
+    {{ form_widget(context.hour, { 'size': '1' }) }}:{{ form_widget(context.minute, { 'size': '1' }) }}{% if with_seconds %}:{{ form_widget(context.second, { 'size': '1' }) }}{% endif %}
 {% endspaceless %}
 {% endblock time__widget %}
 
@@ -203,9 +196,9 @@
 
 {% block file__widget %}
 {% spaceless %}
-    {{ renderer.file.widget }}
-    {{ renderer.token.widget }}
-    {{ renderer.name.widget }}
+    {{ form_widget(context.file) }}
+    {{ form_widget(context.token) }}
+    {{ form_widget(context.name) }}
 {% endspaceless %}
 {% endblock file__widget %}
 

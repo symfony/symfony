@@ -17,7 +17,7 @@ use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\EventListener\FixRadioInputListener;
-use Symfony\Component\Form\Renderer\ThemeRendererInterface;
+use Symfony\Component\Form\TemplateContext;
 use Symfony\Component\Form\DataTransformer\ScalarToChoiceTransformer;
 use Symfony\Component\Form\DataTransformer\ScalarToBooleanChoicesTransformer;
 use Symfony\Component\Form\DataTransformer\ArrayToChoicesTransformer;
@@ -70,23 +70,23 @@ class ChoiceType extends AbstractType
 
     }
 
-    public function buildRenderer(ThemeRendererInterface $renderer, FormInterface $form)
+    public function buildVariables(TemplateContext $variables, FormInterface $form)
     {
         $choices = $form->getAttribute('choice_list')->getChoices();
         $preferred = array_flip($form->getAttribute('preferred_choices'));
 
-        $renderer->setVar('multiple', $form->getAttribute('multiple'));
-        $renderer->setVar('expanded', $form->getAttribute('expanded'));
-        $renderer->setVar('preferred_choices', array_intersect_key($choices, $preferred));
-        $renderer->setVar('choices', array_diff_key($choices, $preferred));
-        $renderer->setVar('separator', '-------------------');
-        $renderer->setVar('empty_value', '');
+        $variables->set('multiple', $form->getAttribute('multiple'));
+        $variables->set('expanded', $form->getAttribute('expanded'));
+        $variables->set('preferred_choices', array_intersect_key($choices, $preferred));
+        $variables->set('choices', array_diff_key($choices, $preferred));
+        $variables->set('separator', '-------------------');
+        $variables->set('empty_value', '');
 
-        if ($renderer->getVar('multiple') && !$renderer->getVar('expanded')) {
+        if ($variables->get('multiple') && !$variables->get('expanded')) {
             // Add "[]" to the name in case a select tag with multiple options is
             // displayed. Otherwise only one of the selected options is sent in the
             // POST request.
-            $renderer->setVar('name', $renderer->getVar('name').'[]');
+            $variables->set('name', $variables->get('name').'[]');
         }
     }
 

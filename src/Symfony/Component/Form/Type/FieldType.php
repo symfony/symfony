@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Type;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Renderer\ThemeRendererInterface;
+use Symfony\Component\Form\TemplateContext;
 use Symfony\Component\Form\EventListener\TrimListener;
 use Symfony\Component\Form\Validator\DefaultValidator;
 use Symfony\Component\Form\Validator\DelegatingValidator;
@@ -64,11 +64,11 @@ class FieldType extends AbstractType
         }
     }
 
-    public function buildRenderer(ThemeRendererInterface $renderer, FormInterface $form)
+    public function buildVariables(TemplateContext $variables, FormInterface $form)
     {
-        if ($renderer->hasParent()) {
-            $parentId = $renderer->getParent()->getVar('id');
-            $parentName = $renderer->getParent()->getVar('name');
+        if ($variables->hasParent()) {
+            $parentId = $variables->getParent()->get('id');
+            $parentName = $variables->getParent()->get('name');
             $id = sprintf('%s_%s', $parentId, $form->getName());
             $name = sprintf('%s[%s]', $parentName, $form->getName());
         } else {
@@ -76,19 +76,24 @@ class FieldType extends AbstractType
             $name = $form->getName();
         }
 
-        $renderer->setVar('renderer', $renderer);
-        $renderer->setVar('id', $id);
-        $renderer->setVar('name', $name);
-        $renderer->setVar('errors', $form->getErrors());
-        $renderer->setVar('value', $form->getClientData());
-        $renderer->setVar('read_only', $form->isReadOnly());
-        $renderer->setVar('required', $form->isRequired());
-        $renderer->setVar('class', null);
-        $renderer->setVar('max_length', $form->getAttribute('max_length'));
-        $renderer->setVar('size', null);
-        $renderer->setVar('label', ucfirst(strtolower(str_replace('_', ' ', $form->getName()))));
-        $renderer->setVar('multipart', false);
-        $renderer->setVar('attr', array());
+        $variables->set('id', $id);
+        $variables->set('name', $name);
+        $variables->set('errors', $form->getErrors());
+        $variables->set('value', $form->getClientData());
+        $variables->set('read_only', $form->isReadOnly());
+        $variables->set('required', $form->isRequired());
+        $variables->set('class', null);
+        $variables->set('max_length', $form->getAttribute('max_length'));
+        $variables->set('size', null);
+        $variables->set('label', ucfirst(strtolower(str_replace('_', ' ', $form->getName()))));
+        $variables->set('multipart', false);
+        $variables->set('attr', array());
+
+        $types = array();
+        foreach (array_reverse((array) $form->getTypes()) as $type) {
+            $types[] = $type->getName();
+        }
+        $variables->set('types', $types);
     }
 
     public function getDefaultOptions(array $options)

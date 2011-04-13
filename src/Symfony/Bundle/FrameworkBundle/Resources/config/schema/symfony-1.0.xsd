@@ -95,11 +95,12 @@
         <xsd:sequence>
             <xsd:element name="loader" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="engine" type="templating_engine" minOccurs="1" maxOccurs="unbounded" />
-            <xsd:element name="assets-base-url" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="assets-base-url" type="base_url" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="package" type="package" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
 
         <xsd:attribute name="assets-version" type="xsd:string" />
+        <xsd:attribute name="assets-version-format" type="xsd:string" />
         <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="cache-warmer" type="cache_warmer" />
     </xsd:complexType>
@@ -110,11 +111,20 @@
 
     <xsd:complexType name="package">
         <xsd:sequence>
-            <xsd:element name="base-url" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="base-url" type="base_url" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
 
         <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="version" type="xsd:string" />
+        <xsd:attribute name="version-format" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="base_url">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="secure" type="xsd:boolean" />
+            </xsd:extension>
+        </xsd:simpleContent>
     </xsd:complexType>
 
     <xsd:complexType name="translator">

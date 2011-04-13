@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -330,19 +331,7 @@ class FrameworkExtension extends Extension
             $loader->load('templating_debug.xml');
         }
 
-        $packages = array();
-        foreach ($config['packages'] as $name => $package) {
-            $packages[$name] = new Definition('%templating.asset_package.class%', array(
-                $package['base_urls'],
-                $package['version'],
-            ));
-        }
-        $container
-            ->getDefinition('templating.helper.assets')
-            ->setArgument(1, isset($config['assets_base_urls']) ? $config['assets_base_urls'] : array())
-            ->setArgument(2, $config['assets_version'])
-            ->setArgument(3, $packages)
-        ;
+        $this->registerAssetsHelperConfiguration($config, $container);
 
         if (!empty($config['loaders'])) {
             $loaders = array_map(function($loader) { return new Reference($loader); }, $config['loaders']);
@@ -405,6 +394,56 @@ class FrameworkExtension extends Extension
         } else {
             $container->getDefinition('templating.engine.delegating')->setArgument(1, $engines);
             $container->setAlias('templating', 'templating.engine.delegating');
+        }
+    }
+
+    private function registerAssetsHelperConfiguration(array $config, ContainerBuilder $container)
+    {
+        $packages     = array();
+        $httpPackages = array();
+        $sslPackages  = array();
+
+        foreach ($config['packages'] as $name => $package) {
+            $packageDef = new DefinitionDecorator('templating.asset_package');
+            $packageDef->setArgument(2, $package['version_format']);
+
+            if (isset($package['version'])) {
+                $packageDef->setArgument(1, $package['version']);
+            }
+
+            if (isset($package['base_urls'])) {
+                if ($package['base_urls']['http'] == $package['base_urls']['ssl']) {
+                    $packageDef->setArgument(0, $package['base_urls']['http']);
+                    $packages[$name] = $packageDef;
+                } else {
+                    $sslDef = clone $packageDef;
+                    $sslDef->setArgument(0, $package['base_urls']['ssl']);
+                    $sslPackages[$name] = $sslDef;
+
+                    $packageDef->setArgument(0, $package['base_urls']['http']);
+                    $httpPackages[$name] = $packageDef;
+                }
+            } else {
+                $packages[$name] = $packageDef;
+            }
+        }
+
+        $helper = $container->getDefinition('templating.helper.assets')->setArgument(1, $packages);
+
+        if (0 < count($httpPackages) || 0 < count($sslPackages)) {
+            $container->register('templating.asset_packages.http')
+                ->setClass('ArrayIterator')
+                ->addArgument($httpPackages);
+            $container->register('templating.asset_packages.ssl')
+                ->setClass('ArrayIterator')
+                ->addArgument($sslPackages);
+            $container->register('templating.helper.assets.configurator')
+                ->setClass('Symfony\\Bundle\\FrameworkBundle\\DependencyInjection\\Configurator\\AssetsHelperConfigurator')
+                ->setScope('request')
+                ->addArgument(new Reference('service_container'))
+                ->addArgument(new Reference('request'));
+
+            $helper->setConfigurator(array(new Reference('templating.helper.assets.configurator'), 'configure'));
         }
     }
 

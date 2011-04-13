@@ -24,13 +24,11 @@ class AssetsHelper extends BaseAssetsHelper
     /**
      * Constructor.
      *
-     * @param Request      $request  A Request instance
-     * @param string|array $baseURLs The domain URL or an array of domain URLs
-     * @param string       $version  The version
-     * @param array        $packages Asset packages indexed by name
+     * @param Request $request  A Request instance
+     * @param array   $packages An array of packages
      */
-    public function __construct(Request $request, $baseURLs = array(), $version = null, $packages = array())
+    public function __construct(Request $request, array $packages = array())
     {
-        parent::__construct($request->getBasePath(), $baseURLs, $version, $packages);
+        parent::__construct($request->getBasePath(), null, null, $packages);
     }
 }

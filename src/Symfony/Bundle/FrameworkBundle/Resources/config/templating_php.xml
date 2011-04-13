@@ -35,8 +35,6 @@
         <service id="templating.helper.assets" class="%templating.helper.assets.class%">
             <tag name="templating.helper" alias="assets" />
             <argument type="service" id="request" strict="false" />
-            <argument type="collection" /> <!-- assets base URLs -->
-            <argument /> <!-- assets version -->
             <argument type="collection" /> <!-- packages -->
         </service>
 
@@ -78,6 +76,12 @@
 
         <service id="templating.globals" class="%templating.globals.class%">
             <argument type="service" id="service_container" />
+        </service>
+
+        <service id="templating.asset_package" class="%templating.asset_package.class%" abstract="true">
+            <argument /> <!-- base urls -->
+            <argument /> <!-- version -->
+            <argument /> <!-- version format -->
         </service>
     </services>
 </container>

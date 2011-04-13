@@ -70,7 +70,7 @@ class Cookie
         return $this->domain;
     }
 
-    public function getExpire()
+    public function getExpiresTime()
     {
         return $this->expire;
     }

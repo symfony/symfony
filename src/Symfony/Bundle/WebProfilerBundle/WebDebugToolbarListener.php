@@ -61,8 +61,8 @@ class WebDebugToolbarListener
         }
 
         if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects) {
-            // keep current flashes for one more request
             if (null !== $session = $request->getSession()) {
+                // keep current flashes for one more request
                 $session->setFlashes($session->getFlashes());
             }
 

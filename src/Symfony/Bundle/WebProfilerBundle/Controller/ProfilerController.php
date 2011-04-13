@@ -178,13 +178,16 @@ class ProfilerController extends ContainerAware
         $profiler->disable();
 
         if (null === $session = $this->container->get('request')->getSession()) {
-            return new Response();
+            $ip    =
+            $url   =
+            $limit =
+            $token = null;
+        } else {
+            $ip    = $session->get('_profiler_search_ip');
+            $url   = $session->get('_profiler_search_url');
+            $limit = $session->get('_profiler_search_limit');
+            $token = $session->get('_profiler_search_token');
         }
-
-        $ip    = $session->get('_profiler_search_ip');
-        $url   = $session->get('_profiler_search_url');
-        $limit = $session->get('_profiler_search_limit');
-        $token = $session->get('_profiler_search_token');
 
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:search.html.twig', array(
             'token' => $token,
@@ -206,13 +209,9 @@ class ProfilerController extends ContainerAware
 
         $pofiler = $profiler->loadFromToken($token);
 
-        if (null === $session = $this->container->get('request')->getSession()) {
-            throw new \RuntimeException('To access to search, activate the session in your configuration.');
-        }
-
-        $ip    = $session->get('_profiler_search_ip');
-        $url   = $session->get('_profiler_search_url');
-        $limit = $session->get('_profiler_search_limit');
+        $ip    = $this->container->get('request')->query->get('ip');
+        $url   = $this->container->get('request')->query->get('url');
+        $limit = $this->container->get('request')->query->get('limit');
 
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:results.html.twig', array(
             'token'    => $token,
@@ -237,14 +236,17 @@ class ProfilerController extends ContainerAware
 
         $request = $this->container->get('request');
 
-        if (null === $session = $request->getSession()) {
-            throw new \RuntimeException('To access to search, activate the session in your configuration.');
-        }
+        $ip    = preg_replace('/[^\d\.]/', '', $request->query->get('ip'));
+        $url   = $request->query->get('url');
+        $limit = $request->query->get('limit');
+        $token = $request->query->get('token');
 
-        $session->set('_profiler_search_ip', $ip = preg_replace('/[^\d\.]/', '', $request->query->get('ip')));
-        $session->set('_profiler_search_url', $url = $request->query->get('url'));
-        $session->set('_profiler_search_limit', $limit = $request->query->get('limit'));
-        $session->set('_profiler_search_token', $token = $request->query->get('token'));
+        if (null !== $session = $request->getSession()) {
+            $session->set('_profiler_search_ip', $ip);
+            $session->set('_profiler_search_url', $url);
+            $session->set('_profiler_search_limit', $limit);
+            $session->set('_profiler_search_token', $token);
+        }
 
         if (!empty($token)) {
             return new RedirectResponse($this->container->get('router')->generate('_profiler', array('token' => $token)));
@@ -252,7 +254,12 @@ class ProfilerController extends ContainerAware
 
         $tokens = $profiler->find($ip, $url, $limit);
 
-        return new RedirectResponse($this->container->get('router')->generate('_profiler_search_results', array('token' => $tokens ? $tokens[0]['token'] : 'empty')));
+        return new RedirectResponse($this->container->get('router')->generate('_profiler_search_results', array(
+            'token' => $tokens ? $tokens[0]['token'] : 'empty',
+            'ip'    => $ip,
+            'url'   => $url,
+            'limit' => $limit,
+        )));
     }
 
     protected function getTemplateNames($profiler)

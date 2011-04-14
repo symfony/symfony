@@ -15,29 +15,29 @@ require_once __DIR__.'/TestCase.php';
 
 class CheckboxTypeTest extends TestCase
 {
-    public function testPassValueToRenderer()
+    public function testPassValueToContext()
     {
         $form = $this->factory->create('checkbox', 'name', array('value' => 'foobar'));
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertEquals('foobar', $renderer->getVar('value'));
+        $this->assertEquals('foobar', $context->getVar('value'));
     }
 
     public function testCheckedIfDataTrue()
     {
         $form = $this->factory->create('checkbox');
         $form->setData(true);
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertTrue($renderer->getVar('checked'));
+        $this->assertTrue($context->getVar('checked'));
     }
 
     public function testNotCheckedIfDataFalse()
     {
         $form = $this->factory->create('checkbox');
         $form->setData(false);
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertFalse($renderer->getVar('checked'));
+        $this->assertFalse($context->getVar('checked'));
     }
 }

@@ -24,13 +24,13 @@ class RadioType extends AbstractType
             ->setAttribute('value', $options['value']);
     }
 
-    public function buildVariables(TemplateContext $variables, FormInterface $form)
+    public function buildContext(TemplateContext $context, FormInterface $form)
     {
-        $variables->set('value', $form->getAttribute('value'));
-        $variables->set('checked', (bool)$form->getData());
+        $context->setVar('value', $form->getAttribute('value'));
+        $context->setVar('checked', (bool)$form->getData());
 
-        if ($variables->hasParent()) {
-            $variables->set('name', $variables->getParent()->get('name'));
+        if ($context->hasParent()) {
+            $context->setVar('name', $context->getParent()->getVar('name'));
         }
     }
 

@@ -15,38 +15,38 @@ require_once __DIR__.'/TestCase.php';
 
 class RadioTypeTest extends TestCase
 {
-    public function testPassValueToRenderer()
+    public function testPassValueToContext()
     {
         $form = $this->factory->create('radio', 'name', array('value' => 'foobar'));
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertEquals('foobar', $renderer->getVar('value'));
+        $this->assertEquals('foobar', $context->getVar('value'));
     }
 
-    public function testPassParentNameToRenderer()
+    public function testPassParentNameToContext()
     {
         $parent = $this->factory->create('field', 'parent');
         $parent->add($this->factory->create('radio', 'child'));
-        $renderer = $this->factory->createRenderer($parent, 'stub');
+        $context = $parent->getContext();
 
-        $this->assertEquals('parent', $renderer['child']->getVar('name'));
+        $this->assertEquals('parent', $context['child']->getVar('name'));
     }
 
     public function testCheckedIfDataTrue()
     {
         $form = $this->factory->create('radio');
         $form->setData(true);
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertTrue($renderer->getVar('checked'));
+        $this->assertTrue($context->getVar('checked'));
     }
 
     public function testNotCheckedIfDataFalse()
     {
         $form = $this->factory->create('radio');
         $form->setData(false);
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertFalse($renderer->getVar('checked'));
+        $this->assertFalse($context->getVar('checked'));
     }
 }

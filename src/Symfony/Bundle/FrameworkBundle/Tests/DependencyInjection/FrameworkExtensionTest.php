@@ -57,14 +57,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('router.cached', (string) $container->getAlias('router'), '->registerRouterConfiguration() changes router alias to cached if cache warming is set');
     }
 
-    public function testForm()
-    {
-        $container = $this->createContainerFromFile('full');
-
-        $this->assertTrue($container->hasAlias('form.theme.factory'), '->registerTemplatingConfiguration() aliases a form.theme.factory service.');
-        $this->assertEquals('form.theme.factory.twig', (string)$container->getAlias('form.theme.factory'));
-    }
-
     /**
      * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
@@ -190,7 +182,7 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testValidationPaths()
     {
         require_once __DIR__ . "/Fixtures/TestBundle/TestBundle.php";
-        
+
         $container = $this->createContainerFromFile('validation_annotations', array(
             'kernel.bundles' => array('TestBundle' => 'Symfony\Bundle\FrameworkBundle\Tests\TestBundle'),
         ));

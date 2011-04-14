@@ -22,10 +22,10 @@ class PasswordType extends AbstractType
         $builder->setAttribute('always_empty', $options['always_empty']);
     }
 
-    public function buildVariables(TemplateContext $variables, FormInterface $form)
+    public function buildContext(TemplateContext $context, FormInterface $form)
     {
         if ($form->getAttribute('always_empty') || !$form->isBound()) {
-            $variables->set('value', '');
+            $context->setVar('value', '');
         }
     }
 

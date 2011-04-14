@@ -64,11 +64,11 @@ class FieldType extends AbstractType
         }
     }
 
-    public function buildVariables(TemplateContext $variables, FormInterface $form)
+    public function buildContext(TemplateContext $context, FormInterface $form)
     {
-        if ($variables->hasParent()) {
-            $parentId = $variables->getParent()->get('id');
-            $parentName = $variables->getParent()->get('name');
+        if ($context->hasParent()) {
+            $parentId = $context->getParent()->getVar('id');
+            $parentName = $context->getParent()->getVar('name');
             $id = sprintf('%s_%s', $parentId, $form->getName());
             $name = sprintf('%s[%s]', $parentName, $form->getName());
         } else {
@@ -76,24 +76,24 @@ class FieldType extends AbstractType
             $name = $form->getName();
         }
 
-        $variables->set('id', $id);
-        $variables->set('name', $name);
-        $variables->set('errors', $form->getErrors());
-        $variables->set('value', $form->getClientData());
-        $variables->set('read_only', $form->isReadOnly());
-        $variables->set('required', $form->isRequired());
-        $variables->set('class', null);
-        $variables->set('max_length', $form->getAttribute('max_length'));
-        $variables->set('size', null);
-        $variables->set('label', ucfirst(strtolower(str_replace('_', ' ', $form->getName()))));
-        $variables->set('multipart', false);
-        $variables->set('attr', array());
+        $context->setVar('id', $id);
+        $context->setVar('name', $name);
+        $context->setVar('errors', $form->getErrors());
+        $context->setVar('value', $form->getClientData());
+        $context->setVar('read_only', $form->isReadOnly());
+        $context->setVar('required', $form->isRequired());
+        $context->setVar('class', null);
+        $context->setVar('max_length', $form->getAttribute('max_length'));
+        $context->setVar('size', null);
+        $context->setVar('label', ucfirst(strtolower(str_replace('_', ' ', $form->getName()))));
+        $context->setVar('multipart', false);
+        $context->setVar('attr', array());
 
         $types = array();
         foreach (array_reverse((array) $form->getTypes()) as $type) {
             $types[] = $type->getName();
         }
-        $variables->set('types', $types);
+        $context->setVar('types', $types);
     }
 
     public function getDefaultOptions(array $options)

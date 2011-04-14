@@ -70,23 +70,23 @@ class ChoiceType extends AbstractType
 
     }
 
-    public function buildVariables(TemplateContext $variables, FormInterface $form)
+    public function buildContext(TemplateContext $context, FormInterface $form)
     {
         $choices = $form->getAttribute('choice_list')->getChoices();
         $preferred = array_flip($form->getAttribute('preferred_choices'));
 
-        $variables->set('multiple', $form->getAttribute('multiple'));
-        $variables->set('expanded', $form->getAttribute('expanded'));
-        $variables->set('preferred_choices', array_intersect_key($choices, $preferred));
-        $variables->set('choices', array_diff_key($choices, $preferred));
-        $variables->set('separator', '-------------------');
-        $variables->set('empty_value', '');
+        $context->setVar('multiple', $form->getAttribute('multiple'));
+        $context->setVar('expanded', $form->getAttribute('expanded'));
+        $context->setVar('preferred_choices', array_intersect_key($choices, $preferred));
+        $context->setVar('choices', array_diff_key($choices, $preferred));
+        $context->setVar('separator', '-------------------');
+        $context->setVar('empty_value', '');
 
-        if ($variables->get('multiple') && !$variables->get('expanded')) {
+        if ($context->getVar('multiple') && !$context->getVar('expanded')) {
             // Add "[]" to the name in case a select tag with multiple options is
             // displayed. Otherwise only one of the selected options is sent in the
             // POST request.
-            $variables->set('name', $variables->get('name').'[]');
+            $context->setVar('name', $context->getVar('name').'[]');
         }
     }
 

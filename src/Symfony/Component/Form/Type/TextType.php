@@ -22,9 +22,9 @@ class TextType extends AbstractType
         $builder->setAttribute('max_length', $options['max_length']);
     }
 
-    public function buildVariables(TemplateContext $variables, FormInterface $form)
+    public function buildContext(TemplateContext $context, FormInterface $form)
     {
-        $variables->set('max_length', $form->getAttribute('max_length'));
+        $context->setVar('max_length', $form->getAttribute('max_length'));
     }
 
     public function getParent(array $options)

@@ -216,50 +216,50 @@ class ChoiceTypeTest extends TestCase
         $this->factory->create('choice', 'name');
     }
 
-    public function testPassMultipleToRenderer()
+    public function testPassMultipleToContext()
     {
         $form = $this->factory->create('choice', 'name', array(
             'multiple' => true,
             'choices' => $this->choices,
         ));
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertTrue($renderer->getVar('multiple'));
+        $this->assertTrue($context->getVar('multiple'));
     }
 
-    public function testPassExpandedToRenderer()
+    public function testPassExpandedToContext()
     {
         $form = $this->factory->create('choice', 'name', array(
             'expanded' => true,
             'choices' => $this->choices,
         ));
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertTrue($renderer->getVar('expanded'));
+        $this->assertTrue($context->getVar('expanded'));
     }
 
-    public function testPassChoicesToRenderer()
+    public function testPassChoicesToContext()
     {
         $choices = array('a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D');
         $form = $this->factory->create('choice', 'name', array(
             'choices' => $choices,
         ));
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertSame($choices, $renderer->getVar('choices'));
+        $this->assertSame($choices, $context->getVar('choices'));
     }
 
-    public function testPassPreferredChoicesToRenderer()
+    public function testPassPreferredChoicesToContext()
     {
         $choices = array('a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D');
         $form = $this->factory->create('choice', 'name', array(
             'choices' => $choices,
             'preferred_choices' => array('b', 'd'),
         ));
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertSame(array('a' => 'A', 'c' => 'C'), $renderer->getVar('choices'));
-        $this->assertSame(array('b' => 'B', 'd' => 'D'), $renderer->getVar('preferred_choices'));
+        $this->assertSame(array('a' => 'A', 'c' => 'C'), $context->getVar('choices'));
+        $this->assertSame(array('b' => 'B', 'd' => 'D'), $context->getVar('preferred_choices'));
     }
 
     public function testAdjustNameForMultipleNonExpanded()
@@ -269,8 +269,8 @@ class ChoiceTypeTest extends TestCase
             'expanded' => false,
             'choices' => $this->choices,
         ));
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertSame('name[]', $renderer->getVar('name'));
+        $this->assertSame('name[]', $context->getVar('name'));
     }
 }

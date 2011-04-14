@@ -48,10 +48,10 @@ class FileType extends AbstractType
             ->add('name', 'hidden');
     }
 
-    public function buildVariablesBottomUp(TemplateContext $variables, FormInterface $form)
+    public function buildContextBottomUp(TemplateContext $context, FormInterface $form)
     {
-        $variables->set('multipart', true);
-        $variables['file']->set('type', 'file');
+        $context->setVar('multipart', true);
+        $context['file']->setVar('type', 'file');
     }
 
     public function getDefaultOptions(array $options)

@@ -26,9 +26,9 @@ class MoneyType extends AbstractType
             ->setAttribute('currency', $options['currency']);
     }
 
-    public function buildVariables(TemplateContext $variables, FormInterface $form)
+    public function buildContext(TemplateContext $context, FormInterface $form)
     {
-        $variables->set('money_pattern', self::getPattern($form->getAttribute('currency')));
+        $context->setVar('money_pattern', self::getPattern($form->getAttribute('currency')));
     }
 
     public function getDefaultOptions(array $options)

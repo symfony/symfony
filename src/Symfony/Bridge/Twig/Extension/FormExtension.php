@@ -175,16 +175,16 @@ class FormExtension extends \Twig_Extension
     protected function render(TemplateContext $context, $section, array $variables = array(), array $resources = null)
     {
         $templates = $this->getTemplates($context, $resources);
-        $blocks = $context->get('types');
+        $blocks = $context->getVar('types');
         foreach ($blocks as &$block) {
             $block = $block.'__'.$section;
 
             if (isset($templates[$block])) {
                 if ('widget' === $section) {
-                    $context->set('is_rendered', true);
+                    $context->setVar('is_rendered', true);
                 }
 
-                return $templates[$block]->renderBlock($block, array_merge($context->all(), $variables));
+                return $templates[$block]->renderBlock($block, array_merge($context->getVars(), $variables));
             }
         }
 

@@ -22,11 +22,11 @@ abstract class AbstractType implements FormTypeInterface
     {
     }
 
-    public function buildVariables(TemplateContext $variables, FormInterface $form)
+    public function buildContext(TemplateContext $context, FormInterface $form)
     {
     }
 
-    public function buildVariablesBottomUp(TemplateContext $variables, FormInterface $form)
+    public function buildContextBottomUp(TemplateContext $context, FormInterface $form)
     {
     }
 

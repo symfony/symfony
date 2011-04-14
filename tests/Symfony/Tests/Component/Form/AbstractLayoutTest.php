@@ -210,11 +210,13 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testChoice()
+    public function testSingleChoice()
     {
         $form = $this->factory->create('choice', 'name', array(
             'choices' => array('a' => 'A', 'b' => 'B'),
             'data' => 'a',
+            'multiple' => false,
+            'expanded' => false,
         ));
 
         $this->assertWidgetMatchesXpath($form, array(),
@@ -229,12 +231,14 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testChoiceWithPreferred()
+    public function testSingleChoiceWithPreferred()
     {
         $form = $this->factory->create('choice', 'name', array(
             'choices' => array('a' => 'A', 'b' => 'B'),
             'preferred_choices' => array('b'),
             'data' => 'a',
+            'multiple' => false,
+            'expanded' => false,
         ));
 
         $this->assertWidgetMatchesXpath($form, array('separator' => '-- sep --'),
@@ -250,12 +254,14 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testNonRequiredChoice()
+    public function testSingleChoiceNonRequired()
     {
         $form = $this->factory->create('choice', 'name', array(
             'choices' => array('a' => 'A', 'b' => 'B'),
             'required' => false,
             'data' => 'a',
+            'multiple' => false,
+            'expanded' => false,
         ));
 
         $this->assertWidgetMatchesXpath($form, array(),
@@ -271,7 +277,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGroupedChoice()
+    public function testSingleChoiceGrouped()
     {
         $form = $this->factory->create('choice', 'name', array(
             'choices' => array(
@@ -279,6 +285,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
                 'Group2' => array('c' => 'C'),
             ),
             'data' => 'a',
+            'multiple' => false,
+            'expanded' => false,
         ));
 
         $this->assertWidgetMatchesXpath($form, array(),
@@ -296,6 +304,97 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         [count(./option)=1]
     ]
     [count(./optgroup)=2]
+'
+        );
+    }
+
+    public function testMultipleChoice()
+    {
+        $form = $this->factory->create('choice', 'name', array(
+            'choices' => array('a' => 'A', 'b' => 'B'),
+            'data' => array('a'),
+            'multiple' => true,
+            'expanded' => false,
+        ));
+
+        $this->assertWidgetMatchesXpath($form, array(),
+'/select
+    [@name="name[]"]
+    [@multiple="multiple"]
+    [
+        ./option[@value="a"][@selected="selected"][.="A"]
+        /following-sibling::option[@value="b"][not(@selected)][.="B"]
+    ]
+    [count(./option)=2]
+'
+        );
+    }
+
+    public function testMultipleChoiceNonRequired()
+    {
+        $form = $this->factory->create('choice', 'name', array(
+            'choices' => array('a' => 'A', 'b' => 'B'),
+            'data' => array('a'),
+            'required' => false,
+            'multiple' => true,
+            'expanded' => false,
+        ));
+
+        $this->assertWidgetMatchesXpath($form, array(),
+'/select
+    [@name="name[]"]
+    [@multiple="multiple"]
+    [
+        ./option[@value="a"][@selected="selected"][.="A"]
+        /following-sibling::option[@value="b"][not(@selected)][.="B"]
+    ]
+    [count(./option)=2]
+'
+        );
+    }
+
+    public function testSingleChoiceExpanded()
+    {
+        $form = $this->factory->create('choice', 'name', array(
+            'choices' => array('a' => 'A', 'b' => 'B'),
+            'data' => 'a',
+            'multiple' => false,
+            'expanded' => true,
+        ));
+
+        $this->assertWidgetMatchesXpath($form, array(),
+'/div
+    [
+        ./input[@type="radio"][@name="name"][@id="name_a"][@checked]
+        /following-sibling::label[@for="name_a"][.="[trans]A[/trans]"]
+        /following-sibling::input[@type="radio"][@name="name"][@id="name_b"][not(@checked)]
+        /following-sibling::label[@for="name_b"][.="[trans]B[/trans]"]
+    ]
+    [count(./input)=2]
+'
+        );
+    }
+
+    public function testMultipleChoiceExpanded()
+    {
+        $form = $this->factory->create('choice', 'name', array(
+            'choices' => array('a' => 'A', 'b' => 'B', 'c' => 'C'),
+            'data' => array('a', 'c'),
+            'multiple' => true,
+            'expanded' => true,
+        ));
+
+        $this->assertWidgetMatchesXpath($form, array(),
+'/div
+    [
+        ./input[@type="checkbox"][@name="name[a]"][@id="name_a"][@checked]
+        /following-sibling::label[@for="name_a"][.="[trans]A[/trans]"]
+        /following-sibling::input[@type="checkbox"][@name="name[b]"][@id="name_b"][not(@checked)]
+        /following-sibling::label[@for="name_b"][.="[trans]B[/trans]"]
+        /following-sibling::input[@type="checkbox"][@name="name[c]"][@id="name_c"][@checked]
+        /following-sibling::label[@for="name_c"][.="[trans]C[/trans]"]
+    ]
+    [count(./input)=3]
 '
         );
     }

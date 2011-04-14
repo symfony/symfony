@@ -216,50 +216,50 @@ class ChoiceTypeTest extends TestCase
         $this->factory->create('choice', 'name');
     }
 
-    public function testPassMultipleToContext()
+    public function testPassMultipleToView()
     {
         $form = $this->factory->create('choice', 'name', array(
             'multiple' => true,
             'choices' => $this->choices,
         ));
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertTrue($context->getVar('multiple'));
+        $this->assertTrue($view->getVar('multiple'));
     }
 
-    public function testPassExpandedToContext()
+    public function testPassExpandedToView()
     {
         $form = $this->factory->create('choice', 'name', array(
             'expanded' => true,
             'choices' => $this->choices,
         ));
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertTrue($context->getVar('expanded'));
+        $this->assertTrue($view->getVar('expanded'));
     }
 
-    public function testPassChoicesToContext()
+    public function testPassChoicesToView()
     {
         $choices = array('a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D');
         $form = $this->factory->create('choice', 'name', array(
             'choices' => $choices,
         ));
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertSame($choices, $context->getVar('choices'));
+        $this->assertSame($choices, $view->getVar('choices'));
     }
 
-    public function testPassPreferredChoicesToContext()
+    public function testPassPreferredChoicesToView()
     {
         $choices = array('a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D');
         $form = $this->factory->create('choice', 'name', array(
             'choices' => $choices,
             'preferred_choices' => array('b', 'd'),
         ));
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertSame(array('a' => 'A', 'c' => 'C'), $context->getVar('choices'));
-        $this->assertSame(array('b' => 'B', 'd' => 'D'), $context->getVar('preferred_choices'));
+        $this->assertSame(array('a' => 'A', 'c' => 'C'), $view->getVar('choices'));
+        $this->assertSame(array('b' => 'B', 'd' => 'D'), $view->getVar('preferred_choices'));
     }
 
     public function testAdjustNameForMultipleNonExpanded()
@@ -269,8 +269,8 @@ class ChoiceTypeTest extends TestCase
             'expanded' => false,
             'choices' => $this->choices,
         ));
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertSame('name[]', $context->getVar('name'));
+        $this->assertSame('name[]', $view->getVar('name'));
     }
 }

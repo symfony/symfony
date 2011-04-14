@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
-use Symfony\Component\Form\TemplateContext;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Exception\FormException;
 
 /**
@@ -43,14 +43,14 @@ class FormExtension extends \Twig_Extension
     }
 
     /**
-     * Sets a theme for a given context.
+     * Sets a theme for a given view.
      *
-     * @param TemplateContext $context   A TemplateContext instance
+     * @param FormView $view   A FormView instance
      * @param array           $resources An array of resources
      */
-    public function setTheme(TemplateContext $context, array $resources)
+    public function setTheme(FormView $view, array $resources)
     {
-        $this->themes->attach($context, $resources);
+        $this->themes->attach($view, $resources);
     }
 
     /**
@@ -86,115 +86,115 @@ class FormExtension extends \Twig_Extension
      *
      *     <form action="..." method="post" {{ form_enctype(form) }}>
      *
-     * @param TemplateContext $context  The context for which to render the encoding type
+     * @param FormView $view  The view for which to render the encoding type
      */
-    public function renderEnctype(TemplateContext $context)
+    public function renderEnctype(FormView $view)
     {
-        return $this->render($context, 'enctype');
+        return $this->render($view, 'enctype');
     }
 
     /**
-     * Renders a row for the context.
+     * Renders a row for the view.
      *
-     * @param TemplateContext $context  The context to render as a row
+     * @param FormView $view  The view to render as a row
      */
-    public function renderRow(TemplateContext $context, array $variables = array())
+    public function renderRow(FormView $view, array $variables = array())
     {
-        return $this->render($context, 'row', $variables);
+        return $this->render($view, 'row', $variables);
     }
 
-    public function renderRest(TemplateContext $context, array $variables = array())
+    public function renderRest(FormView $view, array $variables = array())
     {
-        return $this->render($context, 'rest', $variables);
+        return $this->render($view, 'rest', $variables);
     }
 
     /**
-     * Renders the HTML for a given context
+     * Renders the HTML for a given view
      *
      * Example usage in Twig:
      *
-     *     {{ form_widget(context) }}
+     *     {{ form_widget(view) }}
      *
      * You can pass attributes element during the call:
      *
-     *     {{ form_widget(context, {'class': 'foo'}) }}
+     *     {{ form_widget(view, {'class': 'foo'}) }}
      *
      * Some fields also accept additional variables as parameters:
      *
-     *     {{ form_widget(context, {}, {'separator': '+++++'}) }}
+     *     {{ form_widget(view, {}, {'separator': '+++++'}) }}
      *
-     * @param TemplateContext $context    The context to render
+     * @param FormView $view    The view to render
      * @param array           $attributes HTML attributes passed to the template
      * @param array           $parameters Additional variables passed to the template
      * @param array|string    $resources  A resource or array of resources
      */
-    public function renderWidget(TemplateContext $context, array $variables = array(), $resources = null)
+    public function renderWidget(FormView $view, array $variables = array(), $resources = null)
     {
         if (null !== $resources && !is_array($resources)) {
             $resources = array($resources);
         }
 
-        return $this->render($context, 'widget', $variables, $resources);
+        return $this->render($view, 'widget', $variables, $resources);
     }
 
     /**
-     * Renders the errors of the given context
+     * Renders the errors of the given view
      *
-     * @param TemplateContext $context The context to render the errors for
+     * @param FormView $view The view to render the errors for
      * @param array           $params  Additional variables passed to the template
      */
-    public function renderErrors(TemplateContext $context)
+    public function renderErrors(FormView $view)
     {
-        return $this->render($context, 'errors');
+        return $this->render($view, 'errors');
     }
 
     /**
-     * Renders the label of the given context
+     * Renders the label of the given view
      *
-     * @param TemplateContext $context The context to render the label for
+     * @param FormView $view The view to render the label for
      */
-    public function renderLabel(TemplateContext $context, $label = null)
+    public function renderLabel(FormView $view, $label = null)
     {
-        return $this->render($context, 'label', null === $label ? array() : array('label' => $label));
+        return $this->render($view, 'label', null === $label ? array() : array('label' => $label));
     }
 
     /**
-     * Renders the widget data of the given context
+     * Renders the widget data of the given view
      *
-     * @param TemplateContext $context The context to render the data for
+     * @param FormView $view The view to render the data for
      */
-    public function renderData(TemplateContext $context)
+    public function renderData(FormView $view)
     {
         return $form->getData();
     }
 
-    protected function render(TemplateContext $context, $section, array $variables = array(), array $resources = null)
+    protected function render(FormView $view, $section, array $variables = array(), array $resources = null)
     {
-        $templates = $this->getTemplates($context, $resources);
-        $blocks = $context->getVar('types');
+        $templates = $this->getTemplates($view, $resources);
+        $blocks = $view->getVar('types');
         foreach ($blocks as &$block) {
             $block = $block.'__'.$section;
 
             if (isset($templates[$block])) {
                 if ('widget' === $section || 'row' === $section) {
-                    $context->setRendered(true);
+                    $view->setRendered(true);
                 }
 
-                return $templates[$block]->renderBlock($block, array_merge($context->getVars(), $variables));
+                return $templates[$block]->renderBlock($block, array_merge($view->getVars(), $variables));
             }
         }
 
         throw new FormException(sprintf('Unable to render form as none of the following blocks exist: "%s".', implode('", "', $blocks)));
     }
 
-    protected function getTemplate(TemplateContext $context, $name, array $resources = null)
+    protected function getTemplate(FormView $view, $name, array $resources = null)
     {
-        $templates = $this->getTemplates($context, $resources);
+        $templates = $this->getTemplates($view, $resources);
 
         return $templates[$name];
     }
 
-    protected function getTemplates(TemplateContext $context, array $resources = null)
+    protected function getTemplates(FormView $view, array $resources = null)
     {
         // templates are looked for in the following resources:
         //   * resources provided directly into the function call
@@ -205,7 +205,7 @@ class FormExtension extends \Twig_Extension
         $all = $this->resources;
 
         // themes
-        $parent = $context;
+        $parent = $view;
         do {
             if (isset($this->themes[$parent])) {
                 $all = array_merge($all, $this->themes[$parent]);

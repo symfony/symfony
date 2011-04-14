@@ -1,8 +1,8 @@
 {% block field__rows %}
 {% spaceless %}
-    {{ form_errors(context) }}
-    {% for context in context.children %}
-        {{ form_row(context) }}
+    {{ form_errors(form) }}
+    {% for child in form.children %}
+        {{ form_row(child) }}
     {% endfor %}
 {% endspaceless %}
 {% endblock field__rows %}
@@ -27,9 +27,9 @@
 
 {% block field__rest %}
 {% spaceless %}
-    {% for context in context.children %}
-        {% if not context.rendered %}
-            {{ form_row(context) }}
+    {% for child in form.children %}
+        {% if not child.rendered %}
+            {{ form_row(child) }}
         {% endif %}
     {% endfor %}
 {% endspaceless %}
@@ -75,7 +75,7 @@
 {% endblock hidden__widget %}
 
 {% block hidden__row %}
-    {{ form_widget(context) }}
+    {{ form_widget(form) }}
 {% endblock hidden__row %}
 
 {% block textarea__widget %}
@@ -87,14 +87,14 @@
 {% block options %}
 {% spaceless %}
     {% for choice, label in options %}
-        {% if context.choiceGroup(label) %}
+        {% if form.choiceGroup(label) %}
             <optgroup label="{{ choice }}">
                 {% for nestedChoice, nestedLabel in label %}
-                    <option value="{{ nestedChoice }}"{% if context.choiceSelected(nestedChoice) %} selected="selected"{% endif %}>{{ nestedLabel }}</option>
+                    <option value="{{ nestedChoice }}"{% if form.choiceSelected(nestedChoice) %} selected="selected"{% endif %}>{{ nestedLabel }}</option>
                 {% endfor %}
             </optgroup>
         {% else %}
-            <option value="{{ choice }}"{% if context.choiceSelected(choice) %} selected="selected"{% endif %}>{{ label }}</option>
+            <option value="{{ choice }}"{% if form.choiceSelected(choice) %} selected="selected"{% endif %}>{{ label }}</option>
         {% endif %}
     {% endfor %}
 {% endspaceless %}
@@ -104,7 +104,7 @@
 {% spaceless %}
     {% if expanded %}
         <div {{ block('attributes') }}>
-        {% for choice, child in context %}
+        {% for choice, child in form %}
             {{ form_widget(child) }}
             {{ form_label(child) }}
         {% endfor %}
@@ -141,10 +141,10 @@
 {% block datetime__widget %}
 {% spaceless %}
     <div {{ block('attributes') }}>
-        {{ form_errors(context.date) }}
-        {{ form_errors(context.time) }}
-        {{ form_widget(context.date) }}
-        {{ form_widget(context.time) }}
+        {{ form_errors(form.date) }}
+        {{ form_errors(form.time) }}
+        {{ form_widget(form.date) }}
+        {{ form_widget(form.time) }}
     </div>
 {% endspaceless %}
 {% endblock datetime__widget %}
@@ -156,9 +156,9 @@
     {% else %}
         <div {{ block('attributes') }}>
             {{ date_pattern|replace({
-                '{{ year }}': form_widget(context.year),
-                '{{ month }}': form_widget(context.month),
-                '{{ day }}': form_widget(context.day),
+                '{{ year }}': form_widget(form.year),
+                '{{ month }}': form_widget(form.month),
+                '{{ day }}': form_widget(form.day),
             })|raw }}
         </div>
     {% endif %}
@@ -168,7 +168,7 @@
 {% block time__widget %}
 {% spaceless %}
     <div {{ block('attributes') }}>
-        {{ form_widget(context.hour, { 'size': '1' }) }}:{{ form_widget(context.minute, { 'size': '1' }) }}{% if with_seconds %}:{{ form_widget(context.second, { 'size': '1' }) }}{% endif %}
+        {{ form_widget(form.hour, { 'size': '1' }) }}:{{ form_widget(form.minute, { 'size': '1' }) }}{% if with_seconds %}:{{ form_widget(form.second, { 'size': '1' }) }}{% endif %}
     </div>
 {% endspaceless %}
 {% endblock time__widget %}
@@ -211,9 +211,9 @@
 {% block file__widget %}
 {% spaceless %}
     <div {{ block('attributes') }}>
-        {{ form_widget(context.file) }}
-        {{ form_widget(context.token) }}
-        {{ form_widget(context.name) }}
+        {{ form_widget(form.file) }}
+        {{ form_widget(form.token) }}
+        {{ form_widget(form.name) }}
     </div>
 {% endspaceless %}
 {% endblock file__widget %}
@@ -234,9 +234,9 @@
 {% block field__row %}
 {% spaceless %}
     <div>
-        {{ form_label(context) }}
-        {{ form_errors(context) }}
-        {{ form_widget(context) }}
+        {{ form_label(form) }}
+        {{ form_errors(form) }}
+        {{ form_widget(form) }}
     </div>
 {% endspaceless %}
 {% endblock field__row %}
@@ -245,7 +245,7 @@
 {% spaceless %}
     <div {{ block('attributes') }}>
         {{ block('field__rows') }}
-        {{ form_rest(context) }}
+        {{ form_rest(form) }}
     </div>
 {% endspaceless %}
 {% endblock form__widget %}

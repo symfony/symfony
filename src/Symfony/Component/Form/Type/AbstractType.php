@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Type;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\TemplateContext;
+use Symfony\Component\Form\FormView;
 
 abstract class AbstractType implements FormTypeInterface
 {
@@ -22,11 +22,11 @@ abstract class AbstractType implements FormTypeInterface
     {
     }
 
-    public function buildContext(TemplateContext $context, FormInterface $form)
+    public function buildView(FormView $view, FormInterface $form)
     {
     }
 
-    public function buildContextBottomUp(TemplateContext $context, FormInterface $form)
+    public function buildViewBottomUp(FormView $view, FormInterface $form)
     {
     }
 

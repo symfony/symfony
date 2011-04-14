@@ -19,8 +19,8 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->create('text', 'name');
         $form->addError(new FormError('Error!'));
-        $context = $form->getContext();
-        $html = $this->renderRow($context);
+        $view = $form->getView();
+        $html = $this->renderRow($view);
 
         $this->assertMatchesXpath($html,
 '/tr
@@ -42,7 +42,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     public function testRepeatedRow()
     {
         $form = $this->factory->create('repeated', 'name');
-        $html = $this->renderRow($form->getContext());
+        $html = $this->renderRow($form->getView());
 
         $this->assertMatchesXpath($html,
 '/tr
@@ -68,8 +68,8 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->create('repeated', 'name');
         $form->addError(new FormError('Error!'));
-        $context = $form->getContext();
-        $html = $this->renderRow($context);
+        $view = $form->getView();
+        $html = $this->renderRow($view);
 
         $this->assertMatchesXpath($html,
 '/tr
@@ -97,23 +97,23 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testRest()
     {
-        $context = $this->factory->createBuilder('form', 'name')
+        $view = $this->factory->createBuilder('form', 'name')
             ->add('field1', 'text')
             ->add('field2', 'repeated')
             ->add('field3', 'text')
             ->add('field4', 'text')
             ->getForm()
-            ->getContext();
+            ->getView();
 
         // Render field2 row -> does not implicitely call renderWidget because
         // it is a repeated field!
-        $this->renderRow($context['field2']);
+        $this->renderRow($view['field2']);
 
         // Render field3 widget
-        $this->renderWidget($context['field3']);
+        $this->renderWidget($view['field3']);
 
         // Rest should only contain field1 and field4
-        $html = $this->renderRest($context);
+        $html = $this->renderRest($view);
 
         $this->assertMatchesXpath($html,
 '/tr[@style="display: none"]
@@ -149,7 +149,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             'data' => array('a', 'b'),
         ));
 
-        $this->assertWidgetMatchesXpath($form->getContext(), array(),
+        $this->assertWidgetMatchesXpath($form->getView(), array(),
 '/table
     [
         ./tr[./td/input[@type="text"][@value="a"]]
@@ -162,13 +162,13 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testForm()
     {
-        $context = $this->factory->createBuilder('form', 'name')
+        $view = $this->factory->createBuilder('form', 'name')
             ->add('firstName', 'text')
             ->add('lastName', 'text')
             ->getForm()
-            ->getContext();
+            ->getView();
 
-        $this->assertWidgetMatchesXpath($context, array(),
+        $this->assertWidgetMatchesXpath($view, array(),
 '/table
     [
         ./tr[@style="display: none"]
@@ -203,7 +203,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             'data' => 'foobar',
         ));
 
-        $this->assertWidgetMatchesXpath($form->getContext(), array(),
+        $this->assertWidgetMatchesXpath($form->getView(), array(),
 '/table
     [
         ./tr

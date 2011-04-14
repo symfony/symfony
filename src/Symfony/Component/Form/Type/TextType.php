@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\TemplateContext;
+use Symfony\Component\Form\FormView;
 
 class TextType extends AbstractType
 {
@@ -22,9 +22,9 @@ class TextType extends AbstractType
         $builder->setAttribute('max_length', $options['max_length']);
     }
 
-    public function buildContext(TemplateContext $context, FormInterface $form)
+    public function buildView(FormView $view, FormInterface $form)
     {
-        $context->setVar('max_length', $form->getAttribute('max_length'));
+        $view->setVar('max_length', $form->getAttribute('max_length'));
     }
 
     public function getParent(array $options)

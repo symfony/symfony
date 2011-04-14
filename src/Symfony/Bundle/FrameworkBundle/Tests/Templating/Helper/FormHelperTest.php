@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper;
 use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTemplateNameParser;
 use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
-use Symfony\Component\Form\TemplateContext;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Templating\PhpEngine;
 use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
@@ -45,34 +45,34 @@ class FormHelperTest extends AbstractDivLayoutTest
         ));
     }
 
-    protected function renderEnctype(TemplateContext $context)
+    protected function renderEnctype(FormView $view)
     {
-        return (string)$this->helper->enctype($context);
+        return (string)$this->helper->enctype($view);
     }
 
-    protected function renderLabel(TemplateContext $context, $label = null)
+    protected function renderLabel(FormView $view, $label = null)
     {
-        return (string)$this->helper->label($context, $label);
+        return (string)$this->helper->label($view, $label);
     }
 
-    protected function renderErrors(TemplateContext $context)
+    protected function renderErrors(FormView $view)
     {
-        return (string)$this->helper->errors($context);
+        return (string)$this->helper->errors($view);
     }
 
-    protected function renderWidget(TemplateContext $context, array $vars = array())
+    protected function renderWidget(FormView $view, array $vars = array())
     {
-        return (string)$this->helper->widget($context, $vars);
+        return (string)$this->helper->widget($view, $vars);
     }
 
-    protected function renderRow(TemplateContext $context, array $vars = array())
+    protected function renderRow(FormView $view, array $vars = array())
     {
-        return (string)$this->helper->row($context, $vars);
+        return (string)$this->helper->row($view, $vars);
     }
 
-    protected function renderRest(TemplateContext $context, array $vars = array())
+    protected function renderRest(FormView $view, array $vars = array())
     {
-        return (string)$this->helper->rest($context, $vars);
+        return (string)$this->helper->rest($view, $vars);
     }
 
 }

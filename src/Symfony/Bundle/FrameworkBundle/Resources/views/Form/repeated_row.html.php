@@ -1,5 +1,5 @@
-<?php echo $view['form']->errors($context) ?>
+<?php echo $view['form']->errors($form) ?>
 
-<?php foreach ($context->getChildren() as $context): ?>
-    <?php echo $view['form']->row($context); ?>
+<?php foreach ($form->getChildren() as $child): ?>
+    <?php echo $view['form']->row($child); ?>
 <?php endforeach; ?>

@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Type;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\TemplateContext;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\EventListener\TrimListener;
 use Symfony\Component\Form\Validator\DefaultValidator;
 use Symfony\Component\Form\Validator\DelegatingValidator;
@@ -64,11 +64,11 @@ class FieldType extends AbstractType
         }
     }
 
-    public function buildContext(TemplateContext $context, FormInterface $form)
+    public function buildView(FormView $view, FormInterface $form)
     {
-        if ($context->hasParent()) {
-            $parentId = $context->getParent()->getVar('id');
-            $parentName = $context->getParent()->getVar('name');
+        if ($view->hasParent()) {
+            $parentId = $view->getParent()->getVar('id');
+            $parentName = $view->getParent()->getVar('name');
             $id = sprintf('%s_%s', $parentId, $form->getName());
             $name = sprintf('%s[%s]', $parentName, $form->getName());
         } else {
@@ -76,24 +76,24 @@ class FieldType extends AbstractType
             $name = $form->getName();
         }
 
-        $context->setVar('id', $id);
-        $context->setVar('name', $name);
-        $context->setVar('errors', $form->getErrors());
-        $context->setVar('value', $form->getClientData());
-        $context->setVar('read_only', $form->isReadOnly());
-        $context->setVar('required', $form->isRequired());
-        $context->setVar('class', null);
-        $context->setVar('max_length', $form->getAttribute('max_length'));
-        $context->setVar('size', null);
-        $context->setVar('label', ucfirst(strtolower(str_replace('_', ' ', $form->getName()))));
-        $context->setVar('multipart', false);
-        $context->setVar('attr', array());
+        $view->setVar('id', $id);
+        $view->setVar('name', $name);
+        $view->setVar('errors', $form->getErrors());
+        $view->setVar('value', $form->getClientData());
+        $view->setVar('read_only', $form->isReadOnly());
+        $view->setVar('required', $form->isRequired());
+        $view->setVar('class', null);
+        $view->setVar('max_length', $form->getAttribute('max_length'));
+        $view->setVar('size', null);
+        $view->setVar('label', ucfirst(strtolower(str_replace('_', ' ', $form->getName()))));
+        $view->setVar('multipart', false);
+        $view->setVar('attr', array());
 
         $types = array();
         foreach (array_reverse((array) $form->getTypes()) as $type) {
             $types[] = $type->getName();
         }
-        $context->setVar('types', $types);
+        $view->setVar('types', $types);
     }
 
     public function getDefaultOptions(array $options)

@@ -17,7 +17,7 @@ use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\EventListener\FixRadioInputListener;
-use Symfony\Component\Form\TemplateContext;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\DataTransformer\ScalarToChoiceTransformer;
 use Symfony\Component\Form\DataTransformer\ScalarToBooleanChoicesTransformer;
 use Symfony\Component\Form\DataTransformer\ArrayToChoicesTransformer;
@@ -70,23 +70,23 @@ class ChoiceType extends AbstractType
 
     }
 
-    public function buildContext(TemplateContext $context, FormInterface $form)
+    public function buildView(FormView $view, FormInterface $form)
     {
         $choices = $form->getAttribute('choice_list')->getChoices();
         $preferred = array_flip($form->getAttribute('preferred_choices'));
 
-        $context->setVar('multiple', $form->getAttribute('multiple'));
-        $context->setVar('expanded', $form->getAttribute('expanded'));
-        $context->setVar('preferred_choices', array_intersect_key($choices, $preferred));
-        $context->setVar('choices', array_diff_key($choices, $preferred));
-        $context->setVar('separator', '-------------------');
-        $context->setVar('empty_value', '');
+        $view->setVar('multiple', $form->getAttribute('multiple'));
+        $view->setVar('expanded', $form->getAttribute('expanded'));
+        $view->setVar('preferred_choices', array_intersect_key($choices, $preferred));
+        $view->setVar('choices', array_diff_key($choices, $preferred));
+        $view->setVar('separator', '-------------------');
+        $view->setVar('empty_value', '');
 
-        if ($context->getVar('multiple') && !$context->getVar('expanded')) {
+        if ($view->getVar('multiple') && !$view->getVar('expanded')) {
             // Add "[]" to the name in case a select tag with multiple options is
             // displayed. Otherwise only one of the selected options is sent in the
             // POST request.
-            $context->setVar('name', $context->getVar('name').'[]');
+            $view->setVar('name', $view->getVar('name').'[]');
         }
     }
 

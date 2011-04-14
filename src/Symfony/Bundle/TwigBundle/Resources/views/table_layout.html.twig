@@ -4,11 +4,11 @@
 {% spaceless %}
     <tr>
         <td>
-            {{ form_label(context) }}
+            {{ form_label(form) }}
         </td>
         <td>
-            {{ form_errors(context) }}
-            {{ form_widget(context) }}
+            {{ form_errors(form) }}
+            {{ form_widget(form) }}
         </td>
     </tr>
 {% endspaceless %}
@@ -30,7 +30,7 @@
 {% spaceless %}
     <tr style="display: none">
         <td colspan="2">
-            {{ form_widget(context) }}
+            {{ form_widget(form) }}
         </td>
     </tr>
 {% endspaceless %}
@@ -46,7 +46,7 @@
 {% spaceless %}
     <table {{ block('attributes') }}>
         {{ block('field__rows') }}
-        {{ form_rest(context) }}
+        {{ form_rest(form) }}
     </table>
 {% endspaceless %}
 {% endblock form__widget %}

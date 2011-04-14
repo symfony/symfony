@@ -14,7 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Util\ChoiceUtil;
 
-class TemplateContext implements \ArrayAccess, \IteratorAggregate
+class FormView implements \ArrayAccess, \IteratorAggregate
 {
     private $vars = array(
         'value' => null,
@@ -43,10 +43,10 @@ class TemplateContext implements \ArrayAccess, \IteratorAggregate
         $types = (array) $form->getTypes();
         $children = array();
 
-        $this->setVar('context', $this);
+        $this->setVar('form', $this);
 
         foreach ($types as $type) {
-            $type->buildContext($this, $form);
+            $type->buildView($this, $form);
         }
 
         foreach ($form as $key => $child) {
@@ -56,7 +56,7 @@ class TemplateContext implements \ArrayAccess, \IteratorAggregate
         $this->setChildren($children);
 
         foreach ($types as $type) {
-            $type->buildContextBottomUp($this, $form);
+            $type->buildViewBottomUp($this, $form);
         }
     }
 

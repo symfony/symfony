@@ -15,7 +15,7 @@ require_once __DIR__ . '/TestCase.php';
 require_once __DIR__ . '/../Fixtures/Author.php';
 
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormContext;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Field;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\DataError;
@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
-use Symfony\Component\Validator\ExecutionContext;
+use Symfony\Component\Validator\ExecutionView;
 use Symfony\Tests\Component\Form\Fixtures\Author;
 
 class FormTest_AuthorWithoutRefSetter
@@ -236,21 +236,21 @@ class FormTypeTest extends TestCase
         $this->assertSame($ref2, $author['referenceCopy']);
     }
 
-    public function testPassMultipartFalseToContext()
+    public function testPassMultipartFalseToView()
     {
         $form = $this->factory->create('form');
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertFalse($context->getVar('multipart'));
+        $this->assertFalse($view->getVar('multipart'));
     }
 
-    public function testPassMultipartTrueIfAnyChildIsMultipartToContext()
+    public function testPassMultipartTrueIfAnyChildIsMultipartToView()
     {
         $form = $this->factory->create('form');
         $form->add($this->factory->create('text'));
         $form->add($this->factory->create('file'));
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertTrue($context->getVar('multipart'));
+        $this->assertTrue($view->getVar('multipart'));
     }
 }

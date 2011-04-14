@@ -21,26 +21,26 @@ class PasswordTypeTest extends TestCase
     {
         $form = $this->factory->create('password');
         $form->setData('pAs5w0rd');
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertSame('', $context->getVar('value'));
+        $this->assertSame('', $view->getVar('value'));
     }
 
     public function testEmptyIfBound()
     {
         $form = $this->factory->create('password');
         $form->bind('pAs5w0rd');
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertSame('', $context->getVar('value'));
+        $this->assertSame('', $view->getVar('value'));
     }
 
     public function testNotEmptyIfBoundAndNotAlwaysEmpty()
     {
         $form = $this->factory->create('password', null, array('always_empty' => false));
         $form->bind('pAs5w0rd');
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertSame('pAs5w0rd', $context->getVar('value'));
+        $this->assertSame('pAs5w0rd', $view->getVar('value'));
     }
 }

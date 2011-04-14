@@ -14,7 +14,7 @@ namespace Symfony\Tests\Component\Form\Type;
 require_once __DIR__ . '/LocalizedTestCase.php';
 
 use Symfony\Component\Form\DateField;
-use Symfony\Component\Form\FormContext;
+use Symfony\Component\Form\FormView;
 
 class DateTypeTest extends LocalizedTestCase
 {
@@ -429,12 +429,12 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertTrue($form->isPartiallyFilled());
     }
 
-    public function testPassDatePatternToContext()
+    public function testPassDatePatternToView()
     {
         $form = $this->factory->create('date');
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertSame('{{ day }}.{{ month }}.{{ year }}', $context->getVar('date_pattern'));
+        $this->assertSame('{{ day }}.{{ month }}.{{ year }}', $view->getVar('date_pattern'));
     }
 
     public function testDontPassDatePatternIfText()
@@ -442,18 +442,18 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', 'name', array(
             'widget' => 'text',
         ));
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertNull($context->getVar('date_pattern'));
+        $this->assertNull($view->getVar('date_pattern'));
     }
 
-    public function testPassWidgetToContext()
+    public function testPassWidgetToView()
     {
         $form = $this->factory->create('date', 'name', array(
             'widget' => 'text',
         ));
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertSame('text', $context->getVar('widget'));
+        $this->assertSame('text', $view->getVar('widget'));
     }
 }

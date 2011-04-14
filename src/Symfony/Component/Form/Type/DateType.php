@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\ChoiceList\PaddedChoiceList;
 use Symfony\Component\Form\ChoiceList\MonthChoiceList;
-use Symfony\Component\Form\TemplateContext;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\DataTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\DataTransformer\DateTimeToStringTransformer;
@@ -77,11 +77,11 @@ class DateType extends AbstractType
             ->setAttribute('widget', $options['widget']);
     }
 
-    public function buildContextBottomUp(TemplateContext $context, FormInterface $form)
+    public function buildViewBottomUp(FormView $view, FormInterface $form)
     {
-        $context->setVar('widget', $form->getAttribute('widget'));
+        $view->setVar('widget', $form->getAttribute('widget'));
 
-        if ($context->hasChildren()) {
+        if ($view->hasChildren()) {
 
             $pattern = $form->getAttribute('formatter')->getPattern();
 
@@ -94,7 +94,7 @@ class DateType extends AbstractType
                 $pattern = '{{ year }}-{{ month }}-{{ day }}';
             }
 
-            $context->setVar('date_pattern', $pattern);
+            $view->setVar('date_pattern', $pattern);
         }
     }
 

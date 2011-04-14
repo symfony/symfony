@@ -1,1 +1,1 @@
-<?php echo $view['form']->widget($context) ?>
+<?php echo $view['form']->widget($form) ?>

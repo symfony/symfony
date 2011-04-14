@@ -14,7 +14,7 @@ namespace Symfony\Tests\Component\Form\Type;
 require_once __DIR__.'/TestCase.php';
 
 use Symfony\Component\Form\LocaleField;
-use Symfony\Component\Form\FormContext;
+use Symfony\Component\Form\FormView;
 
 class LocaleTypeTest extends TestCase
 {
@@ -23,8 +23,8 @@ class LocaleTypeTest extends TestCase
         \Locale::setDefault('de_AT');
 
         $form = $this->factory->create('locale');
-        $context = $form->getContext();
-        $choices = $context->getVar('choices');
+        $view = $form->getView();
+        $choices = $view->getVar('choices');
 
         $this->assertArrayHasKey('en', $choices);
         $this->assertEquals('Englisch', $choices['en']);

@@ -19,7 +19,7 @@ use Symfony\Component\Form\DataTransformer\DataTransformerChain;
 use Symfony\Component\Form\DataTransformer\ReversedTransformer;
 use Symfony\Component\Form\DataTransformer\FileToStringTransformer;
 use Symfony\Component\Form\DataTransformer\FileToArrayTransformer;
-use Symfony\Component\Form\TemplateContext;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\File\TemporaryStorage;
 
 class FileType extends AbstractType
@@ -48,10 +48,10 @@ class FileType extends AbstractType
             ->add('name', 'hidden');
     }
 
-    public function buildContextBottomUp(TemplateContext $context, FormInterface $form)
+    public function buildViewBottomUp(FormView $view, FormInterface $form)
     {
-        $context->setVar('multipart', true);
-        $context['file']->setVar('type', 'file');
+        $view->setVar('multipart', true);
+        $view['file']->setVar('type', 'file');
     }
 
     public function getDefaultOptions(array $options)

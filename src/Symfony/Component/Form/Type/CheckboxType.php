@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Type;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\DataTransformer\BooleanToStringTransformer;
-use Symfony\Component\Form\TemplateContext;
+use Symfony\Component\Form\FormView;
 
 class CheckboxType extends AbstractType
 {
@@ -24,10 +24,10 @@ class CheckboxType extends AbstractType
             ->setAttribute('value', $options['value']);
     }
 
-    public function buildContext(TemplateContext $context, FormInterface $form)
+    public function buildView(FormView $view, FormInterface $form)
     {
-        $context->setVar('value', $form->getAttribute('value'));
-        $context->setVar('checked', (bool)$form->getData());
+        $view->setVar('value', $form->getAttribute('value'));
+        $view->setVar('checked', (bool)$form->getData());
     }
 
     public function getDefaultOptions(array $options)

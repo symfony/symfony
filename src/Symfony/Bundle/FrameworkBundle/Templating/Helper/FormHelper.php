@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Templating\EngineInterface;
-use Symfony\Component\Form\TemplateContext;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Exception\FormException;
 
 /**
@@ -59,14 +59,14 @@ class FormHelper extends Helper
         return $html;
     }
 
-    public function enctype(TemplateContext $context)
+    public function enctype(FormView $view)
     {
-        return $this->renderSection($context, 'enctype');
+        return $this->renderSection($view, 'enctype');
     }
 
-    public function widget(TemplateContext $context, array $variables = array())
+    public function widget(FormView $view, array $variables = array())
     {
-        return trim($this->renderSection($context, 'widget', $variables));
+        return trim($this->renderSection($view, 'widget', $variables));
     }
 
     /**
@@ -75,30 +75,30 @@ class FormHelper extends Helper
      * @param  FieldInterface $field
      * @return string
      */
-    public function row(TemplateContext $context, array $variables = array())
+    public function row(FormView $view, array $variables = array())
     {
-        return $this->renderSection($context, 'row', $variables);
+        return $this->renderSection($view, 'row', $variables);
     }
 
-    public function label(TemplateContext $context, $label = null)
+    public function label(FormView $view, $label = null)
     {
-        return $this->renderSection($context, 'label', null === $label ? array() : array('label' => $label));
+        return $this->renderSection($view, 'label', null === $label ? array() : array('label' => $label));
     }
 
-    public function errors(TemplateContext $context)
+    public function errors(FormView $view)
     {
-        return $this->renderSection($context, 'errors');
+        return $this->renderSection($view, 'errors');
     }
 
-    public function rest(TemplateContext $context, array $variables = array())
+    public function rest(FormView $view, array $variables = array())
     {
-        return $this->renderSection($context, 'rest', $variables);
+        return $this->renderSection($view, 'rest', $variables);
     }
 
-    protected function renderSection(TemplateContext $context, $section, array $variables = array())
+    protected function renderSection(FormView $view, $section, array $variables = array())
     {
         $template = null;
-        $blocks = $context->getVar('types');
+        $blocks = $view->getVar('types');
 
         foreach ($blocks as &$block) {
             $block = $block.'_'.$section;
@@ -114,10 +114,10 @@ class FormHelper extends Helper
         }
 
         if ('widget' === $section || 'row' === $section) {
-            $context->setRendered(true);
+            $view->setRendered(true);
         }
 
-        return $this->render($template, array_merge($context->getVars(), $variables));
+        return $this->render($template, array_merge($view->getVars(), $variables));
     }
 
     public function render($template, array $variables = array())

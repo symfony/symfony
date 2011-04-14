@@ -14,7 +14,7 @@ namespace Symfony\Tests\Bridge\Twig\Extension;
 require_once __DIR__.'/Fixtures/StubTranslator.php';
 require_once __DIR__.'/Fixtures/StubFilesystemLoader.php';
 
-use Symfony\Component\Form\TemplateContext;
+use Symfony\Component\Form\FormView;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Tests\Component\Form\AbstractDivLayoutTest;
@@ -40,33 +40,33 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $this->extension->initRuntime($environment);
     }
 
-    protected function renderEnctype(TemplateContext $context)
+    protected function renderEnctype(FormView $view)
     {
-        return (string)$this->extension->renderEnctype($context);
+        return (string)$this->extension->renderEnctype($view);
     }
 
-    protected function renderLabel(TemplateContext $context, $label = null)
+    protected function renderLabel(FormView $view, $label = null)
     {
-        return (string)$this->extension->renderLabel($context, $label);
+        return (string)$this->extension->renderLabel($view, $label);
     }
 
-    protected function renderErrors(TemplateContext $context)
+    protected function renderErrors(FormView $view)
     {
-        return (string)$this->extension->renderErrors($context);
+        return (string)$this->extension->renderErrors($view);
     }
 
-    protected function renderWidget(TemplateContext $context, array $vars = array())
+    protected function renderWidget(FormView $view, array $vars = array())
     {
-        return (string)$this->extension->renderWidget($context, $vars);
+        return (string)$this->extension->renderWidget($view, $vars);
     }
 
-    protected function renderRow(TemplateContext $context, array $vars = array())
+    protected function renderRow(FormView $view, array $vars = array())
     {
-        return (string)$this->extension->renderRow($context, $vars);
+        return (string)$this->extension->renderRow($view, $vars);
     }
 
-    protected function renderRest(TemplateContext $context, array $vars = array())
+    protected function renderRest(FormView $view, array $vars = array())
     {
-        return (string)$this->extension->renderRest($context, $vars);
+        return (string)$this->extension->renderRest($view, $vars);
     }
 }

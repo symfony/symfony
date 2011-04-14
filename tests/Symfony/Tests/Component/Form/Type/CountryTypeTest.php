@@ -12,7 +12,7 @@
 namespace Symfony\Tests\Component\Form\Type;
 
 use Symfony\Component\Form\CountryField;
-use Symfony\Component\Form\FormContext;
+use Symfony\Component\Form\FormView;
 
 require_once __DIR__.'/TestCase.php';
 
@@ -23,8 +23,8 @@ class CountryTypeTest extends TestCase
         \Locale::setDefault('de_AT');
 
         $form = $this->factory->create('country');
-        $context = $form->getContext();
-        $choices = $context->getVar('choices');
+        $view = $form->getView();
+        $choices = $view->getVar('choices');
 
         $this->assertArrayHasKey('DE', $choices);
         $this->assertEquals('Deutschland', $choices['DE']);
@@ -41,8 +41,8 @@ class CountryTypeTest extends TestCase
     public function testUnknownCountryIsNotIncluded()
     {
         $form = $this->factory->create('country', 'country');
-        $context = $form->getContext();
-        $choices = $context->getVar('choices');
+        $view = $form->getView();
+        $choices = $view->getVar('choices');
 
         $this->assertArrayNotHasKey('ZZ', $choices);
     }

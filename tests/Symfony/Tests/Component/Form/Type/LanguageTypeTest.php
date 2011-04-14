@@ -14,7 +14,7 @@ namespace Symfony\Tests\Component\Form\Type;
 require_once __DIR__.'/TestCase.php';
 
 use Symfony\Component\Form\LanguageField;
-use Symfony\Component\Form\FormContext;
+use Symfony\Component\Form\FormView;
 
 class LanguageTypeTest extends TestCase
 {
@@ -23,8 +23,8 @@ class LanguageTypeTest extends TestCase
         \Locale::setDefault('de_AT');
 
         $form = $this->factory->create('language');
-        $context = $form->getContext();
-        $choices = $context->getVar('choices');
+        $view = $form->getView();
+        $choices = $view->getVar('choices');
 
         $this->assertArrayHasKey('en', $choices);
         $this->assertEquals('Englisch', $choices['en']);
@@ -41,8 +41,8 @@ class LanguageTypeTest extends TestCase
     public function testMultipleLanguagesIsNotIncluded()
     {
         $form = $this->factory->create('language', 'language');
-        $context = $form->getContext();
-        $choices = $context->getVar('choices');
+        $view = $form->getView();
+        $choices = $view->getVar('choices');
 
         $this->assertArrayNotHasKey('mul', $choices);
     }

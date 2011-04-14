@@ -15,29 +15,29 @@ require_once __DIR__.'/TestCase.php';
 
 class CheckboxTypeTest extends TestCase
 {
-    public function testPassValueToContext()
+    public function testPassValueToView()
     {
         $form = $this->factory->create('checkbox', 'name', array('value' => 'foobar'));
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertEquals('foobar', $context->getVar('value'));
+        $this->assertEquals('foobar', $view->getVar('value'));
     }
 
     public function testCheckedIfDataTrue()
     {
         $form = $this->factory->create('checkbox');
         $form->setData(true);
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertTrue($context->getVar('checked'));
+        $this->assertTrue($view->getVar('checked'));
     }
 
     public function testNotCheckedIfDataFalse()
     {
         $form = $this->factory->create('checkbox');
         $form->setData(false);
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertFalse($context->getVar('checked'));
+        $this->assertFalse($view->getVar('checked'));
     }
 }

@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Type;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\DataTransformer\MoneyToLocalizedStringTransformer;
-use Symfony\Component\Form\TemplateContext;
+use Symfony\Component\Form\FormView;
 
 class MoneyType extends AbstractType
 {
@@ -26,9 +26,9 @@ class MoneyType extends AbstractType
             ->setAttribute('currency', $options['currency']);
     }
 
-    public function buildContext(TemplateContext $context, FormInterface $form)
+    public function buildView(FormView $view, FormInterface $form)
     {
-        $context->setVar('money_pattern', self::getPattern($form->getAttribute('currency')));
+        $view->setVar('money_pattern', self::getPattern($form->getAttribute('currency')));
     }
 
     public function getDefaultOptions(array $options)

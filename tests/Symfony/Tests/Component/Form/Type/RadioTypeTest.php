@@ -15,38 +15,38 @@ require_once __DIR__.'/TestCase.php';
 
 class RadioTypeTest extends TestCase
 {
-    public function testPassValueToContext()
+    public function testPassValueToView()
     {
         $form = $this->factory->create('radio', 'name', array('value' => 'foobar'));
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertEquals('foobar', $context->getVar('value'));
+        $this->assertEquals('foobar', $view->getVar('value'));
     }
 
-    public function testPassParentNameToContext()
+    public function testPassParentNameToView()
     {
         $parent = $this->factory->create('field', 'parent');
         $parent->add($this->factory->create('radio', 'child'));
-        $context = $parent->getContext();
+        $view = $parent->getView();
 
-        $this->assertEquals('parent', $context['child']->getVar('name'));
+        $this->assertEquals('parent', $view['child']->getVar('name'));
     }
 
     public function testCheckedIfDataTrue()
     {
         $form = $this->factory->create('radio');
         $form->setData(true);
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertTrue($context->getVar('checked'));
+        $this->assertTrue($view->getVar('checked'));
     }
 
     public function testNotCheckedIfDataFalse()
     {
         $form = $this->factory->create('radio');
         $form->setData(false);
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertFalse($context->getVar('checked'));
+        $this->assertFalse($view->getVar('checked'));
     }
 }

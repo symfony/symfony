@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\TemplateContext;
+use Symfony\Component\Form\FormView;
 
 class PasswordType extends AbstractType
 {
@@ -22,10 +22,10 @@ class PasswordType extends AbstractType
         $builder->setAttribute('always_empty', $options['always_empty']);
     }
 
-    public function buildContext(TemplateContext $context, FormInterface $form)
+    public function buildView(FormView $view, FormInterface $form)
     {
         if ($form->getAttribute('always_empty') || !$form->isBound()) {
-            $context->setVar('value', '');
+            $view->setVar('value', '');
         }
     }
 

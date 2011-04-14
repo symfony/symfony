@@ -1,5 +1,5 @@
 <div>
-    <?php echo $view['form']->label($context) ?>
-    <?php echo $view['form']->errors($context) ?>
-    <?php echo $view['form']->widget($context) ?>
+    <?php echo $view['form']->label($form) ?>
+    <?php echo $view['form']->errors($form) ?>
+    <?php echo $view['form']->widget($form) ?>
 </div>

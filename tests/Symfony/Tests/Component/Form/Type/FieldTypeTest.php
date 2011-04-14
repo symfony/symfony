@@ -110,42 +110,42 @@ class FieldTypeTest extends TestCase
         $this->assertEquals('reverse[ a ]', $form->getData());
     }
 
-    public function testPassIdAndNameToContext()
+    public function testPassIdAndNameToView()
     {
         $form = $this->factory->create('field', 'name');
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertEquals('name', $context->getVar('id'));
-        $this->assertEquals('name', $context->getVar('name'));
+        $this->assertEquals('name', $view->getVar('id'));
+        $this->assertEquals('name', $view->getVar('name'));
     }
 
-    public function testPassIdAndNameToContextWithParent()
+    public function testPassIdAndNameToViewWithParent()
     {
         $parent = $this->factory->create('field', 'parent');
         $parent->add($this->factory->create('field', 'child'));
-        $context = $parent->getContext();
+        $view = $parent->getView();
 
-        $this->assertEquals('parent_child', $context['child']->getVar('id'));
-        $this->assertEquals('parent[child]', $context['child']->getVar('name'));
+        $this->assertEquals('parent_child', $view['child']->getVar('id'));
+        $this->assertEquals('parent[child]', $view['child']->getVar('name'));
     }
 
-    public function testPassIdAndNameToContextWithGrandParent()
+    public function testPassIdAndNameToViewWithGrandParent()
     {
         $parent = $this->factory->create('field', 'parent');
         $parent->add($this->factory->create('field', 'child'));
         $parent['child']->add($this->factory->create('field', 'grand_child'));
-        $context = $parent->getContext();
+        $view = $parent->getView();
 
-        $this->assertEquals('parent_child_grand_child', $context['child']['grand_child']->getVar('id'));
-        $this->assertEquals('parent[child][grand_child]', $context['child']['grand_child']->getVar('name'));
+        $this->assertEquals('parent_child_grand_child', $view['child']['grand_child']->getVar('id'));
+        $this->assertEquals('parent[child][grand_child]', $view['child']['grand_child']->getVar('name'));
     }
 
-    public function testPassMaxLengthToContext()
+    public function testPassMaxLengthToView()
     {
         $form = $this->factory->create('field', null, array('max_length' => 10));
-        $context = $form->getContext();
+        $view = $form->getView();
 
-        $this->assertSame(10, $context->getVar('max_length'));
+        $this->assertSame(10, $view->getVar('max_length'));
     }
 
     public function testBindWithEmptyDataCreatesObjectIfClassAvailable()

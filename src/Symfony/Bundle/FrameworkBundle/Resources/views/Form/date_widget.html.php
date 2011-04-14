@@ -11,9 +11,9 @@
 <?php else: ?>
     <div<?php echo $view['form']->attributes() ?>>
         <?php echo str_replace(array('{{ year }}', '{{ month }}', '{{ day }}'), array(
-            $view['form']->widget($context['year']),
-            $view['form']->widget($context['month']),
-            $view['form']->widget($context['day']),
+            $view['form']->widget($form['year']),
+            $view['form']->widget($form['month']),
+            $view['form']->widget($form['day']),
         ), $date_pattern) ?>
     </div>
 <?php endif ?>

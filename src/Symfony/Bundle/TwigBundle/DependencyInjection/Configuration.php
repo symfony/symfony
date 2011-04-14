@@ -64,11 +64,11 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->arrayNode('resources')
                             ->addDefaultsIfNotSet()
-                            ->defaultValue(array('TwigBundle::form.html.twig'))
+                            ->defaultValue(array('TwigBundle:Form:div_layout.html.twig'))
                             ->validate()
                                 ->always()
                                 ->then(function($v){
-                                    return array_merge(array('TwigBundle::form.html.twig'), $v);
+                                    return array_merge(array('TwigBundle:Form:div_layout.html.twig'), $v);
                                 })
                             ->end()
                             ->prototype('scalar')->end()

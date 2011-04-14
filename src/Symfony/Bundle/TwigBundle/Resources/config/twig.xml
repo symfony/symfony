@@ -54,9 +54,7 @@
 
         <service id="twig.extension.form" class="Symfony\Bridge\Twig\Extension\FormExtension" public="false">
             <tag name="twig.extension" />
-            <argument type="collection">
-                <argument>TwigBundle:Form:div_layout.html.twig</argument>
-            </argument>
+            <argument>%twig.form.resources%</argument>
         </service>
 
         <service id="twig.extension.text" class="Twig_Extensions_Extension_Text" public="false" />

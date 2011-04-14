@@ -192,9 +192,7 @@ class Form implements \ArrayAccess
 
         if (!$uri) {
             $uri = $this->path;
-        }
-
-        if ('#' === $uri[0]) {
+        } elseif ('#' === $uri[0]) {
             $uri = $this->path.$uri;
         }
 

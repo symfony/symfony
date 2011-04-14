@@ -73,7 +73,6 @@ class FormExtension extends \Twig_Extension
             'form_widget'  => new \Twig_Function_Method($this, 'renderWidget', array('is_safe' => array('html'))),
             'form_errors'  => new \Twig_Function_Method($this, 'renderErrors', array('is_safe' => array('html'))),
             'form_label'   => new \Twig_Function_Method($this, 'renderLabel', array('is_safe' => array('html'))),
-            'form_data'    => new \Twig_Function_Method($this, 'renderData', array('is_safe' => array('html'))),
             'form_row'     => new \Twig_Function_Method($this, 'renderRow', array('is_safe' => array('html'))),
             'form_rest'    => new \Twig_Function_Method($this, 'renderRest', array('is_safe' => array('html'))),
         );
@@ -156,16 +155,6 @@ class FormExtension extends \Twig_Extension
     public function renderLabel(FormView $view, $label = null)
     {
         return $this->render($view, 'label', null === $label ? array() : array('label' => $label));
-    }
-
-    /**
-     * Renders the widget data of the given view
-     *
-     * @param FormView $view The view to render the data for
-     */
-    public function renderData(FormView $view)
-    {
-        return $form->getData();
     }
 
     protected function render(FormView $view, $section, array $variables = array(), array $resources = null)

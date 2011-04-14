@@ -1,8 +1,10 @@
 {% block field__rows %}
+{% spaceless %}
     {{ form_errors(context) }}
     {% for context in context.children %}
         {{ form_row(context) }}
     {% endfor %}
+{% endspaceless %}
 {% endblock field__rows %}
 
 {% block field__enctype %}
@@ -12,6 +14,7 @@
 {% endblock field__enctype %}
 
 {% block field__errors %}
+{% spaceless %}
     {% if errors|length > 0 %}
     <ul>
         {% for error in errors %}
@@ -19,14 +22,17 @@
         {% endfor %}
     </ul>
     {% endif %}
+{% endspaceless %}
 {% endblock field__errors %}
 
 {% block field__rest %}
+{% spaceless %}
     {% for context in context.children %}
         {% if not context.rendered %}
             {{ form_row(context) }}
         {% endif %}
     {% endfor %}
+{% endspaceless %}
 {% endblock field__rest %}
 
 {% block field__label %}

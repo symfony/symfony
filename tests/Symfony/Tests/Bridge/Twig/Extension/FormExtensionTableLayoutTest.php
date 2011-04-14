@@ -16,10 +16,10 @@ require_once __DIR__.'/Fixtures/StubTranslator.php';
 use Symfony\Component\Form\FormInterface;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
-use Symfony\Tests\Component\Form\AbstractDivLayoutTest;
+use Symfony\Tests\Component\Form\AbstractTableLayoutTest;
 use Symfony\Tests\Bridge\Twig\Extension\Fixtures\StubTranslator;
 
-class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
+class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
 {
     protected function setUp()
     {
@@ -29,7 +29,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             __DIR__.'/../../../../../../src/Symfony/Bundle/TwigBundle/Resources/views',
         ));
 
-        $this->extension = new FormExtension(array('div_layout.html.twig'));
+        $this->extension = new FormExtension(array('table_layout.html.twig'));
 
         $environment = new \Twig_Environment($loader);
         $environment->addExtension($this->extension);

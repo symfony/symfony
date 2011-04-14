@@ -1,6 +1,7 @@
 {% extends "widgets.html.twig" %}
 
 {% block field__row %}
+{% spaceless %}
     <tr>
         <td>
             {{ form_label(context) }}
@@ -10,23 +11,42 @@
             {{ form_widget(context) }}
         </td>
     </tr>
+{% endspaceless %}
 {% endblock field__row %}
 
 {% block form__errors %}
+{% spaceless %}
+    {% if errors|length > 0 %}
     <tr>
         <td colspan="2">
             {{ block('field__errors') }}
         </td>
     </tr>
+    {% endif %}
+{% endspaceless %}
 {% endblock form__errors %}
 
+{% block hidden__row %}
+{% spaceless %}
+    <tr style="display: none">
+        <td colspan="2">
+            {{ form_widget(context) }}
+        </td>
+    </tr>
+{% endspaceless %}
+{% endblock hidden__row %}
+
 {% block repeated__errors %}
+{% spaceless %}
     {{ block('form__errors') }}
+{% endspaceless %}
 {% endblock repeated__errors %}
 
 {% block form__widget %}
-    <table>
+{% spaceless %}
+    <table {{ block('attributes') }}>
         {{ block('field__rows') }}
         {{ form_rest(context) }}
     </table>
+{% endspaceless %}
 {% endblock form__widget %}

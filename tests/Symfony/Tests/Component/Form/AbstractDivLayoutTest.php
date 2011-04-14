@@ -81,9 +81,6 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 '/input
     [@type="hidden"]
     [@id="name__token"]
-    [count(../div)=2]
-    [count(..//label)=2]
-    [count(..//input)=3]
 /following-sibling::div
     [
         ./label[@for="name_field1"]
@@ -94,6 +91,9 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         ./label[@for="name_field4"]
         /following-sibling::input[@type="text"][@id="name_field4"]
     ]
+    [count(../div)=2]
+    [count(..//label)=2]
+    [count(..//input)=3]
 '
         );
     }
@@ -107,7 +107,8 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
         $this->assertWidgetMatchesXpath($form, array(),
 '/div
-    [./div[./input[@type="text"][@value="a"]]
+    [
+        ./div[./input[@type="text"][@value="a"]]
         /following-sibling::div[./input[@type="text"][@value="b"]]
     ]
     [count(./div[./input])=2]

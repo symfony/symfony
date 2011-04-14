@@ -55,6 +55,7 @@
 
         <service id="file_locator" class="%file_locator.class%">
             <argument type="service" id="kernel" />
+            <argument>%kernel.root_dir%/Resources</argument>
         </service>
     </services>
     <interfaces>

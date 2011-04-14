@@ -30,14 +30,15 @@ class CachedTemplateLocator extends TemplateLocator
      * @param FileLocatorInterface $locator  A FileLocatorInterface instance
      * @param string               $path     A global fallback path
      */
-    public function __construct($cacheDir, FileLocatorInterface $locator, $path)
+    public function __construct($cacheDir, FileLocatorInterface $locator)
     {
         if (!file_exists($cache = $cacheDir.'/templates.php')) {
             throw new \RuntimeException(sprintf('The template locator cache is not warmed up (%s).', $cache));
         }
 
         $this->templates = require $cache;
-        parent::__construct($locator, $path);
+
+        parent::__construct($locator);
     }
 
     /**

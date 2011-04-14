@@ -26,11 +26,11 @@ class TemplateLocatorTest extends TestCase
         $fileLocator
             ->expects($this->once())
             ->method('locate')
-            ->with($template->getPath(), '/path/to/fallback')
+            ->with($template->getPath())
             ->will($this->returnValue('/path/to/template'))
         ;
 
-        $locator = new TemplateLocator($fileLocator, '/path/to/fallback');
+        $locator = new TemplateLocator($fileLocator);
 
         $this->assertEquals('/path/to/template', $locator->locate($template));
     }
@@ -50,7 +50,7 @@ class TemplateLocatorTest extends TestCase
             ->will($this->throwException(new \InvalidArgumentException()))
         ;
 
-        $locator = new TemplateLocator($fileLocator, '/path/to/fallback');
+        $locator = new TemplateLocator($fileLocator);
 
         $locator->locate($template);
     }
@@ -60,7 +60,7 @@ class TemplateLocatorTest extends TestCase
      */
     public function testThrowsAnExceptionWhenTemplateIsNotATemplateReferenceInterface()
     {
-        $locator = new TemplateLocator($this->getFileLocator(), '/path/to/fallback');
+        $locator = new TemplateLocator($this->getFileLocator());
         $locator->locate('template');
     }
 

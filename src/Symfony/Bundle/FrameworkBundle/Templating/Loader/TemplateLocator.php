@@ -29,12 +29,10 @@ class TemplateLocator implements FileLocatorInterface
      * Constructor.
      *
      * @param FileLocatorInterface $locator A FileLocatorInterface instance
-     * @param string               $path    A global fallback path
      */
-    public function __construct(FileLocatorInterface $locator, $path)
+    public function __construct(FileLocatorInterface $locator)
     {
         $this->locator = $locator;
-        $this->path = $path;
         $this->cache = array();
     }
 
@@ -63,7 +61,7 @@ class TemplateLocator implements FileLocatorInterface
         }
 
         try {
-            return $this->cache[$key] = $this->locator->locate($template->getPath(), $this->path);
+            return $this->cache[$key] = $this->locator->locate($template->getPath(), $currentPath);
         } catch (\InvalidArgumentException $e) {
             throw new \InvalidArgumentException(sprintf('Unable to find template "%s" in "%s".', $template, $this->path), 0, $e);
         }

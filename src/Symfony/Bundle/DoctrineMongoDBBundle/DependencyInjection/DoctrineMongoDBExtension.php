@@ -85,8 +85,10 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
     {
         $overrides = array(
             'proxy_namespace',
+            'proxy_dir',
             'auto_generate_proxy_classes',
             'hydrator_namespace',
+            'hydrator_dir',
             'auto_generate_hydrator_classes',
         );
 
@@ -153,10 +155,10 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         $methods = array(
             'setMetadataCacheImpl' => new Reference(sprintf('doctrine.odm.mongodb.%s_metadata_cache', $documentManager['name'])),
             'setMetadataDriverImpl' => new Reference(sprintf('doctrine.odm.mongodb.%s_metadata_driver', $documentManager['name'])),
-            'setProxyDir' => '%kernel.cache_dir%'.'/doctrine/odm/mongodb/Proxies',
+            'setProxyDir' => '%doctrine.odm.mongodb.proxy_dir%',
             'setProxyNamespace' => '%doctrine.odm.mongodb.proxy_namespace%',
             'setAutoGenerateProxyClasses' => '%doctrine.odm.mongodb.auto_generate_proxy_classes%',
-            'setHydratorDir' => '%kernel.cache_dir%'.'/doctrine/odm/mongodb/Hydrators',
+            'setHydratorDir' => '%doctrine.odm.mongodb.hydrator_dir%',
             'setHydratorNamespace' => '%doctrine.odm.mongodb.hydrator_namespace%',
             'setAutoGenerateHydratorClasses' => '%doctrine.odm.mongodb.auto_generate_hydrator_classes%',
             'setDefaultDB' => $defaultDatabase,

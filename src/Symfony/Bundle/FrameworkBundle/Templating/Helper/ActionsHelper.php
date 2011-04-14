@@ -46,10 +46,6 @@ class ActionsHelper extends Helper
     {
         $options['attributes'] = $attributes;
 
-        if (isset($options['query'])) {
-            $options['query'] = $options['query'];
-        }
-
         return $this->kernel->render($controller, $options);
     }
 

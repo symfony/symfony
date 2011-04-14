@@ -109,7 +109,7 @@ function get_data($index, $dataDir, $locale = 'en', $constraint = null)
     $bundle = load_resource_bundle($locale, __DIR__.DIRECTORY_SEPARATOR.$dataDir);
 
     foreach ($bundle->get($index) as $code => $name) {
-        if (!is_null($constraint)) {
+        if (null !== $constraint) {
             if ($constraint($code)) {
                 $data[$code] = $name;
             }

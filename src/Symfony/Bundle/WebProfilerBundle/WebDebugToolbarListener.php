@@ -61,8 +61,10 @@ class WebDebugToolbarListener
         }
 
         if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects) {
-            // keep current flashes for one more request
-            $request->getSession()->setFlashes($request->getSession()->getFlashes());
+            if (null !== $session = $request->getSession()) {
+                // keep current flashes for one more request
+                $session->setFlashes($session->getFlashes());
+            }
 
             $response->setContent($this->templating->render('WebProfilerBundle:Profiler:toolbar_redirect.html.twig', array('location' => $response->headers->get('Location'))));
             $response->setStatusCode(200);

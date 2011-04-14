@@ -25,13 +25,15 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $options = $processor->processConfiguration($configuration, array());
 
         $defaults = array(
-            'auto_generate_hydrator_classes'    => false,
-            'auto_generate_proxy_classes'       => false,
-            'default_database'                  => 'default',
-            'document_managers'                 => array(),
-            'connections'                       => array(),
-            'proxy_namespace'                   => 'Proxies',
-            'hydrator_namespace'                => 'Hydrators',
+            'auto_generate_hydrator_classes' => false,
+            'auto_generate_proxy_classes'    => false,
+            'default_database'               => 'default',
+            'document_managers'              => array(),
+            'connections'                    => array(),
+            'proxy_dir'                      => '%kernel.cache_dir%/doctrine/odm/mongodb/Proxies',
+            'proxy_namespace'                => 'Proxies',
+            'hydrator_dir'                   => '%kernel.cache_dir%/doctrine/odm/mongodb/Hydrators',
+            'hydrator_namespace'             => 'Hydrators',
         );
 
         foreach ($defaults as $key => $default) {
@@ -58,8 +60,10 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $options = $processor->processConfiguration($configuration, array($config));
 
         $expected = array(
+            'proxy_dir'                         => '%kernel.cache_dir%/doctrine/odm/mongodb/Proxies',
             'proxy_namespace'                   => 'Test_Proxies',
             'auto_generate_proxy_classes'       => true,
+            'hydrator_dir'                      => '%kernel.cache_dir%/doctrine/odm/mongodb/Hydrators',
             'hydrator_namespace'                => 'Test_Hydrators',
             'auto_generate_hydrator_classes'    => true,
             'default_document_manager'          => 'default_dm_name',

@@ -28,6 +28,7 @@ class TemplatePathsCacheWarmer extends CacheWarmer
     protected $parser;
     protected $rootDir;
     protected $locator;
+    protected $templates;
 
     /**
      * Constructor.
@@ -54,11 +55,9 @@ class TemplatePathsCacheWarmer extends CacheWarmer
     {
         $templates = array();
 
-        foreach ($this->kernel->getBundles() as $name => $bundle) {
-            $templates += $this->findTemplatesIn($bundle->getPath().'/Resources/views', $name);
+        foreach ($this->findAllTemplates() as $template) {
+            $templates[$template->getSignature()] = $this->locator->locate($template);
         }
-
-        $templates += $this->findTemplatesIn($this->rootDir.'/views');
 
         $this->writeCacheFile($cacheDir.'/templates.php', sprintf('<?php return %s;', var_export($templates, true)));
     }
@@ -74,12 +73,34 @@ class TemplatePathsCacheWarmer extends CacheWarmer
     }
 
     /**
+     * Find all the templates in the bundle and in the kernel Resources folder
+     *
+     * @return array An array of templates of type TemplateReferenceInterface
+     */
+    public function findAllTemplates()
+    {
+        if (null !== $this->templates) {
+            return $this->templates;
+        }
+
+        $templates = array();
+
+        foreach ($this->kernel->getBundles() as $name => $bundle) {
+            $templates = array_merge($templates, $this->findTemplatesIn($bundle->getPath().'/Resources/views', $name));
+        }
+
+        $templates = array_merge($templates, $this->findTemplatesIn($this->rootDir.'/views'));
+
+        return $this->templates = $templates;
+    }
+
+    /**
      * Find templates in the given directory
      *
      * @param string $dir       The folder where to look for templates
      * @param string $bundle    The name of the bundle (null when out of a bundle)
      *
-     * @return array An array of template paths
+     * @return array An array of templates of type TemplateReferenceInterface
      */
     protected function findTemplatesIn($dir, $bundle = null)
     {
@@ -93,7 +114,7 @@ class TemplatePathsCacheWarmer extends CacheWarmer
                     if (null !== $bundle) {
                         $template->set('bundle', $bundle);                        
                     } 
-                    $templates[$template->getSignature()] = $this->locator->locate($template);
+                    $templates[] = $template;
                 }
             }
         }

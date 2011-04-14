@@ -20,14 +20,16 @@ class ConstraintViolation
 {
     protected $messageTemplate;
     protected $messageParameters;
+    protected $messagePluralization;
     protected $root;
     protected $propertyPath;
     protected $invalidValue;
 
-    public function __construct($messageTemplate, array $messageParameters, $root, $propertyPath, $invalidValue)
+    public function __construct($messageTemplate, array $messageParameters, $root, $propertyPath, $invalidValue, $messagePluralization = null)
     {
         $this->messageTemplate = $messageTemplate;
         $this->messageParameters = $messageParameters;
+        $this->messagePluralization = $messagePluralization;
         $this->root = $root;
         $this->propertyPath = $propertyPath;
         $this->invalidValue = $invalidValue;
@@ -66,6 +68,14 @@ class ConstraintViolation
     public function getMessageParameters()
     {
         return $this->messageParameters;
+    }
+
+    /**
+     * @return integer|null
+     */
+    public function getMessagePluralization()
+    {
+        return $this->messagePluralization;
     }
 
     /**

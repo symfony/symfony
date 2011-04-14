@@ -66,6 +66,7 @@ class PassConfig
                 new AnalyzeServiceReferencesPass(),
                 new RemoveUnusedDefinitionsPass(),
             )),
+            new CheckExceptionOnInvalidReferenceBehaviorPass(),
         );
     }
 

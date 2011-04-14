@@ -1,4 +1,4 @@
-{% extends "TwigBundle::widgets.html.twig" %}
+{% extends "widgets.html.twig" %}
 
 {% block field__row %}
 {% spaceless %}
@@ -12,7 +12,9 @@
 
 {% block form__widget %}
 {% spaceless %}
-    {{ block('field__rows') }}
-    {{ form_rest(context) }}
+    <div {{ block('attributes') }}>
+        {{ block('field__rows') }}
+        {{ form_rest(context) }}
+    </div>
 {% endspaceless %}
 {% endblock form__widget %}

@@ -98,16 +98,16 @@ class FormExtension extends \Twig_Extension
      *
      * @param TemplateContext $context  The context to render as a row
      */
-    public function renderRow(TemplateContext $context)
+    public function renderRow(TemplateContext $context, array $variables = array())
     {
         $context->setRendered();
 
-        return $this->render($context, 'row');
+        return $this->render($context, 'row', $variables);
     }
 
-    public function renderRest(TemplateContext $context)
+    public function renderRest(TemplateContext $context, array $variables = array())
     {
-        return $this->render($context, 'rest');
+        return $this->render($context, 'rest', $variables);
     }
 
     /**
@@ -130,7 +130,7 @@ class FormExtension extends \Twig_Extension
      * @param array           $parameters Additional variables passed to the template
      * @param array|string    $resources  A resource or array of resources
      */
-    public function renderWidget(TemplateContext $context, array $attributes = array(), array $parameters = array(), $resources = null)
+    public function renderWidget(TemplateContext $context, array $variables = array(), $resources = null)
     {
         $context->setRendered();
 
@@ -138,7 +138,7 @@ class FormExtension extends \Twig_Extension
             $resources = array($resources);
         }
 
-        return $this->render($context, 'widget', array(), $resources);
+        return $this->render($context, 'widget', $variables, $resources);
     }
 
     /**
@@ -147,9 +147,9 @@ class FormExtension extends \Twig_Extension
      * @param TemplateContext $context The context to render the errors for
      * @param array           $params  Additional variables passed to the template
      */
-    public function renderErrors(TemplateContext $context, array $parameters = array())
+    public function renderErrors(TemplateContext $context)
     {
-        return $this->render($context, 'errors', $parameters);
+        return $this->render($context, 'errors');
     }
 
     /**

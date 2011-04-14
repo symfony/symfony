@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper;
 use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTemplateNameParser;
 use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
-use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\TemplateContext;
 use Symfony\Component\Templating\PhpEngine;
 use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
@@ -45,34 +45,34 @@ class FormHelperTest extends AbstractDivLayoutTest
         ));
     }
 
-    protected function renderEnctype(FormInterface $form)
+    protected function renderEnctype(TemplateContext $context)
     {
-        return (string)$this->helper->enctype($form->getContext());
+        return (string)$this->helper->enctype($context);
     }
 
-    protected function renderLabel(FormInterface $form, $label = null)
+    protected function renderLabel(TemplateContext $context, $label = null)
     {
-        return (string)$this->helper->label($form->getContext(), $label);
+        return (string)$this->helper->label($context, $label);
     }
 
-    protected function renderErrors(FormInterface $form)
+    protected function renderErrors(TemplateContext $context)
     {
-        return (string)$this->helper->errors($form->getContext());
+        return (string)$this->helper->errors($context);
     }
 
-    protected function renderWidget(FormInterface $form, array $vars = array())
+    protected function renderWidget(TemplateContext $context, array $vars = array())
     {
-        return (string)$this->helper->widget($form->getContext(), $vars);
+        return (string)$this->helper->widget($context, $vars);
     }
 
-    protected function renderRow(FormInterface $form, array $vars = array())
+    protected function renderRow(TemplateContext $context, array $vars = array())
     {
-        return (string)$this->helper->row($form->getContext(), $vars);
+        return (string)$this->helper->row($context, $vars);
     }
 
-    protected function renderRest(FormInterface $form, array $vars = array())
+    protected function renderRest(TemplateContext $context, array $vars = array())
     {
-        return (string)$this->helper->rest($form->getContext(), $vars);
+        return (string)$this->helper->rest($context, $vars);
     }
 
 }

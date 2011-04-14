@@ -11,7 +11,6 @@
 
 namespace Symfony\Tests\Component\Form;
 
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\TemplateContext;
 use Symfony\Component\Form\FormFactory;
@@ -74,9 +73,9 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    protected function assertWidgetMatchesXpath(FormInterface $form, array $vars, $xpath)
+    protected function assertWidgetMatchesXpath(TemplateContext $context, array $vars, $xpath)
     {
-        $html = $this->renderWidget($form, array_merge(array(
+        $html = $this->renderWidget($context, array_merge(array(
             'id' => 'my_id',
             'attr' => array('class' => 'my_class'),
         ), $vars));
@@ -88,17 +87,17 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertMatchesXpath($html, $xpath);
     }
 
-    abstract protected function renderEnctype(FormInterface $form);
+    abstract protected function renderEnctype(TemplateContext $context);
 
-    abstract protected function renderLabel(FormInterface $form, $label = null);
+    abstract protected function renderLabel(TemplateContext $context, $label = null);
 
-    abstract protected function renderErrors(FormInterface $form);
+    abstract protected function renderErrors(TemplateContext $context);
 
-    abstract protected function renderWidget(FormInterface $form, array $vars = array());
+    abstract protected function renderWidget(TemplateContext $context, array $vars = array());
 
-    abstract protected function renderRow(FormInterface $form, array $vars = array());
+    abstract protected function renderRow(TemplateContext $context, array $vars = array());
 
-    abstract protected function renderRest(FormInterface $form, array $vars = array());
+    abstract protected function renderRest(TemplateContext $context, array $vars = array());
 
     public function testEnctype()
     {
@@ -106,7 +105,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             ->add('file', 'file')
             ->getForm();
 
-        $this->assertEquals('enctype="multipart/form-data"', $this->renderEnctype($form));
+        $this->assertEquals('enctype="multipart/form-data"', $this->renderEnctype($form->getContext()));
     }
 
     public function testNoEnctype()
@@ -115,13 +114,13 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             ->add('text', 'text')
             ->getForm();
 
-        $this->assertEquals('', $this->renderEnctype($form));
+        $this->assertEquals('', $this->renderEnctype($form->getContext()));
     }
 
     public function testLabel()
     {
         $form = $this->factory->create('text', 'name');
-        $html = $this->renderLabel($form);
+        $html = $this->renderLabel($form->getContext());
 
         $this->assertMatchesXpath($html,
 '/label
@@ -134,7 +133,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     public function testLabelWithCustomText()
     {
         $form = $this->factory->create('text', 'name');
-        $html = $this->renderLabel($form, 'Custom label');
+        $html = $this->renderLabel($form->getContext(), 'Custom label');
 
         $this->assertMatchesXpath($html,
 '/label
@@ -149,7 +148,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $form = $this->factory->create('text', 'name');
         $form->addError(new FormError('Error 1'));
         $form->addError(new FormError('Error 2'));
-        $html = $this->renderErrors($form);
+        $context = $form->getContext();
+        $html = $this->renderErrors($context);
 
         $this->assertMatchesXpath($html,
 '/ul
@@ -168,7 +168,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'data' => true,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/input
     [@type="checkbox"]
     [@name="name"]
@@ -185,7 +185,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'data' => true,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/input
     [@type="checkbox"]
     [@name="name"]
@@ -201,7 +201,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'data' => false,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/input
     [@type="checkbox"]
     [@name="name"]
@@ -219,7 +219,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'expanded' => false,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/select
     [@name="name"]
     [
@@ -241,7 +241,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'expanded' => false,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array('separator' => '-- sep --'),
+        $this->assertWidgetMatchesXpath($form->getContext(), array('separator' => '-- sep --'),
 '/select
     [@name="name"]
     [
@@ -264,7 +264,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'expanded' => false,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/select
     [@name="name"]
     [
@@ -289,7 +289,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'expanded' => false,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/select
     [@name="name"]
     [./optgroup[@label="Group1"]
@@ -317,7 +317,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'expanded' => false,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/select
     [@name="name[]"]
     [@multiple="multiple"]
@@ -340,7 +340,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'expanded' => false,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/select
     [@name="name[]"]
     [@multiple="multiple"]
@@ -362,7 +362,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'expanded' => true,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/div
     [
         ./input[@type="radio"][@name="name"][@id="name_a"][@checked]
@@ -384,7 +384,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'expanded' => true,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/div
     [
         ./input[@type="checkbox"][@name="name[a]"][@id="name_a"][@checked]
@@ -405,7 +405,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'data' => 'AT',
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/select
     [@name="name"]
     [./option[@value="AT"][@selected="selected"][.="Austria"]]
@@ -418,7 +418,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     {
         $form = $this->factory->create('csrf', 'name');
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/input
     [@type="hidden"]
     [string-length(@value)>=40]
@@ -434,7 +434,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'with_seconds' => false,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/div
     [
         ./div
@@ -474,7 +474,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'with_seconds' => true,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/div
     [
         ./div
@@ -517,7 +517,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'widget' => 'choice',
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/div
     [
         ./select
@@ -543,7 +543,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'widget' => 'text',
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/input
     [@type="text"]
     [@name="name"]
@@ -556,7 +556,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     {
         $form = $this->factory->create('file', 'name');
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/div
     [
         ./input[@type="file"][@id="name_file"]
@@ -574,7 +574,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'data' => 'foobar',
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/input
     [@type="hidden"]
     [@name="name"]
@@ -589,7 +589,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'data' => '123',
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/input
     [@type="number"]
     [@name="name"]
@@ -604,7 +604,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'data' => 'de',
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/select
     [@name="name"]
     [./option[@value="de"][@selected="selected"][.="German"]]
@@ -619,7 +619,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'data' => 'de_AT',
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/select
     [@name="name"]
     [./option[@value="de_AT"][@selected="selected"][.="German (Austria)"]]
@@ -635,7 +635,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'currency' => 'EUR',
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/input
     [@type="text"]
     [@name="name"]
@@ -651,7 +651,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'data' => 1234.56,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/input
     [@type="text"]
     [@name="name"]
@@ -666,7 +666,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'data' => 'Pa$sW0rD',
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/input
     [@type="password"]
     [@name="name"]
@@ -682,7 +682,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'max_length' => 123,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/input
     [@type="password"]
     [@name="name"]
@@ -698,7 +698,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'data' => 0.1,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/input
     [@type="text"]
     [@name="name"]
@@ -714,7 +714,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'data' => true,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/input
     [@type="radio"]
     [@name="name"]
@@ -731,7 +731,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'value' => 'foobar',
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/input
     [@type="radio"]
     [@name="name"]
@@ -747,7 +747,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'data' => false,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/input
     [@type="radio"]
     [@name="name"]
@@ -762,7 +762,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'data' => 'foobar',
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/textarea
     [@name="name"]
     [.="foobar"]
@@ -776,7 +776,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'data' => 'foobar',
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/input
     [@type="text"]
     [@name="name"]
@@ -793,7 +793,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'max_length' => 123,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/input
     [@type="text"]
     [@name="name"]
@@ -811,7 +811,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'with_seconds' => false,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/div
     [
         ./select
@@ -834,7 +834,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'with_seconds' => true,
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/div
     [
         ./select
@@ -858,7 +858,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'data' => 'Europe/Vienna',
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/select
     [@name="name"]
     [./optgroup
@@ -877,7 +877,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'data' => 'http://www.google.com',
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/input
     [@type="url"]
     [@name="name"]

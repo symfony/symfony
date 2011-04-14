@@ -834,7 +834,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     public function getContext()
     {
-        return TemplateContext::create($this);
+        return new TemplateContext($this);
     }
 
     /**

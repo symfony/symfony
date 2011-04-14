@@ -100,8 +100,6 @@ class FormExtension extends \Twig_Extension
      */
     public function renderRow(TemplateContext $context, array $variables = array())
     {
-        $context->setRendered();
-
         return $this->render($context, 'row', $variables);
     }
 
@@ -132,8 +130,6 @@ class FormExtension extends \Twig_Extension
      */
     public function renderWidget(TemplateContext $context, array $variables = array(), $resources = null)
     {
-        $context->setRendered();
-
         if (null !== $resources && !is_array($resources)) {
             $resources = array($resources);
         }
@@ -180,8 +176,8 @@ class FormExtension extends \Twig_Extension
             $block = $block.'__'.$section;
 
             if (isset($templates[$block])) {
-                if ('widget' === $section) {
-                    $context->setVar('is_rendered', true);
+                if ('widget' === $section || 'row' === $section) {
+                    $context->setRendered(true);
                 }
 
                 return $templates[$block]->renderBlock($block, array_merge($context->getVars(), $variables));

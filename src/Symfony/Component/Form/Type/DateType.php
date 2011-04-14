@@ -80,7 +80,7 @@ class DateType extends AbstractType
 
     public function buildViewBottomUp(FormView $view, FormInterface $form)
     {
-        $view->setVar('widget', $form->getAttribute('widget'));
+        $view->set('widget', $form->getAttribute('widget'));
 
         if ($view->hasChildren()) {
 
@@ -95,7 +95,7 @@ class DateType extends AbstractType
                 $pattern = '{{ year }}-{{ month }}-{{ day }}';
             }
 
-            $view->setVar('date_pattern', $pattern);
+            $view->set('date_pattern', $pattern);
         }
     }
 

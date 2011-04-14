@@ -24,7 +24,7 @@ class LanguageTypeTest extends TestCase
 
         $form = $this->factory->create('language');
         $view = $form->createView();
-        $choices = $view->getVar('choices');
+        $choices = $view->get('choices');
 
         $this->assertArrayHasKey('en', $choices);
         $this->assertEquals('Englisch', $choices['en']);
@@ -42,7 +42,7 @@ class LanguageTypeTest extends TestCase
     {
         $form = $this->factory->create('language', 'language');
         $view = $form->createView();
-        $choices = $view->getVar('choices');
+        $choices = $view->get('choices');
 
         $this->assertArrayNotHasKey('mul', $choices);
     }

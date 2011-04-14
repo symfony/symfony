@@ -41,13 +41,13 @@ class FormType extends AbstractType
         $multipart = false;
 
         foreach ($view as $child) {
-            if ($child->getVar('multipart')) {
+            if ($child->get('multipart')) {
                 $multipart = true;
                 break;
             }
         }
 
-        $view->setVar('multipart', $multipart);
+        $view->set('multipart', $multipart);
     }
 
     public function getDefaultOptions(array $options)

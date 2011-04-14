@@ -77,14 +77,12 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     protected function assertWidgetMatchesXpath(FormInterface $form, array $vars, $xpath)
     {
         $html = $this->renderWidget($form, array_merge(array(
-            'name' => 'my_name',
             'id' => 'my_id',
             'attr' => array('class' => 'my_class'),
         ), $vars));
 
         $xpath = trim($xpath).'
     [@id="my_id"]
-    [@name="my_name"]
     [@class="my_class"]';
 
         $this->assertMatchesXpath($html, $xpath);
@@ -173,6 +171,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form, array(),
 '/input
     [@type="checkbox"]
+    [@name="name"]
     [@checked="checked"]
     [@value="1"]
 '
@@ -189,6 +188,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form, array(),
 '/input
     [@type="checkbox"]
+    [@name="name"]
     [@checked="checked"]
     [@value="foobar"]
 '
@@ -204,6 +204,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form, array(),
 '/input
     [@type="checkbox"]
+    [@name="name"]
     [not(@checked)]
 '
         );
@@ -218,6 +219,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form, array(),
 '/select
+    [@name="name"]
     [
         ./option[@value="a"][@selected="selected"][.="A"]
         /following-sibling::option[@value="b"][not(@selected)][.="B"]
@@ -237,6 +239,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form, array('separator' => '-- sep --'),
 '/select
+    [@name="name"]
     [
         ./option[@value="b"][not(@selected)][.="B"]
         /following-sibling::option[@disabled="disabled"][not(@selected)][.="-- sep --"]
@@ -257,6 +260,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form, array(),
 '/select
+    [@name="name"]
     [
         ./option[@value=""][.=""]
         /following-sibling::option[@value="a"][@selected="selected"][.="A"]
@@ -279,6 +283,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form, array(),
 '/select
+    [@name="name"]
     [./optgroup[@label="Group1"]
         [
             ./option[@value="a"][@selected="selected"][.="A"]
@@ -303,6 +308,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form, array(),
 '/select
+    [@name="name"]
     [./option[@value="AT"][@selected="selected"][.="Austria"]]
     [count(./option)>200]
 '
@@ -414,7 +420,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form, array(),
 '/div
-    [./select
+    [
+        ./select
             [@id="name_month"]
             [./option[@value="2"][@selected="selected"]]
         /following-sibling::select
@@ -440,6 +447,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form, array(),
 '/input
     [@type="text"]
+    [@name="name"]
     [@value="Feb 3, 2011"]
 '
         );
@@ -470,6 +478,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form, array(),
 '/input
     [@type="hidden"]
+    [@name="name"]
     [@value="foobar"]
 '
         );
@@ -484,6 +493,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form, array(),
 '/input
     [@type="number"]
+    [@name="name"]
     [@value="123"]
 '
         );
@@ -497,6 +507,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form, array(),
 '/select
+    [@name="name"]
     [./option[@value="de"][@selected="selected"][.="German"]]
     [count(./option)>200]
 '
@@ -511,6 +522,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form, array(),
 '/select
+    [@name="name"]
     [./option[@value="de_AT"][@selected="selected"][.="German (Austria)"]]
     [count(./option)>200]
 '
@@ -527,6 +539,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form, array(),
 '/input
     [@type="text"]
+    [@name="name"]
     [@value="1234.56"]
     [contains(.., "€")]
 '
@@ -542,6 +555,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form, array(),
 '/input
     [@type="text"]
+    [@name="name"]
     [@value="1234.56"]
 '
         );
@@ -556,7 +570,25 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form, array(),
 '/input
     [@type="password"]
+    [@name="name"]
     [@value=""]
+'
+        );
+    }
+
+    public function testPasswordWithMaxLength()
+    {
+        $form = $this->factory->create('password', 'name', array(
+            'data' => 'Pa$sW0rD',
+            'max_length' => 123,
+        ));
+
+        $this->assertWidgetMatchesXpath($form, array(),
+'/input
+    [@type="password"]
+    [@name="name"]
+    [@value=""]
+    [@maxlength="123"]
 '
         );
     }
@@ -570,6 +602,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form, array(),
 '/input
     [@type="text"]
+    [@name="name"]
     [@value="10"]
     [contains(.., "%")]
 '
@@ -585,6 +618,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form, array(),
 '/input
     [@type="radio"]
+    [@name="name"]
     [@checked="checked"]
     [@value=""]
 '
@@ -601,6 +635,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form, array(),
 '/input
     [@type="radio"]
+    [@name="name"]
     [@checked="checked"]
     [@value="foobar"]
 '
@@ -616,6 +651,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form, array(),
 '/input
     [@type="radio"]
+    [@name="name"]
     [not(@checked)]
 '
         );
@@ -629,6 +665,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form, array(),
 '/textarea
+    [@name="name"]
     [.="foobar"]
 '
         );
@@ -643,6 +680,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form, array(),
 '/input
     [@type="text"]
+    [@name="name"]
     [@value="foobar"]
     [not(@maxlength)]
 '
@@ -659,6 +697,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form, array(),
 '/input
     [@type="text"]
+    [@name="name"]
     [@value="foobar"]
     [@maxlength="123"]
 '
@@ -675,7 +714,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form, array(),
 '/div
-    [./select
+    [
+        ./select
             [@id="name_hour"]
             [./option[@value="4"][@selected="selected"]]
         /following-sibling::select
@@ -697,7 +737,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form, array(),
 '/div
-    [./select
+    [
+        ./select
             [@id="name_hour"]
             [./option[@value="4"][@selected="selected"]]
         /following-sibling::select
@@ -720,6 +761,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form, array(),
 '/select
+    [@name="name"]
     [./optgroup
         [@label="Europe"]
         [./option[@value="Europe/Vienna"][@selected="selected"][.="Vienna"]]
@@ -739,6 +781,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form, array(),
 '/input
     [@type="url"]
+    [@name="name"]
     [@value="http://www.google.com"]
 '
         );

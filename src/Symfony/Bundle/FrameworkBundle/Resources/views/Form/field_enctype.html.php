@@ -1,1 +1,1 @@
-<?php if ($context->get('multipart')): ?>enctype="multipart/form-data"<?php endif ?>
+<?php if ($context->getVar('multipart')): ?>enctype="multipart/form-data"<?php endif ?>

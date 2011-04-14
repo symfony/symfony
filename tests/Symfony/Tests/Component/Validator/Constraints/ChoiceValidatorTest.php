@@ -161,7 +161,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => 'baz',
-            ));
+            ), null, null);
 
         $this->assertFalse($this->validator->isValid('baz', $constraint));
     }
@@ -196,7 +196,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ limit }}' => 2,
-            ));
+            ), null, 2);
 
         $this->assertFalse($this->validator->isValid(array('foo'), $constraint));
     }
@@ -214,7 +214,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ limit }}' => 2,
-            ));
+            ), null, 2);
 
         $this->assertFalse($this->validator->isValid(array('foo', 'bar', 'moo'), $constraint));
     }

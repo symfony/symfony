@@ -95,6 +95,10 @@ class UrlMatcher implements UrlMatcherInterface
     protected function mergeDefaults($params, $defaults)
     {
         $parameters = array_merge($this->defaults, $defaults);
+        while (($key = array_search('~', $parameters))) {
+            $parameters[$key] = null;
+        }
+
         foreach ($params as $key => $value) {
             if (!is_int($key)) {
                 $parameters[$key] = urldecode($value);

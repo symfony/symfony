@@ -35,7 +35,7 @@ class TwigExtensionTest extends TestCase
 
         $this->assertEquals('Twig_Environment', $container->getParameter('twig.class'), '->load() loads the twig.xml file');
         $this->assertFalse($container->getDefinition('twig.cache_warmer')->hasTag('kernel.cache_warmer'), '->load() does not enable cache warming by default');
-        $this->assertContains('TwigBundle::form.html.twig', $container->getParameter('twig.form.resources'), '->load() includes default template for form resources');
+        $this->assertContains('TwigBundle:Form:div_layout.html.twig', $container->getParameter('twig.form.resources'), '->load() includes default template for form resources');
 
         // Twig options
         $options = $container->getParameter('twig.options');

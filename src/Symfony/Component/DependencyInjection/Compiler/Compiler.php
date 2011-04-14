@@ -107,11 +107,14 @@ class Compiler
      */
     public function compile(ContainerBuilder $container)
     {
+        $start = microtime(true);
         foreach ($this->passConfig->getPasses() as $pass) {
             $this->startPass($pass);
             $pass->process($container);
             $this->endPass($pass);
         }
+
+        $this->addLogMessage(sprintf('Compilation finished in %.3fs.', microtime(true) - $start));
     }
 
     /**
@@ -133,6 +136,6 @@ class Compiler
     private function endPass(CompilerPassInterface $pass)
     {
         $this->currentPass = null;
-        $this->addLogMessage(sprintf('%s finished in %.3fs', get_class($pass), microtime(true) - $this->currentStartTime));
+        $this->addLogMessage($this->loggingFormatter->formatPassTime($pass, microtime(true) - $this->currentStartTime));
     }
 }

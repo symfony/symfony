@@ -82,7 +82,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
                 }
 
                 if ($this->isInlinableDefinition($container, $id, $definition = $container->getDefinition($id))) {
-                    $this->compiler->addLogMessage($this->formatter->formatInlineDefinition($this, $id, $this->currentId));
+                    $this->compiler->addLogMessage($this->formatter->formatInlineService($this, $id, $this->currentId));
 
                     if (ContainerInterface::SCOPE_PROTOTYPE !== $definition->getScope()) {
                         $arguments[$k] = $definition;

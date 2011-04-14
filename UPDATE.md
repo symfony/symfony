@@ -6,13 +6,29 @@ one. It only discusses changes that need to be done when using the "public"
 API of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.
 
+PR11 to PR12
+------------
+
+* AsseticBundle's XML `bundle` node has been normalized to match other similar
+  nodes
+
+  Before:
+
+        <bundle name="MyBundle" />
+
+  After:
+
+        <bundle>MyBundle</bundle>
+
 PR10 to PR11
 ------------
 
 * Extension configuration classes should now implement the
-`Symfony\Component\Config\Definition\ConfigurationInterface` interface. Note that
-the BC is kept but implementing this interface in your extensions will allow for
-further developments.
+  `Symfony\Component\Config\Definition\ConfigurationInterface` interface. Note
+  that the BC is kept but implementing this interface in your extensions will
+  allow for further developments.
+
+* The "fingerscrossed" Monolog option has been renamed to "fingers_crossed".
 
 PR9 to PR10
 -----------

@@ -27,13 +27,11 @@
 
         <service id="templating.locator.uncached" class="%templating.locator.class%" public="false">
             <argument type="service" id="file_locator" />
-            <argument>%kernel.root_dir%/Resources</argument>
         </service>
 
         <service id="templating.locator.cached" class="%templating.locator.cached.class%" public="false">
             <argument>%kernel.cache_dir%</argument>
             <argument type="service" id="file_locator" />
-            <argument>%kernel.root_dir%/Resources</argument>
         </service>
 
         <service id="templating.cache_warmer.template_paths" class="%templating.cache_warmer.template_paths.class%" public="false">

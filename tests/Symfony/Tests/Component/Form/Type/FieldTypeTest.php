@@ -115,8 +115,8 @@ class FieldTypeTest extends TestCase
         $form = $this->factory->create('field', 'name');
         $view = $form->createView();
 
-        $this->assertEquals('name', $view->getVar('id'));
-        $this->assertEquals('name', $view->getVar('name'));
+        $this->assertEquals('name', $view->get('id'));
+        $this->assertEquals('name', $view->get('name'));
     }
 
     public function testPassIdAndNameToViewWithParent()
@@ -125,8 +125,8 @@ class FieldTypeTest extends TestCase
         $parent->add($this->factory->create('field', 'child'));
         $view = $parent->createView();
 
-        $this->assertEquals('parent_child', $view['child']->getVar('id'));
-        $this->assertEquals('parent[child]', $view['child']->getVar('name'));
+        $this->assertEquals('parent_child', $view['child']->get('id'));
+        $this->assertEquals('parent[child]', $view['child']->get('name'));
     }
 
     public function testPassIdAndNameToViewWithGrandParent()
@@ -136,8 +136,8 @@ class FieldTypeTest extends TestCase
         $parent['child']->add($this->factory->create('field', 'grand_child'));
         $view = $parent->createView();
 
-        $this->assertEquals('parent_child_grand_child', $view['child']['grand_child']->getVar('id'));
-        $this->assertEquals('parent[child][grand_child]', $view['child']['grand_child']->getVar('name'));
+        $this->assertEquals('parent_child_grand_child', $view['child']['grand_child']->get('id'));
+        $this->assertEquals('parent[child][grand_child]', $view['child']['grand_child']->get('name'));
     }
 
     public function testPassMaxLengthToView()
@@ -145,7 +145,7 @@ class FieldTypeTest extends TestCase
         $form = $this->factory->create('field', null, array('max_length' => 10));
         $view = $form->createView();
 
-        $this->assertSame(10, $view->getVar('max_length'));
+        $this->assertSame(10, $view->get('max_length'));
     }
 
     public function testBindWithEmptyDataCreatesObjectIfClassAvailable()

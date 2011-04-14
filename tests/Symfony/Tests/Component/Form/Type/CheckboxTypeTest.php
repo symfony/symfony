@@ -20,7 +20,7 @@ class CheckboxTypeTest extends TestCase
         $form = $this->factory->create('checkbox', 'name', array('value' => 'foobar'));
         $view = $form->createView();
 
-        $this->assertEquals('foobar', $view->getVar('value'));
+        $this->assertEquals('foobar', $view->get('value'));
     }
 
     public function testCheckedIfDataTrue()
@@ -29,7 +29,7 @@ class CheckboxTypeTest extends TestCase
         $form->setData(true);
         $view = $form->createView();
 
-        $this->assertTrue($view->getVar('checked'));
+        $this->assertTrue($view->get('checked'));
     }
 
     public function testNotCheckedIfDataFalse()
@@ -38,6 +38,6 @@ class CheckboxTypeTest extends TestCase
         $form->setData(false);
         $view = $form->createView();
 
-        $this->assertFalse($view->getVar('checked'));
+        $this->assertFalse($view->get('checked'));
     }
 }

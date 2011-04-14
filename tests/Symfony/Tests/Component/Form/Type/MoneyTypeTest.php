@@ -22,6 +22,6 @@ class MoneyTypeTest extends LocalizedTestCase
         $form = $this->factory->create('money');
         $view = $form->createView();
 
-        $this->assertSame('{{ widget }} €', $view->getVar('money_pattern'));
+        $this->assertSame('{{ widget }} €', $view->get('money_pattern'));
     }
 }

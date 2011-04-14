@@ -69,8 +69,8 @@ class FieldType extends AbstractType
     public function buildView(FormView $view, FormInterface $form)
     {
         if ($view->hasParent()) {
-            $parentId = $view->getParent()->getVar('id');
-            $parentName = $view->getParent()->getVar('name');
+            $parentId = $view->getParent()->get('id');
+            $parentName = $view->getParent()->get('name');
             $id = sprintf('%s_%s', $parentId, $form->getName());
             $name = sprintf('%s[%s]', $parentName, $form->getName());
         } else {
@@ -78,25 +78,26 @@ class FieldType extends AbstractType
             $name = $form->getName();
         }
 
-        $view->setVar('form', $view);
-        $view->setVar('id', $id);
-        $view->setVar('name', $name);
-        $view->setVar('errors', $form->getErrors());
-        $view->setVar('value', $form->getClientData());
-        $view->setVar('read_only', $form->isReadOnly());
-        $view->setVar('required', $form->isRequired());
-        $view->setVar('class', null);
-        $view->setVar('max_length', $form->getAttribute('max_length'));
-        $view->setVar('size', null);
-        $view->setVar('label', $form->getAttribute('label'));
-        $view->setVar('multipart', false);
-        $view->setVar('attr', array());
+        $view->set('form', $view);
+        $view->set('id', $id);
+        $view->set('name', $name);
+        $view->set('errors', $form->getErrors());
+        $view->set('value', $form->getClientData());
+        $view->set('read_only', $form->isReadOnly());
+        $view->set('required', $form->isRequired());
+        $view->set('class', null);
+        $view->set('max_length', $form->getAttribute('max_length'));
+        $view->set('size', null);
+        $view->set('label', ucfirst(strtolower(str_replace('_', ' ', $form->getName()))));
+        $view->set('label', $form->getAttribute('label'));
+        $view->set('multipart', false);
+        $view->set('attr', array());
 
         $types = array();
         foreach (array_reverse((array) $form->getTypes()) as $type) {
             $types[] = $type->getName();
         }
-        $view->setVar('types', $types);
+        $view->set('types', $types);
     }
 
     public function getDefaultOptions(array $options)

@@ -224,7 +224,7 @@ class ChoiceTypeTest extends TestCase
         ));
         $view = $form->createView();
 
-        $this->assertTrue($view->getVar('multiple'));
+        $this->assertTrue($view->get('multiple'));
     }
 
     public function testPassExpandedToView()
@@ -235,7 +235,7 @@ class ChoiceTypeTest extends TestCase
         ));
         $view = $form->createView();
 
-        $this->assertTrue($view->getVar('expanded'));
+        $this->assertTrue($view->get('expanded'));
     }
 
     public function testPassChoicesToView()
@@ -246,7 +246,7 @@ class ChoiceTypeTest extends TestCase
         ));
         $view = $form->createView();
 
-        $this->assertSame($choices, $view->getVar('choices'));
+        $this->assertSame($choices, $view->get('choices'));
     }
 
     public function testPassPreferredChoicesToView()
@@ -258,8 +258,8 @@ class ChoiceTypeTest extends TestCase
         ));
         $view = $form->createView();
 
-        $this->assertSame(array('a' => 'A', 'c' => 'C'), $view->getVar('choices'));
-        $this->assertSame(array('b' => 'B', 'd' => 'D'), $view->getVar('preferred_choices'));
+        $this->assertSame(array('a' => 'A', 'c' => 'C'), $view->get('choices'));
+        $this->assertSame(array('b' => 'B', 'd' => 'D'), $view->get('preferred_choices'));
     }
 
     public function testAdjustNameForMultipleNonExpanded()
@@ -271,6 +271,6 @@ class ChoiceTypeTest extends TestCase
         ));
         $view = $form->createView();
 
-        $this->assertSame('name[]', $view->getVar('name'));
+        $this->assertSame('name[]', $view->get('name'));
     }
 }

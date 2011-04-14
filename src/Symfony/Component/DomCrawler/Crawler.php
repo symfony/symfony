@@ -122,6 +122,7 @@ class Crawler extends \SplObjectStorage
      */
     public function addHtmlContent($content, $charset = 'UTF-8')
     {
+        $revert = libxml_use_internal_errors(true);
         $dom = new \DOMDocument('1.0', $charset);
         $dom->validateOnParse = true;
 
@@ -133,6 +134,7 @@ class Crawler extends \SplObjectStorage
         if (count($base)) {
             $this->base = current($base);
         }
+        libxml_use_internal_errors($revert);
     }
 
     /**

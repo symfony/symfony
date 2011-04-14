@@ -21,6 +21,11 @@ class LoggingFormatter
         return $this->format($pass, sprintf('Inlined service "%s" to "%s".', $id, $target));
     }
 
+    public function formatUpdateReference(CompilerPassInterface $pass, $serviceId, $oldDestId, $newDestId)
+    {
+        return $this->format($pass, sprintf('Changed reference of service "%s" previously pointing to "%s" to "%s".', $serviceId, $oldDestId, $newDestId));
+    }
+
     public function formatResolveInheritance(CompilerPassInterface $pass, $childId, $parentId)
     {
         return $this->format($pass, sprintf('Resolving inheritance for "%s" (parent: %s).', $childId, $parentId));

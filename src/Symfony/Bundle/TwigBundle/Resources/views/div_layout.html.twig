@@ -43,7 +43,7 @@
 
 {% block attributes %}
 {% spaceless %}
-    id="{{ id }}" name="{{ name }}"{% if class %} class="{{ class }}"{% endif %}{% if read_only %} disabled="disabled"{% endif %}{% if required %} required="required"{% endif %}{% if max_length %} maxlength="{{ max_length }}"{% endif %}{% if size %} size="{{ size }}"{% endif %}
+    id="{{ id }}" name="{{ name }}"{% if class %} class="{{ class }}"{% endif %}{% if read_only %} disabled="disabled"{% endif %}{% if required %} required="required"{% endif %}{% if max_length %} maxlength="{{ max_length }}"{% endif %}
     {% for attrname,attrvalue in attr %}{{attrname}}="{{attrvalue}}" {% endfor %}
 {% endspaceless %}
 {% endblock attributes %}
@@ -168,7 +168,7 @@
 {% block time__widget %}
 {% spaceless %}
     <div {{ block('attributes') }}>
-        {{ form_widget(form.hour, { 'size': '1' }) }}:{{ form_widget(form.minute, { 'size': '1' }) }}{% if with_seconds %}:{{ form_widget(form.second, { 'size': '1' }) }}{% endif %}
+        {{ form_widget(form.hour, { 'attr': { 'size': '1' } }) }}:{{ form_widget(form.minute, { 'attr': { 'size': '1' } }) }}{% if with_seconds %}:{{ form_widget(form.second, { 'attr': { 'size': '1' } }) }}{% endif %}
     </div>
 {% endspaceless %}
 {% endblock time__widget %}

@@ -816,9 +816,11 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [
         ./select
             [@id="name_hour"]
+            [@size="1"]
             [./option[@value="4"][@selected="selected"]]
         /following-sibling::select
             [@id="name_minute"]
+            [@size="1"]
             [./option[@value="5"][@selected="selected"]]
     ]
     [count(./select)=2]
@@ -839,12 +841,15 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [
         ./select
             [@id="name_hour"]
+            [@size="1"]
             [./option[@value="4"][@selected="selected"]]
         /following-sibling::select
             [@id="name_minute"]
+            [@size="1"]
             [./option[@value="5"][@selected="selected"]]
         /following-sibling::select
             [@id="name_second"]
+            [@size="1"]
             [./option[@value="6"][@selected="selected"]]
     ]
     [count(./select)=3]

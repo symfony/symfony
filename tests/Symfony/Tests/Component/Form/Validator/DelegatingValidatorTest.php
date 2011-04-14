@@ -23,6 +23,8 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 {
     private $dispatcher;
 
+    private $factory;
+
     private $builder;
 
     private $delegate;
@@ -36,6 +38,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
         $this->delegate = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
         $this->validator = new DelegatingValidator($this->delegate);
         $this->message = 'Message';
@@ -71,7 +74,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function getBuilder($name = 'name', $propertyPath = null)
     {
-        $builder = new FormBuilder($name, $this->dispatcher);
+        $builder = new FormBuilder($name, $this->factory, $this->dispatcher);
         $builder->setAttribute('property_path', new PropertyPath($propertyPath ?: $name));
         $builder->setAttribute('error_mapping', array());
 

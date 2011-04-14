@@ -56,18 +56,12 @@ class FormBuilder
 
     private $emptyData = '';
 
-    public function __construct($name, EventDispatcherInterface $dispatcher, $dataClass = null)
+    public function __construct($name, FormFactoryInterface $factory, EventDispatcherInterface $dispatcher, $dataClass = null)
     {
         $this->name = $name;
+        $this->factory = $factory;
         $this->dispatcher = $dispatcher;
         $this->dataClass = $dataClass;
-    }
-
-    public function setFormFactory(FormFactoryInterface $factory)
-    {
-        $this->factory = $factory;
-
-        return $this;
     }
 
     public function getFormFactory()

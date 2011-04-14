@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Type;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\EventListener\TrimListener;
 use Symfony\Component\Form\Validator\DefaultValidator;
@@ -124,9 +125,9 @@ class FieldType extends AbstractType
         return $defaultOptions;
     }
 
-    public function createBuilder($name, array $options)
+    public function createBuilder($name, FormFactoryInterface $factory, array $options)
     {
-        return new FormBuilder($name, new EventDispatcher(), $options['data_class']);
+        return new FormBuilder($name, $factory, new EventDispatcher(), $options['data_class']);
     }
 
     public function getParent(array $options)

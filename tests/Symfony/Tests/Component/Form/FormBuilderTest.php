@@ -21,12 +21,15 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 {
     private $dispatcher;
 
+    private $factory;
+
     private $builder;
 
     public function setUp()
     {
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->builder = new FormBuilder('name', $this->dispatcher);
+        $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
+        $this->builder = new FormBuilder('name', $this->factory, $this->dispatcher);
     }
 
     /**
@@ -54,7 +57,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testAddWithGuessFluent()
     {
-        $this->builder = new FormBuilder('name', $this->dispatcher, 'stdClass');
+        $this->builder = new FormBuilder('name', $this->factory, $this->dispatcher, 'stdClass');
         $builder = $this->builder->add('foo');
         $this->assertSame($builder, $this->builder);
     }
@@ -110,12 +113,10 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $expectedName = 'foo';
         $expectedOptions = array('bar' => 'baz');
 
-        $factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
-        $factory->expects($this->once())
+        $this->factory->expects($this->once())
                 ->method('createBuilder')
                 ->with($this->equalTo($expectedType), $this->equalTo($expectedName), $this->equalTo($expectedOptions))
                 ->will($this->returnValue($this->getFormBuilder()));
-        $this->builder->setFormFactory($factory);
 
         $this->builder->add($expectedName, $expectedType, $expectedOptions);
         $builder = $this->builder->get($expectedName);
@@ -128,14 +129,12 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $expectedName = 'foo';
         $expectedOptions = array('bar' => 'baz');
 
-        $factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
-        $factory->expects($this->once())
+        $this->factory->expects($this->once())
                 ->method('createBuilderForProperty')
                 ->with($this->equalTo('stdClass'), $this->equalTo($expectedName), $this->equalTo($expectedOptions))
                 ->will($this->returnValue($this->getFormBuilder()));
 
-        $this->builder = new FormBuilder('name', $this->dispatcher, 'stdClass');
-        $this->builder->setFormFactory($factory);
+        $this->builder = new FormBuilder('name', $this->factory, $this->dispatcher, 'stdClass');
         $this->builder->add($expectedName, null, $expectedOptions);
         $builder = $this->builder->get($expectedName);
 

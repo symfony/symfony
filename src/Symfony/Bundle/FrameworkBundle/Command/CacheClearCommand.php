@@ -57,7 +57,7 @@ EOF
         $oldCacheDir  = $realCacheDir.'_old';
 
         if (!is_writable($realCacheDir)) {
-            throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $this->realCacheDir));
+            throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $realCacheDir));
         }
 
         if ($input->getOption('no-warmup')) {

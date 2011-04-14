@@ -250,7 +250,13 @@
     {% if errors|length > 0 %}
     <ul>
         {% for error in errors %}
-            <li>{{ error.messageTemplate|trans(error.messageParameters, 'validators') }}</li>
+            <li>{{
+                error.messagePluralization is null
+                ?
+                    error.messageTemplate|trans(error.messageParameters, 'validators')
+                :
+                    error.messageTemplate|transchoice(error.messagePluralization, error.messageParameters, 'validators')
+            }}</li>
         {% endfor %}
     </ul>
     {% endif %}

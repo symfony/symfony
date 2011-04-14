@@ -11,14 +11,24 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 class LoggingFormatter
 {
-    public function formatRemoveDefinition(CompilerPassInterface $pass, $id, $reason)
+    public function formatRemoveService(CompilerPassInterface $pass, $id, $reason)
     {
-        return $this->format($pass, sprintf('Removed definition "%s"; reason: %s', $id, $reason));
+        return $this->format($pass, sprintf('Removed service "%s"; reason: %s', $id, $reason));
     }
 
-    public function formatInlineDefinition(CompilerPassInterface $pass, $id, $target)
+    public function formatInlineService(CompilerPassInterface $pass, $id, $target)
     {
-        return $this->format($pass, sprintf('Inlined definition "%s" to "%s".', $id, $target));
+        return $this->format($pass, sprintf('Inlined service "%s" to "%s".', $id, $target));
+    }
+
+    public function formatResolveInheritance(CompilerPassInterface $pass, $childId, $parentId)
+    {
+        return $this->format($pass, sprintf('Resolving inheritance for "%s" (parent: %s).', $childId, $parentId));
+    }
+
+    public function formatPassTime(CompilerPassInterface $pass, $time)
+    {
+        return $this->format($pass, sprintf('finished in %.3fs.', $time));
     }
 
     public function format(CompilerPassInterface $pass, $message)

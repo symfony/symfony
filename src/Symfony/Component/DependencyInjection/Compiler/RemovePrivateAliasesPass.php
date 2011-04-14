@@ -38,7 +38,7 @@ class RemovePrivateAliasesPass implements CompilerPassInterface
             }
 
             $container->removeAlias($id);
-            $compiler->addLogMessage($formatter->formatRemoveDefinition($this, $id, 'private alias'));
+            $compiler->addLogMessage($formatter->formatRemoveService($this, $id, 'private alias'));
         }
     }
 }

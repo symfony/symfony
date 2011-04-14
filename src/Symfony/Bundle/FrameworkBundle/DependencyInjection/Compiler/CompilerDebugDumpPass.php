@@ -12,7 +12,7 @@ class CompilerDebugDumpPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $cache = new ConfigCache($this->getCompilerLogFilename($container), false);
-        $cache->write(serialize($container->getCompiler()->getLog()));
+        $cache->write(implode("\n", $container->getCompiler()->getLog()));
     }
 
     public static function getCompilerLogFilename(ContainerInterface $container)

@@ -19,7 +19,8 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->create('text', 'name');
         $form->addError(new FormError('Error!'));
-        $html = $this->renderRow($form);
+        $context = $form->getContext();
+        $html = $this->renderRow($context);
 
         $this->assertMatchesXpath($html,
 '/tr
@@ -41,7 +42,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     public function testRepeatedRow()
     {
         $form = $this->factory->create('repeated', 'name');
-        $html = $this->renderRow($form);
+        $html = $this->renderRow($form->getContext());
 
         $this->assertMatchesXpath($html,
 '/tr
@@ -67,7 +68,8 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->create('repeated', 'name');
         $form->addError(new FormError('Error!'));
-        $html = $this->renderRow($form);
+        $context = $form->getContext();
+        $html = $this->renderRow($context);
 
         $this->assertMatchesXpath($html,
 '/tr
@@ -95,22 +97,23 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testRest()
     {
-        $form = $this->factory->createBuilder('form', 'name')
+        $context = $this->factory->createBuilder('form', 'name')
             ->add('field1', 'text')
             ->add('field2', 'repeated')
             ->add('field3', 'text')
             ->add('field4', 'text')
-            ->getForm();
+            ->getForm()
+            ->getContext();
 
         // Render field2 row -> does not implicitely call renderWidget because
         // it is a repeated field!
-        $this->renderRow($form['field2']);
+        $this->renderRow($context['field2']);
 
         // Render field3 widget
-        $this->renderWidget($form['field3']);
+        $this->renderWidget($context['field3']);
 
         // Rest should only contain field1 and field4
-        $html = $this->renderRest($form);
+        $html = $this->renderRest($context);
 
         $this->assertMatchesXpath($html,
 '/tr[@style="display: none"]
@@ -146,7 +149,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             'data' => array('a', 'b'),
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/table
     [
         ./tr[./td/input[@type="text"][@value="a"]]
@@ -159,12 +162,13 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testForm()
     {
-        $form = $this->factory->createBuilder('form', 'name')
+        $context = $this->factory->createBuilder('form', 'name')
             ->add('firstName', 'text')
             ->add('lastName', 'text')
-            ->getForm();
+            ->getForm()
+            ->getContext();
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($context, array(),
 '/table
     [
         ./tr[@style="display: none"]
@@ -199,7 +203,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             'data' => 'foobar',
         ));
 
-        $this->assertWidgetMatchesXpath($form, array(),
+        $this->assertWidgetMatchesXpath($form->getContext(), array(),
 '/table
     [
         ./tr

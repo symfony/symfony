@@ -16,12 +16,8 @@ use Symfony\Component\Form\Util\ChoiceUtil;
 
 class TemplateContext implements \ArrayAccess, \IteratorAggregate
 {
-    static $cache;
-
     private $vars = array(
         'value' => null,
-        'choices' => array(),
-        'preferred_choices' => array(),
         'attr' => array(),
     );
 
@@ -40,28 +36,7 @@ class TemplateContext implements \ArrayAccess, \IteratorAggregate
      */
     private $rendered = false;
 
-    static public function create(FormInterface $form)
-    {
-        if (null === self::$cache) {
-            self::$cache = new \SplObjectStorage();
-        }
-
-        if (isset(self::$cache[$form])) {
-            return self::$cache[$form];
-        }
-
-        // populate the cache for the root form
-        $root = $form;
-        while ($root->getParent()) {
-            $root = $root->getParent();
-        }
-
-        self::$cache[$root] = new self($root);
-
-        return self::$cache[$form];
-    }
-
-    private function __construct(FormInterface $form, self $parent = null)
+    public function __construct(FormInterface $form, self $parent = null)
     {
         $this->parent = $parent;
 
@@ -75,7 +50,7 @@ class TemplateContext implements \ArrayAccess, \IteratorAggregate
         }
 
         foreach ($form as $key => $child) {
-            $children[$key] = self::$cache[$child] = new self($child, $this);
+            $children[$key] = new self($child, $this);
         }
 
         $this->setChildren($children);
@@ -183,16 +158,6 @@ class TemplateContext implements \ArrayAccess, \IteratorAggregate
         }
 
         return new \ArrayIterator(array());
-    }
-
-    public function getChoiceLabel($choice)
-    {
-        return isset($this->vars['choices'][$choice])
-            ? $this->vars['choices'][$choice]
-            : (isset($this->vars['preferred_choices'][$choice])
-                ? $this->vars['preferred_choices'][$choice]
-                : null
-            );
     }
 
     public function isChoiceGroup($choice)

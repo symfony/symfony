@@ -29,6 +29,8 @@ class FormTest extends \PHPUnit_Framework_TestCase
 {
     private $dispatcher;
 
+    private $factory;
+
     private $builder;
 
     private $form;
@@ -36,6 +38,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
         $this->form = $this->getBuilder()->getForm();
     }
 
@@ -863,7 +866,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null)
     {
-        return new FormBuilder($name, $dispatcher ?: $this->dispatcher);
+        return new FormBuilder($name, $this->factory, $dispatcher ?: $this->dispatcher);
     }
 
     protected function getMockForm($name = 'name')

@@ -52,7 +52,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
         $this->factory = new FormFactory($this->typeLoader);
 
-        $this->builder = new FormBuilder('name', $this->dispatcher);
+        $this->builder = new FormBuilder('name', $this->factory, $this->dispatcher);
     }
 
     protected function getTypeLoaders()

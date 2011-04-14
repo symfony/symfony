@@ -12,8 +12,8 @@
 namespace Symfony\Component\Form\Type;
 
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormView;
 
 abstract class AbstractType implements FormTypeInterface
@@ -30,7 +30,7 @@ abstract class AbstractType implements FormTypeInterface
     {
     }
 
-    public function createBuilder($name, array $options)
+    public function createBuilder($name, FormFactoryInterface $factory, array $options)
     {
         return null;
     }

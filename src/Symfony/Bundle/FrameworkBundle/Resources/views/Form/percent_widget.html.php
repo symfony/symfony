@@ -1,1 +1,1 @@
-<?php echo $view['form']->widget('number', 'widget', $context) ?> %
+<?php echo $view['form']->render('FrameworkBundle:Form:number_widget.html.php') ?> %

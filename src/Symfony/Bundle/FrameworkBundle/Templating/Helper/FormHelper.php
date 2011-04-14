@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Form\TemplateContext;
 use Symfony\Component\Form\Exception\FormException;
 
@@ -28,16 +28,32 @@ class FormHelper extends Helper
 
     protected $engine;
 
+    protected $varStack = array();
+
     public function __construct(EngineInterface $engine)
     {
         $this->engine = $engine;
     }
 
-    public function attributes(array $attribs)
+    public function attributes()
     {
         $html = '';
-        foreach ($attribs as $k => $v) {
-            $html .= $this->engine->escape($k).'="'.$this->engine->escape($v).'" ';
+        $attr = array();
+
+        if (count($this->varStack) > 0) {
+            $vars = end($this->varStack);
+
+            if (isset($vars['attr'])) {
+                $attr = $vars['attr'];
+            }
+
+            if (isset($vars['id'])) {
+                $attr['id'] = $vars['id'];
+            }
+        }
+
+        foreach ($attr as $k => $v) {
+            $html .= ' '.$this->engine->escape($k).'="'.$this->engine->escape($v).'"';
         }
 
         return $html;
@@ -45,12 +61,12 @@ class FormHelper extends Helper
 
     public function enctype(TemplateContext $context)
     {
-        return $this->renderTemplate($context, 'enctype');
+        return $this->renderSection($context, 'enctype');
     }
 
-    public function widget(TemplateContext $context, array $parameters = array(), $template = null)
+    public function widget(TemplateContext $context, array $variables = array())
     {
-        return trim($this->renderTemplate($context, 'widget', $parameters, $template));
+        return trim($this->renderSection($context, 'widget', $variables));
     }
 
     /**
@@ -59,42 +75,63 @@ class FormHelper extends Helper
      * @param  FieldInterface $field
      * @return string
      */
-    public function row(TemplateContext $context, $template = null)
+    public function row(TemplateContext $context, array $variables = array())
     {
-        return $this->renderTemplate($context, 'row', array(), $template);
+        return $this->renderSection($context, 'row', $variables);
     }
 
-    public function label(TemplateContext $context, $label = null, array $parameters = array(), $template = null)
+    public function label(TemplateContext $context, $label = null)
     {
-        return $this->renderTemplate($context, 'label', null === $label ? array() : array('label' => $label));
+        return $this->renderSection($context, 'label', null === $label ? array() : array('label' => $label));
     }
 
-    public function errors(TemplateContext $context, array $parameters = array(), $template = null)
+    public function errors(TemplateContext $context)
     {
-        return $this->renderTemplate($context, 'errors', array(), $template);
+        return $this->renderSection($context, 'errors');
     }
 
-    public function rest(TemplateContext $context, array $parameters = array(), $template = null)
+    public function rest(TemplateContext $context, array $variables = array())
     {
-        return $this->renderTemplate($context, 'rest', array(), $template);
+        return $this->renderSection($context, 'rest', $variables);
     }
 
-    protected function renderTemplate(TemplateContext $context, $section, array $variables = array(), array $resources = null)
+    protected function renderSection(TemplateContext $context, $section, array $variables = array())
     {
-        $blocks = $context->get('types');
+        $template = null;
+        $blocks = $context->getVar('types');
+
         foreach ($blocks as &$block) {
             $block = $block.'_'.$section;
+            $template = $this->lookupTemplate($block);
 
-            if ($template = $this->lookupTemplate($block)) {
-                if ('widget' === $section) {
-                    $context->set('is_rendered', true);
-                }
-
-                return $this->engine->render($template, array_merge($context->all(), $variables));
+            if ($template) {
+                break;
             }
         }
 
-        throw new FormException(sprintf('Unable to render form as none of the following blocks exist: "%s".', implode('", "', $blocks)));
+        if (!$template) {
+            throw new FormException(sprintf('Unable to render form as none of the following blocks exist: "%s".', implode('", "', $blocks)));
+        }
+
+        if ('widget' === $section || 'row' === $section) {
+            $context->setRendered(true);
+        }
+
+        return $this->render($template, array_merge($context->getVars(), $variables));
+    }
+
+    public function render($template, array $variables = array())
+    {
+        array_push($this->varStack, array_merge(
+            count($this->varStack) > 0 ? end($this->varStack) : array(),
+            $variables
+        ));
+
+        $html = $this->engine->render($template, end($this->varStack));
+
+        array_pop($this->varStack);
+
+        return $html;
     }
 
     protected function lookupTemplate($templateName)

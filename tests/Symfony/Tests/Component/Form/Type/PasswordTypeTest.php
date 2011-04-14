@@ -21,26 +21,26 @@ class PasswordTypeTest extends TestCase
     {
         $form = $this->factory->create('password');
         $form->setData('pAs5w0rd');
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertSame('', $renderer->getVar('value'));
+        $this->assertSame('', $context->getVar('value'));
     }
 
     public function testEmptyIfBound()
     {
         $form = $this->factory->create('password');
         $form->bind('pAs5w0rd');
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertSame('', $renderer->getVar('value'));
+        $this->assertSame('', $context->getVar('value'));
     }
 
     public function testNotEmptyIfBoundAndNotAlwaysEmpty()
     {
         $form = $this->factory->create('password', null, array('always_empty' => false));
         $form->bind('pAs5w0rd');
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertSame('pAs5w0rd', $renderer->getVar('value'));
+        $this->assertSame('pAs5w0rd', $context->getVar('value'));
     }
 }

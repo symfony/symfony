@@ -77,11 +77,11 @@ class DateType extends AbstractType
             ->setAttribute('widget', $options['widget']);
     }
 
-    public function buildVariablesBottomUp(TemplateContext $variables, FormInterface $form)
+    public function buildContextBottomUp(TemplateContext $context, FormInterface $form)
     {
-        $variables->set('widget', $form->getAttribute('widget'));
+        $context->setVar('widget', $form->getAttribute('widget'));
 
-        if ($variables->hasChildren()) {
+        if ($context->hasChildren()) {
 
             $pattern = $form->getAttribute('formatter')->getPattern();
 
@@ -94,7 +94,7 @@ class DateType extends AbstractType
                 $pattern = '{{ year }}-{{ month }}-{{ day }}';
             }
 
-            $variables->set('date_pattern', $pattern);
+            $context->setVar('date_pattern', $pattern);
         }
     }
 

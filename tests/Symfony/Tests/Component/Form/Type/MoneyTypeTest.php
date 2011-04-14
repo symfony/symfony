@@ -15,13 +15,13 @@ require_once __DIR__ . '/LocalizedTestCase.php';
 
 class MoneyTypeTest extends LocalizedTestCase
 {
-    public function testPassMoneyPatternToRenderer()
+    public function testPassMoneyPatternToContext()
     {
         \Locale::setDefault('de_DE');
 
         $form = $this->factory->create('money');
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertSame('{{ widget }} €', $renderer->getVar('money_pattern'));
+        $this->assertSame('{{ widget }} €', $context->getVar('money_pattern'));
     }
 }

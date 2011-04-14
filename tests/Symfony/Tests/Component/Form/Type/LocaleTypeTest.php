@@ -23,8 +23,8 @@ class LocaleTypeTest extends TestCase
         \Locale::setDefault('de_AT');
 
         $form = $this->factory->create('locale');
-        $renderer = $this->factory->createRenderer($form, 'stub');
-        $choices = $renderer->getVar('choices');
+        $context = $form->getContext();
+        $choices = $context->getVar('choices');
 
         $this->assertArrayHasKey('en', $choices);
         $this->assertEquals('Englisch', $choices['en']);

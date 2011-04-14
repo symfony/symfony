@@ -110,42 +110,42 @@ class FieldTypeTest extends TestCase
         $this->assertEquals('reverse[ a ]', $form->getData());
     }
 
-    public function testPassIdAndNameToRenderer()
+    public function testPassIdAndNameToContext()
     {
         $form = $this->factory->create('field', 'name');
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertEquals('name', $renderer->getVar('id'));
-        $this->assertEquals('name', $renderer->getVar('name'));
+        $this->assertEquals('name', $context->getVar('id'));
+        $this->assertEquals('name', $context->getVar('name'));
     }
 
-    public function testPassIdAndNameToRendererWithParent()
+    public function testPassIdAndNameToContextWithParent()
     {
         $parent = $this->factory->create('field', 'parent');
         $parent->add($this->factory->create('field', 'child'));
-        $renderer = $this->factory->createRenderer($parent, 'stub');
+        $context = $parent->getContext();
 
-        $this->assertEquals('parent_child', $renderer['child']->getVar('id'));
-        $this->assertEquals('parent[child]', $renderer['child']->getVar('name'));
+        $this->assertEquals('parent_child', $context['child']->getVar('id'));
+        $this->assertEquals('parent[child]', $context['child']->getVar('name'));
     }
 
-    public function testPassIdAndNameToRendererWithGrandParent()
+    public function testPassIdAndNameToContextWithGrandParent()
     {
         $parent = $this->factory->create('field', 'parent');
         $parent->add($this->factory->create('field', 'child'));
         $parent['child']->add($this->factory->create('field', 'grand_child'));
-        $renderer = $this->factory->createRenderer($parent, 'stub');
+        $context = $parent->getContext();
 
-        $this->assertEquals('parent_child_grand_child', $renderer['child']['grand_child']->getVar('id'));
-        $this->assertEquals('parent[child][grand_child]', $renderer['child']['grand_child']->getVar('name'));
+        $this->assertEquals('parent_child_grand_child', $context['child']['grand_child']->getVar('id'));
+        $this->assertEquals('parent[child][grand_child]', $context['child']['grand_child']->getVar('name'));
     }
 
-    public function testPassMaxLengthToRenderer()
+    public function testPassMaxLengthToContext()
     {
         $form = $this->factory->create('field', null, array('max_length' => 10));
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertSame(10, $renderer->getVar('max_length'));
+        $this->assertSame(10, $context->getVar('max_length'));
     }
 
     public function testBindWithEmptyDataCreatesObjectIfClassAvailable()

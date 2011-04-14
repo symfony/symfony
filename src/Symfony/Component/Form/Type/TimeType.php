@@ -71,10 +71,10 @@ class TimeType extends AbstractType
             ->setAttribute('with_seconds', $options['with_seconds']);
     }
 
-    public function buildVariables(TemplateContext $variables, FormInterface $form)
+    public function buildContext(TemplateContext $context, FormInterface $form)
     {
-        $variables->set('widget', $form->getAttribute('widget'));
-        $variables->set('with_seconds', $form->getAttribute('with_seconds'));
+        $context->setVar('widget', $form->getAttribute('widget'));
+        $context->setVar('with_seconds', $form->getAttribute('with_seconds'));
     }
 
     public function getDefaultOptions(array $options)

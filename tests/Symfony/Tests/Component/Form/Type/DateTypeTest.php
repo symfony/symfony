@@ -429,12 +429,12 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertTrue($form->isPartiallyFilled());
     }
 
-    public function testPassDatePatternToRenderer()
+    public function testPassDatePatternToContext()
     {
         $form = $this->factory->create('date');
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertSame('{{ day }}.{{ month }}.{{ year }}', $renderer->getVar('date_pattern'));
+        $this->assertSame('{{ day }}.{{ month }}.{{ year }}', $context->getVar('date_pattern'));
     }
 
     public function testDontPassDatePatternIfText()
@@ -442,18 +442,18 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', 'name', array(
             'widget' => 'text',
         ));
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertNull($renderer->getVar('date_pattern'));
+        $this->assertNull($context->getVar('date_pattern'));
     }
 
-    public function testPassWidgetToRenderer()
+    public function testPassWidgetToContext()
     {
         $form = $this->factory->create('date', 'name', array(
             'widget' => 'text',
         ));
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertSame('text', $renderer->getVar('widget'));
+        $this->assertSame('text', $context->getVar('widget'));
     }
 }

@@ -19,9 +19,9 @@ interface FormTypeInterface
 {
     function buildForm(FormBuilder $builder, array $options);
 
-    function buildVariables(TemplateContext $variables, FormInterface $form);
+    function buildContext(TemplateContext $context, FormInterface $form);
 
-    function buildVariablesBottomUp(TemplateContext $variables, FormInterface $form);
+    function buildContextBottomUp(TemplateContext $context, FormInterface $form);
 
     function createBuilder($name, array $options);
 

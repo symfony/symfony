@@ -36,18 +36,18 @@ class FormType extends AbstractType
         }
     }
 
-    public function buildVariablesBottomUp(TemplateContext $variables, FormInterface $form)
+    public function buildContextBottomUp(TemplateContext $context, FormInterface $form)
     {
         $multipart = false;
 
-        foreach ($variables as $child) {
-            if ($child->get('multipart')) {
+        foreach ($context as $child) {
+            if ($child->getVar('multipart')) {
                 $multipart = true;
                 break;
             }
         }
 
-        $variables->set('multipart', $multipart);
+        $context->setVar('multipart', $multipart);
     }
 
     public function getDefaultOptions(array $options)

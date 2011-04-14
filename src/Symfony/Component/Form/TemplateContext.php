@@ -68,10 +68,10 @@ class TemplateContext implements \ArrayAccess, \IteratorAggregate
         $types = (array) $form->getTypes();
         $children = array();
 
-        $this->set('context', $this);
+        $this->setVar('context', $this);
 
         foreach ($types as $type) {
-            $type->buildVariables($this, $form);
+            $type->buildContext($this, $form);
         }
 
         foreach ($form as $key => $child) {
@@ -81,21 +81,21 @@ class TemplateContext implements \ArrayAccess, \IteratorAggregate
         $this->setChildren($children);
 
         foreach ($types as $type) {
-            $type->buildVariablesBottomUp($this, $form);
+            $type->buildContextBottomUp($this, $form);
         }
     }
 
-    public function set($name, $value)
+    public function setVar($name, $value)
     {
         $this->vars[$name] = $value;
     }
 
-    public function has($name)
+    public function hasVar($name)
     {
         return array_key_exists($name, $this->vars);
     }
 
-    public function get($name)
+    public function getVar($name)
     {
         if (!isset($this->vars[$name])) {
             return null;
@@ -104,7 +104,7 @@ class TemplateContext implements \ArrayAccess, \IteratorAggregate
         return $this->vars[$name];
     }
 
-    public function all()
+    public function getVars()
     {
         return $this->vars;
     }

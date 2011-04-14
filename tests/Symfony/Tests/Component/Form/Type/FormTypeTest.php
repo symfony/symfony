@@ -236,21 +236,21 @@ class FormTypeTest extends TestCase
         $this->assertSame($ref2, $author['referenceCopy']);
     }
 
-    public function testPassMultipartFalseToRenderer()
+    public function testPassMultipartFalseToContext()
     {
         $form = $this->factory->create('form');
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertFalse($renderer->getVar('multipart'));
+        $this->assertFalse($context->getVar('multipart'));
     }
 
-    public function testPassMultipartTrueIfAnyChildIsMultipartToRenderer()
+    public function testPassMultipartTrueIfAnyChildIsMultipartToContext()
     {
         $form = $this->factory->create('form');
         $form->add($this->factory->create('text'));
         $form->add($this->factory->create('file'));
-        $renderer = $this->factory->createRenderer($form, 'stub');
+        $context = $form->getContext();
 
-        $this->assertTrue($renderer->getVar('multipart'));
+        $this->assertTrue($context->getVar('multipart'));
     }
 }

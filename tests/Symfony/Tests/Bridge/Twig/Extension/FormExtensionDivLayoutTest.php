@@ -12,12 +12,14 @@
 namespace Symfony\Tests\Bridge\Twig\Extension;
 
 require_once __DIR__.'/Fixtures/StubTranslator.php';
+require_once __DIR__.'/Fixtures/StubFilesystemLoader.php';
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Tests\Component\Form\AbstractDivLayoutTest;
 use Symfony\Tests\Bridge\Twig\Extension\Fixtures\StubTranslator;
+use Symfony\Tests\Bridge\Twig\Extension\Fixtures\StubFilesystemLoader;
 
 class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 {
@@ -25,7 +27,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     {
         parent::setUp();
 
-        $loader = new \Twig_Loader_Filesystem(array(
+        $loader = new StubFilesystemLoader(array(
             __DIR__.'/../../../../../../src/Symfony/Bundle/TwigBundle/Resources/views',
         ));
 

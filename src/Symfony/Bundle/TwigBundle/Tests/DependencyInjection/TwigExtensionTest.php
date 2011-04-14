@@ -65,7 +65,7 @@ class TwigExtensionTest extends TestCase
 
         // Form resources
         $resources = $container->getParameter('twig.form.resources');
-        $this->assertContains('TwigBundle::form.html.twig', $resources, '->load() includes default template for form resources');
+        $this->assertContains('TwigBundle:Form:div_layout.html.twig', $resources, '->load() includes default template for form resources');
         $this->assertContains('MyBundle::form.html.twig', $resources, '->load() merges new templates into form resources');
 
         // Globals

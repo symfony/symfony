@@ -103,14 +103,15 @@
 {% block choice__widget %}
 {% spaceless %}
     {% if expanded %}
+        <div {{ block('attributes') }}>
         {% for choice, child in context %}
             {{ form_widget(child) }}
-            {{ child.setVar('label', context.choiceLabel(choice)) }}
             {{ form_label(child) }}
         {% endfor %}
+        </div>
     {% else %}
     <select {{ block('attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
-        {% if not required %}
+        {% if not multiple and not required %}
             <option value="">{{ empty_value }}</option>
         {% endif %}
         {% if preferred_choices|length > 0 %}

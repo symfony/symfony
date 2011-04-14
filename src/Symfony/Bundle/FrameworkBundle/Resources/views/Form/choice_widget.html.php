@@ -1,8 +1,10 @@
 <?php if ($expanded): ?>
+    <div<?php echo $view['form']->attributes() ?>>
     <?php foreach ($context as $choice => $child): ?>
         <?php echo $view['form']->widget($child) ?>
         <?php echo $view['form']->label($child) ?>
     <?php endforeach ?>
+    </div>
 <?php else: ?>
     <select
         <?php echo $view['form']->attributes() ?>
@@ -11,7 +13,7 @@
         <?php if ($multiple): ?> multiple="multiple"<?php endif ?>
         <?php if ($class): ?> class="<?php echo $class ?>"<?php endif ?>
     >
-        <?php if (!$required): ?><option value=""><?php echo $empty_value; ?></option><?php endif; ?>
+        <?php if (!$multiple && !$required): ?><option value=""><?php echo $empty_value; ?></option><?php endif; ?>
         <?php if (count($preferred_choices) > 0): ?>
             <?php foreach ($preferred_choices as $choice => $label): ?>
                 <?php if ($context->isChoiceGroup($label)): ?>

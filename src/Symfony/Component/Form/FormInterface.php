@@ -125,5 +125,5 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
 
     function isRoot();
 
-    function getView();
+    function getView(FormView $parent = null);
 }

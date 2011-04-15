@@ -77,6 +77,7 @@ class FieldType extends AbstractType
             $name = $form->getName();
         }
 
+        $view->setVar('form', $view);
         $view->setVar('id', $id);
         $view->setVar('name', $name);
         $view->setVar('errors', $form->getErrors());

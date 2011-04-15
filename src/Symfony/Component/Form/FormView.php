@@ -36,30 +36,6 @@ class FormView implements \ArrayAccess, \IteratorAggregate
      */
     private $rendered = false;
 
-    public function __construct(FormInterface $form, self $parent = null)
-    {
-        $this->parent = $parent;
-
-        $types = (array) $form->getTypes();
-        $children = array();
-
-        $this->setVar('form', $this);
-
-        foreach ($types as $type) {
-            $type->buildView($this, $form);
-        }
-
-        foreach ($form as $key => $child) {
-            $children[$key] = new self($child, $this);
-        }
-
-        $this->setChildren($children);
-
-        foreach ($types as $type) {
-            $type->buildViewBottomUp($this, $form);
-        }
-    }
-
     public function setVar($name, $value)
     {
         $this->vars[$name] = $value;

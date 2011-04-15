@@ -241,7 +241,7 @@ class FormTypeTest extends TestCase
         $form = $this->factory->create('form');
         $view = $form->createView();
 
-        $this->assertFalse($view->getVar('multipart'));
+        $this->assertFalse($view->get('multipart'));
     }
 
     public function testPassMultipartTrueIfAnyChildIsMultipartToView()
@@ -251,6 +251,6 @@ class FormTypeTest extends TestCase
         $form->add($this->factory->create('file'));
         $view = $form->createView();
 
-        $this->assertTrue($view->getVar('multipart'));
+        $this->assertTrue($view->get('multipart'));
     }
 }

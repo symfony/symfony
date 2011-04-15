@@ -24,7 +24,7 @@ class CountryTypeTest extends TestCase
 
         $form = $this->factory->create('country');
         $view = $form->createView();
-        $choices = $view->getVar('choices');
+        $choices = $view->get('choices');
 
         $this->assertArrayHasKey('DE', $choices);
         $this->assertEquals('Deutschland', $choices['DE']);
@@ -42,7 +42,7 @@ class CountryTypeTest extends TestCase
     {
         $form = $this->factory->create('country', 'country');
         $view = $form->createView();
-        $choices = $view->getVar('choices');
+        $choices = $view->get('choices');
 
         $this->assertArrayNotHasKey('ZZ', $choices);
     }

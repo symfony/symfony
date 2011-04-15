@@ -98,7 +98,7 @@ class FormHelper extends Helper
     protected function renderSection(FormView $view, $section, array $variables = array())
     {
         $template = null;
-        $blocks = $view->getVar('types');
+        $blocks = $view->get('types');
 
         foreach ($blocks as &$block) {
             $block = $block.'_'.$section;
@@ -117,7 +117,7 @@ class FormHelper extends Helper
             $view->setRendered(true);
         }
 
-        return $this->render($template, array_merge($view->getVars(), $variables));
+        return $this->render($template, array_merge($view->all(), $variables));
     }
 
     public function render($template, array $variables = array())

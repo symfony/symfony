@@ -81,18 +81,18 @@ class ChoiceType extends AbstractType
         $choices = $form->getAttribute('choice_list')->getChoices();
         $preferred = array_flip($form->getAttribute('preferred_choices'));
 
-        $view->setVar('multiple', $form->getAttribute('multiple'));
-        $view->setVar('expanded', $form->getAttribute('expanded'));
-        $view->setVar('preferred_choices', array_intersect_key($choices, $preferred));
-        $view->setVar('choices', array_diff_key($choices, $preferred));
-        $view->setVar('separator', '-------------------');
-        $view->setVar('empty_value', '');
+        $view->set('multiple', $form->getAttribute('multiple'));
+        $view->set('expanded', $form->getAttribute('expanded'));
+        $view->set('preferred_choices', array_intersect_key($choices, $preferred));
+        $view->set('choices', array_diff_key($choices, $preferred));
+        $view->set('separator', '-------------------');
+        $view->set('empty_value', '');
 
-        if ($view->getVar('multiple') && !$view->getVar('expanded')) {
+        if ($view->get('multiple') && !$view->get('expanded')) {
             // Add "[]" to the name in case a select tag with multiple options is
             // displayed. Otherwise only one of the selected options is sent in the
             // POST request.
-            $view->setVar('name', $view->getVar('name').'[]');
+            $view->set('name', $view->get('name').'[]');
         }
     }
 

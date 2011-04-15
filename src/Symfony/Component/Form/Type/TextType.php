@@ -24,7 +24,7 @@ class TextType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form)
     {
-        $view->setVar('max_length', $form->getAttribute('max_length'));
+        $view->set('max_length', $form->getAttribute('max_length'));
     }
 
     public function getParent(array $options)

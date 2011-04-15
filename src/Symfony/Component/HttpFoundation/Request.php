@@ -126,7 +126,7 @@ class Request
      *
      * @return Request A new request
      */
-    static public function createfromGlobals()
+    static public function createFromGlobals()
     {
         return new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
     }

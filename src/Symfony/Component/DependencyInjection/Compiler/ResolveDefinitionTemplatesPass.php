@@ -15,6 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class ResolveDefinitionTemplatesPass implements CompilerPassInterface
 {
     private $container;
+    private $compiler;
+    private $formatter;
 
     /**
      * Process the ContainerBuilder to replace DefinitionDecorator instances with their real Definition instances.
@@ -24,6 +26,9 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $this->container = $container;
+        $this->compiler = $container->getCompiler();
+        $this->formatter = $this->compiler->getLoggingFormatter();
+
         foreach (array_keys($container->getDefinitions()) as $id) {
             // yes, we are specifically fetching the definition from the
             // container to ensure we are not operating on stale data
@@ -54,6 +59,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
             $parentDef = $this->resolveDefinition($parent, $parentDef);
         }
 
+        $this->compiler->addLogMessage($this->formatter->formatResolveInheritance($this, $id, $parent));
         $def = new Definition();
 
         // merge in parent definition

@@ -13,7 +13,7 @@ namespace Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection;
 
 class TestHydrator extends \Doctrine\ORM\Internal\Hydration\AbstractHydrator
 {
-    protected function _hydrateAll();
+    protected function _hydrateAll()
     {
         return array();
     }

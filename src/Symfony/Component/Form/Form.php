@@ -361,7 +361,7 @@ class Form implements \IteratorAggregate, FormInterface
 
         // Hook to change content of the data
         $event = new FilterDataEvent($this, $appData);
-        $this->dispatcher->dispatch(Events::filterSetData, $event);
+        $this->dispatcher->dispatch(Events::onSetData, $event);
         $appData = $event->getData();
 
         // Treat data as strings unless a value transformer exists
@@ -418,7 +418,7 @@ class Form implements \IteratorAggregate, FormInterface
 
         // Hook to change content of the data bound by the browser
         $event = new FilterDataEvent($this, $clientData);
-        $this->dispatcher->dispatch(Events::filterBoundClientData, $event);
+        $this->dispatcher->dispatch(Events::onBindClientData, $event);
         $clientData = $event->getData();
 
         if (count($this->children) > 0) {
@@ -475,7 +475,7 @@ class Form implements \IteratorAggregate, FormInterface
             // Hook to change content of the data in the normalized
             // representation
             $event = new FilterDataEvent($this, $normData);
-            $this->dispatcher->dispatch(Events::filterBoundNormData, $event);
+            $this->dispatcher->dispatch(Events::onBindNormData, $event);
             $normData = $event->getData();
 
             // Synchronize representations - must not change the content!

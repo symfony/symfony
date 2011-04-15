@@ -53,7 +53,7 @@ class ResizeFormListener implements EventSubscriberInterface
         return array(
             Events::preSetData,
             Events::preBind,
-            Events::filterBoundNormData,
+            Events::onBindNormData,
         );
     }
 
@@ -111,7 +111,7 @@ class ResizeFormListener implements EventSubscriberInterface
         }
     }
 
-    public function filterBoundNormData(FilterDataEvent $event)
+    public function onBindNormData(FilterDataEvent $event)
     {
         if (!$this->resizeOnBind) {
             return;

@@ -417,7 +417,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         // use real event dispatcher now
         $form = $this->getBuilder('name', new EventDispatcher())
             ->addEventSubscriber(new FixedFilterListener(array(
-                'filterSetData' => array(
+                'onSetData' => array(
                     'app' => 'filtered',
                 ),
             )))
@@ -540,10 +540,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
         // use real event dispatcher now
         $form = $this->getBuilder('name', new EventDispatcher())
             ->addEventSubscriber(new FixedFilterListener(array(
-                'filterBoundClientData' => array(
+                'onBindClientData' => array(
                     'client' => 'filteredclient',
                 ),
-                'filterBoundNormData' => array(
+                'onBindNormData' => array(
                     'norm' => 'filterednorm',
                 ),
             )))

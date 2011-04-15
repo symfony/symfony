@@ -194,6 +194,11 @@ class PrototypedArrayNode extends ArrayNode
                     if ($this->removeKeyAttribute) {
                         unset($v[$this->keyAttribute]);
                     }
+
+                    // if only "value" is left
+                    if (1 == count($v) && isset($v['value'])) {
+                        $v = $v['value'];
+                    }
                 }
 
                 if (array_key_exists($k, $normalized)) {

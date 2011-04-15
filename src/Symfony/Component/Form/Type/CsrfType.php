@@ -35,9 +35,10 @@ class CsrfType extends AbstractType
             ->setData($csrfProvider->generateCsrfToken($pageId))
             ->addValidator(new CallbackValidator(
                 function (FormInterface $form) use ($csrfProvider, $pageId) {
-                    if ($form->hasParent() && $form->getParent()->isRoot()
+                    if ((!$form->hasParent() || $form->getParent()->isRoot())
                             && !$csrfProvider->isCsrfTokenValid($pageId, $form->getData())) {
                         $form->addError(new FormError('The CSRF token is invalid. Please try to resubmit the form'));
+                        $form->setData($csrfProvider->generateCsrfToken($pageId));
                     }
                 }
             ));

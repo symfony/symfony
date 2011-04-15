@@ -643,7 +643,12 @@ class Request
             $this->format = $this->get('_format');
             if (null === $this->format) {
                 $formats = $this->getAcceptableContentTypes();
-                $this->format = reset($formats) ? $this->getFormat(current($formats)) : $default;
+                if (!empty($formats)) {
+                    $this->format =  $this->getFormat($formats[0]);
+                }
+                if (null === $this->format) {
+                    $this->format =  $default;
+                }
             }
         }
 

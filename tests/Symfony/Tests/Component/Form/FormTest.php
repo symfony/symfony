@@ -15,6 +15,7 @@ require_once __DIR__.'/Fixtures/FixedDataTransformer.php';
 require_once __DIR__.'/Fixtures/FixedFilterListener.php';
 
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\DataTransformer\TransformationFailedException;
@@ -862,6 +863,67 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form->bind('foobar');
 
         $this->assertSame(array(), $form->getErrors());
+    }
+
+    public function testGetView()
+    {
+        $test = $this;
+        $type1 = $this->getMock('Symfony\Component\Form\Type\FormTypeInterface');
+        $type2 = $this->getMock('Symfony\Component\Form\Type\FormTypeInterface');
+        $calls = array();
+
+        $type1->expects($this->once())
+            ->method('buildView')
+            ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
+                $calls[] = 'type1::buildView';
+                $test->assertTrue($view->hasParent());
+                $test->assertFalse($view->hasChildren());
+            }));
+
+        $type2->expects($this->once())
+            ->method('buildView')
+            ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
+                $calls[] = 'type2::buildView';
+                $test->assertTrue($view->hasParent());
+                $test->assertFalse($view->hasChildren());
+            }));
+
+        $type1->expects($this->once())
+            ->method('buildViewBottomUp')
+            ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
+                $calls[] = 'type1::buildViewBottomUp';
+                $test->assertTrue($view->hasChildren());
+            }));
+
+        $type2->expects($this->once())
+            ->method('buildViewBottomUp')
+            ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
+                $calls[] = 'type2::buildViewBottomUp';
+                $test->assertTrue($view->hasChildren());
+            }));
+
+        $form = $this->getBuilder()->setTypes(array($type1, $type2))->getForm();
+        $form->setParent($this->getBuilder()->getForm());
+        $form->add($this->getBuilder()->getForm());
+
+        $form->getView();
+
+        $this->assertEquals(array(
+            0 => 'type1::buildView',
+            1 => 'type2::buildView',
+            2 => 'type1::buildViewBottomUp',
+            3 => 'type2::buildViewBottomUp',
+        ), $calls);
+    }
+
+    public function testGetViewAcceptsParent()
+    {
+        $parent = new FormView();
+
+        $form = $this->getBuilder()->getForm();
+        $view = $form->getView($parent);
+
+        $this->assertSame($parent, $view->getParent());
     }
 
     protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null)

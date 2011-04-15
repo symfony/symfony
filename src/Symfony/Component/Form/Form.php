@@ -832,9 +832,36 @@ class Form implements \IteratorAggregate, FormInterface
         return $value;
     }
 
-    public function getView()
+    public function getView(FormView $parent = null)
     {
-        return new FormView($this);
+        if (null === $parent && $this->parent) {
+            $parent = $this->parent->getView();
+        }
+
+        $view = new FormView();
+
+        if (null !== $parent) {
+            $view->setParent($parent);
+        }
+
+        $types = (array) $this->types;
+        $childViews = array();
+
+        foreach ($types as $type) {
+            $type->buildView($view, $this);
+        }
+
+        foreach ($this->children as $key => $child) {
+            $childViews[$key] = $child->getView($view);
+        }
+
+        $view->setChildren($childViews);
+
+        foreach ($types as $type) {
+            $type->buildViewBottomUp($view, $this);
+        }
+
+        return $view;
     }
 
     /**

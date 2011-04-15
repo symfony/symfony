@@ -34,17 +34,23 @@ class MonthChoiceList extends PaddedChoiceList
         parent::load();
 
         $pattern = $this->formatter->getPattern();
+        $timezone = $this->formatter->getTimezoneId();
+
+        $this->formatter->setTimezoneId(\DateTimeZone::UTC);
 
         if (preg_match('/M+/', $pattern, $matches)) {
             $this->formatter->setPattern($matches[0]);
 
             foreach ($this->choices as $choice => $value) {
-                $this->choices[$choice] = $this->formatter->format(gmmktime(0, 0, 0, $choice));
+                // It's important to specify the first day of the month here!
+                $this->choices[$choice] = $this->formatter->format(gmmktime(0, 0, 0, $choice, 1));
             }
 
             // I'd like to clone the formatter above, but then we get a
             // segmentation fault, so let's restore the old state instead
             $this->formatter->setPattern($pattern);
         }
+
+        $this->formatter->setTimezoneId($timezone);
     }
 }

@@ -41,9 +41,15 @@ class ChoiceType extends AbstractType
 
             foreach ($options['choices'] as $choice => $value) {
                 if ($options['multiple']) {
-                    $builder->add((string)$choice, 'checkbox', array('value' => $choice));
+                    $builder->add((string)$choice, 'checkbox', array(
+                        'value' => $choice,
+                        'label' => $value,
+                    ));
                 } else {
-                    $builder->add((string)$choice, 'radio', array('value' => $choice));
+                    $builder->add((string)$choice, 'radio', array(
+                        'value' => $choice,
+                        'label' => $value,
+                    ));
                 }
             }
         }

@@ -412,16 +412,17 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'data' => array('&a', '&c'),
             'multiple' => true,
             'expanded' => true,
+            'required' => true,
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./input[@type="checkbox"][@name="na&me[&a]"][@id="na&me_&a"][@checked]
+        ./input[@type="checkbox"][@name="na&me[&a]"][@id="na&me_&a"][@checked][not(@required)]
         /following-sibling::label[@for="na&me_&a"][.="[trans]Choice&A[/trans]"]
-        /following-sibling::input[@type="checkbox"][@name="na&me[&b]"][@id="na&me_&b"][not(@checked)]
+        /following-sibling::input[@type="checkbox"][@name="na&me[&b]"][@id="na&me_&b"][not(@checked)][not(@required)]
         /following-sibling::label[@for="na&me_&b"][.="[trans]Choice&B[/trans]"]
-        /following-sibling::input[@type="checkbox"][@name="na&me[&c]"][@id="na&me_&c"][@checked]
+        /following-sibling::input[@type="checkbox"][@name="na&me[&c]"][@id="na&me_&c"][@checked][not(@required)]
         /following-sibling::label[@for="na&me_&c"][.="[trans]Choice&C[/trans]"]
     ]
     [count(./input)=3]

@@ -644,10 +644,10 @@ class Request
             if (null === $this->format) {
                 $formats = $this->getAcceptableContentTypes();
                 if (!empty($formats)) {
-                    $this->format =  $this->getFormat($formats[0]);
+                    $this->format = $this->getFormat($formats[0]);
                 }
                 if (null === $this->format) {
-                    $this->format =  $default;
+                    $this->format = $default;
                 }
             }
         }

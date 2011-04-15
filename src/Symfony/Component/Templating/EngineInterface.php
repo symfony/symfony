@@ -19,7 +19,7 @@ namespace Symfony\Component\Templating;
  * a path on the filesystem (in fact, the template can be stored
  * anywhere, like in a database).
  *
- * The methods should accept any name. If the name is not an instance of 
+ * The methods should accept any name. If the name is not an instance of
  * TemplateReferenceInterface, a TemplateNameParserInterface should be used to
  * convert the name to a TemplateReferenceInterface instance.
  *

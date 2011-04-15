@@ -53,7 +53,7 @@ class MessageLogger implements \Swift_Events_SendListener
 
     /**
      * Empty the message list
-     * 
+     *
      */
     public function clear()
     {

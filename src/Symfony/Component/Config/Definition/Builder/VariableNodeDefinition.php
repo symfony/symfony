@@ -37,7 +37,7 @@ class VariableNodeDefinition extends NodeDefinition
     protected function createNode()
     {
         $node = $this->instantiateNode();
-        
+
         if (null !== $this->normalization) {
             $node->setNormalizationClosures($this->normalization->before);
         }
@@ -65,5 +65,5 @@ class VariableNodeDefinition extends NodeDefinition
 
         return $node;
     }
-    
+
 }

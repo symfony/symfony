@@ -20,14 +20,14 @@ class AuditLoggerTest extends \PHPUnit_Framework_TestCase
     {
         $logger = $this->getLogger();
         $ace = $this->getEntry();
-        
+
         if (true === $granting) {
             $ace
                 ->expects($this->once())
                 ->method('isAuditSuccess')
                 ->will($this->returnValue($audit))
            ;
-           
+
            $ace
                ->expects($this->never())
                ->method('isAuditFailure')
@@ -37,7 +37,7 @@ class AuditLoggerTest extends \PHPUnit_Framework_TestCase
                 ->expects($this->never())
                 ->method('isAuditSuccess')
             ;
-            
+
             $ace
                 ->expects($this->once())
                 ->method('isAuditFailure')
@@ -57,10 +57,10 @@ class AuditLoggerTest extends \PHPUnit_Framework_TestCase
                 ->method('doLog')
             ;
         }
-        
+
         $logger->logIfNeeded($granting, $ace);
     }
-    
+
     public function getTestLogData()
     {
         return array(
@@ -70,12 +70,12 @@ class AuditLoggerTest extends \PHPUnit_Framework_TestCase
             array(false, true),
         );
     }
-    
+
     protected function getEntry()
     {
         return $this->getMock('Symfony\Component\Security\Acl\Model\AuditableEntryInterface');
     }
-    
+
     protected function getLogger()
     {
         return $this->getMockForAbstractClass('Symfony\Component\Security\Acl\Domain\AuditLogger');

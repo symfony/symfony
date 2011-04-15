@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\TwigBundle\Node;
 
 /**
- * 
+ *
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

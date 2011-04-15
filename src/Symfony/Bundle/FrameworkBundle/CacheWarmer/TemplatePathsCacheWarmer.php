@@ -91,8 +91,8 @@ class TemplatePathsCacheWarmer extends CacheWarmer
                 $template = $this->parser->parseFromFilename($file->getRelativePathname());
                 if (false !== $template) {
                     if (null !== $bundle) {
-                        $template->set('bundle', $bundle);                        
-                    } 
+                        $template->set('bundle', $bundle);
+                    }
                     $templates[$template->getSignature()] = $this->locator->locate($template);
                 }
             }

@@ -119,7 +119,7 @@ class PseudoNode implements NodeInterface
         return $xpath;
     }
 
-    /** 
+    /**
      * Sets the XPath  to be the last child.
      *
      * @param XPathExpr $xpath The XPath expression

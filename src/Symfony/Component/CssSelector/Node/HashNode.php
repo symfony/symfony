@@ -38,7 +38,7 @@ class HashNode implements NodeInterface
         $this->id = $id;
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     public function __toString()

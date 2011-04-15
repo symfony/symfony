@@ -341,7 +341,7 @@ EOF;
 
         $kernel->locateResource('@Bundle1Bundle/config/routing.xml');
     }
-   
+
     public function testLocateResourceReturnsTheFirstThatMatches()
     {
         $kernel = $this->getKernel();

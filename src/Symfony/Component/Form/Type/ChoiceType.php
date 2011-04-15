@@ -44,6 +44,9 @@ class ChoiceType extends AbstractType
                     $builder->add((string)$choice, 'checkbox', array(
                         'value' => $choice,
                         'label' => $value,
+                        // The user can check 0 or more checkboxes. If required
+                        // is true, he is required to check all of them.
+                        'required' => false,
                     ));
                 } else {
                     $builder->add((string)$choice, 'radio', array(

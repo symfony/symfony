@@ -56,6 +56,48 @@ class ChoiceTypeTest extends TestCase
         ));
     }
 
+    public function testExpandedCheckboxesAreNeverRequired()
+    {
+        $form = $this->factory->create('choice', 'name', array(
+            'multiple' => true,
+            'expanded' => true,
+            'required' => true,
+            'choices' => $this->choices,
+        ));
+
+        foreach ($form as $child) {
+            $this->assertFalse($child->isRequired());
+        }
+    }
+
+    public function testExpandedRadiosAreRequiredIfChoiceFieldIsRequired()
+    {
+        $form = $this->factory->create('choice', 'name', array(
+            'multiple' => false,
+            'expanded' => true,
+            'required' => true,
+            'choices' => $this->choices,
+        ));
+
+        foreach ($form as $child) {
+            $this->assertTrue($child->isRequired());
+        }
+    }
+
+    public function testExpandedRadiosAreNotRequiredIfChoiceFieldIsNotRequired()
+    {
+        $form = $this->factory->create('choice', 'name', array(
+            'multiple' => false,
+            'expanded' => true,
+            'required' => false,
+            'choices' => $this->choices,
+        ));
+
+        foreach ($form as $child) {
+            $this->assertFalse($child->isRequired());
+        }
+    }
+
     public function testBindSingleNonExpanded()
     {
         $form = $this->factory->create('choice', 'name', array(

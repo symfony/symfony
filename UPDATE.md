@@ -9,16 +9,20 @@ timeline closely anyway.
 PR11 to PR12
 ------------
 
-* AsseticBundle's XML `bundle` node has been normalized to match other similar
-  nodes
+* XML configurations have been normalized. All tags with only one attribute
+  have been converted to tag content:
 
   Before:
 
         <bundle name="MyBundle" />
+        <app:engine id="twig" />
+        <twig:extension id="twig.extension.debug" />
 
   After:
 
         <bundle>MyBundle</bundle>
+        <app:engine>twig</app:engine>
+        <twig:extension>twig.extension.debug</twig:extension>
 
 PR10 to PR11
 ------------

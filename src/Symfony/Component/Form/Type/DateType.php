@@ -29,7 +29,8 @@ class DateType extends AbstractType
         $formatter = new \IntlDateFormatter(
             \Locale::getDefault(),
             $options['format'],
-            \IntlDateFormatter::NONE
+            \IntlDateFormatter::NONE,
+            \DateTimeZone::UTC
         );
 
         if ($options['widget'] === 'text') {

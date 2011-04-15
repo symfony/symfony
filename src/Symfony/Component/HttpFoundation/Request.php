@@ -630,14 +630,26 @@ class Request
      *
      *  * format defined by the user (with setRequestFormat())
      *  * _format request parameter
-     *  * null
+     *  * Accept header
+     *  * $default
+     *
+     * @param string  $default     The default format
      *
      * @return string The request format
      */
-    public function getRequestFormat()
+    public function getRequestFormat($default = 'html')
     {
         if (null === $this->format) {
-            $this->format = $this->get('_format', 'html');
+            $this->format = $this->get('_format');
+            if (null === $this->format) {
+                $formats = $this->getAcceptableContentTypes();
+                if (!empty($formats)) {
+                    $this->format = $this->getFormat($formats[0]);
+                }
+                if (null === $this->format) {
+                    $this->format = $default;
+                }
+            }
         }
 
         return $this->format;

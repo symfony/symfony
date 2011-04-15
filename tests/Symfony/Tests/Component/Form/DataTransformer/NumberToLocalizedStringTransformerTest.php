@@ -71,44 +71,56 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
-        $this->assertEquals(1, $transformer->reverseTransform('1', null));
-        $this->assertEquals(1.5, $transformer->reverseTransform('1,5', null));
-        $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5', null));
-        $this->assertEquals(12345.912, $transformer->reverseTransform('12345,912', null));
+        $this->assertEquals(1, $transformer->reverseTransform('1'));
+        $this->assertEquals(1.5, $transformer->reverseTransform('1,5'));
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
+        $this->assertEquals(12345.912, $transformer->reverseTransform('12345,912'));
     }
 
     public function testReverseTransform_empty()
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
-        $this->assertSame(null, $transformer->reverseTransform('', null));
+        $this->assertSame(null, $transformer->reverseTransform(''));
     }
 
     public function testReverseTransformWithGrouping()
     {
         $transformer = new NumberToLocalizedStringTransformer(null, true);
 
-        $this->assertEquals(1234.5, $transformer->reverseTransform('1.234,5', null));
-        $this->assertEquals(12345.912, $transformer->reverseTransform('12.345,912', null));
-        $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5', null));
-        $this->assertEquals(12345.912, $transformer->reverseTransform('12345,912', null));
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1.234,5'));
+        $this->assertEquals(12345.912, $transformer->reverseTransform('12.345,912'));
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
+        $this->assertEquals(12345.912, $transformer->reverseTransform('12345,912'));
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
     public function testTransformExpectsNumeric()
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
-
         $transformer->transform('foo');
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
     public function testReverseTransformExpectsString()
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $transformer->reverseTransform(1);
+    }
 
-        $transformer->reverseTransform(1, null);
+    /**
+     * @expectedException Symfony\Component\Form\DataTransformer\TransformationFailedException
+     */
+    public function testReverseTransformExpectsValidNumber()
+    {
+        $transformer = new NumberToLocalizedStringTransformer();
+
+        $transformer->reverseTransform('foo');
     }
 }

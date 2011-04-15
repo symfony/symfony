@@ -23,7 +23,7 @@ class LanguageTypeTest extends TestCase
         \Locale::setDefault('de_AT');
 
         $form = $this->factory->create('language');
-        $view = $form->getView();
+        $view = $form->createView();
         $choices = $view->getVar('choices');
 
         $this->assertArrayHasKey('en', $choices);
@@ -41,7 +41,7 @@ class LanguageTypeTest extends TestCase
     public function testMultipleLanguagesIsNotIncluded()
     {
         $form = $this->factory->create('language', 'language');
-        $view = $form->getView();
+        $view = $form->createView();
         $choices = $view->getVar('choices');
 
         $this->assertArrayNotHasKey('mul', $choices);

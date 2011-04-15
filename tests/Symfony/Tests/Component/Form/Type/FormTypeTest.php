@@ -239,7 +239,7 @@ class FormTypeTest extends TestCase
     public function testPassMultipartFalseToView()
     {
         $form = $this->factory->create('form');
-        $view = $form->getView();
+        $view = $form->createView();
 
         $this->assertFalse($view->getVar('multipart'));
     }
@@ -249,7 +249,7 @@ class FormTypeTest extends TestCase
         $form = $this->factory->create('form');
         $form->add($this->factory->create('text'));
         $form->add($this->factory->create('file'));
-        $view = $form->getView();
+        $view = $form->createView();
 
         $this->assertTrue($view->getVar('multipart'));
     }

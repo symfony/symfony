@@ -222,7 +222,7 @@ class ChoiceTypeTest extends TestCase
             'multiple' => true,
             'choices' => $this->choices,
         ));
-        $view = $form->getView();
+        $view = $form->createView();
 
         $this->assertTrue($view->getVar('multiple'));
     }
@@ -233,7 +233,7 @@ class ChoiceTypeTest extends TestCase
             'expanded' => true,
             'choices' => $this->choices,
         ));
-        $view = $form->getView();
+        $view = $form->createView();
 
         $this->assertTrue($view->getVar('expanded'));
     }
@@ -244,7 +244,7 @@ class ChoiceTypeTest extends TestCase
         $form = $this->factory->create('choice', 'name', array(
             'choices' => $choices,
         ));
-        $view = $form->getView();
+        $view = $form->createView();
 
         $this->assertSame($choices, $view->getVar('choices'));
     }
@@ -256,7 +256,7 @@ class ChoiceTypeTest extends TestCase
             'choices' => $choices,
             'preferred_choices' => array('b', 'd'),
         ));
-        $view = $form->getView();
+        $view = $form->createView();
 
         $this->assertSame(array('a' => 'A', 'c' => 'C'), $view->getVar('choices'));
         $this->assertSame(array('b' => 'B', 'd' => 'D'), $view->getVar('preferred_choices'));
@@ -269,7 +269,7 @@ class ChoiceTypeTest extends TestCase
             'expanded' => false,
             'choices' => $this->choices,
         ));
-        $view = $form->getView();
+        $view = $form->createView();
 
         $this->assertSame('name[]', $view->getVar('name'));
     }

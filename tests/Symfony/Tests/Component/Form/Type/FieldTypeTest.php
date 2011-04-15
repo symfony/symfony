@@ -113,7 +113,7 @@ class FieldTypeTest extends TestCase
     public function testPassIdAndNameToView()
     {
         $form = $this->factory->create('field', 'name');
-        $view = $form->getView();
+        $view = $form->createView();
 
         $this->assertEquals('name', $view->getVar('id'));
         $this->assertEquals('name', $view->getVar('name'));
@@ -123,7 +123,7 @@ class FieldTypeTest extends TestCase
     {
         $parent = $this->factory->create('field', 'parent');
         $parent->add($this->factory->create('field', 'child'));
-        $view = $parent->getView();
+        $view = $parent->createView();
 
         $this->assertEquals('parent_child', $view['child']->getVar('id'));
         $this->assertEquals('parent[child]', $view['child']->getVar('name'));
@@ -134,7 +134,7 @@ class FieldTypeTest extends TestCase
         $parent = $this->factory->create('field', 'parent');
         $parent->add($this->factory->create('field', 'child'));
         $parent['child']->add($this->factory->create('field', 'grand_child'));
-        $view = $parent->getView();
+        $view = $parent->createView();
 
         $this->assertEquals('parent_child_grand_child', $view['child']['grand_child']->getVar('id'));
         $this->assertEquals('parent[child][grand_child]', $view['child']['grand_child']->getVar('name'));
@@ -143,7 +143,7 @@ class FieldTypeTest extends TestCase
     public function testPassMaxLengthToView()
     {
         $form = $this->factory->create('field', null, array('max_length' => 10));
-        $view = $form->getView();
+        $view = $form->createView();
 
         $this->assertSame(10, $view->getVar('max_length'));
     }

@@ -19,7 +19,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->create('text', 'name');
         $form->addError(new FormError('Error!'));
-        $view = $form->getView();
+        $view = $form->createView();
         $html = $this->renderRow($view);
 
         $this->assertMatchesXpath($html,
@@ -42,7 +42,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     public function testRepeatedRow()
     {
         $form = $this->factory->create('repeated', 'name');
-        $html = $this->renderRow($form->getView());
+        $html = $this->renderRow($form->createView());
 
         $this->assertMatchesXpath($html,
 '/tr
@@ -68,7 +68,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->create('repeated', 'name');
         $form->addError(new FormError('Error!'));
-        $view = $form->getView();
+        $view = $form->createView();
         $html = $this->renderRow($view);
 
         $this->assertMatchesXpath($html,
@@ -103,7 +103,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             ->add('field3', 'text')
             ->add('field4', 'text')
             ->getForm()
-            ->getView();
+            ->createView();
 
         // Render field2 row -> does not implicitely call renderWidget because
         // it is a repeated field!
@@ -149,7 +149,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             'data' => array('a', 'b'),
         ));
 
-        $this->assertWidgetMatchesXpath($form->getView(), array(),
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/table
     [
         ./tr[./td/input[@type="text"][@value="a"]]
@@ -166,7 +166,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             ->add('firstName', 'text')
             ->add('lastName', 'text')
             ->getForm()
-            ->getView();
+            ->createView();
 
         $this->assertWidgetMatchesXpath($view, array(),
 '/table
@@ -203,7 +203,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             'data' => 'foobar',
         ));
 
-        $this->assertWidgetMatchesXpath($form->getView(), array(),
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/table
     [
         ./tr

@@ -104,7 +104,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('/app.php/testing', $url);
     }
-    
+
     public function testRelativeUrlWithParameter()
     {
         $this->routeCollection->add('test', new Route('/testing/{foo}'));
@@ -119,7 +119,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('/app.php/testing/bar', $url);
     }
-    
+
     public function testRelativeUrlWithExtraParameters()
     {
         $this->routeCollection->add('test', new Route('/testing'));
@@ -134,7 +134,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('/app.php/testing?foo=bar', $url);
     }
-    
+
     public function testAbsoluteUrlWithExtraParameters()
     {
         $this->routeCollection->add('test', new Route('/testing'));
@@ -149,15 +149,15 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('http://localhost/app.php/testing?foo=bar', $url);
     }
-    
+
     /**
      * @expectedException \InvalidArgumentException
      */
     public function testGenerateWithoutRoutes()
-    {       
+    {
         $this->generator->generate('test', array(), true);
     }
-    
+
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -166,7 +166,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->routeCollection->add('test', new Route('/testing/{foo}'));
         $this->generator->generate('test', array(), true);
     }
-    
+
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -176,7 +176,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->routeCollection->add('test', $route);
         $this->generator->generate('test', array('foo' => 'bar'), true);
     }
-    
+
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -185,5 +185,5 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $route = new Route('/testing/{foo}', array(), array('foo' => 'd+'));
         $this->routeCollection->add('test', $route);
         $this->generator->generate('test', array('foo' => 'bar'), true);
-    } 
+    }
 }

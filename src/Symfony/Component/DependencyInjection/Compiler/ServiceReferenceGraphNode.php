@@ -45,7 +45,7 @@ class ServiceReferenceGraphNode
     /**
      * Adds an in edge to this node.
      *
-     * @param ServiceReferenceGraphEdge $edge 
+     * @param ServiceReferenceGraphEdge $edge
      */
     public function addInEdge(ServiceReferenceGraphEdge $edge)
     {
@@ -55,7 +55,7 @@ class ServiceReferenceGraphNode
     /**
      * Adds an out edge to this node.
      *
-     * @param ServiceReferenceGraphEdge $edge 
+     * @param ServiceReferenceGraphEdge $edge
      */
     public function addOutEdge(ServiceReferenceGraphEdge $edge)
     {

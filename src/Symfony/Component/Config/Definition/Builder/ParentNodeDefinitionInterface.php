@@ -24,4 +24,3 @@ interface ParentNodeDefinitionInterface
 
     function setBuilder(NodeBuilder $builder);
 }
- 

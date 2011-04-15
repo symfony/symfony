@@ -34,7 +34,7 @@ class TemplateTest extends TestCase
     {
         if (!$template->get('bundle')) {
             $this->assertEquals($template->getPath(), $path);
-        }        
+        }
     }
 
     public function getTemplateToPathProvider()

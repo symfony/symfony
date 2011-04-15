@@ -24,7 +24,7 @@ class MainConfiguration implements ConfigurationInterface
     /**
      * Constructor.
      *
-     * @param array $factories 
+     * @param array $factories
      */
     public function __construct(array $factories)
     {

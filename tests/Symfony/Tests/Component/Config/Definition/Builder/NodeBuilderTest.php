@@ -30,7 +30,7 @@ class NodeBuilderTest extends \PHPUnit_Framework_TestCase
     public function testAddingANewNodeType()
     {
         $class = __NAMESPACE__.'\\SomeNodeDefinition';
-        
+
         $builder = new BaseNodeBuilder();
         $node = $builder
             ->setNodeClass('newtype', $class)
@@ -66,7 +66,7 @@ class NodeBuilderTest extends \PHPUnit_Framework_TestCase
         $node2 = $builder->node('', 'custom');
 
         $this->assertEquals(get_class($node1), get_class($node2));
-    }    
+    }
 }
 
 class SomeNodeDefinition extends BaseVariableNodeDefinition

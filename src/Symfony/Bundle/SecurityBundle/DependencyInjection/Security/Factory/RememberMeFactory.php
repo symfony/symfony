@@ -111,7 +111,7 @@ class RememberMeFactory implements SecurityFactoryInterface
     public function addConfiguration(NodeDefinition $node)
     {
         $builder = $node->children();
-        
+
         $builder
             ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
             ->scalarNode('token_provider')->end()

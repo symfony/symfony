@@ -183,6 +183,19 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->form->has('1'));
     }
 
+    // fixes https://github.com/symfony/symfony/pull/40
+    public function testPreBindDealsWithEmptyData()
+    {
+        $this->form->add($this->getForm('1'));
+
+        $data = '';
+        $event = new DataEvent($this->form, $data);
+        $listener = new ResizeFormListener($this->factory, 'text', true);
+        $listener->preBind($event);
+
+        $this->assertFalse($this->form->has('1'));
+    }
+
     public function testOnBindNormDataRemovesEntriesMissingInTheFormIfResizable()
     {
         $this->form->add($this->getForm('1'));

@@ -1,1 +1,1 @@
-<label for="<?php echo $id ?>"><?php echo $view['translator']->trans($label) ?></label>
+<label for="<?php echo $view->escape($id) ?>"><?php echo $view->escape($view['translator']->trans($label)) ?></label>

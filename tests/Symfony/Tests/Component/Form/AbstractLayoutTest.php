@@ -20,6 +20,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 {
+    protected $csrfProvider;
+
     protected $factory;
 
     protected function setUp()
@@ -28,9 +30,9 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher = new EventDispatcher();
         $validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
-        $csrfProvider = new DefaultCsrfProvider('foo');
+        $this->csrfProvider = $this->getMock('Symfony\Component\Form\CsrfProvider\CsrfProviderInterface');
         $storage = new \Symfony\Component\HttpFoundation\File\TemporaryStorage('foo', 1, \sys_get_temp_dir());
-        $loader = new DefaultTypeLoader($validator, $csrfProvider , $storage);
+        $loader = new DefaultTypeLoader($validator, $this->csrfProvider , $storage);
 
         $this->factory = new FormFactory($loader);
     }
@@ -75,14 +77,15 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     protected function assertWidgetMatchesXpath(FormView $view, array $vars, $xpath)
     {
+        // include ampersands everywhere to validate escaping
         $html = $this->renderWidget($view, array_merge(array(
-            'id' => 'my_id',
-            'attr' => array('class' => 'my_class'),
+            'id' => 'my&id',
+            'attr' => array('class' => 'my&class'),
         ), $vars));
 
         $xpath = trim($xpath).'
-    [@id="my_id"]
-    [@class="my_class"]';
+    [@id="my&id"]
+    [@class="my&class"]';
 
         $this->assertMatchesXpath($html, $xpath);
     }
@@ -101,7 +104,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testEnctype()
     {
-        $form = $this->factory->createBuilder('form', 'name')
+        $form = $this->factory->createBuilder('form', 'na&me', array('property_path' => 'name'))
             ->add('file', 'file')
             ->getForm();
 
@@ -110,7 +113,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testNoEnctype()
     {
-        $form = $this->factory->createBuilder('form', 'name')
+        $form = $this->factory->createBuilder('form', 'na&me', array('property_path' => 'name'))
             ->add('text', 'text')
             ->getForm();
 
@@ -119,25 +122,25 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testLabel()
     {
-        $form = $this->factory->create('text', 'name');
+        $form = $this->factory->create('text', 'na&me', array('property_path' => 'name'));
         $html = $this->renderLabel($form->createView());
 
         $this->assertMatchesXpath($html,
 '/label
-    [@for="name"]
-    [.="[trans]Name[/trans]"]
+    [@for="na&me"]
+    [.="[trans]Na&me[/trans]"]
 '
         );
     }
 
     public function testLabelWithCustomText()
     {
-        $form = $this->factory->create('text', 'name');
+        $form = $this->factory->create('text', 'na&me', array('property_path' => 'name'));
         $html = $this->renderLabel($form->createView(), 'Custom label');
 
         $this->assertMatchesXpath($html,
 '/label
-    [@for="name"]
+    [@for="na&me"]
     [.="[trans]Custom label[/trans]"]
 '
         );
@@ -145,7 +148,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testErrors()
     {
-        $form = $this->factory->create('text', 'name');
+        $form = $this->factory->create('text', 'na&me', array('property_path' => 'name'));
         $form->addError(new FormError('Error 1'));
         $form->addError(new FormError('Error 2'));
         $view = $form->createView();
@@ -164,14 +167,15 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckedCheckbox()
     {
-        $form = $this->factory->create('checkbox', 'name', array(
+        $form = $this->factory->create('checkbox', 'na&me', array(
+            'property_path' => 'name',
             'data' => true,
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="checkbox"]
-    [@name="name"]
+    [@name="na&me"]
     [@checked="checked"]
     [@value="1"]
 '
@@ -180,31 +184,33 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckedCheckboxWithValue()
     {
-        $form = $this->factory->create('checkbox', 'name', array(
-            'value' => 'foobar',
+        $form = $this->factory->create('checkbox', 'na&me', array(
+            'property_path' => 'name',
+            'value' => 'foo&bar',
             'data' => true,
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="checkbox"]
-    [@name="name"]
+    [@name="na&me"]
     [@checked="checked"]
-    [@value="foobar"]
+    [@value="foo&bar"]
 '
         );
     }
 
     public function testUncheckedCheckbox()
     {
-        $form = $this->factory->create('checkbox', 'name', array(
+        $form = $this->factory->create('checkbox', 'na&me', array(
+            'property_path' => 'name',
             'data' => false,
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="checkbox"]
-    [@name="name"]
+    [@name="na&me"]
     [not(@checked)]
 '
         );
@@ -212,7 +218,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testSingleChoice()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', 'na&me', array(
+            'property_path' => 'name',
             'choices' => array('a' => 'A', 'b' => 'B'),
             'data' => 'a',
             'multiple' => false,
@@ -221,7 +228,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
-    [@name="name"]
+    [@name="na&me"]
     [
         ./option[@value="a"][@selected="selected"][.="A"]
         /following-sibling::option[@value="b"][not(@selected)][.="B"]
@@ -233,7 +240,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testSingleChoiceWithPreferred()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', 'na&me', array(
+            'property_path' => 'name',
             'choices' => array('a' => 'A', 'b' => 'B'),
             'preferred_choices' => array('b'),
             'data' => 'a',
@@ -243,7 +251,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form->createView(), array('separator' => '-- sep --'),
 '/select
-    [@name="name"]
+    [@name="na&me"]
     [
         ./option[@value="b"][not(@selected)][.="B"]
         /following-sibling::option[@disabled="disabled"][not(@selected)][.="-- sep --"]
@@ -256,7 +264,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testSingleChoiceNonRequired()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', 'na&me', array(
+            'property_path' => 'name',
             'choices' => array('a' => 'A', 'b' => 'B'),
             'required' => false,
             'data' => 'a',
@@ -266,7 +275,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
-    [@name="name"]
+    [@name="na&me"]
     [
         ./option[@value=""][.=""]
         /following-sibling::option[@value="a"][@selected="selected"][.="A"]
@@ -279,7 +288,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testSingleChoiceGrouped()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', 'na&me', array(
+            'property_path' => 'name',
             'choices' => array(
                 'Group1' => array('a' => 'A', 'b' => 'B'),
                 'Group2' => array('c' => 'C'),
@@ -291,7 +301,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
-    [@name="name"]
+    [@name="na&me"]
     [./optgroup[@label="Group1"]
         [
             ./option[@value="a"][@selected="selected"][.="A"]
@@ -310,7 +320,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testMultipleChoice()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', 'na&me', array(
+            'property_path' => 'name',
             'choices' => array('a' => 'A', 'b' => 'B'),
             'data' => array('a'),
             'multiple' => true,
@@ -319,7 +330,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
-    [@name="name[]"]
+    [@name="na&me[]"]
     [@multiple="multiple"]
     [
         ./option[@value="a"][@selected="selected"][.="A"]
@@ -332,7 +343,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testMultipleChoiceNonRequired()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', 'na&me', array(
+            'property_path' => 'name',
             'choices' => array('a' => 'A', 'b' => 'B'),
             'data' => array('a'),
             'required' => false,
@@ -342,7 +354,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
-    [@name="name[]"]
+    [@name="na&me[]"]
     [@multiple="multiple"]
     [
         ./option[@value="a"][@selected="selected"][.="A"]
@@ -355,7 +367,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testSingleChoiceExpanded()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', 'na&me', array(
+            'property_path' => 'name',
             'choices' => array('a' => 'A', 'b' => 'B'),
             'data' => 'a',
             'multiple' => false,
@@ -365,10 +378,10 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./input[@type="radio"][@name="name"][@id="name_a"][@checked]
-        /following-sibling::label[@for="name_a"][.="[trans]A[/trans]"]
-        /following-sibling::input[@type="radio"][@name="name"][@id="name_b"][not(@checked)]
-        /following-sibling::label[@for="name_b"][.="[trans]B[/trans]"]
+        ./input[@type="radio"][@name="na&me"][@id="na&me_a"][@checked]
+        /following-sibling::label[@for="na&me_a"][.="[trans]A[/trans]"]
+        /following-sibling::input[@type="radio"][@name="na&me"][@id="na&me_b"][not(@checked)]
+        /following-sibling::label[@for="na&me_b"][.="[trans]B[/trans]"]
     ]
     [count(./input)=2]
 '
@@ -377,7 +390,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testMultipleChoiceExpanded()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', 'na&me', array(
+            'property_path' => 'name',
             'choices' => array('a' => 'A', 'b' => 'B', 'c' => 'C'),
             'data' => array('a', 'c'),
             'multiple' => true,
@@ -387,12 +401,12 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./input[@type="checkbox"][@name="name[a]"][@id="name_a"][@checked]
-        /following-sibling::label[@for="name_a"][.="[trans]A[/trans]"]
-        /following-sibling::input[@type="checkbox"][@name="name[b]"][@id="name_b"][not(@checked)]
-        /following-sibling::label[@for="name_b"][.="[trans]B[/trans]"]
-        /following-sibling::input[@type="checkbox"][@name="name[c]"][@id="name_c"][@checked]
-        /following-sibling::label[@for="name_c"][.="[trans]C[/trans]"]
+        ./input[@type="checkbox"][@name="na&me[a]"][@id="na&me_a"][@checked]
+        /following-sibling::label[@for="na&me_a"][.="[trans]A[/trans]"]
+        /following-sibling::input[@type="checkbox"][@name="na&me[b]"][@id="na&me_b"][not(@checked)]
+        /following-sibling::label[@for="na&me_b"][.="[trans]B[/trans]"]
+        /following-sibling::input[@type="checkbox"][@name="na&me[c]"][@id="na&me_c"][@checked]
+        /following-sibling::label[@for="na&me_c"][.="[trans]C[/trans]"]
     ]
     [count(./input)=3]
 '
@@ -401,13 +415,14 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testCountry()
     {
-        $form = $this->factory->create('country', 'name', array(
+        $form = $this->factory->create('country', 'na&me', array(
+            'property_path' => 'name',
             'data' => 'AT',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
-    [@name="name"]
+    [@name="na&me"]
     [./option[@value="AT"][@selected="selected"][.="Austria"]]
     [count(./option)>200]
 '
@@ -416,19 +431,23 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testCsrf()
     {
-        $form = $this->factory->create('csrf', 'name');
+        $this->csrfProvider->expects($this->any())
+            ->method('generateCsrfToken')
+            ->will($this->returnValue('foo&bar'));
+
+        $form = $this->factory->create('csrf', 'na&me', array('property_path' => 'name'));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="hidden"]
-    [string-length(@value)>=40]
+    [@value="foo&bar"]
 '
         );
     }
 
     public function testCsrfWithNonRootParent()
     {
-        $form = $this->factory->create('csrf', 'name');
+        $form = $this->factory->create('csrf', 'na&me', array('property_path' => 'name'));
         $form->setParent($this->factory->create('form'));
         $form->getParent()->setParent($this->factory->create('form'));
 
@@ -439,7 +458,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testDateTime()
     {
-        $form = $this->factory->create('datetime', 'name', array(
+        $form = $this->factory->create('datetime', 'na&me', array(
+            'property_path' => 'name',
             'data' => '2011-02-03 04:05:06',
             'input' => 'string',
             'with_seconds' => false,
@@ -449,26 +469,26 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '/div
     [
         ./div
-            [@id="name_date"]
+            [@id="na&me_date"]
             [
                 ./select
-                    [@id="name_date_month"]
+                    [@id="na&me_date_month"]
                     [./option[@value="2"][@selected="selected"]]
                 /following-sibling::select
-                    [@id="name_date_day"]
+                    [@id="na&me_date_day"]
                     [./option[@value="3"][@selected="selected"]]
                 /following-sibling::select
-                    [@id="name_date_year"]
+                    [@id="na&me_date_year"]
                     [./option[@value="2011"][@selected="selected"]]
             ]
         /following-sibling::div
-            [@id="name_time"]
+            [@id="na&me_time"]
             [
                 ./select
-                    [@id="name_time_hour"]
+                    [@id="na&me_time_hour"]
                     [./option[@value="4"][@selected="selected"]]
                 /following-sibling::select
-                    [@id="name_time_minute"]
+                    [@id="na&me_time_minute"]
                     [./option[@value="5"][@selected="selected"]]
             ]
     ]
@@ -479,7 +499,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testDateTimeWithSeconds()
     {
-        $form = $this->factory->create('datetime', 'name', array(
+        $form = $this->factory->create('datetime', 'na&me', array(
+            'property_path' => 'name',
             'data' => '2011-02-03 04:05:06',
             'input' => 'string',
             'with_seconds' => true,
@@ -489,29 +510,29 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '/div
     [
         ./div
-            [@id="name_date"]
+            [@id="na&me_date"]
             [
                 ./select
-                    [@id="name_date_month"]
+                    [@id="na&me_date_month"]
                     [./option[@value="2"][@selected="selected"]]
                 /following-sibling::select
-                    [@id="name_date_day"]
+                    [@id="na&me_date_day"]
                     [./option[@value="3"][@selected="selected"]]
                 /following-sibling::select
-                    [@id="name_date_year"]
+                    [@id="na&me_date_year"]
                     [./option[@value="2011"][@selected="selected"]]
             ]
         /following-sibling::div
-            [@id="name_time"]
+            [@id="na&me_time"]
             [
                 ./select
-                    [@id="name_time_hour"]
+                    [@id="na&me_time_hour"]
                     [./option[@value="4"][@selected="selected"]]
                 /following-sibling::select
-                    [@id="name_time_minute"]
+                    [@id="na&me_time_minute"]
                     [./option[@value="5"][@selected="selected"]]
                 /following-sibling::select
-                    [@id="name_time_second"]
+                    [@id="na&me_time_second"]
                     [./option[@value="6"][@selected="selected"]]
             ]
     ]
@@ -522,7 +543,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testDateChoice()
     {
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'na&me', array(
+            'property_path' => 'name',
             'data' => '2011-02-03',
             'input' => 'string',
             'widget' => 'choice',
@@ -532,13 +554,13 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '/div
     [
         ./select
-            [@id="name_month"]
+            [@id="na&me_month"]
             [./option[@value="2"][@selected="selected"]]
         /following-sibling::select
-            [@id="name_day"]
+            [@id="na&me_day"]
             [./option[@value="3"][@selected="selected"]]
         /following-sibling::select
-            [@id="name_year"]
+            [@id="na&me_year"]
             [./option[@value="2011"][@selected="selected"]]
     ]
     [count(./select)=3]
@@ -548,7 +570,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testDateText()
     {
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', 'na&me', array(
+            'property_path' => 'name',
             'data' => '2011-02-03',
             'input' => 'string',
             'widget' => 'text',
@@ -557,7 +580,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="text"]
-    [@name="name"]
+    [@name="na&me"]
     [@value="Feb 3, 2011"]
 '
         );
@@ -565,14 +588,14 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testFile()
     {
-        $form = $this->factory->create('file', 'name');
+        $form = $this->factory->create('file', 'na&me', array('property_path' => 'name'));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./input[@type="file"][@id="name_file"]
-        /following-sibling::input[@type="hidden"][@id="name_token"]
-        /following-sibling::input[@type="hidden"][@id="name_name"]
+        ./input[@type="file"][@id="na&me_file"]
+        /following-sibling::input[@type="hidden"][@id="na&me_token"]
+        /following-sibling::input[@type="hidden"][@id="na&me_name"]
     ]
     [count(./input)=3]
 '
@@ -581,29 +604,31 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testHidden()
     {
-        $form = $this->factory->create('hidden', 'name', array(
-            'data' => 'foobar',
+        $form = $this->factory->create('hidden', 'na&me', array(
+            'property_path' => 'name',
+            'data' => 'foo&bar',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="hidden"]
-    [@name="name"]
-    [@value="foobar"]
+    [@name="na&me"]
+    [@value="foo&bar"]
 '
         );
     }
 
     public function testInteger()
     {
-        $form = $this->factory->create('integer', 'name', array(
+        $form = $this->factory->create('integer', 'na&me', array(
+            'property_path' => 'name',
             'data' => '123',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="number"]
-    [@name="name"]
+    [@name="na&me"]
     [@value="123"]
 '
         );
@@ -611,13 +636,14 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testLanguage()
     {
-        $form = $this->factory->create('language', 'name', array(
+        $form = $this->factory->create('language', 'na&me', array(
+            'property_path' => 'name',
             'data' => 'de',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
-    [@name="name"]
+    [@name="na&me"]
     [./option[@value="de"][@selected="selected"][.="German"]]
     [count(./option)>200]
 '
@@ -626,13 +652,14 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testLocale()
     {
-        $form = $this->factory->create('locale', 'name', array(
+        $form = $this->factory->create('locale', 'na&me', array(
+            'property_path' => 'name',
             'data' => 'de_AT',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
-    [@name="name"]
+    [@name="na&me"]
     [./option[@value="de_AT"][@selected="selected"][.="German (Austria)"]]
     [count(./option)>200]
 '
@@ -641,7 +668,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testMoney()
     {
-        $form = $this->factory->create('money', 'name', array(
+        $form = $this->factory->create('money', 'na&me', array(
+            'property_path' => 'name',
             'data' => 1234.56,
             'currency' => 'EUR',
         ));
@@ -649,7 +677,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="text"]
-    [@name="name"]
+    [@name="na&me"]
     [@value="1234.56"]
     [contains(.., "€")]
 '
@@ -658,14 +686,15 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testNumber()
     {
-        $form = $this->factory->create('number', 'name', array(
+        $form = $this->factory->create('number', 'na&me', array(
+            'property_path' => 'name',
             'data' => 1234.56,
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="text"]
-    [@name="name"]
+    [@name="na&me"]
     [@value="1234.56"]
 '
         );
@@ -673,30 +702,49 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testPassword()
     {
-        $form = $this->factory->create('password', 'name', array(
-            'data' => 'Pa$sW0rD',
+        $form = $this->factory->create('password', 'na&me', array(
+            'property_path' => 'name',
+            'data' => 'foo&bar',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="password"]
-    [@name="name"]
+    [@name="na&me"]
     [@value=""]
+'
+        );
+    }
+
+    public function testPasswordBoundNotAlwaysEmpty()
+    {
+        $form = $this->factory->create('password', 'na&me', array(
+            'property_path' => 'name',
+            'always_empty' => false,
+        ));
+        $form->bind('foo&bar');
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/input
+    [@type="password"]
+    [@name="na&me"]
+    [@value="foo&bar"]
 '
         );
     }
 
     public function testPasswordWithMaxLength()
     {
-        $form = $this->factory->create('password', 'name', array(
-            'data' => 'Pa$sW0rD',
+        $form = $this->factory->create('password', 'na&me', array(
+            'property_path' => 'name',
+            'data' => 'foo&bar',
             'max_length' => 123,
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="password"]
-    [@name="name"]
+    [@name="na&me"]
     [@value=""]
     [@maxlength="123"]
 '
@@ -705,14 +753,15 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testPercent()
     {
-        $form = $this->factory->create('percent', 'name', array(
+        $form = $this->factory->create('percent', 'na&me', array(
+            'property_path' => 'name',
             'data' => 0.1,
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="text"]
-    [@name="name"]
+    [@name="na&me"]
     [@value="10"]
     [contains(.., "%")]
 '
@@ -721,14 +770,15 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckedRadio()
     {
-        $form = $this->factory->create('radio', 'name', array(
+        $form = $this->factory->create('radio', 'na&me', array(
+            'property_path' => 'name',
             'data' => true,
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="radio"]
-    [@name="name"]
+    [@name="na&me"]
     [@checked="checked"]
     [@value=""]
 '
@@ -737,31 +787,33 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckedRadioWithValue()
     {
-        $form = $this->factory->create('radio', 'name', array(
+        $form = $this->factory->create('radio', 'na&me', array(
+            'property_path' => 'name',
             'data' => true,
-            'value' => 'foobar',
+            'value' => 'foo&bar',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="radio"]
-    [@name="name"]
+    [@name="na&me"]
     [@checked="checked"]
-    [@value="foobar"]
+    [@value="foo&bar"]
 '
         );
     }
 
     public function testUncheckedRadio()
     {
-        $form = $this->factory->create('radio', 'name', array(
+        $form = $this->factory->create('radio', 'na&me', array(
+            'property_path' => 'name',
             'data' => false,
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="radio"]
-    [@name="name"]
+    [@name="na&me"]
     [not(@checked)]
 '
         );
@@ -769,29 +821,31 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testTextarea()
     {
-        $form = $this->factory->create('textarea', 'name', array(
-            'data' => 'foobar',
+        $form = $this->factory->create('textarea', 'na&me', array(
+            'property_path' => 'name',
+            'data' => 'foo&bar',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/textarea
-    [@name="name"]
-    [.="foobar"]
+    [@name="na&me"]
+    [.="foo&bar"]
 '
         );
     }
 
     public function testText()
     {
-        $form = $this->factory->create('text', 'name', array(
-            'data' => 'foobar',
+        $form = $this->factory->create('text', 'na&me', array(
+            'property_path' => 'name',
+            'data' => 'foo&bar',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="text"]
-    [@name="name"]
-    [@value="foobar"]
+    [@name="na&me"]
+    [@value="foo&bar"]
     [not(@maxlength)]
 '
         );
@@ -799,16 +853,17 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testTextWithMaxLength()
     {
-        $form = $this->factory->create('text', 'name', array(
-            'data' => 'foobar',
+        $form = $this->factory->create('text', 'na&me', array(
+            'property_path' => 'name',
+            'data' => 'foo&bar',
             'max_length' => 123,
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="text"]
-    [@name="name"]
-    [@value="foobar"]
+    [@name="na&me"]
+    [@value="foo&bar"]
     [@maxlength="123"]
 '
         );
@@ -816,7 +871,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testTime()
     {
-        $form = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'na&me', array(
+            'property_path' => 'name',
             'data' => '04:05:06',
             'input' => 'string',
             'with_seconds' => false,
@@ -826,11 +882,11 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '/div
     [
         ./select
-            [@id="name_hour"]
+            [@id="na&me_hour"]
             [@size="1"]
             [./option[@value="4"][@selected="selected"]]
         /following-sibling::select
-            [@id="name_minute"]
+            [@id="na&me_minute"]
             [@size="1"]
             [./option[@value="5"][@selected="selected"]]
     ]
@@ -841,7 +897,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testTimeWithSeconds()
     {
-        $form = $this->factory->create('time', 'name', array(
+        $form = $this->factory->create('time', 'na&me', array(
+            'property_path' => 'name',
             'data' => '04:05:06',
             'input' => 'string',
             'with_seconds' => true,
@@ -851,15 +908,15 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '/div
     [
         ./select
-            [@id="name_hour"]
+            [@id="na&me_hour"]
             [@size="1"]
             [./option[@value="4"][@selected="selected"]]
         /following-sibling::select
-            [@id="name_minute"]
+            [@id="na&me_minute"]
             [@size="1"]
             [./option[@value="5"][@selected="selected"]]
         /following-sibling::select
-            [@id="name_second"]
+            [@id="na&me_second"]
             [@size="1"]
             [./option[@value="6"][@selected="selected"]]
     ]
@@ -870,13 +927,14 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testTimezone()
     {
-        $form = $this->factory->create('timezone', 'name', array(
+        $form = $this->factory->create('timezone', 'na&me', array(
+            'property_path' => 'name',
             'data' => 'Europe/Vienna',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
-    [@name="name"]
+    [@name="na&me"]
     [./optgroup
         [@label="Europe"]
         [./option[@value="Europe/Vienna"][@selected="selected"][.="Vienna"]]
@@ -889,15 +947,16 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testUrl()
     {
-        $form = $this->factory->create('url', 'name', array(
-            'data' => 'http://www.google.com',
+        $form = $this->factory->create('url', 'na&me', array(
+            'property_path' => 'name',
+            'data' => 'http://www.google.com?foo1=bar1&foo2=bar2',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="url"]
-    [@name="name"]
-    [@value="http://www.google.com"]
+    [@name="na&me"]
+    [@value="http://www.google.com?foo1=bar1&foo2=bar2"]
 '
         );
     }

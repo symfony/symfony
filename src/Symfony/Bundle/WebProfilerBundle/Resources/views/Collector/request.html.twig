@@ -75,6 +75,16 @@
 
     {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.requestheaders } only %}
 
+    <h2>Request Content</h2>
+
+    <p>
+        {% if collector.content %}
+            <pre>{{ collector.content }}</pre>
+        {% else %}
+            <em>No content</em>
+        {% endif %}
+    </p>
+
     <h2>Request Server Parameters</h2>
 
     {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.requestserver } only %}

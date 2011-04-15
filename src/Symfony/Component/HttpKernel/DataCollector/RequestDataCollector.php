@@ -46,6 +46,7 @@ class RequestDataCollector extends DataCollector
 
         $this->data = array(
             'format'             => $request->getRequestFormat(),
+            'content'            => $request->getContent(),
             'content_type'       => $response->headers->get('Content-Type') ? $response->headers->get('Content-Type') : 'text/html',
             'status_code'        => $response->getStatusCode(),
             'request_query'      => $request->query->all(),
@@ -97,6 +98,11 @@ class RequestDataCollector extends DataCollector
     public function getSessionAttributes()
     {
         return $this->data['session_attributes'];
+    }
+
+    public function getContent()
+    {
+        return $this->data['content'];
     }
 
     public function getContentType()

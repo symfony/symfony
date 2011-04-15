@@ -236,8 +236,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     {
         $form = $this->factory->create('choice', 'na&me', array(
             'property_path' => 'name',
-            'choices' => array('a' => 'Choice A', 'b' => 'Choice B'),
-            'data' => 'a',
+            'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
+            'data' => '&a',
             'multiple' => false,
             'expanded' => false,
         ));
@@ -246,8 +246,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '/select
     [@name="na&me"]
     [
-        ./option[@value="a"][@selected="selected"][.="Choice A"]
-        /following-sibling::option[@value="b"][not(@selected)][.="Choice B"]
+        ./option[@value="&a"][@selected="selected"][.="Choice&A"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
     ]
     [count(./option)=2]
 '
@@ -258,9 +258,9 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     {
         $form = $this->factory->create('choice', 'na&me', array(
             'property_path' => 'name',
-            'choices' => array('a' => 'Choice A', 'b' => 'Choice B'),
-            'preferred_choices' => array('b'),
-            'data' => 'a',
+            'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
+            'preferred_choices' => array('&b'),
+            'data' => '&a',
             'multiple' => false,
             'expanded' => false,
         ));
@@ -269,9 +269,9 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '/select
     [@name="na&me"]
     [
-        ./option[@value="b"][not(@selected)][.="Choice B"]
+        ./option[@value="&b"][not(@selected)][.="Choice&B"]
         /following-sibling::option[@disabled="disabled"][not(@selected)][.="-- sep --"]
-        /following-sibling::option[@value="a"][@selected="selected"][.="Choice A"]
+        /following-sibling::option[@value="&a"][@selected="selected"][.="Choice&A"]
     ]
     [count(./option)=3]
 '
@@ -282,9 +282,9 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     {
         $form = $this->factory->create('choice', 'na&me', array(
             'property_path' => 'name',
-            'choices' => array('a' => 'Choice A', 'b' => 'Choice B'),
+            'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'required' => false,
-            'data' => 'a',
+            'data' => '&a',
             'multiple' => false,
             'expanded' => false,
         ));
@@ -294,8 +294,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@name="na&me"]
     [
         ./option[@value=""][.=""]
-        /following-sibling::option[@value="a"][@selected="selected"][.="Choice A"]
-        /following-sibling::option[@value="b"][not(@selected)][.="Choice B"]
+        /following-sibling::option[@value="&a"][@selected="selected"][.="Choice&A"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
     ]
     [count(./option)=3]
 '
@@ -307,10 +307,10 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $form = $this->factory->create('choice', 'na&me', array(
             'property_path' => 'name',
             'choices' => array(
-                'Group1' => array('a' => 'Choice A', 'b' => 'Choice B'),
-                'Group2' => array('c' => 'Choice C'),
+                'Group&1' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
+                'Group&2' => array('&c' => 'Choice&C'),
             ),
-            'data' => 'a',
+            'data' => '&a',
             'multiple' => false,
             'expanded' => false,
         ));
@@ -318,15 +318,15 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
     [@name="na&me"]
-    [./optgroup[@label="Group1"]
+    [./optgroup[@label="Group&1"]
         [
-            ./option[@value="a"][@selected="selected"][.="Choice A"]
-            /following-sibling::option[@value="b"][not(@selected)][.="Choice B"]
+            ./option[@value="&a"][@selected="selected"][.="Choice&A"]
+            /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
         ]
         [count(./option)=2]
     ]
-    [./optgroup[@label="Group2"]
-        [./option[@value="c"][not(@selected)][.="Choice C"]]
+    [./optgroup[@label="Group&2"]
+        [./option[@value="&c"][not(@selected)][.="Choice&C"]]
         [count(./option)=1]
     ]
     [count(./optgroup)=2]
@@ -338,8 +338,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     {
         $form = $this->factory->create('choice', 'na&me', array(
             'property_path' => 'name',
-            'choices' => array('a' => 'Choice A', 'b' => 'Choice B'),
-            'data' => array('a'),
+            'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
+            'data' => array('&a'),
             'multiple' => true,
             'expanded' => false,
         ));
@@ -349,8 +349,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@name="na&me[]"]
     [@multiple="multiple"]
     [
-        ./option[@value="a"][@selected="selected"][.="Choice A"]
-        /following-sibling::option[@value="b"][not(@selected)][.="Choice B"]
+        ./option[@value="&a"][@selected="selected"][.="Choice&A"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
     ]
     [count(./option)=2]
 '
@@ -361,8 +361,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     {
         $form = $this->factory->create('choice', 'na&me', array(
             'property_path' => 'name',
-            'choices' => array('a' => 'Choice A', 'b' => 'Choice B'),
-            'data' => array('a'),
+            'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
+            'data' => array('&a'),
             'required' => false,
             'multiple' => true,
             'expanded' => false,
@@ -373,8 +373,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@name="na&me[]"]
     [@multiple="multiple"]
     [
-        ./option[@value="a"][@selected="selected"][.="Choice A"]
-        /following-sibling::option[@value="b"][not(@selected)][.="Choice B"]
+        ./option[@value="&a"][@selected="selected"][.="Choice&A"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
     ]
     [count(./option)=2]
 '
@@ -385,8 +385,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     {
         $form = $this->factory->create('choice', 'na&me', array(
             'property_path' => 'name',
-            'choices' => array('a' => 'Choice A', 'b' => 'Choice B'),
-            'data' => 'a',
+            'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
+            'data' => '&a',
             'multiple' => false,
             'expanded' => true,
         ));
@@ -394,10 +394,10 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./input[@type="radio"][@name="na&me"][@id="na&me_a"][@checked]
-        /following-sibling::label[@for="na&me_a"][.="[trans]Choice A[/trans]"]
-        /following-sibling::input[@type="radio"][@name="na&me"][@id="na&me_b"][not(@checked)]
-        /following-sibling::label[@for="na&me_b"][.="[trans]Choice B[/trans]"]
+        ./input[@type="radio"][@name="na&me"][@id="na&me_&a"][@checked]
+        /following-sibling::label[@for="na&me_&a"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::input[@type="radio"][@name="na&me"][@id="na&me_&b"][not(@checked)]
+        /following-sibling::label[@for="na&me_&b"][.="[trans]Choice&B[/trans]"]
     ]
     [count(./input)=2]
 '
@@ -408,8 +408,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     {
         $form = $this->factory->create('choice', 'na&me', array(
             'property_path' => 'name',
-            'choices' => array('a' => 'Choice A', 'b' => 'Choice B', 'c' => 'Choice C'),
-            'data' => array('a', 'c'),
+            'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B', '&c' => 'Choice&C'),
+            'data' => array('&a', '&c'),
             'multiple' => true,
             'expanded' => true,
         ));
@@ -417,12 +417,12 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./input[@type="checkbox"][@name="na&me[a]"][@id="na&me_a"][@checked]
-        /following-sibling::label[@for="na&me_a"][.="[trans]Choice A[/trans]"]
-        /following-sibling::input[@type="checkbox"][@name="na&me[b]"][@id="na&me_b"][not(@checked)]
-        /following-sibling::label[@for="na&me_b"][.="[trans]Choice B[/trans]"]
-        /following-sibling::input[@type="checkbox"][@name="na&me[c]"][@id="na&me_c"][@checked]
-        /following-sibling::label[@for="na&me_c"][.="[trans]Choice C[/trans]"]
+        ./input[@type="checkbox"][@name="na&me[&a]"][@id="na&me_&a"][@checked]
+        /following-sibling::label[@for="na&me_&a"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::input[@type="checkbox"][@name="na&me[&b]"][@id="na&me_&b"][not(@checked)]
+        /following-sibling::label[@for="na&me_&b"][.="[trans]Choice&B[/trans]"]
+        /following-sibling::input[@type="checkbox"][@name="na&me[&c]"][@id="na&me_&c"][@checked]
+        /following-sibling::label[@for="na&me_&c"][.="[trans]Choice&C[/trans]"]
     ]
     [count(./input)=3]
 '

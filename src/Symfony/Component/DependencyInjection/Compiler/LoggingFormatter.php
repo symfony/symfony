@@ -31,11 +31,6 @@ class LoggingFormatter
         return $this->format($pass, sprintf('Resolving inheritance for "%s" (parent: %s).', $childId, $parentId));
     }
 
-    public function formatPassTime(CompilerPassInterface $pass, $time)
-    {
-        return $this->format($pass, sprintf('finished in %.3fs.', $time));
-    }
-
     public function format(CompilerPassInterface $pass, $message)
     {
         return sprintf('%s: %s', get_class($pass), $message);

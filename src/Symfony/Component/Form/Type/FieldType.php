@@ -56,6 +56,7 @@ class FieldType extends AbstractType
             ->setAttribute('validation_groups', $options['validation_groups'])
             ->setAttribute('error_mapping', $options['error_mapping'])
             ->setAttribute('max_length', $options['max_length'])
+            ->setAttribute('label', $options['label'] ?: $this->humanize($builder->getName()))
             ->setData($options['data'])
             ->addValidator(new DefaultValidator())
             ->addValidator(new DelegatingValidator($this->validator));
@@ -87,7 +88,7 @@ class FieldType extends AbstractType
         $view->setVar('class', null);
         $view->setVar('max_length', $form->getAttribute('max_length'));
         $view->setVar('size', null);
-        $view->setVar('label', ucfirst(strtolower(str_replace('_', ' ', $form->getName()))));
+        $view->setVar('label', $form->getAttribute('label'));
         $view->setVar('multipart', false);
         $view->setVar('attr', array());
 
@@ -112,6 +113,7 @@ class FieldType extends AbstractType
             'validation_groups' => null,
             'error_bubbling' => false,
             'error_mapping' => array(),
+            'label' => null,
         );
 
         if (!empty($options['data_class'])) {
@@ -139,5 +141,10 @@ class FieldType extends AbstractType
     public function getName()
     {
         return 'field';
+    }
+
+    private function humanize($text)
+    {
+        return ucfirst(strtolower(str_replace('_', ' ', $text)));
     }
 }

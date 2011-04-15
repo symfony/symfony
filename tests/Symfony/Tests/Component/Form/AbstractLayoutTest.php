@@ -133,7 +133,23 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testLabelWithCustomText()
+    public function testLabelWithCustomTextPassedAsOption()
+    {
+        $form = $this->factory->create('text', 'na&me', array(
+            'property_path' => 'name',
+            'label' => 'Custom label',
+        ));
+        $html = $this->renderLabel($form->createView());
+
+        $this->assertMatchesXpath($html,
+'/label
+    [@for="na&me"]
+    [.="[trans]Custom label[/trans]"]
+'
+        );
+    }
+
+    public function testLabelWithCustomTextPassedDirectly()
     {
         $form = $this->factory->create('text', 'na&me', array('property_path' => 'name'));
         $html = $this->renderLabel($form->createView(), 'Custom label');

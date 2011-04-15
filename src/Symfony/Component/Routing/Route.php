@@ -142,10 +142,6 @@ class Route
      */
     public function setDefaults(array $defaults)
     {
-        while (($key = array_search(null, $defaults))) {
-            $defaults[$key] = '~';
-        }
-
         $this->defaults = $defaults;
 
         return $this;

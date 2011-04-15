@@ -53,9 +53,6 @@ class RepeatedPass implements CompilerPassInterface
         foreach ($this->passes as $pass) {
             $time = microtime(true);
             $pass->process($container);
-            $compiler->addLogMessage(sprintf(
-                '%s finished in %.3fs', get_class($pass), microtime(true) - $time
-            ));
         }
 
         if ($this->repeat) {

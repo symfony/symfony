@@ -109,7 +109,5 @@ class Compiler
         foreach ($this->passConfig->getPasses() as $pass) {
             $pass->process($container);
         }
-
-        $this->addLogMessage(sprintf('Compilation finished in %.3fs.', microtime(true) - $start));
     }
 }

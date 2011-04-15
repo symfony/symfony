@@ -640,16 +640,7 @@ class Request
     public function getRequestFormat($default = 'html')
     {
         if (null === $this->format) {
-            $this->format = $this->get('_format');
-            if (null === $this->format) {
-                $formats = $this->getAcceptableContentTypes();
-                if (!empty($formats)) {
-                    $this->format = $this->getFormat($formats[0]);
-                }
-                if (null === $this->format) {
-                    $this->format = $default;
-                }
-            }
+            $this->format = $this->get('_format', $default);
         }
 
         return $this->format;
@@ -736,7 +727,7 @@ class Request
             return $this->languages;
         }
 
-        $languages = $this->splitHttpAcceptHeader($this->headers->get('Accept-Language'));
+        $languages = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept-Language')));
         $this->languages = array();
         foreach ($languages as $lang) {
             if (strstr($lang, '-')) {
@@ -776,7 +767,7 @@ class Request
             return $this->charsets;
         }
 
-        return $this->charsets = $this->splitHttpAcceptHeader($this->headers->get('Accept-Charset'));
+        return $this->charsets = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept-Charset')));
     }
 
     /**
@@ -790,7 +781,7 @@ class Request
             return $this->acceptableContentTypes;
         }
 
-        return $this->acceptableContentTypes = $this->splitHttpAcceptHeader($this->headers->get('Accept'));
+        return $this->acceptableContentTypes = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept')));
     }
 
     /**
@@ -833,8 +824,9 @@ class Request
         }
 
         arsort($values);
+        reset($values);
 
-        return array_keys($values);
+        return $values;
     }
 
     /*
@@ -983,6 +975,7 @@ class Request
     static protected function initializeFormats()
     {
         static::$formats = array(
+            'html' => array('text/html', 'application/xhtml+xml'),
             'txt'  => array('text/plain'),
             'js'   => array('application/javascript', 'application/x-javascript', 'text/javascript'),
             'css'  => array('text/css'),

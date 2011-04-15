@@ -4,7 +4,6 @@
         name="<?php echo $view->escape($form['file']->get('name')) ?>"
         <?php if ($form['file']->get('disabled')): ?>disabled="disabled"<?php endif ?>
         <?php if ($form['file']->get('required')): ?>required="required"<?php endif ?>
-        <?php if ($form['file']->get('class')): ?>class="<?php echo $form['file']->get('class') ?>"<?php endif ?>
     />
 
     <?php echo $view['form']->widget($form['token']) ?>

@@ -11,7 +11,6 @@
         name="<?php echo $view->escape($name) ?>"
         <?php if ($read_only): ?> disabled="disabled"<?php endif ?>
         <?php if ($multiple): ?> multiple="multiple"<?php endif ?>
-        <?php if ($class): ?> class="<?php echo $class ?>"<?php endif ?>
     >
         <?php if (!$multiple && !$required): ?><option value=""><?php echo $empty_value; ?></option><?php endif; ?>
         <?php if (count($preferred_choices) > 0): ?>

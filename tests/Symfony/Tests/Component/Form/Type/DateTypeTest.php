@@ -432,7 +432,7 @@ class DateTypeTest extends LocalizedTestCase
     public function testPassDatePatternToView()
     {
         $form = $this->factory->create('date');
-        $view = $form->getView();
+        $view = $form->createView();
 
         $this->assertSame('{{ day }}.{{ month }}.{{ year }}', $view->getVar('date_pattern'));
     }
@@ -442,7 +442,7 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', 'name', array(
             'widget' => 'text',
         ));
-        $view = $form->getView();
+        $view = $form->createView();
 
         $this->assertNull($view->getVar('date_pattern'));
     }
@@ -452,7 +452,7 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', 'name', array(
             'widget' => 'text',
         ));
-        $view = $form->getView();
+        $view = $form->createView();
 
         $this->assertSame('text', $view->getVar('widget'));
     }

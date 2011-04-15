@@ -832,10 +832,10 @@ class Form implements \IteratorAggregate, FormInterface
         return $value;
     }
 
-    public function getView(FormView $parent = null)
+    public function createView(FormView $parent = null)
     {
         if (null === $parent && $this->parent) {
-            $parent = $this->parent->getView();
+            $parent = $this->parent->createView();
         }
 
         $view = new FormView();
@@ -852,7 +852,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         foreach ($this->children as $key => $child) {
-            $childViews[$key] = $child->getView($view);
+            $childViews[$key] = $child->createView($view);
         }
 
         $view->setChildren($childViews);

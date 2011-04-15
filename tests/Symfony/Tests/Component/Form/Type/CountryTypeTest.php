@@ -23,7 +23,7 @@ class CountryTypeTest extends TestCase
         \Locale::setDefault('de_AT');
 
         $form = $this->factory->create('country');
-        $view = $form->getView();
+        $view = $form->createView();
         $choices = $view->getVar('choices');
 
         $this->assertArrayHasKey('DE', $choices);
@@ -41,7 +41,7 @@ class CountryTypeTest extends TestCase
     public function testUnknownCountryIsNotIncluded()
     {
         $form = $this->factory->create('country', 'country');
-        $view = $form->getView();
+        $view = $form->createView();
         $choices = $view->getVar('choices');
 
         $this->assertArrayNotHasKey('ZZ', $choices);

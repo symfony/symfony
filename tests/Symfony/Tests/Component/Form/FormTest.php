@@ -865,7 +865,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(), $form->getErrors());
     }
 
-    public function testGetView()
+    public function testCreateView()
     {
         $test = $this;
         $type1 = $this->getMock('Symfony\Component\Form\Type\FormTypeInterface');
@@ -906,7 +906,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form->setParent($this->getBuilder()->getForm());
         $form->add($this->getBuilder()->getForm());
 
-        $form->getView();
+        $form->createView();
 
         $this->assertEquals(array(
             0 => 'type1::buildView',
@@ -916,12 +916,12 @@ class FormTest extends \PHPUnit_Framework_TestCase
         ), $calls);
     }
 
-    public function testGetViewAcceptsParent()
+    public function testCreateViewAcceptsParent()
     {
         $parent = new FormView();
 
         $form = $this->getBuilder()->getForm();
-        $view = $form->getView($parent);
+        $view = $form->createView($parent);
 
         $this->assertSame($parent, $view->getParent());
     }

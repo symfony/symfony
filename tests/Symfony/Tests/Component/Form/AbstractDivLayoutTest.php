@@ -19,7 +19,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->create('text', 'name');
         $form->addError(new FormError('Error!'));
-        $view = $form->getView();
+        $view = $form->createView();
         $html = $this->renderRow($view);
 
         $this->assertMatchesXpath($html,
@@ -39,7 +39,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->create('repeated', 'name');
         $form->addError(new FormError('Error!'));
-        $view = $form->getView();
+        $view = $form->createView();
         $html = $this->renderRow($view);
 
         $this->assertMatchesXpath($html,
@@ -68,7 +68,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             ->add('field3', 'text')
             ->add('field4', 'text')
             ->getForm()
-            ->getView();
+            ->createView();
 
         // Render field2 row -> does not implicitely call renderWidget because
         // it is a repeated field!
@@ -108,7 +108,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             'data' => array('a', 'b'),
         ));
 
-        $this->assertWidgetMatchesXpath($form->getView(), array(),
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
         ./div[./input[@type="text"][@value="a"]]
@@ -126,7 +126,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             ->add('lastName', 'text')
             ->getForm();
 
-        $this->assertWidgetMatchesXpath($form->getView(), array(),
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
         ./input[@type="hidden"][@id="name__token"]
@@ -153,7 +153,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             'data' => 'foobar',
         ));
 
-        $this->assertWidgetMatchesXpath($form->getView(), array(),
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
         ./div

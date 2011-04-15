@@ -21,7 +21,7 @@ class PasswordTypeTest extends TestCase
     {
         $form = $this->factory->create('password');
         $form->setData('pAs5w0rd');
-        $view = $form->getView();
+        $view = $form->createView();
 
         $this->assertSame('', $view->getVar('value'));
     }
@@ -30,7 +30,7 @@ class PasswordTypeTest extends TestCase
     {
         $form = $this->factory->create('password');
         $form->bind('pAs5w0rd');
-        $view = $form->getView();
+        $view = $form->createView();
 
         $this->assertSame('', $view->getVar('value'));
     }
@@ -39,7 +39,7 @@ class PasswordTypeTest extends TestCase
     {
         $form = $this->factory->create('password', null, array('always_empty' => false));
         $form->bind('pAs5w0rd');
-        $view = $form->getView();
+        $view = $form->createView();
 
         $this->assertSame('pAs5w0rd', $view->getVar('value'));
     }

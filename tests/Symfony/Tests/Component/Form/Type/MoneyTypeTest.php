@@ -20,7 +20,7 @@ class MoneyTypeTest extends LocalizedTestCase
         \Locale::setDefault('de_DE');
 
         $form = $this->factory->create('money');
-        $view = $form->getView();
+        $view = $form->createView();
 
         $this->assertSame('{{ widget }} €', $view->getVar('money_pattern'));
     }

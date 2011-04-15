@@ -24,9 +24,9 @@ final class Events
 
     const postSetData = 'postSetData';
 
-    const filterBoundClientData = 'filterBoundClientData';
+    const onBindClientData = 'onBindClientData';
 
-    const filterBoundNormData = 'filterBoundNormData';
+    const onBindNormData = 'onBindNormData';
 
-    const filterSetData = 'filterSetData';
+    const onSetData = 'onSetData';
 }

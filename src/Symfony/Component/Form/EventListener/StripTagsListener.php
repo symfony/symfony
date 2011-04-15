@@ -22,13 +22,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class StripTagsListener implements EventSubscriberInterface
 {
-    public function filterBoundClientData(FilterDataEvent $event)
+    public function onBindClientData(FilterDataEvent $event)
     {
         $event->setData(strip_tags($event->getData()));
     }
 
     public static function getSubscribedEvents()
     {
-        return Events::filterBoundDataFromClient;
+        return Events::onBindDataFromClient;
     }
 }

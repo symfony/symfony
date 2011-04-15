@@ -24,7 +24,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class FixRadioInputListener implements EventSubscriberInterface
 {
-    public function filterBoundClientData(FilterDataEvent $event)
+    public function onBindClientData(FilterDataEvent $event)
     {
         $data = $event->getData();
 
@@ -33,6 +33,6 @@ class FixRadioInputListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return Events::filterBoundClientData;
+        return Events::onBindClientData;
     }
 }

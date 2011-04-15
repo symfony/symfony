@@ -35,10 +35,10 @@ class FixFileUploadListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return Events::filterBoundClientData;
+        return Events::onBindClientData;
     }
 
-    public function filterBoundClientData(FilterDataEvent $event)
+    public function onBindClientData(FilterDataEvent $event)
     {
         $form = $event->getForm();
 

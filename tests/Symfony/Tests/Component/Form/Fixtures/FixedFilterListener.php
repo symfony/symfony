@@ -13,45 +13,45 @@ class FixedFilterListener implements EventSubscriberInterface
     public function __construct(array $mapping)
     {
         $this->mapping = array_merge(array(
-            'filterBoundClientData' => array(),
-            'filterBoundNormData' => array(),
-            'filterSetData' => array(),
+            'onBindClientData' => array(),
+            'onBindNormData' => array(),
+            'onSetData' => array(),
         ), $mapping);
     }
 
-    public function filterBoundClientData(FilterDataEvent $event)
+    public function onBindClientData(FilterDataEvent $event)
     {
         $data = $event->getData();
 
-        if (isset($this->mapping['filterBoundClientData'][$data])) {
-            $event->setData($this->mapping['filterBoundClientData'][$data]);
+        if (isset($this->mapping['onBindClientData'][$data])) {
+            $event->setData($this->mapping['onBindClientData'][$data]);
         }
     }
 
-    public function filterBoundNormData(FilterDataEvent $event)
+    public function onBindNormData(FilterDataEvent $event)
     {
         $data = $event->getData();
 
-        if (isset($this->mapping['filterBoundNormData'][$data])) {
-            $event->setData($this->mapping['filterBoundNormData'][$data]);
+        if (isset($this->mapping['onBindNormData'][$data])) {
+            $event->setData($this->mapping['onBindNormData'][$data]);
         }
     }
 
-    public function filterSetData(FilterDataEvent $event)
+    public function onSetData(FilterDataEvent $event)
     {
         $data = $event->getData();
 
-        if (isset($this->mapping['filterSetData'][$data])) {
-            $event->setData($this->mapping['filterSetData'][$data]);
+        if (isset($this->mapping['onSetData'][$data])) {
+            $event->setData($this->mapping['onSetData'][$data]);
         }
     }
 
     public static function getSubscribedEvents()
     {
         return array(
-            Events::filterBoundClientData,
-            Events::filterBoundNormData,
-            Events::filterSetData,
+            Events::onBindClientData,
+            Events::onBindNormData,
+            Events::onSetData,
         );
     }
 }

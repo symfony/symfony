@@ -23,7 +23,7 @@ class StripTagsListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FilterDataEvent($form, $data);
 
         $filter = new StripTagsListener();
-        $filter->filterBoundClientData($event);
+        $filter->onBindClientData($event);
 
         $this->assertEquals('Foo!Bar!Baz!', $event->getData());
     }

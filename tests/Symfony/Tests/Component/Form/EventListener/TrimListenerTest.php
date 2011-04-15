@@ -23,7 +23,7 @@ class TrimListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FilterDataEvent($form, $data);
 
         $filter = new TrimListener();
-        $filter->filterBoundClientData($event);
+        $filter->onBindClientData($event);
 
         $this->assertEquals('Foo!', $event->getData());
     }
@@ -35,7 +35,7 @@ class TrimListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FilterDataEvent($form, $data);
 
         $filter = new TrimListener();
-        $filter->filterBoundClientData($event);
+        $filter->onBindClientData($event);
 
         $this->assertSame(1234, $event->getData());
     }

@@ -48,6 +48,15 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Bernhard', $path->getValue($array));
     }
 
+    public function testGetValueReadsElementWithSpecialCharsExceptDOt()
+    {
+        $array = array('#!@$' => 'Bernhard');
+
+        $path = new PropertyPath('#!@$');
+
+        $this->assertEquals('Bernhard', $path->getValue($array));
+    }
+
     public function testGetValueReadsNestedIndexWithSpecialChars()
     {
         $array = array('root' => array('#!@$.' => 'Bernhard'));

@@ -32,6 +32,12 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      */
     function getParent();
 
+    function add(FormInterface $child);
+
+    function has($name);
+
+    function remove($name);
+
     function getChildren();
 
     function hasChildren();

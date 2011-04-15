@@ -60,23 +60,25 @@ class ResizeFormListener implements EventSubscriberInterface
     public function preSetData(DataEvent $event)
     {
         $form = $event->getForm();
-        $collection = $event->getData();
+        $data = $event->getData();
 
-        if (null === $collection) {
-            $collection = array();
+        if (null === $data) {
+            $data = array();
         }
 
-        if (!is_array($collection) && !$collection instanceof \Traversable) {
-            throw new UnexpectedTypeException($collection, 'array or \Traversable');
+        if (!is_array($data) && !$data instanceof \Traversable) {
+            throw new UnexpectedTypeException($data, 'array or \Traversable');
         }
 
+        // First remove all rows except for the prototype row
         foreach ($form as $name => $child) {
-            if (!$this->resizeOnBind || '$$name$$' != $name) {
+            if (!($this->resizeOnBind && '$$name$$' === $name)) {
                 $form->remove($name);
             }
         }
 
-        foreach ($collection as $name => $value) {
+        // Then add all rows again in the correct order
+        foreach ($data as $name => $value) {
             $form->add($this->factory->create($this->type, $name, array(
                 'property_path' => '['.$name.']',
             )));
@@ -96,12 +98,18 @@ class ResizeFormListener implements EventSubscriberInterface
             $data = array();
         }
 
+        if (!is_array($data) && !$data instanceof \Traversable) {
+            throw new UnexpectedTypeException($data, 'array or \Traversable');
+        }
+
+        // Remove all empty rows except for the prototype row
         foreach ($form as $name => $child) {
-            if (!isset($data[$name]) && '$$name$$' != $name) {
+            if (!isset($data[$name]) && '$$name$$' !== $name) {
                 $form->remove($name);
             }
         }
 
+        // Add all additional rows
         foreach ($data as $name => $value) {
             if (!$form->has($name)) {
                 $form->add($this->factory->create($this->type, $name, array(
@@ -118,14 +126,22 @@ class ResizeFormListener implements EventSubscriberInterface
         }
 
         $form = $event->getForm();
-        $collection = $event->getData();
+        $data = $event->getData();
 
-        foreach ($collection as $name => $child) {
+        if (null === $data) {
+            $data = array();
+        }
+
+        if (!is_array($data) && !$data instanceof \Traversable) {
+            throw new UnexpectedTypeException($data, 'array or \Traversable');
+        }
+
+        foreach ($data as $name => $child) {
             if (!$form->has($name)) {
-                unset($collection[$name]);
+                unset($data[$name]);
             }
         }
 
-        $event->setData($collection);
+        $event->setData($data);
     }
 }

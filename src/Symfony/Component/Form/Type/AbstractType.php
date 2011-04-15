@@ -47,6 +47,10 @@ abstract class AbstractType implements FormTypeInterface
 
     public function getName()
     {
-        return get_class($this);
+        if (preg_match('/\\\\([a-z]+)(?:Form|Type)?$/im', get_class($this), $matches)) {
+            $name = strtolower($matches[1]);
+        }
+
+        return $name;
     }
 }

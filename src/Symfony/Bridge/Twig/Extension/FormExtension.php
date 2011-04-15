@@ -160,7 +160,7 @@ class FormExtension extends \Twig_Extension
     protected function render(FormView $view, $section, array $variables = array(), array $resources = null)
     {
         $templates = $this->getTemplates($view, $resources);
-        $blocks = $view->getVar('types');
+        $blocks = $view->get('types');
         foreach ($blocks as &$block) {
             $block = $block.'__'.$section;
 
@@ -169,7 +169,7 @@ class FormExtension extends \Twig_Extension
                     $view->setRendered(true);
                 }
 
-                return $templates[$block]->renderBlock($block, array_merge($view->getVars(), $variables));
+                return $templates[$block]->renderBlock($block, array_merge($view->all(), $variables));
             }
         }
 

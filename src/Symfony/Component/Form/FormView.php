@@ -36,28 +36,54 @@ class FormView implements \ArrayAccess, \IteratorAggregate
      */
     private $rendered = false;
 
-    public function setVar($name, $value)
+    /**
+     * @param string $name
+     * @param mixed $value
+     */
+    public function set($name, $value)
     {
         $this->vars[$name] = $value;
     }
 
-    public function hasVar($name)
+    /**
+     * @param $name
+     * @return Boolean
+     */
+    public function has($name)
     {
         return array_key_exists($name, $this->vars);
     }
 
-    public function getVar($name)
+    /**
+     * @param $name
+     * @param $default
+     * @return mixed
+     */
+    public function get($name, $default = null)
     {
-        if (!isset($this->vars[$name])) {
-            return null;
+        if (false === $this->has($name)) {
+            return $default;
         }
 
         return $this->vars[$name];
     }
 
-    public function getVars()
+    /**
+     * @return array
+     */
+    public function all()
     {
         return $this->vars;
+    }
+
+    /**
+     * Alias of all so it is possible to do `form.vars.foo`
+     *
+     * @return array
+     */
+    public function getVars()
+    {
+        return $this->all();
     }
 
     public function setAttribute($name, $value)

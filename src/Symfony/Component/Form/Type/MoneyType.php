@@ -28,7 +28,7 @@ class MoneyType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form)
     {
-        $view->setVar('money_pattern', self::getPattern($form->getAttribute('currency')));
+        $view->set('money_pattern', self::getPattern($form->getAttribute('currency')));
     }
 
     public function getDefaultOptions(array $options)

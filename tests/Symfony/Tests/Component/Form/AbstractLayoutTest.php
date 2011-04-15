@@ -426,6 +426,17 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testCsrfWithNonRootParent()
+    {
+        $form = $this->factory->create('csrf', 'name');
+        $form->setParent($this->factory->create('form'));
+        $form->getParent()->setParent($this->factory->create('form'));
+
+        $html = $this->renderWidget($form->createView());
+
+        $this->assertEquals('', trim($html));
+    }
+
     public function testDateTime()
     {
         $form = $this->factory->create('datetime', 'name', array(

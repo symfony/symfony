@@ -82,7 +82,7 @@
 {% endblock csrf__widget %}
 
 {% block hidden__row %}
-    {{ form_widget(form) }}
+    {{ form_widget(form, _context) }}
 {% endblock hidden__row %}
 
 {% block textarea__widget %}
@@ -241,9 +241,9 @@
 {% block field__row %}
 {% spaceless %}
     <div>
-        {{ form_label(form) }}
+        {{ form_label(form, label) }}
         {{ form_errors(form) }}
-        {{ form_widget(form) }}
+        {{ form_widget(form, _context) }}
     </div>
 {% endspaceless %}
 {% endblock field__row %}

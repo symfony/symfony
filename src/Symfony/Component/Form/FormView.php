@@ -14,7 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Util\ChoiceUtil;
 
-class FormView implements \ArrayAccess, \IteratorAggregate
+class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 {
     private $vars = array(
         'value' => null,
@@ -178,5 +178,14 @@ class FormView implements \ArrayAccess, \IteratorAggregate
         }
 
         return $choice === $this->vars['value'];
+    }
+
+    /**
+     * @see Countable
+     * @return integer
+     */
+    public function count()
+    {
+        return count($this->children);
     }
 }

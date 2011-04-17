@@ -728,7 +728,7 @@ class Request
 
         $languages = $this->splitHttpAcceptHeader($this->headers->get('Accept-Language'));
         $this->languages = array();
-        foreach ($languages as $lang) {
+        foreach ($languages as $lang => $q) {
             if (strstr($lang, '-')) {
                 $codes = explode('-', $lang);
                 if ($codes[0] == 'i') {
@@ -766,7 +766,7 @@ class Request
             return $this->charsets;
         }
 
-        return $this->charsets = $this->splitHttpAcceptHeader($this->headers->get('Accept-Charset'));
+        return $this->charsets = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept-Charset')));
     }
 
     /**
@@ -780,7 +780,7 @@ class Request
             return $this->acceptableContentTypes;
         }
 
-        return $this->acceptableContentTypes = $this->splitHttpAcceptHeader($this->headers->get('Accept'));
+        return $this->acceptableContentTypes = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept')));
     }
 
     /**
@@ -823,8 +823,9 @@ class Request
         }
 
         arsort($values);
+        reset($values);
 
-        return array_keys($values);
+        return $values;
     }
 
     /*

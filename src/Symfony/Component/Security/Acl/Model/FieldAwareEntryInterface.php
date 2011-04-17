@@ -18,5 +18,10 @@ namespace Symfony\Component\Security\Acl\Model;
  */
 interface FieldAwareEntryInterface
 {
+    /**
+     * Returns the field used for this entry.
+     *
+     * @return string
+     */
     function getField();
 }

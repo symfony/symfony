@@ -109,6 +109,17 @@ abstract class Client
     }
 
     /**
+     * Sets single server parameter.
+     *
+     * @param string $key   A key of the parameter
+     * @param string $value A value of the parameter
+     */
+    public function setServerParameter($key, $value)
+    {
+        $this->server[$key] = $value;
+    }
+
+    /**
      * Returns the History instance.
      *
      * @return History A History instance

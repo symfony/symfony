@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\Serializer\Encoder;
+namespace Symfony\Component\Serializer;
 
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -18,15 +18,21 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-interface EncoderInterface
+interface SerializerAwareInterface
 {
     /**
-     * Encodes data into a string
+     * Sets the owning Serializer object
      *
-     * @param mixed $data data to encode
-     * @param string $format format to encode to
-     * @return string
+     * @param SerializerInterface $serializer
      * @api
      */
-    function encode($data, $format);
+    function setSerializer(SerializerInterface $serializer);
+
+    /**
+     * Gets the owning Serializer object
+     *
+     * @return SerializerInterface
+     * @api
+     */
+    function getSerializer();
 }

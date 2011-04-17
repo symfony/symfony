@@ -18,15 +18,15 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-interface EncoderInterface
+interface DecoderInterface
 {
     /**
-     * Encodes data into a string
+     * Decodes a string into PHP data
      *
-     * @param mixed $data data to encode
-     * @param string $format format to encode to
-     * @return string
+     * @param string $data data to decode
+     * @param string $format format to decode from
+     * @return mixed
      * @api
      */
-    function encode($data, $format);
+    function decode($data, $format);
 }

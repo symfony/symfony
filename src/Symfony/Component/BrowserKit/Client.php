@@ -109,6 +109,29 @@ abstract class Client
     }
 
     /**
+     * Sets single server parameter.
+     *
+     * @param string $key   A key of the parameter
+     * @param string $value A value of the parameter
+     */
+    public function setServerParameter($key, $value)
+    {
+        $this->server[$key] = $value;
+    }
+
+    /**
+     * Gets single server parameter for specified key.
+     *
+     * @param string $key     A key of the parameter to get
+     * @param string $default A default value when key is undefined
+     * @return string A value of the parameter
+     */
+    public function getServerParameter($key, $default = '')
+    {
+        return (isset($this->server[$key])) ? $this->server[$key] : $default;
+    }
+
+    /**
      * Returns the History instance.
      *
      * @return History A History instance

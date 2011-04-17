@@ -974,6 +974,7 @@ class Request
     static protected function initializeFormats()
     {
         static::$formats = array(
+            'html' => array('text/html', 'application/xhtml+xml'),
             'txt'  => array('text/plain'),
             'js'   => array('application/javascript', 'application/x-javascript', 'text/javascript'),
             'css'  => array('text/css'),

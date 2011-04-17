@@ -666,4 +666,17 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->headers->set('Accept-language', 'zh, i-cherokee; q=0.6');
         $this->assertEquals(array('zh', 'cherokee'), $request->getLanguages());
     }
+
+    public function testGetRequestFormat()
+    {
+        $request = new Request();
+        $this->assertEquals('html', $request->getRequestFormat());
+
+        $request = new Request();
+        $this->assertEquals(null, $request->getRequestFormat(null));
+
+        $request = new Request();
+        $this->assertEquals(null, $request->setRequestFormat('foo'));
+        $this->assertEquals('foo', $request->getRequestFormat(null));
+    }
 }

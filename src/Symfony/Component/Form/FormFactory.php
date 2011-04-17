@@ -46,11 +46,7 @@ class FormFactory implements FormFactoryInterface
 
         // TESTME
         if (null === $name) {
-            $typeAsString = is_object($type) ? get_class($type) : $type;
-
-            if (preg_match('/\w+$/', $typeAsString, $matches)) {
-                $name = $matches[0];
-            }
+            $name = is_object($type) ? $type->getName() : $type;
         }
 
         while (null !== $type) {

@@ -61,9 +61,9 @@ class ContainerAwareEventDispatcher extends EventDispatcher
             throw new \InvalidArgumentException('Expected a string argument');
         }
 
-        foreach ((array) $eventNames as $event) {
+        foreach ((array) $eventNames as $eventName) {
             // Prevent duplicate entries
-            $this->listenerIds[$event][$serviceId] = $priority;
+            $this->listenerIds[$eventName][$serviceId] = $priority;
         }
     }
 

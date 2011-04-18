@@ -72,6 +72,8 @@ class ContainerAwareEventDispatcher extends EventDispatcher
      *
      * Lazily loads listeners for this event from the dependency injection
      * container.
+     *
+     * @throws \InvalidArgumentException if the service is not defined
      */
     public function dispatch($eventName, Event $event = null)
     {

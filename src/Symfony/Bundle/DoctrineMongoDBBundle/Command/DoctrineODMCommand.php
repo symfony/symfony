@@ -109,7 +109,8 @@ abstract class DoctrineODMCommand extends Command
     protected function findBasePathForBundle($bundle)
     {
         $path = str_replace('\\', '/', $bundle->getNamespace());
-        $destination = str_replace('/'.$path, "", $bundle->getPath(), $c);
+        $search = str_replace('\\','/',$bundle->getPath());
+        $destination = str_replace('/'.$path, "", $search, $c);
 
         if ($c != 1) {
             throw new \RuntimeException("Something went terribly wrong.");

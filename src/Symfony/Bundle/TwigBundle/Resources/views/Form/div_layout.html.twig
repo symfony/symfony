@@ -256,3 +256,10 @@
     </div>
 {% endspaceless %}
 {% endblock form__widget %}
+
+{% block email__widget %}
+{% spaceless %}
+    {% set type = type|default('email') %}
+    {{ block('field__widget') }}
+{% endspaceless %}
+{% endblock email__widget %}

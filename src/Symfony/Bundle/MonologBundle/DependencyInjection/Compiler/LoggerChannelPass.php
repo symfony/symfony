@@ -27,13 +27,13 @@ class LoggerChannelPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container)
     {
-        if (false === $container->hasDefinition('monolog.logger')) {
+        if (!$container->hasDefinition('monolog.logger')) {
             return;
         }
 
         foreach ($container->findTaggedServiceIds('monolog.logger') as $id => $tags) {
             foreach ($tags as $tag) {
-                if (!empty ($tag['channel']) && 'app' !== $tag['channel']) {
+                if (!empty($tag['channel']) && 'app' !== $tag['channel']) {
                     $definition = $container->getDefinition($id);
                     $loggerId = sprintf('monolog.logger.%s', $tag['channel']);
                     $this->createLogger($tag['channel'], $loggerId, $container);

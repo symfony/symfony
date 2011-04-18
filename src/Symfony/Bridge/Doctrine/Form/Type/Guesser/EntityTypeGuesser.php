@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Type\Guesser;
+namespace Symfony\Bridge\Doctrine\Form\Type\Guesser;
 
 use Doctrine\ORM\EntityManager;
 

@@ -25,7 +25,7 @@
         <service id="form.factory" class="%form.factory.class%">
             <argument type="service" id="form.type.loader" />
             <!--
-            All services with tag "form.guesser" are inserted here by 
+            All services with tag "form.guesser" are inserted here by
             AddFormGuessersPass
             -->
             <argument type="collection" />
@@ -36,7 +36,7 @@
             <tag name="form.guesser" />
             <argument type="service" id="validator.mapping.class_metadata_factory" />
         </service>
-        
+
         <!-- CsrfProvider -->
         <service id="form.csrf_provider" class="%form.csrf_provider.class%">
             <argument type="service" id="session" />
@@ -50,17 +50,17 @@
             <argument>%file.temporary_storage.nesting_levels%</argument>
             <argument>%file.temporary_storage.directory%</argument>
         </service>
-        
+
         <!-- ContainerAwareTypeLoader -->
         <service id="form.type.loader" class="%form.type.loader.class%">
             <argument type="service" id="service_container" />
             <!--
-            All services with tag "form.type" are inserted here by 
+            All services with tag "form.type" are inserted here by
             AddFormTypesPass
             -->
             <argument type="collection" />
         </service>
-        
+
         <!-- FieldTypes -->
         <service id="form.type.field" class="Symfony\Component\Form\Type\FieldType">
             <tag name="form.type" alias="field" />
@@ -93,6 +93,9 @@
         </service>
         <service id="form.type.datetime" class="Symfony\Component\Form\Type\DateTimeType">
             <tag name="form.type" alias="datetime" />
+        </service>
+        <service id="form.type.email" class="Symfony\Component\Form\Type\EmailType">
+            <tag name="form.type" alias="email" />
         </service>
         <service id="form.type.file" class="Symfony\Component\Form\Type\FileType">
             <tag name="form.type" alias="file" />
@@ -143,6 +146,6 @@
         <service id="form.type.url" class="Symfony\Component\Form\Type\UrlType">
             <tag name="form.type" alias="url" />
         </service>
-        
+
     </services>
 </container>

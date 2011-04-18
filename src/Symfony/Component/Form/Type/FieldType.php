@@ -86,10 +86,8 @@ class FieldType extends AbstractType
         $view->set('value', $form->getClientData());
         $view->set('read_only', $form->isReadOnly());
         $view->set('required', $form->isRequired());
-        $view->set('class', null);
         $view->set('max_length', $form->getAttribute('max_length'));
         $view->set('size', null);
-        $view->set('label', ucfirst(strtolower(str_replace('_', ' ', $form->getName()))));
         $view->set('label', $form->getAttribute('label'));
         $view->set('multipart', false);
         $view->set('attr', array());

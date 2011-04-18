@@ -32,6 +32,7 @@ class DefaultTypeLoader extends ArrayTypeLoader
             new Type\CountryType(),
             new Type\DateType(),
             new Type\DateTimeType(),
+            new Type\EmailType(),
             new Type\HiddenType(),
             new Type\IntegerType(),
             new Type\LanguageType(),

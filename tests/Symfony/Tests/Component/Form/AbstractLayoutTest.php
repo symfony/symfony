@@ -603,6 +603,41 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testEmail()
+    {
+        $form = $this->factory->create('email', 'na&me', array(
+            'property_path' => 'name',
+            'data' => 'foo&bar',
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/input
+    [@type="email"]
+    [@name="na&me"]
+    [@value="foo&bar"]
+    [not(@maxlength)]
+'
+        );
+    }
+
+    public function testEmailWithMaxLength()
+    {
+        $form = $this->factory->create('email', 'na&me', array(
+            'property_path' => 'name',
+            'data' => 'foo&bar',
+            'max_length' => 123,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/input
+    [@type="email"]
+    [@name="na&me"]
+    [@value="foo&bar"]
+    [@maxlength="123"]
+'
+        );
+    }
+
     public function testFile()
     {
         $form = $this->factory->create('file', 'na&me', array('property_path' => 'name'));

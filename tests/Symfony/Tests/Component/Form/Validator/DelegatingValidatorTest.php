@@ -91,6 +91,19 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         return $this->getMock('Symfony\Tests\Component\Form\FormInterface');
     }
 
+    public function testUseValidateValueWhenValidationConstraintExist()
+    {
+        $constraint = $this->getMockForAbstractClass('Symfony\Component\Validator\Constraint');
+        $form = $this
+            ->getBuilder('name')
+            ->setAttribute('validation_constraint', $constraint)
+            ->getForm();
+
+        $this->delegate->expects($this->once())->method('validateValue');
+
+        $this->validator->validate($form);
+    }
+
     public function testFormErrorsOnForm()
     {
         $form = $this->getForm();

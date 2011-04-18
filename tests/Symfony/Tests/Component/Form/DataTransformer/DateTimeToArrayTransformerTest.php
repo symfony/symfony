@@ -145,6 +145,24 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
         $this->assertDateTimeEquals($output, $transformer->reverseTransform($input, null));
     }
 
+    public function testReverseTransformWithSomeZero()
+    {
+        $transformer = new DateTimeToArrayTransformer('UTC', 'UTC');
+
+        $input = array(
+            'year' => '2010',
+            'month' => '2',
+            'day' => '3',
+            'hour' => '4',
+            'minute' => '0',
+            'second' => '0',
+        );
+
+        $output = new \DateTime('2010-02-03 04:00:00 UTC');
+
+        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input, null));
+    }
+
     public function testReverseTransform_completelyEmpty()
     {
         $transformer = new DateTimeToArrayTransformer();

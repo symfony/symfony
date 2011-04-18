@@ -162,7 +162,7 @@ class FormExtension extends \Twig_Extension
         $templates = $this->getTemplates($view, $resources);
         $blocks = $view->get('types');
         foreach ($blocks as &$block) {
-            $block = $block.'__'.$section;
+            $block = $block.'_'.$section;
 
             if (isset($templates[$block])) {
                 if ('widget' === $section || 'row' === $section) {

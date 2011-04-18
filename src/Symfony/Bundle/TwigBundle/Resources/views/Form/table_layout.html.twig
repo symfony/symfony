@@ -1,6 +1,6 @@
 {% extends "TwigBundle:Form:div_layout.html.twig" %}
 
-{% block field__row %}
+{% block field_row %}
 {% spaceless %}
     <tr>
         <td>
@@ -12,21 +12,21 @@
         </td>
     </tr>
 {% endspaceless %}
-{% endblock field__row %}
+{% endblock field_row %}
 
-{% block form__errors %}
+{% block form_errors %}
 {% spaceless %}
     {% if errors|length > 0 %}
     <tr>
         <td colspan="2">
-            {{ block('field__errors') }}
+            {{ block('field_errors') }}
         </td>
     </tr>
     {% endif %}
 {% endspaceless %}
-{% endblock form__errors %}
+{% endblock form_errors %}
 
-{% block hidden__row %}
+{% block hidden_row %}
 {% spaceless %}
     <tr style="display: none">
         <td colspan="2">
@@ -34,19 +34,19 @@
         </td>
     </tr>
 {% endspaceless %}
-{% endblock hidden__row %}
+{% endblock hidden_row %}
 
-{% block repeated__errors %}
+{% block repeated_errors %}
 {% spaceless %}
-    {{ block('form__errors') }}
+    {{ block('form_errors') }}
 {% endspaceless %}
-{% endblock repeated__errors %}
+{% endblock repeated_errors %}
 
-{% block form__widget %}
+{% block form_widget %}
 {% spaceless %}
     <table {{ block('attributes') }}>
-        {{ block('field__rows') }}
+        {{ block('field_rows') }}
         {{ form_rest(form) }}
     </table>
 {% endspaceless %}
-{% endblock form__widget %}
+{% endblock form_widget %}

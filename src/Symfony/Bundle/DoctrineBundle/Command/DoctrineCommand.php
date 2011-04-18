@@ -164,8 +164,12 @@ abstract class DoctrineCommand extends Command
      */
     protected function findBasePathForBundle($bundle)
     {
-        $path = str_replace('\\', '/', $bundle->getNamespace());
-        $destination = str_replace('/'.$path, "", $bundle->getPath(), $c);
+        if (DIRECTORY_SEPARATOR == '/') {
+            $path = '/'.str_replace('\\', '/', $bundle->getNamespace());
+        } else {
+            $path = '\\'.$bundle->getNamespace();
+        }
+        $destination = str_replace($path, "", $bundle->getPath(), $c);
 
         if ($c != 1) {
             throw new \RuntimeException("Something went terribly wrong.");

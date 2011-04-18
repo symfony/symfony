@@ -44,7 +44,13 @@ class DelegatingValidator implements FormValidatorInterface
             // Validate the form in group "Default"
             // Validation of the data in the custom group is done by validateData(),
             // which is constrained by the Execute constraint
-            if ($violations = $this->validator->validate($form)) {
+            if ($form->hasAttribute('validation_constraint')) {
+                $violations = $this->validator->validateValue($form->getData(), $form->getAttribute('validation_constraint'));
+            } else {
+                $violations = $this->validator->validate($form);
+            }
+
+            if ($violations) {
                 foreach ($violations as $violation) {
                     $propertyPath = $violation->getPropertyPath();
                     $template = $violation->getMessageTemplate();

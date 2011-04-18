@@ -57,6 +57,7 @@ class FieldType extends AbstractType
             ->setAttribute('error_mapping', $options['error_mapping'])
             ->setAttribute('max_length', $options['max_length'])
             ->setAttribute('label', $options['label'] ?: $this->humanize($builder->getName()))
+            ->setAttribute('validation_constraint', $options['validation_constraint'])
             ->setData($options['data'])
             ->addValidator(new DefaultValidator())
             ->addValidator(new DelegatingValidator($this->validator));
@@ -115,6 +116,7 @@ class FieldType extends AbstractType
             'error_bubbling' => false,
             'error_mapping' => array(),
             'label' => null,
+            'validation_constraint' => null,
         );
 
         if (!empty($options['data_class'])) {

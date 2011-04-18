@@ -169,7 +169,7 @@ abstract class DoctrineCommand extends Command
         $destination = str_replace('/'.$path, "", $search, $c);
 
         if ($c != 1) {
-            throw new \RuntimeException("Something went terribly wrong.");
+            throw new \RuntimeException("Can't find base path for bundle. Path: $path , Destination: $destination");
         }
 
         return $destination;

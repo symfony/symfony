@@ -8,6 +8,7 @@
         <parameter key="assetic.controller.class">Symfony\Bundle\AsseticBundle\Controller\AsseticController</parameter>
         <parameter key="assetic.routing_loader.class">Symfony\Bundle\AsseticBundle\Routing\AsseticLoader</parameter>
         <parameter key="assetic.cache.class">Assetic\Cache\FilesystemCache</parameter>
+        <parameter key="assetic.prepend_controller_worker.class">Symfony\Bundle\AsseticBundle\Factory\Worker\PrependControllerWorker</parameter>
     </parameters>
 
     <services>
@@ -22,6 +23,9 @@
         </service>
         <service id="assetic.cache" class="%assetic.cache.class%" public="false">
             <argument>%assetic.cache_dir%/assets</argument>
+        </service>
+        <service id="assetic.prepend_controller_worker" class="%assetic.prepend_controller_worker.class%" public="false">
+            <tag name="assetic.factory_worker" />
         </service>
     </services>
 </container>

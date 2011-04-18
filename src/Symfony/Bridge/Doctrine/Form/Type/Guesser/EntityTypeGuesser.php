@@ -12,6 +12,10 @@
 namespace Symfony\Bridge\Doctrine\Form\Type\Guesser;
 
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\Form\Type\Guesser\Guess;
+use Symfony\Component\Form\Type\Guesser\TypeGuesserInterface;
+use Symfony\Component\Form\Type\Guesser\TypeGuess;
+use Symfony\Component\Form\Type\Guesser\ValueGuess;
 
 /**
  * Guesses form fields from the metadata of Doctrine 2

@@ -119,7 +119,22 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('/app.php/testing/bar', $url);
     }
-    
+
+    public function testRelativeUrlWithNullParameter()
+    {
+        $this->routeCollection->add('test', new Route('/testing.{format}', array('format' => null)));
+        $this->generator->setContext(array(
+            'base_url'=>'/app.php',
+            'method'=>'GET',
+            'host'=>'localhost',
+            'port'=>80,
+            'is_secure'=>false));
+
+        $url = $this->generator->generate('test', array(), false);
+
+        $this->assertEquals('/app.php/testing', $url);
+    }
+
     public function testRelativeUrlWithExtraParameters()
     {
         $this->routeCollection->add('test', new Route('/testing'));

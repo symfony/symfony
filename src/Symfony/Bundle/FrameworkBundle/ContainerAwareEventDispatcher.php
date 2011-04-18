@@ -34,7 +34,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
      * The service IDs of the event listeners and subscribers
      * @var array
      */
-    private $listenerIds;
+    private $listenerIds = array();
 
     /**
      * Constructor.

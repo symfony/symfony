@@ -37,6 +37,12 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     private $listenerIds = array();
 
     /**
+     * The services registered as listeners
+     * @var array
+     */
+    private $listeners = array();
+
+    /**
      * Constructor.
      *
      * @param ContainerInterface $container A ContainerInterface instance
@@ -79,7 +85,12 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     {
         if (isset($this->listenerIds[$eventName])) {
             foreach ($this->listenerIds[$eventName] as $serviceId => $priority) {
-                $this->addListener($eventName, $this->container->get($serviceId), $priority);
+                if (isset($this->listeners[$eventName][$serviceId])) {
+                    $this->removeListener($eventName, $this->listeners[$eventName][$serviceId]);
+                }
+                $listener = $this->container->get($serviceId);
+                $this->listeners[$eventName][$serviceId] = $listener;
+                $this->addListener($eventName, $listener, $priority);
             }
         }
 

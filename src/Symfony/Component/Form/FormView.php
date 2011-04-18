@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Util\ChoiceUtil;
+use Symfony\Component\Form\Util\FormUtil;
 
 class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 {
@@ -169,7 +169,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     public function isChoiceSelected($choice)
     {
-        $choice = ChoiceUtil::toValidChoice($choice);
+        $choice = FormUtil::toArrayKey($choice);
 
         // The value should already have been converted by value transformers,
         // otherwise we had to do the conversion on every call of this method

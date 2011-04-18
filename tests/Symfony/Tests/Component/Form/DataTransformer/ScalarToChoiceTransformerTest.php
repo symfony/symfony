@@ -25,7 +25,7 @@ class ScalarToChoiceTransformerTest extends \PHPUnit_Framework_TestCase
     public function transformProvider()
     {
         return array(
-            // more extensive test set can be found in ChoiceUtilTest
+            // more extensive test set can be found in FormUtilTest
             array(0, 0),
             array(false, 0),
             array('', ''),

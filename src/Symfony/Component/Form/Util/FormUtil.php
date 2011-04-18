@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Form\Util;
 
-abstract class ChoiceUtil
+abstract class FormUtil
 {
-    public static function toValidChoice($value)
+    public static function toArrayKey($value)
     {
         if ((string)(int)$value === (string)$value) {
             return (int)$value;
@@ -26,8 +26,8 @@ abstract class ChoiceUtil
         return (string)$value;
     }
 
-    public static function toValidChoiceArray(array $array)
+    public static function toArrayKeys(array $array)
     {
-        return array_map(array(__CLASS__, 'toValidChoice'), $array);
+        return array_map(array(__CLASS__, 'toArrayKey'), $array);
     }
 }

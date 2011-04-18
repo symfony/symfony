@@ -11,11 +11,11 @@
 
 namespace Symfony\Tests\Component\Form\Util;
 
-use Symfony\Component\Form\Util\ChoiceUtil;
+use Symfony\Component\Form\Util\FormUtil;
 
-class ChoiceUtilTest extends \PHPUnit_Framework_TestCase
+class FormUtilTest extends \PHPUnit_Framework_TestCase
 {
-    public function toValidChoiceProvider()
+    public function toArrayKeyProvider()
     {
         return array(
             array(0, 0),
@@ -32,22 +32,22 @@ class ChoiceUtilTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider toValidChoiceProvider
+     * @dataProvider toArrayKeyProvider
      */
-    public function testToValidChoice($in, $out)
+    public function testToArrayKey($in, $out)
     {
-        $this->assertSame($out, ChoiceUtil::toValidChoice($in));
+        $this->assertSame($out, FormUtil::toArrayKey($in));
     }
 
-    public function testToValidChoiceArray()
+    public function testToArrayKeys()
     {
         $in = $out = array();
 
-        foreach ($this->toValidChoiceProvider() as $call) {
+        foreach ($this->toArrayKeyProvider() as $call) {
             $in[] = $call[0];
             $out[] = $call[1];
         }
 
-        $this->assertSame($out, ChoiceUtil::toValidChoiceArray($in));
+        $this->assertSame($out, FormUtil::toArrayKeys($in));
     }
 }

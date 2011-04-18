@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\DataTransformer;
 
-use Symfony\Component\Form\Util\ChoiceUtil;
+use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class ArrayToChoicesTransformer implements DataTransformerInterface
@@ -26,7 +26,7 @@ class ArrayToChoicesTransformer implements DataTransformerInterface
             throw new UnexpectedTypeException($array, 'array');
         }
 
-        return ChoiceUtil::toValidChoiceArray($array);
+        return FormUtil::toArrayKeys($array);
     }
 
     public function reverseTransform($array)

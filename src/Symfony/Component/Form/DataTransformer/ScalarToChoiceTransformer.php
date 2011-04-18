@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Form\DataTransformer;
 
-use Symfony\Component\Form\Util\ChoiceUtil;
+use Symfony\Component\Form\Util\FormUtil;
 
 class ScalarToChoiceTransformer implements DataTransformerInterface
 {
     public function transform($value)
     {
-        return ChoiceUtil::toValidChoice($value);
+        return FormUtil::toArrayKey($value);
     }
 
     public function reverseTransform($value)

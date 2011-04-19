@@ -26,6 +26,10 @@ PR11 to PR12
         <app:engine>twig</app:engine>
         <twig:extension>twig.extension.debug</twig:extension>
 
+* Fixes a critical security issue which allowed all users to switch to 
+  arbitrary accounts when the SwitchUserListener was activated. Configurations
+  which do not use the SwitchUserListener are not affected.
+
 PR10 to PR11
 ------------
 

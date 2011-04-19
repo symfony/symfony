@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
@@ -112,7 +113,9 @@ class SwitchUserListener implements ListenerInterface
             throw new \LogicException(sprintf('You are already switched to "%s" user.', $token->getUsername()));
         }
 
-        $this->accessDecisionManager->decide($token, array($this->role));
+        if (false === $this->accessDecisionManager->decide($token, array($this->role))) {
+            throw new AccessDeniedException();
+        }
 
         $username = $request->get($this->usernameParameter);
 

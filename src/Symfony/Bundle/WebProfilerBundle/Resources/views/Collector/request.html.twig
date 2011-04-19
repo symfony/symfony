@@ -78,7 +78,9 @@
     <h2>Request Content</h2>
 
     <p>
-        {% if collector.content %}
+        {% if collector.content is false %}
+            <em>Request content not available (it was retrieved as a resource).</em>
+        {% elseif collector.content %}
             <pre>{{ collector.content }}</pre>
         {% else %}
             <em>No content</em>

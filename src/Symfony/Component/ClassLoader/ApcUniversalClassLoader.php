@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\ClassLoader;
 
-require_once __DIR__.'/UniversalClassLoader.php';
-
 /**
  * Class loader utilizing APC to remember where files are.
  *

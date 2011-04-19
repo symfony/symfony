@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\DoctrineMongoDBBundle\Tests\DependencyInjection;
 
 use Symfony\Bundle\DoctrineMongoDBBundle\Tests\TestCase;
+use Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection\Compiler\AddValidatorNamespaceAliasPass;
 use Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection\DoctrineMongoDBExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -334,24 +335,25 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
     public function testRegistersValidatorNamespace()
     {
         $container = $this->getContainer();
+        $container->register('validator.mapping.loader.annotation_loader')
+            ->setClass('stdClass')
+            ->addArgument(array('foo' => 'Foo\\'));
+        $container->getCompilerPassConfig()->setOptimizationPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
+        $container->addCompilerPass(new AddValidatorNamespaceAliasPass());
+        $container->compile();
 
-        $container->setParameter('validator.annotations.namespaces', array('Namespace1\\', 'Namespace2\\'));
-
-        $loader = new DoctrineMongoDBExtension();
-
-        $loader->load(array(array()), $container);
-
+        $definition = $container->getDefinition('validator.mapping.loader.annotation_loader');
+        $arguments = $definition->getArguments();
         $this->assertEquals(array(
-            'Namespace1\\',
-            'Namespace2\\',
-            'mongodb' => 'Symfony\Bundle\DoctrineMongoDBBundle\Validator\Constraints\\',
-        ), $container->getParameter('validator.annotations.namespaces'));
+            'assertMongoDB' => 'Symfony\\Bundle\\DoctrineMongoDBBundle\\Validator\\Constraints\\',
+            'foo' => 'Foo\\',
+        ), $arguments[0], 'compiler adds constraint alias to validator');
     }
 
     protected function getContainer($bundle = 'YamlBundle')
     {
         require_once __DIR__.'/Fixtures/Bundles/'.$bundle.'/'.$bundle.'.php';
-
 
         return new ContainerBuilder(new ParameterBag(array(
             'kernel.bundles'     => array($bundle => 'DoctrineMongoDBBundle\\Tests\\DependencyInjection\\Fixtures\\Bundles\\'.$bundle.'\\'.$bundle),

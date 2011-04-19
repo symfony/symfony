@@ -71,8 +71,6 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
             $config['metadata_cache_driver'],
             $container
         );
-
-        $this->loadConstraints($container);
     }
 
     /**
@@ -309,19 +307,6 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
             $method = $odmConfigDef->removeMethodCall('setDocumentNamespaces');
         }
         $odmConfigDef->addMethodCall('setDocumentNamespaces', array($this->aliasMap));
-    }
-
-    protected function loadConstraints(ContainerBuilder $container)
-    {
-        // FIXME: the validator.annotations.namespaces parameter does not exist anymore
-        // and anyway, it was not available in the FrameworkExtension code
-        // as each bundle is isolated from the others
-        if ($container->hasParameter('validator.annotations.namespaces')) {
-            $container->setParameter('validator.annotations.namespaces', array_merge(
-                $container->getParameter('validator.annotations.namespaces'),
-                array('mongodb' => 'Symfony\Bundle\DoctrineMongoDBBundle\Validator\Constraints\\')
-            ));
-        }
     }
 
     protected function getObjectManagerElementName($name)

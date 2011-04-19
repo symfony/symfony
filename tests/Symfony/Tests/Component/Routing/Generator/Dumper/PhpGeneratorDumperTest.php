@@ -61,8 +61,7 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
             'base_url' => '/app.php',
             'method' => 'GET',
             'host' => 'localhost',
-            'port' => 80,
-            'is_secure' => false
+            'scheme' => 'http',
         ));
 
         $absoluteUrlWithParameter    = $projectUrlGenerator->generate('Test', array('foo' => 'bar'), true);
@@ -88,8 +87,7 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
             'base_url' => '/app.php',
             'method' => 'GET',
             'host' => 'localhost',
-            'port' => 80,
-            'is_secure' => false
+            'scheme' => 'http',
         ));
 
         $projectUrlGenerator->generate('Test', array());

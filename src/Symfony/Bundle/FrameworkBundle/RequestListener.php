@@ -29,14 +29,18 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class RequestListener
 {
-    protected $router;
-    protected $logger;
-    protected $container;
+    private $router;
+    private $logger;
+    private $container;
+    private $httpPort;
+    private $httpsPort;
 
-    public function __construct(ContainerInterface $container, RouterInterface $router, LoggerInterface $logger = null)
+    public function __construct(ContainerInterface $container, RouterInterface $router, $httpPort = 80, $httpsPort = 443, LoggerInterface $logger = null)
     {
         $this->container = $container;
         $this->router = $router;
+        $this->httpPort = $httpPort;
+        $this->httpsPort = $httpsPort;
         $this->logger = $logger;
     }
 
@@ -73,11 +77,12 @@ class RequestListener
             // set the context even if the parsing does not need to be done
             // to have correct link generation
             $this->router->setContext(array(
-                'base_url'  => $request->getBaseUrl(),
-                'method'    => $request->getMethod(),
-                'host'      => $request->getHost(),
-                'port'      => $request->getPort(),
-                'is_secure' => $request->isSecure(),
+                'base_url'   => $request->getBaseUrl(),
+                'method'     => $request->getMethod(),
+                'host'       => $request->getHost(),
+                'scheme'     => $request->getScheme(),
+                'http_port'  => $this->httpPort,
+                'https_port' => $this->httpsPort,
             ));
         }
 

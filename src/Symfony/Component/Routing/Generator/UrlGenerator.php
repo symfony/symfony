@@ -129,14 +129,23 @@ class UrlGenerator implements UrlGeneratorInterface
 
         $url = (isset($this->context['base_url']) ? $this->context['base_url'] : '').$url;
 
-        if ($absolute && isset($this->context['host'])) {
-            $isSecure = (isset($this->context['is_secure']) && $this->context['is_secure']);
-            $port = isset($this->context['port']) ? $this->context['port'] : 80;
-            $urlBeginning = 'http'.($isSecure ? 's' : '').'://'.$this->context['host'];
-            if (($isSecure && $port != 443) || (!$isSecure && $port != 80)) {
-                $urlBeginning .= ':'.$port;
+        if (isset($this->context['host'])) {
+            $scheme = isset($this->context['scheme']) ? $this->context['scheme'] : 'http';
+            if (isset($requirements['_scheme']) && ($req = strtolower($requirements['_scheme'])) && $scheme != $req) {
+                $absolute = true;
+                $scheme = $req;
             }
-            $url = $urlBeginning.$url;
+
+            if ($absolute) {
+                $port = '';
+                if ('http' === $scheme && 80 != ($httpPort = isset($this->context['http_port']) ? $this->context['http_port'] : 80)) {
+                    $port = ':'.$httpPort;
+                } elseif ('https' === $scheme && 443 != ($httpsPort = isset($this->context['https_port']) ? $this->context['https_port'] : 443)) {
+                    $port = ':'.$httpsPort;
+                }
+
+                $url = $scheme.'://'.$this->context['host'].$port.$url;
+            }
         }
 
         return $url;

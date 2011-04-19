@@ -100,6 +100,22 @@ class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\Redirec
             return array (  'def' => 'test',  '_route' => 'foofoo',);
         }
 
+        // secure
+        if ($pathinfo === '/secure') {
+            if (isset($this->context['scheme']) && $this->context['scheme'] !== 'https') {
+                return $this->redirect($pathinfo, 'secure', 'https');
+            }
+            return array('_route' => 'secure');
+        }
+
+        // nonsecure
+        if ($pathinfo === '/nonsecure') {
+            if (isset($this->context['scheme']) && $this->context['scheme'] !== 'http') {
+                return $this->redirect($pathinfo, 'nonsecure', 'http');
+            }
+            return array('_route' => 'nonsecure');
+        }
+
         throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new NotFoundException();
     }
 }

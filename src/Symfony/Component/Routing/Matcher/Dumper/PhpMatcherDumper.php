@@ -41,17 +41,17 @@ class PhpMatcherDumper extends MatcherDumper
 
         // trailing slash support is only enabled if we know how to redirect the user
         $interfaces = class_implements($options['base_class']);
-        $supportsTrailingSlash = isset($interfaces['Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface']);
+        $supportsRedirections = isset($interfaces['Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface']);
 
         return
             $this->startClass($options['class'], $options['base_class']).
             $this->addConstructor().
-            $this->addMatcher($supportsTrailingSlash).
+            $this->addMatcher($supportsRedirections).
             $this->endClass()
         ;
     }
 
-    private function addMatcher($supportsTrailingSlash)
+    private function addMatcher($supportsRedirections)
     {
         $code = array();
 
@@ -61,7 +61,7 @@ class PhpMatcherDumper extends MatcherDumper
             $hasTrailingSlash = false;
             $matches = false;
             if (!count($compiledRoute->getVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#', $compiledRoute->getRegex(), $m)) {
-                if ($supportsTrailingSlash && substr($m['url'], -1) === '/') {
+                if ($supportsRedirections && substr($m['url'], -1) === '/') {
                     $conditions[] = sprintf("rtrim(\$pathinfo, '/') === '%s'", rtrim(str_replace('\\', '', $m['url']), '/'));
                     $hasTrailingSlash = true;
                 } else {
@@ -73,7 +73,7 @@ class PhpMatcherDumper extends MatcherDumper
                 }
 
                 $regex = $compiledRoute->getRegex();
-                if ($supportsTrailingSlash && $pos = strpos($regex, '/$')) {
+                if ($supportsRedirections && $pos = strpos($regex, '/$')) {
                     $regex = substr($regex, 0, $pos).'/?$'.substr($regex, $pos + 2);
                     $hasTrailingSlash = true;
                 }
@@ -105,6 +105,19 @@ EOF;
                 $code[] = sprintf(<<<EOF
             if (substr(\$pathinfo, -1) !== '/') {
                 return \$this->redirect(\$pathinfo.'/', '%s');
+            }
+EOF
+                , $name);
+            }
+
+            if ($scheme = $route->getRequirement('_scheme')) {
+                if (!$supportsRedirections) {
+                    throw new \LogicException('The "_scheme" requirement is only supported for route dumper that implements RedirectableUrlMatcherInterface.');
+                }
+
+                $code[] = sprintf(<<<EOF
+            if (isset(\$this->context['scheme']) && \$this->context['scheme'] !== '$scheme') {
+                return \$this->redirect(\$pathinfo, '%s', '$scheme');
             }
 EOF
                 , $name);

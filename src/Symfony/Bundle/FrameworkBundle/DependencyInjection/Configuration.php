@@ -131,6 +131,8 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('cache_warmer')->defaultFalse()->end()
                         ->scalarNode('resource')->isRequired()->end()
                         ->scalarNode('type')->end()
+                        ->scalarNode('http_port')->defaultValue(80)->end()
+                        ->scalarNode('https_port')->defaultValue(443)->end()
                     ->end()
                 ->end()
             ->end()

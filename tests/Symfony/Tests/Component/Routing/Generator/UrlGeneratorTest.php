@@ -28,7 +28,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     public function testAbsoluteSecureUrlWithPort443()
     {
         $routes = $this->getRoutes('test', new Route('/testing'));
-        $url = $this->getGenerator($routes, array('port' => 443, 'is_secure' => true))->generate('test', array(), true);
+        $url = $this->getGenerator($routes, array('scheme' => 'https'))->generate('test', array(), true);
 
         $this->assertEquals('https://localhost/app.php/testing', $url);
     }
@@ -36,7 +36,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     public function testAbsoluteUrlWithNonStandardPort()
     {
         $routes = $this->getRoutes('test', new Route('/testing'));
-        $url = $this->getGenerator($routes, array('port' => 8080))->generate('test', array(), true);
+        $url = $this->getGenerator($routes, array('http_port' => 8080))->generate('test', array(), true);
 
         $this->assertEquals('http://localhost:8080/app.php/testing', $url);
     }
@@ -44,7 +44,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     public function testAbsoluteSecureUrlWithNonStandardPort()
     {
         $routes = $this->getRoutes('test', new Route('/testing'));
-        $url = $this->getGenerator($routes, array('port' => 8080, 'is_secure' => true))->generate('test', array(), true);
+        $url = $this->getGenerator($routes, array('https_port' => 8080, 'scheme' => 'https'))->generate('test', array(), true);
 
         $this->assertEquals('https://localhost:8080/app.php/testing', $url);
     }
@@ -125,6 +125,24 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->getGenerator($routes)->generate('test', array('foo' => 'bar'), true);
     }
 
+    public function testSchemeRequirementDoesNothingIfSameCurrentScheme()
+    {
+        $routes = $this->getRoutes('test', new Route('/', array(), array('_scheme' => 'http')));
+        $this->assertEquals('/app.php/', $this->getGenerator($routes)->generate('test'));
+
+        $routes = $this->getRoutes('test', new Route('/', array(), array('_scheme' => 'https')));
+        $this->assertEquals('/app.php/', $this->getGenerator($routes, array('scheme' => 'https'))->generate('test'));
+    }
+
+    public function testSchemeRequirementForcesAbsoluteUrl()
+    {
+        $routes = $this->getRoutes('test', new Route('/', array(), array('_scheme' => 'https')));
+        $this->assertEquals('https://localhost/app.php/', $this->getGenerator($routes)->generate('test'));
+
+        $routes = $this->getRoutes('test', new Route('/', array(), array('_scheme' => 'http')));
+        $this->assertEquals('http://localhost/app.php/', $this->getGenerator($routes, array('scheme' => 'https'))->generate('test'));
+    }
+
     protected function getGenerator(RouteCollection $routes, array $context = array())
     {
         $generator = new UrlGenerator($routes);
@@ -132,8 +150,9 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
             'base_url' => '/app.php',
             'method' => 'GET',
             'host' => 'localhost',
-            'port' => 80,
-            'is_secure' => false,
+            'http_port' => 80,
+            'https_port' => 443,
+            'scheme' => 'http',
         ), $context));
 
         return $generator;

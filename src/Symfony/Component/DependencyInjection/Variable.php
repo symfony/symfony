@@ -31,7 +31,7 @@ class Variable
     /**
      * Constructor
      *
-     * @param string $name 
+     * @param string $name
      */
     public function __construct($name)
     {

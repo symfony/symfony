@@ -24,7 +24,7 @@ use Symfony\Component\Form\ValueTransformer\MoneyToLocalizedStringTransformer;
  *  * currency:     The currency to display the money with. This is the 3-letter
  *                  ISO 4217 currency code.
  *  * divisor:      A number to divide the money by before displaying. Default 1.
- * 
+ *
  * @see Symfony\Component\Form\NumberField
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */

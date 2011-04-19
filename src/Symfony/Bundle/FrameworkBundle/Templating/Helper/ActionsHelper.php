@@ -36,7 +36,7 @@ class ActionsHelper extends Helper
     /**
      * Returns the Response content for a given controller or URI.
      *
-     * @param string $controller A controller name to execute (a string like Blog:Post:index), or a relative URI
+     * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
      * @param array  $attributes An array of request attributes
      * @param array  $options    An array of options
      *
@@ -45,10 +45,6 @@ class ActionsHelper extends Helper
     public function render($controller, array $attributes = array(), array $options = array())
     {
         $options['attributes'] = $attributes;
-
-        if (isset($options['query'])) {
-            $options['query'] = $options['query'];
-        }
 
         return $this->kernel->render($controller, $options);
     }

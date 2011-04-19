@@ -39,54 +39,53 @@ class PhpMatcherDumper extends MatcherDumper
             'base_class' => 'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
         ), $options);
 
+        // trailing slash support is only enabled if we know how to redirect the user
+        $interfaces = class_implements($options['base_class']);
+        $supportsTrailingSlash = isset($interfaces['Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface']);
+
         return
             $this->startClass($options['class'], $options['base_class']).
             $this->addConstructor().
-            $this->addMatcher().
+            $this->addMatcher($supportsTrailingSlash).
             $this->endClass()
         ;
     }
 
-    private function addMatcher()
+    private function addMatcher($supportsTrailingSlash)
     {
         $code = array();
 
         foreach ($this->getRoutes()->all() as $name => $route) {
             $compiledRoute = $route->compile();
-
             $conditions = array();
-
             $hasTrailingSlash = false;
+            $matches = false;
             if (!count($compiledRoute->getVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#', $compiledRoute->getRegex(), $m)) {
-                if (substr($m['url'], -1) === '/') {
+                if ($supportsTrailingSlash && substr($m['url'], -1) === '/') {
                     $conditions[] = sprintf("rtrim(\$pathinfo, '/') === '%s'", rtrim(str_replace('\\', '', $m['url']), '/'));
                     $hasTrailingSlash = true;
                 } else {
                     $conditions[] = sprintf("\$pathinfo === '%s'", str_replace('\\', '', $m['url']));
                 }
-
-                $matches = 'array()';
             } else {
                 if ($compiledRoute->getStaticPrefix()) {
                     $conditions[] = sprintf("0 === strpos(\$pathinfo, '%s')", $compiledRoute->getStaticPrefix());
                 }
 
                 $regex = $compiledRoute->getRegex();
-                if ($pos = strpos($regex, '/$')) {
-                    $regex = substr($regex, 0, $pos) . '/?$' . substr($regex, $pos+2);
-                    $conditions[] = sprintf("preg_match('%s', \$pathinfo, \$matches)", $regex);
+                if ($supportsTrailingSlash && $pos = strpos($regex, '/$')) {
+                    $regex = substr($regex, 0, $pos).'/?$'.substr($regex, $pos + 2);
                     $hasTrailingSlash = true;
-                } else {
-                    $conditions[] = sprintf("preg_match('%s', \$pathinfo, \$matches)", $regex);
                 }
+                $conditions[] = sprintf("preg_match('%s', \$pathinfo, \$matches)", $regex);
 
-                $matches = '$matches';
+                $matches = true;
             }
 
             $conditions = implode(' && ', $conditions);
 
             $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);
-            
+
             $code[] = <<<EOF
         // $name
         if ($conditions) {
@@ -105,22 +104,27 @@ EOF;
             if ($hasTrailingSlash) {
                 $code[] = sprintf(<<<EOF
             if (substr(\$pathinfo, -1) !== '/') {
-                return array('_controller' => 'Symfony\\Bundle\\FrameworkBundle\\Controller\\RedirectController::urlRedirectAction', 'url' => \$this->context['base_url'].\$pathinfo.'/', 'permanent' => true, '_route' => '%s');
+                return \$this->redirect(\$pathinfo.'/', '%s');
             }
 EOF
-            , $name);
+                , $name);
             }
 
-            $code[] = sprintf(<<<EOF
-            return array_merge(\$this->mergeDefaults($matches, %s), array('_route' => '%s'));
-        }
-EOF
-            , str_replace("\n", '', var_export($compiledRoute->getDefaults(), true)), $name);
+            // optimize parameters array
+            if (true === $matches && $compiledRoute->getDefaults()) {
+                $code[] = sprintf("            return array_merge(\$this->mergeDefaults(\$matches, %s), array('_route' => '%s'));"
+                    , str_replace("\n", '', var_export($compiledRoute->getDefaults(), true)), $name);
+            } elseif (true === $matches) {
+                $code[] = sprintf("            \$matches['_route'] = '%s';\n            return \$matches;", $name);
+            } elseif ($compiledRoute->getDefaults()) {
+                $code[] = sprintf('            return %s;', str_replace("\n", '', var_export(array_merge($compiledRoute->getDefaults(), array('_route' => $name)), true)));
+            } else {
+                $code[] = sprintf("            return array('_route' => '%s');", $name);
+            }
+            $code[] = "        }";
 
             if ($req) {
-                $code[] = <<<EOF
-        $gotoname:
-EOF;
+                $code[] = "        $gotoname:";
             }
 
             $code[] = '';

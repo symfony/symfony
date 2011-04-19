@@ -3,6 +3,7 @@
 namespace Symfony\Component\Serializer;
 
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -26,6 +27,7 @@ interface SerializerInterface
      * @param mixed $data any data
      * @param string $format format name
      * @return string
+     * @api
      */
     function serialize($data, $format);
 
@@ -35,6 +37,7 @@ interface SerializerInterface
      * @param mixed $data data to normalize
      * @param string $format format name, present to give the option to normalizers to act differently based on formats
      * @return array|scalar
+     * @api
      */
     function normalize($data, $format);
 
@@ -64,6 +67,7 @@ interface SerializerInterface
      * @param mixed $data data to encode
      * @param string $format format name
      * @return array|scalar
+     * @api
      */
     function encode($data, $format);
 
@@ -73,8 +77,24 @@ interface SerializerInterface
      * @param string $data data to decode
      * @param string $format format name
      * @return mixed
+     * @api
      */
     function decode($data, $format);
+
+    /**
+     * @param NormalizerInterface $normalizer
+     */
+    function addNormalizer(NormalizerInterface $normalizer);
+
+    /**
+     * @return array[]NormalizerInterface
+     */
+    function getNormalizers();
+
+    /**
+     * @param NormalizerInterface $normalizer
+     */
+    function removeNormalizer(NormalizerInterface $normalizer);
 
     /**
      * @param string $format format name

@@ -24,18 +24,18 @@ class Session implements \Serializable
     protected $attributes;
     protected $oldFlashes;
     protected $started;
-    protected $options;
+    protected $defaultLocale;
 
     /**
      * Constructor.
      *
-     * @param SessionStorageInterface $session A SessionStorageInterface instance
-     * @param array                   $options An array of options
+     * @param SessionStorageInterface $session       A SessionStorageInterface instance
+     * @param string                  $defaultLocale The default locale
      */
-    public function __construct(SessionStorageInterface $storage, array $options = array())
+    public function __construct(SessionStorageInterface $storage, $defaultLocale = 'en')
     {
         $this->storage = $storage;
-        $this->options = $options;
+        $this->defaultLocale = $defaultLocale;
         $this->attributes = array('_flash' => array(), '_locale' => $this->getDefaultLocale());
         $this->started = false;
     }
@@ -288,18 +288,18 @@ class Session implements \Serializable
 
     public function serialize()
     {
-        return serialize(array($this->storage, $this->options));
+        return serialize(array($this->storage, $this->defaultLocale));
     }
 
     public function unserialize($serialized)
     {
-        list($this->storage, $this->options) = unserialize($serialized);
+        list($this->storage, $this->defaultLocale) = unserialize($serialized);
         $this->attributes = array();
         $this->started = false;
     }
 
-    protected function getDefaultLocale()
+    private function getDefaultLocale()
     {
-        return isset($this->options['default_locale']) ? $this->options['default_locale'] : 'en';
+        return $this->defaultLocale;
     }
 }

@@ -8,12 +8,12 @@ class ConstraintC extends Constraint
 {
     public $option1;
 
-    public function requiredOptions()
+    public function getRequiredOptions()
     {
         return array('option1');
     }
 
-    public function targets()
+    public function getTargets()
     {
         return array(self::PROPERTY_CONSTRAINT, self::CLASS_CONSTRAINT);
     }

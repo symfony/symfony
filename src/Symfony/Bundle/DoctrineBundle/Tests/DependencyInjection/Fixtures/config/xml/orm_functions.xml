@@ -10,11 +10,11 @@
         <dbal />
         <orm default-entity-manager="default">
             <entity-manager name="default">
-                <mapping name="Yaml" />
+                <mapping name="YamlBundle" />
                 <dql>
-                    <string-function name="test_string" class="Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestStringFunction" />
-                    <numeric-function name="test_numeric" class="Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestNumericFunction" />
-                    <datetime-function name="test_datetime" class="Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestDatetimeFunction" />
+                    <string-function name="test_string">Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestStringFunction</string-function>
+                    <numeric-function name="test_numeric">Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestNumericFunction</numeric-function>
+                    <datetime-function name="test_datetime">Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestDatetimeFunction</datetime-function>
                 </dql>
             </entity-manager>
         </orm>

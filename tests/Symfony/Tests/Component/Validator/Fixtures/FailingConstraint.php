@@ -8,7 +8,7 @@ class FailingConstraint extends Constraint
 {
     public $message = '';
 
-    public function targets()
+    public function getTargets()
     {
         return array(self::PROPERTY_CONSTRAINT, self::CLASS_CONSTRAINT);
     }

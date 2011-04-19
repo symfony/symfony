@@ -131,7 +131,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetMimeTypeFromFormat($format, $mimeTypes)
     {
-        if (!is_null($format)) {
+        if (null !== $format) {
             $request = new Request();
             $this->assertEquals($mimeTypes[0], $request->getMimeType($format));
         }

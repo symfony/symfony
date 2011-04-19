@@ -4,34 +4,45 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * FrameworkExtension configuration structure.
  *
  * @author Jeremy Mikola <jmikola@gmail.com>
  */
-class Configuration
+class Configuration implements ConfigurationInterface
 {
+    private $debug;
+
     /**
-     * Generates the configuration tree.
+     * Constructor
      *
-     * @param boolean $kernelDebug The kernel.debug DIC parameter
-     *
-     * @return \Symfony\Component\Config\Definition\ArrayNode The config tree
+     * @param Boolean $debug Wether to use the debug mode
      */
-    public function getConfigTree($kernelDebug)
+    public function  __construct($debug)
+    {
+        $this->debug = (Boolean) $debug;
+    }
+
+    /**
+     * Generates the configuration tree builder.
+     *
+     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+     */
+    public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('framework');
 
         $rootNode
             ->children()
-                ->scalarNode('cache_warmer')->defaultValue(!$kernelDebug)->end()
+                ->scalarNode('cache_warmer')->defaultValue(!$this->debug)->end()
                 ->scalarNode('charset')->end()
                 ->scalarNode('document_root')->end()
                 ->scalarNode('error_handler')->end()
-                ->scalarNode('exception_controller')->end()
-                ->scalarNode('ide')->end()
+                ->scalarNode('exception_controller')->defaultValue('Symfony\\Bundle\\FrameworkBundle\\Controller\\ExceptionController::showAction')->end()
+                ->scalarNode('ide')->defaultNull()->end()
                 ->booleanNode('test')->end()
             ->end()
         ;
@@ -45,7 +56,7 @@ class Configuration
         $this->addTranslatorSection($rootNode);
         $this->addValidationSection($rootNode);
 
-        return $treeBuilder->buildTree();
+        return $treeBuilder;
     }
 
     private function addCsrfProtectionSection(ArrayNodeDefinition $rootNode)
@@ -90,6 +101,7 @@ class Configuration
                     ->canBeUnset()
                     ->children()
                         ->booleanNode('only_exceptions')->defaultValue(false)->end()
+                        ->booleanNode('only_master_requests')->defaultValue(false)->end()
                         ->scalarNode('dsn')->defaultValue('sqlite:%kernel.cache_dir%/profiler.db')->end()
                         ->scalarNode('username')->defaultValue('')->end()
                         ->scalarNode('password')->defaultValue('')->end()
@@ -143,11 +155,11 @@ class Configuration
                             }
                             return $v;
                         })
-                    ->end()                    
+                    ->end()
                     ->children()
                         ->booleanNode('auto_start')->end()
                         ->scalarNode('class')->end()
-                        ->scalarNode('default_locale')->end()
+                        ->scalarNode('default_locale')->defaultValue('en')->end()
                         ->scalarNode('storage_id')->defaultValue('native')->end()
                         // NativeSessionStorage options
                         ->scalarNode('name')->end()
@@ -174,7 +186,7 @@ class Configuration
                 ->arrayNode('templating')
                     ->canBeUnset()
                     ->children()
-                        ->scalarNode('assets_version')->end()
+                        ->scalarNode('assets_version')->defaultValue(null)->end()
                     ->end()
                     ->fixXmlConfig('assets_base_url')
                     ->children()
@@ -183,12 +195,7 @@ class Configuration
                                 ->ifTrue(function($v){ return !is_array($v); })
                                 ->then(function($v){ return array($v); })
                             ->end()
-                            ->prototype('scalar')
-                                ->beforeNormalization()
-                                    ->ifTrue(function($v) { return is_array($v) && isset($v['value']); })
-                                    ->then(function($v){ return $v['value']; })
-                                ->end()
-                            ->end()
+                            ->prototype('scalar')->end()
                         ->end()
                         ->scalarNode('cache')->end()
                         ->scalarNode('cache_warmer')->defaultFalse()->end()
@@ -201,13 +208,8 @@ class Configuration
                             ->beforeNormalization()
                                 ->ifTrue(function($v){ return !is_array($v); })
                                 ->then(function($v){ return array($v); })
-                                ->end()
-                            ->prototype('scalar')
-                                ->beforeNormalization()
-                                    ->ifTrue(function($v) { return is_array($v) && isset($v['id']); })
-                                    ->then(function($v){ return $v['id']; })
-                                ->end()
                             ->end()
+                            ->prototype('scalar')->end()
                         ->end()
                     ->end()
                     ->fixXmlConfig('loader')
@@ -225,18 +227,11 @@ class Configuration
                         ->arrayNode('packages')
                             ->useAttributeAsKey('name')
                             ->prototype('array')
-                                ->children()
-                                    ->scalarNode('version')->defaultNull()->end()
-                                ->end()
                                 ->fixXmlConfig('base_url')
                                 ->children()
+                                    ->scalarNode('version')->defaultNull()->end()
                                     ->arrayNode('base_urls')
-                                        ->prototype('scalar')
-                                            ->beforeNormalization()
-                                                ->ifTrue(function($v) { return is_array($v) && isset($v['value']); })
-                                                ->then(function($v){ return $v['value']; })
-                                            ->end()
-                                        ->end()
+                                        ->prototype('scalar')->end()
                                     ->end()
                                 ->end()
                             ->end()
@@ -255,7 +250,7 @@ class Configuration
                     ->canBeUnset()
                     ->children()
                         ->booleanNode('enabled')->defaultTrue()->end()
-                        ->scalarNode('fallback')->end()
+                        ->scalarNode('fallback')->defaultValue('en')->end()
                     ->end()
                 ->end()
             ->end()
@@ -279,6 +274,7 @@ class Configuration
                     ->end()
                     ->children()
                         ->booleanNode('enabled')->end()
+                        ->scalarNode('cache')->end()
                         ->arrayNode('annotations')
                             ->canBeUnset()
                             ->treatNullLike(array())
@@ -287,12 +283,7 @@ class Configuration
                             ->children()
                                 ->arrayNode('namespaces')
                                     ->useAttributeAsKey('prefix')
-                                    ->prototype('scalar')
-                                        ->beforeNormalization()
-                                            ->ifTrue(function($v) { return is_array($v) && isset($v['namespace']); })
-                                            ->then(function($v){ return $v['namespace']; })
-                                        ->end()
-                                    ->end()
+                                    ->prototype('scalar')->end()
                                 ->end()
                             ->end()
                         ->end()

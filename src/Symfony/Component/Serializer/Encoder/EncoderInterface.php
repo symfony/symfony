@@ -26,29 +26,7 @@ interface EncoderInterface
      * @param mixed $data data to encode
      * @param string $format format to encode to
      * @return string
+     * @api
      */
     function encode($data, $format);
-
-    /**
-     * Decodes a string into PHP data
-     *
-     * @param string $data data to decode
-     * @param string $format format to decode from
-     * @return mixed
-     */
-    function decode($data, $format);
-
-    /**
-     * Sets the owning Serializer object
-     *
-     * @param SerializerInterface $serializer
-     */
-    function setSerializer(SerializerInterface $serializer);
-
-    /**
-     * Gets the owning Serializer object
-     *
-     * @return SerializerInterface
-     */
-    function getSerializer();
 }

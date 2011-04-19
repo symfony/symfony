@@ -301,11 +301,13 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         $acl->insertObjectAce($sid, 1);
         $acl->insertClassAce($sid, 5, 0, false);
         $acl->insertObjectAce($sid, 2, 1, true);
+        $acl->insertClassFieldAce('field', $sid, 2, 0, true);
         $provider->updateAcl($acl);
 
         $acl->updateObjectAce(0, 3);
         $acl->deleteObjectAce(1);
         $acl->updateObjectAuditing(0, true, false);
+        $acl->updateClassFieldAce(0, 'field', 15);
         $provider->updateAcl($acl);
 
         $reloadProvider = $this->getProvider();

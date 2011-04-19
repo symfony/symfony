@@ -45,6 +45,10 @@ class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
             throw new AccessDeniedException($path);
         }
 
+        if (!self::isSupported()) {
+            return null;
+        }
+        
         ob_start();
 
         // need to use --mime instead of -i. see #6641

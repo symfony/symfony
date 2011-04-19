@@ -6,21 +6,18 @@
 
     <parameters>
         <parameter key="session.class">Symfony\Component\HttpFoundation\Session</parameter>
-        <parameter key="session.default_locale">en</parameter>
         <parameter key="session.storage.native.class">Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage</parameter>
         <parameter key="session.storage.native.options" type="collection" />
         <parameter key="session.storage.pdo.class">Symfony\Component\HttpFoundation\SessionStorage\PdoSessionStorage</parameter>
         <parameter key="session.storage.pdo.options" type="collection" />
-        <parameter key="session.storage.array.class">Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage</parameter>
-        <parameter key="session.storage.array.options" type="collection" />
+        <parameter key="session.storage.filesystem.class">Symfony\Component\HttpFoundation\SessionStorage\FilesystemSessionStorage</parameter>
+        <parameter key="session.storage.filesystem.options" type="collection" />
     </parameters>
 
     <services>
         <service id="session" class="%session.class%">
             <argument type="service" id="session.storage" />
-            <argument type="collection">
-                <argument key="default_locale">%session.default_locale%</argument>
-            </argument>
+            <argument /> <!-- default locale -->
         </service>
 
         <service id="session.storage.native" class="%session.storage.native.class%" public="false">
@@ -32,8 +29,9 @@
             <argument>%session.storage.pdo.options%</argument>
         </service>
 
-        <service id="session.storage.array" class="%session.storage.array.class%" public="false">
-            <argument>%session.storage.array.options%</argument>
+        <service id="session.storage.filesystem" class="%session.storage.filesystem.class%" public="false">
+            <argument>%kernel.cache_dir%/sessions</argument>
+            <argument>%session.storage.filesystem.options%</argument>
         </service>
 
         <service id="session.storage" alias="session.storage.native" public="false" />

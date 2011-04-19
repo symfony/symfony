@@ -14,7 +14,6 @@ namespace Symfony\Bundle\DoctrineMongoDBBundle\Tests\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection\Configuration;
 use Symfony\Component\Yaml\Yaml;
-
 use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
@@ -23,16 +22,18 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(false);
-        $options = $processor->process($configuration->getConfigTree(), array());
+        $options = $processor->processConfiguration($configuration, array());
 
         $defaults = array(
-            'auto_generate_hydrator_classes'    => false,
-            'auto_generate_proxy_classes'       => false,
-            'default_database'                  => 'default',
-            'document_managers'                 => array(),
-            'connections'                       => array(),
-            'proxy_namespace'                   => 'Proxies',
-            'hydrator_namespace'                => 'Hydrators',
+            'auto_generate_hydrator_classes' => false,
+            'auto_generate_proxy_classes'    => false,
+            'default_database'               => 'default',
+            'document_managers'              => array(),
+            'connections'                    => array(),
+            'proxy_dir'                      => '%kernel.cache_dir%/doctrine/odm/mongodb/Proxies',
+            'proxy_namespace'                => 'Proxies',
+            'hydrator_dir'                   => '%kernel.cache_dir%/doctrine/odm/mongodb/Hydrators',
+            'hydrator_namespace'             => 'Hydrators',
         );
 
         foreach ($defaults as $key => $default) {
@@ -56,11 +57,13 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(false);
-        $options = $processor->process($configuration->getConfigTree(), array($config));
+        $options = $processor->processConfiguration($configuration, array($config));
 
         $expected = array(
+            'proxy_dir'                         => '%kernel.cache_dir%/doctrine/odm/mongodb/Proxies',
             'proxy_namespace'                   => 'Test_Proxies',
             'auto_generate_proxy_classes'       => true,
+            'hydrator_dir'                      => '%kernel.cache_dir%/doctrine/odm/mongodb/Hydrators',
             'hydrator_namespace'                => 'Test_Hydrators',
             'auto_generate_hydrator_classes'    => true,
             'default_document_manager'          => 'default_dm_name',
@@ -86,7 +89,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'document_managers' => array(
                 'dm1' => array(
                     'mappings' => array(
-                        'Foo' => array(
+                        'FooBundle'     => array(
                             'type' => 'annotations',
                         ),
                     ),
@@ -103,7 +106,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'connection' => 'dm2_connection',
                     'database' => 'db1',
                     'mappings' => array(
-                        'Bar' => array(
+                        'BarBundle' => array(
                             'type'      => 'yml',
                             'dir'       => '%kernel.cache_dir%',
                             'prefix'    => 'prefix_val',
@@ -141,7 +144,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(false);
-        $options = $processor->process($configuration->getConfigTree(), $configs);
+        $options = $processor->processConfiguration($configuration, $configs);
 
         foreach ($correctValues as $key => $correctVal)
         {
@@ -230,7 +233,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(false);
-        $options = $processor->process($configuration->getConfigTree(), array($config));
+        $options = $processor->processConfiguration($configuration, array($config));
         $this->assertSame($normalized, $options[$targetKey]);
     }
 

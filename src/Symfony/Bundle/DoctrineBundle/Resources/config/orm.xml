@@ -6,9 +6,6 @@
 
     <parameters>
         <parameter key="doctrine.orm.default_entity_manager">default</parameter>
-        <parameter key="doctrine.orm.metadata_cache_driver">array</parameter>
-        <parameter key="doctrine.orm.query_cache_driver">array</parameter>
-        <parameter key="doctrine.orm.result_cache_driver">array</parameter>
         <parameter key="doctrine.orm.configuration_class">Doctrine\ORM\Configuration</parameter>
         <parameter key="doctrine.orm.entity_manager_class">Doctrine\ORM\EntityManager</parameter>
         <parameter key="doctrine.orm.auto_generate_proxy_classes">false</parameter>
@@ -60,7 +57,7 @@
         
         <service id="form.field_factory.doctrine_guesser" class="%form.field_factory.doctrine_guesser.class%" public="false">
         	<tag name="form.field_factory.guesser" />
-            <argument type="service" id="doctrine.orm.default_entity_manager" />
+            <argument type="service" id="doctrine.orm.entity_manager" />
         </service>
     </services>
 </container>

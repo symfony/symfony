@@ -13,9 +13,9 @@ namespace Symfony\Bundle\WebProfilerBundle\DependencyInjection;
 
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Definition\Processor;
 
 /**
  * WebProfilerExtension.
@@ -31,36 +31,26 @@ use Symfony\Component\Config\FileLocator;
  */
 class WebProfilerExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
-    {
-        foreach ($configs as $config) {
-            $this->doConfigLoad($config, $container);
-        }
-    }
-
     /**
      * Loads the web profiler configuration.
      *
      * @param array            $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    protected function doConfigLoad(array $config, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container)
     {
-        if (isset($config['toolbar'])) {
-            if ($config['toolbar']) {
-                if (!$container->hasDefinition('debug.toolbar')) {
-                    $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-                    $loader->load('toolbar.xml');
-                }
-            } elseif ($container->hasDefinition('debug.toolbar')) {
-                $container->getDefinition('debug.toolbar')->clearTags();
-            }
-        }
+        $processor = new Processor();
+        $configuration = new Configuration();
+        $config = $processor->processConfiguration($configuration, $configs);
 
-        foreach (array('intercept-redirects', 'intercept_redirects') as $key) {
-            if (isset($config[$key])) {
-                $container->setParameter('debug.toolbar.intercept_redirects', (Boolean) $config[$key]);
-            }
+        if ($config['toolbar']) {
+            $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+            $loader->load('toolbar.xml');
+
+            $container->getDefinition('web_profiler.debug.toolbar')
+                ->setArgument(1, $config['intercept_redirects'])
+                ->setArgument(2, $config['verbose'])
+            ;
         }
     }
 

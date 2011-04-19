@@ -57,7 +57,7 @@ EOF
         $oldCacheDir  = $realCacheDir.'_old';
 
         if (!is_writable($realCacheDir)) {
-            throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $this->realCacheDir));
+            throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $realCacheDir));
         }
 
         if ($input->getOption('no-warmup')) {
@@ -137,7 +137,7 @@ EOF;
         require_once $file;
         @unlink($file);
 
-        $class = "$namespace\\$class"; 
+        $class = "$namespace\\$class";
 
         return new $class($parent->getEnvironment(), $debug);
     }

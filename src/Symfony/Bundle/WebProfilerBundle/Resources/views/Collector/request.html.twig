@@ -1,4 +1,4 @@
-{% extends 'WebProfiler:Profiler:layout.html.twig' %}
+{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
 
 {% block toolbar %}
     {% set icon %}
@@ -17,14 +17,10 @@
             <span style="margin: 0; padding: 0; color: #979696;">|</span>
             <span{{ not collector.route ? ' style="color:#a33"' : '' }}>{{ collector.route ? collector.route : 'NONE' }}</span>
             <span style="margin: 0; padding: 0; color: #979696;">|</span>
-            <span>{{ collector.format }}</span>
-            <span style="margin: 0; padding: 0; color: #979696;">|</span>
             <span style="color: {{ 200 == collector.statuscode ? '#759e1a' : '#a33' }}">{{ collector.statuscode }}</span>
-            <span style="margin: 0; padding: 0; color: #979696;">|</span>
-            <span>{{ collector.contenttype }}</span>
         {% endspaceless %}
     {% endset %}
-    {% include 'WebProfiler:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
+    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
 {% endblock %}
 
 {% block menu %}
@@ -38,7 +34,7 @@
     <h2>Request GET Parameters</h2>
 
     {% if collector.requestquery.all|length %}
-        {% include 'WebProfiler:Profiler:bag.html.twig' with { 'bag': collector.requestquery } only %}
+        {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.requestquery } only %}
     {% else %}
         <p>
             <em>No GET parameters</em>
@@ -48,7 +44,7 @@
     <h2>Request POST Parameters</h2>
 
     {% if collector.requestrequest.all|length %}
-        {% include 'WebProfiler:Profiler:bag.html.twig' with { 'bag': collector.requestrequest } only %}
+        {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.requestrequest } only %}
     {% else %}
         <p>
             <em>No POST parameters</em>
@@ -58,7 +54,7 @@
     <h2>Request Attributes</h2>
 
     {% if collector.requestattributes.all|length %}
-        {% include 'WebProfiler:Profiler:bag.html.twig' with { 'bag': collector.requestattributes } only %}
+        {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.requestattributes } only %}
     {% else %}
         <p>
             <em>No attributes</em>
@@ -68,7 +64,7 @@
     <h2>Request Cookies</h2>
 
     {% if collector.requestcookies.all|length %}
-        {% include 'WebProfiler:Profiler:bag.html.twig' with { 'bag': collector.requestcookies } only %}
+        {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.requestcookies } only %}
     {% else %}
         <p>
             <em>No cookies</em>
@@ -77,15 +73,25 @@
 
     <h2>Request Headers</h2>
 
-    {% include 'WebProfiler:Profiler:bag.html.twig' with { 'bag': collector.requestheaders } only %}
+    {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.requestheaders } only %}
+
+    <h2>Request Content</h2>
+
+    <p>
+        {% if collector.content %}
+            <pre>{{ collector.content }}</pre>
+        {% else %}
+            <em>No content</em>
+        {% endif %}
+    </p>
 
     <h2>Request Server Parameters</h2>
 
-    {% include 'WebProfiler:Profiler:bag.html.twig' with { 'bag': collector.requestserver } only %}
+    {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.requestserver } only %}
 
     <h2>Response Headers</h2>
 
-    {% include 'WebProfiler:Profiler:bag.html.twig' with { 'bag': collector.responseheaders } only %}
+    {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.responseheaders } only %}
 
     <h2>Session Attributes</h2>
 
@@ -113,7 +119,7 @@
     {% if profiler.parent %}
         <h2><a href="{{ path('_profiler', { 'token': profiler.parent }) }}">Parent request: {{ profiler.parent }}</a></h2>
 
-        {% include 'WebProfiler:Profiler:bag.html.twig' with { 'bag': profiler.parenttoken.get('request').requestattributes } only %}
+        {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': profiler.parenttoken.get('request').requestattributes } only %}
     {% endif %}
 
     {% if profiler.children|length %}
@@ -121,7 +127,7 @@
 
         {% for subrequest in profiler.children %}
             <h3><a href="{{ path('_profiler', { 'token': subrequest.token }) }}">{{ subrequest.token }}</a></h3>
-            {% include 'WebProfiler:Profiler:bag.html.twig' with { 'bag': subrequest.get('request').requestattributes } only %}
+            {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': subrequest.get('request').requestattributes } only %}
         {% endfor %}
     {% endif %}
 

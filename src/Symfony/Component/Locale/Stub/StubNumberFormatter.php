@@ -227,7 +227,7 @@ class StubNumberFormatter
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'style', $style, $message);
         }
 
-        if (!is_null($pattern)) {
+        if (null !== $pattern) {
             throw new MethodArgumentNotImplementedException(__METHOD__, 'pattern');
         }
 
@@ -446,7 +446,7 @@ class StubNumberFormatter
         }
 
         // We don't calculate the position when parsing the value
-        if (!is_null($position)) {
+        if (null !== $position) {
             throw new MethodArgumentNotImplementedException(__METHOD__, 'position');
         }
 

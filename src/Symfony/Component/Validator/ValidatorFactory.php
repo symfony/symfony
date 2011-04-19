@@ -51,8 +51,8 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
  *
  * <code>
  * $defaultContext = new ValidatorContext();
- * $defaultContext->classMetadataFactory($metadataFactory);
- * $defaultContext->constraintValidatorFactory($validatorFactory);
+ * $defaultContext->setClassMetadataFactory($metadataFactory);
+ * $defaultContext->setConstraintValidatorFactory($validatorFactory);
  * $factory = new ValidatorFactory($defaultContext);
  *
  * $form = $factory->getValidator();
@@ -65,7 +65,7 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
  *
  * <code>
  * $form = $factory
- *     ->classMetadataFactory($customFactory);
+ *     ->setClassMetadataFactory($customFactory);
  *     ->getValidator();
  * </code>
  *
@@ -143,8 +143,8 @@ class ValidatorFactory implements ValidatorContextInterface
             throw new MappingException('No mapping loader was found for the given parameters');
         }
 
-        $context->classMetadataFactory(new ClassMetadataFactory($loader));
-        $context->constraintValidatorFactory(new ConstraintValidatorFactory());
+        $context->setClassMetadataFactory(new ClassMetadataFactory($loader));
+        $context->setConstraintValidatorFactory(new ConstraintValidatorFactory());
 
         return new static($context);
     }
@@ -166,11 +166,11 @@ class ValidatorFactory implements ValidatorContextInterface
      * @param  ClassMetadataFactoryInterface $metadataFactory  The new factory instance
      * @return ValidatorContextInterface                       The preconfigured form context
      */
-    public function classMetadataFactory(ClassMetadataFactoryInterface $metadataFactory)
+    public function setClassMetadataFactory(ClassMetadataFactoryInterface $metadataFactory)
     {
         $context = clone $this->defaultContext;
 
-        return $context->classMetadataFactory($metadataFactory);
+        return $context->setClassMetadataFactory($metadataFactory);
     }
 
     /**
@@ -180,11 +180,11 @@ class ValidatorFactory implements ValidatorContextInterface
      * @param  ClassMetadataFactoryInterface $validatorFactory  The new factory instance
      * @return ValidatorContextInterface                        The preconfigured form context
      */
-    public function constraintValidatorFactory(ConstraintValidatorFactoryInterface $validatorFactory)
+    public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $validatorFactory)
     {
         $context = clone $this->defaultContext;
 
-        return $context->constraintValidatorFactory($validatorFactory);
+        return $context->setConstraintValidatorFactory($validatorFactory);
     }
 
     /**

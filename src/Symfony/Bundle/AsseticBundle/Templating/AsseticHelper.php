@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\AsseticBundle\Templating;
 
+use Assetic\Asset\AssetInterface;
 use Assetic\Factory\AssetFactory;
 use Symfony\Component\Templating\Helper\Helper;
 
@@ -19,42 +20,30 @@ use Symfony\Component\Templating\Helper\Helper;
  *
  * @author Kris Wallsmith <kris.wallsmith@symfony.com>
  */
-class AsseticHelper extends Helper
+abstract class AsseticHelper extends Helper
 {
     protected $factory;
     protected $debug;
-    protected $defaultJavascriptsOutput;
-    protected $defaultStylesheetsOutput;
-    protected $defaultImageOutput;
 
     /**
      * Constructor.
      *
-     * @param AssetFactory $factory                  The asset factory
-     * @param Boolean      $debug                    The debug mode
-     * @param string       $defaultJavascriptsOutput The default {@link javascripts()} output string
-     * @param string       $defaultStylesheetsOutput The default {@link stylesheets()} output string
-     * @param string       $defaultImageOutput       The default {@link image()} output string
+     * @param AssetFactory $factory The asset factory
+     * @param Boolean      $debug   The debug mode
      */
-    public function __construct(AssetFactory $factory, $debug = false, $defaultJavascriptsOutput = 'js/*.js', $defaultStylesheetsOutput = 'css/*.css', $defaultImageOutput = 'images/*')
+    public function __construct(AssetFactory $factory, $debug = false)
     {
         $this->factory = $factory;
         $this->debug = $debug;
-        $this->defaultJavascriptsOutput = $defaultJavascriptsOutput;
-        $this->defaultStylesheetsOutput = $defaultStylesheetsOutput;
-        $this->defaultImageOutput = $defaultImageOutput;
     }
 
     /**
      * Returns an array of javascript urls.
-     *
-     * This convenience method wraps {@link assets()} and provides a default
-     * output string.
      */
     public function javascripts($inputs = array(), $filters = array(), array $options = array())
     {
         if (!isset($options['output'])) {
-            $options['output'] = $this->defaultJavascriptsOutput;
+            $options['output'] = 'js/*';
         }
 
         return $this->getAssetUrls($inputs, $filters, $options);
@@ -62,14 +51,11 @@ class AsseticHelper extends Helper
 
     /**
      * Returns an array of stylesheet urls.
-     *
-     * This convenience method wraps {@link assets()} and provides a default
-     * output string.
      */
     public function stylesheets($inputs = array(), $filters = array(), array $options = array())
     {
         if (!isset($options['output'])) {
-            $options['output'] = $this->defaultStylesheetsOutput;
+            $options['output'] = 'css/*';
         }
 
         return $this->getAssetUrls($inputs, $filters, $options);
@@ -77,17 +63,16 @@ class AsseticHelper extends Helper
 
     /**
      * Returns an array of one image url.
-     *
-     * This convenience method wraps {@link assets()} and provides a default
-     * output string.
      */
     public function image($inputs = array(), $filters = array(), array $options = array())
     {
         if (!isset($options['output'])) {
-            $options['output'] = $this->defaultImageOutput;
+            $options['output'] = 'images/*';
         }
 
-        return $this->getAssetUrls($inputs, $filters, $options, true);
+        $options['single'] = true;
+
+        return $this->getAssetUrls($inputs, $filters, $options);
     }
 
     /**
@@ -105,11 +90,10 @@ class AsseticHelper extends Helper
      * @param array|string $inputs  An array or comma-separated list of input strings
      * @param array|string $filters An array or comma-separated list of filter names
      * @param array        $options An array of options
-     * @param Boolean      $single  Use only the last input string
      *
      * @return array An array of URLs for the asset
      */
-    private function getAssetUrls($inputs = array(), $filters = array(), array $options = array(), $single = false)
+    private function getAssetUrls($inputs = array(), $filters = array(), array $options = array())
     {
         $explode = function($value)
         {
@@ -128,23 +112,39 @@ class AsseticHelper extends Helper
             $options['debug'] = $this->debug;
         }
 
-        if ($single && 1 < count($inputs)) {
+        if (isset($options['single']) && $options['single'] && 1 < count($inputs)) {
             $inputs = array_slice($inputs, -1);
+        }
+
+        if (!isset($options['name'])) {
+            $options['name'] = $this->factory->generateAssetName($inputs, $filters);
         }
 
         $coll = $this->factory->createAsset($inputs, $filters, $options);
 
         if (!$options['debug']) {
-            return array($coll->getTargetUrl());
+            return array($this->getAssetUrl($coll, $options));
         }
 
         $urls = array();
         foreach ($coll as $leaf) {
-            $urls[] = $leaf->getTargetUrl();
+            $urls[] = $this->getAssetUrl($leaf, array_replace($options, array(
+                'name' => $options['name'].'_'.count($urls),
+            )));
         }
 
         return $urls;
     }
+
+    /**
+     * Returns an URL for the supplied asset.
+     *
+     * @param AssetInterface $asset   An asset
+     * @param array          $options An array of options
+     *
+     * @return string An echo-ready URL
+     */
+    abstract protected function getAssetUrl(AssetInterface $asset, $options = array());
 
     public function getName()
     {

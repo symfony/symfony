@@ -4,13 +4,14 @@ namespace Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * FrameworkExtension configuration structure.
  *
  * @author Ryan Weaver <ryan@thatsquality.com>
  */
-class Configuration
+class Configuration implements ConfigurationInterface
 {
     private $debug;
 
@@ -25,11 +26,11 @@ class Configuration
     }
 
     /**
-     * Generates the configuration tree.
+     * Generates the configuration tree builder.
      *
-     * @return \Symfony\Component\Config\Definition\ArrayNode The config tree
+     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
      */
-    public function getConfigTree()
+    public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('doctrine_mongo_db');
@@ -40,8 +41,10 @@ class Configuration
         $rootNode
             ->children()
                 ->scalarNode('proxy_namespace')->defaultValue('Proxies')->end()
+                ->scalarNode('proxy_dir')->defaultValue('%kernel.cache_dir%/doctrine/odm/mongodb/Proxies')->end()
                 ->scalarNode('auto_generate_proxy_classes')->defaultValue(false)->end()
                 ->scalarNode('hydrator_namespace')->defaultValue('Hydrators')->end()
+                ->scalarNode('hydrator_dir')->defaultValue('%kernel.cache_dir%/doctrine/odm/mongodb/Hydrators')->end()
                 ->scalarNode('auto_generate_hydrator_classes')->defaultValue(false)->end()
                 ->scalarNode('default_document_manager')->end()
                 ->scalarNode('default_connection')->end()
@@ -49,7 +52,7 @@ class Configuration
             ->end()
         ;
 
-        return $treeBuilder->buildTree();
+        return $treeBuilder;
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Symfony\Component\Serializer\Encoder;
 
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\SerializerAwareInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -18,7 +19,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-abstract class AbstractEncoder implements EncoderInterface
+abstract class AbstractEncoder implements SerializerAwareInterface, EncoderInterface
 {
     protected $serializer;
 

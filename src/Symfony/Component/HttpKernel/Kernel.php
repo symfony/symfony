@@ -192,9 +192,9 @@ abstract class Kernel implements KernelInterface
 
         if (true === $first) {
             return $this->bundleMap[$name][0];
-        } elseif (false === $first) {
-            return $this->bundleMap[$name];
         }
+
+        return $this->bundleMap[$name];
     }
 
     /**
@@ -204,15 +204,17 @@ abstract class Kernel implements KernelInterface
      *
      * The resource name must follow the following pattern:
      *
-     *     @BundleName/path/to/a/file.something
+     *     @<BundleName>/path/to/a/file.something
      *
      * where BundleName is the name of the bundle
      * and the remaining part is the relative path in the bundle.
      *
-     * If $dir is passed, and the first segment of the path is Resources,
+     * If $dir is passed, and the first segment of the path is "Resources",
      * this method will look for a file named:
      *
-     *     $dir/BundleName/path/without/Resources
+     *     $dir/<BundleName>/path/without/Resources
+     *
+     * before looking in the bundle resource folder.
      *
      * @param string  $name  A resource name to locate
      * @param string  $dir   A directory where to look for the resource first
@@ -221,7 +223,8 @@ abstract class Kernel implements KernelInterface
      * @return string|array The absolute path of the resource or an array if $first is false
      *
      * @throws \InvalidArgumentException if the file cannot be found or the name is not valid
-     * @throws \RuntimeException         if the name contains invalid/unsafe characters
+     * @throws \RuntimeException         if the name contains invalid/unsafe
+     * @throws \RuntimeException         if a custom resource is hidden by a resource in a derived bundle
      */
     public function locateResource($name, $dir = null, $first = true)
     {
@@ -234,30 +237,41 @@ abstract class Kernel implements KernelInterface
         }
 
         $name = substr($name, 1);
-        list($bundle, $path) = explode('/', $name, 2);
+        list($bundleName, $path) = explode('/', $name, 2);
 
-        $isResource = 0 === strpos($path, 'Resources');
-
+        $isResource = 0 === strpos($path, 'Resources') && null !== $dir;
+        $overridePath = substr($path, 9);
+        $resourceBundle = null;
+        $bundles = $this->getBundle($bundleName, false);
         $files = array();
-        if (true === $isResource && null !== $dir && file_exists($file = $dir.'/'.$bundle.'/'.substr($path, 10))) {
-            if ($first) {
-                return $file;
-            }
 
-            $files[] = $file;
-        }
+        foreach ($bundles as $bundle) {
+            if ($isResource && file_exists($file = $dir.'/'.$bundle->getName().$overridePath)) {
+                if (null !== $resourceBundle) {
+                    throw new \RuntimeException(sprintf('"%s" resource is hidden by a resource from the "%s" derived bundle. Create a "%s" file to override the bundle resource.',
+                        $file,
+                        $resourceBundle,
+                        $dir.'/'.$bundles[0]->getName().$overridePath
+                    ));
+                }
 
-        foreach ($this->getBundle($bundle, false) as $bundle) {
-            if (file_exists($file = $bundle->getPath().'/'.$path)) {
                 if ($first) {
                     return $file;
                 }
                 $files[] = $file;
             }
+
+            if (file_exists($file = $bundle->getPath().'/'.$path)) {
+                if ($first && !$isResource) {
+                    return $file;
+                }
+                $files[] = $file;
+                $resourceBundle = $bundle->getName();
+            }
         }
 
-        if ($files) {
-            return $files;
+        if (count($files) > 0) {
+            return $first && $isResource ? $files[0] : $files;
         }
 
         throw new \InvalidArgumentException(sprintf('Unable to find file "@%s".', $name));
@@ -356,6 +370,7 @@ abstract class Kernel implements KernelInterface
      *
      * @throws \LogicException if two bundles share a common name
      * @throws \LogicException if a bundle tries to extend a non-registered bundle
+     * @throws \LogicException if a bundle tries to extend itself
      * @throws \LogicException if two bundles extend the same ancestor
      */
     protected function initializeBundles()
@@ -375,6 +390,9 @@ abstract class Kernel implements KernelInterface
             if ($parentName = $bundle->getParent()) {
                 if (isset($directChildren[$parentName])) {
                     throw new \LogicException(sprintf('Bundle "%s" is directly extended by two bundles "%s" and "%s".', $parentName, $name, $directChildren[$parentName]));
+                }
+                if ($parentName == $name) {
+                    throw new \LogicException(sprintf('Bundle "%s" can not extend itself.', $name));
                 }
                 $directChildren[$parentName] = $name;
             } else {
@@ -418,6 +436,18 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
+     * Gets the container's base class.
+     *
+     * All names except Container must be fully qualified.
+     *
+     * @return string
+     */
+    protected function getContainerBaseClass()
+    {
+        return 'Container';
+    }
+
+    /**
      * Initializes the service container.
      *
      * The cached version of the service container is used when fresh, otherwise the
@@ -430,7 +460,7 @@ abstract class Kernel implements KernelInterface
         $fresh = true;
         if (!$cache->isFresh()) {
             $container = $this->buildContainer();
-            $this->dumpContainer($cache, $container, $class);
+            $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
 
             $fresh = false;
         }
@@ -538,12 +568,13 @@ abstract class Kernel implements KernelInterface
      * @param ConfigCache       $cache      The config cache
      * @param ContainerBuilder  $container  The service container
      * @param string            $class      The name of the class to generate
+     * @param string            $baseClass  The name of the container's base class
      */
-    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class)
+    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class, $baseClass)
     {
         // cache the container
         $dumper = new PhpDumper($container);
-        $content = $dumper->dump(array('class' => $class));
+        $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass));
         if (!$this->debug) {
             $content = self::stripComments($content);
         }

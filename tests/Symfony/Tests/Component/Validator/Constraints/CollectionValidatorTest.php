@@ -40,6 +40,13 @@ class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         )))));
     }
 
+    public function testFieldsAsDefaultOption()
+    {
+        $this->validator->isValid(array('foo' => 'foobar'), new Collection(array(
+            'foo' => new Min(4),
+        )));
+    }
+
     public function testThrowsExceptionIfNotTraversable()
     {
         $this->setExpectedException('Symfony\Component\Validator\Exception\UnexpectedTypeException');

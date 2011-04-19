@@ -14,14 +14,14 @@ namespace Symfony\Bundle\AsseticBundle\Twig;
 use Assetic\Extension\Twig\AsseticTokenParser;
 
 /**
- * Parses the {% assets %} tag.
+ * Parses an Assetic tag.
  *
  * @author Kris Wallsmith <kris.wallsmith@symfony.com>
  */
 class StaticTokenParser extends AsseticTokenParser
 {
-    static protected function createNode(\Twig_NodeInterface $body, array $sourceUrls, $targetUrl, array $filterNames, $assetName, $debug = false, $lineno = 0, $tag = null)
+    static protected function createNode(\Twig_NodeInterface $body, array $inputs, array $filters, array $attributes, $lineno = 0, $tag = null)
     {
-        return new StaticNode($body, $sourceUrls, $targetUrl, $filterNames, $assetName, $debug, $lineno, $tag);
+        return new StaticNode($body, $inputs, $filters, $attributes, $lineno, $tag);
     }
 }

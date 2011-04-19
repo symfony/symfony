@@ -134,6 +134,7 @@ class StubNumberFormatterTest extends LocaleTestCase
     public function testFormatCurrencyWithCurrencyStyleIntl($value, $currency, $expected)
     {
         $this->skipIfIntlExtensionIsNotLoaded();
+        $this->skipIfICUVersionIsTooOld();
         $formatter = $this->getIntlFormatterWithCurrencyStyle();
         $this->assertEquals($expected, $formatter->formatCurrency($value, $currency));
     }
@@ -181,6 +182,7 @@ class StubNumberFormatterTest extends LocaleTestCase
     public function testFormatCurrencyWithCurrencyStyleSwissRoundingIntl($value, $currency, $symbol, $expected)
     {
         $this->skipIfIntlExtensionIsNotLoaded();
+        $this->skipIfICUVersionIsTooOld();
         $formatter = $this->getIntlFormatterWithCurrencyStyle();
         $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
     }
@@ -382,7 +384,7 @@ class StubNumberFormatterTest extends LocaleTestCase
     {
         $formatter = $this->getStubFormatterWithDecimalStyle();
 
-        if (!is_null($fractionDigits)) {
+        if (null !== $fractionDigits) {
             $attributeRet = $formatter->setAttribute(StubNumberFormatter::FRACTION_DIGITS, $fractionDigits);
         }
 
@@ -403,7 +405,7 @@ class StubNumberFormatterTest extends LocaleTestCase
         $this->skipIfIntlExtensionIsNotLoaded();
         $formatter = $this->getIntlFormatterWithDecimalStyle();
 
-        if (!is_null($fractionDigits)) {
+        if (null !== $fractionDigits) {
             $attributeRet = $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $fractionDigits);
         }
 
@@ -435,7 +437,7 @@ class StubNumberFormatterTest extends LocaleTestCase
     {
         $formatter = $this->getStubFormatterWithDecimalStyle();
 
-        if (!is_null($groupingUsed)) {
+        if (null !== $groupingUsed) {
             $attributeRet = $formatter->setAttribute(StubNumberFormatter::GROUPING_USED, $groupingUsed);
         }
 
@@ -456,7 +458,7 @@ class StubNumberFormatterTest extends LocaleTestCase
         $this->skipIfIntlExtensionIsNotLoaded();
         $formatter = $this->getIntlFormatterWithDecimalStyle();
 
-        if (!is_null($groupingUsed)) {
+        if (null !== $groupingUsed) {
             $attributeRet = $formatter->setAttribute(\NumberFormatter::GROUPING_USED, $groupingUsed);
         }
 
@@ -660,6 +662,7 @@ class StubNumberFormatterTest extends LocaleTestCase
     public function testParseIntl($value, $expected, $message = '')
     {
         $this->skipIfIntlExtensionIsNotLoaded();
+        $this->skipIfICUVersionIsTooOld();
         $formatter = $this->getIntlFormatterWithDecimalStyle();
         $parsedValue = $formatter->parse($value, \NumberFormatter::TYPE_DOUBLE);
         $this->assertSame($expected, $parsedValue, $message);

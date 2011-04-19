@@ -17,8 +17,8 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Bundle\DoctrineAbstractBundle\DependencyInjection\AbstractDoctrineExtension;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Bundle\DoctrineAbstractBundle\DependencyInjection\AbstractDoctrineExtension;
 
 /**
  * Doctrine MongoDB ODM extension.
@@ -40,7 +40,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
 
         $processor = new Processor();
         $configuration = new Configuration($container->getParameter('kernel.debug'));
-        $config = $processor->process($configuration->getConfigTree(), $configs);
+        $config = $processor->processConfiguration($configuration, $configs);
 
         // can't currently default this correctly in Configuration
         if (!isset($config['metadata_cache_driver'])) {
@@ -85,8 +85,10 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
     {
         $overrides = array(
             'proxy_namespace',
+            'proxy_dir',
             'auto_generate_proxy_classes',
             'hydrator_namespace',
+            'hydrator_dir',
             'auto_generate_hydrator_classes',
         );
 
@@ -153,10 +155,10 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         $methods = array(
             'setMetadataCacheImpl' => new Reference(sprintf('doctrine.odm.mongodb.%s_metadata_cache', $documentManager['name'])),
             'setMetadataDriverImpl' => new Reference(sprintf('doctrine.odm.mongodb.%s_metadata_driver', $documentManager['name'])),
-            'setProxyDir' => '%kernel.cache_dir%'.'/doctrine/odm/mongodb/Proxies',
+            'setProxyDir' => '%doctrine.odm.mongodb.proxy_dir%',
             'setProxyNamespace' => '%doctrine.odm.mongodb.proxy_namespace%',
             'setAutoGenerateProxyClasses' => '%doctrine.odm.mongodb.auto_generate_proxy_classes%',
-            'setHydratorDir' => '%kernel.cache_dir%'.'/doctrine/odm/mongodb/Hydrators',
+            'setHydratorDir' => '%doctrine.odm.mongodb.hydrator_dir%',
             'setHydratorNamespace' => '%doctrine.odm.mongodb.hydrator_namespace%',
             'setAutoGenerateHydratorClasses' => '%doctrine.odm.mongodb.auto_generate_hydrator_classes%',
             'setDefaultDB' => $defaultDatabase,
@@ -311,6 +313,9 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
 
     protected function loadConstraints(ContainerBuilder $container)
     {
+        // FIXME: the validator.annotations.namespaces parameter does not exist anymore
+        // and anyway, it was not available in the FrameworkExtension code
+        // as each bundle is isolated from the others
         if ($container->hasParameter('validator.annotations.namespaces')) {
             $container->setParameter('validator.annotations.namespaces', array_merge(
                 $container->getParameter('validator.annotations.namespaces'),

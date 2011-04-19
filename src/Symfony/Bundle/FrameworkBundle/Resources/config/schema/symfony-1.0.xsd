@@ -54,6 +54,7 @@
         </xsd:all>
 
         <xsd:attribute name="only-exceptions" type="xsd:string" />
+        <xsd:attribute name="only-master-requests" type="xsd:string" />
         <xsd:attribute name="dsn" type="xsd:string" />
         <xsd:attribute name="username" type="xsd:string" />
         <xsd:attribute name="password" type="xsd:string" />
@@ -93,7 +94,7 @@
     <xsd:complexType name="templating">
         <xsd:sequence>
             <xsd:element name="loader" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-            <xsd:element name="engine" type="templating_engine" minOccurs="1" maxOccurs="unbounded" />
+            <xsd:element name="engine" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
             <xsd:element name="assets-base-url" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="package" type="package" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
@@ -101,10 +102,6 @@
         <xsd:attribute name="assets-version" type="xsd:string" />
         <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="cache-warmer" type="cache_warmer" />
-    </xsd:complexType>
-
-    <xsd:complexType name="templating_engine">
-        <xsd:attribute name="id" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="package">
@@ -127,11 +124,15 @@
         </xsd:sequence>
 
         <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="annotations" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="validation_namespace">
-        <xsd:attribute name="prefix" type="xsd:string" />
-        <xsd:attribute name="namespace" type="xsd:string" />
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="prefix" type="xsd:string" />
+            </xsd:extension>
+        </xsd:simpleContent>
     </xsd:complexType>
 </xsd:schema>

@@ -35,7 +35,7 @@ class ValidatorContext implements ValidatorContextInterface
     /**
      * @inheritDoc
      */
-    public function classMetadataFactory(ClassMetadataFactoryInterface $classMetadataFactory)
+    public function setClassMetadataFactory(ClassMetadataFactoryInterface $classMetadataFactory)
     {
         $this->classMetadataFactory = $classMetadataFactory;
 
@@ -45,7 +45,7 @@ class ValidatorContext implements ValidatorContextInterface
     /**
      * @inheritDoc
      */
-    public function constraintValidatorFactory(ConstraintValidatorFactoryInterface $constraintValidatorFactory)
+    public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $constraintValidatorFactory)
     {
         $this->constraintValidatorFactory = $constraintValidatorFactory;
 

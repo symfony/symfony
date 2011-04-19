@@ -38,9 +38,9 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
         $factory1 = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
         $factory2 = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
 
-        $this->defaultContext->classMetadataFactory($factory1);
+        $this->defaultContext->setClassMetadataFactory($factory1);
 
-        $result = $this->factory->classMetadataFactory($factory2);
+        $result = $this->factory->setClassMetadataFactory($factory2);
 
         $this->assertSame($factory1, $this->defaultContext->getClassMetadataFactory());
         $this->assertSame($factory2, $result->getClassMetadataFactory());
@@ -51,9 +51,9 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
         $factory1 = $this->getMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
         $factory2 = $this->getMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
 
-        $this->defaultContext->constraintValidatorFactory($factory1);
+        $this->defaultContext->setConstraintValidatorFactory($factory1);
 
-        $result = $this->factory->constraintValidatorFactory($factory2);
+        $result = $this->factory->setConstraintValidatorFactory($factory2);
 
         $this->assertSame($factory1, $this->defaultContext->getConstraintValidatorFactory());
         $this->assertSame($factory2, $result->getConstraintValidatorFactory());
@@ -65,8 +65,8 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
         $validatorFactory = $this->getMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
 
         $this->defaultContext
-            ->classMetadataFactory($metadataFactory)
-            ->constraintValidatorFactory($validatorFactory);
+            ->setClassMetadataFactory($metadataFactory)
+            ->setConstraintValidatorFactory($validatorFactory);
 
         $validator = $this->factory->getValidator();
 
@@ -82,8 +82,8 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
 
         $context = new ValidatorContext();
         $context
-            ->classMetadataFactory(new ClassMetadataFactory(new AnnotationLoader()))
-            ->constraintValidatorFactory(new ConstraintValidatorFactory());
+            ->setClassMetadataFactory(new ClassMetadataFactory(new AnnotationLoader()))
+            ->setConstraintValidatorFactory(new ConstraintValidatorFactory());
 
         $this->assertEquals(new ValidatorFactory($context), $factory);
     }
@@ -99,10 +99,10 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
 
         $context = new ValidatorContext();
         $context
-            ->classMetadataFactory(new ClassMetadataFactory(new AnnotationLoader(array(
+            ->setClassMetadataFactory(new ClassMetadataFactory(new AnnotationLoader(array(
                 'myns' => 'My\\Namespace\\',
             ))))
-            ->constraintValidatorFactory(new ConstraintValidatorFactory());
+            ->setConstraintValidatorFactory(new ConstraintValidatorFactory());
 
         $this->assertEquals(new ValidatorFactory($context), $factory);
     }
@@ -114,8 +114,8 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
 
         $context = new ValidatorContext();
         $context
-            ->classMetadataFactory(new ClassMetadataFactory(new XmlFilesLoader(array($path))))
-            ->constraintValidatorFactory(new ConstraintValidatorFactory());
+            ->setClassMetadataFactory(new ClassMetadataFactory(new XmlFilesLoader(array($path))))
+            ->setConstraintValidatorFactory(new ConstraintValidatorFactory());
 
         $this->assertEquals(new ValidatorFactory($context), $factory);
     }
@@ -127,8 +127,8 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
 
         $context = new ValidatorContext();
         $context
-            ->classMetadataFactory(new ClassMetadataFactory(new YamlFilesLoader(array($path))))
-            ->constraintValidatorFactory(new ConstraintValidatorFactory());
+            ->setClassMetadataFactory(new ClassMetadataFactory(new YamlFilesLoader(array($path))))
+            ->setConstraintValidatorFactory(new ConstraintValidatorFactory());
 
         $this->assertEquals(new ValidatorFactory($context), $factory);
     }
@@ -140,8 +140,8 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
 
         $context = new ValidatorContext();
         $context
-            ->classMetadataFactory(new ClassMetadataFactory(new StaticMethodLoader('loadMetadata')))
-            ->constraintValidatorFactory(new ConstraintValidatorFactory());
+            ->setClassMetadataFactory(new ClassMetadataFactory(new StaticMethodLoader('loadMetadata')))
+            ->setConstraintValidatorFactory(new ConstraintValidatorFactory());
 
         $this->assertEquals(new ValidatorFactory($context), $factory);
     }
@@ -164,8 +164,8 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
 
         $context = new ValidatorContext();
         $context
-            ->classMetadataFactory(new ClassMetadataFactory($chain))
-            ->constraintValidatorFactory(new ConstraintValidatorFactory());
+            ->setClassMetadataFactory(new ClassMetadataFactory($chain))
+            ->setConstraintValidatorFactory(new ConstraintValidatorFactory());
 
         $this->assertEquals(new ValidatorFactory($context), $factory);
     }

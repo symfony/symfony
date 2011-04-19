@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xsd:schema xmlns="http://symfony.com/schema/dic/monolog"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://symfony.com/schema/dic/monolog"
+    elementFormDefault="qualified">
+
+    <xsd:element name="config" type="config" />
+
+    <xsd:complexType name="config">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="handler" type="handler" />
+            <xsd:element name="processor" type="xsd:string" />
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="handler">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="processor" type="xsd:string" />
+        </xsd:choice>
+        <xsd:attribute name="type" type="xsd:string" use="required" />
+        <xsd:attribute name="priority" type="xsd:integer" />
+        <xsd:attribute name="level" type="level" />
+        <xsd:attribute name="bubble" type="xsd:boolean" />
+        <xsd:attribute name="path" type="xsd:string" />
+        <xsd:attribute name="id" type="xsd:string" />
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="ident" type="xsd:string" />
+        <xsd:attribute name="facility" type="xsd:string" />
+        <xsd:attribute name="action-level" type="level" />
+        <xsd:attribute name="buffer-size" type="xsd:integer" />
+        <xsd:attribute name="max-files" type="xsd:integer" />
+        <xsd:attribute name="handler" type="xsd:string" />
+        <xsd:attribute name="formatter" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:simpleType name="level">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="error" />
+            <xsd:enumeration value="warning" />
+            <xsd:enumeration value="info" />
+            <xsd:enumeration value="debug" />
+
+            <xsd:enumeration value="100" />
+            <xsd:enumeration value="200" />
+            <xsd:enumeration value="300" />
+            <xsd:enumeration value="400" />
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

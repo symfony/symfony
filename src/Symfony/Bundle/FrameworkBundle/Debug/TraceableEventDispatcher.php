@@ -24,8 +24,9 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements TraceableEventDispatcherInterface
 {
-    protected $logger;
-    protected $called;
+    private $logger;
+    private $called;
+    private $container;
 
     /**
      * Constructor.
@@ -37,8 +38,31 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     {
         parent::__construct($container);
 
+        $this->container = $container;
         $this->logger = $logger;
         $this->called = array();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws \RuntimeException if the listener method is not callable
+     */
+    public function addListener($eventNames, $listener, $priority = 0)
+    {
+        if (!$listener instanceof \Closure) {
+            foreach ((array) $eventNames as $method) {
+                if (!is_callable(array($listener, $method))) {
+                    $msg = sprintf('The event method "%s()" is not callable on the class "%s".', $method, get_class($listener));
+                    if (null !== $this->logger) {
+                        $this->logger->err($msg);
+                    }
+                    throw new \RuntimeException($msg);
+                }
+            }
+        }
+
+        parent::addListener($eventNames, $listener, $priority);
     }
 
     /**
@@ -48,30 +72,25 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     {
         parent::triggerListener($listener, $eventName, $event);
 
-        $listenerString = $this->listenerToString($listener);
-
         if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Notified event "%s" to listener "%s"', $eventName, $listenerString));
+            $this->logger->debug(sprintf('Notified event "%s" to listener "%s".', $eventName, get_class($listener)));
         }
 
-        $this->called[$eventName.'.'.$listenerString] = array(
-            'class' => $listenerString,
-            'event' => $eventName,
-        );
+        $this->called[$eventName.'.'.get_class($listener)] = $this->getListenerInfo($listener, $eventName);
 
         if ($event->isPropagationStopped() && null !== $this->logger) {
-            $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s"', $this->listenerToString($listener), $eventName));
+            $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s".', get_class($listener), $eventName));
 
             $skippedListeners = $this->getListeners($eventName);
             $skipped = false;
 
             foreach ($skippedListeners as $skippedListener) {
                 if ($skipped) {
-                    $this->logger->debug(sprintf('Listener "%s" was not called for event "%s"', $this->listenerToString($skippedListener), $eventName));
+                    $this->logger->debug(sprintf('Listener "%s" was not called for event "%s".', get_class($skippedListener), $eventName));
                 }
 
                 if ($skippedListener === $listener) {
-                    $skipped = false;
+                    $skipped = true;
                 }
             }
         }
@@ -93,12 +112,8 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
         $notCalled = array();
         foreach (array_keys($this->getListeners()) as $name) {
             foreach ($this->getListeners($name) as $listener) {
-                $listener = $this->listenerToString($listener);
-                if (!isset($this->called[$name.'.'.$listener])) {
-                    $notCalled[] = array(
-                        'class' => $listener,
-                        'event' => $name,
-                    );
+                if (!isset($this->called[$name.'.'.get_class($listener)])) {
+                    $notCalled[$name.'.'.get_class($listener)] = $this->getListenerInfo($listener, $name);
                 }
             }
         }
@@ -106,18 +121,37 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
         return $notCalled;
     }
 
-    protected function listenerToString($listener)
+    /**
+     * Returns information about the listener
+     * 
+     * @param object $listener  The listener
+     * @param string $eventName The event name
+     * 
+     * @return array Informations about the listener
+     */
+    private function getListenerInfo($listener, $eventName)
     {
-        if (is_object($listener)) {
-            if ($listener instanceof \Closure) {
-                return 'Closure';
+        $info = array('event' => $eventName);
+        if ($listener instanceof \Closure) {
+            $info += array('type' => 'Closure');
+        } else {
+            $class = get_class($listener);
+            try {
+                $r = new \ReflectionMethod($class, $eventName);
+                $file = $r->getFileName();
+                $line = $r->getStartLine();
+            } catch (\ReflectionException $e) {
+                $file = null;
+                $line = null;
             }
-
-            return get_class($listener);
+            $info += array(
+                'type'  => 'Method',
+                'class' => $class,
+                'file'  => $file,
+                'line'  => $line
+            );
         }
 
-        if (is_array($listener)) {
-            return is_object($listener[0]) ? get_class($listener[0]) : implode('::', $listener);
-        }
+        return $info;
     }
 }

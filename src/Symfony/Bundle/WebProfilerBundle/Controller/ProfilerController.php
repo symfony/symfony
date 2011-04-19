@@ -39,7 +39,7 @@ class ProfilerController extends ContainerAware
         $profiler = $this->container->get('profiler')->loadFromToken($token);
 
         if ($profiler->isEmpty()) {
-            return $this->container->get('templating')->renderResponse('WebProfiler:Profiler:notfound.html.twig', array('token' => $token));
+            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:notfound.html.twig', array('token' => $token));
         }
 
         if (!$profiler->has($panel)) {
@@ -129,8 +129,10 @@ class ProfilerController extends ContainerAware
     {
         $request = $this->container->get('request');
 
-        // keep current flashes for one more request
-        $request->getSession()->setFlashes($request->getSession()->getFlashes());
+        if (null !== $session = $request->getSession()) {
+            // keep current flashes for one more request
+            $session->setFlashes($session->getFlashes());
+        }
 
         if (null === $token) {
             return new Response();
@@ -156,11 +158,12 @@ class ProfilerController extends ContainerAware
             // the profiler is not enabled
         }
 
-        return $this->container->get('templating')->renderResponse('WebProfiler:Profiler:toolbar.html.twig', array(
+        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:toolbar.html.twig', array(
             'position'     => $position,
             'profiler'     => $profiler,
             'templates'    => $this->getTemplates($profiler),
             'profiler_url' => $url,
+            'verbose'      => $this->container->get('web_profiler.debug.toolbar')->getVerbose()
         ));
     }
 
@@ -174,17 +177,23 @@ class ProfilerController extends ContainerAware
         $profiler = $this->container->get('profiler');
         $profiler->disable();
 
-        $session = $this->container->get('request')->getSession();
-        $ip = $session->get('_profiler_search_ip');
-        $url = $session->get('_profiler_search_url');
-        $limit = $session->get('_profiler_search_limit');
-        $token = $session->get('_profiler_search_token');
+        if (null === $session = $this->container->get('request')->getSession()) {
+            $ip    =
+            $url   =
+            $limit =
+            $token = null;
+        } else {
+            $ip    = $session->get('_profiler_search_ip');
+            $url   = $session->get('_profiler_search_url');
+            $limit = $session->get('_profiler_search_limit');
+            $token = $session->get('_profiler_search_token');
+        }
 
-        return $this->container->get('templating')->renderResponse('WebProfiler:Profiler:search.html.twig', array(
-            'token'    => $token,
-            'ip'       => $ip,
-            'url'      => $url,
-            'limit'    => $limit,
+        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:search.html.twig', array(
+            'token' => $token,
+            'ip'    => $ip,
+            'url'   => $url,
+            'limit' => $limit,
         ));
     }
 
@@ -200,12 +209,11 @@ class ProfilerController extends ContainerAware
 
         $pofiler = $profiler->loadFromToken($token);
 
-        $session = $this->container->get('request')->getSession();
-        $ip = $session->get('_profiler_search_ip');
-        $url = $session->get('_profiler_search_url');
-        $limit = $session->get('_profiler_search_limit');
+        $ip    = $this->container->get('request')->query->get('ip');
+        $url   = $this->container->get('request')->query->get('url');
+        $limit = $this->container->get('request')->query->get('limit');
 
-        return $this->container->get('templating')->renderResponse('WebProfiler:Profiler:results.html.twig', array(
+        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:results.html.twig', array(
             'token'    => $token,
             'profiler' => $profiler,
             'tokens'   => $profiler->find($ip, $url, $limit),
@@ -228,11 +236,17 @@ class ProfilerController extends ContainerAware
 
         $request = $this->container->get('request');
 
-        $session = $request->getSession();
-        $session->set('_profiler_search_ip', $ip = preg_replace('/[^\d\.]/', '', $request->query->get('ip')));
-        $session->set('_profiler_search_url', $url = $request->query->get('url'));
-        $session->set('_profiler_search_limit', $limit = $request->query->get('limit'));
-        $session->set('_profiler_search_token', $token = $request->query->get('token'));
+        $ip    = preg_replace('/[^\d\.]/', '', $request->query->get('ip'));
+        $url   = $request->query->get('url');
+        $limit = $request->query->get('limit');
+        $token = $request->query->get('token');
+
+        if (null !== $session = $request->getSession()) {
+            $session->set('_profiler_search_ip', $ip);
+            $session->set('_profiler_search_url', $url);
+            $session->set('_profiler_search_limit', $limit);
+            $session->set('_profiler_search_token', $token);
+        }
 
         if (!empty($token)) {
             return new RedirectResponse($this->container->get('router')->generate('_profiler', array('token' => $token)));
@@ -240,7 +254,12 @@ class ProfilerController extends ContainerAware
 
         $tokens = $profiler->find($ip, $url, $limit);
 
-        return new RedirectResponse($this->container->get('router')->generate('_profiler_search_results', array('token' => $tokens ? $tokens[0]['token'] : 'empty')));
+        return new RedirectResponse($this->container->get('router')->generate('_profiler_search_results', array(
+            'token' => $tokens ? $tokens[0]['token'] : 'empty',
+            'ip'    => $ip,
+            'url'   => $url,
+            'limit' => $limit,
+        )));
     }
 
     protected function getTemplateNames($profiler)

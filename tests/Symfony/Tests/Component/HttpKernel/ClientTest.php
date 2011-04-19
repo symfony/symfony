@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\Client;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Cookie;
 
 require_once __DIR__.'/TestHttpKernel.php';
 
@@ -54,5 +55,25 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->request('GET', '/');
 
         $this->assertEquals('Request: /', $client->getResponse()->getContent(), '->getScript() returns a script that uses the request handler to make the request');
+    }
+
+    public function testFilterResponseConvertsCookies()
+    {
+        $client = new Client(new TestHttpKernel());
+
+        $r = new \ReflectionObject($client);
+        $m = $r->getMethod('filterResponse');
+        $m->setAccessible(true);
+
+        $response = new Response();
+        $response->headers->setCookie(new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
+        $domResponse = $m->invoke($client, $response);
+        $this->assertEquals('foo=bar; expires=Sun, 15-Feb-2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly', $domResponse->getHeader('Set-Cookie'));
+
+        $response = new Response();
+        $response->headers->setCookie(new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
+        $response->headers->setCookie(new Cookie('foo1', 'bar1', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
+        $domResponse = $m->invoke($client, $response);
+        $this->assertEquals('foo=bar; expires=Sun, 15-Feb-2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly, foo1=bar1; expires=Sun, 15-Feb-2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly', $domResponse->getHeader('Set-Cookie'));
     }
 }

@@ -22,13 +22,20 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
 {
+    private $compiler;
+    private $formatter;
+    private $sourceId;
+
     /**
      * Process the Container to replace aliases with service definitions.
      *
-     * @param ContainerBuilder $container 
+     * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {
+        $this->compiler = $container->getCompiler();
+        $this->formatter = $this->compiler->getLoggingFormatter();
+
         foreach ($container->getAliases() as $id => $alias) {
             $aliasId = (string) $alias;
 
@@ -67,13 +74,19 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
             }
         }
 
-        foreach ($container->getDefinitions() as $definition) {
+        foreach ($container->getDefinitions() as $id => $definition) {
+            $this->sourceId = $id;
+
             $definition->setArguments(
                 $this->updateArgumentReferences($definition->getArguments(), $currentId, $newId)
             );
 
             $definition->setMethodCalls(
                 $this->updateArgumentReferences($definition->getMethodCalls(), $currentId, $newId)
+            );
+
+            $definition->setProperties(
+                $this->updateArgumentReferences($definition->getProperties(), $currentId, $newId)
             );
         }
     }
@@ -93,6 +106,7 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
             } else if ($argument instanceof Reference) {
                 if ($currentId === (string) $argument) {
                     $arguments[$k] = new Reference($newId, $argument->getInvalidBehavior());
+                    $this->compiler->addLogMessage($this->formatter->formatUpdateReference($this, $this->sourceId, $currentId, $newId));
                 }
             }
         }

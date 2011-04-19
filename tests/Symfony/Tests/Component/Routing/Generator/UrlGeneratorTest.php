@@ -17,150 +17,74 @@ use Symfony\Component\Routing\Generator\UrlGenerator;
 
 class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var RouteCollection */
-    private $routeCollection;
-    /** @var UrlGenerator */
-    private $generator;
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->routeCollection = new RouteCollection();
-        $this->generator = new UrlGenerator($this->routeCollection);
-    }
-
     public function testAbsoluteUrlWithPort80()
     {
-        $this->routeCollection->add('test', new Route('/testing'));
-        $this->generator->setContext(array(
-            'base_url'=>'/app.php',
-            'method'=>'GET',
-            'host'=>'localhost',
-            'port'=>80,
-            'is_secure'=>false));
-
-        $url = $this->generator->generate('test', array(), true);
+        $routes = $this->getRoutes('test', new Route('/testing'));
+        $url = $this->getGenerator($routes)->generate('test', array(), true);
 
         $this->assertEquals('http://localhost/app.php/testing', $url);
     }
 
     public function testAbsoluteSecureUrlWithPort443()
     {
-        $this->routeCollection->add('test', new Route('/testing'));
-        $this->generator->setContext(array(
-            'base_url'=>'/app.php',
-            'method'=>'GET',
-            'host'=>'localhost',
-            'port'=>443,
-            'is_secure'=>true));
-
-        $url = $this->generator->generate('test', array(), true);
+        $routes = $this->getRoutes('test', new Route('/testing'));
+        $url = $this->getGenerator($routes, array('port' => 443, 'is_secure' => true))->generate('test', array(), true);
 
         $this->assertEquals('https://localhost/app.php/testing', $url);
     }
 
     public function testAbsoluteUrlWithNonStandardPort()
     {
-        $this->routeCollection->add('test', new Route('/testing'));
-        $this->generator->setContext(array(
-            'base_url'=>'/app.php',
-            'method'=>'GET',
-            'host'=>'localhost',
-            'port'=>8080,
-            'is_secure'=>false));
-
-        $url = $this->generator->generate('test', array(), true);
+        $routes = $this->getRoutes('test', new Route('/testing'));
+        $url = $this->getGenerator($routes, array('port' => 8080))->generate('test', array(), true);
 
         $this->assertEquals('http://localhost:8080/app.php/testing', $url);
     }
 
     public function testAbsoluteSecureUrlWithNonStandardPort()
     {
-        $this->routeCollection->add('test', new Route('/testing'));
-        $this->generator->setContext(array(
-            'base_url'=>'/app.php',
-            'method'=>'GET',
-            'host'=>'localhost',
-            'port'=>8080,
-            'is_secure'=>true));
-
-        $url = $this->generator->generate('test', array(), true);
+        $routes = $this->getRoutes('test', new Route('/testing'));
+        $url = $this->getGenerator($routes, array('port' => 8080, 'is_secure' => true))->generate('test', array(), true);
 
         $this->assertEquals('https://localhost:8080/app.php/testing', $url);
     }
 
     public function testRelativeUrlWithoutParameters()
     {
-        $this->routeCollection->add('test', new Route('/testing'));
-        $this->generator->setContext(array(
-            'base_url'=>'/app.php',
-            'method'=>'GET',
-            'host'=>'localhost',
-            'port'=>80,
-            'is_secure'=>false));
-
-        $url = $this->generator->generate('test', array(), false);
+        $routes = $this->getRoutes('test', new Route('/testing'));
+        $url = $this->getGenerator($routes)->generate('test', array(), false);
 
         $this->assertEquals('/app.php/testing', $url);
     }
 
     public function testRelativeUrlWithParameter()
     {
-        $this->routeCollection->add('test', new Route('/testing/{foo}'));
-        $this->generator->setContext(array(
-            'base_url'=>'/app.php',
-            'method'=>'GET',
-            'host'=>'localhost',
-            'port'=>80,
-            'is_secure'=>false));
-
-        $url = $this->generator->generate('test', array('foo' => 'bar'), false);
+        $routes = $this->getRoutes('test', new Route('/testing/{foo}'));
+        $url = $this->getGenerator($routes)->generate('test', array('foo' => 'bar'), false);
 
         $this->assertEquals('/app.php/testing/bar', $url);
     }
 
     public function testRelativeUrlWithNullParameter()
     {
-        $this->routeCollection->add('test', new Route('/testing.{format}', array('format' => null)));
-        $this->generator->setContext(array(
-            'base_url'=>'/app.php',
-            'method'=>'GET',
-            'host'=>'localhost',
-            'port'=>80,
-            'is_secure'=>false));
-
-        $url = $this->generator->generate('test', array(), false);
+        $routes = $this->getRoutes('test', new Route('/testing.{format}', array('format' => null)));
+        $url = $this->getGenerator($routes)->generate('test', array(), false);
 
         $this->assertEquals('/app.php/testing', $url);
     }
 
     public function testRelativeUrlWithExtraParameters()
     {
-        $this->routeCollection->add('test', new Route('/testing'));
-        $this->generator->setContext(array(
-            'base_url'=>'/app.php',
-            'method'=>'GET',
-            'host'=>'localhost',
-            'port'=>80,
-            'is_secure'=>false));
-
-        $url = $this->generator->generate('test', array('foo' => 'bar'), false);
+        $routes = $this->getRoutes('test', new Route('/testing'));
+        $url = $this->getGenerator($routes)->generate('test', array('foo' => 'bar'), false);
 
         $this->assertEquals('/app.php/testing?foo=bar', $url);
     }
 
     public function testAbsoluteUrlWithExtraParameters()
     {
-        $this->routeCollection->add('test', new Route('/testing'));
-        $this->generator->setContext(array(
-            'base_url'=>'/app.php',
-            'method'=>'GET',
-            'host'=>'localhost',
-            'port'=>80,
-            'is_secure'=>false));
-
-        $url = $this->generator->generate('test', array('foo' => 'bar'), true);
+        $routes = $this->getRoutes('test', new Route('/testing'));
+        $url = $this->getGenerator($routes)->generate('test', array('foo' => 'bar'), true);
 
         $this->assertEquals('http://localhost/app.php/testing?foo=bar', $url);
     }
@@ -170,7 +94,8 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGenerateWithoutRoutes()
     {
-        $this->generator->generate('test', array(), true);
+        $routes = $this->getRoutes('foo', new Route('/testing/{foo}'));
+        $this->getGenerator($routes)->generate('test', array(), true);
     }
 
     /**
@@ -178,8 +103,8 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGenerateForRouteWithoutManditoryParameter()
     {
-        $this->routeCollection->add('test', new Route('/testing/{foo}'));
-        $this->generator->generate('test', array(), true);
+        $routes = $this->getRoutes('test', new Route('/testing/{foo}'));
+        $this->getGenerator($routes)->generate('test', array(), true);
     }
 
     /**
@@ -187,9 +112,8 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGenerateForRouteWithInvalidOptionalParameter()
     {
-        $route = new Route('/testing/{foo}', array('foo' => '1'), array('foo' => 'd+'));
-        $this->routeCollection->add('test', $route);
-        $this->generator->generate('test', array('foo' => 'bar'), true);
+        $routes = $this->getRoutes('test', new Route('/testing/{foo}', array('foo' => '1'), array('foo' => 'd+')));
+        $this->getGenerator($routes)->generate('test', array('foo' => 'bar'), true);
     }
 
     /**
@@ -197,8 +121,29 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGenerateForRouteWithInvalidManditoryParameter()
     {
-        $route = new Route('/testing/{foo}', array(), array('foo' => 'd+'));
-        $this->routeCollection->add('test', $route);
-        $this->generator->generate('test', array('foo' => 'bar'), true);
+        $routes = $this->getRoutes('test', new Route('/testing/{foo}', array(), array('foo' => 'd+')));
+        $this->getGenerator($routes)->generate('test', array('foo' => 'bar'), true);
+    }
+
+    protected function getGenerator(RouteCollection $routes, array $context = array())
+    {
+        $generator = new UrlGenerator($routes);
+        $generator->setContext(array_replace(array(
+            'base_url' => '/app.php',
+            'method' => 'GET',
+            'host' => 'localhost',
+            'port' => 80,
+            'is_secure' => false,
+        ), $context));
+
+        return $generator;
+    }
+
+    protected function getRoutes($name, Route $route)
+    {
+        $routes = new RouteCollection();
+        $routes->add($name, $route);
+
+        return $routes;
     }
 }

@@ -41,7 +41,7 @@ class AddCacheWarmerPass implements CompilerPassInterface
         krsort($warmers);
         $warmers = call_user_func_array('array_merge', $warmers);
 
-        $container->getDefinition('cache_warmer')->setArgument(0, $warmers);
+        $container->getDefinition('cache_warmer')->replaceArgument(0, $warmers);
 
         if ('full' === $container->getParameter('kernel.cache_warmup')) {
             $container->getDefinition('cache_warmer')->addMethodCall('enableOptionalWarmers', array());

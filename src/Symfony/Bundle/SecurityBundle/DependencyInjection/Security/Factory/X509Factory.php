@@ -30,16 +30,16 @@ class X509Factory implements SecurityFactoryInterface
         $provider = 'security.authentication.provider.pre_authenticated.'.$id;
         $container
             ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.pre_authenticated'))
-            ->setArgument(0, new Reference($userProvider))
+            ->replaceArgument(0, new Reference($userProvider))
             ->addArgument($id)
         ;
 
         // listener
         $listenerId = 'security.authentication.listener.x509.'.$id;
         $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.x509'));
-        $listener->setArgument(2, $id);
-        $listener->setArgument(3, $config['user']);
-        $listener->setArgument(4, $config['credentials']);
+        $listener->replaceArgument(2, $id);
+        $listener->replaceArgument(3, $config['user']);
+        $listener->replaceArgument(4, $config['credentials']);
 
         return array($provider, $listenerId, $defaultEntryPoint);
     }

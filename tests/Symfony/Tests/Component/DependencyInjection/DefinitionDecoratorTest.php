@@ -57,7 +57,7 @@ class DefinitionDecoratorTest extends \PHPUnit_Framework_TestCase
         $def = new DefinitionDecorator('foo');
 
         $this->assertEquals(array(), $def->getArguments());
-        $this->assertSame($def, $def->setArgument(0, 'foo'));
+        $this->assertSame($def, $def->replaceArgument(0, 'foo'));
         $this->assertEquals(array('index_0' => 'foo'), $def->getArguments());
     }
 }

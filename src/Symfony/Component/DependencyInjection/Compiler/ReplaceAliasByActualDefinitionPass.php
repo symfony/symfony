@@ -47,7 +47,7 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
 
             $definition->setPublic(true);
             $container->setDefinition($id, $definition);
-            $container->remove($aliasId);
+            $container->removeDefinition($aliasId);
 
             $this->updateReferences($container, $aliasId, $id);
 

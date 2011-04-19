@@ -241,11 +241,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Removes a service.
+     * Removes a service definition.
      *
      * @param string $id The service identifier
      */
-    public function remove($id)
+    public function removeDefinition($id)
     {
         unset($this->definitions[strtolower($id)]);
     }

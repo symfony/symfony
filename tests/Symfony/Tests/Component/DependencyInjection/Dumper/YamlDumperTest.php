@@ -79,7 +79,7 @@ interfaces:
     FooClass:
         calls:
           - [setBar, [someValue]]
-
+          
 
 services:
   foo:

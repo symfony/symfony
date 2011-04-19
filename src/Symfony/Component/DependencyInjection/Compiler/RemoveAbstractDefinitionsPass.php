@@ -22,7 +22,7 @@ class RemoveAbstractDefinitionsPass implements CompilerPassInterface
 
         foreach ($container->getDefinitions() as $id => $definition) {
             if ($definition->isAbstract()) {
-                $container->remove($id);
+                $container->removeDefinition($id);
                 $compiler->addLogMessage($formatter->formatRemoveService($this, $id, 'abstract'));
             }
         }

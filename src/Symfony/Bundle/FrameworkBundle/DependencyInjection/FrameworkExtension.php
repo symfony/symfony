@@ -256,6 +256,10 @@ class FrameworkExtension extends Extension
             $container->setAlias('router', 'router.cached');
         }
 
+        $def = $container->getDefinition('request_listener');
+        $def->setArgument(2, $config['http_port']);
+        $def->setArgument(3, $config['https_port']);
+
         $this->addClassesToCompile(array(
             'Symfony\\Component\\Routing\\RouterInterface',
             'Symfony\\Component\\Routing\\Matcher\\UrlMatcherInterface',

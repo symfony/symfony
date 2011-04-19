@@ -51,22 +51,42 @@ class RedirectController extends ContainerAware
     /**
      * Redirects to a URL.
      *
-     * It expects a url path parameter.
      * By default, the response status code is 301.
      *
-     * If the url is empty, the status code will be 410.
-     * If the permanent path parameter is set, the status code will be 302.
+     * If the path is empty, the status code will be 410.
+     * If the permanent flag is set, the status code will be 302.
      *
-     * @param string  $url       The url to redirect to
+     * @param string  $path      The path to redirect to
      * @param Boolean $permanent Whether the redirect is permanent or not
+     * @param Boolean $scheme    The URL scheme (null to keep the current one)
+     * @param integer $httpPort  The HTTP port
+     * @param integer $httpsPort The HTTPS port
      *
      * @return Response A Response instance
      */
-    public function urlRedirectAction($url, $permanent = false)
+    public function urlRedirectAction($path, $permanent = false, $scheme = null, $httpPort = 80, $httpsPort = 443)
     {
-        if (!$url) {
+        if (!$path) {
             return new Response(null, 410);
         }
+
+        $request = $this->container->get('request');
+        if (null === $scheme) {
+            $scheme = $request->getScheme();
+        }
+        $qs = $request->getQueryString();
+        if ($qs) {
+            $qs = '?'.$qs;
+        }
+
+        $port = '';
+        if ('http' === $scheme && 80 != $httpPort) {
+            $port = ':'.$httpPort;
+        } elseif ('https' === $scheme && 443 != $httpPort) {
+            $port = ':'.$httpsPort;
+        }
+
+        $url = $scheme.'://'.$request->getHttpHost().$port.$request->getBaseUrl().$path.$qs;
 
         return new RedirectResponse($url, $permanent ? 301 : 302);
     }

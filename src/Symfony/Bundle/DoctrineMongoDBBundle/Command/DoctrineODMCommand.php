@@ -113,7 +113,7 @@ abstract class DoctrineODMCommand extends Command
         $destination = str_replace('/'.$path, '', $search, $c);
 
         if ($c != 1) {
-            throw new \RuntimeException('Can\'t find base path for bundle (path: "$path", destination: "$destination").');
+            throw new \RuntimeException(sprintf('Can\'t find base path for bundle (path: "%s", destination: "%s").', $path, $destination));
         }
 
         return $destination;

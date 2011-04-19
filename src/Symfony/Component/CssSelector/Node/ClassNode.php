@@ -39,7 +39,7 @@ class ClassNode implements NodeInterface
     }
 
     /**
-     * {@inheritDoc} 
+     * {@inheritDoc}
      */
     public function __toString()
     {

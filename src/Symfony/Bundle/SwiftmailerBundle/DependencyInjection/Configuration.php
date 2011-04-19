@@ -36,7 +36,7 @@ class Configuration implements ConfigurationInterface
     {
         $this->debug = (Boolean) $debug;
     }
-    
+
     /**
      * Generates the configuration tree builder.
      *

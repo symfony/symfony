@@ -83,7 +83,7 @@ class TemplateNameParser extends BaseTemplateNameParser
      * Convert a filename to a template.
      *
      * @param string $file The filename
-     * 
+     *
      * @return TemplateReferenceInterface A template
      */
     public function parseFromFilename($file)

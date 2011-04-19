@@ -36,7 +36,7 @@ class Configuration implements ConfigurationInterface
     {
         $this->debug = (Boolean) $debug;
     }
-    
+
     /**
      * Generates the configuration tree builder.
      *
@@ -127,7 +127,7 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->children()
-                ->arrayNode('orm')                    
+                ->arrayNode('orm')
                     ->children()
                         ->scalarNode('default_entity_manager')->end()
                         ->booleanNode('auto_generate_proxy_classes')->defaultFalse()->end()

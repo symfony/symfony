@@ -25,7 +25,7 @@ class MessageDataCollector extends DataCollector
 {
     protected $logger;
     protected $mailer;
-    
+
     public function __construct(\Swift_Events_SendListener $logger, \Swift_Mailer $mailer)
     {
         $this->logger = $logger;
@@ -51,7 +51,7 @@ class MessageDataCollector extends DataCollector
     {
         return $this->data['messages'];
     }
-    
+
     public function isSpool()
     {
         return $this->data['isSpool'];

@@ -360,13 +360,13 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($this->getToken(), new FieldVote(new \stdClass(), 'foo'), array('VIEW')));
     }
-    
+
     public function testWhenReceivingAnObjectIdentityInterfaceWeDontRetrieveANewObjectIdentity()
     {
         list($voter, $provider, $permissionMap, $oidStrategy, $sidStrategy) = $this->getVoter();
-        
+
         $oid = new ObjectIdentity('someID','someType');
-        
+
         $permissionMap
             ->expects($this->once())
             ->method('contains')

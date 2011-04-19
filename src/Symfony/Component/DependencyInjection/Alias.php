@@ -31,7 +31,7 @@ class Alias
     /**
      * Checks if this DI Alias should be public or not.
      *
-     * @return boolean 
+     * @return boolean
      */
     public function isPublic()
     {

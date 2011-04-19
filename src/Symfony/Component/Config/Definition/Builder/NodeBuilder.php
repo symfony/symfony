@@ -96,7 +96,7 @@ class NodeBuilder implements NodeParentInterface
     {
         return $this->node($name, 'variable');
     }
-    
+
     /**
      * Returns the parent node.
      *
@@ -154,9 +154,9 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Returns the class name of the node definition
-     * 
+     *
      * @param string $type The node type
-     * 
+     *
      * @return string The node definition class name
      *
      * @throws \RuntimeException When the node type is not registered

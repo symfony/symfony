@@ -37,7 +37,7 @@ class FunctionNode implements NodeInterface
      * @param NodeInterface $selector The XPath expression
      * @param string $type
      * @param string $name
-     * @param XPathExpr $expr 
+     * @param XPathExpr $expr
      */
     public function __construct($selector, $type, $name, $expr)
     {
@@ -76,10 +76,10 @@ class FunctionNode implements NodeInterface
     /**
      * undocumented function
      *
-     * @param XPathExpr $xpath 
-     * @param mixed $expr 
-     * @param string $last 
-     * @param string $addNameTest 
+     * @param XPathExpr $xpath
+     * @param mixed $expr
+     * @param string $last
+     * @param string $addNameTest
      * @return XPathExpr
      */
     protected function _xpath_nth_child($xpath, $expr, $last = false, $addNameTest = true)
@@ -148,8 +148,8 @@ class FunctionNode implements NodeInterface
     /**
      * undocumented function
      *
-     * @param XPathExpr $xpath 
-     * @param XPathExpr $expr 
+     * @param XPathExpr $xpath
+     * @param XPathExpr $expr
      * @return XPathExpr
      */
     protected function _xpath_nth_last_child($xpath, $expr)
@@ -160,8 +160,8 @@ class FunctionNode implements NodeInterface
     /**
      * undocumented function
      *
-     * @param XPathExpr $xpath 
-     * @param XPathExpr $expr 
+     * @param XPathExpr $xpath
+     * @param XPathExpr $expr
      * @return XPathExpr
      */
     protected function _xpath_nth_of_type($xpath, $expr)
@@ -176,8 +176,8 @@ class FunctionNode implements NodeInterface
     /**
      * undocumented function
      *
-     * @param XPathExpr $xpath 
-     * @param XPathExpr $expr 
+     * @param XPathExpr $xpath
+     * @param XPathExpr $expr
      * @return XPathExpr
      */
     protected function _xpath_nth_last_of_type($xpath, $expr)
@@ -188,8 +188,8 @@ class FunctionNode implements NodeInterface
     /**
      * undocumented function
      *
-     * @param XPathExpr $xpath 
-     * @param XPathExpr $expr 
+     * @param XPathExpr $xpath
+     * @param XPathExpr $expr
      * @return XPathExpr
      */
     protected function _xpath_contains($xpath, $expr)
@@ -211,8 +211,8 @@ class FunctionNode implements NodeInterface
     /**
      * undocumented function
      *
-     * @param XPathExpr $xpath 
-     * @param XPathExpr $expr 
+     * @param XPathExpr $xpath
+     * @param XPathExpr $expr
      * @return XPathExpr
      */
     protected function _xpath_not($xpath, $expr)
@@ -229,7 +229,7 @@ class FunctionNode implements NodeInterface
     /**
      * Parses things like '1n+2', or 'an+b' generally, returning (a, b)
      *
-     * @param mixed $s 
+     * @param mixed $s
      * @return array
      */
     protected function parseSeries($s)

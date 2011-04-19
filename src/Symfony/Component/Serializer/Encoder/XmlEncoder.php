@@ -174,7 +174,7 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
             } else {
                 $value = (string) $subnode;
             }
-            
+
             if ($key === 'item') {
                 if (isset($value['@key'])) {
                     $data[(string)$value['@key']] = $value['#'];

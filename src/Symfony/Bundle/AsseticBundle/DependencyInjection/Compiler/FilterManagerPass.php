@@ -39,6 +39,6 @@ class FilterManagerPass implements CompilerPassInterface
 
         $container
             ->getDefinition('assetic.filter_manager')
-            ->setArgument(1, $mapping);
+            ->replaceArgument(1, $mapping);
     }
 }

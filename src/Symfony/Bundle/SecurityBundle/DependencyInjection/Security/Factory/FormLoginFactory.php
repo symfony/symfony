@@ -65,8 +65,8 @@ class FormLoginFactory extends AbstractFactory
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
             ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.dao'))
-            ->setArgument(0, new Reference($userProviderId))
-            ->setArgument(2, $id)
+            ->replaceArgument(0, new Reference($userProviderId))
+            ->replaceArgument(2, $id)
         ;
 
         return $provider;

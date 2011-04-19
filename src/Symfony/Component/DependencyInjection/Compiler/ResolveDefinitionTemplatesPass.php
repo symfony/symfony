@@ -111,7 +111,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
             }
 
             $index = (integer) substr($k, strlen('index_'));
-            $def->setArgument($index, $v);
+            $def->replaceArgument($index, $v);
         }
 
         // merge properties

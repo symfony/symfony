@@ -19,7 +19,7 @@ class ApcUniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
     protected function skipIfAPCExtensionIsNotLoadedOrEnabled()
     {
         if (!extension_loaded('apc')) {
-            $this->markTestSkipped('The apc extension is available.');
+            $this->markTestSkipped('The apc extension is not available.');
         }
 
         if (!(ini_get('apc.enabled') && ini_get('apc.enable_cli'))) {
@@ -29,7 +29,7 @@ class ApcUniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructor()
     {
-		$this->skipIfAPCExtensionIsNotLoadedOrEnabled();
+        $this->skipIfAPCExtensionIsNotLoadedOrEnabled();
 
         $loader = new ApcUniversalClassLoader('test.prefix.');
         $loader->registerNamespace('Namespaced', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
@@ -42,7 +42,7 @@ class ApcUniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadClass($className, $testClassName, $message)
     {
-		$this->skipIfAPCExtensionIsNotLoadedOrEnabled();
+        $this->skipIfAPCExtensionIsNotLoadedOrEnabled();
 
         $loader = new ApcUniversalClassLoader('test.prefix.');
         $loader->registerNamespace('Namespaced', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
@@ -66,7 +66,7 @@ class ApcUniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadClassFromFallback($className, $testClassName, $message)
     {
-		$this->skipIfAPCExtensionIsNotLoadedOrEnabled();
+        $this->skipIfAPCExtensionIsNotLoadedOrEnabled();
 
         $loader = new ApcUniversalClassLoader('test.prefix.');
         $loader->registerNamespace('Namespaced', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
@@ -92,7 +92,7 @@ class ApcUniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadClassNamespaceCollision($namespaces, $className, $message)
     {
-		$this->skipIfAPCExtensionIsNotLoadedOrEnabled();
+        $this->skipIfAPCExtensionIsNotLoadedOrEnabled();
 
         $loader = new ApcUniversalClassLoader('test.prefix.');
         $loader->registerNamespaces($namespaces);
@@ -144,7 +144,7 @@ class ApcUniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadClassPrefixCollision($prefixes, $className, $message)
     {
-		$this->skipIfAPCExtensionIsNotLoadedOrEnabled();
+        $this->skipIfAPCExtensionIsNotLoadedOrEnabled();
 
         $loader = new ApcUniversalClassLoader('test.prefix.');
         $loader->registerPrefixes($prefixes);

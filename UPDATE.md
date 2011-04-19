@@ -9,6 +9,8 @@ timeline closely anyway.
 PR11 to PR12
 ------------
 
+* HttpFoundation\Cookie::getExpire() was renamed to getExpiresTime()
+
 * XML configurations have been normalized. All tags with only one attribute
   have been converted to tag content:
 

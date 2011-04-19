@@ -45,7 +45,11 @@ class DelegatingValidator implements FormValidatorInterface
             // Validation of the data in the custom group is done by validateData(),
             // which is constrained by the Execute constraint
             if ($form->hasAttribute('validation_constraint')) {
-                $violations = $this->validator->validateValue($form->getData(), $form->getAttribute('validation_constraint'));
+                $violations = $this->validator->validateValue(
+                    $form->getData(),
+                    $form->getAttribute('validation_constraint'),
+                    self::getFormValidationGroups($form)
+                );
             } else {
                 $violations = $this->validator->validate($form);
             }
@@ -185,29 +189,6 @@ class DelegatingValidator implements FormValidatorInterface
     public static function validateFormData(FormInterface $form, ExecutionContext $context)
     {
         if (is_object($form->getData()) || is_array($form->getData())) {
-            $groups = null;
-
-            if ($form->hasAttribute('validation_groups')) {
-                $groups = $form->getAttribute('validation_groups');
-            }
-
-            $currentForm = $form;
-            while (!$groups && $currentForm->hasParent()) {
-                $currentForm = $currentForm->getParent();
-
-                if ($currentForm->hasAttribute('validation_groups')) {
-                    $groups = $currentForm->getAttribute('validation_groups');
-                }
-            }
-
-            if (null === $groups) {
-                $groups = array('Default');
-            }
-
-            if (!is_array($groups)) {
-                $groups = array($groups);
-            }
-
             $propertyPath = $context->getPropertyPath();
             $graphWalker = $context->getGraphWalker();
 
@@ -222,9 +203,37 @@ class DelegatingValidator implements FormValidatorInterface
 
             $propertyPath .= 'data';
 
-            foreach ($groups as $group) {
+            foreach (self::getFormValidationGroups($form) as $group) {
                 $graphWalker->walkReference($form->getData(), $group, $propertyPath, true);
             }
         }
+    }
+
+    static protected function getFormValidationGroups(FormInterface $form)
+    {
+        $groups = null;
+
+        if ($form->hasAttribute('validation_groups')) {
+            $groups = $form->getAttribute('validation_groups');
+        }
+
+        $currentForm = $form;
+        while (!$groups && $currentForm->hasParent()) {
+            $currentForm = $currentForm->getParent();
+
+            if ($currentForm->hasAttribute('validation_groups')) {
+                $groups = $currentForm->getAttribute('validation_groups');
+            }
+        }
+
+        if (null === $groups) {
+            $groups = array('Default');
+        }
+
+        if (!is_array($groups)) {
+            $groups = array($groups);
+        }
+
+        return $groups;
     }
 }

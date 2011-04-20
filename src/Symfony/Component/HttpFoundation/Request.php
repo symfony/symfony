@@ -440,6 +440,57 @@ class Request
 
         return $name.':'.$port;
     }
+    
+    public function getSubdomain()
+    {
+        $serverName = $this->server->get('SERVER_NAME');
+        $parts = explode('.', $serverName);
+
+        $twoParts = array(
+            'ac.cn', 'ac.jp', 'ac.uk', 'ad.jp', 'adm.br', 'adv.br', 'agr.br', 'ah.cn', 'am.br', 
+            'arq.br', 'art.br', 'asn.au', 'ato.br', 'av.tr', 'bio.br', 'biz.tr', 'bj.cn', 'bel.tr', 
+            'bmd.br', 'cim.br', 'cng.br', 'cnt.br', 'com.au', 'com.br', 'com.cn', 'com.eg', 'com.hk', 
+            'com.mx', 'com.tr', 'com.ru', 'com.tw', 'conf.au', 'co.at','co.jp', 'co.uk', 'cq.cn', 
+            'csiro.au', 'dr.tr', 'ecn.br', 'edu', 'edu.au', 'edu.br', 'edu.tr', 'esp.br', 'etc.br', 
+            'eti.br', 'eun.eg', 'eng.br', 'far.br', 'fj.cn', 'fm.br', 'fnd.br', 'fot.br', 'fst.br', 
+            'gb.com', 'gb.net', 'g12.br', 'gd.cn', 'gen.tr', 'ggf.br', 'gr.jp', 'gs.cn', 'gov.au', 
+            'gov.br', 'gov.cn', 'gov.hk', 'gov.tr', 'gob.mx', 'gz.cn', 'gx.cn', 'he.cn', 'ha.cn', 
+            'hb.cn', 'hi.cn', 'hl.cn', 'hn.cn', 'hk.cn', 'id.au', 'ind.br', 'imb.br', 'inf.br', 
+            'info.au', 'info.tr', 'idv.tw', 'jl.cn', 'jor.br', 'js.cn', 'jx.cn', 'k12.tr', 'lel.br', 
+            'ln.cn', 'ltd.uk', 'mat.br', 'me.uk', 'med.br', 'mil.br', 'mil.tr', 'mo.cn', 'mus.br', 
+            'name.tr', 'ne.jp', 'net.au', 'net.br', 'net.cn', 'net.eg', 'net.hk', 'net.lu', 'net.mx', 
+            'net.uk', 'net.ru', 'net.tr', 'net.tw', 'nm.cn', 'no.com', 'nom.br', 'not.br', 'ntr.br', 
+            'nx.cn', 'plc.uk', 'odo.br', 'oop.br', 'or.jp', 'or.at', 'org.au', 'org.br', 'org.cn', 
+            'org.hk', 'org.lu', 'org.ru', 'org.tr', 'org.tw', 'org.uk', 'pol.tr', 'pp.ru', 'ppg.br',
+            'pro.br', 'psi.br', 'psc.br', 'qh.cn', 'qsl.br', 'rec.br', 'sc.cn', 'sd.cn', 'se.com', 
+            'se.net', 'sh.cn', 'slg.br', 'sn.cn', 'srv.br', 'sx.cn', 'tel.tr', 'tj.cn', 'tmp.br', 
+            'trd.br', 'tur.br', 'tv.br', 'tw.cn', 'uk.com', 'uk.net', 'vet.br', 'web.tr', 'xj.cn', 
+            'xz.cn', 'yn.cn', 'zj.cn'
+        );
+
+        $threeParts = array('wattle.id.au', 'emu.id.au');
+
+        // three sections tld first
+        if (in_array(implode('.', array_slice($parts, count($parts) - 3)), $threeParts)) {
+            $parts = array_slice($parts, 0, count($parts) - 2);
+        }
+
+        if (in_array(implode('.', array_slice($parts, count($parts) - 2)), $twoParts)) {
+            array_pop($parts);
+        }
+
+        // domain.com
+        if (count($parts) < 3) {
+            return null;
+        }
+
+        // foo.bar.domain.com
+        if (count($parts) > 3) {
+            return implode('.', array_slice($parts, 0, count($parts) - 2));
+        }
+
+        return $parts[0];
+    }
 
     public function getRequestUri()
     {

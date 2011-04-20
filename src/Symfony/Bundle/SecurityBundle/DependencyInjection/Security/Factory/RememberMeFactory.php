@@ -35,9 +35,6 @@ class RememberMeFactory implements SecurityFactoryInterface
 
         // remember me services
         if (isset($config['token_provider'])) {
-            $config['token-provider'] = $config['token_provider'];
-        }
-        if (isset($config['token-provider'])) {
             $templateId = 'security.authentication.rememberme.services.persistent';
             $rememberMeServicesId = $templateId.'.'.$id;
         } else {
@@ -56,10 +53,9 @@ class RememberMeFactory implements SecurityFactoryInterface
         $rememberMeServices->replaceArgument(1, $config['key']);
         $rememberMeServices->replaceArgument(2, $id);
 
-        if (isset($config['token-provider'])) {
-            // FIXME: make the naming assumption more flexible
+        if (isset($config['token_provider'])) {
             $rememberMeServices->addMethodCall('setTokenProvider', array(
-                new Reference('security.rememberme.token.provider.'.$config['token-provider'])
+                new Reference($config['token_provider'])
             ));
         }
 

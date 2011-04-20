@@ -16,7 +16,7 @@ namespace Symfony\Component\Security\Acl\Model;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-interface FieldAwareEntryInterface
+interface FieldEntryInterface extends EntryInterface
 {
     /**
      * Returns the field used for this entry.

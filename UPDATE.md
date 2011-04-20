@@ -21,6 +21,9 @@ PR12 to PR13
 
         $container->removeDefinition('my_definition');
         $definition->replaceArgument(0, 'foo');
+        
+* In the rememberme configuration, the token_provider key now expects a real 
+  service id instead of only a suffix.
 
 PR11 to PR12
 ------------

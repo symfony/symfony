@@ -121,7 +121,7 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Doctrine2 MongoDB is required for this test');
         }
         $database = 'aclTest';
-        $mongo = new \Doctrine\MongoDB\Connection();
+        $this->connection = $mongo = new \Doctrine\MongoDB\Connection();
         $this->con = $mongo->selectDatabase($database);
 
         $options = $this->getOptions();
@@ -187,6 +187,8 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         $this->oid = array();
+        $this->connection->close();
+        $this->connection = null;
         $this->con->drop();
         $this->con = null;
     }
@@ -259,6 +261,6 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function getProvider()
     {
-        return new AclProvider($this->con, $this->getStrategy(), $this->getOptions());
+        return new AclProvider($this->connection, 'aclTest', $this->getStrategy(), $this->getOptions());
     }
 }

@@ -4,6 +4,7 @@ namespace Symfony\Bridge\MongoDB\Security\Acl;
 
 use Doctrine\MongoDB\Database;
 use Doctrine\MongoDB\Cursor;
+use Doctrine\MongoDB\Connection;
 
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\Entry;
@@ -49,15 +50,16 @@ class AclProvider implements AclProviderInterface
     /**
      * Constructor
      *
-     * @param Database $database
+     * @param Doctrine\MongoDb\Connection $connection
+     * @param string $database
      * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
      * @param array $options
      * @param AclCacheInterface $aclCache
      */
-    public function __construct(Database $database, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $options, AclCacheInterface $aclCache = null)
+    public function __construct(Connection $connection, $database, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $options, AclCacheInterface $aclCache = null)
     {
         $this->aclCache = $aclCache;
-        $this->connection = $database;
+        $this->connection = $connection->selectDatabase($database);
         $this->loadedAces = array();
         $this->loadedAcls = array();
         $this->options = $options;

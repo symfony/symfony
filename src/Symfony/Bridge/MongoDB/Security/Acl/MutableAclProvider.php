@@ -3,6 +3,7 @@
 namespace Symfony\Bridge\MongoDB\Security\Acl;
 
 use Doctrine\Common\PropertyChangedListener;
+use Doctrine\MongoDB\Connection;
 use Doctrine\MongoDB\Database;
 
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
@@ -41,9 +42,9 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     /**
      * {@inheritDoc}
      */
-    public function __construct(Database $database, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $options, AclCacheInterface $aclCache = null)
+    public function __construct(Connection $connection, $database, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $options, AclCacheInterface $aclCache = null)
     {
-        parent::__construct($database, $permissionGrantingStrategy, $options, $aclCache);
+        parent::__construct($connection, $database, $permissionGrantingStrategy, $options, $aclCache);
 
         $this->propertyChanges = new \SplObjectStorage();
     }

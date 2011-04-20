@@ -20,7 +20,9 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
 {
+    static protected $database = 'aclTest';
     protected $con;
+    protected $connection;
 
     public static function assertAceEquals(EntryInterface $a, EntryInterface $b)
     {
@@ -244,7 +246,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
     public function testUpdateDoesNothingWhenThereAreNoChanges()
     {
         $args = array(
-            $this->con, new PermissionGrantingStrategy(), array(),
+            $this->connection, static::$database, new PermissionGrantingStrategy(), array(),
         );
         $provider = $this->getMockBuilder('Symfony\Bridge\MongoDB\Security\Acl\MutableAclProvider')
                 ->setConstructorArgs($args)
@@ -421,14 +423,15 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         if (!class_exists('Doctrine\MongoDB\Connection')) {
             $this->markTestSkipped('Doctrine2 MongoDB is required for this test');
         }
-        $database = 'aclTest';
-        $mongo = new \Doctrine\MongoDB\Connection();
-        $this->con = $mongo->selectDatabase($database);
+        $this->connection = new \Doctrine\MongoDB\Connection();
+        $this->con = $this->connection->selectDatabase(static::$database);
     }
 
     protected function tearDown()
     {
         $this->oid = array();
+        $this->connection->close();
+        $this->connection = null;
         $this->con->drop();
         $this->con = null;
     }
@@ -465,6 +468,6 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function getProvider($cache = null)
     {
-        return new MutableAclProvider($this->con, $this->getStrategy(), $this->getOptions(), $cache);
+        return new MutableAclProvider($this->connection, static::$database, $this->getStrategy(), $this->getOptions(), $cache);
     }
 }

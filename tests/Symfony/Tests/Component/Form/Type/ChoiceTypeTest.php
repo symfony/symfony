@@ -56,6 +56,16 @@ class ChoiceTypeTest extends TestCase
         ));
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testChoiceListOptionExpectsChoiceListInterface()
+    {
+        $form = $this->factory->create('choice', 'name', array(
+            'choice_list' => array('foo' => 'foo'),
+        ));
+    }
+
     public function testExpandedCheckboxesAreNeverRequired()
     {
         $form = $this->factory->create('choice', 'name', array(

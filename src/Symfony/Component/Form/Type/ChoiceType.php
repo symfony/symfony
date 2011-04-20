@@ -14,8 +14,8 @@ namespace Symfony\Component\Form\Type;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Exception\FormException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
+use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\EventListener\FixRadioInputListener;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\DataTransformer\ScalarToChoiceTransformer;
@@ -29,6 +29,10 @@ class ChoiceType extends AbstractType
     {
         if (!$options['choices'] && !$options['choice_list']) {
             throw new FormException('Either the option "choices" or "choice_list" is required');
+        }
+
+        if ($options['choice_list'] && !$options['choice_list'] instanceof ChoiceListInterface) {
+            throw new FormException('The "choice_list" must be an instance of "Symfony\Component\Form\ChoiceList\ChoiceListInterface".');
         }
 
         if (!$options['choice_list']) {

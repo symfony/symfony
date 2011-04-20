@@ -70,8 +70,8 @@ class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\Redirec
 
         // baz5
         if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/?$#x', $pathinfo, $matches)) {
-            if (!in_array($this->context->getMethod(), array('post'))) {
-                $allow = array_merge($allow, array('post'));
+            if ($this->context->getMethod() != 'post') {
+                $allow[] = 'post';
                 goto not_baz5;
             }
             if (substr($pathinfo, -1) !== '/') {
@@ -84,8 +84,8 @@ class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\Redirec
 
         // baz.baz6
         if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/?$#x', $pathinfo, $matches)) {
-            if (!in_array($this->context->getMethod(), array('put'))) {
-                $allow = array_merge($allow, array('put'));
+            if ($this->context->getMethod() != 'put') {
+                $allow[] = 'put';
                 goto not_bazbaz6;
             }
             if (substr($pathinfo, -1) !== '/') {

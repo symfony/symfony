@@ -107,6 +107,8 @@ EOF;
         return <<<EOF
 <?php
 
+use Symfony\Component\Routing\RequestContext;
+
 /**
  * $class
  *
@@ -129,7 +131,7 @@ EOF;
     /**
      * Constructor.
      */
-    public function __construct(array \$context = array(), array \$defaults = array())
+    public function __construct(RequestContext \$context, array \$defaults = array())
     {
         \$this->context = \$context;
         \$this->defaults = \$defaults;

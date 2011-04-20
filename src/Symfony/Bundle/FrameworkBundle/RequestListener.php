@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Matcher\Exception\NotFoundException;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\RequestContext;
 
 /**
  * RequestListener.
@@ -76,13 +77,13 @@ class RequestListener
         if ($master) {
             // set the context even if the parsing does not need to be done
             // to have correct link generation
-            $this->router->setContext(array(
-                'base_url'   => $request->getBaseUrl(),
-                'method'     => $request->getMethod(),
-                'host'       => $request->getHost(),
-                'scheme'     => $request->getScheme(),
-                'http_port'  => $this->httpPort,
-                'https_port' => $this->httpsPort,
+            $this->router->setContext(new RequestContext(
+                $request->getBaseUrl(),
+                $request->getMethod(),
+                $request->getHost(),
+                $request->getScheme(),
+                $this->httpPort,
+                $this->httpsPort
             ));
         }
 

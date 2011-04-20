@@ -14,6 +14,7 @@ namespace Symfony\Tests\Component\Routing\Generator\Dumper\PhpGeneratorDumper;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\Generator\Dumper\PhpGeneratorDumper;
+use Symfony\Component\Routing\RequestContext;
 
 class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,7 +38,7 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         $this->routeCollection = new RouteCollection();
-        $this->generatorDumper = new PhpGeneratorDumper($this->routeCollection);
+        $this->generatorDumper = new PhpGeneratorDumper($this->routeCollection, new RequestContext());
         $this->testTmpFilepath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'php_generator.php';
         @unlink($this->testTmpFilepath);
     }
@@ -57,12 +58,7 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
         include ($this->testTmpFilepath);
 
-        $projectUrlGenerator = new \ProjectUrlGenerator(array(
-            'base_url' => '/app.php',
-            'method' => 'GET',
-            'host' => 'localhost',
-            'scheme' => 'http',
-        ));
+        $projectUrlGenerator = new \ProjectUrlGenerator(new RequestContext('/app.php'));
 
         $absoluteUrlWithParameter    = $projectUrlGenerator->generate('Test', array('foo' => 'bar'), true);
         $absoluteUrlWithoutParameter = $projectUrlGenerator->generate('Test2', array(), true);
@@ -83,12 +79,7 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump(array('class' => 'WithoutRoutesUrlGenerator')));
         include ($this->testTmpFilepath);
 
-        $projectUrlGenerator = new \WithoutRoutesUrlGenerator(array(
-            'base_url' => '/app.php',
-            'method' => 'GET',
-            'host' => 'localhost',
-            'scheme' => 'http',
-        ));
+        $projectUrlGenerator = new \WithoutRoutesUrlGenerator(new RequestContext('/app.php'));
 
         $projectUrlGenerator->generate('Test', array());
     }
@@ -100,7 +91,7 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump(array('class' => 'DefaultRoutesUrlGenerator')));
         include ($this->testTmpFilepath);
 
-        $projectUrlGenerator = new \DefaultRoutesUrlGenerator(array());
+        $projectUrlGenerator = new \DefaultRoutesUrlGenerator(new RequestContext());
         $url = $projectUrlGenerator->generate('Test', array());
 
         $this->assertEquals($url, '/testing');

@@ -42,6 +42,18 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         $configuration = new Configuration($container->getParameter('kernel.debug'));
         $config = $processor->processConfiguration($configuration, $configs);
 
+        if (isset($config['acl_database'])) {
+            $container->setParameter('doctrine.odm.mongodb.security.acl.default_database', $config['acl_database']);
+        } else {
+            $container->setParameter('doctrine.odm.mongodb.security.acl.default_database', $config['default_database']);
+
+        }
+
+        if (isset($config['collections'])) {
+            $container->setParameter('doctrine.odm.mongodb.security.acl.entry_collection', $config['collections']['entry']);
+            $container->setParameter('doctrine.odm.mongodb.security.acl.oid_collection', $config['collections']['object_identity']);
+        }
+        
         // can't currently default this correctly in Configuration
         if (!isset($config['metadata_cache_driver'])) {
             $config['metadata_cache_driver'] = array('type' => 'array');

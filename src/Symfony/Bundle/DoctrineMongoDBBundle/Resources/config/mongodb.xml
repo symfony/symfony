@@ -47,7 +47,7 @@
         <!-- security/user -->
         <parameter key="doctrine.odm.mongodb.security.user.provider.class">Symfony\Bundle\DoctrineMongoDBBundle\Security\DocumentUserProvider</parameter>
         <parameter key="doctrine.odm.mongodb.security.acl.provider.class">Symfony\Bridge\MongoDB\Security\Acl\MutableAclProvider</parameter>
-        <parameter key="doctrine.odm.mongodb.security.acl.database">%doctrine.odm.mongodb.default_database%</parameter>
+        <parameter key="doctrine.odm.mongodb.security.acl.database">%doctrine.odm.mongodb.security.acl.default_database%</parameter>
         <parameter key="doctrine.odm.mongodb.security.acl.entry_collection">entries</parameter>
         <parameter key="doctrine.odm.mongodb.security.acl.oid_collection">objectIdentities</parameter>
 

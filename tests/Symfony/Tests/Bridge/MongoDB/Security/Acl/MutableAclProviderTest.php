@@ -389,7 +389,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         $connection = $this->getField($provider, 'connection');
         $options = $this->getOptions();
 
-        $parent = $connection->selectCollection($options['oid_table_name'])->findOne($query);
+        $parent = $connection->selectCollection($options['oid_collection'])->findOne($query);
 
         // update parent relationship
         $updates['parent'] = $parent;
@@ -407,7 +407,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
             '$set' => $updates,
         );
 
-        $connection->selectCollection($options['oid_table_name'])->update($entry, $newData);
+        $connection->selectCollection($options['oid_collection'])->update($entry, $newData);
     }
 
     protected function callMethod($object, $method, array $args)
@@ -455,9 +455,9 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
     protected function getOptions()
     {
         return array(
-            'oid_table_name' => 'aclObjectIdentities',
+            'oid_collection' => 'aclObjectIdentities',
             'sid_table_name' => 'aclSecurityIdentities',
-            'entry_table_name' => 'aclEntries',
+            'entry_collection' => 'aclEntries',
         );
     }
 

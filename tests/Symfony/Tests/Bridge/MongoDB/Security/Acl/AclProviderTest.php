@@ -142,7 +142,7 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             $sids[$id] = $data;
         }
 
-        $this->oidCollection = $this->con->selectCollection($options['oid_table_name']);
+        $this->oidCollection = $this->con->selectCollection($options['oid_collection']);
         $this->oids = array();
         foreach ($this->getOidData() as $data) {
             $query = array();
@@ -166,14 +166,14 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
         }
 
         $fields = array('id', 'class', 'objectIdentity', 'fieldName', 'aceOrder', 'securityIdentity', 'mask', 'granting', 'grantingStrategy', 'auditSuccess', 'auditFailure');
-        $this->entryCollection = $this->con->selectCollection($options['entry_table_name']);
+        $this->entryCollection = $this->con->selectCollection($options['entry_collection']);
         foreach ($this->getEntryData() as $data) {
             $query = array_combine($fields, $data);
             unset($query['id']);
             unset($query['class']);
             $oid = $query['objectIdentity'];
             $query['objectIdentity'] = array(
-                '$ref' => $options['oid_table_name'],
+                '$ref' => $options['oid_collection'],
                 '$id' => $this->oids[$oid]['_id'],
             );
             $sid = $query['securityIdentity'];
@@ -249,8 +249,8 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
     protected function getOptions()
     {
         return array(
-            'oid_table_name' => 'aclObjectIdentities',
-            'entry_table_name' => 'aclEntries',
+            'oid_collection' => 'aclObjectIdentities',
+            'entry_collection' => 'aclEntries',
         );
     }
 

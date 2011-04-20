@@ -21,11 +21,11 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
 
         // get some random test object identities from the database
         $oids = array();
-        $max = $this->con->selectCollection($this->options['oid_table_name'])->find()->count();
+        $max = $this->con->selectCollection($this->options['oid_collection'])->find()->count();
 
         for ($i = 0; $i < 25; $i++) {
             $randomKey = rand(0, $max);
-            $oid = $this->con->selectCollection($this->options['oid_table_name'])->findOne(array('randomKey' => $randomKey));
+            $oid = $this->con->selectCollection($this->options['oid_collection'])->findOne(array('randomKey' => $randomKey));
             $oids[] = new ObjectIdentity($oid['identifier'], $oid['type']);
         }
 
@@ -63,11 +63,11 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
      */
     protected function generateTestData()
     {
-        $this->con->selectCollection($this->options['oid_table_name'])->drop();
-        $this->con->selectCollection($this->options['entry_table_name'])->drop();
-        $this->con->selectCollection($this->options['oid_table_name'])->ensureIndex(array('randomKey' => 1), array());
-        $this->con->selectCollection($this->options['oid_table_name'])->ensureIndex(array('identifier' => 1, 'type' => 1));
-        $this->con->selectCollection($this->options['entry_table_name'])->ensureIndex(array('objectIdentity.$id' => 1));
+        $this->con->selectCollection($this->options['oid_collection'])->drop();
+        $this->con->selectCollection($this->options['entry_collection'])->drop();
+        $this->con->selectCollection($this->options['oid_collection'])->ensureIndex(array('randomKey' => 1), array());
+        $this->con->selectCollection($this->options['oid_collection'])->ensureIndex(array('identifier' => 1, 'type' => 1));
+        $this->con->selectCollection($this->options['entry_collection'])->ensureIndex(array('objectIdentity.$id' => 1));
 
         for ($i = 0; $i < 40000; $i++) {
             $this->generateAclHierarchy();
@@ -105,7 +105,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
     {
         static $aclRandomKeyValue = 0; // used to retrieve random objects
 
-        $oidCollection = $this->con->selectCollection($this->options['oid_table_name']);
+        $oidCollection = $this->con->selectCollection($this->options['oid_collection']);
 
         $acl = array_merge($objectIdentity,
                            array(
@@ -143,7 +143,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
         $sids = array();
         $fieldOrder = array();
 
-        $collection = $this->con->selectCollection($this->options['entry_table_name']);
+        $collection = $this->con->selectCollection($this->options['entry_collection']);
         for ($i = 0; $i <= 30; $i++) {
             $query = array();
 
@@ -151,7 +151,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
 
             if (rand(0, 5) != 0) {
                 $query['objectIdentity'] = array(
-                    '$ref' => $this->options['oid_table_name'],
+                    '$ref' => $this->options['oid_collection'],
                     '$id' => $acl['_id'],
                 );
             }
@@ -222,8 +222,8 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
     protected function getOptions()
     {
         return array(
-            'oid_table_name' => 'aclObjectIdentities',
-            'entry_table_name' => 'aclEntries',
+            'oid_collection' => 'aclObjectIdentities',
+            'entry_collection' => 'aclEntries',
         );
     }
 

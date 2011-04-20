@@ -86,7 +86,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         $query = array(
             '_id' => array('$in' => $removable),
         );
-        $this->connection->selectCollection($this->options['oid_table_name'])->remove($query);
+        $this->connection->selectCollection($this->options['oid_collection'])->remove($query);
         $this->deleteAccessControlEntries($removable);
 
         // evict the ACL from the in-memory identity map
@@ -333,7 +333,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         }
 
         // TODO: safe options
-        return $this->connection->selectCollection($this->options['oid_table_name'])->insert($data);
+        return $this->connection->selectCollection($this->options['oid_collection'])->insert($data);
     }
 
     /**
@@ -348,7 +348,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         $query = array(
             'objectIdentity' => array('$in' => $removableIds),
         );
-        $this->connection->selectCollection($this->options['entry_table_name'])->remove($query);
+        $this->connection->selectCollection($this->options['entry_collection'])->remove($query);
     }
 
     /**
@@ -369,7 +369,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             $query = array(
                 '_id' => new \MongoId($acl->getParentAcl()->getId()),
             );
-            $parent = $this->connection->selectCollection($this->options['oid_table_name'])->findOne($query);
+            $parent = $this->connection->selectCollection($this->options['oid_collection'])->findOne($query);
 
             $updates['parent'] = $parent;
 
@@ -389,7 +389,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             '$set' => $updates,
         );
 
-        $this->connection->selectCollection($this->options['oid_table_name'])->update($entry, $newData);
+        $this->connection->selectCollection($this->options['oid_collection'])->update($entry, $newData);
     }
 
     /**
@@ -522,14 +522,14 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
         if (isset($objectIdentityId)) {
             $criteria['objectIdentity'] = array(
-                '$ref' => $this->options['oid_table_name'],
+                '$ref' => $this->options['oid_collection'],
                 '$id' => new \MongoId($objectIdentityId),
             );
         }
         if (isset($field)) {
             $criteria['fieldName'] = $field;
         }
-        $this->connection->selectCollection($this->options['entry_table_name'])->insert($criteria);
+        $this->connection->selectCollection($this->options['entry_collection'])->insert($criteria);
         return $criteria['_id'];
     }
 
@@ -543,7 +543,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         $criteria = array(
             '_id' => new \MongoId($id),
         );
-        $this->connection->selectCollection($this->options['entry_table_name'])->remove($criteria);
+        $this->connection->selectCollection($this->options['entry_collection'])->remove($criteria);
     }
 
     /**
@@ -576,7 +576,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             $criteria = array(
                 '_id' => new \MongoId($ace->getId()),
             );
-            $this->connection->selectCollection($this->options['entry_table_name'])->update($criteria, array('$set' => $update));
+            $this->connection->selectCollection($this->options['entry_collection'])->update($criteria, array('$set' => $update));
         }
     }
 }

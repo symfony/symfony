@@ -83,7 +83,7 @@ class AclProvider implements AclProviderInterface
             );
         }
         $children = array();
-        foreach ($this->connection->selectCollection($this->options['oid_table_name'])->find($query) as $data) {
+        foreach ($this->connection->selectCollection($this->options['oid_collection'])->find($query) as $data) {
             $children[] = $data;
         }
         return $children;
@@ -229,9 +229,9 @@ class AclProvider implements AclProviderInterface
         }
         $oids = $this->getOIDSet($objIdentities, $sids);
         $entryQuery = array('objectIdentity.$id' => array('$in' => $oids));
-        $entryCursor = $this->connection->selectCollection($this->options['entry_table_name'])->find($entryQuery);
+        $entryCursor = $this->connection->selectCollection($this->options['entry_collection'])->find($entryQuery);
         $oidQuery = array('_id' => array('$in' => $oids));
-        $oidCursor = $this->connection->selectCollection($this->options['oid_table_name'])->find($oidQuery);
+        $oidCursor = $this->connection->selectCollection($this->options['oid_collection'])->find($oidQuery);
         return $this->hydrateObjectIdentities($entryCursor, $oidCursor, $oidLookup, $sids);
     }
 
@@ -253,7 +253,7 @@ class AclProvider implements AclProviderInterface
         }
         $query = array('$or' => $batchSet);
 
-        return $this->connection->selectCollection($this->options['oid_table_name'])->find($query);
+        return $this->connection->selectCollection($this->options['oid_collection'])->find($query);
     }
 
     /**
@@ -269,7 +269,7 @@ class AclProvider implements AclProviderInterface
             "type" => $oid->getType(),
         );
 
-        return $this->connection->selectCollection($this->options['oid_table_name'])->findOne($query);
+        return $this->connection->selectCollection($this->options['oid_collection'])->findOne($query);
     }
 
     /**
@@ -560,7 +560,7 @@ class AclProvider implements AclProviderInterface
         $fields = array(
             "_id" => true,
         );
-        $id = $this->connection->selectCollection($this->options['oid_table_name'])->findOne($query, $fields);
+        $id = $this->connection->selectCollection($this->options['oid_collection'])->findOne($query, $fields);
         return $id ? array_pop($id) : null;
     }
 }

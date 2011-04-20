@@ -24,13 +24,28 @@ class AssetManagerCacheWarmerTest extends \PHPUnit_Framework_TestCase
 
     public function testWarmUp()
     {
-        $am = $this->getMockBuilder('Assetic\\Factory\\LazyAssetManager')
+        $am = $this
+            ->getMockBuilder('Assetic\\Factory\\LazyAssetManager')
             ->disableOriginalConstructor()
-            ->getMock();
+            ->getMock()
+        ;
 
         $am->expects($this->once())->method('load');
+        
+        $container = $this
+            ->getMockBuilder('Symfony\\Component\\DependencyInjection\\Container')
+            ->setConstructorArgs(array())
+            ->getMock()
+        ;
+        
+        $container
+            ->expects($this->once())
+            ->method('get')
+            ->with('assetic.asset_manager')
+            ->will($this->returnValue($am))
+        ;
 
-        $warmer = new AssetManagerCacheWarmer($am);
+        $warmer = new AssetManagerCacheWarmer($container);
         $warmer->warmUp('/path/to/cache');
     }
 }

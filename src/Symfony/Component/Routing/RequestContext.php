@@ -24,6 +24,7 @@ class RequestContext
     private $scheme;
     private $httpPort;
     private $httpsPort;
+    private $parameters;
 
     /**
      * Constructor.
@@ -43,6 +44,7 @@ class RequestContext
         $this->scheme = strtolower($scheme);
         $this->httpPort = $httpPort;
         $this->httpsPort = $httpsPort;
+        $this->parameters = array();
     }
 
     /**
@@ -163,5 +165,66 @@ class RequestContext
     public function setHttpsPort($httpsPort)
     {
         $this->httpsPort = $httpsPort;
+    }
+
+    /**
+     * Returns the parameters.
+     *
+     * @return array The parameters
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * Sets the parameters.
+     *
+     * This method implements a fluent interface.
+     *
+     * @param array $parameters The parameters
+     *
+     * @return Route The current Route instance
+     */
+    public function setParameters(array $parameters)
+    {
+        $this->parameters = $parameters;
+
+        return $this;
+    }
+
+    /**
+     * Gets a parameter value.
+     *
+     * @param string $name A parameter name
+     *
+     * @return mixed The parameter value
+     */
+    public function getParameter($name)
+    {
+        return isset($this->parameters[$name]) ? $this->parameters[$name] : null;
+    }
+
+    /**
+     * Checks if a parameter value is set for the given parameter.
+     *
+     * @param string $name A parameter name
+     *
+     * @return Boolean true if the parameter value is set, false otherwise
+     */
+    public function hasParameter($name)
+    {
+        return array_key_exists($name, $this->parameters);
+    }
+
+    /**
+     * Sets a parameter value.
+     *
+     * @param string $name    A parameter name
+     * @param mixed  $parameter The parameter value
+     */
+    public function setParameter($name, $parameter)
+    {
+        $this->parameters[$name] = $parameter;
     }
 }

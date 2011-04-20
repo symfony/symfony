@@ -2,33 +2,33 @@
 
 <container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:app="http://symfony.com/schema/dic/symfony"
+    xmlns:framework="http://symfony.com/schema/dic/symfony"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
                         http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
-    <app:config>
-        <app:csrf-protection enabled="true" field-name="_csrf" secret="s3cr3t" />
-        <app:esi enabled="true" />
-        <app:profiler only-exceptions="true" />
-        <app:router cache-warmer="true" resource="%kernel.root_dir%/config/routing.xml" type="xml" />
-        <app:session auto-start="true" class="Session" default-locale="fr" storage-id="native" name="_SYMFONY" lifetime="86400" path="/" domain="example.com" secure="true" httponly="true" />
-        <app:templating assets-version="SomeVersionScheme" cache-warmer="true" cache="/path/to/cache" >
-            <app:loader>loader.foo</app:loader>
-            <app:loader>loader.bar</app:loader>
-            <app:engine>php</app:engine>
-            <app:engine>twig</app:engine>
-            <app:assets-base-url>http://cdn.example.com</app:assets-base-url>
-            <app:package name="images" version="1.0.0">
-                <app:base-url>http://images1.example.com</app:base-url>
-                <app:base-url>http://images2.example.com</app:base-url>
-            </app:package>
-            <app:package name="foo" version="1.0.0" />
-            <app:package name="bar">
-                <app:base-url>http://bar1.example.com</app:base-url>
-                <app:base-url>http://bar2.example.com</app:base-url>
-            </app:package>
-        </app:templating>
-        <app:translator enabled="true" fallback="fr" />
-        <app:validation enabled="true" cache="apc" />
-    </app:config>
+    <framework:config>
+        <framework:csrf-protection enabled="true" field-name="_csrf" secret="s3cr3t" />
+        <framework:esi enabled="true" />
+        <framework:profiler only-exceptions="true" />
+        <framework:router cache-warmer="true" resource="%kernel.root_dir%/config/routing.xml" type="xml" />
+        <framework:session auto-start="true" class="Session" default-locale="fr" storage-id="native" name="_SYMFONY" lifetime="86400" path="/" domain="example.com" secure="true" httponly="true" />
+        <framework:templating assets-version="SomeVersionScheme" cache-warmer="true" cache="/path/to/cache" >
+            <framework:loader>loader.foo</framework:loader>
+            <framework:loader>loader.bar</framework:loader>
+            <framework:engine>php</framework:engine>
+            <framework:engine>twig</framework:engine>
+            <framework:assets-base-url>http://cdn.example.com</framework:assets-base-url>
+            <framework:package name="images" version="1.0.0">
+                <framework:base-url>http://images1.example.com</framework:base-url>
+                <framework:base-url>http://images2.example.com</framework:base-url>
+            </framework:package>
+            <framework:package name="foo" version="1.0.0" />
+            <framework:package name="bar">
+                <framework:base-url>http://bar1.example.com</framework:base-url>
+                <framework:base-url>http://bar2.example.com</framework:base-url>
+            </framework:package>
+        </framework:templating>
+        <framework:translator enabled="true" fallback="fr" />
+        <framework:validation enabled="true" cache="apc" />
+    </framework:config>
 </container>

@@ -410,6 +410,27 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('www.host.com', $request->getHost(), '->getHost() value from Host header has priority over SERVER_NAME ');
     }
 
+    public function getSubdomains()
+    {
+        return array(
+            array('domain', null),
+            array('domain.com', null),
+            array('foo.domain.com', 'foo'),
+            array('bar.foo.domain.com', 'bar.foo'),
+            array('foo.bar.foo.domain.com', 'foo.bar.foo')
+        );
+    }
+    
+    /**
+     * @cover Symfony\Component\HttpFoundation\Request::getSubdomain
+     * @dataProvider getSubdomains
+     */
+    public function testGetSubdomain($host, $subdomain)
+    {
+        $request = new Request(array(), array(), array(), array(), array(), array('SERVER_NAME' => $host));
+        $this->assertEquals($subdomain, $request->getSubdomain());
+    } 
+
     /**
      * @covers Symfony\Component\HttpFoundation\Request::setMethod
      * @covers Symfony\Component\HttpFoundation\Request::getMethod

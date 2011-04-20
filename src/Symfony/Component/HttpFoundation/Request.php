@@ -440,6 +440,24 @@ class Request
 
         return $name.':'.$port;
     }
+    
+    public function getSubdomain()
+    {
+        $serverName = $this->server->get('SERVER_NAME');
+        $parts = explode('.', $serverName);
+
+        // domain.com
+        if (count($parts) < 3) {
+            return null;
+        }
+
+        // foo.bar.domain.com
+        if (count($parts) > 3) {
+            return implode('.', array_slice($parts, 0, count($parts) - 2));
+        }
+
+        return $parts[0];
+    }
 
     public function getRequestUri()
     {

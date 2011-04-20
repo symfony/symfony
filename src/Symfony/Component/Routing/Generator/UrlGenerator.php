@@ -79,7 +79,8 @@ class UrlGenerator implements UrlGeneratorInterface
      */
     protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $absolute)
     {
-        $tparams = array_merge($defaults, $parameters);
+        $parameters = array_replace($this->context->getParameters(), $parameters);
+        $tparams = array_replace($defaults, $parameters);
 
         // all params must be given
         if ($diff = array_diff_key($variables, $tparams)) {

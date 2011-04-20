@@ -46,6 +46,10 @@
 
         <!-- security/user -->
         <parameter key="doctrine.odm.mongodb.security.user.provider.class">Symfony\Bundle\DoctrineMongoDBBundle\Security\DocumentUserProvider</parameter>
+        <parameter key="doctrine.odm.mongodb.security.acl.provider.class">Symfony\Bridge\MongoDB\Security\Acl\MutableAclProvider</parameter>
+        <parameter key="doctrine.odm.mongodb.security.acl.database">%doctrine.odm.mongodb.default_database%</parameter>
+        <parameter key="doctrine.odm.mongodb.security.acl.entry_collection">entries</parameter>
+        <parameter key="doctrine.odm.mongodb.security.acl.oid_collection">objectIdentities</parameter>
 
         <!-- proxy cache warmer -->
         <parameter key="doctrine.odm.mongodb.proxy_cache_warmer.class">Symfony\Bundle\DoctrineMongoDBBundle\CacheWarmer\ProxyCacheWarmer</parameter>
@@ -111,6 +115,16 @@
         </service>
 
         <!-- Security -->
+        <service id="doctrine.odm.mongodb.security.acl.provider" class="%doctrine.odm.mongodb.security.acl.provider.class%" public="false" abstract="true">
+            <argument type="service" id="doctrine.odm.mongodb.default_connection" />
+            <argument>%doctrine.odm.mongodb.security.acl.database%</argument>
+            <argument type="service" id="security.acl.permission_granting_strategy" />
+            <argument type="collection">
+                <argument key="entry_collection">%doctrine.odm.mongodb.security.acl.entry_collection%</argument>
+                <argument key="entry_collection">%doctrine.odm.mongodb.security.acl.oid_collection%</argument>
+            </argument>
+            <argument type="service" id="security.acl.cache" on-invalid="null" />
+        </service>
         <service id="doctrine.odm.mongodb.security.user.provider" class="%doctrine.odm.mongodb.security.user.provider.class%" public="false" abstract="true">
             <argument type="service" id="doctrine.odm.mongodb.security.user.document_manager" />
         </service>

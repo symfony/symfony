@@ -62,7 +62,7 @@ class RequestListener
         }
 
         // starts the session if a session cookie already exists in the request...
-        if ($request->hasSession()) {
+        if ($request->hasSession() && null !== $request->getSession()) {
             $request->getSession()->start();
         }
     }

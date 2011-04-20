@@ -77,14 +77,20 @@ class RequestListener
         if ($master) {
             // set the context even if the parsing does not need to be done
             // to have correct link generation
-            $this->router->setContext(new RequestContext(
+            $context = new RequestContext(
                 $request->getBaseUrl(),
                 $request->getMethod(),
                 $request->getHost(),
                 $request->getScheme(),
                 $this->httpPort,
                 $this->httpsPort
-            ));
+            );
+
+            if ($session = $request->getSession()) {
+                $context->setParameter('_locale', $session->getLocale());
+            }
+
+            $this->router->setContext($context);
         }
 
         if ($request->attributes->has('_controller')) {
@@ -101,10 +107,6 @@ class RequestListener
             }
 
             $request->attributes->add($parameters);
-
-            if ($locale = $request->attributes->get('_locale')) {
-                $request->getSession()->setLocale($locale);
-            }
         } catch (NotFoundException $e) {
             $message = sprintf('No route found for "%s %s"', $request->getMethod(), $request->getPathInfo());
             if (null !== $this->logger) {
@@ -117,6 +119,11 @@ class RequestListener
                 $this->logger->err($message);
             }
             throw new MethodNotAllowedHttpException($e->getAllowedMethods(), $message, $e);
+        }
+
+        if ($master && $locale = $request->attributes->get('_locale')) {
+            $request->getSession()->setLocale($locale);
+            $context->setParameter('_locale', $locale);
         }
     }
 

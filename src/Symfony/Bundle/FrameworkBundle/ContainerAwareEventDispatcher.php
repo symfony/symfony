@@ -85,12 +85,16 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     {
         if (isset($this->listenerIds[$eventName])) {
             foreach ($this->listenerIds[$eventName] as $serviceId => $priority) {
-                if (isset($this->listeners[$eventName][$serviceId])) {
-                    $this->removeListener($eventName, $this->listeners[$eventName][$serviceId]);
-                }
                 $listener = $this->container->get($serviceId);
+
+                if (!isset($this->listeners[$eventName][$serviceId])) {
+                    $this->addListener($eventName, $listener, $priority);
+                } elseif ($listener !== $this->listeners[$eventName][$serviceId]) {
+                    $this->removeListener($eventName, $this->listeners[$eventName][$serviceId]);
+                    $this->addListener($eventName, $listener, $priority);
+                }
+
                 $this->listeners[$eventName][$serviceId] = $listener;
-                $this->addListener($eventName, $listener, $priority);
             }
         }
 

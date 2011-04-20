@@ -195,10 +195,9 @@ EOF;
     /**
      * Constructor.
      */
-    public function __construct(RequestContext \$context, array \$defaults = array())
+    public function __construct(RequestContext \$context)
     {
         \$this->context = \$context;
-        \$this->defaults = \$defaults;
     }
 
 EOF;

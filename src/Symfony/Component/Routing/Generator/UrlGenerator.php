@@ -22,7 +22,6 @@ use Symfony\Component\Routing\RequestContext;
  */
 class UrlGenerator implements UrlGeneratorInterface
 {
-    protected $defaults;
     protected $context;
 
     private $routes;
@@ -33,13 +32,11 @@ class UrlGenerator implements UrlGeneratorInterface
      *
      * @param RouteCollection $routes   A RouteCollection instance
      * @param RequestContext  $context  The context
-     * @param array           $defaults The default values
      */
-    public function __construct(RouteCollection $routes, RequestContext $context, array $defaults = array())
+    public function __construct(RouteCollection $routes, RequestContext $context)
     {
         $this->routes = $routes;
         $this->context = $context;
-        $this->defaults = $defaults;
         $this->cache = array();
     }
 
@@ -82,7 +79,6 @@ class UrlGenerator implements UrlGeneratorInterface
      */
     protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $absolute)
     {
-        $defaults = array_merge($this->defaults, $defaults);
         $tparams = array_merge($defaults, $parameters);
 
         // all params must be given

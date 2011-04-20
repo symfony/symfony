@@ -15,10 +15,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
     /**
      * Constructor.
      */
-    public function __construct(RequestContext $context, array $defaults = array())
+    public function __construct(RequestContext $context)
     {
         $this->context = $context;
-        $this->defaults = $defaults;
     }
 
     public function match($pathinfo)

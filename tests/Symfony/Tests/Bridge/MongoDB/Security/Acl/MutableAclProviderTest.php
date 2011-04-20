@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Tests\Component\Security\Acl\MongoDB;
+namespace Symfony\Tests\Bridge\MongoDB\Security\Acl;
 
 use Doctrine\MongoDB\Connection;
 
@@ -13,9 +13,9 @@ use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
 use Symfony\Component\Security\Acl\Exception\ConcurrentModificationException;
-use Symfony\Component\Security\Acl\MongoDB\AclProvider;
+use Symfony\Bridge\MongoDB\Security\Acl\AclProvider;
 use Symfony\Component\Security\Acl\Domain\PermissionGrantingStrategy;
-use Symfony\Component\Security\Acl\MongoDB\MutableAclProvider;
+use Symfony\Bridge\MongoDB\Security\Acl\MutableAclProvider;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
@@ -246,7 +246,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         $args = array(
             $this->con, new PermissionGrantingStrategy(), array(),
         );
-        $provider = $this->getMockBuilder('Symfony\Component\Security\Acl\MongoDB\MutableAclProvider')
+        $provider = $this->getMockBuilder('Symfony\Bridge\MongoDB\Security\Acl\MutableAclProvider')
                 ->setConstructorArgs($args)
                 ->getMock();
         $provider

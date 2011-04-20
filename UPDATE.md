@@ -6,6 +6,22 @@ one. It only discusses changes that need to be done when using the "public"
 API of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.
 
+PR12 to PR13
+------------
+
+* Some methods in the DependencyInjection component's ContainerBuilder and
+  Definition classes have been renamed to be more specific and consistent:
+
+  Before:
+
+        $container->remove('my_definition');
+        $definition->setArgument(0, 'foo');
+
+  After:
+
+        $container->removeDefinition('my_definition');
+        $definition->replaceArgument(0, 'foo');
+
 PR11 to PR12
 ------------
 

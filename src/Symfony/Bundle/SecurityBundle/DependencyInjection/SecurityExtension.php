@@ -62,7 +62,7 @@ class SecurityExtension extends Extension
 
         // set some global scalars
         $container->setParameter('security.access.denied_url', $config['access_denied_url']);
-        $container->getDefinition('security.authentication.session_strategy')->setArgument(0, $config['session_fixation_strategy']);
+        $container->getDefinition('security.authentication.session_strategy')->replaceArgument(0, $config['session_fixation_strategy']);
         $container
             ->getDefinition('security.access.decision_manager')
             ->addArgument($config['access_decision_manager']['strategy'])
@@ -138,13 +138,13 @@ class SecurityExtension extends Extension
     private function createRoleHierarchy($config, ContainerBuilder $container)
     {
         if (!isset($config['role_hierarchy'])) {
-            $container->remove('security.access.role_hierarchy_voter');
+            $container->removeDefinition('security.access.role_hierarchy_voter');
 
             return;
         }
 
         $container->setParameter('security.role_hierarchy.roles', $config['role_hierarchy']);
-        $container->remove('security.access.simple_role_voter');
+        $container->removeDefinition('security.access.simple_role_voter');
     }
 
     private function createAuthorization($config, ContainerBuilder $container)
@@ -202,12 +202,12 @@ class SecurityExtension extends Extension
             $contextId = 'security.firewall.map.context.'.$name;
             $context = $container->setDefinition($contextId, new DefinitionDecorator('security.firewall.context'));
             $context
-                ->setArgument(0, $listeners)
-                ->setArgument(1, $exceptionListener)
+                ->replaceArgument(0, $listeners)
+                ->replaceArgument(1, $exceptionListener)
             ;
             $map[$contextId] = $matcher;
         }
-        $mapDef->setArgument(1, $map);
+        $mapDef->replaceArgument(1, $map);
 
         // add authentication providers to authentication manager
         $authenticationProviders = array_map(function($id) {
@@ -215,7 +215,7 @@ class SecurityExtension extends Extension
         }, array_values(array_unique($authenticationProviders)));
         $container
             ->getDefinition('security.authentication.manager')
-            ->setArgument(0, $authenticationProviders)
+            ->replaceArgument(0, $authenticationProviders)
         ;
     }
 
@@ -263,13 +263,13 @@ class SecurityExtension extends Extension
         if (isset($firewall['logout'])) {
             $listenerId = 'security.logout_listener.'.$id;
             $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.logout_listener'));
-            $listener->setArgument(1, $firewall['logout']['path']);
-            $listener->setArgument(2, $firewall['logout']['target']);
+            $listener->replaceArgument(1, $firewall['logout']['path']);
+            $listener->replaceArgument(2, $firewall['logout']['target']);
             $listeners[] = new Reference($listenerId);
 
             // add logout success handler
             if (isset($firewall['logout']['success_handler'])) {
-                $listener->setArgument(3, new Reference($firewall['logout']['success_handler']));
+                $listener->replaceArgument(3, new Reference($firewall['logout']['success_handler']));
             }
 
             // add session logout handler
@@ -324,7 +324,7 @@ class SecurityExtension extends Extension
 
         $listenerId = 'security.context_listener.'.count($this->contextListeners);
         $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.context_listener'));
-        $listener->setArgument(2, $contextKey);
+        $listener->replaceArgument(2, $contextKey);
 
         return $this->contextListeners[$contextKey] = $listenerId;
     }
@@ -356,7 +356,7 @@ class SecurityExtension extends Extension
             $listenerId = 'security.authentication.listener.anonymous.'.$id;
             $container
                 ->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.anonymous'))
-                ->setArgument(1, $firewall['anonymous']['key'])
+                ->replaceArgument(1, $firewall['anonymous']['key'])
             ;
 
             $listeners[] = new Reference($listenerId);
@@ -364,7 +364,7 @@ class SecurityExtension extends Extension
             $providerId = 'security.authentication.provider.anonymous.'.$id;
             $container
                 ->setDefinition($providerId, new DefinitionDecorator('security.authentication.provider.anonymous'))
-                ->setArgument(0, $firewall['anonymous']['key'])
+                ->replaceArgument(0, $firewall['anonymous']['key'])
             ;
 
             $authenticationProviders[] = $providerId;
@@ -496,13 +496,13 @@ class SecurityExtension extends Extension
     {
         $exceptionListenerId = 'security.exception_listener.'.$id;
         $listener = $container->setDefinition($exceptionListenerId, new DefinitionDecorator('security.exception_listener'));
-        $listener->setArgument(2, null === $defaultEntryPoint ? null : new Reference($defaultEntryPoint));
+        $listener->replaceArgument(2, null === $defaultEntryPoint ? null : new Reference($defaultEntryPoint));
 
         // access denied handler setup
         if (isset($config['access_denied_handler'])) {
-            $listener->setArgument(4, new Reference($config['access_denied_handler']));
+            $listener->replaceArgument(4, new Reference($config['access_denied_handler']));
         } else if (isset($config['access_denied_url'])) {
-            $listener->setArgument(3, $config['access_denied_url']);
+            $listener->replaceArgument(3, $config['access_denied_url']);
         }
 
         return $exceptionListenerId;
@@ -514,10 +514,10 @@ class SecurityExtension extends Extension
 
         $switchUserListenerId = 'security.authentication.switchuser_listener.'.$id;
         $listener = $container->setDefinition($switchUserListenerId, new DefinitionDecorator('security.authentication.switchuser_listener'));
-        $listener->setArgument(1, new Reference($userProvider));
-        $listener->setArgument(3, $id);
-        $listener->setArgument(6, $config['parameter']);
-        $listener->setArgument(7, $config['role']);
+        $listener->replaceArgument(1, new Reference($userProvider));
+        $listener->replaceArgument(3, $id);
+        $listener->replaceArgument(6, $config['parameter']);
+        $listener->replaceArgument(7, $config['role']);
 
         return $switchUserListenerId;
     }

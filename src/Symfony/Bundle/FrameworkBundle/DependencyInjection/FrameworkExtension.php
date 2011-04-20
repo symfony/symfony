@@ -75,12 +75,12 @@ class FrameworkExtension extends Extension
             } else {
                 $container
                     ->getDefinition('error_handler')->addMethodCall('register', array())
-                    ->setArgument(0, $config['error_handler'])
+                    ->replaceArgument(0, $config['error_handler'])
                 ;
             }
         }
 
-        $container->getDefinition('exception_listener')->setArgument(0, $config['exception_controller']);
+        $container->getDefinition('exception_listener')->replaceArgument(0, $config['exception_controller']);
 
         if (!empty($config['test'])) {
             $loader->load('test.xml');
@@ -194,8 +194,8 @@ class FrameworkExtension extends Extension
         $loader->load('collectors.xml');
 
         $container->getDefinition('profiler_listener')
-            ->setArgument(2, $config['only_exceptions'])
-            ->setArgument(3, $config['only_master_requests'])
+            ->replaceArgument(2, $config['only_exceptions'])
+            ->replaceArgument(3, $config['only_master_requests'])
         ;
 
         // Choose storage class based on the DSN
@@ -209,10 +209,10 @@ class FrameworkExtension extends Extension
         }
 
         $container->getDefinition('profiler.storage')
-            ->setArgument(0, $config['dsn'])
-            ->setArgument(1, $config['username'])
-            ->setArgument(2, $config['password'])
-            ->setArgument(3, $config['lifetime'])
+            ->replaceArgument(0, $config['dsn'])
+            ->replaceArgument(1, $config['username'])
+            ->replaceArgument(2, $config['password'])
+            ->replaceArgument(3, $config['lifetime'])
             ->setClass($supported[$class])
         ;
 
@@ -289,7 +289,7 @@ class FrameworkExtension extends Extension
             $container->setParameter('session.class', $config['class']);
         }
 
-        $container->getDefinition('session')->setArgument(1, $config['default_locale']);
+        $container->getDefinition('session')->replaceArgument(1, $config['default_locale']);
 
         $container->setAlias('session.storage', 'session.storage.'.$config['storage_id']);
 
@@ -327,7 +327,7 @@ class FrameworkExtension extends Extension
 
         $container
             ->getDefinition('templating.helper.code')
-            ->setArgument(0, str_replace('%', '%%', isset($links[$ide]) ? $links[$ide] : $ide))
+            ->replaceArgument(0, str_replace('%', '%%', isset($links[$ide]) ? $links[$ide] : $ide))
         ;
 
         if ($container->getParameter('kernel.debug')) {
@@ -343,9 +343,9 @@ class FrameworkExtension extends Extension
         }
         $container
             ->getDefinition('templating.helper.assets')
-            ->setArgument(1, isset($config['assets_base_urls']) ? $config['assets_base_urls'] : array())
-            ->setArgument(2, $config['assets_version'])
-            ->setArgument(3, $packages)
+            ->replaceArgument(1, isset($config['assets_base_urls']) ? $config['assets_base_urls'] : array())
+            ->replaceArgument(2, $config['assets_version'])
+            ->replaceArgument(3, $packages)
         ;
 
         if (!empty($config['loaders'])) {
@@ -364,7 +364,7 @@ class FrameworkExtension extends Extension
             // Wrap the existing loader with cache (must happen after loaders are registered)
             $container->setDefinition('templating.loader.wrapped', $container->findDefinition('templating.loader'));
             $loaderCache = $container->getDefinition('templating.loader.cache');
-            $loaderCache->setArgument(1, $config['cache']);
+            $loaderCache->replaceArgument(1, $config['cache']);
 
             $container->setDefinition('templating.loader', $loaderCache);
         }
@@ -407,7 +407,7 @@ class FrameworkExtension extends Extension
         if (1 === count($engines)) {
             $container->setAlias('templating', (string) reset($engines));
         } else {
-            $container->getDefinition('templating.engine.delegating')->setArgument(1, $engines);
+            $container->getDefinition('templating.engine.delegating')->replaceArgument(1, $engines);
             $container->setAlias('templating', 'templating.engine.delegating');
         }
     }
@@ -470,12 +470,12 @@ class FrameworkExtension extends Extension
 
         $container
             ->getDefinition('validator.mapping.loader.xml_files_loader')
-            ->setArgument(0, $this->getValidatorXmlMappingFiles($container))
+            ->replaceArgument(0, $this->getValidatorXmlMappingFiles($container))
         ;
 
         $container
             ->getDefinition('validator.mapping.loader.yaml_files_loader')
-            ->setArgument(0, $this->getValidatorYamlMappingFiles($container))
+            ->replaceArgument(0, $this->getValidatorYamlMappingFiles($container))
         ;
 
         if (isset($config['annotations'])) {
@@ -488,7 +488,7 @@ class FrameworkExtension extends Extension
             // Register annotation loader
             $container
                 ->getDefinition('validator.mapping.loader.annotation_loader')
-                ->setArgument(0, $namespaces)
+                ->replaceArgument(0, $namespaces)
             ;
 
             $loaderChain = $container->getDefinition('validator.mapping.loader.loader_chain');
@@ -499,7 +499,7 @@ class FrameworkExtension extends Extension
 
         if (isset($config['cache'])) {
             $container->getDefinition('validator.mapping.class_metadata_factory')
-                ->setArgument(1, new Reference('validator.mapping.cache.'.$config['cache']));
+                ->replaceArgument(1, new Reference('validator.mapping.cache.'.$config['cache']));
             $container->setParameter(
                 'validator.mapping.cache.prefix',
                 'validator_'.md5($container->getParameter('kernel.root_dir'))

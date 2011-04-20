@@ -34,7 +34,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
      * The service IDs of the event listeners and subscribers
      * @var array
      */
-    private $listenerIds;
+    private $listenerIds = array();
 
     /**
      * Constructor.
@@ -61,9 +61,9 @@ class ContainerAwareEventDispatcher extends EventDispatcher
             throw new \InvalidArgumentException('Expected a string argument');
         }
 
-        foreach ((array) $eventNames as $event) {
+        foreach ((array) $eventNames as $eventName) {
             // Prevent duplicate entries
-            $this->listenerIds[$event][$serviceId] = $priority;
+            $this->listenerIds[$eventName][$serviceId] = $priority;
         }
     }
 
@@ -72,6 +72,8 @@ class ContainerAwareEventDispatcher extends EventDispatcher
      *
      * Lazily loads listeners for this event from the dependency injection
      * container.
+     *
+     * @throws \InvalidArgumentException if the service is not defined
      */
     public function dispatch($eventName, Event $event = null)
     {

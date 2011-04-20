@@ -2,6 +2,7 @@
 
 use Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Matcher\Exception\NotFoundException;
+use Symfony\Component\Routing\RequestContext;
 
 /**
  * ProjectUrlMatcher
@@ -14,7 +15,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
     /**
      * Constructor.
      */
-    public function __construct(array $context = array(), array $defaults = array())
+    public function __construct(RequestContext $context, array $defaults = array())
     {
         $this->context = $context;
         $this->defaults = $defaults;
@@ -31,7 +32,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
         // bar
         if (0 === strpos($pathinfo, '/bar') && preg_match('#^/bar/(?P<foo>[^/\.]+?)$#x', $pathinfo, $matches)) {
-            if (isset($this->context['method']) && !in_array(strtolower($this->context['method']), array('get', 'head'))) {
+            if (!in_array($this->context->getMethod(), array('get', 'head'))) {
                 $allow = array_merge($allow, array('get', 'head'));
                 goto not_bar;
             }
@@ -63,7 +64,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
         // baz5
         if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/$#x', $pathinfo, $matches)) {
-            if (isset($this->context['method']) && !in_array(strtolower($this->context['method']), array('post'))) {
+            if (!in_array($this->context->getMethod(), array('post'))) {
                 $allow = array_merge($allow, array('post'));
                 goto not_baz5;
             }
@@ -74,7 +75,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
         // baz.baz6
         if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/$#x', $pathinfo, $matches)) {
-            if (isset($this->context['method']) && !in_array(strtolower($this->context['method']), array('put'))) {
+            if (!in_array($this->context->getMethod(), array('put'))) {
                 $allow = array_merge($allow, array('put'));
                 goto not_bazbaz6;
             }

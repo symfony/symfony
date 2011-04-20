@@ -48,11 +48,11 @@ class Router implements RouterInterface
      *
      * @throws \InvalidArgumentException When unsupported option is provided
      */
-    public function __construct(LoaderInterface $loader, $resource, array $options = array(), array $context = array(), array $defaults = array())
+    public function __construct(LoaderInterface $loader, $resource, array $options = array(), RequestContext $context = null, array $defaults = array())
     {
         $this->loader = $loader;
         $this->resource = $resource;
-        $this->context = $context;
+        $this->context = null === $context ? new RequestContext() : $context;
         $this->defaults = $defaults;
         $this->options = array(
             'cache_dir'              => null,
@@ -102,9 +102,9 @@ class Router implements RouterInterface
     /**
      * Sets the request context.
      *
-     * @param array $context  The context
+     * @param RequestContext $context The context
      */
-    public function setContext(array $context = array())
+    public function setContext(RequestContext $context)
     {
         $this->getMatcher()->setContext($context);
         $this->getGenerator()->setContext($context);

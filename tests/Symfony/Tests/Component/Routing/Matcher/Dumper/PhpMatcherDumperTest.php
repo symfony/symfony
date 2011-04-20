@@ -14,6 +14,7 @@ namespace Symfony\Tests\Component\Routing;
 use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RequestContext;
 
 class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
 {
@@ -67,7 +68,7 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
             array('def' => 'test')
         ));
 
-        $dumper = new PhpMatcherDumper($collection);
+        $dumper = new PhpMatcherDumper($collection, new RequestContext());
         $this->assertStringEqualsFile(__DIR__.'/../../Fixtures/dumper/url_matcher1.php', $dumper->dump(), '->dump() dumps basic routes to the correct PHP file.');
 
         // force HTTPS redirection
@@ -98,7 +99,7 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
             array(),
             array('_scheme' => 'https')
         ));
-        $dumper = new PhpMatcherDumper($collection);
+        $dumper = new PhpMatcherDumper($collection, new RequestContext());
         $dumper->dump();
     }
 }

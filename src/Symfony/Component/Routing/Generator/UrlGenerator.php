@@ -13,6 +13,7 @@ namespace Symfony\Component\Routing\Generator;
 
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RequestContext;
 
 /**
  * UrlGenerator generates URL based on a set of routes.
@@ -31,10 +32,10 @@ class UrlGenerator implements UrlGeneratorInterface
      * Constructor.
      *
      * @param RouteCollection $routes   A RouteCollection instance
-     * @param array           $context  The context
+     * @param RequestContext  $context  The context
      * @param array           $defaults The default values
      */
-    public function __construct(RouteCollection $routes, array $context = array(), array $defaults = array())
+    public function __construct(RouteCollection $routes, RequestContext $context, array $defaults = array())
     {
         $this->routes = $routes;
         $this->context = $context;
@@ -45,9 +46,9 @@ class UrlGenerator implements UrlGeneratorInterface
     /**
      * Sets the request context.
      *
-     * @param array $context  The context
+     * @param RequestContext $context  The context
      */
-    public function setContext(array $context = array())
+    public function setContext(RequestContext $context)
     {
         $this->context = $context;
     }
@@ -127,10 +128,10 @@ class UrlGenerator implements UrlGeneratorInterface
             $url .= '?'.http_build_query($extra);
         }
 
-        $url = (isset($this->context['base_url']) ? $this->context['base_url'] : '').$url;
+        $url = $this->context->getBaseUrl().$url;
 
-        if (isset($this->context['host'])) {
-            $scheme = isset($this->context['scheme']) ? $this->context['scheme'] : 'http';
+        if ($this->context->getHost()) {
+            $scheme = $this->context->getScheme();
             if (isset($requirements['_scheme']) && ($req = strtolower($requirements['_scheme'])) && $scheme != $req) {
                 $absolute = true;
                 $scheme = $req;
@@ -138,13 +139,13 @@ class UrlGenerator implements UrlGeneratorInterface
 
             if ($absolute) {
                 $port = '';
-                if ('http' === $scheme && 80 != ($httpPort = isset($this->context['http_port']) ? $this->context['http_port'] : 80)) {
-                    $port = ':'.$httpPort;
-                } elseif ('https' === $scheme && 443 != ($httpsPort = isset($this->context['https_port']) ? $this->context['https_port'] : 443)) {
-                    $port = ':'.$httpsPort;
+                if ('http' === $scheme && 80 != $this->context->getHttpPort()) {
+                    $port = ':'.$this->context->getHttpPort();
+                } elseif ('https' === $scheme && 443 != $this->context->getHttpsPort()) {
+                    $port = ':'.$this->context->getHttpsPort();
                 }
 
-                $url = $scheme.'://'.$this->context['host'].$port.$url;
+                $url = $scheme.'://'.$this->context->getHost().$port.$url;
             }
         }
 

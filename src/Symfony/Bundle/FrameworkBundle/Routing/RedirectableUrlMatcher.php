@@ -35,8 +35,8 @@ class RedirectableUrlMatcher extends UrlMatcher implements RedirectableUrlMatche
             'path'        => $path,
             'permanent'   => true,
             'scheme'      => $scheme,
-            'httpPort'    => isset($this->context['http_port']) ? $this->context['http_port'] : 80,
-            'httpsPort'   => isset($this->context['https_port']) ? $this->context['https_port'] : 443,
+            'httpPort'    => $this->context->getHttpPort(),
+            'httpsPort'   => $this->context->getHttpsPort(),
             '_route'      => $route,
         );
     }

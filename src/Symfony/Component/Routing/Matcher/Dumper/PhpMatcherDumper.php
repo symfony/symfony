@@ -94,7 +94,7 @@ EOF;
             if ($req = $route->getRequirement('_method')) {
                 $req = implode('\', \'', array_map('strtolower', explode('|', $req)));
                 $code[] = <<<EOF
-            if (isset(\$this->context['method']) && !in_array(strtolower(\$this->context['method']), array('$req'))) {
+            if (!in_array(\$this->context->getMethod(), array('$req'))) {
                 \$allow = array_merge(\$allow, array('$req'));
                 goto $gotoname;
             }
@@ -116,7 +116,7 @@ EOF
                 }
 
                 $code[] = sprintf(<<<EOF
-            if (isset(\$this->context['scheme']) && \$this->context['scheme'] !== '$scheme') {
+            if (\$this->context->getScheme() !== '$scheme') {
                 return \$this->redirect(\$pathinfo, '%s', '$scheme');
             }
 EOF
@@ -165,6 +165,7 @@ EOF;
 
 use Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Matcher\Exception\NotFoundException;
+use Symfony\Component\Routing\RequestContext;
 
 /**
  * $class
@@ -184,7 +185,7 @@ EOF;
     /**
      * Constructor.
      */
-    public function __construct(array \$context = array(), array \$defaults = array())
+    public function __construct(RequestContext \$context, array \$defaults = array())
     {
         \$this->context = \$context;
         \$this->defaults = \$defaults;

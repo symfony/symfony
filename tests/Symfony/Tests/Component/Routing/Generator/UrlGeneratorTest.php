@@ -14,6 +14,7 @@ namespace Symfony\Tests\Component\Routing\Generator;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\Generator\UrlGenerator;
+use Symfony\Component\Routing\RequestContext;
 
 class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,7 +37,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     public function testAbsoluteUrlWithNonStandardPort()
     {
         $routes = $this->getRoutes('test', new Route('/testing'));
-        $url = $this->getGenerator($routes, array('http_port' => 8080))->generate('test', array(), true);
+        $url = $this->getGenerator($routes, array('httpPort' => 8080))->generate('test', array(), true);
 
         $this->assertEquals('http://localhost:8080/app.php/testing', $url);
     }
@@ -44,7 +45,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     public function testAbsoluteSecureUrlWithNonStandardPort()
     {
         $routes = $this->getRoutes('test', new Route('/testing'));
-        $url = $this->getGenerator($routes, array('https_port' => 8080, 'scheme' => 'https'))->generate('test', array(), true);
+        $url = $this->getGenerator($routes, array('httpsPort' => 8080, 'scheme' => 'https'))->generate('test', array(), true);
 
         $this->assertEquals('https://localhost:8080/app.php/testing', $url);
     }
@@ -143,17 +144,14 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://localhost/app.php/', $this->getGenerator($routes, array('scheme' => 'https'))->generate('test'));
     }
 
-    protected function getGenerator(RouteCollection $routes, array $context = array())
+    protected function getGenerator(RouteCollection $routes, array $parameters = array())
     {
-        $generator = new UrlGenerator($routes);
-        $generator->setContext(array_replace(array(
-            'base_url' => '/app.php',
-            'method' => 'GET',
-            'host' => 'localhost',
-            'http_port' => 80,
-            'https_port' => 443,
-            'scheme' => 'http',
-        ), $context));
+        $context = new RequestContext('/app.php');
+        foreach ($parameters as $key => $value) {
+            $method = 'set'.$key;
+            $context->$method($value);
+        }
+        $generator = new UrlGenerator($routes, $context);
 
         return $generator;
     }

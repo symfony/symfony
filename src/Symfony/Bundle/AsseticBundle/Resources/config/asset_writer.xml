@@ -12,7 +12,7 @@
     <services>
         <service id="assetic.asset_writer_cache_warmer" class="%assetic.asset_writer_cache_warmer.class%" public="false">
             <tag name="kernel.cache_warmer" />
-            <argument type="service" id="assetic.asset_manager" />
+            <argument type="service" id="service_container" />
             <argument type="service" id="assetic.asset_writer" />
         </service>
         <service id="assetic.asset_writer" class="%assetic.asset_writer.class%" public="false">

@@ -20,17 +20,19 @@ class FilesystemSessionStorage extends NativeSessionStorage
 {
     private $path;
     private $data;
+    private $started;
 
     public function __construct($path, array $options = array())
     {
         $this->path = $path;
+        $this->started = false;
 
         parent::__construct($options);
     }
 
     public function start()
     {
-        if (self::$sessionStarted) {
+        if ($this->started) {
             return;
         }
 
@@ -57,6 +59,16 @@ class FilesystemSessionStorage extends NativeSessionStorage
         $file = $this->path.'/'.session_id().'.session';
 
         $this->data = file_exists($file) ? unserialize(file_get_contents($file)) : array();
+        $this->started = true;
+    }
+
+    public function getId()
+    {
+        if (!$this->started) {
+            throw new \RuntimeException('The session must be started before reading its ID');
+        }
+
+        return session_id();
     }
 
     public function read($key, $default = null)
@@ -85,6 +97,7 @@ class FilesystemSessionStorage extends NativeSessionStorage
         if ($destroy) {
             $this->data = array();
         }
+
         return true;
     }
 }

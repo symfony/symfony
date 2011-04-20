@@ -205,7 +205,7 @@ class Definition
      *
      * @return Definition The current instance
      */
-    public function setArgument($index, $argument)
+    public function replaceArgument($index, $argument)
     {
         if ($index < 0 || $index > count($this->arguments) - 1) {
             throw new \OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, count($this->arguments) - 1));

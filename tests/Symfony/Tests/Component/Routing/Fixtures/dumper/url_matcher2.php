@@ -15,10 +15,9 @@ class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\Redirec
     /**
      * Constructor.
      */
-    public function __construct(RequestContext $context, array $defaults = array())
+    public function __construct(RequestContext $context)
     {
         $this->context = $context;
-        $this->defaults = $defaults;
     }
 
     public function match($pathinfo)

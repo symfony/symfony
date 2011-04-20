@@ -24,7 +24,6 @@ use Symfony\Component\Routing\RequestContext;
  */
 class UrlMatcher implements UrlMatcherInterface
 {
-    protected $defaults;
     protected $context;
 
     private $routes;
@@ -34,13 +33,11 @@ class UrlMatcher implements UrlMatcherInterface
      *
      * @param RouteCollection $routes   A RouteCollection instance
      * @param RequestContext  $context  The context
-     * @param array           $defaults The default values
      */
-    public function __construct(RouteCollection $routes, RequestContext $context, array $defaults = array())
+    public function __construct(RouteCollection $routes, RequestContext $context)
     {
         $this->routes = $routes;
         $this->context = $context;
-        $this->defaults = $defaults;
     }
 
     /**
@@ -95,7 +92,7 @@ class UrlMatcher implements UrlMatcherInterface
 
     protected function mergeDefaults($params, $defaults)
     {
-        $parameters = array_merge($this->defaults, $defaults);
+        $parameters = $defaults;
         foreach ($params as $key => $value) {
             if (!is_int($key)) {
                 $parameters[$key] = urldecode($value);

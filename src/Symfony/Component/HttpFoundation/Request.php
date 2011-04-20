@@ -408,7 +408,7 @@ class Request
 
     public function getScheme()
     {
-        return ($this->server->get('HTTPS') == 'on') ? 'https' : 'http';
+        return $this->isSecure() ? 'https' : 'http';
     }
 
     public function getPort()

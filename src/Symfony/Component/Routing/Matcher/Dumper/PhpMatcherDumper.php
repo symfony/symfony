@@ -92,13 +92,23 @@ class PhpMatcherDumper extends MatcherDumper
 EOF;
 
             if ($req = $route->getRequirement('_method')) {
-                $req = implode('\', \'', array_map('strtolower', explode('|', $req)));
-                $code[] = <<<EOF
-            if (!in_array(\$this->context->getMethod(), array('$req'))) {
-                \$allow = array_merge(\$allow, array('$req'));
+                $methods = array_map('strtolower', explode('|', $req));
+                if (1 === count($methods)) {
+                    $code[] = <<<EOF
+            if (\$this->context->getMethod() != '$methods[0]') {
+                \$allow[] = '$methods[0]';
                 goto $gotoname;
             }
 EOF;
+                } else {
+                    $methods = implode('\', \'', $methods);
+                    $code[] = <<<EOF
+            if (!in_array(\$this->context->getMethod(), array('$methods'))) {
+                \$allow = array_merge(\$allow, array('$methods'));
+                goto $gotoname;
+            }
+EOF;
+                }
             }
 
             if ($hasTrailingSlash) {

@@ -29,7 +29,7 @@ class InitAclMongoDBCommand extends Command
     {
         $this
             ->setName('init:acl:mongodb')
-            ->addDescription('Set the indexes required by the MongoDB ACL provider')
+            ->setDescription('Set the indexes required by the MongoDB ACL provider')
         ;
     }
 
@@ -40,14 +40,14 @@ class InitAclMongoDBCommand extends Command
     {
         // todo: change services and paramters when the configuration has been finalized
         $mongo = $this->container->get('doctrine.odm.mongodb.default_connection');
-        $this->dbName = $this->container->getParameter('doctrine.odm.mongodb.default_database');
+        $this->dbName = $this->container->getParameter('doctrine.odm.mongodb.security.acl.database');
         $db = $mongo->selectDatabase($this->dbName);
 
-        $oidCollection = $db->selectCollection($this->container->getParameter('security.acl.dbal.oid_table_name'));
+        $oidCollection = $db->selectCollection($this->container->getParameter('doctrine.odm.mongodb.security.acl.oid_collection'));
         $oidCollection->ensureIndex(array('randomKey' => 1), array());
         $oidCollection->ensureIndex(array('identifier' => 1, 'type' => 1));
 
-        $entryCollection = $db->selectCollection($this->container->getParameter('security.acl.dbal.entry_table_name'));
+        $entryCollection = $db->selectCollection($this->container->getParameter('doctrine.odm.mongodb.security.acl.entry_collection'));
         $entryCollection->ensureIndex(array('objectIdentity.$id' => 1));
 
         $output->writeln('ACL indexes have been initialized successfully.');

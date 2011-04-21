@@ -751,7 +751,7 @@ class Response
 
     public function isRedirect()
     {
-        return in_array($this->statusCode, array(301, 302, 303, 307));
+        return in_array($this->statusCode, array(201, 301, 302, 303, 307));
     }
 
     public function isEmpty()

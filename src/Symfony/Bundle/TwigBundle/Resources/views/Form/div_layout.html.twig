@@ -18,7 +18,7 @@
     {% if errors|length > 0 %}
     <ul>
         {% for error in errors %}
-            <li>{% trans error.messageTemplate with error.messageParameters from 'validators' %}</li>
+            <li>{{ error.messageTemplate|trans(error.messageParameters, 'validators') }}</li>
         {% endfor %}
     </ul>
     {% endif %}
@@ -37,7 +37,7 @@
 
 {% block field_label %}
 {% spaceless %}
-    <label for="{{ id }}">{% trans label %}</label>
+    <label for="{{ id }}">{{ label|trans }}</label>
 {% endspaceless %}
 {% endblock field_label %}
 

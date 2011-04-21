@@ -46,9 +46,7 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Assetic is not available.');
         }
 
-        $this->kernel = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Kernel')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->kernel = $this->getMock('Symfony\\Component\\HttpKernel\\KernelInterface');
 
         $this->container = new ContainerBuilder();
         $this->container->addScope(new Scope('request'));
@@ -61,6 +59,7 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
         $this->container->setParameter('kernel.cache_dir', __DIR__);
         $this->container->setParameter('kernel.debug', false);
         $this->container->setParameter('kernel.root_dir', __DIR__);
+        $this->container->set('kernel', $this->kernel);
     }
 
     /**

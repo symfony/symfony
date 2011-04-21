@@ -63,6 +63,11 @@ PR11 to PR12
   arbitrary accounts when the SwitchUserListener was activated. Configurations
   which do not use the SwitchUserListener are not affected.
 
+* The Dependency Injection Container now strongly validates the references of 
+  all your services at the end of its compilation process. If you have invalid
+  references this will result in a compile-time exception instead of a run-time
+  exception (the previous behavior).
+
 PR10 to PR11
 ------------
 

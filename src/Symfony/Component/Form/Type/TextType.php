@@ -17,16 +17,6 @@ use Symfony\Component\Form\FormView;
 
 class TextType extends AbstractType
 {
-    public function buildForm(FormBuilder $builder, array $options)
-    {
-        $builder->setAttribute('max_length', $options['max_length']);
-    }
-
-    public function buildView(FormView $view, FormInterface $form)
-    {
-        $view->set('max_length', $form->getAttribute('max_length'));
-    }
-
     public function getParent(array $options)
     {
         return 'field';

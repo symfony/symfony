@@ -311,7 +311,8 @@ class Request
 
     public function hasSession()
     {
-        return $this->cookies->has(session_name());
+        // the check for $this->session avoids malicious users trying to fake a session cookie with proper name
+        return $this->cookies->has(session_name()) && null !== $this->session;
     }
 
     public function setSession(Session $session)

@@ -79,6 +79,7 @@ class UrlGenerator implements UrlGeneratorInterface
      */
     protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $absolute)
     {
+        $originParameters = $parameters;
         $parameters = array_replace($this->context->getParameters(), $parameters);
         $tparams = array_replace($defaults, $parameters);
 
@@ -121,7 +122,7 @@ class UrlGenerator implements UrlGeneratorInterface
         }
 
         // add a query string if needed
-        if ($extra = array_diff_key($parameters, $variables, $defaults)) {
+        if ($extra = array_diff_key($originParameters, $variables, $defaults)) {
             $url .= '?'.http_build_query($extra);
         }
 

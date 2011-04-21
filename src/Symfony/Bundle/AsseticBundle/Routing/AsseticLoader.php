@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\AsseticBundle\Routing;
 
+use Assetic\Asset\AssetInterface;
 use Assetic\Factory\LazyAssetManager;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Resource\FileResource;
@@ -62,20 +63,38 @@ class AsseticLoader extends Loader
         // routes
         foreach ($this->am->getNames() as $name) {
             $asset = $this->am->get($name);
+            $formula = $this->am->getFormula($name);
 
-            $defaults = array(
-                '_controller' => 'assetic.controller:render',
-                'name'        => $name,
-            );
+            $this->loadRouteForAsset($routes, $asset, $name);
 
-            if ($extension = pathinfo($asset->getTargetUrl(), PATHINFO_EXTENSION)) {
-                $defaults['_format'] = $extension;
+            // add a route for each "leaf" in debug mode
+            if (isset($formula[2]['debug']) ? $formula[2]['debug'] : $this->am->isDebug()) {
+                $i = 0;
+                foreach ($asset as $leaf) {
+                    $pos = $i++;
+                    $this->loadRouteForAsset($routes, $leaf, $name.'_'.$pos, $pos);
+                }
             }
-
-            $routes->add('assetic_'.$name, new Route($asset->getTargetUrl(), $defaults));
         }
 
         return $routes;
+    }
+
+    private function loadRouteForAsset(RouteCollection $routes, AssetInterface $asset, $name, $pos = null)
+    {
+        $defaults = array(
+            '_controller' => 'assetic.controller:render',
+            'name'        => $name,
+            'pos'         => $pos,
+        );
+
+        $pattern = $asset->getTargetUrl();
+
+        if ($format = pathinfo($pattern, PATHINFO_EXTENSION)) {
+            $defaults['_format'] = $format;
+        }
+
+        $routes->add('_assetic_'.$name, new Route($pattern, $defaults));
     }
 
     public function supports($resource, $type = null)

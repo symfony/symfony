@@ -106,8 +106,20 @@ class Router implements RouterInterface
      */
     public function setContext(RequestContext $context)
     {
+        $this->context = $context;
+
         $this->getMatcher()->setContext($context);
         $this->getGenerator()->setContext($context);
+    }
+
+    /**
+     * Gets the request context.
+     *
+     * @return RequestContext The context
+     */
+    public function getContext()
+    {
+        return $this->context;
     }
 
     /**

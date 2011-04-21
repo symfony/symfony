@@ -51,6 +51,16 @@ class UrlMatcher implements UrlMatcherInterface
     }
 
     /**
+     * Gets the request context.
+     *
+     * @return RequestContext The context
+     */
+    public function getContext()
+    {
+        return $this->context;
+    }
+
+    /**
      * Tries to match a URL with a set of routes.
      *
      * @param  string $pathinfo The path info to be parsed

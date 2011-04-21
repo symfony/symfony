@@ -20,7 +20,7 @@ use Assetic\Extension\Twig\AsseticTokenParser;
  */
 class DynamicTokenParser extends AsseticTokenParser
 {
-    static protected function createNode(\Twig_NodeInterface $body, array $inputs, array $filters, array $attributes, $lineno = 0, $tag = null)
+    protected function createNode(\Twig_NodeInterface $body, array $inputs, array $filters, array $attributes, $lineno = 0, $tag = null)
     {
         return new DynamicNode($body, $inputs, $filters, $attributes, $lineno, $tag);
     }

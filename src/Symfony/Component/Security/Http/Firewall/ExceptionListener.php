@@ -152,7 +152,10 @@ class ExceptionListener
 
         // session isn't required when using http basic authentification mechanism for example
         if ($request->hasSession()) {
-            $request->getSession()->set('_security.target_path', $request->getUri());
+            // do not set target_path in case of xhr requests
+            if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || 'XMLHttpRequest' !== $_SERVER['HTTP_X_REQUESTED_WITH']) {
+                $request->getSession()->set('_security.target_path', $request->getUri());
+            }
         }
 
         return $this->authenticationEntryPoint->start($request, $authException);

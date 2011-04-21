@@ -24,7 +24,7 @@
     {% if field.hasErrors %}
     <ul>
         {% for error in field.errors %}
-            <li>{% trans error.messageTemplate with error.messageParameters from 'validators' %}</li>
+            <li>{{ error.messageTemplate|trans(error.messageParameters, 'validators') }}</li>
         {% endfor %}
     </ul>
     {% endif %}
@@ -41,7 +41,7 @@
 
 {% block label %}
 {% spaceless %}
-    <label for="{{ field.id }}">{% trans label %}</label>
+    <label for="{{ field.id }}">{{ label|trans|raw }}</label>
 {% endspaceless %}
 {% endblock label %}
 

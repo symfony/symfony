@@ -40,6 +40,6 @@ class DynamicAsseticHelper extends AsseticHelper
 
     protected function getAssetUrl(AssetInterface $asset, $options = array())
     {
-        return $this->routerHelper->generate('assetic_'.$options['name']);
+        return $this->routerHelper->generate('_assetic_'.$options['name']);
     }
 }

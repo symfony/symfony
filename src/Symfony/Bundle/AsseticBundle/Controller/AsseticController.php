@@ -36,13 +36,21 @@ class AsseticController
         $this->cache = $cache;
     }
 
-    public function render($name)
+    public function render($name, $pos = null)
     {
         if (!$this->am->has($name)) {
-            throw new NotFoundHttpException('Asset Not Found');
+            throw new NotFoundHttpException(sprintf('The "%s" asset could not be found.', $name));
         }
 
         $asset = $this->getAsset($name);
+        if (null !== $pos) {
+            $leaves = array_values(iterator_to_array($asset));
+            if (!isset($leaves[$pos])) {
+                throw new NotFoundHttpException(sprintf('The "%s" asset does not include a leaf at position %d.', $name, $pos));
+            }
+            $asset = $leaves[$pos];
+        }
+
         $response = $this->createResponse();
 
         // last-modified

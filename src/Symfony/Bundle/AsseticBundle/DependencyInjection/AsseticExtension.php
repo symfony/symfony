@@ -74,12 +74,10 @@ class AsseticExtension extends Extension
         // choose dynamic or static
         if ($parameterBag->resolveValue($parameterBag->get('assetic.use_controller'))) {
             $loader->load('controller.xml');
-            $container->setParameter('assetic.twig_extension.class', '%assetic.twig_extension.dynamic.class%');
             $container->getDefinition('assetic.helper.dynamic')->addTag('templating.helper', array('alias' => 'assetic'));
             $container->removeDefinition('assetic.helper.static');
         } else {
             $loader->load('asset_writer.xml');
-            $container->setParameter('assetic.twig_extension.class', '%assetic.twig_extension.static.class%');
             $container->getDefinition('assetic.helper.static')->addTag('templating.helper', array('alias' => 'assetic'));
             $container->removeDefinition('assetic.helper.dynamic');
         }

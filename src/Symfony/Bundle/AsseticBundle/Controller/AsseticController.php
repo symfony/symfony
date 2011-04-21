@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\AsseticBundle\Controller;
 
 use Assetic\Asset\AssetCache;
+use Assetic\Asset\AssetInterface;
 use Assetic\Factory\LazyAssetManager;
 use Assetic\Cache\CacheInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,13 +43,9 @@ class AsseticController
             throw new NotFoundHttpException(sprintf('The "%s" asset could not be found.', $name));
         }
 
-        $asset = $this->getAsset($name);
-        if (null !== $pos) {
-            $leaves = array_values(iterator_to_array($asset));
-            if (!isset($leaves[$pos])) {
-                throw new NotFoundHttpException(sprintf('The "%s" asset does not include a leaf at position %d.', $name, $pos));
-            }
-            $asset = $leaves[$pos];
+        $asset = $this->am->get($name);
+        if (null !== $pos && !$asset = $this->findAssetLeaf($asset, $pos)) {
+            throw new NotFoundHttpException(sprintf('The "%s" asset does not include a leaf at position %d.', $name, $pos));
         }
 
         $response = $this->createResponse();
@@ -71,7 +68,7 @@ class AsseticController
             return $response;
         }
 
-        $response->setContent($asset->dump());
+        $response->setContent($this->cachifyAsset($asset)->dump());
 
         return $response;
     }
@@ -81,8 +78,17 @@ class AsseticController
         return new Response();
     }
 
-    protected function getAsset($name)
+    protected function cachifyAsset(AssetInterface $asset)
     {
-        return new AssetCache($this->am->get($name), $this->cache);
+        return new AssetCache($asset, $this->cache);
+    }
+
+    private function findAssetLeaf(AssetInterface $asset, $pos)
+    {
+        $leaves = array_values(iterator_to_array($asset));
+
+        if (isset($leaves[$pos])) {
+            return $leaves[$pos];
+        }
     }
 }

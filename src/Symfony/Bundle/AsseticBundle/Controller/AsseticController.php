@@ -83,12 +83,13 @@ class AsseticController
         return new AssetCache($asset, $this->cache);
     }
 
-    private function findAssetLeaf(AssetInterface $asset, $pos)
+    private function findAssetLeaf(\Traversable $asset, $pos)
     {
-        $leaves = array_values(iterator_to_array($asset));
-
-        if (isset($leaves[$pos])) {
-            return $leaves[$pos];
+        $i = 0;
+        foreach ($asset as $leaf) {
+            if ($pos == $i++) {
+                return $leaf;
+            }
         }
     }
 }

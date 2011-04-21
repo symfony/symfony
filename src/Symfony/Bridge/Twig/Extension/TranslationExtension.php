@@ -53,7 +53,7 @@ class TranslationExtension extends \Twig_Extension
     public function getTokenParsers()
     {
         return array(
-            // {% trans "Symfony is great!" %}
+            // {% trans %}Symfony is great!{% endtrans %}
             new TransTokenParser(),
 
             // {% transchoice count %}

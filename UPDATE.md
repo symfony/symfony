@@ -6,8 +6,22 @@ one. It only discusses changes that need to be done when using the "public"
 API of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.
 
-PR12 to PR13
-------------
+PR12 to beta1
+-------------
+
+* The `trans` tag does not accept a message as an argument anymore:
+
+    {% trans "foo" %}
+    {% trans foo %}
+
+  Use the long version the tags or the filter instead:
+
+    {% trans %}foo{% endtrans %}
+    {{ foo|trans }}
+
+  This has been done to clarify the usage of the tag and filter and also to
+  make it clearer when the automatic output escaping rules are applied (see
+  the doc for more information).
 
 * Some methods in the DependencyInjection component's ContainerBuilder and
   Definition classes have been renamed to be more specific and consistent:

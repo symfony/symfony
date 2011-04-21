@@ -90,6 +90,30 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://localhost/app.php/testing?foo=bar', $url);
     }
 
+    public function testUrlWithExtraParametersFromGlobals()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing'));
+        $generator = $this->getGenerator($routes);
+        $context = new RequestContext('/app.php');
+        $context->setParameter('bar', 'bar');
+        $generator->setContext($context);
+        $url = $generator->generate('test', array('foo' => 'bar'));
+
+        $this->assertEquals('/app.php/testing?foo=bar', $url);
+    }
+
+    public function testUrlWithGlobalParameter()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing/{foo}'));
+        $generator = $this->getGenerator($routes);
+        $context = new RequestContext('/app.php');
+        $context->setParameter('foo', 'bar');
+        $generator->setContext($context);
+        $url = $generator->generate('test', array());
+
+        $this->assertEquals('/app.php/testing/bar', $url);
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */

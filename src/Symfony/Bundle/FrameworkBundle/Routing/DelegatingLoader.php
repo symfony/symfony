@@ -13,6 +13,9 @@ namespace Symfony\Bundle\FrameworkBundle\Routing;
 
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\Config\Loader\DelegatingLoader as BaseDelegatingLoader;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
@@ -24,10 +27,11 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DelegatingLoader extends BaseDelegatingLoader
+class DelegatingLoader extends BaseDelegatingLoader implements ContainerAwareInterface
 {
     protected $parser;
     protected $logger;
+    protected $container;
 
     /**
      * Constructor.
@@ -43,6 +47,11 @@ class DelegatingLoader extends BaseDelegatingLoader
 
         parent::__construct($resolver);
     }
+ 
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
 
     /**
      * Loads a resource.
@@ -55,6 +64,7 @@ class DelegatingLoader extends BaseDelegatingLoader
     public function load($resource, $type = null)
     {
         $collection = parent::load($resource, $type);
+        $parameterBag = new ParameterBag($this->container->parameters);
 
         foreach ($collection->all() as $name => $route) {
             if ($controller = $route->getDefault('_controller')) {
@@ -66,6 +76,7 @@ class DelegatingLoader extends BaseDelegatingLoader
 
                 $route->setDefault('_controller', $controller);
             }
+            $route->setPattern($parameterBag->resolveValue($route->getPattern()));
         }
 
         return $collection;

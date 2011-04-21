@@ -53,7 +53,7 @@ class TransTokenParser extends \Twig_TokenParser
                 $stream->next();
                 $domain = $this->parser->getExpressionParser()->parseExpression();
             } elseif (!$stream->test(\Twig_Token::BLOCK_END_TYPE)) {
-                throw new \Twig_Error_Syntax(sprintf('Unexpected token. Twig was looking for the "from" keyword line %s)', $lineno), -1);
+                throw new \Twig_Error_Syntax('Unexpected token. Twig was looking for the "with" or "from" keyword.');
             }
         }
 
@@ -64,7 +64,7 @@ class TransTokenParser extends \Twig_TokenParser
         }
 
         if (!$body instanceof \Twig_Node_Text && !$body instanceof \Twig_Node_Expression) {
-            throw new \Twig_Error_Syntax('A message must be a simple text', -1);
+            throw new \Twig_Error_Syntax('A message must be a simple text');
         }
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);

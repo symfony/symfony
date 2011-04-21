@@ -256,7 +256,7 @@ class Container implements ContainerInterface
             }
         }
 
-        return array_merge($ids, array_keys($this->services));
+        return array_unique(array_merge($ids, array_keys($this->services)));
     }
 
     /**

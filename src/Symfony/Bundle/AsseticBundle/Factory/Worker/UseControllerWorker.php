@@ -15,23 +15,19 @@ use Assetic\Asset\AssetInterface;
 use Assetic\Factory\Worker\WorkerInterface;
 
 /**
- * Prepends a fake front controller to every asset's target URL.
- *
- * This worker should only be added when the use_controller configuration
- * option is true. It changes the target URL to include the front controller.
+ * Prepends a fake front controller so the asset knows where it is-ish.
  *
  * @author Kris Wallsmith <kris@symfony.com>
  */
-class PrependControllerWorker implements WorkerInterface
+class UseControllerWorker implements WorkerInterface
 {
-    const CONTROLLER = 'front_controller/';
-
     public function process(AssetInterface $asset)
     {
         $targetUrl = $asset->getTargetUrl();
-
-        if ($targetUrl && '/' != $targetUrl[0] && 0 !== strpos($targetUrl, self::CONTROLLER)) {
-            $asset->setTargetUrl(self::CONTROLLER.$targetUrl);
+        if ($targetUrl && '/' != $targetUrl[0] && 0 !== strpos($targetUrl, '_controller/')) {
+            $asset->setTargetUrl('_controller/'.$targetUrl);
         }
+
+        return $asset;
     }
 }

@@ -71,8 +71,7 @@ class AsseticLoader extends Loader
             if (isset($formula[2]['debug']) ? $formula[2]['debug'] : $this->am->isDebug()) {
                 $i = 0;
                 foreach ($asset as $leaf) {
-                    $pos = $i++;
-                    $this->loadRouteForAsset($routes, $leaf, $name.'_'.$pos, $pos);
+                    $this->loadRouteForAsset($routes, $leaf, $name, $i++);
                 }
             }
         }
@@ -106,7 +105,12 @@ class AsseticLoader extends Loader
             $defaults['_format'] = $format;
         }
 
-        $routes->add('_assetic_'.$name, new Route($pattern, $defaults));
+        $route = '_assetic_'.$name;
+        if (null !== $pos) {
+            $route .= '_'.$pos;
+        }
+
+        $routes->add($route, new Route($pattern, $defaults));
     }
 
     public function supports($resource, $type = null)

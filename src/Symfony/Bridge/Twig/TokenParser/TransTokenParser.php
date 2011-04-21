@@ -36,20 +36,14 @@ class TransTokenParser extends \Twig_TokenParser
         $vars = new \Twig_Node_Expression_Array(array(), $lineno);
         $domain = new \Twig_Node_Expression_Constant('messages', $lineno);
         if (!$stream->test(\Twig_Token::BLOCK_END_TYPE)) {
-            if (!$stream->test('from') && !$stream->test('with')) {
-                // {% trans "message" %}
-                // {% trans message %}
-                $body = $this->parser->getExpressionParser()->parseExpression();
-            }
-
             if ($stream->test('with')) {
-                // {% trans "message" with vars %}
+                // {% trans with vars %}
                 $stream->next();
                 $vars = $this->parser->getExpressionParser()->parseExpression();
             }
 
             if ($stream->test('from')) {
-                // {% trans "message" from "messages" %}
+                // {% trans from "messages" %}
                 $stream->next();
                 $domain = $this->parser->getExpressionParser()->parseExpression();
             } elseif (!$stream->test(\Twig_Token::BLOCK_END_TYPE)) {
@@ -57,11 +51,9 @@ class TransTokenParser extends \Twig_TokenParser
             }
         }
 
-        if (null === $body) {
-            // {% trans %}message{% endtrans %}
-            $stream->expect(\Twig_Token::BLOCK_END_TYPE);
-            $body = $this->parser->subparse(array($this, 'decideTransFork'), true);
-        }
+        // {% trans %}message{% endtrans %}
+        $stream->expect(\Twig_Token::BLOCK_END_TYPE);
+        $body = $this->parser->subparse(array($this, 'decideTransFork'), true);
 
         if (!$body instanceof \Twig_Node_Text && !$body instanceof \Twig_Node_Expression) {
             throw new \Twig_Error_Syntax('A message must be a simple text');

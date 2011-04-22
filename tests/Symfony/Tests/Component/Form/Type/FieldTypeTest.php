@@ -29,7 +29,7 @@ class FieldTypeTest extends TestCase
 {
     public function testGetPropertyPathDefaultPath()
     {
-        $form = $this->factory->create('field', 'title');
+        $form = $this->factory->createNamed('field', 'title');
 
         $this->assertEquals(new PropertyPath('title'), $form->getAttribute('property_path'));
     }
@@ -57,7 +57,7 @@ class FieldTypeTest extends TestCase
 
     public function testGetPropertyPathPathIsNull()
     {
-        $form = $this->factory->create('field', 'title', array('property_path' => null));
+        $form = $this->factory->createNamed('field', 'title', null, array('property_path' => null));
 
         $this->assertEquals(new PropertyPath('title'), $form->getAttribute('property_path'));
     }
@@ -112,7 +112,7 @@ class FieldTypeTest extends TestCase
 
     public function testPassIdAndNameToView()
     {
-        $form = $this->factory->create('field', 'name');
+        $form = $this->factory->createNamed('field', 'name');
         $view = $form->createView();
 
         $this->assertEquals('name', $view->get('id'));
@@ -121,8 +121,8 @@ class FieldTypeTest extends TestCase
 
     public function testPassIdAndNameToViewWithParent()
     {
-        $parent = $this->factory->create('field', 'parent');
-        $parent->add($this->factory->create('field', 'child'));
+        $parent = $this->factory->createNamed('field', 'parent');
+        $parent->add($this->factory->createNamed('field', 'child'));
         $view = $parent->createView();
 
         $this->assertEquals('parent_child', $view['child']->get('id'));
@@ -131,9 +131,9 @@ class FieldTypeTest extends TestCase
 
     public function testPassIdAndNameToViewWithGrandParent()
     {
-        $parent = $this->factory->create('field', 'parent');
-        $parent->add($this->factory->create('field', 'child'));
-        $parent['child']->add($this->factory->create('field', 'grand_child'));
+        $parent = $this->factory->createNamed('field', 'parent');
+        $parent->add($this->factory->createNamed('field', 'child'));
+        $parent['child']->add($this->factory->createNamed('field', 'grand_child'));
         $view = $parent->createView();
 
         $this->assertEquals('parent_child_grand_child', $view['child']['grand_child']->get('id'));
@@ -150,10 +150,10 @@ class FieldTypeTest extends TestCase
 
     public function testBindWithEmptyDataCreatesObjectIfClassAvailable()
     {
-        $form = $this->factory->create('form', 'author', array(
+        $form = $this->factory->create('form', null, array(
             'data_class' => 'Symfony\Tests\Component\Form\Fixtures\Author',
         ));
-        $form->add($this->factory->create('field', 'firstName'));
+        $form->add($this->factory->createNamed('field', 'firstName'));
 
         $form->setData(null);
         $form->bind(array('firstName' => 'Bernhard'));
@@ -169,8 +169,8 @@ class FieldTypeTest extends TestCase
      */
     public function testBindWithEmptyDataStoresArrayIfNoClassAvailable()
     {
-        $form = $this->factory->create('form', 'author');
-        $form->add($this->factory->create('field', 'firstName'));
+        $form = $this->factory->create('form');
+        $form->add($this->factory->createNamed('field', 'firstName'));
 
         $form->setData(null);
         $form->bind(array('firstName' => 'Bernhard'));
@@ -182,10 +182,10 @@ class FieldTypeTest extends TestCase
     {
         $author = new Author();
 
-        $form = $this->factory->create('form', 'author', array(
+        $form = $this->factory->create('form', null, array(
             'empty_data' => $author,
         ));
-        $form->add($this->factory->create('field', 'firstName'));
+        $form->add($this->factory->createNamed('field', 'firstName'));
 
         $form->bind(array('firstName' => 'Bernhard'));
 

@@ -29,7 +29,7 @@ class UrlTypeTest extends LocalizedTestCase
 
     public function testSubmitAddsNoDefaultProtocolIfAlreadyIncluded()
     {
-        $form = $this->factory->create('url', 'name', array(
+        $form = $this->factory->create('url', null, array(
             'default_protocol' => 'http',
         ));
 
@@ -41,7 +41,7 @@ class UrlTypeTest extends LocalizedTestCase
 
     public function testSubmitAddsNoDefaultProtocolIfEmpty()
     {
-        $form = $this->factory->create('url', 'name', array(
+        $form = $this->factory->create('url', null, array(
             'default_protocol' => 'http',
         ));
 
@@ -53,7 +53,7 @@ class UrlTypeTest extends LocalizedTestCase
 
     public function testSubmitAddsNoDefaultProtocolIfSetToNull()
     {
-        $form = $this->factory->create('url', 'name', array(
+        $form = $this->factory->create('url', null, array(
             'default_protocol' => null,
         ));
 

@@ -41,7 +41,7 @@ class CsrfTypeTest extends TestCase
             ->with('%PAGE_ID%')
             ->will($this->returnValue('token'));
 
-        $form = $this->factory->create('csrf', 'name', array(
+        $form = $this->factory->create('csrf', null, array(
             'csrf_provider' => $this->provider,
             'page_id' => '%PAGE_ID%'
         ));
@@ -56,7 +56,7 @@ class CsrfTypeTest extends TestCase
             ->with('%PAGE_ID%', 'token')
             ->will($this->returnValue(true));
 
-        $form = $this->factory->create('csrf', 'name', array(
+        $form = $this->factory->create('csrf', null, array(
             'csrf_provider' => $this->provider,
             'page_id' => '%PAGE_ID%'
         ));
@@ -70,7 +70,7 @@ class CsrfTypeTest extends TestCase
         $this->provider->expects($this->never())
             ->method('isCsrfTokenValid');
 
-        $form = $this->factory->create('csrf', 'name', array(
+        $form = $this->factory->create('csrf', null, array(
             'csrf_provider' => $this->provider,
             'page_id' => '%PAGE_ID%'
         ));
@@ -96,7 +96,7 @@ class CsrfTypeTest extends TestCase
             ->with('%PAGE_ID%')
             ->will($this->returnValue('token2'));
 
-        $form = $this->factory->create('csrf', 'name', array(
+        $form = $this->factory->create('csrf', null, array(
             'csrf_provider' => $this->provider,
             'page_id' => '%PAGE_ID%'
         ));

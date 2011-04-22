@@ -17,7 +17,7 @@ class CheckboxTypeTest extends TestCase
 {
     public function testPassValueToView()
     {
-        $form = $this->factory->create('checkbox', 'name', array('value' => 'foobar'));
+        $form = $this->factory->create('checkbox', null, array('value' => 'foobar'));
         $view = $form->createView();
 
         $this->assertEquals('foobar', $view->get('value'));

@@ -114,8 +114,8 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $expectedOptions = array('bar' => 'baz');
 
         $this->factory->expects($this->once())
-                ->method('createBuilder')
-                ->with($this->equalTo($expectedType), $this->equalTo($expectedName), $this->equalTo($expectedOptions))
+                ->method('createNamedBuilder')
+                ->with($expectedType, $expectedName, null, $expectedOptions)
                 ->will($this->returnValue($this->getFormBuilder()));
 
         $this->builder->add($expectedName, $expectedType, $expectedOptions);
@@ -131,7 +131,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->factory->expects($this->once())
                 ->method('createBuilderForProperty')
-                ->with($this->equalTo('stdClass'), $this->equalTo($expectedName), $this->equalTo($expectedOptions))
+                ->with('stdClass', $expectedName, null, $expectedOptions)
                 ->will($this->returnValue($this->getFormBuilder()));
 
         $this->builder = new FormBuilder('name', $this->factory, $this->dispatcher, 'stdClass');

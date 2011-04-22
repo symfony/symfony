@@ -2,10 +2,10 @@
 
 $container->loadFromExtension('framework', array(
     'session' => array(
-        'storage_id'      => 'pdo',
-        'pdo.db_table'    => 'table',
-        'pdo.db_id_col'   => 'id',
-        'pdo.db_data_col' => 'data',
-        'pdo.db_time_col' => 'time',
+        'storage_id'  => 'pdo',
+        'db_table'    => 'table',
+        'db_id_col'   => 'id',
+        'db_data_col' => 'data',
+        'db_time_col' => 'time',
     ),
 ));

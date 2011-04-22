@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Acl\Domain;
 
 use Symfony\Component\Security\Acl\Model\AclInterface;
-use Symfony\Component\Security\Acl\Model\FieldAwareEntryInterface;
+use Symfony\Component\Security\Acl\Model\FieldEntryInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 /**
@@ -20,7 +20,7 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class FieldEntry extends Entry implements FieldAwareEntryInterface
+class FieldEntry extends Entry implements FieldEntryInterface
 {
     private $field;
 

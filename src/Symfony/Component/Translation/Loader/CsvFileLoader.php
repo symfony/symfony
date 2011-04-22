@@ -30,13 +30,13 @@ class CsvFileLoader extends ArrayLoader implements LoaderInterface
     public function load($resource, $locale, $domain = 'messages')
     {
         $messages = array();
-        
+
         try {
             $file = new \SplFileObject($resource, 'rb');
         } catch(\RuntimeException $e) {
             throw new \InvalidArgumentException(sprintf('Error opening file "%s".', $resource));
         }
-        
+
         $file->setFlags(\SplFileObject::READ_CSV | \SplFileObject::SKIP_EMPTY);
         $file->setCsvControl(';');
 

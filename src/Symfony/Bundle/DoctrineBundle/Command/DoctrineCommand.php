@@ -39,7 +39,7 @@ abstract class DoctrineCommand extends Command
 {
     /**
      * Convenience method to push the helper sets of a given entity manager into the application.
-     * 
+     *
      * @param Application $application
      * @param string $emName
      */
@@ -165,10 +165,11 @@ abstract class DoctrineCommand extends Command
     protected function findBasePathForBundle($bundle)
     {
         $path = str_replace('\\', '/', $bundle->getNamespace());
-        $destination = str_replace('/'.$path, "", $bundle->getPath(), $c);
+        $search = str_replace('\\', '/', $bundle->getPath());
+        $destination = str_replace('/'.$path, '', $search, $c);
 
         if ($c != 1) {
-            throw new \RuntimeException("Something went terribly wrong.");
+            throw new \RuntimeException(sprintf('Can\'t find base path for bundle (path: "%s", destination: "%s").', $path, $destination));
         }
 
         return $destination;

@@ -60,7 +60,7 @@ class ControllerResolver implements ControllerResolverInterface
             return false;
         }
 
-        if ($controller instanceof \Closure) {
+        if (is_array($controller) || method_exists($controller, '__invoke')) {
             return $controller;
         }
 
@@ -92,15 +92,21 @@ class ControllerResolver implements ControllerResolverInterface
         if (is_array($controller)) {
             $r = new \ReflectionMethod($controller[0], $controller[1]);
             $repr = sprintf('%s::%s()', get_class($controller[0]), $controller[1]);
+        } elseif (is_object($controller)) {
+            $r = new \ReflectionObject($controller);
+            $r = $r->getMethod('__invoke');
+            $repr = get_class($controller);
         } else {
             $r = new \ReflectionFunction($controller);
-            $repr = 'Closure';
+            $repr = $controller;
         }
 
         $arguments = array();
         foreach ($r->getParameters() as $param) {
             if (array_key_exists($param->getName(), $attributes)) {
                 $arguments[] = $attributes[$param->getName()];
+            } elseif ($param->getClass() && $param->getClass()->isInstance($request)) {
+                $arguments[] = $request;
             } elseif ($param->isDefaultValueAvailable()) {
                 $arguments[] = $param->getDefaultValue();
             } else {

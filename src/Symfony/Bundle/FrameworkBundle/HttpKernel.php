@@ -169,7 +169,7 @@ class HttpKernel extends BaseHttpKernel
             'controller' => $controller,
             'path'       => $attributes ? http_build_query($attributes) : 'none',
             '_format'    => $this->container->get('request')->getRequestFormat(),
-        ), true);
+        ));
 
         if ($query) {
             $uri = $uri.'?'.http_build_query($query);

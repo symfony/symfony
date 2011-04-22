@@ -19,4 +19,8 @@ namespace Symfony\Component\Security\Acl\Exception;
  */
 class NoAceFoundException extends Exception
 {
+    public function __construct()
+    {
+        parent::__construct('No applicable ACE was found.');
+    }
 }

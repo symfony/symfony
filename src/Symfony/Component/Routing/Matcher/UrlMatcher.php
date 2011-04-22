@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Matcher\Exception\NotFoundException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RequestContext;
 
 /**
  * UrlMatcher matches URL based on a set of routes.
@@ -23,7 +24,6 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class UrlMatcher implements UrlMatcherInterface
 {
-    protected $defaults;
     protected $context;
 
     private $routes;
@@ -32,24 +32,32 @@ class UrlMatcher implements UrlMatcherInterface
      * Constructor.
      *
      * @param RouteCollection $routes   A RouteCollection instance
-     * @param array           $context  The context
-     * @param array           $defaults The default values
+     * @param RequestContext  $context  The context
      */
-    public function __construct(RouteCollection $routes, array $context = array(), array $defaults = array())
+    public function __construct(RouteCollection $routes, RequestContext $context)
     {
         $this->routes = $routes;
         $this->context = $context;
-        $this->defaults = $defaults;
     }
 
     /**
      * Sets the request context.
      *
-     * @param array $context  The context
+     * @param RequestContext $context The context
      */
-    public function setContext(array $context = array())
+    public function setContext(RequestContext $context)
     {
         $this->context = $context;
+    }
+
+    /**
+     * Gets the request context.
+     *
+     * @return RequestContext The context
+     */
+    public function getContext()
+    {
+        return $this->context;
     }
 
     /**
@@ -79,7 +87,7 @@ class UrlMatcher implements UrlMatcherInterface
             }
 
             // check HTTP method requirement
-            if (isset($this->context['method']) && $route->getRequirement('_method') && ($req = explode('|', $route->getRequirement('_method'))) && !in_array(strtolower($this->context['method']), array_map('strtolower', $req))) {
+            if ($route->getRequirement('_method') && ($req = explode('|', $route->getRequirement('_method'))) && !in_array($this->context->getMethod(), array_map('strtolower', $req))) {
                 $allow = array_merge($allow, $req);
                 continue;
             }
@@ -94,7 +102,7 @@ class UrlMatcher implements UrlMatcherInterface
 
     protected function mergeDefaults($params, $defaults)
     {
-        $parameters = array_merge($this->defaults, $defaults);
+        $parameters = $defaults;
         foreach ($params as $key => $value) {
             if (!is_int($key)) {
                 $parameters[$key] = urldecode($value);

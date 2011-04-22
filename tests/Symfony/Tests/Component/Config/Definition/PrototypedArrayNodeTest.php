@@ -8,7 +8,7 @@ use Symfony\Component\Config\Definition\ScalarNode;
 
 class PrototypedArrayNodeTest extends \PHPUnit_Framework_TestCase
 {
- 
+
     public function testGetDefaultValueReturnsAnEmptyArrayForPrototypes()
     {
         $node = new PrototypedArrayNode('root');

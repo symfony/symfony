@@ -10,7 +10,7 @@
         <dbal />
         <orm default-entity-manager="default">
             <entity-manager name="default">
-                <hydrator name="test_hydrator" class="Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestHydrator" />
+                <hydrator name="test_hydrator">Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestHydrator</hydrator>
                 <mapping name="YamlBundle" />
             </entity-manager>
         </orm>

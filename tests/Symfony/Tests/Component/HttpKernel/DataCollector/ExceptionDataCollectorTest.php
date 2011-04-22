@@ -24,11 +24,11 @@ class ExceptionDataCollectorTest extends \PHPUnit_Framework_TestCase
         $c = new ExceptionDataCollector();
         $flattened = FlattenException::create($e);
         $trace = $flattened->getTrace();
-        
+
         $this->assertFalse($c->hasException());
-        
+
         $c->collect(new Request(), new Response(),$e);
-        
+
         $this->assertTrue($c->hasException());
         $this->assertEquals($flattened,$c->getException());
         $this->assertSame('foo',$c->getMessage());
@@ -36,5 +36,5 @@ class ExceptionDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('exception',$c->getName());
         $this->assertSame($trace,$c->getTrace());
     }
-    
+
 }

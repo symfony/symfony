@@ -20,11 +20,11 @@ class MemoryDataCollectorTest extends \PHPUnit_Framework_TestCase
     public function testCollect()
     {
         $c = new MemoryDataCollector();
-        
+
         $c->collect(new Request(), new Response());
-        
+
         $this->assertInternalType('integer',$c->getMemory());
         $this->assertSame('memory',$c->getName());
     }
-    
+
 }

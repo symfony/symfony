@@ -6,19 +6,67 @@ one. It only discusses changes that need to be done when using the "public"
 API of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.
 
+PR12 to beta1
+-------------
+
+* The `trans` tag does not accept a message as an argument anymore:
+
+    {% trans "foo" %}
+    {% trans foo %}
+
+  Use the long version the tags or the filter instead:
+
+    {% trans %}foo{% endtrans %}
+    {{ foo|trans }}
+
+  This has been done to clarify the usage of the tag and filter and also to
+  make it clearer when the automatic output escaping rules are applied (see
+  the doc for more information).
+
+* Some methods in the DependencyInjection component's ContainerBuilder and
+  Definition classes have been renamed to be more specific and consistent:
+
+  Before:
+
+        $container->remove('my_definition');
+        $definition->setArgument(0, 'foo');
+
+  After:
+
+        $container->removeDefinition('my_definition');
+        $definition->replaceArgument(0, 'foo');
+        
+* In the rememberme configuration, the token_provider key now expects a real 
+  service id instead of only a suffix.
+
 PR11 to PR12
 ------------
 
-* AsseticBundle's XML `bundle` node has been normalized to match other similar
-  nodes
+* HttpFoundation\Cookie::getExpire() was renamed to getExpiresTime()
+
+* XML configurations have been normalized. All tags with only one attribute
+  have been converted to tag content:
 
   Before:
 
         <bundle name="MyBundle" />
+        <app:engine id="twig" />
+        <twig:extension id="twig.extension.debug" />
 
   After:
 
         <bundle>MyBundle</bundle>
+        <app:engine>twig</app:engine>
+        <twig:extension>twig.extension.debug</twig:extension>
+
+* Fixes a critical security issue which allowed all users to switch to 
+  arbitrary accounts when the SwitchUserListener was activated. Configurations
+  which do not use the SwitchUserListener are not affected.
+
+* The Dependency Injection Container now strongly validates the references of 
+  all your services at the end of its compilation process. If you have invalid
+  references this will result in a compile-time exception instead of a run-time
+  exception (the previous behavior).
 
 PR10 to PR11
 ------------

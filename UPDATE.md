@@ -9,6 +9,19 @@ timeline closely anyway.
 PR12 to beta1
 -------------
 
+* The `session` configuration has been refactored:
+
+  * The `class` option has been removed (use the `session.class` parameter
+    instead);
+
+  * The PDO session storage configuration has been removed (a cookbook recipe
+    is in the work);
+
+  * The `storage_id` option now takes a service id instead of just part of it.
+
+* The `DoctrineMigrationsBundle` and `DoctrineFixturesBundle` bundles have
+  been moved to their own repositories.
+
 * The form framework has been refactored extensively (more information in the
   documentation).
 
@@ -38,8 +51,8 @@ PR12 to beta1
 
         $container->removeDefinition('my_definition');
         $definition->replaceArgument(0, 'foo');
-        
-* In the rememberme configuration, the token_provider key now expects a real 
+
+* In the rememberme configuration, the `token_provider key` now expects a real
   service id instead of only a suffix.
 
 PR11 to PR12

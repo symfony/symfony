@@ -128,6 +128,48 @@ class UploadedFile extends File
     }
 
     /**
+     * Returns whether the file was uploaded succesfully.
+     *
+     * @return Boolean  True if no error occurred during uploading
+     */
+    public function isValid()
+    {
+        return $this->error === UPLOAD_ERR_OK;
+    }
+
+    /**
+     * Returns true if the size of the uploaded file exceeds the
+     * upload_max_filesize directive in php.ini
+     *
+     * @return Boolean
+     */
+    protected function isIniSizeExceeded()
+    {
+        return $this->error === UPLOAD_ERR_INI_SIZE;
+    }
+
+    /**
+     * Returns true if the size of the uploaded file exceeds the
+     * MAX_FILE_SIZE directive specified in the HTML form
+     *
+     * @return Boolean
+     */
+    protected function isFormSizeExceeded()
+    {
+        return $this->error === UPLOAD_ERR_FORM_SIZE;
+    }
+
+    /**
+     * Returns true if the file was completely uploaded
+     *
+     * @return Boolean
+     */
+    protected function isUploadComplete()
+    {
+        return $this->error !== UPLOAD_ERR_PARTIAL;
+    }
+
+    /**
      * @inheritDoc
      */
     protected function doMove($directory, $filename)

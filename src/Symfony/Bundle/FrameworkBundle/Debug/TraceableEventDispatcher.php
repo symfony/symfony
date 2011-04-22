@@ -110,6 +110,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     public function getNotCalledListeners()
     {
         $notCalled = array();
+
         foreach (array_keys($this->getListeners()) as $name) {
             foreach ($this->getListeners($name) as $listener) {
                 if (!isset($this->called[$name.'.'.get_class($listener)])) {

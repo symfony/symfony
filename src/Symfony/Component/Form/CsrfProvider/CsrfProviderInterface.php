@@ -22,7 +22,7 @@ namespace Symfony\Component\Form\CsrfProvider;
  *
  * If you want to secure a form submission against CSRF attacks, you could
  * use the class name of the form as page ID. This way you make sure that the
- * form can only be submitted to pages that are designed to handle the form,
+ * form can only be bound to pages that are designed to handle the form,
  * that is, that use the same class name to validate the CSRF token with
  * isCsrfTokenValid().
  *

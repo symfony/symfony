@@ -103,11 +103,11 @@
                 <th>Key</th>
                 <th>Value</th>
             </tr>
-
-            {% for key, value in collector.sessionattributes %}
+            {% set attributes = collector.sessionattributes %}
+            {% for key in attributes|keys|sort %}
                 <tr>
                     <th>{{ key }}</th>
-                    <td>{{ value|yaml_dump }}</td>
+                    <td>{{ attributes[key]|yaml_dump }}</td>
                 </tr>
             {% endfor %}
         </table>

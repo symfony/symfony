@@ -19,19 +19,11 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 use Symfony\Component\Form\Extension\Core\Validator\DefaultValidator;
-use Symfony\Component\Form\Extension\Core\Validator\DelegatingValidator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Validator\ValidatorInterface;
 
 class FieldType extends AbstractType
 {
-    private $validator;
-
-    public function __construct(ValidatorInterface $validator)
-    {
-        $this->validator = $validator;
-    }
-
     public function buildForm(FormBuilder $builder, array $options)
     {
         if (null === $options['property_path']) {
@@ -44,24 +36,17 @@ class FieldType extends AbstractType
             $options['property_path'] = new PropertyPath($options['property_path']);
         }
 
-        $options['validation_groups'] = empty($options['validation_groups'])
-            ? null
-            : (array)$options['validation_groups'];
-
         $builder->setRequired($options['required'])
             ->setReadOnly($options['read_only'])
             ->setErrorBubbling($options['error_bubbling'])
             ->setEmptyData($options['empty_data'])
             ->setAttribute('by_reference', $options['by_reference'])
             ->setAttribute('property_path', $options['property_path'])
-            ->setAttribute('validation_groups', $options['validation_groups'])
             ->setAttribute('error_mapping', $options['error_mapping'])
             ->setAttribute('max_length', $options['max_length'])
             ->setAttribute('label', $options['label'] ?: $this->humanize($builder->getName()))
-            ->setAttribute('validation_constraint', $options['validation_constraint'])
             ->setData($options['data'])
-            ->addValidator(new DefaultValidator())
-            ->addValidator(new DelegatingValidator($this->validator));
+            ->addValidator(new DefaultValidator());
 
         if ($options['trim']) {
             $builder->addEventSubscriber(new TrimListener());
@@ -111,11 +96,9 @@ class FieldType extends AbstractType
             'max_length' => null,
             'property_path' => null,
             'by_reference' => true,
-            'validation_groups' => null,
             'error_bubbling' => false,
             'error_mapping' => array(),
             'label' => null,
-            'validation_constraint' => null,
         );
 
         if (!empty($options['data_class'])) {

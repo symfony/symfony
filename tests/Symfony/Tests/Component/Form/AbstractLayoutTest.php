@@ -29,12 +29,11 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         \Locale::setDefault('en');
 
         $dispatcher = new EventDispatcher();
-        $validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
         $this->csrfProvider = $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface');
         $storage = new \Symfony\Component\HttpFoundation\File\TemporaryStorage('foo', 1, \sys_get_temp_dir());
 
         $this->factory = new FormFactory(array(
-            new CoreExtension($validator, $storage),
+            new CoreExtension($storage),
             new CsrfExtension($this->csrfProvider),
         ));
     }

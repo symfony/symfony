@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Extension\Core\Validator;
+namespace Symfony\Component\Form\Extension\Validator\Validator;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormValidatorInterface;

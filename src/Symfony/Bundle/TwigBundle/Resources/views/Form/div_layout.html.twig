@@ -197,7 +197,7 @@
 
 {% block money_widget %}
 {% spaceless %}
-    foo {{ money_pattern|replace({ '{{ widget }}': block('field_widget') })|raw }}
+    {{ money_pattern|replace({ '{{ widget }}': block('field_widget') })|raw }}
 {% endspaceless %}
 {% endblock money_widget %}
 

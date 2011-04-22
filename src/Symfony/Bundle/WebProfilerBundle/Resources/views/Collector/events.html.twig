@@ -33,10 +33,11 @@
                 <th>Event name</th>
                 <th>Listener</th>
             </tr>
-            {% for listener in collector.notcalledlisteners %}
+            {% set listeners = collector.notcalledlisteners %}
+            {% for listener in listeners|keys|sort %}
                 <tr>
-                    <td><code>{{ listener.event }}</code></td>
-                    <td><code>{{ display_listener(listener) }}</code></td>
+                    <td><code>{{ listeners[listener].event }}</code></td>
+                    <td><code>{{ display_listener(listeners[listener]) }}</code></td>
                 </tr>
             {% endfor %}
         </table>

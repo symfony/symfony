@@ -543,7 +543,7 @@ class Request
         }
 
         // Remove port number from host
-        $host = preg_replace('/:(\d+)$/', '', $host);
+        $host = preg_replace('/:\d+$/', '', $host);
 
         return trim($host);
     }

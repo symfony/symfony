@@ -9,6 +9,9 @@ timeline closely anyway.
 PR12 to beta1
 -------------
 
+* The form framework has been refactored extensively (more information in the
+  documentation).
+
 * The `trans` tag does not accept a message as an argument anymore:
 
     {% trans "foo" %}

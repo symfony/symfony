@@ -434,21 +434,36 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method from _method if defined and POST');
     }
 
-    public function testGetClientIp()
+    /**
+     * @dataProvider testGetClientIpProvider
+     */
+    public function testGetClientIp($expected, $proxy, $remoteAddr, $httpClientIp, $httpForwardedFor)
     {
         $request = new Request;
         $this->assertEquals('', $request->getClientIp());
         $this->assertEquals('', $request->getClientIp(true));
-        $request->initialize(array(), array(), array(), array(), array(), array('REMOTE_ADDR' => '88.88.88.88'));
-        $this->assertEquals('88.88.88.88', $request->getClientIp());
-        $request->initialize(array(), array(), array(), array(), array(), array('REMOTE_ADDR' => '127.0.0.1', 'HTTP_CLIENT_IP' => '88.88.88.88'));
-        $this->assertEquals('127.0.0.1', $request->getClientIp());
-        $request->initialize(array(), array(), array(), array(), array(), array('REMOTE_ADDR' => '127.0.0.1', 'HTTP_CLIENT_IP' => '88.88.88.88'));
-        $this->assertEquals('88.88.88.88', $request->getClientIp(true));
-        $request->initialize(array(), array(), array(), array(), array(), array('REMOTE_ADDR' => '127.0.0.1', 'HTTP_X_FORWARDED_FOR' => '88.88.88.88'));
-        $this->assertEquals('127.0.0.1', $request->getClientIp());
-        $request->initialize(array(), array(), array(), array(), array(), array('REMOTE_ADDR' => '127.0.0.1', 'HTTP_X_FORWARDED_FOR' => '88.88.88.88'));
-        $this->assertEquals('88.88.88.88', $request->getClientIp(true));
+
+        $server = array('REMOTE_ADDR' => $remoteAddr);
+        if (!is_null($httpClientIp)) {
+            $server['HTTP_CLIENT_IP'] = $httpClientIp;
+        }
+        if (!is_null($httpForwardedFor)) {
+            $server['HTTP_X_FORWARDED_FOR'] = $httpForwardedFor;
+        }
+
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+        $this->assertEquals($expected, $request->getClientIp($proxy));
+    }
+
+    public function testGetClientIpProvider()
+    {
+        return array(
+            array('88.88.88.88', false, '88.88.88.88', null, null),
+            array('127.0.0.1', false, '127.0.0.1', '88.88.88.88', null),
+            array('88.88.88.88', true, '127.0.0.1', '88.88.88.88', null),
+            array('127.0.0.1', false, '127.0.0.1', null, '88.88.88.88'),
+            array('88.88.88.88', true, '127.0.0.1', null, '88.88.88.88'),
+        );
     }
 
     public function testGetContentWorksTwiceInDefaultMode()

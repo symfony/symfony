@@ -115,10 +115,11 @@
             <th>Name</th>
             <th>Path</th>
         </tr>
-        {% for name, path in collector.bundles %}
+        {% set bundles = collector.bundles %}
+        {% for name in bundles|keys|sort %}
         <tr>
             <th>{{ name }}</th>
-            <td>{{ path }}</td>
+            <td>{{ bundles[name] }}</td>
         </tr>
         {% endfor %}
     </table>

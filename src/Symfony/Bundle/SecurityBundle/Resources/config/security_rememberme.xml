@@ -8,7 +8,7 @@
         <parameter key="security.authentication.provider.rememberme.class">Symfony\Component\Security\Core\Authentication\Provider\RememberMeAuthenticationProvider</parameter>
 
         <parameter key="security.authentication.listener.rememberme.class">Symfony\Component\Security\Http\Firewall\RememberMeListener</parameter>
-        <parameter key="security.rembemerme.token.provider.in_memory.class">Symfony\Component\Security\Core\Authentication\RememberMe\InMemoryTokenProvider</parameter>
+        <parameter key="security.rememberme.token.provider.in_memory.class">Symfony\Component\Security\Core\Authentication\RememberMe\InMemoryTokenProvider</parameter>
 
         <parameter key="security.authentication.rememberme.services.persistent.class">Symfony\Component\Security\Http\RememberMe\PersistentTokenBasedRememberMeServices</parameter>
         <parameter key="security.authentication.rememberme.services.simplehash.class">Symfony\Component\Security\Http\RememberMe\TokenBasedRememberMeServices</parameter>
@@ -30,7 +30,7 @@
             <argument type="service" id="security.user_checker" />
         </service>
 
-        <service id="security.rememberme.token.provider.in_memory" class="%security.rembemerme.token.provider.in_memory.class%" public="false"></service>
+        <service id="security.rememberme.token.provider.in_memory" class="%security.rememberme.token.provider.in_memory.class%" public="false"></service>
 
         <service id="security.authentication.rememberme.services.abstract" abstract="true" public="false">
             <tag name="monolog.logger" channel="security" />

@@ -32,7 +32,7 @@ class PluralizationRules
     static public function get($number, $locale)
     {
         if ("pt_BR" == $locale) {
-            // temporary set a locale for brasilian
+            // temporary set a locale for brazilian
             $locale = "xbr";
         }
 
@@ -198,7 +198,7 @@ class PluralizationRules
     static public function set($rule, $locale)
     {
         if ("pt_BR" == $locale) {
-            // temporary set a locale for brasilian
+            // temporary set a locale for brazilian
             $locale = "xbr";
         }
 

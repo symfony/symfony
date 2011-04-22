@@ -69,7 +69,7 @@ final class Events
     const onCoreController = 'onCoreController';
 
     /**
-     * The onCoreController event occurs once a reponse was created for
+     * The onCoreController event occurs once a response was created for
      * replying to a request
      *
      * This event allows you to modify or replace the response that will be

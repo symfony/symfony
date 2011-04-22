@@ -127,7 +127,7 @@ class DefinitionDecorator extends Definition
      * @param mixed $value
      *
      * @return DefinitionDecorator the current instance
-     * @throws \InvalidArgumentException when $index isnt an integer
+     * @throws \InvalidArgumentException when $index isn't an integer
      */
     public function replaceArgument($index, $value)
     {

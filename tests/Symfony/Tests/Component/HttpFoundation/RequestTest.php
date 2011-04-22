@@ -89,6 +89,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(90, $request->getPort());
         $this->assertTrue($request->isSecure());
 
+        $request = Request::create('https://[::1]:90/foo');
+        $this->assertEquals('https://[::1]:90/foo', $request->getUri());
+        $this->assertEquals('/foo', $request->getPathInfo());
+        $this->assertEquals('[::1]', $request->getHost());
+        $this->assertEquals('[::1]:90', $request->getHttpHost());
+        $this->assertEquals(90, $request->getPort());
+        $this->assertTrue($request->isSecure());
+
         $json = '{"jsonrpc":"2.0","method":"echo","id":7,"params":["Hello World"]}';
         $request = Request::create('http://example.com/jsonrpc', 'POST', array(), array(), array(), array(), $json);
         $this->assertEquals($json, $request->getContent());
@@ -471,6 +479,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('88.88.88.88', true, '127.0.0.1', '88.88.88.88', null),
             array('127.0.0.1', false, '127.0.0.1', null, '88.88.88.88'),
             array('88.88.88.88', true, '127.0.0.1', null, '88.88.88.88'),
+            array('::1', false, '::1', null, null),
+            array('2620:0:1cfe:face:b00c::3', true, '::1', '2620:0:1cfe:face:b00c::3', null),
         );
     }
 

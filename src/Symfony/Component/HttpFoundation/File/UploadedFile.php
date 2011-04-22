@@ -128,7 +128,7 @@ class UploadedFile extends File
     }
 
     /**
-     * Returns whether the file was uploaded succesfully.
+     * Returns whether the file was uploaded successfully.
      *
      * @return Boolean  True if no error occurred during uploading
      */

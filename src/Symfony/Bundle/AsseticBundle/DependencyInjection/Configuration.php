@@ -31,7 +31,7 @@ class Configuration implements ConfigurationInterface
     /**
      * Constructor
      *
-     * @param Boolean $debug    Wether to use the debug mode
+     * @param Boolean $debug    Whether to use the debug mode
      * @param array   $bundles  An array of bundle names
      */
     public function __construct($debug, array $bundles)

@@ -350,7 +350,7 @@ class StubIntlDateFormatter
     /**
      * Set the formatter's pattern
      *
-     * @param  strubg  $pattern   A pattern string in conformance with the ICU IntlDateFormatter documentation
+     * @param  string  $pattern   A pattern string in conformance with the ICU IntlDateFormatter documentation
      * @return bool               true on success or false on failure
      * @see    http://www.php.net/manual/en/intldateformatter.setpattern.php
      * @see    http://userguide.icu-project.org/formatparse/datetime

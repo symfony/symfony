@@ -125,7 +125,7 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
-     * Disable adding concrete childrend for prototyped nodes.
+     * Disable adding concrete children for prototyped nodes.
      *
      * @param NodeInterface $node The child node to add
      * @throws \RuntimeException Prototyped array nodes can't have concrete children.

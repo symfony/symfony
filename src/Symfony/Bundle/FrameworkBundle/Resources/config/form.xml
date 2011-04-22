@@ -7,7 +7,7 @@
     <parameters>
         <parameter key="form.extension.class">Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension</parameter>
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
-        <parameter key="form.type_guesser.validator.class">Symfony\Component\Form\Extension\Core\CoreTypeGuesser</parameter>
+        <parameter key="form.type_guesser.validator.class">Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser</parameter>
         <parameter key="form.csrf_provider.class">Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider</parameter>
         <parameter key="form.csrf_protection.enabled">true</parameter>
         <parameter key="form.csrf_protection.field_name">_token</parameter>

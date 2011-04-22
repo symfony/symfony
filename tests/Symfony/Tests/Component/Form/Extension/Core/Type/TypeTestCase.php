@@ -18,8 +18,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class TypeTestCase extends \PHPUnit_Framework_TestCase
 {
-    protected $validator;
-
     protected $storage;
 
     protected $factory;
@@ -32,7 +30,6 @@ abstract class TypeTestCase extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->storage = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\TemporaryStorage')
             ->disableOriginalConstructor()
@@ -44,7 +41,7 @@ abstract class TypeTestCase extends \PHPUnit_Framework_TestCase
     protected function getExtensions()
     {
         return array(
-            new CoreExtension($this->validator, $this->storage),
+            new CoreExtension($this->storage),
         );
     }
 

@@ -63,47 +63,6 @@ class FormTest_AuthorWithoutRefSetter
 
 class FormTypeTest extends TypeTestCase
 {
-    public function testValidationGroupNullByDefault()
-    {
-        $form =  $this->factory->create('form');
-
-        $this->assertNull($form->getAttribute('validation_groups'));
-    }
-
-    public function testValidationGroupsCanBeSetToString()
-    {
-        $form = $this->factory->create('form', null, array(
-            'validation_groups' => 'group',
-        ));
-
-        $this->assertEquals(array('group'), $form->getAttribute('validation_groups'));
-    }
-
-    public function testValidationGroupsCanBeSetToArray()
-    {
-        $form = $this->factory->create('form', null, array(
-            'validation_groups' => array('group1', 'group2'),
-        ));
-
-        $this->assertEquals(array('group1', 'group2'), $form->getAttribute('validation_groups'));
-    }
-
-    public function testBindValidatesData()
-    {
-        $builder = $this->factory->createBuilder('form', null, array(
-            'validation_groups' => 'group',
-        ));
-        $builder->add('firstName', 'field');
-        $form = $builder->getForm();
-
-        $this->validator->expects($this->once())
-            ->method('validate')
-            ->with($this->equalTo($form));
-
-        // specific data is irrelevant
-        $form->bind(array());
-    }
-
     public function testSubformDoesntCallSetters()
     {
         $author = new FormTest_AuthorWithoutRefSetter(new Author());

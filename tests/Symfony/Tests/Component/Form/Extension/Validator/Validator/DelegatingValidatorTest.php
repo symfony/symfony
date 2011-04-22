@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Form\Extension\Core\Validator;
+namespace Symfony\Tests\Component\Form\Extension\Validator\Validator;
 
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Util\PropertyPath;
-use Symfony\Component\Form\Extension\Core\Validator\DelegatingValidator;
+use Symfony\Component\Form\Extension\Validator\Validator\DelegatingValidator;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ExecutionContext;

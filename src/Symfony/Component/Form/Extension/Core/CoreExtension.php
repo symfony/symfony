@@ -18,22 +18,19 @@ use Symfony\Component\HttpFoundation\File\TemporaryStorage;
 
 class CoreExtension extends AbstractExtension
 {
-    private $validator;
-
     private $storage;
 
     private $typeGuesser;
 
-    public function __construct(ValidatorInterface $validator, TemporaryStorage $storage)
+    public function __construct(TemporaryStorage $storage)
     {
-        $this->validator = $validator;
         $this->storage = $storage;
     }
 
     protected function loadTypes()
     {
         return array(
-            new Type\FieldType($this->validator),
+            new Type\FieldType(),
             new Type\FormType(),
             new Type\BirthdayType(),
             new Type\CheckboxType(),
@@ -60,10 +57,5 @@ class CoreExtension extends AbstractExtension
             new Type\UrlType(),
             new Type\FileType($this->storage),
         );
-    }
-
-    public function loadTypeGuesser()
-    {
-        return new CoreTypeGuesser($this->validator->getMetadataFactory());
     }
 }

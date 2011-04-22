@@ -14,16 +14,10 @@ namespace Symfony\Tests\Component\Routing;
 use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RequestContext;
 
 class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
 {
-    static protected $fixturesPath;
-
-    static public function setUpBeforeClass()
-    {
-        self::$fixturesPath = realpath(__DIR__.'/../../Fixtures/');
-    }
-
     public function testDump()
     {
         $collection = new RouteCollection();
@@ -74,8 +68,38 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
             array('def' => 'test')
         ));
 
-        $dumper = new PhpMatcherDumper($collection);
-        $this->assertStringEqualsFile(self::$fixturesPath.'/dumper/url_matcher1.php', $dumper->dump(), '->dump() dumps basic routes to the correct PHP file.');
-        $this->assertStringEqualsFile(self::$fixturesPath.'/dumper/url_matcher2.php', $dumper->dump(array('base_class' => 'Symfony\Tests\Component\Routing\Fixtures\RedirectableUrlMatcher')), '->dump() dumps basic routes to the correct PHP file.');
+        $dumper = new PhpMatcherDumper($collection, new RequestContext());
+        $this->assertStringEqualsFile(__DIR__.'/../../Fixtures/dumper/url_matcher1.php', $dumper->dump(), '->dump() dumps basic routes to the correct PHP file.');
+
+        // force HTTPS redirection
+        $collection->add('secure', new Route(
+            '/secure',
+            array(),
+            array('_scheme' => 'https')
+        ));
+
+        // force HTTP redirection
+        $collection->add('nonsecure', new Route(
+            '/nonsecure',
+            array(),
+            array('_scheme' => 'http')
+        ));
+
+        $this->assertStringEqualsFile(__DIR__.'/../../Fixtures/dumper/url_matcher2.php', $dumper->dump(array('base_class' => 'Symfony\Tests\Component\Routing\Fixtures\RedirectableUrlMatcher')), '->dump() dumps basic routes to the correct PHP file.');
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testDumpWhenSchemeIsUsedWithoutAProperDumper()
+    {
+        $collection = new RouteCollection();
+        $collection->add('secure', new Route(
+            '/secure',
+            array(),
+            array('_scheme' => 'https')
+        ));
+        $dumper = new PhpMatcherDumper($collection, new RequestContext());
+        $dumper->dump();
     }
 }

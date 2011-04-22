@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  * @author John Wards <jwards@whiteoctober.co.uk>
  * @author Fabian Vogler <fabian@equivalence.ch>
  */
-class XmlEncoder extends AbstractEncoder
+class XmlEncoder extends AbstractEncoder implements DecoderInterface
 {
     private $dom;
     private $format;
@@ -174,7 +174,7 @@ class XmlEncoder extends AbstractEncoder
             } else {
                 $value = (string) $subnode;
             }
-            
+
             if ($key === 'item') {
                 if (isset($value['@key'])) {
                     $data[(string)$value['@key']] = $value['#'];

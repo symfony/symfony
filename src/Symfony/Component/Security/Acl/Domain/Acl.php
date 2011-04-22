@@ -10,6 +10,7 @@
 
 namespace Symfony\Component\Security\Acl\Domain;
 
+use Doctrine\Common\NotifyPropertyChanged;
 use Doctrine\Common\PropertyChangedListener;
 use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\AuditableAclInterface;
@@ -33,7 +34,7 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class Acl implements AuditableAclInterface
+class Acl implements AuditableAclInterface, NotifyPropertyChanged
 {
     private $parentAcl;
     private $permissionGrantingStrategy;

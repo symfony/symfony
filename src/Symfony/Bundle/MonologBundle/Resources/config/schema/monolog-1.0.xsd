@@ -10,13 +10,13 @@
     <xsd:complexType name="config">
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="handler" type="handler" />
-            <xsd:element name="processor" type="processor" />
+            <xsd:element name="processor" type="xsd:string" />
         </xsd:choice>
     </xsd:complexType>
 
     <xsd:complexType name="handler">
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
-            <xsd:element name="processor" type="processor" />
+            <xsd:element name="processor" type="xsd:string" />
         </xsd:choice>
         <xsd:attribute name="type" type="xsd:string" use="required" />
         <xsd:attribute name="priority" type="xsd:integer" />
@@ -32,10 +32,6 @@
         <xsd:attribute name="max-files" type="xsd:integer" />
         <xsd:attribute name="handler" type="xsd:string" />
         <xsd:attribute name="formatter" type="xsd:string" />
-    </xsd:complexType>
-
-    <xsd:complexType name="processor">
-        <xsd:attribute name="callback" type="xsd:string" use="required" />
     </xsd:complexType>
 
     <xsd:simpleType name="level">

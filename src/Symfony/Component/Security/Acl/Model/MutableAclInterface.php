@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Acl\Model;
 
-use Doctrine\Common\NotifyPropertyChanged;
-
 /**
  * This interface adds mutators for the AclInterface.
  *
@@ -21,7 +19,7 @@ use Doctrine\Common\NotifyPropertyChanged;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-interface MutableAclInterface extends AclInterface, NotifyPropertyChanged
+interface MutableAclInterface extends AclInterface
 {
     /**
      * Deletes a class-based ACE

@@ -491,7 +491,7 @@ class File
             throw new FileNotFoundException($path);
         }
 
-        $this->path = realpath($path);
+        $this->path = $path;
     }
 
     /**

@@ -88,6 +88,47 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $kernel->handle(new Request());
     }
 
+    public function testHandleWhenNoControllerIsAClosure()
+    {
+        $response = new Response('foo');
+        $dispatcher = new EventDispatcher();
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(function () use ($response) { return $response; }));
+
+        $this->assertSame($response, $kernel->handle(new Request()));
+    }
+
+    public function testHandleWhenNoControllerIsAnObjectWithInvoke()
+    {
+        $dispatcher = new EventDispatcher();
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(new Controller()));
+
+        $this->assertEquals(new Response('foo'), $kernel->handle(new Request()));
+    }
+
+    public function testHandleWhenNoControllerIsAFunction()
+    {
+        $dispatcher = new EventDispatcher();
+        $kernel = new HttpKernel($dispatcher, $this->getResolver('Symfony\Tests\Component\HttpKernel\controller_func'));
+
+        $this->assertEquals(new Response('foo'), $kernel->handle(new Request()));
+    }
+
+    public function testHandleWhenNoControllerIsAnArray()
+    {
+        $dispatcher = new EventDispatcher();
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(array(new Controller(), 'controller')));
+
+        $this->assertEquals(new Response('foo'), $kernel->handle(new Request()));
+    }
+
+    public function testHandleWhenNoControllerIsAStaticArray()
+    {
+        $dispatcher = new EventDispatcher();
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(array('Symfony\Tests\Component\HttpKernel\Controller', 'staticcontroller')));
+
+        $this->assertEquals(new Response('foo'), $kernel->handle(new Request()));
+    }
+
     /**
      * @expectedException LogicException
      */
@@ -139,4 +180,27 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
 
         return $resolver;
     }
+}
+
+class Controller
+{
+    public function __invoke()
+    {
+        return new Response('foo');
+    }
+
+    public function controller()
+    {
+        return new Response('foo');
+    }
+
+    static public function staticController()
+    {
+        return new Response('foo');
+    }
+}
+
+function controller_func()
+{
+    return new Response('foo');
 }

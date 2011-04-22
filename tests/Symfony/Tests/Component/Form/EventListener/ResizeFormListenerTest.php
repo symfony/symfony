@@ -49,12 +49,12 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->form->add($this->getForm('1'));
 
         $this->factory->expects($this->at(0))
-            ->method('create')
-            ->with('text', 1, array('property_path' => '[1]'))
+            ->method('createNamed')
+            ->with('text', 1, null, array('property_path' => '[1]'))
             ->will($this->returnValue($this->getForm('1')));
         $this->factory->expects($this->at(1))
-            ->method('create')
-            ->with('text', 2, array('property_path' => '[2]'))
+            ->method('createNamed')
+            ->with('text', 2, null, array('property_path' => '[2]'))
             ->will($this->returnValue($this->getForm('2')));
 
         $data = array(1 => 'string', 2 => 'string');
@@ -104,7 +104,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testPreSetDataDealsWithNullData()
     {
-        $this->factory->expects($this->never())->method('create');
+        $this->factory->expects($this->never())->method('createNamed');
 
         $data = null;
         $event = new DataEvent($this->form, $data);
@@ -118,8 +118,8 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->form->add($this->getForm('1'));
 
         $this->factory->expects($this->once())
-            ->method('create')
-            ->with('text', 2, array('property_path' => '[2]'))
+            ->method('createNamed')
+            ->with('text', 2, null, array('property_path' => '[2]'))
             ->will($this->returnValue($this->getForm('2')));
 
         $data = array(0 => 'string', 2 => 'string');

@@ -364,9 +364,10 @@ class FormBuilder
     public function build($name, $type = null, array $options = array())
     {
         if (null !== $type) {
-            $builder = $this->getFormFactory()->createBuilder(
+            $builder = $this->getFormFactory()->createNamedBuilder(
                 $type,
                 $name,
+                null,
                 $options
             );
         } else {
@@ -377,6 +378,7 @@ class FormBuilder
             $builder = $this->getFormFactory()->createBuilderForProperty(
                 $this->dataClass,
                 $name,
+                null,
                 $options
             );
         }

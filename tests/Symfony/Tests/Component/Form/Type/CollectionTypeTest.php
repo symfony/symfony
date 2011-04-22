@@ -20,7 +20,7 @@ class CollectionFormTest extends TestCase
 {
     public function testContainsOnlyCsrfTokenByDefault()
     {
-        $form = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', null, array(
             'type' => 'field',
             'csrf_field_name' => 'abc',
         ));
@@ -31,7 +31,7 @@ class CollectionFormTest extends TestCase
 
     public function testSetDataAdjustsSize()
     {
-        $form = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', null, array(
             'type' => 'field',
         ));
         $form->setData(array('foo@foo.com', 'foo@bar.com'));
@@ -51,7 +51,7 @@ class CollectionFormTest extends TestCase
 
     public function testSetDataAdjustsSizeIfModifiable()
     {
-        $form = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', null, array(
             'type' => 'field',
             'modifiable' => true,
             'prototype' => true,
@@ -72,7 +72,7 @@ class CollectionFormTest extends TestCase
 
     public function testThrowsExceptionIfObjectIsNotTraversable()
     {
-        $form = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', null, array(
             'type' => 'field',
         ));
         $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
@@ -81,7 +81,7 @@ class CollectionFormTest extends TestCase
 
     public function testModifiableCollectionsContainExtraForm()
     {
-        $form = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', null, array(
             'type' => 'field',
             'modifiable' => true,
             'prototype' => true,
@@ -95,7 +95,7 @@ class CollectionFormTest extends TestCase
 
     public function testNotResizedIfBoundWithMissingData()
     {
-        $form = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', null, array(
             'type' => 'field',
         ));
         $form->setData(array('foo@foo.com', 'bar@bar.com'));
@@ -109,7 +109,7 @@ class CollectionFormTest extends TestCase
 
     public function testResizedIfBoundWithMissingDataAndModifiable()
     {
-        $form = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', null, array(
             'type' => 'field',
             'modifiable' => true,
         ));
@@ -123,7 +123,7 @@ class CollectionFormTest extends TestCase
 
     public function testNotResizedIfBoundWithExtraData()
     {
-        $form = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', null, array(
             'type' => 'field',
         ));
         $form->setData(array('foo@bar.com'));
@@ -136,7 +136,7 @@ class CollectionFormTest extends TestCase
 
     public function testResizedUpIfBoundWithExtraDataAndModifiable()
     {
-        $form = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', null, array(
             'type' => 'field',
             'modifiable' => true,
         ));
@@ -152,7 +152,7 @@ class CollectionFormTest extends TestCase
 
     public function testModifableButNoPrototype()
     {
-        $form = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', null, array(
             'type' => 'field',
             'modifiable' => true,
             'prototype' => false,
@@ -163,7 +163,7 @@ class CollectionFormTest extends TestCase
 
     public function testResizedDownIfBoundWithLessDataAndModifiable()
     {
-        $form = $this->factory->create('collection', 'emails', array(
+        $form = $this->factory->create('collection', null, array(
             'type' => 'field',
             'modifiable' => true,
         ));

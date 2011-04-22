@@ -33,7 +33,7 @@ class FileTypeTest extends TestCase
     {
         parent::setUp();
 
-        $this->form = $this->factory->create('file', 'file');
+        $this->form = $this->factory->create('file');
     }
 
     protected function tearDown()

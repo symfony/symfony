@@ -41,6 +41,6 @@ class AddFormTypesPass implements CompilerPassInterface
             $types[$alias] = $serviceId;
         }
 
-        $container->getDefinition('form.type.loader')->setArgument(1, $types);
+        $container->getDefinition('form.type.loader')->replaceArgument(1, $types);
     }
 }

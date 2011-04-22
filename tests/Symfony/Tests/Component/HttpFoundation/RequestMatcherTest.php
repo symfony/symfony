@@ -35,6 +35,8 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
             array(true, '192.168.1.1', '192.168.1.1/1'),
             array(true, '192.168.1.1', '192.168.1.0/24'),
             array(false, '192.168.1.1', '1.2.3.4/1'),
+            array(true, '2a01:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65'),
+            array(false, '2a00:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65'),
         );
     }
 

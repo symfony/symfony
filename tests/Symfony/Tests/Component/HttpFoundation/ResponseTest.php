@@ -188,6 +188,17 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response->__toString();
     }
 
+    public function testContentTypeCharset()
+    {
+        $response = new Response();
+        $response->headers->set('Content-Type', 'text/css');
+
+        // force fixContentType() to be called
+        $response->__toString();
+
+        $this->assertEquals('text/css; charset=UTF-8', $response->headers->get('Content-Type'));
+    }
+
     public function testSetCache()
     {
         $response = new Response();

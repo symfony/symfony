@@ -85,7 +85,7 @@ class FrameworkExtension extends Extension
         if (!empty($config['test'])) {
             $loader->load('test.xml');
             if (isset($config['session'])) {
-                $config['session']['storage_id'] = 'filesystem';
+                $config['session']['storage_id'] = 'session.storage.filesystem';
             }
         }
 
@@ -281,25 +281,22 @@ class FrameworkExtension extends Extension
     {
         $loader->load('session.xml');
 
+        // session
+        $session = $container->getDefinition('session');
         if (!empty($config['auto_start'])) {
-            $container->getDefinition('session')->addMethodCall('start');
+            $session->addMethodCall('start');
         }
+        $session->replaceArgument(1, $config['default_locale']);
 
-        if (isset($config['class'])) {
-            $container->setParameter('session.class', $config['class']);
-        }
-
-        $container->getDefinition('session')->replaceArgument(1, $config['default_locale']);
-
-        $container->setAlias('session.storage', 'session.storage.'.$config['storage_id']);
-
-        $options = $container->getParameter('session.storage.'.$config['storage_id'].'.options');
-        foreach (array('name', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'db_table', 'db_id_col', 'db_data_col', 'db_time_col') as $key) {
+        // session storage
+        $container->setAlias('session.storage', $config['storage_id']);
+        $options = array();
+        foreach (array('name', 'lifetime', 'path', 'domain', 'secure', 'httponly') as $key) {
             if (isset($config[$key])) {
                 $options[$key] = $config[$key];
             }
         }
-        $container->setParameter('session.storage.'.$config['storage_id'].'.options', $options);
+        $container->setParameter('session.storage.options', $options);
 
         $this->addClassesToCompile(array(
             'Symfony\\Component\\HttpFoundation\\Session',

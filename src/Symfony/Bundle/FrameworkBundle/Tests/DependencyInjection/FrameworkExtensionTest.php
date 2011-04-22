@@ -75,28 +75,15 @@ abstract class FrameworkExtensionTest extends TestCase
         $arguments = $container->getDefinition('session')->getArguments();
         $this->assertEquals('fr', $arguments[1]);
         $this->assertTrue($container->getDefinition('session')->hasMethodCall('start'));
-        $this->assertEquals('Session', $container->getParameter('session.class'));
         $this->assertEquals('session.storage.native', (string) $container->getAlias('session.storage'));
 
-        $options = $container->getParameter('session.storage.native.options');
+        $options = $container->getParameter('session.storage.options');
         $this->assertEquals('_SYMFONY', $options['name']);
         $this->assertEquals(86400, $options['lifetime']);
         $this->assertEquals('/', $options['path']);
         $this->assertEquals('example.com', $options['domain']);
         $this->assertTrue($options['secure']);
         $this->assertTrue($options['httponly']);
-    }
-
-    public function testSessionPdo()
-    {
-        $container = $this->createContainerFromFile('session_pdo');
-        $options = $container->getParameter('session.storage.pdo.options');
-
-        $this->assertEquals('session.storage.pdo', (string) $container->getAlias('session.storage'));
-        $this->assertEquals('table', $options['db_table']);
-        $this->assertEquals('id', $options['db_id_col']);
-        $this->assertEquals('data', $options['db_data_col']);
-        $this->assertEquals('time', $options['db_time_col']);
     }
 
     public function testTemplating()

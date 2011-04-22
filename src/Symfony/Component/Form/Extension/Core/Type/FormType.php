@@ -25,16 +25,6 @@ class FormType extends AbstractType
     {
         $builder->setAttribute('virtual', $options['virtual'])
             ->setDataMapper(new PropertyPathMapper($options['data_class']));
-
-        if ($options['csrf_protection']) {
-            $csrfOptions = array('page_id' => $options['csrf_page_id']);
-
-            if ($options['csrf_provider']) {
-                $csrfOptions['csrf_provider'] = $options['csrf_provider'];
-            }
-
-            $builder->add($options['csrf_field_name'], 'csrf', $csrfOptions);
-        }
     }
 
     public function buildViewBottomUp(FormView $view, FormInterface $form)
@@ -54,10 +44,6 @@ class FormType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         $defaultOptions = array(
-            'csrf_protection' => true,
-            'csrf_field_name' => '_token',
-            'csrf_provider' => null,
-            'csrf_page_id' => get_class($this),
             'virtual' => false,
             // Errors in forms bubble by default, so that form errors will
             // end up as global errors in the root form

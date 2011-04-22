@@ -16,15 +16,13 @@ use Symfony\Component\Form\Form;
 
 class CollectionFormTest extends TypeTestCase
 {
-    public function testContainsOnlyCsrfTokenByDefault()
+    public function testContainsNoFieldByDefault()
     {
         $form = $this->factory->create('collection', null, array(
             'type' => 'field',
-            'csrf_field_name' => 'abc',
         ));
 
-        $this->assertTrue($form->has('abc'));
-        $this->assertEquals(1, count($form));
+        $this->assertEquals(0, count($form));
     }
 
     public function testSetDataAdjustsSize()

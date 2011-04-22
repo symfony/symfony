@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form;
 
-interface FormTypeInterface
+interface FormTypeExtensionInterface
 {
     function buildForm(FormBuilder $builder, array $options);
 
@@ -19,15 +19,7 @@ interface FormTypeInterface
 
     function buildViewBottomUp(FormView $view, FormInterface $form);
 
-    function createBuilder($name, FormFactoryInterface $factory, array $options);
-
     function getDefaultOptions(array $options);
 
-    function getParent(array $options);
-
-    function getName();
-
-    function setExtensions(array $extensions);
-
-    function getExtensions();
+    function getExtendedType();
 }

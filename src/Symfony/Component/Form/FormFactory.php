@@ -20,6 +20,8 @@ class FormFactory implements FormFactoryInterface
 {
     private $extensions = array();
 
+    private $types = array();
+
     private $guesser;
 
     public function __construct(array $extensions)
@@ -46,6 +48,46 @@ class FormFactory implements FormFactoryInterface
         }
 
         $this->guesser = new FormTypeGuesserChain($guessers);
+    }
+
+    public function getType($name)
+    {
+        $type = null;
+
+        if ($name instanceof FormTypeInterface) {
+            $type = $name;
+            $name = $type->getName();
+        }
+
+        if (!isset($this->types[$name])) {
+            if (!$type) {
+                foreach ($this->extensions as $extension) {
+                    if ($extension->hasType($name)) {
+                        $type = $extension->getType($name);
+                        break;
+                    }
+                }
+
+                if (!$type) {
+                    throw new FormException(sprintf('Could not load type "%s"', $name));
+                }
+            }
+
+            $typeExtensions = array();
+
+            foreach ($this->extensions as $extension) {
+                $typeExtensions = array_merge(
+                    $typeExtensions,
+                    $extension->getTypeExtensions($name)
+                );
+            }
+
+            $type->setExtensions($typeExtensions);
+
+            $this->types[$name] = $type;
+        }
+
+        return $this->types[$name];
     }
 
     public function create($type, $data = null, array $options = array())
@@ -77,27 +119,22 @@ class FormFactory implements FormFactoryInterface
     {
         $builder = null;
         $types = array();
+        $typeExtensions = array();
         $knownOptions = array();
         $passedOptions = array_keys($options);
 
         while (null !== $type) {
-            if (!$type instanceof FormTypeInterface) {
-                foreach ($this->extensions as $extension) {
-                    if ($extension->hasType($type)) {
-                        $type = $extension->getType($type);
-                        break;
-                    }
-                }
+            $type = $this->getType($type);
 
-                if (!$type) {
-                    throw new FormException(sprintf('Could not load type "%s"', $type));
-                }
+            $defaultOptions = $type->getDefaultOptions($options);
+
+            foreach ($type->getExtensions() as $typeExtension) {
+                $defaultOptions = array_merge($defaultOptions, $typeExtension->getDefaultOptions($options));
             }
 
-            array_unshift($types, $type);
-            $defaultOptions = $type->getDefaultOptions($options);
             $options = array_merge($defaultOptions, $options);
             $knownOptions = array_merge($knownOptions, array_keys($defaultOptions));
+            array_unshift($types, $type);
             $type = $type->getParent($options);
         }
 
@@ -117,6 +154,10 @@ class FormFactory implements FormFactoryInterface
 
         foreach ($types as $type) {
             $type->buildForm($builder, $options);
+
+            foreach ($type->getExtensions() as $typeExtension) {
+                $typeExtension->buildForm($builder, $options);
+            }
         }
 
         if (null !== $data) {

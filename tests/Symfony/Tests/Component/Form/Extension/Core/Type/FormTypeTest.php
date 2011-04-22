@@ -63,24 +63,6 @@ class FormTest_AuthorWithoutRefSetter
 
 class FormTypeTest extends TypeTestCase
 {
-    public function testCsrfProtectionByDefault()
-    {
-        $form =  $this->factory->create('form', null, array(
-            'csrf_field_name' => 'csrf',
-        ));
-
-        $this->assertTrue($form->has('csrf'));
-    }
-
-    public function testCsrfProtectionCanBeDisabled()
-    {
-        $form =  $this->factory->create('form', null, array(
-            'csrf_protection' => false,
-        ));
-
-        $this->assertEquals(0, count($form));
-    }
-
     public function testValidationGroupNullByDefault()
     {
         $form =  $this->factory->create('form');

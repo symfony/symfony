@@ -31,7 +31,10 @@ class CsrfExtension extends AbstractExtension
         );
     }
 
-    protected function loadTypeGuesser()
+    protected function loadTypeExtensions()
     {
+        return array(
+            new Type\FormTypeCsrfExtension(),
+        );
     }
 }

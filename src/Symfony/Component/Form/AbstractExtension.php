@@ -25,9 +25,9 @@ abstract class AbstractExtension implements FormExtensionInterface
     private $types;
 
     /**
-     * @var Boolean
+     * @var array
      */
-    private $typesLoaded = false;
+    private $typeExtensions;
 
     /**
      * @var FormTypeGuesserInterface
@@ -39,14 +39,23 @@ abstract class AbstractExtension implements FormExtensionInterface
      */
     private $typeGuesserLoaded = false;
 
-    abstract protected function loadTypes();
+    protected function loadTypes()
+    {
+        return array();
+    }
 
-    abstract protected function loadTypeGuesser();
+    protected function loadTypeExtensions()
+    {
+        return array();
+    }
+
+    protected function loadTypeGuesser()
+    {
+        return null;
+    }
 
     private function initTypes()
     {
-        $this->typesLoaded = true;
-
         $types = $this->loadTypes();
         $typesByName = array();
 
@@ -59,6 +68,28 @@ abstract class AbstractExtension implements FormExtensionInterface
         }
 
         $this->types = $typesByName;
+    }
+
+    private function initTypeExtensions()
+    {
+        $extensions = $this->loadTypeExtensions();
+        $extensionsByType = array();
+
+        foreach ($extensions as $extension) {
+            if (!$extension instanceof FormTypeExtensionInterface) {
+                throw new UnexpectedTypeException($extension, 'Symfony\Component\Form\FormTypeExtensionInterface');
+            }
+
+            $type = $extension->getExtendedType();
+
+            if (!isset($extensionsByType[$type])) {
+                $extensionsByType[$type] = array();
+            }
+
+            $extensionsByType[$type][] = $extension;
+        }
+
+        $this->typeExtensions = $extensionsByType;
     }
 
     private function initTypeGuesser()
@@ -76,12 +107,12 @@ abstract class AbstractExtension implements FormExtensionInterface
 
     public function getType($name)
     {
-        if (!$this->typesLoaded) {
+        if (null === $this->types) {
             $this->initTypes();
         }
 
         if (!isset($this->types[$name])) {
-            throw new FormException(sprintf('The type "%s" can not be typesLoaded by this extension', $name));
+            throw new FormException(sprintf('The type "%s" can not be loaded by this extension', $name));
         }
 
         return $this->types[$name];
@@ -89,11 +120,31 @@ abstract class AbstractExtension implements FormExtensionInterface
 
     public function hasType($name)
     {
-        if (!$this->typesLoaded) {
+        if (null === $this->types) {
             $this->initTypes();
         }
 
         return isset($this->types[$name]);
+    }
+
+    function getTypeExtensions($name)
+    {
+        if (null === $this->typeExtensions) {
+            $this->initTypeExtensions();
+        }
+
+        return isset($this->typeExtensions[$name])
+            ? $this->typeExtensions[$name]
+            : array();
+    }
+
+    function hasTypeExtensions($name)
+    {
+        if (null === $this->typeExtensions) {
+            $this->initTypeExtensions();
+        }
+
+        return isset($this->typeExtensions[$name]) && count($this->typeExtensions[$name]) > 0;
     }
 
     public function getTypeGuesser()

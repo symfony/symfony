@@ -13,6 +13,8 @@ namespace Symfony\Component\Form;
 
 abstract class AbstractType implements FormTypeInterface
 {
+    private $extensions = array();
+
     public function buildForm(FormBuilder $builder, array $options)
     {
     }
@@ -45,5 +47,21 @@ abstract class AbstractType implements FormTypeInterface
         preg_match('/\\\\(\w+?)(Form)?(Type)?$/i', get_class($this), $matches);
 
         return strtolower($matches[1]);
+    }
+
+    public function setExtensions(array $extensions)
+    {
+        foreach ($extensions as $extension) {
+            if (!$extension instanceof FormTypeExtensionInterface) {
+                throw new UnexpectedTypeException($extension, 'Symfony\Component\Form\FormTypeExtensionInterface');
+            }
+        }
+
+        $this->extensions = $extensions;
+    }
+
+    public function getExtensions()
+    {
+        return $this->extensions;
     }
 }

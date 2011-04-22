@@ -844,6 +844,10 @@ class Form implements \IteratorAggregate, FormInterface
 
         foreach ($types as $type) {
             $type->buildView($view, $this);
+
+            foreach ($type->getExtensions() as $typeExtension) {
+                $typeExtension->buildView($view, $this);
+            }
         }
 
         foreach ($this->children as $key => $child) {
@@ -854,6 +858,10 @@ class Form implements \IteratorAggregate, FormInterface
 
         foreach ($types as $type) {
             $type->buildViewBottomUp($view, $this);
+
+            foreach ($type->getExtensions() as $typeExtension) {
+                $typeExtension->buildViewBottomUp($view, $this);
+            }
         }
 
         return $view;

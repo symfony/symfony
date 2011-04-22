@@ -28,25 +28,45 @@ class DependencyInjectionExtension implements FormExtensionInterface
     private $guesserLoaded = false;
 
     public function __construct(ContainerInterface $container,
-        array $typeServiceIds, array $guesserServiceIds)
+        array $typeServiceIds, array $typeExtensionServiceIds,
+        array $guesserServiceIds)
     {
         $this->container = $container;
         $this->typeServiceIds = $typeServiceIds;
+        $this->typeExtensionServiceIds = $typeExtensionServiceIds;
         $this->guesserServiceIds = $guesserServiceIds;
     }
 
-    public function getType($identifier)
+    public function getType($name)
     {
-        if (!isset($this->typeServiceIds[$identifier])) {
-            throw new \InvalidArgumentException(sprintf('The field type "%s" is not registered with the service container.', $identifier));
+        if (!isset($this->typeServiceIds[$name])) {
+            throw new \InvalidArgumentException(sprintf('The field type "%s" is not registered with the service container.', $name));
         }
 
-        return $this->container->get($this->typeServiceIds[$identifier]);
+        return $this->container->get($this->typeServiceIds[$name]);
     }
 
-    public function hasType($identifier)
+    public function hasType($name)
     {
-        return isset($this->typeServiceIds[$identifier]);
+        return isset($this->typeServiceIds[$name]);
+    }
+
+    public function getTypeExtensions($name)
+    {
+        $extensions = array();
+
+        if (isset($this->typeExtensionServiceIds[$name])) {
+            foreach ($this->typeExtensionServiceIds[$name] as $serviceId) {
+                $extensions[] = $this->container->get($serviceId);
+            }
+        }
+
+        return $extensions;
+    }
+
+    public function hasTypeExtensions($name)
+    {
+        return isset($this->typeExtensionServiceIds[$name]);
     }
 
     public function getTypeGuesser()

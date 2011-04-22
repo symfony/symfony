@@ -29,8 +29,8 @@ class HttpBasicFactory implements SecurityFactoryInterface
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
             ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.dao'))
-            ->setArgument(0, new Reference($userProvider))
-            ->setArgument(2, $id)
+            ->replaceArgument(0, new Reference($userProvider))
+            ->replaceArgument(2, $id)
         ;
 
         // entry point
@@ -39,8 +39,8 @@ class HttpBasicFactory implements SecurityFactoryInterface
         // listener
         $listenerId = 'security.authentication.listener.basic.'.$id;
         $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.basic'));
-        $listener->setArgument(2, $id);
-        $listener->setArgument(3, new Reference($entryPointId));
+        $listener->replaceArgument(2, $id);
+        $listener->replaceArgument(3, new Reference($entryPointId));
 
         return array($provider, $listenerId, $entryPointId);
     }

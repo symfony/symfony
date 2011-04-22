@@ -124,10 +124,10 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
 
     /**
      * Returns information about the listener
-     * 
+     *
      * @param object $listener  The listener
      * @param string $eventName The event name
-     * 
+     *
      * @return array Informations about the listener
      */
     private function getListenerInfo($listener, $eventName)

@@ -5,10 +5,33 @@
 このドキュメントでは、フレームワークの "パブリックな" APIを使っている場合に必要な変更点についてのみ説明しています。
 フレームワークのコアコードを "ハック" している場合は、変更履歴を注意深く追跡する必要があるでしょう。
 
+PR11 to PR12
+------------
+
+* HttpFoundation\Cookie::getExpire() は getExpiresTime() に名前が変更されました。
+
+* XMLのコンフィギュレーションの記述方法が変更されました。属性が1つしかないタグは、すべてタグのコンテンツとして記述するように変更されました。
+
+  変更前:
+
+        <bundle name="MyBundle" />
+        <app:engine id="twig" />
+        <twig:extension id="twig.extension.debug" />
+
+  変更後:
+
+        <bundle>MyBundle</bundle>
+        <app:engine>twig</app:engine>
+        <twig:extension>twig.extension.debug</twig:extension>
+
+* SwitchUserListenerが有効な場合に、すべてのユーザーが任意のアカウントになりすませる致命的な脆弱性を修正しました。SwitchUserListenerを利用しない設定にしている場合は影響はありません。
+
 PR10 から PR11
 --------------
 
 * エクステンションのコンフィギュレーションクラスには、\ `Symfony\Component\Config\Definition\ConfigurationInterface`\ インターフェイスを実装する必要があります。この部分の後方互換性は維持されていますが、今後の開発のために、エクステンションにこのインターフェイスを実装しておいてください。
+
+* Monologのオプション "fingerscrossed" は "fingers_crossed" に名前が変更されました。
 
 PR9 から PR10
 -------------

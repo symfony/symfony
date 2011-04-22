@@ -212,7 +212,7 @@ class RouteCompiler implements RouteCompilerInterface
         $this->segments[] = preg_quote($separator, '#').'(?P<'.$variable.'>'.$requirement.')';
         $this->variables[$variable] = $name;
 
-        if (null === $this->route->getDefault($variable)) {
+        if (!$this->route->hasDefault($variable)) {
             $this->firstOptional = count($this->segments);
         }
     }

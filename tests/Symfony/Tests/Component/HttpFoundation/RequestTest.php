@@ -116,7 +116,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     public function testGetFormatFromMimeType($format, $mimeTypes)
     {
         $request = new Request();
-        foreach ($mimeTypes as $mime) {            
+        foreach ($mimeTypes as $mime) {
             $this->assertEquals($format, $request->getFormat($mime));
         }
         $request->setFormat($format, $mimeTypes);
@@ -634,7 +634,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $request->headers->set('Accept-Charset', 'ISO-8859-1, US-ASCII, UTF-8; q=0.8, ISO-10646-UCS-2; q=0.6');
         $this->assertEquals(array('ISO-8859-1', 'US-ASCII', 'UTF-8', 'ISO-10646-UCS-2'), $request->getCharsets());
-        
+
         $request = new Request();
         $request->headers->set('Accept-Charset', 'ISO-8859-1,utf-8;q=0.7,*;q=0.7');
         $this->assertEquals(array('ISO-8859-1', '*', 'utf-8'), $request->getCharsets());

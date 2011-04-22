@@ -23,7 +23,7 @@ class MaskBuilderTest extends \PHPUnit_Framework_TestCase
     {
         new MaskBuilder($invalidMask);
     }
-    
+
     public function getInvalidConstructorData()
     {
         return array(
@@ -33,32 +33,32 @@ class MaskBuilderTest extends \PHPUnit_Framework_TestCase
             array(new \stdClass()),
         );
     }
-    
+
     public function testConstructorWithoutArguments()
     {
         $builder = new MaskBuilder();
-        
+
         $this->assertEquals(0, $builder->get());
     }
-    
+
     public function testConstructor()
     {
         $builder = new MaskBuilder(123456);
-        
+
         $this->assertEquals(123456, $builder->get());
     }
-    
+
     public function testAddAndRemove()
     {
         $builder = new MaskBuilder();
-        
+
         $builder
             ->add('view')
             ->add('eDiT')
             ->add('ownEr')
         ;
         $mask = $builder->get();
-        
+
         $this->assertEquals(MaskBuilder::MASK_VIEW, $mask & MaskBuilder::MASK_VIEW);
         $this->assertEquals(MaskBuilder::MASK_EDIT, $mask & MaskBuilder::MASK_EDIT);
         $this->assertEquals(MaskBuilder::MASK_OWNER, $mask & MaskBuilder::MASK_OWNER);
@@ -66,37 +66,37 @@ class MaskBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $mask & MaskBuilder::MASK_CREATE);
         $this->assertEquals(0, $mask & MaskBuilder::MASK_DELETE);
         $this->assertEquals(0, $mask & MaskBuilder::MASK_UNDELETE);
-        
+
         $builder->remove('edit')->remove('OWner');
         $mask = $builder->get();
         $this->assertEquals(0, $mask & MaskBuilder::MASK_EDIT);
         $this->assertEquals(0, $mask & MaskBuilder::MASK_OWNER);
         $this->assertEquals(MaskBuilder::MASK_VIEW, $mask & MaskBuilder::MASK_VIEW);
     }
-    
+
     public function testGetPattern()
     {
         $builder = new MaskBuilder;
         $this->assertEquals(MaskBuilder::ALL_OFF, $builder->getPattern());
-        
+
         $builder->add('view');
         $this->assertEquals(str_repeat('.', 31).'V', $builder->getPattern());
-        
+
         $builder->add('owner');
         $this->assertEquals(str_repeat('.', 24).'N......V', $builder->getPattern());
-        
+
         $builder->add(1 << 10);
         $this->assertEquals(str_repeat('.', 21).MaskBuilder::ON.'..N......V', $builder->getPattern());
     }
-    
+
     public function testReset()
     {
         $builder = new MaskBuilder();
         $this->assertEquals(0, $builder->get());
-        
+
         $builder->add('view');
         $this->assertTrue($builder->get() > 0);
-        
+
         $builder->reset();
         $this->assertEquals(0, $builder->get());
     }

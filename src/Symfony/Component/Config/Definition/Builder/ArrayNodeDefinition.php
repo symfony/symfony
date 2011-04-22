@@ -97,7 +97,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
         return $this;
     }
-    
+
     /**
      * Requires the node to have at least one element.
      *
@@ -238,7 +238,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Returns a node builder to be used to add children and protoype
-     * 
+     *
      * @return NodeBuilder The node builder
      */
     protected function getNodeBuilder()

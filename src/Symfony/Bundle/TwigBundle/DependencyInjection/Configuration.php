@@ -43,12 +43,7 @@ class Configuration implements ConfigurationInterface
             ->fixXmlConfig('extension')
             ->children()
                 ->arrayNode('extensions')
-                    ->prototype('scalar')
-                        ->beforeNormalization()
-                            ->ifTrue(function($v) { return is_array($v) && isset($v['id']); })
-                            ->then(function($v){ return $v['id']; })
-                        ->end()
-                    ->end()
+                    ->prototype('scalar')->end()
                 ->end()
             ->end()
         ;

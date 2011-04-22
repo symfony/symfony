@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Twig\Node;
 
 /**
- * 
+ *
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

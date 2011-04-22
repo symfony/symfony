@@ -33,30 +33,38 @@ class DateType extends AbstractType
             \DateTimeZone::UTC
         );
 
-        if ($options['widget'] === 'text') {
-            $builder->appendClientTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $options['format'], \IntlDateFormatter::NONE));
-        } else {
-            // Only pass a subset of the options to children
-            $yearOptions = array(
-                'choice_list' => new PaddedChoiceList(
-                    $options['years'], 4, '0', STR_PAD_LEFT
-                ),
-            );
-            $monthOptions = array(
-                'choice_list' => new MonthChoiceList(
-                    $formatter, $options['months']
-                ),
-            );
-            $dayOptions = array(
-                'choice_list' => new PaddedChoiceList(
-                    $options['days'], 2, '0', STR_PAD_LEFT
-                ),
-            );
+        if ($options['widget'] === 'choice' || $options['widget'] === 'split-text') {
 
-            $builder->add('year', 'choice', $yearOptions)
-                ->add('month', 'choice', $monthOptions)
-                ->add('day', 'choice', $dayOptions)
+            $widget = $options['widget'] === 'split-text' ? 'text' : $options['widget'];
+
+            if ($widget == 'text') {
+                 $yearOptions = $monthOptions = $dayOptions = array();
+            } else {
+
+                // Only pass a subset of the options to children
+                $yearOptions = array(
+                    'choice_list' => new PaddedChoiceList(
+                        $options['years'], 4, '0', STR_PAD_LEFT
+                    ),
+                );
+                $monthOptions = array(
+                    'choice_list' => new MonthChoiceList(
+                        $formatter, $options['months']
+                    ),
+                );
+                $dayOptions = array(
+                    'choice_list' => new PaddedChoiceList(
+                        $options['days'], 2, '0', STR_PAD_LEFT
+                    ),
+                );
+            }
+
+            $builder->add('year', $widget, $yearOptions)
+                ->add('month', $widget, $monthOptions)
+                ->add('day', $widget, $dayOptions)
                 ->appendClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], array('year', 'month', 'day')));
+        } else {
+            $builder->appendClientTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $options['format'], \IntlDateFormatter::NONE));
         }
 
         if ($options['input'] === 'string') {

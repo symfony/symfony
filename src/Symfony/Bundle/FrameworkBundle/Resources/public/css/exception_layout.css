@@ -71,11 +71,6 @@ img
     padding-top:20px;
 }
 
-.search button
-{
-    float:none;
-}
-
 .search label
 {
     line-height:28px; 
@@ -98,10 +93,10 @@ img
     -webkit-appearance: textfield;
 }
 
-button
+.search button
 {
     -webkit-appearance: button-bevel;
-    float: left;
+    float: none;
     text-align: left;
     padding: 0;
     margin: 0;
@@ -117,24 +112,24 @@ button
     background: none;
 }
 
-button:-moz-focus-inner
+.search button:-moz-focus-inner
 {
   padding: 0;
   border: none;
 }
 
-button:hover
+.search button:hover
 {
     text-decoration: none;
 }
 
-button span span,
-button span span span
+.search button span span,
+.search button span span span
 {
   position: static;
 }
 
-button span
+.search button span
 {
     position: relative;
     text-decoration: none;
@@ -145,13 +140,13 @@ button span
     background: transparent url(../images/border_l.png) no-repeat top left;
 }
 
-button span span
+.search button span span
 {
     padding: 0 8px 0 0;
     background: transparent url(../images/border_r.png) right top no-repeat;
 }
 
-button span span span
+.search button span span span
 {
     padding: 0px 7px;
     font: bold 11px Arial, Helvetica, sans-serif;

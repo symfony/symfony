@@ -13,22 +13,35 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
-use Symfony\Bundle\FrameworkBundle\Tests\Logger;
-use Symfony\Bundle\FrameworkBundle\Tests\Kernel;
-
-require_once __DIR__.'/../Kernel.php';
-require_once __DIR__.'/../Logger.php';
+use Symfony\Component\ClassLoader\UniversalClassLoader;
 
 class ControllerNameParserTest extends TestCase
 {
+    protected $loader;
+
+    public function setUp()
+    {
+        $this->loader = new UniversalClassLoader();
+        $this->loader->registerNamespaces(array(
+            'TestBundle'      => __DIR__.'/../Fixtures',
+            'TestApplication' => __DIR__.'/../Fixtures',
+        ));
+        $this->loader->register();
+    }
+
+    public function tearDown()
+    {
+        spl_autoload_unregister(array($this->loader, 'loadClass'));
+    }
+
     public function testParse()
     {
         $parser = $this->createParser();
 
-        $this->assertEquals('TestBundle\FooBundle\Controller\DefaultController::indexAction', $parser->parse('Foo:Default:index'), '->parse() converts a short a:b:c notation string to a class::method string');
-        $this->assertEquals('TestBundle\FooBundle\Controller\Sub\DefaultController::indexAction', $parser->parse('Foo:Sub\Default:index'), '->parse() converts a short a:b:c notation string to a class::method string');
-        $this->assertEquals('TestBundle\Fabpot\FooBundle\Controller\DefaultController::indexAction', $parser->parse('SensioFoo:Default:index'), '->parse() converts a short a:b:c notation string to a class::method string');
-        $this->assertEquals('TestBundle\Sensio\Cms\FooBundle\Controller\DefaultController::indexAction', $parser->parse('SensioCmsFoo:Default:index'), '->parse() converts a short a:b:c notation string to a class::method string');
+        $this->assertEquals('TestBundle\FooBundle\Controller\DefaultController::indexAction', $parser->parse('FooBundle:Default:index'), '->parse() converts a short a:b:c notation string to a class::method string');
+        $this->assertEquals('TestBundle\FooBundle\Controller\Sub\DefaultController::indexAction', $parser->parse('FooBundle:Sub\Default:index'), '->parse() converts a short a:b:c notation string to a class::method string');
+        $this->assertEquals('TestBundle\Fabpot\FooBundle\Controller\DefaultController::indexAction', $parser->parse('SensioFooBundle:Default:index'), '->parse() converts a short a:b:c notation string to a class::method string');
+        $this->assertEquals('TestBundle\Sensio\Cms\FooBundle\Controller\DefaultController::indexAction', $parser->parse('SensioCmsFooBundle:Default:index'), '->parse() converts a short a:b:c notation string to a class::method string');
 
         try {
             $parser->parse('foo:');
@@ -56,17 +69,38 @@ class ControllerNameParserTest extends TestCase
     public function getMissingControllersTest()
     {
         return array(
-            array('Foo:Fake:index'),          // a normal bundle
-            array('SensioFoo:Fake:index'),    // a bundle with children
+            array('FooBundle:Fake:index'),          // a normal bundle
+            array('SensioFooBundle:Fake:index'),    // a bundle with children
         );
     }
 
     private function createParser()
     {
-        $kernel = new Kernel();
-        $kernel->boot();
-        $logger = new Logger();
+        $bundles = array(
+            'SensioFooBundle' => array($this->getBundle('TestBundle\Fabpot\FooBundle', 'FabpotFooBundle'), $this->getBundle('TestBundle\Sensio\FooBundle', 'SensioFooBundle')),
+            'SensioCmsFooBundle' => array($this->getBundle('TestBundle\Sensio\Cms\FooBundle', 'SensioCmsFooBundle')),
+            'FooBundle' => array($this->getBundle('TestBundle\FooBundle', 'FooBundle')),
+            'FabpotFooBundle' => array($this->getBundle('TestBundle\Fabpot\FooBundle', 'FabpotFooBundle'), $this->getBundle('TestBundle\Sensio\FooBundle', 'SensioFooBundle')),
+        );
 
-        return new ControllerNameParser($kernel, $logger);
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
+        $kernel
+            ->expects($this->any())
+            ->method('getBundle')
+            ->will($this->returnCallback(function ($bundle) use ($bundles) {
+                return $bundles[$bundle];
+            }))
+        ;
+
+        return new ControllerNameParser($kernel);
+    }
+
+    private function getBundle($namespace, $name)
+    {
+        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
+        $bundle->expects($this->any())->method('getName')->will($this->returnValue($name));
+        $bundle->expects($this->any())->method('getNamespace')->will($this->returnValue($namespace));
+
+        return $bundle;
     }
 }

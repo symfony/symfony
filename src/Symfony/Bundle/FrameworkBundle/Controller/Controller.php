@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Controller is a simple implementation of a Controller.
@@ -41,7 +42,7 @@ class Controller extends ContainerAware
     /**
      * Forwards the request to another controller.
      *
-     * @param  string  $controller The controller name (a string like Blog:Post:index)
+     * @param  string  $controller The controller name (a string like BlogBundle:Post:index)
      * @param  array   $path       An array of path parameters
      * @param  array   $query      An array of query parameters
      *
@@ -90,6 +91,20 @@ class Controller extends ContainerAware
     public function render($view, array $parameters = array(), Response $response = null)
     {
         return $this->container->get('templating')->renderResponse($view, $parameters, $response);
+    }
+
+    /**
+     * Returns a NotFoundHttpException.
+     *
+     * This will result in a 404 response code. Usage example:
+     *
+     *     throw $this->createNotFoundException('Page not found!');
+     *
+     * @return NotFoundHttpException
+     */
+    public function createNotFoundException($message = 'Not Found', \Exception $previous = null)
+    {
+        return new NotFoundHttpException($message, $previous);
     }
 
     /**

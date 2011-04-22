@@ -24,7 +24,7 @@ class TreeBuilder implements NodeParentInterface
 
     /**
      * Creates the root node.
-     * 
+     *
      * @param string      $name     The name of the root node
      * @param string      $type     The type of the root node
      * @param NodeBuilder $builder  A custom node builder instance
@@ -36,7 +36,7 @@ class TreeBuilder implements NodeParentInterface
     public function root($name, $type = 'array', NodeBuilder $builder = null)
     {
         $builder = null === $builder ? new NodeBuilder() : $builder;
-        
+
         $this->root = $builder->node($name, $type);
         $this->root->setParent($this);
 
@@ -56,7 +56,7 @@ class TreeBuilder implements NodeParentInterface
         if (null !== $this->tree) {
             return $this->tree;
         }
-       
+
         return $this->tree = $this->root->getNode(true);
     }
 }

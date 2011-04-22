@@ -1,4 +1,4 @@
-{% extends 'WebProfiler:Profiler:layout.html.twig' %}
+{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
 
 {% block toolbar %}
     {% if collector.counterrors %}
@@ -8,7 +8,7 @@
         {% set text %}
             <span>{{ collector.counterrors }}</span>
         {% endset %}
-        {% include 'WebProfiler:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
+        {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
     {% endif %}
 {% endblock %}
 
@@ -30,8 +30,7 @@
     {% if collector.logs %}
         <ul class="alt">
             {% for log in collector.logs %}
-                <li class="{{ cycle(['odd', 'even'], loop.index) }}{% if 'ERR' == log.priorityName %} error{% endif %}">
-                    {{ log.priorityName }}
+                <li class="{{ cycle(['odd', 'even'], loop.index) }}{% if 'ERR' == log.priorityName or 'ERROR' == log.priorityName %} error{% endif %}">
                     {{ log.message }}
                 </li>
             {% endfor %}

@@ -23,7 +23,7 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
     /**
      * Processes the ContainerBuilder to validate the Definition.
      *
-     * @param ContainerBuilder $container 
+     * @param ContainerBuilder $container
      * @throws \RuntimeException When the Definition is invalid
      */
     public function process(ContainerBuilder $container)

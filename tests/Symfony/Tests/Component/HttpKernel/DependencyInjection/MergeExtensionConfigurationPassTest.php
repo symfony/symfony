@@ -18,9 +18,9 @@ class MergeExtensionConfigurationPassTest extends \PHPUnit_Framework_TestCase
     public function testAutoloadMainExtension()
     {
         $bundles = array(
-            'ExtensionAbsent'  => 'Symfony\\Tests\\Component\\HttpKernel\\Fixtures\\ExtensionAbsentBundle\\ExtensionAbsentBundle',
-            'ExtensionLoaded'  => 'Symfony\\Tests\\Component\\HttpKernel\\Fixtures\\ExtensionLoadedBundle\\ExtensionLoadedBundle',
-            'ExtensionPresent' => 'Symfony\\Tests\\Component\\HttpKernel\\Fixtures\\ExtensionPresentBundle\\ExtensionPresentBundle',
+            'ExtensionAbsentBundle'  => 'Symfony\\Tests\\Component\\HttpKernel\\Fixtures\\ExtensionAbsentBundle\\ExtensionAbsentBundle',
+            'ExtensionLoadedBundle'  => 'Symfony\\Tests\\Component\\HttpKernel\\Fixtures\\ExtensionLoadedBundle\\ExtensionLoadedBundle',
+            'ExtensionPresentBundle' => 'Symfony\\Tests\\Component\\HttpKernel\\Fixtures\\ExtensionPresentBundle\\ExtensionPresentBundle',
         );
 
         $container = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerBuilder');

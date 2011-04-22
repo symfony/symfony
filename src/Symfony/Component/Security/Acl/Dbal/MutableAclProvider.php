@@ -776,7 +776,7 @@ QUERY;
                     $aceId = $this->connection->executeQuery($this->getSelectAccessControlEntryIdSql($classId, $objectIdentityId, $field, $i))->fetchColumn();
                     $this->loadedAces[$aceId] = $ace;
 
-                    $aceIdProperty = new \ReflectionProperty($ace, 'id');
+                    $aceIdProperty = new \ReflectionProperty('Symfony\Component\Security\Acl\Domain\Entry', 'id');
                     $aceIdProperty->setAccessible(true);
                     $aceIdProperty->setValue($ace, intval($aceId));
                 } else {

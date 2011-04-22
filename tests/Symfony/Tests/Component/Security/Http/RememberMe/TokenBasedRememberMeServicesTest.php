@@ -214,7 +214,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($cookie->isCleared());
         $this->assertTrue($cookie->isSecure());
         $this->assertTrue($cookie->isHttpOnly());
-        $this->assertTrue($cookie->getExpire() > time() + 3590 && $cookie->getExpire() < time() + 3610);
+        $this->assertTrue($cookie->getExpiresTime() > time() + 3590 && $cookie->getExpiresTime() < time() + 3610);
         $this->assertEquals('myfoodomain.foo', $cookie->getDomain());
         $this->assertEquals('/foo/path', $cookie->getPath());
     }

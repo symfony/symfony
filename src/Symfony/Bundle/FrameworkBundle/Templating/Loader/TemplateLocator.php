@@ -29,12 +29,10 @@ class TemplateLocator implements FileLocatorInterface
      * Constructor.
      *
      * @param FileLocatorInterface $locator A FileLocatorInterface instance
-     * @param string               $path    A global fallback path
      */
-    public function __construct(FileLocatorInterface $locator, $path)
+    public function __construct(FileLocatorInterface $locator)
     {
         $this->locator = $locator;
-        $this->path = $path;
         $this->cache = array();
     }
 
@@ -47,10 +45,15 @@ class TemplateLocator implements FileLocatorInterface
      *
      * @return string The full path for the file
      *
-     * @throws \InvalidArgumentException When file is not found
+     * @throws \InvalidArgumentException When the template is not an instance of TemplateReferenceInterface
+     * @throws \InvalidArgumentException When the template file can not be found
      */
     public function locate($template, $currentPath = null, $first = true)
     {
+        if (!$template instanceof TemplateReferenceInterface) {
+            throw new \InvalidArgumentException("The template must be an instance of TemplateReferenceInterface.");
+        }
+
         $key = $template->getSignature();
 
         if (isset($this->cache[$key])) {
@@ -58,9 +61,9 @@ class TemplateLocator implements FileLocatorInterface
         }
 
         try {
-            return $this->cache[$key] = $this->locator->locate($template->getPath(), $this->path);
+            return $this->cache[$key] = $this->locator->locate($template->getPath(), $currentPath);
         } catch (\InvalidArgumentException $e) {
-            throw new \InvalidArgumentException(sprintf('Unable to find template "%s" in "%s".', json_encode($template), $this->path), 0, $e);
+            throw new \InvalidArgumentException(sprintf('Unable to find template "%s" in "%s".', $template, $this->path), 0, $e);
         }
     }
 }

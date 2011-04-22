@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Exception\NonExistentServiceException;
 use Symfony\Component\DependencyInjection\Exception\CircularReferenceException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -237,7 +238,7 @@ class Container implements ContainerInterface
         }
 
         if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
-            throw new \InvalidArgumentException(sprintf('The service "%s" does not exist.', $id));
+            throw new NonExistentServiceException($id);
         }
     }
 
@@ -256,7 +257,7 @@ class Container implements ContainerInterface
             }
         }
 
-        return array_merge($ids, array_keys($this->services));
+        return array_unique(array_merge($ids, array_keys($this->services)));
     }
 
     /**

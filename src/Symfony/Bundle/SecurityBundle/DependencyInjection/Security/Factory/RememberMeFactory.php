@@ -35,9 +35,6 @@ class RememberMeFactory implements SecurityFactoryInterface
 
         // remember me services
         if (isset($config['token_provider'])) {
-            $config['token-provider'] = $config['token_provider'];
-        }
-        if (isset($config['token-provider'])) {
             $templateId = 'security.authentication.rememberme.services.persistent';
             $rememberMeServicesId = $templateId.'.'.$id;
         } else {
@@ -53,18 +50,17 @@ class RememberMeFactory implements SecurityFactoryInterface
         }
 
         $rememberMeServices = $container->setDefinition($rememberMeServicesId, new DefinitionDecorator($templateId));
-        $rememberMeServices->setArgument(1, $config['key']);
-        $rememberMeServices->setArgument(2, $id);
+        $rememberMeServices->replaceArgument(1, $config['key']);
+        $rememberMeServices->replaceArgument(2, $id);
 
-        if (isset($config['token-provider'])) {
-            // FIXME: make the naming assumption more flexible
+        if (isset($config['token_provider'])) {
             $rememberMeServices->addMethodCall('setTokenProvider', array(
-                new Reference('security.rememberme.token.provider.'.$config['token-provider'])
+                new Reference($config['token_provider'])
             ));
         }
 
         // remember-me options
-        $rememberMeServices->setArgument(3, array_intersect_key($config, $this->options));
+        $rememberMeServices->replaceArgument(3, array_intersect_key($config, $this->options));
 
         // attach to remember-me aware listeners
         $userProviders = array();
@@ -88,12 +84,12 @@ class RememberMeFactory implements SecurityFactoryInterface
         if (count($userProviders) === 0) {
             throw new \RuntimeException('You must configure at least one remember-me aware listener (such as form-login) for each firewall that has remember-me enabled.');
         }
-        $rememberMeServices->setArgument(0, $userProviders);
+        $rememberMeServices->replaceArgument(0, $userProviders);
 
         // remember-me listener
         $listenerId = 'security.authentication.listener.rememberme.'.$id;
         $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.rememberme'));
-        $listener->setArgument(1, new Reference($rememberMeServicesId));
+        $listener->replaceArgument(1, new Reference($rememberMeServicesId));
 
         return array($authProviderId, $listenerId, $defaultEntryPoint);
     }
@@ -111,7 +107,7 @@ class RememberMeFactory implements SecurityFactoryInterface
     public function addConfiguration(NodeDefinition $node)
     {
         $builder = $node->children();
-        
+
         $builder
             ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
             ->scalarNode('token_provider')->end()

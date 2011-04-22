@@ -31,7 +31,7 @@ class CodeHelper extends Helper
      */
     public function __construct($fileLinkFormat, $rootDir)
     {
-        $this->fileLinkFormat = null !== $fileLinkFormat ? $fileLinkFormat : ini_get('xdebug.file_link_format');
+        $this->fileLinkFormat = empty($fileLinkFormat) ? ini_get('xdebug.file_link_format') : $fileLinkFormat;
         $this->rootDir = str_replace('\\', '/', $rootDir).'/';
     }
 
@@ -169,7 +169,7 @@ class CodeHelper extends Helper
                 $fileStr = sprintf('<abbr title="%s">kernel.root_dir</abbr>/%s', $this->rootDir, $fileStr);
             }
 
-            $text = "$fileStr line $line";
+            $text = "$fileStr at line $line";
         }
 
         if (false !== $link = $this->getFileLink($file, $line)) {
@@ -189,15 +189,19 @@ class CodeHelper extends Helper
      */
     public function getFileLink($file, $line)
     {
-        return $this->fileLinkFormat ? strtr($this->fileLinkFormat, array('%f' => $file, '%l' => $line)) : false;
+        if ($this->fileLinkFormat && file_exists($file)) {
+            return strtr($this->fileLinkFormat, array('%f' => $file, '%l' => $line));
+        }
+
+        return false;
     }
 
     public function formatFileFromText($text)
     {
         $that = $this;
 
-        return preg_replace_callback('/in (.*?)(?: on|at)? line (\d+)/', function ($match) use ($that) {
-            return 'in '.$that->formatFile($match[1], $match[2]);
+        return preg_replace_callback('/in (")?(.*?)\1(?: +(?:on|at))? +line (\d+)/', function ($match) use ($that) {
+            return 'in '.$that->formatFile($match[2], $match[3]);
         }, $text);
     }
 

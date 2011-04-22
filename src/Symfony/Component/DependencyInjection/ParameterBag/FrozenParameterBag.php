@@ -12,7 +12,7 @@
 namespace Symfony\Component\DependencyInjection\ParameterBag;
 
 /**
- * 
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class FrozenParameterBag extends ParameterBag

@@ -133,7 +133,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
      * @param ReflectionMethod $method the method to check
      * @return Boolean whether the method is a getter.
      */
-    protected function isGetMethod(\ReflectionMethod $method)
+    private function isGetMethod(\ReflectionMethod $method)
     {
         return (
             0 === strpos($method->getName(), 'get') &&

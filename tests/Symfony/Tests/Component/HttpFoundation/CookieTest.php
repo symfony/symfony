@@ -69,13 +69,13 @@ class CookieTest extends \PHPUnit_Framework_TestCase
     {
         new Cookie('MyCookie', $value);
     }
-    
+
     /**
      * @expectedException InvalidArgumentException
      */
     public function testInvalidExpiration()
     {
-        $cookie = new Cookie('MyCookie', 'foo','bar');        
+        $cookie = new Cookie('MyCookie', 'foo','bar');
     }
 
     /**
@@ -96,11 +96,11 @@ class CookieTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('/', $cookie->getPath(), '->getPath() returns / as the default path');
     }
 
-    public function testGetExpires()
+    public function testGetExpiresTime()
     {
         $cookie = new Cookie('foo', 'bar', 3600);
 
-        $this->assertEquals(3600, $cookie->getExpire(), '->getExpire() returns the expire date');
+        $this->assertEquals(3600, $cookie->getExpiresTime(), '->getExpiresTime() returns the expire date');
     }
 
     public function testGetDomain()

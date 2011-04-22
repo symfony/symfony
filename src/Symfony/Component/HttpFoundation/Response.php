@@ -145,7 +145,7 @@ class Response
 
         // cookies
         foreach ($this->headers->getCookies() as $cookie) {
-            setcookie($cookie->getName(), $cookie->getValue(), $cookie->getExpire(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
+            setcookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
         }
     }
 
@@ -458,6 +458,7 @@ class Response
      */
     public function setSharedMaxAge($value)
     {
+        $this->setPublic();
         $this->headers->addCacheControlDirective('s-maxage', $value);
     }
 
@@ -737,7 +738,7 @@ class Response
 
     public function isRedirect()
     {
-        return in_array($this->statusCode, array(301, 302, 303, 307));
+        return in_array($this->statusCode, array(201, 301, 302, 303, 307));
     }
 
     public function isEmpty()

@@ -51,7 +51,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder(new ParameterBag(array(
             'kernel.debug'       => false,
-            'kernel.bundles'     => array('Yaml' => 'Fixtures\Bundles\YamlBundle\YamlBundle'),
+            'kernel.bundles'     => array('YamlBundle' => 'Fixtures\Bundles\YamlBundle\YamlBundle'),
             'kernel.cache_dir'   => sys_get_temp_dir(),
             'kernel.root_dir'    => __DIR__ . "/../../../../" // src dir
         )));
@@ -74,7 +74,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
                 'default_entity_manager' => 'default',
                 'entity_managers' => array (
                     'default' => array(
-                    'mappings' => array('Yaml' => array(
+                    'mappings' => array('YamlBundle' => array(
                         'type' => 'yml',
                         'dir' => __DIR__ . "/DependencyInjection/Fixtures/Bundles/YamlBundle/Resources/config/doctrine/metadata/orm",
                         'prefix' => 'Fixtures\Bundles\YamlBundle',

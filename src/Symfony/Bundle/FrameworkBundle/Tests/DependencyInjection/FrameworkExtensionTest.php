@@ -113,7 +113,12 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertEquals('templating.engine.delegating', (string) $container->getAlias('templating'), '->registerTemplatingConfiguration() configures delegating loader if multiple engines are provided');
 
-        $this->assertEquals('templating.loader.chain', (string) $container->getAlias('templating.loader'), '->registerTemplatingConfiguration() configures loader chain if multiple loaders are provided');
+        $this->assertEquals($container->getDefinition('templating.loader.chain'), $container->getDefinition('templating.loader.wrapped'), '->registerTemplatingConfiguration() configures loader chain if multiple loaders are provided');
+
+        $this->assertEquals($container->getDefinition('templating.loader'), $container->getDefinition('templating.loader.cache'), '->registerTemplatingConfiguration() configures the loader to use cache');
+
+        $arguments = $container->getDefinition('templating.loader.cache')->getArguments();
+        $this->assertEquals('/path/to/cache', $arguments[1]);
 
         $this->assertEquals(array('php', 'twig'), $container->getParameter('templating.engines'), '->registerTemplatingConfiguration() sets a templating.engines parameter');
     }
@@ -174,22 +179,40 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('Application\\Validator\\Constraints\\', $arguments[0]['app'], '->registerValidationConfiguration() loads custom validation namespaces');
     }
 
-    protected function createContainer()
+    public function testValidationPaths()
     {
-        return new ContainerBuilder(new ParameterBag(array(
-            'kernel.bundles'          => array('Framework' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
+        require_once __DIR__ . "/Fixtures/TestBundle/TestBundle.php";
+
+        $container = $this->createContainerFromFile('validation_annotations', array(
+            'kernel.bundles' => array('TestBundle' => 'Symfony\Bundle\FrameworkBundle\Tests\TestBundle'),
+        ));
+
+        $yamlArgs = $container->getDefinition('validator.mapping.loader.yaml_files_loader')->getArguments();
+        $this->assertEquals(1, count($yamlArgs[0]));
+        $this->assertStringEndsWith('TestBundle/Resources/config/validation.yml', $yamlArgs[0][0]);
+
+        $xmlArgs = $container->getDefinition('validator.mapping.loader.xml_files_loader')->getArguments();
+        $this->assertEquals(2, count($xmlArgs[0]));
+        $this->assertStringEndsWith('Component/Form/Resources/config/validation.xml', $xmlArgs[0][0]);
+        $this->assertStringEndsWith('TestBundle/Resources/config/validation.xml', $xmlArgs[0][1]);
+    }
+
+    protected function createContainer(array $data = array())
+    {
+        return new ContainerBuilder(new ParameterBag(array_merge(array(
+            'kernel.bundles'          => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
             'kernel.cache_dir'        => __DIR__,
             'kernel.compiled_classes' => array(),
             'kernel.debug'            => false,
             'kernel.environment'      => 'test',
             'kernel.name'             => 'kernel',
             'kernel.root_dir'         => __DIR__,
-        )));
+        ), $data)));
     }
 
-    protected function createContainerFromFile($file)
+    protected function createContainerFromFile($file, $data = array())
     {
-        $container = $this->createContainer();
+        $container = $this->createContainer($data);
         $container->registerExtension(new FrameworkExtension());
         $this->loadFromFile($container, $file);
 

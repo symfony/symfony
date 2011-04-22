@@ -307,7 +307,7 @@ class StubIntlDateFormatter
     public function parse($value, &$position = null)
     {
         // We don't calculate the position when parsing the value
-        if (!is_null($position)) {
+        if (null !== $position) {
             throw new MethodArgumentNotImplementedException(__METHOD__, 'position');
         }
 
@@ -375,7 +375,7 @@ class StubIntlDateFormatter
      */
     public function setTimeZoneId($timeZoneId)
     {
-        if (is_null($timeZoneId)) {
+        if (null === $timeZoneId) {
             $timeZoneId = date_default_timezone_get();
             $this->unitializedTimeZoneId = true;
         }

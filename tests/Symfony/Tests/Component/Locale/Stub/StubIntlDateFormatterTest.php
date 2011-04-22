@@ -833,12 +833,9 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
     protected function createDateTime($timestamp = null, $timeZone = null)
     {
-        $timestamp = is_null($timestamp) ? time() : $timestamp;
-        $timeZone = is_null($timeZone) ? date_default_timezone_get() : $timeZone;
-
         $dateTime = new \DateTime();
-        $dateTime->setTimestamp($timestamp);
-        $dateTime->setTimeZone(new \DateTimeZone($timeZone));
+        $dateTime->setTimestamp(null === $timestamp ? time() : $timestamp);
+        $dateTime->setTimeZone(new \DateTimeZone(null === $timeZone ? date_default_timezone_get() : $timeZone));
 
         return $dateTime;
     }

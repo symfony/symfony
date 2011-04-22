@@ -33,7 +33,7 @@ class RequestDataCollector extends DataCollector
         $responseHeaders = $response->headers->all();
         $cookies = array();
         foreach ($response->headers->getCookies() as $cookie) {
-            $cookies[] = $this->getCookieHeader($cookie->getName(), $cookie->getValue(), $cookie->getExpire(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
+            $cookies[] = $this->getCookieHeader($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
         }
         if (count($cookies) > 0) {
             $responseHeaders['Set-Cookie'] = $cookies;
@@ -44,8 +44,17 @@ class RequestDataCollector extends DataCollector
             $attributes[$key] = is_object($value) ? sprintf('Object(%s)', get_class($value)) : $value;
         }
 
+        $content = null;
+        try {
+            $content = $request->getContent();
+        } catch (\LogicException $e) {
+            // the user already got the request content as a resource
+            $content = false;
+        }
+
         $this->data = array(
             'format'             => $request->getRequestFormat(),
+            'content'            => $content,
             'content_type'       => $response->headers->get('Content-Type') ? $response->headers->get('Content-Type') : 'text/html',
             'status_code'        => $response->getStatusCode(),
             'request_query'      => $request->query->all(),
@@ -97,6 +106,11 @@ class RequestDataCollector extends DataCollector
     public function getSessionAttributes()
     {
         return $this->data['session_attributes'];
+    }
+
+    public function getContent()
+    {
+        return $this->data['content'];
     }
 
     public function getContentType()

@@ -5,27 +5,27 @@
     xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
     <route id="_profiler_search" pattern="/search">
-        <default key="_controller">WebProfiler:Profiler:search</default>
+        <default key="_controller">WebProfilerBundle:Profiler:search</default>
     </route>
 
     <route id="_profiler_purge" pattern="/purge">
-        <default key="_controller">WebProfiler:Profiler:purge</default>
+        <default key="_controller">WebProfilerBundle:Profiler:purge</default>
     </route>
 
     <route id="_profiler_import" pattern="/import">
-        <default key="_controller">WebProfiler:Profiler:import</default>
+        <default key="_controller">WebProfilerBundle:Profiler:import</default>
     </route>
 
     <route id="_profiler_export" pattern="/export/{token}.txt">
-        <default key="_controller">WebProfiler:Profiler:export</default>
+        <default key="_controller">WebProfilerBundle:Profiler:export</default>
     </route>
 
     <route id="_profiler_search_results" pattern="/{token}/search/results">
-        <default key="_controller">WebProfiler:Profiler:searchResults</default>
+        <default key="_controller">WebProfilerBundle:Profiler:searchResults</default>
     </route>
 
     <route id="_profiler" pattern="/{token}">
-        <default key="_controller">WebProfiler:Profiler:panel</default>
+        <default key="_controller">WebProfilerBundle:Profiler:panel</default>
     </route>
 
 </routes>

@@ -32,6 +32,7 @@ $container->loadFromExtension('framework', array(
     'templating' => array(
         'assets_version'   => 'SomeVersionScheme',
         'assets_base_urls' => 'http://cdn.example.com',
+        'cache'            => '/path/to/cache',
         'cache_warmer'     => true,
         'engines'          => array('php', 'twig'),
         'loader'           => array('loader.foo', 'loader.bar'),
@@ -54,5 +55,6 @@ $container->loadFromExtension('framework', array(
     ),
     'validation' => array(
         'enabled' => true,
+        'cache'   => 'apc',
     ),
 ));

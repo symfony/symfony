@@ -8,7 +8,6 @@
         <parameter key="router.class">Symfony\Component\Routing\Router</parameter>
         <parameter key="router.cached.class">Symfony\Bundle\FrameworkBundle\Routing\CachedRouter</parameter>
         <parameter key="routing.loader.class">Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader</parameter>
-        <parameter key="routing.file_locator.class">Symfony\Component\HttpKernel\Config\FileLocator</parameter>
         <parameter key="routing.resolver.class">Symfony\Component\Config\Loader\LoaderResolver</parameter>
         <parameter key="routing.loader.xml.class">Symfony\Component\Routing\Loader\XmlFileLoader</parameter>
         <parameter key="routing.loader.yml.class">Symfony\Component\Routing\Loader\YamlFileLoader</parameter>
@@ -16,8 +15,8 @@
         <parameter key="router.options.generator_class">Symfony\Component\Routing\Generator\UrlGenerator</parameter>
         <parameter key="router.options.generator_base_class">Symfony\Component\Routing\Generator\UrlGenerator</parameter>
         <parameter key="router.options.generator_dumper_class">Symfony\Component\Routing\Generator\Dumper\PhpGeneratorDumper</parameter>
-        <parameter key="router.options.matcher_class">Symfony\Component\Routing\Matcher\UrlMatcher</parameter>
-        <parameter key="router.options.matcher_base_class">Symfony\Component\Routing\Matcher\UrlMatcher</parameter>
+        <parameter key="router.options.matcher_class">Symfony\Bundle\FrameworkBundle\Routing\RedirectableUrlMatcher</parameter>
+        <parameter key="router.options.matcher_base_class">Symfony\Bundle\FrameworkBundle\Routing\RedirectableUrlMatcher</parameter>
         <parameter key="router.options.matcher_dumper_class">Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper</parameter>
         <parameter key="router.cache_warmer.class">Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer</parameter>
         <parameter key="router.options.matcher.cache_class">%kernel.name%%kernel.environment%UrlMatcher</parameter>
@@ -28,26 +27,23 @@
     <services>
         <service id="routing.resolver" class="%routing.resolver.class%" public="false" />
 
-        <service id="routing.file_locator" class="%routing.file_locator.class%" public="false">
-            <argument type="service" id="kernel" />
-        </service>
-
         <service id="routing.loader.xml" class="%routing.loader.xml.class%" public="false">
             <tag name="routing.loader" />
-            <argument type="service" id="routing.file_locator" />
+            <argument type="service" id="file_locator" />
         </service>
 
         <service id="routing.loader.yml" class="%routing.loader.yml.class%" public="false">
             <tag name="routing.loader" />
-            <argument type="service" id="routing.file_locator" />
+            <argument type="service" id="file_locator" />
         </service>
 
         <service id="routing.loader.php" class="%routing.loader.php.class%" public="false">
             <tag name="routing.loader" />
-            <argument type="service" id="routing.file_locator" />
+            <argument type="service" id="file_locator" />
         </service>
 
         <service id="routing.loader.real" class="%routing.loader.class%">
+            <tag name="monolog.logger" channel="router" />
             <argument type="service" id="controller_name_converter" />
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="routing.resolver" />

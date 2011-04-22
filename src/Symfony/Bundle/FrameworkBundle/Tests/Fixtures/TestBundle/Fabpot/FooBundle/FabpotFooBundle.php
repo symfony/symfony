@@ -25,6 +25,6 @@ class FabpotFooBundle extends Bundle
      */
     public function getParent()
     {
-        return 'SensioFoo';
+        return 'SensioFooBundle';
     }
 }

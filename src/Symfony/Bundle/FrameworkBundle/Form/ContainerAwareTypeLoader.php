@@ -28,7 +28,9 @@ class ContainerAwareTypeLoader implements TypeLoaderInterface
 
     public function getType($identifier)
     {
-        // TODO check whether identifier exists
+        if (!isset($this->serviceIds[$identifier])) {
+            throw new \InvalidArgumentException(sprintf('The field type "%s" is not registered with the service container.', $identifier));
+        }
 
         return $this->container->get($this->serviceIds[$identifier]);
     }

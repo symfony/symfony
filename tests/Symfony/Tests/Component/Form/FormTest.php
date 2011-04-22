@@ -18,7 +18,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\DataTransformer\TransformationFailedException;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -868,8 +868,8 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testCreateView()
     {
         $test = $this;
-        $type1 = $this->getMock('Symfony\Component\Form\Type\FormTypeInterface');
-        $type2 = $this->getMock('Symfony\Component\Form\Type\FormTypeInterface');
+        $type1 = $this->getMock('Symfony\Component\Form\FormTypeInterface');
+        $type2 = $this->getMock('Symfony\Component\Form\FormTypeInterface');
         $calls = array();
 
         $type1->expects($this->once())
@@ -966,16 +966,16 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     protected function getDataMapper()
     {
-        return $this->getMock('Symfony\Component\Form\DataMapper\DataMapperInterface');
+        return $this->getMock('Symfony\Component\Form\DataMapperInterface');
     }
 
     protected function getDataTransformer()
     {
-        return $this->getMock('Symfony\Component\Form\DataTransformer\DataTransformerInterface');
+        return $this->getMock('Symfony\Component\Form\DataTransformerInterface');
     }
 
     protected function getFormValidator()
     {
-        return $this->getMock('Symfony\Component\Form\Validator\FormValidatorInterface');
+        return $this->getMock('Symfony\Component\Form\FormValidatorInterface');
     }
 }

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\Exception\FormException;
@@ -21,12 +19,9 @@ use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\DanglingFieldException;
 use Symfony\Component\Form\Exception\FieldDefinitionException;
-use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
-use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
-use Symfony\Component\Form\DataTransformer\TransformationFailedException;
-use Symfony\Component\Form\DataMapper\DataMapperInterface;
-use Symfony\Component\Form\Validator\FormValidatorInterface;
-use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -213,19 +208,19 @@ class Form implements \IteratorAggregate, FormInterface
     {
         foreach ($clientTransformers as $transformer) {
             if (!$transformer instanceof DataTransformerInterface) {
-                throw new UnexpectedTypeException($transformer, 'Symfony\Component\Form\DataTransformer\DataTransformerInterface');
+                throw new UnexpectedTypeException($transformer, 'Symfony\Component\Form\DataTransformerInterface');
             }
         }
 
         foreach ($normTransformers as $transformer) {
             if (!$transformer instanceof DataTransformerInterface) {
-                throw new UnexpectedTypeException($transformer, 'Symfony\Component\Form\DataTransformer\DataTransformerInterface');
+                throw new UnexpectedTypeException($transformer, 'Symfony\Component\Form\DataTransformerInterface');
             }
         }
 
         foreach ($validators as $validator) {
             if (!$validator instanceof FormValidatorInterface) {
-                throw new UnexpectedTypeException($validator, 'Symfony\Component\Form\Validator\FormValidatorInterface');
+                throw new UnexpectedTypeException($validator, 'Symfony\Component\Form\FormValidatorInterface');
             }
         }
 

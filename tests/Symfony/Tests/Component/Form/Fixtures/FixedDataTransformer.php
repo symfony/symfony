@@ -2,7 +2,7 @@
 
 namespace Symfony\Tests\Component\Form\Fixtures;
 
-use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
+use Symfony\Component\Form\DataTransformerInterface;
 
 class FixedDataTransformer implements DataTransformerInterface
 {

@@ -12,26 +12,40 @@
 namespace Symfony\Tests\Component\Form;
 
 use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Form\Type\Guesser\Guess;
-use Symfony\Component\Form\Type\Guesser\ValueGuess;
-use Symfony\Component\Form\Type\Guesser\TypeGuess;
+use Symfony\Component\Form\Guess\Guess;
+use Symfony\Component\Form\Guess\ValueGuess;
+use Symfony\Component\Form\Guess\TypeGuess;
 
 class FormFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    private $typeLoader;
+    private $extension1;
+
+    private $extension2;
+
+    private $guesser1;
+
+    private $guesser2;
 
     private $factory;
 
     protected function setUp()
     {
-        $this->typeLoader = $this->getMock('Symfony\Component\Form\Type\Loader\TypeLoaderInterface');
-        $this->factory = new FormFactory($this->typeLoader);
+        $this->guesser1 = $this->getMock('Symfony\Component\Form\FormTypeGuesserInterface');
+        $this->guesser2 = $this->getMock('Symfony\Component\Form\FormTypeGuesserInterface');
+        $this->extension1 = $this->getMock('Symfony\Component\Form\FormExtensionInterface');
+        $this->extension1->expects($this->any())
+            ->method('getTypeGuesser')
+            ->will($this->returnValue($this->guesser1));
+        $this->extension2 = $this->getMock('Symfony\Component\Form\FormExtensionInterface');
+        $this->extension2->expects($this->any())
+            ->method('getTypeGuesser')
+            ->will($this->returnValue($this->guesser2));
+        $this->factory = new FormFactory(array($this->extension1, $this->extension2));
     }
 
     public function testCreateBuilderForPropertyCreatesFieldWithHighestConfidence()
     {
-        $guesser1 = $this->getMock('Symfony\Component\Form\Type\Guesser\TypeGuesserInterface');
-        $guesser1->expects($this->once())
+        $this->guesser1->expects($this->once())
             ->method('guessType')
             ->with('Application\Author', 'firstName')
             ->will($this->returnValue(new TypeGuess(
@@ -40,8 +54,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                 Guess::MEDIUM_CONFIDENCE
             )));
 
-        $guesser2 = $this->getMock('Symfony\Component\Form\Type\Guesser\TypeGuesserInterface');
-        $guesser2->expects($this->once())
+        $this->guesser2->expects($this->once())
             ->method('guessType')
             ->with('Application\Author', 'firstName')
             ->will($this->returnValue(new TypeGuess(
@@ -50,7 +63,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                 Guess::HIGH_CONFIDENCE
             )));
 
-        $factory = $this->createMockFactory(array('createNamedBuilder'), array($guesser1, $guesser2));
+        $factory = $this->createMockFactory(array('createNamedBuilder'));
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
@@ -64,13 +77,12 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateBuilderCreatesTextFieldIfNoGuess()
     {
-        $guesser = $this->getMock('Symfony\Component\Form\Type\Guesser\TypeGuesserInterface');
-        $guesser->expects($this->once())
+        $this->guesser1->expects($this->once())
                 ->method('guessType')
                 ->with('Application\Author', 'firstName')
                 ->will($this->returnValue(null));
 
-        $factory = $this->createMockFactory(array('createNamedBuilder'), array($guesser));
+        $factory = $this->createMockFactory(array('createNamedBuilder'));
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
@@ -84,8 +96,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testOptionsCanBeOverridden()
     {
-        $guesser = $this->getMock('Symfony\Component\Form\Type\Guesser\TypeGuesserInterface');
-        $guesser->expects($this->once())
+        $this->guesser1->expects($this->once())
                 ->method('guessType')
                 ->with('Application\Author', 'firstName')
                 ->will($this->returnValue(new TypeGuess(
@@ -94,7 +105,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                     Guess::MEDIUM_CONFIDENCE
                 )));
 
-        $factory = $this->createMockFactory(array('createNamedBuilder'), array($guesser));
+        $factory = $this->createMockFactory(array('createNamedBuilder'));
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
@@ -113,8 +124,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateBuilderUsesMaxLengthIfFound()
     {
-        $guesser1 = $this->getMock('Symfony\Component\Form\Type\Guesser\TypeGuesserInterface');
-        $guesser1->expects($this->once())
+        $this->guesser1->expects($this->once())
                 ->method('guessMaxLength')
                 ->with('Application\Author', 'firstName')
                 ->will($this->returnValue(new ValueGuess(
@@ -122,8 +132,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                     Guess::MEDIUM_CONFIDENCE
                 )));
 
-        $guesser2 = $this->getMock('Symfony\Component\Form\Type\Guesser\TypeGuesserInterface');
-        $guesser2->expects($this->once())
+        $this->guesser2->expects($this->once())
                 ->method('guessMaxLength')
                 ->with('Application\Author', 'firstName')
                 ->will($this->returnValue(new ValueGuess(
@@ -131,7 +140,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                     Guess::HIGH_CONFIDENCE
                 )));
 
-        $factory = $this->createMockFactory(array('createNamedBuilder'), array($guesser1, $guesser2));
+        $factory = $this->createMockFactory(array('createNamedBuilder'));
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
@@ -148,8 +157,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateBuilderUsesRequiredSettingWithHighestConfidence()
     {
-        $guesser1 = $this->getMock('Symfony\Component\Form\Type\Guesser\TypeGuesserInterface');
-        $guesser1->expects($this->once())
+        $this->guesser1->expects($this->once())
                 ->method('guessRequired')
                 ->with('Application\Author', 'firstName')
                 ->will($this->returnValue(new ValueGuess(
@@ -157,8 +165,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                     Guess::MEDIUM_CONFIDENCE
                 )));
 
-        $guesser2 = $this->getMock('Symfony\Component\Form\Type\Guesser\TypeGuesserInterface');
-        $guesser2->expects($this->once())
+        $this->guesser2->expects($this->once())
                 ->method('guessRequired')
                 ->with('Application\Author', 'firstName')
                 ->will($this->returnValue(new ValueGuess(
@@ -166,7 +173,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                     Guess::HIGH_CONFIDENCE
                 )));
 
-        $factory = $this->createMockFactory(array('createNamedBuilder'), array($guesser1, $guesser2));
+        $factory = $this->createMockFactory(array('createNamedBuilder'));
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
@@ -181,11 +188,11 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('builderInstance', $builder);
     }
 
-    private function createMockFactory(array $methods = array(), array $guessers = array())
+    private function createMockFactory(array $methods = array())
     {
         return $this->getMockBuilder('Symfony\Component\Form\FormFactory')
             ->setMethods($methods)
-            ->setConstructorArgs(array($this->typeLoader, $guessers))
+            ->setConstructorArgs(array(array($this->extension1, $this->extension2)))
             ->getMock();
     }
 }

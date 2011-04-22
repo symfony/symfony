@@ -14,8 +14,8 @@ namespace Symfony\Tests\Component\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Form\CsrfProvider\DefaultCsrfProvider;
-use Symfony\Component\Form\Type\Loader\DefaultTypeLoader;
+use Symfony\Component\Form\Extension\Core\CoreExtension;
+use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
@@ -30,11 +30,13 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher = new EventDispatcher();
         $validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
-        $this->csrfProvider = $this->getMock('Symfony\Component\Form\CsrfProvider\CsrfProviderInterface');
+        $this->csrfProvider = $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface');
         $storage = new \Symfony\Component\HttpFoundation\File\TemporaryStorage('foo', 1, \sys_get_temp_dir());
-        $loader = new DefaultTypeLoader($validator, $this->csrfProvider , $storage);
 
-        $this->factory = new FormFactory($loader);
+        $this->factory = new FormFactory(array(
+            new CoreExtension($validator, $storage),
+            new CsrfExtension($this->csrfProvider),
+        ));
     }
 
     protected function assertXpathNodeValue(\DomElement $element, $expression, $nodeValue)

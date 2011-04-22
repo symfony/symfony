@@ -51,7 +51,7 @@ class ChoiceTypeTest extends TestCase
      */
     public function testChoicesOptionExpectsArray()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', null, array(
             'choices' => new \ArrayObject(),
         ));
     }
@@ -61,14 +61,14 @@ class ChoiceTypeTest extends TestCase
      */
     public function testChoiceListOptionExpectsChoiceListInterface()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', null, array(
             'choice_list' => array('foo' => 'foo'),
         ));
     }
 
     public function testExpandedCheckboxesAreNeverRequired()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', null, array(
             'multiple' => true,
             'expanded' => true,
             'required' => true,
@@ -82,7 +82,7 @@ class ChoiceTypeTest extends TestCase
 
     public function testExpandedRadiosAreRequiredIfChoiceFieldIsRequired()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => true,
@@ -96,7 +96,7 @@ class ChoiceTypeTest extends TestCase
 
     public function testExpandedRadiosAreNotRequiredIfChoiceFieldIsNotRequired()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -110,7 +110,7 @@ class ChoiceTypeTest extends TestCase
 
     public function testBindSingleNonExpanded()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', null, array(
             'multiple' => false,
             'expanded' => false,
             'choices' => $this->choices,
@@ -124,7 +124,7 @@ class ChoiceTypeTest extends TestCase
 
     public function testBindMultipleNonExpanded()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', null, array(
             'multiple' => true,
             'expanded' => false,
             'choices' => $this->choices,
@@ -138,7 +138,7 @@ class ChoiceTypeTest extends TestCase
 
     public function testBindSingleExpanded()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', null, array(
             'multiple' => false,
             'expanded' => true,
             'choices' => $this->choices,
@@ -161,7 +161,7 @@ class ChoiceTypeTest extends TestCase
 
     public function testBindSingleExpandedNumericChoices()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', null, array(
             'multiple' => false,
             'expanded' => true,
             'choices' => $this->numericChoices,
@@ -184,7 +184,7 @@ class ChoiceTypeTest extends TestCase
 
     public function testBindMultipleExpanded()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', null, array(
             'multiple' => true,
             'expanded' => true,
             'choices' => $this->choices,
@@ -207,7 +207,7 @@ class ChoiceTypeTest extends TestCase
 
     public function testBindMultipleExpandedNumericChoices()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', null, array(
             'multiple' => true,
             'expanded' => true,
             'choices' => $this->numericChoices,
@@ -234,7 +234,7 @@ class ChoiceTypeTest extends TestCase
      */
     public function testSetDataSingleNonExpandedAcceptsBoolean()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', null, array(
             'multiple' => false,
             'expanded' => false,
             'choices' => $this->numericChoices,
@@ -248,7 +248,7 @@ class ChoiceTypeTest extends TestCase
 
     public function testSetDataMultipleNonExpandedAcceptsBoolean()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', null, array(
             'multiple' => true,
             'expanded' => false,
             'choices' => $this->numericChoices,
@@ -270,7 +270,7 @@ class ChoiceTypeTest extends TestCase
 
     public function testPassMultipleToView()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', null, array(
             'multiple' => true,
             'choices' => $this->choices,
         ));
@@ -281,7 +281,7 @@ class ChoiceTypeTest extends TestCase
 
     public function testPassExpandedToView()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', null, array(
             'expanded' => true,
             'choices' => $this->choices,
         ));
@@ -293,7 +293,7 @@ class ChoiceTypeTest extends TestCase
     public function testPassChoicesToView()
     {
         $choices = array('a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D');
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', null, array(
             'choices' => $choices,
         ));
         $view = $form->createView();
@@ -304,7 +304,7 @@ class ChoiceTypeTest extends TestCase
     public function testPassPreferredChoicesToView()
     {
         $choices = array('a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D');
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->create('choice', null, array(
             'choices' => $choices,
             'preferred_choices' => array('b', 'd'),
         ));
@@ -316,7 +316,7 @@ class ChoiceTypeTest extends TestCase
 
     public function testAdjustNameForMultipleNonExpanded()
     {
-        $form = $this->factory->create('choice', 'name', array(
+        $form = $this->factory->createNamed('choice', 'name', null, array(
             'multiple' => true,
             'expanded' => false,
             'choices' => $this->choices,

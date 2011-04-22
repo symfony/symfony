@@ -50,11 +50,11 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                 Guess::HIGH_CONFIDENCE
             )));
 
-        $factory = $this->createMockFactory(array('createBuilder'), array($guesser1, $guesser2));
+        $factory = $this->createMockFactory(array('createNamedBuilder'), array($guesser1, $guesser2));
 
         $factory->expects($this->once())
-            ->method('createBuilder')
-            ->with('password', 'firstName', array('max_length' => 7))
+            ->method('createNamedBuilder')
+            ->with('password', 'firstName', null, array('max_length' => 7))
             ->will($this->returnValue('builderInstance'));
 
         $builder = $factory->createBuilderForProperty('Application\Author', 'firstName');
@@ -70,10 +70,10 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                 ->with('Application\Author', 'firstName')
                 ->will($this->returnValue(null));
 
-        $factory = $this->createMockFactory(array('createBuilder'), array($guesser));
+        $factory = $this->createMockFactory(array('createNamedBuilder'), array($guesser));
 
         $factory->expects($this->once())
-            ->method('createBuilder')
+            ->method('createNamedBuilder')
             ->with('text', 'firstName')
             ->will($this->returnValue('builderInstance'));
 
@@ -94,16 +94,17 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                     Guess::MEDIUM_CONFIDENCE
                 )));
 
-        $factory = $this->createMockFactory(array('createBuilder'), array($guesser));
+        $factory = $this->createMockFactory(array('createNamedBuilder'), array($guesser));
 
         $factory->expects($this->once())
-            ->method('createBuilder')
-            ->with('text', 'firstName', array('max_length' => 11))
+            ->method('createNamedBuilder')
+            ->with('text', 'firstName', null, array('max_length' => 11))
             ->will($this->returnValue('builderInstance'));
 
         $builder = $factory->createBuilderForProperty(
             'Application\Author',
             'firstName',
+            null,
             array('max_length' => 11)
         );
 
@@ -130,11 +131,11 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                     Guess::HIGH_CONFIDENCE
                 )));
 
-        $factory = $this->createMockFactory(array('createBuilder'), array($guesser1, $guesser2));
+        $factory = $this->createMockFactory(array('createNamedBuilder'), array($guesser1, $guesser2));
 
         $factory->expects($this->once())
-            ->method('createBuilder')
-            ->with('text', 'firstName', array('max_length' => 20))
+            ->method('createNamedBuilder')
+            ->with('text', 'firstName', null, array('max_length' => 20))
             ->will($this->returnValue('builderInstance'));
 
         $builder = $factory->createBuilderForProperty(
@@ -165,11 +166,11 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                     Guess::HIGH_CONFIDENCE
                 )));
 
-        $factory = $this->createMockFactory(array('createBuilder'), array($guesser1, $guesser2));
+        $factory = $this->createMockFactory(array('createNamedBuilder'), array($guesser1, $guesser2));
 
         $factory->expects($this->once())
-            ->method('createBuilder')
-            ->with('text', 'firstName', array('required' => false))
+            ->method('createNamedBuilder')
+            ->with('text', 'firstName', null, array('required' => false))
             ->will($this->returnValue('builderInstance'));
 
         $builder = $factory->createBuilderForProperty(

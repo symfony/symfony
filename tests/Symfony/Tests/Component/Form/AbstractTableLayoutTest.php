@@ -17,7 +17,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 {
     public function testRow()
     {
-        $form = $this->factory->create('text', 'name');
+        $form = $this->factory->createNamed('text', 'name');
         $form->addError(new FormError('Error!'));
         $view = $form->createView();
         $html = $this->renderRow($view);
@@ -41,7 +41,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testRepeatedRow()
     {
-        $form = $this->factory->create('repeated', 'name');
+        $form = $this->factory->createNamed('repeated', 'name');
         $html = $this->renderRow($form->createView());
 
         $this->assertMatchesXpath($html,
@@ -66,7 +66,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testRepeatedRowWithErrors()
     {
-        $form = $this->factory->create('repeated', 'name');
+        $form = $this->factory->createNamed('repeated', 'name');
         $form->addError(new FormError('Error!'));
         $view = $form->createView();
         $html = $this->renderRow($view);
@@ -97,7 +97,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testRest()
     {
-        $view = $this->factory->createBuilder('form', 'name')
+        $view = $this->factory->createNamedBuilder('form', 'name')
             ->add('field1', 'text')
             ->add('field2', 'repeated')
             ->add('field3', 'text')
@@ -144,9 +144,8 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testCollection()
     {
-        $form = $this->factory->create('collection', 'name', array(
+        $form = $this->factory->createNamed('collection', 'name', array('a', 'b'), array(
             'type' => 'text',
-            'data' => array('a', 'b'),
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -162,7 +161,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testForm()
     {
-        $view = $this->factory->createBuilder('form', 'name')
+        $view = $this->factory->createNamedBuilder('form', 'name')
             ->add('firstName', 'text')
             ->add('lastName', 'text')
             ->getForm()
@@ -198,9 +197,8 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testRepeated()
     {
-        $form = $this->factory->create('repeated', 'name', array(
+        $form = $this->factory->createNamed('repeated', 'name', 'foobar', array(
             'type' => 'text',
-            'data' => 'foobar',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),

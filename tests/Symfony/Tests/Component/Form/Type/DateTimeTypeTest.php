@@ -21,7 +21,7 @@ class DateTimeTypeTest extends LocalizedTestCase
 {
     public function testSubmit_dateTime()
     {
-        $form = $this->factory->create('datetime', 'name', array(
+        $form = $this->factory->create('datetime', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'date_widget' => 'choice',
@@ -48,7 +48,7 @@ class DateTimeTypeTest extends LocalizedTestCase
 
     public function testSubmit_string()
     {
-        $form = $this->factory->create('datetime', 'name', array(
+        $form = $this->factory->create('datetime', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'input' => 'string',
@@ -73,7 +73,7 @@ class DateTimeTypeTest extends LocalizedTestCase
 
     public function testSubmit_timestamp()
     {
-        $form = $this->factory->create('datetime', 'name', array(
+        $form = $this->factory->create('datetime', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'input' => 'timestamp',
@@ -100,7 +100,7 @@ class DateTimeTypeTest extends LocalizedTestCase
 
     public function testSubmit_withSeconds()
     {
-        $form = $this->factory->create('datetime', 'name', array(
+        $form = $this->factory->create('datetime', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'date_widget' => 'choice',
@@ -131,7 +131,7 @@ class DateTimeTypeTest extends LocalizedTestCase
 
     public function testSubmit_differentTimezones()
     {
-        $form = $this->factory->create('datetime', 'name', array(
+        $form = $this->factory->create('datetime', null, array(
             'data_timezone' => 'America/New_York',
             'user_timezone' => 'Pacific/Tahiti',
             'date_widget' => 'choice',

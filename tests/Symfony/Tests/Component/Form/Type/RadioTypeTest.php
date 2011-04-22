@@ -17,7 +17,7 @@ class RadioTypeTest extends TestCase
 {
     public function testPassValueToView()
     {
-        $form = $this->factory->create('radio', 'name', array('value' => 'foobar'));
+        $form = $this->factory->create('radio', null, array('value' => 'foobar'));
         $view = $form->createView();
 
         $this->assertEquals('foobar', $view->get('value'));
@@ -25,8 +25,8 @@ class RadioTypeTest extends TestCase
 
     public function testPassParentNameToView()
     {
-        $parent = $this->factory->create('field', 'parent');
-        $parent->add($this->factory->create('radio', 'child'));
+        $parent = $this->factory->createNamed('field', 'parent');
+        $parent->add($this->factory->createNamed('radio', 'child'));
         $view = $parent->createView();
 
         $this->assertEquals('parent', $view['child']->get('name'));

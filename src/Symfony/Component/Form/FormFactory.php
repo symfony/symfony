@@ -35,19 +35,37 @@ class FormFactory implements FormFactoryInterface
         $this->guessers = $guessers;
     }
 
-    public function createBuilder($type, $name = null, array $options = array())
+    public function create($type, $data = null, array $options = array())
     {
-        // TODO $type can be FQN of a type class
+        return $this->createBuilder($type, $data, $options)->getForm();
+    }
 
+    public function createNamed($type, $name, $data = null, array $options = array())
+    {
+        return $this->createNamedBuilder($type, $name, $data, $options)->getForm();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createForProperty($class, $property, $data = null, array $options = array())
+    {
+        return $this->createBuilderForProperty($class, $property, $data, $options)->getForm();
+    }
+
+    public function createBuilder($type, $data = null, array $options = array())
+    {
+        $name = is_object($type) ? $type->getName() : $type;
+
+        return $this->createNamedBuilder($type, $name, $data, $options);
+    }
+
+    public function createNamedBuilder($type, $name, $data = null, array $options = array())
+    {
         $builder = null;
         $types = array();
         $knownOptions = array();
         $passedOptions = array_keys($options);
-
-        // TESTME
-        if (null === $name) {
-            $name = is_object($type) ? $type->getName() : $type;
-        }
 
         while (null !== $type) {
             // TODO check if type exists
@@ -80,15 +98,14 @@ class FormFactory implements FormFactoryInterface
             $type->buildForm($builder, $options);
         }
 
+        if (null !== $data) {
+            $builder->setData($data);
+        }
+
         return $builder;
     }
 
-    public function create($type, $name = null, array $options = array())
-    {
-        return $this->createBuilder($type, $name, $options)->getForm();
-    }
-
-    public function createBuilderForProperty($class, $property, array $options = array())
+    public function createBuilderForProperty($class, $property, $data = null, array $options = array())
     {
         // guess field class and options
         $typeGuess = $this->guess(function ($guesser) use ($class, $property) {
@@ -121,15 +138,7 @@ class FormFactory implements FormFactoryInterface
             $options = array_merge($typeGuess->getOptions(), $options);
         }
 
-        return $this->createBuilder($type, $property, $options);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function createForProperty($class, $property, array $options = array())
-    {
-        return $this->createBuilderForProperty($class, $property, $options)->getForm();
+        return $this->createNamedBuilder($type, $property, $data, $options);
     }
 
     /**

@@ -80,7 +80,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 //
 //        $this->persist(array($entity1, $entity2));
 //
-//        $field = $this->factory->create('entity', 'name', array(
+//        $field = $this->factory->createNamed('entity', 'name', null, array(
 //            'em' => $this->em,
 //            'class' => self::SINGLE_IDENT_CLASS,
 //            'required' => false,
@@ -96,7 +96,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
      */
     public function testConfigureQueryBuilderWithNonQueryBuilderAndNonClosure()
     {
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => new \stdClass(),
@@ -108,7 +108,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
      */
     public function testConfigureQueryBuilderWithClosureReturningNonQueryBuilder()
     {
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => function () {
@@ -121,7 +121,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
     public function testSetDataSingleNull()
     {
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => false,
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
@@ -134,7 +134,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
     public function testSetDataMultipleExpandedNull()
     {
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => true,
             'expanded' => true,
             'em' => $this->em,
@@ -148,7 +148,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
     public function testSetDataMultipleNonExpandedNull()
     {
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => true,
             'expanded' => false,
             'em' => $this->em,
@@ -162,7 +162,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
     public function testSubmitSingleExpandedNull()
     {
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => false,
             'expanded' => true,
             'em' => $this->em,
@@ -176,7 +176,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
     public function testSubmitSingleNonExpandedNull()
     {
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => false,
             'expanded' => false,
             'em' => $this->em,
@@ -190,7 +190,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
     public function testSubmitMultipleNull()
     {
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => true,
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
@@ -208,7 +208,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2));
 
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => false,
             'expanded' => false,
             'em' => $this->em,
@@ -230,7 +230,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2));
 
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => false,
             'expanded' => false,
             'em' => $this->em,
@@ -254,7 +254,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => true,
             'expanded' => false,
             'em' => $this->em,
@@ -279,7 +279,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => true,
             'expanded' => false,
             'em' => $this->em,
@@ -310,7 +310,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => true,
             'expanded' => false,
             'em' => $this->em,
@@ -336,7 +336,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => true,
             'expanded' => false,
             'em' => $this->em,
@@ -366,7 +366,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2));
 
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => false,
             'expanded' => true,
             'em' => $this->em,
@@ -392,7 +392,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'multiple' => true,
             'expanded' => true,
             'em' => $this->em,
@@ -424,7 +424,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
             // not all persisted entities should be displayed
@@ -448,7 +448,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
             'choices' => array($entity1, $entity2),
@@ -469,7 +469,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'em' => $this->em,
             'class' => self::COMPOSITE_IDENT_CLASS,
             'choices' => array($entity1, $entity2),
@@ -492,7 +492,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $repository = $this->em->getRepository(self::SINGLE_IDENT_CLASS);
 
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => $repository->createQueryBuilder('e')
@@ -514,7 +514,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => function ($repository) {
@@ -538,7 +538,7 @@ class EntityTypeTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->create('entity', 'name', array(
+        $field = $this->factory->createNamed('entity', 'name', null, array(
             'em' => $this->em,
             'class' => self::COMPOSITE_IDENT_CLASS,
             'query_builder' => function ($repository) {

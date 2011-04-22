@@ -65,7 +65,7 @@ class FormTypeTest extends TestCase
 {
     public function testCsrfProtectionByDefault()
     {
-        $form =  $this->factory->create('form', 'author', array(
+        $form =  $this->factory->create('form', null, array(
             'csrf_field_name' => 'csrf',
         ));
 
@@ -74,7 +74,7 @@ class FormTypeTest extends TestCase
 
     public function testCsrfProtectionCanBeDisabled()
     {
-        $form =  $this->factory->create('form', 'author', array(
+        $form =  $this->factory->create('form', null, array(
             'csrf_protection' => false,
         ));
 
@@ -90,7 +90,7 @@ class FormTypeTest extends TestCase
 
     public function testValidationGroupsCanBeSetToString()
     {
-        $form = $this->factory->create('form', 'author', array(
+        $form = $this->factory->create('form', null, array(
             'validation_groups' => 'group',
         ));
 
@@ -99,7 +99,7 @@ class FormTypeTest extends TestCase
 
     public function testValidationGroupsCanBeSetToArray()
     {
-        $form = $this->factory->create('form', 'author', array(
+        $form = $this->factory->create('form', null, array(
             'validation_groups' => array('group1', 'group2'),
         ));
 
@@ -108,7 +108,7 @@ class FormTypeTest extends TestCase
 
     public function testBindValidatesData()
     {
-        $builder = $this->factory->createBuilder('form', 'author', array(
+        $builder = $this->factory->createBuilder('form', null, array(
             'validation_groups' => 'group',
         ));
         $builder->add('firstName', 'field');
@@ -126,7 +126,7 @@ class FormTypeTest extends TestCase
     {
         $author = new FormTest_AuthorWithoutRefSetter(new Author());
 
-        $builder = $this->factory->createBuilder('form', 'author');
+        $builder = $this->factory->createBuilder('form');
         $builder->add('reference', 'form');
         $builder->get('reference')->add('firstName', 'field');
         $builder->setData($author);
@@ -148,7 +148,7 @@ class FormTypeTest extends TestCase
         $author = new FormTest_AuthorWithoutRefSetter(null);
         $newReference = new Author();
 
-        $builder = $this->factory->createBuilder('form', 'author');
+        $builder = $this->factory->createBuilder('form');
         $builder->add('referenceCopy', 'form');
         $builder->get('referenceCopy')->add('firstName', 'field');
         $builder->setData($author);
@@ -170,7 +170,7 @@ class FormTypeTest extends TestCase
     {
         $author = new FormTest_AuthorWithoutRefSetter(new Author());
 
-        $builder = $this->factory->createBuilder('form', 'author');
+        $builder = $this->factory->createBuilder('form');
         $builder->add('referenceCopy', 'form', array('by_reference' => false));
         $builder->get('referenceCopy')->add('firstName', 'field');
         $builder->setData($author);
@@ -191,7 +191,7 @@ class FormTypeTest extends TestCase
     {
         $author = new FormTest_AuthorWithoutRefSetter('scalar');
 
-        $builder = $this->factory->createBuilder('form', 'author');
+        $builder = $this->factory->createBuilder('form');
         $builder->add('referenceCopy', 'form');
         $builder->get('referenceCopy')->appendClientTransformer(new CallbackTransformer(
         function () {},
@@ -216,7 +216,7 @@ class FormTypeTest extends TestCase
         $ref2 = new Author();
         $author = array('referenceCopy' => $ref1);
 
-        $builder = $this->factory->createBuilder('form', 'author');
+        $builder = $this->factory->createBuilder('form');
         $builder->setData($author);
         $builder->add('referenceCopy', 'form');
         $builder->get('referenceCopy')->appendClientTransformer(new CallbackTransformer(

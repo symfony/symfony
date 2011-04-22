@@ -27,7 +27,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testSubmitFromInputDateTime()
     {
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -42,7 +42,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testSubmitFromInputString()
     {
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -57,7 +57,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testSubmitFromInputTimestamp()
     {
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -74,7 +74,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testSubmitFromInputRaw()
     {
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -95,7 +95,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testSubmitFromChoice()
     {
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
@@ -117,7 +117,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testSubmitFromChoiceEmpty()
     {
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
@@ -138,7 +138,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testSetData_differentTimezones()
     {
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'America/New_York',
             'user_timezone' => 'Pacific/Tahiti',
             // don't do this test with DateTime, because it leads to wrong results!
@@ -155,7 +155,7 @@ class DateTypeTest extends LocalizedTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -171,7 +171,7 @@ class DateTypeTest extends LocalizedTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -187,7 +187,7 @@ class DateTypeTest extends LocalizedTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
@@ -207,7 +207,7 @@ class DateTypeTest extends LocalizedTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -223,7 +223,7 @@ class DateTypeTest extends LocalizedTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -239,7 +239,7 @@ class DateTypeTest extends LocalizedTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -255,7 +255,7 @@ class DateTypeTest extends LocalizedTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
@@ -275,7 +275,7 @@ class DateTypeTest extends LocalizedTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -291,7 +291,7 @@ class DateTypeTest extends LocalizedTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -307,7 +307,7 @@ class DateTypeTest extends LocalizedTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -323,7 +323,7 @@ class DateTypeTest extends LocalizedTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
@@ -345,7 +345,7 @@ class DateTypeTest extends LocalizedTestCase
 
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -361,7 +361,7 @@ class DateTypeTest extends LocalizedTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
@@ -376,7 +376,7 @@ class DateTypeTest extends LocalizedTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
@@ -395,7 +395,7 @@ class DateTypeTest extends LocalizedTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
@@ -414,7 +414,7 @@ class DateTypeTest extends LocalizedTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'choice',
@@ -439,7 +439,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testDontPassDatePatternIfText()
     {
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'widget' => 'text',
         ));
         $view = $form->createView();
@@ -449,7 +449,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testPassWidgetToView()
     {
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'widget' => 'text',
         ));
         $view = $form->createView();

@@ -14,13 +14,10 @@ namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
-use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class TypeTestCase extends \PHPUnit_Framework_TestCase
 {
-    protected $csrfProvider;
-
     protected $validator;
 
     protected $storage;
@@ -35,7 +32,6 @@ abstract class TypeTestCase extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->csrfProvider = $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface');
         $this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->storage = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\TemporaryStorage')
@@ -49,7 +45,6 @@ abstract class TypeTestCase extends \PHPUnit_Framework_TestCase
     {
         return array(
             new CoreExtension($this->validator, $this->storage),
-            new CsrfExtension($this->csrfProvider),
         );
     }
 

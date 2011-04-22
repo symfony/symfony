@@ -53,6 +53,10 @@ class TestType implements FormTypeInterface
     function getDefaultOptions(array $options) {}
 
     function getParent(array $options) {}
+
+    function setExtensions(array $extensions) {}
+
+    function getExtensions() {}
 }
 
 class TestExtension extends AbstractExtension

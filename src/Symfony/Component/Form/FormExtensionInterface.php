@@ -17,5 +17,9 @@ interface FormExtensionInterface
 
     function hasType($name);
 
+    function getTypeExtensions($name);
+
+    function hasTypeExtensions($name);
+
     function getTypeGuesser();
 }

@@ -65,4 +65,9 @@ class TestCacheWarmer extends CacheWarmer
     {
         return false;
     }
+    
+    public function getName()
+    {
+        return 'warmer';
+    }
 }

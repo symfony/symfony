@@ -33,4 +33,34 @@ class AssetManagerCacheWarmer extends CacheWarmer
     {
         return true;
     }
+    
+    /**
+     * Returns the warmer name.
+     * 
+     * @return string The warmer name
+     */
+    public function getName() 
+    {
+        return 'assetic.asset-manager';
+    }
+    
+    /**
+     * Returns the list or warmers that should be executed before this one.
+     * 
+     * @return array List of warmers to run before this one
+     */    
+    public function getPreWarmers() 
+    {
+        return array('framework.template-paths');
+    }    
+
+    /**
+     * Returns the list or warmers that should be executed after this one.
+     * 
+     * @return array List of warmers to run after this one
+     */    
+    public function getPostWarmers()
+    {
+        return array('framework.router');
+    }
 }

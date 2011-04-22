@@ -104,4 +104,24 @@ class TemplateCacheCacheWarmer extends CacheWarmer
 
         return $templates;
     }
+    
+    /**
+     * Returns the warmer name.
+     * 
+     * @return string The warmer name
+     */
+    public function getName() 
+    {
+        return 'twig.template-cache';
+    }
+    
+    /**
+     * Returns the list or warmers that should be executed before this one.
+     * 
+     * @return array List of warmers to run before this one
+     */    
+    public function getPreWarmers() 
+    {
+        return array('framework.template-paths');
+    }    
 }

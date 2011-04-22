@@ -28,4 +28,24 @@ abstract class CacheWarmer implements CacheWarmerInterface
 
         throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file));
     }
+    
+    /**
+     * Returns the list or warmers that should be executed before this one.
+     * 
+     * @return array List of warmers to run before this one
+     */
+    public function getPreWarmers() 
+    {
+        return array();
+    }
+    
+    /**
+     * Returns the list or warmers that should be executed after this one.
+     * 
+     * @return array List of warmers to run after this one
+     */    
+    public function getPostWarmers() 
+    {
+        return array();
+    }    
 }

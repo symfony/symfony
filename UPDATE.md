@@ -9,6 +9,12 @@ timeline closely anyway.
 PR12 to beta1
 -------------
 
+* The cache warmer warm-up order is no more dictated by an absolute priority.
+  A dependency resolution algorithm is used to warm-up the warmers in the correct
+  order. The getName(), getPreWarmers() and getPostWarmers() methods have been
+  added to the CacheWarmerInterface and must be implemented in each warmer.
+  The CacheWarmerAggregate class has been renamed to CacheWarmerManager.  
+
 * The `trans` tag does not accept a message as an argument anymore:
 
     {% trans "foo" %}

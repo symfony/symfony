@@ -100,4 +100,14 @@ class TemplatePathsCacheWarmer extends CacheWarmer
 
         return $templates;
     }
+    
+    /**
+     * Returns the warmer name.
+     * 
+     * @return string The warmer name
+     */
+    public function getName() 
+    {
+        return 'framework.template-paths';
+    }           
 }

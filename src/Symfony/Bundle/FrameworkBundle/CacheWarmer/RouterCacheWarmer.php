@@ -54,4 +54,14 @@ class RouterCacheWarmer extends CacheWarmer
     {
         return false;
     }
+    
+    /**
+     * Returns the warmer name.
+     * 
+     * @return string The warmer name
+     */
+    public function getName() 
+    {
+        return 'framework.router';
+    }           
 }

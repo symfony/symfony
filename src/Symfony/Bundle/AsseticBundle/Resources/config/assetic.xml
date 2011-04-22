@@ -41,7 +41,7 @@
         </service>
 
         <service id="assetic.asset_manager_cache_warmer" class="%assetic.asset_manager_cache_warmer.class%" public="false">
-            <tag name="kernel.cache_warmer" priority="10" />
+            <tag name="kernel.cache_warmer" />
             <argument type="service" id="service_container" />
         </service>
     </services>

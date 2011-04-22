@@ -372,7 +372,7 @@ class FrameworkExtension extends Extension
         if ($config['cache_warmer']) {
             $container
                 ->getDefinition('templating.cache_warmer.template_paths')
-                ->addTag('kernel.cache_warmer', array('priority' => 20))
+                ->addTag('kernel.cache_warmer')
             ;
             $container->setAlias('templating.locator', 'templating.locator.cached');
         } else {

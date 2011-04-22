@@ -33,18 +33,13 @@ class AddCacheWarmerPass implements CompilerPassInterface
 
         $warmers = array();
         foreach ($container->findTaggedServiceIds('kernel.cache_warmer') as $id => $attributes) {
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $warmers[$priority][] = new Reference($id);
+            $warmers[] = new Reference($id);
         }
-
-        // sort by priority and flatten
-        krsort($warmers);
-        $warmers = call_user_func_array('array_merge', $warmers);
 
         $container->getDefinition('cache_warmer')->replaceArgument(0, $warmers);
 
         if ('full' === $container->getParameter('kernel.cache_warmup')) {
-            $container->getDefinition('cache_warmer')->addMethodCall('enableOptionalWarmers', array());
+            $container->getDefinition('cache_warmer')->addMethodCall('enableOptionalWarmers');
         }
     }
 }

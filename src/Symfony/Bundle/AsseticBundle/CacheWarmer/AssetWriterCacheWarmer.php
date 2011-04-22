@@ -36,4 +36,14 @@ class AssetWriterCacheWarmer extends CacheWarmer
     {
         return true;
     }
+    
+    /**
+     * Returns the warmer name.
+     * 
+     * @return string The warmer name
+     */
+    public function getName() 
+    {
+        return 'assetic.asset-writer';
+    }    
 }

@@ -72,4 +72,34 @@ class ProxyCacheWarmer implements CacheWarmerInterface
             $em->getProxyFactory()->generateProxyClasses($classes);
         }
     }
+    
+    /**
+     * Returns the warmer name.
+     * 
+     * @return string The warmer name
+     */
+    public function getName() 
+    {
+        return 'doctrine.proxy';
+    }
+    
+    /**
+     * Returns the list or warmers that should be executed before this one.
+     * 
+     * @return array List of warmers to run before this one
+     */    
+    public function getPreWarmers() 
+    {
+        return array();
+    }    
+
+    /**
+     * Returns the list or warmers that should be executed after this one.
+     * 
+     * @return array List of warmers to run after this one
+     */    
+    public function getPostWarmers()
+    {
+        return array();
+    }        
 }

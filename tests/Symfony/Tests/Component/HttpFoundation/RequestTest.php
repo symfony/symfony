@@ -81,6 +81,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(90, $request->getPort());
         $this->assertTrue($request->isSecure());
 
+        $request = Request::create('https://127.0.0.1:90/foo');
+        $this->assertEquals('https://127.0.0.1:90/foo', $request->getUri());
+        $this->assertEquals('/foo', $request->getPathInfo());
+        $this->assertEquals('127.0.0.1', $request->getHost());
+        $this->assertEquals('127.0.0.1:90', $request->getHttpHost());
+        $this->assertEquals(90, $request->getPort());
+        $this->assertTrue($request->isSecure());
+
         $json = '{"jsonrpc":"2.0","method":"echo","id":7,"params":["Hello World"]}';
         $request = Request::create('http://example.com/jsonrpc', 'POST', array(), array(), array(), array(), $json);
         $this->assertEquals($json, $request->getContent());

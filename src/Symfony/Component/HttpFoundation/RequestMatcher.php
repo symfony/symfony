@@ -157,7 +157,7 @@ class RequestMatcher implements RequestMatcherInterface
         $bytes_addr = unpack("n*", inet_pton($address));
         $bytes_test = unpack("n*", inet_pton($ip));
 
-        for ($i = 1; $i <= ceil($netmask / 16); $i++) {
+        for ($i = 1, $ceil = ceil($netmask / 16); $i <= $ceil; $i++) {
             $left = $netmask - 16 * ($i-1);
             $left = ($left <= 16) ?: 16;
             $mask = ~(0xffff >> $left) & 0xffff;

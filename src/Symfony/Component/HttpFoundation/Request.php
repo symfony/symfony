@@ -126,7 +126,7 @@ class Request
      *
      * @return Request A new request
      */
-    static public function createfromGlobals()
+    static public function createFromGlobals()
     {
         return new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
     }
@@ -311,7 +311,8 @@ class Request
 
     public function hasSession()
     {
-        return $this->cookies->has(session_name());
+        // the check for $this->session avoids malicious users trying to fake a session cookie with proper name
+        return $this->cookies->has(session_name()) && null !== $this->session;
     }
 
     public function setSession(Session $session)
@@ -408,7 +409,7 @@ class Request
 
     public function getScheme()
     {
-        return ($this->server->get('HTTPS') == 'on') ? 'https' : 'http';
+        return $this->isSecure() ? 'https' : 'http';
     }
 
     public function getPort()

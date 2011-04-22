@@ -66,9 +66,9 @@ class CachedTemplateLocator extends TemplateLocator
 
     /**
      * Returns the template path from the cache
-     * 
+     *
      * @param TemplateReferenceInterface $template The template
-     * 
+     *
      * @return string|null The path when it is present in the cache, false otherwise
      */
     protected function getCachedTemplatePath(TemplateReferenceInterface $template)

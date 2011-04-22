@@ -20,6 +20,6 @@ class NodeBuilder extends BaseNodeBuilder
                 return __NAMESPACE__.'\\'.ucfirst($type).'NodeDefinition';
             default:
                 return parent::getNodeClass($type);
-        }        
+        }
     }
 }

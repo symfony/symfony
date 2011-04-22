@@ -53,7 +53,7 @@ class TranslationExtension extends \Twig_Extension
     public function getTokenParsers()
     {
         return array(
-            // {% trans "Symfony is great!" %}
+            // {% trans %}Symfony is great!{% endtrans %}
             new TransTokenParser(),
 
             // {% transchoice count %}
@@ -70,7 +70,7 @@ class TranslationExtension extends \Twig_Extension
 
     public function transchoice($message, $count, array $arguments = array(), $domain = "messages")
     {
-        return $this->translator->transChoice($message, $count, $arguments, $domain);
+        return $this->translator->transChoice($message, $count, array_merge(array('%count%' => $count), $arguments), $domain);
     }
 
     /**

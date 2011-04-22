@@ -30,15 +30,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     const ALL   = 'all';
     const ANY   = 'any';
 
-    private static $noAceException;
     private $auditLogger;
-
-    public function __construct()
-    {
-        if (null === static::$noAceException) {
-            static::$noAceException = new NoAceFoundException('No ACE.');
-        }
-    }
 
     /**
      * Sets the audit logger
@@ -61,7 +53,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                 $aces = $acl->getObjectAces();
 
                 if (!$aces) {
-                    throw static::$noAceException;
+                    throw new NoAceFoundException();
                 }
 
                 return $this->hasSufficientPermissions($acl, $aces, $masks, $sids, $administrativeMode);
@@ -69,7 +61,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                 $aces = $acl->getClassAces();
 
                 if (!$aces) {
-                    throw static::$noAceException;
+                    throw $noObjectAce;
                 }
 
                 return $this->hasSufficientPermissions($acl, $aces, $masks, $sids, $administrativeMode);
@@ -79,7 +71,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                 return $parentAcl->isGranted($masks, $sids, $administrativeMode);
             }
 
-            throw new NoAceFoundException('No applicable ACE was found.');
+            throw $noClassAce;
         }
     }
 
@@ -92,14 +84,14 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
             try {
                 $aces = $acl->getObjectFieldAces($field);
                 if (!$aces) {
-                    throw static::$noAceException;
+                    throw new NoAceFoundException();
                 }
 
                 return $this->hasSufficientPermissions($acl, $aces, $masks, $sids, $administrativeMode);
             } catch (NoAceFoundException $noObjectAces) {
                 $aces = $acl->getClassFieldAces($field);
                 if (!$aces) {
-                    throw static::$noAceException;
+                    throw $noObjectAces;
                 }
 
                 return $this->hasSufficientPermissions($acl, $aces, $masks, $sids, $administrativeMode);
@@ -109,7 +101,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                 return $parentAcl->isFieldGranted($field, $masks, $sids, $administrativeMode);
             }
 
-            throw new NoAceFoundException('No applicable ACE was found.');
+            throw $noClassAces;
         }
     }
 
@@ -177,7 +169,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
             return false;
         }
 
-        throw static::$noAceException;
+        throw new NoAceFoundException();
     }
 
     /**

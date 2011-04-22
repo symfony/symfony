@@ -41,17 +41,17 @@ class PhpMatcherDumper extends MatcherDumper
 
         // trailing slash support is only enabled if we know how to redirect the user
         $interfaces = class_implements($options['base_class']);
-        $supportsTrailingSlash = isset($interfaces['Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface']);
+        $supportsRedirections = isset($interfaces['Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface']);
 
         return
             $this->startClass($options['class'], $options['base_class']).
             $this->addConstructor().
-            $this->addMatcher($supportsTrailingSlash).
+            $this->addMatcher($supportsRedirections).
             $this->endClass()
         ;
     }
 
-    private function addMatcher($supportsTrailingSlash)
+    private function addMatcher($supportsRedirections)
     {
         $code = array();
 
@@ -61,7 +61,7 @@ class PhpMatcherDumper extends MatcherDumper
             $hasTrailingSlash = false;
             $matches = false;
             if (!count($compiledRoute->getVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#', $compiledRoute->getRegex(), $m)) {
-                if ($supportsTrailingSlash && substr($m['url'], -1) === '/') {
+                if ($supportsRedirections && substr($m['url'], -1) === '/') {
                     $conditions[] = sprintf("rtrim(\$pathinfo, '/') === '%s'", rtrim(str_replace('\\', '', $m['url']), '/'));
                     $hasTrailingSlash = true;
                 } else {
@@ -73,7 +73,7 @@ class PhpMatcherDumper extends MatcherDumper
                 }
 
                 $regex = $compiledRoute->getRegex();
-                if ($supportsTrailingSlash && $pos = strpos($regex, '/$')) {
+                if ($supportsRedirections && $pos = strpos($regex, '/$')) {
                     $regex = substr($regex, 0, $pos).'/?$'.substr($regex, $pos + 2);
                     $hasTrailingSlash = true;
                 }
@@ -92,19 +92,42 @@ class PhpMatcherDumper extends MatcherDumper
 EOF;
 
             if ($req = $route->getRequirement('_method')) {
-                $req = implode('\', \'', array_map('strtolower', explode('|', $req)));
-                $code[] = <<<EOF
-            if (isset(\$this->context['method']) && !in_array(strtolower(\$this->context['method']), array('$req'))) {
-                \$allow = array_merge(\$allow, array('$req'));
+                $methods = array_map('strtolower', explode('|', $req));
+                if (1 === count($methods)) {
+                    $code[] = <<<EOF
+            if (\$this->context->getMethod() != '$methods[0]') {
+                \$allow[] = '$methods[0]';
                 goto $gotoname;
             }
 EOF;
+                } else {
+                    $methods = implode('\', \'', $methods);
+                    $code[] = <<<EOF
+            if (!in_array(\$this->context->getMethod(), array('$methods'))) {
+                \$allow = array_merge(\$allow, array('$methods'));
+                goto $gotoname;
+            }
+EOF;
+                }
             }
 
             if ($hasTrailingSlash) {
                 $code[] = sprintf(<<<EOF
             if (substr(\$pathinfo, -1) !== '/') {
                 return \$this->redirect(\$pathinfo.'/', '%s');
+            }
+EOF
+                , $name);
+            }
+
+            if ($scheme = $route->getRequirement('_scheme')) {
+                if (!$supportsRedirections) {
+                    throw new \LogicException('The "_scheme" requirement is only supported for route dumper that implements RedirectableUrlMatcherInterface.');
+                }
+
+                $code[] = sprintf(<<<EOF
+            if (\$this->context->getScheme() !== '$scheme') {
+                return \$this->redirect(\$pathinfo, '%s', '$scheme');
             }
 EOF
                 , $name);
@@ -152,6 +175,7 @@ EOF;
 
 use Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Matcher\Exception\NotFoundException;
+use Symfony\Component\Routing\RequestContext;
 
 /**
  * $class
@@ -171,10 +195,9 @@ EOF;
     /**
      * Constructor.
      */
-    public function __construct(array \$context = array(), array \$defaults = array())
+    public function __construct(RequestContext \$context)
     {
         \$this->context = \$context;
-        \$this->defaults = \$defaults;
     }
 
 EOF;

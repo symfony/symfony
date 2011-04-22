@@ -48,8 +48,8 @@ class WebProfilerExtension extends Extension
             $loader->load('toolbar.xml');
 
             $container->getDefinition('web_profiler.debug.toolbar')
-                ->setArgument(1, $config['intercept_redirects'])
-                ->setArgument(2, $config['verbose'])
+                ->replaceArgument(1, $config['intercept_redirects'])
+                ->replaceArgument(2, $config['verbose'])
             ;
         }
     }

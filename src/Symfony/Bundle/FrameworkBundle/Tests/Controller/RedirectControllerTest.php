@@ -17,8 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\RedirectController;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
-use Symfony\Bundle\FrameworkBundle\Tests\Logger;
-use Symfony\Bundle\FrameworkBundle\Tests\Kernel;
 
 /**
  * @author Marcin Sikon<marcin.sikon@gmail.com>

@@ -77,7 +77,7 @@ EOT
         $em = $this->getEntityManager($this->container, $input->getOption('em'));
         $databaseDriver = new DatabaseDriver($em->getConnection()->getSchemaManager());
         $em->getConfiguration()->setMetadataDriverImpl($databaseDriver);
-        
+
         $emName = $input->getOption('em');
         $emName = $emName ? $emName : 'default';
 

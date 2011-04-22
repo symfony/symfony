@@ -31,6 +31,8 @@
             <tag name="monolog.logger" channel="request" />
             <argument type="service" id="service_container" />
             <argument type="service" id="router" />
+            <argument /> <!-- HTTP port -->
+            <argument /> <!-- HTTPS port -->
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 

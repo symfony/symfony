@@ -57,6 +57,8 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
             array('http://www.symfony.com/'),
             array('http://127.0.0.1/'),
             array('http://127.0.0.1:80/'),
+            array('http://[::1]/'),
+            array('http://[::1]:80/'),
         );
     }
 

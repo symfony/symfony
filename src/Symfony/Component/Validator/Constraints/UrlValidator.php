@@ -20,9 +20,13 @@ class UrlValidator extends ConstraintValidator
     const PATTERN = '~^
             (%s)://                                 # protocol
             (
-                ([a-z0-9-]+\.)+[a-z]{2,6}             # a domain name
-                    |                                   #  or
-                \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}    # a IP address
+                ([a-z0-9-]+\.)+[a-z]{2,6}               # a domain name
+                    |                                     #  or
+                \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}      # a IP address
+                    |                                     #  or
+                \[
+                    [0-9a-fA-F]{0,4}(:[0-9a-fA-F]{0,4}){1,5}((:[0-9a-fA-F]{0,4}){1,2}|:([\d\.]+))
+                \]  # a IPv6 address
             )
             (:[0-9]+)?                              # a port (optional)
             (/?|/\S+)                               # a /, nothing or a / with something

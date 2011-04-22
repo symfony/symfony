@@ -18,17 +18,9 @@ class TimezoneType extends AbstractType
 {
     public function getDefaultOptions(array $options)
     {
-        $defaultOptions = array(
-            'preferred_choices' => array(),
+        return array(
+            'choice_list' => new TimezoneChoiceList(),
         );
-
-        $options = array_replace($defaultOptions, $options);
-
-        if (!isset($options['choice_list'])) {
-            $defaultOptions['choice_list'] = new TimezoneChoiceList();
-        }
-
-        return $defaultOptions;
     }
 
     public function getParent(array $options)

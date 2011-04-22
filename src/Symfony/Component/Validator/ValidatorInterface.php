@@ -58,4 +58,11 @@ interface ValidatorInterface
      * @return ConstraintViolationList
      */
     function validateValue($value, Constraint $constraint, $groups = null);
+
+    /**
+     * Returns the factory for ClassMetadata instances
+     *
+     * @return Mapping\ClassMetadataFactoryInterface
+     */
+    function getMetadataFactory();
 }

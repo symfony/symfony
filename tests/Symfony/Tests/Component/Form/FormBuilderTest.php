@@ -13,9 +13,9 @@ namespace Symfony\Tests\Component\Form;
 
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\Type\Guesser\Guess;
-use Symfony\Component\Form\Type\Guesser\ValueGuess;
-use Symfony\Component\Form\Type\Guesser\TypeGuess;
+use Symfony\Component\Form\Guess\Guess;
+use Symfony\Component\Form\Guess\ValueGuess;
+use Symfony\Component\Form\Guess\TypeGuess;
 
 class FormBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -78,7 +78,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
     public function testAddFormType()
     {
         $this->assertFalse($this->builder->has('foo'));
-        $this->builder->add('foo', $this->getMock('Symfony\Component\Form\Type\FormTypeInterface'));
+        $this->builder->add('foo', $this->getMock('Symfony\Component\Form\FormTypeInterface'));
         $this->assertTrue($this->builder->has('foo'));
     }
 

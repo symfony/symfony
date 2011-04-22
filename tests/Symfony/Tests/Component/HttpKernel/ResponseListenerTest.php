@@ -62,7 +62,7 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FilterResponseEvent($this->kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $response);
         $this->dispatcher->dispatch(Events::onCoreResponse, $event);
 
-        $this->assertEquals('', $event->getResponse()->headers->get('content-type'));
+        $this->assertEquals('text/html', $event->getResponse()->headers->get('content-type'));
     }
 
     public function testFilterSetContentType()

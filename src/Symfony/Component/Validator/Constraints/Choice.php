@@ -18,9 +18,10 @@ class Choice extends \Symfony\Component\Validator\Constraint
     public $multiple = false;
     public $min = null;
     public $max = null;
-    public $message = 'This value should be one of the given choices';
-    public $minMessage = 'You should select at least {{ limit }} choices';
-    public $maxMessage = 'You should select at most {{ limit }} choices';
+    public $message = 'The value you selected is not a valid choice';
+    public $multipleMessage = 'One or more of the given values is invalid';
+    public $minMessage = 'You must select at least {{ limit }} choices';
+    public $maxMessage = 'You must select at most {{ limit }} choices';
 
     /**
      * {@inheritDoc}

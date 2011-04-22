@@ -63,4 +63,11 @@ interface TemplateReferenceInterface
      * @return string A path to the template or a resource
      */
     function getPath();
+
+    /**
+     * Returns the template name
+     *
+     * @return string The template name
+     */
+    function getLogicalName();
 }

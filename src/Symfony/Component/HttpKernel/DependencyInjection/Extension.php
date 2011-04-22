@@ -82,7 +82,7 @@ abstract class Extension implements ExtensionInterface
      */
     public function getNamespace()
     {
-        return false;
+        return 'http://example.org/schema/dic/'.$this->getAlias();
     }
 
     /**

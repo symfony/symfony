@@ -2,7 +2,7 @@
 
 /*
  * This file is part of the Symfony package.
- * 
+ *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
@@ -48,7 +48,7 @@ class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
         if (!self::isSupported()) {
             return null;
         }
-        
+
         ob_start();
 
         // need to use --mime instead of -i. see #6641

@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Bundle\FrameworkBundle\Tests\Kernel;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 
@@ -22,9 +21,18 @@ class TemplateNameParserTest extends TestCase
 
     protected function  setUp()
     {
-        $kernel = new Kernel();
-        $kernel->boot();
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
+        $kernel
+            ->expects($this->any())
+            ->method('getBundle')
+            ->will($this->returnCallback(function ($bundle) {
+                if (in_array($bundle, array('SensioFooBundle', 'SensioCmsFooBundle', 'FooBundle'))) {
+                    return true;
+                }
 
+                throw new \InvalidArgumentException();
+            }))
+        ;
         $this->parser = new TemplateNameParser($kernel);
     }
 
@@ -41,16 +49,18 @@ class TemplateNameParserTest extends TestCase
         $template = $this->parser->parse($name);
 
         $this->assertEquals($template->getSignature(), $ref->getSignature());
+        $this->assertEquals($template->getLogicalName(), $ref->getLogicalName());
+        $this->assertEquals($template->getLogicalName(), $name);
     }
 
     public function getLogicalNameToTemplateProvider()
     {
         return array(
-            array('Foo:Post:index.html.php', new TemplateReference('Foo', 'Post', 'index', 'html', 'php')),
-            array('Foo:Post:index.html.twig', new TemplateReference('Foo', 'Post', 'index', 'html', 'twig')),
-            array('Foo:Post:index.xml.php', new TemplateReference('Foo', 'Post', 'index', 'xml', 'php')),
-            array('SensioFoo:Post:index.html.php', new TemplateReference('SensioFoo', 'Post', 'index', 'html', 'php')),
-            array('SensioCmsFoo:Post:index.html.php', new TemplateReference('SensioCmsFoo', 'Post', 'index', 'html', 'php')),
+            array('FooBundle:Post:index.html.php', new TemplateReference('FooBundle', 'Post', 'index', 'html', 'php')),
+            array('FooBundle:Post:index.html.twig', new TemplateReference('FooBundle', 'Post', 'index', 'html', 'twig')),
+            array('FooBundle:Post:index.xml.php', new TemplateReference('FooBundle', 'Post', 'index', 'xml', 'php')),
+            array('SensioFooBundle:Post:index.html.php', new TemplateReference('SensioFooBundle', 'Post', 'index', 'html', 'php')),
+            array('SensioCmsFooBundle:Post:index.html.php', new TemplateReference('SensioCmsFooBundle', 'Post', 'index', 'html', 'php')),
             array(':Post:index.html.php', new TemplateReference('', 'Post', 'index', 'html', 'php')),
             array('::index.html.php', new TemplateReference('', '', 'index', 'html', 'php')),
         );
@@ -68,11 +78,11 @@ class TemplateNameParserTest extends TestCase
     public function getInvalidLogicalNameProvider()
     {
         return array(
-            array('Bar:Post:index.html.php'),
-            array('Foo:Post:index'),
+            array('BarBundle:Post:index.html.php'),
+            array('FooBundle:Post:index'),
             array('FooBundle:Post'),
-            array('Foo:Post:foo:bar'),
-            array('Foo:Post:index.foo.bar.foobar'),
+            array('FooBundle:Post:foo:bar'),
+            array('FooBundle:Post:index.foo.bar.foobar'),
         );
     }
 
@@ -82,7 +92,7 @@ class TemplateNameParserTest extends TestCase
     public function testParseFromFilename($file, $ref)
     {
         $template = $this->parser->parseFromFilename($file);
-        
+
         if ($ref === false) {
             $this->assertFalse($template);
         } else {

@@ -55,25 +55,51 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function getPhpUnitXmlDir()
     {
-        $dir = getcwd();
+        $dir = null;
         if (!isset($_SERVER['argv']) || false === strpos($_SERVER['argv'][0], 'phpunit')) {
             throw new \RuntimeException('You must override the WebTestCase::createKernel() method.');
         }
 
-        // find the --configuration flag from PHPUnit
-        $cli = implode(' ', $_SERVER['argv']);
-        if (preg_match('/\-\-configuration[= ]+([^ ]+)/', $cli, $matches)) {
-            $dir = realpath($matches[1]);
-        } elseif (preg_match('/\-c +([^ ]+)/', $cli, $matches)) {
-            $dir = realpath($matches[1]);
-        } elseif (file_exists(getcwd().'/phpunit.xml') || file_exists(getcwd().'/phpunit.xml.dist')) {
+        $dir = $this->getPhpUnitCliConfigArgument();
+        if ($dir === null &&
+            (file_exists(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml') ||
+            file_exists(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml.dist'))) {
             $dir = getcwd();
-        } else {
+        }
+
+        // Can't continue
+        if ($dir === null) {
             throw new \RuntimeException('Unable to guess the Kernel directory.');
         }
 
         if (!is_dir($dir)) {
             $dir = dirname($dir);
+        }
+
+        return $dir;
+    }
+
+    /**
+     * Finds the value of configuration flag from cli
+     *
+     * PHPUnit will use the last configuration argument on the command line, so this only returns
+     * the last configuration argument
+     *
+     * @return string The value of the phpunit cli configuration option
+     */
+    private function getPhpUnitCliConfigArgument()
+    {
+        $dir = null;
+        $reversedArgs = array_reverse($_SERVER['argv']);
+        foreach ($reversedArgs as $argIndex=>$testArg) {
+            if ($testArg === '-c' || $testArg === '--configuration') {
+                $dir = realpath($reversedArgs[$argIndex - 1]);
+                break;
+            } elseif (strpos($testArg, '--configuration=') === 0) {
+                $argPath = substr($testArg, strlen('--configuration='));
+                $dir = realpath($argPath);
+                break;
+            }
         }
 
         return $dir;

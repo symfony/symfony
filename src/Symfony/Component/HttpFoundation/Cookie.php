@@ -26,7 +26,7 @@ class Cookie
     protected $secure;
     protected $httpOnly;
 
-    public function __construct($name, $value = null, $expire = 0, $path = '/', $domain = null, $secure = false, $httpOnly = true)
+    public function __construct($name, $value = null, $expire = 0, $path = '/', $domain = null, $secure = false, $httpOnly = false)
     {
         // from PHP source code
         if (preg_match("/[=,; \t\r\n\013\014]/", $name)) {
@@ -41,9 +41,15 @@ class Cookie
             throw new \InvalidArgumentException('The cookie name cannot be empty');
         }
 
-        // check if the expiration is valid
-        if (!$expire instanceof \DateTime && !is_numeric($expire) && (strtotime($expire) === false || strtotime($expire) === -1)) {
-            throw new \InvalidArgumentException('The cookie expiration is not valid');
+        // convert expiration time to a Unix timestamp
+        if ($expire instanceof \DateTime) {
+            $expire = $expire->format('U');
+        } elseif (!is_numeric($expire)) {
+            $expire = strtotime($expire);
+
+            if (false === $expire || -1 === $expire) {
+                throw new \InvalidArgumentException('The cookie expiration time is not valid.');
+            }
         }
 
         $this->name = $name;
@@ -70,7 +76,7 @@ class Cookie
         return $this->domain;
     }
 
-    public function getExpire()
+    public function getExpiresTime()
     {
         return $this->expire;
     }

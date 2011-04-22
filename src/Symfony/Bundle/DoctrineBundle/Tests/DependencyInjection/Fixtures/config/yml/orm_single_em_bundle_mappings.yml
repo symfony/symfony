@@ -4,8 +4,8 @@ doctrine:
         entity_managers:
             default:
                 mappings:
-                    Annotations: ~
-                    Yaml:
+                    AnnotationsBundle: ~
+                    YamlBundle:
                         dir: Resources/config/doctrine/metadata
                         alias: yml
                     manual:

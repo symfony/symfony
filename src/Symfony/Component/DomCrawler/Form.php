@@ -190,8 +190,12 @@ class Form implements \ArrayAccess
         $uri = $this->node->getAttribute('action');
         $urlHaveScheme = 'http' === substr($uri, 0, 4);
 
-        if (!$uri || '#' === $uri) {
+        if (!$uri) {
             $uri = $this->path;
+        }
+
+        if ('#' === $uri[0]) {
+            $uri = $this->path.$uri;
         }
 
         if (!in_array($this->getMethod(), array('post', 'put', 'delete')) && $queryString = http_build_query($this->getValues(), null, '&')) {

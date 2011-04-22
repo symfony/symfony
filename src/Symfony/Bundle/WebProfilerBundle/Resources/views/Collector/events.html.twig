@@ -1,4 +1,6 @@
-{% extends 'WebProfiler:Profiler:layout.html.twig' %}
+{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+
+{% from _self import display_listener %}
 
 {% block menu %}
 <span class="label">
@@ -12,13 +14,13 @@
 
     <table>
         <tr>
-            <th>Class</th>
-            <th>Event</th>
+            <th>Event name</th>
+            <th>Listener</th>
         </tr>
-        {% for elements in collector.calledlisteners %}
+        {% for listener in collector.calledlisteners %}
             <tr>
-                <td><code>{{ elements.class|abbr_class }}</code></td>
-                <td><code>{{ elements.event }}</code></td>
+                <td><code>{{ listener.event }}</code></td>
+                <td><code>{{ display_listener(listener) }}</code></td>
             </tr>
         {% endfor %}
     </table>
@@ -28,15 +30,24 @@
 
         <table>
             <tr>
-                <th>Event</th>
+                <th>Event name</th>
                 <th>Listener</th>
             </tr>
-            {% for elements in collector.notcalledlisteners %}
+            {% for listener in collector.notcalledlisteners %}
                 <tr>
-                    <td><code>{{ elements.class|abbr_class }}</code></td>
-                    <td><code>{{ elements.event }}</code></td>
+                    <td><code>{{ listener.event }}</code></td>
+                    <td><code>{{ display_listener(listener) }}</code></td>
                 </tr>
             {% endfor %}
         </table>
     {% endif %}
 {% endblock %}
+
+{% macro display_listener(listener) %}
+    {% if listener.type == "Closure" %}
+        Closure
+    {% else %}
+        {% set link = listener.file|file_link(listener.line) %}
+        {{ listener.class|abbr_class }}::{% if link %}<a href="{{ link }}">{{ listener.event }}</a>{% else %}{{ listener.event }}{% endif %}
+    {% endif %}
+{% endmacro %}

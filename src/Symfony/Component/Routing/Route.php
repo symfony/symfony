@@ -160,6 +160,18 @@ class Route
     }
 
     /**
+     * Checks if a default value is set for the given variable.
+     *
+     * @param string $name A variable name
+     *
+     * @return Boolean true if the default value is set, false otherwise
+     */
+    public function hasDefault($name)
+    {
+        return array_key_exists($name, $this->defaults);
+    }
+
+    /**
      * Sets a default value.
      *
      * @param string $name    A variable name

@@ -12,13 +12,13 @@
 namespace Symfony\Bridge\Twig\Node;
 
 /**
- * 
+ *
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class TransNode extends \Twig_Node
 {
-    public function __construct(\Twig_NodeInterface $body, \Twig_NodeInterface $domain, \Twig_Node_Expression $count = null, \Twig_Node_Expression $vars = null, $lineno, $tag = null)
+    public function __construct(\Twig_NodeInterface $body, \Twig_NodeInterface $domain, \Twig_Node_Expression $count = null, \Twig_Node_Expression $vars = null, $lineno = 0, $tag = null)
     {
         parent::__construct(array('count' => $count, 'body' => $body, 'domain' => $domain, 'vars' => $vars), array(), $lineno, $tag);
     }
@@ -38,7 +38,6 @@ class TransNode extends \Twig_Node
             $defaults = $this->getNode('vars');
             $vars = null;
         }
-
         list($msg, $defaults) = $this->compileString($this->getNode('body'), $defaults);
 
         $method = null === $this->getNode('count') ? 'trans' : 'transChoice';

@@ -33,7 +33,7 @@ $container->loadFromExtension('security', array(
             ),
         ),
         'doctrine' => array(
-            'entity' => array('class' => 'Security:User', 'property' => 'username')
+            'entity' => array('class' => 'SecurityBundle:User', 'property' => 'username')
         ),
         'service' => array(
             'id' => 'user.manager',

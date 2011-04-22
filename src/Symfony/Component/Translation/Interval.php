@@ -57,7 +57,7 @@ class Interval
             $leftNumber = self::convertNumber($matches['left']);
             $rightNumber = self::convertNumber($matches['right']);
 
-            return 
+            return
                 ('[' === $matches['left_delimiter'] ? $number >= $leftNumber : $number > $leftNumber)
                 && (']' === $matches['right_delimiter'] ? $number <= $rightNumber : $number < $rightNumber)
             ;

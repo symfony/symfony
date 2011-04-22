@@ -31,18 +31,6 @@ class BundleTest extends \PHPUnit_Framework_TestCase
         $bundle2 = new ExtensionAbsentBundle();
 
         $this->assertNull($bundle2->registerCommands($app));
-    }
 
-    public function testGetName()
-    {
-        $bundle = new ExtensionPresentBundle();
-        $this->assertEquals('ExtensionPresent', $bundle->getName(), '->getName() rtrims "Bundle"');
-    }
-
-    public function testInvalidBundleName()
-    {
-        $this->setExpectedException('RuntimeException');
-        $bundle = $this->getMockForAbstractClass('Symfony\\Component\\HttpKernel\\Bundle\\Bundle');
-        $bundle->getName();
     }
 }

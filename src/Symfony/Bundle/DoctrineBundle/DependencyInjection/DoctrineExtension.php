@@ -31,9 +31,9 @@ class DoctrineExtension extends AbstractDoctrineExtension
 {
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration();
         $processor = new Processor();
-        $config = $processor->process($configuration->getConfigTree($container->getParameter('kernel.debug')), $configs);
+        $configuration = new Configuration($container->getParameter('kernel.debug'));
+        $config = $processor->processConfiguration($configuration, $configs);
 
         if (!empty($config['dbal'])) {
             $this->dbalLoad($config['dbal'], $container);
@@ -195,6 +195,10 @@ class DoctrineExtension extends AbstractDoctrineExtension
         );
         foreach ($uniqueMethods as $method => $arg) {
             $ormConfigDef->addMethodCall($method, array($arg));
+        }
+
+        foreach ($entityManager['hydrators'] as $name => $class) {
+            $ormConfigDef->addMethodCall('addCustomHydrationMode', array ($name, $class));
         }
 
         if (!empty($entityManager['dql'])) {

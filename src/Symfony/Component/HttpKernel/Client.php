@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\BrowserKit\Client as BaseClient;
 use Symfony\Component\BrowserKit\Request as DomRequest;
 use Symfony\Component\BrowserKit\Response as DomResponse;
+use Symfony\Component\BrowserKit\Cookie as DomCookie;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\CookieJar;
 
@@ -139,6 +140,15 @@ EOF;
      */
     protected function filterResponse($response)
     {
-        return new DomResponse($response->getContent(), $response->getStatusCode(), $response->headers->all());
+        $headers = $response->headers->all();
+        if ($response->headers->getCookies()) {
+            $cookies = array();
+            foreach ($response->headers->getCookies() as $cookie) {
+                $cookies[] = new DomCookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
+            }
+            $headers['Set-Cookie'] = implode(', ', $cookies);
+        }
+
+        return new DomResponse($response->getContent(), $response->getStatusCode(), $headers);
     }
 }

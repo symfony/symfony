@@ -91,6 +91,7 @@ class HttpCache implements HttpKernelInterface
             'stale_if_error'         => 60,
         ), $options);
         $this->esi = $esi;
+        $this->traces = array();
     }
 
     /**

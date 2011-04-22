@@ -66,6 +66,7 @@ EOT
         }
 
         // validate namespace
+        $namespace = strtr($namespace, '/', '\\');
         if (preg_match('/[^A-Za-z0-9_\\\-]/', $namespace)) {
             throw new \InvalidArgumentException('The namespace contains invalid characters.');
         }
@@ -96,8 +97,6 @@ EOT
 
         $targetDir = $dir.strtr($namespace, '\\', '/');
 
-
-
         if (file_exists($targetDir)) {
             throw new \RuntimeException(sprintf('Bundle "%s" already exists.', $bundle));
         }
@@ -107,9 +106,8 @@ EOT
         $filesystem->mirror(__DIR__.'/../Resources/skeleton/bundle/'.$input->getOption('format'), $targetDir);
 
         Mustache::renderDir($targetDir, array(
-            'namespace'   => $namespace,
-            'bundle'      => $bundle,
-            'bundleShort' => preg_replace('/Bundle$/', '', $bundle),
+            'namespace' => $namespace,
+            'bundle'    => $bundle,
         ));
 
         rename($targetDir.'/Bundle.php', $targetDir.'/'.$bundle.'.php');

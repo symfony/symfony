@@ -40,6 +40,6 @@ class AddSecurityVotersPass implements CompilerPassInterface
         $voters = iterator_to_array($voters);
         ksort($voters);
 
-        $container->getDefinition('security.access.decision_manager')->setArgument(0, array_values($voters));
+        $container->getDefinition('security.access.decision_manager')->replaceArgument(0, array_values($voters));
     }
 }

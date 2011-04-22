@@ -25,8 +25,6 @@ use Symfony\Component\Finder\Finder;
  */
 class TemplateCacheCacheWarmer extends CacheWarmer
 {
-    const TEMPLATES_PATH_IN_BUNDLE = '/Resources/views';
-
     protected $container;
     protected $parser;
     protected $kernel;
@@ -59,12 +57,12 @@ class TemplateCacheCacheWarmer extends CacheWarmer
         $twig = $this->container->get('twig');
 
         foreach ($this->kernel->getBundles() as $name => $bundle) {
-            foreach ($this->findTemplatesIn($bundle->getPath().self::TEMPLATES_PATH_IN_BUNDLE, $name) as $template) {
+            foreach ($this->findTemplatesIn($bundle->getPath().'/Resources/views', $name) as $template) {
                 $twig->loadTemplate($template);
             }
         }
 
-        foreach ($this->findTemplatesIn($this->rootDir) as $template) {
+        foreach ($this->findTemplatesIn($this->rootDir.'/views') as $template) {
             $twig->loadTemplate($template);
         }
     }
@@ -99,7 +97,7 @@ class TemplateCacheCacheWarmer extends CacheWarmer
                     if (null !== $bundle) {
                       $template->set('bundle', $bundle);
                     }
-                    $templates[] = $template;
+                    $templates[] = $template->getLogicalName();
                 }
             }
         }

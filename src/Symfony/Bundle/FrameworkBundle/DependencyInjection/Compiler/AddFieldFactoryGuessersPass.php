@@ -33,6 +33,6 @@ class AddFieldFactoryGuessersPass implements CompilerPassInterface
             return new Reference($id);
         }, array_keys($container->findTaggedServiceIds('form.field_factory.guesser')));
 
-        $container->getDefinition('form.field_factory')->setArgument(0, $guessers);
+        $container->getDefinition('form.field_factory')->replaceArgument(0, $guessers);
     }
 }

@@ -28,6 +28,7 @@ framework:
         cache_warmer:     true
         engines:          [php, twig]
         loader:           [loader.foo, loader.bar]
+        cache:            /path/to/cache
         packages:
             images:
                 version: 1.0.0
@@ -41,3 +42,4 @@ framework:
         fallback: fr
     validation:
         enabled: true
+        cache:   apc

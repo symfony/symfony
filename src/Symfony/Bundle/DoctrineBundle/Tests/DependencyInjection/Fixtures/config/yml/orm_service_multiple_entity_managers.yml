@@ -26,9 +26,9 @@ doctrine:
                 metadata_cache_driver: xcache
                 connection: conn1
                 mappings:
-                    Yaml: ~
+                    YamlBundle: ~
             em2:
                 metadata_cache_driver: apc
                 connection: conn2
                 mappings:
-                    Yaml: ~
+                    YamlBundle: ~

@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Configuration;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration;
 use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
@@ -41,11 +41,10 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'factory'   => array('foo' => 'bar'),
             'factories' => array('lorem' => 'ipsum'),
         ));
-        
-        $configuration = new Configuration();
+
         $processor = new Processor();
-        $tree = $configuration->getMainConfigTree(array());
-        $config = $processor->process($tree, array($config));
+        $configuration = new MainConfiguration(array());
+        $config = $processor->processConfiguration($configuration, array($config));
 
         $this->assertFalse(array_key_exists('factory', $config), 'The factory key is silently removed without an exception');
         $this->assertEquals(array(), $config['factories'], 'The factories key is just an empty array');

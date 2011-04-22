@@ -119,8 +119,8 @@
                 <target>Le fichier envoyé est trop gros. Merci d'essayer d'envoyer un fichier plus petit</target>
             </trans-unit>
             <trans-unit id="30">
-                <source>The CSRF token is invalid</source>
-                <target>Le jeton CSRF est invalide</target>
+                <source>The CSRF token is invalid. Please try to resubmit the form</source>
+                <target>Le jeton CSRF est invalide. Veuillez renvoyer le formulaire</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal</source>

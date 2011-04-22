@@ -7,11 +7,7 @@
     <parameters>
         <parameter key="session.class">Symfony\Component\HttpFoundation\Session</parameter>
         <parameter key="session.storage.native.class">Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage</parameter>
-        <parameter key="session.storage.native.options" type="collection" />
-        <parameter key="session.storage.pdo.class">Symfony\Component\HttpFoundation\SessionStorage\PdoSessionStorage</parameter>
-        <parameter key="session.storage.pdo.options" type="collection" />
         <parameter key="session.storage.filesystem.class">Symfony\Component\HttpFoundation\SessionStorage\FilesystemSessionStorage</parameter>
-        <parameter key="session.storage.filesystem.options" type="collection" />
     </parameters>
 
     <services>
@@ -21,19 +17,12 @@
         </service>
 
         <service id="session.storage.native" class="%session.storage.native.class%" public="false">
-            <argument>%session.storage.native.options%</argument>
-        </service>
-
-        <service id="session.storage.pdo" class="%session.storage.pdo.class%" public="false">
-            <argument type="service" id="pdo_connection" />
-            <argument>%session.storage.pdo.options%</argument>
+            <argument>%session.storage.options%</argument>
         </service>
 
         <service id="session.storage.filesystem" class="%session.storage.filesystem.class%" public="false">
             <argument>%kernel.cache_dir%/sessions</argument>
-            <argument>%session.storage.filesystem.options%</argument>
+            <argument>%session.storage.options%</argument>
         </service>
-
-        <service id="session.storage" alias="session.storage.native" public="false" />
     </services>
 </container>

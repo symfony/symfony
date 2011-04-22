@@ -74,7 +74,6 @@
     </xsd:complexType>
 
     <xsd:complexType name="session">
-        <xsd:attribute name="class" type="xsd:string" />
         <xsd:attribute name="storage-id" type="xsd:string" />
         <xsd:attribute name="default-locale" type="xsd:string" />
         <xsd:attribute name="name" type="xsd:string" />
@@ -85,10 +84,6 @@
         <xsd:attribute name="httponly" type="xsd:boolean" />
         <xsd:attribute name="cache-limiter" type="xsd:string" />
         <xsd:attribute name="auto-start" type="xsd:boolean" />
-        <xsd:attribute name="pdo.db-table" type="xsd:string" />
-        <xsd:attribute name="pdo.db-id-col" type="xsd:string" />
-        <xsd:attribute name="pdo.db-data-col" type="xsd:string" />
-        <xsd:attribute name="pdo.db-time-col" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="templating">

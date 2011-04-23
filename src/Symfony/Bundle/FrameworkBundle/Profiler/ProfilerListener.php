@@ -85,14 +85,16 @@ class ProfilerListener
         $response = $event->getResponse();
 
         if ($this->onlyMasterRequests && HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
-            return $response;
-        }
-
-        if (null !== $this->matcher && !$this->matcher->matches($event->getRequest())) {
-            return $response;
+            return;
         }
 
         if ($this->onlyException && null === $this->exception) {
+            return;
+        }
+
+        $this->exception = null;
+
+        if (null !== $this->matcher && !$this->matcher->matches($event->getRequest())) {
             return;
         }
 
@@ -103,6 +105,5 @@ class ProfilerListener
         }
 
         $profiler->collect($event->getRequest(), $event->getResponse(), $this->exception);
-        $this->exception = null;
     }
 }

@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\InterfaceInjector;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -62,9 +61,6 @@ class YamlFileLoader extends FileLoader
         // extensions
         $this->loadFromExtensions($content);
 
-        // interface injectors
-        $this->parseInterfaceInjectors($content, $file);
-
         // services
         $this->parseDefinitions($content, $file);
     }
@@ -99,43 +95,6 @@ class YamlFileLoader extends FileLoader
             $this->setCurrentDir(dirname($file));
             $this->import($import['resource'], null, isset($import['ignore_errors']) ? (Boolean) $import['ignore_errors'] : false, $file);
         }
-    }
-
-    /**
-     * Parses interface injectors.
-     *
-     * @param array $content
-     * @param string $file
-     * @return void
-     */
-    private function parseInterfaceInjectors($content, $file)
-    {
-        if (!isset($content['interfaces'])) {
-            return;
-        }
-
-        foreach ($content['interfaces'] as $class => $interface) {
-            $this->parseInterfaceInjector($class, $interface, $file);
-        }
-    }
-
-    /**
-     * Parses an interface injector.
-     *
-     * @param string $class
-     * @param array $interface
-     * @param string $file
-     * @return void
-     */
-    private function parseInterfaceInjector($class, $interface, $file)
-    {
-        $injector = new InterfaceInjector($class);
-        if (isset($interface['calls'])) {
-            foreach ($interface['calls'] as $call) {
-                $injector->addMethodCall($call[0], $this->resolveServices($call[1]));
-            }
-        }
-        $this->container->addInterfaceInjector($injector);
     }
 
     /**
@@ -292,7 +251,7 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach (array_keys($content) as $namespace) {
-            if (in_array($namespace, array('imports', 'parameters', 'services', 'interfaces'))) {
+            if (in_array($namespace, array('imports', 'parameters', 'services'))) {
                 continue;
             }
 
@@ -345,7 +304,7 @@ class YamlFileLoader extends FileLoader
     private function loadFromExtensions($content)
     {
         foreach ($content as $namespace => $values) {
-            if (in_array($namespace, array('imports', 'parameters', 'services', 'interfaces'))) {
+            if (in_array($namespace, array('imports', 'parameters', 'services'))) {
                 continue;
             }
 

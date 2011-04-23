@@ -13,7 +13,6 @@ namespace Symfony\Tests\Component\DependencyInjection\Dumper;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
-use Symfony\Component\DependencyInjection\InterfaceInjector;
 
 class YamlDumperTest extends \PHPUnit_Framework_TestCase
 {
@@ -56,34 +55,5 @@ class YamlDumperTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf('\RuntimeException', $e, '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
             $this->assertEquals('Unable to dump a service container if a parameter is an object or a resource.', $e->getMessage(), '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
         }
-    }
-
-    public function testInterfaceInjectors()
-    {
-        $interfaceInjector = new InterfaceInjector('FooClass');
-        $interfaceInjector->addMethodCall('setBar', array('someValue'));
-        $container = include self::$fixturesPath.'/containers/interfaces1.php';
-        $container->addInterfaceInjector($interfaceInjector);
-
-        $dumper = new YamlDumper($container);
-
-        $classBody = $dumper->dump();
-        //TODO: find a better way to test dumper
-        //var_dump($classBody);
-
-        $this->assertEquals("parameters:
-  cla: Fo
-  ss: Class
-
-interfaces:
-    FooClass:
-        calls:
-          - [setBar, [someValue]]
-          
-
-services:
-  foo:
-    class: %cla%o%ss%
-", $classBody);
     }
 }

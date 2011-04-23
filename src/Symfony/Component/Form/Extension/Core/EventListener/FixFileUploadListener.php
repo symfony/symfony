@@ -55,12 +55,6 @@ class FixFileUploadListener implements EventSubscriberInterface
         if ($data['file'] instanceof UploadedFile && $data['file']->isValid()) {
             $data['token'] = (string)rand(100000, 999999);
             $directory = $this->storage->getTempDir($data['token']);
-
-            if (!file_exists($directory)) {
-                // Recursively create directories
-                mkdir($directory, 0777, true);
-            }
-
             $data['file']->move($directory);
             $data['name'] = $data['file']->getName();
         }

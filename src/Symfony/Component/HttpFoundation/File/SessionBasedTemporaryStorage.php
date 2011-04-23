@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Session;
  */
 class SessionBasedTemporaryStorage extends TemporaryStorage
 {
+    private $session;
+
     public function __construct(Session $session, $secret, $directory)
     {
         parent::__construct($secret, $directory);

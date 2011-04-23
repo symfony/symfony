@@ -33,7 +33,7 @@ class Link
      * @param string   $method The method to use for the link (get by default)
      * @param string   $host   The base URI to use for absolute links (like http://localhost)
      * @param string   $path   The base path for relative links (/ by default)
-     * @param strin    $base    An optional base href for generating the uri
+     * @param string   $base    An optional base href for generating the uri
      *
      * @throws \LogicException if the node is not a link
      *

@@ -18,7 +18,7 @@ class Configuration implements ConfigurationInterface
     /**
      * Constructor
      *
-     * @param Boolean $debug Wether to use the debug mode
+     * @param Boolean $debug Whether to use the debug mode
      */
     public function  __construct($debug)
     {

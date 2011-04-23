@@ -42,7 +42,7 @@ class StubCollator
     const HIRAGANA_QUATERNARY_MODE = 6;
     const NUMERIC_COLLATION = 7;
 
-    /** Attribute contants values */
+    /** Attribute constants values */
     const DEFAULT_VALUE = -1;
 
     const PRIMARY = 0;

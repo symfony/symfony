@@ -25,7 +25,7 @@ class NormalizationBuilder
     /**
      * Constructor
      *
-     * @param NodeDefintion $node The related node
+     * @param NodeDefinition $node The related node
      */
     public function __construct(NodeDefinition $node)
     {

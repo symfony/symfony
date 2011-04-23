@@ -284,7 +284,7 @@ class StubLocale
     /**
      * Returns the localized display name for the locale script
      *
-     * @param  string  $locale    The locale code to return the display scrit from
+     * @param  string  $locale    The locale code to return the display script from
      * @param  string  $inLocale  Optional format locale code to use to display the script name
      * @return string             The localized script display name
      * @see    http://www.php.net/manual/en/locale.getdisplayscript.php
@@ -380,7 +380,7 @@ class StubLocale
      * Returns an associative array of locale identifier subtags
      *
      * @param  string  $locale    The locale code to extract the subtag array from
-     * @return array              Associative arrat with the extracted subtags
+     * @return array              Associative array with the extracted subtags
      * @see    http://www.php.net/manual/en/locale.parselocale.php
      * @throws MethodNotImplementedException
      */

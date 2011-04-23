@@ -288,15 +288,4 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($loader->supports('foo.xml'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
     }
-
-    public function testLoadInterfaceInjectors()
-    {
-        $container = new ContainerBuilder();
-        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
-        $loader->load('interfaces1.xml');
-        $interfaces = $container->getInterfaceInjectors('FooClass');
-        $this->assertEquals(1, count($interfaces), '->load() parses <interface> elements');
-        $interface = $interfaces['FooClass'];
-        $this->assertTrue($interface->hasMethodCall('setBar'), '->load() applies method calls correctly');
-    }
 }

@@ -15,7 +15,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\InterfaceInjector;
 
 /**
  * XmlDumper dumps a service container as an XML string.
@@ -48,7 +47,6 @@ class XmlDumper extends Dumper
 
         $this->addParameters($container);
         $this->addServices($container);
-        $this->addInterfaceInjectors($container);
 
         $this->document->appendChild($container);
         $xml = $this->document->saveXML();
@@ -96,40 +94,6 @@ class XmlDumper extends Dumper
             }
             $parent->appendChild($call);
         }
-    }
-
-    /**
-     * Adds interface injector.
-     *
-     * @param InterfaceInjector $injector
-     * @param DOMElement $parent
-     * @return void
-     */
-    private function addInterfaceInjector(InterfaceInjector $injector, \DOMElement $parent)
-    {
-        $interface = $this->document->createElement('interface');
-        $interface->setAttribute('class', $injector->getClass());
-        $this->addMethodCalls($injector->getMethodCalls(), $interface);
-        $parent->appendChild($interface);
-    }
-
-    /**
-     * Adds interface injectors.
-     *
-     * @param DOMElement $parent
-     * @return void
-     */
-    private function addInterfaceInjectors(\DOMElement $parent)
-    {
-        if (!$this->container->getInterfaceInjectors()) {
-            return;
-        }
-
-        $interfaces = $this->document->createElement('interfaces');
-        foreach ($this->container->getInterfaceInjectors() as $injector) {
-            $this->addInterfaceInjector($injector, $interfaces);
-        }
-        $parent->appendChild($interfaces);
     }
 
     /**

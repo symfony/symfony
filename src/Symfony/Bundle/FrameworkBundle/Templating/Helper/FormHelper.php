@@ -104,13 +104,10 @@ class FormHelper extends Helper
         $template = null;
         $blocks = $view->get('types');
 
-        if (isset($resources['theme'])) {
-            $template = $resources['theme'];
-        }
-
         foreach ($blocks as &$block) {
             $block = $block.'_'.$section;
-            $template = $this->lookupTemplate($block, $template);
+            $theme = isset($resources['theme']) ? $resources['theme'] : null;
+            $template = $this->lookupTemplate($block, $theme);
 
             if ($template) {
                 break;
@@ -142,17 +139,17 @@ class FormHelper extends Helper
         return $html;
     }
 
-    protected function lookupTemplate($templateName, $templateDir = null)
+    protected function lookupTemplate($templateName, $theme = null)
     {
         if (isset(self::$cache[$templateName])) {
             return self::$cache[$templateName];
         }
 
-        if (empty($templateDir)) {
-            $templateDir = 'FrameworkBundle:Form';
+        if ($theme) {
+            $template = $theme;
+        } else {
+            $template = $templateDir.':'.$templateName.'.html.php';
         }
-
-        $template = $templateDir.':'.$templateName.'.html.php';
 
         if (!$this->engine->exists($template)) {
             $template = false;

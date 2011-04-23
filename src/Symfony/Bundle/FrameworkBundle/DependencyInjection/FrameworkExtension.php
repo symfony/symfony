@@ -446,10 +446,9 @@ class FrameworkExtension extends Extension
                     // filename is domain.locale.format
                     list($domain, $locale, $format) = explode('.', $file->getBasename());
 
-                    $resources[] = array($format, (string) $file, $locale, $domain);
+                    $translator->addMethodCall('addResource', array($format, (string) $file, $locale, $domain));
                 }
             }
-            $container->setParameter('translation.resources', $resources);
         }
     }
 

@@ -24,7 +24,8 @@ class FileTypeTest extends TypeTestCase
 
     public static function setUpBeforeClass()
     {
-        self::$tmpDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'symfony-test';
+        self::$tmpDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'symfony-test';
+        mkdir(self::$tmpDir, 0777, true);
     }
 
     protected function setUp()

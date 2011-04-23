@@ -176,12 +176,12 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $yamlArgs = $container->getDefinition('validator.mapping.loader.yaml_files_loader')->getArguments();
         $this->assertEquals(1, count($yamlArgs[0]));
-        $this->assertStringEndsWith('TestBundle/Resources/config/validation.yml', $yamlArgs[0][0]);
+        $this->assertStringEndsWith('TestBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'validation.yml', $yamlArgs[0][0]);
 
         $xmlArgs = $container->getDefinition('validator.mapping.loader.xml_files_loader')->getArguments();
         $this->assertEquals(2, count($xmlArgs[0]));
         $this->assertStringEndsWith('Component/Form/Resources/config/validation.xml', $xmlArgs[0][0]);
-        $this->assertStringEndsWith('TestBundle/Resources/config/validation.xml', $xmlArgs[0][1]);
+        $this->assertStringEndsWith('TestBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'validation.xml', $xmlArgs[0][1]);
     }
 
     protected function createContainer(array $data = array())

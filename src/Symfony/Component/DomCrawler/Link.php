@@ -20,36 +20,39 @@ namespace Symfony\Component\DomCrawler;
  */
 class Link
 {
-    private $node;
-    private $method;
-    private $host;
-    private $path;
-    private $base;
+    protected $node;
+    protected $method;
+    protected $currentUri;
 
     /**
      * Constructor.
      *
-     * @param \DOMNode $node   A \DOMNode instance
-     * @param string   $method The method to use for the link (get by default)
-     * @param string   $host   The base URI to use for absolute links (like http://localhost)
-     * @param string   $path   The base path for relative links (/ by default)
-     * @param string   $base    An optional base href for generating the uri
+     * @param \DOMNode $node       A \DOMNode instance
+     * @param string   $currentUri The URI of the page where the link is embedded (or the base href)
+     * @param string   $method     The method to use for the link (get by default)
      *
      * @throws \LogicException if the node is not a link
      *
      * @api
      */
-    public function __construct(\DOMNode $node, $method = 'get', $host = null, $path = '/', $base = null)
+    public function __construct(\DOMNode $node, $currentUri, $method = 'get')
+    {
+        if (!in_array(substr($currentUri, 0, 4), array('http', 'file'))) {
+            throw new \InvalidArgumentException(sprintf('Current URI must be an asbolute URL ("%s").', $currentUri));
+        }
+
+        $this->setNode($node);
+        $this->method = $method;
+        $this->currentUri = $currentUri;
+    }
+
+    protected function setNode(\DOMNode $node)
     {
         if ('a' != $node->nodeName) {
             throw new \LogicException(sprintf('Unable to click on a "%s" tag.', $node->nodeName));
         }
 
         $this->node = $node;
-        $this->method = $method;
-        $this->host = $host;
-        $this->path = empty($path) ? '/' : $path;
-        $this->base = $base;
     }
 
     /**
@@ -65,42 +68,41 @@ class Link
     /**
      * Gets the URI associated with this link.
      *
-     * @param Boolean $absolute Whether to return an absolute URI or not (this only works if a base URI has been provided)
-     *
      * @return string The URI
      *
      * @api
      */
-    public function getUri($absolute = true)
+    public function getUri()
     {
-        $uri = $this->node->getAttribute('href');
-        $urlHaveScheme = 'http' === substr($uri, 0, 4);
+        $uri = $this->getRawUri();
 
+        // absolute URL?
+        if ('http' === substr($uri, 0, 4)) {
+            return $uri;
+        }
+
+        // empty URI
         if (!$uri) {
-            $uri = $this->path;
+            return $this->currentUri;
         }
 
-        if ('#' === $uri[0]) {
-            $uri = $this->path.$uri;
+        // only an anchor or a query string
+        if (in_array($uri[0], array('?', '#'))) {
+            return $this->currentUri.$uri;
         }
 
-        $path = $this->path;
-        if ('?' !== substr($uri, 0, 1) && '/' !== substr($path, -1)) {
-            $path = substr($path, 0, strrpos($path, '/') + 1);
+        // absolute path
+        if ('/' === $uri[0]) {
+            return preg_replace('#^(.*?//[^/]+)(?:\/.*)?$#', '$1', $this->currentUri).$uri;
         }
 
-        if (!$this->base && $uri && '/' !== $uri[0] && !$urlHaveScheme) {
-            $uri = $path.$uri;
-        } elseif ($this->base) {
-            $uri = $this->base.$uri;
-        }
+        // relative path
+        return substr($this->currentUri, 0, strrpos($this->currentUri, '/') + 1).$uri;
+    }
 
-        if (!$this->base && $absolute && null !== $this->host && !$urlHaveScheme) {
-
-            return $this->host.$uri;
-        }
-
-        return $uri;
+    protected function getRawUri()
+    {
+        return $this->node->getAttribute('href');
     }
 
     /**

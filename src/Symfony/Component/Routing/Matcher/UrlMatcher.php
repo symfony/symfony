@@ -31,8 +31,8 @@ class UrlMatcher implements UrlMatcherInterface
     /**
      * Constructor.
      *
-     * @param RouteCollection $routes   A RouteCollection instance
-     * @param RequestContext  $context  The context
+     * @param RouteCollection $routes  A RouteCollection instance
+     * @param RequestContext  $context The context
      */
     public function __construct(RouteCollection $routes, RequestContext $context)
     {

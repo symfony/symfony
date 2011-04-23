@@ -32,10 +32,10 @@ class TemplatePathsCacheWarmer extends CacheWarmer
     /**
      * Constructor.
      *
-     * @param KernelInterface      $kernel  A KernelInterface instance
-     * @param TemplateNameParser   $parser  A TemplateNameParser instance
-     * @param TemplateLocator      $locator The template locator
-     * @param string               $rootDir The directory where global templates can be stored
+     * @param KernelInterface    $kernel  A KernelInterface instance
+     * @param TemplateNameParser $parser  A TemplateNameParser instance
+     * @param TemplateLocator    $locator The template locator
+     * @param string             $rootDir The directory where global templates can be stored
      */
     public function __construct(KernelInterface $kernel, TemplateNameParser $parser, TemplateLocator $locator, $rootDir)
     {

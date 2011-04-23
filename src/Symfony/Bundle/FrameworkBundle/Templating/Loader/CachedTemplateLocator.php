@@ -28,7 +28,6 @@ class CachedTemplateLocator extends TemplateLocator
      *
      * @param string               $cacheDir The cache path
      * @param FileLocatorInterface $locator  A FileLocatorInterface instance
-     * @param string               $path     A global fallback path
      */
     public function __construct($cacheDir, FileLocatorInterface $locator)
     {

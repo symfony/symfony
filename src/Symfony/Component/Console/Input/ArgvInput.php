@@ -111,7 +111,7 @@ class ArgvInput extends Input
     /**
      * Parses a short option set.
      *
-     * @param string $token The current token
+     * @param string $name The current token
      *
      * @throws \RuntimeException When option given doesn't exist
      */

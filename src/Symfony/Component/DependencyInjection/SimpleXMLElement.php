@@ -32,7 +32,9 @@ class SimpleXMLElement extends \SimpleXMLElement
     /**
      * Returns arguments as valid php types.
      *
-     * @param string $name
+     * @param string  $name
+     * @param Boolean $lowercase
+     *
      * @return mixed
      */
     public function getArgumentsAsPhp($name, $lowercase = true)

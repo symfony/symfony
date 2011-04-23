@@ -138,6 +138,8 @@ class AclVoter implements VoterInterface
      * You can override this method when writing a voter for a specific domain
      * class.
      *
+     * @param string $class The class name
+     *
      * @return Boolean
      */
     public function supportsClass($class)

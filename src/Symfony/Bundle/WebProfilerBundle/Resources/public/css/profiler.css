@@ -109,7 +109,7 @@ abbr
 .clear
 {
     clear:both;
-    height:0px;
+    height:0;
     font-size:0;
     line-height:0;
 }
@@ -192,7 +192,7 @@ abbr
 {
     display: block;
     position: absolute;
-    left: 0px;
+    left: 0;
     top: 12px;
     width: 60px;
     text-align: center;
@@ -394,10 +394,9 @@ td.main, td.menu {
 {
     -webkit-appearance: button-bevel;
     float: none;
-    display: block;
     padding: 0;
     margin: 0;
-    border: 0px solid #000000;
+    border: 0 solid #000;
     text-decoration: none;
     cursor: pointer;
     background-color: transparent;
@@ -405,7 +404,6 @@ td.main, td.menu {
     display: inline-block;
     text-align: center;
     vertical-align: middle;
-    border: 0;
     background: none;
 }
 
@@ -439,7 +437,7 @@ td.main, td.menu {
 
 .search button span span span
 {
-    padding: 0px 7px;
+    padding: 0 7px;
     font: bold 11px Arial, Helvetica, sans-serif;
     color: #6b6b6b;
     line-height: 28px;

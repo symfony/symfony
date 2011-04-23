@@ -38,7 +38,7 @@ class EsiListener
     /**
      * Filters the Response.
      *
-     * @param FilterResponseEvent $event  A FilterResponseEvent instance
+     * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
     public function onCoreResponse(FilterResponseEvent $event)
     {

@@ -27,8 +27,8 @@ interface LogoutHandlerInterface
      * to be logged out. Usually, you would unset session variables, or remove
      * cookies, etc.
      *
-     * @param Request $request
-     * @param Response $response
+     * @param Request        $request
+     * @param Response       $response
      * @param TokenInterface $token
      * @return void
      */

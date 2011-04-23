@@ -51,7 +51,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
      *
      *      <doctrine:dbal id="myconn" dbname="sfweb" user="root" />
      *
-     * @param array $config An array of configuration settings
+     * @param array            $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
     protected function dbalLoad(array $config, ContainerBuilder $container)
@@ -77,9 +77,9 @@ class DoctrineExtension extends AbstractDoctrineExtension
     /**
      * Loads a configured DBAL connection.
      *
-     * @param string $name The name of the connection
-     * @param array $connection A dbal connection configuration.
-     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param string           $name       The name of the connection
+     * @param array            $connection A dbal connection configuration.
+     * @param ContainerBuilder $container  A ContainerBuilder instance
      */
     protected function loadDbalConnection($name, array $connection, ContainerBuilder $container)
     {
@@ -137,7 +137,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
      *
      *     <doctrine:orm id="mydm" connection="myconn" />
      *
-     * @param array $config An array of configuration settings
+     * @param array            $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
     protected function ormLoad(array $config, ContainerBuilder $container)
@@ -295,8 +295,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
     /**
      * Loads a configured entity managers cache drivers.
      *
-     * @param array $entityManager A configured ORM entity manager.
-     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param array            $entityManager A configured ORM entity manager.
+     * @param ContainerBuilder $container     A ContainerBuilder instance
      */
     protected function loadOrmCacheDrivers(array $entityManager, ContainerBuilder $container)
     {
@@ -308,9 +308,9 @@ class DoctrineExtension extends AbstractDoctrineExtension
     /**
      * Loads a configured entity managers metadata, query or result cache driver.
      *
-     * @param array $entityManager A configured ORM entity manager.
+     * @param array            $entityManager A configured ORM entity manager.
      * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param string $cacheName
+     * @param string           $cacheName
      */
     protected function loadOrmEntityManagerCacheDriver(array $entityManager, ContainerBuilder $container, $cacheName)
     {
@@ -324,8 +324,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
     /**
      * Gets an entity manager cache driver definition for metadata, query and result caches.
      *
-     * @param array $entityManager The array configuring an entity manager.
-     * @param array $cacheDriver The cache driver configuration.
+     * @param array            $entityManager The array configuring an entity manager.
+     * @param array            $cacheDriver The cache driver configuration.
      * @param ContainerBuilder $container
      * @return Definition $cacheDef
      */

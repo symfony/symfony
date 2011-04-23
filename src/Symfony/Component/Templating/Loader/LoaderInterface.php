@@ -32,8 +32,8 @@ interface LoaderInterface
     /**
      * Returns true if the template is still fresh.
      *
-     * @param TemplateReferenceInterface    $template A template
-     * @param integer                       $time     The last modification time of the cached template (timestamp)
+     * @param TemplateReferenceInterface $template A template
+     * @param integer                    $time     The last modification time of the cached template (timestamp)
      */
     function isFresh(TemplateReferenceInterface $template, $time);
 }

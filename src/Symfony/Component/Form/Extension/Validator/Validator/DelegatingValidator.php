@@ -29,7 +29,9 @@ class DelegatingValidator implements FormValidatorInterface
     }
 
     /**
-     * Validates the form and its domain object
+     * Validates the form and its domain object.
+     *
+     * @param FormInterface $form A FormInterface instance
      */
     public function validate(FormInterface $form)
     {
@@ -184,8 +186,8 @@ class DelegatingValidator implements FormValidatorInterface
      *
      * This method is called automatically during the validation process.
      *
-     * @param FormInterface $form        The validated form
-     * @param ExecutionContext $context  The current validation context
+     * @param FormInterface    $form    The validated form
+     * @param ExecutionContext $context The current validation context
      */
     public static function validateFormData(FormInterface $form, ExecutionContext $context)
     {

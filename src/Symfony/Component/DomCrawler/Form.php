@@ -262,7 +262,7 @@ class Form extends Link implements \ArrayAccess
     /**
      * Sets a named field.
      *
-     * @param string $name The field name
+     * @param Field\FormField $field The field
      *
      * @return FormField The field instance
      *

@@ -411,7 +411,7 @@ class Definition
     /**
      * Sets the scope of the service
      *
-     * @param  string $string Whether the service must be shared or not
+     * @param  string $scope Whether the service must be shared or not
      *
      * @return Definition The current instance
      */

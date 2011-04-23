@@ -257,9 +257,10 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
     /**
      * Selects the type of node to create and appends it to the parent.
      *
-     * @param  $parentNode
-     * @param  $data
-     * @param  $nodename
+     * @param DOMNode      $parentNode
+     * @param array|object $data
+     * @param string       $nodename
+     * @param string       $key
      * @return void
      */
     private function appendNode($parentNode, $data, $nodeName, $key = null)

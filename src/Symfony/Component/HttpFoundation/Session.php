@@ -29,7 +29,7 @@ class Session implements \Serializable
     /**
      * Constructor.
      *
-     * @param SessionStorageInterface $session       A SessionStorageInterface instance
+     * @param SessionStorageInterface $storage       A SessionStorageInterface instance
      * @param string                  $defaultLocale The default locale
      */
     public function __construct(SessionStorageInterface $storage, $defaultLocale = 'en')

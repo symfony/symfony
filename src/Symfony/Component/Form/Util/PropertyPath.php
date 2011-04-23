@@ -51,7 +51,7 @@ class PropertyPath implements \IteratorAggregate
     /**
      * Parses the given property path
      *
-     * @param string $this
+     * @param string $propertyPath
      */
     public function __construct($propertyPath)
     {
@@ -124,6 +124,8 @@ class PropertyPath implements \IteratorAggregate
 
     /**
      * Returns the element at the given index in the property path
+     *
+     * @param $index The index key
      *
      * @return string  A property or index name
      */
@@ -208,7 +210,7 @@ class PropertyPath implements \IteratorAggregate
      * If neither is found, an exception is thrown.
      *
      * @param  object|array $objectOrArray    The object or array to traverse
-     * @return mixed                          The value at the end of the
+     * @param  mixed        $value            The value at the end of the
      *                                        property path
      * @throws InvalidPropertyException       If the property/setter does not
      *                                        exist
@@ -346,7 +348,7 @@ class PropertyPath implements \IteratorAggregate
     /**
      * Sets the value of the property at the given index in the path
      *
-     * @param object $object         The object or array to traverse
+     * @param object  $objectOrArray The object or array to traverse
      * @param integer $currentIndex  The index of the modified property in the
      *                               path
      * @param mixed $value           The value to set

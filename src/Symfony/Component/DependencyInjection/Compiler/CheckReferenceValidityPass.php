@@ -103,7 +103,7 @@ class CheckReferenceValidityPass implements CompilerPassInterface
     /**
      * Validates the scope of a single Reference.
      *
-     * @param Reference $reference
+     * @param Reference  $reference
      * @param Definition $definition
      * @throws \RuntimeException when there is an issue with the Reference scope
      */

@@ -26,8 +26,8 @@ class PhpFileLoader extends FileLoader
     /**
      * Loads a PHP file.
      *
-     * @param mixed  $resource A PHP file path
-     * @param string $type     The resource type
+     * @param mixed  $file A PHP file path
+     * @param string $type The resource type
      */
     public function load($file, $type = null)
     {

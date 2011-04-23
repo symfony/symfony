@@ -110,9 +110,9 @@ class DumpCommand extends Command
     /**
      * Checks if an asset should be dumped.
      *
-     * @param LazyAssetManager $am         The asset manager
-     * @param string           $name       The asset name
-     * @param array            $previously An array of previous visits
+     * @param LazyAssetManager $am          The asset manager
+     * @param string           $name        The asset name
+     * @param array            &$previously An array of previous visits
      *
      * @return AssetInterface|Boolean The asset if it should be dumped
      */

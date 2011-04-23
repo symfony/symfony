@@ -296,7 +296,7 @@ class FullTransformer
 
     /**
      * Add sensible default values for missing items in the extracted date/time options array. The values
-     * are base in the beggining of the Unix era
+     * are base in the beginning of the Unix era
      *
      * @param  array  $options
      * @return array

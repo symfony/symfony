@@ -132,14 +132,14 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
      * @param string $url   The URL
      * @param string $limit The maximum number of tokens to return
      *
-     * @return array An array with (creteria, args)
+     * @return array An array with (criteria, args)
      */
     abstract protected function buildCriteria($ip, $url, $limit);
 
     /**
      * Initializes the database
      *
-     * @throws \RuntimeException When the requeted database driver is not installed
+     * @throws \RuntimeException When the requested database driver is not installed
      */
     abstract protected function initDb();
 

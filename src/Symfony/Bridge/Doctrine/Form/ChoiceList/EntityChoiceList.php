@@ -103,7 +103,7 @@ class EntityChoiceList extends ArrayChoiceList
         $this->unitOfWork = $em->getUnitOfWork();
         $this->identifier = $em->getClassMetadata($class)->getIdentifierFieldNames();
 
-        // The propery option defines, which property (path) is used for
+        // The property option defines, which property (path) is used for
         // displaying entities as strings
         if ($property) {
             $this->propertyPath = new PropertyPath($property);

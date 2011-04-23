@@ -137,7 +137,7 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
     }
 
     /**
-     * Checks the name is avalid xml element name
+     * Checks the name is a valid xml element name
      * @param string $name
      * @return Boolean
      */

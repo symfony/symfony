@@ -64,9 +64,13 @@ class FormHelper extends Helper
         return $this->renderSection($view, 'enctype');
     }
 
-    public function widget(FormView $view, array $variables = array())
+    public function widget(FormView $view, array $variables = array(), $resources = null)
     {
-        return trim($this->renderSection($view, 'widget', $variables));
+        if (null !== $resources && !is_array($resources)) {
+            $resources = array($resources);
+        }
+
+        return trim($this->renderSection($view, 'widget', $variables, $resources));
     }
 
     /**
@@ -95,14 +99,18 @@ class FormHelper extends Helper
         return $this->renderSection($view, 'rest', $variables);
     }
 
-    protected function renderSection(FormView $view, $section, array $variables = array())
+    protected function renderSection(FormView $view, $section, array $variables = array(), array $resources = null)
     {
         $template = null;
         $blocks = $view->get('types');
 
+        if (isset($resources['theme'])) {
+            $template = $resources['theme'];
+        }
+
         foreach ($blocks as &$block) {
             $block = $block.'_'.$section;
-            $template = $this->lookupTemplate($block);
+            $template = $this->lookupTemplate($block, $template);
 
             if ($template) {
                 break;
@@ -134,19 +142,18 @@ class FormHelper extends Helper
         return $html;
     }
 
-    protected function lookupTemplate($templateName)
+    protected function lookupTemplate($templateName, $templateDir = null)
     {
         if (isset(self::$cache[$templateName])) {
             return self::$cache[$templateName];
         }
 
-        $template = $templateName.'.html.php';
-/*
-        if ($this->templateDir) {
-            $template = $this->templateDir.':'.$template;
+        if (empty($templateDir)) {
+            $templateDir = 'FrameworkBundle:Form';
         }
-*/
-$template = 'FrameworkBundle:Form:'.$template;
+
+        $template = $templateDir.':'.$templateName.'.html.php';
+
         if (!$this->engine->exists($template)) {
             $template = false;
         }

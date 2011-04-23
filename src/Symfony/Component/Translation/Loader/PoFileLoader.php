@@ -35,7 +35,7 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
 
 	public function load($resource, $locale, $domain = 'messages') {
 
-		$messages = $this->_parsePo($resource);
+		$messages = $this->parse($resource);
 
         // empty file
         if (null === $messages) {
@@ -62,12 +62,15 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
 	 * - Translator and extracted comments are treated as being the same type.
 	 * - Message IDs are allowed to have other encodings as just US-ASCII.
 	 *
-	 * Items with an empty id are ignored. For more information see `_merge()`.
+	 * Items with an empty id are ignored. For more information see `merge()`.
 	 *
 	 * @param resource $stream
 	 * @return array
 	 */
-	protected function _parsePo($stream) {
+	protected function parse($resource) {
+
+		$stream = fopen($resource, 'r+');
+
 		$defaults = array(
 			'ids' => array(),
 			'translated' => null,
@@ -82,7 +85,7 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
 			$line = trim($line);
 
 			if ($line === '') {
-				$data = $this->_merge($data, $item);
+				$data = $this->merge($data, $item);
 				$item = $defaults;
 			} elseif (substr($line, 0, 3) === '#~ ') {
 				$item['flags']['obsolete'] = true;
@@ -118,7 +121,10 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
 				$item['translated'][(integer) substr($line, 7, 1)] = substr($line, 11, -1);
 			}
 		}
-		return $this->_merge($data, $item);
+
+		fclose($stream);
+
+		return $this->merge($data, $item);
 	}
 
 
@@ -144,12 +150,12 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
 	 * or are empty are **not** being merged. Whitespace characters are space, tab, vertical
 	 * tab, line feed, carriage return and form feed.
 	 *
-	 * @see lithium\g11n\catalog\Adapter::_merge()
+	 * @see lithium\g11n\catalog\Adapter::merge()
 	 * @param array $data Data to merge item into.
 	 * @param array $item Item to merge into $data.
 	 * @return array The merged data.
 	 */
-	protected function _merge(array $data, array $item) {
+	protected function merge(array $data, array $item) {
 		$filter = function ($value) use (&$filter) {
 			if (is_array($value)) {
 				return array_map($filter, $value);
@@ -169,6 +175,44 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
 		if (empty($item['id']) || ctype_space($item['id'])) {
 			return $data;
 		}
-        return parent::_merge($data, $item);
+        return $this->_merge($data, $item);
     }
-}
+
+
+	/**
+	 * Merges an item into given data.
+	 *
+	 * @param array $data Data to merge item into.
+	 * @param array $item Item to merge into $data. The item must have an `'id'` key.
+	 * @return array The merged data.
+	 */
+	protected function _merge(array $data, array $item) {
+		if (!isset($item['id'])) {
+			return $data;
+		}
+		$id = $item['id'];
+
+		$defaults = array(
+			'ids' => array(),
+			'translated' => null,
+			'flags' => array(),
+			'comments' => array(),
+			'occurrences' => array()
+		);
+		$item += $defaults;
+
+		if (!isset($data[$id])) {
+			$data[$id] = $item;
+			return $data;
+		}
+		foreach (array('ids', 'flags', 'comments', 'occurrences') as $field) {
+			$data[$id][$field] = array_merge($data[$id][$field], $item[$field]);
+		}
+		if (!isset($data[$id]['translated'])) {
+			$data[$id]['translated'] = $item['translated'];
+		} elseif (is_array($item['translated'])) {
+			$data[$id]['translated'] = (array) $data[$id]['translated'] + $item['translated'];
+		}
+		return $data;
+	}
+ }

@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\TwigBundle\Extension;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Bundle\TwigBundle\TokenParser\IncludeTokenParser;
 use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;
 
 /**
@@ -98,9 +97,6 @@ class TemplatingExtension extends \Twig_Extension
         return array(
             // {% render 'BlogBundle:Post:list' with { 'limit': 2 }, { 'alt': 'BlogBundle:Post:error' } %}
             new RenderTokenParser(),
-
-            // {% include 'sometemplate.php' with { 'something' : 'something2' } %}
-            new IncludeTokenParser(),
         );
     }
 

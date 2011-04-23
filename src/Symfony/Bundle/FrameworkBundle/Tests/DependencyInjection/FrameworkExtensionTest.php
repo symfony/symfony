@@ -117,9 +117,16 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('translator.real'), '->registerTranslatorConfiguration() loads translation.xml');
         $this->assertSame($container->getDefinition('translator.real'), $container->getDefinition('translator'), '->registerTranslatorConfiguration() redefines translator service from identity to real translator');
 
+        $resources = array();
+        foreach ($container->getDefinition('translator.real')->getMethodCalls() as $call) {
+            if ('addResource' == $call[0]) {
+                $resources[] = $call[1];
+            }
+        }
+
         $this->assertContains(
             realpath(__DIR__.'/../../Resources/translations/validators.fr.xliff'),
-            array_map(function($resource) { return realpath($resource[1]); }, $container->getParameter('translation.resources')),
+            array_map(function($resource) use ($resources) { return realpath($resource[1]); }, $resources),
             '->registerTranslatorConfiguration() finds FrameworkExtension translation resources'
         );
 

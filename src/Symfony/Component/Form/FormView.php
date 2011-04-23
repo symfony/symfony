@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Util\FormUtil;
 
 class FormView implements \ArrayAccess, \IteratorAggregate, \Countable

@@ -41,6 +41,14 @@ class Validator implements ValidatorInterface
     /**
      * {@inheritDoc}
      */
+    public function getMetadataFactory()
+    {
+        return $this->metadataFactory;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate($object, $groups = null)
     {
         $metadata = $this->metadataFactory->getClassMetadata(get_class($object));

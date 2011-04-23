@@ -18,7 +18,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\DataTransformer\TransformationFailedException;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -868,14 +868,30 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testCreateView()
     {
         $test = $this;
-        $type1 = $this->getMock('Symfony\Component\Form\Type\FormTypeInterface');
-        $type2 = $this->getMock('Symfony\Component\Form\Type\FormTypeInterface');
+        $type1 = $this->getMock('Symfony\Component\Form\FormTypeInterface');
+        $type1Extension = $this->getMock('Symfony\Component\Form\FormTypeExtensionInterface');
+        $type1->expects($this->any())
+            ->method('getExtensions')
+            ->will($this->returnValue(array($type1Extension)));
+        $type2 = $this->getMock('Symfony\Component\Form\FormTypeInterface');
+        $type2Extension = $this->getMock('Symfony\Component\Form\FormTypeExtensionInterface');
+        $type2->expects($this->any())
+            ->method('getExtensions')
+            ->will($this->returnValue(array($type2Extension)));
         $calls = array();
 
         $type1->expects($this->once())
             ->method('buildView')
             ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
                 $calls[] = 'type1::buildView';
+                $test->assertTrue($view->hasParent());
+                $test->assertFalse($view->hasChildren());
+            }));
+
+        $type1Extension->expects($this->once())
+            ->method('buildView')
+            ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
+                $calls[] = 'type1ext::buildView';
                 $test->assertTrue($view->hasParent());
                 $test->assertFalse($view->hasChildren());
             }));
@@ -888,6 +904,14 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 $test->assertFalse($view->hasChildren());
             }));
 
+        $type2Extension->expects($this->once())
+            ->method('buildView')
+            ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
+                $calls[] = 'type2ext::buildView';
+                $test->assertTrue($view->hasParent());
+                $test->assertFalse($view->hasChildren());
+            }));
+
         $type1->expects($this->once())
             ->method('buildViewBottomUp')
             ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
@@ -895,10 +919,24 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 $test->assertTrue($view->hasChildren());
             }));
 
+        $type1Extension->expects($this->once())
+            ->method('buildViewBottomUp')
+            ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
+                $calls[] = 'type1ext::buildViewBottomUp';
+                $test->assertTrue($view->hasChildren());
+            }));
+
         $type2->expects($this->once())
             ->method('buildViewBottomUp')
             ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
                 $calls[] = 'type2::buildViewBottomUp';
+                $test->assertTrue($view->hasChildren());
+            }));
+
+        $type2Extension->expects($this->once())
+            ->method('buildViewBottomUp')
+            ->will($this->returnCallback(function (FormView $view, Form $form) use ($test, &$calls) {
+                $calls[] = 'type2ext::buildViewBottomUp';
                 $test->assertTrue($view->hasChildren());
             }));
 
@@ -910,9 +948,13 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(
             0 => 'type1::buildView',
-            1 => 'type2::buildView',
-            2 => 'type1::buildViewBottomUp',
-            3 => 'type2::buildViewBottomUp',
+            1 => 'type1ext::buildView',
+            2 => 'type2::buildView',
+            3 => 'type2ext::buildView',
+            4 => 'type1::buildViewBottomUp',
+            5 => 'type1ext::buildViewBottomUp',
+            6 => 'type2::buildViewBottomUp',
+            7 => 'type2ext::buildViewBottomUp',
         ), $calls);
     }
 
@@ -966,16 +1008,16 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     protected function getDataMapper()
     {
-        return $this->getMock('Symfony\Component\Form\DataMapper\DataMapperInterface');
+        return $this->getMock('Symfony\Component\Form\DataMapperInterface');
     }
 
     protected function getDataTransformer()
     {
-        return $this->getMock('Symfony\Component\Form\DataTransformer\DataTransformerInterface');
+        return $this->getMock('Symfony\Component\Form\DataTransformerInterface');
     }
 
     protected function getFormValidator()
     {
-        return $this->getMock('Symfony\Component\Form\Validator\FormValidatorInterface');
+        return $this->getMock('Symfony\Component\Form\FormValidatorInterface');
     }
 }

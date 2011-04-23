@@ -85,10 +85,6 @@ class TemplatingExtension extends \Twig_Extension
     {
         $options['attributes'] = $attributes;
 
-        if (isset($options['query'])) {
-            $options['query'] = $options['query'];
-        }
-
         return $this->container->get('http_kernel')->render($controller, $options);
     }
 

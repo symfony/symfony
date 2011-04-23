@@ -4,7 +4,7 @@ namespace Symfony\Component\Translation\Loader;
 
 use Symfony\Component\Config\Resource\FileResource;
 
-class PoFileLoader implements LoaderInterface {
+class MoFileLoader implements LoaderInterface {
 
 	/**
 	 * Magic used for validating the format of a MO file as well as

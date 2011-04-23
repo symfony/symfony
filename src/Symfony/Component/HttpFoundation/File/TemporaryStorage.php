@@ -22,12 +22,8 @@ class TemporaryStorage
     private $directory;
     private $secret;
 
-    public function __construct($secret, $directory = null)
+    public function __construct($secret, $directory)
     {
-        if (empty($directory)) {
-            $directory = sys_get_temp_dir();
-        }
-
         $this->directory = realpath($directory);
         $this->secret = $secret;
     }

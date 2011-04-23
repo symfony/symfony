@@ -13,8 +13,6 @@
         <parameter key="form.validation_groups">Default</parameter>
         <parameter key="file.temporary_storage.class">Symfony\Component\HttpFoundation\File\SessionBasedTemporaryStorage</parameter>
         <parameter key="file.temporary_storage.secret">abcdef</parameter>
-        <parameter key="file.temporary_storage.directory"></parameter>
-
     </parameters>
 
     <services>
@@ -66,7 +64,7 @@
         <service id="file.temporary_storage" class="%file.temporary_storage.class%">
             <argument type="service" id="session" />
             <argument>%file.temporary_storage.secret%</argument>
-            <argument>%file.temporary_storage.directory%</argument>
+            <argument>%kernel.cache_dir%/upload</argument>
         </service>
 
         <!-- CoreExtension -->

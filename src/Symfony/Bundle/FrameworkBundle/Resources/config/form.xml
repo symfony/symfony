@@ -13,7 +13,6 @@
         <parameter key="form.validation_groups">Default</parameter>
         <parameter key="file.temporary_storage.class">Symfony\Component\HttpFoundation\File\SessionBasedTemporaryStorage</parameter>
         <parameter key="file.temporary_storage.secret">abcdef</parameter>
-        <parameter key="file.temporary_storage.nesting_levels">3</parameter>
         <parameter key="file.temporary_storage.directory"></parameter>
 
     </parameters>
@@ -67,7 +66,6 @@
         <service id="file.temporary_storage" class="%file.temporary_storage.class%">
             <argument type="service" id="session" />
             <argument>%file.temporary_storage.secret%</argument>
-            <argument>%file.temporary_storage.nesting_levels%</argument>
             <argument>%file.temporary_storage.directory%</argument>
         </service>
 

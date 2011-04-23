@@ -12,17 +12,15 @@
 namespace Symfony\Component\HttpFoundation\File;
 
 use Symfony\Component\HttpFoundation\Session;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\File\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
 class SessionBasedTemporaryStorage extends TemporaryStorage
 {
-    public function __construct(Session $session, $secret, $nestingLevels = 3, $directory = null)
+    public function __construct(Session $session, $secret, $directory = null)
     {
-        parent::__construct($secret, $nestingLevels, $directory);
+        parent::__construct($secret, $directory);
 
         $this->session = $session;
     }
@@ -31,6 +29,6 @@ class SessionBasedTemporaryStorage extends TemporaryStorage
     {
         $this->session->start();
 
-        return $this->session->getId() . parent::generateHashInfo($token);
+        return $this->session->getId().parent::generateHashInfo($token);
     }
 }

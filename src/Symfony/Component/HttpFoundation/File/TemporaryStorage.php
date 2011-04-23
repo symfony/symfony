@@ -46,6 +46,12 @@ class TemporaryStorage
 
         $hash = $this->generateHash($token);
 
-        return $this->directory.DIRECTORY_SEPARATOR.substr($hash, 0, 2).DIRECTORY_SEPARATOR.substr($hash, 2);
+        $directory = $this->directory.DIRECTORY_SEPARATOR.substr($hash, 0, 2).DIRECTORY_SEPARATOR.substr($hash, 2);
+
+        if (!file_exists($directory)) {
+            mkdir($directory, 0777, true);
+        }
+
+        return $directory;
     }
 }

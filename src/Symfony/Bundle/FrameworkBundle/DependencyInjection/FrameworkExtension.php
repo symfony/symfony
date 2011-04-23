@@ -299,9 +299,9 @@ class FrameworkExtension extends Extension
         $container->setParameter('session.storage.options', $options);
 
         $this->addClassesToCompile(array(
-            'Symfony\\Component\\HttpFoundation\\Session',
             'Symfony\\Component\\HttpFoundation\\SessionStorage\\SessionStorageInterface',
-            $container->getParameter('session.class'),
+            $container->findDefinition('session.storage')->getClass(),
+            $container->getDefinition('session')->getClass(),
         ));
     }
 

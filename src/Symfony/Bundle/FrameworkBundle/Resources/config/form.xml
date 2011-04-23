@@ -10,7 +10,6 @@
         <parameter key="form.type_guesser.validator.class">Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser</parameter>
         <parameter key="form.csrf_provider.class">Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider</parameter>
 
-        <parameter key="form.validation_groups">Default</parameter>
         <parameter key="file.temporary_storage.class">Symfony\Component\HttpFoundation\File\SessionBasedTemporaryStorage</parameter>
         <parameter key="file.temporary_storage.secret">abcdef</parameter>
     </parameters>

@@ -245,10 +245,13 @@ class FrameworkExtension extends Extension
     {
         $loader->load('routing.xml');
 
-        $container->setParameter('routing.resource', $config['resource']);
+        $router = $container->findDefinition('router.real');
+        $router->replaceArgument(1, $config['resource']);
 
         if (isset($config['type'])) {
-            $container->setParameter('router.options.resource_type', $config['type']);
+            $arguments = $router->getArguments();
+            $arguments[2]['resource_type'] = $config['type'];
+            $router->replaceArgument(2, $arguments[2]);
         }
 
         if ($config['cache_warmer']) {

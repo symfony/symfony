@@ -16,6 +16,7 @@ use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
+use Symfony\Component\Validator\Constraint;
 
 class ValidatorTypeGuesser implements FormTypeGuesserInterface
 {

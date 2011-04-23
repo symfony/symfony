@@ -27,16 +27,6 @@ class TemplatingExtension extends \Twig_Extension
         $this->container = $container;
     }
 
-    public function getContainer()
-    {
-        return $this->container;
-    }
-
-    public function getTemplating()
-    {
-        return $this->container->get('templating');
-    }
-
     /**
      * {@inheritdoc}
      */

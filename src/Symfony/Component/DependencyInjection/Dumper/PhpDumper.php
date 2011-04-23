@@ -834,8 +834,8 @@ EOF;
     /**
      * Builds service calls from arguments
      *
-     * @param array $arguments
-     * @param string $calls By reference
+     * @param array  $arguments
+     * @param string $calls    By reference
      * @param string $behavior By reference
      * @return void
      */
@@ -1034,7 +1034,7 @@ EOF;
     /**
      * Gets a service call
      *
-     * @param string $id
+     * @param string    $id
      * @param Reference $reference
      * @return string
      */

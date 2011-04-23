@@ -387,7 +387,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Binds POST data to the field, transforms and validates it.
      *
-     * @param  string|array $data  The POST data
+     * @param string|array $clientData The POST data
      */
     public function bind($clientData)
     {
@@ -503,8 +503,6 @@ class Form implements \IteratorAggregate, FormInterface
      * constructor.
      *
      * @param Request $request    The request to bind to the form
-     * @param array|object $data  The data from which to read default values
-     *                            and where to write bound values
      */
     public function bindRequest(Request $request)
     {

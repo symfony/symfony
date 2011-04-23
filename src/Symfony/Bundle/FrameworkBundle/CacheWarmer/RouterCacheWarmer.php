@@ -26,7 +26,7 @@ class RouterCacheWarmer extends CacheWarmer
     /**
      * Constructor.
      *
-     * @param router $router A Router instance
+     * @param Router $router A Router instance
      */
     public function __construct(Router $router)
     {

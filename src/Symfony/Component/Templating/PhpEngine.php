@@ -190,8 +190,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Sets a helper.
      *
-     * @param HelperInterface $value The helper instance
-     * @param string          $alias An alias
+     * @param HelperInterface $name  The helper instance
+     * @param string          $value An alias
      */
     public function offsetSet($name, $value)
     {
@@ -232,8 +232,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Sets a helper.
      *
-     * @param HelperInterface $value The helper instance
-     * @param string          $alias An alias
+     * @param HelperInterface $helper The helper instance
+     * @param string          $alias  An alias
      */
     public function set(HelperInterface $helper, $alias = null)
     {
@@ -321,7 +321,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Adds an escaper for the given context.
      *
-     * @param string $name    The escaper context (html, js, ...)
+     * @param string $context The escaper context (html, js, ...)
      * @param mixed  $escaper A PHP callable
      */
     public function setEscaper($context, $escaper)
@@ -332,7 +332,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Gets an escaper for a given context.
      *
-     * @param  string $name The context name
+     * @param string $context The context name
      *
      * @return mixed  $escaper A PHP callable
      */

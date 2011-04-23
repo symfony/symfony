@@ -51,11 +51,11 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Constructor
      *
-     * @param integer $id
-     * @param ObjectIdentityInterface $objectIdentity
+     * @param integer                             $id
+     * @param ObjectIdentityInterface             $objectIdentity
      * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
-     * @param array $loadedSids
-     * @param Boolean $entriesInheriting
+     * @param array                               $loadedSids
+     * @param Boolean                             $entriesInheriting
      * @return void
      */
     public function __construct($id, ObjectIdentityInterface $objectIdentity, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $loadedSids = array(), $entriesInheriting)
@@ -453,12 +453,12 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Inserts an ACE
      *
-     * @param string $property
-     * @param integer $index
-     * @param integer $mask
+     * @param string                    $property
+     * @param integer                   $index
+     * @param integer                   $mask
      * @param SecurityIdentityInterface $sid
-     * @param Boolean $granting
-     * @param string $strategy
+     * @param Boolean                   $granting
+     * @param string                    $strategy
      * @throws \OutOfBoundsException
      * @throws \InvalidArgumentException
      * @return void
@@ -502,13 +502,13 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Inserts a field-based ACE
      *
-     * @param string $property
-     * @param integer $index
-     * @param string $field
-     * @param integer $mask
+     * @param string                    $property
+     * @param integer                   $index
+     * @param string                    $field
+     * @param integer                   $mask
      * @param SecurityIdentityInterface $sid
-     * @param Boolean $granting
-     * @param string $strategy
+     * @param Boolean                   $granting
+     * @param string                    $strategy
      * @throws \InvalidArgumentException
      * @throws \OutOfBoundsException
      * @return void
@@ -665,9 +665,9 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      * Called when a property of an ACE associated with this ACL changes
      *
      * @param EntryInterface $entry
-     * @param string $name
-     * @param mixed $oldValue
-     * @param mixed $newValue
+     * @param string         $name
+     * @param mixed          $oldValue
+     * @param mixed          $newValue
      * @return void
      */
     private function onEntryPropertyChanged(EntryInterface $entry, $name, $oldValue, $newValue)

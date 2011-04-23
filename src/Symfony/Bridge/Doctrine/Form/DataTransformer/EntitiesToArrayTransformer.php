@@ -30,10 +30,9 @@ class EntitiesToArrayTransformer implements DataTransformerInterface
     /**
      * Transforms entities into choice keys
      *
-     * @param  Collection|object  A collection of entities, a single entity or
-     *                            NULL
-     * @return mixed              An array of choice keys, a single key or
-     *                            NULL
+     * @param Collection|object $collection A collection of entities, a single entity or
+     *                                      NULL
+     * @return mixed An array of choice keys, a single key or NULL
      */
     public function transform($collection)
     {

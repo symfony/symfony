@@ -26,8 +26,7 @@ class ClassMapCacheWarmer extends CacheWarmer
     /**
      * Constructor.
      *
-     * @param KernelInterface $kernel  A KernelInterface instance
-     * @param string          $rootDir The directory where global templates can be stored
+     * @param ContainerInterface $container The container
      */
     public function __construct(ContainerInterface $container)
     {

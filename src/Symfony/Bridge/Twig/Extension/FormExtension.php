@@ -45,8 +45,8 @@ class FormExtension extends \Twig_Extension
     /**
      * Sets a theme for a given view.
      *
-     * @param FormView $view   A FormView instance
-     * @param array           $resources An array of resources
+     * @param FormView $view      A FormView instance
+     * @param array    $resources An array of resources
      */
     public function setTheme(FormView $view, array $resources)
     {
@@ -95,7 +95,8 @@ class FormExtension extends \Twig_Extension
     /**
      * Renders a row for the view.
      *
-     * @param FormView $view  The view to render as a row
+     * @param FormView $view      The view to render as a row
+     * @param array    $variables An array of variables
      */
     public function renderRow(FormView $view, array $variables = array())
     {
@@ -122,9 +123,8 @@ class FormExtension extends \Twig_Extension
      *
      *     {{ form_widget(view, {}, {'separator': '+++++'}) }}
      *
-     * @param FormView $view    The view to render
-     * @param array           $attributes HTML attributes passed to the template
-     * @param array           $parameters Additional variables passed to the template
+     * @param FormView        $view       The view to render
+     * @param array           $variables Additional variables passed to the template
      * @param array|string    $resources  A resource or array of resources
      */
     public function renderWidget(FormView $view, array $variables = array(), $resources = null)
@@ -140,7 +140,6 @@ class FormExtension extends \Twig_Extension
      * Renders the errors of the given view
      *
      * @param FormView $view The view to render the errors for
-     * @param array           $params  Additional variables passed to the template
      */
     public function renderErrors(FormView $view)
     {
@@ -150,7 +149,8 @@ class FormExtension extends \Twig_Extension
     /**
      * Renders the label of the given view
      *
-     * @param FormView $view The view to render the label for
+     * @param FormView $view  The view to render the label for
+     * @param string   $label Label name
      */
     public function renderLabel(FormView $view, $label = null)
     {

@@ -72,7 +72,9 @@ class FormHelper extends Helper
     /**
      * Renders the entire form field "row".
      *
-     * @param  FieldInterface $field
+     * @param FormView $view
+     * @param array    $variables
+     *
      * @return string
      */
     public function row(FormView $view, array $variables = array())

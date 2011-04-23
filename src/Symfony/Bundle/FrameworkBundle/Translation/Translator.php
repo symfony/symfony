@@ -40,6 +40,7 @@ class Translator extends BaseTranslator
      *
      * @param ContainerInterface $container A ContainerInterface instance
      * @param MessageSelector    $selector  The message selector for pluralization
+     * @param array              $loaderIds An array of loader Ids
      * @param array              $options   An array of options
      * @param Session            $session   A Session instance
      */

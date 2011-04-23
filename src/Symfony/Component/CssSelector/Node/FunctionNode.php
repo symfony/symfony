@@ -77,9 +77,9 @@ class FunctionNode implements NodeInterface
      * undocumented function
      *
      * @param XPathExpr $xpath
-     * @param mixed $expr
-     * @param string $last
-     * @param string $addNameTest
+     * @param mixed     $expr
+     * @param Boolean   $last
+     * @param Boolean   $addNameTest
      * @return XPathExpr
      */
     protected function _xpath_nth_child($xpath, $expr, $last = false, $addNameTest = true)

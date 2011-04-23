@@ -21,7 +21,6 @@
         <parameter key="router.cache_warmer.class">Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer</parameter>
         <parameter key="router.options.matcher.cache_class">%kernel.name%%kernel.environment%UrlMatcher</parameter>
         <parameter key="router.options.generator.cache_class">%kernel.name%%kernel.environment%UrlGenerator</parameter>
-        <parameter key="router.options.resource_type" />
     </parameters>
 
     <services>
@@ -56,7 +55,7 @@
 
         <service id="router.real" class="%router.class%">
             <argument type="service" id="routing.loader" />
-            <argument>%routing.resource%</argument>
+            <argument /> <!-- routing resource -->
             <argument type="collection">
                 <argument key="cache_dir">%kernel.cache_dir%</argument>
                 <argument key="debug">%kernel.debug%</argument>
@@ -68,7 +67,6 @@
                 <argument key="matcher_base_class">%router.options.matcher_base_class%</argument>
                 <argument key="matcher_dumper_class">%router.options.matcher_dumper_class%</argument>
                 <argument key="matcher_cache_class">%router.options.matcher.cache_class%</argument>
-                <argument key="resource_type">%router.options.resource_type%</argument>
             </argument>
         </service>
 

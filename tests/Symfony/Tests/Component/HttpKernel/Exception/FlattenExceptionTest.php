@@ -42,7 +42,7 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($flattened2,$flattened->getPrevious());
 
-        $this->assertSame(array($flattened2),$flattened->getPreviouses());
+        $this->assertSame(array($flattened2),$flattened->getAllPrevious());
     }
 
     /**

@@ -47,7 +47,7 @@ class FlattenException
     public function toArray()
     {
         $exceptions = array();
-        foreach (array_merge(array($this), $this->getPreviouses()) as $exception) {
+        foreach (array_merge(array($this), $this->getAllPrevious()) as $exception) {
             $exceptions[] = array(
                 'message' => $exception->getMessage(),
                 'class'   => $exception->getClass(),
@@ -118,7 +118,7 @@ class FlattenException
         $this->previous = $previous;
     }
 
-    public function getPreviouses()
+    public function getAllPrevious()
     {
         $exceptions = array();
         $e = $this;

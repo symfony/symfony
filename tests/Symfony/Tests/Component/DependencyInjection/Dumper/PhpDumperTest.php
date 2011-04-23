@@ -15,7 +15,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\InterfaceInjector;
 
 class PhpDumperTest extends \PHPUnit_Framework_TestCase
 {
@@ -92,42 +91,5 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $container->set('bar', $bar = new \stdClass());
 
         $this->assertSame($bar, $container->get('foo')->bar, '->set() overrides an already defined service');
-    }
-
-    public function testInterfaceInjectors()
-    {
-        $interfaceInjector = new InterfaceInjector('FooClass');
-        $interfaceInjector->addMethodCall('setBar', array('someValue'));
-        $container = include self::$fixturesPath.'/containers/interfaces1.php';
-        $container->addInterfaceInjector($interfaceInjector);
-
-        $dumper = new PhpDumper($container);
-
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_interfaces-1.php', $dumper->dump(), '->dump() dumps interface injectors');
-    }
-
-    public function testInterfaceInjectorsAndServiceFactories()
-    {
-        $interfaceInjector = new InterfaceInjector('BarClass');
-        $interfaceInjector->addMethodCall('setFoo', array('someValue'));
-        $container = include self::$fixturesPath.'/containers/interfaces2.php';
-        $container->addInterfaceInjector($interfaceInjector);
-
-        $dumper = new PhpDumper($container);
-
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_interfaces-2.php', $dumper->dump(), '->dump() dumps interface injectors');
-    }
-
-    public function testFrozenContainerInterfaceInjectors()
-    {
-        $interfaceInjector = new InterfaceInjector('FooClass');
-        $interfaceInjector->addMethodCall('setBar', array('someValue'));
-        $container = include self::$fixturesPath.'/containers/interfaces1.php';
-        $container->addInterfaceInjector($interfaceInjector);
-        $container->compile();
-
-        $dumper = new PhpDumper($container);
-
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_interfaces-1-1.php', $dumper->dump(), '->dump() dumps interface injectors');
     }
 }

@@ -15,7 +15,6 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\InterfaceInjector;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -55,9 +54,6 @@ class XmlFileLoader extends FileLoader
 
         // extensions
         $this->loadFromExtensions($xml);
-
-        // interface injectors
-        $this->parseInterfaceInjectors($xml, $file);
 
         // services
         $this->parseDefinitions($xml, $file);
@@ -109,40 +105,6 @@ class XmlFileLoader extends FileLoader
             $this->setCurrentDir(dirname($file));
             $this->import((string) $import['resource'], null, (Boolean) $import->getAttributeAsPhp('ignore-errors'), $file);
         }
-    }
-
-    /**
-     * Parses interface injectors
-     *
-     * @param SimpleXMLElement $xml
-     * @param string $file
-     * @return void
-     */
-    private function parseInterfaceInjectors(SimpleXMLElement $xml, $file)
-    {
-        if (!$xml->interfaces) {
-            return;
-        }
-
-        foreach ($xml->interfaces->interface as $interface) {
-            $this->parseInterfaceInjector((string) $interface['class'], $interface, $file);
-        }
-    }
-
-    /**
-     * Parses an individual interface injector
-     *
-     * @param string $class
-     * @param SimpleXMLElement $interface
-     * @param string $file
-     */
-    private function parseInterfaceInjector($class, $interface, $file)
-    {
-        $injector = new InterfaceInjector($class);
-        foreach ($interface->call as $call) {
-            $injector->addMethodCall((string) $call['method'], $call->getArgumentsAsPhp('argument'));
-        }
-        $this->container->addInterfaceInjector($injector);
     }
 
     /**

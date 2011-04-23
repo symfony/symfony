@@ -32,29 +32,7 @@ class YamlDumper extends Dumper
      */
     public function dump(array $options = array())
     {
-        return $this->addParameters().$this->addInterfaceInjectors()."\n".$this->addServices();
-    }
-
-    /**
-     * Adds interface injectors
-     *
-     * @return string
-     */
-    private function addInterfaceInjectors()
-    {
-        if (!$this->container->getInterfaceInjectors()) {
-            return '';
-        }
-
-        $code = "\ninterfaces:\n";
-        foreach ($this->container->getInterfaceInjectors() as $injector) {
-            $code .= sprintf("    %s:\n", $injector->getClass());
-            if ($injector->getMethodCalls()) {
-                $code .= sprintf("        calls:\n          %s\n", str_replace("\n", "\n          ", Yaml::dump($this->dumpValue($injector->getMethodCalls()), 1)));
-            }
-        }
-
-        return $code;
+        return $this->addParameters()."\n".$this->addServices();
     }
 
     /**

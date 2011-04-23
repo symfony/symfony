@@ -15,7 +15,6 @@ use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
-use Symfony\Component\DependencyInjection\InterfaceInjector;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
@@ -341,7 +340,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         $this->addDefinitions($container->getDefinitions());
         $this->addAliases($container->getAliases());
-        $this->addInterfaceInjectors($container->getInterfaceInjectors());
         $this->getParameterBag()->add($container->getParameterBag()->all());
 
         foreach ($container->getResources() as $resource) {
@@ -515,74 +513,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Adds an InterfaceInjector.
-     *
-     * @param InterfaceInjector $injector
-     */
-    public function addInterfaceInjector(InterfaceInjector $injector)
-    {
-        $class = $injector->getClass();
-        if (isset($this->injectors[$class])) {
-            return $this->injectors[$class]->merge($injector);
-        }
-
-        $this->injectors[$class] = $injector;
-    }
-
-    /**
-     * Adds multiple InterfaceInjectors.
-     *
-     * @param array $injectors An array of InterfaceInjectors
-     */
-    public function addInterfaceInjectors(array $injectors)
-    {
-        foreach ($injectors as $injector) {
-            $this->addInterfaceInjector($injector);
-        }
-    }
-
-    /**
-     * Gets defined InterfaceInjectors.  If a service is provided, only that
-     * support the service will be returned.
-     *
-     * @param string $service If provided, only injectors supporting this service will be returned
-     *
-     * @return array An array of InterfaceInjectors
-     */
-    public function getInterfaceInjectors($service = null)
-    {
-        if (null === $service) {
-            return $this->injectors;
-        }
-
-        return array_filter($this->injectors, function(InterfaceInjector $injector) use ($service) {
-            return $injector->supports($service);
-        });
-    }
-
-    /**
-     * Returns true if an InterfaceInjector is defined for the class.
-     *
-     * @param string $class The class
-     *
-     * @return Boolean true if at least one InterfaceInjector is defined, false otherwise
-     */
-    public function hasInterfaceInjectorForClass($class)
-    {
-        return array_key_exists($class, $this->injectors);
-    }
-
-    /**
-     * Sets the defined InterfaceInjectors.
-     *
-     * @param array $injectors An array of InterfaceInjectors indexed by class names
-     */
-    public function setInterfaceInjectors(array $injectors)
-    {
-        $this->injectors = $injectors;
-    }
-
-    /**
      * Registers a service definition.
      *
      * This methods allows for simple registration of service definition
@@ -738,10 +668,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $r = new \ReflectionClass($this->getParameterBag()->resolveValue($definition->getClass()));
 
             $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
-        }
-
-        foreach ($this->getInterfaceInjectors($service) as $injector) {
-            $injector->processDefinition($definition, $service);
         }
 
         if (self::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {

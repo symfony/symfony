@@ -86,50 +86,9 @@ class PhpDumper extends Dumper
         $code .=
             $this->addServices().
             $this->addDefaultParametersMethod().
-            $this->addInterfaceInjectors().
             $this->endClass()
         ;
 
-        return $code;
-    }
-
-    /**
-     * Returns applyInterfaceInjectors function for the dumper.
-     *
-     * @return string
-     */
-    private function addInterfaceInjectors()
-    {
-        if ($this->container->isFrozen() || 0 === count($this->container->getInterfaceInjectors())) {
-            return;
-        }
-
-        $code = <<<EOF
-
-    /**
-     * Applies all known interface injection calls
-     *
-     * @param Object \$instance
-     */
-    protected function applyInterfaceInjectors(\$instance)
-    {
-
-EOF;
-        foreach ($this->container->getInterfaceInjectors() as $injector) {
-            $code .= sprintf("        if (\$instance instanceof \\%s) {\n", $injector->getClass());
-            foreach ($injector->getMethodCalls() as $call) {
-                $arguments = array();
-                foreach ($call[1] as $value) {
-                    $arguments[] = $this->dumpValue($value);
-                }
-                $code .= $this->wrapServiceConditionals($call[1], sprintf("            \$instance->%s(%s);\n", $call[0], implode(', ', $arguments)));
-            }
-            $code .= sprintf("        }\n");
-        }
-        $code .= <<<EOF
-    }
-
-EOF;
         return $code;
     }
 
@@ -375,10 +334,6 @@ EOF;
      */
     private function isSimpleInstance($id, $definition)
     {
-        if (!$this->container->isFrozen() && count($this->container->getInterfaceInjectors()) > 0) {
-            return false;
-        }
-
         foreach (array_merge(array($definition), $this->getInlinedDefinitions($definition)) as $sDefinition) {
             if ($definition !== $sDefinition && !$this->hasReference($id, $sDefinition->getMethodCalls())) {
                 continue;
@@ -410,10 +365,6 @@ EOF;
             }
 
             $calls .= $this->wrapServiceConditionals($call[1], sprintf("        \$%s->%s(%s);\n", $variableName, $call[0], implode(', ', $arguments)));
-        }
-
-        if (!$this->container->isFrozen() && count($this->container->getInterfaceInjectors()) > 0) {
-            $calls .= sprintf("\n        \$this->applyInterfaceInjectors(\$%s);\n", $variableName);
         }
 
         return $calls;

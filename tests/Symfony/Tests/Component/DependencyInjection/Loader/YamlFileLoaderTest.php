@@ -162,17 +162,6 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
     }
 
-    public function testLoadInterfaceInjectors()
-    {
-        $container = new ContainerBuilder();
-        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
-        $loader->load('interfaces1.yml');
-        $interfaces = $container->getInterfaceInjectors('FooClass');
-        $this->assertEquals(1, count($interfaces), '->load() parses interfaces');
-        $interface = $interfaces['FooClass'];
-        $this->assertTrue($interface->hasMethodCall('setBar'), '->load() parses interfaces elements');
-    }
-
     public function testNonArrayTagThrowsException()
     {
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));

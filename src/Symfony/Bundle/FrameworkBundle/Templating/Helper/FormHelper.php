@@ -148,7 +148,7 @@ class FormHelper extends Helper
         if ($theme) {
             $template = $theme;
         } else {
-            $template = $templateDir.':'.$templateName.'.html.php';
+            $template = 'FrameworkBundle:Form:'.$templateName.'.html.php';
         }
 
         if (!$this->engine->exists($template)) {

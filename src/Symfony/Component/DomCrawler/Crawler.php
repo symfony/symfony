@@ -23,31 +23,20 @@ use Symfony\Component\CssSelector\Parser as CssParser;
 class Crawler extends \SplObjectStorage
 {
     private $uri;
-    private $host;
-    private $path;
-    private $base;
 
     /**
      * Constructor.
      *
      * @param mixed  $node A Node to use as the base for the crawling
-     * @param string $uri  The base URI to use for absolute links or form actions
-     * @param string $base An optional base href for generating the uris for Form and Link.
-     *                     This will be autodetected if $node has a <base> tag.
+     * @param string $uri  The current URI or the base href value
      *
      * @api
      */
-    public function __construct($node = null, $uri = null, $base = null)
+    public function __construct($node = null, $uri = null)
     {
         $this->uri = $uri;
 
-        list($this->host, $this->path) = $this->parseUri($this->uri);
-
         $this->add($node);
-
-        if ($base) {
-            $this->base = $base;
-        }
     }
 
     /**
@@ -131,7 +120,7 @@ class Crawler extends \SplObjectStorage
         $base = $this->filter('base')->extract(array('href'));
 
         if (count($base)) {
-            $this->base = current($base);
+            $this->uri = current($base);
         }
     }
 
@@ -498,7 +487,7 @@ class Crawler extends \SplObjectStorage
 
         $domxpath = new \DOMXPath($document);
 
-        return new static($domxpath->query($xpath), $this->uri, $this->base);
+        return new static($domxpath->query($xpath), $this->uri);
     }
 
     /**
@@ -579,7 +568,7 @@ class Crawler extends \SplObjectStorage
 
         $node = $this->getNode(0);
 
-        return new Link($node, $method, $this->host, $this->path, $this->base);
+        return new Link($node, $this->uri, $method);
     }
 
     /**
@@ -593,7 +582,7 @@ class Crawler extends \SplObjectStorage
     {
         $links = array();
         foreach ($this as $node) {
-            $links[] = new Link($node, 'get', $this->host, $this->path);
+            $links[] = new Link($node, $this->uri, 'get');
         }
 
         return $links;
@@ -617,7 +606,7 @@ class Crawler extends \SplObjectStorage
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        $form = new Form($this->getNode(0), $method, $this->host, $this->path, $this->base);
+        $form = new Form($this->getNode(0), $this->uri, $method);
 
         if (null !== $values) {
             $form->setValues($values);
@@ -663,17 +652,6 @@ class Crawler extends \SplObjectStorage
 
         return null;
         // @codeCoverageIgnoreEnd
-    }
-
-    private function parseUri($uri)
-    {
-        if ('http' !== substr($uri, 0, 4)) {
-            return array(null, '/');
-        }
-
-        $path = parse_url($uri, PHP_URL_PATH);
-
-        return array(preg_replace('#^(.*?//[^/]+)\/.*$#', '$1', $uri), $path);
     }
 
     private function sibling($node, $siblingDir = 'nextSibling')

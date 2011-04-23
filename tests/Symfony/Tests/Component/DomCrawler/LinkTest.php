@@ -15,78 +15,79 @@ use Symfony\Component\DomCrawler\Link;
 
 class LinkTest extends \PHPUnit_Framework_TestCase
 {
-    public function testConstructor()
+    /**
+     * @expectedException \LogicException
+     */
+    public function testConstructorWithANonATag()
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><div><div></html>');
 
-        $node = $dom->getElementsByTagName('div')->item(0);
-
-        try {
-            new Link($node);
-            $this->fail('__construct() throws a \LogicException if the node is not an "a" tag');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\LogicException', $e, '__construct() throws a \LogicException if the node is not an "a" tag');
-        }
+        new Link($dom->getElementsByTagName('div')->item(0), 'http://www.example.com/');
     }
 
-    public function testGetters()
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testConstructorWithAnInvalidCurrentUri()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('<html><a href="/foo">foo</a></html>');
+
+        new Link($dom->getElementsByTagName('a')->item(0), 'example.com');
+    }
+
+    public function testGetNode()
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><a href="/foo">foo</a></html>');
 
         $node = $dom->getElementsByTagName('a')->item(0);
-        $link = new Link($node);
+        $link = new Link($node, 'http://example.com/');
 
-        $this->assertEquals('/foo', $link->getUri(), '->getUri() returns the URI of the link');
         $this->assertEquals($node, $link->getNode(), '->getNode() returns the node associated with the link');
+    }
+
+    public function testGetMethod()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('<html><a href="/foo">foo</a></html>');
+
+        $node = $dom->getElementsByTagName('a')->item(0);
+        $link = new Link($node, 'http://example.com/');
+
         $this->assertEquals('get', $link->getMethod(), '->getMethod() returns the method of the link');
 
-        $link = new Link($node, 'post');
+        $link = new Link($node, 'http://example.com/', 'post');
         $this->assertEquals('post', $link->getMethod(), '->getMethod() returns the method of the link');
+    }
 
-        $link = new Link($node, 'get', 'http://localhost', '/bar/');
-        $this->assertEquals('http://localhost/foo', $link->getUri(), '->getUri() returns the absolute URI of the link');
-        $this->assertEquals('/foo', $link->getUri(false), '->getUri() returns the relative URI of the link if false is the first argument');
-
+    /**
+     * @dataProvider getGetUriTests
+     */
+    public function testGetUri($url, $currentUri, $expected)
+    {
         $dom = new \DOMDocument();
-        $dom->loadHTML('<html><a href="foo">foo</a></html>');
-        $node = $dom->getElementsByTagName('a')->item(0);
+        $dom->loadHTML(sprintf('<html><a href="%s">foo</a></html>', $url));
+        $link = new Link($dom->getElementsByTagName('a')->item(0), $currentUri);
 
-        $link = new Link($node, 'get', 'http://localhost', '/bar/');
-        $this->assertEquals('http://localhost/bar/foo', $link->getUri(), '->getUri() returns the absolute URI of the link for relative hrefs');
-        $this->assertEquals('/bar/foo', $link->getUri(false), '->getUri() returns the relative URI of the link if false is the first argument');
+        $this->assertEquals($expected, $link->getUri());
+    }
 
-        $dom = new \DOMDocument();
-        $dom->loadHTML('<html><a href="http://login.foo.com/foo">foo</a></html>');
-        $node = $dom->getElementsByTagName('a')->item(0);
+    public function getGetUriTests()
+    {
+        return array(
+            array('/foo', 'http://localhost/bar/foo/', 'http://localhost/foo'),
+            array('/foo', 'http://localhost/bar/foo', 'http://localhost/foo'),
 
-        $link = new Link($node, 'get', 'http://www.foo.com');
-        $this->assertEquals('http://login.foo.com/foo', $link->getUri(), '->getUri() returns the absolute URI of the link, regardless of the context of the object');
+            array('foo', 'http://localhost/bar/foo/', 'http://localhost/bar/foo/foo'),
+            array('foo', 'http://localhost/bar/foo', 'http://localhost/bar/foo'),
 
-        $link = new Link($node, 'get');
-        $this->assertEquals('http://login.foo.com/foo', $link->getUri(), '->getUri() returns the absolute URI of the link, regardless of the context of the object');
+            array('', 'http://localhost/bar/', 'http://localhost/bar/'),
+            array('#', 'http://localhost/bar/', 'http://localhost/bar/#'),
+            array('?a=b', 'http://localhost/bar/', 'http://localhost/bar/?a=b'),
 
-        $link = new Link($node, 'get', null, '/bar/');
-        $this->assertEquals('http://login.foo.com/foo', $link->getUri(), '->getUri() returns the absolute URI of the link, regardless of the context of the object');
-
-        $link = new Link($node, 'get','http://www.foo.com','/bar/');
-        $this->assertEquals('http://login.foo.com/foo', $link->getUri(), '->getUri() returns the absolute URI of the link, regardless of the context of the object');
-
-        $dom = new \DOMDocument();
-        $dom->loadHTML('<html><a href="?get=param">foo</a></html>');
-        $node = $dom->getElementsByTagName('a')->item(0);
-
-        $link = new Link($node, 'get', 'http://www.foo.com', '/foo/bar');
-        $this->assertEquals('http://www.foo.com/foo/bar?get=param', $link->getUri(), '->getUri() returns the absolute URI of the link, regardless of the context of the object');
-
-        $link = new Link($node, 'get', 'http://www.foo.com', '/foo/bar');
-        $this->assertEquals('/foo/bar?get=param', $link->getUri(false), '->getUri() returns the relative URI of the link if false is the first argument');
-
-        $dom = new \DOMDocument();
-        $dom->loadHTML('<html><a href="test.html">foo</a></html>');
-        $node = $dom->getElementsByTagName('a')->item(0);
-        $link = new Link($node, 'get', null, '/foo/bar', 'http://www.foo.com/');
-        $this->assertEquals('http://www.foo.com/test.html', $link->getUri());
+            array('http://login.foo.com/foo', 'http://localhost/bar/', 'http://login.foo.com/foo'),
+        );
     }
 }

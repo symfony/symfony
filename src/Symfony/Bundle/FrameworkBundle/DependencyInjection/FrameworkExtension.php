@@ -161,11 +161,11 @@ class FrameworkExtension extends Extension
      */
     private function registerCsrfProtectionConfiguration(array $config, ContainerBuilder $container)
     {
-        foreach (array('enabled', 'field_name', 'secret') as $key) {
-            if (isset($config[$key])) {
-                $container->setParameter('form.csrf_protection.'.$key, $config[$key]);
-            }
-        }
+        $container->getDefinition('form.csrf_provider')->replaceArgument(1, $config['secret']);
+
+        // FIXME: those are not used
+        $container->setParameter('form.csrf_protection.field_name', $config['field_name']);
+        $container->setParameter('form.csrf_protection.enabled', $config['enabled']);
     }
 
     /**

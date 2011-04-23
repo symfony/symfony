@@ -26,7 +26,8 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->getParameter('form.csrf_protection.enabled'));
         $this->assertEquals('_csrf', $container->getParameter('form.csrf_protection.field_name'));
-        $this->assertEquals('s3cr3t', $container->getParameter('form.csrf_protection.secret'));
+        $arguments = $container->findDefinition('form.csrf_provider')->getArguments();
+        $this->assertEquals('s3cr3t', $arguments[1]);
     }
 
     public function testEsi()

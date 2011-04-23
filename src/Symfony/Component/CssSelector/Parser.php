@@ -168,7 +168,7 @@ class Parser
      *
      * @throws SyntaxError When expected symbol but got something else
      *
-     * @param  TokenStream The stream containing the selector.
+     * @param  TokenStream $stream The stream containing the selector.
      *
      * @return Node\NodeInterface
      */

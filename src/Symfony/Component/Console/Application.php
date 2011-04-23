@@ -640,8 +640,8 @@ class Application
     /**
      * Returns an XML representation of the Application.
      *
-     * @param string $namespace An optional namespace name
-     * @param Boolean $asDom Whether to return a DOM or an XML string
+     * @param string  $namespace An optional namespace name
+     * @param Boolean $asDom     Whether to return a DOM or an XML string
      *
      * @return string|DOMDocument An XML string representing the Application
      */

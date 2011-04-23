@@ -30,8 +30,8 @@ class UrlGenerator implements UrlGeneratorInterface
     /**
      * Constructor.
      *
-     * @param RouteCollection $routes   A RouteCollection instance
-     * @param RequestContext  $context  The context
+     * @param RouteCollection $routes  A RouteCollection instance
+     * @param RequestContext  $context The context
      */
     public function __construct(RouteCollection $routes, RequestContext $context)
     {
@@ -43,7 +43,7 @@ class UrlGenerator implements UrlGeneratorInterface
     /**
      * Sets the request context.
      *
-     * @param RequestContext $context  The context
+     * @param RequestContext $context The context
      */
     public function setContext(RequestContext $context)
     {

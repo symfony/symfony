@@ -19,7 +19,7 @@ class MethodNotImplementedException extends NotImplementedException
     /**
      * Constructor
      *
-     * @param string $message  The exception message. A note to install the intl extension is appended to this string
+     * @param string $methodName The name of the method
      */
     public function __construct($methodName)
     {

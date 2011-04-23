@@ -83,8 +83,8 @@ class ParameterBag implements ParameterBagInterface
     /**
      * Sets a service container parameter.
      *
-     * @param string $name       The parameter name
-     * @param mixed  $parameters The parameter value
+     * @param string $name  The parameter name
+     * @param mixed  $value The parameter value
      */
     public function set($name, $value)
     {

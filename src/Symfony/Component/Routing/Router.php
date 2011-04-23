@@ -40,10 +40,10 @@ class Router implements RouterInterface
      *   * debug:         Whether to enable debugging or not (false by default)
      *   * resource_type: Type hint for the main resource (optional)
      *
-     * @param LoaderInterface $loader A LoaderInterface instance
+     * @param LoaderInterface $loader   A LoaderInterface instance
      * @param mixed           $resource The main resource to load
      * @param array           $options  An array of options
-     * @param array           $context  The context
+     * @param RequestContext  $context  The context
      * @param array           $defaults The default values
      *
      * @throws \InvalidArgumentException When unsupported option is provided

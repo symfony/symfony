@@ -41,8 +41,8 @@ interface OutputFormatterInterface
     /**
      * Sets a new style.
      *
-     * @param   string                          $name     The style name
-     * @param   OutputFormatterStyleInterface   $options  The style instance
+     * @param string                        $name  The style name
+     * @param OutputFormatterStyleInterface $style The style instance
      *
      * @api
      */

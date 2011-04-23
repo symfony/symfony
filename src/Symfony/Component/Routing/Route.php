@@ -214,6 +214,7 @@ class Route
     /**
      * Returns the requirement for the given key.
      *
+     * @param string $key The key
      * @return string The regex
      */
     public function getRequirement($key)
@@ -224,8 +225,8 @@ class Route
     /**
      * Sets a requirement for the given key.
      *
-     * @param string The key
-     * @param string The regex
+     * @param string $key The key
+     * @param string $regex The regex
      */
     public function setRequirement($key, $regex)
     {

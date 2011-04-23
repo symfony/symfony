@@ -44,8 +44,10 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     /**
      * Constructor
      *
-     * @param array $userProviders
-     * @param array $options
+     * @param array           $userProviders
+     * @param string          $key
+     * @param string          $providerKey
+     * @param array           $options
      * @param LoggerInterface $logger
      */
     public function __construct(array $userProviders, $key, $providerKey, array $options = array(), LoggerInterface $logger = null)
@@ -140,8 +142,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     /**
      * Implementation for LogoutHandlerInterface. Deletes the cookie.
      *
-     * @param Request $request
-     * @param Response $response
+     * @param Request        $request
+     * @param Response       $response
      * @param TokenInterface $token
      * @return void
      */
@@ -167,9 +169,9 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * Implementation for RememberMeServicesInterface. This is called when an
      * authentication is successful.
      *
-     * @param Request $request
-     * @param Response $response
-     * @param TokenInterface $token The token that resulted in a successful authentication
+     * @param Request        $request
+     * @param Response       $response
+     * @param TokenInterface $token    The token that resulted in a successful authentication
      * @return void
      */
     public final function loginSuccess(Request $request, Response $response, TokenInterface $token)
@@ -201,7 +203,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * Subclasses should validate the cookie and do any additional processing
      * that is required. This is called from autoLogin().
      *
-     * @param array $cookieParts
+     * @param array   $cookieParts
      * @param Request $request
      * @return TokenInterface
      */
@@ -216,8 +218,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * requested remember-me capabilities. The implementation usually sets a
      * cookie and possibly stores a persistent record of it.
      *
-     * @param Request $request
-     * @param Response $response
+     * @param Request        $request
+     * @param Response       $response
      * @param TokenInterface $token
      * @return void
      */

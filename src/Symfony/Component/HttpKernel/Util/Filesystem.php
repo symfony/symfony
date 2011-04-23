@@ -25,9 +25,9 @@ class Filesystem
      *
      * By default, if the target already exists, it is not overridden.
      *
-     * @param string $originFile  The original filename
-     * @param string $targetFile  The target filename
-     * @param array  $override    Whether to override an existing file or not
+     * @param string $originFile The original filename
+     * @param string $targetFile The target filename
+     * @param array  $override   Whether to override an existing file or not
      */
     public function copy($originFile, $targetFile, $override = false)
     {
@@ -143,9 +143,9 @@ class Filesystem
     /**
      * Creates a symbolic link or copy a directory.
      *
-     * @param string  $originDir      The origin directory path
-     * @param string  $targetDir      The symbolic link name
-     * @param Boolean $copyOnWindows  Whether to copy files if on windows
+     * @param string  $originDir     The origin directory path
+     * @param string  $targetDir     The symbolic link name
+     * @param Boolean $copyOnWindows Whether to copy files if on windows
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {

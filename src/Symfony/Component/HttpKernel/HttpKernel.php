@@ -35,8 +35,8 @@ class HttpKernel implements HttpKernelInterface
     /**
      * Constructor
      *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param ControllerResolverInterface $resolver A ControllerResolverInterface instance
+     * @param EventDispatcherInterface    $dispatcher An EventDispatcherInterface instance
+     * @param ControllerResolverInterface $resolver   A ControllerResolverInterface instance
      */
     public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver)
     {
@@ -78,7 +78,7 @@ class HttpKernel implements HttpKernelInterface
      * Exceptions are not caught.
      *
      * @param Request $request A Request instance
-     * @param integer $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
+     * @param integer $type    The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
      *
      * @return Response A Response instance
      *

@@ -90,7 +90,7 @@ interface OutputInterface
     /**
      * Sets output formatter.
      *
-     * @param   OutputFormatterInterface    $formatter
+     * @param OutputFormatterInterface $formatter
      *
      * @api
      */

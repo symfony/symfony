@@ -147,8 +147,8 @@ class Container implements ContainerInterface
     /**
      * Sets a parameter.
      *
-     * @param string $name       The parameter name
-     * @param mixed  $parameters The parameter value
+     * @param string $name  The parameter name
+     * @param mixed  $value The parameter value
      */
     public function setParameter($name, $value)
     {
@@ -201,8 +201,8 @@ class Container implements ContainerInterface
      * If a service is both defined through a set() method and
      * with a set*Service() method, the former has always precedence.
      *
-     * @param  string $id              The service identifier
-     * @param  int    $invalidBehavior The behavior when the service does not exist
+     * @param  string  $id              The service identifier
+     * @param  integer $invalidBehavior The behavior when the service does not exist
      *
      * @return object The associated service
      *

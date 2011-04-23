@@ -171,8 +171,8 @@ class FrameworkExtension extends Extension
     /**
      * Loads the ESI configuration.
      *
-     * @param array            $config    An ESI configuration array
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     * @param array         $config An ESI configuration array
+     * @param XmlFileLoader $loader An XmlFileLoader instance
      */
     private function registerEsiConfiguration(array $config, XmlFileLoader $loader)
     {
@@ -312,6 +312,7 @@ class FrameworkExtension extends Extension
      * Loads the templating configuration.
      *
      * @param array            $config    A templating configuration array
+     * @param string           $ide
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
      */

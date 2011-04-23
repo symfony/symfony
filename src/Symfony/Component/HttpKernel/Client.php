@@ -91,7 +91,7 @@ EOF;
     /**
      * Converts the BrowserKit request to a HttpKernel request.
      *
-     * @param Request $request A Request instance
+     * @param DomRequest $request A Request instance
      *
      * @return Request A Request instance
      */

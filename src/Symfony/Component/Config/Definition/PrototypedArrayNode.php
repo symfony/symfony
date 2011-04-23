@@ -70,7 +70,7 @@ class PrototypedArrayNode extends ArrayNode
      * If $remove is false, the resulting array will still have the
      * "'id' => 'my_name'" item in it.
      *
-     * @param string $attribute The name of the attribute which value is to be used as a key
+     * @param string  $attribute The name of the attribute which value is to be used as a key
      * @param Boolean $remove Whether or not to remove the key
      */
     public function setKeyAttribute($attribute, $remove = true)

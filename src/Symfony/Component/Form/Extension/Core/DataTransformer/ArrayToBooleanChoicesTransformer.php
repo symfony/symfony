@@ -33,7 +33,7 @@ class ArrayToBooleanChoicesTransformer implements DataTransformerInterface
      * depending on whether a given option is selected. If this field is rendered
      * as select tag, the value is not modified.
      *
-     * @param  mixed $value  An array if "multiple" is set to true, a scalar
+     * @param  mixed $array  An array if "multiple" is set to true, a scalar
      *                       value otherwise.
      * @return mixed         An array if "expanded" or "multiple" is set to true,
      *                       a scalar value otherwise.

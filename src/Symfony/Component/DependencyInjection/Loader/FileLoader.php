@@ -28,7 +28,7 @@ abstract class FileLoader extends BaseFileLoader
      * Constructor.
      *
      * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param FileLocator $locator A FileLocator instance
+     * @param FileLocator      $locator   A FileLocator instance
      */
     public function __construct(ContainerBuilder $container, FileLocator $locator)
     {

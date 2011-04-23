@@ -74,7 +74,7 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Creates the node.
      *
-     * @param Boolean $forceRootNode Wether to force this node as the root node
+     * @param Boolean $forceRootNode Whether to force this node as the root node
      *
      * @return NodeInterface
      */

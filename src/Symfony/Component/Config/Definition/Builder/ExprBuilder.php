@@ -27,7 +27,7 @@ class ExprBuilder
     /**
      * Constructor
      *
-     * @param NodeDefinition $parent The related node
+     * @param NodeDefinition $node The related node
      */
     public function __construct(NodeDefinition $node)
     {

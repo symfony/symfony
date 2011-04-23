@@ -26,7 +26,7 @@ class ObjectIdentity implements ObjectIdentityInterface
     private $type;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $identifier
      * @param string $type

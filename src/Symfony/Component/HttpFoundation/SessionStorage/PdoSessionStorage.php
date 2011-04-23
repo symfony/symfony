@@ -25,7 +25,7 @@ class PdoSessionStorage extends NativeSessionStorage
     /**
      * Constructor.
      *
-     * @param \PDO  $pdo       A PDO instance
+     * @param \PDO  $db        A PDO instance
      * @param array $options   An associative array of session options
      * @param array $dbOptions An associative array of DB options
      *

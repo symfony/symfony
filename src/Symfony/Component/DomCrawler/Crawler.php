@@ -602,8 +602,8 @@ class Crawler extends \SplObjectStorage
     /**
      * Returns a Form object for the first node in the list.
      *
-     * @param  array  $arguments An array of values for the form fields
-     * @param  string $method    The method for the form
+     * @param  array  $values An array of values for the form fields
+     * @param  string $method The method for the form
      *
      * @return Form   A Form instance
      *

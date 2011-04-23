@@ -34,8 +34,8 @@ class SessionCsrfProvider extends DefaultCsrfProvider
      * A recommended value for the secret is a generated value with at least
      * 32 characters and mixed letters, digits and special characters.
      *
-     * @param Session $session  The user session
-     * @param string $secret    A secret value included in the CSRF token
+     * @param Session $session The user session
+     * @param string  $secret  A secret value included in the CSRF token
      */
     public function __construct(Session $session, $secret)
     {

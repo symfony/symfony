@@ -191,7 +191,7 @@ class FormBuilder
     /**
      * Prepends a transformer to the client transformer chain
      *
-     * @param DataTransformerInterface $clientTransformer
+     * @param DataTransformerInterface $normTransformer
      */
     public function prependNormTransformer(DataTransformerInterface $normTransformer = null)
     {
@@ -336,7 +336,9 @@ class FormBuilder
      * $form->add($locationGroup);
      * </code>
      *
-     * @param FormInterface|string $form
+     * @param string                   $name
+     * @param string|FormTypeInterface $type
+     * @param array                    $options
      * @return FormInterface
      */
     public function add($name, $type = null, array $options = array())

@@ -34,8 +34,9 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     /**
      * Constructor.
      *
-     * @param UserCheckerInterface $userChecker             An UserCheckerInterface interface
-     * @param Boolean                 $hideUserNotFoundExceptions Whether to hide user not found exception or not
+     * @param UserCheckerInterface $userChecker                An UserCheckerInterface interface
+     * @param string               $providerKey                A provider key
+     * @param Boolean              $hideUserNotFoundExceptions Whether to hide user not found exception or not
      */
     public function __construct(UserCheckerInterface $userChecker, $providerKey, $hideUserNotFoundExceptions = true)
     {
@@ -110,8 +111,8 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
      * Does additional checks on the user and token (like validating the
      * credentials).
      *
-     * @param UserInterface      $user The retrieved UserInterface instance
-     * @param UsernamePasswordToken $token   The UsernamePasswordToken token to be authenticated
+     * @param UserInterface         $user  The retrieved UserInterface instance
+     * @param UsernamePasswordToken $token The UsernamePasswordToken token to be authenticated
      *
      * @throws AuthenticationException if the credentials could not be validated
      */

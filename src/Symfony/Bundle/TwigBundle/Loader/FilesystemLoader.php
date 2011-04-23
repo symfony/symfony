@@ -30,7 +30,8 @@ class FilesystemLoader implements \Twig_LoaderInterface
     /**
      * Constructor.
      *
-     * @param FileLocatorInterface $locator A FileLocatorInterface instance
+     * @param FileLocatorInterface        $locator A FileLocatorInterface instance
+     * @param TemplateNameParserInterface $parser  A TemplateNameParserInterface instance
      */
     public function __construct(FileLocatorInterface $locator, TemplateNameParserInterface $parser)
     {

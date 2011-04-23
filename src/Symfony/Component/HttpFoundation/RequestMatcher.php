@@ -66,7 +66,7 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * Adds a check for the HTTP method.
      *
-     * @param string|array An HTTP method or an array of HTTP methods
+     * @param string|array $method An HTTP method or an array of HTTP methods
      */
     public function matchMethod($method)
     {

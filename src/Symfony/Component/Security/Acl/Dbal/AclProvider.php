@@ -46,12 +46,12 @@ class AclProvider implements AclProviderInterface
     private $permissionGrantingStrategy;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param Connection $connection
+     * @param Connection                          $connection
      * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
-     * @param array $options
-     * @param AclCacheInterface $cache
+     * @param array                               $options
+     * @param AclCacheInterface                   $cache
      */
     public function __construct(Connection $connection, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $options, AclCacheInterface $cache = null)
     {
@@ -280,7 +280,7 @@ SELECTCLAUSE;
      * object identities.
      *
      * @param ObjectIdentityInterface $oid
-     * @param Boolean $directChildrenOnly
+     * @param Boolean                 $directChildrenOnly
      * @return string
      */
     protected function getFindChildrenSql(ObjectIdentityInterface $oid, $directChildrenOnly)
@@ -441,8 +441,8 @@ QUERY;
      * performance of the entire ACL system.
      *
      * @param Statement $stmt
-     * @param array $oidLookup
-     * @param array $sids
+     * @param array     $oidLookup
+     * @param array     $sids
      * @throws \RuntimeException
      * @return \SplObjectStorage
      */

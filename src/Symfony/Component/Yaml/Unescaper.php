@@ -121,9 +121,9 @@ class Unescaper
     /**
      * Convert a string from one encoding to another.
      *
-     * @param string $string The string to convert
-     * @param string $to     The input encoding
-     * @param string $from   The output encoding
+     * @param string $value The string to convert
+     * @param string $to    The input encoding
+     * @param string $from  The output encoding
      *
      * @return string The string with the new encoding
      *

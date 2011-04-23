@@ -30,9 +30,10 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     /**
      * Constructor.
      *
-     * @param VoterInterface[] $voters                     An array of VoterInterface instances
-     * @param string           $strategy                   The vote strategy
-     * @param Boolean          $allowIfAllAbstainDecisions Whether to grant access if all voters abstained or not
+     * @param VoterInterface[] $voters                             An array of VoterInterface instances
+     * @param string           $strategy                           The vote strategy
+     * @param Boolean          $allowIfAllAbstainDecisions         Whether to grant access if all voters abstained or not
+     * @param Boolean          $allowIfEqualGrantedDeniedDecisions Whether to grant access if result are equals
      */
     public function __construct(array $voters, $strategy = 'affirmative', $allowIfAllAbstainDecisions = false, $allowIfEqualGrantedDeniedDecisions = true)
     {

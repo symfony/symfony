@@ -26,7 +26,7 @@ class FileBag extends ParameterBag
     /**
      * Constructor.
      *
-     * @param array $headers An array of HTTP files
+     * @param array $parameters An array of HTTP files
      */
     public function __construct(array $parameters = array())
     {

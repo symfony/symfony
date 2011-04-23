@@ -68,10 +68,10 @@ class HttpCache implements HttpKernelInterface
      *                            This setting is overridden by the stale-if-error HTTP Cache-Control extension
      *                            (see RFC 5861).
      *
-     * @param HttpKernelInterface $kernel An HttpKernelInterface instance
-     * @param StoreInterface      $store  A Store instance
-     * @param Esi                 $esi    An Esi instance
-     * @param array                                             $options        An array of options
+     * @param HttpKernelInterface $kernel  An HttpKernelInterface instance
+     * @param StoreInterface      $store   A Store instance
+     * @param Esi                 $esi     An Esi instance
+     * @param array               $options An array of options
      */
     public function __construct(HttpKernelInterface $kernel, StoreInterface $store, Esi $esi = null, array $options = array())
     {
@@ -201,7 +201,7 @@ class HttpCache implements HttpKernelInterface
      * Forwards the Request to the backend without storing the Response in the cache.
      *
      * @param Request $request A Request instance
-     * @param Boolean  $catch   whether to process exceptions
+     * @param Boolean $catch   Whether to process exceptions
      *
      * @return Response A Response instance
      */
@@ -216,7 +216,7 @@ class HttpCache implements HttpKernelInterface
      * Invalidates non-safe methods (like POST, PUT, and DELETE).
      *
      * @param Request $request A Request instance
-     * @param Boolean  $catch   whether to process exceptions
+     * @param Boolean $catch   Whether to process exceptions
      *
      * @return Response A Response instance
      *
@@ -364,8 +364,8 @@ class HttpCache implements HttpKernelInterface
      *
      * This methods is triggered when the cache missed or a reload is required.
      *
-     * @param Request  $request A Request instance
-     * @param Boolean  $catch   whether to process exceptions
+     * @param Request $request A Request instance
+     * @param Boolean $catch   whether to process exceptions
      *
      * @return Response A Response instance
      */
@@ -398,9 +398,9 @@ class HttpCache implements HttpKernelInterface
     /**
      * Forwards the Request to the backend and returns the Response.
      *
-     * @param Request  $request  A Request instance
-     * @param Boolean  $catch    Whether to catch exceptions or not
-     * @param Response $response A Response instance (the stale entry if present, null otherwise)
+     * @param Request  $request A Request instance
+     * @param Boolean  $catch   Whether to catch exceptions or not
+     * @param Response $entry   A Response instance (the stale entry if present, null otherwise)
      *
      * @return Response A Response instance
      */
@@ -537,6 +537,7 @@ class HttpCache implements HttpKernelInterface
     /**
      * Restores the Response body.
      *
+     * @param Request  $request  A Request instance
      * @param Response $response A Response instance
      *
      * @return Response A Response instance
@@ -610,7 +611,8 @@ class HttpCache implements HttpKernelInterface
     /**
      * Records that an event took place.
      *
-     * @param string $event The event name
+     * @param Request $request A Request instance
+     * @param string  $event The event name
      */
     private function record(Request $request, $event)
     {

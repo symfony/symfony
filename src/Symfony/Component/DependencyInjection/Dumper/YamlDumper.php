@@ -196,7 +196,7 @@ class YamlDumper extends Dumper
     /**
      * Gets the service call.
      *
-     * @param string $id
+     * @param string    $id
      * @param Reference $reference
      * @return string
      */

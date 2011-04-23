@@ -90,8 +90,8 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      * AuthenticationProviderInterface.
      *
      * @param ContainerBuilder $container
-     * @param string           $id The unique id of the firewall
-     * @param array            $options The options array for this listener
+     * @param string           $id             The unique id of the firewall
+     * @param array            $config         The options array for this listener
      * @param string           $userProviderId The id of the user provider
      *
      * @return string never null, the id of the authentication provider

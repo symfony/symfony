@@ -54,9 +54,9 @@ class GraphWalker
      * instance and validation group.
      *
      * @param ClassMetadata $metadata
-     * @param  object $object The object to validate
-     * @param  string $group The validator group to use for validation
-     * @param  string $propertyPath
+     * @param object        $object       The object to validate
+     * @param string        $group        The validator group to use for validation
+     * @param string        $propertyPath
      */
     public function walkObject(ClassMetadata $metadata, $object, $group, $propertyPath)
     {

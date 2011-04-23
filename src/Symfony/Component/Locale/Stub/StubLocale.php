@@ -135,6 +135,8 @@ class StubLocale
     /**
      * Returns the currencies data
      *
+     * @param string $locale
+     *
      * @return array  The currencies data
      */
     static public function getCurrenciesData($locale)
@@ -203,8 +205,9 @@ class StubLocale
     /**
      * Checks if a language tag filter matches with locale
      *
-     * @param  string   $langtag  The language tag to check
-     * @param  string   $locale   The language range to check against
+     * @param  string  $langtag      The language tag to check
+     * @param  string  $locale       The language range to check against
+     * @param  Boolean $canonicalize
      * @return string             The corresponding locale code
      * @see    http://www.php.net/manual/en/locale.filtermatches.php
      * @throws MethodNotImplementedException

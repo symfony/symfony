@@ -32,8 +32,8 @@ class TemplateCacheCacheWarmer extends CacheWarmer
     /**
      * Constructor.
      *
-     * @param ContainerInterface   $container The dependency injection container
-     * @param string               $rootDir The directory where global templates can be stored
+     * @param ContainerInterface $container The dependency injection container
+     * @param string             $rootDir The directory where global templates can be stored
      */
     public function __construct(ContainerInterface $container, $rootDir)
     {

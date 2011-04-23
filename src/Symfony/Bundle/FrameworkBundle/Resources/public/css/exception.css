@@ -265,7 +265,7 @@ build: 56
     margin-left: 0; 
     white-space: nowrap; 
     font-size: 12px; 
-    padding-bottom: 0px;
+    padding-bottom: 0;
 }
 .sf-exceptionreset li .selected
 {

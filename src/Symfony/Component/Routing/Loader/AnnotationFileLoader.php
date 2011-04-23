@@ -29,8 +29,9 @@ class AnnotationFileLoader extends FileLoader
     /**
      * Constructor.
      *
-     * @param AnnotationClassLoader $loader An AnnotationClassLoader instance
-     * @param string|array          $paths  A path or an array of paths where to look for resources
+     * @param FileLocator           $locator A FileLocator instance
+     * @param AnnotationClassLoader $loader  An AnnotationClassLoader instance
+     * @param string|array          $paths   A path or an array of paths where to look for resources
      */
     public function __construct(FileLocator $locator, AnnotationClassLoader $loader, $paths = array())
     {

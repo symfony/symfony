@@ -86,7 +86,7 @@ class AssetsHelper extends Helper implements AssetPackageInterface
     /**
      * Gets the version to add to public URL.
      *
-     * @param string $package A package name
+     * @param string $packageName A package name
      *
      * @return string The current version
      */
@@ -125,7 +125,8 @@ class AssetsHelper extends Helper implements AssetPackageInterface
      * If multiple base URLs have been defined a random one will be picked for each asset.
      * In other words: for one asset path the same base URL will always be picked among the available base URLs.
      *
-     * @param  string $path The path
+     * @param string $path The path
+     * @param string $packageName The package name
      *
      * @return string The base URL
      */

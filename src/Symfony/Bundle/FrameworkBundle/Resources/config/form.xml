@@ -5,10 +5,10 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
+        <parameter key="form.extension.class">Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension</parameter>
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
-        <parameter key="form.type.loader.class">Symfony\Bundle\FrameworkBundle\Form\ContainerAwareTypeLoader</parameter>
-        <parameter key="form.guesser.validator.class">Symfony\Component\Form\Type\Guesser\ValidatorTypeGuesser</parameter>
-        <parameter key="form.csrf_provider.class">Symfony\Component\Form\CsrfProvider\SessionCsrfProvider</parameter>
+        <parameter key="form.type_guesser.validator.class">Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser</parameter>
+        <parameter key="form.csrf_provider.class">Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider</parameter>
         <parameter key="form.csrf_protection.enabled">true</parameter>
         <parameter key="form.csrf_protection.field_name">_token</parameter>
         <parameter key="form.csrf_protection.secret">secret</parameter>
@@ -23,17 +23,39 @@
 
         <!-- FormFactory -->
         <service id="form.factory" class="%form.factory.class%">
-            <argument type="service" id="form.type.loader" />
+            <argument type="collection">
+                <!--
+                We don't need to be able to add more extensions.
+                 * more types can be registered with the form.type tag
+                 * more type_guessers can be registered with the form.type.type_guesser tag 
+                -->
+                <argument type="service" id="form.extension" />
+            </argument>
+        </service>
+
+        <!-- DependencyInjectionExtension -->
+        <service id="form.extension" class="%form.extension.class%" public="false">
+            <argument type="service" id="service_container" />
             <!--
-            All services with tag "form.guesser" are inserted here by
-            AddFormGuessersPass
+            All services with tag "form.type" are inserted here by
+            InitFormsPass
+            -->
+            <argument type="collection" />
+            <!--
+            All services with tag "form.type_extension" are inserted here by
+            InitFormsPass
+            -->
+            <argument type="collection" />
+            <!--
+            All services with tag "form.type_guesser" are inserted here by
+            InitFormsPass
             -->
             <argument type="collection" />
         </service>
-
+        
         <!-- ValidatorTypeGuesser -->
-        <service id="form.guesser.validator" class="%form.guesser.validator.class%" public="false">
-            <tag name="form.guesser" />
+        <service id="form.type_guesser.validator" class="%form.type_guesser.validator.class%">
+            <tag name="form.type_guesser" />
             <argument type="service" id="validator.mapping.class_metadata_factory" />
         </service>
 
@@ -50,101 +72,96 @@
             <argument>%file.temporary_storage.nesting_levels%</argument>
             <argument>%file.temporary_storage.directory%</argument>
         </service>
-
-        <!-- ContainerAwareTypeLoader -->
-        <service id="form.type.loader" class="%form.type.loader.class%">
-            <argument type="service" id="service_container" />
-            <!--
-            All services with tag "form.type" are inserted here by
-            AddFormTypesPass
-            -->
-            <argument type="collection" />
-        </service>
-
-        <!-- FieldTypes -->
-        <service id="form.type.field" class="Symfony\Component\Form\Type\FieldType">
+        
+        <!-- CoreExtension -->
+        <service id="form.type.field" class="Symfony\Component\Form\Extension\Core\Type\FieldType">
             <tag name="form.type" alias="field" />
             <argument type="service" id="validator" />
         </service>
-        <service id="form.type.form" class="Symfony\Component\Form\Type\FormType">
+        <service id="form.type.form" class="Symfony\Component\Form\Extension\Core\Type\FormType">
             <tag name="form.type" alias="form" />
         </service>
-        <service id="form.type.birthday" class="Symfony\Component\Form\Type\BirthdayType">
+        <service id="form.type.birthday" class="Symfony\Component\Form\Extension\Core\Type\BirthdayType">
             <tag name="form.type" alias="birthday" />
         </service>
-        <service id="form.type.checkbox" class="Symfony\Component\Form\Type\CheckboxType">
+        <service id="form.type.checkbox" class="Symfony\Component\Form\Extension\Core\Type\CheckboxType">
             <tag name="form.type" alias="checkbox" />
         </service>
-        <service id="form.type.choice" class="Symfony\Component\Form\Type\ChoiceType">
+        <service id="form.type.choice" class="Symfony\Component\Form\Extension\Core\Type\ChoiceType">
             <tag name="form.type" alias="choice" />
         </service>
-        <service id="form.type.collection" class="Symfony\Component\Form\Type\CollectionType">
+        <service id="form.type.collection" class="Symfony\Component\Form\Extension\Core\Type\CollectionType">
             <tag name="form.type" alias="collection" />
         </service>
-        <service id="form.type.country" class="Symfony\Component\Form\Type\CountryType">
+        <service id="form.type.country" class="Symfony\Component\Form\Extension\Core\Type\CountryType">
             <tag name="form.type" alias="country" />
         </service>
-        <service id="form.type.csrf" class="Symfony\Component\Form\Type\CsrfType">
-            <tag name="form.type" alias="csrf" />
-            <argument type="service" id="form.csrf_provider" />
-        </service>
-        <service id="form.type.date" class="Symfony\Component\Form\Type\DateType">
+        <service id="form.type.date" class="Symfony\Component\Form\Extension\Core\Type\DateType">
             <tag name="form.type" alias="date" />
         </service>
-        <service id="form.type.datetime" class="Symfony\Component\Form\Type\DateTimeType">
+        <service id="form.type.datetime" class="Symfony\Component\Form\Extension\Core\Type\DateTimeType">
             <tag name="form.type" alias="datetime" />
         </service>
-        <service id="form.type.email" class="Symfony\Component\Form\Type\EmailType">
+        <service id="form.type.email" class="Symfony\Component\Form\Extension\Core\Type\EmailType">
             <tag name="form.type" alias="email" />
         </service>
-        <service id="form.type.file" class="Symfony\Component\Form\Type\FileType">
+        <service id="form.type.file" class="Symfony\Component\Form\Extension\Core\Type\FileType">
             <tag name="form.type" alias="file" />
             <argument type="service" id="file.temporary_storage" />
         </service>
-        <service id="form.type.hidden" class="Symfony\Component\Form\Type\HiddenType">
+        <service id="form.type.hidden" class="Symfony\Component\Form\Extension\Core\Type\HiddenType">
             <tag name="form.type" alias="hidden" />
         </service>
-        <service id="form.type.integer" class="Symfony\Component\Form\Type\IntegerType">
+        <service id="form.type.integer" class="Symfony\Component\Form\Extension\Core\Type\IntegerType">
             <tag name="form.type" alias="integer" />
         </service>
-        <service id="form.type.language" class="Symfony\Component\Form\Type\LanguageType">
+        <service id="form.type.language" class="Symfony\Component\Form\Extension\Core\Type\LanguageType">
             <tag name="form.type" alias="language" />
         </service>
-        <service id="form.type.locale" class="Symfony\Component\Form\Type\LocaleType">
+        <service id="form.type.locale" class="Symfony\Component\Form\Extension\Core\Type\LocaleType">
             <tag name="form.type" alias="locale" />
         </service>
-        <service id="form.type.money" class="Symfony\Component\Form\Type\MoneyType">
+        <service id="form.type.money" class="Symfony\Component\Form\Extension\Core\Type\MoneyType">
             <tag name="form.type" alias="money" />
         </service>
-        <service id="form.type.number" class="Symfony\Component\Form\Type\NumberType">
+        <service id="form.type.number" class="Symfony\Component\Form\Extension\Core\Type\NumberType">
             <tag name="form.type" alias="number" />
         </service>
-        <service id="form.type.password" class="Symfony\Component\Form\Type\PasswordType">
+        <service id="form.type.password" class="Symfony\Component\Form\Extension\Core\Type\PasswordType">
             <tag name="form.type" alias="password" />
         </service>
-        <service id="form.type.percent" class="Symfony\Component\Form\Type\PercentType">
+        <service id="form.type.percent" class="Symfony\Component\Form\Extension\Core\Type\PercentType">
             <tag name="form.type" alias="percent" />
         </service>
-        <service id="form.type.radio" class="Symfony\Component\Form\Type\RadioType">
+        <service id="form.type.radio" class="Symfony\Component\Form\Extension\Core\Type\RadioType">
             <tag name="form.type" alias="radio" />
         </service>
-        <service id="form.type.repeated" class="Symfony\Component\Form\Type\RepeatedType">
+        <service id="form.type.repeated" class="Symfony\Component\Form\Extension\Core\Type\RepeatedType">
             <tag name="form.type" alias="repeated" />
         </service>
-        <service id="form.type.textarea" class="Symfony\Component\Form\Type\TextareaType">
+        <service id="form.type.textarea" class="Symfony\Component\Form\Extension\Core\Type\TextareaType">
             <tag name="form.type" alias="textarea" />
         </service>
-        <service id="form.type.text" class="Symfony\Component\Form\Type\TextType">
+        <service id="form.type.text" class="Symfony\Component\Form\Extension\Core\Type\TextType">
             <tag name="form.type" alias="text" />
         </service>
-        <service id="form.type.time" class="Symfony\Component\Form\Type\TimeType">
+        <service id="form.type.time" class="Symfony\Component\Form\Extension\Core\Type\TimeType">
             <tag name="form.type" alias="time" />
         </service>
-        <service id="form.type.timezone" class="Symfony\Component\Form\Type\TimezoneType">
+        <service id="form.type.timezone" class="Symfony\Component\Form\Extension\Core\Type\TimezoneType">
             <tag name="form.type" alias="timezone" />
         </service>
-        <service id="form.type.url" class="Symfony\Component\Form\Type\UrlType">
+        <service id="form.type.url" class="Symfony\Component\Form\Extension\Core\Type\UrlType">
             <tag name="form.type" alias="url" />
+        </service>
+        
+        <!-- CsrfExtension -->
+        <service id="form.type.csrf" class="Symfony\Component\Form\Extension\Csrf\Type\CsrfType">
+            <tag name="form.type" alias="csrf" />
+            <argument type="service" id="form.csrf_provider" />
+        </service>
+        <service id="form.type_extension.csrf" class="Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension">
+            <tag name="form.type_extension" alias="form" />
         </service>
 
     </services>

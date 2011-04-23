@@ -11,12 +11,8 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\DataMapper\DataMapperInterface;
-use Symfony\Component\Form\DataTransformer\DataTransformerInterface;
-use Symfony\Component\Form\Validator\FormValidatorInterface;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Type\FormTypeInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -350,7 +346,7 @@ class FormBuilder
         }
 
         if (null !== $type && !is_string($type) && !$type instanceof FormTypeInterface) {
-            throw new UnexpectedTypeException($type, 'string or Symfony\Component\Form\Type\FormTypeInterface');
+            throw new UnexpectedTypeException($type, 'string or Symfony\Component\Form\FormTypeInterface');
         }
 
         $this->children[$name] = array(

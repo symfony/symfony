@@ -12,13 +12,12 @@
 namespace Symfony\Tests\Bridge\Doctrine\Form;
 
 use Doctrine\ORM\EntityManager;
+use Symfony\Tests\Component\Form\Extension\Core\Type\TestCase;
 
-abstract class DoctrineOrmTestCase extends \Symfony\Tests\Component\Form\Type\TestCase
+abstract class DoctrineOrmTestCase extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        parent::setUp();
-
         if (!class_exists('Doctrine\\Common\\Version')) {
             $this->markTestSkipped('Doctrine is not available.');
         }
@@ -27,7 +26,7 @@ abstract class DoctrineOrmTestCase extends \Symfony\Tests\Component\Form\Type\Te
     /**
      * @return EntityManager
      */
-    protected function createTestEntityManager($paths = array())
+    public static function createTestEntityManager($paths = array())
     {
         $config = new \Doctrine\ORM\Configuration();
         $config->setAutoGenerateProxyClasses(true);

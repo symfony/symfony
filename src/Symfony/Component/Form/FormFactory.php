@@ -11,28 +11,83 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Type\FormTypeInterface;
-use Symfony\Component\Form\Type\Loader\TypeLoaderInterface;
-use Symfony\Component\Form\Type\Guesser\TypeGuesserInterface;
-use Symfony\Component\Form\Type\Guesser\Guess;
+use Symfony\Component\Form\Guess\TypeGuesserInterface;
+use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class FormFactory implements FormFactoryInterface
 {
-    private $typeLoader;
+    private $extensions = array();
 
-    private $guessers = array();
+    private $types = array();
 
-    public function __construct(TypeLoaderInterface $typeLoader, array $guessers = array())
+    private $guesser;
+
+    public function __construct(array $extensions)
     {
-        foreach ($guessers as $guesser) {
-            if (!$guesser instanceof TypeGuesserInterface) {
-                throw new UnexpectedTypeException($guesser, 'Symfony\Component\Form\Type\Guesser\TypeGuesserInterface');
+        foreach ($extensions as $extension) {
+            if (!$extension instanceof FormExtensionInterface) {
+                throw new UnexpectedTypeException($extension, 'Symfony\Component\Form\FormExtensionInterface');
             }
         }
-        $this->typeLoader = $typeLoader;
-        $this->guessers = $guessers;
+
+        $this->extensions = $extensions;
+    }
+
+    private function loadGuesser()
+    {
+        $guessers = array();
+
+        foreach ($this->extensions as $extension) {
+            $guesser = $extension->getTypeGuesser();
+
+            if ($guesser) {
+                $guessers[] = $guesser;
+            }
+        }
+
+        $this->guesser = new FormTypeGuesserChain($guessers);
+    }
+
+    public function getType($name)
+    {
+        $type = null;
+
+        if ($name instanceof FormTypeInterface) {
+            $type = $name;
+            $name = $type->getName();
+        }
+
+        if (!isset($this->types[$name])) {
+            if (!$type) {
+                foreach ($this->extensions as $extension) {
+                    if ($extension->hasType($name)) {
+                        $type = $extension->getType($name);
+                        break;
+                    }
+                }
+
+                if (!$type) {
+                    throw new FormException(sprintf('Could not load type "%s"', $name));
+                }
+            }
+
+            $typeExtensions = array();
+
+            foreach ($this->extensions as $extension) {
+                $typeExtensions = array_merge(
+                    $typeExtensions,
+                    $extension->getTypeExtensions($name)
+                );
+            }
+
+            $type->setExtensions($typeExtensions);
+
+            $this->types[$name] = $type;
+        }
+
+        return $this->types[$name];
     }
 
     public function create($type, $data = null, array $options = array())
@@ -64,19 +119,22 @@ class FormFactory implements FormFactoryInterface
     {
         $builder = null;
         $types = array();
+        $typeExtensions = array();
         $knownOptions = array();
         $passedOptions = array_keys($options);
 
         while (null !== $type) {
-            // TODO check if type exists
-            if (!$type instanceof FormTypeInterface) {
-                $type = $this->typeLoader->getType($type);
+            $type = $this->getType($type);
+
+            $defaultOptions = $type->getDefaultOptions($options);
+
+            foreach ($type->getExtensions() as $typeExtension) {
+                $defaultOptions = array_merge($defaultOptions, $typeExtension->getDefaultOptions($options));
             }
 
-            array_unshift($types, $type);
-            $defaultOptions = $type->getDefaultOptions($options);
             $options = array_merge($defaultOptions, $options);
             $knownOptions = array_merge($knownOptions, array_keys($defaultOptions));
+            array_unshift($types, $type);
             $type = $type->getParent($options);
         }
 
@@ -96,6 +154,10 @@ class FormFactory implements FormFactoryInterface
 
         foreach ($types as $type) {
             $type->buildForm($builder, $options);
+
+            foreach ($type->getExtensions() as $typeExtension) {
+                $typeExtension->buildForm($builder, $options);
+            }
         }
 
         if (null !== $data) {
@@ -107,22 +169,14 @@ class FormFactory implements FormFactoryInterface
 
     public function createBuilderForProperty($class, $property, $data = null, array $options = array())
     {
-        // guess field class and options
-        $typeGuess = $this->guess(function ($guesser) use ($class, $property) {
-            return $guesser->guessType($class, $property);
-        });
+        if (!$this->guesser) {
+            $this->loadGuesser();
+        }
 
-        // guess maximum length
-        $maxLengthGuess = $this->guess(function ($guesser) use ($class, $property) {
-            return $guesser->guessMaxLength($class, $property);
-        });
+        $typeGuess = $this->guesser->guessType($class, $property);
+        $maxLengthGuess = $this->guesser->guessMaxLength($class, $property);
+        $requiredGuess = $this->guesser->guessRequired($class, $property);
 
-        // guess whether field is required
-        $requiredGuess = $this->guess(function ($guesser) use ($class, $property) {
-            return $guesser->guessRequired($class, $property);
-        });
-
-        // construct field
         $type = $typeGuess ? $typeGuess->getType() : 'text';
 
         if ($maxLengthGuess) {
@@ -139,27 +193,5 @@ class FormFactory implements FormFactoryInterface
         }
 
         return $this->createNamedBuilder($type, $property, $data, $options);
-    }
-
-    /**
-     * Executes a closure for each guesser and returns the best guess from the
-     * return values
-     *
-     * @param  \Closure $closure  The closure to execute. Accepts a guesser as
-     *                            argument and should return a FieldFactoryGuess
-     *                            instance
-     * @return FieldFactoryGuess  The guess with the highest confidence
-     */
-    protected function guess(\Closure $closure)
-    {
-        $guesses = array();
-
-        foreach ($this->guessers as $guesser) {
-            if ($guess = $closure($guesser)) {
-                $guesses[] = $guess;
-            }
-        }
-
-        return Guess::getBestGuess($guesses);
     }
 }

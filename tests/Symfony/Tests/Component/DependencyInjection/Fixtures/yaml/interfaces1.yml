@@ -1,6 +1,0 @@
-services:
-  foo: { class: FooClass }
-interfaces:
-  FooClass:
-    calls:
-      - [ setBar, [ correct ] ]

@@ -471,30 +471,6 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::addInterfaceInjector
-     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::addInterfaceInjectors
-     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::getInterfaceInjectors
-     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::hasInterfaceInjectorForClass
-     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::setDefinition
-     */
-    public function testInterfaceInjection()
-    {
-        $definition = new Definition('Symfony\Tests\Component\DependencyInjection\FooClass');
-
-        $injectors[] = $this->getMockInterfaceInjector('Symfony\Tests\Component\DependencyInjection\FooClass', 1);
-        $injectors[] = $this->getMockInterfaceInjector('Symfony\Tests\Component\DependencyInjection\FooClass', 0);
-
-        $container = new ContainerBuilder();
-        $container->addInterfaceInjectors($injectors);
-        $this->assertEquals(1, count($container->getInterfaceInjectors('Symfony\Tests\Component\DependencyInjection\FooClass')));
-        $this->assertTrue($container->hasInterfaceInjectorForClass('Symfony\Tests\Component\DependencyInjection\FooClass'));
-        $this->assertFalse($container->hasInterfaceInjectorForClass('\Foo'));
-
-        $container->setDefinition('test', $definition);
-        $test = $container->get('test');
-    }
-
-    /**
      * @expectedException BadMethodCallException
      */
     public function testThrowsExceptionWhenSetServiceOnAFrozenContainer()
@@ -512,20 +488,6 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->compile();
         $container->setDefinition('a', new Definition());
-    }
-
-    /**
-     * @param string $class
-     * @param int $methodCallsCount
-     * @return Symfony\Component\DependencyInjection\InterfaceInjector
-     */
-    private function getMockInterfaceInjector($class, $methodCallsCount)
-    {
-        $injector = $this->getMock('Symfony\Component\DependencyInjection\InterfaceInjector', array('processDefinition'), array('Symfony\Tests\Component\DependencyInjection\FooClass'), '', true, false);
-        $injector->expects($this->exactly($methodCallsCount))
-            ->method('processDefinition')
-        ;
-        return $injector;
     }
 }
 

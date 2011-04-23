@@ -49,7 +49,6 @@ class PassConfig
             new ResolveParameterPlaceHoldersPass(),
             new CheckDefinitionValidityPass(),
             new ResolveReferencesToAliasesPass(),
-            new ResolveInterfaceInjectorsPass(),
             new ResolveInvalidReferencesPass(),
             new AnalyzeServiceReferencesPass(true),
             new CheckCircularReferencesPass(),

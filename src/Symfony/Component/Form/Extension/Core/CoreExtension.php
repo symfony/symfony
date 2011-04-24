@@ -16,11 +16,14 @@ use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\File\TemporaryStorage;
 
+/**
+ * Represents the main form extension, which loads the core functionality.
+ *
+ * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ */
 class CoreExtension extends AbstractExtension
 {
     private $storage;
-
-    private $typeGuesser;
 
     public function __construct(TemporaryStorage $storage)
     {

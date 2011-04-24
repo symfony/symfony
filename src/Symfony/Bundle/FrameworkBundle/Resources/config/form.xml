@@ -21,7 +21,7 @@
                 <!--
                 We don't need to be able to add more extensions.
                  * more types can be registered with the form.type tag
-                 * more type_guessers can be registered with the form.type.type_guesser tag 
+                 * more type_guessers can be registered with the form.type.type_guesser tag
                 -->
                 <argument type="service" id="form.extension" />
             </argument>
@@ -146,6 +146,12 @@
         </service>
         <service id="form.type.url" class="Symfony\Component\Form\Extension\Core\Type\UrlType">
             <tag name="form.type" alias="url" />
+        </service>
+
+        <!-- FieldTypeValidatorExtension -->
+        <service id="form.type_extension.field" class="Symfony\Component\Form\Extension\Validator\Type\FieldTypeValidatorExtension">
+            <tag name="form.type_extension" alias="field" />
+            <argument type="service" id="validator" />
         </service>
 
         <!-- CsrfExtension -->

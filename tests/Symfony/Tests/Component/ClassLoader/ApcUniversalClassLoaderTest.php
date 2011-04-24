@@ -25,160 +25,168 @@ class ApcUniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
         if (!(ini_get('apc.enabled') && ini_get('apc.enable_cli'))) {
             $this->markTestSkipped('The apc extension is available, but not enabled.');
         }
+
+        apc_clear_cache('user');
     }
+
+	protected function tearDown()
+	{
+        apc_clear_cache('user');
+	}
 
     public function testConstructor()
     {
         $loader = new ApcUniversalClassLoader('test.prefix.');
-        $loader->registerNamespace('Namespaced', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->registerNamespace('Apc\Namespaced', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
 
-        $this->assertEquals($loader->findFile('\Namespaced\Bar'), apc_fetch('test.prefix.\Namespaced\Bar'), '__construct() takes a prefix as its first argument');
+        $this->assertEquals($loader->findFile('\Apc\Namespaced\FooBar'), apc_fetch('test.prefix.\Apc\Namespaced\FooBar'), '__construct() takes a prefix as its first argument');
     }
 
-    /**
-     * @dataProvider getLoadClassTests
-     */
-    public function testLoadClass($className, $testClassName, $message)
-    {
-        $loader = new ApcUniversalClassLoader('test.prefix.');
-        $loader->registerNamespace('Namespaced', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
-        $loader->registerPrefix('Pearlike_', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
-        $loader->loadClass($testClassName);
-        $this->assertTrue(class_exists($className), $message);
-    }
+   /**
+    * @dataProvider getLoadClassTests
+    */
+   public function testLoadClass($className, $testClassName, $message)
+   {
+       $loader = new ApcUniversalClassLoader('test.prefix.');
+       $loader->registerNamespace('Apc\Namespaced', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+       $loader->registerPrefix('Apc_Pearlike_', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+       $loader->loadClass($testClassName);
+       $this->assertTrue(class_exists($className), $message);
+   }
 
-    public function getLoadClassTests()
-    {
-        return array(
-            array('\\Namespaced\\Foo', 'Namespaced\\Foo',   '->loadClass() loads Namespaced\Foo class'),
-            array('\\Pearlike_Foo',    'Pearlike_Foo',      '->loadClass() loads Pearlike_Foo class'),
-            array('\\Namespaced\\Bar', '\\Namespaced\\Bar', '->loadClass() loads Namespaced\Bar class with a leading slash'),
-            array('\\Pearlike_Bar',    '\\Pearlike_Bar',    '->loadClass() loads Pearlike_Bar class with a leading slash'),
-        );
-    }
+   public function getLoadClassTests()
+   {
+       return array(
+           array('\\Apc\\Namespaced\\Foo', '\\Apc\\Namespaced\\Foo',   '->loadClass() loads Apc\Namespaced\Foo class'),
+           array('Apc_Pearlike_Foo',    'Apc_Pearlike_Foo',      '->loadClass() loads Apc_Pearlike_Foo class'),
+           array('\\Apc\\Namespaced\\Bar', '\\Apc\\Namespaced\\Bar', '->loadClass() loads Apc\Namespaced\Bar class with a leading slash'),
+           array('Apc_Pearlike_Bar',    '\\Apc_Pearlike_Bar',    '->loadClass() loads Apc_Pearlike_Bar class with a leading slash'),
+       );
+   }
 
-    /**
-     * @dataProvider getLoadClassFromFallbackTests
-     */
-    public function testLoadClassFromFallback($className, $testClassName, $message)
-    {
-        $loader = new ApcUniversalClassLoader('test.prefix.');
-        $loader->registerNamespace('Namespaced', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
-        $loader->registerPrefix('Pearlike_', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
-        $loader->registerNamespaceFallback(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/fallback');
-        $loader->registerPrefixFallback(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/fallback');
-        $loader->loadClass($testClassName);
-        $this->assertTrue(class_exists($className), $message);
-    }
+   /**
+    * @dataProvider getLoadClassFromFallbackTests
+    */
+   public function testLoadClassFromFallback($className, $testClassName, $message)
+   {
+       $loader = new ApcUniversalClassLoader('test.prefix.fallback');
+       $loader->registerNamespace('Apc\Namespaced', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+       $loader->registerPrefix('Apc_Pearlike_', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+       $loader->registerNamespaceFallback(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/fallback');
+       $loader->registerPrefixFallback(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/fallback');
+       $loader->loadClass($testClassName);
+       $this->assertTrue(class_exists($className), $message);
+   }
 
-    public function getLoadClassFromFallbackTests()
-    {
-        return array(
-            array('\\Namespaced\\Baz',    'Namespaced\\Baz',    '->loadClass() loads Namespaced\Baz class'),
-            array('\\Pearlike_Baz',       'Pearlike_Baz',       '->loadClass() loads Pearlike_Baz class'),
-            array('\\Namespaced\\FooBar', 'Namespaced\\FooBar', '->loadClass() loads Namespaced\Baz class from fallback dir'),
-            array('\\Pearlike_FooBar',    'Pearlike_FooBar',    '->loadClass() loads Pearlike_Baz class from fallback dir'),
-        );
-    }
+   public function getLoadClassFromFallbackTests()
+   {
+       return array(
+           array('\\Apc\\Namespaced\\Baz',    '\\Apc\\Namespaced\\Baz',    '->loadClass() loads Apc\Namespaced\Baz class'),
+           array('Apc_Pearlike_Baz',       'Apc_Pearlike_Baz',       '->loadClass() loads Apc_Pearlike_Baz class'),
+           array('\\Apc\\Namespaced\\FooBar', '\\Apc\\Namespaced\\FooBar', '->loadClass() loads Apc\Namespaced\Baz class from fallback dir'),
+           array('Apc_Pearlike_FooBar',    'Apc_Pearlike_FooBar',    '->loadClass() loads Apc_Pearlike_Baz class from fallback dir'),
+       );
+   }
 
-    /**
-     * @dataProvider getLoadClassNamespaceCollisionTests
-     */
-    public function testLoadClassNamespaceCollision($namespaces, $className, $message)
-    {
-        $loader = new ApcUniversalClassLoader('test.prefix.');
-        $loader->registerNamespaces($namespaces);
+   /**
+    * @dataProvider getLoadClassNamespaceCollisionTests
+    */
+   public function testLoadClassNamespaceCollision($namespaces, $className, $message)
+   {
+       $loader = new ApcUniversalClassLoader('test.prefix.collision.');
+       $loader->registerNamespaces($namespaces);
 
-        $loader->loadClass($className);
-        $this->assertTrue(class_exists($className), $message);
-    }
+       $loader->loadClass($className);
 
-    public function getLoadClassNamespaceCollisionTests()
-    {
-        return array(
-            array(
-                array(
-                    'NamespaceCollision\\A' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/alpha',
-                    'NamespaceCollision\\A\\B' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/beta',
-                ),
-                'NamespaceCollision\A\Foo',
-                '->loadClass() loads NamespaceCollision\A\Foo from alpha.',
-            ),
-            array(
-                array(
-                    'NamespaceCollision\\A\\B' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/beta',
-                    'NamespaceCollision\\A' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/alpha',
-                ),
-                'NamespaceCollision\A\Bar',
-                '->loadClass() loads NamespaceCollision\A\Bar from alpha.',
-            ),
-            array(
-                array(
-                    'NamespaceCollision\\A' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/alpha',
-                    'NamespaceCollision\\A\\B' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/beta',
-                ),
-                'NamespaceCollision\A\B\Foo',
-                '->loadClass() loads NamespaceCollision\A\B\Foo from beta.',
-            ),
-            array(
-                array(
-                    'NamespaceCollision\\A\\B' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/beta',
-                    'NamespaceCollision\\A' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/alpha',
-                ),
-                'NamespaceCollision\A\B\Bar',
-                '->loadClass() loads NamespaceCollision\A\B\Bar from beta.',
-            ),
-        );
-    }
+       $this->assertTrue(class_exists($className), $message);
+   }
 
-    /**
-     * @dataProvider getLoadClassPrefixCollisionTests
-     */
-    public function testLoadClassPrefixCollision($prefixes, $className, $message)
-    {
-        $loader = new ApcUniversalClassLoader('test.prefix.');
-        $loader->registerPrefixes($prefixes);
+   public function getLoadClassNamespaceCollisionTests()
+   {
+       return array(
+           array(
+               array(
+                   'Apc\\NamespaceCollision\\A' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/alpha',
+                   'Apc\\NamespaceCollision\\A\\B' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/beta',
+               ),
+               '\Apc\NamespaceCollision\A\Foo',
+               '->loadClass() loads NamespaceCollision\A\Foo from alpha.',
+           ),
+           array(
+               array(
+                   'Apc\\NamespaceCollision\\A\\B' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/beta',
+                   'Apc\\NamespaceCollision\\A' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/alpha',
+               ),
+               '\Apc\NamespaceCollision\A\Bar',
+               '->loadClass() loads NamespaceCollision\A\Bar from alpha.',
+           ),
+           array(
+               array(
+                   'Apc\\NamespaceCollision\\A' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/alpha',
+                   'Apc\\NamespaceCollision\\A\\B' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/beta',
+               ),
+               '\Apc\NamespaceCollision\A\B\Foo',
+               '->loadClass() loads NamespaceCollision\A\B\Foo from beta.',
+           ),
+           array(
+               array(
+                   'Apc\\NamespaceCollision\\A\\B' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/beta',
+                   'Apc\\NamespaceCollision\\A' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/alpha',
+               ),
+               '\Apc\NamespaceCollision\A\B\Bar',
+               '->loadClass() loads NamespaceCollision\A\B\Bar from beta.',
+           ),
+       );
+   }
 
-        $loader->loadClass($className);
-        $this->assertTrue(class_exists($className), $message);
-    }
+   /**
+    * @dataProvider getLoadClassPrefixCollisionTests
+    */
+   public function testLoadClassPrefixCollision($prefixes, $className, $message)
+   {
+       $loader = new ApcUniversalClassLoader('test.prefix.collision.');
+       $loader->registerPrefixes($prefixes);
 
-    public function getLoadClassPrefixCollisionTests()
-    {
-        return array(
-            array(
-                array(
-                    'PrefixCollision_A_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/alpha',
-                    'PrefixCollision_A_B_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/beta',
-                ),
-                'PrefixCollision_A_Foo',
-                '->loadClass() loads PrefixCollision_A_Foo from alpha.',
-            ),
-            array(
-                array(
-                    'PrefixCollision_A_B_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/beta',
-                    'PrefixCollision_A_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/alpha',
-                ),
-                'PrefixCollision_A_Bar',
-                '->loadClass() loads PrefixCollision_A_Bar from alpha.',
-            ),
-            array(
-                array(
-                    'PrefixCollision_A_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/alpha',
-                    'PrefixCollision_A_B_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/beta',
-                ),
-                'PrefixCollision_A_B_Foo',
-                '->loadClass() loads PrefixCollision_A_B_Foo from beta.',
-            ),
-            array(
-                array(
-                    'PrefixCollision_A_B_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/beta',
-                    'PrefixCollision_A_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/alpha',
-                ),
-                'PrefixCollision_A_B_Bar',
-                '->loadClass() loads PrefixCollision_A_B_Bar from beta.',
-            ),
-        );
-    }
+       $loader->loadClass($className);
+       $this->assertTrue(class_exists($className), $message);
+   }
+
+   public function getLoadClassPrefixCollisionTests()
+   {
+       return array(
+           array(
+               array(
+                   'ApcPrefixCollision_A_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/alpha/Apc',
+                   'ApcPrefixCollision_A_B_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/beta/Apc',
+               ),
+               'ApcPrefixCollision_A_Foo',
+               '->loadClass() loads ApcPrefixCollision_A_Foo from alpha.',
+           ),
+           array(
+               array(
+                   'ApcPrefixCollision_A_B_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/beta/Apc',
+                   'ApcPrefixCollision_A_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/alpha/Apc',
+               ),
+               'ApcPrefixCollision_A_Bar',
+               '->loadClass() loads ApcPrefixCollision_A_Bar from alpha.',
+           ),
+           array(
+               array(
+                   'ApcPrefixCollision_A_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/alpha/Apc',
+                   'ApcPrefixCollision_A_B_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/beta/Apc',
+               ),
+               'ApcPrefixCollision_A_B_Foo',
+               '->loadClass() loads ApcPrefixCollision_A_B_Foo from beta.',
+           ),
+           array(
+               array(
+                   'ApcPrefixCollision_A_B_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/beta/Apc',
+                   'ApcPrefixCollision_A_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/Apc/alpha/Apc',
+               ),
+               'ApcPrefixCollision_A_B_Bar',
+               '->loadClass() loads ApcPrefixCollision_A_B_Bar from beta.',
+           ),
+       );
+   }
 
 }

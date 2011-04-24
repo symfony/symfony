@@ -14,6 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\Guess\TypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class FormFactory implements FormFactoryInterface
 {
@@ -23,16 +24,15 @@ class FormFactory implements FormFactoryInterface
 
     private $guesser;
 
-    public function __construct(array $extensions = array())
+    public function __construct(array $extensions)
     {
         foreach ($extensions as $extension) {
-            $this->addExtension($extension);
+            if (!$extension instanceof FormExtensionInterface) {
+                throw new UnexpectedTypeException($extension, 'Symfony\Component\Form\FormExtensionInterface');
+            }
         }
-    }
 
-    public function addExtension(FormExtensionInterface $extension)
-    {
-        $this->extensions[] = $extension;
+        $this->extensions = $extensions;
     }
 
     private function loadGuesser()

@@ -25,6 +25,16 @@ class DateTypeTest extends LocalizedTestCase
         \Locale::setDefault('de_AT');
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testInvalidWidgetOption()
+    {
+        $form = $this->factory->create('date', 'name', array(
+            'widget' => 'fake_widget',
+        ));
+    }
+
     public function testSubmitFromInputDateTime()
     {
         $form = $this->factory->create('date', null, array(

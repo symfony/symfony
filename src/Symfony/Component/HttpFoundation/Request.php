@@ -543,9 +543,9 @@ class Request
         }
 
         // Remove port number from host
-        $elements = explode(':', $host);
+        $host = preg_replace('/:\d+$/', '', $host);
 
-        return trim($elements[0]);
+        return trim($host);
     }
 
     public function setMethod($method)

@@ -156,8 +156,6 @@ class DelegatingValidator implements FormValidatorInterface
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $child) {
-            $path = (string)$child->getAttribute('property_path');
-
             $nestedNamePath = $namePath . $child->getName();
             $forms[$nestedNamePath] = $child;
 

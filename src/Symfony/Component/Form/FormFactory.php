@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Guess\TypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -119,7 +118,6 @@ class FormFactory implements FormFactoryInterface
     {
         $builder = null;
         $types = array();
-        $typeExtensions = array();
         $knownOptions = array();
         $passedOptions = array_keys($options);
 

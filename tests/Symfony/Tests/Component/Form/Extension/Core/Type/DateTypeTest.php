@@ -30,8 +30,18 @@ class DateTypeTest extends LocalizedTestCase
      */
     public function testInvalidWidgetOption()
     {
-        $form = $this->factory->create('date', 'name', array(
+        $form = $this->factory->create('date', null, array(
             'widget' => 'fake_widget',
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testInvalidInputOption()
+    {
+        $form = $this->factory->create('date', null, array(
+            'input' => 'fake_input',
         ));
     }
 

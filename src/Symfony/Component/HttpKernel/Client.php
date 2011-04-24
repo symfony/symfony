@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel;
 
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\BrowserKit\Client as BaseClient;

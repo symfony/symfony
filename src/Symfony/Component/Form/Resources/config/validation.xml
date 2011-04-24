@@ -7,7 +7,7 @@
   <class name="Symfony\Component\Form\Form">
     <constraint name="Callback">
       <value>
-        <value>Symfony\Component\Form\Extension\Core\Validator\DelegatingValidator</value>
+        <value>Symfony\Component\Form\Extension\Validator\Validator\DelegatingValidator</value>
         <value>validateFormData</value>
       </value>
     </constraint>

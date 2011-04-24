@@ -24,6 +24,11 @@ class TemporaryStorage
 
     public function __construct($secret, $directory)
     {
+        // make tempDir if it's not exist
+        if (!file_exists($directory)) {
+            mkdir($directory, 0777, true);
+        }
+    
         $this->directory = realpath($directory);
         $this->secret = $secret;
     }

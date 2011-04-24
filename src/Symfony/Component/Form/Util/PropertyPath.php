@@ -125,7 +125,7 @@ class PropertyPath implements \IteratorAggregate
     /**
      * Returns the element at the given index in the property path
      *
-     * @param $index The index key
+     * @param integer $index The index key
      *
      * @return string  A property or index name
      */

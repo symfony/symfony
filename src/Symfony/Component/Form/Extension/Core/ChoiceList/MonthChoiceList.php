@@ -18,9 +18,8 @@ class MonthChoiceList extends PaddedChoiceList
     /**
      * Generates an array of localized month choices
      *
-     * @param  array $months  The month numbers to generate
-     * @return array          The localized months respecting the configured
-     *                        locale and date format
+     * @param IntlDateFormatter $formatter An IntlDateFormatter instance
+     * @param array             $months    The month numbers to generate
      */
     public function __construct(\IntlDateFormatter $formatter, array $months)
     {

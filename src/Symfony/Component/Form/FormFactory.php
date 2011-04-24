@@ -123,6 +123,10 @@ class FormFactory implements FormFactoryInterface
         $knownOptions = array();
         $passedOptions = array_keys($options);
 
+        if (!array_key_exists('data', $options)) {
+            $options['data'] = $data;
+        }
+
         while (null !== $type) {
             $type = $this->getType($type);
 
@@ -158,10 +162,6 @@ class FormFactory implements FormFactoryInterface
             foreach ($type->getExtensions() as $typeExtension) {
                 $typeExtension->buildForm($builder, $options);
             }
-        }
-
-        if (null !== $data) {
-            $builder->setData($data);
         }
 
         return $builder;

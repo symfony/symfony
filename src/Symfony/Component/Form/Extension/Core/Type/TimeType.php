@@ -26,7 +26,6 @@ class TimeType extends AbstractType
     public function buildForm(FormBuilder $builder, array $options)
     {
         $hourOptions = $minuteOptions = $secondOptions = array();
-        $child = $options['widget'] === 'text' ? 'text' : 'choice';
         $parts = array('hour', 'minute');
 
         if ($options['widget'] === 'choice') {

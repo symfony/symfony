@@ -38,6 +38,10 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface {
         if (null === $messages) {
             $messages = array();
         }
+        
+        array_walk($results, function(&$value) {
+			$value = $value['translated'];
+		});
 
         // not an array
         if (!is_array($messages)) {

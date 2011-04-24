@@ -40,8 +40,6 @@ class FormBuilder
 
     private $types = array();
 
-    private $parent;
-
     private $dataClass;
 
     private $children = array();
@@ -68,23 +66,6 @@ class FormBuilder
     public function getName()
     {
         return $this->name;
-    }
-
-    public function setParent(FormBuilder $builder)
-    {
-        $this->parent = $builder;
-
-        return $this;
-    }
-
-    public function getParent()
-    {
-        return $this->parent;
-    }
-
-    public function end()
-    {
-        return $this->parent;
     }
 
     public function setData($data)
@@ -341,17 +322,23 @@ class FormBuilder
      * @param array                    $options
      * @return FormInterface
      */
-    public function add($name, $type = null, array $options = array())
+    public function add($child, $type = null, array $options = array())
     {
-        if (!is_string($name)) {
-            throw new UnexpectedTypeException($name, 'string');
+        if ($child instanceof self) {
+            $this->children[$child->getName()] = $child;
+
+            return $this;
+        }
+
+        if (!is_string($child)) {
+            throw new UnexpectedTypeException($child, 'string or Symfony\Component\Form\FormBuilder');
         }
 
         if (null !== $type && !is_string($type) && !$type instanceof FormTypeInterface) {
             throw new UnexpectedTypeException($type, 'string or Symfony\Component\Form\FormTypeInterface');
         }
 
-        $this->children[$name] = array(
+        $this->children[$child] = array(
             'type' => $type,
             'options' => $options,
         );
@@ -359,7 +346,7 @@ class FormBuilder
         return $this;
     }
 
-    public function build($name, $type = null, array $options = array())
+    public function create($name, $type = null, array $options = array())
     {
         if (null !== $type) {
             $builder = $this->getFormFactory()->createNamedBuilder(
@@ -381,10 +368,6 @@ class FormBuilder
             );
         }
 
-        $this->children[$name] = $builder;
-
-        $builder->setParent($this);
-
         return $builder;
     }
 
@@ -394,13 +377,13 @@ class FormBuilder
             throw new FormException(sprintf('The field "%s" does not exist', $name));
         }
 
-        $child = $this->children[$name];
-
-        if ($child instanceof FormBuilder) {
-            return $child;
+        if (!$this->children[$name] instanceof FormBuilder) {
+            $this->children[$name] = $this->create($name,
+                $this->children[$name]['type'],
+                $this->children[$name]['options']);
         }
 
-        return $this->build($name, $child['type'], $child['options']);
+        return $this->children[$name];
     }
 
     /**
@@ -411,11 +394,6 @@ class FormBuilder
     public function remove($name)
     {
         if (isset($this->children[$name])) {
-            // field might still be lazy
-            if ($this->children[$name] instanceof FormInterface) {
-                $this->children[$name]->setParent(null);
-            }
-
             unset($this->children[$name]);
         }
     }
@@ -442,7 +420,7 @@ class FormBuilder
 
         foreach ($this->children as $name => $builder) {
             if (!$builder instanceof FormBuilder) {
-                $builder = $this->build($name, $builder['type'], $builder['options']);
+                $builder = $this->create($name, $builder['type'], $builder['options']);
             }
 
             $children[$builder->getName()] = $builder->getForm();

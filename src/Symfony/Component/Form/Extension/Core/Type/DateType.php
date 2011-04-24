@@ -75,6 +75,8 @@ class DateType extends AbstractType
             $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], array('year', 'month', 'day'))
             ));
+        } else if ($options['input'] !== 'datetime') {
+            throw new FormException('The "input" option must be "datetime", "string", "timestamp" or "array".');
         }
 
         $builder

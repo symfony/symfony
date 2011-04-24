@@ -101,8 +101,15 @@ class FieldType extends AbstractType
             'label' => null,
         );
 
-        if (!empty($options['data_class'])) {
-            $class = $options['data_class'];
+        $class = isset($options['data_class']) ? $options['data_class'] : null;
+
+        // If no data class is set explicitely and an object is passed as data,
+        // use the class of that object as data class
+        if (!$class && isset($options['data']) && is_object($options['data'])) {
+            $defaultOptions['data_class'] = $class = get_class($options['data']);
+        }
+
+        if ($class) {
             $defaultOptions['empty_data'] = function () use ($class) {
                 return new $class();
             };

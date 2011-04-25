@@ -81,7 +81,7 @@ class CookieJar
     public function updateFromResponse(Response $response, $uri = null)
     {
         foreach ($response->getHeader('Set-Cookie', false) as $cookie) {
-            $this->set(Cookie::fromString($cookie), $uri);
+            $this->set(Cookie::fromString($cookie, $uri));
         }
     }
 

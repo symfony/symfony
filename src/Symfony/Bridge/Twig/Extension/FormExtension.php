@@ -169,7 +169,10 @@ class FormExtension extends \Twig_Extension
                     $view->setRendered(true);
                 }
 
-                return $templates[$block]->renderBlock($block, array_merge($view->all(), $variables));
+                $parameters = $view->all();
+                $parameters['attr'] = $variables;
+
+                return $templates[$block]->renderBlock($block, $parameters);
             }
         }
 

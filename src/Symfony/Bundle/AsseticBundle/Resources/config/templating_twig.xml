@@ -14,8 +14,8 @@
             <tag name="twig.extension" />
             <tag name="assetic.templating.twig" />
             <argument type="service" id="assetic.asset_factory" />
-            <argument>%assetic.debug%</argument>
             <argument>%assetic.use_controller%</argument>
+            <argument type="collection" />
         </service>
         <service id="assetic.twig_formula_loader" class="%assetic.cached_formula_loader.class%" public="false">
             <tag name="assetic.formula_loader" alias="twig" />

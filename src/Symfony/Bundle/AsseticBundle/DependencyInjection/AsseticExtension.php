@@ -71,6 +71,9 @@ class AsseticExtension extends Extension
             }
         }
 
+        // twig functions
+        $container->getDefinition('assetic.twig_extension')->replaceArgument(2, $config['twig']['functions']);
+
         // choose dynamic or static
         if ($parameterBag->resolveValue($parameterBag->get('assetic.use_controller'))) {
             $loader->load('controller.xml');

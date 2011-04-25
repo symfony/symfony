@@ -91,6 +91,29 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end()
+
+            // twig
+            ->children()
+                ->arrayNode('twig')
+                    ->addDefaultsIfNotSet()
+                    ->defaultValue(array())
+                    ->fixXmlConfig('function')
+                    ->children()
+                        ->arrayNode('functions')
+                            ->addDefaultsIfNotSet()
+                            ->defaultValue(array())
+                            ->useAttributeAsKey('name')
+                            ->prototype('variable')
+                                ->treatNullLike(array())
+                                ->validate()
+                                    ->ifTrue(function($v) { return !is_array($v); })
+                                    ->thenInvalid('The assetic.twig.functions config %s must be either null or an array.')
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
         ;
 
         return $builder;

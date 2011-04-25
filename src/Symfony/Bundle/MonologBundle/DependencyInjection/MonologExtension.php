@@ -123,6 +123,14 @@ class MonologExtension extends Extension
             ));
             break;
 
+        case 'firephp':
+            $definition->setArguments(array(
+                $handler['level'],
+                $handler['bubble'],
+            ));
+            $definition->addTag('kernel.listener', array('event' => 'onCoreResponse'));
+            break;
+
         case 'rotating_file':
             if (!isset($handler['path'])) {
                 $handler['path'] = '%kernel.logs_dir%/%kernel.environment%.log';

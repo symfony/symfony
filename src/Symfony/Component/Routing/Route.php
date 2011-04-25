@@ -31,9 +31,7 @@ class Route
      *
      * Available options:
      *
-     *  * segment_separators: An array of allowed characters for segment separators (/ by default)
-     *  * text_regex:         A regex that match a valid text name (.+? by default)
-     *  * compiler_class:     A class name able to compile this route instance (RouteCompiler by default)
+     *  * compiler_class: A class name able to compile this route instance (RouteCompiler by default)
      *
      * @param string $pattern       The pattern to match
      * @param array  $defaults      An array of default parameter values
@@ -101,8 +99,6 @@ class Route
     public function setOptions(array $options)
     {
         $this->options = array_merge(array(
-            'segment_separators' => array('/', '.'),
-            'text_regex'         => '.+?',
             'compiler_class'     => 'Symfony\\Component\\Routing\\RouteCompiler',
         ), $options);
 

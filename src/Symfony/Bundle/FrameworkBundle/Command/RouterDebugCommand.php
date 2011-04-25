@@ -135,24 +135,6 @@ EOF
         $output->writeln(sprintf('<comment>Options</comment>      %s', $options));
         $output->write('<comment>Regex</comment>        ');
         $output->writeln(preg_replace('/^             /', '', preg_replace('/^/m', '             ', $route->getRegex())), OutputInterface::OUTPUT_RAW);
-
-        $tokens = '';
-        foreach ($route->getTokens() as $token) {
-            if (!$tokens) {
-                $tokens = $this->displayToken($token);
-            } else {
-                $tokens .= "\n".str_repeat(' ', 13).$this->displayToken($token);
-            }
-        }
-        $output->writeln(sprintf('<comment>Tokens</comment>       %s', $tokens));
-    }
-
-    protected function displayToken($token)
-    {
-        $type = array_shift($token);
-        array_shift($token);
-
-        return sprintf('%-10s %s', $type, $this->formatValue($token));
     }
 
     protected function formatValue($value)

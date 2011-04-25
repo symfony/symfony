@@ -12,10 +12,15 @@
 namespace Symfony\Bundle\AsseticBundle\CacheWarmer;
 
 use Assetic\AssetWriter;
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class AssetWriterCacheWarmer extends CacheWarmer
+/**
+ * The AssetWriterCacheWarmer processes and writes the asset files.
+ * 
+ * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ */
+class AssetWriterCacheWarmer implements CacheWarmerInterface
 {
     private $container;
     private $writer;

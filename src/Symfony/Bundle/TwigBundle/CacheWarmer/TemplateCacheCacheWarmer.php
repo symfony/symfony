@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\CacheWarmer;
 
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 
@@ -23,7 +23,7 @@ use Symfony\Component\Finder\Finder;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TemplateCacheCacheWarmer extends CacheWarmer
+class TemplateCacheCacheWarmer implements CacheWarmerInterface
 {
     protected $container;
     protected $parser;

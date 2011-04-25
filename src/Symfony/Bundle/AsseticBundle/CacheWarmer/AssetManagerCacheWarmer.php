@@ -11,10 +11,15 @@
 
 namespace Symfony\Bundle\AsseticBundle\CacheWarmer;
 
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class AssetManagerCacheWarmer extends CacheWarmer
+/**
+ * The AssetManagerCacheWarmer warms up the formula loader.
+ *
+ * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ */
+class AssetManagerCacheWarmer implements CacheWarmerInterface
 {
     private $container;
 

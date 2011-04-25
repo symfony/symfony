@@ -72,9 +72,32 @@ class UrlMatcher implements UrlMatcherInterface
      */
     public function match($pathinfo)
     {
-        $allow = array();
+        $this->allow = array();
 
-        foreach ($this->routes->all() as $name => $route) {
+        if ($ret = $this->matchCollection($pathinfo, $this->routes)) {
+            return $ret;
+        }
+
+        throw 0 < count($this->allow)
+            ? new MethodNotAllowedException(array_unique(array_map('strtolower', $this->allow)))
+            : new NotFoundException();
+    }
+
+    protected function matchCollection($pathinfo, RouteCollection $routes)
+    {
+        foreach ($routes as $name => $route) {
+            if ($route instanceof RouteCollection) {
+                if ($route->getPrefix() !== substr($pathinfo, 0, strlen($route->getPrefix()))) {
+                    continue;
+                }
+
+                if (!$ret = $this->matchCollection($pathinfo, $route)) {
+                    continue;
+                }
+
+                return $ret;
+            }
+
             $compiledRoute = $route->compile();
 
             // check the static prefix of the URL first. Only use the more expensive preg_match when it matches
@@ -88,16 +111,13 @@ class UrlMatcher implements UrlMatcherInterface
 
             // check HTTP method requirement
             if ($route->getRequirement('_method') && ($req = explode('|', $route->getRequirement('_method'))) && !in_array($this->context->getMethod(), array_map('strtolower', $req))) {
-                $allow = array_merge($allow, $req);
+                $this->allow = array_merge($this->allow, $req);
+
                 continue;
             }
 
             return array_merge($this->mergeDefaults($matches, $route->getDefaults()), array('_route' => $name));
         }
-
-        throw 0 < count($allow)
-            ? new MethodNotAllowedException(array_unique(array_map('strtolower', $allow)))
-            : new NotFoundException();
     }
 
     protected function mergeDefaults($params, $defaults)

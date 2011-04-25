@@ -166,7 +166,7 @@ class FormExtension extends \Twig_Extension
 
             if (isset($templates[$block])) {
                 if ('widget' === $section || 'row' === $section) {
-                    $view->setRendered(true);
+                    $view->setRendered();
                 }
 
                 return $templates[$block]->renderBlock($block, array_merge($view->all(), $variables));

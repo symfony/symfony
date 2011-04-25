@@ -70,20 +70,19 @@ class MonologExtension extends Extension
                     $logger->addMethodCall('pushHandler', array(new Reference($handler['id'])));
                 }
             }
-        }
 
-        $this->addClassesToCompile(array(
-            'Monolog\\Formatter\\FormatterInterface',
-            'Monolog\\Formatter\\LineFormatter',
-            'Monolog\\Handler\\HandlerInterface',
-            'Monolog\\Handler\\AbstractHandler',
-            'Monolog\\Handler\\StreamHandler',
-            'Monolog\\Handler\\FingersCrossedHandler',
-            'Monolog\\Handler\\TestHandler',
-            'Monolog\\Logger',
-            'Symfony\\Bundle\\MonologBundle\\Logger\\Logger',
-            'Symfony\\Bundle\\MonologBundle\\Logger\\DebugHandler',
-        ));
+            $this->addClassesToCompile(array(
+                'Monolog\\Formatter\\FormatterInterface',
+                'Monolog\\Formatter\\LineFormatter',
+                'Monolog\\Handler\\HandlerInterface',
+                'Monolog\\Handler\\AbstractHandler',
+                'Monolog\\Handler\\StreamHandler',
+                'Monolog\\Handler\\FingersCrossedHandler',
+                'Monolog\\Logger',
+                'Symfony\\Bundle\\MonologBundle\\Logger\\Logger',
+                'Symfony\\Bundle\\MonologBundle\\Logger\\DebugHandler',
+            ));
+        }
     }
 
     /**
@@ -122,6 +121,14 @@ class MonologExtension extends Extension
                 $handler['level'],
                 $handler['bubble'],
             ));
+            break;
+
+        case 'firephp':
+            $definition->setArguments(array(
+                $handler['level'],
+                $handler['bubble'],
+            ));
+            $definition->addTag('kernel.listener', array('event' => 'onCoreResponse'));
             break;
 
         case 'rotating_file':

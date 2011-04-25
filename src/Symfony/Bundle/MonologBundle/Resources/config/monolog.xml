@@ -13,6 +13,7 @@
         <parameter key="monolog.handler.syslog.class">Monolog\Handler\SyslogHandler</parameter>
         <parameter key="monolog.handler.null.class">Monolog\Handler\NullHandler</parameter>
         <parameter key="monolog.handler.test.class">Monolog\Handler\TestHandler</parameter>
+        <parameter key="monolog.handler.firephp.class">Symfony\Bundle\MonologBundle\Logger\FirePHPHandler</parameter>
         <parameter key="monolog.handler.debug.class">Symfony\Bundle\MonologBundle\Logger\DebugHandler</parameter>
     </parameters>
 

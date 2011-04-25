@@ -37,7 +37,7 @@ class Translator implements TranslatorInterface
      *
      * @api
      */
-    public function __construct($locale = null, MessageSelector $selector)
+    public function __construct($locale, MessageSelector $selector)
     {
         $this->locale = $locale;
         $this->selector = $selector;

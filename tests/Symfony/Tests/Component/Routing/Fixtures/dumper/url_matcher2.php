@@ -30,7 +30,7 @@ class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\Redirec
         }
 
         // bar
-        if (0 === strpos($pathinfo, '/bar') && preg_match('#^/bar/(?P<foo>.*?)$#x', $pathinfo, $matches)) {
+        if (0 === strpos($pathinfo, '/bar') && preg_match('#^/bar/(?P<foo>[^/]*?)$#x', $pathinfo, $matches)) {
             if (!in_array($this->context->getMethod(), array('get', 'head'))) {
                 $allow = array_merge($allow, array('get', 'head'));
                 goto not_bar;

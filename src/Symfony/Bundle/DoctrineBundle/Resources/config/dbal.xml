@@ -30,7 +30,7 @@
         </service>
 
         <service id="doctrine.dbal.connection_factory" class="%doctrine.dbal.connection_factory.class%">
-            <argument>%doctrine.dbal.types%</argument>
+            <argument /> <!-- Types -->
         </service>
     </services>
 </container>

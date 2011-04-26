@@ -69,9 +69,7 @@ class ArrayInput extends Input
      */
     public function hasParameterOption($values)
     {
-        if (!is_array($values)) {
-            $values = array($values);
-        }
+        $values = (array) $values;
 
         foreach ($this->parameters as $k => $v) {
             if (!is_int($k)) {
@@ -99,9 +97,7 @@ class ArrayInput extends Input
      */
     public function getParameterOption($values, $default = false)
     {
-        if (!is_array($values)) {
-            $values = array($values);
-        }
+        $values = (array) $values;
 
         foreach ($this->parameters as $k => $v) {
             if (is_int($k) && in_array($v, $values)) {

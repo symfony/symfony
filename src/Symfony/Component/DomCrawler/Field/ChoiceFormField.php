@@ -115,8 +115,8 @@ class ChoiceFormField extends FormField
                 throw new \InvalidArgumentException(sprintf('Input "%s" cannot take "%s" as a value (possible values: %s).', $this->name, $value, implode(', ', $this->options)));
             }
 
-            if ($this->multiple && !is_array($value)) {
-                $value = array($value);
+            if ($this->multiple) {
+                $value = (array) $value;
             }
 
             if (is_array($value)) {

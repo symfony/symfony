@@ -27,10 +27,7 @@ class FileLocator implements FileLocatorInterface
      */
     public function __construct($paths = array())
     {
-        if (!is_array($paths)) {
-            $paths = array($paths);
-        }
-        $this->paths = $paths;
+        $this->paths = (array) $paths;
     }
 
     /**

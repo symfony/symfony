@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\NonExistentParameterException;
 
 /**
  * Resolves all parameter placeholders "%somevalue%" to their real values.
@@ -31,18 +32,24 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
     {
         $this->parameterBag = $container->getParameterBag();
 
-        foreach ($container->getDefinitions() as $definition) {
-            $definition->setClass($this->resolveValue($definition->getClass()));
-            $definition->setFile($this->resolveValue($definition->getFile()));
-            $definition->setArguments($this->resolveValue($definition->getArguments()));
+        foreach ($container->getDefinitions() as $id => $definition) {
+            try {
+                $definition->setClass($this->resolveValue($definition->getClass()));
+                $definition->setFile($this->resolveValue($definition->getFile()));
+                $definition->setArguments($this->resolveValue($definition->getArguments()));
 
-            $calls = array();
-            foreach ($definition->getMethodCalls() as $name => $arguments) {
-                $calls[$this->resolveValue($name)] = $this->resolveValue($arguments);
+                $calls = array();
+                foreach ($definition->getMethodCalls() as $name => $arguments) {
+                    $calls[$this->resolveValue($name)] = $this->resolveValue($arguments);
+                }
+                $definition->setMethodCalls($calls);
+
+                $definition->setProperties($this->resolveValue($definition->getProperties()));
+            } catch (NonExistentParameterException $e) {
+                $e->setSourceId($id);
+
+                throw $e;
             }
-            $definition->setMethodCalls($calls);
-
-            $definition->setProperties($this->resolveValue($definition->getProperties()));
         }
 
         $aliases = array();
@@ -53,7 +60,13 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
 
         $parameterBag = $container->getParameterBag();
         foreach ($parameterBag->all() as $key => $value) {
-            $parameterBag->set($key, $this->resolveValue($value));
+            try {
+                $parameterBag->set($key, $this->resolveValue($value));
+            } catch (NonExistentParameterException $e) {
+                $e->setSourceKey($key);
+
+                throw $e;
+            }
         }
     }
 

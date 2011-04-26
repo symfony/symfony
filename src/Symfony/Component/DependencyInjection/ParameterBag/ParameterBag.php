@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\ParameterBag;
 
+use Symfony\Component\DependencyInjection\Exception\NonExistentParameterException;
+
 /**
  *
  * @author Fabien Potencier <fabien@symfony.com>
@@ -74,7 +76,7 @@ class ParameterBag implements ParameterBagInterface
         $name = strtolower($name);
 
         if (!array_key_exists($name, $this->parameters)) {
-            throw new \InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
+            throw new NonExistentParameterException($name);
         }
 
         return $this->parameters[$name];
@@ -109,7 +111,13 @@ class ParameterBag implements ParameterBagInterface
     public function resolve()
     {
         foreach ($this->parameters as $key => $value) {
-            $this->parameters[$key] = $this->resolveValue($value);
+            try {
+                $this->parameters[$key] = $this->resolveValue($value);
+            } catch (NonExistentParameterException $e) {
+                $e->setSourceKey($key);
+
+                throw $e;
+            }
         }
     }
 

@@ -119,9 +119,7 @@ class HeaderBag
     {
         $key = strtr(strtolower($key), '_', '-');
 
-        if (!is_array($values)) {
-            $values = array($values);
-        }
+        $values = (array) $values;
 
         if (true === $replace || !isset($this->headers[$key])) {
             $this->headers[$key] = $values;

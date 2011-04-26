@@ -69,7 +69,9 @@ abstract class Bundle extends ContainerAware implements BundleInterface
             $this->extension = class_exists($class) ? new $class() : false;
         }
 
-        return $this->extension ?: null;
+        if ($this->extension) {
+            return $this->extension;
+        }
     }
 
     /**

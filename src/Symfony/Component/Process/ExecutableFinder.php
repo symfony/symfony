@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Process;
 
-use Symfony\Component\Process\Exception\ExecutableNotFoundException;
-
 /**
  * Generic executable finder.
  *
@@ -33,6 +31,13 @@ class ExecutableFinder
         $this->suffixes[] = $suffix;
     }
 
+    /**
+     * Finds an executable by name.
+     *
+     * @param string $name The executable name (without the extension)
+     *
+     * @return string|false The executable path or false if it cannot be found
+     */
     public function find($name)
     {
         $dirs = explode(PATH_SEPARATOR, getenv('PATH') ? getenv('PATH') : getenv('Path'));
@@ -45,6 +50,6 @@ class ExecutableFinder
             }
         }
 
-        throw new ExecutableNotFoundException($name);
+        return false;
     }
 }

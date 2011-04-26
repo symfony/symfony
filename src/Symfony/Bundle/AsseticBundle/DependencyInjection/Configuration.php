@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\AsseticBundle\DependencyInjection;
 
 use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\Exception\ExecutableNotFoundException;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -58,9 +57,9 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('use_controller')->defaultValue($this->debug)->end()
                 ->scalarNode('read_from')->defaultValue('%kernel.root_dir%/../web')->end()
                 ->scalarNode('write_to')->defaultValue('%assetic.read_from%')->end()
-                ->scalarNode('java')->defaultValue(function() use ($finder) { try { return $finder->find('java'); } catch(ExecutableNotFoundException $ex) { return null; } })->end()
-                ->scalarNode('node')->defaultValue(function() use ($finder) { try { return $finder->find('node'); } catch(ExecutableNotFoundException $ex) { return null; } })->end()
-                ->scalarNode('sass')->defaultValue(function() use ($finder) { try { return $finder->find('sass'); } catch(ExecutableNotFoundException $ex) { return null; } })->end()
+                ->scalarNode('java')->defaultValue(function() use ($finder) { $java = $finder->find('java'); return $java ? $java : '/usr/bin/java'; })->end()
+                ->scalarNode('node')->defaultValue(function() use ($finder) { $node = $finder->find('node'); return $node ? $node : '/usr/bin/node'; })->end()
+                ->scalarNode('sass')->defaultValue(function() use ($finder) { $saas = $finder->find('saas'); return $saas ? $saas : '/usr/bin/saas'; })->end()
             ->end()
 
             // bundles

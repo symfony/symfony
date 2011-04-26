@@ -120,8 +120,16 @@ class RouteCollection implements \IteratorAggregate
      */
     public function addPrefix($prefix)
     {
+        // a prefix must not end with a slash
+        $prefix = rtrim($prefix, '/');
+
         if (!$prefix) {
             return;
+        }
+
+        // a prefix must start with a slash
+        if ('/' !== $prefix[0]) {
+            $prefix = '/'.$prefix;
         }
 
         $this->prefix = $prefix.$this->prefix;

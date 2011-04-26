@@ -9,6 +9,7 @@
         <parameter key="assetic.routing_loader.class">Symfony\Bundle\AsseticBundle\Routing\AsseticLoader</parameter>
         <parameter key="assetic.cache.class">Assetic\Cache\FilesystemCache</parameter>
         <parameter key="assetic.use_controller_worker.class">Symfony\Bundle\AsseticBundle\Factory\Worker\UseControllerWorker</parameter>
+        <parameter key="assetic.request_listener.class">Symfony\Bundle\AsseticBundle\Listener\RequestListener</parameter>
     </parameters>
 
     <services>
@@ -26,6 +27,9 @@
         </service>
         <service id="assetic.use_controller_worker" class="%assetic.use_controller_worker.class%" public="false">
             <tag name="assetic.factory_worker" />
+        </service>
+        <service id="assetic.request_listener" class="%assetic.request_listener.class%">
+            <tag name="kernel.listener" event="onCoreRequest" />
         </service>
     </services>
 </container>

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\Exception\InvalidArgumentException;
+
 /**
  * ParameterBag is a container for key/value pairs.
  *
@@ -105,13 +107,13 @@ class ParameterBag
 
             if ('[' === $char) {
                 if (null !== $currentKey) {
-                    throw new \InvalidArgumentException(sprintf('Malformed path. Unexpected "[" at position %d.', $i));
+                    throw new InvalidArgumentException(sprintf('Malformed path. Unexpected "[" at position %d.', $i));
                 }
 
                 $currentKey = '';
             } else if (']' === $char) {
                 if (null === $currentKey) {
-                    throw new \InvalidArgumentException(sprintf('Malformed path. Unexpected "]" at position %d.', $i));
+                    throw new InvalidArgumentException(sprintf('Malformed path. Unexpected "]" at position %d.', $i));
                 }
 
                 if (!is_array($value) || !array_key_exists($currentKey, $value)) {
@@ -122,7 +124,7 @@ class ParameterBag
                 $currentKey = null;
             } else {
                 if (null === $currentKey) {
-                    throw new \InvalidArgumentException(sprintf('Malformed path. Unexpected "%s" at position %d.', $char, $i));
+                    throw new InvalidArgumentException(sprintf('Malformed path. Unexpected "%s" at position %d.', $char, $i));
                 }
 
                 $currentKey .= $char;
@@ -130,7 +132,7 @@ class ParameterBag
         }
 
         if (null !== $currentKey) {
-            throw new \InvalidArgumentException(sprintf('Malformed path. Path must end with "]".'));
+            throw new InvalidArgumentException(sprintf('Malformed path. Path must end with "]".'));
         }
 
         return $value;

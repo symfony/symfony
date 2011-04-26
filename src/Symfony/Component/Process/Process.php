@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Process;
 
+use Symfony\Component\Process\Exception\RuntimeException;
+
 /**
  * Process is a thin wrapper around proc_* functions to ease
  * start independent PHP processes.
@@ -49,7 +51,7 @@ class Process
     public function __construct($commandline, $cwd = null, array $env = array(), $stdin = null, $timeout = 60, array $options = array())
     {
         if (!function_exists('proc_open')) {
-            throw new \RuntimeException('The Process class relies on proc_open, which is not available on your PHP installation.');
+            throw new RuntimeException('The Process class relies on proc_open, which is not available on your PHP installation.');
         }
 
         $this->commandline = $commandline;
@@ -108,7 +110,7 @@ class Process
         stream_set_blocking($pipes[2], false);
 
         if (!is_resource($process)) {
-            throw new \RuntimeException('Unable to launch a new process.');
+            throw new RuntimeException('Unable to launch a new process.');
         }
 
         if (null !== $this->stdin) {
@@ -128,7 +130,7 @@ class Process
             } elseif ($n === 0) {
                 proc_terminate($process);
 
-                throw new \RuntimeException('The process timed out.');
+                throw new RuntimeException('The process timed out.');
             } elseif ($n > 0) {
                 $called = false;
 
@@ -160,7 +162,7 @@ class Process
         proc_close($process);
 
         if ($this->status['signaled']) {
-            throw new \RuntimeException(sprintf('The process stopped because of a "%s" signal.', $this->status['stopsig']));
+            throw new RuntimeException(sprintf('The process stopped because of a "%s" signal.', $this->status['stopsig']));
         }
 
         return $this->exitcode = $this->status['exitcode'];

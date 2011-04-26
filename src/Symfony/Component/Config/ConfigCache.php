@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Config;
 
+use Symfony\Component\Config\Exception\RuntimeException;
+
 /**
  * ConfigCache manages PHP cache files.
  *
@@ -92,17 +94,17 @@ class ConfigCache
         $dir = dirname($this->file);
         if (!is_dir($dir)) {
             if (false === @mkdir($dir, 0777, true)) {
-                throw new \RuntimeException(sprintf('Unable to create the %s directory', $dir));
+                throw new RuntimeException(sprintf('Unable to create the %s directory', $dir));
             }
         } elseif (!is_writable($dir)) {
-            throw new \RuntimeException(sprintf('Unable to write in the %s directory', $dir));
+            throw new RuntimeException(sprintf('Unable to write in the %s directory', $dir));
         }
 
         $tmpFile = tempnam(dirname($this->file), basename($this->file));
         if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $this->file)) {
             chmod($this->file, 0666);
         } else {
-            throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $this->file));
+            throw new RuntimeException(sprintf('Failed to write cache file "%s".', $this->file));
         }
 
         if (null !== $metadata && true === $this->debug) {

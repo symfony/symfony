@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Translation;
 
+use Symfony\Component\Translation\Exception\InvalidArgumentException;
+
 /**
  * MessageSelector.
  *
@@ -72,7 +74,7 @@ class MessageSelector
 
         $position = PluralizationRules::get($number, $locale);
         if (!isset($standardRules[$position])) {
-            throw new \InvalidArgumentException('Unable to choose a translation.');
+            throw new InvalidArgumentException('Unable to choose a translation.');
         }
 
         return $standardRules[$position];

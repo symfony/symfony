@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Templating;
 
+use Symfony\Component\Templating\Exception\RuntimeException;
+
 /**
  * DelegatingEngine selects an engine for a given template.
  *
@@ -106,6 +108,6 @@ class DelegatingEngine implements EngineInterface
             }
         }
 
-        throw new \RuntimeException(sprintf('No engine is able to work with the template "%s".', $name));
+        throw new RuntimeException(sprintf('No engine is able to work with the template "%s".', $name));
     }
 }

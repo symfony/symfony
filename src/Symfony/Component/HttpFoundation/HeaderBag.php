@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\Exception\InvalidArgumentException;
+use Symfony\Component\HttpFoundation\Exception\RuntimeException;
+
 /**
  * HeaderBag is a container for HTTP headers.
  *
@@ -218,7 +221,7 @@ class HeaderBag
     public function getCookie($name)
     {
         if (!$this->hasCookie($name)) {
-            throw new \InvalidArgumentException(sprintf('There is no cookie with name "%s".', $name));
+            throw new InvalidArgumentException(sprintf('There is no cookie with name "%s".', $name));
         }
 
         return $this->cookies[$name];
@@ -249,7 +252,7 @@ class HeaderBag
         }
 
         if (false === $date = \DateTime::createFromFormat(DATE_RFC2822, $value)) {
-            throw new \RuntimeException(sprintf('The %s HTTP header is not parseable (%s).', $key, $value));
+            throw new RuntimeException(sprintf('The %s HTTP header is not parseable (%s).', $key, $value));
         }
 
         return $date;

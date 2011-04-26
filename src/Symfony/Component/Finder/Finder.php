@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Finder;
 
+use Symfony\Component\Finder\Exception\InvalidArgumentException;
+use Symfony\Component\Finder\Exception\LogicException;
+
 /**
  * Finder allows to build rules to find files and directories.
  *
@@ -331,7 +334,7 @@ class Finder implements \IteratorAggregate
 
         foreach ($dirs as $dir) {
             if (!is_dir($dir)) {
-                throw new \InvalidArgumentException(sprintf('The "%s" directory does not exist.', $dir));
+                throw new InvalidArgumentException(sprintf('The "%s" directory does not exist.', $dir));
             }
         }
 
@@ -352,7 +355,7 @@ class Finder implements \IteratorAggregate
     public function getIterator()
     {
         if (0 === count($this->dirs)) {
-            throw new \LogicException('You must call the in() method before iterating over a Finder.');
+            throw new LogicException('You must call the in() method before iterating over a Finder.');
         }
 
         if (1 === count($this->dirs) && 0 === count($this->iterators)) {
@@ -391,7 +394,7 @@ class Finder implements \IteratorAggregate
             }
             $this->iterators[] = $it;
         } else {
-            throw new \InvalidArgumentException('Finder::append() method wrong argument type.');
+            throw new InvalidArgumentException('Finder::append() method wrong argument type.');
         }
     }
 

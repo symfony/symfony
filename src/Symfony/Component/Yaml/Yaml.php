@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Yaml;
 
+use Symfony\Component\Yaml\Exception\InvalidArgumentException;
+
 /**
  * Yaml offers convenience methods to load and dump YAML.
  *
@@ -32,7 +34,7 @@ class Yaml
     static public function setSpecVersion($version)
     {
         if (!in_array($version, array('1.1', '1.2'))) {
-            throw new \InvalidArgumentException(sprintf('Version %s of the YAML specifications is not supported', $version));
+            throw new InvalidArgumentException(sprintf('Version %s of the YAML specifications is not supported', $version));
         }
 
         self::$spec = $version;
@@ -94,7 +96,7 @@ class Yaml
         try {
             $ret = $yaml->parse($input);
         } catch (\Exception $e) {
-            throw new \InvalidArgumentException(sprintf('Unable to parse %s: %s', $file ? sprintf('file "%s"', $file) : 'string', $e->getMessage()), 0, $e);
+            throw new InvalidArgumentException(sprintf('Unable to parse %s: %s', $file ? sprintf('file "%s"', $file) : 'string', $e->getMessage()), 0, $e);
         }
 
         return $ret;

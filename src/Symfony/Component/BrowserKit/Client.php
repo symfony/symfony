@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\BrowserKit;
 
+use Symfony\Component\BrowserKit\Exception\RuntimeException;
+use Symfony\Component\BrowserKit\Exception\LogicException;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Link;
 use Symfony\Component\DomCrawler\Form;
@@ -86,7 +88,7 @@ abstract class Client
     {
         if (!class_exists('Symfony\\Component\\Process\\Process')) {
             // @codeCoverageIgnoreStart
-            throw new \RuntimeException('Unable to isolate requests as the Symfony Process Component is not installed.');
+            throw new RuntimeException('Unable to isolate requests as the Symfony Process Component is not installed.');
             // @codeCoverageIgnoreEnd
         }
 
@@ -286,7 +288,7 @@ abstract class Client
         $process->run();
 
         if (!$process->isSuccessful()) {
-            throw new \RuntimeException($process->getErrorOutput());
+            throw new RuntimeException($process->getErrorOutput());
         }
 
         return unserialize($process->getOutput());
@@ -311,7 +313,7 @@ abstract class Client
     protected function getScript($request)
     {
         // @codeCoverageIgnoreStart
-        throw new \LogicException('To insulate requests, you need to override the getScript() method.');
+        throw new LogicException('To insulate requests, you need to override the getScript() method.');
         // @codeCoverageIgnoreEnd
     }
 
@@ -404,7 +406,7 @@ abstract class Client
     public function followRedirect()
     {
         if (empty($this->redirect)) {
-            throw new \LogicException('The request was not redirected.');
+            throw new LogicException('The request was not redirected.');
         }
 
         return $this->request('get', $this->redirect);

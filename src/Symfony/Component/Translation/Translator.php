@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation;
 
+use Symfony\Component\Translation\Exception\RuntimeException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 
 /**
@@ -156,7 +157,7 @@ class Translator implements TranslatorInterface
         if (isset($this->resources[$locale])) {
             foreach ($this->resources[$locale] as $resource) {
                 if (!isset($this->loaders[$resource[0]])) {
-                    throw new \RuntimeException(sprintf('The "%s" translation loader is not registered.', $resource[0]));
+                    throw new RuntimeException(sprintf('The "%s" translation loader is not registered.', $resource[0]));
                 }
                 $this->catalogues[$locale]->addCatalogue($this->loaders[$resource[0]]->load($resource[1], $locale, $resource[2]));
             }

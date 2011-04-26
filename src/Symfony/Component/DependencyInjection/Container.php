@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\NonExistentServiceException;
 use Symfony\Component\DependencyInjection\Exception\CircularReferenceException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -165,14 +167,14 @@ class Container implements ContainerInterface
     public function set($id, $service, $scope = self::SCOPE_CONTAINER)
     {
         if (self::SCOPE_PROTOTYPE === $scope) {
-            throw new \InvalidArgumentException('You cannot set services of scope "prototype".');
+            throw new InvalidArgumentException('You cannot set services of scope "prototype".');
         }
 
         $id = strtolower($id);
 
         if (self::SCOPE_CONTAINER !== $scope) {
             if (!isset($this->scopedServices[$scope])) {
-                throw new \RuntimeException('You cannot set services of inactive scopes.');
+                throw new RuntimeException('You cannot set services of inactive scopes.');
             }
 
             $this->scopedServices[$scope][$id] = $service;
@@ -269,11 +271,11 @@ class Container implements ContainerInterface
     public function enterScope($name)
     {
         if (!isset($this->scopes[$name])) {
-            throw new \InvalidArgumentException(sprintf('The scope "%s" does not exist.', $name));
+            throw new InvalidArgumentException(sprintf('The scope "%s" does not exist.', $name));
         }
 
         if (self::SCOPE_CONTAINER !== $this->scopes[$name] && !isset($this->scopedServices[$this->scopes[$name]])) {
-            throw new \RuntimeException(sprintf('The parent scope "%s" must be active when entering this scope.', $this->scopes[$name]));
+            throw new RuntimeException(sprintf('The parent scope "%s" must be active when entering this scope.', $this->scopes[$name]));
         }
 
         // check if a scope of this name is already active, if so we need to
@@ -329,7 +331,7 @@ class Container implements ContainerInterface
     public function leaveScope($name)
     {
         if (!isset($this->scopedServices[$name])) {
-            throw new \InvalidArgumentException(sprintf('The scope "%s" is not active.', $name));
+            throw new InvalidArgumentException(sprintf('The scope "%s" is not active.', $name));
         }
 
         // remove all services of this scope, or any of its child scopes from
@@ -368,13 +370,13 @@ class Container implements ContainerInterface
         $parentScope = $scope->getParentName();
 
         if (self::SCOPE_CONTAINER === $name || self::SCOPE_PROTOTYPE === $name) {
-            throw new \InvalidArgumentException(sprintf('The scope "%s" is reserved.', $name));
+            throw new InvalidArgumentException(sprintf('The scope "%s" is reserved.', $name));
         }
         if (isset($this->scopes[$name])) {
-            throw new \InvalidArgumentException(sprintf('A scope with name "%s" already exists.', $name));
+            throw new InvalidArgumentException(sprintf('A scope with name "%s" already exists.', $name));
         }
         if (self::SCOPE_CONTAINER !== $parentScope && !isset($this->scopes[$parentScope])) {
-            throw new \InvalidArgumentException(sprintf('The parent scope "%s" does not exist, or is invalid.', $parentScope));
+            throw new InvalidArgumentException(sprintf('The parent scope "%s" does not exist, or is invalid.', $parentScope));
         }
 
         $this->scopes[$name] = $parentScope;

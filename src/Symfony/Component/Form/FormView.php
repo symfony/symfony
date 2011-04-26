@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\Util\FormUtil;
 
 class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
@@ -142,12 +143,12 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     public function offsetSet($name, $value)
     {
-        throw new \BadMethodCallException('Not supported');
+        throw new BadMethodCallException('Not supported');
     }
 
     public function offsetUnset($name)
     {
-        throw new \BadMethodCallException('Not supported');
+        throw new BadMethodCallException('Not supported');
     }
 
     public function getIterator()

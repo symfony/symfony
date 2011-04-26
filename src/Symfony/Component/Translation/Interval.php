@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Translation;
 
+use Symfony\Component\Translation\Exception\InvalidArgumentException;
+
 /**
  * Tests if a given number belongs to a given math interval.
  *
@@ -44,7 +46,7 @@ class Interval
         $interval = trim($interval);
 
         if (!preg_match('/^'.self::getIntervalRegexp().'$/x', $interval, $matches)) {
-            throw new \InvalidArgumentException(sprintf('"%s" is not a valid interval.', $interval));
+            throw new InvalidArgumentException(sprintf('"%s" is not a valid interval.', $interval));
         }
 
         if ($matches[1]) {

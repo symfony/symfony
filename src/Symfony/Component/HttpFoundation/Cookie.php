@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\Exception\InvalidArgumentException;
+
 /**
  * Represents a cookie
  *
@@ -30,15 +32,15 @@ class Cookie
     {
         // from PHP source code
         if (preg_match("/[=,; \t\r\n\013\014]/", $name)) {
-            throw new \InvalidArgumentException(sprintf('The cookie name "%s" contains invalid characters.', $name));
+            throw new InvalidArgumentException(sprintf('The cookie name "%s" contains invalid characters.', $name));
         }
 
         if (preg_match("/[,; \t\r\n\013\014]/", $value)) {
-            throw new \InvalidArgumentException(sprintf('The cookie value "%s" contains invalid characters.', $name));
+            throw new InvalidArgumentException(sprintf('The cookie value "%s" contains invalid characters.', $name));
         }
 
         if (empty($name)) {
-            throw new \InvalidArgumentException('The cookie name cannot be empty');
+            throw new InvalidArgumentException('The cookie name cannot be empty');
         }
 
         // convert expiration time to a Unix timestamp
@@ -48,7 +50,7 @@ class Cookie
             $expire = strtotime($expire);
 
             if (false === $expire || -1 === $expire) {
-                throw new \InvalidArgumentException('The cookie expiration time is not valid.');
+                throw new InvalidArgumentException('The cookie expiration time is not valid.');
             }
         }
 

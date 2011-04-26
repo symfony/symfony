@@ -2,6 +2,8 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+
 /**
  * This definition decorates another definition.
  *
@@ -132,7 +134,7 @@ class DefinitionDecorator extends Definition
     public function replaceArgument($index, $value)
     {
         if (!is_int($index)) {
-            throw new \InvalidArgumentException('$index must be an integer.');
+            throw new InvalidArgumentException('$index must be an integer.');
         }
 
         $this->arguments['index_'.$index] = $value;

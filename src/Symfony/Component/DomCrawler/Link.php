@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\DomCrawler;
 
+use Symfony\Component\DomCrawler\Exception\InvalidArgumentException;
+use Symfony\Component\DomCrawler\Exception\LogicException;
+
 /**
  * Link represents an HTML link (an HTML a tag).
  *
@@ -38,7 +41,7 @@ class Link
     public function __construct(\DOMNode $node, $currentUri, $method = 'get')
     {
         if (!in_array(substr($currentUri, 0, 4), array('http', 'file'))) {
-            throw new \InvalidArgumentException(sprintf('Current URI must be an asbolute URL ("%s").', $currentUri));
+            throw new InvalidArgumentException(sprintf('Current URI must be an asbolute URL ("%s").', $currentUri));
         }
 
         $this->setNode($node);
@@ -49,7 +52,7 @@ class Link
     protected function setNode(\DOMNode $node)
     {
         if ('a' != $node->nodeName) {
-            throw new \LogicException(sprintf('Unable to click on a "%s" tag.', $node->nodeName));
+            throw new LogicException(sprintf('Unable to click on a "%s" tag.', $node->nodeName));
         }
 
         $this->node = $node;

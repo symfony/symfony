@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Translation;
 
+use Symfony\Component\Translation\Exception\LogicException;
+
 /**
  * Returns the plural rules for a given locale.
  *
@@ -207,7 +209,7 @@ class PluralizationRules
         }
 
         if (!is_callable($rule)) {
-            throw new \LogicException('The given rule can not be called');
+            throw new LogicException('The given rule can not be called');
         }
 
         self::$rules[$locale] = $rule;

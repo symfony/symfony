@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\BrowserKit;
 
+use Symfony\Component\BrowserKit\Exception\LogicException;
+
 /**
  * History.
  *
@@ -70,7 +72,7 @@ class History
     public function back()
     {
         if ($this->position < 1) {
-            throw new \LogicException('You are already on the first page.');
+            throw new LogicException('You are already on the first page.');
         }
 
         return clone $this->stack[--$this->position];
@@ -86,7 +88,7 @@ class History
     public function forward()
     {
         if ($this->position > count($this->stack) - 2) {
-            throw new \LogicException('You are already on the last page.');
+            throw new LogicException('You are already on the last page.');
         }
 
         return clone $this->stack[++$this->position];
@@ -102,7 +104,7 @@ class History
     public function current()
     {
         if (-1 == $this->position) {
-            throw new \LogicException('The page history is empty.');
+            throw new LogicException('The page history is empty.');
         }
 
         return clone $this->stack[$this->position];

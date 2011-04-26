@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\Exception\FormException;
@@ -742,7 +743,7 @@ class Form implements \IteratorAggregate, FormInterface
             return $this->children[$name];
         }
 
-        throw new \InvalidArgumentException(sprintf('Field "%s" does not exist.', $name));
+        throw new InvalidArgumentException(sprintf('Field "%s" does not exist.', $name));
     }
 
     /**

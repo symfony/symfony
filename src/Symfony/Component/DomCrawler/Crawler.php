@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DomCrawler;
 
+use Symfony\Component\DomCrawler\Exception\InvalidArgumentException;
+use Symfony\Component\DomCrawler\Exception\RuntimeException;
 use Symfony\Component\CssSelector\Parser as CssParser;
 
 /**
@@ -307,7 +309,7 @@ class Crawler extends \SplObjectStorage
     public function siblings()
     {
         if (!count($this)) {
-            throw new \InvalidArgumentException('The current node list is empty.');
+            throw new InvalidArgumentException('The current node list is empty.');
         }
 
         return new static($this->sibling($this->getNode(0)->parentNode->firstChild), $this->uri);
@@ -325,7 +327,7 @@ class Crawler extends \SplObjectStorage
     public function nextAll()
     {
         if (!count($this)) {
-            throw new \InvalidArgumentException('The current node list is empty.');
+            throw new InvalidArgumentException('The current node list is empty.');
         }
 
         return new static($this->sibling($this->getNode(0)), $this->uri);
@@ -341,7 +343,7 @@ class Crawler extends \SplObjectStorage
     public function previousAll()
     {
         if (!count($this)) {
-            throw new \InvalidArgumentException('The current node list is empty.');
+            throw new InvalidArgumentException('The current node list is empty.');
         }
 
         return new static($this->sibling($this->getNode(0), 'previousSibling'), $this->uri);
@@ -359,7 +361,7 @@ class Crawler extends \SplObjectStorage
     public function parents()
     {
         if (!count($this)) {
-            throw new \InvalidArgumentException('The current node list is empty.');
+            throw new InvalidArgumentException('The current node list is empty.');
         }
 
         $node = $this->getNode(0);
@@ -386,7 +388,7 @@ class Crawler extends \SplObjectStorage
     public function children()
     {
         if (!count($this)) {
-            throw new \InvalidArgumentException('The current node list is empty.');
+            throw new InvalidArgumentException('The current node list is empty.');
         }
 
         return new static($this->sibling($this->getNode(0)->firstChild), $this->uri);
@@ -406,7 +408,7 @@ class Crawler extends \SplObjectStorage
     public function attr($attribute)
     {
         if (!count($this)) {
-            throw new \InvalidArgumentException('The current node list is empty.');
+            throw new InvalidArgumentException('The current node list is empty.');
         }
 
         return $this->getNode(0)->getAttribute($attribute);
@@ -424,7 +426,7 @@ class Crawler extends \SplObjectStorage
     public function text()
     {
         if (!count($this)) {
-            throw new \InvalidArgumentException('The current node list is empty.');
+            throw new InvalidArgumentException('The current node list is empty.');
         }
 
         return $this->getNode(0)->nodeValue;
@@ -505,7 +507,7 @@ class Crawler extends \SplObjectStorage
     {
         if (!class_exists('Symfony\\Component\\CssSelector\\Parser')) {
             // @codeCoverageIgnoreStart
-            throw new \RuntimeException('Unable to filter with a CSS selector as the Symfony CssSelector is not installed (you can use filterXPath instead).');
+            throw new RuntimeException('Unable to filter with a CSS selector as the Symfony CssSelector is not installed (you can use filterXPath instead).');
             // @codeCoverageIgnoreEnd
         }
 
@@ -561,7 +563,7 @@ class Crawler extends \SplObjectStorage
     public function link($method = 'get')
     {
         if (!count($this)) {
-            throw new \InvalidArgumentException('The current node list is empty.');
+            throw new InvalidArgumentException('The current node list is empty.');
         }
 
         $node = $this->getNode(0);
@@ -601,7 +603,7 @@ class Crawler extends \SplObjectStorage
     public function form(array $values = null, $method = null)
     {
         if (!count($this)) {
-            throw new \InvalidArgumentException('The current node list is empty.');
+            throw new InvalidArgumentException('The current node list is empty.');
         }
 
         $form = new Form($this->getNode(0), $this->uri, $method);

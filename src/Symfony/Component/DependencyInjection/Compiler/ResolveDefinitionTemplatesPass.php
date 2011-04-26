@@ -44,7 +44,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
     /**
      * Resolves the definition
      *
-     * @param string $id The definition identifier
+     * @param string              $id         The definition identifier
      * @param DefinitionDecorator $definition
      * @return Definition
      */
@@ -111,7 +111,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
             }
 
             $index = (integer) substr($k, strlen('index_'));
-            $def->setArgument($index, $v);
+            $def->replaceArgument($index, $v);
         }
 
         // merge properties

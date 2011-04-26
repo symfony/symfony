@@ -28,6 +28,7 @@ class Translator extends BaseTranslator
     protected $container;
     protected $options;
     protected $session;
+    protected $loaderIds;
 
     /**
      * Constructor.
@@ -39,15 +40,17 @@ class Translator extends BaseTranslator
      *
      * @param ContainerInterface $container A ContainerInterface instance
      * @param MessageSelector    $selector  The message selector for pluralization
+     * @param array              $loaderIds An array of loader Ids
      * @param array              $options   An array of options
      * @param Session            $session   A Session instance
      */
-    public function __construct(ContainerInterface $container, MessageSelector $selector, array $options = array(), Session $session = null)
+    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array(), Session $session = null)
     {
         parent::__construct(null, $selector);
 
         $this->session = $session;
         $this->container = $container;
+        $this->loaderIds = $loaderIds;
 
         $this->options = array(
             'cache_dir' => null,
@@ -111,12 +114,8 @@ class Translator extends BaseTranslator
 
     protected function initialize()
     {
-        foreach ($this->container->getParameter('translation.loaders') as $id => $alias) {
+        foreach ($this->loaderIds as $id => $alias) {
             $this->addLoader($alias, $this->container->get($id));
-        }
-
-        foreach ($this->container->getParameter('translation.resources') as $resource) {
-            $this->addResource($resource[0], $resource[1], $resource[2], $resource[3]);
         }
     }
 }

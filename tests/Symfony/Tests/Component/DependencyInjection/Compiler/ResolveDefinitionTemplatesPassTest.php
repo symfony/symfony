@@ -14,7 +14,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->register('parent', 'foo')->setArguments(array('moo', 'b'))->setProperty('foo', 'moo');
         $container->setDefinition('child', new DefinitionDecorator('parent'))
-            ->setArgument(0, 'a')
+            ->replaceArgument(0, 'a')
             ->setProperty('foo', 'bar')
             ->setClass('bar')
         ;
@@ -119,12 +119,12 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
 
         $container
             ->setDefinition('child2', new DefinitionDecorator('child1'))
-            ->setArgument(1, 'b')
+            ->replaceArgument(1, 'b')
         ;
 
         $container
             ->setDefinition('child1', new DefinitionDecorator('parent'))
-            ->setArgument(0, 'a')
+            ->replaceArgument(0, 'a')
         ;
 
         $this->process($container);

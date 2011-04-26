@@ -40,19 +40,19 @@ class Router implements RouterInterface
      *   * debug:         Whether to enable debugging or not (false by default)
      *   * resource_type: Type hint for the main resource (optional)
      *
-     * @param LoaderInterface $loader A LoaderInterface instance
+     * @param LoaderInterface $loader   A LoaderInterface instance
      * @param mixed           $resource The main resource to load
      * @param array           $options  An array of options
-     * @param array           $context  The context
+     * @param RequestContext  $context  The context
      * @param array           $defaults The default values
      *
      * @throws \InvalidArgumentException When unsupported option is provided
      */
-    public function __construct(LoaderInterface $loader, $resource, array $options = array(), array $context = array(), array $defaults = array())
+    public function __construct(LoaderInterface $loader, $resource, array $options = array(), RequestContext $context = null, array $defaults = array())
     {
         $this->loader = $loader;
         $this->resource = $resource;
-        $this->context = $context;
+        $this->context = null === $context ? new RequestContext() : $context;
         $this->defaults = $defaults;
         $this->options = array(
             'cache_dir'              => null,
@@ -102,12 +102,24 @@ class Router implements RouterInterface
     /**
      * Sets the request context.
      *
-     * @param array $context  The context
+     * @param RequestContext $context The context
      */
-    public function setContext(array $context = array())
+    public function setContext(RequestContext $context)
     {
+        $this->context = $context;
+
         $this->getMatcher()->setContext($context);
         $this->getGenerator()->setContext($context);
+    }
+
+    /**
+     * Gets the request context.
+     *
+     * @return RequestContext The context
+     */
+    public function getContext()
+    {
+        return $this->context;
     }
 
     /**

@@ -36,7 +36,9 @@ class SecurityContext implements SecurityContextInterface
     /**
      * Constructor.
      *
+     * @param AuthenticationManagerInterface      $authenticationManager An AuthenticationManager instance
      * @param AccessDecisionManagerInterface|null $accessDecisionManager An AccessDecisionManager instance
+     * @param Boolean                             $alwaysAuthenticate
      */
     public function __construct(AuthenticationManagerInterface $authenticationManager, AccessDecisionManagerInterface $accessDecisionManager, $alwaysAuthenticate = false)
     {

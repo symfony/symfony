@@ -49,7 +49,7 @@ class Escaper
     {
         return preg_match('/'.self::REGEX_CHARACTER_TO_ESCAPE.'/u', $value);
     }
-    
+
     /**
      * Escapes and surrounds a PHP value with double quotes.
      *

@@ -38,25 +38,16 @@ install_git()
 install_git assetic git://github.com/kriswallsmith/assetic.git
 
 # Doctrine ORM
-install_git doctrine git://github.com/doctrine/doctrine2.git
-
-# Doctrine Data Fixtures Extension
-install_git doctrine-data-fixtures git://github.com/doctrine/data-fixtures.git
+install_git doctrine git://github.com/doctrine/doctrine2.git 2.0.4
 
 # Doctrine DBAL
-install_git doctrine-dbal git://github.com/doctrine/dbal.git
+install_git doctrine-dbal git://github.com/doctrine/dbal.git 2.0.4
 
 # Doctrine Common
-install_git doctrine-common git://github.com/doctrine/common.git
+install_git doctrine-common git://github.com/doctrine/common.git 2.0.2
 
 # Doctrine migrations
 install_git doctrine-migrations git://github.com/doctrine/migrations.git
-
-# Doctrine MongoDB
-install_git doctrine-mongodb git://github.com/doctrine/mongodb.git
-
-# Doctrine MongoDB
-install_git doctrine-mongodb-odm git://github.com/doctrine/mongodb-odm.git
 
 # Monolog
 install_git monolog git://github.com/Seldaek/monolog.git

@@ -11,17 +11,19 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\FileBag;
-use Symfony\Component\Validator\ValidatorInterface;
-use Symfony\Component\Validator\ExecutionContext;
+use Symfony\Component\Form\Event\DataEvent;
+use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\MissingOptionsException;
-use Symfony\Component\Form\Exception\AlreadySubmittedException;
+use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\DanglingFieldException;
 use Symfony\Component\Form\Exception\FieldDefinitionException;
-use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\FileBag;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Form represents a form.
@@ -35,485 +37,587 @@ use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
  * CSRF secret. If the global CSRF secret is also null, then a random one
  * is generated on the fly.
  *
+ * To implement your own form fields, you need to have a thorough understanding
+ * of the data flow within a form field. A form field stores its data in three
+ * different representations:
+ *
+ *   (1) the format required by the form's object
+ *   (2) a normalized format for internal processing
+ *   (3) the format used for display
+ *
+ * A date field, for example, may store a date as "Y-m-d" string (1) in the
+ * object. To facilitate processing in the field, this value is normalized
+ * to a DateTime object (2). In the HTML representation of your form, a
+ * localized string (3) is presented to and modified by the user.
+ *
+ * In most cases, format (1) and format (2) will be the same. For example,
+ * a checkbox field uses a Boolean value both for internal processing as for
+ * storage in the object. In these cases you simply need to set a value
+ * transformer to convert between formats (2) and (3). You can do this by
+ * calling appendClientTransformer() in the configure() method.
+ *
+ * In some cases though it makes sense to make format (1) configurable. To
+ * demonstrate this, let's extend our above date field to store the value
+ * either as "Y-m-d" string or as timestamp. Internally we still want to
+ * use a DateTime object for processing. To convert the data from string/integer
+ * to DateTime you can set a normalization transformer by calling
+ * appendNormTransformer() in configure(). The normalized data is then
+ * converted to the displayed data as described before.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class Form extends Field implements \IteratorAggregate, FormInterface
+class Form implements \IteratorAggregate, FormInterface
 {
     /**
-     * Contains all the fields of this group
-     * @var array
-     */
-    protected $fields = array();
-
-    /**
-     * Contains the names of submitted values who don't belong to any fields
-     * @var array
-     */
-    protected $extraFields = array();
-
-    /**
-     * Stores the class that the data of this form must be instances of
+     * The name of this form
      * @var string
      */
-    protected $dataClass;
+    private $name;
 
     /**
-     * Stores the constructor closure for creating new domain object instances
-     * @var \Closure
+     * The parent fo this form
+     * @var FormInterface
      */
-    protected $dataConstructor;
+    private $parent;
 
     /**
-     * The context used when creating the form
-     * @var FormContext
+     * The children of this form
+     * @var array
      */
-    protected $context = null;
+    private $children = array();
 
     /**
-     * Creates a new form with the options stored in the given context
-     *
-     * @param  FormContextInterface $context
-     * @param  string $name
-     * @param  array $options
-     * @return Form
+     * The mapper for mapping data to children and back
+     * @var DataMapper\DataMapperInterface
      */
-    public static function create(FormContextInterface $context, $name = null, array $options = array())
+    private $dataMapper;
+
+    /**
+     * The errors of this form
+     * @var array
+     */
+    private $errors = array();
+
+    /**
+     * Whether added errors should bubble up to the parent
+     * @var Boolean
+     */
+    private $errorBubbling;
+
+    /**
+     * Whether this form is bound
+     * @var Boolean
+     */
+    private $bound = false;
+
+    /**
+     * Whether this form may not be empty
+     * @var Boolean
+     */
+    private $required;
+
+    /**
+     * The form data in application format
+     * @var mixed
+     */
+    private $data;
+
+    /**
+     * The form data in normalized format
+     * @var mixed
+     */
+    private $normData;
+
+    /**
+     * The form data in client format
+     * @var mixed
+     */
+    private $clientData;
+
+    /**
+     * Data used for the client data when no value is bound
+     * @var mixed
+     */
+    private $emptyData = '';
+
+    /**
+     * The names of bound values that don't belong to any children
+     * @var array
+     */
+    private $extraData = array();
+
+    /**
+     * The transformer for transforming from application to normalized format
+     * and back
+     * @var DataTransformer\DataTransformerInterface
+     */
+    private $normTransformers;
+
+    /**
+     * The transformer for transforming from normalized to client format and
+     * back
+     * @var DataTransformer\DataTransformerInterface
+     */
+    private $clientTransformers;
+
+    /**
+     * Whether the data in application, normalized and client format is
+     * synchronized. Data may not be synchronized if transformation errors
+     * occur.
+     * @var Boolean
+     */
+    private $synchronized = true;
+
+    /**
+     * The validators attached to this form
+     * @var array
+     */
+    private $validators;
+
+    /**
+     * Whether this form may only be read, but not bound
+     * @var Boolean
+     */
+    private $readOnly = false;
+
+    /**
+     * The dispatcher for distributing events of this form
+     * @var Symfony\Component\EventDispatcher\EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * Key-value store for arbitrary attributes attached to this form
+     * @var array
+     */
+    private $attributes;
+
+    /**
+     * The FormTypeInterface instances used to create this form
+     * @var array
+     */
+    private $types;
+
+    public function __construct($name, EventDispatcherInterface $dispatcher,
+        array $types = array(), array $clientTransformers = array(),
+        array $normTransformers = array(),
+        DataMapperInterface $dataMapper = null, array $validators = array(),
+        $required = false, $readOnly = false, $errorBubbling = false,
+        $emptyData = null, array $attributes = array())
     {
-        return new static($name, array_merge($context->getOptions(), $options));
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param string $name
-     * @param array $options
-     */
-    public function __construct($name = null, array $options = array())
-    {
-        $this->addOption('data_class');
-        $this->addOption('data_constructor');
-        $this->addOption('csrf_field_name', '_token');
-        $this->addOption('csrf_provider');
-        $this->addOption('field_factory');
-        $this->addOption('validation_groups');
-        $this->addOption('virtual', false);
-        $this->addOption('validator');
-        $this->addOption('context');
-        $this->addOption('by_reference', true);
-
-        if (isset($options['validation_groups'])) {
-            $options['validation_groups'] = (array)$options['validation_groups'];
-        }
-
-        if (isset($options['data_class'])) {
-            $this->dataClass = $options['data_class'];
-        }
-
-        if (isset($options['data_constructor'])) {
-            $this->dataConstructor = $options['data_constructor'];
-        }
-
-        parent::__construct($name, $options);
-
-        // Enable CSRF protection
-        if ($this->getOption('csrf_provider')) {
-            if (!$this->getOption('csrf_provider') instanceof CsrfProviderInterface) {
-                throw new FormException('The object passed to the "csrf_provider" option must implement CsrfProviderInterface');
+        foreach ($clientTransformers as $transformer) {
+            if (!$transformer instanceof DataTransformerInterface) {
+                throw new UnexpectedTypeException($transformer, 'Symfony\Component\Form\DataTransformerInterface');
             }
-
-            $fieldName = $this->getOption('csrf_field_name');
-            $token = $this->getOption('csrf_provider')->generateCsrfToken(get_class($this));
-
-            $this->add(new HiddenField($fieldName, array('data' => $token)));
         }
+
+        foreach ($normTransformers as $transformer) {
+            if (!$transformer instanceof DataTransformerInterface) {
+                throw new UnexpectedTypeException($transformer, 'Symfony\Component\Form\DataTransformerInterface');
+            }
+        }
+
+        foreach ($validators as $validator) {
+            if (!$validator instanceof FormValidatorInterface) {
+                throw new UnexpectedTypeException($validator, 'Symfony\Component\Form\FormValidatorInterface');
+            }
+        }
+
+        $this->name = (string)$name;
+        $this->types = $types;
+        $this->dispatcher = $dispatcher;
+        $this->clientTransformers = $clientTransformers;
+        $this->normTransformers = $normTransformers;
+        $this->validators = $validators;
+        $this->dataMapper = $dataMapper;
+        $this->required = $required;
+        $this->readOnly = $readOnly;
+        $this->attributes = $attributes;
+        $this->errorBubbling = $errorBubbling;
+        $this->emptyData = $emptyData;
+
+        $this->setData(null);
     }
 
-    /**
-     * Clones this group
-     */
     public function __clone()
     {
-        foreach ($this->fields as $name => $field) {
-            $field = clone $field;
-            // this condition is only to "bypass" a PHPUnit bug with mocks
-            if (null !== $field->getParent()) {
-                $field->setParent($this);
-            }
-            $this->fields[$name] = $field;
+        foreach ($this->children as $key => $child) {
+            $this->children[$key] = clone $child;
         }
     }
 
     /**
-     * Adds a new field to this group. A field must have a unique name within
-     * the group. Otherwise the existing field is overwritten.
-     *
-     * If you add a nested group, this group should also be represented in the
-     * object hierarchy. If you want to add a group that operates on the same
-     * hierarchy level, use merge().
-     *
-     * <code>
-     * class Entity
-     * {
-     *   public $location;
-     * }
-     *
-     * class Location
-     * {
-     *   public $longitude;
-     *   public $latitude;
-     * }
-     *
-     * $entity = new Entity();
-     * $entity->location = new Location();
-     *
-     * $form = new Form('entity', $entity, $validator);
-     *
-     * $locationGroup = new Form('location');
-     * $locationGroup->add(new TextField('longitude'));
-     * $locationGroup->add(new TextField('latitude'));
-     *
-     * $form->add($locationGroup);
-     * </code>
-     *
-     * @param FieldInterface|string $field
-     * @return FieldInterface
+     * {@inheritDoc}
      */
-    public function add($field)
+    public function getName()
     {
-        if ($this->isSubmitted()) {
-            throw new AlreadySubmittedException('You cannot add fields after submitting a form');
-        }
+        return $this->name;
+    }
 
-        // if the field is given as string, ask the field factory of the form
-        // to create a field
-        if (!$field instanceof FieldInterface) {
-            if (!is_string($field)) {
-                throw new UnexpectedTypeException($field, 'FieldInterface or string');
-            }
-
-            $factory = $this->getFieldFactory();
-
-            if (!$factory) {
-                throw new FormException('A field factory must be set to automatically create fields');
-            }
-
-            $class = $this->getDataClass();
-
-            if (!$class) {
-                throw new FormException('The data class must be set to automatically create fields');
-            }
-
-            $options = func_num_args() > 1 ? func_get_arg(1) : array();
-            $field = $factory->getInstance($class, $field, $options);
-        }
-
-        if ('' === $field->getKey() || null === $field->getKey()) {
-            throw new FieldDefinitionException('You cannot add anonymous fields');
-        }
-
-        $this->fields[$field->getKey()] = $field;
-
-        $field->setParent($this);
-
-        $data = $this->getTransformedData();
-
-        // if the property "data" is NULL, getTransformedData() returns an empty
-        // string
-        if (!empty($data)) {
-            $field->readProperty($data);
-        }
-
-        return $field;
+    public function getTypes()
+    {
+        return $this->types;
     }
 
     /**
-     * Removes the field with the given key.
-     *
-     * @param string $key
+     * {@inheritDoc}
      */
-    public function remove($key)
+    public function isRequired()
     {
-        $this->fields[$key]->setParent(null);
+        if (null === $this->parent || $this->parent->isRequired()) {
+            return $this->required;
+        }
 
-        unset($this->fields[$key]);
+        return false;
     }
 
     /**
-     * Returns whether a field with the given key exists.
+     * {@inheritDoc}
+     */
+    public function isReadOnly()
+    {
+        if (null === $this->parent || !$this->parent->isReadOnly()) {
+            return $this->readOnly;
+        }
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setParent(FormInterface $parent = null)
+    {
+        $this->parent = $parent;
+
+        return $this;
+    }
+
+    /**
+     * Returns the parent field.
      *
-     * @param  string $key
+     * @return FormInterface  The parent field
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * Returns whether the field has a parent.
+     *
      * @return Boolean
      */
-    public function has($key)
+    public function hasParent()
     {
-        return isset($this->fields[$key]);
+        return null !== $this->parent;
     }
 
     /**
-     * Returns the field with the given key.
+     * Returns the root of the form tree
      *
-     * @param  string $key
-     * @return FieldInterface
+     * @return FormInterface  The root of the tree
      */
-    public function get($key)
+    public function getRoot()
     {
-        if (isset($this->fields[$key])) {
-            return $this->fields[$key];
+        return $this->parent ? $this->parent->getRoot() : $this;
+    }
+
+    /**
+     * Returns whether the field is the root of the form tree
+     *
+     * @return Boolean
+     */
+    public function isRoot()
+    {
+        return !$this->hasParent();
+    }
+
+    public function hasAttribute($name)
+    {
+        return isset($this->attributes[$name]);
+    }
+
+    public function getAttribute($name)
+    {
+        return $this->attributes[$name];
+    }
+
+    /**
+     * Updates the field with default data
+     *
+     * @see FormInterface
+     */
+    public function setData($appData)
+    {
+        $event = new DataEvent($this, $appData);
+        $this->dispatcher->dispatch(Events::preSetData, $event);
+
+        // Hook to change content of the data
+        $event = new FilterDataEvent($this, $appData);
+        $this->dispatcher->dispatch(Events::onSetData, $event);
+        $appData = $event->getData();
+
+        // Treat data as strings unless a value transformer exists
+        if (!$this->clientTransformers && !$this->normTransformers && is_scalar($appData)) {
+            $appData = (string)$appData;
         }
 
-        throw new \InvalidArgumentException(sprintf('Field "%s" does not exist.', $key));
-    }
+        // Synchronize representations - must not change the content!
+        $normData = $this->appToNorm($appData);
+        $clientData = $this->normToClient($normData);
 
-    /**
-     * Returns all fields in this group
-     *
-     * @return array
-     */
-    public function getFields()
-    {
-        return $this->fields;
-    }
+        $this->data = $appData;
+        $this->normData = $normData;
+        $this->clientData = $clientData;
+        $this->synchronized = true;
 
-    /**
-     * Returns an array of visible fields from the current schema.
-     *
-     * @return array
-     */
-    public function getVisibleFields()
-    {
-        return $this->getFieldsByVisibility(false, false);
-    }
-
-    /**
-     * Returns an array of visible fields from the current schema.
-     *
-     * This variant of the method will recursively get all the
-     * fields from the nested forms or field groups
-     *
-     * @return array
-     */
-    public function getAllVisibleFields()
-    {
-        return $this->getFieldsByVisibility(false, true);
-    }
-
-    /**
-     * Returns an array of hidden fields from the current schema.
-     *
-     * @return array
-     */
-    public function getHiddenFields()
-    {
-        return $this->getFieldsByVisibility(true, false);
-    }
-
-    /**
-     * Returns an array of hidden fields from the current schema.
-     *
-     * This variant of the method will recursively get all the
-     * fields from the nested forms or field groups
-     *
-     * @return array
-     */
-    public function getAllHiddenFields()
-    {
-        return $this->getFieldsByVisibility(true, true);
-    }
-
-    /**
-     * Returns a filtered array of fields from the current schema.
-     *
-     * @param Boolean $hidden Whether to return hidden fields only or visible fields only
-     * @param Boolean $recursive Whether to recur through embedded schemas
-     *
-     * @return array
-     */
-    protected function getFieldsByVisibility($hidden, $recursive)
-    {
-        $fields = array();
-        $hidden = (Boolean)$hidden;
-
-        foreach ($this->fields as $field) {
-            if ($field instanceof Form && $recursive) {
-                $fields = array_merge($fields, $field->getFieldsByVisibility($hidden, $recursive));
-            } else if ($hidden === $field->isHidden()) {
-                $fields[] = $field;
-            }
+        if ($this->dataMapper) {
+            // Update child forms from the data
+            $this->dataMapper->mapDataToForms($clientData, $this->children);
         }
 
-        return $fields;
-    }
+        $event = new DataEvent($this, $appData);
+        $this->dispatcher->dispatch(Events::postSetData, $event);
 
-    /**
-     * Initializes the field group with an object to operate on
-     *
-     * @see FieldInterface
-     */
-    public function setData($data)
-    {
-        if (empty($data)) {
-            if ($this->dataConstructor) {
-                $constructor = $this->dataConstructor;
-                $data = $constructor();
-            } else if ($this->dataClass) {
-                $class = $this->dataClass;
-                $data = new $class();
-            }
-        }
-
-        parent::setData($data);
-
-        // get transformed data and pass its values to child fields
-        $data = $this->getTransformedData();
-
-        if (!empty($data) && !is_array($data) && !is_object($data)) {
-            throw new \InvalidArgumentException(sprintf('Expected argument of type object or array, %s given', gettype($data)));
-        }
-
-        if (!empty($data)) {
-            if ($this->dataClass && !$data instanceof $this->dataClass) {
-                throw new FormException(sprintf('Form data should be instance of %s', $this->dataClass));
-            }
-
-            $this->readObject($data);
-        }
-    }
-
-    /**
-     * Returns the data of the field as it is displayed to the user.
-     *
-     * @see FieldInterface
-     * @return array of field name => value
-     */
-    public function getDisplayedData()
-    {
-        $values = array();
-
-        foreach ($this->fields as $key => $field) {
-            $values[$key] = $field->getDisplayedData();
-        }
-
-        return $values;
+        return $this;
     }
 
     /**
      * Binds POST data to the field, transforms and validates it.
      *
-     * @param  string|array $data  The POST data
+     * @param string|array $clientData The POST data
      */
-    public function submit($data)
+    public function bind($clientData)
     {
-        if (null === $data) {
-            $data = array();
+        if ($this->readOnly) {
+            return;
         }
 
-        if (!is_array($data)) {
-            throw new UnexpectedTypeException($data, 'array');
+        if (is_scalar($clientData) || null === $clientData) {
+            $clientData = (string)$clientData;
         }
 
-        // remember for later
-        $submittedData = $data;
+        // Initialize errors in the very beginning so that we don't lose any
+        // errors added during listeners
+        $this->errors = array();
 
-        foreach ($this->fields as $key => $field) {
-            if (!isset($data[$key])) {
-                $data[$key] = null;
+        $event = new DataEvent($this, $clientData);
+        $this->dispatcher->dispatch(Events::preBind, $event);
+
+        $appData = null;
+        $normData = null;
+        $extraData = array();
+        $synchronized = false;
+
+        // Hook to change content of the data bound by the browser
+        $event = new FilterDataEvent($this, $clientData);
+        $this->dispatcher->dispatch(Events::onBindClientData, $event);
+        $clientData = $event->getData();
+
+        if (count($this->children) > 0) {
+            if (null === $clientData || '' === $clientData) {
+                $clientData = array();
+            }
+
+            if (!is_array($clientData)) {
+                throw new UnexpectedTypeException($clientData, 'array');
+            }
+
+            foreach ($this->children as $name => $child) {
+                if (!isset($clientData[$name])) {
+                    $clientData[$name] = null;
+                }
+            }
+
+            foreach ($clientData as $name => $value) {
+                if ($this->has($name)) {
+                    $this->children[$name]->bind($value);
+                } else {
+                    $extraData[$name] = $value;
+                }
+            }
+
+            // If we have a data mapper, use old client data and merge
+            // data from the children into it later
+            if ($this->dataMapper) {
+                $clientData = $this->getClientData();
             }
         }
 
-        $data = $this->preprocessData($data);
+        if (null === $clientData || '' === $clientData) {
+            $clientData = $this->emptyData;
 
-        foreach ($data as $key => $value) {
-            if ($this->has($key)) {
-                $this->fields[$key]->submit($value);
+            if ($clientData instanceof \Closure) {
+                $clientData = $clientData->__invoke($this);
             }
         }
 
-        $data = $this->getTransformedData();
+        // Merge form data from children into existing client data
+        if (count($this->children) > 0 && $this->dataMapper) {
+            $this->dataMapper->mapFormsToData($this->children, $clientData);
+        }
 
-        $this->writeObject($data);
+        try {
+            // Normalize data to unified representation
+            $normData = $this->clientToNorm($clientData);
+            $synchronized = true;
+        } catch (TransformationFailedException $e) {
+        }
 
-        // set and reverse transform the data
-        parent::submit($data);
+        if ($synchronized) {
+            // Hook to change content of the data in the normalized
+            // representation
+            $event = new FilterDataEvent($this, $normData);
+            $this->dispatcher->dispatch(Events::onBindNormData, $event);
+            $normData = $event->getData();
 
-        $this->extraFields = array();
+            // Synchronize representations - must not change the content!
+            $appData = $this->normToApp($normData);
+            $clientData = $this->normToClient($normData);
+        }
 
-        foreach ($submittedData as $key => $value) {
-            if (!$this->has($key)) {
-                $this->extraFields[] = $key;
-            }
+        $this->bound = true;
+        $this->data = $appData;
+        $this->normData = $normData;
+        $this->clientData = $clientData;
+        $this->extraData = $extraData;
+        $this->synchronized = $synchronized;
+
+        $event = new DataEvent($this, $clientData);
+        $this->dispatcher->dispatch(Events::postBind, $event);
+
+        foreach ($this->validators as $validator) {
+            $validator->validate($this);
         }
     }
 
     /**
-     * Updates the child fields from the properties of the given data
+     * Binds a request to the form
      *
-     * This method calls readProperty() on all child fields that have a
-     * property path set. If a child field has no property path set but
-     * implements FormInterface, writeProperty() is called on its
-     * children instead.
+     * If the request was a POST request, the data is bound to the form,
+     * transformed and written into the form data (an object or an array).
+     * You can set the form data by passing it in the second parameter
+     * of this method or by passing it in the "data" option of the form's
+     * constructor.
      *
-     * @param array|object $objectOrArray
+     * @param Request $request    The request to bind to the form
      */
-    protected function readObject(&$objectOrArray)
+    public function bindRequest(Request $request)
     {
-        $iterator = new RecursiveFieldIterator($this);
-        $iterator = new \RecursiveIteratorIterator($iterator);
+        // Store the bound data in case of a post request
+        switch ($request->getMethod()) {
+            case 'POST':
+            case 'PUT':
+                $data = array_replace_recursive(
+                    $request->request->get($this->getName(), array()),
+                    $request->files->get($this->getName(), array())
+                );
+                break;
+            case 'GET':
+                $data = $request->query->get($this->getName(), array());
+                break;
+            default:
+                throw new FormException(sprintf('The request method "%s" is not supported', $request->getMethod()));
+        }
 
-        foreach ($iterator as $field) {
-            $field->readProperty($objectOrArray);
+        $this->bind($data);
+    }
+
+    /**
+     * Returns the data in the format needed for the underlying object.
+     *
+     * @return mixed
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * Returns the normalized data of the field.
+     *
+     * @return mixed  When the field is not bound, the default data is returned.
+     *                When the field is bound, the normalized bound data is
+     *                returned if the field is valid, null otherwise.
+     */
+    public function getNormData()
+    {
+        return $this->normData;
+    }
+
+    /**
+     * Returns the data transformed by the value transformer
+     *
+     * @return string
+     */
+    public function getClientData()
+    {
+        return $this->clientData;
+    }
+
+    public function getExtraData()
+    {
+        return $this->extraData;
+    }
+
+    /**
+     * Adds an error to the field.
+     *
+     * @see FormInterface
+     */
+    public function addError(FormError $error)
+    {
+        if ($this->parent && $this->errorBubbling) {
+            $this->parent->addError($error);
+        } else {
+            $this->errors[] = $error;
         }
     }
 
     /**
-     * Updates all properties of the given data from the child fields
-     *
-     * This method calls writeProperty() on all child fields that have a property
-     * path set. If a child field has no property path set but implements
-     * FormInterface, writeProperty() is called on its children instead.
-     *
-     * @param array|object $objectOrArray
-     */
-    protected function writeObject(&$objectOrArray)
-    {
-        $iterator = new RecursiveFieldIterator($this);
-        $iterator = new \RecursiveIteratorIterator($iterator);
-
-        foreach ($iterator as $field) {
-            $field->writeProperty($objectOrArray);
-        }
-    }
-
-    /**
-     * Processes the submitted data before it is passed to the individual fields
-     *
-     * The data is in the user format.
-     *
-     * @param  array $data
-     * @return array
-     */
-    protected function preprocessData(array $data)
-    {
-        return $data;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function isVirtual()
-    {
-        return $this->getOption('virtual');
-    }
-
-    /**
-     * Returns whether this form was submitted with extra fields
+     * Returns whether errors bubble up to the parent
      *
      * @return Boolean
      */
-    public function isSubmittedWithExtraFields()
+    public function getErrorBubbling()
     {
-        // TODO: integrate the field names in the error message
-        return count($this->extraFields) > 0;
+        return $this->errorBubbling;
+    }
+
+    /**
+     * Returns whether the field is bound.
+     *
+     * @return Boolean  true if the form is bound to input values, false otherwise
+     */
+    public function isBound()
+    {
+        return $this->bound;
+    }
+
+    /**
+     * Returns whether the data in the different formats is synchronized
+     *
+     * @return Boolean
+     */
+    public function isSynchronized()
+    {
+        return $this->synchronized;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isEmpty()
+    {
+        foreach ($this->children as $child) {
+            if (!$child->isEmpty()) {
+                return false;
+            }
+        }
+
+        return array() === $this->data || null === $this->data || '' === $this->data;
     }
 
     /**
@@ -523,12 +627,12 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function isValid()
     {
-        if (!parent::isValid()) {
+        if (!$this->isBound() || $this->hasErrors()) {
             return false;
         }
 
-        foreach ($this->fields as $field) {
-            if (!$field->isValid()) {
+        foreach ($this->children as $child) {
+            if (!$child->isValid()) {
                 return false;
             }
         }
@@ -537,109 +641,153 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Returns whether or not there are errors.
+     *
+     * @return Boolean  true if form is bound and not valid
      */
-    public function addError(Error $error, PropertyPathIterator $pathIterator = null)
+    public function hasErrors()
     {
-        if (null !== $pathIterator) {
-            if ($error instanceof FieldError && $pathIterator->hasNext()) {
-                $pathIterator->next();
-
-                if ($pathIterator->isProperty() && $pathIterator->current() === 'fields') {
-                    $pathIterator->next();
-                }
-
-                if ($this->has($pathIterator->current()) && !$this->get($pathIterator->current())->isHidden()) {
-                    $this->get($pathIterator->current())->addError($error, $pathIterator);
-
-                    return;
-                }
-            } else if ($error instanceof DataError) {
-                $iterator = new RecursiveFieldIterator($this);
-                $iterator = new \RecursiveIteratorIterator($iterator);
-
-                foreach ($iterator as $field) {
-                    if (null !== ($fieldPath = $field->getPropertyPath())) {
-                        if ($fieldPath->getElement(0) === $pathIterator->current() && !$field->isHidden()) {
-                            if ($pathIterator->hasNext()) {
-                                $pathIterator->next();
-                            }
-
-                            $field->addError($error, $pathIterator);
-
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-
-        parent::addError($error);
+        // Don't call isValid() here, as its semantics are slightly different
+        // Field groups are not valid if their children are invalid, but
+        // hasErrors() returns only true if a field/field group itself has
+        // errors
+        return count($this->errors) > 0;
     }
 
     /**
-     * Returns whether the field requires a multipart form.
+     * Returns all errors
      *
+     * @return array  An array of FormError instances that occurred during binding
+     */
+    public function getErrors()
+    {
+        return $this->errors;
+    }
+
+    /**
+     * Returns the DataTransformer.
+     *
+     * @return array
+     */
+    public function getNormTransformers()
+    {
+        return $this->normTransformers;
+    }
+
+    /**
+     * Returns the DataTransformer.
+     *
+     * @return array
+     */
+    public function getClientTransformers()
+    {
+        return $this->clientTransformers;
+    }
+
+    /**
+     * Returns all children in this group
+     *
+     * @return array
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    public function hasChildren()
+    {
+        return count($this->children) > 0;
+    }
+
+    public function add(FormInterface $child)
+    {
+        $this->children[$child->getName()] = $child;
+
+        $child->setParent($this);
+
+        if ($this->dataMapper) {
+            $this->dataMapper->mapDataToForm($this->getClientData(), $child);
+        }
+    }
+
+    public function remove($name)
+    {
+        if (isset($this->children[$name])) {
+            $this->children[$name]->setParent(null);
+
+            unset($this->children[$name]);
+        }
+    }
+
+    /**
+     * Returns whether a child with the given name exists.
+     *
+     * @param  string $name
      * @return Boolean
      */
-    public function isMultipart()
+    public function has($name)
     {
-        foreach ($this->fields as $field) {
-            if ($field->isMultipart()) {
-                return true;
-            }
-        }
-
-        return false;
+        return isset($this->children[$name]);
     }
 
     /**
-     * Returns true if the field exists (implements the \ArrayAccess interface).
+     * Returns the child with the given name.
      *
-     * @param string $key The key of the field
+     * @param  string $name
+     * @return FormInterface
+     */
+    public function get($name)
+    {
+        if (isset($this->children[$name])) {
+            return $this->children[$name];
+        }
+
+        throw new \InvalidArgumentException(sprintf('Field "%s" does not exist.', $name));
+    }
+
+    /**
+     * Returns true if the child exists (implements the \ArrayAccess interface).
+     *
+     * @param string $name The name of the child
      *
      * @return Boolean true if the widget exists, false otherwise
      */
-    public function offsetExists($key)
+    public function offsetExists($name)
     {
-        return $this->has($key);
+        return $this->has($name);
     }
 
     /**
-     * Returns the form field associated with the name (implements the \ArrayAccess interface).
+     * Returns the form child associated with the name (implements the \ArrayAccess interface).
      *
-     * @param string $key The offset of the value to get
+     * @param string $name The offset of the value to get
      *
-     * @return Field A form field instance
+     * @return FormInterface  A form instance
      */
-    public function offsetGet($key)
+    public function offsetGet($name)
     {
-        return $this->get($key);
+        return $this->get($name);
     }
 
     /**
-     * Throws an exception saying that values cannot be set (implements the \ArrayAccess interface).
+     * Adds a child to the form (implements the \ArrayAccess interface).
      *
-     * @param string $offset (ignored)
-     * @param string $value (ignored)
-     *
-     * @throws \LogicException
+     * @param string $name Ignored. The name of the child is used.
+     * @param FormInterface $child  The child to be added
      */
-    public function offsetSet($key, $field)
+    public function offsetSet($name, $child)
     {
-        throw new \LogicException('Use the method add() to add fields');
+        $this->add($child);
     }
 
     /**
-     * Throws an exception saying that values cannot be unset (implements the \ArrayAccess interface).
+     * Removes the child with the given name from the form (implements the \ArrayAccess interface).
      *
-     * @param string $key
-     *
-     * @throws \LogicException
+     * @param string $name  The name of the child to be removed
      */
-    public function offsetUnset($key)
+    public function offsetUnset($name)
     {
-        return $this->remove($key);
+        $this->remove($name);
     }
 
     /**
@@ -649,316 +797,126 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function getIterator()
     {
-        return new \ArrayIterator($this->fields);
+        return new \ArrayIterator($this->children);
     }
 
     /**
-     * Returns the number of form fields (implements the \Countable interface).
+     * Returns the number of form children (implements the \Countable interface).
      *
-     * @return integer The number of embedded form fields
+     * @return integer The number of embedded form children
      */
     public function count()
     {
-        return count($this->fields);
+        return count($this->children);
     }
 
     /**
-     * Returns a factory for automatically creating fields based on metadata
-     * available for a form's object
+     * Normalizes the value if a normalization transformer is set
      *
-     * @return FieldFactoryInterface  The factory
+     * @param  mixed $value  The value to transform
+     * @return string
      */
-    public function getFieldFactory()
+    private function appToNorm($value)
     {
-        return $this->getOption('field_factory');
-    }
-
-    /**
-     * Returns the validator used by the form
-     *
-     * @return ValidatorInterface  The validator instance
-     */
-    public function getValidator()
-    {
-        return $this->getOption('validator');
-    }
-
-    /**
-     * Returns the validation groups validated by the form
-     *
-     * @return array  A list of validation groups or null
-     */
-    public function getValidationGroups()
-    {
-        $groups = $this->getOption('validation_groups');
-
-        if (!$groups && $this->hasParent()) {
-            $groups = $this->getParent()->getValidationGroups();
+        foreach ($this->normTransformers as $transformer) {
+            $value = $transformer->transform($value);
         }
 
-        return $groups;
+        return $value;
     }
 
-    /**
-     * Returns the name used for the CSRF protection field
-     *
-     * @return string  The field name
-     */
-    public function getCsrfFieldName()
+    public function createView(FormView $parent = null)
     {
-        return $this->getOption('csrf_field_name');
-    }
-
-    /**
-     * Returns the provider used for generating and validating CSRF tokens
-     *
-     * @return CsrfProviderInterface  The provider instance
-     */
-    public function getCsrfProvider()
-    {
-        return $this->getOption('csrf_provider');
-    }
-
-    /**
-     * Binds a request to the form
-     *
-     * If the request was a POST request, the data is submitted to the form,
-     * transformed and written into the form data (an object or an array).
-     * You can set the form data by passing it in the second parameter
-     * of this method or by passing it in the "data" option of the form's
-     * constructor.
-     *
-     * @param Request $request    The request to bind to the form
-     * @param array|object $data  The data from which to read default values
-     *                            and where to write submitted values
-     */
-    public function bind(Request $request, $data = null)
-    {
-        if (!$this->getName()) {
-            throw new FormException('You cannot bind anonymous forms. Please give this form a name');
+        if (null === $parent && $this->parent) {
+            $parent = $this->parent->createView();
         }
 
-        // Store object from which to read the default values and where to
-        // write the submitted values
-        if (null !== $data) {
-            $this->setData($data);
+        $view = new FormView();
+
+        if (null !== $parent) {
+            $view->setParent($parent);
         }
 
-        // Store the submitted data in case of a post request
-        if ('POST' == $request->getMethod()) {
-            $values = $request->request->get($this->getName(), array());
-            $files = $request->files->get($this->getName(), array());
+        $types = (array) $this->types;
+        $childViews = array();
 
-            $this->submit(self::deepArrayUnion($values, $files));
+        foreach ($types as $type) {
+            $type->buildView($view, $this);
 
-            $this->validate();
-        }
-    }
-
-    /**
-     * Validates the form and its domain object
-     *
-     * @throws FormException  If the option "validator" was not set
-     */
-    public function validate()
-    {
-        $validator = $this->getOption('validator');
-
-        if (null === $validator) {
-            throw new MissingOptionsException('The option "validator" is required for validating', array('validator'));
-        }
-
-        // Validate the form in group "Default"
-        // Validation of the data in the custom group is done by validateData(),
-        // which is constrained by the Execute constraint
-        if ($violations = $validator->validate($this)) {
-            foreach ($violations as $violation) {
-                $propertyPath = new PropertyPath($violation->getPropertyPath());
-                $iterator = $propertyPath->getIterator();
-                $template = $violation->getMessageTemplate();
-                $parameters = $violation->getMessageParameters();
-
-                if ($iterator->current() == 'data') {
-                    $iterator->next(); // point at the first data element
-                    $error = new DataError($template, $parameters);
-                } else {
-                    $error = new FieldError($template, $parameters);
-                }
-
-                $this->addError($error, $iterator);
-            }
-        }
-    }
-
-    /**
-     * @return true if this form is CSRF protected
-     */
-    public function isCsrfProtected()
-    {
-        return $this->has($this->getOption('csrf_field_name'));
-    }
-
-    /**
-     * Returns whether the CSRF token is valid
-     *
-     * @return Boolean
-     */
-    public function isCsrfTokenValid()
-    {
-        if (!$this->isCsrfProtected()) {
-            return true;
-        } else {
-            $token = $this->get($this->getOption('csrf_field_name'))->getDisplayedData();
-
-            return $this->getOption('csrf_provider')->isCsrfTokenValid(get_class($this), $token);
-        }
-    }
-
-    /**
-     * Returns whether the maximum POST size was reached in this request.
-     *
-     * @return Boolean
-     */
-    public function isPostMaxSizeReached()
-    {
-        if ($this->isRoot() && isset($_SERVER['CONTENT_LENGTH'])) {
-            $length = (int) $_SERVER['CONTENT_LENGTH'];
-            $max = trim(ini_get('post_max_size'));
-
-            switch (strtolower(substr($max, -1))) {
-                // The 'G' modifier is available since PHP 5.1.0
-                case 'g':
-                    $max *= 1024;
-                case 'm':
-                    $max *= 1024;
-                case 'k':
-                    $max *= 1024;
-            }
-
-            return $length > $max;
-        }
-
-        return false;
-    }
-
-    /**
-     * Sets the class that object bound to this form must be instances of
-     *
-     * @param string  A fully qualified class name
-     */
-    protected function setDataClass($class)
-    {
-        $this->dataClass = $class;
-    }
-
-    /**
-     * Returns the class that object must have that are bound to this form
-     *
-     * @return string  A fully qualified class name
-     */
-    public function getDataClass()
-    {
-        return $this->dataClass;
-    }
-
-    /**
-     * Returns the context used when creating this form
-     *
-     * @return FormContext  The context instance
-     */
-    public function getContext()
-    {
-        return $this->getOption('context');
-    }
-
-    /**
-     * Validates the data of this form
-     *
-     * This method is called automatically during the validation process.
-     *
-     * @param ExecutionContext $context  The current validation context
-     */
-    public function validateData(ExecutionContext $context)
-    {
-        if (is_object($this->getData()) || is_array($this->getData())) {
-            $groups = $this->getValidationGroups();
-            $propertyPath = $context->getPropertyPath();
-            $graphWalker = $context->getGraphWalker();
-
-            if (null === $groups) {
-                $groups = array(null);
-            }
-
-            // The Execute constraint is called on class level, so we need to
-            // set the property manually
-            $context->setCurrentProperty('data');
-
-            // Adjust the property path accordingly
-            if (!empty($propertyPath)) {
-                $propertyPath .= '.';
-            }
-
-            $propertyPath .= 'data';
-
-            foreach ($groups as $group) {
-                $graphWalker->walkReference($this->getData(), $group, $propertyPath, true);
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function writeProperty(&$objectOrArray)
-    {
-        $isReference = false;
-
-        // If the data is identical to the value in $objectOrArray, we are
-        // dealing with a reference
-        if ($this->getPropertyPath() !== null) {
-            $isReference = $this->getData() === $this->getPropertyPath()->getValue($objectOrArray);
-        }
-
-        // Don't write into $objectOrArray if $objectOrArray is an object,
-        // $isReference is true (see above) and the option "by_reference" is
-        // true as well
-        if (!is_object($objectOrArray) || !$isReference || !$this->getOption('by_reference')) {
-            parent::writeProperty($objectOrArray);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isEmpty()
-    {
-        foreach ($this->fields as $field) {
-            if (!$field->isEmpty()) {
-                return false;
+            foreach ($type->getExtensions() as $typeExtension) {
+                $typeExtension->buildView($view, $this);
             }
         }
 
-        return true;
-    }
+        foreach ($this->children as $key => $child) {
+            $childViews[$key] = $child->createView($view);
+        }
 
-    /**
-     * Merges two arrays without reindexing numeric keys.
-     *
-     * @param array $array1 An array to merge
-     * @param array $array2 An array to merge
-     *
-     * @return array The merged array
-     */
-    static protected function deepArrayUnion($array1, $array2)
-    {
-        foreach ($array2 as $key => $value) {
-            if (is_array($value) && isset($array1[$key]) && is_array($array1[$key])) {
-                $array1[$key] = self::deepArrayUnion($array1[$key], $value);
-            } else {
-                $array1[$key] = $value;
+        $view->setChildren($childViews);
+
+        foreach ($types as $type) {
+            $type->buildViewBottomUp($view, $this);
+
+            foreach ($type->getExtensions() as $typeExtension) {
+                $typeExtension->buildViewBottomUp($view, $this);
             }
         }
 
-        return $array1;
+        return $view;
+    }
+
+    /**
+     * Reverse transforms a value if a normalization transformer is set.
+     *
+     * @param  string $value  The value to reverse transform
+     * @return mixed
+     */
+    private function normToApp($value)
+    {
+        for ($i = count($this->normTransformers) - 1; $i >= 0; --$i) {
+            $value = $this->normTransformers[$i]->reverseTransform($value);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Transforms the value if a value transformer is set.
+     *
+     * @param  mixed $value  The value to transform
+     * @return string
+     */
+    private function normToClient($value)
+    {
+        if (!$this->clientTransformers) {
+            // Scalar values should always be converted to strings to
+            // facilitate differentiation between empty ("") and zero (0).
+            return null === $value || is_scalar($value) ? (string)$value : $value;
+        }
+
+        foreach ($this->clientTransformers as $transformer) {
+            $value = $transformer->transform($value);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Reverse transforms a value if a value transformer is set.
+     *
+     * @param  string $value  The value to reverse transform
+     * @return mixed
+     */
+    private function clientToNorm($value)
+    {
+        if (!$this->clientTransformers) {
+            return '' === $value ? null : $value;
+        }
+
+        for ($i = count($this->clientTransformers) - 1; $i >= 0; --$i) {
+            $value = $this->clientTransformers[$i]->reverseTransform($value);
+        }
+
+        return $value;
     }
 }

@@ -21,17 +21,11 @@ interface RedirectableUrlMatcherInterface
     /**
      * Redirects the user to another URL.
      *
-     * As the Routing component does not know know to redirect the user,
-     * the default implementation throw an exception.
-     *
-     * Override this method to implement your own logic.
-     *
-     * If you are using a Dumper, don't forget to change the default base.
-     *
-     * @param string $pathinfo The path info to redirect to.
-     * @param string $route    The route that matched
+     * @param string  $path   The path info to redirect to.
+     * @param string  $route  The route that matched
+     * @param string  $scheme The URL scheme (null to keep the current one)
      *
      * @return array An array of parameters
      */
-    function redirect($pathinfo, $route);
+    function redirect($path, $route, $scheme = null);
 }

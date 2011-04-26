@@ -135,7 +135,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $constraint = new Choice(array(
             'choices' => array('foo', 'bar'),
-            'message' => 'myMessage',
+            'multipleMessage' => 'myMessage',
             'multiple' => true,
         ));
 

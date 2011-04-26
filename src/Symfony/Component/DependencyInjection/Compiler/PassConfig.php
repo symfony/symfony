@@ -49,7 +49,6 @@ class PassConfig
             new ResolveParameterPlaceHoldersPass(),
             new CheckDefinitionValidityPass(),
             new ResolveReferencesToAliasesPass(),
-            new ResolveInterfaceInjectorsPass(),
             new ResolveInvalidReferencesPass(),
             new AnalyzeServiceReferencesPass(true),
             new CheckCircularReferencesPass(),
@@ -66,6 +65,7 @@ class PassConfig
                 new AnalyzeServiceReferencesPass(),
                 new RemoveUnusedDefinitionsPass(),
             )),
+            new CheckExceptionOnInvalidReferenceBehaviorPass(),
         );
     }
 
@@ -91,7 +91,7 @@ class PassConfig
      *
      * @param CompilerPassInterface $pass A Compiler pass
      * @param string $type The pass type
-     * @throws \InvalidArgumentException when a pass type doesnt exist
+     * @throws \InvalidArgumentException when a pass type doesn't exist
      */
     public function addPass(CompilerPassInterface $pass, $type = self::TYPE_BEFORE_OPTIMIZATION)
     {

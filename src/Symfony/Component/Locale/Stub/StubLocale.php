@@ -73,7 +73,7 @@ class StubLocale
      * @return array                     The country names with their codes as keys
      * @throws InvalidArgumentException  When the locale is different than 'en'
      */
-    static public function getDisplayCountries($locale = 'en')
+    static public function getDisplayCountries($locale)
     {
         return self::getStubData($locale, 'countries', 'region');
     }
@@ -134,6 +134,8 @@ class StubLocale
 
     /**
      * Returns the currencies data
+     *
+     * @param string $locale
      *
      * @return array  The currencies data
      */
@@ -203,8 +205,9 @@ class StubLocale
     /**
      * Checks if a language tag filter matches with locale
      *
-     * @param  string   $langtag  The language tag to check
-     * @param  string   $locale   The language range to check against
+     * @param  string  $langtag      The language tag to check
+     * @param  string  $locale       The language range to check against
+     * @param  Boolean $canonicalize
      * @return string             The corresponding locale code
      * @see    http://www.php.net/manual/en/locale.filtermatches.php
      * @throws MethodNotImplementedException
@@ -284,7 +287,7 @@ class StubLocale
     /**
      * Returns the localized display name for the locale script
      *
-     * @param  string  $locale    The locale code to return the display scrit from
+     * @param  string  $locale    The locale code to return the display script from
      * @param  string  $inLocale  Optional format locale code to use to display the script name
      * @return string             The localized script display name
      * @see    http://www.php.net/manual/en/locale.getdisplayscript.php
@@ -380,7 +383,7 @@ class StubLocale
      * Returns an associative array of locale identifier subtags
      *
      * @param  string  $locale    The locale code to extract the subtag array from
-     * @return array              Associative arrat with the extracted subtags
+     * @return array              Associative array with the extracted subtags
      * @see    http://www.php.net/manual/en/locale.parselocale.php
      * @throws MethodNotImplementedException
      */

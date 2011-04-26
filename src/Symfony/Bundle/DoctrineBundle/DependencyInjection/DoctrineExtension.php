@@ -51,7 +51,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
      *
      *      <doctrine:dbal id="myconn" dbname="sfweb" user="root" />
      *
-     * @param array $config An array of configuration settings
+     * @param array            $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
     protected function dbalLoad(array $config, ContainerBuilder $container)
@@ -67,7 +67,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $container->setAlias('database_connection', sprintf('doctrine.dbal.%s_connection', $config['default_connection']));
         $container->setAlias('doctrine.dbal.event_manager', new Alias(sprintf('doctrine.dbal.%s_connection.event_manager', $config['default_connection']), false));
         $container->setParameter('doctrine.dbal.default_connection', $config['default_connection']);
-        $container->setParameter('doctrine.dbal.types', $config['types']);
+
+        $container->getDefinition('doctrine.dbal.connection_factory')->replaceArgument(0, $config['types']);
 
         foreach ($config['connections'] as $name => $connection) {
             $this->loadDbalConnection($name, $connection, $container);
@@ -77,13 +78,13 @@ class DoctrineExtension extends AbstractDoctrineExtension
     /**
      * Loads a configured DBAL connection.
      *
-     * @param string $name The name of the connection
-     * @param array $connection A dbal connection configuration.
-     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param string           $name       The name of the connection
+     * @param array            $connection A dbal connection configuration.
+     * @param ContainerBuilder $container  A ContainerBuilder instance
      */
     protected function loadDbalConnection($name, array $connection, ContainerBuilder $container)
     {
-        $containerDef = new Definition('%doctrine.dbal.configuration_class%');
+        $containerDef = new Definition('%doctrine.dbal.configuration.class%');
         $containerDef->setPublic(false);
         if (isset($connection['logging']) && $connection['logging']) {
             $containerDef->addMethodCall('setSQLLogger', array(new Reference('doctrine.dbal.logger')));
@@ -98,7 +99,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
         // event manager
         $eventManagerId = sprintf('doctrine.dbal.%s_connection.event_manager', $name);
-        $eventManagerDef = new Definition('%doctrine.dbal.event_manager_class%');
+        $eventManagerDef = new Definition('%doctrine.dbal.event_manager.class%');
         $eventManagerDef->setPublic(false);
         $container->setDefinition($eventManagerId, $eventManagerDef);
 
@@ -137,7 +138,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
      *
      *     <doctrine:orm id="mydm" connection="myconn" />
      *
-     * @param array $config An array of configuration settings
+     * @param array            $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
     protected function ormLoad(array $config, ContainerBuilder $container)
@@ -176,7 +177,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
     {
         $configServiceName = sprintf('doctrine.orm.%s_configuration', $entityManager['name']);
 
-        $ormConfigDef = new Definition('%doctrine.orm.configuration_class%');
+        $ormConfigDef = new Definition('%doctrine.orm.configuration.class%');
         $ormConfigDef->setPublic(false);
         $container->setDefinition($configServiceName, $ormConfigDef);
 
@@ -221,8 +222,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
             new Reference($connectionId),
             new Reference(sprintf('doctrine.orm.%s_configuration', $entityManager['name']))
         );
-        $ormEmDef = new Definition('%doctrine.orm.entity_manager_class%', $ormEmArgs);
-        $ormEmDef->setFactoryClass('%doctrine.orm.entity_manager_class%');
+        $ormEmDef = new Definition('%doctrine.orm.entity_manager.class%', $ormEmArgs);
+        $ormEmDef->setFactoryClass('%doctrine.orm.entity_manager.class%');
         $ormEmDef->setFactoryMethod('create');
         $ormEmDef->addTag('doctrine.orm.entity_manager');
         $container->setDefinition($entityManagerService, $ormEmDef);
@@ -295,8 +296,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
     /**
      * Loads a configured entity managers cache drivers.
      *
-     * @param array $entityManager A configured ORM entity manager.
-     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param array            $entityManager A configured ORM entity manager.
+     * @param ContainerBuilder $container     A ContainerBuilder instance
      */
     protected function loadOrmCacheDrivers(array $entityManager, ContainerBuilder $container)
     {
@@ -308,9 +309,9 @@ class DoctrineExtension extends AbstractDoctrineExtension
     /**
      * Loads a configured entity managers metadata, query or result cache driver.
      *
-     * @param array $entityManager A configured ORM entity manager.
+     * @param array            $entityManager A configured ORM entity manager.
      * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param string $cacheName
+     * @param string           $cacheName
      */
     protected function loadOrmEntityManagerCacheDriver(array $entityManager, ContainerBuilder $container, $cacheName)
     {
@@ -324,8 +325,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
     /**
      * Gets an entity manager cache driver definition for metadata, query and result caches.
      *
-     * @param array $entityManager The array configuring an entity manager.
-     * @param array $cacheDriver The cache driver configuration.
+     * @param array            $entityManager The array configuring an entity manager.
+     * @param array            $cacheDriver The cache driver configuration.
      * @param ContainerBuilder $container
      * @return Definition $cacheDef
      */
@@ -333,8 +334,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
     {
         switch ($cacheDriver['type']) {
             case 'memcache':
-                $memcacheClass = !empty ($cacheDriver['class']) ? $cacheDriver['class'] : '%doctrine.orm.cache.memcache_class%';
-                $memcacheInstanceClass = !empty ($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%doctrine.orm.cache.memcache_instance_class%';
+                $memcacheClass = !empty ($cacheDriver['class']) ? $cacheDriver['class'] : '%doctrine.orm.cache.memcache.class%';
+                $memcacheInstanceClass = !empty ($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%doctrine.orm.cache.memcache_instance.class%';
                 $memcacheHost = !empty ($cacheDriver['host']) ? $cacheDriver['host'] : '%doctrine.orm.cache.memcache_host%';
                 $memcachePort = !empty ($cacheDriver['port']) ? $cacheDriver['port'] : '%doctrine.orm.cache.memcache_port%';
                 $cacheDef = new Definition($memcacheClass);
@@ -348,7 +349,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             case 'apc':
             case 'array':
             case 'xcache':
-                $cacheDef = new Definition('%'.sprintf('doctrine.orm.cache.%s_class', $cacheDriver['type']).'%');
+                $cacheDef = new Definition('%'.sprintf('doctrine.orm.cache.%s.class', $cacheDriver['type']).'%');
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf('%s is unrecognized cache driver.', $cacheDriver['type']));

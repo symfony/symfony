@@ -14,7 +14,7 @@ namespace Symfony\Tests\Component\Form;
 require_once __DIR__ . '/Fixtures/Author.php';
 require_once __DIR__ . '/Fixtures/Magician.php';
 
-use Symfony\Component\Form\PropertyPath;
+use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Tests\Component\Form\Fixtures\Author;
 use Symfony\Tests\Component\Form\Fixtures\Magician;
 
@@ -44,6 +44,15 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $array = array('#!@$.' => 'Bernhard');
 
         $path = new PropertyPath('[#!@$.]');
+
+        $this->assertEquals('Bernhard', $path->getValue($array));
+    }
+
+    public function testGetValueReadsElementWithSpecialCharsExceptDOt()
+    {
+        $array = array('#!@$' => 'Bernhard');
+
+        $path = new PropertyPath('#!@$');
 
         $this->assertEquals('Bernhard', $path->getValue($array));
     }
@@ -192,6 +201,33 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $path->getValue(new Author());
     }
 
+    public function testGetValueThrowsExceptionIfNotObjectOrArray()
+    {
+        $path = new PropertyPath('foobar');
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+
+        $path->getValue('baz');
+    }
+
+    public function testGetValueThrowsExceptionIfNull()
+    {
+        $path = new PropertyPath('foobar');
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+
+        $path->getValue(null);
+    }
+
+    public function testGetValueThrowsExceptionIfEmpty()
+    {
+        $path = new PropertyPath('foobar');
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+
+        $path->getValue('');
+    }
+
     public function testSetValueUpdatesArrays()
     {
         $array = array();
@@ -292,6 +328,36 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $path->setValue(new Author(), 'foobar');
     }
 
+    public function testSetValueThrowsExceptionIfNotObjectOrArray()
+    {
+        $path = new PropertyPath('foobar');
+        $value = 'baz';
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+
+        $path->setValue($value, 'bam');
+    }
+
+    public function testSetValueThrowsExceptionIfNull()
+    {
+        $path = new PropertyPath('foobar');
+        $value = null;
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+
+        $path->setValue($value, 'bam');
+    }
+
+    public function testSetValueThrowsExceptionIfEmpty()
+    {
+        $path = new PropertyPath('foobar');
+        $value = '';
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+
+        $path->setValue($value, 'bam');
+    }
+
     public function testToString()
     {
         $path = new PropertyPath('reference.traversable[index].property');
@@ -317,7 +383,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('Symfony\Component\Form\Exception\InvalidPropertyPathException');
 
-        new PropertyPath('property.$field');
+        new PropertyPath('property.$form');
     }
 
     public function testInvalidPropertyPath_empty()

@@ -2,6 +2,7 @@
 
 use Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Matcher\Exception\NotFoundException;
+use Symfony\Component\Routing\RequestContext;
 
 /**
  * ProjectUrlMatcher
@@ -14,10 +15,9 @@ class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\Redirec
     /**
      * Constructor.
      */
-    public function __construct(array $context = array(), array $defaults = array())
+    public function __construct(RequestContext $context)
     {
         $this->context = $context;
-        $this->defaults = $defaults;
     }
 
     public function match($pathinfo)
@@ -30,8 +30,8 @@ class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\Redirec
         }
 
         // bar
-        if (0 === strpos($pathinfo, '/bar') && preg_match('#^/bar/(?P<foo>[^/\.]+?)$#x', $pathinfo, $matches)) {
-            if (isset($this->context['method']) && !in_array(strtolower($this->context['method']), array('get', 'head'))) {
+        if (0 === strpos($pathinfo, '/bar') && preg_match('#^/bar/(?P<foo>[^/]*?)$#x', $pathinfo, $matches)) {
+            if (!in_array($this->context->getMethod(), array('get', 'head'))) {
                 $allow = array_merge($allow, array('get', 'head'));
                 goto not_bar;
             }
@@ -59,7 +59,7 @@ class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\Redirec
         }
 
         // baz4
-        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/?$#x', $pathinfo, $matches)) {
+        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/]*?)/?$#x', $pathinfo, $matches)) {
             if (substr($pathinfo, -1) !== '/') {
                 return $this->redirect($pathinfo.'/', 'baz4');
             }
@@ -68,9 +68,9 @@ class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\Redirec
         }
 
         // baz5
-        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/?$#x', $pathinfo, $matches)) {
-            if (isset($this->context['method']) && !in_array(strtolower($this->context['method']), array('post'))) {
-                $allow = array_merge($allow, array('post'));
+        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/]*?)/?$#x', $pathinfo, $matches)) {
+            if ($this->context->getMethod() != 'post') {
+                $allow[] = 'post';
                 goto not_baz5;
             }
             if (substr($pathinfo, -1) !== '/') {
@@ -82,9 +82,9 @@ class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\Redirec
         not_baz5:
 
         // baz.baz6
-        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/?$#x', $pathinfo, $matches)) {
-            if (isset($this->context['method']) && !in_array(strtolower($this->context['method']), array('put'))) {
-                $allow = array_merge($allow, array('put'));
+        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/]*?)/?$#x', $pathinfo, $matches)) {
+            if ($this->context->getMethod() != 'put') {
+                $allow[] = 'put';
                 goto not_bazbaz6;
             }
             if (substr($pathinfo, -1) !== '/') {
@@ -98,6 +98,22 @@ class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\Redirec
         // foofoo
         if ($pathinfo === '/foofoo') {
             return array (  'def' => 'test',  '_route' => 'foofoo',);
+        }
+
+        // secure
+        if ($pathinfo === '/secure') {
+            if ($this->context->getScheme() !== 'https') {
+                return $this->redirect($pathinfo, 'secure', 'https');
+            }
+            return array('_route' => 'secure');
+        }
+
+        // nonsecure
+        if ($pathinfo === '/nonsecure') {
+            if ($this->context->getScheme() !== 'http') {
+                return $this->redirect($pathinfo, 'nonsecure', 'http');
+            }
+            return array('_route' => 'nonsecure');
         }
 
         throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new NotFoundException();

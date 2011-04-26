@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Exception\NonExistentServiceException;
 use Symfony\Component\DependencyInjection\Exception\CircularReferenceException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -146,8 +147,8 @@ class Container implements ContainerInterface
     /**
      * Sets a parameter.
      *
-     * @param string $name       The parameter name
-     * @param mixed  $parameters The parameter value
+     * @param string $name  The parameter name
+     * @param mixed  $value The parameter value
      */
     public function setParameter($name, $value)
     {
@@ -200,8 +201,8 @@ class Container implements ContainerInterface
      * If a service is both defined through a set() method and
      * with a set*Service() method, the former has always precedence.
      *
-     * @param  string $id              The service identifier
-     * @param  int    $invalidBehavior The behavior when the service does not exist
+     * @param  string  $id              The service identifier
+     * @param  integer $invalidBehavior The behavior when the service does not exist
      *
      * @return object The associated service
      *
@@ -237,7 +238,7 @@ class Container implements ContainerInterface
         }
 
         if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
-            throw new \InvalidArgumentException(sprintf('The service "%s" does not exist.', $id));
+            throw new NonExistentServiceException($id);
         }
     }
 
@@ -256,7 +257,7 @@ class Container implements ContainerInterface
             }
         }
 
-        return array_merge($ids, array_keys($this->services));
+        return array_unique(array_merge($ids, array_keys($this->services)));
     }
 
     /**

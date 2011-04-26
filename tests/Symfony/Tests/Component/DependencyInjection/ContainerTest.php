@@ -83,7 +83,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             $this->fail('->getParameter() thrown an \InvalidArgumentException if the key does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->getParameter() thrown an \InvalidArgumentException if the key does not exist');
-            $this->assertEquals('The parameter "baba" must be defined.', $e->getMessage(), '->getParameter() thrown an \InvalidArgumentException if the key does not exist');
+            $this->assertEquals('You have requested a non-existent parameter "baba".', $e->getMessage(), '->getParameter() thrown an \InvalidArgumentException if the key does not exist');
         }
     }
 
@@ -161,8 +161,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             $sc->get('');
             $this->fail('->get() throws a \InvalidArgumentException exception if the service is empty');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws a \InvalidArgumentException exception if the service is empty');
-            $this->assertEquals('The service "" does not exist.', $e->getMessage(), '->get() throws a \InvalidArgumentException exception if the service is empty');
+            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\NonExistentServiceException', $e, '->get() throws a NonExistentServiceException exception if the service is empty');
         }
         $this->assertNull($sc->get('', ContainerInterface::NULL_ON_INVALID_REFERENCE));
     }

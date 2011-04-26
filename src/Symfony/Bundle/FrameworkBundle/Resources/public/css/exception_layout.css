@@ -22,7 +22,7 @@ img
 .clear
 {
     clear:both;
-    height:0px;
+    height:0;
     font-size:0;
     line-height:0;
 }
@@ -97,7 +97,6 @@ img
 {
     -webkit-appearance: button-bevel;
     float: none;
-    text-align: left;
     padding: 0;
     margin: 0;
     overflow: visible;
@@ -148,7 +147,7 @@ img
 
 .search button span span span
 {
-    padding: 0px 7px;
+    padding: 0 7px;
     font: bold 11px Arial, Helvetica, sans-serif;
     color: #6b6b6b;
     line-height: 28px;

@@ -311,7 +311,8 @@ class Request
 
     public function hasSession()
     {
-        return $this->cookies->has(session_name());
+        // the check for $this->session avoids malicious users trying to fake a session cookie with proper name
+        return $this->cookies->has(session_name()) && null !== $this->session;
     }
 
     public function setSession(Session $session)
@@ -408,7 +409,7 @@ class Request
 
     public function getScheme()
     {
-        return ($this->server->get('HTTPS') == 'on') ? 'https' : 'http';
+        return $this->isSecure() ? 'https' : 'http';
     }
 
     public function getPort()
@@ -542,9 +543,9 @@ class Request
         }
 
         // Remove port number from host
-        $elements = explode(':', $host);
+        $host = preg_replace('/:\d+$/', '', $host);
 
-        return trim($elements[0]);
+        return trim($host);
     }
 
     public function setMethod($method)
@@ -630,14 +631,16 @@ class Request
      *
      *  * format defined by the user (with setRequestFormat())
      *  * _format request parameter
-     *  * null
+     *  * $default
+     *
+     * @param string  $default     The default format
      *
      * @return string The request format
      */
-    public function getRequestFormat()
+    public function getRequestFormat($default = 'html')
     {
         if (null === $this->format) {
-            $this->format = $this->get('_format', 'html');
+            $this->format = $this->get('_format', $default);
         }
 
         return $this->format;
@@ -726,7 +729,7 @@ class Request
 
         $languages = $this->splitHttpAcceptHeader($this->headers->get('Accept-Language'));
         $this->languages = array();
-        foreach ($languages as $lang) {
+        foreach ($languages as $lang => $q) {
             if (strstr($lang, '-')) {
                 $codes = explode('-', $lang);
                 if ($codes[0] == 'i') {
@@ -764,7 +767,7 @@ class Request
             return $this->charsets;
         }
 
-        return $this->charsets = $this->splitHttpAcceptHeader($this->headers->get('Accept-Charset'));
+        return $this->charsets = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept-Charset')));
     }
 
     /**
@@ -778,7 +781,7 @@ class Request
             return $this->acceptableContentTypes;
         }
 
-        return $this->acceptableContentTypes = $this->splitHttpAcceptHeader($this->headers->get('Accept'));
+        return $this->acceptableContentTypes = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept')));
     }
 
     /**
@@ -821,8 +824,9 @@ class Request
         }
 
         arsort($values);
+        reset($values);
 
-        return array_keys($values);
+        return $values;
     }
 
     /*
@@ -971,6 +975,7 @@ class Request
     static protected function initializeFormats()
     {
         static::$formats = array(
+            'html' => array('text/html', 'application/xhtml+xml'),
             'txt'  => array('text/plain'),
             'js'   => array('application/javascript', 'application/x-javascript', 'text/javascript'),
             'css'  => array('text/css'),

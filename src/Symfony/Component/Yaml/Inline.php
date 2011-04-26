@@ -143,8 +143,8 @@ class Inline
      *
      * @param scalar  $scalar
      * @param string  $delimiters
-     * @param array   $stringDelimiter
-     * @param integer $i
+     * @param array   $stringDelimiters
+     * @param integer &$i
      * @param Boolean $evaluate
      *
      * @return string A YAML string

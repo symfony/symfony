@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Matcher\Exception\NotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RequestContext;
 
 class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,7 +25,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo'));
 
-        $matcher = new UrlMatcher($coll, array('method' => 'get'));
+        $matcher = new UrlMatcher($coll, new RequestContext());
         $matcher->match('/foo');
     }
 
@@ -33,7 +34,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', array(), array('_method' => 'post')));
 
-        $matcher = new UrlMatcher($coll, array('method' => 'get'));
+        $matcher = new UrlMatcher($coll, new RequestContext());
 
         try {
             $matcher->match('/foo');
@@ -49,7 +50,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll->add('foo1', new Route('/foo', array(), array('_method' => 'post')));
         $coll->add('foo2', new Route('/foo', array(), array('_method' => 'put|delete')));
 
-        $matcher = new UrlMatcher($coll, array('method' => 'get'));
+        $matcher = new UrlMatcher($coll, new RequestContext());
 
         try {
             $matcher->match('/foo');
@@ -64,7 +65,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         // test the patterns are matched are parameters are returned
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo/{bar}'));
-        $matcher = new UrlMatcher($collection, array(), array());
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
         try {
             $matcher->match('/no-match');
             $this->fail();
@@ -74,26 +75,36 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         // test that defaults are merged
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo/{bar}', array('def' => 'test')));
-        $matcher = new UrlMatcher($collection, array(), array());
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
         $this->assertEquals(array('_route' => 'foo', 'bar' => 'baz', 'def' => 'test'), $matcher->match('/foo/baz'));
 
         // test that route "method" is ignored if no method is given in the context
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo', array(), array('_method' => 'GET|head')));
-        $matcher = new UrlMatcher($collection, array(), array());
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
         $this->assertInternalType('array', $matcher->match('/foo'));
 
         // route does not match with POST method context
-        $matcher = new UrlMatcher($collection, array('method' => 'POST'), array());
+        $matcher = new UrlMatcher($collection, new RequestContext('', 'post'), array());
         try {
             $matcher->match('/foo');
             $this->fail();
         } catch (MethodNotAllowedException $e) {}
 
         // route does match with GET or HEAD method context
-        $matcher = new UrlMatcher($collection, array('method' => 'GET'), array());
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
         $this->assertInternalType('array', $matcher->match('/foo'));
-        $matcher = new UrlMatcher($collection, array('method' => 'HEAD'), array());
+        $matcher = new UrlMatcher($collection, new RequestContext('', 'head'), array());
         $this->assertInternalType('array', $matcher->match('/foo'));
+    }
+
+    public function testMatchRegression()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo/{foo}'));
+        $coll->add('bar', new Route('/foo/bar/{foo}'));
+
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $this->assertEquals(array('foo' => 'bar', '_route' => 'bar'), $matcher->match('/foo/bar/bar'));
     }
 }

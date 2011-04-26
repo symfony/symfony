@@ -137,7 +137,7 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
     }
 
     /**
-     * Checks the name is avalid xml element name
+     * Checks the name is a valid xml element name
      * @param string $name
      * @return Boolean
      */
@@ -174,7 +174,7 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
             } else {
                 $value = (string) $subnode;
             }
-            
+
             if ($key === 'item') {
                 if (isset($value['@key'])) {
                     $data[(string)$value['@key']] = $value['#'];
@@ -257,9 +257,10 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
     /**
      * Selects the type of node to create and appends it to the parent.
      *
-     * @param  $parentNode
-     * @param  $data
-     * @param  $nodename
+     * @param DOMNode      $parentNode
+     * @param array|object $data
+     * @param string       $nodename
+     * @param string       $key
      * @return void
      */
     private function appendNode($parentNode, $data, $nodeName, $key = null)

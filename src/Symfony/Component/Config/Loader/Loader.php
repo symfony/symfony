@@ -63,7 +63,7 @@ abstract class Loader implements LoaderInterface
      */
     public function resolve($resource, $type = null)
     {
-        
+
         if ($this->supports($resource, $type)) {
             return $this;
         }
@@ -76,5 +76,5 @@ abstract class Loader implements LoaderInterface
 
         return $loader;
     }
-    
+
 }

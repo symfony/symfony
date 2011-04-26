@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -70,7 +70,7 @@ class PrototypedArrayNode extends ArrayNode
      * If $remove is false, the resulting array will still have the
      * "'id' => 'my_name'" item in it.
      *
-     * @param string $attribute The name of the attribute which value is to be used as a key
+     * @param string  $attribute The name of the attribute which value is to be used as a key
      * @param Boolean $remove Whether or not to remove the key
      */
     public function setKeyAttribute($attribute, $remove = true)
@@ -125,7 +125,7 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
-     * Disable adding concrete childrend for prototyped nodes.
+     * Disable adding concrete children for prototyped nodes.
      *
      * @param NodeInterface $node The child node to add
      * @throws \RuntimeException Prototyped array nodes can't have concrete children.

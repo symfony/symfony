@@ -2,6 +2,7 @@
 
 use Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Matcher\Exception\NotFoundException;
+use Symfony\Component\Routing\RequestContext;
 
 /**
  * ProjectUrlMatcher
@@ -14,10 +15,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
     /**
      * Constructor.
      */
-    public function __construct(array $context = array(), array $defaults = array())
+    public function __construct(RequestContext $context)
     {
         $this->context = $context;
-        $this->defaults = $defaults;
     }
 
     public function match($pathinfo)
@@ -30,8 +30,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         }
 
         // bar
-        if (0 === strpos($pathinfo, '/bar') && preg_match('#^/bar/(?P<foo>[^/\.]+?)$#x', $pathinfo, $matches)) {
-            if (isset($this->context['method']) && !in_array(strtolower($this->context['method']), array('get', 'head'))) {
+        if (0 === strpos($pathinfo, '/bar') && preg_match('#^/bar/(?P<foo>[^/]*?)$#x', $pathinfo, $matches)) {
+            if (!in_array($this->context->getMethod(), array('get', 'head'))) {
                 $allow = array_merge($allow, array('get', 'head'));
                 goto not_bar;
             }
@@ -56,15 +56,15 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         }
 
         // baz4
-        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/$#x', $pathinfo, $matches)) {
+        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/]*?)/$#x', $pathinfo, $matches)) {
             $matches['_route'] = 'baz4';
             return $matches;
         }
 
         // baz5
-        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/$#x', $pathinfo, $matches)) {
-            if (isset($this->context['method']) && !in_array(strtolower($this->context['method']), array('post'))) {
-                $allow = array_merge($allow, array('post'));
+        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/]*?)/$#x', $pathinfo, $matches)) {
+            if ($this->context->getMethod() != 'post') {
+                $allow[] = 'post';
                 goto not_baz5;
             }
             $matches['_route'] = 'baz5';
@@ -73,9 +73,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         not_baz5:
 
         // baz.baz6
-        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/$#x', $pathinfo, $matches)) {
-            if (isset($this->context['method']) && !in_array(strtolower($this->context['method']), array('put'))) {
-                $allow = array_merge($allow, array('put'));
+        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/]*?)/$#x', $pathinfo, $matches)) {
+            if ($this->context->getMethod() != 'put') {
+                $allow[] = 'put';
                 goto not_bazbaz6;
             }
             $matches['_route'] = 'baz.baz6';

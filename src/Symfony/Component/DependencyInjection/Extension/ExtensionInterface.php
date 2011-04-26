@@ -23,7 +23,7 @@ interface ExtensionInterface
     /**
      * Loads a specific configuration.
      *
-     * @param array   $config        An array of configuration values
+     * @param array            $config    An array of configuration values
      * @param ContainerBuilder $container A ContainerBuilder instance
      *
      * @throws \InvalidArgumentException When provided tag is not defined in this extension

@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Events;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 
 /**
- * AnonymousAuthenticationListener automatically addds a Token if none is
+ * AnonymousAuthenticationListener automatically adds a Token if none is
  * already present.
  *
  * @author Fabien Potencier <fabien@symfony.com>

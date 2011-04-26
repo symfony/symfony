@@ -36,7 +36,7 @@ class NativeSessionStorage implements SessionStorageInterface
      *
      * The default values for most options are those returned by the session_get_cookie_params() function
      *
-     * @param array $options  An associative array of options
+     * @param array $options  An associative array of session options
      */
     public function __construct(array $options = array())
     {
@@ -100,7 +100,8 @@ class NativeSessionStorage implements SessionStorageInterface
      *
      * The preferred format for a key is directory style so naming conflicts can be avoided.
      *
-     * @param string $key A unique key identifying your data
+     * @param string $key     A unique key identifying your data
+     * @param string $default Default value
      *
      * @return mixed Data associated with the key
      */

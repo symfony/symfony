@@ -74,8 +74,8 @@ interface RememberMeServicesInterface
      * (such as a HTTP POST parameter) that indicates the browser has explicitly
      * requested for the authentication to be remembered.
      *
-     * @param Request $request
-     * @param Response $response
+     * @param Request        $request
+     * @param Response       $response
      * @param TokenInterface $token
      * @return void
      */

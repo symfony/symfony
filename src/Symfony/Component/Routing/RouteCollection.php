@@ -18,10 +18,11 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RouteCollection
+class RouteCollection implements \IteratorAggregate
 {
     private $routes;
     private $resources;
+    private $prefix;
 
     /**
      * Constructor.
@@ -30,6 +31,12 @@ class RouteCollection
     {
         $this->routes = array();
         $this->resources = array();
+        $this->prefix = '';
+    }
+
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->routes);
     }
 
     /**
@@ -56,7 +63,16 @@ class RouteCollection
      */
     public function all()
     {
-        return $this->routes;
+        $routes = array();
+        foreach ($this->routes as $name => $route) {
+            if ($route instanceof RouteCollection) {
+                $routes = array_merge($routes, $route->all());
+            } else {
+                $routes[$name] = $route;
+            }
+        }
+
+        return $routes;
     }
 
     /**
@@ -68,7 +84,20 @@ class RouteCollection
      */
     public function get($name)
     {
-        return isset($this->routes[$name]) ? $this->routes[$name] : null;
+        // get the latest defined route
+        foreach (array_reverse($this->routes) as $routes) {
+            if (!$routes instanceof RouteCollection) {
+                continue;
+            }
+
+            if (null !== $route = $routes->get($name)) {
+                return $route;
+            }
+        }
+
+        if (isset($this->routes[$name])) {
+            return $this->routes[$name];
+        };
     }
 
     /**
@@ -81,11 +110,7 @@ class RouteCollection
     {
         $collection->addPrefix($prefix);
 
-        foreach ($collection->getResources() as $resource) {
-            $this->addResource($resource);
-        }
-
-        $this->routes = array_merge($this->routes, $collection->all());
+        $this->routes[] = $collection;
     }
 
     /**
@@ -95,13 +120,28 @@ class RouteCollection
      */
     public function addPrefix($prefix)
     {
+        // a prefix must not end with a slash
+        $prefix = rtrim($prefix, '/');
+
         if (!$prefix) {
             return;
         }
 
+        // a prefix must start with a slash
+        if ('/' !== $prefix[0]) {
+            $prefix = '/'.$prefix;
+        }
+
+        $this->prefix = $prefix.$this->prefix;
+
         foreach ($this->all() as $route) {
             $route->setPattern($prefix.$route->getPattern());
         }
+    }
+
+    public function getPrefix()
+    {
+        return $this->prefix;
     }
 
     /**
@@ -111,7 +151,14 @@ class RouteCollection
      */
     public function getResources()
     {
-        return array_unique($this->resources);
+        $resources = $this->resources;
+        foreach ($this as $routes) {
+            if ($routes instanceof RouteCollection) {
+                $resources = array_merge($resources, $routes->getResources());
+            }
+        }
+
+        return array_unique($resources);
     }
 
     /**

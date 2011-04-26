@@ -34,7 +34,13 @@ class ContainerAwareEventDispatcher extends EventDispatcher
      * The service IDs of the event listeners and subscribers
      * @var array
      */
-    private $listenerIds;
+    private $listenerIds = array();
+
+    /**
+     * The services registered as listeners
+     * @var array
+     */
+    private $listeners = array();
 
     /**
      * Constructor.
@@ -61,9 +67,9 @@ class ContainerAwareEventDispatcher extends EventDispatcher
             throw new \InvalidArgumentException('Expected a string argument');
         }
 
-        foreach ((array) $eventNames as $event) {
+        foreach ((array) $eventNames as $eventName) {
             // Prevent duplicate entries
-            $this->listenerIds[$event][$serviceId] = $priority;
+            $this->listenerIds[$eventName][$serviceId] = $priority;
         }
     }
 
@@ -72,12 +78,23 @@ class ContainerAwareEventDispatcher extends EventDispatcher
      *
      * Lazily loads listeners for this event from the dependency injection
      * container.
+     *
+     * @throws \InvalidArgumentException if the service is not defined
      */
     public function dispatch($eventName, Event $event = null)
     {
         if (isset($this->listenerIds[$eventName])) {
             foreach ($this->listenerIds[$eventName] as $serviceId => $priority) {
-                $this->addListener($eventName, $this->container->get($serviceId), $priority);
+                $listener = $this->container->get($serviceId);
+
+                if (!isset($this->listeners[$eventName][$serviceId])) {
+                    $this->addListener($eventName, $listener, $priority);
+                } elseif ($listener !== $this->listeners[$eventName][$serviceId]) {
+                    $this->removeListener($eventName, $this->listeners[$eventName][$serviceId]);
+                    $this->addListener($eventName, $listener, $priority);
+                }
+
+                $this->listeners[$eventName][$serviceId] = $listener;
             }
         }
 

@@ -21,7 +21,7 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
     {
         $flattened = FlattenException::create($exception);
         $flattened2 = FlattenException::create($exception);
-        
+
         $flattened->setPrevious($flattened2);
 
         $this->assertEquals($exception->getMessage(), $flattened->getMessage(), 'The message is copied from the original exception.');
@@ -29,7 +29,7 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(get_class($exception), $flattened->getClass(), 'The class is set to the class of the original exception');
 
     }
-    
+
     /**
      * @dataProvider flattenDataProvider
      */
@@ -37,14 +37,14 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
     {
         $flattened = FlattenException::create($exception);
         $flattened2 = FlattenException::create($exception);
-        
+
         $flattened->setPrevious($flattened2);
-        
+
         $this->assertSame($flattened2,$flattened->getPrevious());
-        
-        $this->assertSame(array($flattened2),$flattened->getPreviouses());
+
+        $this->assertSame(array($flattened2),$flattened->getAllPrevious());
     }
-    
+
     /**
      * @dataProvider flattenDataProvider
      */
@@ -52,7 +52,7 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
     {
         $flattened = FlattenException::create($exception);
         $flattened->setTrace(array(),'foo.php',123);
-        
+
         $this->assertEquals(array(
             array(
                 'message'=> 'test',
@@ -64,7 +64,7 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
             )
         ),$flattened->toArray());
     }
-    
+
     public function flattenDataProvider()
     {
         return array(

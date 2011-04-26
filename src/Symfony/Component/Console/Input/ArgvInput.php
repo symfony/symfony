@@ -111,7 +111,7 @@ class ArgvInput extends Input
     /**
      * Parses a short option set.
      *
-     * @param string $token The current token
+     * @param string $name The current token
      *
      * @throws \RuntimeException When option given doesn't exist
      */
@@ -260,9 +260,7 @@ class ArgvInput extends Input
      */
     public function hasParameterOption($values)
     {
-        if (!is_array($values)) {
-            $values = array($values);
-        }
+        $values = (array) $values;
 
         foreach ($this->tokens as $v) {
             if (in_array($v, $values)) {
@@ -285,9 +283,7 @@ class ArgvInput extends Input
      */
     public function getParameterOption($values, $default = false)
     {
-        if (!is_array($values)) {
-            $values = array($values);
-        }
+        $values = (array) $values;
 
         $tokens = $this->tokens;
         while ($token = array_shift($tokens)) {

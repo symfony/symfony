@@ -18,7 +18,7 @@ class Configuration implements ConfigurationInterface
     /**
      * Constructor
      *
-     * @param Boolean $debug Wether to use the debug mode
+     * @param Boolean $debug Whether to use the debug mode
      */
     public function  __construct($debug)
     {
@@ -68,9 +68,9 @@ class Configuration implements ConfigurationInterface
                     ->treatNullLike(array('enabled' => true))
                     ->treatTrueLike(array('enabled' => true))
                     ->children()
-                        ->booleanNode('enabled')->end()
-                        ->scalarNode('field_name')->end()
-                        ->scalarNode('secret')->end()
+                        ->booleanNode('enabled')->defaultTrue()->end()
+                        ->scalarNode('field_name')->defaultValue('_token')->end()
+                        ->scalarNode('secret')->defaultValue('secret')->end()
                     ->end()
                 ->end()
             ->end()
@@ -100,8 +100,8 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('profiler')
                     ->canBeUnset()
                     ->children()
-                        ->booleanNode('only_exceptions')->defaultValue(false)->end()
-                        ->booleanNode('only_master_requests')->defaultValue(false)->end()
+                        ->booleanNode('only_exceptions')->defaultFalse()->end()
+                        ->booleanNode('only_master_requests')->defaultFalse()->end()
                         ->scalarNode('dsn')->defaultValue('sqlite:%kernel.cache_dir%/profiler.db')->end()
                         ->scalarNode('username')->defaultValue('')->end()
                         ->scalarNode('password')->defaultValue('')->end()
@@ -131,6 +131,8 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('cache_warmer')->defaultFalse()->end()
                         ->scalarNode('resource')->isRequired()->end()
                         ->scalarNode('type')->end()
+                        ->scalarNode('http_port')->defaultValue(80)->end()
+                        ->scalarNode('https_port')->defaultValue(443)->end()
                     ->end()
                 ->end()
             ->end()
@@ -143,36 +145,16 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('session')
                     ->canBeUnset()
-                    // Strip "pdo." prefix from option keys, since dots cannot appear in node names
-                    ->beforeNormalization()
-                        ->ifArray()
-                        ->then(function($v){
-                            foreach ($v as $key => $value) {
-                                if (0 === strncmp('pdo.', $key, 4)) {
-                                    $v[substr($key, 4)] = $value;
-                                    unset($v[$key]);
-                                }
-                            }
-                            return $v;
-                        })
-                    ->end()
                     ->children()
                         ->booleanNode('auto_start')->end()
-                        ->scalarNode('class')->end()
                         ->scalarNode('default_locale')->defaultValue('en')->end()
-                        ->scalarNode('storage_id')->defaultValue('native')->end()
-                        // NativeSessionStorage options
+                        ->scalarNode('storage_id')->defaultValue('session.storage.native')->end()
                         ->scalarNode('name')->end()
                         ->scalarNode('lifetime')->end()
                         ->scalarNode('path')->end()
                         ->scalarNode('domain')->end()
                         ->booleanNode('secure')->end()
                         ->booleanNode('httponly')->end()
-                        // PdoSessionStorage options
-                        ->scalarNode('db_table')->end()
-                        ->scalarNode('db_id_col')->end()
-                        ->scalarNode('db_data_col')->end()
-                        ->scalarNode('db_time_col')->end()
                     ->end()
                 ->end()
             ->end()

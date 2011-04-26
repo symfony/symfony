@@ -11,21 +11,27 @@
 
 namespace Symfony\Bundle\AsseticBundle\CacheWarmer;
 
-use Assetic\Factory\LazyAssetManager;
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class AssetManagerCacheWarmer extends CacheWarmer
+/**
+ * The AssetManagerCacheWarmer warms up the formula loader.
+ *
+ * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ */
+class AssetManagerCacheWarmer implements CacheWarmerInterface
 {
-    protected $am;
+    private $container;
 
-    public function __construct(LazyAssetManager $am)
+    public function __construct(ContainerInterface $container)
     {
-        $this->am = $am;
+        $this->container = $container;
     }
 
     public function warmUp($cacheDir)
     {
-        $this->am->load();
+        $am = $this->container->get('assetic.asset_manager');
+        $am->load();
     }
 
     public function isOptional()

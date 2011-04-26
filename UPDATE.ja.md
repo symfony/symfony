@@ -5,10 +5,76 @@
 このドキュメントでは、フレームワークの "パブリックな" APIを使っている場合に必要な変更点についてのみ説明しています。
 フレームワークのコアコードを "ハック" している場合は、変更履歴を注意深く追跡する必要があるでしょう。
 
+PR12 から beta1
+---------------
+
+* `session` のコンフィギュレーションがリファクタリングされました
+
+  * `class` オプションが削除されました（代わりに `session.class` パラメータを使ってください）
+
+  * PDO セッションストレージのコンフィギュレーションが削除されました（クックブックのレシピは修正中です）
+
+  * `storage_id` オプションには、サービスIDの一部ではなく、サービスIDそのものを指定するように変更されました。
+
+* `DoctrineMigrationsBundle` と `DoctrineFixturesBundle` の 2 つのバンドルは、symfony コアから独立し、個別のリポジトリで管理されるようになりました。
+
+* フォームフレームワークの大きなリファクタリングが行われました（詳細はドキュメントを参照してください）
+
+* `trans` タグで、翻訳するメッセージを引数として受け取る形式が廃止されました:
+
+    {% trans "foo" %}
+    {% trans foo %}
+
+  次のような長い形式か、フィルタ形式を使ってください:
+
+    {% trans %}foo{% endtrans %}
+    {{ foo|trans }}
+
+  こうすることで、タグとフィルタの使用方法が明確になり、自動出力エスケープのルールが適用された場合により分かりやすくなります（詳細はドキュメントを参照してください）。
+
+* DependencyInjection コンポーネントの ContainerBuilder クラスと Definition クラスのいくつかのメソッドの名前が、より分かりやすく一貫性のある名前に変更されました:
+
+  変更前:
+
+        $container->remove('my_definition');
+        $definition->setArgument(0, 'foo');
+
+  変更後:
+
+        $container->removeDefinition('my_definition');
+        $definition->replaceArgument(0, 'foo');
+
+* rememberme のコンフィギュレーションで、`token_provider key` サービスIDのサフィックスを指定するのではなく、サービスIDそのものを指定するように変更されました。
+
+PR11 から PR12
+--------------
+
+* HttpFoundation\Cookie::getExpire() は getExpiresTime() に名前が変更されました。
+
+* XMLのコンフィギュレーションの記述方法が変更されました。属性が1つしかないタグは、すべてタグのコンテンツとして記述するように変更されました。
+
+  変更前:
+
+        <bundle name="MyBundle" />
+        <app:engine id="twig" />
+        <twig:extension id="twig.extension.debug" />
+
+  変更後:
+
+        <bundle>MyBundle</bundle>
+        <app:engine>twig</app:engine>
+        <twig:extension>twig.extension.debug</twig:extension>
+
+* SwitchUserListenerが有効な場合に、すべてのユーザーが任意のアカウントになりすませる致命的な脆弱性を修正しました。SwitchUserListenerを利用しない設定にしている場合は影響はありません。
+
+* DIコンテナのコンパイルプロセスの最後に、すべてのサービスに対する参照のバリデーションがより厳密に行われるようになりました。これにより、無効なサービス参照が見つかった場合は、コンパイル時の例外が発生します（以前の動作は、実行時例外でした）。
+
 PR10 から PR11
 --------------
 
 * エクステンションのコンフィギュレーションクラスには、\ `Symfony\Component\Config\Definition\ConfigurationInterface`\ インターフェイスを実装する必要があります。この部分の後方互換性は維持されていますが、今後の開発のために、エクステンションにこのインターフェイスを実装しておいてください。
+
+* Monologのオプション "fingerscrossed" は "fingers_crossed" に名前が変更されました。
 
 PR9 から PR10
 -------------

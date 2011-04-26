@@ -44,9 +44,17 @@ class RequestDataCollector extends DataCollector
             $attributes[$key] = is_object($value) ? sprintf('Object(%s)', get_class($value)) : $value;
         }
 
+        $content = null;
+        try {
+            $content = $request->getContent();
+        } catch (\LogicException $e) {
+            // the user already got the request content as a resource
+            $content = false;
+        }
+
         $this->data = array(
             'format'             => $request->getRequestFormat(),
-            'content'            => $request->getContent(),
+            'content'            => $content,
             'content_type'       => $response->headers->get('Content-Type') ? $response->headers->get('Content-Type') : 'text/html',
             'status_code'        => $response->getStatusCode(),
             'request_query'      => $request->query->all(),

@@ -44,7 +44,7 @@ class DefinitionDecorator extends Definition
     {
         return $this->changes;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -54,7 +54,7 @@ class DefinitionDecorator extends Definition
 
         return parent::setClass($class);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -64,7 +64,7 @@ class DefinitionDecorator extends Definition
 
         return parent::setFactoryClass($class);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -74,7 +74,7 @@ class DefinitionDecorator extends Definition
 
         return parent::setFactoryMethod($method);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -84,7 +84,7 @@ class DefinitionDecorator extends Definition
 
         return parent::setFactoryService($service);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -94,7 +94,7 @@ class DefinitionDecorator extends Definition
 
         return parent::setConfigurator($callable);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -104,7 +104,7 @@ class DefinitionDecorator extends Definition
 
         return parent::setFile($file);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -127,9 +127,9 @@ class DefinitionDecorator extends Definition
      * @param mixed $value
      *
      * @return DefinitionDecorator the current instance
-     * @throws \InvalidArgumentException when $index isnt an integer
+     * @throws \InvalidArgumentException when $index isn't an integer
      */
-    public function setArgument($index, $value)
+    public function replaceArgument($index, $value)
     {
         if (!is_int($index)) {
             throw new \InvalidArgumentException('$index must be an integer.');

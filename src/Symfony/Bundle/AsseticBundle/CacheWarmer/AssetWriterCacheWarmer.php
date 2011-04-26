@@ -11,24 +11,30 @@
 
 namespace Symfony\Bundle\AsseticBundle\CacheWarmer;
 
-use Assetic\AssetManager;
 use Assetic\AssetWriter;
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class AssetWriterCacheWarmer extends CacheWarmer
+/**
+ * The AssetWriterCacheWarmer processes and writes the asset files.
+ * 
+ * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ */
+class AssetWriterCacheWarmer implements CacheWarmerInterface
 {
-    protected $am;
-    protected $writer;
+    private $container;
+    private $writer;
 
-    public function __construct(AssetManager $am, AssetWriter $writer)
+    public function __construct(ContainerInterface $container, AssetWriter $writer)
     {
-        $this->am = $am;
+        $this->container = $container;
         $this->writer = $writer;
     }
 
     public function warmUp($cacheDir)
     {
-        $this->writer->writeManagerAssets($this->am);
+        $am = $this->container->get('assetic.asset_manager');
+        $this->writer->writeManagerAssets($am);
     }
 
     public function isOptional()

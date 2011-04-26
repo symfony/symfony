@@ -4,105 +4,15 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping http://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
 
-  <class name="Symfony\Component\Form\Field">
-    <getter property="transformationSuccessful">
-      <constraint name="True">
-        <option name="message">This value is invalid</option>
-      </constraint>
-    </getter>
-  </class>
-
   <class name="Symfony\Component\Form\Form">
-    <constraint name="Callback"><value>validateData</value></constraint>
-    <property name="fields">
+    <constraint name="Callback">
+      <value>
+        <value>Symfony\Component\Form\Extension\Validator\Validator\DelegatingValidator</value>
+        <value>validateFormData</value>
+      </value>
+    </constraint>
+    <property name="children">
       <constraint name="Valid" />
     </property>
-    <getter property="submittedWithExtraFields">
-      <constraint name="False">
-        <option name="message">This form should not contain extra fields</option>
-      </constraint>
-    </getter>
-    <getter property="postMaxSizeReached">
-      <constraint name="False">
-        <option name="message">The uploaded file was too large. Please try to upload a smaller file</option>
-      </constraint>
-    </getter>
-    <getter property="csrfTokenValid">
-      <constraint name="True">
-        <option name="message">The CSRF token is invalid. Please try to resubmit the form</option>
-      </constraint>
-    </getter>
-  </class>
-
-  <class name="Symfony\Component\Form\RepeatedField">
-    <getter property="firstEqualToSecond">
-      <constraint name="True">
-        <option name="message">The two values should be equal</option>
-      </constraint>
-    </getter>
-  </class>
-
-  <class name="Symfony\Component\Form\DateField">
-    <getter property="partiallyFilled">
-      <constraint name="False">
-        <option name="message">The date is not fully selected</option>
-      </constraint>
-    </getter>
-    <getter property="yearWithinRange">
-      <constraint name="True">
-        <option name="message">The year is invalid</option>
-      </constraint>
-    </getter>
-    <getter property="monthWithinRange">
-      <constraint name="True">
-        <option name="message">The month is invalid</option>
-      </constraint>
-    </getter>
-    <getter property="dayWithinRange">
-      <constraint name="True">
-        <option name="message">The day is invalid</option>
-      </constraint>
-    </getter>
-  </class>
-
-  <class name="Symfony\Component\Form\TimeField">
-    <getter property="partiallyFilled">
-      <constraint name="False">
-        <option name="message">The time is not fully selected</option>
-      </constraint>
-    </getter>
-    <getter property="hourWithinRange">
-      <constraint name="True">
-        <option name="message">The hour is invalid</option>
-      </constraint>
-    </getter>
-    <getter property="minuteWithinRange">
-      <constraint name="True">
-        <option name="message">The minutes are invalid</option>
-      </constraint>
-    </getter>
-    <getter property="secondWithinRange">
-      <constraint name="True">
-        <option name="message">The seconds are invalid</option>
-      </constraint>
-    </getter>
-  </class>
-
-  <class name="Symfony\Component\Form\FileField">
-    <getter property="iniSizeExceeded">
-      <constraint name="False">
-        <option name="message">The file is too large. Please upload a smaller file</option>
-      </constraint>
-    </getter>
-    <getter property="formSizeExceeded">
-      <constraint name="False">
-        <option name="message">The file is too large. Please upload a smaller file</option>
-      </constraint>
-    </getter>
-    <getter property="uploadComplete">
-      <constraint name="True">
-        <option name="message">The file was only partially uploaded. Please try again</option>
-      </constraint>
-    </getter>
   </class>
 </constraint-mapping>

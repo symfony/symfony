@@ -33,14 +33,14 @@ interface ValidatorContextInterface
     /**
      * Sets the class metadata factory used in the new validator
      *
-     * @param ClassMetadataFactoryInterface $classMetadataFactory  The factory instance
+     * @param ClassMetadataFactoryInterface $classMetadataFactory The factory instance
      */
     function setClassMetadataFactory(ClassMetadataFactoryInterface $classMetadataFactory);
 
     /**
      * Sets the constraint validator factory used in the new validator
      *
-     * @param ConstraintValidatorFactoryInterface $constraintValidatorFactory  The factory instance
+     * @param ConstraintValidatorFactoryInterface $constraintValidatorFactory The factory instance
      */
     function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $constraintValidatorFactory);
 

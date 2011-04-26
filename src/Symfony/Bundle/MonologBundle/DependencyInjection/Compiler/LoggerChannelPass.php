@@ -39,7 +39,7 @@ class LoggerChannelPass implements CompilerPassInterface
                     $this->createLogger($tag['channel'], $loggerId, $container);
                     foreach ($definition->getArguments() as $index => $argument) {
                         if ($argument instanceof Reference && 'logger' === (string) $argument) {
-                            $definition->setArgument($index, new Reference($loggerId, $argument->getInvalidBehavior(), $argument->isStrict()));
+                            $definition->replaceArgument($index, new Reference($loggerId, $argument->getInvalidBehavior(), $argument->isStrict()));
                         }
                     }
                 }
@@ -51,7 +51,7 @@ class LoggerChannelPass implements CompilerPassInterface
     {
         if (!in_array($channel, $this->channels)) {
             $logger = new DefinitionDecorator('monolog.logger_prototype');
-            $logger->setArgument(0, $channel);
+            $logger->replaceArgument(0, $channel);
             $container->setDefinition($loggerId, $logger);
             array_push($this->channels, $channel);
         }

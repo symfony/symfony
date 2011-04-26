@@ -39,9 +39,9 @@ class CustomNormalizer extends AbstractNormalizer
     /**
      * Checks if the given class implements the NormalizableInterface.
      *
-     * @param  ReflectionClass $class  A ReflectionClass instance of the class
-     *                                 to serialize into or from.
-     * @param  string $format The format being (de-)serialized from or into.
+     * @param ReflectionClass $class  A ReflectionClass instance of the class
+     *                                to serialize into or from.
+     * @param string          $format The format being (de-)serialized from or into.
      * @return Boolean
      */
     public function supports(\ReflectionClass $class, $format = null)

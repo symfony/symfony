@@ -36,9 +36,10 @@ class LogoutListener implements ListenerInterface
     /**
      * Constructor
      *
-     * @param SecurityContextInterface $securityContext
-     * @param string $logoutPath The path that starts the logout process
-     * @param string $targetUrl  The URL to redirect to after logout
+     * @param SecurityContextInterface      $securityContext
+     * @param string                        $logoutPath      The path that starts the logout process
+     * @param string                        $targetUrl       The URL to redirect to after logout
+     * @param LogoutSuccessHandlerInterface $successHandler
      */
     public function __construct(SecurityContextInterface $securityContext, $logoutPath, $targetUrl = '/', LogoutSuccessHandlerInterface $successHandler = null)
     {

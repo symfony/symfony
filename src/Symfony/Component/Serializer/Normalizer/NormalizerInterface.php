@@ -46,8 +46,10 @@ interface NormalizerInterface
      * Checks whether the given class is supported by this normalizer
      *
      * @param ReflectionClass $class
-     * @param string $format format the given data was extracted from
+     * @param string          $format format the given data was extracted from
+     *
      * @return Boolean
+     *
      * @api
      */
     function supports(\ReflectionClass $class, $format = null);

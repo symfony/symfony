@@ -30,13 +30,13 @@ class Configuration implements ConfigurationInterface
     /**
      * Constructor
      *
-     * @param Boolean $debug Wether to use the debug mode
+     * @param Boolean $debug Whether to use the debug mode
      */
     public function  __construct($debug)
     {
         $this->debug = (Boolean) $debug;
     }
-    
+
     /**
      * Generates the configuration tree builder.
      *
@@ -127,7 +127,7 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->children()
-                ->arrayNode('orm')                    
+                ->arrayNode('orm')
                     ->children()
                         ->scalarNode('default_entity_manager')->end()
                         ->booleanNode('auto_generate_proxy_classes')->defaultFalse()->end()

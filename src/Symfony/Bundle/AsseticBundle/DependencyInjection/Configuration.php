@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\AsseticBundle\DependencyInjection;
 
+use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -31,7 +32,7 @@ class Configuration implements ConfigurationInterface
     /**
      * Constructor
      *
-     * @param Boolean $debug    Wether to use the debug mode
+     * @param Boolean $debug    Whether to use the debug mode
      * @param array   $bundles  An array of bundle names
      */
     public function __construct($debug, array $bundles)
@@ -48,6 +49,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $builder = new TreeBuilder();
+        $finder = new ExecutableFinder();
 
         $builder->root('assetic')
             ->children()
@@ -55,9 +57,9 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('use_controller')->defaultValue($this->debug)->end()
                 ->scalarNode('read_from')->defaultValue('%kernel.root_dir%/../web')->end()
                 ->scalarNode('write_to')->defaultValue('%assetic.read_from%')->end()
-                ->scalarNode('java')->defaultValue('/usr/bin/java')->end()
-                ->scalarNode('node')->defaultValue('/usr/bin/node')->end()
-                ->scalarNode('sass')->defaultValue('/usr/bin/sass')->end()
+                ->scalarNode('java')->defaultValue(function() use ($finder) { $java = $finder->find('java'); return $java ? $java : '/usr/bin/java'; })->end()
+                ->scalarNode('node')->defaultValue(function() use ($finder) { $node = $finder->find('node'); return $node ? $node : '/usr/bin/node'; })->end()
+                ->scalarNode('sass')->defaultValue(function() use ($finder) { $saas = $finder->find('saas'); return $saas ? $saas : '/usr/bin/saas'; })->end()
             ->end()
 
             // bundles
@@ -87,6 +89,29 @@ class Configuration implements ConfigurationInterface
                         ->validate()
                             ->ifTrue(function($v) { return !is_array($v); })
                             ->thenInvalid('The assetic.filters config %s must be either null or an array.')
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+
+            // twig
+            ->children()
+                ->arrayNode('twig')
+                    ->addDefaultsIfNotSet()
+                    ->defaultValue(array())
+                    ->fixXmlConfig('function')
+                    ->children()
+                        ->arrayNode('functions')
+                            ->addDefaultsIfNotSet()
+                            ->defaultValue(array())
+                            ->useAttributeAsKey('name')
+                            ->prototype('variable')
+                                ->treatNullLike(array())
+                                ->validate()
+                                    ->ifTrue(function($v) { return !is_array($v); })
+                                    ->thenInvalid('The assetic.twig.functions config %s must be either null or an array.')
+                                ->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()

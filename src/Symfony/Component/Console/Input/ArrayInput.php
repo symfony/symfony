@@ -29,7 +29,7 @@ class ArrayInput extends Input
     /**
      * Constructor.
      *
-     * @param array           $param An array of parameters
+     * @param array           $parameters An array of parameters
      * @param InputDefinition $definition A InputDefinition instance
      *
      * @api
@@ -63,15 +63,13 @@ class ArrayInput extends Input
      * This method is to be used to introspect the input parameters
      * before it has been validated. It must be used carefully.
      *
-     * @param string|array $value The values to look for in the raw parameters (can be an array)
+     * @param string|array $values The values to look for in the raw parameters (can be an array)
      *
      * @return Boolean true if the value is contained in the raw parameters
      */
     public function hasParameterOption($values)
     {
-        if (!is_array($values)) {
-            $values = array($values);
-        }
+        $values = (array) $values;
 
         foreach ($this->parameters as $k => $v) {
             if (!is_int($k)) {
@@ -99,9 +97,7 @@ class ArrayInput extends Input
      */
     public function getParameterOption($values, $default = false)
     {
-        if (!is_array($values)) {
-            $values = array($values);
-        }
+        $values = (array) $values;
 
         foreach ($this->parameters as $k => $v) {
             if (is_int($k) && in_array($v, $values)) {

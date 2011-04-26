@@ -24,8 +24,12 @@ class UsernamePasswordToken extends AbstractToken
     /**
      * Constructor.
      *
-     * @param string $user The username (like a nickname, email address, etc.)
+     * @param string $user        The username (like a nickname, email address, etc.)
      * @param string $credentials This usually is the password of the user
+     * @param string $providerKey The provider key
+     * @param array  $roles       An array of roles
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($user, $credentials, $providerKey, array $roles = array())
     {

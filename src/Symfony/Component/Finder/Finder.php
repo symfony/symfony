@@ -327,9 +327,7 @@ class Finder implements \IteratorAggregate
      */
     public function in($dirs)
     {
-        if (!is_array($dirs)) {
-            $dirs = array($dirs);
-        }
+        $dirs = (array) $dirs;
 
         foreach ($dirs as $dir) {
             if (!is_dir($dir)) {

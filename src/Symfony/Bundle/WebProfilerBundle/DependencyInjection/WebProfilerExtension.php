@@ -34,7 +34,7 @@ class WebProfilerExtension extends Extension
     /**
      * Loads the web profiler configuration.
      *
-     * @param array            $config    An array of configuration settings
+     * @param array            $configs   An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
     public function load(array $configs, ContainerBuilder $container)
@@ -48,8 +48,8 @@ class WebProfilerExtension extends Extension
             $loader->load('toolbar.xml');
 
             $container->getDefinition('web_profiler.debug.toolbar')
-                ->setArgument(1, $config['intercept_redirects'])
-                ->setArgument(2, $config['verbose'])
+                ->replaceArgument(1, $config['intercept_redirects'])
+                ->replaceArgument(2, $config['verbose'])
             ;
         }
     }

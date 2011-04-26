@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\TwigBundle\Extension;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Bundle\TwigBundle\TokenParser\IncludeTokenParser;
 use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;
 
 /**
@@ -26,16 +25,6 @@ class TemplatingExtension extends \Twig_Extension
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    public function getContainer()
-    {
-        return $this->container;
-    }
-
-    public function getTemplating()
-    {
-        return $this->container->get('templating');
     }
 
     /**
@@ -85,10 +74,6 @@ class TemplatingExtension extends \Twig_Extension
     {
         $options['attributes'] = $attributes;
 
-        if (isset($options['query'])) {
-            $options['query'] = $options['query'];
-        }
-
         return $this->container->get('http_kernel')->render($controller, $options);
     }
 
@@ -102,9 +87,6 @@ class TemplatingExtension extends \Twig_Extension
         return array(
             // {% render 'BlogBundle:Post:list' with { 'limit': 2 }, { 'alt': 'BlogBundle:Post:error' } %}
             new RenderTokenParser(),
-
-            // {% include 'sometemplate.php' with { 'something' : 'something2' } %}
-            new IncludeTokenParser(),
         );
     }
 

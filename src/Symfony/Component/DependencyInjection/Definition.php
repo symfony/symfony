@@ -205,7 +205,7 @@ class Definition
      *
      * @return Definition The current instance
      */
-    public function setArgument($index, $argument)
+    public function replaceArgument($index, $argument)
     {
         if ($index < 0 || $index > count($this->arguments) - 1) {
             throw new \OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, count($this->arguments) - 1));
@@ -411,7 +411,7 @@ class Definition
     /**
      * Sets the scope of the service
      *
-     * @param  string $string Whether the service must be shared or not
+     * @param  string $scope Whether the service must be shared or not
      *
      * @return Definition The current instance
      */

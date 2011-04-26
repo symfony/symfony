@@ -110,6 +110,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     public function getNotCalledListeners()
     {
         $notCalled = array();
+
         foreach (array_keys($this->getListeners()) as $name) {
             foreach ($this->getListeners($name) as $listener) {
                 if (!isset($this->called[$name.'.'.get_class($listener)])) {
@@ -123,10 +124,10 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
 
     /**
      * Returns information about the listener
-     * 
+     *
      * @param object $listener  The listener
      * @param string $eventName The event name
-     * 
+     *
      * @return array Informations about the listener
      */
     private function getListenerInfo($listener, $eventName)

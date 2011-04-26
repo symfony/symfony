@@ -30,15 +30,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     const ALL   = 'all';
     const ANY   = 'any';
 
-    private static $noAceException;
     private $auditLogger;
-
-    public function __construct()
-    {
-        if (null === static::$noAceException) {
-            static::$noAceException = new NoAceFoundException('No ACE.');
-        }
-    }
 
     /**
      * Sets the audit logger
@@ -61,7 +53,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                 $aces = $acl->getObjectAces();
 
                 if (!$aces) {
-                    throw static::$noAceException;
+                    throw new NoAceFoundException();
                 }
 
                 return $this->hasSufficientPermissions($acl, $aces, $masks, $sids, $administrativeMode);
@@ -69,7 +61,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                 $aces = $acl->getClassAces();
 
                 if (!$aces) {
-                    throw static::$noAceException;
+                    throw $noObjectAce;
                 }
 
                 return $this->hasSufficientPermissions($acl, $aces, $masks, $sids, $administrativeMode);
@@ -79,7 +71,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                 return $parentAcl->isGranted($masks, $sids, $administrativeMode);
             }
 
-            throw new NoAceFoundException('No applicable ACE was found.');
+            throw $noClassAce;
         }
     }
 
@@ -92,14 +84,14 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
             try {
                 $aces = $acl->getObjectFieldAces($field);
                 if (!$aces) {
-                    throw static::$noAceException;
+                    throw new NoAceFoundException();
                 }
 
                 return $this->hasSufficientPermissions($acl, $aces, $masks, $sids, $administrativeMode);
             } catch (NoAceFoundException $noObjectAces) {
                 $aces = $acl->getClassFieldAces($field);
                 if (!$aces) {
-                    throw static::$noAceException;
+                    throw $noObjectAces;
                 }
 
                 return $this->hasSufficientPermissions($acl, $aces, $masks, $sids, $administrativeMode);
@@ -109,7 +101,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                 return $parentAcl->isFieldGranted($field, $masks, $sids, $administrativeMode);
             }
 
-            throw new NoAceFoundException('No applicable ACE was found.');
+            throw $noClassAces;
         }
     }
 
@@ -137,10 +129,10 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * access finally.
      *
      * @param AclInterface $acl
-     * @param array $aces an array of ACE to check against
-     * @param array $masks an array of permission masks
-     * @param array $sids an array of SecurityIdentityInterface implementations
-     * @param Boolean $administrativeMode true turns off audit logging
+     * @param array        $aces               An array of ACE to check against
+     * @param array        $masks              An array of permission masks
+     * @param array        $sids               An array of SecurityIdentityInterface implementations
+     * @param Boolean      $administrativeMode True turns off audit logging
      * @return Boolean true, or false; either granting, or denying access respectively.
      */
     private function hasSufficientPermissions(AclInterface $acl, array $aces, array $masks, array $sids, $administrativeMode)
@@ -177,7 +169,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
             return false;
         }
 
-        throw static::$noAceException;
+        throw new NoAceFoundException();
     }
 
     /**
@@ -197,7 +189,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * Strategy EQUAL:
      * The ACE will be considered applicable when the bitmasks are equal.
      *
-     * @param integer $requiredMask
+     * @param integer        $requiredMask
      * @param EntryInterface $ace
      * @return Boolean
      */

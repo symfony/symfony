@@ -86,6 +86,7 @@ class Response
         $this->setStatusCode($status);
         $this->setProtocolVersion('1.0');
         $this->headers = new ResponseHeaderBag($headers);
+        $this->charset = 'UTF-8';
     }
 
     /**
@@ -97,9 +98,7 @@ class Response
     {
         $content = '';
 
-        if (!$this->headers->has('Content-Type')) {
-            $this->headers->set('Content-Type', 'text/html; charset='.(null === $this->charset ? 'UTF-8' : $this->charset));
-        }
+        $this->fixContentType();
 
         // status
         $content .= sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText)."\n";
@@ -129,9 +128,7 @@ class Response
      */
     public function sendHeaders()
     {
-        if (!$this->headers->has('Content-Type')) {
-            $this->headers->set('Content-Type', 'text/html; charset='.(null === $this->charset ? 'UTF-8' : $this->charset));
-        }
+        $this->fixContentType();
 
         // status
         header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText));
@@ -738,7 +735,7 @@ class Response
 
     public function isRedirect()
     {
-        return in_array($this->statusCode, array(301, 302, 303, 307));
+        return in_array($this->statusCode, array(201, 301, 302, 303, 307));
     }
 
     public function isEmpty()
@@ -749,5 +746,15 @@ class Response
     public function isRedirected($location)
     {
         return $this->isRedirect() && $location == $this->headers->get('Location');
+    }
+
+    protected function fixContentType()
+    {
+        if (!$this->headers->has('Content-Type')) {
+            $this->headers->set('Content-Type', 'text/html; charset='.$this->charset);
+        } elseif ('text/' === substr($this->headers->get('Content-Type'), 0, 5) && false === strpos($this->headers->get('Content-Type'), 'charset')) {
+            // add the charset
+            $this->headers->set('Content-Type', $this->headers->get('Content-Type').'; charset='.$this->charset);
+        }
     }
 }

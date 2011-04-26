@@ -90,8 +90,8 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      * AuthenticationProviderInterface.
      *
      * @param ContainerBuilder $container
-     * @param string           $id The unique id of the firewall
-     * @param array            $options The options array for this listener
+     * @param string           $id             The unique id of the firewall
+     * @param array            $config         The options array for this listener
      * @param string           $userProviderId The id of the user provider
      *
      * @return string never null, the id of the authentication provider
@@ -148,17 +148,17 @@ abstract class AbstractFactory implements SecurityFactoryInterface
     {
         $listenerId = $this->getListenerId();
         $listener = new DefinitionDecorator($listenerId);
-        $listener->setArgument(3, $id);
-        $listener->setArgument(4, array_intersect_key($config, $this->options));
+        $listener->replaceArgument(3, $id);
+        $listener->replaceArgument(4, array_intersect_key($config, $this->options));
 
         // success handler
         if (isset($config['success_handler'])) {
-            $listener->setArgument(5, new Reference($config['success_handler']));
+            $listener->replaceArgument(5, new Reference($config['success_handler']));
         }
 
         // failure handler
         if (isset($config['failure_handler'])) {
-            $listener->setArgument(6, new Reference($config['failure_handler']));
+            $listener->replaceArgument(6, new Reference($config['failure_handler']));
         }
 
         $listenerId .= '.'.$id;

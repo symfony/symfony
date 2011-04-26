@@ -565,10 +565,10 @@ abstract class Kernel implements KernelInterface
     /**
      * Dumps the service container to PHP code in the cache.
      *
-     * @param ConfigCache       $cache      The config cache
-     * @param ContainerBuilder  $container  The service container
-     * @param string            $class      The name of the class to generate
-     * @param string            $baseClass  The name of the container's base class
+     * @param ConfigCache      $cache     The config cache
+     * @param ContainerBuilder $container The service container
+     * @param string           $class     The name of the class to generate
+     * @param string           $baseClass The name of the container's base class
      */
     protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class, $baseClass)
     {
@@ -597,7 +597,7 @@ abstract class Kernel implements KernelInterface
             new YamlFileLoader($container, $locator),
             new IniFileLoader($container, $locator),
             new PhpFileLoader($container, $locator),
-            new ClosureLoader($container, $locator),
+            new ClosureLoader($container),
         ));
 
         return new DelegatingLoader($resolver);

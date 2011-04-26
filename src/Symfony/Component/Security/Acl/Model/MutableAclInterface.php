@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Acl\Model;
 
-use Doctrine\Common\NotifyPropertyChanged;
-
 /**
  * This interface adds mutators for the AclInterface.
  *
@@ -21,7 +19,7 @@ use Doctrine\Common\NotifyPropertyChanged;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-interface MutableAclInterface extends AclInterface, NotifyPropertyChanged
+interface MutableAclInterface extends AclInterface
 {
     /**
      * Deletes a class-based ACE
@@ -68,10 +66,10 @@ interface MutableAclInterface extends AclInterface, NotifyPropertyChanged
      * Inserts a class-based ACE
      *
      * @param SecurityIdentityInterface $sid
-     * @param integer $mask
-     * @param integer $index
-     * @param Boolean $granting
-     * @param string $strategy
+     * @param integer                   $mask
+     * @param integer                   $index
+     * @param Boolean                   $granting
+     * @param string                    $strategy
      * @return void
      */
     function insertClassAce(SecurityIdentityInterface $sid, $mask, $index = 0, $granting = true, $strategy = null);
@@ -79,12 +77,12 @@ interface MutableAclInterface extends AclInterface, NotifyPropertyChanged
     /**
      * Inserts a class-field-based ACE
      *
-     * @param string $field
+     * @param string                    $field
      * @param SecurityIdentityInterface $sid
-     * @param integer $mask
-     * @param integer $index
-     * @param Boolean $granting
-     * @param string $strategy
+     * @param integer                   $mask
+     * @param integer                   $index
+     * @param Boolean                   $granting
+     * @param string                    $strategy
      * @return void
      */
     function insertClassFieldAce($field, SecurityIdentityInterface $sid, $mask, $index = 0, $granting = true, $strategy = null);
@@ -93,10 +91,10 @@ interface MutableAclInterface extends AclInterface, NotifyPropertyChanged
      * Inserts an object-based ACE
      *
      * @param SecurityIdentityInterface $sid
-     * @param integer $mask
-     * @param integer $index
-     * @param Boolean $granting
-     * @param string $strategy
+     * @param integer                   $mask
+     * @param integer                   $index
+     * @param Boolean                   $granting
+     * @param string                    $strategy
      * @return void
      */
     function insertObjectAce(SecurityIdentityInterface $sid, $mask, $index = 0, $granting = true, $strategy = null);
@@ -104,12 +102,12 @@ interface MutableAclInterface extends AclInterface, NotifyPropertyChanged
     /**
      * Inserts an object-field-based ACE
      *
-     * @param string $field
+     * @param string                    $field
      * @param SecurityIdentityInterface $sid
-     * @param integer $mask
-     * @param integer $index
-     * @param Boolean $granting
-     * @param string $strategy
+     * @param integer                   $mask
+     * @param integer                   $index
+     * @param Boolean                   $granting
+     * @param string                    $strategy
      * @return void
      */
     function insertObjectFieldAce($field, SecurityIdentityInterface $sid, $mask, $index = 0, $granting = true, $strategy = null);

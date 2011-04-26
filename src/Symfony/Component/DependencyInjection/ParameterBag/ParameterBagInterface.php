@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\ParameterBag;
 
+use Symfony\Component\DependencyInjection\Exception\NonExistentParameterException;
+
 /**
  * ParameterBagInterface.
  *
@@ -44,7 +46,7 @@ interface ParameterBagInterface
      *
      * @return mixed  The parameter value
      *
-     * @throws  \InvalidArgumentException if the parameter is not defined
+     * @throws NonExistentParameterException if the parameter is not defined
      */
     function get($name);
 

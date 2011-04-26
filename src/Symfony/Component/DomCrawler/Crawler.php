@@ -447,9 +447,7 @@ class Crawler extends \SplObjectStorage
      */
     public function extract($attributes)
     {
-        if (!is_array($attributes)) {
-            $attributes = array($attributes);
-        }
+        $attributes = (array) $attributes;
 
         $data = array();
         foreach ($this as $node) {

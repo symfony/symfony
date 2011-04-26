@@ -231,10 +231,6 @@ class DelegatingValidator implements FormValidatorInterface
             $groups = array('Default');
         }
 
-        if (!is_array($groups)) {
-            $groups = array($groups);
-        }
-
-        return $groups;
+        return (array) $groups;
     }
 }

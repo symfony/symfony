@@ -68,19 +68,19 @@
             </trans-unit>
             <trans-unit id="17">
                 <source>This value should be {{ limit }} or less</source>
-                <target>Cette valeur doit être {{ limit }} ou moins</target>
+                <target>Cette valeur doit être inférieure ou égale à {{ limit }}</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value is too long. It should have {{ limit }} characters or less</source>
-                <target>Cette chaine est trop longue. Elle doit avoir {{ limit }} caractères au maximum</target>
+                <target>Cette chaine est trop longue. Elle doit avoir au maximum {{ limit }} caractères</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>This value should be {{ limit }} or more</source>
-                <target>Cette valeur doit être {{ limit }} ou plus</target>
+                <target>Cette valeur doit être supérieure ou égale à {{ limit }}</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>This value is too short. It should have {{ limit }} characters or more</source>
-                <target>Cette chaine est trop courte. Elle doit avoir {{ limit }} caractères au minimum</target>
+                <target>Cette chaine est trop courte. Elle doit avoir au minimum {{ limit }} caractères</target>
             </trans-unit>
             <trans-unit id="21">
                 <source>This value should not be blank</source>

@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
-use \Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateFinderInterface;
+use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateFinderInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocator;
 
 /**

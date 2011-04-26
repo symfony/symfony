@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\CacheWarmer;
 
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplatePathsCacheWarmer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateFinder;

@@ -25,13 +25,17 @@ class ApcUniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
         if (!(ini_get('apc.enabled') && ini_get('apc.enable_cli'))) {
             $this->markTestSkipped('The apc extension is available, but not enabled.');
         }
-
-        apc_clear_cache('user');
+        else
+        {
+            apc_clear_cache('user');
+        }
     }
 
 	protected function tearDown()
 	{
-        apc_clear_cache('user');
+        if (ini_get('apc.enabled') && ini_get('apc.enable_cli')) {
+            apc_clear_cache('user');
+        }
 	}
 
     public function testConstructor()

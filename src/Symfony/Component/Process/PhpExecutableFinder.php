@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Process;
 
+use Symfony\Component\Process\Exception\ExecutableNotFoundException;
+
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
@@ -31,13 +33,13 @@ class PhpExecutableFinder
     /**
      * Finds The PHP executable.
      *
-     * @return string|false The PHP executable path or false if it cannot be found
+     * @return string|null The PHP executable path or false if it cannot be found
      */
     public function find()
     {
         if ($php = getenv('PHP_PATH')) {
             if (!is_executable($php)) {
-                return false;
+                return null;
             }
 
             return $php;
@@ -57,5 +59,19 @@ class PhpExecutableFinder
         }
 
         return $this->executableFinder->find('php');
+    }
+
+    /**
+     * Gets the PHP executable
+     *
+     * @return string
+     */
+    public function get()
+    {
+        if (null !== $path = $this->find()) {
+            return $path;
+        }
+
+        throw new ExecutableNotFoundException('php');
     }
 }

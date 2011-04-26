@@ -421,7 +421,7 @@ class EntityTypeTest extends TypeTestCase
 
     public function testOverrideChoices()
     {
-        $this->markTestSkipped('Fix me');
+        $this->markTestIncomplete('Fix me');
 
         $entity1 = new SingleIdentEntity(1, 'Foo');
         $entity2 = new SingleIdentEntity(2, 'Bar');

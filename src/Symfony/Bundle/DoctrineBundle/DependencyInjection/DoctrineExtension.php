@@ -83,7 +83,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
      */
     protected function loadDbalConnection($name, array $connection, ContainerBuilder $container)
     {
-        $containerDef = new Definition('%doctrine.dbal.configuration_class%');
+        $containerDef = new Definition('%doctrine.dbal.configuration.class%');
         $containerDef->setPublic(false);
         if (isset($connection['logging']) && $connection['logging']) {
             $containerDef->addMethodCall('setSQLLogger', array(new Reference('doctrine.dbal.logger')));
@@ -98,7 +98,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
         // event manager
         $eventManagerId = sprintf('doctrine.dbal.%s_connection.event_manager', $name);
-        $eventManagerDef = new Definition('%doctrine.dbal.event_manager_class%');
+        $eventManagerDef = new Definition('%doctrine.dbal.event_manager.class%');
         $eventManagerDef->setPublic(false);
         $container->setDefinition($eventManagerId, $eventManagerDef);
 
@@ -176,7 +176,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
     {
         $configServiceName = sprintf('doctrine.orm.%s_configuration', $entityManager['name']);
 
-        $ormConfigDef = new Definition('%doctrine.orm.configuration_class%');
+        $ormConfigDef = new Definition('%doctrine.orm.configuration.class%');
         $ormConfigDef->setPublic(false);
         $container->setDefinition($configServiceName, $ormConfigDef);
 
@@ -221,8 +221,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
             new Reference($connectionId),
             new Reference(sprintf('doctrine.orm.%s_configuration', $entityManager['name']))
         );
-        $ormEmDef = new Definition('%doctrine.orm.entity_manager_class%', $ormEmArgs);
-        $ormEmDef->setFactoryClass('%doctrine.orm.entity_manager_class%');
+        $ormEmDef = new Definition('%doctrine.orm.entity_manager.class%', $ormEmArgs);
+        $ormEmDef->setFactoryClass('%doctrine.orm.entity_manager.class%');
         $ormEmDef->setFactoryMethod('create');
         $ormEmDef->addTag('doctrine.orm.entity_manager');
         $container->setDefinition($entityManagerService, $ormEmDef);
@@ -333,8 +333,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
     {
         switch ($cacheDriver['type']) {
             case 'memcache':
-                $memcacheClass = !empty ($cacheDriver['class']) ? $cacheDriver['class'] : '%doctrine.orm.cache.memcache_class%';
-                $memcacheInstanceClass = !empty ($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%doctrine.orm.cache.memcache_instance_class%';
+                $memcacheClass = !empty ($cacheDriver['class']) ? $cacheDriver['class'] : '%doctrine.orm.cache.memcache.class%';
+                $memcacheInstanceClass = !empty ($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%doctrine.orm.cache.memcache_instance.class%';
                 $memcacheHost = !empty ($cacheDriver['host']) ? $cacheDriver['host'] : '%doctrine.orm.cache.memcache_host%';
                 $memcachePort = !empty ($cacheDriver['port']) ? $cacheDriver['port'] : '%doctrine.orm.cache.memcache_port%';
                 $cacheDef = new Definition($memcacheClass);
@@ -348,7 +348,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             case 'apc':
             case 'array':
             case 'xcache':
-                $cacheDef = new Definition('%'.sprintf('doctrine.orm.cache.%s_class', $cacheDriver['type']).'%');
+                $cacheDef = new Definition('%'.sprintf('doctrine.orm.cache.%s.class', $cacheDriver['type']).'%');
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf('%s is unrecognized cache driver.', $cacheDriver['type']));

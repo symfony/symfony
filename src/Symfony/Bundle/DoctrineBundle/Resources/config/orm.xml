@@ -6,8 +6,8 @@
 
     <parameters>
         <parameter key="doctrine.orm.default_entity_manager">default</parameter>
-        <parameter key="doctrine.orm.configuration_class">Doctrine\ORM\Configuration</parameter>
-        <parameter key="doctrine.orm.entity_manager_class">Doctrine\ORM\EntityManager</parameter>
+        <parameter key="doctrine.orm.configuration.class">Doctrine\ORM\Configuration</parameter>
+        <parameter key="doctrine.orm.entity_manager.class">Doctrine\ORM\EntityManager</parameter>
         <parameter key="doctrine.orm.auto_generate_proxy_classes">false</parameter>
         <parameter key="doctrine.orm.entity_managers" type="collection"></parameter>
 
@@ -16,22 +16,22 @@
         <parameter key="doctrine.orm.proxy_dir">%kernel.cache_dir%/doctrine/orm/Proxies</parameter>
 
         <!-- cache -->
-        <parameter key="doctrine.orm.cache.array_class">Doctrine\Common\Cache\ArrayCache</parameter>
-        <parameter key="doctrine.orm.cache.apc_class">Doctrine\Common\Cache\ApcCache</parameter>
-        <parameter key="doctrine.orm.cache.memcache_class">Doctrine\Common\Cache\MemcacheCache</parameter>
+        <parameter key="doctrine.orm.cache.array.class">Doctrine\Common\Cache\ArrayCache</parameter>
+        <parameter key="doctrine.orm.cache.apc.class">Doctrine\Common\Cache\ApcCache</parameter>
+        <parameter key="doctrine.orm.cache.memcache.class">Doctrine\Common\Cache\MemcacheCache</parameter>
         <parameter key="doctrine.orm.cache.memcache_host">localhost</parameter>
         <parameter key="doctrine.orm.cache.memcache_port">11211</parameter>
-        <parameter key="doctrine.orm.cache.memcache_instance_class">Memcache</parameter>
-        <parameter key="doctrine.orm.cache.xcache_class">Doctrine\Common\Cache\XcacheCache</parameter>
+        <parameter key="doctrine.orm.cache.memcache_instance.class">Memcache</parameter>
+        <parameter key="doctrine.orm.cache.xcache.class">Doctrine\Common\Cache\XcacheCache</parameter>
 
         <!-- metadata -->
-        <parameter key="doctrine.orm.metadata.driver_chain_class">Doctrine\ORM\Mapping\Driver\DriverChain</parameter>
-        <parameter key="doctrine.orm.metadata.annotation_class">Doctrine\ORM\Mapping\Driver\AnnotationDriver</parameter>
-        <parameter key="doctrine.orm.metadata.annotation_reader_class">Doctrine\Common\Annotations\AnnotationReader</parameter>
-        <parameter key="doctrine.orm.metadata.xml_class">Doctrine\ORM\Mapping\Driver\XmlDriver</parameter>
-        <parameter key="doctrine.orm.metadata.yml_class">Doctrine\ORM\Mapping\Driver\YamlDriver</parameter>
-        <parameter key="doctrine.orm.metadata.php_class">Doctrine\ORM\Mapping\Driver\PHPDriver</parameter>
-        <parameter key="doctrine.orm.metadata.staticphp_class">Doctrine\ORM\Mapping\Driver\StaticPHPDriver</parameter>
+        <parameter key="doctrine.orm.metadata.driver_chain.class">Doctrine\ORM\Mapping\Driver\DriverChain</parameter>
+        <parameter key="doctrine.orm.metadata.annotation.class">Doctrine\ORM\Mapping\Driver\AnnotationDriver</parameter>
+        <parameter key="doctrine.orm.metadata.annotation_reader.class">Doctrine\Common\Annotations\AnnotationReader</parameter>
+        <parameter key="doctrine.orm.metadata.xml.class">Doctrine\ORM\Mapping\Driver\XmlDriver</parameter>
+        <parameter key="doctrine.orm.metadata.yml.class">Doctrine\ORM\Mapping\Driver\YamlDriver</parameter>
+        <parameter key="doctrine.orm.metadata.php.class">Doctrine\ORM\Mapping\Driver\PHPDriver</parameter>
+        <parameter key="doctrine.orm.metadata.staticphp.class">Doctrine\ORM\Mapping\Driver\StaticPHPDriver</parameter>
         <parameter key="doctrine.orm.class_metadata_factory_name">Doctrine\ORM\Mapping\ClassMetadataFactory</parameter>
 
         <!-- cache warmer -->
@@ -43,7 +43,7 @@
 
     <services>
         <!--- Annotation Metadata Reader Service -->
-        <service id="doctrine.orm.metadata.annotation_reader" class="%doctrine.orm.metadata.annotation_reader_class%" public="false">
+        <service id="doctrine.orm.metadata.annotation_reader" class="%doctrine.orm.metadata.annotation_reader.class%" public="false">
             <call method="setAnnotationNamespaceAlias">
               <argument>Doctrine\ORM\Mapping\</argument>
               <argument>orm</argument>

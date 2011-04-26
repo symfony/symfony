@@ -180,7 +180,7 @@ abstract class AbstractDoctrineExtension extends Extension
         if ($container->hasDefinition($this->getObjectManagerElementName($objectManager['name'] . '_metadata_driver'))) {
             $chainDriverDef = $container->getDefinition($this->getObjectManagerElementName($objectManager['name'] . '_metadata_driver'));
         } else {
-            $chainDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.driver_chain_class%'));
+            $chainDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.driver_chain.class%'));
             $chainDriverDef->setPublic(false);
         }
 
@@ -196,12 +196,12 @@ abstract class AbstractDoctrineExtension extends Extension
                 }
                 $mappingDriverDef->setArguments($args);
             } else if ($driverType == 'annotation') {
-                $mappingDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.' . $driverType . '_class%'), array(
+                $mappingDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.' . $driverType . '.class%'), array(
                     new Reference($this->getObjectManagerElementName('metadata.annotation_reader')),
                     array_values($driverPaths)
                 ));
             } else {
-                $mappingDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.' . $driverType . '_class%'), array(
+                $mappingDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.' . $driverType . '.class%'), array(
                     array_values($driverPaths)
                 ));
             }

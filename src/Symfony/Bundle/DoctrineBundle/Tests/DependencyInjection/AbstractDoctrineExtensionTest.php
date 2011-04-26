@@ -115,21 +115,21 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $loader->load(array(array('dbal' => null, 'orm' => array('default_entity_manager' => 'default', 'entity_managers' => array('default' => array('mappings' => array('YamlBundle' => array())))))), $container);
 
         $this->assertFalse($container->getParameter('doctrine.orm.auto_generate_proxy_classes'));
-        $this->assertEquals('Doctrine\ORM\Configuration', $container->getParameter('doctrine.orm.configuration_class'));
-        $this->assertEquals('Doctrine\ORM\EntityManager', $container->getParameter('doctrine.orm.entity_manager_class'));
+        $this->assertEquals('Doctrine\ORM\Configuration', $container->getParameter('doctrine.orm.configuration.class'));
+        $this->assertEquals('Doctrine\ORM\EntityManager', $container->getParameter('doctrine.orm.entity_manager.class'));
         $this->assertEquals('Proxies', $container->getParameter('doctrine.orm.proxy_namespace'));
-        $this->assertEquals('Doctrine\Common\Cache\ArrayCache', $container->getParameter('doctrine.orm.cache.array_class'));
-        $this->assertEquals('Doctrine\Common\Cache\ApcCache', $container->getParameter('doctrine.orm.cache.apc_class'));
-        $this->assertEquals('Doctrine\Common\Cache\MemcacheCache', $container->getParameter('doctrine.orm.cache.memcache_class'));
+        $this->assertEquals('Doctrine\Common\Cache\ArrayCache', $container->getParameter('doctrine.orm.cache.array.class'));
+        $this->assertEquals('Doctrine\Common\Cache\ApcCache', $container->getParameter('doctrine.orm.cache.apc.class'));
+        $this->assertEquals('Doctrine\Common\Cache\MemcacheCache', $container->getParameter('doctrine.orm.cache.memcache.class'));
         $this->assertEquals('localhost', $container->getParameter('doctrine.orm.cache.memcache_host'));
         $this->assertEquals('11211', $container->getParameter('doctrine.orm.cache.memcache_port'));
-        $this->assertEquals('Memcache', $container->getParameter('doctrine.orm.cache.memcache_instance_class'));
-        $this->assertEquals('Doctrine\Common\Cache\XcacheCache', $container->getParameter('doctrine.orm.cache.xcache_class'));
-        $this->assertEquals('Doctrine\ORM\Mapping\Driver\DriverChain', $container->getParameter('doctrine.orm.metadata.driver_chain_class'));
-        $this->assertEquals('Doctrine\ORM\Mapping\Driver\AnnotationDriver', $container->getParameter('doctrine.orm.metadata.annotation_class'));
-        $this->assertEquals('Doctrine\Common\Annotations\AnnotationReader', $container->getParameter('doctrine.orm.metadata.annotation_reader_class'));
-        $this->assertEquals('Doctrine\ORM\Mapping\Driver\XmlDriver', $container->getParameter('doctrine.orm.metadata.xml_class'));
-        $this->assertEquals('Doctrine\ORM\Mapping\Driver\YamlDriver', $container->getParameter('doctrine.orm.metadata.yml_class'));
+        $this->assertEquals('Memcache', $container->getParameter('doctrine.orm.cache.memcache_instance.class'));
+        $this->assertEquals('Doctrine\Common\Cache\XcacheCache', $container->getParameter('doctrine.orm.cache.xcache.class'));
+        $this->assertEquals('Doctrine\ORM\Mapping\Driver\DriverChain', $container->getParameter('doctrine.orm.metadata.driver_chain.class'));
+        $this->assertEquals('Doctrine\ORM\Mapping\Driver\AnnotationDriver', $container->getParameter('doctrine.orm.metadata.annotation.class'));
+        $this->assertEquals('Doctrine\Common\Annotations\AnnotationReader', $container->getParameter('doctrine.orm.metadata.annotation_reader.class'));
+        $this->assertEquals('Doctrine\ORM\Mapping\Driver\XmlDriver', $container->getParameter('doctrine.orm.metadata.xml.class'));
+        $this->assertEquals('Doctrine\ORM\Mapping\Driver\YamlDriver', $container->getParameter('doctrine.orm.metadata.yml.class'));
 
         $config = array(
             'proxy_namespace' => 'MyProxies',
@@ -156,8 +156,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('doctrine.dbal.default_connection.event_manager', (string) $args[2]);
 
         $definition = $container->getDefinition('doctrine.orm.default_entity_manager');
-        $this->assertEquals('%doctrine.orm.entity_manager_class%', $definition->getClass());
-        $this->assertEquals('%doctrine.orm.entity_manager_class%', $definition->getFactoryClass());
+        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
+        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getFactoryClass());
         $this->assertEquals('create', $definition->getFactoryMethod());
         $this->assertArrayHasKey('doctrine.orm.entity_manager', $definition->getTags());
 
@@ -177,13 +177,13 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('doctrine.orm.default_result_cache', (string) $calls[3][1][0]);
 
         $definition = $container->getDefinition('doctrine.orm.default_metadata_cache');
-        $this->assertEquals('%doctrine.orm.cache.array_class%', $definition->getClass());
+        $this->assertEquals('%doctrine.orm.cache.array.class%', $definition->getClass());
 
         $definition = $container->getDefinition('doctrine.orm.default_query_cache');
-        $this->assertEquals('%doctrine.orm.cache.array_class%', $definition->getClass());
+        $this->assertEquals('%doctrine.orm.cache.array.class%', $definition->getClass());
 
         $definition = $container->getDefinition('doctrine.orm.default_result_cache');
-        $this->assertEquals('%doctrine.orm.cache.array_class%', $definition->getClass());
+        $this->assertEquals('%doctrine.orm.cache.array.class%', $definition->getClass());
     }
 
     public function testSingleEntityManagerConfiguration()
@@ -197,8 +197,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('Doctrine\DBAL\Connection', $definition->getClass());
 
         $definition = $container->getDefinition('doctrine.orm.default_entity_manager');
-        $this->assertEquals('%doctrine.orm.entity_manager_class%', $definition->getClass());
-        $this->assertEquals('%doctrine.orm.entity_manager_class%', $definition->getFactoryClass());
+        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
+        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getFactoryClass());
         $this->assertEquals('create', $definition->getFactoryMethod());
         $this->assertArrayHasKey('doctrine.orm.entity_manager', $definition->getTags());
 
@@ -237,8 +237,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         ));
 
         $definition = $container->getDefinition('doctrine.orm.default_entity_manager');
-        $this->assertEquals('%doctrine.orm.entity_manager_class%', $definition->getClass());
-        $this->assertEquals('%doctrine.orm.entity_manager_class%', $definition->getFactoryClass());
+        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
+        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getFactoryClass());
         $this->assertEquals('create', $definition->getFactoryMethod());
         $this->assertArrayHasKey('doctrine.orm.entity_manager', $definition->getTags());
 
@@ -279,8 +279,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         ));
 
         $definition = $container->getDefinition('doctrine.orm.default_entity_manager');
-        $this->assertEquals('%doctrine.orm.entity_manager_class%', $definition->getClass());
-        $this->assertEquals('%doctrine.orm.entity_manager_class%', $definition->getFactoryClass());
+        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
+        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getFactoryClass());
         $this->assertEquals('create', $definition->getFactoryMethod());
         $this->assertArrayHasKey('doctrine.orm.entity_manager', $definition->getTags());
 
@@ -314,8 +314,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('doctrine.orm.em2_entity_manager', (string) $container->getAlias('doctrine.orm.entity_manager'));
 
         $definition = $container->getDefinition('doctrine.orm.em1_entity_manager');
-        $this->assertEquals('%doctrine.orm.entity_manager_class%', $definition->getClass());
-        $this->assertEquals('%doctrine.orm.entity_manager_class%', $definition->getFactoryClass());
+        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
+        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getFactoryClass());
         $this->assertEquals('create', $definition->getFactoryMethod());
         $this->assertArrayHasKey('doctrine.orm.entity_manager', $definition->getTags());
 
@@ -336,8 +336,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('doctrine.dbal.conn2_connection.event_manager', (string) $args[2]);
 
         $definition = $container->getDefinition('doctrine.orm.em2_entity_manager');
-        $this->assertEquals('%doctrine.orm.entity_manager_class%', $definition->getClass());
-        $this->assertEquals('%doctrine.orm.entity_manager_class%', $definition->getFactoryClass());
+        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
+        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getFactoryClass());
         $this->assertEquals('create', $definition->getFactoryMethod());
         $this->assertArrayHasKey('doctrine.orm.entity_manager', $definition->getTags());
 
@@ -348,13 +348,13 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('doctrine.orm.em2_configuration', (string) $arguments[1]);
 
         $definition = $container->getDefinition('doctrine.orm.em1_metadata_cache');
-        $this->assertEquals('%doctrine.orm.cache.xcache_class%', $definition->getClass());
+        $this->assertEquals('%doctrine.orm.cache.xcache.class%', $definition->getClass());
 
         $definition = $container->getDefinition('doctrine.orm.em1_query_cache');
-        $this->assertEquals('%doctrine.orm.cache.array_class%', $definition->getClass());
+        $this->assertEquals('%doctrine.orm.cache.array.class%', $definition->getClass());
 
         $definition = $container->getDefinition('doctrine.orm.em1_result_cache');
-        $this->assertEquals('%doctrine.orm.cache.array_class%', $definition->getClass());
+        $this->assertEquals('%doctrine.orm.cache.array.class%', $definition->getClass());
     }
 
     public function testBundleEntityAliases()
@@ -478,10 +478,10 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container->compile();
 
         $definition = $container->getDefinition('doctrine.orm.em1_metadata_cache');
-        $this->assertDICDefinitionClass($definition, '%doctrine.orm.cache.xcache_class%');
+        $this->assertDICDefinitionClass($definition, '%doctrine.orm.cache.xcache.class%');
 
         $definition = $container->getDefinition('doctrine.orm.em2_metadata_cache');
-        $this->assertDICDefinitionClass($definition, '%doctrine.orm.cache.apc_class%');
+        $this->assertDICDefinitionClass($definition, '%doctrine.orm.cache.apc.class%');
     }
 
     public function testEntityManagerMemcacheMetadataCacheDriverConfiguration()
@@ -522,7 +522,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container->compile();
 
         $cacheDefinition = $container->getDefinition('doctrine.orm.default_metadata_cache');
-        $this->assertEquals('%doctrine.orm.cache.apc_class%', $cacheDefinition->getClass());
+        $this->assertEquals('%doctrine.orm.cache.apc.class%', $cacheDefinition->getClass());
 
         $configDefinition = $container->getDefinition('doctrine.orm.default_configuration');
         $this->assertDICDefinitionMethodCallOnce($configDefinition, 'setAutoGenerateProxyClasses', array(true));

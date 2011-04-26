@@ -12,7 +12,6 @@
 namespace Symfony\Tests\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class RequestTest extends \PHPUnit_Framework_TestCase
 {

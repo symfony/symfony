@@ -57,9 +57,9 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('use_controller')->defaultValue($this->debug)->end()
                 ->scalarNode('read_from')->defaultValue('%kernel.root_dir%/../web')->end()
                 ->scalarNode('write_to')->defaultValue('%assetic.read_from%')->end()
-                ->scalarNode('java')->defaultValue(function() use ($finder) { $java = $finder->find('java'); return $java ? $java : '/usr/bin/java'; })->end()
-                ->scalarNode('node')->defaultValue(function() use ($finder) { $node = $finder->find('node'); return $node ? $node : '/usr/bin/node'; })->end()
-                ->scalarNode('sass')->defaultValue(function() use ($finder) { $saas = $finder->find('saas'); return $saas ? $saas : '/usr/bin/saas'; })->end()
+                ->scalarNode('java')->defaultValue($finder->find('java', '/usr/bin/java'))->end()
+                ->scalarNode('node')->defaultValue($finder->find('node', '/usr/bin/node'))->end()
+                ->scalarNode('sass')->defaultValue($finder->find('sass', '/usr/bin/sass'))->end()
             ->end()
 
             // bundles

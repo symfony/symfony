@@ -28,11 +28,16 @@ class PhpExecutableFinder
         $this->executableFinder = new ExecutableFinder();
     }
 
+    /**
+     * Finds The PHP executable.
+     *
+     * @return string|false The PHP executable path or false if it cannot be found
+     */
     public function find()
     {
         if ($php = getenv('PHP_PATH')) {
             if (!is_executable($php)) {
-                throw new RuntimeException('The defined PHP_PATH environment variable is not a valid PHP executable.');
+                return false;
             }
 
             return $php;

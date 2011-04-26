@@ -39,6 +39,11 @@ class AsseticExtension extends BaseAsseticExtension
         );
     }
 
+    public function getNodeVisitors()
+    {
+        return array(new AsseticNodeVisitor());
+    }
+
     public function getGlobals()
     {
         $globals = parent::getGlobals();

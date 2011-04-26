@@ -67,7 +67,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $container->setAlias('database_connection', sprintf('doctrine.dbal.%s_connection', $config['default_connection']));
         $container->setAlias('doctrine.dbal.event_manager', new Alias(sprintf('doctrine.dbal.%s_connection.event_manager', $config['default_connection']), false));
         $container->setParameter('doctrine.dbal.default_connection', $config['default_connection']);
-        $container->setParameter('doctrine.dbal.types', $config['types']);
+
+        $container->getDefinition('doctrine.dbal.connection_factory')->replaceArgument(0, $config['types']);
 
         foreach ($config['connections'] as $name => $connection) {
             $this->loadDbalConnection($name, $connection, $container);

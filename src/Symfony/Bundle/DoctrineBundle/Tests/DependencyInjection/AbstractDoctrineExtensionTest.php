@@ -646,9 +646,10 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->compile();
 
+        $arguments = $container->getDefinition('doctrine.dbal.connection_factory')->getArguments();
         $this->assertEquals(
             array('test' => 'Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType'),
-            $container->getParameter('doctrine.dbal.types')
+            $arguments[0]
         );
     }
 

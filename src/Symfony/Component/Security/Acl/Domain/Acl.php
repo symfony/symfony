@@ -237,9 +237,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
             return true;
         }
 
-        if (!is_array($sids)) {
-            $sids = array($sids);
-        }
+        $sids = (array) $sids;
 
         foreach ($sids as $sid) {
             if (!$sid instanceof SecurityIdentityInterface) {

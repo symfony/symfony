@@ -31,11 +31,7 @@ class FilesystemLoader extends Loader
      */
     public function __construct($templatePathPatterns)
     {
-        if (!is_array($templatePathPatterns)) {
-            $templatePathPatterns = array($templatePathPatterns);
-        }
-
-        $this->templatePathPatterns = $templatePathPatterns;
+        $this->templatePathPatterns = (array) $templatePathPatterns;
     }
 
     /**

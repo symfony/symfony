@@ -82,6 +82,14 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/app.php/testing//bar', $url);
     }
 
+    public function testRelativeUrlWithOptionalZeroParameter()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing/{page}'));
+        $url = $this->getGenerator($routes)->generate('test', array('page' => 0), false);
+
+        $this->assertEquals('/app.php/testing/0', $url);
+    }
+
     public function testRelativeUrlWithExtraParameters()
     {
         $routes = $this->getRoutes('test', new Route('/testing'));

@@ -32,11 +32,7 @@ class AssetPackage implements AssetPackageInterface
         $this->baseUrls = array();
         $this->version = $version;
 
-        if (!is_array($baseUrls)) {
-            $baseUrls = (array) $baseUrls;
-        }
-
-        foreach ($baseUrls as $baseUrl) {
+        foreach ((array) $baseUrls as $baseUrl) {
             $this->baseUrls[] = rtrim($baseUrl, '/');
         }
     }

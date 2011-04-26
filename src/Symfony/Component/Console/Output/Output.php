@@ -154,9 +154,7 @@ abstract class Output implements OutputInterface
             return;
         }
 
-        if (!is_array($messages)) {
-            $messages = array($messages);
-        }
+        $messages = (array) $messages;
 
         foreach ($messages as $message) {
             switch ($type) {

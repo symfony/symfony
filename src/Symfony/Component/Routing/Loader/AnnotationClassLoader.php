@@ -139,17 +139,17 @@ abstract class AnnotationClassLoader implements LoaderInterface
         foreach ($class->getMethods() as $method) {
             if ($annots = $this->reader->getMethodAnnotation($method, $this->routesAnnotationClass)) {
                 foreach ($annots->getRoutes() as $annot) {
-                    $this->addRoute($collection, $annot, $globals, $annot, $class, $method);
+                    $this->addRoute($collection, $annot, $globals, $class, $method);
                 }
             } elseif ($annot = $this->reader->getMethodAnnotation($method, $this->routeAnnotationClass)) {
-                $this->addRoute($collection, $annot, $globals, $annot, $class, $method);
+                $this->addRoute($collection, $annot, $globals, $class, $method);
             }
         }
 
         return $collection;
     }
 
-    protected function addRoute(RouteCollection $collection, $annot, $globals, $annot, \ReflectionClass $class, \ReflectionMethod $method)
+    protected function addRoute(RouteCollection $collection, $annot, $globals, \ReflectionClass $class, \ReflectionMethod $method)
     {
         if (null === $annot->getName()) {
             $annot->setName($this->getDefaultRouteName($class, $method));

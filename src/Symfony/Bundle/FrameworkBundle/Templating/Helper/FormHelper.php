@@ -116,7 +116,7 @@ class FormHelper extends Helper
         }
 
         if ('widget' === $section || 'row' === $section) {
-            $view->setRendered(true);
+            $view->setRendered();
         }
 
         return $this->render($template, array_merge($view->all(), $variables));

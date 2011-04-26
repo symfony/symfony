@@ -59,7 +59,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('username')->defaultNull()->end()
                 ->scalarNode('password')->defaultNull()->end()
                 ->scalarNode('host')->defaultValue('localhost')->end()
-                ->scalarNode('port')->defaultValue(false)->end()
+                ->scalarNode('port')->defaultFalse()->end()
                 ->scalarNode('encryption')
                     ->defaultNull()
                     ->validate()

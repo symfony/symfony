@@ -13,6 +13,7 @@
         <parameter key="templating.loader.filesystem.class">Symfony\Bundle\FrameworkBundle\Templating\Loader\FilesystemLoader</parameter>
         <parameter key="templating.loader.cache.class">Symfony\Component\Templating\Loader\CacheLoader</parameter>
         <parameter key="templating.loader.chain.class">Symfony\Component\Templating\Loader\ChainLoader</parameter>
+        <parameter key="templating.finder.class">Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateFinder</parameter>
     </parameters>
 
     <services>
@@ -34,11 +35,15 @@
             <argument type="service" id="file_locator" />
         </service>
 
-        <service id="templating.cache_warmer.template_paths" class="%templating.cache_warmer.template_paths.class%" public="false">
+        <service id="templating.finder" class="%templating.finder.class%" public="false">
             <argument type="service" id="kernel" />
             <argument type="service" id="templating.name_parser" />
-            <argument type="service" id="templating.locator.uncached" />
             <argument>%kernel.root_dir%/Resources</argument>
+        </service>
+
+        <service id="templating.cache_warmer.template_paths" class="%templating.cache_warmer.template_paths.class%" public="false">
+            <argument type="service" id="templating.finder" />
+            <argument type="service" id="templating.locator.uncached" />
         </service>
 
         <service id="templating.loader.filesystem" class="%templating.loader.filesystem.class%" public="false">

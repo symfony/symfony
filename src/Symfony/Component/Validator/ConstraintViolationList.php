@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator;
 /**
  * An array-acting object that holds many ConstrainViolation instances.
  */
-class ConstraintViolationList implements \IteratorAggregate, \Countable
+class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayAccess
 {
     protected $violations = array();
 
@@ -75,4 +75,41 @@ EOF;
     {
         return count($this->violations);
     }
+
+    /**
+     * @see ArrayAccess
+     */
+    public function offsetExists($offset)
+    {
+        return isset($this->violations[$offset]);
+    }
+
+    /**
+     * @see ArrayAccess
+     */
+    public function offsetGet($offset)
+    {
+        return isset($this->violations[$offset]) ? $this->violations[$offset] : null;
+    }
+
+    /**
+     * @see ArrayAccess
+     */
+    public function offsetSet($offset, $value)
+    {
+        if (null === $offset) {
+            $this->violations[] = $value;
+        } else {
+            $this->violations[$offset] = $value;
+        }
+    }
+
+    /**
+     * @see ArrayAccess
+     */
+    public function offsetUnset($offset)
+    {
+        unset($this->violations[$offset]);
+    }
+    
 }

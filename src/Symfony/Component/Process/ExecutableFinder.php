@@ -34,11 +34,12 @@ class ExecutableFinder
     /**
      * Finds an executable by name.
      *
-     * @param string $name The executable name (without the extension)
+     * @param string $name    The executable name (without the extension)
+     * @param string $default The default to return if no executable is found
      *
-     * @return string|false The executable path or false if it cannot be found
+     * @return string The executable path or default value
      */
-    public function find($name)
+    public function find($name, $default = null)
     {
         $dirs = explode(PATH_SEPARATOR, getenv('PATH') ? getenv('PATH') : getenv('Path'));
         $suffixes = DIRECTORY_SEPARATOR == '\\' ? (getenv('PATHEXT') ? explode(PATH_SEPARATOR, getenv('PATHEXT')) : $this->suffixes) : array('');
@@ -50,6 +51,6 @@ class ExecutableFinder
             }
         }
 
-        return false;
+        return $default;
     }
 }

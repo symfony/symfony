@@ -164,7 +164,7 @@ class UploadedFile extends File
     public function move($directory, $name = null)
     {
         if ($this->moved) {
-            return parent::doMove($directory, $name);
+            return parent::move($directory, $name);
         }
 
         $newPath = $directory.DIRECTORY_SEPARATOR.(null === $name ? $this->getName() : $name);

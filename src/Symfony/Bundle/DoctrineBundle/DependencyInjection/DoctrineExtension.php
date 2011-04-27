@@ -71,6 +71,12 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
         $container->getDefinition('doctrine.dbal.connection_factory')->replaceArgument(0, $config['types']);
 
+        $connections = array();
+        foreach (array_keys($config['connections']) as $name) {
+            $connections[$name] = sprintf('doctrine.dbal.%s_connection', $name);
+        }
+        $container->setParameter('doctrine.dbal.connections', $connections);
+
         foreach ($config['connections'] as $name => $connection) {
             $this->loadDbalConnection($name, $connection, $container);
         }

@@ -59,6 +59,6 @@
             <argument type="service" id="doctrine.orm.entity_manager" />
         </service>
 
-        <service id="doctrine.orm.configuration" class="%doctrine.orm.configuration.class%" public="false" abstract="true" />
+        <service id="doctrine.orm.configuration" class="%doctrine.orm.configuration.class%" abstract="true" />
     </services>
 </container>

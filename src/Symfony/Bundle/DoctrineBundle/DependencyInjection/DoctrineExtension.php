@@ -108,7 +108,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 $mysqlSessionInit = new Definition('%doctrine.dbal.events.mysql_session_init.class%');
                 $mysqlSessionInit->setArguments(array($connection['charset']));
                 $mysqlSessionInit->setPublic(false);
-                $mysqlSessionInit->addTag(sprintf('doctrine.dbal.%s_event_subscriber', $name));
+                $mysqlSessionInit->addTag('doctrine.event_subscriber', array('connection' => $name));
 
                 $container->setDefinition(
                     sprintf('doctrine.dbal.%s_connection.events.mysqlsessioninit', $name),

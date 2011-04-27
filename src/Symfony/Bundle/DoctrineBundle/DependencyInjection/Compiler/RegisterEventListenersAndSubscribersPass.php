@@ -9,55 +9,85 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 
 class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 {
-    protected $container;
+    private $container;
+    private $connections;
+    private $eventManagers;
 
     public function process(ContainerBuilder $container)
     {
         $this->container = $container;
-        foreach ($container->getDefinitions() as $id => $definition) {
-            if (!$definition instanceof DefinitionDecorator || 'doctrine.dbal.connection.event_manager' !== $definition->getParent()) {
-                continue;
+        $this->connections = $container->getParameter('doctrine.dbal.connections');
+
+        foreach ($container->findTaggedServiceIds('doctrine.event_subscriber') as $subscriberId => $instances) {
+            $this->registerSubscriber($subscriberId, $instances);
+        }
+
+        foreach ($container->findTaggedServiceIds('doctrine.event_listener') as $listenerId => $instances) {
+            $this->registerListener($listenerId, $instances);
+        }
+    }
+
+    protected function registerSubscriber($subscriberId, $instances)
+    {
+        $connections = array();
+        foreach ($instances as $attributes) {
+            if (isset($attributes['connection'])) {
+                $connections[] = $attributes['connection'];
+            } else {
+                $connections = array_keys($this->connections);
+                break;
+            }
+        }
+
+        foreach ($connections as $name) {
+            $this->getEventManager($name)->addMethodCall('addEventSubscriber', array(new Reference($subscriberId)));
+        }
+    }
+
+    protected function registerListener($listenerId, $instances)
+    {
+        $connections = array();
+        foreach ($instances as $attributes) {
+            if (!isset($attributes['event'])) {
+                throw new \InvalidArgumentException(sprintf('Doctrine event listener "%s" must specify the "event" attribute.', $listenerId));
             }
 
-            $prefix = substr($id, 0, -strlen('_connection.event_manager'));
-            $this->registerListeners($prefix, $definition);
-            $this->registerSubscribers($prefix, $definition);
-        }
-    }
+            if (isset($attributes['connection'])) {
+                $cs = array($attributes['connection']);
+            } else {
+                $cs = array_keys($this->connections);
+            }
 
-    protected function registerSubscribers($prefix, $definition)
-    {
-        $subscribers = array_merge(
-            $this->container->findTaggedServiceIds('doctrine.common.event_subscriber'),
-            $this->container->findTaggedServiceIds($prefix.'_event_subscriber')
-        );
-
-        foreach ($subscribers as $id => $instances) {
-            $definition->addMethodCall('addEventSubscriber', array(new Reference($id)));
-        }
-    }
-
-    protected function registerListeners($prefix, $definition)
-    {
-        $listeners = array_merge(
-            $this->container->findTaggedServiceIds('doctrine.common.event_listener'),
-            $this->container->findTaggedServiceIds($prefix.'_event_listener')
-        );
-
-        foreach ($listeners as $listenerId => $instances) {
-            $events = array();
-            foreach ($instances as $attributes) {
-                if (isset($attributes['event'])) {
-                    $events[] = $attributes['event'];
+            foreach ($cs as $connection) {
+                if (!is_array($connections[$connection])) {
+                    $connections[$connection] = array();
                 }
-            }
-
-            if (0 < count($events)) {
-                $definition->addMethodCall('addEventListener', array(
-                    $events,
-                    new Reference($listenerId),
-                ));
+                $connections[$connection][] = $attributes['event'];
             }
         }
+
+        foreach ($connections as $name => $events) {
+            $this->getEventManager($name)->addMethodCall('addEventListener', array(
+                array_unique($events),
+                new Reference($listenerId),
+            ));
+        }
+    }
+
+    private function getEventManager($name)
+    {
+        if (null === $this->eventManagers) {
+            $this->eventManagers = array();
+            foreach ($this->connections as $n => $id) {
+                $arguments = $this->container->getDefinition($id)->getArguments();
+                $this->eventManagers[$n] = $this->container->getDefinition((string) $arguments[2]);
+            }
+        }
+
+        if (!isset($this->eventManagers[$name])) {
+            throw new \InvalidArgumentException(sprintf('Doctrine connection "%s" does not exist but is referenced in the "%s" event listener.', $name, $listenerId));
+        }
+
+        return $this->eventManagers[$name];
     }
 }

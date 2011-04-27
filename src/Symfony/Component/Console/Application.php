@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -410,7 +411,7 @@ class Application
     public function get($name)
     {
         if (!isset($this->commands[$name]) && !isset($this->aliases[$name])) {
-            throw new \InvalidArgumentException(sprintf('The command "%s" does not exist.', $name));
+            throw new InvalidArgumentException(sprintf('The command "%s" does not exist.', $name));
         }
 
         $command = isset($this->commands[$name]) ? $this->commands[$name] : $this->aliases[$name];
@@ -474,11 +475,11 @@ class Application
         $abbrevs = static::getAbbreviations($this->getNamespaces());
 
         if (!isset($abbrevs[$namespace])) {
-            throw new \InvalidArgumentException(sprintf('There are no commands defined in the "%s" namespace.', $namespace));
+            throw new InvalidArgumentException(sprintf('There are no commands defined in the "%s" namespace.', $namespace));
         }
 
         if (count($abbrevs[$namespace]) > 1) {
-            throw new \InvalidArgumentException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions($abbrevs[$namespace])));
+            throw new InvalidArgumentException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions($abbrevs[$namespace])));
         }
 
         return $abbrevs[$namespace][0];
@@ -525,17 +526,17 @@ class Application
         if (isset($abbrevs[$name]) && count($abbrevs[$name]) > 1) {
             $suggestions = $this->getAbbreviationSuggestions(array_map(function ($command) use ($namespace) { return $namespace.':'.$command; }, $abbrevs[$name]));
 
-            throw new \InvalidArgumentException(sprintf('Command "%s" is ambiguous (%s).', $fullName, $suggestions));
+            throw new InvalidArgumentException(sprintf('Command "%s" is ambiguous (%s).', $fullName, $suggestions));
         }
 
         // aliases
         $abbrevs = static::getAbbreviations(array_keys($this->aliases));
         if (!isset($abbrevs[$fullName])) {
-            throw new \InvalidArgumentException(sprintf('Command "%s" is not defined.', $fullName));
+            throw new InvalidArgumentException(sprintf('Command "%s" is not defined.', $fullName));
         }
 
         if (count($abbrevs[$fullName]) > 1) {
-            throw new \InvalidArgumentException(sprintf('Command "%s" is ambiguous (%s).', $fullName, $this->getAbbreviationSuggestions($abbrevs[$fullName])));
+            throw new InvalidArgumentException(sprintf('Command "%s" is ambiguous (%s).', $fullName, $this->getAbbreviationSuggestions($abbrevs[$fullName])));
         }
 
         return $this->get($abbrevs[$fullName][0]);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing;
 
+use Symfony\Component\Routing\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Resource\ResourceInterface;
 
 /**
@@ -50,7 +51,7 @@ class RouteCollection implements \IteratorAggregate
     public function add($name, Route $route)
     {
         if (!preg_match('/^[a-z0-9A-Z_.]+$/', $name)) {
-            throw new \InvalidArgumentException(sprintf('Name "%s" contains non valid characters for a route name.', $name));
+            throw new InvalidArgumentException(sprintf('Name "%s" contains non valid characters for a route name.', $name));
         }
 
         $this->routes[$name] = $route;

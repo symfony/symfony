@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Templating;
 
+use Symfony\Component\Templating\Exception\RuntimeException;
+use Symfony\Component\Templating\Exception\LogicException;
+use Symfony\Component\Templating\Exception\InvalidArgumentException;
 use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Storage\FileStorage;
 use Symfony\Component\Templating\Storage\StringStorage;
@@ -82,7 +85,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         $parameters = array_replace($this->getGlobals(), $parameters);
         // render
         if (false === $content = $this->evaluate($storage, $parameters)) {
-            throw new \RuntimeException(sprintf('The template "%s" cannot be rendered.', $this->parser->parse($name)));
+            throw new RuntimeException(sprintf('The template "%s" cannot be rendered.', $this->parser->parse($name)));
         }
 
         // decorator
@@ -205,7 +208,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      */
     public function offsetUnset($name)
     {
-        throw new \LogicException(sprintf('You can\'t unset a helper (%s).', $name));
+        throw new LogicException(sprintf('You can\'t unset a helper (%s).', $name));
     }
 
     /**
@@ -269,7 +272,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     public function get($name)
     {
         if (!isset($this->helpers[$name])) {
-            throw new \InvalidArgumentException(sprintf('The helper "%s" is not defined.', $name));
+            throw new InvalidArgumentException(sprintf('The helper "%s" is not defined.', $name));
         }
 
         return $this->helpers[$name];
@@ -339,7 +342,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     public function getEscaper($context)
     {
         if (!isset($this->escapers[$context])) {
-            throw new \InvalidArgumentException(sprintf('No registered escaper for context "%s".', $context));
+            throw new InvalidArgumentException(sprintf('No registered escaper for context "%s".', $context));
         }
 
         return $this->escapers[$context];
@@ -431,7 +434,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                     };
 
                     if (null === $value = preg_replace_callback('#[^\p{L}\p{N} ]#u', $callback, $value)) {
-                        throw new \InvalidArgumentException('The string to escape is not a valid UTF-8 string.');
+                        throw new InvalidArgumentException('The string to escape is not a valid UTF-8 string.');
                     }
 
                     if ('UTF-8' != $that->getCharset()) {
@@ -462,7 +465,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
             return mb_convert_encoding($string, $to, $from);
         }
 
-        throw new \RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');
+        throw new RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');
     }
 
     /**
@@ -496,7 +499,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         $storage = $this->loader->load($template);
 
         if (false === $storage) {
-            throw new \InvalidArgumentException(sprintf('The template "%s" does not exist.', $template));
+            throw new InvalidArgumentException(sprintf('The template "%s" does not exist.', $template));
         }
 
         return $this->cache[$key] = $storage;

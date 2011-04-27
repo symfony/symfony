@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console;
 
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -42,7 +43,7 @@ class Shell
     public function __construct(Application $application)
     {
         if (!function_exists('readline')) {
-            throw new \RuntimeException('Unable to start the shell as the Readline extension is not enabled.');
+            throw new RuntimeException('Unable to start the shell as the Readline extension is not enabled.');
         }
 
         $this->application = $application;

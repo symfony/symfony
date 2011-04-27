@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Locale;
 
+use Symfony\Component\Locale\Exception\RuntimeException;
+
 class Locale extends \Locale
 {
     /**
@@ -44,7 +46,7 @@ class Locale extends \Locale
             $bundle = new \ResourceBundle($locale, __DIR__.'/Resources/data/region');
 
             if (null === $bundle) {
-                throw new \RuntimeException('The country resource bundle could not be loaded');
+                throw new RuntimeException('The country resource bundle could not be loaded');
             }
 
             $collator = new \Collator($locale);
@@ -91,7 +93,7 @@ class Locale extends \Locale
             $bundle = new \ResourceBundle($locale, __DIR__.'/Resources/data/lang');
 
             if (null === $bundle) {
-                throw new \RuntimeException('The language resource bundle could not be loaded');
+                throw new RuntimeException('The language resource bundle could not be loaded');
             }
 
             $collator = new \Collator($locale);
@@ -136,7 +138,7 @@ class Locale extends \Locale
             $bundle = new \ResourceBundle($locale, __DIR__.'/Resources/data/names');
 
             if (null === $bundle) {
-                throw new \RuntimeException('The locale resource bundle could not be loaded');
+                throw new RuntimeException('The locale resource bundle could not be loaded');
             }
 
             $collator = new \Collator($locale);

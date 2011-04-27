@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Templating;
 
+use Symfony\Component\Templating\Exception\InvalidArgumentException;
+
 /**
  * Internal representation of a template.
  *
@@ -58,7 +60,7 @@ class TemplateReference implements TemplateReferenceInterface
         if (array_key_exists($name, $this->parameters)) {
             $this->parameters[$name] = $value;
         } else {
-            throw new \InvalidArgumentException(sprintf('The template does not support the "%s" parameter.', $name));
+            throw new InvalidArgumentException(sprintf('The template does not support the "%s" parameter.', $name));
         }
 
         return $this;
@@ -79,7 +81,7 @@ class TemplateReference implements TemplateReferenceInterface
             return $this->parameters[$name];
         }
 
-        throw new \InvalidArgumentException(sprintf('The template does not support the "%s" parameter.', $name));
+        throw new InvalidArgumentException(sprintf('The template does not support the "%s" parameter.', $name));
     }
 
     /**

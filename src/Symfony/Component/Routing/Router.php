@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing;
 
+use Symfony\Component\Routing\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\ConfigCache;
 
@@ -81,7 +82,7 @@ class Router implements RouterInterface
         }
 
         if ($isInvalid) {
-            throw new \InvalidArgumentException(sprintf('The Router does not support the following options: \'%s\'.', implode('\', \'', $invalid)));
+            throw new InvalidArgumentException(sprintf('The Router does not support the following options: \'%s\'.', implode('\', \'', $invalid)));
         }
     }
 

@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpKernel;
 
+use Symfony\Component\HttpKernel\Exception\InvalidArgumentException;
+use Symfony\Component\HttpKernel\Exception\RuntimeException;
+use Symfony\Component\HttpKernel\Exception\LogicException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -187,7 +190,7 @@ abstract class Kernel implements KernelInterface
     public function getBundle($name, $first = true)
     {
         if (!isset($this->bundleMap[$name])) {
-            throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled. Maybe you forgot to add it in the registerBundles() function of your %s.php file?', $name, get_class($this)));
+            throw new InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled. Maybe you forgot to add it in the registerBundles() function of your %s.php file?', $name, get_class($this)));
         }
 
         if (true === $first) {
@@ -229,11 +232,11 @@ abstract class Kernel implements KernelInterface
     public function locateResource($name, $dir = null, $first = true)
     {
         if ('@' !== $name[0]) {
-            throw new \InvalidArgumentException(sprintf('A resource name must start with @ ("%s" given).', $name));
+            throw new InvalidArgumentException(sprintf('A resource name must start with @ ("%s" given).', $name));
         }
 
         if (false !== strpos($name, '..')) {
-            throw new \RuntimeException(sprintf('File name "%s" contains invalid characters (..).', $name));
+            throw new RuntimeException(sprintf('File name "%s" contains invalid characters (..).', $name));
         }
 
         $name = substr($name, 1);
@@ -248,7 +251,7 @@ abstract class Kernel implements KernelInterface
         foreach ($bundles as $bundle) {
             if ($isResource && file_exists($file = $dir.'/'.$bundle->getName().$overridePath)) {
                 if (null !== $resourceBundle) {
-                    throw new \RuntimeException(sprintf('"%s" resource is hidden by a resource from the "%s" derived bundle. Create a "%s" file to override the bundle resource.',
+                    throw new RuntimeException(sprintf('"%s" resource is hidden by a resource from the "%s" derived bundle. Create a "%s" file to override the bundle resource.',
                         $file,
                         $resourceBundle,
                         $dir.'/'.$bundles[0]->getName().$overridePath
@@ -274,7 +277,7 @@ abstract class Kernel implements KernelInterface
             return $first && $isResource ? $files[0] : $files;
         }
 
-        throw new \InvalidArgumentException(sprintf('Unable to find file "@%s".', $name));
+        throw new InvalidArgumentException(sprintf('Unable to find file "@%s".', $name));
     }
 
     /**
@@ -383,16 +386,16 @@ abstract class Kernel implements KernelInterface
         foreach ($this->registerBundles() as $bundle) {
             $name = $bundle->getName();
             if (isset($this->bundles[$name])) {
-                throw new \LogicException(sprintf('Trying to register two bundles with the same name "%s"', $name));
+                throw new LogicException(sprintf('Trying to register two bundles with the same name "%s"', $name));
             }
             $this->bundles[$name] = $bundle;
 
             if ($parentName = $bundle->getParent()) {
                 if (isset($directChildren[$parentName])) {
-                    throw new \LogicException(sprintf('Bundle "%s" is directly extended by two bundles "%s" and "%s".', $parentName, $name, $directChildren[$parentName]));
+                    throw new LogicException(sprintf('Bundle "%s" is directly extended by two bundles "%s" and "%s".', $parentName, $name, $directChildren[$parentName]));
                 }
                 if ($parentName == $name) {
-                    throw new \LogicException(sprintf('Bundle "%s" can not extend itself.', $name));
+                    throw new LogicException(sprintf('Bundle "%s" can not extend itself.', $name));
                 }
                 $directChildren[$parentName] = $name;
             } else {
@@ -402,7 +405,7 @@ abstract class Kernel implements KernelInterface
 
         // look for orphans
         if (count($diff = array_values(array_diff(array_keys($directChildren), array_keys($this->bundles))))) {
-            throw new \LogicException(sprintf('Bundle "%s" extends bundle "%s", which is not registered.', $directChildren[$diff[0]], $diff[0]));
+            throw new LogicException(sprintf('Bundle "%s" extends bundle "%s", which is not registered.', $directChildren[$diff[0]], $diff[0]));
         }
 
         // inheritance

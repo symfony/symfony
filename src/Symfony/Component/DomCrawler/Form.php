@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DomCrawler;
 
+use Symfony\Component\DomCrawler\Exception\LogicException;
+use Symfony\Component\DomCrawler\Exception\InvalidArgumentException;
 use Symfony\Component\DomCrawler\Field\FormField;
 
 /**
@@ -51,11 +53,11 @@ class Form extends Link implements \ArrayAccess
             do {
                 // use the ancestor form element
                 if (null === $node = $node->parentNode) {
-                    throw new \LogicException('The selected node does not have a form ancestor.');
+                    throw new LogicException('The selected node does not have a form ancestor.');
                 }
             } while ('form' != $node->nodeName);
         } else {
-            throw new \LogicException(sprintf('Unable to submit on a "%s" tag.', $node->nodeName));
+            throw new LogicException(sprintf('Unable to submit on a "%s" tag.', $node->nodeName));
         }
 
         $this->node = $node;
@@ -253,7 +255,7 @@ class Form extends Link implements \ArrayAccess
     public function get($name)
     {
         if (!$this->has($name)) {
-            throw new \InvalidArgumentException(sprintf('The form has no "%s" field', $name));
+            throw new InvalidArgumentException(sprintf('The form has no "%s" field', $name));
         }
 
         return $this->fields[$name];
@@ -348,7 +350,7 @@ class Form extends Link implements \ArrayAccess
     public function offsetGet($name)
     {
         if (!$this->has($name)) {
-            throw new \InvalidArgumentException(sprintf('The form field "%s" does not exist', $name));
+            throw new InvalidArgumentException(sprintf('The form field "%s" does not exist', $name));
         }
 
         return $this->fields[$name];
@@ -365,7 +367,7 @@ class Form extends Link implements \ArrayAccess
     public function offsetSet($name, $value)
     {
         if (!$this->has($name)) {
-            throw new \InvalidArgumentException(sprintf('The form field "%s" does not exist', $name));
+            throw new InvalidArgumentException(sprintf('The form field "%s" does not exist', $name));
         }
 
         $this->fields[$name]->setValue($value);

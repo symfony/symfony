@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\ClassLoader;
 
+use Symfony\Component\ClassLoader\Exception\InvalidArgumentException;
+use Symfony\Component\ClassLoader\Exception\RuntimeException;
+
 /**
  * ClassCollectionLoader.
  *
@@ -87,7 +90,7 @@ class ClassCollectionLoader
         $content = '';
         foreach ($classes as $class) {
             if (!class_exists($class) && !interface_exists($class)) {
-                throw new \InvalidArgumentException(sprintf('Unable to load class "%s"', $class));
+                throw new InvalidArgumentException(sprintf('Unable to load class "%s"', $class));
             }
 
             $r = new \ReflectionClass($class);
@@ -184,7 +187,7 @@ class ClassCollectionLoader
             return;
         }
 
-        throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file));
+        throw new RuntimeException(sprintf('Failed to write cache file "%s".', $file));
     }
 
     /**

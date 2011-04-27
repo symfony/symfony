@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\BrowserKit;
 
+use Symfony\Component\BrowserKit\Exception\InvalidArgumentException;
+
 /**
  * Cookie represents an HTTP cookie.
  *
@@ -103,7 +105,7 @@ class Cookie
         $parts = explode(';', $cookie);
 
         if (false === strpos($parts[0], '=')) {
-            throw new \InvalidArgumentException('The cookie string "%s" is not valid.');
+            throw new InvalidArgumentException('The cookie string "%s" is not valid.');
         }
 
         list($name, $value) = explode('=', array_shift($parts), 2);
@@ -120,7 +122,7 @@ class Cookie
 
         if (null !== $url) {
             if ((false === $parts = parse_url($url)) || !isset($parts['host']) || !isset($parts['path'])) {
-                throw new \InvalidArgumentException(sprintf('The URL "%s" is not valid.', $url));
+                throw new InvalidArgumentException(sprintf('The URL "%s" is not valid.', $url));
             }
 
             $values['domain'] = $parts['host'];
@@ -145,7 +147,7 @@ class Cookie
             if (2 === count($elements = explode('=', $part, 2))) {
                 if ('expires' === $elements[0]) {
                     if (false === $date = \DateTime::createFromFormat(static::DATE_FORMAT, $elements[1], new \DateTimeZone('UTC'))) {
-                        throw new \InvalidArgumentException(sprintf('The expires part of cookie is not valid (%s).', $elements[1]));
+                        throw new InvalidArgumentException(sprintf('The expires part of cookie is not valid (%s).', $elements[1]));
                     }
 
                     $elements[1] = $date->getTimestamp();

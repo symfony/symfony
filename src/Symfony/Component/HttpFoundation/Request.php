@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\Exception\LogicException;
 use Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage;
 
 /**
@@ -665,7 +666,7 @@ class Request
     public function getContent($asResource = false)
     {
         if (false === $this->content || (true === $asResource && null !== $this->content)) {
-            throw new \LogicException('getContent() can only be called once when using the resource return type.');
+            throw new LogicException('getContent() can only be called once when using the resource return type.');
         }
 
         if (true === $asResource) {

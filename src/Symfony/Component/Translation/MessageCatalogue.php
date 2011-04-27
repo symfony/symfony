@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation;
 
+use Symfony\Component\Translation\Exception\LogicException;
 use Symfony\Component\Config\Resource\ResourceInterface;
 
 /**
@@ -139,7 +140,7 @@ class MessageCatalogue implements MessageCatalogueInterface
     public function addCatalogue(MessageCatalogueInterface $catalogue)
     {
         if ($catalogue->getLocale() !== $this->locale) {
-            throw new \LogicException(sprintf('Cannot add a catalogue for locale "%s" as the current locale for this catalogue is "%s"', $catalogue->getLocale(), $this->locale));
+            throw new LogicException(sprintf('Cannot add a catalogue for locale "%s" as the current locale for this catalogue is "%s"', $catalogue->getLocale(), $this->locale));
         }
 
         foreach ($catalogue->all() as $domain => $messages) {

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\Exception\InvalidArgumentException;
+
 /**
  * RedirectResponse represents an HTTP response doing a redirect.
  *
@@ -29,7 +31,7 @@ class RedirectResponse extends Response
     public function __construct($url, $status = 302)
     {
         if (empty($url)) {
-            throw new \InvalidArgumentException('Cannot redirect to an empty URL.');
+            throw new InvalidArgumentException('Cannot redirect to an empty URL.');
         }
 
         parent::__construct(
@@ -39,7 +41,7 @@ class RedirectResponse extends Response
         );
 
         if (!$this->isRedirect()) {
-            throw new \InvalidArgumentException(sprintf('The HTTP status code is not a redirect ("%s" given).', $status));
+            throw new InvalidArgumentException(sprintf('The HTTP status code is not a redirect ("%s" given).', $status));
         }
     }
 }

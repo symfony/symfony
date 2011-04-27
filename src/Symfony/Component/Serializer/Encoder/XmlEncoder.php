@@ -54,9 +54,10 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
     public function decode($data, $format)
     {
         $xml = simplexml_load_string($data);
-        if (!$xml->count() && !$xml->attributes()) {
-            return (string) $xml;
-        } elseif (!$xml->count()) {
+        if (!$xml->count()) {
+            if (!$xml->attributes()) {
+                return (string) $xml;
+            }
             $data = array();
             foreach ($xml->attributes() as $attrkey => $attr) {
                 $data['@'.$attrkey] = (string) $attr;

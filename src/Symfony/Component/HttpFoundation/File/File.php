@@ -500,11 +500,11 @@ class File
     /**
      * Returns the extension based on the mime type (with dot).
      *
-     * If the mime type is unknown, the actual extension is returned instead.
+     * If the mime type is unknown, returns null.
      *
-     * @return string
+     * @return string|null The guessed extension or null if it cannot be guessed
      */
-    public function getDefaultExtension()
+    public function guessExtension()
     {
         $type = $this->getMimeType();
 
@@ -512,7 +512,7 @@ class File
             return '.'.self::$defaultExtensions[$type];
         }
 
-        return $this->getExtension();
+        return null;
     }
 
     /**

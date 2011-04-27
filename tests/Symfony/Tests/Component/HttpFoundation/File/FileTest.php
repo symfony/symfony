@@ -63,21 +63,21 @@ class FileTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('image/gif', $this->file->getMimeType());
     }
 
-    public function testGetDefaultExtensionWithoutGuesser()
+    public function testGuessExtensionWithoutGuesser()
     {
         $file = new File(__DIR__.'/Fixtures/directory/.empty');
 
-        $this->assertEquals('.empty', $file->getDefaultExtension());
+        $this->assertEquals(null, $file->guessExtension());
     }
 
-    public function testGetDefaultExtensionIsBasedOnMimeType()
+    public function testGuessExtensionIsBasedOnMimeType()
     {
         $file = new File(__DIR__.'/Fixtures/test');
         $guesser = $this->createMockGuesser($file->getPath(), 'image/gif');
 
         MimeTypeGuesser::getInstance()->register($guesser);
 
-        $this->assertEquals('.gif', $file->getDefaultExtension());
+        $this->assertEquals('.gif', $file->guessExtension());
     }
 
     public function testConstructWhenFileNotExists()

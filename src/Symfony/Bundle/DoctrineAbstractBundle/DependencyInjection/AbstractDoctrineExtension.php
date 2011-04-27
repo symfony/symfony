@@ -44,21 +44,14 @@ abstract class AbstractDoctrineExtension extends Extension
     {
         if (isset($objectManager['mappings'])) {
             foreach ($objectManager['mappings'] as $mappingName => $mappingConfig) {
-                if (!isset($mappingConfig['dir'])) {
-                    $mappingConfig['dir'] = false;
-                }
-                if (!isset($mappingConfig['type'])) {
-                    $mappingConfig['type'] = false;
-                }
-                if (!isset($mappingConfig['prefix'])) {
-                    $mappingConfig['prefix'] = false;
-                }
+                $mappingConfig = array_replace(array(
+                    'dir'    => false,
+                    'type'   => false,
+                    'prefix' => false,
+                ), $mappingConfig);
 
                 $mappingConfig['dir'] = $container->getParameterBag()->resolveValue($mappingConfig['dir']);
                 // a bundle configuration is detected by realizing that the specified dir is not absolute and existing
-                if (isset($mappingConfig['is-bundle'])) {
-                    $mappingConfig['is_bundle'] = $mappingConfig['is-bundle'];
-                }
                 if (!isset($mappingConfig['is_bundle'])) {
                     $mappingConfig['is_bundle'] = !file_exists($mappingConfig['dir']);
                 }

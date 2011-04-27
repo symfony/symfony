@@ -139,6 +139,22 @@ class Configuration implements ConfigurationInterface
         $node
             ->children()
                 ->arrayNode('orm')
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) { return is_array($v) && !array_key_exists('entity_managers', $v) && !array_key_exists('entity_manager', $v); })
+                        ->then(function ($v) {
+                            $entityManager = array();
+                            foreach (array('result_cache_driver', 'result-cache-driver', 'metadata_cache_driver', 'metadata-cache-driver', 'query_cache_driver', 'query-cache-driver', 'mappings', 'mapping', 'connection') as $key) {
+                                if (array_key_exists($key, $v)) {
+                                    $entityManager[$key] = $v[$key];
+                                    unset($v[$key]);
+                                }
+                            }
+                            $v['default_entity_manager'] = isset($v['default_entity_manager']) ? (string) $v['default_entity_manager'] : 'default';
+                            $v['entity_managers'] = array($v['default_entity_manager'] => $entityManager);
+
+                            return $v;
+                        })
+                    ->end()
                     ->children()
                         ->scalarNode('default_entity_manager')->end()
                         ->booleanNode('auto_generate_proxy_classes')->defaultFalse()->end()

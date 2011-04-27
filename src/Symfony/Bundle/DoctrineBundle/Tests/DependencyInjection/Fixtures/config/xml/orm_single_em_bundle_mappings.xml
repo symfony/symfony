@@ -11,15 +11,13 @@
             <connection name="default" dbname="db" />
         </dbal>
 
-        <orm default-entity-manager="default">
-            <entity-manager name="default">
-                <mapping name="AnnotationsBundle" />
-                <mapping name="YamlBundle" dir="Resources/config/doctrine/metadata" alias="yml" />
-                <mapping name="manual" type="xml" prefix="Fixtures\Bundles\XmlBundle"
-                    dir="%kernel.root_dir%/../src/Symfony/Bundle/DoctrineBundle/Tests/DependencyInjection/Fixtures/Bundles/XmlBundle/Resources/config/doctrine/metadata"
-                    alias="TestAlias"
-                />
-            </entity-manager>
+        <orm>
+            <mapping name="AnnotationsBundle" />
+            <mapping name="YamlBundle" dir="Resources/config/doctrine/metadata" alias="yml" />
+            <mapping name="manual" type="xml" prefix="Fixtures\Bundles\XmlBundle"
+                dir="%kernel.root_dir%/../src/Symfony/Bundle/DoctrineBundle/Tests/DependencyInjection/Fixtures/Bundles/XmlBundle/Resources/config/doctrine/metadata"
+                alias="TestAlias"
+            />
         </orm>
     </config>
 </srv:container>

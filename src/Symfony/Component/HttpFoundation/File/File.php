@@ -441,42 +441,11 @@ class File
     );
 
     /**
-     * Stores the absolute path to the document root directory.
-     *
-     * @var string
-     */
-    static protected $documentRoot;
-
-    /**
      * The absolute path to the file without dots.
      *
      * @var string
      */
     protected $path;
-
-    /**
-     * Sets the path to the document root directory.
-     *
-     * @param string $documentRoot
-     */
-    static public function setDocumentRoot($documentRoot)
-    {
-        if (!is_dir($documentRoot)) {
-            throw new \LogicException($documentRoot . ' is not a directory.');
-        }
-
-        self::$documentRoot = realpath($documentRoot);
-    }
-
-    /**
-     * Returns the path to the document root directory.
-     *
-     * @return string
-     */
-    static public function getDocumentRoot()
-    {
-        return self::$documentRoot;
-    }
 
     /**
      * Constructs a new file from the given path.
@@ -491,7 +460,7 @@ class File
             throw new FileNotFoundException($path);
         }
 
-        $this->path = $path;
+        $this->path = realpath($path);
     }
 
     /**
@@ -501,7 +470,7 @@ class File
      */
     public function __toString()
     {
-        return null === $this->path ? '' : $this->path;
+        return (string) $this->path;
     }
 
     /**
@@ -522,7 +491,7 @@ class File
     public function getExtension()
     {
         if ($ext = pathinfo($this->getName(), PATHINFO_EXTENSION)) {
-            return '.' . $ext;
+            return '.'.$ext;
         }
 
         return '';
@@ -531,19 +500,19 @@ class File
     /**
      * Returns the extension based on the mime type (with dot).
      *
-     * If the mime type is unknown, the actual extension is returned instead.
+     * If the mime type is unknown, returns null.
      *
-     * @return string
+     * @return string|null The guessed extension or null if it cannot be guessed
      */
-    public function getDefaultExtension()
+    public function guessExtension()
     {
         $type = $this->getMimeType();
 
         if (isset(self::$defaultExtensions[$type])) {
-            return '.' . self::$defaultExtensions[$type];
+            return '.'.self::$defaultExtensions[$type];
         }
 
-        return $this->getExtension();
+        return null;
     }
 
     /**
@@ -564,26 +533,6 @@ class File
     public function getPath()
     {
         return $this->path;
-    }
-
-    /**
-     * Returns the path relative to the document root.
-     *
-     * You can set the document root using the static method setDocumentRoot().
-     * If the file is outside of the document root, this method returns an
-     * empty string.
-     *
-     * @return string The relative file path
-     */
-    public function getWebPath()
-    {
-        $root = self::$documentRoot;
-
-        if (false === strpos($this->path, $root)) {
-            return '';
-        }
-
-        return str_replace(array($root, DIRECTORY_SEPARATOR), array('', '/'), $this->path);
     }
 
     /**
@@ -618,26 +567,6 @@ class File
     }
 
     /**
-     * Moves the file to a new directory and gives it a new filename
-     *
-     * @param string $directory The new directory
-     * @param string $filename  The new file name
-     *
-     * @throws FileException When the file could not be moved
-     */
-    protected function doMove($directory, $filename)
-    {
-        $newPath = $directory . DIRECTORY_SEPARATOR . $filename;
-
-        if (!@rename($this->getPath(), $newPath)) {
-            $error = error_get_last();
-            throw new FileException(sprintf('Could not move file %s to %s (%s)', $this->getPath(), $newPath, strip_tags($error['message'])));
-        }
-
-        $this->path = realpath($newPath);
-    }
-
-    /**
      * Moves the file to a new location.
      *
      * @param string $directory The destination folder
@@ -645,20 +574,13 @@ class File
      */
     public function move($directory, $name = null)
     {
-        $this->doMove($directory, $this->getName());
+        $newPath = $directory.DIRECTORY_SEPARATOR.(null === $name ? $this->getName() : $name);
 
-        if (null !== $name) {
-            $this->rename($name);
+        if (!@rename($this->getPath(), $newPath)) {
+            $error = error_get_last();
+            throw new FileException(sprintf('Could not move file %s to %s (%s)', $this->getPath(), $newPath, strip_tags($error['message'])));
         }
-    }
 
-    /**
-     * Renames the file.
-     *
-     * @param string $name The new file name
-     */
-    public function rename($name)
-    {
-        $this->doMove($this->getDirectory(), $name);
+        $this->path = realpath($newPath);
     }
 }

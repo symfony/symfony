@@ -66,34 +66,47 @@ class FileTypeTest extends TypeTestCase
 
                 return $tmpDir;
             }));
-
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
+            
+        $file = $this
+            ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
             ->disableOriginalConstructor()
-            ->getMock();
+            ->getMock()
+        ;
         $file->expects($this->once())
+             ->method('getBasename')
+             ->will($this->returnValue('original_name.jpg'))
+        ;
+        $file->expects($this->once())
+             ->method('getPathname')
+             ->will($this->returnValue($tmpDir.'/original_name.jpg'))
+        ;
+        
+        $uploadedFile = $this
+            ->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $uploadedFile->expects($this->once())
              ->method('move')
-             ->with($this->equalTo($tmpDir));
-        $file->expects($this->any())
+             ->with($this->equalTo($tmpDir))
+             ->will($this->returnValue($file))
+        ;
+        $uploadedFile->expects($this->once())
              ->method('isValid')
-             ->will($this->returnValue(true));
-        $file->expects($this->any())
-             ->method('getName')
-             ->will($this->returnValue('original_name.jpg'));
-        $file->expects($this->any())
-             ->method('getPath')
-             ->will($this->returnValue($tmpDir.'/original_name.jpg'));
-
+             ->will($this->returnValue(true))
+        ;
+       
         $this->form->bind(array(
-            'file' => $file,
+            'file'  => $uploadedFile,
             'token' => '',
-            'name' => '',
+            'name'  => '',
         ));
-
+        
         $this->assertRegExp('/^\d{6}$/', $generatedToken);
         $this->assertEquals(array(
-            'file' => $file,
+            'file'  => $file,
             'token' => $generatedToken,
-            'name' => 'original_name.jpg',
+            'name'  => 'original_name.jpg',
         ), $this->form->getClientData());
         $this->assertEquals($tmpDir.'/original_name.jpg', $this->form->getData());
     }
@@ -104,15 +117,17 @@ class FileTypeTest extends TypeTestCase
         $tmpPath = $tmpDir . DIRECTORY_SEPARATOR . 'original_name.jpg';
         $this->createTmpFile($tmpPath);
 
-        $this->storage->expects($this->atLeastOnce())
+        $this->storage
+            ->expects($this->once())
             ->method('getTempDir')
             ->with($this->equalTo('123456'))
-            ->will($this->returnValue($tmpDir));
+            ->will($this->returnValue($tmpDir))
+        ;
 
         $this->form->bind(array(
-            'file' => null,
+            'file'  => null,
             'token' => '123456',
-            'name' => 'original_name.jpg',
+            'name'  => 'original_name.jpg',
         ));
 
         $this->assertTrue(file_exists($tmpPath));
@@ -120,9 +135,9 @@ class FileTypeTest extends TypeTestCase
         $file = new File($tmpPath);
 
         $this->assertEquals(array(
-            'file' => $file,
+            'file'  => $file,
             'token' => '123456',
-            'name' => 'original_name.jpg',
+            'name'  => 'original_name.jpg',
         ), $this->form->getClientData());
         $this->assertEquals(realpath($tmpPath), realpath($this->form->getData()));
     }
@@ -133,15 +148,15 @@ class FileTypeTest extends TypeTestCase
             ->method('getTempDir');
 
         $this->form->bind(array(
-            'file' => '',
+            'file'  => '',
             'token' => '',
-            'name' => '',
+            'name'  => '',
         ));
 
         $this->assertEquals(array(
-            'file' => '',
+            'file'  => '',
             'token' => '',
-            'name' => '',
+            'name'  => '',
         ), $this->form->getClientData());
         $this->assertEquals(null, $this->form->getData());
     }
@@ -157,15 +172,15 @@ class FileTypeTest extends TypeTestCase
 
         $this->form->setData($tmpPath);
         $this->form->bind(array(
-            'file' => '',
+            'file'  => '',
             'token' => '',
-            'name' => '',
+            'name'  => '',
         ));
 
         $this->assertEquals(array(
-            'file' => $file,
+            'file'  => $file,
             'token' => '',
-            'name' => '',
+            'name'  => '',
         ), $this->form->getClientData());
         $this->assertEquals(realpath($tmpPath), realpath($this->form->getData()));
     }

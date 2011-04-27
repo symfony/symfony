@@ -52,13 +52,6 @@ class UploadedFile extends File
     protected $error;
 
     /**
-     * Whether the uploaded file has already been moved.
-     *
-     * @var Boolean
-     */
-    protected $moved;
-
-    /**
      * Accepts the information of the uploaded file as provided by the PHP global $_FILES.
      *
      * @param string  $path         The full temporary path to the file
@@ -66,35 +59,51 @@ class UploadedFile extends File
      * @param string  $mimeType     The type of the file as provided by PHP
      * @param integer $size         The file size
      * @param integer $error        The error constant of the upload (one of PHP's UPLOAD_ERR_XXX constants)
-     * @param Boolean $moved        Whether the file has been moved from its original location
      *
      * @throws FileException         If file_uploads is disabled
      * @throws FileNotFoundException If the file does not exist
      */
-    public function __construct($path, $originalName, $mimeType, $size, $error, $moved = false)
+    public function __construct($path, $originalName, $mimeType, $size, $error)
     {
         if (!ini_get('file_uploads')) {
             throw new FileException(sprintf('Unable to create UploadedFile because "file_uploads" is disabled in your php.ini file (%s)', get_cfg_var('cfg_file_path')));
         }
 
-        if (!is_file($path)) {
-            throw new FileNotFoundException($path);
-        }
-
-        $this->path = realpath($path);
-        $this->originalName = $originalName;
+        parent::__construct($path);
+        
+        $this->originalName = basename($originalName);
         $this->mimeType = $mimeType ?: 'application/octet-stream';
         $this->size = $size;
         $this->error = $error ?: UPLOAD_ERR_OK;
-        $this->moved = (Boolean) $moved;
     }
 
     /**
-     * @inheritDoc
+     * Returns the mime type of the file.
+     * 
+     * Warning: The returned mime type is not safe as it defaults to the mime
+     * type provide by the end user which could have been manipulated.
+     * 
+     * @see getSafeMimeType
+     *
+     * @return string|null The guessed mime type (i.e. "application/pdf")
      */
     public function getMimeType()
     {
-        return parent::getMimeType() ?: $this->mimeType;
+        return $this->getSafeMimeType() ?: $this->mimeType;
+    }
+    
+    /**
+     * Returns the mime type of the file.
+     *
+     * The mime type is guessed using the functions finfo(), mime_content_type()
+     * and the system binary "file" (in this order), depending on which of those
+     * is available on the current operating system.
+     *
+     * @return string|null The guessed mime type (i.e. "application/pdf")
+     */
+    public function getSafeMimeType()
+    {
+        return parent::getMimeType();
     }
 
     /**
@@ -106,22 +115,6 @@ class UploadedFile extends File
     }
 
     /**
-     * @inheritDoc
-     */
-    public function getExtension()
-    {
-        if ($this->moved) {
-            return parent::getExtension();
-        }
-
-        if ($ext = pathinfo($this->getOriginalName(), PATHINFO_EXTENSION)) {
-            return '.'.$ext;
-        }
-
-        return '';
-    }
-
-    /**
      * Gets the original uploaded name.
      *
      * Warning: This name is not safe as it can have been manipulated by the end-user.
@@ -130,7 +123,7 @@ class UploadedFile extends File
      *
      * @return string
      */
-    public function getOriginalName()
+    public function getOriginalBasename()
     {
         return $this->originalName;
     }
@@ -156,25 +149,5 @@ class UploadedFile extends File
     public function isValid()
     {
         return $this->error === UPLOAD_ERR_OK;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function move($directory, $name = null)
-    {
-        if ($this->moved) {
-            return parent::doMove($directory, $name);
-        }
-
-        $newPath = $directory.DIRECTORY_SEPARATOR.(null === $name ? $this->getName() : $name);
-
-        if (!@move_uploaded_file($this->getPath(), $newPath)) {
-            $error = error_get_last();
-            throw new FileException(sprintf('Could not move file %s to %s (%s)', $this->getPath(), $newPath, strip_tags($error['message'])));
-        }
-
-        $this->moved = true;
-        $this->path = realpath($newPath);
     }
 }

@@ -396,7 +396,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if (is_scalar($clientData) || null === $clientData) {
-            $clientData = (string)$clientData;
+            $clientData = (string) $clientData;
         }
 
         // Initialize errors in the very beginning so that we don't lose any

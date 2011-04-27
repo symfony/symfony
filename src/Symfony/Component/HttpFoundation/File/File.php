@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpFoundation\File;
 
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use Symfony\Component\HttpFoundation\File\Exception\DirectoryNotFoundException;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 
 /**
@@ -20,7 +21,7 @@ use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class File
+class File extends \SplFileInfo
 {
     /**
      * A map of mime types and their default extensions.
@@ -441,13 +442,6 @@ class File
     );
 
     /**
-     * The absolute path to the file without dots.
-     *
-     * @var string
-     */
-    protected $path;
-
-    /**
      * Constructs a new file from the given path.
      *
      * @param string $path The path to the file
@@ -460,45 +454,11 @@ class File
             throw new FileNotFoundException($path);
         }
 
-        $this->path = realpath($path);
+        parent::__construct($path);
     }
 
     /**
-     * Alias for getPath().
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return (string) $this->path;
-    }
-
-    /**
-     * Returns the file name.
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return basename($this->path);
-    }
-
-    /**
-     * Returns the file extension (with dot).
-     *
-     * @return string
-     */
-    public function getExtension()
-    {
-        if ($ext = pathinfo($this->getName(), PATHINFO_EXTENSION)) {
-            return '.'.$ext;
-        }
-
-        return '';
-    }
-
-    /**
-     * Returns the extension based on the mime type (with dot).
+     * Returns the extension based on the mime type.
      *
      * If the mime type is unknown, returns null.
      *
@@ -508,31 +468,7 @@ class File
     {
         $type = $this->getMimeType();
 
-        if (isset(self::$defaultExtensions[$type])) {
-            return '.'.self::$defaultExtensions[$type];
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the directory of the file.
-     *
-     * @return string
-     */
-    public function getDirectory()
-    {
-        return dirname($this->path);
-    }
-
-    /**
-     * Returns the absolute file path, without dots.
-     *
-     * @return string
-     */
-    public function getPath()
-    {
-        return $this->path;
+        return isset(static::$defaultExtensions[$type]) ? static::$defaultExtensions[$type] : null;
     }
 
     /**
@@ -542,27 +478,30 @@ class File
      * and the system binary "file" (in this order), depending on which of those
      * is available on the current operating system.
      *
-     * @return string The guessed mime type (i.e. "application/pdf")
+     * @return string|null The guessed mime type (i.e. "application/pdf")
      */
     public function getMimeType()
     {
         $guesser = MimeTypeGuesser::getInstance();
 
-        return $guesser->guess($this->getPath());
+        return $guesser->guess($this->getPathname());
     }
 
     /**
      * Returns the size of this file.
      *
      * @return integer The file size in bytes
+     * 
+     * @throws FileException if an error occurs
      */
     public function getSize()
     {
-        if (false === $size = @filesize($this->getPath())) {
-            $error = error_get_last();
-            throw new FileException(sprintf('Could not read file size of %s (%s)', $this->getPath(), strip_tags($error['message'])));
+        try {
+            $size = parent::getSize();
+        } catch (\RuntimeException $e) {
+            throw new FileException(sprintf('Could not read file size of %s', $this->getPathname()), $e->getCode(), $e);
         }
-
+        
         return $size;
     }
 
@@ -571,16 +510,26 @@ class File
      *
      * @param string $directory The destination folder
      * @param string $name      The new file name
+     * 
+     * @return File A File object representing the new file
+     * 
+     * @throws DirectoryNotFoundException if the destination folder does not exists
      */
     public function move($directory, $name = null)
-    {
-        $newPath = $directory.DIRECTORY_SEPARATOR.(null === $name ? $this->getName() : $name);
-
-        if (!@rename($this->getPath(), $newPath)) {
+    {        
+        $targetDir = realpath($directory);
+                
+        if ($targetDir === false) {
+            throw new DirectoryNotFoundException($directory);
+        }
+        
+        $newPath = realpath($directory).DIRECTORY_SEPARATOR.(null === $name ? $this->getBasename() : basename($name));
+        
+        if (!@rename($this->getPathname(), $newPath)) {
             $error = error_get_last();
             throw new FileException(sprintf('Could not move file %s to %s (%s)', $this->getPath(), $newPath, strip_tags($error['message'])));
         }
 
-        $this->path = realpath($newPath);
+        return new self($newPath);
     }
 }

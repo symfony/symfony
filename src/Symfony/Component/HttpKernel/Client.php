@@ -106,9 +106,6 @@ EOF;
     /**
      * Filters an array of files.
      *
-     * This method marks all uploaded files as already moved thus avoiding
-     * UploadedFile's call to move_uploaded_file(), which would otherwise fail.
-     *
      * @param array $files An array of files
      *
      * @return array An array with all uploaded files marked as already moved
@@ -120,8 +117,7 @@ EOF;
             if (is_array($value)) {
                 $filtered[$key] = $this->filterFiles($value);
             } elseif ($value instanceof UploadedFile) {
-                // create an already-moved uploaded file
-                $filtered[$key] = new UploadedFile($value->getPath(), $value->getName(), $value->getMimeType(), $value->getSize(), $value->getError(), true);
+                $filtered[$key] = new UploadedFile($value->getPath(), $value->getName(), $value->getMimeType(), $value->getSize(), $value->getError());
             } else {
                 $filtered[$key] = $value;
             }

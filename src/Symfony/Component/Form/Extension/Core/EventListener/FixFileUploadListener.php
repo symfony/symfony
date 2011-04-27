@@ -46,31 +46,29 @@ class FixFileUploadListener implements EventSubscriberInterface
 
         // TESTME
         $data = array_merge(array(
-            'file' => '',
+            'file'  => '',
             'token' => '',
-            'name' => '',
+            'name'  => '',
         ), $event->getData());
 
-        // Newly uploaded file
+        
         if ($data['file'] instanceof UploadedFile && $data['file']->isValid()) {
+            // Newly uploaded file
             $data['token'] = (string)rand(100000, 999999);
             $directory = $this->storage->getTempDir($data['token']);
-            $data['file']->move($directory);
-            $data['name'] = $data['file']->getName();
-        }
-
-        // Existing uploaded file
-        if (!$data['file'] && $data['token'] && $data['name']) {
+            $file = $data['file']->move($directory);
+            $data['file'] = $file;
+            $data['name'] = $file->getBasename();
+        } else if ($data['token'] && $data['name']) {
+            // Existing uploaded file
             $path = $this->storage->getTempDir($data['token']) . DIRECTORY_SEPARATOR . $data ['name'];
 
             if (file_exists($path)) {
                 $data['file'] = new File($path);
             }
-        }
-
-        // Clear other fields if we still don't have a file, but keep
-        // possible existing files of the field
-        if (!$data['file']) {
+        } else {
+            // Clear other fields if we still don't have a file, but keep
+            // possible existing files of the field            
             $data = $form->getNormData();
         }
 

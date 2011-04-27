@@ -31,7 +31,7 @@ class FileToStringTransformer implements DataTransformerInterface
             throw new UnexpectedTypeException($file, 'Symfony\Component\HttpFoundation\File\File');
         }
 
-        return $file->getPath();
+        return $file->getPathname();
     }
 
     public function reverseTransform($path)

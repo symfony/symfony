@@ -12,11 +12,11 @@
 namespace Symfony\Component\HttpFoundation\File\Exception;
 
 /**
- * Thrown when a file was not found
+ * Thrown when a directory was not found
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class FileNotFoundException extends FileException
+class DirectoryNotFoundException extends FileException
 {
     /**
      * Constructor.
@@ -25,6 +25,6 @@ class FileNotFoundException extends FileException
      */
     public function __construct($path, $code = 0, \Exception $previous = null)
     {
-        parent::__construct(sprintf('The file "%s" does not exist', $path), $code, $previous);
+        parent::__construct(sprintf('The directory "%s" does not exist', $path), $code, $previous);
     }
 }

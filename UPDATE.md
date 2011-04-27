@@ -9,6 +9,8 @@ timeline closely anyway.
 PR12 to beta1
 -------------
 
+* The `File::getWebPath()` method has been removed.
+
 * The `session` configuration has been refactored:
 
   * The `class` option has been removed (use the `session.class` parameter

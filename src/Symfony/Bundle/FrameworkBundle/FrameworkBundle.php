@@ -56,10 +56,6 @@ class FrameworkBundle extends Bundle
             $this->container->get('error_handler');
         }
 
-        if ($this->container->hasParameter('document_root')) {
-            File::setDocumentRoot($this->container->getParameter('document_root'));
-        }
-
         if (file_exists($this->container->getParameter('kernel.cache_dir').'/autoload.php')) {
             $classloader = new MapFileClassLoader($this->container->getParameter('kernel.cache_dir').'/autoload.php');
             $classloader->register(true);

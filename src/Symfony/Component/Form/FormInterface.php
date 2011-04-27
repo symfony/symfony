@@ -16,7 +16,7 @@ namespace Symfony\Component\Form;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-interface FormInterface extends \ArrayAccess, \Traversable, \Countable
+interface FormInterface extends \ArrayAccess, \Countable, \IteratorAggregate
 {
     /**
      * Sets the parent form.

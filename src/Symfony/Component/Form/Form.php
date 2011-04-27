@@ -67,7 +67,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class Form implements \IteratorAggregate, FormInterface
+class Form implements FormInterface
 {
     /**
      * The name of this form

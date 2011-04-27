@@ -40,7 +40,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function getMockForm()
     {
-        return $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        return $this->getMock('Symfony\Component\Form\FormInterface');
     }
 
     public function testPreSetDataResizesForm()

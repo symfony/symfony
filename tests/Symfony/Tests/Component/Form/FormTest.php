@@ -975,7 +975,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     protected function getMockForm($name = 'name')
     {
-        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        $form = $this->getMock('Symfony\Component\Form\FormInterface');
 
         $form->expects($this->any())
             ->method('getName')

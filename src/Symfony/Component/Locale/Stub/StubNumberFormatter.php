@@ -732,7 +732,7 @@ class StubNumberFormatter
 
     /**
      * Returns the normalized value for the GROUPING_USED attribute. Any value that can be converted to int will be
-     * cast to boolean and then to int again. This way, negative values are converted to 1 and string values to 0.
+     * cast to Boolean and then to int again. This way, negative values are converted to 1 and string values to 0.
      *
      * @param  mixed  $value   The value to be normalized
      * @return int             The normalized value for the attribute (0 or 1)

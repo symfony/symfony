@@ -157,7 +157,7 @@ php: |
 --- 
 test: Boolean 
 brief: > 
-    You can use 'true' and 'false' for boolean values. 
+    You can use 'true' and 'false' for Boolean values.
 yaml: | 
     Is Gus a Liar?: true
     Do I rely on Gus for Sustenance?: false

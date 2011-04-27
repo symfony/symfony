@@ -104,7 +104,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns whether the form is empty
      *
-     * @return boolean
+     * @return Boolean
      */
     function isEmpty();
 

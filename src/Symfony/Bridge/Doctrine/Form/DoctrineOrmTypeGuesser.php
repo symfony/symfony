@@ -33,7 +33,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     /**
      * Returns whether Doctrine 2 metadata exists for that class
      *
-     * @return boolean
+     * @return Boolean
      */
     protected function isMappedClass($class)
     {

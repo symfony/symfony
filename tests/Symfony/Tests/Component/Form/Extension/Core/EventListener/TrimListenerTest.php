@@ -19,7 +19,7 @@ class TrimListenerTest extends \PHPUnit_Framework_TestCase
     public function testTrim()
     {
         $data = " Foo! ";
-        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        $form = $this->getMock('Symfony\Component\Form\FormInterface');
         $event = new FilterDataEvent($form, $data);
 
         $filter = new TrimListener();
@@ -31,7 +31,7 @@ class TrimListenerTest extends \PHPUnit_Framework_TestCase
     public function testTrimSkipNonStrings()
     {
         $data = 1234;
-        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        $form = $this->getMock('Symfony\Component\Form\FormInterface');
         $event = new FilterDataEvent($form, $data);
 
         $filter = new TrimListener();

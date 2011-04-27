@@ -24,7 +24,7 @@ class CsrfTypeTest extends TypeTestCase
 
     protected function getNonRootForm()
     {
-        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        $form = $this->getMock('Symfony\Component\Form\FormInterface');
         $form->expects($this->any())
             ->method('isRoot')
             ->will($this->returnValue(false));

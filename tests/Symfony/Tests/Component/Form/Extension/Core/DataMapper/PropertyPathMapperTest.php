@@ -31,7 +31,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
 
     private function getForm(PropertyPath $propertyPath = null)
     {
-        $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
+        $form = $this->getMock('Symfony\Component\Form\FormInterface');
 
         $form->expects($this->any())
             ->method('getAttribute')

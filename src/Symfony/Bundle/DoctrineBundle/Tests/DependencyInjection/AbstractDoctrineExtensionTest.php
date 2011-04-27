@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
 use Symfony\Component\Config\FileLocator;
 
 abstract class AbstractDoctrineExtensionTest extends TestCase
@@ -59,9 +60,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $loadXml->load('dbal_service_multiple_connections.xml');
         $loader->load(array(array()), $container);
 
-        $container->getCompilerPassConfig()->setOptimizationPasses(array());
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->compile();
+        $this->compileContainer($container);
 
         // doctrine.dbal.mysql_connection
         $arguments = $container->getDefinition('doctrine.dbal.mysql_connection')->getArguments();
@@ -93,9 +92,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $loadXml->load('dbal_service_single_connection.xml');
         $loader->load(array(array()), $container);
 
-        $container->getCompilerPassConfig()->setOptimizationPasses(array());
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->compile();
+        $this->compileContainer($container);
 
         // doctrine.dbal.mysql_connection
         $arguments = $container->getDefinition('doctrine.dbal.mysql_connection')->getArguments();
@@ -144,9 +141,10 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $container = $this->getContainer();
         $loader->load(array(array('dbal' => null, 'orm' => $config)), $container);
+        $this->compileContainer($container);
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection');
-        $this->assertEquals('Doctrine\DBAL\Connection', $definition->getClass());
+        $this->assertEquals('%doctrine.dbal.connection.class%', $definition->getClass());
 
         $args = $definition->getArguments();
         $this->assertEquals('pdo_mysql', $args[0]['driver']);
@@ -192,9 +190,10 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $loader = new DoctrineExtension();
 
         $loader->load(array(array('dbal' => null, 'orm' => array('default_entity_manager' => 'default', 'entity_managers' => array('default' => array('mappings' => array('YamlBundle' => array())))))), $container);
+        $this->compileContainer($container);
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection');
-        $this->assertEquals('Doctrine\DBAL\Connection', $definition->getClass());
+        $this->assertEquals('%doctrine.dbal.connection.class%', $definition->getClass());
 
         $definition = $container->getDefinition('doctrine.orm.default_entity_manager');
         $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
@@ -215,12 +214,10 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'orm_service_simple_single_entity_manager');
 
-        $container->getCompilerPassConfig()->setOptimizationPasses(array());
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->compile();
+        $this->compileContainer($container);
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection');
-        $this->assertEquals('Doctrine\DBAL\Connection', $definition->getClass());
+        $this->assertEquals('%doctrine.dbal.connection.class%', $definition->getClass());
 
         $this->assertDICConstructorArguments($definition, array(
             array(
@@ -255,12 +252,10 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'orm_service_single_entity_manager');
 
-        $container->getCompilerPassConfig()->setOptimizationPasses(array());
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->compile();
+        $this->compileContainer($container);
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection');
-        $this->assertEquals('Doctrine\DBAL\Connection', $definition->getClass());
+        $this->assertEquals('%doctrine.dbal.connection.class%', $definition->getClass());
 
         $this->assertDICConstructorArguments($definition, array(
             array(
@@ -297,12 +292,10 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'orm_service_multiple_entity_managers');
 
-        $container->getCompilerPassConfig()->setOptimizationPasses(array());
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->compile();
+        $this->compileContainer($container);
 
         $definition = $container->getDefinition('doctrine.dbal.conn1_connection');
-        $this->assertEquals('Doctrine\DBAL\Connection', $definition->getClass());
+        $this->assertEquals('%doctrine.dbal.connection.class%', $definition->getClass());
 
         $args = $definition->getArguments();
         $this->assertEquals('pdo_sqlite', $args[0]['driver']);
@@ -326,7 +319,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('doctrine.orm.em1_configuration', (string) $arguments[1]);
 
         $definition = $container->getDefinition('doctrine.dbal.conn2_connection');
-        $this->assertEquals('Doctrine\DBAL\Connection', $definition->getClass());
+        $this->assertEquals('%doctrine.dbal.connection.class%', $definition->getClass());
 
         $args = $definition->getArguments();
         $this->assertEquals('pdo_sqlite', $args[0]['driver']);
@@ -473,9 +466,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'orm_service_multiple_entity_managers');
 
-        $container->getCompilerPassConfig()->setOptimizationPasses(array());
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->compile();
+        $this->compileContainer($container);
 
         $definition = $container->getDefinition('doctrine.orm.em1_metadata_cache');
         $this->assertDICDefinitionClass($definition, '%doctrine.orm.cache.xcache.class%');
@@ -492,9 +483,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'orm_service_simple_single_entity_manager');
 
-        $container->getCompilerPassConfig()->setOptimizationPasses(array());
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->compile();
+        $this->compileContainer($container);
 
         $definition = $container->getDefinition('doctrine.orm.default_metadata_cache');
         $this->assertDICDefinitionClass($definition, 'Doctrine\Common\Cache\MemcacheCache');
@@ -517,9 +506,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'orm_imports');
 
-        $container->getCompilerPassConfig()->setOptimizationPasses(array());
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->compile();
+        $this->compileContainer($container);
 
         $cacheDefinition = $container->getDefinition('doctrine.orm.default_metadata_cache');
         $this->assertEquals('%doctrine.orm.cache.apc.class%', $cacheDefinition->getClass());
@@ -537,8 +524,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'orm_single_em_bundle_mappings');
 
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->compile();
+        $this->compileContainer($container);
 
         $definition = $container->getDefinition('doctrine.orm.default_metadata_driver');
 
@@ -583,8 +569,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'orm_multiple_em_bundle_mappings');
 
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->compile();
+        $this->compileContainer($container);
 
         $this->assertEquals(array("em1", "em2"), $container->getParameter('doctrine.orm.entity_managers'), "Set of the existing EntityManagers names is incorrect.");
 
@@ -642,9 +627,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $loader = new DoctrineExtension();
         $container->registerExtension($loader);
         $this->loadFromFile($container, 'dbal_types');
-        $container->getCompilerPassConfig()->setOptimizationPasses(array());
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->compile();
+        $this->compileContainer($container);
 
         $arguments = $container->getDefinition('doctrine.dbal.connection_factory')->getArguments();
         $this->assertEquals(
@@ -660,9 +643,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $loader = new DoctrineExtension();
         $container->registerExtension($loader);
         $this->loadFromFile($container, 'orm_functions');
-        $container->getCompilerPassConfig()->setOptimizationPasses(array());
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->compile();
+        $this->compileContainer($container);
 
         $definition = $container->getDefinition('doctrine.orm.default_configuration');
         $this->assertDICDefinitionMethodCallOnce($definition, 'addCustomStringFunction', array('test_string', 'Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestStringFunction'));
@@ -677,9 +658,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $loader = new DoctrineExtension();
         $container->registerExtension($loader);
         $this->loadFromFile($container, 'orm_hydration_mode');
-        $container->getCompilerPassConfig()->setOptimizationPasses(array());
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->compile();
+        $this->compileContainer($container);
 
         $definition = $container->getDefinition('doctrine.orm.default_configuration');
         $this->assertDICDefinitionMethodCallOnce($definition, 'addCustomHydrationMode', array('test_hydrator', 'Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestHydrator'));
@@ -759,5 +738,12 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         if (!$called) {
             $this->fail("Method '" . $methodName . "' is expected to be called once, definition does not contain a call though.");
         }
+    }
+
+    protected function compileContainer(ContainerBuilder $container)
+    {
+        $container->getCompilerPassConfig()->setOptimizationPasses(array(new ResolveDefinitionTemplatesPass()));
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
+        $container->compile();
     }
 }

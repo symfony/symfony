@@ -574,34 +574,7 @@ class File
      */
     public function move($directory, $name = null)
     {
-        $this->doMove($directory, $this->getName());
-
-        if (null !== $name) {
-            $this->rename($name);
-        }
-    }
-
-    /**
-     * Renames the file.
-     *
-     * @param string $name The new file name
-     */
-    public function rename($name)
-    {
-        $this->doMove($this->getDirectory(), $name);
-    }
-
-    /**
-     * Moves the file to a new directory and gives it a new filename
-     *
-     * @param string $directory The new directory
-     * @param string $filename  The new file name
-     *
-     * @throws FileException When the file could not be moved
-     */
-    protected function doMove($directory, $filename)
-    {
-        $newPath = $directory.DIRECTORY_SEPARATOR.$filename;
+        $newPath = $directory.DIRECTORY_SEPARATOR.(null === $name ? $this->getName() : $name);
 
         if (!@rename($this->getPath(), $newPath)) {
             $error = error_get_last();

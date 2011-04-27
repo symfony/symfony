@@ -38,7 +38,7 @@ class Link
     public function __construct(\DOMNode $node, $currentUri, $method = 'get')
     {
         if (!in_array(substr($currentUri, 0, 4), array('http', 'file'))) {
-            throw new \InvalidArgumentException(sprintf('Current URI must be an asbolute URL ("%s").', $currentUri));
+            throw new \InvalidArgumentException(sprintf('Current URI must be an absolute URL ("%s").', $currentUri));
         }
 
         $this->setNode($node);

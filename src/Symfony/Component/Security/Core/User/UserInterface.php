@@ -61,7 +61,7 @@ interface UserInterface
      * are relevant for assessing whether re-authentication is required.
      *
      * @param UserInterface $user
-     * @return Boolean
+     * @return boolean
      */
     function equals(UserInterface $user);
 }

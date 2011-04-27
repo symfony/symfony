@@ -40,7 +40,7 @@ class PropertyPathIterator extends \ArrayIterator
     /**
      * Returns whether next() can be called without making the iterator invalid
      *
-     * @return Boolean
+     * @return boolean
      */
     public function hasNext()
     {
@@ -51,7 +51,7 @@ class PropertyPathIterator extends \ArrayIterator
      * Returns whether the current element in the property path is an array
      * index
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isIndex()
     {
@@ -62,7 +62,7 @@ class PropertyPathIterator extends \ArrayIterator
      * Returns whether the current element in the property path is a property
      * names
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isProperty()
     {

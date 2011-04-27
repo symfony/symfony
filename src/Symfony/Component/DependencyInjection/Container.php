@@ -101,7 +101,7 @@ class Container implements ContainerInterface
     /**
      * Returns true if the container parameter bag are frozen.
      *
-     * @return Boolean true if the container parameter bag are frozen, false otherwise
+     * @return boolean true if the container parameter bag are frozen, false otherwise
      */
     public function isFrozen()
     {
@@ -137,7 +137,7 @@ class Container implements ContainerInterface
      *
      * @param  string $name The parameter name
      *
-     * @return Boolean The presence of parameter in container
+     * @return boolean The presence of parameter in container
      */
     public function hasParameter($name)
     {
@@ -186,7 +186,7 @@ class Container implements ContainerInterface
      *
      * @param  string  $id      The service identifier
      *
-     * @return Boolean true if the service is defined, false otherwise
+     * @return boolean true if the service is defined, false otherwise
      */
     public function has($id)
     {
@@ -391,7 +391,7 @@ class Container implements ContainerInterface
      * Returns whether this container has a certain scope
      *
      * @param string $name The name of the scope
-     * @return Boolean
+     * @return boolean
      */
     public function hasScope($name)
     {
@@ -404,7 +404,7 @@ class Container implements ContainerInterface
      * This does not actually check if the passed scope actually exists.
      *
      * @param string $name
-     * @return Boolean
+     * @return boolean
      */
     public function isScopeActive($name)
     {

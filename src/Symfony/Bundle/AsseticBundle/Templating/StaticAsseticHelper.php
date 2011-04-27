@@ -29,7 +29,7 @@ class StaticAsseticHelper extends AsseticHelper
      *
      * @param AssetsHelper $assetsHelper The assets helper
      * @param AssetFactory $factory      The asset factory
-     * @param Boolean      $debug        The debug mode
+     * @param boolean      $debug        The debug mode
      */
     public function __construct(AssetsHelper $assetsHelper, AssetFactory $factory, $debug = false)
     {

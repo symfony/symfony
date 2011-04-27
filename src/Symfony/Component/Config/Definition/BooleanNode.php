@@ -14,7 +14,7 @@ namespace Symfony\Component\Config\Definition;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 
 /**
- * This node represents a Boolean value in the config tree.
+ * This node represents a boolean value in the config tree.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

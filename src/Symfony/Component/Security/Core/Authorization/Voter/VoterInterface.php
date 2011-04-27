@@ -29,7 +29,7 @@ interface VoterInterface
      *
      * @param string $attribute An attribute
      *
-     * @return Boolean true if this Voter supports the attribute, false otherwise
+     * @return boolean true if this Voter supports the attribute, false otherwise
      */
     function supportsAttribute($attribute);
 

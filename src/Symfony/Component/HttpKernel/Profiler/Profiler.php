@@ -193,7 +193,7 @@ class Profiler
     /**
      * Checks if the profiler is empty.
      *
-     * @return Boolean Whether the profiler is empty or not
+     * @return boolean Whether the profiler is empty or not
      */
     public function isEmpty()
     {

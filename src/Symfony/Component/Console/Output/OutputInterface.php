@@ -34,7 +34,7 @@ interface OutputInterface
      * Writes a message to the output.
      *
      * @param string|array $messages The message as an array of lines of a single string
-     * @param Boolean      $newline  Whether to add a newline or not
+     * @param boolean      $newline  Whether to add a newline or not
      * @param integer      $type     The type of output
      *
      * @throws \InvalidArgumentException When unknown output type is given
@@ -72,7 +72,7 @@ interface OutputInterface
     /**
      * Sets the decorated flag.
      *
-     * @param Boolean $decorated Whether to decorated the messages or not
+     * @param boolean $decorated Whether to decorated the messages or not
      *
      * @api
      */
@@ -81,7 +81,7 @@ interface OutputInterface
     /**
      * Gets the decorated flag.
      *
-     * @return Boolean true if the output will decorate messages, false otherwise
+     * @return boolean true if the output will decorate messages, false otherwise
      *
      * @api
      */

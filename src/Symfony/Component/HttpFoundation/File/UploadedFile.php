@@ -53,7 +53,7 @@ class UploadedFile extends File
     /**
      * Whether the uploaded file has already been moved.
      *
-     * @var Boolean
+     * @var boolean
      */
     protected $moved;
 
@@ -65,7 +65,7 @@ class UploadedFile extends File
      * @param string  $mimeType     The type of the file as provided by PHP
      * @param integer $size         The file size
      * @param integer $error        The error constant of the upload (one of PHP's UPLOAD_ERR_XXX constants)
-     * @param Boolean $moved        Whether the file has been moved from its original location
+     * @param boolean $moved        Whether the file has been moved from its original location
      *
      * @throws FileException         If file_uploads is disabled
      * @throws FileNotFoundException If the file does not exist
@@ -85,7 +85,7 @@ class UploadedFile extends File
         $this->mimeType = $mimeType ?: 'application/octet-stream';
         $this->size = $size;
         $this->error = $error ?: UPLOAD_ERR_OK;
-        $this->moved = (Boolean) $moved;
+        $this->moved = (boolean) $moved;
     }
 
     /**
@@ -130,7 +130,7 @@ class UploadedFile extends File
     /**
      * Returns whether the file was uploaded successfully.
      *
-     * @return Boolean  True if no error occurred during uploading
+     * @return boolean  True if no error occurred during uploading
      */
     public function isValid()
     {
@@ -141,7 +141,7 @@ class UploadedFile extends File
      * Returns true if the size of the uploaded file exceeds the
      * upload_max_filesize directive in php.ini
      *
-     * @return Boolean
+     * @return boolean
      */
     protected function isIniSizeExceeded()
     {
@@ -152,7 +152,7 @@ class UploadedFile extends File
      * Returns true if the size of the uploaded file exceeds the
      * MAX_FILE_SIZE directive specified in the HTML form
      *
-     * @return Boolean
+     * @return boolean
      */
     protected function isFormSizeExceeded()
     {
@@ -162,7 +162,7 @@ class UploadedFile extends File
     /**
      * Returns true if the file was completely uploaded
      *
-     * @return Boolean
+     * @return boolean
      */
     protected function isUploadComplete()
     {

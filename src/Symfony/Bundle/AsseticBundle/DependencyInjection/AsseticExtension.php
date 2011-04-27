@@ -93,7 +93,7 @@ class AsseticExtension extends Extension
      * Merges the user's config arrays.
      *
      * @param array   $configs An array of config arrays
-     * @param Boolean $debug   The debug mode
+     * @param boolean $debug   The debug mode
      * @param array   $bundles An array of all bundle names
      *
      * @return array The merged config

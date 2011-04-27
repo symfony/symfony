@@ -36,8 +36,8 @@ class WebDebugToolbarListener
     public function __construct(TwigEngine $templating, $interceptRedirects = false, $verbose = true)
     {
         $this->templating = $templating;
-        $this->interceptRedirects = (Boolean) $interceptRedirects;
-        $this->verbose = (Boolean) $verbose;
+        $this->interceptRedirects = (boolean) $interceptRedirects;
+        $this->verbose = (boolean) $verbose;
     }
 
     public function getVerbose()

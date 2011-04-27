@@ -992,7 +992,7 @@ EOF;
             return $this->dumpParameter($value);
         } elseif (true === $interpolate && is_string($value)) {
             if (preg_match('/^%([^%]+)%$/', $value, $match)) {
-                // we do this to deal with non string values (Boolean, integer, ...)
+                // we do this to deal with non string values (boolean, integer, ...)
                 // the preg_replace_callback converts them to strings
                 return $this->dumpParameter(strtolower($match[1]));
             } else {

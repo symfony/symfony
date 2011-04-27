@@ -401,9 +401,9 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      * @param integer $securityIdentityId
      * @param string $strategy
      * @param integer $mask
-     * @param Boolean $granting
-     * @param Boolean $auditSuccess
-     * @param Boolean $auditFailure
+     * @param boolean $granting
+     * @param boolean $auditSuccess
+     * @param boolean $auditFailure
      * @return string
      */
     protected function getInsertAccessControlEntrySql($classId, $objectIdentityId, $field, $aceOrder, $securityIdentityId, $strategy, $mask, $granting, $auditSuccess, $auditFailure)
@@ -477,7 +477,7 @@ QUERY;
      *
      * @param string $identifier
      * @param integer $classId
-     * @param Boolean $entriesInheriting
+     * @param boolean $entriesInheriting
      * @return string
      */
     protected function getInsertObjectIdentitySql($identifier, $classId, $entriesInheriting)

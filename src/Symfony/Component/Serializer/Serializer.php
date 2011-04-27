@@ -34,7 +34,7 @@ class Serializer implements SerializerInterface
 
     /**
      * @param mixed $value value to test
-     * @return Boolean whether the type is a structured type (array + objects)
+     * @return boolean whether the type is a structured type (array + objects)
      */
     public function isStructuredType($value)
     {

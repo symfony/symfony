@@ -33,7 +33,7 @@ class OutputFormatter implements OutputFormatterInterface
      */
     public function __construct($decorated = null, array $styles = array())
     {
-        $this->decorated = (Boolean) $decorated;
+        $this->decorated = (boolean) $decorated;
 
         $this->setStyle('error',    new OutputFormatterStyle('white', 'red'));
         $this->setStyle('info',     new OutputFormatterStyle('green'));
@@ -48,19 +48,19 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Sets the decorated flag.
      *
-     * @param Boolean $decorated Whether to decorated the messages or not
+     * @param boolean $decorated Whether to decorated the messages or not
      *
      * @api
      */
     public function setDecorated($decorated)
     {
-        $this->decorated = (Boolean) $decorated;
+        $this->decorated = (boolean) $decorated;
     }
 
     /**
      * Gets the decorated flag.
      *
-     * @return Boolean true if the output will decorate messages, false otherwise
+     * @return boolean true if the output will decorate messages, false otherwise
      *
      * @api
      */

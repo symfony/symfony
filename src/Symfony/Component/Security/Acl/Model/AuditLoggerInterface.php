@@ -22,7 +22,7 @@ interface AuditLoggerInterface
      * This method is called whenever access is granted, or denied, and
      * administrative mode is turned off.
      *
-     * @param Boolean $granted
+     * @param boolean $granted
      * @param EntryInterface $ace
      * @return void
      */

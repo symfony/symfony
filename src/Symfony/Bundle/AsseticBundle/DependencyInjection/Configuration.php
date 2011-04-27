@@ -32,12 +32,12 @@ class Configuration implements ConfigurationInterface
     /**
      * Constructor
      *
-     * @param Boolean $debug    Whether to use the debug mode
+     * @param boolean $debug    Whether to use the debug mode
      * @param array   $bundles  An array of bundle names
      */
     public function __construct($debug, array $bundles)
     {
-        $this->debug = (Boolean) $debug;
+        $this->debug = (boolean) $debug;
         $this->bundles = $bundles;
     }
 

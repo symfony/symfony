@@ -73,9 +73,9 @@ interface SessionStorageInterface
     /**
      * Regenerates id that represents this storage.
      *
-     * @param  Boolean $destroy Destroy session when regenerating?
+     * @param  boolean $destroy Destroy session when regenerating?
      *
-     * @return Boolean True if session regenerated, false if error
+     * @return boolean True if session regenerated, false if error
      *
      * @throws \RuntimeException If an error occurs while regenerating this storage
      */

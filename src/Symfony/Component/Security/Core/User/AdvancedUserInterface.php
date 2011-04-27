@@ -21,28 +21,28 @@ interface AdvancedUserInterface extends UserInterface
     /**
      * Checks whether the user's account has expired.
      *
-     * @return Boolean true if the user's account is non expired, false otherwise
+     * @return boolean true if the user's account is non expired, false otherwise
      */
     function isAccountNonExpired();
 
     /**
      * Checks whether the user is locked.
      *
-     * @return Boolean true if the user is not locked, false otherwise
+     * @return boolean true if the user is not locked, false otherwise
      */
     function isAccountNonLocked();
 
     /**
      * Checks whether the user's credentials (password) has expired.
      *
-     * @return Boolean true if the user's credentials are non expired, false otherwise
+     * @return boolean true if the user's credentials are non expired, false otherwise
      */
     function isCredentialsNonExpired();
 
     /**
      * Checks whether the user is enabled.
      *
-     * @return Boolean true if the user is enabled, false otherwise
+     * @return boolean true if the user is enabled, false otherwise
      */
     function isEnabled();
 }

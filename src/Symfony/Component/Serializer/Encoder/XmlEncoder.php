@@ -81,7 +81,7 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
     /**
      * @param DOMNode $node
      * @param string $val
-     * @return Boolean
+     * @return boolean
      */
     final protected function appendXMLString($node, $val)
     {
@@ -98,7 +98,7 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
     /**
      * @param DOMNode $node
      * @param string $val
-     * @return Boolean
+     * @return boolean
      */
     final protected function appendText($node, $val)
     {
@@ -111,7 +111,7 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
     /**
      * @param DOMNode $node
      * @param string $val
-     * @return Boolean
+     * @return boolean
      */
     final protected function appendCData($node, $val)
     {
@@ -124,7 +124,7 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
     /**
      * @param DOMNode $node
      * @param DOMDocumentFragment $fragment
-     * @return Boolean
+     * @return boolean
      */
     final protected function appendDocumentFragment($node, $fragment)
     {
@@ -139,7 +139,7 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
     /**
      * Checks the name is a valid xml element name
      * @param string $name
-     * @return Boolean
+     * @return boolean
      */
     final protected function isElementNameValid($name)
     {
@@ -201,7 +201,7 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
      *
      * @param DOMNode $parentNode
      * @param array|object $data data
-     * @return bool
+     * @return boolean
      */
     private function buildXml($parentNode, $data)
     {
@@ -282,7 +282,7 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
      *
      * @param DOMNode $node
      * @param mixed $val
-     * @return Boolean
+     * @return boolean
      */
     private function selectNodeType($node, $val)
     {

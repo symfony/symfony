@@ -37,15 +37,15 @@ class ProfilerListener
      *
      * @param ContainerInterface      $container          A ContainerInterface instance
      * @param RequestMatcherInterface $matcher            A RequestMatcher instance
-     * @param Boolean                 $onlyException      true if the profiler only collects data when an exception occurs, false otherwise
-     * @param Boolean                 $onlyMasterRequests true if the profiler only collects data when the request is a master request, false otherwise
+     * @param boolean                 $onlyException      true if the profiler only collects data when an exception occurs, false otherwise
+     * @param boolean                 $onlyMasterRequests true if the profiler only collects data when the request is a master request, false otherwise
      */
     public function __construct(ContainerInterface $container, RequestMatcherInterface $matcher = null, $onlyException = false, $onlyMasterRequests = false)
     {
         $this->container = $container;
         $this->matcher = $matcher;
-        $this->onlyException = (Boolean) $onlyException;
-        $this->onlyMasterRequests = (Boolean) $onlyMasterRequests;
+        $this->onlyException = (boolean) $onlyException;
+        $this->onlyMasterRequests = (boolean) $onlyMasterRequests;
     }
 
     /**

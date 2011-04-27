@@ -64,7 +64,7 @@ class CachedRouter implements RouterInterface
      *
      * @param  string  $name       The name of the route
      * @param  array   $parameters An array of parameters
-     * @param  Boolean $absolute   Whether to generate an absolute URL
+     * @param  boolean $absolute   Whether to generate an absolute URL
      *
      * @return string The generated URL
      */

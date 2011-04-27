@@ -100,7 +100,7 @@ class SlotsHelper extends Helper
      * @param string $name    The slot name
      * @param string $default The default slot content
      *
-     * @return Boolean true if the slot is defined or if a default content has been provided, false otherwise
+     * @return boolean true if the slot is defined or if a default content has been provided, false otherwise
      */
     public function output($name, $default = false)
     {

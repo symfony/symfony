@@ -48,7 +48,7 @@ interface NormalizerInterface
      * @param ReflectionClass $class
      * @param string          $format format the given data was extracted from
      *
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */

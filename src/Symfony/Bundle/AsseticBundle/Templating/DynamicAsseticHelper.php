@@ -29,7 +29,7 @@ class DynamicAsseticHelper extends AsseticHelper
      *
      * @param RouterHelper $routerHelper The router helper
      * @param AssetFactory $factory      The asset factory
-     * @param Boolean      $debug        The debug mode
+     * @param boolean      $debug        The debug mode
      */
     public function __construct(RouterHelper $routerHelper, AssetFactory $factory, $debug = false)
     {

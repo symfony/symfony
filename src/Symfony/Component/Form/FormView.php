@@ -31,7 +31,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * Row implicitly includes widget, however certain rendering mechanisms
      * have to skip widget rendering when a row is rendered.
      *
-     * @var Boolean
+     * @var boolean
      */
     private $rendered = false;
 
@@ -46,7 +46,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * @param $name
-     * @return Boolean
+     * @return boolean
      */
     public function has($name)
     {

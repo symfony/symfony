@@ -40,9 +40,9 @@ class Entry implements AuditableEntryInterface
      * @param SecurityIdentityInterface $sid
      * @param string                    $strategy
      * @param integer                   $mask
-     * @param Boolean                   $granting
-     * @param Boolean                   $auditFailure
-     * @param Boolean                   $auditSuccess
+     * @param boolean                   $granting
+     * @param boolean                   $auditFailure
+     * @param boolean                   $auditSuccess
      */
     public function __construct($id, AclInterface $acl, SecurityIdentityInterface $sid, $strategy, $mask, $granting, $auditFailure, $auditSuccess)
     {
@@ -126,7 +126,7 @@ class Entry implements AuditableEntryInterface
      * Do never call this method directly. Use the respective methods on the
      * AclInterface instead.
      *
-     * @param Boolean $boolean
+     * @param boolean $boolean
      * @return void
      */
     public function setAuditFailure($boolean)
@@ -140,7 +140,7 @@ class Entry implements AuditableEntryInterface
      * Do never call this method directly. Use the respective methods on the
      * AclInterface instead.
      *
-     * @param Boolean $boolean
+     * @param boolean $boolean
      * @return void
      */
     public function setAuditSuccess($boolean)

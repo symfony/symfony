@@ -32,7 +32,7 @@ interface CacheWarmerInterface
      * A warmer should return true if the cache can be
      * generated incrementally and on-demand.
      *
-     * @return Boolean true if the warmer is optional, false otherwise
+     * @return boolean true if the warmer is optional, false otherwise
      */
     function isOptional();
 }

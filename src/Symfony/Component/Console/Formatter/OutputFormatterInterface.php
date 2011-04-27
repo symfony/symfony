@@ -23,7 +23,7 @@ interface OutputFormatterInterface
     /**
      * Sets the decorated flag.
      *
-     * @param Boolean $decorated Whether to decorated the messages or not
+     * @param boolean $decorated Whether to decorated the messages or not
      *
      * @api
      */
@@ -32,7 +32,7 @@ interface OutputFormatterInterface
     /**
      * Gets the decorated flag.
      *
-     * @return Boolean true if the output will decorate messages, false otherwise
+     * @return boolean true if the output will decorate messages, false otherwise
      *
      * @api
      */

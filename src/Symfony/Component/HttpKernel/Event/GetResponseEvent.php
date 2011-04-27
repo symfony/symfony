@@ -57,7 +57,7 @@ class GetResponseEvent extends KernelEvent
     /**
      * Returns whether a response was set
      *
-     * @return Boolean Whether a response was set
+     * @return boolean Whether a response was set
      */
     public function hasResponse()
     {

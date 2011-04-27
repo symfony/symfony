@@ -51,7 +51,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * localized string (3) is presented to and modified by the user.
  *
  * In most cases, format (1) and format (2) will be the same. For example,
- * a checkbox field uses a Boolean value both for internal processing as for
+ * a checkbox field uses a boolean value both for internal processing as for
  * storage in the object. In these cases you simply need to set a value
  * transformer to convert between formats (2) and (3). You can do this by
  * calling appendClientTransformer() in the configure() method.
@@ -101,19 +101,19 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Whether added errors should bubble up to the parent
-     * @var Boolean
+     * @var boolean
      */
     private $errorBubbling;
 
     /**
      * Whether this form is bound
-     * @var Boolean
+     * @var boolean
      */
     private $bound = false;
 
     /**
      * Whether this form may not be empty
-     * @var Boolean
+     * @var boolean
      */
     private $required;
 
@@ -165,7 +165,7 @@ class Form implements \IteratorAggregate, FormInterface
      * Whether the data in application, normalized and client format is
      * synchronized. Data may not be synchronized if transformation errors
      * occur.
-     * @var Boolean
+     * @var boolean
      */
     private $synchronized = true;
 
@@ -177,7 +177,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Whether this form may only be read, but not bound
-     * @var Boolean
+     * @var boolean
      */
     private $readOnly = false;
 
@@ -307,7 +307,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns whether the field has a parent.
      *
-     * @return Boolean
+     * @return boolean
      */
     public function hasParent()
     {
@@ -327,7 +327,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns whether the field is the root of the form tree
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isRoot()
     {
@@ -579,7 +579,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns whether errors bubble up to the parent
      *
-     * @return Boolean
+     * @return boolean
      */
     public function getErrorBubbling()
     {
@@ -589,7 +589,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns whether the field is bound.
      *
-     * @return Boolean  true if the form is bound to input values, false otherwise
+     * @return boolean  true if the form is bound to input values, false otherwise
      */
     public function isBound()
     {
@@ -599,7 +599,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns whether the data in the different formats is synchronized
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isSynchronized()
     {
@@ -623,7 +623,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns whether the field is valid.
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isValid()
     {
@@ -643,7 +643,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns whether or not there are errors.
      *
-     * @return Boolean  true if form is bound and not valid
+     * @return boolean  true if form is bound and not valid
      */
     public function hasErrors()
     {
@@ -723,7 +723,7 @@ class Form implements \IteratorAggregate, FormInterface
      * Returns whether a child with the given name exists.
      *
      * @param  string $name
-     * @return Boolean
+     * @return boolean
      */
     public function has($name)
     {
@@ -750,7 +750,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @param string $name The name of the child
      *
-     * @return Boolean true if the widget exists, false otherwise
+     * @return boolean true if the widget exists, false otherwise
      */
     public function offsetExists($name)
     {

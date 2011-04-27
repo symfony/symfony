@@ -73,7 +73,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns whether the form is valid.
      *
-     * @return Boolean
+     * @return boolean
      */
     function isValid();
 
@@ -84,7 +84,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * will always return false. Otherwise the value set with setRequired()
      * is returned.
      *
-     * @return Boolean
+     * @return boolean
      */
     function isRequired();
 
@@ -97,7 +97,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * Fields whose parents are read-only are considered read-only regardless of
      * their own state.
      *
-     * @return Boolean
+     * @return boolean
      */
     function isReadOnly();
 

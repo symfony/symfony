@@ -22,8 +22,8 @@ interface AuditableAclInterface extends MutableAclInterface
      * Updates auditing for class-based ACE
      *
      * @param integer $index
-     * @param Boolean $auditSuccess
-     * @param Boolean $auditFailure
+     * @param boolean $auditSuccess
+     * @param boolean $auditFailure
      * @return void
      */
     function updateClassAuditing($index, $auditSuccess, $auditFailure);
@@ -33,8 +33,8 @@ interface AuditableAclInterface extends MutableAclInterface
      *
      * @param integer $index
      * @param string $field
-     * @param Boolean $auditSuccess
-     * @param Boolean $auditFailure
+     * @param boolean $auditSuccess
+     * @param boolean $auditFailure
      * @return void
      */
 
@@ -44,8 +44,8 @@ interface AuditableAclInterface extends MutableAclInterface
      * Updates auditing for object-based ACE
      *
      * @param integer $index
-     * @param Boolean $auditSuccess
-     * @param Boolean $auditFailure
+     * @param boolean $auditSuccess
+     * @param boolean $auditFailure
      * @return void
      */
     function updateObjectAuditing($index, $auditSuccess, $auditFailure);
@@ -55,8 +55,8 @@ interface AuditableAclInterface extends MutableAclInterface
      *
      * @param integer $index
      * @param string $field
-     * @param Boolean $auditSuccess
-     * @param Boolean $auditFailure
+     * @param boolean $auditSuccess
+     * @param boolean $auditFailure
      * @return void
      */
     function updateObjectFieldAuditing($index, $field, $auditSuccess, $auditFailure);

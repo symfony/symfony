@@ -101,10 +101,10 @@ class GlobalVariables
     /**
      * Returns the current app debug mode.
      *
-     * @return Boolean The current debug mode
+     * @return boolean The current debug mode
      */
     public function getDebug()
     {
-        return (bool) $this->container->getParameter('kernel.debug');
+        return (boolean) $this->container->getParameter('kernel.debug');
     }
 }

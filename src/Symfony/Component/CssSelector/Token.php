@@ -54,7 +54,7 @@ class Token
      *
      * @param  string $type The type to test against this token's one.
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isType($type)
     {

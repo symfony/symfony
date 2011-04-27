@@ -23,7 +23,7 @@ interface RequestMatcherInterface
      *
      * @param  Request $request The request to check for a match
      *
-     * @return Boolean true if the request matches, false otherwise
+     * @return boolean true if the request matches, false otherwise
      */
     function matches(Request $request);
 }

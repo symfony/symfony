@@ -65,7 +65,7 @@ class XmlFileLoader extends FileLoader
      * @param mixed  $resource A resource
      * @param string $type     The resource type
      *
-     * @return Boolean true if this class supports the given resource, false otherwise
+     * @return boolean true if this class supports the given resource, false otherwise
      */
     public function supports($resource, $type = null)
     {
@@ -103,7 +103,7 @@ class XmlFileLoader extends FileLoader
 
         foreach ($imports as $import) {
             $this->setCurrentDir(dirname($file));
-            $this->import((string) $import['resource'], null, (Boolean) $import->getAttributeAsPhp('ignore-errors'), $file);
+            $this->import((string) $import['resource'], null, (boolean) $import->getAttributeAsPhp('ignore-errors'), $file);
         }
     }
 

@@ -43,7 +43,7 @@ class ExceptionDataCollector extends DataCollector
     /**
      * Checks if the exception is not null.
      *
-     * @return Boolean true if the exception is not null, false otherwise
+     * @return boolean true if the exception is not null, false otherwise
      */
     public function hasException()
     {

@@ -57,8 +57,8 @@ class Cookie
         $this->domain = $domain;
         $this->expire = $expire;
         $this->path = $path;
-        $this->secure = (Boolean) $secure;
-        $this->httpOnly = (Boolean) $httpOnly;
+        $this->secure = (boolean) $secure;
+        $this->httpOnly = (boolean) $httpOnly;
     }
 
     public function getName()
@@ -99,7 +99,7 @@ class Cookie
     /**
      * Whether this cookie is about to be cleared
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isCleared()
     {

@@ -53,7 +53,7 @@ class HttpKernel implements HttpKernelInterface
      * @param  Request $request A Request instance
      * @param  integer $type    The type of the request
      *                          (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
-     * @param  Boolean $catch   Whether to catch exceptions or not
+     * @param  boolean $catch   Whether to catch exceptions or not
      *
      * @return Response A Response instance
      *

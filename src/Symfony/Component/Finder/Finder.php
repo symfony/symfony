@@ -216,7 +216,7 @@ class Finder implements \IteratorAggregate
      */
     public function ignoreVCS($ignoreVCS)
     {
-        $this->ignoreVCS = (Boolean) $ignoreVCS;
+        $this->ignoreVCS = (boolean) $ignoreVCS;
 
         return $this;
     }

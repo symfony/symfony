@@ -71,7 +71,7 @@ class PrototypedArrayNode extends ArrayNode
      * "'id' => 'my_name'" item in it.
      *
      * @param string  $attribute The name of the attribute which value is to be used as a key
-     * @param Boolean $remove Whether or not to remove the key
+     * @param boolean $remove Whether or not to remove the key
      */
     public function setKeyAttribute($attribute, $remove = true)
     {

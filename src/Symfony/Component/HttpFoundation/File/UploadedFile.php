@@ -180,7 +180,7 @@ class UploadedFile extends File
 
         $newPath = $directory . DIRECTORY_SEPARATOR . $filename;
 
-        if (!move_uploaded_file($this->getPath(), $newPath)) {
+        if (!@move_uploaded_file($this->getPath(), $newPath)) {
             throw new FileException(sprintf('Could not move file %s to %s', $this->getPath(), $newPath));
         }
 
@@ -197,10 +197,10 @@ class UploadedFile extends File
             return parent::move($directory, $name);
         }
 
-        $this->doMove($directory, $this->originalName);
-
-        if (null !== $name) {
-            $this->rename($name);
+        if (null === $name) {
+            $name = $this->originalName;
         }
+
+        $this->doMove($directory, $name);
     }
 }

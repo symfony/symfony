@@ -71,6 +71,7 @@
             <xsd:element name="metadata-cache-driver" type="metadata_cache_driver" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
 
+        <xsd:attribute name="auto-mapping" type="xsd:string" />
         <xsd:attribute name="default-entity-manager" type="xsd:string" />
         <xsd:attribute name="default-connection" type="xsd:string" />
 
@@ -99,6 +100,7 @@
             <xsd:element name="hydrator" type="type" minOccurs="0" maxOccurs="unbounded" />
         </xsd:choice>
 
+        <xsd:attribute name="auto-mapping" type="xsd:string" />
         <xsd:attribute name="connection" type="xsd:string" />
         <xsd:attribute name="name" type="xsd:string" />
         <xsd:attribute name="result-cache-driver" type="xsd:string" />

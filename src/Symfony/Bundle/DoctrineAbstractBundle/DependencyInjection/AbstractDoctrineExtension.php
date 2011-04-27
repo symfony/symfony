@@ -42,44 +42,42 @@ abstract class AbstractDoctrineExtension extends Extension
      */
     protected function loadMappingInformation(array $objectManager, ContainerBuilder $container)
     {
-        if (isset($objectManager['mappings'])) {
-            foreach ($objectManager['mappings'] as $mappingName => $mappingConfig) {
-                $mappingConfig = array_replace(array(
-                    'dir'    => false,
-                    'type'   => false,
-                    'prefix' => false,
-                ), $mappingConfig);
+        foreach ($objectManager['mappings'] as $mappingName => $mappingConfig) {
+            $mappingConfig = array_replace(array(
+                'dir'    => false,
+                'type'   => false,
+                'prefix' => false,
+            ), (array) $mappingConfig);
 
-                $mappingConfig['dir'] = $container->getParameterBag()->resolveValue($mappingConfig['dir']);
-                // a bundle configuration is detected by realizing that the specified dir is not absolute and existing
-                if (!isset($mappingConfig['is_bundle'])) {
-                    $mappingConfig['is_bundle'] = !file_exists($mappingConfig['dir']);
-                }
-
-                if ($mappingConfig['is_bundle']) {
-                    $bundle = null;
-                    foreach ($container->getParameter('kernel.bundles') as $name => $class) {
-                        if ($mappingName === $name) {
-                            $bundle = new \ReflectionClass($class);
-
-                            break;
-                        }
-                    }
-
-                    if (null === $bundle) {
-                        throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled.', $mappingName));
-                    }
-
-                    $mappingConfig = $this->getMappingDriverBundleConfigDefaults($mappingConfig, $bundle, $container);
-                    if (!$mappingConfig) {
-                        continue;
-                    }
-                }
-
-                $this->assertValidMappingConfiguration($mappingConfig, $objectManager['name']);
-                $this->setMappingDriverConfig($mappingConfig, $mappingName);
-                $this->setMappingDriverAlias($mappingConfig, $mappingName);
+            $mappingConfig['dir'] = $container->getParameterBag()->resolveValue($mappingConfig['dir']);
+            // a bundle configuration is detected by realizing that the specified dir is not absolute and existing
+            if (!isset($mappingConfig['is_bundle'])) {
+                $mappingConfig['is_bundle'] = !file_exists($mappingConfig['dir']);
             }
+
+            if ($mappingConfig['is_bundle']) {
+                $bundle = null;
+                foreach ($container->getParameter('kernel.bundles') as $name => $class) {
+                    if ($mappingName === $name) {
+                        $bundle = new \ReflectionClass($class);
+
+                        break;
+                    }
+                }
+
+                if (null === $bundle) {
+                    throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled.', $mappingName));
+                }
+
+                $mappingConfig = $this->getMappingDriverBundleConfigDefaults($mappingConfig, $bundle, $container);
+                if (!$mappingConfig) {
+                    continue;
+                }
+            }
+
+            $this->assertValidMappingConfiguration($mappingConfig, $objectManager['name']);
+            $this->setMappingDriverConfig($mappingConfig, $mappingName);
+            $this->setMappingDriverAlias($mappingConfig, $mappingName);
         }
     }
 

@@ -65,10 +65,6 @@ class FrameworkExtension extends Extension
             $container->setParameter('kernel.charset', $config['charset']);
         }
 
-        if (isset($config['document_root'])) {
-            $container->setParameter('document_root', $config['document_root']);
-        }
-
         if (isset($config['error_handler'])) {
             if (false === $config['error_handler']) {
                 $container->getDefinition('error_handler')->setMethodCalls(array());

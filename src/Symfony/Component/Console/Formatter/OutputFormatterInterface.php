@@ -53,7 +53,7 @@ interface OutputFormatterInterface
      *
      * @param   string  $name
      *
-     * @return  boolean
+     * @return  Boolean
      *
      * @api
      */

@@ -50,7 +50,7 @@ class RequestDataCollector extends BaseRequestDataCollector
                     'file'   => $r->getFilename(),
                     'line'   => $r->getStartLine(),
                 );
-            } elseif ($controller instanceof \Closure) {
+            } elseif (is_callable($controller)) {
                 $this->data['controller'] = 'Closure';
             } else {
                 $this->data['controller'] = (string) $controller ?: 'n/a';

@@ -25,7 +25,7 @@ class ClosureLoader extends Loader
     /**
      * Loads a Closure.
      *
-     * @param \Closure $closure A Closure
+     * @param function $closure A callback function
      * @param string   $type    The resource type
      */
     public function load($closure, $type = null)
@@ -43,6 +43,6 @@ class ClosureLoader extends Loader
      */
     public function supports($resource, $type = null)
     {
-        return $resource instanceof \Closure && (!$type || 'closure' === $type);
+        return is_callable($resource) && (!$type || 'closure' === $type);
     }
 }

@@ -36,13 +36,17 @@ class ValidationBuilder
     /**
      * Registers a closure to run as normalization or an expression builder to build it if null is provided.
      *
-     * @param \Closure $closure
+     * @param function $closure
      *
      * @return ExprBuilder|ValidationBuilder
      */
-    public function rule(\Closure $closure = null)
+    public function rule($closure = null)
     {
         if (null !== $closure) {
+            if (!is_callable($closure)) {
+                throw new \InvalidArgumentException('The parameter should be a function');
+            }
+            
             $this->rules[] = $closure;
 
             return $this;

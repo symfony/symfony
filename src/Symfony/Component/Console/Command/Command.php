@@ -103,7 +103,7 @@ class Command
      * This method is not abstract because you can use this class
      * as a concrete class. In this case, instead of defining the
      * execute() method, you set the code to execute by passing
-     * a Closure to the setCode() method.
+     * a callback to the setCode() method.
      *
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
@@ -194,7 +194,7 @@ class Command
      * If this method is used, it overrides the code defined
      * in the execute() method.
      *
-     * @param \Closure $code A \Closure
+     * @param function $code A callback function
      *
      * @return Command The current instance
      *
@@ -202,8 +202,12 @@ class Command
      *
      * @api
      */
-    public function setCode(\Closure $code)
+    public function setCode($code)
     {
+        if (!is_callable($code)) {
+            throw new \InvalidArgumentException('The code should be a function');
+        }
+        
         $this->code = $code;
 
         return $this;

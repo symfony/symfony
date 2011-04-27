@@ -72,16 +72,20 @@ class DialogHelper extends Helper
      *
      * @param OutputInterface $output
      * @param string|array    $question
-     * @param Closure         $validator
+     * @param function        $validator
      * @param integer         $attempts Max number of times to ask before giving up (false by default, which means infinite)
      *
      * @return mixed
      *
      * @throws \Exception When any of the validator returns an error
      */
-    public function askAndValidate(OutputInterface $output, $question, \Closure $validator, $attempts = false)
+    public function askAndValidate(OutputInterface $output, $question, $validator, $attempts = false)
     {
         // @codeCoverageIgnoreStart
+        if (!is_callable($validator)) {
+            throw new \InvalidArgumentException('The validator should be a function');
+        }
+        
         $error = null;
         while (false === $attempts || $attempts--) {
             if (null !== $error) {
@@ -91,7 +95,7 @@ class DialogHelper extends Helper
             $value = $this->ask($output, $question, null);
 
             try {
-                return $validator($value);
+                return call_user_func($validator, $value);
             } catch (\Exception $error) {
             }
         }

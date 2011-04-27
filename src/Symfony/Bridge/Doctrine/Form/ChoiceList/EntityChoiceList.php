@@ -85,12 +85,12 @@ class EntityChoiceList extends ArrayChoiceList
     {
         // If a query builder was passed, it must be a closure or QueryBuilder
         // instance
-        if (!(null === $queryBuilder || $queryBuilder instanceof QueryBuilder || $queryBuilder instanceof \Closure)) {
-            throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder or \Closure');
+        if (!(null === $queryBuilder || $queryBuilder instanceof QueryBuilder || is_callable($queryBuilder))) {
+            throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder or function');
         }
 
-        if ($queryBuilder instanceof \Closure) {
-            $queryBuilder = $queryBuilder($em->getRepository($class));
+        if (is_callable($queryBuilder)) {
+            $queryBuilder = call_user_func($queryBuilder, $em->getRepository($class));
 
             if (!$queryBuilder instanceof QueryBuilder) {
                 throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder');

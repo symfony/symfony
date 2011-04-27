@@ -176,7 +176,7 @@ abstract class BaseNode implements NodeInterface
     {
         // run custom normalization closures
         foreach ($this->normalizationClosures as $closure) {
-            $value = $closure($value);
+            $value = call_user_func($closure, $value);
         }
 
         // replace value with their equivalent
@@ -209,7 +209,7 @@ abstract class BaseNode implements NodeInterface
         // The closure is also allowed to return another value.
         foreach ($this->finalValidationClosures as $closure) {
             try {
-                $value = $closure($value);
+                $value = call_user_func($closure, $value);
             } catch (Exception $correctEx) {
                 throw $correctEx;
             } catch (\Exception $invalid) {

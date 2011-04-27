@@ -25,7 +25,7 @@ class SortableIterator extends \ArrayIterator
      * Constructor.
      *
      * @param \Iterator        $iterator The Iterator to filter
-     * @param integer|\Closure $sort     The sort type (SORT_BY_NAME, SORT_BY_TYPE, or a \Closure instance)
+     * @param integer|function $sort     The sort type (SORT_BY_NAME, SORT_BY_TYPE, or a function)
      */
     public function __construct(\Iterator $iterator, $sort)
     {
@@ -45,8 +45,8 @@ class SortableIterator extends \ArrayIterator
 
                 return strcmp($a->getRealpath(), $b->getRealpath());
             };
-        } elseif (!$sort instanceof \Closure) {
-            throw new \InvalidArgumentException(sprintf('The SortableIterator takes a \Closure or a valid built-in sort algorithm as an argument (%s given).', $sort));
+        } elseif (!is_callable($sort)) {
+            throw new \InvalidArgumentException(sprintf('The SortableIterator takes a function or a valid built-in sort algorithm as an argument (%s given).', $sort));
         }
 
         $array = new \ArrayObject(iterator_to_array($iterator));

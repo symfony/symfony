@@ -33,28 +33,6 @@ class FileTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(__DIR__.'/Fixtures/test.gif', (string) $this->file);
     }
 
-    public function testGetWebPathReturnsPathRelativeToDocumentRoot()
-    {
-        File::setDocumentRoot(__DIR__);
-
-        $this->assertEquals(__DIR__, File::getDocumentRoot());
-        $this->assertEquals('/Fixtures/test.gif', $this->file->getWebPath());
-    }
-
-    public function testGetWebPathReturnsEmptyPathIfOutsideDocumentRoot()
-    {
-        File::setDocumentRoot(__DIR__.'/Fixtures/directory');
-
-        $this->assertEquals('', $this->file->getWebPath());
-    }
-
-    public function testSetDocumentRootThrowsLogicExceptionWhenNotExists()
-    {
-        $this->setExpectedException('LogicException');
-
-        File::setDocumentRoot(__DIR__.'/Fixtures/not_here');
-    }
-
     public function testGetNameReturnsNameWithExtension()
     {
         $this->assertEquals('test.gif', $this->file->getName());

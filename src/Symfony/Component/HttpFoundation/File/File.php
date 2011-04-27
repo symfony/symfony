@@ -491,7 +491,7 @@ class File
     public function getExtension()
     {
         if ($ext = pathinfo($this->getName(), PATHINFO_EXTENSION)) {
-            return '.' . $ext;
+            return '.'.$ext;
         }
 
         return '';
@@ -509,7 +509,7 @@ class File
         $type = $this->getMimeType();
 
         if (isset(self::$defaultExtensions[$type])) {
-            return '.' . self::$defaultExtensions[$type];
+            return '.'.self::$defaultExtensions[$type];
         }
 
         return $this->getExtension();
@@ -567,26 +567,6 @@ class File
     }
 
     /**
-     * Moves the file to a new directory and gives it a new filename
-     *
-     * @param string $directory The new directory
-     * @param string $filename  The new file name
-     *
-     * @throws FileException When the file could not be moved
-     */
-    protected function doMove($directory, $filename)
-    {
-        $newPath = $directory . DIRECTORY_SEPARATOR . $filename;
-
-        if (!@rename($this->getPath(), $newPath)) {
-            $error = error_get_last();
-            throw new FileException(sprintf('Could not move file %s to %s (%s)', $this->getPath(), $newPath, strip_tags($error['message'])));
-        }
-
-        $this->path = realpath($newPath);
-    }
-
-    /**
      * Moves the file to a new location.
      *
      * @param string $directory The destination folder
@@ -609,5 +589,25 @@ class File
     public function rename($name)
     {
         $this->doMove($this->getDirectory(), $name);
+    }
+
+    /**
+     * Moves the file to a new directory and gives it a new filename
+     *
+     * @param string $directory The new directory
+     * @param string $filename  The new file name
+     *
+     * @throws FileException When the file could not be moved
+     */
+    protected function doMove($directory, $filename)
+    {
+        $newPath = $directory.DIRECTORY_SEPARATOR.$filename;
+
+        if (!@rename($this->getPath(), $newPath)) {
+            $error = error_get_last();
+            throw new FileException(sprintf('Could not move file %s to %s (%s)', $this->getPath(), $newPath, strip_tags($error['message'])));
+        }
+
+        $this->path = realpath($newPath);
     }
 }

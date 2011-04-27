@@ -172,25 +172,6 @@ class UploadedFile extends File
     /**
      * @inheritDoc
      */
-    protected function doMove($directory, $filename)
-    {
-        if ($this->moved) {
-            return parent::doMove($directory, $filename);
-        }
-
-        $newPath = $directory . DIRECTORY_SEPARATOR . $filename;
-
-        if (!move_uploaded_file($this->getPath(), $newPath)) {
-            throw new FileException(sprintf('Could not move file %s to %s', $this->getPath(), $newPath));
-        }
-
-        $this->moved = true;
-        $this->path = realpath($newPath);
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function move($directory, $name = null)
     {
         if ($this->moved) {
@@ -202,5 +183,24 @@ class UploadedFile extends File
         if (null !== $name) {
             $this->rename($name);
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function doMove($directory, $filename)
+    {
+        if ($this->moved) {
+            return parent::doMove($directory, $filename);
+        }
+
+        $newPath = $directory.DIRECTORY_SEPARATOR.$filename;
+
+        if (!move_uploaded_file($this->getPath(), $newPath)) {
+            throw new FileException(sprintf('Could not move file %s to %s', $this->getPath(), $newPath));
+        }
+
+        $this->moved = true;
+        $this->path = realpath($newPath);
     }
 }

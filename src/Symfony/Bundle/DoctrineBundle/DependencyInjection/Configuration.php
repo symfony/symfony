@@ -156,13 +156,15 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('orm')
                     ->beforeNormalization()
-                        ->ifTrue(function ($v) { return is_array($v) && !array_key_exists('entity_managers', $v) && !array_key_exists('entity_manager', $v); })
+                        ->ifTrue(function ($v) { return null === $v || (is_array($v) && !array_key_exists('entity_managers', $v) && !array_key_exists('entity_manager', $v)); })
                         ->then(function ($v) {
+                            $v = (array) $v;
                             $entityManager = array();
                             foreach (array(
                                 'result_cache_driver', 'result-cache-driver',
                                 'metadata_cache_driver', 'metadata-cache-driver',
                                 'query_cache_driver', 'query-cache-driver',
+                                'auto_mapping', 'auto-mapping',
                                 'mappings', 'mapping',
                                 'connection'
                             ) as $key) {
@@ -206,6 +208,7 @@ class Configuration implements ConfigurationInterface
                 ->children()
                     ->scalarNode('connection')->end()
                     ->scalarNode('class_metadata_factory_name')->defaultValue('%doctrine.orm.class_metadata_factory_name%')->end()
+                    ->scalarNode('auto_mapping')->defaultFalse()->end()
                 ->end()
                 ->fixXmlConfig('hydrator')
                 ->children()
@@ -217,8 +220,6 @@ class Configuration implements ConfigurationInterface
                 ->fixXmlConfig('mapping')
                 ->children()
                     ->arrayNode('mappings')
-                        ->isRequired()
-                        ->requiresAtLeastOneElement()
                         ->useAttributeAsKey('name')
                         ->prototype('array')
                             ->beforeNormalization()

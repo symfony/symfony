@@ -449,8 +449,8 @@ class Form implements \IteratorAggregate, FormInterface
         if (null === $clientData || '' === $clientData) {
             $clientData = $this->emptyData;
 
-            if ($clientData instanceof \Closure) {
-                $clientData = $clientData->__invoke($this);
+            if (is_callable($clientData)) {
+                $clientData = call_user_func($clientData, $this);
             }
         }
 

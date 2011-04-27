@@ -9,7 +9,7 @@ timeline closely anyway.
 PR12 to beta1
 -------------
 
-* The `File::getWebPath()` method has been removed.
+* The `File::getWebPath()` and `File::rename()` methods have been removed.
 
 * The `session` configuration has been refactored:
 

@@ -83,7 +83,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Checks if we have an extension.
      *
      * @param string $name The name of the extension
-     * @return boolean If the extension exists
+     * @return Boolean If the extension exists
      */
     public function hasExtension($name)
     {

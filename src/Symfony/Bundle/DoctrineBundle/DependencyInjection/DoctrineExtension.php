@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bundle\DoctrineAbstractBundle\DependencyInjection\AbstractDoctrineExtension;
 use Symfony\Component\Config\FileLocator;
@@ -84,27 +85,19 @@ class DoctrineExtension extends AbstractDoctrineExtension
      */
     protected function loadDbalConnection($name, array $connection, ContainerBuilder $container)
     {
-        $containerDef = new Definition('%doctrine.dbal.configuration.class%');
-        $containerDef->setPublic(false);
+        // configuration
+        $configuration = $container->setDefinition(sprintf('doctrine.dbal.%s_connection.configuration', $name), new DefinitionDecorator('doctrine.dbal.connection.configuration'));
         if (isset($connection['logging']) && $connection['logging']) {
-            $containerDef->addMethodCall('setSQLLogger', array(new Reference('doctrine.dbal.logger')));
+            $configuration->addMethodCall('setSQLLogger', array(new Reference('doctrine.dbal.logger')));
             unset ($connection['logging']);
         }
-        $container->setDefinition(sprintf('doctrine.dbal.%s_connection.configuration', $name), $containerDef);
-
-        $driverDef = new Definition('Doctrine\DBAL\Connection');
-        $driverDef->setFactoryService('doctrine.dbal.connection_factory');
-        $driverDef->setFactoryMethod('createConnection');
-        $container->setDefinition(sprintf('doctrine.dbal.%s_connection', $name), $driverDef);
 
         // event manager
-        $eventManagerId = sprintf('doctrine.dbal.%s_connection.event_manager', $name);
-        $eventManagerDef = new Definition('%doctrine.dbal.event_manager.class%');
-        $eventManagerDef->setPublic(false);
-        $container->setDefinition($eventManagerId, $eventManagerDef);
+        $container->setDefinition(sprintf('doctrine.dbal.%s_connection.event_manager', $name), new DefinitionDecorator('doctrine.dbal.connection.event_manager'));
 
+        // connection
         if (isset($connection['charset'])) {
-            if ( (isset($connection['driver']) && stripos($connection['driver'], 'mysql') !== false) ||
+            if ((isset($connection['driver']) && stripos($connection['driver'], 'mysql') !== false) ||
                  (isset($connection['driverClass']) && stripos($connection['driverClass'], 'mysql') !== false)) {
                 $mysqlSessionInit = new Definition('%doctrine.dbal.events.mysql_session_init.class%');
                 $mysqlSessionInit->setArguments(array($connection['charset']));
@@ -121,14 +114,17 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
         if (isset($connection['platform_service'])) {
             $connection['platform'] = new Reference($connection['platform_service']);
-            unset ($connection['platform_service']);
+            unset($connection['platform_service']);
         }
 
-        $driverDef->setArguments(array(
-            $connection,
-            new Reference(sprintf('doctrine.dbal.%s_connection.configuration', $name)),
-            new Reference(sprintf('doctrine.dbal.%s_connection.event_manager', $name))
-        ));
+        $container
+            ->setDefinition(sprintf('doctrine.dbal.%s_connection', $name), new DefinitionDecorator('doctrine.dbal.connection'))
+            ->setArguments(array(
+                $connection,
+                new Reference(sprintf('doctrine.dbal.%s_connection.configuration', $name)),
+                new Reference(sprintf('doctrine.dbal.%s_connection.event_manager', $name)),
+            ))
+        ;
     }
 
     /**

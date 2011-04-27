@@ -9,7 +9,8 @@ timeline closely anyway.
 PR12 to beta1
 -------------
 
-* The `File::getWebPath()` and `File::rename()` methods have been removed.
+* The `File::getWebPath()` and `File::rename()` methods have been removed, as
+  well as the `framework.document_root` configuration setting.
 
 * The `session` configuration has been refactored:
 

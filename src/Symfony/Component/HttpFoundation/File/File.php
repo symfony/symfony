@@ -460,7 +460,7 @@ class File
             throw new FileNotFoundException($path);
         }
 
-        $this->path = $path;
+        $this->path = realpath($path);
     }
 
     /**
@@ -470,7 +470,7 @@ class File
      */
     public function __toString()
     {
-        return null === $this->path ? '' : $this->path;
+        return (string) $this->path;
     }
 
     /**

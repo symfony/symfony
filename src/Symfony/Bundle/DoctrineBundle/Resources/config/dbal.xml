@@ -34,10 +34,10 @@
             <argument /> <!-- Types -->
         </service>
 
-        <service id="doctrine.dbal.connection" class="%doctrine.dbal.connection.class%" factory-service="doctrine.dbal.connection_factory" factory-method="createConnection" public="false" abstract="true" />
+        <service id="doctrine.dbal.connection" class="%doctrine.dbal.connection.class%" factory-service="doctrine.dbal.connection_factory" factory-method="createConnection" abstract="true" />
 
-        <service id="doctrine.dbal.connection.event_manager" class="%doctrine.dbal.connection.event_manager.class%" public="false" abstract="true" />
+        <service id="doctrine.dbal.connection.event_manager" class="%doctrine.dbal.connection.event_manager.class%" abstract="true" />
 
-        <service id="doctrine.dbal.connection.configuration" class="%doctrine.dbal.configuration.class%" public="false" abstract="true" />
+        <service id="doctrine.dbal.connection.configuration" class="%doctrine.dbal.configuration.class%" abstract="true" />
     </services>
 </container>

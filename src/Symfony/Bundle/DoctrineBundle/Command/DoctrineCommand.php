@@ -102,6 +102,7 @@ abstract class DoctrineCommand extends Command
     {
         $connectionName = $name ?: $this->container->getParameter('doctrine.dbal.default_connection');
         $connectionName = sprintf('doctrine.dbal.%s_connection', $connectionName);
+
         if (!$this->container->has($connectionName)) {
             throw new \InvalidArgumentException(sprintf('<error>Could not find a connection named <comment>%s</comment></error>', $name));
         }

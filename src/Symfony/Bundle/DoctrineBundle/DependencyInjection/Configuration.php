@@ -58,11 +58,6 @@ class Configuration implements ConfigurationInterface
         $node
             ->children()
             ->arrayNode('dbal')
-                ->beforeNormalization()
-                    ->ifNull()
-                    // Define a default connection using the default values
-                    ->then(function($v) { return array ('connections' => array('default' => array())); })
-                ->end()
                 ->children()
                     ->scalarNode('default_connection')->end()
                 ->end()

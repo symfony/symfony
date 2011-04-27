@@ -7,7 +7,6 @@
     <parameters>
         <parameter key="doctrine.orm.configuration.class">Doctrine\ORM\Configuration</parameter>
         <parameter key="doctrine.orm.entity_manager.class">Doctrine\ORM\EntityManager</parameter>
-        <parameter key="doctrine.orm.entity_managers" type="collection"></parameter>
 
         <!-- cache -->
         <parameter key="doctrine.orm.cache.array.class">Doctrine\Common\Cache\ArrayCache</parameter>

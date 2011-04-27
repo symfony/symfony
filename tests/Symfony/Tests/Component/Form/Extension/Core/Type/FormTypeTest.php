@@ -23,7 +23,6 @@ use Symfony\Component\Form\HiddenField;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ExecutionView;

@@ -5,15 +5,9 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="doctrine.orm.default_entity_manager">default</parameter>
         <parameter key="doctrine.orm.configuration.class">Doctrine\ORM\Configuration</parameter>
         <parameter key="doctrine.orm.entity_manager.class">Doctrine\ORM\EntityManager</parameter>
-        <parameter key="doctrine.orm.auto_generate_proxy_classes">false</parameter>
         <parameter key="doctrine.orm.entity_managers" type="collection"></parameter>
-
-        <!-- proxies -->
-        <parameter key="doctrine.orm.proxy_namespace">Proxies</parameter>
-        <parameter key="doctrine.orm.proxy_dir">%kernel.cache_dir%/doctrine/orm/Proxies</parameter>
 
         <!-- cache -->
         <parameter key="doctrine.orm.cache.array.class">Doctrine\Common\Cache\ArrayCache</parameter>

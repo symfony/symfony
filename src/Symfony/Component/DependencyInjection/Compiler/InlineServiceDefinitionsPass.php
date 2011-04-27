@@ -106,7 +106,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
      * @param ContainerBuilder $container
      * @param string           $id
      * @param Definition       $definition
-     * @return boolean If the definition is inlineable
+     * @return Boolean If the definition is inlineable
      */
     private function isInlinableDefinition(ContainerBuilder $container, $id, Definition $definition)
     {

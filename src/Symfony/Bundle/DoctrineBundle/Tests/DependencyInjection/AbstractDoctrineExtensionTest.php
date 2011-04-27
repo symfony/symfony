@@ -95,7 +95,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->compileContainer($container);
 
         // doctrine.dbal.mysql_connection
-        $arguments = $container->getDefinition('doctrine.dbal.mysql_connection')->getArguments();
+        $arguments = $container->getDefinition('doctrine.dbal.default_connection')->getArguments();
         $config = $arguments[0];
 
         $this->assertEquals('mysql_s3cr3t', $config['password']);

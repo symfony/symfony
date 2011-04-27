@@ -97,7 +97,7 @@ interface InputInterface
     /**
      * Is this input means interactive?
      *
-     * @return bool
+     * @return boolean
      */
     function isInteractive();
 }

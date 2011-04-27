@@ -201,7 +201,7 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
      *
      * @param DOMNode $parentNode
      * @param array|object $data data
-     * @return bool
+     * @return boolean
      */
     private function buildXml($parentNode, $data)
     {

@@ -37,7 +37,7 @@ class ResizeFormListener implements EventSubscriberInterface
     private $type;
 
     /**
-     * @var bool
+     * @var boolean
      */
     private $resizeOnBind;
 

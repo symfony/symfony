@@ -32,7 +32,7 @@ class PhpExecutableFinder
     /**
      * Finds The PHP executable.
      *
-     * @return string The PHP executable path or false if it cannot be found
+     * @return string The PHP executable path
      */
     public function get()
     {
@@ -63,7 +63,7 @@ class PhpExecutableFinder
     /**
      * Finds the PHP executable
      *
-     * @return string|null
+     * @return string|null The PHP executable or null if it could not be found
      */
     public function find()
     {

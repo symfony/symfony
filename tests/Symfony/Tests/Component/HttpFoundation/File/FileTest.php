@@ -167,25 +167,6 @@ class FileTest extends \PHPUnit_Framework_TestCase
         @unlink($targetPath);
     }
 
-    public function testRename()
-    {
-        $path = __DIR__.'/Fixtures/test.copy.gif';
-        $targetPath = realpath(__DIR__.'/Fixtures').DIRECTORY_SEPARATOR.'test.target.gif';
-        @unlink($path);
-        @unlink($targetPath);
-        copy(realpath(__DIR__.'/Fixtures/test.gif'), $path);
-
-        $file = new File($path);
-        $file->rename('test.target.gif');
-
-        $this->assertTrue(file_exists($targetPath));
-        $this->assertFalse(file_exists($path));
-        $this->assertEquals($targetPath, $file->getPath());
-
-        @unlink($path);
-        @unlink($targetPath);
-    }
-
     protected function createMockGuesser($path, $mimeType)
     {
         $guesser = $this->getMock('Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface');

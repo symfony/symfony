@@ -123,7 +123,7 @@ abstract class AbstractDoctrineExtension extends Extension
             }
             $this->drivers[$mappingConfig['type']][$mappingConfig['prefix']] = realpath($mappingConfig['dir']);
         } else {
-            throw new \InvalidArgumentException(sprintf('Invalid mapping path given. Cannot load mapping/bundle named "%s".', $mappingName));
+            throw new \InvalidArgumentException(sprintf('Invalid Doctrine mapping path given. Cannot load Doctrine mapping/bundle named "%s".', $mappingName));
         }
     }
 
@@ -225,11 +225,11 @@ abstract class AbstractDoctrineExtension extends Extension
     protected function assertValidMappingConfiguration(array $mappingConfig, $objectManagerName)
     {
         if (!$mappingConfig['type'] || !$mappingConfig['dir'] || !$mappingConfig['prefix']) {
-            throw new \InvalidArgumentException(sprintf('Mapping definitions for manager "%s" require at least the "type", "dir" and "prefix" options.', $objectManagerName));
+            throw new \InvalidArgumentException(sprintf('Mapping definitions for Doctrine manager "%s" require at least the "type", "dir" and "prefix" options.', $objectManagerName));
         }
 
         if (!file_exists($mappingConfig['dir'])) {
-            throw new \InvalidArgumentException(sprintf('Specified non-existing directory "%s" as mapping source.', $mappingConfig['dir']));
+            throw new \InvalidArgumentException(sprintf('Specified non-existing directory "%s" as Doctrine mapping source.', $mappingConfig['dir']));
         }
 
         if (!in_array($mappingConfig['type'], array('xml', 'yml', 'annotation', 'php', 'staticphp'))) {

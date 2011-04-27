@@ -41,7 +41,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer();
         $loader = new DoctrineExtension();
 
-        $loader->load(array(array('dbal' => array('connections' => array('default'=> array('password' => 'foo')))), array(), array('dbal' => array('default_connection' => 'foo')), array()), $container);
+        $loader->load(array(array('dbal' => array('connections' => array('default' => array('password' => 'foo')))), array(), array('dbal' => array('default_connection' => 'foo')), array()), $container);
 
         $arguments = $container->getDefinition('doctrine.dbal.default_connection')->getArguments();
         $config = $arguments[0];
@@ -109,7 +109,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer();
         $loader = new DoctrineExtension();
 
-        $loader->load(array(array('dbal' => null, 'orm' => array('default_entity_manager' => 'default', 'entity_managers' => array('default' => array('mappings' => array('YamlBundle' => array())))))), $container);
+        $loader->load(array(array('dbal' => array('connections' => array('default' => array('password' => 'foo'))), 'orm' => array('default_entity_manager' => 'default', 'entity_managers' => array('default' => array('mappings' => array('YamlBundle' => array())))))), $container);
 
         $this->assertFalse($container->getParameter('doctrine.orm.auto_generate_proxy_classes'));
         $this->assertEquals('Doctrine\ORM\Configuration', $container->getParameter('doctrine.orm.configuration.class'));
@@ -140,7 +140,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         );
 
         $container = $this->getContainer();
-        $loader->load(array(array('dbal' => null, 'orm' => $config)), $container);
+        $loader->load(array(array('dbal' => array('connections' => array('default' => array('password' => 'foo'))), 'orm' => $config)), $container);
         $this->compileContainer($container);
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection');
@@ -189,7 +189,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer();
         $loader = new DoctrineExtension();
 
-        $loader->load(array(array('dbal' => null, 'orm' => array('default_entity_manager' => 'default', 'entity_managers' => array('default' => array('mappings' => array('YamlBundle' => array())))))), $container);
+        $loader->load(array(array('dbal' => array('connections' => array('default' => array('password' => 'foo'))), 'orm' => array('default_entity_manager' => 'default', 'entity_managers' => array('default' => array('mappings' => array('YamlBundle' => array())))))), $container);
         $this->compileContainer($container);
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection');
@@ -221,13 +221,14 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $this->assertDICConstructorArguments($definition, array(
             array(
+                'dbname' => 'db',
                 'host' => 'localhost',
-                'driver' => 'pdo_mysql',
-                'driverOptions' => array(),
+                'port' => null,
                 'user' => 'root',
                 'password' => null,
-                'port' => null,
+                'driver' => 'pdo_mysql',
                 'logging' => false,
+                'driverOptions' => array(),
             ),
             new Reference('doctrine.dbal.default_connection.configuration'),
             new Reference('doctrine.dbal.default_connection.event_manager')

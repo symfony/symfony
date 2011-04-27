@@ -17,20 +17,14 @@ use Symfony\Component\HttpFoundation\File\Exception\DirectoryNotFoundException;
 
 class FileTest extends \PHPUnit_Framework_TestCase
 {
-    protected $file;
-
-    protected function setUp()
-    {
-        $this->file = new File(__DIR__.'/Fixtures/test.gif');
-    }
-
     public function testGetMimeTypeUsesMimeTypeGuessers()
     {
-        $guesser = $this->createMockGuesser($this->file->getPathname(), 'image/gif');
+        $file = new File(__DIR__.'/Fixtures/test.gif');
+        $guesser = $this->createMockGuesser($file->getPathname(), 'image/gif');
 
         MimeTypeGuesser::getInstance()->register($guesser);
 
-        $this->assertEquals('image/gif', $this->file->getMimeType());
+        $this->assertEquals('image/gif', $file->getMimeType());
     }
 
     public function testGuessExtensionWithoutGuesser()
@@ -88,7 +82,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
         
         $this->assertTrue(file_exists($targetPath));
         $this->assertFalse(file_exists($path));
-        $this->assertEquals($targetPath, $movedFile->getPathname());
+        $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
 
         @unlink($targetPath);
     }
@@ -107,7 +101,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue(file_exists($targetPath));
         $this->assertFalse(file_exists($path));
-        $this->assertEquals($targetPath, $movedFile->getPathname());
+        $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
 
         @unlink($targetPath);
     }

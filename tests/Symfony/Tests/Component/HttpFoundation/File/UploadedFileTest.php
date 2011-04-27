@@ -103,7 +103,7 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue(file_exists($targetPath));
         $this->assertFalse(file_exists($path));
-        $this->assertEquals($targetPath, $movedFile->getPathname());
+        $this->assertEquals(realPath($targetPath), $movedFile->getRealPath());
 
         @unlink($targetPath);
     }    

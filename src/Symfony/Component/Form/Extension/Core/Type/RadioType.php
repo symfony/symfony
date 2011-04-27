@@ -28,7 +28,7 @@ class RadioType extends AbstractType
     public function buildView(FormView $view, FormInterface $form)
     {
         $view->set('value', $form->getAttribute('value'));
-        $view->set('checked', (bool)$form->getData());
+        $view->set('checked', (Boolean) $form->getData());
 
         if ($view->hasParent()) {
             $view->set('name', $view->getParent()->get('name'));

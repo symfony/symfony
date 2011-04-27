@@ -98,7 +98,7 @@ class StubCollator
      *                           StubCollator::SORT_REGULAR - compare items normally (don't change types)
      *                           StubCollator::SORT_NUMERIC - compare items numerically
      *                           StubCollator::SORT_STRING - compare items as strings
-     * @return bool              True on success or false on failure
+     * @return Boolean           True on success or false on failure
      */
     public function asort(&$array, $sortFlag = self::SORT_REGULAR)
     {
@@ -118,7 +118,7 @@ class StubCollator
      *
      * @param  string  $str1   The first string to compare
      * @param  string  $str2   The second string to compare
-     * @return bool|int        Return the comparison result or false on failure:
+     * @return Boolean|int     Return the comparison result or false on failure:
      *                         1 if $str1 is greater than $str2
      *                         0 if $str1 is equal than $str2
      *                         -1 if $str1 is less than $str2
@@ -134,7 +134,7 @@ class StubCollator
      * Get a value of an integer collator attribute
      *
      * @param  int   $attr   An attribute specifier, one of the attribute constants
-     * @return bool|int      The attribute value on success or false on error
+     * @return Boolean|int   The attribute value on success or false on error
      * @see    http://www.php.net/manual/en/collator.getattribute.php
      * @throws MethodNotImplementedException
      */
@@ -190,7 +190,7 @@ class StubCollator
     /**
      * Get current collator's strenght
      *
-     * @return bool|int   The current collator's strenght or false on failure
+     * @return Boolean|int   The current collator's strenght or false on failure
      * @see    http://www.php.net/manual/en/collator.getstrength.php
      * @throws MethodNotImplementedException
      */
@@ -204,7 +204,7 @@ class StubCollator
      *
      * @param  int   $attr   An attribute specifier, one of the attribute constants
      * @param  int   $val    The attribute value, one of the attribute value constants
-     * @return bool          True on success or false on failure
+     * @return Boolean       True on success or false on failure
      * @see    http://www.php.net/manual/en/collator.setattribute.php
      * @throws MethodNotImplementedException
      */
@@ -223,7 +223,7 @@ class StubCollator
      *                           StubCollator::QUATERNARY
      *                           StubCollator::IDENTICAL
      *                           StubCollator::DEFAULT
-     * @return bool              True on success or false on failure
+     * @return Boolean           True on success or false on failure
      * @see    http://www.php.net/manual/en/collator.setstrength.php
      * @throws MethodNotImplementedException
      */
@@ -236,7 +236,7 @@ class StubCollator
      * Sort array using specified collator and sort keys
      *
      * @param  array   &$arr   Array of strings to sort
-     * @return bool            True on success or false on failure
+     * @return Boolean         True on success or false on failure
      * @see    http://www.php.net/manual/en/collator.sortwithsortkeys.php
      * @throws MethodNotImplementedException
      */
@@ -253,7 +253,7 @@ class StubCollator
      *                             StubCollator::SORT_REGULAR
      *                             StubCollator::SORT_NUMERIC
      *                             StubCollator::SORT_STRING
-     * @return bool                True on success or false on failure
+     * @return Boolean             True on success or false on failure
      * @see    http://www.php.net/manual/en/collator.sort.php
      * @throws MethodNotImplementedException
      */

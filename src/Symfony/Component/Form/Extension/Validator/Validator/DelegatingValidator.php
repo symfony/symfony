@@ -67,11 +67,13 @@ class DelegatingValidator implements FormValidatorInterface
                     foreach ($mapping as $mappedPath => $child) {
                         if (preg_match($mappedPath, $propertyPath)) {
                             $child->addError($error);
-                            continue 2;
+                            goto next_violation;
                         }
                     }
 
                     $form->addError($error);
+
+                    next_violation:
                 }
             }
         }

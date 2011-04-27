@@ -58,6 +58,22 @@ class Configuration implements ConfigurationInterface
         $node
             ->children()
             ->arrayNode('dbal')
+                ->beforeNormalization()
+                    ->ifTrue(function ($v) { return is_array($v) && !array_key_exists('connections', $v) && !array_key_exists('connection', $v); })
+                    ->then(function ($v) {
+                        $connection = array();
+                        foreach (array('dbname', 'host', 'port', 'user', 'password', 'driver', 'driver_class', 'options', 'path', 'memory', 'unix_socket', 'wrapper_class', 'platform_service', 'charset', 'logging') as $key) {
+                            if (array_key_exists($key, $v)) {
+                                $connection[$key] = $v[$key];
+                                unset($v[$key]);
+                            }
+                        }
+                        $v['default_connection'] = isset($v['default_connection']) ? (string) $v['default_connection'] : 'default';
+                        $v['connections'] = array($v['default_connection'] => $connection);
+
+                        return $v;
+                    })
+                ->end()
                 ->children()
                     ->scalarNode('default_connection')->end()
                 ->end()

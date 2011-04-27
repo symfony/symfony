@@ -9,6 +9,36 @@ timeline closely anyway.
 beta1 to beta2
 --------------
 
+* Doctrine event subscribers now use a unique "doctrine.event_subscriber" tag.
+  Doctrine event listeners also use a unique "doctrine.event_listener" tag. To
+  specify a connection, use the optional "connection" attribute.
+
+    Before:
+
+        listener:
+            class: MyEventListener
+            tags:
+                - { name: doctrine.common.event_listener, event: name }
+                - { name: doctrine.dbal.default_event_listener, event: name }
+        subscriber:
+            class: MyEventSubscriber
+            tags:
+                - { name: doctrine.common.event_subscriber }
+                - { name: doctrine.dbal.default_event_subscriber }
+
+    After:
+
+        listener:
+            class: MyEventListener
+            tags:
+                - { name: doctrine.event_listener, event: name }                      # register for all connections
+                - { name: doctrine.event_listener, event: name, connection: default } # only for the default connection
+        subscriber:
+            class: MyEventSubscriber
+            tags:
+                - { name: doctrine.event_subscriber }                      # register for all connections
+                - { name: doctrine.event_subscriber, connection: default } # only for the default connection
+
 * The `doctrine.orm.entity_managers` is now hash of entity manager names/ids pairs:
 
     Before: array('default', 'foo')

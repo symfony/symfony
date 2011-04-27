@@ -6,6 +6,14 @@ one. It only discusses changes that need to be done when using the "public"
 API of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.
 
+beta1 to beta2
+--------------
+
+* The `doctrine.orm.entity_managers` is now hash of entity manager names/ids pairs:
+
+    Before: array('default', 'foo')
+    After:  array('default' => 'doctrine.orm.default_entity_manager', 'foo' => 'doctrine.orm.foo_entity_manager'))
+
 PR12 to beta1
 -------------
 

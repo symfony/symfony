@@ -154,7 +154,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('create', $definition->getFactoryMethod());
         $this->assertArrayHasKey('doctrine.orm.entity_manager', $definition->getTags());
 
-        $this->assertEquals(array("default"), $container->getParameter('doctrine.orm.entity_managers'), "Set of the existing EntityManagers names is incorrect.");
+        $this->assertEquals(array('default' => 'doctrine.orm.default_entity_manager'), $container->getParameter('doctrine.orm.entity_managers'), "Set of the existing EntityManagers names is incorrect.");
 
         $arguments = $definition->getArguments();
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[0]);
@@ -567,7 +567,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $this->compileContainer($container);
 
-        $this->assertEquals(array("em1", "em2"), $container->getParameter('doctrine.orm.entity_managers'), "Set of the existing EntityManagers names is incorrect.");
+        $this->assertEquals(array('em1' => 'doctrine.orm.em1_entity_manager', 'em2' => 'doctrine.orm.em2_entity_manager'), $container->getParameter('doctrine.orm.entity_managers'), "Set of the existing EntityManagers names is incorrect.");
 
         $def1 = $container->getDefinition('doctrine.orm.em1_metadata_driver');
         $def2 = $container->getDefinition('doctrine.orm.em2_metadata_driver');

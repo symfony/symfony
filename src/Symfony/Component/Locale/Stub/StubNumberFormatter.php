@@ -292,7 +292,7 @@ class StubNumberFormatter
      *
      * @param  number      $value                     The value to format
      * @param  int         $type                      Type of the formatting, one of the format type constants
-     * @return bool|string                            The formatted value or false on error
+     * @return Boolean|string                         The formatted value or false on error
      * @see    http://www.php.net/manual/en/numberformatter.format.php
      * @throws RuntimeException                       If the method is called with the class $style 'CURRENCY'
      * @throws MethodArgumentNotImplementedException  If the $type is different than TYPE_DEFAULT
@@ -327,7 +327,7 @@ class StubNumberFormatter
      * Returns an attribute value
      *
      * @param  int       $attr   An attribute specifier, one of the numeric attribute constants
-     * @return bool|int          The attribute value on success or false on error
+     * @return Boolean|int       The attribute value on success or false on error
      * @see    http://www.php.net/manual/en/numberformatter.getattribute.php
      */
     public function getAttribute($attr)
@@ -372,7 +372,7 @@ class StubNumberFormatter
     /**
      * Returns the formatter's pattern
      *
-     * @return bool|string        The pattern string used by the formatter or false on error
+     * @return Boolean|string     The pattern string used by the formatter or false on error
      * @see    http://www.php.net/manual/en/numberformatter.getpattern.php
      * @throws MethodNotImplementedException
      */
@@ -385,7 +385,7 @@ class StubNumberFormatter
      * Returns a formatter symbol value
      *
      * @param  int           $attr   A symbol specifier, one of the format symbol constants
-     * @return bool|string           The symbol value or false on error
+     * @return Boolean|string        The symbol value or false on error
      * @see    http://www.php.net/manual/en/numberformatter.getsymbol.php
      * @throws MethodNotImplementedException
      */
@@ -398,7 +398,7 @@ class StubNumberFormatter
      * Returns a formatter text attribute value
      *
      * @param  int           $attr   An attribute specifier, one of the text attribute constants
-     * @return bool|string           The attribute value or false on error
+     * @return Boolean|string        The attribute value or false on error
      * @see    http://www.php.net/manual/en/numberformatter.gettextattribute.php
      * @throws MethodNotImplementedException
      */
@@ -413,7 +413,7 @@ class StubNumberFormatter
      * @param  string       $value      The value to parse
      * @param  string       $currency   Parameter to receive the currency name (reference)
      * @param  int          $position   Offset to begin the parsing on return this value will hold the offset at which the parsing ended
-     * @return bool|string              The parsed numeric value of false on error
+     * @return Boolean|string           The parsed numeric value of false on error
      * @see    http://www.php.net/manual/en/numberformatter.parsecurrency.php
      * @throws MethodNotImplementedException
      */
@@ -428,7 +428,7 @@ class StubNumberFormatter
      * @param  string       $value                          The value to parse
      * @param  string       $type                           Type of the formatting, one of the format type constants. NumberFormatter::TYPE_DOUBLE by default
      * @param  int          $position                       Offset to begin the parsing on return this value will hold the offset at which the parsing ended
-     * @return bool|string                                  The parsed value of false on error
+     * @return Boolean|string                               The parsed value of false on error
      * @see    http://www.php.net/manual/en/numberformatter.parse.php
      * @throws MethodArgumentValueNotImplementedException   When $type equals to TYPE_INT64, behavior not implemented
      * @throws MethodArgumentNotImplementedException        When $position different than null, behavior not implemented
@@ -468,7 +468,7 @@ class StubNumberFormatter
      *
      * @param  int   $attr                                 An attribute specifier, one of the numeric attribute constants
      * @param  int   $value                                The attribute value
-     * @return bool                                        true on success or false on failure
+     * @return Boolean                                     true on success or false on failure
      * @see    http://www.php.net/manual/en/numberformatter.setattribute.php
      * @throws MethodArgumentValueNotImplementedException  When the $attr is not supported
      * @throws MethodArgumentValueNotImplementedException  When the $value is not supported
@@ -510,7 +510,7 @@ class StubNumberFormatter
      * Set the formatter's pattern
      *
      * @param  string  $pattern   A pattern string in conformance with the ICU DecimalFormat documentation
-     * @return bool               true on success or false on failure
+     * @return Boolean            true on success or false on failure
      * @see    http://www.php.net/manual/en/numberformatter.setpattern.php
      * @see    http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
      * @throws MethodNotImplementedException
@@ -525,7 +525,7 @@ class StubNumberFormatter
      *
      * @param  int      $attr    A symbol specifier, one of the format symbol constants
      * @param  string   $value   The value for the symbol
-     * @return bool              true on success or false on failure
+     * @return Boolean           true on success or false on failure
      * @see    http://www.php.net/manual/en/numberformatter.setsymbol.php
      * @throws MethodNotImplementedException
      */
@@ -539,7 +539,7 @@ class StubNumberFormatter
      *
      * @param  int   $attr       An attribute specifier, one of the text attribute constants
      * @param  int   $value      The attribute value
-     * @return bool              true on success or false on failure
+     * @return Boolean           true on success or false on failure
      * @see    http://www.php.net/manual/en/numberformatter.settextattribute.php
      * @throws MethodNotImplementedException
      */
@@ -674,7 +674,7 @@ class StubNumberFormatter
      * Check if the attribute is initialized (value set by client code).
      *
      * @param  string  $attr   The attribute name
-     * @return bool            true if the value was set by cliente, false otherwise
+     * @return Boolean         true if the value was set by cliente, false otherwise
      */
     private function isInitializedAttribute($attr)
     {
@@ -719,7 +719,7 @@ class StubNumberFormatter
      * Check if the rounding mode is invalid.
      *
      * @param  int    $value  The rounding mode value to check
-     * @return bool           true if the rounding mode is invalid, false otherwise
+     * @return Boolean        true if the rounding mode is invalid, false otherwise
      */
     private function isInvalidRoundingMode($value)
     {
@@ -732,13 +732,13 @@ class StubNumberFormatter
 
     /**
      * Returns the normalized value for the GROUPING_USED attribute. Any value that can be converted to int will be
-     * cast to boolean and then to int again. This way, negative values are converted to 1 and string values to 0.
+     * cast to Boolean and then to int again. This way, negative values are converted to 1 and string values to 0.
      *
      * @param  mixed  $value   The value to be normalized
      * @return int             The normalized value for the attribute (0 or 1)
      */
     private function normalizeGroupingUsedValue($value) {
-        return (int) (bool) (int) $value;
+        return (int) (Boolean) (int) $value;
     }
 
     /**

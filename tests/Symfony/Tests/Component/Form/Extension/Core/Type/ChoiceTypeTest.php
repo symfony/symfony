@@ -227,7 +227,7 @@ class ChoiceTypeTest extends TypeTestCase
     }
 
     /*
-     * We need this functionality to create choice fields for boolean types,
+     * We need this functionality to create choice fields for Boolean types,
      * e.g. false => 'No', true => 'Yes'
      */
     public function testSetDataSingleNonExpandedAcceptsBoolean()

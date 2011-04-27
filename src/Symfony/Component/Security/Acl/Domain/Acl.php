@@ -249,11 +249,13 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
 
             foreach ($this->loadedSids as $loadedSid) {
                 if ($loadedSid->equals($sid)) {
-                    continue 2;
+                    goto next_sid;
                 }
             }
 
             return false;
+
+            next_sid:
         }
 
         return true;

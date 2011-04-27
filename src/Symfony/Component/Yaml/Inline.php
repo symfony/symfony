@@ -287,7 +287,7 @@ class Inline
                 case ' ':
                 case ',':
                     ++$i;
-                    continue 2;
+                    goto next_char;
                 case '}':
                     return $output;
             }
@@ -321,9 +321,11 @@ class Inline
                 ++$i;
 
                 if ($done) {
-                    continue 2;
+                    goto next_char;
                 }
             }
+
+            next_char:
         }
 
         throw new ParserException(sprintf('Malformed inline YAML string %s', $mapping));

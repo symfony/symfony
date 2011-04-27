@@ -155,10 +155,12 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                             $firstRejectedAce = $ace;
                         }
 
-                        break 2;
+                        goto next_mask;
                     }
                 }
             }
+
+            next_mask:
         }
 
         if (null !== $firstRejectedAce) {

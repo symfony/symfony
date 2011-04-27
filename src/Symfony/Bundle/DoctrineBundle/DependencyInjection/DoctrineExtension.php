@@ -142,7 +142,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('orm.xml');
 
-        $entityManagers = array_keys($config['entity_managers']);
+        $container->setParameter('doctrine.orm.entity_managers', $entityManagers = array_keys($config['entity_managers']));
 
         if (empty ($config['default_entity_manager'])) {
             $config['default_entity_manager'] = reset($entityManagers);
@@ -159,8 +159,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
             $entityManager['name'] = $name;
             $this->loadOrmEntityManager($entityManager, $container);
         }
-
-        $container->setParameter('doctrine.orm.entity_managers', $entityManagers);
     }
 
     /**
@@ -171,11 +169,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
      */
     protected function loadOrmEntityManager(array $entityManager, ContainerBuilder $container)
     {
-        $configServiceName = sprintf('doctrine.orm.%s_configuration', $entityManager['name']);
-
-        $ormConfigDef = new Definition('%doctrine.orm.configuration.class%');
-        $ormConfigDef->setPublic(false);
-        $container->setDefinition($configServiceName, $ormConfigDef);
+        $ormConfigDef = $container->setDefinition(sprintf('doctrine.orm.%s_configuration', $entityManager['name']), new DefinitionDecorator('doctrine.orm.configuration'));
 
         $this->loadOrmEntityManagerMappingInformation($entityManager, $ormConfigDef, $container);
         $this->loadOrmCacheDrivers($entityManager, $container);

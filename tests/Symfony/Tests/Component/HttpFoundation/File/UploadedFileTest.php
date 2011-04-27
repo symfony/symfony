@@ -12,6 +12,7 @@
 namespace Symfony\Tests\Component\HttpFoundation\File;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class UploadedFileTest extends \PHPUnit_Framework_TestCase
 {
@@ -81,30 +82,19 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('original.gif', $file->getOriginalBasename());
     }
     
-    public function testMove()
+    /**
+     * @expectedException Symfony\Component\HttpFoundation\File\Exception\FileException
+     */
+    public function testMoveLocalFile()
     {
-        $path = __DIR__.'/Fixtures/test.copy.gif';
-        $targetDir = __DIR__.'/Fixtures/directory';
-        $targetPath = $targetDir.'/test.copy.gif';
-        @unlink($path);
-        @unlink($targetPath);
-        copy(__DIR__.'/Fixtures/test.gif', $path);
-
         $file = new UploadedFile(
-            $path,
+            __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
             filesize(__DIR__.'/Fixtures/test.gif'),
             UPLOAD_ERR_OK                
         );
         
-        $movedFile = $file->move($targetDir);
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\File', $movedFile);        
-
-        $this->assertTrue(file_exists($targetPath));
-        $this->assertFalse(file_exists($path));
-        $this->assertEquals(realPath($targetPath), $movedFile->getRealPath());
-
-        @unlink($targetPath);
+        $movedFile = $file->move(__DIR__.'/Fixtures/directory');
     }    
 }

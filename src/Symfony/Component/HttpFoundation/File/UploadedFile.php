@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpFoundation\File;
 
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use Symfony\Component\HttpFoundation\File\Exception\DirectoryNotFoundException;
 
 /**
  * A file uploaded through a form.
@@ -150,4 +151,24 @@ class UploadedFile extends File
     {
         return $this->error === UPLOAD_ERR_OK;
     }
+    
+    /**
+     * Moves the file to a new location.
+     *
+     * @param string $directory The destination folder
+     * @param string $name      The new file name
+     * 
+     * @return File A File object representing the new file
+     * 
+     * @throws DirectoryNotFoundException if the destination folder does not exists
+     * @throws FileException if the file has not been uploaded via Http
+     */
+    public function move($directory, $name = null)
+    {        
+        if (!is_uploaded_file($this->getPathname())) {
+            throw new FileException(sprintf('The file "%s" has not been uploaded via Http', $this->getPathname()));
+        }
+        
+        return parent::move($directory, $name);
+    }    
 }

@@ -499,7 +499,7 @@ class File extends \SplFileInfo
         try {
             $size = parent::getSize();
         } catch (\RuntimeException $e) {
-            throw new FileException(sprintf('Could not read file size of %s', $this->getPathname()), $e->getCode(), $e);
+            throw new FileException(sprintf('Could not read the file size of "%s"', $this->getPathname()), $e->getCode(), $e);
         }
         
         return $size;
@@ -523,11 +523,11 @@ class File extends \SplFileInfo
             throw new DirectoryNotFoundException($directory);
         }
         
-        $newPath = realpath($directory).DIRECTORY_SEPARATOR.(null === $name ? $this->getBasename() : basename($name));
+        $newPath = $targetDir.DIRECTORY_SEPARATOR.(null === $name ? $this->getBasename() : basename($name));
         
         if (!@rename($this->getPathname(), $newPath)) {
             $error = error_get_last();
-            throw new FileException(sprintf('Could not move file %s to %s (%s)', $this->getPath(), $newPath, strip_tags($error['message'])));
+            throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $newPath, strip_tags($error['message'])));
         }
 
         return new self($newPath);

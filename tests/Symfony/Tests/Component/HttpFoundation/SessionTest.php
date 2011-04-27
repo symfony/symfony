@@ -162,14 +162,20 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     public function testLocale()
     {
         $this->assertSame('en', $this->session->getLocale(), 'default locale is en');
+        $this->assertSame('en', \Locale::getDefault(), '\Locale::getDefault() is en');
 
         $this->session->set('_locale','de');
-
         $this->assertSame('de', $this->session->getLocale(), 'locale is de');
+        $this->assertSame('de', \Locale::getDefault(), '\Locale::getDefault() is de');
 
         $this->session = $this->getSession();
         $this->session->setLocale('fr');
         $this->assertSame('fr', $this->session->getLocale(), 'locale is fr');
+        $this->assertSame('fr', \Locale::getDefault(), '\Locale::getDefault() is fr');
+
+        $this->session->setAttributes(array('_locale' => 'de'));
+        $this->assertSame('de', $this->session->getLocale(), 'locale is de');
+        $this->assertSame('de', \Locale::getDefault(), '\Locale::getDefault() is de');
     }
 
     public function testGetId()
@@ -182,11 +188,14 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session->start();
 
         $this->assertSame('en', $this->session->getLocale());
+        $this->assertSame('en', \Locale::getDefault());
+
         $this->assertSame(array(), $this->session->getFlashes());
         $this->assertSame(array('_flash' => array(), '_locale' => 'en'), $this->session->getAttributes());
 
         $this->session->start();
         $this->assertSame('en', $this->session->getLocale());
+        $this->assertSame('en', \Locale::getDefault());
     }
 
     protected function getSession()

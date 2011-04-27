@@ -169,6 +169,10 @@ class DoctrineExtension extends AbstractDoctrineExtension
      */
     protected function loadOrmEntityManager(array $entityManager, ContainerBuilder $container)
     {
+        if ($entityManager['auto_mapping'] && count($container->getParameter('doctrine.orm.entity_managers')) > 1) {
+            throw new \LogicException('You cannot enable "auto_mapping" when several entity managers are defined.');
+        }
+
         $ormConfigDef = $container->setDefinition(sprintf('doctrine.orm.%s_configuration', $entityManager['name']), new DefinitionDecorator('doctrine.orm.configuration'));
 
         $this->loadOrmEntityManagerMappingInformation($entityManager, $ormConfigDef, $container);

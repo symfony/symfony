@@ -60,7 +60,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('dbal.xml');
 
-        if (empty ($config['default_connection'])) {
+        if (empty($config['default_connection'])) {
             $keys = array_keys($config['connections']);
             $config['default_connection'] = reset($keys);
         }
@@ -144,7 +144,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
         $container->setParameter('doctrine.orm.entity_managers', $entityManagers = array_keys($config['entity_managers']));
 
-        if (empty ($config['default_entity_manager'])) {
+        if (empty($config['default_entity_manager'])) {
             $config['default_entity_manager'] = reset($entityManagers);
         }
 
@@ -174,33 +174,33 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $this->loadOrmEntityManagerMappingInformation($entityManager, $ormConfigDef, $container);
         $this->loadOrmCacheDrivers($entityManager, $container);
 
-        $uniqueMethods = array(
-            'setMetadataCacheImpl'          => new Reference(sprintf('doctrine.orm.%s_metadata_cache', $entityManager['name'])),
-            'setQueryCacheImpl'             => new Reference(sprintf('doctrine.orm.%s_query_cache', $entityManager['name'])),
-            'setResultCacheImpl'            => new Reference(sprintf('doctrine.orm.%s_result_cache', $entityManager['name'])),
-            'setMetadataDriverImpl'         => new Reference('doctrine.orm.'.$entityManager['name'].'_metadata_driver'),
-            'setProxyDir'                   => '%doctrine.orm.proxy_dir%',
-            'setProxyNamespace'             => '%doctrine.orm.proxy_namespace%',
-            'setAutoGenerateProxyClasses'   => '%doctrine.orm.auto_generate_proxy_classes%',
-            'setClassMetadataFactoryName'   => $entityManager['class_metadata_factory_name'],
+        $methods = array(
+            'setMetadataCacheImpl'        => new Reference(sprintf('doctrine.orm.%s_metadata_cache', $entityManager['name'])),
+            'setQueryCacheImpl'           => new Reference(sprintf('doctrine.orm.%s_query_cache', $entityManager['name'])),
+            'setResultCacheImpl'          => new Reference(sprintf('doctrine.orm.%s_result_cache', $entityManager['name'])),
+            'setMetadataDriverImpl'       => new Reference('doctrine.orm.'.$entityManager['name'].'_metadata_driver'),
+            'setProxyDir'                 => '%doctrine.orm.proxy_dir%',
+            'setProxyNamespace'           => '%doctrine.orm.proxy_namespace%',
+            'setAutoGenerateProxyClasses' => '%doctrine.orm.auto_generate_proxy_classes%',
+            'setClassMetadataFactoryName' => $entityManager['class_metadata_factory_name'],
         );
-        foreach ($uniqueMethods as $method => $arg) {
+        foreach ($methods as $method => $arg) {
             $ormConfigDef->addMethodCall($method, array($arg));
         }
 
         foreach ($entityManager['hydrators'] as $name => $class) {
-            $ormConfigDef->addMethodCall('addCustomHydrationMode', array ($name, $class));
+            $ormConfigDef->addMethodCall('addCustomHydrationMode', array($name, $class));
         }
 
         if (!empty($entityManager['dql'])) {
             foreach ($entityManager['dql']['string_functions'] as $name => $function) {
-                $ormConfigDef->addMethodCall('addCustomStringFunction', array ($name, $function));
+                $ormConfigDef->addMethodCall('addCustomStringFunction', array($name, $function));
             }
             foreach ($entityManager['dql']['numeric_functions'] as $name => $function) {
-                $ormConfigDef->addMethodCall('addCustomNumericFunction', array ($name, $function));
+                $ormConfigDef->addMethodCall('addCustomNumericFunction', array($name, $function));
             }
             foreach ($entityManager['dql']['datetime_functions'] as $name => $function) {
-                $ormConfigDef->addMethodCall('addCustomDatetimeFunction', array ($name, $function));
+                $ormConfigDef->addMethodCall('addCustomDatetimeFunction', array($name, $function));
             }
         }
 
@@ -270,7 +270,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
     protected function getObjectManagerElementName($name)
     {
-        return 'doctrine.orm.' . $name;
+        return 'doctrine.orm.'.$name;
     }
 
     protected function getMappingObjectDefaultName()
@@ -324,10 +324,10 @@ class DoctrineExtension extends AbstractDoctrineExtension
     {
         switch ($cacheDriver['type']) {
             case 'memcache':
-                $memcacheClass = !empty ($cacheDriver['class']) ? $cacheDriver['class'] : '%doctrine.orm.cache.memcache.class%';
-                $memcacheInstanceClass = !empty ($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%doctrine.orm.cache.memcache_instance.class%';
-                $memcacheHost = !empty ($cacheDriver['host']) ? $cacheDriver['host'] : '%doctrine.orm.cache.memcache_host%';
-                $memcachePort = !empty ($cacheDriver['port']) ? $cacheDriver['port'] : '%doctrine.orm.cache.memcache_port%';
+                $memcacheClass = !empty($cacheDriver['class']) ? $cacheDriver['class'] : '%doctrine.orm.cache.memcache.class%';
+                $memcacheInstanceClass = !empty($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%doctrine.orm.cache.memcache_instance.class%';
+                $memcacheHost = !empty($cacheDriver['host']) ? $cacheDriver['host'] : '%doctrine.orm.cache.memcache_host%';
+                $memcachePort = !empty($cacheDriver['port']) ? $cacheDriver['port'] : '%doctrine.orm.cache.memcache_port%';
                 $cacheDef = new Definition($memcacheClass);
                 $memcacheInstance = new Definition($memcacheInstanceClass);
                 $memcacheInstance->addMethodCall('connect', array(

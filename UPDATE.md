@@ -9,7 +9,13 @@ timeline closely anyway.
 PR12 to beta1
 -------------
 
-* The `File::getWebPath()` and `File::rename()` methods have been removed.
+* The `File` class has been refactored:
+
+  * It nows extends `\SplFileInfo` and rely on its base methods;
+
+  * `getExtension()` return the extension without the leading '.';
+
+  * `move()` returns a new File instance to represent the moved file.
 
 * The `session` configuration has been refactored:
 

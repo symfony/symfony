@@ -83,7 +83,7 @@ class UploadedFile extends File
      * Warning: The returned mime type is not safe as it defaults to the mime
      * type provide by the end user which could have been manipulated.
      * 
-     * @see getSafeMimeType
+     * @see getSafeMimeType()
      *
      * @return string|null The guessed mime type (i.e. "application/pdf")
      */

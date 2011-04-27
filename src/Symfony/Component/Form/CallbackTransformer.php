@@ -11,25 +11,35 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
+
 class CallbackTransformer implements DataTransformerInterface
 {
     private $transform;
 
     private $reverseTransform;
 
-    public function __construct(\Closure $transform, \Closure $reverseTransform)
+    public function __construct($transform, $reverseTransform)
     {
+        if (!is_callable($transform)) {
+            throw new UnexpectedTypeException($transform, 'function');
+        }
+        
+        if (!is_callable($reverseTransform)) {
+            throw new UnexpectedTypeException($reverseTransform, 'function');
+        }
+
         $this->transform = $transform;
         $this->reverseTransform = $reverseTransform;
     }
 
     public function transform($data)
     {
-        return $this->transform->__invoke($data);
+        return call_user_func($this->transform, $data);
     }
 
     public function reverseTransform($data)
     {
-        return $this->reverseTransform->__invoke($data);
+        return call_user_func($this->reverseTransform, $data);
     }
 }

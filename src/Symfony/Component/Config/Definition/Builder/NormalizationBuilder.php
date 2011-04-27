@@ -53,13 +53,17 @@ class NormalizationBuilder
     /**
      * Registers a closure to run before the normalization or an expression builder to build it if null is provided.
      *
-     * @param \Closure $closure
+     * @param function $closure
      *
      * @return ExprBuilder|NormalizationBuilder
      */
-    public function before(\Closure $closure = null)
+    public function before($closure = null)
     {
         if (null !== $closure) {
+            if (!is_callable($closure)) {
+                throw new \InvalidArgumentException('The parameter should be a function or null');
+            }
+            
             $this->before[] = $closure;
 
             return $this;

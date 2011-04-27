@@ -17,6 +17,7 @@ use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class ValidatorTypeGuesser implements FormTypeGuesserInterface
 {
@@ -67,14 +68,18 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      * Iterates over the constraints of a property, executes a constraints on
      * them and returns the best guess
      *
-     * @param string $class       The class to read the constraints from
-     * @param string $property    The property for which to find constraints
-     * @param \Closure $guessForConstraint   The closure that returns a guess
-     *                            for a given constraint
+     * @param string    $class              The class to read the constraints from
+     * @param string    $property           The property for which to find constraints
+     * @param function  $guessForConstraint The closure that returns a guess
+     *                                      for a given constraint
      * @return Guess  The guessed value with the highest confidence
      */
-    protected function guess($class, $property, \Closure $guessForConstraint)
+    protected function guess($class, $property, $guessForConstraint)
     {
+        if (!is_callable($guessForConstraint)) {
+            throw new UnexpectedTypeException($guessForConstraint, 'function');
+        }
+        
         $guesses = array();
         $classMetadata = $this->metadataFactory->getClassMetadata($class);
 

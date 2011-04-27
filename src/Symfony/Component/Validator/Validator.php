@@ -100,13 +100,17 @@ class Validator implements ValidatorInterface
         return $this->validateGraph($value, $walk, $groups);
     }
 
-    protected function validateGraph($root, \Closure $walk, $groups = null)
+    protected function validateGraph($root, $walk, $groups = null)
     {
+        if (!is_callable($walk)) {
+            throw new \InvalidArgumentException('$walk should be a function');
+        }
+        
         $walker = new GraphWalker($root, $this->metadataFactory, $this->validatorFactory);
         $groups = $groups ? (array) $groups : array(Constraint::DEFAULT_GROUP);
 
         foreach ($groups as $group) {
-            $walk($walker, $group);
+            call_user_func($walk, $walker, $group);
         }
 
         return $walker->getViolations();

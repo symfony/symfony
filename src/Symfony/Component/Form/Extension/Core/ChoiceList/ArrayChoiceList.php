@@ -21,8 +21,8 @@ class ArrayChoiceList implements ChoiceListInterface
 
     public function __construct($choices)
     {
-        if (!is_array($choices) && !$choices instanceof \Closure) {
-            throw new UnexpectedTypeException($choices, 'array or \Closure');
+        if (!is_array($choices) && !is_callable($choices)) {
+            throw new UnexpectedTypeException($choices, 'array or function');
         }
 
         $this->choices = $choices;
@@ -44,8 +44,8 @@ class ArrayChoiceList implements ChoiceListInterface
     {
         $this->loaded = true;
 
-        if ($this->choices instanceof \Closure) {
-            $this->choices = $this->choices->__invoke();
+        if (is_callable($this->choices)) {
+            $this->choices = call_user_func($this->choices);
 
             if (!is_array($this->choices)) {
                 throw new UnexpectedTypeException($this->choices, 'array');

@@ -173,8 +173,8 @@ class EventDispatcher implements EventDispatcherInterface
      */
     protected function triggerListener($listener, $eventName, Event $event)
     {
-        if ($listener instanceof \Closure) {
-            $listener->__invoke($event);
+        if (is_callable($listener)) {
+            call_user_func($listener, $event);
         } else {
             $listener->$eventName($event);
         }

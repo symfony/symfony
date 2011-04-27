@@ -80,7 +80,7 @@ class Serializer implements SerializerInterface
             throw new \LogicException('You must register at least one normalizer to be able to denormalize objects.');
         }
         if (isset($this->normalizerCache[$class][$format])) {
-            return $this->normalizerCache[$class][$format]->denormalize($data, $format);
+            return $this->normalizerCache[$class][$format]->denormalize($data, $class, $format);
         }
         $reflClass = new \ReflectionClass($class);
         foreach ($this->normalizers as $normalizer) {

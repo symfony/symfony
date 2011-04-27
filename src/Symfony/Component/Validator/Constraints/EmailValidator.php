@@ -54,7 +54,7 @@ class EmailValidator extends ConstraintValidator
      *
      * @param string $host Host name
      *
-     * @return Boolean
+     * @return boolean
      */
     private function checkMX($host)
     {

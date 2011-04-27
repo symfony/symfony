@@ -70,7 +70,7 @@ interface AclInterface extends \Serializable
     /**
      * Whether this ACL is inheriting ACEs from a parent ACL.
      *
-     * @return Boolean
+     * @return boolean
      */
     function isEntriesInheriting();
 
@@ -80,8 +80,8 @@ interface AclInterface extends \Serializable
      * @param string  $field
      * @param array   $masks
      * @param array   $securityIdentities
-     * @param Boolean $administrativeMode
-     * @return Boolean
+     * @param boolean $administrativeMode
+     * @return boolean
      */
     function isFieldGranted($field, array $masks, array $securityIdentities, $administrativeMode = false);
 
@@ -91,8 +91,8 @@ interface AclInterface extends \Serializable
      * @throws NoAceFoundException when no ACE was applicable for this request
      * @param array   $masks
      * @param array   $securityIdentities
-     * @param Boolean $administrativeMode
-     * @return Boolean
+     * @param boolean $administrativeMode
+     * @return boolean
      */
     function isGranted(array $masks, array $securityIdentities, $administrativeMode = false);
 
@@ -100,7 +100,7 @@ interface AclInterface extends \Serializable
      * Whether the ACL has loaded ACEs for all of the passed security identities
      *
      * @param mixed $securityIdentities an implementation of SecurityIdentityInterface, or an array thereof
-     * @return Boolean
+     * @return boolean
      */
     function isSidLoaded($securityIdentities);
 }

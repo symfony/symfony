@@ -148,7 +148,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      *
      * @param Request $request
      *
-     * @return Boolean
+     * @return boolean
      */
     protected function requiresAuthentication(Request $request)
     {

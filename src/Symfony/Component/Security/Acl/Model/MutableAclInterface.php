@@ -68,7 +68,7 @@ interface MutableAclInterface extends AclInterface
      * @param SecurityIdentityInterface $sid
      * @param integer                   $mask
      * @param integer                   $index
-     * @param Boolean                   $granting
+     * @param boolean                   $granting
      * @param string                    $strategy
      * @return void
      */
@@ -81,7 +81,7 @@ interface MutableAclInterface extends AclInterface
      * @param SecurityIdentityInterface $sid
      * @param integer                   $mask
      * @param integer                   $index
-     * @param Boolean                   $granting
+     * @param boolean                   $granting
      * @param string                    $strategy
      * @return void
      */
@@ -93,7 +93,7 @@ interface MutableAclInterface extends AclInterface
      * @param SecurityIdentityInterface $sid
      * @param integer                   $mask
      * @param integer                   $index
-     * @param Boolean                   $granting
+     * @param boolean                   $granting
      * @param string                    $strategy
      * @return void
      */
@@ -106,7 +106,7 @@ interface MutableAclInterface extends AclInterface
      * @param SecurityIdentityInterface $sid
      * @param integer                   $mask
      * @param integer                   $index
-     * @param Boolean                   $granting
+     * @param boolean                   $granting
      * @param string                    $strategy
      * @return void
      */
@@ -115,7 +115,7 @@ interface MutableAclInterface extends AclInterface
     /**
      * Sets whether entries are inherited
      *
-     * @param Boolean $boolean
+     * @param boolean $boolean
      * @return void
      */
     function setEntriesInheriting($boolean);

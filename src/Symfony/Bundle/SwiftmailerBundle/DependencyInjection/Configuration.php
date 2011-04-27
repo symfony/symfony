@@ -30,11 +30,11 @@ class Configuration implements ConfigurationInterface
     /**
      * Constructor.
      *
-     * @param Boolean $debug The kernel.debug value
+     * @param boolean $debug The kernel.debug value
      */
     public function __construct($debug)
     {
-        $this->debug = (Boolean) $debug;
+        $this->debug = (boolean) $debug;
     }
 
     /**

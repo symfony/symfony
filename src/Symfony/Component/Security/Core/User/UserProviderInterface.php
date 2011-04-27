@@ -51,7 +51,7 @@ interface UserProviderInterface
      *
      * @param string $class
      *
-     * @return Boolean
+     * @return boolean
      */
     function supportsClass($class);
 }

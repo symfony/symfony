@@ -260,7 +260,7 @@ class Response
      * Responses with neither a freshness lifetime (Expires, max-age) nor cache
      * validator (Last-Modified, ETag) are considered uncacheable.
      *
-     * @return Boolean true if the response is worth caching, false otherwise
+     * @return boolean true if the response is worth caching, false otherwise
      */
     public function isCacheable()
     {
@@ -282,7 +282,7 @@ class Response
      * origin. A response is considered fresh when it includes a Cache-Control/max-age
      * indicator or Expiration header and the calculated age is less than the freshness lifetime.
      *
-     * @return Boolean true if the response is fresh, false otherwise
+     * @return boolean true if the response is fresh, false otherwise
      */
     public function isFresh()
     {
@@ -293,7 +293,7 @@ class Response
      * Returns true if the response includes headers that can be used to validate
      * the response with the origin server using a conditional GET request.
      *
-     * @return Boolean true if the response is validateable, false otherwise
+     * @return boolean true if the response is validateable, false otherwise
      */
     public function isValidateable()
     {
@@ -330,7 +330,7 @@ class Response
      * When present, the TTL of the response should not be overridden to be
      * greater than the value provided by the origin.
      *
-     * @return Boolean true if the response must be revalidated by a cache, false otherwise
+     * @return boolean true if the response must be revalidated by a cache, false otherwise
      */
     public function mustRevalidate()
     {
@@ -544,7 +544,7 @@ class Response
      * Sets the ETag value.
      *
      * @param string  $etag The ETag unique identifier
-     * @param Boolean $weak Whether you want a weak ETag or not
+     * @param boolean $weak Whether you want a weak ETag or not
      */
     public function setEtag($etag = null, $weak = false)
     {
@@ -631,7 +631,7 @@ class Response
      */
     public function hasVary()
     {
-        return (Boolean) $this->headers->get('Vary');
+        return (boolean) $this->headers->get('Vary');
     }
 
     /**
@@ -652,7 +652,7 @@ class Response
      * Sets the Vary header.
      *
      * @param string|array $headers
-     * @param Boolean      $replace Whether to replace the actual value of not (true by default)
+     * @param boolean      $replace Whether to replace the actual value of not (true by default)
      */
     public function setVary($headers, $replace = true)
     {
@@ -668,7 +668,7 @@ class Response
      *
      * @param Request $request A Request instance
      *
-     * @return Boolean true if the Response validators matches the Request, false otherwise
+     * @return boolean true if the Response validators matches the Request, false otherwise
      */
     public function isNotModified(Request $request)
     {

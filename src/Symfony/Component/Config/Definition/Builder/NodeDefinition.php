@@ -74,7 +74,7 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Creates the node.
      *
-     * @param Boolean $forceRootNode Whether to force this node as the root node
+     * @param boolean $forceRootNode Whether to force this node as the root node
      *
      * @return NodeInterface
      */
@@ -276,7 +276,7 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets whether the node can be overwritten.
      *
-     * @param Boolean $deny Whether the overwriting is forbidden or not
+     * @param boolean $deny Whether the overwriting is forbidden or not
      *
      * @return NodeDefinition
      */

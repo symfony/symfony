@@ -29,7 +29,7 @@ abstract class AsseticHelper extends Helper
      * Constructor.
      *
      * @param AssetFactory $factory The asset factory
-     * @param Boolean      $debug   The debug mode
+     * @param boolean      $debug   The debug mode
      */
     public function __construct(AssetFactory $factory, $debug = false)
     {

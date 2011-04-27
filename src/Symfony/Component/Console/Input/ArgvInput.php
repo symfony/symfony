@@ -256,7 +256,7 @@ class ArgvInput extends Input
      *
      * @param string|array $values The value(s) to look for in the raw parameters (can be an array)
      *
-     * @return Boolean true if the value is contained in the raw parameters
+     * @return boolean true if the value is contained in the raw parameters
      */
     public function hasParameterOption($values)
     {

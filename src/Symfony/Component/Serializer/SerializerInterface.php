@@ -116,7 +116,7 @@ interface SerializerInterface
      * Checks whether the serializer has an encoder registered for the given format
      *
      * @param string $format format name
-     * @return Boolean
+     * @return boolean
      */
     function hasEncoder($format);
 

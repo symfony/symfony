@@ -29,7 +29,7 @@ interface AuthenticationProviderInterface extends AuthenticationManagerInterface
      *
      * @param TokenInterface $token A TokenInterface instance
      *
-     * @return Boolean true if the implementation supports the Token, false otherwise
+     * @return boolean true if the implementation supports the Token, false otherwise
      */
      function supports(TokenInterface $token);
 }

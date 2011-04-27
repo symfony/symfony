@@ -36,7 +36,7 @@ class PropertyPath implements \IteratorAggregate
     protected $length;
 
     /**
-     * Contains a Boolean for each property in $elements denoting whether this
+     * Contains a boolean for each property in $elements denoting whether this
      * element is an index. It is a property otherwise.
      * @var array
      */
@@ -138,7 +138,7 @@ class PropertyPath implements \IteratorAggregate
      * Returns whether the element at the given index is a property
      *
      * @param  integer $index  The index in the property path
-     * @return Boolean         Whether the element at this index is a property
+     * @return boolean         Whether the element at this index is a property
      */
     public function isProperty($index)
     {
@@ -149,7 +149,7 @@ class PropertyPath implements \IteratorAggregate
      * Returns whether the element at the given index is an array index
      *
      * @param  integer $index  The index in the property path
-     * @return Boolean         Whether the element at this index is an array index
+     * @return boolean         Whether the element at this index is an array index
      */
     public function isIndex($index)
     {

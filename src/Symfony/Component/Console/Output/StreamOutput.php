@@ -38,7 +38,7 @@ class StreamOutput extends Output
      * @param mixed           $stream    A stream resource
      * @param integer         $verbosity The verbosity level (self::VERBOSITY_QUIET, self::VERBOSITY_NORMAL,
      *                                   self::VERBOSITY_VERBOSE)
-     * @param Boolean         $decorated Whether to decorate messages or not (null for auto-guessing)
+     * @param boolean         $decorated Whether to decorate messages or not (null for auto-guessing)
      * @param OutputFormatter $formatter Output formatter instance
      *
      * @throws \InvalidArgumentException When first argument is not a real stream
@@ -74,7 +74,7 @@ class StreamOutput extends Output
      * Writes a message to the output.
      *
      * @param string  $message A message to write to the output
-     * @param Boolean $newline Whether to add a newline or not
+     * @param boolean $newline Whether to add a newline or not
      *
      * @throws \RuntimeException When unable to write output (should never happen)
      */
@@ -98,7 +98,7 @@ class StreamOutput extends Output
      *  -  windows without ansicon
      *  -  non tty consoles
      *
-     * @return Boolean true if the stream supports colorization, false otherwise
+     * @return boolean true if the stream supports colorization, false otherwise
      */
     protected function hasColorSupport()
     {

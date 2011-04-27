@@ -30,11 +30,11 @@ class Configuration implements ConfigurationInterface
     /**
      * Constructor
      *
-     * @param Boolean $debug Whether to use the debug mode
+     * @param boolean $debug Whether to use the debug mode
      */
     public function  __construct($debug)
     {
-        $this->debug = (Boolean) $debug;
+        $this->debug = (boolean) $debug;
     }
 
     /**

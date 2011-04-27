@@ -104,7 +104,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param mixed $name A template name or a TemplateReferenceInterface instance
      *
-     * @return Boolean true if the template exists, false otherwise
+     * @return boolean true if the template exists, false otherwise
      */
     public function exists($name)
     {
@@ -122,7 +122,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param mixed $name A template name or a TemplateReferenceInterface instance
      *
-     * @return Boolean true if this class supports the given resource, false otherwise
+     * @return boolean true if this class supports the given resource, false otherwise
      */
     public function supports($name)
     {
@@ -180,7 +180,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string  $name The helper name
      *
-     * @return Boolean true if the helper is defined, false otherwise
+     * @return boolean true if the helper is defined, false otherwise
      */
     public function offsetExists($name)
     {
@@ -250,7 +250,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string  $name The helper name
      *
-     * @return Boolean true if the helper is defined, false otherwise
+     * @return boolean true if the helper is defined, false otherwise
      */
     public function has($name)
     {
@@ -396,7 +396,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                  */
                 function ($value) use ($that)
                 {
-                    // Numbers and Boolean values get turned into strings which can cause problems
+                    // Numbers and boolean values get turned into strings which can cause problems
                     // with type comparisons (e.g. === or is_int() etc).
                     return is_string($value) ? htmlspecialchars($value, ENT_QUOTES, $that->getCharset(), false) : $value;
                 },

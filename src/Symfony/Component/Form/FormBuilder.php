@@ -95,7 +95,7 @@ class FormBuilder
     /**
      * Sets whether this field is required to be filled out when bound.
      *
-     * @param Boolean $required
+     * @param boolean $required
      */
     public function setRequired($required)
     {
@@ -402,7 +402,7 @@ class FormBuilder
      * Returns whether a field with the given name exists.
      *
      * @param  string $name
-     * @return Boolean
+     * @return boolean
      */
     public function has($name)
     {

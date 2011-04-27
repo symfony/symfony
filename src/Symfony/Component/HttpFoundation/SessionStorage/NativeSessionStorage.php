@@ -148,9 +148,9 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * Regenerates id that represents this storage.
      *
-     * @param  Boolean $destroy Destroy session when regenerating?
+     * @param  boolean $destroy Destroy session when regenerating?
      *
-     * @return Boolean True if session regenerated, false if error
+     * @return boolean True if session regenerated, false if error
      *
      */
     public function regenerate($destroy = false)

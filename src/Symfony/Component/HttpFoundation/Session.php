@@ -72,7 +72,7 @@ class Session implements \Serializable
      *
      * @param string $name The attribute name
      *
-     * @return Boolean true if the attribute is defined, false otherwise
+     * @return boolean true if the attribute is defined, false otherwise
      */
     public function has($name)
     {

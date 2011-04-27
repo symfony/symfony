@@ -160,7 +160,7 @@ class Route
      *
      * @param string $name A variable name
      *
-     * @return Boolean true if the default value is set, false otherwise
+     * @return boolean true if the default value is set, false otherwise
      */
     public function hasDefault($name)
     {

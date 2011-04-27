@@ -45,7 +45,7 @@ class Alias
      */
     public function setPublic($boolean)
     {
-        $this->public = (Boolean) $boolean;
+        $this->public = (boolean) $boolean;
     }
 
     /**

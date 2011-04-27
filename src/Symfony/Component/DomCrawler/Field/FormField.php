@@ -77,7 +77,7 @@ abstract class FormField
     /**
      * Returns true if the field should be included in the submitted values.
      *
-     * @return Boolean true if the field should be included in the submitted values, false otherwise
+     * @return boolean true if the field should be included in the submitted values, false otherwise
      */
     public function hasValue()
     {

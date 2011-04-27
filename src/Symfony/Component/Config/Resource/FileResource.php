@@ -55,7 +55,7 @@ class FileResource implements ResourceInterface
      *
      * @param integer $timestamp The last time the resource was loaded
      *
-     * @return Boolean true if the resource has not been updated, false otherwise
+     * @return boolean true if the resource has not been updated, false otherwise
      */
     public function isFresh($timestamp)
     {

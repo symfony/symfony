@@ -65,52 +65,52 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * Sets whether to add default values for this array if it has not been
      * defined in any of the configuration files.
      *
-     * @param Boolean $boolean
+     * @param boolean $boolean
      */
     public function setAddIfNotSet($boolean)
     {
-        $this->addIfNotSet = (Boolean) $boolean;
+        $this->addIfNotSet = (boolean) $boolean;
     }
 
     /**
      * Sets whether false is allowed as value indicating that the array should
      * be unset.
      *
-     * @param Boolean $allow
+     * @param boolean $allow
      */
     public function setAllowFalse($allow)
     {
-        $this->allowFalse = (Boolean) $allow;
+        $this->allowFalse = (boolean) $allow;
     }
 
     /**
      * Sets whether new keys can be defined in subsequent configurations.
      *
-     * @param Boolean $allow
+     * @param boolean $allow
      */
     public function setAllowNewKeys($allow)
     {
-        $this->allowNewKeys = (Boolean) $allow;
+        $this->allowNewKeys = (boolean) $allow;
     }
 
     /**
      * Sets if deep merging should occur.
      *
-     * @param Boolean $boolean
+     * @param boolean $boolean
      */
     public function setPerformDeepMerging($boolean)
     {
-        $this->performDeepMerging = (Boolean) $boolean;
+        $this->performDeepMerging = (boolean) $boolean;
     }
 
     /**
      * Whether extra keys should just be ignore without an exception.
      *
-     * @param Boolean $boolean To allow extra keys
+     * @param boolean $boolean To allow extra keys
      */
     public function setIgnoreExtraKeys($boolean)
     {
-        $this->ignoreExtraKeys = (Boolean) $boolean;
+        $this->ignoreExtraKeys = (boolean) $boolean;
     }
 
     /**

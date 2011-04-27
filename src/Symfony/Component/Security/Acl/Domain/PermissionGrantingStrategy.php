@@ -132,8 +132,8 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * @param array        $aces               An array of ACE to check against
      * @param array        $masks              An array of permission masks
      * @param array        $sids               An array of SecurityIdentityInterface implementations
-     * @param Boolean      $administrativeMode True turns off audit logging
-     * @return Boolean true, or false; either granting, or denying access respectively.
+     * @param boolean      $administrativeMode True turns off audit logging
+     * @return boolean true, or false; either granting, or denying access respectively.
      */
     private function hasSufficientPermissions(AclInterface $acl, array $aces, array $masks, array $sids, $administrativeMode)
     {
@@ -191,7 +191,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      *
      * @param integer        $requiredMask
      * @param EntryInterface $ace
-     * @return Boolean
+     * @return boolean
      */
     private function isAceApplicable($requiredMask, EntryInterface $ace)
     {

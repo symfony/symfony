@@ -50,8 +50,8 @@ class Cookie
         $this->expires  = null === $expires ? null : (integer) $expires;
         $this->path     = empty($path) ? '/' : $path;
         $this->domain   = $domain;
-        $this->secure   = (Boolean) $secure;
-        $this->httponly = (Boolean) $httponly;
+        $this->secure   = (boolean) $secure;
+        $this->httponly = (boolean) $httponly;
     }
 
     /**
@@ -229,7 +229,7 @@ class Cookie
     /**
      * Returns the secure flag of the cookie.
      *
-     * @return Boolean The cookie secure flag
+     * @return boolean The cookie secure flag
      *
      * @api
      */
@@ -241,7 +241,7 @@ class Cookie
     /**
      * Returns the httponly flag of the cookie.
      *
-     * @return Boolean The cookie httponly flag
+     * @return boolean The cookie httponly flag
      *
      * @api
      */
@@ -253,7 +253,7 @@ class Cookie
     /**
      * Returns true if the cookie has expired.
      *
-     * @return Boolean true if the cookie has expired, false otherwise
+     * @return boolean true if the cookie has expired, false otherwise
      *
      * @api
      */

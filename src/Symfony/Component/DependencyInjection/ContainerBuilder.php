@@ -254,7 +254,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param  string  $id      The service identifier
      *
-     * @return Boolean true if the service is defined, false otherwise
+     * @return boolean true if the service is defined, false otherwise
      */
     public function has($id)
     {
@@ -475,7 +475,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param  string  $id The service identifier
      *
-     * @return Boolean true if the alias exists, false otherwise
+     * @return boolean true if the alias exists, false otherwise
      */
     public function hasAlias($id)
     {
@@ -587,7 +587,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param  string  $id The service identifier
      *
-     * @return Boolean true if the service definition exists, false otherwise
+     * @return boolean true if the service definition exists, false otherwise
      */
     public function hasDefinition($id)
     {

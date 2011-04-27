@@ -34,7 +34,7 @@ class XPathExpr
      * @param string  $path       Actual path of the expression.
      * @param string  $element    The element in the expression.
      * @param string  $condition  A condition for the expression.
-     * @param Boolean $starPrefix Indicates whether to use a star prefix.
+     * @param boolean $starPrefix Indicates whether to use a star prefix.
      */
     public function __construct($prefix = null, $path = null, $element = '*', $condition = null, $starPrefix = false)
     {
@@ -68,7 +68,7 @@ class XPathExpr
     /**
      * Answers whether this XPath expression has a star prefix.
      *
-     * @return Boolean
+     * @return boolean
      */
     public function hasStarPrefix()
     {

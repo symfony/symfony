@@ -37,7 +37,7 @@ class MapFileClassLoader
     /**
      * Registers this instance as an autoloader.
      *
-     * @param Boolean $prepend Whether to prepend the autoloader or not
+     * @param boolean $prepend Whether to prepend the autoloader or not
      *
      * @api
      */

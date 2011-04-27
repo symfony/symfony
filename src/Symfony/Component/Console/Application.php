@@ -259,25 +259,25 @@ class Application
     /**
      * Sets whether to catch exceptions or not during commands execution.
      *
-     * @param Boolean $boolean Whether to catch exceptions or not during commands execution
+     * @param boolean $boolean Whether to catch exceptions or not during commands execution
      *
      * @api
      */
     public function setCatchExceptions($boolean)
     {
-        $this->catchExceptions = (Boolean) $boolean;
+        $this->catchExceptions = (boolean) $boolean;
     }
 
     /**
      * Sets whether to automatically exit after a command execution or not.
      *
-     * @param Boolean $boolean Whether to automatically exit after a command execution or not
+     * @param boolean $boolean Whether to automatically exit after a command execution or not
      *
      * @api
      */
     public function setAutoExit($boolean)
     {
-        $this->autoExit = (Boolean) $boolean;
+        $this->autoExit = (boolean) $boolean;
     }
 
     /**
@@ -432,7 +432,7 @@ class Application
      *
      * @param string $name The command name or alias
      *
-     * @return Boolean true if the command exists, false otherwise
+     * @return boolean true if the command exists, false otherwise
      *
      * @api
      */
@@ -641,7 +641,7 @@ class Application
      * Returns an XML representation of the Application.
      *
      * @param string  $namespace An optional namespace name
-     * @param Boolean $asDom     Whether to return a DOM or an XML string
+     * @param boolean $asDom     Whether to return a DOM or an XML string
      *
      * @return string|DOMDocument An XML string representing the Application
      */

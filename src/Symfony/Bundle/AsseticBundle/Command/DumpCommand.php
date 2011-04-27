@@ -62,7 +62,7 @@ class DumpCommand extends Command
      * @param LazyAssetManager $am      The asset manager
      * @param string           $basePath The base directory to write to
      * @param OutputInterface  $output  The command output
-     * @param Boolean          $debug   Debug mode
+     * @param boolean          $debug   Debug mode
      */
     protected function watch(LazyAssetManager $am, $basePath, OutputInterface $output, $debug = false)
     {
@@ -114,7 +114,7 @@ class DumpCommand extends Command
      * @param string           $name        The asset name
      * @param array            &$previously An array of previous visits
      *
-     * @return AssetInterface|Boolean The asset if it should be dumped
+     * @return AssetInterface|boolean The asset if it should be dumped
      */
     protected function checkAsset(LazyAssetManager $am, $name, array &$previously)
     {

@@ -45,7 +45,7 @@ class CachedTemplateLocator extends TemplateLocator
      *
      * @param TemplateReferenceInterface $template    The template
      * @param string                     $currentPath Unused
-     * @param Boolean                    $first       Unused
+     * @param boolean                    $first       Unused
      *
      * @return string The full path for the file
      *

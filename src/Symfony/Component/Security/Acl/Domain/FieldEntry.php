@@ -33,9 +33,9 @@ class FieldEntry extends Entry implements FieldEntryInterface
      * @param SecurityIdentityInterface $sid
      * @param string                    $strategy
      * @param integer                   $mask
-     * @param Boolean                   $granting
-     * @param Boolean                   $auditFailure
-     * @param Boolean                   $auditSuccess
+     * @param boolean                   $granting
+     * @param boolean                   $auditFailure
+     * @param boolean                   $auditSuccess
      * @return void
      */
     public function __construct($id, AclInterface $acl, $field, SecurityIdentityInterface $sid, $strategy, $mask, $granting, $auditFailure, $auditSuccess)

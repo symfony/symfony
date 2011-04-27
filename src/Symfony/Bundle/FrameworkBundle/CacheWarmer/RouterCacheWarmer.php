@@ -48,7 +48,7 @@ class RouterCacheWarmer implements CacheWarmerInterface
     /**
      * Checks whether this warmer is optional or not.
      *
-     * @return Boolean always false
+     * @return boolean always false
      */
     public function isOptional()
     {

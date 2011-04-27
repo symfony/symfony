@@ -24,9 +24,9 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 class BooleanToStringTransformer implements DataTransformerInterface
 {
     /**
-     * Transforms a Boolean into a string.
+     * Transforms a boolean into a string.
      *
-     * @param  Boolean $value   Boolean value.
+     * @param  boolean $value   boolean value.
      * @return string           String value.
      */
     public function transform($value)
@@ -36,17 +36,17 @@ class BooleanToStringTransformer implements DataTransformerInterface
         }
 
         if (!is_bool($value)) {
-            throw new UnexpectedTypeException($value, 'Boolean');
+            throw new UnexpectedTypeException($value, 'boolean');
         }
 
         return true === $value ? '1' : '';
     }
 
     /**
-     * Transforms a string into a Boolean.
+     * Transforms a string into a boolean.
      *
      * @param  string $value  String value.
-     * @return Boolean        Boolean value.
+     * @return boolean        boolean value.
      */
     public function reverseTransform($value)
     {

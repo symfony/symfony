@@ -37,7 +37,7 @@ class MergeBuilder
     /**
      * Sets whether the node can be unset.
      *
-     * @param Boolean $allow
+     * @param boolean $allow
      * @return MergeBuilder
      */
     public function allowUnset($allow = true)
@@ -50,7 +50,7 @@ class MergeBuilder
     /**
      * Sets whether the node can be overwritten.
      *
-     * @param Boolean $deny Whether the overwriting is forbidden or not
+     * @param boolean $deny Whether the overwriting is forbidden or not
      *
      * @return MergeBuilder
      */

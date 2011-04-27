@@ -91,7 +91,7 @@ interface EventDispatcherInterface
      *
      * @param string $eventName The name of the event.
      *
-     * @return Boolean TRUE if the specified event has any listeners, FALSE
+     * @return boolean TRUE if the specified event has any listeners, FALSE
      *                 otherwise.
      *
      * @api

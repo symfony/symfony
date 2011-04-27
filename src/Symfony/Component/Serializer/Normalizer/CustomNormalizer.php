@@ -42,7 +42,7 @@ class CustomNormalizer extends AbstractNormalizer
      * @param ReflectionClass $class  A ReflectionClass instance of the class
      *                                to serialize into or from.
      * @param string          $format The format being (de-)serialized from or into.
-     * @return Boolean
+     * @return boolean
      */
     public function supports(\ReflectionClass $class, $format = null)
     {

@@ -53,7 +53,7 @@ interface ContainerInterface
      *
      * @param  string  $id      The service identifier
      *
-     * @return Boolean true if the service is defined, false otherwise
+     * @return boolean true if the service is defined, false otherwise
      */
     function has($id);
 
@@ -73,7 +73,7 @@ interface ContainerInterface
      *
      * @param  string $name The parameter name
      *
-     * @return Boolean The presence of parameter in container
+     * @return boolean The presence of parameter in container
      */
     function hasParameter($name);
 
@@ -113,7 +113,7 @@ interface ContainerInterface
      * Whether this container has the given scope
      *
      * @param string $name
-     * @return Boolean
+     * @return boolean
      */
     function hasScope($name);
 
@@ -123,7 +123,7 @@ interface ContainerInterface
      * It does however not check if the scope actually exists.
      *
      * @param string $name
-     * @return Boolean
+     * @return boolean
      */
     function isScopeActive($name);
 }

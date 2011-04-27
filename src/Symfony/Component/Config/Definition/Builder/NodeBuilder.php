@@ -74,7 +74,7 @@ class NodeBuilder implements NodeParentInterface
     }
 
     /**
-     * Creates a child Boolean node.
+     * Creates a child boolean node.
      *
      * @param string $name The name of the node
      *

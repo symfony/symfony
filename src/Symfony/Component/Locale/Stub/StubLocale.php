@@ -207,7 +207,7 @@ class StubLocale
      *
      * @param  string  $langtag      The language tag to check
      * @param  string  $locale       The language range to check against
-     * @param  Boolean $canonicalize
+     * @param  boolean $canonicalize
      * @return string             The corresponding locale code
      * @see    http://www.php.net/manual/en/locale.filtermatches.php
      * @throws MethodNotImplementedException

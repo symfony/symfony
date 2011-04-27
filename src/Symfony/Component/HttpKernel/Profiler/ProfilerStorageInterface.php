@@ -59,7 +59,7 @@ interface ProfilerStorageInterface
      * @param string  $url    An URL
      * @param integer $time   The time of the data
      *
-     * @return Boolean Write operation successful
+     * @return boolean Write operation successful
      */
     function write($token, $parent, $data, $ip, $url, $time);
 

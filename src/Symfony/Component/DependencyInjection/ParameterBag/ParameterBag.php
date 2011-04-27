@@ -98,7 +98,7 @@ class ParameterBag implements ParameterBagInterface
      *
      * @param  string  $name       The parameter name
      *
-     * @return Boolean true if the parameter name is defined, false otherwise
+     * @return boolean true if the parameter name is defined, false otherwise
      */
     public function has($name)
     {
@@ -144,7 +144,7 @@ class ParameterBag implements ParameterBagInterface
         }
 
         if (preg_match('/^%([^%]+)%$/', $value, $match)) {
-            // we do this to deal with non string values (Boolean, integer, ...)
+            // we do this to deal with non string values (boolean, integer, ...)
             // the preg_replace_callback converts them to strings
             return $this->get(strtolower($match[1]));
         }

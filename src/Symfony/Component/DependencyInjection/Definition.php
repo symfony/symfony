@@ -282,7 +282,7 @@ class Definition
      *
      * @param  string $method    The method name to search for
      *
-     * @return Boolean
+     * @return boolean
      */
     public function hasMethodCall($method)
     {
@@ -365,7 +365,7 @@ class Definition
      *
      * @param string $name
      *
-     * @return Boolean
+     * @return boolean
      */
     public function hasTag($name)
     {
@@ -435,12 +435,12 @@ class Definition
     /**
      * Sets the visibility of this service.
      *
-     * @param Boolean $boolean
+     * @param boolean $boolean
      * @return Definition The current instance
      */
     public function setPublic($boolean)
     {
-        $this->public = (Boolean) $boolean;
+        $this->public = (boolean) $boolean;
 
         return $this;
     }
@@ -448,7 +448,7 @@ class Definition
     /**
      * Whether this service is public facing
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isPublic()
     {
@@ -459,13 +459,13 @@ class Definition
      * Sets whether this definition is synthetic, that is not constructed by the
      * container, but dynamically injected.
      *
-     * @param Boolean $boolean
+     * @param boolean $boolean
      *
      * @return Definition the current instance
      */
     public function setSynthetic($boolean)
     {
-        $this->synthetic = (Boolean) $boolean;
+        $this->synthetic = (boolean) $boolean;
 
         return $this;
     }
@@ -474,7 +474,7 @@ class Definition
      * Whether this definition is synthetic, that is not constructed by the
      * container, but dynamically injected.
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isSynthetic()
     {
@@ -485,13 +485,13 @@ class Definition
      * Whether this definition is abstract, that means it merely serves as a
      * template for other definitions.
      *
-     * @param Boolean $boolean
+     * @param boolean $boolean
      *
      * @return Definition the current instance
      */
     public function setAbstract($boolean)
     {
-        $this->abstract = (Boolean) $boolean;
+        $this->abstract = (boolean) $boolean;
 
         return $this;
     }
@@ -500,7 +500,7 @@ class Definition
      * Whether this definition is abstract, that means it merely serves as a
      * template for other definitions.
      *
-     * @return Boolean
+     * @return boolean
      */
     public function isAbstract()
     {

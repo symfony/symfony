@@ -52,6 +52,10 @@ abstract class AbstractDoctrineExtension extends Extension
         }
 
         foreach ($objectManager['mappings'] as $mappingName => $mappingConfig) {
+            if (false === $mappingConfig) {
+                continue;
+            }
+
             $mappingConfig = array_replace(array(
                 'dir'    => false,
                 'type'   => false,

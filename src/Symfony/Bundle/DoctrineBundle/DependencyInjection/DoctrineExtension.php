@@ -342,7 +342,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 $cacheDef = new Definition('%'.sprintf('doctrine.orm.cache.%s.class', $cacheDriver['type']).'%');
                 break;
             default:
-                throw new \InvalidArgumentException(sprintf('%s is unrecognized cache driver.', $cacheDriver['type']));
+                throw new \InvalidArgumentException(sprintf('"%s" is an unrecognized Doctrine cache driver.', $cacheDriver['type']));
         }
 
         $cacheDef->setPublic(false);

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\BrowserKit\Client as BaseClient;
 use Symfony\Component\BrowserKit\Request as DomRequest;
@@ -117,7 +118,7 @@ EOF;
             if (is_array($value)) {
                 $filtered[$key] = $this->filterFiles($value);
             } elseif ($value instanceof UploadedFile) {
-                $filtered[$key] = new UploadedFile($value->getPath(), $value->getName(), $value->getMimeType(), $value->getSize(), $value->getError());
+                $filtered[$key] = new File($value->getPathname());
             } else {
                 $filtered[$key] = $value;
             }

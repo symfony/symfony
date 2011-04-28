@@ -106,23 +106,25 @@ class FileTest extends \PHPUnit_Framework_TestCase
         @unlink($targetPath);
     }
     
-    public function testMoveFailingWhenTargetDirectoryDoesNotExist()
+    public function testMoveToAnUnexistentDirectory()
     {
         $path = __DIR__.'/Fixtures/test.copy.gif';
-        $targetPath = '/thisfolderwontexist';
+        $targetDir = __DIR__.'/Fixtures/directory/sub';
+        $targetPath = $targetDir.'/test.copy.gif';
         @unlink($path);
+        @unlink($targetPath);
+        @rmdir($targetDir);
         copy(__DIR__.'/Fixtures/test.gif', $path);
 
         $file = new File($path);
+        $movedFile = $file->move($targetDir);
 
-        try {
-            $file->move($targetPath);
-        } catch (DirectoryNotFoundException $e) {
-            @unlink($path);
-            return;
-        }
-        
-        $this->fail('The target directory does not exist');
+        $this->assertTrue(file_exists($targetPath));
+        $this->assertFalse(file_exists($path));
+        $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
+       
+        @unlink($targetPath);
+        @rmdir($targetDir);
     }
 
     protected function createMockGuesser($path, $mimeType)

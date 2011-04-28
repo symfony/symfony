@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpFoundation\File;
 
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
-use Symfony\Component\HttpFoundation\File\Exception\DirectoryNotFoundException;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 
 /**
@@ -513,23 +512,27 @@ class File extends \SplFileInfo
      * 
      * @return File A File object representing the new file
      * 
-     * @throws DirectoryNotFoundException if the destination folder does not exists
+     * @throws FileException if the target file could not be created
      */
     public function move($directory, $name = null)
     {        
-        $targetDir = realpath($directory);
-                
-        if ($targetDir === false) {
-            throw new DirectoryNotFoundException($directory);
+        if (!is_dir($directory)) {
+            if (false === @mkdir($directory, 0777, true)) {
+                throw new FileException(sprintf('Unable to create the "%s" directory', $directory));
+            }
+        } elseif (!is_writable($directory)) {
+            throw new FileException(sprintf('Unable to write in the "%s" directory', $directory));
         }
+                                
+        $target = $directory.DIRECTORY_SEPARATOR.(null === $name ? $this->getBasename() : basename($name));
         
-        $newPath = $targetDir.DIRECTORY_SEPARATOR.(null === $name ? $this->getBasename() : basename($name));
-        
-        if (!@rename($this->getPathname(), $newPath)) {
+        if (!@rename($this->getPathname(), $target)) {           
             $error = error_get_last();
-            throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $newPath, strip_tags($error['message'])));
+            throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));            
         }
 
-        return new self($newPath);
+        chmod($target, 0666);
+        
+        return new File($target);
     }
 }

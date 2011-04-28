@@ -30,7 +30,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher = new EventDispatcher();
         $this->csrfProvider = $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface');
-        $storage = new \Symfony\Component\HttpFoundation\File\TemporaryStorage('foo', 1, \sys_get_temp_dir());
+        $storage = new \Symfony\Component\HttpFoundation\File\TemporaryStorage('foo', \sys_get_temp_dir());
 
         $this->factory = new FormFactory(array(
             new CoreExtension($storage),

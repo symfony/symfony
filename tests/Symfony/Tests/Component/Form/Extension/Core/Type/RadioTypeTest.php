@@ -21,6 +21,14 @@ class RadioTypeTest extends TypeTestCase
         $this->assertEquals('foobar', $view->get('value'));
     }
 
+    public function testPassValueToView()
+    {
+        $form = $this->factory->create('radio', null, array('checked' => true));
+        $view = $form->createView();
+
+        $this->assertTrue($view->get('checked'));
+    }
+
     public function testPassParentNameToView()
     {
         $parent = $this->factory->createNamed('field', 'parent');

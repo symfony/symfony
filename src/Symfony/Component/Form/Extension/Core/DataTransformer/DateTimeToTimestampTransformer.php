@@ -71,7 +71,7 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
 
             return $dateTime;
         } catch (\Exception $e) {
-            throw new \InvalidArgumentException('Expected a valid timestamp. ' . $e->getMessage(), 0, $e);
+            throw new TransformationFailedException('Expected a valid timestamp. ' . $e->getMessage(), 0, $e);
         }
     }
 }

@@ -111,6 +111,32 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
     }
+    
+    public function testEncodeScalarRootAttributes()
+    {
+        $array = array(
+          '#' => 'Paul',
+          '@gender' => 'm'  
+        );
+        
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response gender="m"><![CDATA[Paul]]></response>'."\n";
+        
+        $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
+    }
+    
+    public function testEncodeRootAttributes()
+    {
+        $array = array(
+          'firstname' => 'Paul',
+          '@gender' => 'm'  
+        );
+        
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response gender="m"><firstname><![CDATA[Paul]]></firstname></response>'."\n";
+        
+        $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
+    }
 
     public function testEncodeScalarWithAttribute()
     {
@@ -157,6 +183,33 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
             'person' => array('@gender' => 'M', '#' => 'Peter'),
         );
 
+        $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
+    }
+    
+    public function testDecodeScalarRootAttributes()
+    {
+        $source = '<?xml version="1.0"?>'."\n".
+            '<person gender="M">Peter</person>'."\n";
+            
+        $expected = array(
+            '#' => 'Peter',
+            '@gender' => 'M'
+        );
+        
+        $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
+    }
+    
+    public function testDecodeRootAttributes()
+    {
+        $source = '<?xml version="1.0"?>'."\n".
+            '<person gender="M"><firstname>Peter</firstname><lastname>Mac Calloway</lastname></person>'."\n";
+            
+        $expected = array(
+            'firstname' => 'Peter',
+            'lastname' => 'Mac Calloway',
+            '@gender' => 'M'
+        );
+        
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
     }
 

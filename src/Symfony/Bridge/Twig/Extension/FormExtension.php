@@ -156,6 +156,9 @@ class FormExtension extends \Twig_Extension
     {
         $templates = $this->getTemplates($view);
         $blocks = $view->get('types');
+        if ('widget' === $section || 'row' === $section) {
+            array_unshift($blocks, '_'.$view->get('id'));
+        }
         foreach ($blocks as &$block) {
             $block = $block.'_'.$section;
 

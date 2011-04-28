@@ -20,4 +20,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class WebProfilerBundle extends Bundle
 {
+    public function getContainerExtension()
+    {
+        // this extension must be explicitly loaded
+    }
 }

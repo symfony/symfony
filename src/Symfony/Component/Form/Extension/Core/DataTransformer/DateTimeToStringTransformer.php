@@ -81,7 +81,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
 
             return $dateTime;
         } catch (\Exception $e) {
-            throw new \InvalidArgumentException('Expected a valid date string. ' . $e->getMessage(), 0, $e);
+            throw new TransformationFailedException('Expected a valid date string. ' . $e->getMessage(), 0, $e);
         }
     }
 }

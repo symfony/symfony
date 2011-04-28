@@ -38,11 +38,15 @@ class ClosureLoader extends Loader
     /**
      * Loads a Closure.
      *
-     * @param \Closure $closure The resource
+     * @param function $closure The resource
      * @param string   $type    The resource type
      */
     public function load($closure, $type = null)
     {
+        if (!is_callable($closure)) {
+            throw new \InvalidArgumentException('The resource should be a function');
+        }
+        
         call_user_func($closure, $this->container);
     }
 
@@ -56,6 +60,6 @@ class ClosureLoader extends Loader
      */
     public function supports($resource, $type = null)
     {
-        return $resource instanceof \Closure;
+        return is_callable($resource);
     }
 }

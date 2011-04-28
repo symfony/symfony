@@ -27,8 +27,12 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
     protected $customizer;
     protected $catch;
 
-    public function __construct($body, $status, $headers, \Closure $customizer = null)
+    public function __construct($body, $status, $headers, $customizer = null)
     {
+        if (null !== $customizer && !is_callable($customizer)) {
+            throw new \InvalidArgumentException('The customizer should be a function');
+        }
+        
         $this->body = $body;
         $this->status = $status;
         $this->headers = $headers;

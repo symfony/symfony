@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Guess\Guess;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class FormTypeGuesserChain implements FormTypeGuesserInterface
 {
@@ -57,16 +58,20 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
      * Executes a closure for each guesser and returns the best guess from the
      * return values
      *
-     * @param  \Closure $closure  The closure to execute. Accepts a guesser
+     * @param  function $closure  The closure to execute. Accepts a guesser
      *                            as argument and should return a Guess instance
      * @return FieldFactoryGuess  The guess with the highest confidence
      */
-    private function guess(\Closure $closure)
+    private function guess($closure)
     {
+        if (!is_callable($closure)) {
+            throw new UnexpectedTypeException($closure, 'function');
+        }
+        
         $guesses = array();
 
         foreach ($this->guessers as $guesser) {
-            if ($guess = $closure($guesser)) {
+            if ($guess = call_user_func($closure, $guesser)) {
                 $guesses[] = $guess;
             }
         }

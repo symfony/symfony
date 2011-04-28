@@ -224,17 +224,17 @@ class Form implements \IteratorAggregate, FormInterface
             }
         }
 
-        $this->name = (string)$name;
+        $this->name = (string) $name;
         $this->types = $types;
         $this->dispatcher = $dispatcher;
         $this->clientTransformers = $clientTransformers;
         $this->normTransformers = $normTransformers;
         $this->validators = $validators;
         $this->dataMapper = $dataMapper;
-        $this->required = $required;
-        $this->readOnly = $readOnly;
+        $this->required = (Boolean) $required;
+        $this->readOnly = (Boolean) $readOnly;
         $this->attributes = $attributes;
-        $this->errorBubbling = $errorBubbling;
+        $this->errorBubbling = (Boolean) $errorBubbling;
         $this->emptyData = $emptyData;
 
         $this->setData(null);
@@ -361,7 +361,7 @@ class Form implements \IteratorAggregate, FormInterface
 
         // Treat data as strings unless a value transformer exists
         if (!$this->clientTransformers && !$this->normTransformers && is_scalar($appData)) {
-            $appData = (string)$appData;
+            $appData = (string) $appData;
         }
 
         // Synchronize representations - must not change the content!
@@ -396,7 +396,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if (is_scalar($clientData) || null === $clientData) {
-            $clientData = (string)$clientData;
+            $clientData = (string) $clientData;
         }
 
         // Initialize errors in the very beginning so that we don't lose any
@@ -449,8 +449,8 @@ class Form implements \IteratorAggregate, FormInterface
         if (null === $clientData || '' === $clientData) {
             $clientData = $this->emptyData;
 
-            if ($clientData instanceof \Closure) {
-                $clientData = $clientData->__invoke($this);
+            if (!is_string($clientData) && is_callable($clientData)) {
+                $clientData = call_user_func($clientData, $this);
             }
         }
 
@@ -913,8 +913,8 @@ class Form implements \IteratorAggregate, FormInterface
             return '' === $value ? null : $value;
         }
 
-        for ($i = count($this->clientTransformers) - 1; $i >= 0; --$i) {
-            $value = $this->clientTransformers[$i]->reverseTransform($value);
+        foreach (array_reverse($this->clientTransformers) as $transformer) {
+            $value = $transformer->reverseTransform($value);
         }
 
         return $value;

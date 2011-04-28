@@ -52,6 +52,9 @@ install_git doctrine-migrations git://github.com/doctrine/migrations.git
 # Monolog
 install_git monolog git://github.com/Seldaek/monolog.git
 
+# Annotations
+install_git annotations git://github.com/schmittjoh/annotations.git
+
 # Swiftmailer
 install_git swiftmailer git://github.com/swiftmailer/swiftmailer.git origin/4.1
 

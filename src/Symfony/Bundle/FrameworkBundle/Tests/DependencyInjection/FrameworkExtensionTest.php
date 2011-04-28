@@ -26,8 +26,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->getParameter('form.csrf_protection.enabled'));
         $this->assertEquals('_csrf', $container->getParameter('form.csrf_protection.field_name'));
-        $arguments = $container->findDefinition('form.csrf_provider')->getArguments();
-        $this->assertEquals('s3cr3t', $container->getParameterBag()->resolveValue($arguments[1]));
+        $this->assertEquals('s3cr3t', $container->getParameterBag()->resolveValue($container->findDefinition('form.csrf_provider')->getArgument(1)));
     }
 
     public function testEsi()
@@ -43,8 +42,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('profiler'), '->registerProfilerConfiguration() loads profiling.xml');
         $this->assertTrue($container->hasDefinition('data_collector.config'), '->registerProfilerConfiguration() loads collectors.xml');
-        $arguments = $container->getDefinition('profiler_listener')->getArguments();
-        $this->assertTrue($arguments[2]);
+        $this->assertTrue($container->getDefinition('profiler_listener')->getArgument(2));
     }
 
     public function testRouter()
@@ -74,8 +72,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('full');
 
         $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
-        $arguments = $container->getDefinition('session')->getArguments();
-        $this->assertEquals('fr', $arguments[1]);
+        $this->assertEquals('fr', $container->getDefinition('session')->getArgument(1));
         $this->assertTrue($container->getDefinition('session')->hasMethodCall('start'));
         $this->assertEquals('session.storage.native', (string) $container->getAlias('session.storage'));
 
@@ -106,8 +103,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertEquals($container->getDefinition('templating.loader'), $container->getDefinition('templating.loader.cache'), '->registerTemplatingConfiguration() configures the loader to use cache');
 
-        $arguments = $container->getDefinition('templating.loader.cache')->getArguments();
-        $this->assertEquals('/path/to/cache', $arguments[1]);
+        $this->assertEquals('/path/to/cache', $container->getDefinition('templating.loader.cache')->getArgument(1));
 
         $this->assertEquals(array('php', 'twig'), $container->getParameter('templating.engines'), '->registerTemplatingConfiguration() sets a templating.engines parameter');
     }
@@ -154,8 +150,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('validator.mapping.loader.xml_files_loader'), '->registerValidationConfiguration() defines the XML loader');
         $this->assertTrue($container->hasDefinition('validator.mapping.loader.yaml_files_loader'), '->registerValidationConfiguration() defines the YAML loader');
 
-        $xmlLoaderArgs = $container->getDefinition('validator.mapping.loader.xml_files_loader')->getArguments();
-        $xmlFiles = $xmlLoaderArgs[0];
+        $xmlFiles = $container->getDefinition('validator.mapping.loader.xml_files_loader')->getArgument(0);
 
         $this->assertContains(
             realpath(__DIR__.'/../../../../Component/Form/Resources/config/validation.xml'),
@@ -170,9 +165,9 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('validator.mapping.loader.annotation_loader'), '->registerValidationConfiguration() defines the annotation loader');
 
-        $arguments = $container->getDefinition('validator.mapping.loader.annotation_loader')->getArguments();
-        $this->assertEquals('Symfony\\Component\\Validator\\Constraints\\', $arguments[0]['assert'], '->registerValidationConfiguration() loads the default "assert" prefix');
-        $this->assertEquals('Application\\Validator\\Constraints\\', $arguments[0]['app'], '->registerValidationConfiguration() loads custom validation namespaces');
+        $argument = $container->getDefinition('validator.mapping.loader.annotation_loader')->getArgument(0);
+        $this->assertEquals('Symfony\\Component\\Validator\\Constraints\\', $argument['assert'], '->registerValidationConfiguration() loads the default "assert" prefix');
+        $this->assertEquals('Application\\Validator\\Constraints\\', $argument['app'], '->registerValidationConfiguration() loads custom validation namespaces');
     }
 
     public function testValidationPaths()
@@ -183,14 +178,14 @@ abstract class FrameworkExtensionTest extends TestCase
             'kernel.bundles' => array('TestBundle' => 'Symfony\Bundle\FrameworkBundle\Tests\TestBundle'),
         ));
 
-        $yamlArgs = $container->getDefinition('validator.mapping.loader.yaml_files_loader')->getArguments();
-        $this->assertEquals(1, count($yamlArgs[0]));
-        $this->assertStringEndsWith('TestBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'validation.yml', $yamlArgs[0][0]);
+        $yamlArgs = $container->getDefinition('validator.mapping.loader.yaml_files_loader')->getArgument(0);
+        $this->assertEquals(1, count($yamlArgs));
+        $this->assertStringEndsWith('TestBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'validation.yml', $yamlArgs[0]);
 
-        $xmlArgs = $container->getDefinition('validator.mapping.loader.xml_files_loader')->getArguments();
-        $this->assertEquals(2, count($xmlArgs[0]));
-        $this->assertStringEndsWith('Component/Form/Resources/config/validation.xml', $xmlArgs[0][0]);
-        $this->assertStringEndsWith('TestBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'validation.xml', $xmlArgs[0][1]);
+        $xmlArgs = $container->getDefinition('validator.mapping.loader.xml_files_loader')->getArgument(0);
+        $this->assertEquals(2, count($xmlArgs));
+        $this->assertStringEndsWith('Component/Form/Resources/config/validation.xml', $xmlArgs[0]);
+        $this->assertStringEndsWith('TestBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'validation.xml', $xmlArgs[1]);
     }
 
     protected function createContainer(array $data = array())

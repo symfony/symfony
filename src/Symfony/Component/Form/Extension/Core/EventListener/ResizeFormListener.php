@@ -40,11 +40,14 @@ class ResizeFormListener implements EventSubscriberInterface
      */
     private $resizeOnBind;
 
-    public function __construct(FormFactoryInterface $factory, $type, $resizeOnBind = false)
+    private $typeOptions;
+
+    public function __construct(FormFactoryInterface $factory, $type, array $typeOptions = array(), $resizeOnBind = false)
     {
         $this->factory = $factory;
         $this->type = $type;
         $this->resizeOnBind = $resizeOnBind;
+        $this->typeOptions = $typeOptions;
     }
 
     public static function getSubscribedEvents()
@@ -78,9 +81,10 @@ class ResizeFormListener implements EventSubscriberInterface
 
         // Then add all rows again in the correct order
         foreach ($data as $name => $value) {
-            $form->add($this->factory->createNamed($this->type, $name, null, array(
+            $options = array_merge($this->typeOptions, array(
                 'property_path' => '['.$name.']',
-            )));
+            ));
+            $form->add($this->factory->createNamed($this->type, $name, null, $options));
         }
     }
 

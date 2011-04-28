@@ -12,8 +12,8 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\BooleanToStringTransformer;
 use Symfony\Component\Form\FormView;
 
@@ -23,12 +23,13 @@ class RadioType extends AbstractType
     {
         $builder->appendClientTransformer(new BooleanToStringTransformer())
             ->setAttribute('value', $options['value']);
+            ->setAttribute('checked', (Boolean) $options['checked']);
     }
 
     public function buildView(FormView $view, FormInterface $form)
     {
         $view->set('value', $form->getAttribute('value'));
-        $view->set('checked', (Boolean) $form->getData());
+        $view->set('checked', $form->getAttribute('checked') ?: (Boolean) $form->getData());
 
         if ($view->hasParent()) {
             $view->set('name', $view->getParent()->get('name'));
@@ -38,7 +39,8 @@ class RadioType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'value' => null,
+            'value'   => null,
+            'checked' => false,
         );
     }
 

@@ -97,7 +97,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $reverseTransformer->reverseTransform('2010-2010-2010', null);
     }

@@ -529,18 +529,24 @@ abstract class Kernel implements KernelInterface
      */
     protected function buildContainer()
     {
-        $parameterBag = new ParameterBag($this->getKernelParameters());
-
-        $container = new ContainerBuilder($parameterBag);
-        $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass());
+        $container = new ContainerBuilder(new ParameterBag($this->getKernelParameters()));
+        $extensions = array();
         foreach ($this->bundles as $bundle) {
             $bundle->build($container);
+
+            if ($extension = $bundle->getContainerExtension()) {
+                $container->registerExtension($extension);
+                $extensions[] = $extension->getAlias();
+            }
 
             if ($this->debug) {
                 $container->addObjectResource($bundle);
             }
         }
         $container->addObjectResource($this);
+
+        // ensure these extensions are implicitly loaded
+        $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($extensions));
 
         if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
             $container->merge($cont);

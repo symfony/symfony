@@ -1,8 +1,8 @@
 framework:
+    secret: s3cr3t
     csrf_protection:
         enabled:    true
         field_name: _csrf
-        secret:     s3cr3t
     esi:
         enabled: true
     profiler:

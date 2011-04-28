@@ -9,6 +9,20 @@ timeline closely anyway.
 PR12 to beta1
 -------------
 
+* The CSRF secret configuration has been moved to a mandatory global `secret`
+  setting (as the secret is now used for everything and not just CSRF):
+
+    Before:
+
+        framework:
+            csrf_protection:
+                secret: S3cr3t
+
+    After:
+
+        framework:
+            secret: S3cr3t
+
 * The `File::getWebPath()` and `File::rename()` methods have been removed, as
   well as the `framework.document_root` configuration setting.
 

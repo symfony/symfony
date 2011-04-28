@@ -1,10 +1,10 @@
 <?php
 
 $container->loadFromExtension('framework', array(
+    'secret' => 's3cr3t',
     'csrf_protection' => array(
         'enabled'    => true,
         'field_name' => '_csrf',
-        'secret'     => 's3cr3t',
     ),
     'esi' => array(
         'enabled' => true,

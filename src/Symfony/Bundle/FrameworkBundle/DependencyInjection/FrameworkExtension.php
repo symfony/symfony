@@ -65,6 +65,8 @@ class FrameworkExtension extends Extension
             $container->setParameter('kernel.charset', $config['charset']);
         }
 
+        $container->setParameter('kernel.secret', $config['secret']);
+
         if (isset($config['error_handler'])) {
             if (false === $config['error_handler']) {
                 $container->getDefinition('error_handler')->setMethodCalls(array());
@@ -157,8 +159,6 @@ class FrameworkExtension extends Extension
      */
     private function registerCsrfProtectionConfiguration(array $config, ContainerBuilder $container)
     {
-        $container->getDefinition('form.csrf_provider')->replaceArgument(1, $config['secret']);
-
         // FIXME: those are not used
         $container->setParameter('form.csrf_protection.field_name', $config['field_name']);
         $container->setParameter('form.csrf_protection.enabled', $config['enabled']);

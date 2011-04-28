@@ -38,10 +38,6 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
         if (null === $messages) {
             $messages = array();
         }
-        
-        array_walk($results, function(&$value) {
-			$value = $value['translated'];
-		});
 
         // not an array
         if (!is_array($messages)) {
@@ -89,22 +85,22 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
                 $data = $this->merge($data, $item);
                 $item = $defaults;
             } elseif (substr($line, 0, 3) === '#~ ') {
-                $item['flags']['obsolete'] = true;
+                //$item['flags']['obsolete'] = true;
             } elseif (substr($line, 0, 3) === '#, ') {
-                $item['flags'][substr($line, 3)] = true;
+                //$item['flags'][substr($line, 3)] = true;
             } elseif (substr($line, 0, 3) === '#: ') {
-                $item['occurrences'][] = array(
-                    'file' => strtok(substr($line, 3), ':'),
-                    'line' => strtok(':')
-                );
+                //$item['occurrences'][] = array(
+                //    'file' => strtok(substr($line, 3), ':'),
+                //    'line' => strtok(':')
+                //);
             } elseif (substr($line, 0, 3) === '#. ') {
-                $item['comments'][] = substr($line, 3);
+                //$item['comments'][] = substr($line, 3);
             } elseif ($line[0] === '#') {
-                $item['comments'][] = ltrim(substr($line, 1));
+                //$item['comments'][] = ltrim(substr($line, 1));
             } elseif (substr($line, 0, 7) === 'msgid "') {
-                $item['ids']['singular'] = substr($line, 7, -1);
+                //$item['ids']['singular'] = substr($line, 7, -1);
             } elseif (substr($line, 0, 9) === 'msgctxt "') {
-                $item['context'] = substr($line, 9, -1);
+                //$item['context'] = substr($line, 9, -1);
             } elseif (substr($line, 0, 8) === 'msgstr "') {
                 $item['translated'] = substr($line, 8, -1);
             } elseif ($line[0] === '"') {
@@ -117,7 +113,7 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
                     $item[$continues] .= substr($line, 1, -1);
                 }
             } elseif (substr($line, 0, 14) === 'msgid_plural "') {
-                $item['ids']['plural'] = substr($line, 14, -1);
+                //$item['ids']['plural'] = substr($line, 14, -1);
             } elseif (substr($line, 0, 7) === 'msgstr[') {
                 $item['translated'][(integer) substr($line, 7, 1)] = substr($line, 11, -1);
             }

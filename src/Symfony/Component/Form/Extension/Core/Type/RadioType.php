@@ -22,7 +22,7 @@ class RadioType extends AbstractType
     public function buildForm(FormBuilder $builder, array $options)
     {
         $builder->appendClientTransformer(new BooleanToStringTransformer())
-            ->setAttribute('value', $options['value']);
+            ->setAttribute('value', $options['value'])
             ->setAttribute('checked', (Boolean) $options['checked']);
     }
 

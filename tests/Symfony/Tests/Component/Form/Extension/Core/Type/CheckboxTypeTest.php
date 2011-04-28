@@ -21,6 +21,14 @@ class CheckboxTypeTest extends TypeTestCase
         $this->assertEquals('foobar', $view->get('value'));
     }
 
+    public function testPassCheckedToView()
+    {
+        $form = $this->factory->create('checkbox', null, array('checked' => true));
+        $view = $form->createView();
+
+        $this->assertTrue($view->get('checked'));
+    }
+
     public function testCheckedIfDataTrue()
     {
         $form = $this->factory->create('checkbox');

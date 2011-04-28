@@ -22,19 +22,21 @@ class CheckboxType extends AbstractType
     public function buildForm(FormBuilder $builder, array $options)
     {
         $builder->appendClientTransformer(new BooleanToStringTransformer())
-            ->setAttribute('value', $options['value']);
+            ->setAttribute('value', $options['value'])
+            ->setAttribute('checked', (Boolean) $options['checked']);
     }
 
     public function buildView(FormView $view, FormInterface $form)
     {
         $view->set('value', $form->getAttribute('value'));
-        $view->set('checked', (Boolean) $form->getData());
+        $view->set('checked', $form->getAttribute('checked') ?: (Boolean) $form->getData());
     }
 
     public function getDefaultOptions(array $options)
     {
         return array(
-            'value' => '1',
+            'value'   => '1',
+            'checked' => false,
         );
     }
 

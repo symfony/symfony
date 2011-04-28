@@ -44,6 +44,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('exception_controller')->defaultValue('Symfony\\Bundle\\FrameworkBundle\\Controller\\ExceptionController::showAction')->end()
                 ->scalarNode('ide')->defaultNull()->end()
                 ->booleanNode('test')->end()
+                ->booleanNode('compile_classes_extension')->defaultValue('.php.cache')->end()
             ->end()
         ;
 

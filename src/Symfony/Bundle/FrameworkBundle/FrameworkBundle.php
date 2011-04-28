@@ -49,7 +49,8 @@ class FrameworkBundle extends Bundle
             $this->container->getParameter('kernel.cache_dir'),
             'classes',
             $this->container->getParameter('kernel.debug'),
-            true
+            true,
+            $this->container->getParameter('kernel.compile_classes_extension')
         );
 
         if ($this->container->has('error_handler')) {

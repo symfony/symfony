@@ -28,7 +28,7 @@ class LocaleTypeTest extends TypeTestCase
         $this->assertEquals('Englisch', $choices['en']);
         $this->assertArrayHasKey('en_GB', $choices);
         $this->assertEquals('Englisch (Vereinigtes Königreich)', $choices['en_GB']);
-        $this->assertArrayHasKey('zh_Hans_MO', $choices);
-        $this->assertEquals('Chinesisch (vereinfacht, Sonderverwaltungszone Macao)', $choices['zh_Hans_MO']);
+        $this->assertArrayHasKey('zh_Hant_MO', $choices);
+        $this->assertEquals('Chinesisch (traditionell, Sonderverwaltungszone Macao)', $choices['zh_Hant_MO']);
     }
 }

@@ -17,7 +17,6 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TemplatingPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RoutingResolverPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddClassesToCachePass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
@@ -27,7 +26,6 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\ClassLoader\ClassCollectionLoader;
 
 /**
  * Bundle.
@@ -41,15 +39,6 @@ class FrameworkBundle extends Bundle
      */
     public function boot()
     {
-        // load core classes
-        ClassCollectionLoader::load(
-            $this->container->getParameter('kernel.compiled_classes'),
-            $this->container->getParameter('kernel.cache_dir'),
-            'classes',
-            $this->container->getParameter('kernel.debug'),
-            true
-        );
-
         if ($this->container->has('error_handler')) {
             $this->container->get('error_handler');
         }
@@ -67,7 +56,6 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new TemplatingPass());
         $container->addCompilerPass(new AddConstraintValidatorsPass());
         $container->addCompilerPass(new FormPass());
-        $container->addCompilerPass(new AddClassesToCachePass());
         $container->addCompilerPass(new TranslatorPass());
         $container->addCompilerPass(new AddCacheWarmerPass());
 

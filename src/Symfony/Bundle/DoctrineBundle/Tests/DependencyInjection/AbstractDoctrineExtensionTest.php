@@ -43,8 +43,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $loader->load(array(array('dbal' => array('connections' => array('default' => array('password' => 'foo')))), array(), array('dbal' => array('default_connection' => 'foo')), array()), $container);
 
-        $arguments = $container->getDefinition('doctrine.dbal.default_connection')->getArguments();
-        $config = $arguments[0];
+        $config = $container->getDefinition('doctrine.dbal.default_connection')->getArgument(0);
 
         $this->assertEquals('foo', $config['password']);
         $this->assertEquals('root', $config['user']);
@@ -63,8 +62,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->compileContainer($container);
 
         // doctrine.dbal.mysql_connection
-        $arguments = $container->getDefinition('doctrine.dbal.mysql_connection')->getArguments();
-        $config = $arguments[0];
+        $config = $container->getDefinition('doctrine.dbal.mysql_connection')->getArgument(0);
 
         $this->assertEquals('mysql_s3cr3t', $config['password']);
         $this->assertEquals('mysql_user', $config['user']);
@@ -72,13 +70,11 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('/path/to/mysqld.sock', $config['unix_socket']);
 
         // doctrine.dbal.sqlite_connection
-        $arguments = $container->getDefinition('doctrine.dbal.sqlite_connection')->getArguments();
-        $config = $arguments[0];
+        $config = $container->getDefinition('doctrine.dbal.sqlite_connection')->getArgument(0);
         $this->assertArrayHasKey('memory', $config);
 
         // doctrine.dbal.oci8_connection
-        $arguments = $container->getDefinition('doctrine.dbal.oci_connection')->getArguments();
-        $config = $arguments[0];
+        $config = $container->getDefinition('doctrine.dbal.oci_connection')->getArgument(0);
         $this->assertArrayHasKey('charset', $config);
     }
 
@@ -95,8 +91,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->compileContainer($container);
 
         // doctrine.dbal.mysql_connection
-        $arguments = $container->getDefinition('doctrine.dbal.default_connection')->getArguments();
-        $config = $arguments[0];
+        $config = $container->getDefinition('doctrine.dbal.default_connection')->getArgument(0);
 
         $this->assertEquals('mysql_s3cr3t', $config['password']);
         $this->assertEquals('mysql_user', $config['user']);
@@ -630,10 +625,9 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->loadFromFile($container, 'dbal_types');
         $this->compileContainer($container);
 
-        $arguments = $container->getDefinition('doctrine.dbal.connection_factory')->getArguments();
         $this->assertEquals(
             array('test' => 'Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType'),
-            $arguments[0]
+            $container->getDefinition('doctrine.dbal.connection_factory')->getArgument(0)
         );
     }
 

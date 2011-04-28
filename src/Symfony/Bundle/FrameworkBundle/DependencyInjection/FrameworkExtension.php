@@ -245,9 +245,9 @@ class FrameworkExtension extends Extension
         $router->replaceArgument(1, $config['resource']);
 
         if (isset($config['type'])) {
-            $arguments = $router->getArguments();
-            $arguments[2]['resource_type'] = $config['type'];
-            $router->replaceArgument(2, $arguments[2]);
+            $argument = $router->getArgument(2);
+            $argument['resource_type'] = $config['type'];
+            $router->replaceArgument(2, $argument);
         }
 
         if ($config['cache_warmer']) {

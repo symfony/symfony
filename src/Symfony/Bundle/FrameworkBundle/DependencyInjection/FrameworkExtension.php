@@ -87,6 +87,8 @@ class FrameworkExtension extends Extension
             }
         }
 
+        $container->setParameter('kernel.compile_classes', $config['compile_classes']);
+
         if (isset($config['csrf_protection'])) {
             $this->registerCsrfProtectionConfiguration($config['csrf_protection'], $container);
         }

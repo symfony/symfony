@@ -109,7 +109,7 @@ EOF;
      *
      * @param array $files An array of files
      *
-     * @return array An array with all uploaded files marked as already moved
+     * @return array An array with all uploaded files
      */
     protected function filterFiles(array $files)
     {
@@ -118,7 +118,16 @@ EOF;
             if (is_array($value)) {
                 $filtered[$key] = $this->filterFiles($value);
             } elseif ($value instanceof UploadedFile) {
-                $filtered[$key] = new File($value->getPathname());
+                // Create an uploaded file instance with security disabled,
+                // in order to be able to move local files
+                $filtered[$key] = new UploadedFile(
+                    $value->getPathname(), 
+                    $value->getOriginalBasename(), 
+                    $value->getMimeType(), 
+                    $value->getSize(), 
+                    $value->getError(),
+                    false
+                );
             } else {
                 $filtered[$key] = $value;
             }

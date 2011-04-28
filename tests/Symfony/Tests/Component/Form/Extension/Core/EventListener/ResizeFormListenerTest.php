@@ -59,7 +59,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = array(1 => 'string', 2 => 'string');
         $event = new DataEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', false);
+        $listener = new ResizeFormListener($this->factory, 'text', array(), false);
         $listener->preSetData($event);
 
         $this->assertFalse($this->form->has('0'));
@@ -73,7 +73,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = array();
         $event = new DataEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', false);
+        $listener = new ResizeFormListener($this->factory, 'text', array(), false);
         $listener->preSetData($event);
 
         $this->assertFalse($this->form->has('$$name$$'));
@@ -85,7 +85,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = array();
         $event = new DataEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', true);
+        $listener = new ResizeFormListener($this->factory, 'text', array(), true);
         $listener->preSetData($event);
 
         $this->assertTrue($this->form->has('$$name$$'));
@@ -98,7 +98,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
     {
         $data = 'no array or traversable';
         $event = new DataEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', false);
+        $listener = new ResizeFormListener($this->factory, 'text', array(), false);
         $listener->preSetData($event);
     }
 
@@ -108,7 +108,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = null;
         $event = new DataEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', false);
+        $listener = new ResizeFormListener($this->factory, 'text', array(), false);
         $listener->preSetData($event);
     }
 
@@ -124,7 +124,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = array(0 => 'string', 2 => 'string');
         $event = new DataEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', true);
+        $listener = new ResizeFormListener($this->factory, 'text', array(), true);
         $listener->preBind($event);
 
         $this->assertTrue($this->form->has('0'));
@@ -139,7 +139,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = array();
         $event = new DataEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', true);
+        $listener = new ResizeFormListener($this->factory, 'text', array(), true);
         $listener->preBind($event);
 
         $this->assertFalse($this->form->has('0'));
@@ -152,7 +152,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = array(0 => 'string', 2 => 'string');
         $event = new DataEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', false);
+        $listener = new ResizeFormListener($this->factory, 'text', array(), false);
         $listener->preBind($event);
 
         $this->assertTrue($this->form->has('0'));
@@ -167,7 +167,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
     {
         $data = 'no array or traversable';
         $event = new DataEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', true);
+        $listener = new ResizeFormListener($this->factory, 'text', array(), true);
         $listener->preBind($event);
     }
 
@@ -177,7 +177,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = null;
         $event = new DataEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', true);
+        $listener = new ResizeFormListener($this->factory, 'text', array(), true);
         $listener->preBind($event);
 
         $this->assertFalse($this->form->has('1'));
@@ -190,7 +190,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = '';
         $event = new DataEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', true);
+        $listener = new ResizeFormListener($this->factory, 'text', array(), true);
         $listener->preBind($event);
 
         $this->assertFalse($this->form->has('1'));
@@ -202,7 +202,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = array(0 => 'first', 1 => 'second', 2 => 'third');
         $event = new FilterDataEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', true);
+        $listener = new ResizeFormListener($this->factory, 'text', array(), true);
         $listener->onBindNormData($event);
 
         $this->assertEquals(array(1 => 'second'), $event->getData());
@@ -214,7 +214,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = array(0 => 'first', 1 => 'second', 2 => 'third');
         $event = new FilterDataEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', false);
+        $listener = new ResizeFormListener($this->factory, 'text', array(), false);
         $listener->onBindNormData($event);
 
         $this->assertEquals($data, $event->getData());
@@ -227,7 +227,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
     {
         $data = 'no array or traversable';
         $event = new FilterDataEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', true);
+        $listener = new ResizeFormListener($this->factory, 'text', array(), true);
         $listener->onBindNormData($event);
     }
 
@@ -237,7 +237,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = null;
         $event = new FilterDataEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', true);
+        $listener = new ResizeFormListener($this->factory, 'text', array(), true);
         $listener->onBindNormData($event);
 
         $this->assertEquals(array(), $event->getData());

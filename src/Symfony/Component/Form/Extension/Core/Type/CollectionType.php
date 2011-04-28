@@ -27,7 +27,7 @@ class CollectionType extends AbstractType
         }
 
         $listener = new ResizeFormListener($builder->getFormFactory(),
-                $options['type'], $options['modifiable']);
+                $options['type'], $options['modifiable'], $options['type_options']);
 
         $builder->addEventSubscriber($listener);
     }
@@ -38,6 +38,7 @@ class CollectionType extends AbstractType
             'modifiable' => false,
             'prototype'  => true,
             'type' => 'text',
+            'type_options' => array()
         );
     }
 

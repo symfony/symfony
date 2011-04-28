@@ -22,6 +22,7 @@ use Symfony\Component\Finder\Finder;
  * for DependencyInjection extensions and Console commands.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @link   http://symfony.com/doc/2.0/book/bundles.html
  */
 abstract class Bundle extends ContainerAware implements BundleInterface
 {

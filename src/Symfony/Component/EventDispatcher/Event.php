@@ -30,13 +30,13 @@ namespace Symfony\Component\EventDispatcher;
  * further listeners in your event listener.
  *
  * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link    www.doctrine-project.org
  * @since   2.0
  * @version $Revision: 3938 $
  * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
  * @author  Jonathan Wage <jonwage@gmail.com>
  * @author  Roman Borschel <roman@code-factory.org>
  * @author  Bernhard Schussek <bschussek@gmail.com>
+ * @link    http://symfony.com/doc/2.0/book/internals/event_dispatcher.html#events
  */
 class Event
 {

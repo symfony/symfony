@@ -12,6 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Listeners will only be initialized if we really need them.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * @link   http://symfony.com/doc/2.0/book/security/authentication.html#the-firewall-map
  */
 class FirewallMap implements FirewallMapInterface
 {

@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  * Profiler.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @link   http://symfony.com/doc/2.0/book/internals/profiler.html
  */
 class Profiler
 {

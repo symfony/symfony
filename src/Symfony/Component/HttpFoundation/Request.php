@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage;
  * Request represents an HTTP request.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @link   http://symfony.com/doc/2.0/book/controller.html#the-request-object
  */
 class Request
 {

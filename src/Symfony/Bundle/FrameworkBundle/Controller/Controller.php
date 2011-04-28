@@ -22,6 +22,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * It provides methods to common features needed in controllers.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @link   http://symfony.com/doc/2.0/book/controller.html#the-base-controller-class
  */
 class Controller extends ContainerAware
 {

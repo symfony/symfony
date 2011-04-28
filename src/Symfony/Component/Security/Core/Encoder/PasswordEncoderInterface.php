@@ -15,6 +15,7 @@ namespace Symfony\Component\Security\Core\Encoder;
  * PasswordEncoderInterface is the interface for all encoders.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @link   http://symfony.com/doc/2.0/book/security/users.html#encoding-passwords
  */
 interface PasswordEncoderInterface
 {

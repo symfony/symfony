@@ -16,6 +16,7 @@ namespace Symfony\Component\Security\Core\User;
  * implement.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @link   http://symfony.com/doc/2.0/book/security/users.html#userproviderinterface
  */
 interface UserProviderInterface
 {

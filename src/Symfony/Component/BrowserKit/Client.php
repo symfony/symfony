@@ -28,6 +28,7 @@ use Symfony\Component\BrowserKit\Client;
  * you need to also implement the getScript() method.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @link   http://symfony.com/doc/2.0/book/testing.html#browsing
  *
  * @api
  */

@@ -13,6 +13,8 @@ namespace Symfony\Component\Validator;
 
 /**
  * Represents a single violation of a constraint.
+ *
+ * @link http://symfony.com/doc/2.0/book/validation.html
  */
 class ConstraintViolation
 {

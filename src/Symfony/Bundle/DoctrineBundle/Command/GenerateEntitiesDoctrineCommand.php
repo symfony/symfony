@@ -53,7 +53,7 @@ EOT
         $bundleName = $input->getArgument('bundle');
         $filterEntity = $input->getOption('entity');
 
-        $foundBundle = $this->findBundle($bundleName);
+        $foundBundle = $this->getApplication()->getKernel()->getBundle($bundleName);
 
         if ($metadatas = $this->getBundleMetadatas($foundBundle)) {
             $output->writeln(sprintf('Generating entities for "<info>%s</info>"', $foundBundle->getName()));

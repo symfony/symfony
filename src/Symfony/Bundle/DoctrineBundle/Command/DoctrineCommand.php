@@ -139,24 +139,6 @@ abstract class DoctrineCommand extends Command
         return $bundleMetadatas;
     }
 
-    protected function findBundle($bundleName)
-    {
-        $foundBundle = false;
-        foreach ($this->getApplication()->getKernel()->getBundles() as $bundle) {
-            /* @var $bundle Bundle */
-            if (strtolower($bundleName) == strtolower($bundle->getName())) {
-                $foundBundle = $bundle;
-                break;
-            }
-        }
-
-        if (!$foundBundle) {
-            throw new \InvalidArgumentException("No bundle " . $bundleName . " was found.");
-        }
-
-        return $foundBundle;
-    }
-
     /**
      * Transform classname to a path $foundBundle substract it to get the destination
      *

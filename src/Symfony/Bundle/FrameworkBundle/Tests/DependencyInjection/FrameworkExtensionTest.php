@@ -166,10 +166,14 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('validation_annotations');
 
         $this->assertTrue($container->hasDefinition('validator.mapping.loader.annotation_loader'), '->registerValidationConfiguration() defines the annotation loader');
-
-        $argument = $container->getDefinition('validator.mapping.loader.annotation_loader')->getArgument(0);
-        $this->assertEquals('Symfony\\Component\\Validator\\Constraints\\', $argument['assert'], '->registerValidationConfiguration() loads the default "assert" prefix');
-        $this->assertEquals('Application\\Validator\\Constraints\\', $argument['app'], '->registerValidationConfiguration() loads custom validation namespaces');
+        $loaders = $container->getDefinition('validator.mapping.loader.loader_chain')->getArgument(0);
+        $found = false;
+        foreach ($loaders as $loader) {
+            if ('validator.mapping.loader.annotation_loader' === (string) $loader) {
+                $found = true;
+            }
+        }
+        $this->assertTrue($found, 'validator.mapping.loader.annotation_loader is added to the loader chain.');
     }
 
     public function testValidationPaths()

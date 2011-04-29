@@ -37,12 +37,7 @@
 
     <services>
         <!--- Annotation Metadata Reader Service -->
-        <service id="doctrine.orm.metadata.annotation_reader" class="%doctrine.orm.metadata.annotation_reader.class%" public="false">
-            <call method="setAnnotationNamespaceAlias">
-              <argument>Doctrine\ORM\Mapping\</argument>
-              <argument>orm</argument>
-            </call>
-        </service>
+        <service id="doctrine.orm.metadata.annotation_reader" class="%doctrine.orm.metadata.annotation_reader.class%" public="false" />
 
         <service id="doctrine.orm.proxy_cache_warmer" class="%doctrine.orm.proxy_cache_warmer.class%" public="false">
             <tag name="kernel.cache_warmer" />

@@ -484,19 +484,7 @@ class FrameworkExtension extends Extension
             ->replaceArgument(0, $this->getValidatorYamlMappingFiles($container))
         ;
 
-        if (isset($config['annotations'])) {
-            $namespaces = array('assert' => 'Symfony\\Component\\Validator\\Constraints\\');
-            // Register prefixes for constraint namespaces
-            if (!empty($config['annotations']['namespaces'])) {
-                $namespaces = array_merge($namespaces, $config['annotations']['namespaces']);
-            }
-
-            // Register annotation loader
-            $container
-                ->getDefinition('validator.mapping.loader.annotation_loader')
-                ->replaceArgument(0, $namespaces)
-            ;
-
+        if ($config['enable_annotations']) {
             $loaderChain = $container->getDefinition('validator.mapping.loader.loader_chain');
             $arguments = $loaderChain->getArguments();
             array_unshift($arguments[0], new Reference('validator.mapping.loader.annotation_loader'));

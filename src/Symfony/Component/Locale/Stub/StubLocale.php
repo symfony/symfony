@@ -135,6 +135,8 @@ class StubLocale
     /**
      * Returns the currencies data
      *
+     * @param string $locale
+     *
      * @return array  The currencies data
      */
     static public function getCurrenciesData($locale)
@@ -203,8 +205,9 @@ class StubLocale
     /**
      * Checks if a language tag filter matches with locale
      *
-     * @param  string   $langtag  The language tag to check
-     * @param  string   $locale   The language range to check against
+     * @param  string  $langtag      The language tag to check
+     * @param  string  $locale       The language range to check against
+     * @param  Boolean $canonicalize
      * @return string             The corresponding locale code
      * @see    http://www.php.net/manual/en/locale.filtermatches.php
      * @throws MethodNotImplementedException
@@ -366,7 +369,7 @@ class StubLocale
      *
      * @param  array   $langtag       A list of the language tags to compare to locale
      * @param  string  $locale        The locale to use as the language range when matching
-     * @param  bool    $canonicalize  If true, the arguments will be converted to canonical form before matching
+     * @param  Boolean $canonicalize  If true, the arguments will be converted to canonical form before matching
      * @param  string  $default       The locale to use if no match is found
      * @see    http://www.php.net/manual/en/locale.lookup.php
      * @throws RuntimeException       When the intl extension is not loaded
@@ -393,7 +396,7 @@ class StubLocale
      * Sets the default runtime locale
      *
      * @param  string  $locale    The locale code
-     * @return bool               true on success or false on failure
+     * @return Boolean            true on success or false on failure
      * @see    http://www.php.net/manual/en/locale.parselocale.php
      * @throws MethodNotImplementedException
      */

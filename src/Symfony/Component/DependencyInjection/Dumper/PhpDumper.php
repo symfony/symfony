@@ -330,7 +330,7 @@ class PhpDumper extends Dumper
      *
      * @param string $id
      * @param Definition $definition
-     * @return boolean
+     * @return Boolean
      */
     private function isSimpleInstance($id, $definition)
     {
@@ -834,8 +834,8 @@ EOF;
     /**
      * Builds service calls from arguments
      *
-     * @param array $arguments
-     * @param string $calls By reference
+     * @param array  $arguments
+     * @param string $calls    By reference
      * @param string $behavior By reference
      * @return void
      */
@@ -913,7 +913,7 @@ EOF;
      *
      * @param string $id
      * @param array $arguments
-     * @return boolean
+     * @return Boolean
      */
     private function hasReference($id, array $arguments)
     {
@@ -936,7 +936,7 @@ EOF;
      * Dumps values.
      *
      * @param array $value
-     * @param boolean $interpolate
+     * @param Boolean $interpolate
      * @return string
      */
     private function dumpValue($value, $interpolate = true)
@@ -1034,7 +1034,7 @@ EOF;
     /**
      * Gets a service call
      *
-     * @param string $id
+     * @param string    $id
      * @param Reference $reference
      * @return string
      */

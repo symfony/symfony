@@ -59,9 +59,36 @@ class Configuration implements ConfigurationInterface
             ->children()
             ->arrayNode('dbal')
                 ->beforeNormalization()
-                    ->ifNull()
-                    // Define a default connection using the default values
-                    ->then(function($v) { return array ('connections' => array('default' => array())); })
+                    ->ifTrue(function ($v) { return is_array($v) && !array_key_exists('connections', $v) && !array_key_exists('connection', $v); })
+                    ->then(function ($v) {
+                        $connection = array();
+                        foreach (array(
+                            'dbname',
+                            'host',
+                            'port',
+                            'user',
+                            'password',
+                            'driver',
+                            'driver_class',
+                            'options',
+                            'path',
+                            'memory',
+                            'unix_socket',
+                            'wrapper_class', 'wrapper-class', 'wrapperClass',
+                            'platform_service', 'platform-service', 'platform-service',
+                            'charset',
+                            'logging'
+                        ) as $key) {
+                            if (array_key_exists($key, $v)) {
+                                $connection[$key] = $v[$key];
+                                unset($v[$key]);
+                            }
+                        }
+                        $v['default_connection'] = isset($v['default_connection']) ? (string) $v['default_connection'] : 'default';
+                        $v['connections'] = array($v['default_connection'] => $connection);
+
+                        return $v;
+                    })
                 ->end()
                 ->children()
                     ->scalarNode('default_connection')->end()
@@ -128,6 +155,30 @@ class Configuration implements ConfigurationInterface
         $node
             ->children()
                 ->arrayNode('orm')
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) { return null === $v || (is_array($v) && !array_key_exists('entity_managers', $v) && !array_key_exists('entity_manager', $v)); })
+                        ->then(function ($v) {
+                            $v = (array) $v;
+                            $entityManager = array();
+                            foreach (array(
+                                'result_cache_driver', 'result-cache-driver',
+                                'metadata_cache_driver', 'metadata-cache-driver',
+                                'query_cache_driver', 'query-cache-driver',
+                                'auto_mapping', 'auto-mapping',
+                                'mappings', 'mapping',
+                                'connection'
+                            ) as $key) {
+                                if (array_key_exists($key, $v)) {
+                                    $entityManager[$key] = $v[$key];
+                                    unset($v[$key]);
+                                }
+                            }
+                            $v['default_entity_manager'] = isset($v['default_entity_manager']) ? (string) $v['default_entity_manager'] : 'default';
+                            $v['entity_managers'] = array($v['default_entity_manager'] => $entityManager);
+
+                            return $v;
+                        })
+                    ->end()
                     ->children()
                         ->scalarNode('default_entity_manager')->end()
                         ->booleanNode('auto_generate_proxy_classes')->defaultFalse()->end()
@@ -157,6 +208,7 @@ class Configuration implements ConfigurationInterface
                 ->children()
                     ->scalarNode('connection')->end()
                     ->scalarNode('class_metadata_factory_name')->defaultValue('%doctrine.orm.class_metadata_factory_name%')->end()
+                    ->scalarNode('auto_mapping')->defaultFalse()->end()
                 ->end()
                 ->fixXmlConfig('hydrator')
                 ->children()
@@ -168,8 +220,6 @@ class Configuration implements ConfigurationInterface
                 ->fixXmlConfig('mapping')
                 ->children()
                     ->arrayNode('mappings')
-                        ->isRequired()
-                        ->requiresAtLeastOneElement()
                         ->useAttributeAsKey('name')
                         ->prototype('array')
                             ->beforeNormalization()

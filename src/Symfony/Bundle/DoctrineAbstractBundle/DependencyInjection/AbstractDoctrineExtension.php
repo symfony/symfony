@@ -42,51 +42,55 @@ abstract class AbstractDoctrineExtension extends Extension
      */
     protected function loadMappingInformation(array $objectManager, ContainerBuilder $container)
     {
-        if (isset($objectManager['mappings'])) {
-            foreach ($objectManager['mappings'] as $mappingName => $mappingConfig) {
-                if (!isset($mappingConfig['dir'])) {
-                    $mappingConfig['dir'] = false;
+        if (!$objectManager['mappings'] && $objectManager['auto_mapping']) {
+            // automatically register bundle mappings
+            foreach (array_keys($container->getParameter('kernel.bundles')) as $bundle) {
+                if (!isset($objectManager['mappings'][$bundle])) {
+                    $objectManager['mappings'][$bundle] = null;
                 }
-                if (!isset($mappingConfig['type'])) {
-                    $mappingConfig['type'] = false;
-                }
-                if (!isset($mappingConfig['prefix'])) {
-                    $mappingConfig['prefix'] = false;
-                }
-
-                $mappingConfig['dir'] = $container->getParameterBag()->resolveValue($mappingConfig['dir']);
-                // a bundle configuration is detected by realizing that the specified dir is not absolute and existing
-                if (isset($mappingConfig['is-bundle'])) {
-                    $mappingConfig['is_bundle'] = $mappingConfig['is-bundle'];
-                }
-                if (!isset($mappingConfig['is_bundle'])) {
-                    $mappingConfig['is_bundle'] = !file_exists($mappingConfig['dir']);
-                }
-
-                if ($mappingConfig['is_bundle']) {
-                    $bundle = null;
-                    foreach ($container->getParameter('kernel.bundles') as $name => $class) {
-                        if ($mappingName === $name) {
-                            $bundle = new \ReflectionClass($class);
-
-                            break;
-                        }
-                    }
-
-                    if (null === $bundle) {
-                        throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled.', $mappingName));
-                    }
-
-                    $mappingConfig = $this->getMappingDriverBundleConfigDefaults($mappingConfig, $bundle, $container);
-                    if (!$mappingConfig) {
-                        continue;
-                    }
-                }
-
-                $this->assertValidMappingConfiguration($mappingConfig, $objectManager['name']);
-                $this->setMappingDriverConfig($mappingConfig, $mappingName);
-                $this->setMappingDriverAlias($mappingConfig, $mappingName);
             }
+        }
+
+        foreach ($objectManager['mappings'] as $mappingName => $mappingConfig) {
+            if (false === $mappingConfig) {
+                continue;
+            }
+
+            $mappingConfig = array_replace(array(
+                'dir'    => false,
+                'type'   => false,
+                'prefix' => false,
+            ), (array) $mappingConfig);
+
+            $mappingConfig['dir'] = $container->getParameterBag()->resolveValue($mappingConfig['dir']);
+            // a bundle configuration is detected by realizing that the specified dir is not absolute and existing
+            if (!isset($mappingConfig['is_bundle'])) {
+                $mappingConfig['is_bundle'] = !file_exists($mappingConfig['dir']);
+            }
+
+            if ($mappingConfig['is_bundle']) {
+                $bundle = null;
+                foreach ($container->getParameter('kernel.bundles') as $name => $class) {
+                    if ($mappingName === $name) {
+                        $bundle = new \ReflectionClass($class);
+
+                        break;
+                    }
+                }
+
+                if (null === $bundle) {
+                    throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled.', $mappingName));
+                }
+
+                $mappingConfig = $this->getMappingDriverBundleConfigDefaults($mappingConfig, $bundle, $container);
+                if (!$mappingConfig) {
+                    continue;
+                }
+            }
+
+            $this->assertValidMappingConfiguration($mappingConfig, $objectManager['name']);
+            $this->setMappingDriverConfig($mappingConfig, $mappingName);
+            $this->setMappingDriverAlias($mappingConfig, $mappingName);
         }
     }
 
@@ -123,8 +127,7 @@ abstract class AbstractDoctrineExtension extends Extension
             }
             $this->drivers[$mappingConfig['type']][$mappingConfig['prefix']] = realpath($mappingConfig['dir']);
         } else {
-            throw new \InvalidArgumentException("Invalid mapping path given. ".
-                "Cannot load mapping/bundle named '" . $mappingName . "'.");
+            throw new \InvalidArgumentException(sprintf('Invalid Doctrine mapping path given. Cannot load Doctrine mapping/bundle named "%s".', $mappingName));
         }
     }
 
@@ -177,15 +180,15 @@ abstract class AbstractDoctrineExtension extends Extension
     protected function registerMappingDrivers($objectManager, ContainerBuilder $container)
     {
         // configure metadata driver for each bundle based on the type of mapping files found
-        if ($container->hasDefinition($this->getObjectManagerElementName($objectManager['name'] . '_metadata_driver'))) {
-            $chainDriverDef = $container->getDefinition($this->getObjectManagerElementName($objectManager['name'] . '_metadata_driver'));
+        if ($container->hasDefinition($this->getObjectManagerElementName($objectManager['name'].'_metadata_driver'))) {
+            $chainDriverDef = $container->getDefinition($this->getObjectManagerElementName($objectManager['name'].'_metadata_driver'));
         } else {
-            $chainDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.driver_chain_class%'));
+            $chainDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.driver_chain.class%'));
             $chainDriverDef->setPublic(false);
         }
 
         foreach ($this->drivers as $driverType => $driverPaths) {
-            $mappingService = $this->getObjectManagerElementName($objectManager['name'] . '_'.$driverType.'_metadata_driver');
+            $mappingService = $this->getObjectManagerElementName($objectManager['name'].'_'.$driverType.'_metadata_driver');
             if ($container->hasDefinition($mappingService)) {
                 $mappingDriverDef = $container->getDefinition($mappingService);
                 $args = $mappingDriverDef->getArguments();
@@ -196,12 +199,12 @@ abstract class AbstractDoctrineExtension extends Extension
                 }
                 $mappingDriverDef->setArguments($args);
             } else if ($driverType == 'annotation') {
-                $mappingDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.' . $driverType . '_class%'), array(
+                $mappingDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.'.$driverType.'.class%'), array(
                     new Reference($this->getObjectManagerElementName('metadata.annotation_reader')),
                     array_values($driverPaths)
                 ));
             } else {
-                $mappingDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.' . $driverType . '_class%'), array(
+                $mappingDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.'.$driverType.'.class%'), array(
                     array_values($driverPaths)
                 ));
             }
@@ -214,7 +217,7 @@ abstract class AbstractDoctrineExtension extends Extension
             }
         }
 
-        $container->setDefinition($this->getObjectManagerElementName($objectManager['name'] . '_metadata_driver'), $chainDriverDef);
+        $container->setDefinition($this->getObjectManagerElementName($objectManager['name'].'_metadata_driver'), $chainDriverDef);
     }
 
     /**
@@ -226,20 +229,19 @@ abstract class AbstractDoctrineExtension extends Extension
     protected function assertValidMappingConfiguration(array $mappingConfig, $objectManagerName)
     {
         if (!$mappingConfig['type'] || !$mappingConfig['dir'] || !$mappingConfig['prefix']) {
-            throw new \InvalidArgumentException("Mapping definitions for manager '".$objectManagerName."' ".
-                "require at least the 'type', 'dir' and 'prefix' options.");
+            throw new \InvalidArgumentException(sprintf('Mapping definitions for Doctrine manager "%s" require at least the "type", "dir" and "prefix" options.', $objectManagerName));
         }
 
         if (!file_exists($mappingConfig['dir'])) {
-            throw new \InvalidArgumentException("Specified non-existing directory '" . $mappingConfig['dir'] . "' as mapping source.");
+            throw new \InvalidArgumentException(sprintf('Specified non-existing directory "%s" as Doctrine mapping source.', $mappingConfig['dir']));
         }
 
         if (!in_array($mappingConfig['type'], array('xml', 'yml', 'annotation', 'php', 'staticphp'))) {
-            throw new \InvalidArgumentException("Can only configure 'xml', 'yml', 'annotation', 'php' or ".
-                "'staticphp' through the DoctrineBundle. Use your own bundle to configure other metadata drivers. " .
-                "You can register them by adding a a new driver to the ".
-                "'" . $this->getObjectManagerElementName($objectManagerName . ".metadata_driver")."' service definition."
-            );
+            throw new \InvalidArgumentException(sprintf('Can only configure "xml", "yml", "annotation", "php" or '.
+                '"staticphp" through the DoctrineBundle. Use your own bundle to configure other metadata drivers. '.
+                'You can register them by adding a a new driver to the '.
+                '"%s" service definition.', $this->getObjectManagerElementName($objectManagerName.'.metadata_driver')
+            ));
         }
     }
 

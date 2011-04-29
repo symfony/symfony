@@ -41,8 +41,8 @@ interface OutputFormatterInterface
     /**
      * Sets a new style.
      *
-     * @param   string                          $name     The style name
-     * @param   OutputFormatterStyleInterface   $options  The style instance
+     * @param string                        $name  The style name
+     * @param OutputFormatterStyleInterface $style The style instance
      *
      * @api
      */
@@ -53,7 +53,7 @@ interface OutputFormatterInterface
      *
      * @param   string  $name
      *
-     * @return  boolean
+     * @return  Boolean
      *
      * @api
      */

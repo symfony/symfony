@@ -25,8 +25,8 @@ class SessionLogoutHandler implements LogoutHandlerInterface
     /**
      * Invalidate the current session
      *
-     * @param Request $request
-     * @param Response $response
+     * @param Request        $request
+     * @param Response       $response
      * @param TokenInterface $token
      * @return void
      */

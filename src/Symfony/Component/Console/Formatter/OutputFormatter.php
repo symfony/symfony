@@ -26,7 +26,7 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Initializes console output formatter.
      *
-     * @param   boolean $decorated  Whether this formatter should actually decorate strings
+     * @param   Boolean $decorated  Whether this formatter should actually decorate strings
      * @param   array   $styles     Array of "name => FormatterStyle" instance
      *
      * @api
@@ -72,8 +72,8 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Sets a new style.
      *
-     * @param   string                          $name     The style name
-     * @param   OutputFormatterStyleInterface   $options  The style instance
+     * @param string                        $name  The style name
+     * @param OutputFormatterStyleInterface $style The style instance
      *
      * @api
      */
@@ -87,7 +87,7 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @param   string  $name
      *
-     * @return  boolean
+     * @return  Boolean
      *
      * @api
      */
@@ -217,7 +217,7 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @param   string  $string
      *
-     * @return  Symfony\Component\Console\Format\FormatterStyle|boolean false if string is not format string
+     * @return  Symfony\Component\Console\Format\FormatterStyle|Boolean false if string is not format string
      */
     private function createStyleFromString($string)
     {

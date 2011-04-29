@@ -16,19 +16,28 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RequestMatcherTest extends \PHPUnit_Framework_TestCase
 {
-    public function testIp()
+    /**
+     * @dataProvider testIpProvider
+     */
+    public function testIp($matches, $remoteAddr, $cidr)
     {
+        $request = Request::create('', 'get', array(), array(), array(), array('REMOTE_ADDR' => $remoteAddr));
+
         $matcher = new RequestMatcher();
+        $matcher->matchIp($cidr);
 
-        $matcher->matchIp('192.168.1.1/1');
-        $request = Request::create('', 'get', array(), array(), array(), array('REMOTE_ADDR' => '192.168.1.1'));
-        $this->assertTrue($matcher->matches($request));
+        $this->assertEquals($matches, $matcher->matches($request));
+    }
 
-        $matcher->matchIp('192.168.1.0/24');
-        $this->assertTrue($matcher->matches($request));
-
-        $matcher->matchIp('1.2.3.4/1');
-        $this->assertFalse($matcher->matches($request));
+    public function testIpProvider()
+    {
+        return array(
+            array(true, '192.168.1.1', '192.168.1.1/1'),
+            array(true, '192.168.1.1', '192.168.1.0/24'),
+            array(false, '192.168.1.1', '1.2.3.4/1'),
+            array(true, '2a01:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65'),
+            array(false, '2a00:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65'),
+        );
     }
 
     public function testMethod()

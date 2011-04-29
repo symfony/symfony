@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -53,7 +53,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Set a custom children builder
      *
-     * @param NodeBuilder $class A custom NodeBuilder
+     * @param NodeBuilder $builder A custom NodeBuilder
      */
     public function setBuilder(NodeBuilder $builder)
     {
@@ -160,7 +160,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * If you'd like "'id' => 'my_name'" to still be present in the resulting
      * array, then you can set the second argument of this method to false.
      *
-     * @param string $name The name of the key
+     * @param string  $name          The name of the key
      * @param Boolean $removeKeyItem Whether or not the key item should be removed.
      *
      * @return ArrayNodeDefinition

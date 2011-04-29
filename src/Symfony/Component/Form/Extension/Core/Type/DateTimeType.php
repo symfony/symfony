@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -110,6 +110,15 @@ class DateTimeType extends AbstractType
             'time_pattern' => null,
             'time_widget' => null,
             'time_format' => null,
+            /* Defaults for date field */
+            'years' => range(date('Y') - 5, date('Y') + 5),
+            'months' => range(1, 12),
+            'days' => range(1, 31),
+            /* Defaults for time field */
+            'hours' => range(0, 23),
+            'minutes' => range(0, 59),
+            'seconds' => range(0, 59),
+            'with_seconds' => false,
         );
     }
 

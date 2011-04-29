@@ -287,17 +287,10 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
     public function testLink()
     {
-        $crawler = $this->createTestCrawler()->selectLink('Foo');
+        $crawler = $this->createTestCrawler('http://example.com/bar/')->selectLink('Foo');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Link', $crawler->link(), '->link() returns a Link instance');
 
-        $this->assertEquals('/foo', $crawler->link()->getUri(), '->link() returns a Link instance');
         $this->assertEquals('post', $crawler->link('post')->getMethod(), '->link() takes a method as its argument');
-
-        $crawler = $this->createTestCrawler('http://example.com/bar/')->selectLink('Foo');
-        $this->assertEquals('http://example.com/bar/foo', $crawler->link()->getUri(), '->link() returns a Link instance');
-
-        $crawler = $this->createTestCrawler('http://example.com/bar')->selectLink('Foo');
-        $this->assertEquals('http://example.com/foo', $crawler->link()->getUri(), '->link() returns a Link instance');
 
         $crawler = $this->createTestCrawler('http://example.com/bar')->selectLink('GetLink');
         $this->assertEquals('http://example.com/bar?get=param', $crawler->link()->getUri(), '->link() returns a Link instance');
@@ -312,7 +305,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
     public function testLinks()
     {
-        $crawler = $this->createTestCrawler()->selectLink('Foo');
+        $crawler = $this->createTestCrawler('http://example.com/bar/')->selectLink('Foo');
         $this->assertInternalType('array', $crawler->links(), '->links() returns an array');
 
         $this->assertEquals(4, count($crawler->links()), '->links() returns an array');
@@ -324,17 +317,10 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
     public function testForm()
     {
-        $crawler = $this->createTestCrawler()->selectButton('FooValue');
+        $crawler = $this->createTestCrawler('http://example.com/bar/')->selectButton('FooValue');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Form', $crawler->form(), '->form() returns a Form instance');
 
-        $this->assertEquals('/foo?FooName=FooValue', $crawler->form()->getUri(), '->form() returns a Form instance');
         $this->assertEquals(array('FooName' => 'FooBar'), $crawler->form(array('FooName' => 'FooBar'))->getValues(), '->form() takes an array of values to submit as its first argument');
-
-        $crawler = $this->createTestCrawler('http://example.com/bar/')->selectButton('FooValue');
-        $this->assertEquals('http://example.com/bar/foo?FooName=FooValue', $crawler->form()->getUri(), '->form() returns a Form instance');
-
-        $crawler = $this->createTestCrawler('http://example.com/bar')->selectButton('FooValue');
-        $this->assertEquals('http://example.com/foo?FooName=FooValue', $crawler->form()->getUri(), '->form() returns a Form instance');
 
         try {
             $this->createTestCrawler()->filter('ol')->form();

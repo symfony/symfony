@@ -20,14 +20,18 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
+use Symfony\Component\HttpKernel\DependencyInjection\AddClassesToCachePass;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension as DIExtension;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\ClassLoader\ClassCollectionLoader;
 
 /**
  * The Kernel is the heart of the Symfony system.
@@ -47,6 +51,7 @@ abstract class Kernel implements KernelInterface
     protected $booted;
     protected $name;
     protected $startTime;
+    protected $classes;
 
     const VERSION = '2.0.0-DEV';
 
@@ -63,6 +68,7 @@ abstract class Kernel implements KernelInterface
         $this->booted = false;
         $this->rootDir = $this->getRootDir();
         $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
+        $this->classes = array();
 
         if ($this->debug) {
             ini_set('display_errors', 1);
@@ -333,6 +339,28 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
+     * Loads the PHP class cache.
+     *
+     * @param string  $name      The cache name prefix
+     * @param string  $extension File extension of the resulting file
+     */
+    public function loadClassCache($name = 'classes', $extension = '.php')
+    {
+        if (!$this->booted) {
+            $this->boot();
+        }
+
+        if ($this->classes) {
+            ClassCollectionLoader::load($this->classes, $this->getCacheDir(), $name, $this->debug, true, $extension);
+        }
+    }
+
+    public function addClassesToCache(array $classes)
+    {
+        $this->classes = array_unique(array_merge($this->classes, $classes));
+    }
+
+    /**
      * Gets the request start time (not available if debug is disabled).
      *
      * @return integer The request start timestamp
@@ -529,18 +557,24 @@ abstract class Kernel implements KernelInterface
      */
     protected function buildContainer()
     {
-        $parameterBag = new ParameterBag($this->getKernelParameters());
-
-        $container = new ContainerBuilder($parameterBag);
-        $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass());
+        $container = new ContainerBuilder(new ParameterBag($this->getKernelParameters()));
+        $extensions = array();
         foreach ($this->bundles as $bundle) {
             $bundle->build($container);
+
+            if ($extension = $bundle->getContainerExtension()) {
+                $container->registerExtension($extension);
+                $extensions[] = $extension->getAlias();
+            }
 
             if ($this->debug) {
                 $container->addObjectResource($bundle);
             }
         }
         $container->addObjectResource($this);
+
+        // ensure these extensions are implicitly loaded
+        $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($extensions));
 
         if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
             $container->merge($cont);
@@ -557,7 +591,10 @@ abstract class Kernel implements KernelInterface
             }
         }
 
+        $container->addCompilerPass(new AddClassesToCachePass($this));
         $container->compile();
+
+        $this->addClassesToCache($container->getParameter('kernel.compiled_classes'));
 
         return $container;
     }
@@ -565,10 +602,10 @@ abstract class Kernel implements KernelInterface
     /**
      * Dumps the service container to PHP code in the cache.
      *
-     * @param ConfigCache       $cache      The config cache
-     * @param ContainerBuilder  $container  The service container
-     * @param string            $class      The name of the class to generate
-     * @param string            $baseClass  The name of the container's base class
+     * @param ConfigCache      $cache     The config cache
+     * @param ContainerBuilder $container The service container
+     * @param string           $class     The name of the class to generate
+     * @param string           $baseClass The name of the container's base class
      */
     protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class, $baseClass)
     {
@@ -597,7 +634,7 @@ abstract class Kernel implements KernelInterface
             new YamlFileLoader($container, $locator),
             new IniFileLoader($container, $locator),
             new PhpFileLoader($container, $locator),
-            new ClosureLoader($container, $locator),
+            new ClosureLoader($container),
         ));
 
         return new DelegatingLoader($resolver);

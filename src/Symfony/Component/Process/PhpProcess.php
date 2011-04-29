@@ -24,6 +24,8 @@ namespace Symfony\Component\Process;
  */
 class PhpProcess extends Process
 {
+    private $executableFinder;
+
     /**
      * Constructor.
      *
@@ -38,6 +40,8 @@ class PhpProcess extends Process
     public function __construct($script, $cwd = null, array $env = array(), $timeout = 60, array $options = array())
     {
         parent::__construct(null, $cwd, $env, $script, $timeout, $options);
+
+        $this->executableFinder = new PhpExecutableFinder();
     }
 
     /**
@@ -63,42 +67,12 @@ class PhpProcess extends Process
     public function run($callback = null)
     {
         if (null === $this->getCommandLine()) {
-            $this->setCommandLine($this->getPhpBinary());
+            if (false === $php = $this->executableFinder->find()) {
+                throw new \RuntimeException('Unable to find the PHP executable.');
+            }
+            $this->setCommandLine($php);
         }
 
         return parent::run($callback);
-    }
-
-    /**
-     * Returns the PHP binary path.
-     *
-     * @return string The PHP binary path
-     *
-     * @throws \RuntimeException When defined PHP_PATH is not executable or not found
-     */
-    private function getPhpBinary()
-    {
-        if ($php = getenv('PHP_PATH')) {
-            if (!is_executable($php)) {
-                throw new \RuntimeException('The defined PHP_PATH environment variable is not a valid PHP executable.');
-            }
-
-            return $php;
-        }
-
-        $suffixes = DIRECTORY_SEPARATOR == '\\' ? (getenv('PATHEXT') ? explode(PATH_SEPARATOR, getenv('PATHEXT')) : array('.exe', '.bat', '.cmd', '.com')) : array('');
-        foreach ($suffixes as $suffix) {
-            if (is_executable($php = PHP_BINDIR.DIRECTORY_SEPARATOR.'php'.$suffix)) {
-                return $php;
-            }
-        }
-
-        if ($php = getenv('PHP_PEAR_PHP_BIN')) {
-            if (is_executable($php)) {
-                return $php;
-            }
-        }
-
-        throw new \RuntimeException('Unable to find the PHP executable.');
     }
 }

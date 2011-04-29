@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,6 +16,15 @@ use Symfony\Component\Form\FormBuilder;
 
 class FormTypeCsrfExtension extends AbstractTypeExtension
 {
+    private $enabled;
+    private $fieldName;
+
+    public function __construct($enabled = true, $fieldName = '_token')
+    {
+        $this->enabled = $enabled;
+        $this->fieldName = $fieldName;
+    }
+
     public function buildForm(FormBuilder $builder, array $options)
     {
         if ($options['csrf_protection']) {
@@ -32,10 +41,10 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     public function getDefaultOptions(array $options)
     {
         return array(
-            'csrf_protection' => true,
-            'csrf_field_name' => '_token',
-            'csrf_provider' => null,
-            'csrf_page_id' => get_class($this),
+            'csrf_protection' => $this->enabled,
+            'csrf_field_name' => $this->fieldName,
+            'csrf_provider'   => null,
+            'csrf_page_id'    => get_class($this),
         );
     }
 

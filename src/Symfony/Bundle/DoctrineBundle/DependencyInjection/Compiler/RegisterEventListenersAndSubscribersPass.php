@@ -5,6 +5,7 @@ namespace Symfony\Bundle\DoctrineBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 
 class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 {
@@ -14,11 +15,11 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
     {
         $this->container = $container;
         foreach ($container->getDefinitions() as $id => $definition) {
-            if ('%doctrine.dbal.event_manager_class%' !== $definition->getClass()) {
+            if (!$definition instanceof DefinitionDecorator || 'doctrine.dbal.connection.event_manager' !== $definition->getParent()) {
                 continue;
             }
 
-            $prefix = substr($id, 0, -1 * strlen('_connection.event_manager'));
+            $prefix = substr($id, 0, -strlen('_connection.event_manager'));
             $this->registerListeners($prefix, $definition);
             $this->registerSubscribers($prefix, $definition);
         }

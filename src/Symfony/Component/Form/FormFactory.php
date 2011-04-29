@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Guess\TypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class FormFactory implements FormFactoryInterface
 {
@@ -23,16 +23,15 @@ class FormFactory implements FormFactoryInterface
 
     private $guesser;
 
-    public function __construct(array $extensions = array())
+    public function __construct(array $extensions)
     {
         foreach ($extensions as $extension) {
-            $this->addExtension($extension);
+            if (!$extension instanceof FormExtensionInterface) {
+                throw new UnexpectedTypeException($extension, 'Symfony\Component\Form\FormExtensionInterface');
+            }
         }
-    }
 
-    public function addExtension(FormExtensionInterface $extension)
-    {
-        $this->extensions[] = $extension;
+        $this->extensions = $extensions;
     }
 
     private function loadGuesser()
@@ -119,9 +118,12 @@ class FormFactory implements FormFactoryInterface
     {
         $builder = null;
         $types = array();
-        $typeExtensions = array();
         $knownOptions = array();
         $passedOptions = array_keys($options);
+
+        if (!array_key_exists('data', $options)) {
+            $options['data'] = $data;
+        }
 
         while (null !== $type) {
             $type = $this->getType($type);
@@ -158,10 +160,6 @@ class FormFactory implements FormFactoryInterface
             foreach ($type->getExtensions() as $typeExtension) {
                 $typeExtension->buildForm($builder, $options);
             }
-        }
-
-        if (null !== $data) {
-            $builder->setData($data);
         }
 
         return $builder;

@@ -12,6 +12,7 @@
 namespace Symfony\Tests\Component\DependencyInjection\ParameterBag;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Exception\NonExistentParameterException;
 
 class ParameterBagTest extends \PHPUnit_Framework_TestCase
 {
@@ -62,7 +63,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
             $this->fail('->get() throws an \InvalidArgumentException if the key does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws an \InvalidArgumentException if the key does not exist');
-            $this->assertEquals('The parameter "baba" must be defined.', $e->getMessage(), '->get() throws an \InvalidArgumentException if the key does not exist');
+            $this->assertEquals('You have requested a non-existent parameter "baba".', $e->getMessage(), '->get() throws an \InvalidArgumentException if the key does not exist');
         }
     }
 
@@ -99,17 +100,37 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         try {
             $bag->resolveValue('%foobar%', array());
             $this->fail('->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent parameter');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent parameter');
-            $this->assertEquals('The parameter "foobar" must be defined.', $e->getMessage(), '->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent parameter');
+        } catch (NonExistentParameterException $e) {
+            $this->assertEquals('You have requested a non-existent parameter "foobar".', $e->getMessage(), '->resolveValue() throws a NonExistentParameterException if a placeholder references a non-existent parameter');
         }
 
         try {
             $bag->resolveValue('foo %foobar% bar', array());
-            $this->fail('->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent parameter');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent parameter');
-            $this->assertEquals('The parameter "foobar" must be defined.', $e->getMessage(), '->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent parameter');
+            $this->fail('->resolveValue() throws a NonExistentParameterException if a placeholder references a non-existent parameter');
+        } catch (NonExistentParameterException $e) {
+            $this->assertEquals('You have requested a non-existent parameter "foobar".', $e->getMessage(), '->resolveValue() throws a NonExistentParameterException if a placeholder references a non-existent parameter');
+        }
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::resolve
+     */
+    public function testResolveIndicatesWhyAParameterIsNeeded()
+    {
+        $bag = new ParameterBag(array('foo' => '%bar%'));
+
+        try {
+            $bag->resolve();
+        } catch (NonExistentParameterException $e) {
+            $this->assertEquals('The parameter "foo" has a dependency on a non-existent parameter "bar".', $e->getMessage());
+        }
+
+        $bag = new ParameterBag(array('foo' => '%bar%'));
+
+        try {
+            $bag->resolve();
+        } catch (NonExistentParameterException $e) {
+            $this->assertEquals('The parameter "foo" has a dependency on a non-existent parameter "bar".', $e->getMessage());
         }
     }
 }

@@ -30,8 +30,8 @@ class UrlGenerator implements UrlGeneratorInterface
     /**
      * Constructor.
      *
-     * @param RouteCollection $routes   A RouteCollection instance
-     * @param RequestContext  $context  The context
+     * @param RouteCollection $routes  A RouteCollection instance
+     * @param RequestContext  $context The context
      */
     public function __construct(RouteCollection $routes, RequestContext $context)
     {
@@ -43,7 +43,7 @@ class UrlGenerator implements UrlGeneratorInterface
     /**
      * Sets the request context.
      *
-     * @param RequestContext $context  The context
+     * @param RequestContext $context The context
      */
     public function setContext(RequestContext $context)
     {
@@ -89,6 +89,8 @@ class UrlGenerator implements UrlGeneratorInterface
      */
     protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $absolute)
     {
+        $variables = array_flip($variables);
+
         $originParameters = $parameters;
         $parameters = array_replace($this->context->getParameters(), $parameters);
         $tparams = array_replace($defaults, $parameters);
@@ -104,11 +106,11 @@ class UrlGenerator implements UrlGeneratorInterface
             if ('variable' === $token[0]) {
                 if (false === $optional || !isset($defaults[$token[3]]) || (isset($parameters[$token[3]]) && $parameters[$token[3]] != $defaults[$token[3]])) {
                     // check requirement
-                    if (isset($requirements[$token[3]]) && !preg_match('#^'.$requirements[$token[3]].'$#', $tparams[$token[3]])) {
-                        throw new \InvalidArgumentException(sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $requirements[$token[3]], $tparams[$token[3]]));
+                    if (!preg_match('#^'.$token[2].'$#', $tparams[$token[3]])) {
+                        throw new \InvalidArgumentException(sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $token[2], $tparams[$token[3]]));
                     }
 
-                    if (isset($tparams[$token[3]])) {
+                    if (!in_array($tparams[$token[3]], array(null, '', false), true) || !$optional) {
                         // %2F is not valid in a URL, so we don't encode it (which is fine as the requirements explicitly allowed it)
                         $url = $token[1].str_replace('%2F', '/', urlencode($tparams[$token[3]])).$url;
                     }
@@ -116,14 +118,8 @@ class UrlGenerator implements UrlGeneratorInterface
                     $optional = false;
                 }
             } elseif ('text' === $token[0]) {
-                $url = $token[1].$token[2].$url;
+                $url = $token[1].$url;
                 $optional = false;
-            } else {
-                // handle custom tokens
-                if ($segment = call_user_func_array(array($this, 'generateFor'.ucfirst(array_shift($token))), array_merge(array($optional, $tparams), $token))) {
-                    $url = $segment.$url;
-                    $optional = false;
-                }
             }
         }
 

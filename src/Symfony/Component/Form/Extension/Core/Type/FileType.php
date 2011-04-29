@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -35,15 +35,14 @@ class FileType extends AbstractType
     public function buildForm(FormBuilder $builder, array $options)
     {
         if ($options['type'] === 'string') {
-            $builder->appendNormTransformer(new DataTransformerChain(array(
-                new ReversedTransformer(new FileToStringTransformer()),
-                new FileToArrayTransformer(),
-            )));
-        } else {
-            $builder->appendNormTransformer(new FileToArrayTransformer());
+            $builder->appendNormTransformer(
+                new ReversedTransformer(new FileToStringTransformer())
+            );
         }
 
-        $builder->addEventSubscriber(new FixFileUploadListener($this->storage), 10)
+        $builder
+            ->appendNormTransformer(new FileToArrayTransformer())
+            ->addEventSubscriber(new FixFileUploadListener($this->storage), 10)
             ->add('file', 'field')
             ->add('token', 'hidden')
             ->add('name', 'hidden');

@@ -31,11 +31,7 @@ class FilesystemLoader extends Loader
      */
     public function __construct($templatePathPatterns)
     {
-        if (!is_array($templatePathPatterns)) {
-            $templatePathPatterns = array($templatePathPatterns);
-        }
-
-        $this->templatePathPatterns = $templatePathPatterns;
+        $this->templatePathPatterns = (array) $templatePathPatterns;
     }
 
     /**
@@ -85,8 +81,8 @@ class FilesystemLoader extends Loader
     /**
      * Returns true if the template is still fresh.
      *
-     * @param TemplateReferenceInterface    $template A template
-     * @param integer                       $time     The last modification time of the cached template (timestamp)
+     * @param TemplateReferenceInterface $template A template
+     * @param integer                    $time     The last modification time of the cached template (timestamp)
      */
     public function isFresh(TemplateReferenceInterface $template, $time)
     {

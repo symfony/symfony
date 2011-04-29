@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\Routing\Router;
 
 /**
@@ -19,14 +19,14 @@ use Symfony\Component\Routing\Router;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RouterCacheWarmer extends CacheWarmer
+class RouterCacheWarmer implements CacheWarmerInterface
 {
     protected $router;
 
     /**
      * Constructor.
      *
-     * @param router $router A Router instance
+     * @param Router $router A Router instance
      */
     public function __construct(Router $router)
     {

@@ -61,7 +61,7 @@ class Reference
     /**
      * Returns true when this Reference is strict
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isStrict()
     {

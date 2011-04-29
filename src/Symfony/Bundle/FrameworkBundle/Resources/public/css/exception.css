@@ -255,7 +255,7 @@ build: 56
 .sf-exceptionreset ol li {
     list-style: decimal; 
     margin-left: 20px; 
-    padding: 2px, 
+    padding: 2px;
     padding-bottom: 20px;
 }
 
@@ -265,7 +265,7 @@ build: 56
     margin-left: 0; 
     white-space: nowrap; 
     font-size: 12px; 
-    padding-bottom: 0px;
+    padding-bottom: 0;
 }
 .sf-exceptionreset li .selected
 {

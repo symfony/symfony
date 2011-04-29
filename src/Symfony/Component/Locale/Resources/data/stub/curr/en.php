@@ -743,7 +743,7 @@ return array(
         'roundingIncrement' => 0,
     ),
     'INR' => array(
-        'symbol' => 'Rs',
+        'symbol' => '₹',
         'name' => 'Indian Rupee',
         'fractionDigits' => 2,
         'roundingIncrement' => 0,

@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Request represents an HTTP request.
@@ -543,9 +542,9 @@ class Request
         }
 
         // Remove port number from host
-        $elements = explode(':', $host);
+        $host = preg_replace('/:\d+$/', '', $host);
 
-        return trim($elements[0]);
+        return trim($host);
     }
 
     public function setMethod($method)

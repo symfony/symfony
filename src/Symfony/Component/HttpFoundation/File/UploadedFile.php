@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class UploadedFile extends File
 {
@@ -105,13 +106,33 @@ class UploadedFile extends File
     }
 
     /**
-     * Returns the absolute file name without dots.
-     *
-     * @return string The file path
+     * @inheritDoc
      */
-    public function getName()
+    public function getExtension()
     {
-        return $this->moved ? parent::getName() : $this->originalName;
+        if ($this->moved) {
+            return parent::getExtension();
+        }
+
+        if ($ext = pathinfo($this->getOriginalName(), PATHINFO_EXTENSION)) {
+            return '.'.$ext;
+        }
+
+        return '';
+    }
+
+    /**
+     * Gets the original uploaded name.
+     *
+     * Warning: This name is not safe as it can have been manipulated by the end-user.
+     * Moreover, it can contain characters that are not allowed in file names.
+     * Never use it in a path.
+     *
+     * @return string
+     */
+    public function getOriginalName()
+    {
+        return $this->originalName;
     }
 
     /**
@@ -138,57 +159,6 @@ class UploadedFile extends File
     }
 
     /**
-     * Returns true if the size of the uploaded file exceeds the
-     * upload_max_filesize directive in php.ini
-     *
-     * @return Boolean
-     */
-    protected function isIniSizeExceeded()
-    {
-        return $this->error === UPLOAD_ERR_INI_SIZE;
-    }
-
-    /**
-     * Returns true if the size of the uploaded file exceeds the
-     * MAX_FILE_SIZE directive specified in the HTML form
-     *
-     * @return Boolean
-     */
-    protected function isFormSizeExceeded()
-    {
-        return $this->error === UPLOAD_ERR_FORM_SIZE;
-    }
-
-    /**
-     * Returns true if the file was completely uploaded
-     *
-     * @return Boolean
-     */
-    protected function isUploadComplete()
-    {
-        return $this->error !== UPLOAD_ERR_PARTIAL;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function doMove($directory, $filename)
-    {
-        if ($this->moved) {
-            return parent::doMove($directory, $filename);
-        }
-
-        $newPath = $directory . DIRECTORY_SEPARATOR . $filename;
-
-        if (!move_uploaded_file($this->getPath(), $newPath)) {
-            throw new FileException(sprintf('Could not move file %s to %s', $this->getPath(), $newPath));
-        }
-
-        $this->moved = true;
-        $this->path = realpath($newPath);
-    }
-
-    /**
      * @inheritDoc
      */
     public function move($directory, $name = null)
@@ -197,10 +167,14 @@ class UploadedFile extends File
             return parent::move($directory, $name);
         }
 
-        $this->doMove($directory, $this->originalName);
+        $newPath = $directory.DIRECTORY_SEPARATOR.(null === $name ? $this->getName() : $name);
 
-        if (null !== $name) {
-            $this->rename($name);
+        if (!@move_uploaded_file($this->getPath(), $newPath)) {
+            $error = error_get_last();
+            throw new FileException(sprintf('Could not move file %s to %s (%s)', $this->getPath(), $newPath, strip_tags($error['message'])));
         }
+
+        $this->moved = true;
+        $this->path = realpath($newPath);
     }
 }

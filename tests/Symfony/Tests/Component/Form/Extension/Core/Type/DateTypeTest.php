@@ -25,6 +25,26 @@ class DateTypeTest extends LocalizedTestCase
         \Locale::setDefault('de_AT');
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testInvalidWidgetOption()
+    {
+        $form = $this->factory->create('date', null, array(
+            'widget' => 'fake_widget',
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testInvalidInputOption()
+    {
+        $form = $this->factory->create('date', null, array(
+            'input' => 'fake_input',
+        ));
+    }
+
     public function testSubmitFromInputDateTime()
     {
         $form = $this->factory->create('date', null, array(
@@ -153,7 +173,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testIsYearWithinRangeReturnsTrueIfWithin()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
@@ -169,7 +189,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testIsYearWithinRangeReturnsTrueIfEmpty()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
@@ -185,7 +205,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testIsYearWithinRangeReturnsTrueIfEmptyChoice()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
@@ -205,7 +225,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testIsYearWithinRangeReturnsFalseIfNotContained()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
@@ -221,7 +241,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testIsMonthWithinRangeReturnsTrueIfWithin()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
@@ -237,7 +257,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testIsMonthWithinRangeReturnsTrueIfEmpty()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
@@ -253,7 +273,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testIsMonthWithinRangeReturnsTrueIfEmptyChoice()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
@@ -273,7 +293,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testIsMonthWithinRangeReturnsFalseIfNotContained()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
@@ -289,7 +309,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testIsDayWithinRangeReturnsTrueIfWithin()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
@@ -305,7 +325,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testIsDayWithinRangeReturnsTrueIfEmpty()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
@@ -321,7 +341,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testIsDayWithinRangeReturnsTrueIfEmptyChoice()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
@@ -341,9 +361,9 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testIsDayWithinRangeReturnsFalseIfNotContained()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
@@ -359,7 +379,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilledReturnsFalseIfInput()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
@@ -374,7 +394,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilledReturnsFalseIfChoiceAndCompletelyEmpty()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
@@ -393,7 +413,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilledReturnsFalseIfChoiceAndCompletelyFilled()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
@@ -412,7 +432,7 @@ class DateTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilledReturnsTrueIfChoiceAndDayEmpty()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',

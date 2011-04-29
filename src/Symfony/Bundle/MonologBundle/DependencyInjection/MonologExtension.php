@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien@symfony.com
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -49,7 +49,7 @@ class MonologExtension extends Extension
 
             $logger = $container->getDefinition('monolog.logger_prototype');
 
-            if (!empty ($config['processors'])) {
+            if (!empty($config['processors'])) {
                 $this->addProcessors($logger, $config['processors']);
             }
 
@@ -70,20 +70,19 @@ class MonologExtension extends Extension
                     $logger->addMethodCall('pushHandler', array(new Reference($handler['id'])));
                 }
             }
-        }
 
-        $this->addClassesToCompile(array(
-            'Monolog\\Formatter\\FormatterInterface',
-            'Monolog\\Formatter\\LineFormatter',
-            'Monolog\\Handler\\HandlerInterface',
-            'Monolog\\Handler\\AbstractHandler',
-            'Monolog\\Handler\\StreamHandler',
-            'Monolog\\Handler\\FingersCrossedHandler',
-            'Monolog\\Handler\\TestHandler',
-            'Monolog\\Logger',
-            'Symfony\\Bundle\\MonologBundle\\Logger\\Logger',
-            'Symfony\\Bundle\\MonologBundle\\Logger\\DebugHandler',
-        ));
+            $this->addClassesToCompile(array(
+                'Monolog\\Formatter\\FormatterInterface',
+                'Monolog\\Formatter\\LineFormatter',
+                'Monolog\\Handler\\HandlerInterface',
+                'Monolog\\Handler\\AbstractHandler',
+                'Monolog\\Handler\\StreamHandler',
+                'Monolog\\Handler\\FingersCrossedHandler',
+                'Monolog\\Logger',
+                'Symfony\\Bundle\\MonologBundle\\Logger\\Logger',
+                'Symfony\\Bundle\\MonologBundle\\Logger\\DebugHandler',
+            ));
+        }
     }
 
     /**
@@ -122,6 +121,14 @@ class MonologExtension extends Extension
                 $handler['level'],
                 $handler['bubble'],
             ));
+            break;
+
+        case 'firephp':
+            $definition->setArguments(array(
+                $handler['level'],
+                $handler['bubble'],
+            ));
+            $definition->addTag('kernel.listener', array('event' => 'onCoreResponse'));
             break;
 
         case 'rotating_file':
@@ -190,10 +197,10 @@ class MonologExtension extends Extension
             break;
         }
 
-        if (!empty ($handler['formatter'])) {
+        if (!empty($handler['formatter'])) {
             $definition->addMethodCall('setFormatter', array(new Reference($handler['formatter'])));
         }
-        if (!empty ($handler['processors'])) {
+        if (!empty($handler['processors'])) {
             $this->addProcessors($definition, $handler['processors']);
         }
         $container->setDefinition($handlerId, $definition);

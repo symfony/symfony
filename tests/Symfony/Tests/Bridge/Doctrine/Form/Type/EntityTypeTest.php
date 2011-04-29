@@ -13,13 +13,17 @@ namespace Symfony\Tests\Bridge\Doctrine\Form\Type;
 
 require_once __DIR__.'/../DoctrineOrmTestCase.php';
 require_once __DIR__.'/../../Fixtures/SingleIdentEntity.php';
+require_once __DIR__.'/../../Fixtures/SingleStringIdentEntity.php';
 require_once __DIR__.'/../../Fixtures/CompositeIdentEntity.php';
+require_once __DIR__.'/../../Fixtures/CompositeStringIdentEntity.php';
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Tests\Component\Form\Extension\Core\Type\TypeTestCase;
 use Symfony\Tests\Bridge\Doctrine\Form\DoctrineOrmTestCase;
 use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity;
+use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleStringIdentEntity;
 use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeIdentEntity;
+use Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeStringIdentEntity;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\EntityManager;
@@ -28,8 +32,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 class EntityTypeTest extends TypeTestCase
 {
     const SINGLE_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity';
-
+    const SINGLE_STRING_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleStringIdentEntity';
     const COMPOSITE_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeIdentEntity';
+    const COMPOSITE_STRING_IDENT_CLASS = 'Symfony\Tests\Bridge\Doctrine\Form\Fixtures\CompositeStringIdentEntity';
 
     private $em;
 
@@ -46,7 +51,9 @@ class EntityTypeTest extends TypeTestCase
         $schemaTool = new SchemaTool($this->em);
         $classes = array(
             $this->em->getClassMetadata(self::SINGLE_IDENT_CLASS),
+            $this->em->getClassMetadata(self::SINGLE_STRING_IDENT_CLASS),
             $this->em->getClassMetadata(self::COMPOSITE_IDENT_CLASS),
+            $this->em->getClassMetadata(self::COMPOSITE_STRING_IDENT_CLASS),
         );
 
         try {
@@ -421,7 +428,7 @@ class EntityTypeTest extends TypeTestCase
 
     public function testOverrideChoices()
     {
-        $this->markTestSkipped('Fix me');
+        $this->markTestIncomplete('Fix me');
 
         $entity1 = new SingleIdentEntity(1, 'Foo');
         $entity2 = new SingleIdentEntity(2, 'Bar');
@@ -557,5 +564,48 @@ class EntityTypeTest extends TypeTestCase
 
         $this->assertFalse($field->isSynchronized());
         $this->assertNull($field->getData());
+    }
+
+    public function testSubmitSingleStringIdentifier()
+    {
+        $entity1 = new SingleStringIdentEntity('foo', 'Foo');
+
+        $this->persist(array($entity1));
+
+        $field = $this->factory->createNamed('entity', 'name', null, array(
+            'multiple' => false,
+            'expanded' => false,
+            'em' => $this->em,
+            'class' => self::SINGLE_STRING_IDENT_CLASS,
+            'property' => 'name',
+        ));
+
+        $field->bind('foo');
+
+        $this->assertTrue($field->isSynchronized());
+        $this->assertEquals($entity1, $field->getData());
+        $this->assertEquals('foo', $field->getClientData());
+    }
+
+    public function testSubmitCompositeStringIdentifier()
+    {
+        $entity1 = new CompositeStringIdentEntity('foo1', 'foo2', 'Foo');
+
+        $this->persist(array($entity1));
+
+        $field = $this->factory->createNamed('entity', 'name', null, array(
+            'multiple' => false,
+            'expanded' => false,
+            'em' => $this->em,
+            'class' => self::COMPOSITE_STRING_IDENT_CLASS,
+            'property' => 'name',
+        ));
+
+        // the collection key is used here
+        $field->bind('0');
+
+        $this->assertTrue($field->isSynchronized());
+        $this->assertEquals($entity1, $field->getData());
+        $this->assertEquals(0, $field->getClientData());
     }
 }

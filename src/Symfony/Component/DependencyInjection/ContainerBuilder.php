@@ -83,7 +83,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Checks if we have an extension.
      *
      * @param string $name The name of the extension
-     * @return boolean If the extension exists
+     * @return Boolean If the extension exists
      */
     public function hasExtension($name)
     {
@@ -266,8 +266,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Gets a service.
      *
-     * @param  string $id              The service identifier
-     * @param  int    $invalidBehavior The behavior when the service does not exist
+     * @param  string  $id              The service identifier
+     * @param  integer $invalidBehavior The behavior when the service does not exist
      *
      * @return object The associated service
      *
@@ -427,7 +427,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets the service aliases.
      *
-     * @param array $definitions An array of service definitions
+     * @param array $aliases An array of service definitions
      */
     public function setAliases(array $aliases)
     {

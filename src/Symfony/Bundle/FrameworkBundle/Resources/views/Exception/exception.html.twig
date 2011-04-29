@@ -19,11 +19,11 @@
                     <strong>{{ status_code }}</strong> {{ status_text }} - {{ exception.class|abbr_class }}
                 </div>
 
-                {% set previous_count = exception.previouses|length %}
+                {% set previous_count = exception.allPrevious|length %}
                 {% if previous_count %}
                     <div class="linked"><span><strong>{{ previous_count }}</strong> linked Exception{{ previous_count > 1 ? 's' : '' }}:</span>
                         <ul>
-                            {% for i, previous in exception.previouses %}
+                            {% for i, previous in exception.allPrevious %}
                                 <li>
                                     {{ previous.class|abbr_class }} <a href="#traces_link_{{ i + 1 }}" onclick="toggle('traces_{{ i + 1 }}', 'traces'); switchIcons('icon_traces_{{ i + 1 }}_open', 'icon_traces_{{ i + 1 }}_close');">&raquo;</a>
                                 </li>

@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\PaddedChoiceList;
 use Symfony\Component\Form\Extension\Core\ChoiceList\MonthChoiceList;
 use Symfony\Component\Form\FormView;
@@ -36,7 +37,7 @@ class DateType extends AbstractType
 
         if ($options['widget'] === 'text') {
             $builder->appendClientTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $options['format'], \IntlDateFormatter::NONE));
-        } else {
+        } elseif ($options['widget'] == 'choice') {
             // Only pass a subset of the options to children
             $yearOptions = array(
                 'choice_list' => new PaddedChoiceList(
@@ -58,6 +59,8 @@ class DateType extends AbstractType
                 ->add('month', 'choice', $monthOptions)
                 ->add('day', 'choice', $dayOptions)
                 ->appendClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], array('year', 'month', 'day')));
+        } else {
+            throw new FormException('The "widget" option must be set to either "text" or "choice".');
         }
 
         if ($options['input'] === 'string') {
@@ -72,6 +75,8 @@ class DateType extends AbstractType
             $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], array('year', 'month', 'day'))
             ));
+        } else if ($options['input'] !== 'datetime') {
+            throw new FormException('The "input" option must be "datetime", "string", "timestamp" or "array".');
         }
 
         $builder

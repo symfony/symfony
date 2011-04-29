@@ -45,8 +45,8 @@ class FormExtension extends \Twig_Extension
     /**
      * Sets a theme for a given view.
      *
-     * @param FormView $view   A FormView instance
-     * @param array           $resources An array of resources
+     * @param FormView $view      A FormView instance
+     * @param array    $resources An array of resources
      */
     public function setTheme(FormView $view, array $resources)
     {
@@ -95,7 +95,8 @@ class FormExtension extends \Twig_Extension
     /**
      * Renders a row for the view.
      *
-     * @param FormView $view  The view to render as a row
+     * @param FormView $view      The view to render as a row
+     * @param array    $variables An array of variables
      */
     public function renderRow(FormView $view, array $variables = array())
     {
@@ -122,25 +123,18 @@ class FormExtension extends \Twig_Extension
      *
      *     {{ form_widget(view, {}, {'separator': '+++++'}) }}
      *
-     * @param FormView $view    The view to render
-     * @param array           $attributes HTML attributes passed to the template
-     * @param array           $parameters Additional variables passed to the template
-     * @param array|string    $resources  A resource or array of resources
+     * @param FormView        $view       The view to render
+     * @param array           $variables Additional variables passed to the template
      */
-    public function renderWidget(FormView $view, array $variables = array(), $resources = null)
+    public function renderWidget(FormView $view, array $variables = array())
     {
-        if (null !== $resources && !is_array($resources)) {
-            $resources = array($resources);
-        }
-
-        return $this->render($view, 'widget', $variables, $resources);
+        return $this->render($view, 'widget', $variables);
     }
 
     /**
      * Renders the errors of the given view
      *
      * @param FormView $view The view to render the errors for
-     * @param array           $params  Additional variables passed to the template
      */
     public function renderErrors(FormView $view)
     {
@@ -150,23 +144,27 @@ class FormExtension extends \Twig_Extension
     /**
      * Renders the label of the given view
      *
-     * @param FormView $view The view to render the label for
+     * @param FormView $view  The view to render the label for
+     * @param string   $label Label name
      */
     public function renderLabel(FormView $view, $label = null)
     {
         return $this->render($view, 'label', null === $label ? array() : array('label' => $label));
     }
 
-    protected function render(FormView $view, $section, array $variables = array(), array $resources = null)
+    protected function render(FormView $view, $section, array $variables = array())
     {
-        $templates = $this->getTemplates($view, $resources);
+        $templates = $this->getTemplates($view);
         $blocks = $view->get('types');
+        if ('widget' === $section || 'row' === $section) {
+            array_unshift($blocks, '_'.$view->get('id'));
+        }
         foreach ($blocks as &$block) {
             $block = $block.'_'.$section;
 
             if (isset($templates[$block])) {
                 if ('widget' === $section || 'row' === $section) {
-                    $view->setRendered(true);
+                    $view->setRendered();
                 }
 
                 return $templates[$block]->renderBlock($block, array_merge($view->all(), $variables));
@@ -176,17 +174,16 @@ class FormExtension extends \Twig_Extension
         throw new FormException(sprintf('Unable to render form as none of the following blocks exist: "%s".', implode('", "', $blocks)));
     }
 
-    protected function getTemplate(FormView $view, $name, array $resources = null)
+    protected function getTemplate(FormView $view, $name)
     {
-        $templates = $this->getTemplates($view, $resources);
+        $templates = $this->getTemplates($view);
 
         return $templates[$name];
     }
 
-    protected function getTemplates(FormView $view, array $resources = null)
+    protected function getTemplates(FormView $view)
     {
         // templates are looked for in the following resources:
-        //   * resources provided directly into the function call
         //   * resources from the themes (and its parents)
         //   * default resources
 
@@ -200,9 +197,6 @@ class FormExtension extends \Twig_Extension
                 $all = array_merge($all, $this->themes[$parent]);
             }
         } while ($parent = $parent->getParent());
-
-        // local
-        $all = array_merge($all, null !== $resources ? (array) $resources : array());
 
         $templates = array();
         foreach ($all as $resource) {

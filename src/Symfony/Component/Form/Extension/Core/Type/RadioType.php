@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -28,7 +28,7 @@ class RadioType extends AbstractType
     public function buildView(FormView $view, FormInterface $form)
     {
         $view->set('value', $form->getAttribute('value'));
-        $view->set('checked', (bool)$form->getData());
+        $view->set('checked', (Boolean) $form->getData());
 
         if ($view->hasParent()) {
             $view->set('name', $view->getParent()->get('name'));

@@ -60,17 +60,58 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $service = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
 
         $scope = new Scope('scope');
-
         $container = new Container();
         $container->addScope($scope);
         $container->enterScope('scope');
+
         $container->set('service.listener', $service, 'scope');
 
         $dispatcher = new ContainerAwareEventDispatcher($container);
         $dispatcher->addListenerService('onEvent', 'service.listener');
 
         $container->leaveScope('scope');
-        $dispatcher->dispatch('onEvent');        
+        $dispatcher->dispatch('onEvent');
+    }
+
+    public function testReEnteringAScope()
+    {
+        $event = new Event();
+
+        $service1 = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+
+        $service1
+            ->expects($this->exactly(2))
+            ->method('onEvent')
+            ->with($event)
+        ;
+
+        $scope = new Scope('scope');
+        $container = new Container();
+        $container->addScope($scope);
+        $container->enterScope('scope');
+
+        $container->set('service.listener', $service1, 'scope');
+
+        $dispatcher = new ContainerAwareEventDispatcher($container);
+        $dispatcher->addListenerService('onEvent', 'service.listener');        
+        $dispatcher->dispatch('onEvent', $event);
+
+        $service2 = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
+
+        $service2
+            ->expects($this->once())
+            ->method('onEvent')
+            ->with($event)
+        ;
+
+        $container->enterScope('scope');
+        $container->set('service.listener', $service2, 'scope');
+
+        $dispatcher->dispatch('onEvent', $event);
+
+        $container->leaveScope('scope');
+
+        $dispatcher->dispatch('onEvent');
     }
 }
 

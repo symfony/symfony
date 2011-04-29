@@ -126,7 +126,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Checks if the node has a default value.
      *
-     * @return boolean
+     * @return Boolean
      */
     public function hasDefaultValue()
     {

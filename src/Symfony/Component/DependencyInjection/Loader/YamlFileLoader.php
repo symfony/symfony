@@ -32,8 +32,8 @@ class YamlFileLoader extends FileLoader
     /**
      * Loads a Yaml file.
      *
-     * @param mixed $resource The resource
-     * @param string $type    The resource type
+     * @param mixed  $file The resource
+     * @param string $type The resource type
      */
     public function load($file, $type = null)
     {

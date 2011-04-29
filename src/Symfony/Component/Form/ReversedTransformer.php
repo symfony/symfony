@@ -30,7 +30,7 @@ class ReversedTransformer implements DataTransformerInterface
     /**
      * Reverses this transformer
      *
-     * @param DataTransformerInterface $innerTransformer
+     * @param DataTransformerInterface $reversedTransformer
      */
     public function __construct(DataTransformerInterface $reversedTransformer)
     {

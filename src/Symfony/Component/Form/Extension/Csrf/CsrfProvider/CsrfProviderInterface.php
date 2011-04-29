@@ -44,7 +44,7 @@ interface CsrfProviderInterface
      *
      * @param  string $pageId  The page ID used when generating the CSRF token
      * @param  string $token   The token supplied by the browser
-     * @return boolean         Whether the token supplied by the browser is
+     * @return Boolean         Whether the token supplied by the browser is
      *                         correct
      */
     public function isCsrfTokenValid($pageId, $token);

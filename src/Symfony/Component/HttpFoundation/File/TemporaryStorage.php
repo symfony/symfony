@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -20,25 +20,21 @@ use Symfony\Component\HttpFoundation\File\Exception\UnexpectedTypeException;
 class TemporaryStorage
 {
     private $directory;
-
     private $secret;
 
-    private $nestingLevels;
-
-    public function __construct($secret, $nestingLevels = 3, $directory = null)
+    public function __construct($secret, $directory)
     {
-        if (empty($directory)) {
-            $directory = sys_get_temp_dir();
+        if (!file_exists($directory)) {
+            mkdir($directory, 0777, true);
         }
 
         $this->directory = realpath($directory);
         $this->secret = $secret;
-        $this->nestingLevels = $nestingLevels;
     }
 
     protected function generateHashInfo($token)
     {
-        return $this->secret . $token;
+        return $this->secret.$token;
     }
 
     protected function generateHash($token)
@@ -54,17 +50,12 @@ class TemporaryStorage
 
         $hash = $this->generateHash($token);
 
-        if (strlen($hash) < $this->nestingLevels) {
-            throw new FileException(sprintf(
-                    'For %s nesting levels the hash must have at least %s characters', $this->nestingLevels, $this->nestingLevels));
+        $directory = $this->directory.DIRECTORY_SEPARATOR.substr($hash, 0, 2).DIRECTORY_SEPARATOR.substr($hash, 2);
+
+        if (!file_exists($directory)) {
+            mkdir($directory, 0777, true);
         }
 
-        $directory = $this->directory;
-
-        for ($i = 0; $i < ($this->nestingLevels - 1); ++$i) {
-            $directory .= DIRECTORY_SEPARATOR . $hash{$i};
-        }
-
-        return $directory . DIRECTORY_SEPARATOR . substr($hash, $i);
+        return $directory;
     }
 }

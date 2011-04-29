@@ -29,6 +29,8 @@ class Application extends BaseApplication
 
     /**
      * Constructor.
+     *
+     * @param KernelInterface $kernel A KernelInterface instance
      */
     public function __construct(KernelInterface $kernel)
     {

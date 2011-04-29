@@ -207,7 +207,7 @@ class Configuration implements ConfigurationInterface
                 ->append($this->getOrmCacheDriverNode('result_cache_driver'))
                 ->children()
                     ->scalarNode('connection')->end()
-                    ->scalarNode('class_metadata_factory_name')->defaultValue('%doctrine.orm.class_metadata_factory_name%')->end()
+                    ->scalarNode('class_metadata_factory_name')->defaultValue('Doctrine\ORM\Mapping\ClassMetadataFactory')->end()
                     ->scalarNode('auto_mapping')->defaultFalse()->end()
                 ->end()
                 ->fixXmlConfig('hydrator')

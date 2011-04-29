@@ -174,13 +174,6 @@ class FormExtension extends \Twig_Extension
         throw new FormException(sprintf('Unable to render form as none of the following blocks exist: "%s".', implode('", "', $blocks)));
     }
 
-    protected function getTemplate(FormView $view, $name)
-    {
-        $templates = $this->getTemplates($view);
-
-        return $templates[$name];
-    }
-
     protected function getTemplates(FormView $view)
     {
         // templates are looked for in the following resources:

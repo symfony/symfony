@@ -6,30 +6,6 @@ use Symfony\Component\Config\Resource\FileResource;
 
 class PoFileLoader extends ArrayLoader implements LoaderInterface {
 
-    /**
-     * Magic used for validating the format of a MO file as well as
-     * detecting if the machine used to create that file was little endian.
-     *
-     * @var float
-     */
-    const MO_LITTLE_ENDIAN_MAGIC = 0x950412de;
-
-    /**
-     * Magic used for validating the format of a MO file as well as
-     * detecting if the machine used to create that file was big endian.
-     *
-     * @var float
-     */
-    const MO_BIG_ENDIAN_MAGIC = 0xde120495;
-
-    /**
-     * The size of the header of a MO file in bytes.
-     *
-     * @var integer Number of bytes.
-     */
-    const MO_HEADER_SIZE = 28;
-
-
     public function load($resource, $locale, $domain = 'messages') {
 
         $messages = $this->parse($resource);
@@ -64,7 +40,7 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
      * @param resource $stream
      * @return array
      */
-    protected function parse($resource) {
+    public  function parse($resource) {
 
         $stream = fopen($resource, 'r+');
 
@@ -84,23 +60,13 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
             if ($line === '') {
                 $data = $this->merge($data, $item);
                 $item = $defaults;
-            } elseif (substr($line, 0, 3) === '#~ ') {
-                //$item['flags']['obsolete'] = true;
-            } elseif (substr($line, 0, 3) === '#, ') {
-                //$item['flags'][substr($line, 3)] = true;
             } elseif (substr($line, 0, 3) === '#: ') {
-                //$item['occurrences'][] = array(
-                //    'file' => strtok(substr($line, 3), ':'),
-                //    'line' => strtok(':')
-                //);
-            } elseif (substr($line, 0, 3) === '#. ') {
-                //$item['comments'][] = substr($line, 3);
-            } elseif ($line[0] === '#') {
-                //$item['comments'][] = ltrim(substr($line, 1));
+                $item['occurrences'][] = array(
+                    'file' => strtok(substr($line, 3), ':'),
+                    'line' => strtok(':')
+                );
             } elseif (substr($line, 0, 7) === 'msgid "') {
-                //$item['ids']['singular'] = substr($line, 7, -1);
-            } elseif (substr($line, 0, 9) === 'msgctxt "') {
-                //$item['context'] = substr($line, 9, -1);
+                $item['ids']['singular'] = substr($line, 7, -1);
             } elseif (substr($line, 0, 8) === 'msgstr "') {
                 $item['translated'] = substr($line, 8, -1);
             } elseif ($line[0] === '"') {
@@ -113,7 +79,7 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
                     $item[$continues] .= substr($line, 1, -1);
                 }
             } elseif (substr($line, 0, 14) === 'msgid_plural "') {
-                //$item['ids']['plural'] = substr($line, 14, -1);
+                $item['ids']['plural'] = substr($line, 14, -1);
             } elseif (substr($line, 0, 7) === 'msgstr[') {
                 $item['translated'][(integer) substr($line, 7, 1)] = substr($line, 11, -1);
             }
@@ -121,24 +87,15 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
 
         fclose($stream);
 
-        return $this->merge($data, $item);
+		$data = $this->merge($data, $item);
+
+		foreach ($data as $id => $item) {
+
+			$data[$id] = $item['translated'];
+		}
+
+		return $data;
     }
-
-
-    /**
-     * Reads an unsigned long from stream respecting endianess.
-     *
-     * @param resource $stream
-     * @param boolean $isBigEndian
-     * @return integer
-     */
-    protected function _readLong($stream, $isBigEndian) {
-        $result = unpack($isBigEndian ? 'N1' : 'V1', fread($stream, 4));
-        $result = current($result);
-        return (integer) substr($result, -8);
-    }
-
-
 
     /**
      * Merges an item into given data and unescapes fields.
@@ -171,19 +128,8 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
         if (empty($item['id']) || ctype_space($item['id'])) {
             return $data;
         }
-        return $this->_merge($data, $item);
-    }
 
-
-    /**
-     * Merges an item into given data.
-     *
-     * @param array $data Data to merge item into.
-     * @param array $item Item to merge into $data. The item must have an `'id'` key.
-     * @return array The merged data.
-     */
-    protected function _merge(array $data, array $item) {
-        if (!isset($item['id'])) {
+		if (!isset($item['id'])) {
             return $data;
         }
         $id = $item['id'];

@@ -55,6 +55,7 @@ class FieldType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form)
     {
+        $formName = $form->getName();
         if ($view->hasParent()) {
             $parentId = $view->getParent()->get('id');
             $parentName = $view->getParent()->get('name');
@@ -67,6 +68,7 @@ class FieldType extends AbstractType
 
         $view->set('form', $view);
         $view->set('id', $id);
+        $view->set('form_name', $formName);
         $view->set('name', $name);
         $view->set('errors', $form->getErrors());
         $view->set('value', $form->getClientData());

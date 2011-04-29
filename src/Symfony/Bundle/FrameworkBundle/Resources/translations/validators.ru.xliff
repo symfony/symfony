@@ -19,16 +19,16 @@
                 <target>Значение должно быть пустым</target>
             </trans-unit>
             <trans-unit id="5">
-                <source>This value should be one of the given choices</source>
-                <target>Значение должно быть одним из предложенных</target>
+                <source>The value you selected is not a valid choice</source>
+                <target>Выбранное Вами значение недопустимо</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You should select at least {{ limit }} choices</source>
-                <target>Выберите минимум {{ limit }} возможностей</target>
+                <source>You must select at least {{ limit }} choices</source>
+                <target>Вы должны выбрать хотя бы {{ limit }} вариантов</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You should select at most {{ limit }} choices</source>
-                <target>Выберите максимум {{ limit }} возможностей</target>
+                <source>You must select at most {{ limit }} choices</source>
+                <target>Вы должны выбрать не более чем {{ limit }} вариантов</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>The fields {{ fields }} were not expected</source>
@@ -125,6 +125,10 @@
             <trans-unit id="31">
                 <source>The two values should be equal</source>
                 <target>Оба значения должны быть одинаковыми</target>
+            </trans-unit>
+            <trans-unit id="32">
+                <source>One or more of the given values is invalid</source>
+                <target>Одно или несколько заданных значений недопустимо</target>
             </trans-unit>
         </body>
     </file>

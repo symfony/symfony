@@ -34,7 +34,7 @@ class TwigEngine implements EngineInterface
      * @param TemplateNameParserInterface $parser      A TemplateNameParserInterface instance
      * @param GlobalVariables|null        $globals     A GlobalVariables instance or null
      */
-    public function __construct(\Twig_Environment $environment, TemplateNameParserInterface $parser, GlobalVariables $globals)
+    public function __construct(\Twig_Environment $environment, TemplateNameParserInterface $parser, GlobalVariables $globals = null)
     {
         $this->environment = $environment;
         $this->parser = $parser;

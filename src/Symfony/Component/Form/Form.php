@@ -464,6 +464,7 @@ class Form implements \IteratorAggregate, FormInterface
             $normData = $this->clientToNorm($clientData);
             $synchronized = true;
         } catch (TransformationFailedException $e) {
+        	throw $e;
         }
 
         if ($synchronized) {

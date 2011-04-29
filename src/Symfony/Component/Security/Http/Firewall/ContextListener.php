@@ -33,10 +33,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class ContextListener implements ListenerInterface
 {
-    private $context;
-    private $contextKey;
-    private $logger;
-    private $userProviders;
+    protected $context;
+    protected $contextKey;
+    protected $logger;
+    protected $userProviders;
 
     public function __construct(SecurityContext $context, array $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {

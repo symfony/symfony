@@ -25,7 +25,6 @@
         <parameter key="doctrine.orm.metadata.yml.class">Doctrine\ORM\Mapping\Driver\YamlDriver</parameter>
         <parameter key="doctrine.orm.metadata.php.class">Doctrine\ORM\Mapping\Driver\PHPDriver</parameter>
         <parameter key="doctrine.orm.metadata.staticphp.class">Doctrine\ORM\Mapping\Driver\StaticPHPDriver</parameter>
-        <parameter key="doctrine.orm.class_metadata_factory_name">Doctrine\ORM\Mapping\ClassMetadataFactory</parameter>
 
         <!-- cache warmer -->
         <parameter key="doctrine.orm.proxy_cache_warmer.class">Symfony\Bundle\DoctrineBundle\CacheWarmer\ProxyCacheWarmer</parameter>

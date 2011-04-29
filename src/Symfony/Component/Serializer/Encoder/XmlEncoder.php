@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  * @author John Wards <jwards@whiteoctober.co.uk>
  * @author Fabian Vogler <fabian@equivalence.ch>
  */
-class XmlEncoder extends AbstractEncoder implements DecoderInterface
+class XmlEncoder implements EncoderInterface
 {
     private $dom;
     private $format;
@@ -38,7 +38,7 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
         $this->dom = new \DOMDocument();
         $this->format = $format;
 
-        if ($this->serializer->isStructuredType($data)) {
+        if (null !== $data && !is_scalar($data)) {
             $root = $this->dom->createElement($this->rootNodeName);
             $this->dom->appendChild($root);
             $this->buildXml($root, $data);

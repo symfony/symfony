@@ -3,6 +3,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\SerializerAwareInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -14,11 +15,11 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 
 /**
- * Abstract Normalizer implementation
+ * Serializer Aware Normalizer implementation.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-abstract class AbstractNormalizer implements NormalizerInterface
+abstract class SerializerAwareNormalizer implements SerializerAwareInterface, NormalizerInterface
 {
     protected $serializer;
 
@@ -28,13 +29,5 @@ abstract class AbstractNormalizer implements NormalizerInterface
     public function setSerializer(SerializerInterface $serializer)
     {
         $this->serializer = $serializer;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSerializer()
-    {
-        return $this->serializer;
     }
 }

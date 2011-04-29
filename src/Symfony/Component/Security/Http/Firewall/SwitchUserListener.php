@@ -126,6 +126,10 @@ class SwitchUserListener implements ListenerInterface
         $user = $this->provider->loadUserByUsername($username);
         $this->userChecker->checkPostAuth($user);
 
+        if (false === $this->accessDecisionManager->decide($token, $user->getRoles())) {
+           throw new AccessDeniedException();
+        }
+
         $roles = $user->getRoles();
         $roles[] = new SwitchUserRole('ROLE_PREVIOUS_ADMIN', $this->securityContext->getToken());
 

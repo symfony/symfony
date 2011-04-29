@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing\Loader;
 
-use Doctrine\Common\Annotations\AnnotationReader;
+use Annotations\ReaderInterface;
 use Symfony\Component\Routing\Annotation\Route as RouteAnnotation;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\Route;
@@ -64,9 +64,9 @@ abstract class AnnotationClassLoader implements LoaderInterface
     /**
      * Constructor.
      *
-     * @param AnnotationReader $reader
+     * @param ReaderInterface $reader
      */
-    public function __construct(AnnotationReader $reader)
+    public function __construct(ReaderInterface $reader)
     {
         $this->reader = $reader;
     }

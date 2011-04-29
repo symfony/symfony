@@ -11,6 +11,7 @@
         <parameter key="filesystem.class">Symfony\Component\HttpKernel\Util\Filesystem</parameter>
         <parameter key="cache_warmer.class">Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate</parameter>
         <parameter key="file_locator.class">Symfony\Component\HttpKernel\Config\FileLocator</parameter>
+        <parameter key="annotation_reader.class">Annotations\Reader</parameter>
     </parameters>
 
     <services>
@@ -50,6 +51,9 @@
         <service id="file_locator" class="%file_locator.class%">
             <argument type="service" id="kernel" />
             <argument>%kernel.root_dir%/Resources</argument>
+        </service>
+        
+        <service id="annotation_reader" class="%annotation_reader.class%" public="false">
         </service>
     </services>
 </container>

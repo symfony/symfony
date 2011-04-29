@@ -6,6 +6,7 @@ require_once __DIR__.'/EntityParent.php';
 require_once __DIR__.'/EntityInterface.php';
 
 /**
+ * @import("Symfony\Component\Validator\Constraints\*", alias="assert")
  * @Symfony\Tests\Component\Validator\Fixtures\ConstraintA
  * @assert:GroupSequence({"Foo", "Entity"})
  */
@@ -14,10 +15,8 @@ class Entity extends EntityParent implements EntityInterface
     /**
      * @assert:NotNull
      * @assert:Min(3)
-     * @assert:Set({
-     *   @assert:All({@assert:NotNull, @assert:Min(3)}),
-     *   @assert:All(constraints={@assert:NotNull, @assert:Min(3)})
-     * })
+     * @assert:All({@assert:NotNull, @assert:Min(3)}),
+     * @assert:All(constraints={@assert:NotNull, @assert:Min(3)})
      * @assert:Collection(fields={
      *   "foo" = {@assert:NotNull, @assert:Min(3)},
      *   "bar" = @assert:Min(5)

@@ -59,7 +59,6 @@ abstract class AnnotationClassLoader implements LoaderInterface
 {
     protected $reader;
     protected $routeAnnotationClass  = 'Symfony\\Component\\Routing\\Annotation\\Route';
-    protected $routesAnnotationClass = 'Symfony\\Component\\Routing\\Annotation\\Routes';
 
     /**
      * Constructor.
@@ -79,16 +78,6 @@ abstract class AnnotationClassLoader implements LoaderInterface
     public function setRouteAnnotationClass($class)
     {
         $this->routeAnnotationClass = $class;
-    }
-
-    /**
-     * Sets the annotation class to read routes properties from.
-     *
-     * @param string $class A fully-qualified class name
-     */
-    public function setRoutesAnnotationClass($class)
-    {
-        $this->routesAnnotationClass = $class;
     }
 
     /**
@@ -137,12 +126,10 @@ abstract class AnnotationClassLoader implements LoaderInterface
         $collection->addResource(new FileResource($class->getFileName()));
 
         foreach ($class->getMethods() as $method) {
-            if ($annots = $this->reader->getMethodAnnotation($method, $this->routesAnnotationClass)) {
-                foreach ($annots->getRoutes() as $annot) {
+            foreach ($this->reader->getMethodAnnotations($method) as $annot) {
+                if ($annot instanceof $this->routeAnnotationClass) {
                     $this->addRoute($collection, $annot, $globals, $class, $method);
                 }
-            } elseif ($annot = $this->reader->getMethodAnnotation($method, $this->routeAnnotationClass)) {
-                $this->addRoute($collection, $annot, $globals, $class, $method);
             }
         }
 

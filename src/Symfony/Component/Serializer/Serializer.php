@@ -30,7 +30,7 @@ class Serializer implements SerializerInterface
 {
     private $normalizers = array();
     private $encoders = array();
-    private $normalizerCache = array();
+    protected $normalizerCache = array();
 
     /**
      * @param mixed $value value to test

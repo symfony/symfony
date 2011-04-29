@@ -44,6 +44,6 @@ class FormThemeNode extends \Twig_Node
             ;
         }
 
-        $compiler->raw('));');
+        $compiler->raw("));\n");
     }
 }

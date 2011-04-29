@@ -8,7 +8,7 @@
         } else {
             xhr = new ActiveXObject('Microsoft.XMLHTTP');
         }
-        xhr.open('GET', '{{ url("_wdt", { "token": token }) }}', false);
+        xhr.open('GET', '{{ path("_wdt", { "token": token }) }}', false);
         xhr.send('');
         wdt.innerHTML = xhr.responseText;
         wdt.style.display = 'block';

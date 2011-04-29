@@ -48,7 +48,6 @@
         <service id="validator.mapping.loader.static_method_loader" class="%validator.mapping.loader.static_method_loader.class%" public="false" />
 
         <service id="validator.mapping.loader.annotation_loader" class="%validator.mapping.loader.annotation_loader.class%" public="false">
-            <argument /> <!-- namespaces -->
         </service>
 
         <service id="validator.mapping.loader.xml_files_loader" class="%validator.mapping.loader.xml_files_loader.class%" public="false">

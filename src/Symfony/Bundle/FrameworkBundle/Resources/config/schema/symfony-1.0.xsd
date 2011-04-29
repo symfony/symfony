@@ -114,20 +114,8 @@
     </xsd:complexType>
 
     <xsd:complexType name="validation">
-        <xsd:sequence>
-            <xsd:element name="namespace" type="validation_namespace" minOccurs="0" maxOccurs="1" />
-        </xsd:sequence>
-
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="cache" type="xsd:string" />
-        <xsd:attribute name="annotations" type="xsd:boolean" />
-    </xsd:complexType>
-
-    <xsd:complexType name="validation_namespace">
-        <xsd:simpleContent>
-            <xsd:extension base="xsd:string">
-                <xsd:attribute name="prefix" type="xsd:string" />
-            </xsd:extension>
-        </xsd:simpleContent>
+        <xsd:attribute name="enable-annotations" type="xsd:boolean" />
     </xsd:complexType>
 </xsd:schema>

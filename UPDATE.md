@@ -6,6 +6,83 @@ one. It only discusses changes that need to be done when using the "public"
 API of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.
 
+beta1 to beta2
+--------------
+
+* The annotation parsing process has been changed. All annotations which are used
+  in a class must now be imported (just like you import PHP namespaces with the
+  "use" statement):
+
+  Before:
+
+    /**
+     * @orm:Entity
+     */
+    class MyUser
+    {
+        /**
+         * @orm:Id
+         * @orm:GeneratedValue(strategy = "AUTO")
+         * @orm:Column(type="integer")
+         * @var integer
+         */
+        private $id;
+        
+        /**
+         * @orm:Column(type="string", nullable=false)
+         * @assert:NotBlank
+         * @var string
+         */
+        private $name;
+    }
+
+  After:
+
+    /**
+     * @import("Doctrine\ORM\Mapping\*")
+     * @import("Symfony\Component\Validator\Constraints\*")
+     * @ignorePhpDoc
+     * @Entity
+     */
+    class MyUser
+    {
+        /**
+         * @Id
+         * @GeneratedValue(strategy="AUTO")
+         * @Column(type="integer")
+         * @var integer
+         */
+        private $id;
+
+        /**
+         * @Column(type="string", nullable=false)
+         * @NotBlank
+         * @var string
+         */
+        private $name;
+    }
+
+* The config under "framework.validation.annotations" has been removed and was 
+  replaced with a boolean flag "framework.validation.enable_annotations" which
+  defaults to false.
+
+* The Set constraint has been removed as it is not required anymore.
+
+  Before:
+  
+    /**
+     * @assert:Set({@assert:Callback(...), @assert:Callback(...)})
+     */
+    private $foo;
+
+  After:
+
+    /**
+     * @Callback(...)
+     * @Callback(...)
+     */
+    private  $foo;
+
 PR12 to beta1
 -------------
 

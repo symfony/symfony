@@ -2,8 +2,8 @@ How to update your project?
 ===========================
 
 This document explains how to upgrade from one Symfony2 PR version to the next
-one. It only discusses changes that need to be done when using the "public"
-API of the framework. If you "hack" the core, you should probably follow the
+one. It only discusses changes that need to be done when using the "public" API
+of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.
 
 PR12 to beta1
@@ -31,13 +31,13 @@ PR12 to beta1
   * The `class` option has been removed (use the `session.class` parameter
     instead);
 
-  * The PDO session storage configuration has been removed (a cookbook recipe
-    is in the work);
+  * The PDO session storage configuration has been removed (a cookbook recipe is
+    in the work);
 
   * The `storage_id` option now takes a service id instead of just part of it.
 
-* The `DoctrineMigrationsBundle` and `DoctrineFixturesBundle` bundles have
-  been moved to their own repositories.
+* The `DoctrineMigrationsBundle` and `DoctrineFixturesBundle` bundles have been
+  moved to their own repositories.
 
 * The form framework has been refactored extensively (more information in the
   documentation).
@@ -52,9 +52,9 @@ PR12 to beta1
     {% trans %}foo{% endtrans %}
     {{ foo|trans }}
 
-  This has been done to clarify the usage of the tag and filter and also to
-  make it clearer when the automatic output escaping rules are applied (see
-  the doc for more information).
+  This has been done to clarify the usage of the tag and filter and also to make
+  it clearer when the automatic output escaping rules are applied (see the doc
+  for more information).
 
 * Some methods in the DependencyInjection component's ContainerBuilder and
   Definition classes have been renamed to be more specific and consistent:
@@ -92,9 +92,9 @@ PR11 to PR12
         <app:engine>twig</app:engine>
         <twig:extension>twig.extension.debug</twig:extension>
 
-* Fixes a critical security issue which allowed all users to switch to 
-  arbitrary accounts when the SwitchUserListener was activated. Configurations
-  which do not use the SwitchUserListener are not affected.
+* Fixes a critical security issue which allowed all users to switch to arbitrary
+  accounts when the SwitchUserListener was activated. Configurations which do
+  not use the SwitchUserListener are not affected.
 
 * The Dependency Injection Container now strongly validates the references of 
   all your services at the end of its compilation process. If you have invalid

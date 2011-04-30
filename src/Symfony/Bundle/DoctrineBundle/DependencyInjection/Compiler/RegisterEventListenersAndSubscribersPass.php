@@ -59,7 +59,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
             }
 
             foreach ($cs as $connection) {
-                if (!is_array($connections[$connection])) {
+                if (!isset($connections[$connection]) || !is_array($connections[$connection])) {
                     $connections[$connection] = array();
                 }
                 $connections[$connection][] = $attributes['event'];

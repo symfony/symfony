@@ -33,6 +33,7 @@ class Serializer implements SerializerInterface
 {
     private $normalizers = array();
     private $encoders = array();
+    private $normalizerCache = array();
 
     /**
      * {@inheritDoc}
@@ -72,11 +73,18 @@ class Serializer implements SerializerInterface
             return $normalized;
         } else if (null === $data || is_scalar($data)) {
             return $data;
+        } else if (!is_object($data)) {
+            throw new \RuntimeException('Cannot normalize value of type: '.gettype($data));
+        }
+
+        $class = get_class($data);
+        if (isset($this->normalizerCache[$class][$format])) {
+            return $this->normalizerCache[$class][$format];
         }
 
         foreach ($this->normalizers as $normalizer) {
             try {
-                return $normalizer->normalize($data, $format);
+                return $this->normalizerCache[$class][$format] = $normalizer->normalize($data, $format);
             } catch (UnsupportedException $ex) {
                 // try next one
             }

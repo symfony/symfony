@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Translation\Loader;
 
 use Symfony\Component\Config\Resource\FileResource;
@@ -10,7 +19,6 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface {
      * Magic used for validating the format of a MO file as well as
      * detecting if the machine used to create that file was little endian.
      *
-     * @see lithium\g11n\catalog\adapter\Gettext::_parseMo()
      * @var float
      */
     const MO_LITTLE_ENDIAN_MAGIC = 0x950412de;
@@ -38,10 +46,6 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface {
         if (null === $messages) {
             $messages = array();
         }
-        
-        array_walk($results, function(&$value) {
-			$value = $value['translated'];
-		});
 
         // not an array
         if (!is_array($messages)) {
@@ -133,6 +137,11 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface {
 
         fclose($stream);
 
+        foreach ($data as $id => $item) {
+
+			$data[$id] = $item['translated'];
+        }
+
         return $data;
     }
 
@@ -182,18 +191,8 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface {
         if (empty($item['id']) || ctype_space($item['id'])) {
             return $data;
         }
-        return $this->_merge($data, $item);
-    }
 
-    /**
-     * Merges an item into given data.
-     *
-     * @param array $data Data to merge item into.
-     * @param array $item Item to merge into $data. The item must have an `'id'` key.
-     * @return array The merged data.
-     */
-    protected function _merge(array $data, array $item) {
-        if (!isset($item['id'])) {
+                if (!isset($item['id'])) {
             return $data;
         }
         $id = $item['id'];
@@ -219,6 +218,8 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface {
         } elseif (is_array($item['translated'])) {
             $data[$id]['translated'] = (array) $data[$id]['translated'] + $item['translated'];
         }
+
         return $data;
     }
+
 }

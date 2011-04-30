@@ -21,7 +21,7 @@
         <!-- metadata -->
         <parameter key="doctrine.orm.metadata.driver_chain.class">Doctrine\ORM\Mapping\Driver\DriverChain</parameter>
         <parameter key="doctrine.orm.metadata.annotation.class">Doctrine\ORM\Mapping\Driver\AnnotationDriver</parameter>
-        <parameter key="doctrine.orm.metadata.annotation_reader.class">Doctrine\Common\Annotations\AnnotationReader</parameter>
+        <parameter key="doctrine.orm.metadata.annotation_reader.class">Annotations\DoctrineReader</parameter>
         <parameter key="doctrine.orm.metadata.xml.class">Doctrine\ORM\Mapping\Driver\XmlDriver</parameter>
         <parameter key="doctrine.orm.metadata.yml.class">Doctrine\ORM\Mapping\Driver\YamlDriver</parameter>
         <parameter key="doctrine.orm.metadata.php.class">Doctrine\ORM\Mapping\Driver\PHPDriver</parameter>
@@ -37,7 +37,9 @@
 
     <services>
         <!--- Annotation Metadata Reader Service -->
-        <service id="doctrine.orm.metadata.annotation_reader" class="%doctrine.orm.metadata.annotation_reader.class%" public="false" />
+        <service id="doctrine.orm.metadata.annotation_reader" class="%doctrine.orm.metadata.annotation_reader.class%" public="false">
+            <argument type="service" id="annotation_reader" />
+        </service>
 
         <service id="doctrine.orm.proxy_cache_warmer" class="%doctrine.orm.proxy_cache_warmer.class%" public="false">
             <tag name="kernel.cache_warmer" />

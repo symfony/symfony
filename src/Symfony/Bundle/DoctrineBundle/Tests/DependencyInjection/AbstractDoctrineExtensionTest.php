@@ -119,9 +119,11 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('Doctrine\Common\Cache\XcacheCache', $container->getParameter('doctrine.orm.cache.xcache.class'));
         $this->assertEquals('Doctrine\ORM\Mapping\Driver\DriverChain', $container->getParameter('doctrine.orm.metadata.driver_chain.class'));
         $this->assertEquals('Doctrine\ORM\Mapping\Driver\AnnotationDriver', $container->getParameter('doctrine.orm.metadata.annotation.class'));
-        $this->assertEquals('Doctrine\Common\Annotations\AnnotationReader', $container->getParameter('doctrine.orm.metadata.annotation_reader.class'));
         $this->assertEquals('Doctrine\ORM\Mapping\Driver\XmlDriver', $container->getParameter('doctrine.orm.metadata.xml.class'));
         $this->assertEquals('Doctrine\ORM\Mapping\Driver\YamlDriver', $container->getParameter('doctrine.orm.metadata.yml.class'));
+
+        $class = new \ReflectionClass($container->getParameter('doctrine.orm.metadata.annotation_reader.class'));
+        $this->assertTrue($class->getName() === 'Doctrine\Common\Annotations\AnnotationReader' || $class->isSubClassOf('Doctrine\Common\Annotations\AnnotationReader'));
 
         $config = array(
             'proxy_namespace' => 'MyProxies',

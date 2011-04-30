@@ -166,7 +166,6 @@ class PdoSessionStorage extends NativeSessionStorage
         $dbTable    = $this->dbOptions['db_table'];
         $dbDataCol = $this->dbOptions['db_data_col'];
         $dbIdCol   = $this->dbOptions['db_id_col'];
-        $dbTimeCol = $this->dbOptions['db_time_col'];
 
         try {
             $sql = 'SELECT '.$dbDataCol.' FROM '.$dbTable.' WHERE '.$dbIdCol.'=?';

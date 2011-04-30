@@ -38,7 +38,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format)
+    public function normalize($object, $format = null)
     {
         $reflectionObject = new \ReflectionObject($object);
         $reflectionMethods = $reflectionObject->getMethods(\ReflectionMethod::IS_PUBLIC);
@@ -101,6 +101,16 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
         }
 
         return $object;
+    }
+
+    public function supportsNormalization($data, $format = null)
+    {
+        return true;
+    }
+
+    public function supportsDenormalization($data, $type, $format = null)
+    {
+        return class_exists($type);
     }
 
     /**

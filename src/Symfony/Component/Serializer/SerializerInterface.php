@@ -39,7 +39,7 @@ interface SerializerInterface
      * @param string $format
      * @api
      */
-    function unserialize($data, $type, $format);
+    function deserialize($data, $type, $format);
 
     /**
      * Normalizes any data into a set of arrays/scalars

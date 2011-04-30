@@ -14,17 +14,15 @@ namespace Symfony\Component\Serializer\Normalizer;
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-use Symfony\Component\Serializer\Exception\UnsupportedException;
-
 class CustomNormalizer implements NormalizerInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format)
+    public function normalize($object, $format = null)
     {
         if (!$object instanceof NormalizableInterface) {
-            throw new UnsupportedException('Object does not implemented NormalizableInterface.');
+            throw new \RuntimeException('Object does not implemented NormalizableInterface.');
         }
 
         return $object->normalize($this, $format);
@@ -33,15 +31,31 @@ class CustomNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, \ReflectionClass $class, $format = null)
+    public function denormalize($data, $type, $format = null)
     {
-        $object = new $class;
+        if (!class_exists($type)) {
+            throw new \RuntimeException(sprintf('The class "%s" does not exist.', $type));
+        }
+
+        $object = new $type;
         if (!$object instanceof NormalizableInterface) {
-            throw new UnsupportedException('Object does not implemented NormalizableInterface.');
+            throw new \RuntimeException('Object does not implemented NormalizableInterface.');
         }
 
         $object->denormalize($this, $data, $format);
 
         return $object;
+    }
+
+    public function supportsNormalization($data, $format = null)
+    {
+        return $data instanceof NormalizableInterface;
+    }
+
+    public function supportsDenormalization($data, $type, $format = null)
+    {
+        $class = new \ReflectionClass($type);
+
+        return $class->isSubclassOf('Symfony\Component\Serializer\Normalizer\NormalizableInterface');
     }
 }

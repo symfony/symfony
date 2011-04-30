@@ -25,8 +25,6 @@ interface NormalizerInterface
      * @param mixed  $data   data to normalize
      * @param string $format format the normalization result will be encoded as
      *
-     * @throws UnsupportedException if input data, or format is not supported
-     *
      * @return array|scalar
      * @api
      */
@@ -46,6 +44,26 @@ interface NormalizerInterface
      */
     function denormalize($data, $type, $format = null);
 
+    /**
+     * Whether normalization is supported by the implementation.
+     *
+     * @param mixed  $data   data to normalize
+     * @param string $format format the normalization result will be encoded as
+     *
+     * @return Boolean
+     * @api
+     */
     function supportsNormalization($data, $format = null);
+
+    /**
+     * Whether deormalization is supported by the implementation.
+     *
+     * @param mixed  $data   data to normalize
+     * @param string $type
+     * @param string $format format the normalization result will be encoded as
+     *
+     * @return Boolean
+     * @api
+     */
     function supportsDenormalization($data, $type, $format = null);
 }

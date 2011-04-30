@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  * @author John Wards <jwards@whiteoctober.co.uk>
  * @author Fabian Vogler <fabian@equivalence.ch>
  */
-class XmlEncoder implements EncoderInterface
+class XmlEncoder extends SerializerAwareEncoder
 {
     private $dom;
     private $format;
@@ -247,8 +247,8 @@ class XmlEncoder implements EncoderInterface
             return $append;
         }
         if (is_object($data)) {
-            $data = $this->serializer->normalizeObject($data, $this->format);
-            if (!$this->serializer->isStructuredType($data)) {
+            $data = $this->serializer->normalize($data, $this->format);
+            if (null === $data || is_scalar($data)) {
                 // top level data object is normalized into a scalar
                 if (!$parentNode->parentNode->parentNode) {
                     $root = $parentNode->parentNode;
@@ -302,7 +302,7 @@ class XmlEncoder implements EncoderInterface
         } elseif ($val instanceof \Traversable) {
             $this->buildXml($node, $val);
         } elseif (is_object($val)) {
-            return $this->buildXml($node, $this->serializer->normalizeObject($val, $this->format));
+            return $this->buildXml($node, $this->serializer->normalize($val, $this->format));
         } elseif (is_numeric($val)) {
             return $this->appendText($node, (string) $val);
         } elseif (is_string($val)) {

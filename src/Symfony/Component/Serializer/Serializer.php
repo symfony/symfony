@@ -33,7 +33,6 @@ class Serializer implements SerializerInterface
 {
     private $normalizers = array();
     private $encoders = array();
-    private $normalizerCache = array();
 
     /**
      * {@inheritDoc}
@@ -48,22 +47,18 @@ class Serializer implements SerializerInterface
     /**
      * {@inheritDoc}
      */
-    public function unserialize($data, \ReflectionClass $class, $format)
+    public function deserialize($data, $type, $format)
     {
         $data = $this->decode($data, $format);
 
-        return $this->denormalize($data, $class, $format);
+        return $this->denormalize($data, $type, $format);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function normalize($data, $format)
+    public function normalize($data, $format = null)
     {
-        if (!$this->normalizers) {
-            throw new \LogicException('You must register at least one normalizer to be able to normalize objects.');
-        }
-
         if (is_array($data) || $data instanceof \Traversable) {
             $normalized = array();
             foreach ($data as $k => $v) {
@@ -78,15 +73,9 @@ class Serializer implements SerializerInterface
         }
 
         $class = get_class($data);
-        if (isset($this->normalizerCache[$class][$format])) {
-            return $this->normalizerCache[$class][$format];
-        }
-
         foreach ($this->normalizers as $normalizer) {
-            try {
-                return $this->normalizerCache[$class][$format] = $normalizer->normalize($data, $format);
-            } catch (UnsupportedException $ex) {
-                // try next one
+            if ($normalizer->supportsNormalization($data, $format)) {
+                return $normalizer->normalize($data, $format);
             }
         }
 
@@ -96,17 +85,15 @@ class Serializer implements SerializerInterface
     /**
      * {@inheritDoc}
      */
-    public function denormalize($data, \ReflectionClass $class, $format)
+    public function denormalize($data, $type, $format = null)
     {
         if (!$this->normalizers) {
-            throw new \LogicException('You must register at least one normalizer to be able to normalize objects.');
+            throw new \LogicException('You must register at least one normalizer to be able to denormalize.');
         }
 
         foreach ($this->normalizers as $normalizer) {
-            try {
+            if ($normalizer->supportsDenormalization($data, $type, $format)) {
                 return $normalizer->denormalize($data, $class, $format);
-            } catch (UnsupportedException $ex) {
-                // try next one
             }
         }
 

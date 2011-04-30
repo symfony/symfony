@@ -30,19 +30,22 @@ interface NormalizerInterface
      * @return array|scalar
      * @api
      */
-    function normalize($data, $format);
+    function normalize($data, $format = null);
 
     /**
      * Denormalizes data back into an object of the given class
      *
-     * @param mixed            $data   data to restore
-     * @param \ReflectionClass $class  the expected class to instantiate
-     * @param string           $format format the given data was extracted from
+     * @param mixed  $data   data to restore
+     * @param string $class  the expected class to instantiate
+     * @param string $format format the given data was extracted from
      *
      * @throws UnsupportedException if input data, class, or format is not supported
      *
      * @return object
      * @api
      */
-    function denormalize($data, \ReflectionClass $class, $format = null);
+    function denormalize($data, $type, $format = null);
+
+    function supportsNormalization($data, $format = null);
+    function supportsDenormalization($data, $type, $format = null);
 }

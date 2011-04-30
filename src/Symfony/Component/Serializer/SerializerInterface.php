@@ -34,38 +34,42 @@ interface SerializerInterface
     /**
      * Unserializes the given data into the requested class
      *
-     * @param mixed            $data
-     * @param \ReflectionClass $class
-     * @param string           $format
+     * @param mixed  $data
+     * @param string $class
+     * @param string $format
      * @api
      */
-    function unserialize($data, \ReflectionClass $class, $format);
+    function unserialize($data, $type, $format);
 
     /**
      * Normalizes any data into a set of arrays/scalars
      *
      * @param mixed $data data to normalize
      * @param string $format format name, present to give the option to normalizers to act differently based on formats
-     * @return array|scalar
+     *
+     * @return mixed the returned data must not contain objects anymore
      * @api
      */
-    function normalize($data, $format);
+    function normalize($data, $format = null);
 
     /**
      * Denormalizes the given data into the requested class
      *
-     * @param mixed $data
-     * @param \ReflectionClass $class
+     * @param mixed  $data
+     * @param string $class
      * @param string $format
+     *
+     * @return mixed
      * @api
      */
-    function denormalize($data, \ReflectionClass $class, $format = null);
+    function denormalize($data, $type, $format = null);
 
     /**
      * Encodes data into the given format
      *
-     * @param mixed $data data to encode
+     * @param mixed  $data data to encode
      * @param string $format format name
+     *
      * @return array|scalar
      * @api
      */
@@ -76,6 +80,7 @@ interface SerializerInterface
      *
      * @param string $data data to decode
      * @param string $format format name
+     *
      * @return mixed
      * @api
      */

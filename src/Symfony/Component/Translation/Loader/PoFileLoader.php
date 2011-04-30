@@ -56,9 +56,6 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
         $defaults = array(
             'ids' => array(),
             'translated' => null,
-            'flags' => array(),
-            'comments' => array(),
-            'occurrences' => array()
         );
 
         $translated = array();
@@ -69,6 +66,17 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
 
             if ($line === '') {
                 $item = $defaults;
+
+                if (is_array($item['translated'])) {
+                    $translated[$item['ids']['singular']] = stripslashes($item['translated'][0]));
+                    if (isset($item['ids']['plural'])) {
+                        $translated[$item['ids']['plural']] = stripslashes(end($item['translated']));
+                    }
+                }
+                else {
+                    $translated[$item['ids']['singular']] = stripslashes($item['translated']);
+                }
+
             } elseif (substr($line, 0, 7) === 'msgid "') {
                 $item['ids']['singular'] = substr($line, 7, -1);
             } elseif (substr($line, 0, 8) === 'msgstr "') {
@@ -88,9 +96,6 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
                 $item['translated'][(integer) substr($line, 7, 1)] = substr($line, 11, -1);
             }
 
-            foreach ($item['ids'] as $id) {
-                $translated[$id] = stripslashes($item['translated']);
-            }
         }
 
         fclose($stream);

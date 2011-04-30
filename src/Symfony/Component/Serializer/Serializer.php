@@ -33,6 +33,7 @@ class Serializer implements SerializerInterface
 {
     private $normalizers = array();
     private $encoders = array();
+    private $normalizersCache = array();
 
     /**
      * {@inheritDoc}
@@ -73,8 +74,14 @@ class Serializer implements SerializerInterface
         }
 
         $class = get_class($data);
+        if (isset($this->normalizersCache[$class][$format])) {
+            return $this->normalizersCache[$class][$format];
+        }
+
         foreach ($this->normalizers as $normalizer) {
             if ($normalizer->supportsNormalization($data, $format)) {
+                $this->normalizersCache[$class][$format] = $normalizer;
+
                 return $normalizer->normalize($data, $format);
             }
         }
@@ -91,8 +98,14 @@ class Serializer implements SerializerInterface
             throw new \LogicException('You must register at least one normalizer to be able to denormalize.');
         }
 
+        if (isset($this->normalizersCache[$type][$format])) {
+            return $this->normalizersCache[$type][$format];
+        }
+
         foreach ($this->normalizers as $normalizer) {
             if ($normalizer->supportsDenormalization($data, $type, $format)) {
+                $this->normalizersCache[$type][$format] = $normalizer;
+
                 return $normalizer->denormalize($data, $class, $format);
             }
         }

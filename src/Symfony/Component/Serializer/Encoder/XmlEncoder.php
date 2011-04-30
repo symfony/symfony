@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  * @author John Wards <jwards@whiteoctober.co.uk>
  * @author Fabian Vogler <fabian@equivalence.ch>
  */
-class XmlEncoder extends SerializerAwareEncoder
+class XmlEncoder implements EncoderInterface
 {
     private $dom;
     private $format;
@@ -246,19 +246,7 @@ class XmlEncoder extends SerializerAwareEncoder
             }
             return $append;
         }
-        if (is_object($data)) {
-            $data = $this->serializer->normalize($data, $this->format);
-            if (null === $data || is_scalar($data)) {
-                // top level data object is normalized into a scalar
-                if (!$parentNode->parentNode->parentNode) {
-                    $root = $parentNode->parentNode;
-                    $root->removeChild($parentNode);
-                    return $this->appendNode($root, $data, $this->rootNodeName);
-                }
-                return $this->appendNode($parentNode, $data, 'data');
-            }
-            return $this->buildXml($parentNode, $data);
-        }
+
         throw new \UnexpectedValueException('An unexpected value could not be serialized: '.var_export($data, true));
     }
 
@@ -301,8 +289,6 @@ class XmlEncoder extends SerializerAwareEncoder
             $node->appendChild($child);
         } elseif ($val instanceof \Traversable) {
             $this->buildXml($node, $val);
-        } elseif (is_object($val)) {
-            return $this->buildXml($node, $this->serializer->normalize($val, $this->format));
         } elseif (is_numeric($val)) {
             return $this->appendText($node, (string) $val);
         } elseif (is_string($val)) {

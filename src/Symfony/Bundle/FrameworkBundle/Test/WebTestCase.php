@@ -55,7 +55,6 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function getPhpUnitXmlDir()
     {
-        $dir = null;
         if (!isset($_SERVER['argv']) || false === strpos($_SERVER['argv'][0], 'phpunit')) {
             throw new \RuntimeException('You must override the WebTestCase::createKernel() method.');
         }

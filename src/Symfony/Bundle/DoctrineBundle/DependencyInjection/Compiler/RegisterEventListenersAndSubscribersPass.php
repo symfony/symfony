@@ -40,7 +40,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         }
 
         foreach ($connections as $name) {
-            $this->getEventManager($name)->addMethodCall('addEventSubscriber', array(new Reference($subscriberId)));
+            $this->getEventManager($name, $subscriberId)->addMethodCall('addEventSubscriber', array(new Reference($subscriberId)));
         }
     }
 
@@ -67,14 +67,14 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         }
 
         foreach ($connections as $name => $events) {
-            $this->getEventManager($name)->addMethodCall('addEventListener', array(
+            $this->getEventManager($name, $listenerId)->addMethodCall('addEventListener', array(
                 array_unique($events),
                 new Reference($listenerId),
             ));
         }
     }
 
-    private function getEventManager($name)
+    private function getEventManager($name, $listenerId = null)
     {
         if (null === $this->eventManagers) {
             $this->eventManagers = array();

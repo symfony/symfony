@@ -82,8 +82,6 @@ class ProfilerListener
      */
     public function onCoreResponse(FilterResponseEvent $event)
     {
-        $response = $event->getResponse();
-
         if ($this->onlyMasterRequests && HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;
         }

@@ -103,7 +103,7 @@ class FieldType extends AbstractType
 
         $class = isset($options['data_class']) ? $options['data_class'] : null;
 
-        // If no data class is set explicitely and an object is passed as data,
+        // If no data class is set explicitly and an object is passed as data,
         // use the class of that object as data class
         if (!$class && isset($options['data']) && is_object($options['data'])) {
             $defaultOptions['data_class'] = $class = get_class($options['data']);

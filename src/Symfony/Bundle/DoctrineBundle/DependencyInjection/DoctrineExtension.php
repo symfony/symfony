@@ -71,6 +71,12 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
         $container->getDefinition('doctrine.dbal.connection_factory')->replaceArgument(0, $config['types']);
 
+        $connections = array();
+        foreach (array_keys($config['connections']) as $name) {
+            $connections[$name] = sprintf('doctrine.dbal.%s_connection', $name);
+        }
+        $container->setParameter('doctrine.dbal.connections', $connections);
+
         foreach ($config['connections'] as $name => $connection) {
             $this->loadDbalConnection($name, $connection, $container);
         }
@@ -102,7 +108,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 $mysqlSessionInit = new Definition('%doctrine.dbal.events.mysql_session_init.class%');
                 $mysqlSessionInit->setArguments(array($connection['charset']));
                 $mysqlSessionInit->setPublic(false);
-                $mysqlSessionInit->addTag(sprintf('doctrine.dbal.%s_event_subscriber', $name));
+                $mysqlSessionInit->addTag('doctrine.event_subscriber', array('connection' => $name));
 
                 $container->setDefinition(
                     sprintf('doctrine.dbal.%s_connection.events.mysqlsessioninit', $name),
@@ -142,10 +148,15 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('orm.xml');
 
-        $container->setParameter('doctrine.orm.entity_managers', $entityManagers = array_keys($config['entity_managers']));
+        $entityManagers = array();
+        foreach (array_keys($config['entity_managers']) as $name) {
+            $entityManagers[$name] = sprintf('doctrine.orm.%s_entity_manager', $name);
+        }
+        $container->setParameter('doctrine.orm.entity_managers', $entityManagers);
 
         if (empty($config['default_entity_manager'])) {
-            $config['default_entity_manager'] = reset($entityManagers);
+            $tmp = array_keys($entityManagers);
+            $config['default_entity_manager'] = reset($tmp);
         }
 
         $options = array('default_entity_manager', 'auto_generate_proxy_classes', 'proxy_dir', 'proxy_namespace');

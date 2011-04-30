@@ -82,7 +82,7 @@ class UploadedFile extends File
         }
 
         $this->path = realpath($path);
-        $this->originalName = $originalName;
+        $this->originalName = basename($originalName);
         $this->mimeType = $mimeType ?: 'application/octet-stream';
         $this->size = $size;
         $this->error = $error ?: UPLOAD_ERR_OK;

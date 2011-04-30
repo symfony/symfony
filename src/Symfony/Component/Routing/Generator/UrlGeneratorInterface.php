@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Routing\Generator;
 
+use Symfony\Component\Routing\RequestContextAwareInterface;
+
 /**
  * UrlGeneratorInterface is the interface that all URL generator classes must implements.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-interface UrlGeneratorInterface
+interface UrlGeneratorInterface extends RequestContextAwareInterface
 {
     /**
      * Generates a URL from the given parameters.

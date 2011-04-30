@@ -63,6 +63,17 @@ class Serializer implements SerializerInterface
             throw new \LogicException('You must register at least one normalizer to be able to normalize objects.');
         }
 
+        if (is_array($data) || $data instanceof \Traversable) {
+            $normalized = array();
+            foreach ($data as $k => $v) {
+                $normalized[$k] = $this->normalize($v, $format);
+            }
+
+            return $normalized;
+        } else if (null === $data || is_scalar($data)) {
+            return $data;
+        }
+
         foreach ($this->normalizers as $normalizer) {
             try {
                 return $normalizer->normalize($data, $format);

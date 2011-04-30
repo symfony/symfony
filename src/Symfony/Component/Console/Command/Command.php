@@ -110,7 +110,7 @@ class Command
      *
      * @return integer 0 if everything went fine, or an error code
      *
-     * @throws \LogicException When this abstract class is not implemented
+     * @throws \LogicException When this abstract method is not implemented
      * @see    setCode()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -349,7 +349,7 @@ class Command
     }
 
     /**
-     * Returns the command name
+     * Returns the command name.
      *
      * @return string The command name
      *

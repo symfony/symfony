@@ -208,7 +208,7 @@ class ProfilerController extends ContainerAware
         $profiler = $this->container->get('profiler');
         $profiler->disable();
 
-        $pofiler = $profiler->loadFromToken($token);
+        $profiler = $profiler->loadFromToken($token);
 
         $ip    = $this->container->get('request')->query->get('ip');
         $url   = $this->container->get('request')->query->get('url');

@@ -21,55 +21,55 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
 {
     private $container;
     private $router;
-    
+
     protected function setUp()
     {
         $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        // TODO: Change to Symfony\Component\Routing\RouterInterface once has setContext method
-        $this->router = $this->getMockBuilder('Symfony\Component\Routing\Router')
+        $this->router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')
                              ->disableOriginalConstructor()
                              ->getMock();
     }
-    
-    public function testConstructPortGetsPassedInRouterSetContext()
+
+    /**
+     * @dataProvider getPortData
+     */
+    public function testPort($defaultHttpPort, $defaultHttpsPort, $uri, $expectedHttpPort, $expectedHttpsPort)
     {
-        $listener = new RequestListener($this->container, $this->router, 99);
-        
+        $listener = new RequestListener($this->container, $this->router, $defaultHttpPort, $defaultHttpsPort);
+
         $expectedContext = new RequestContext();
-        $expectedContext->setHttpPort(99);
+        $expectedContext->setHttpPort($expectedHttpPort);
+        $expectedContext->setHttpsPort($expectedHttpsPort);
+        $expectedContext->setScheme(0 === strpos($uri, 'https') ? 'https' : 'http');
         $this->router->expects($this->once())
                      ->method('setContext')
                      ->with($expectedContext);
-        
-        $event = $this->createGetResponseEventForUri('http://localhost:99/');
+
+        $event = $this->createGetResponseEventForUri($uri);
         $listener->onCoreRequest($event);
     }
-    
-    public function testRequestPortGetsPassedInRouterSetContextIfNoConstructorPort()
+
+    public function getPortData()
     {
-        $listener = new RequestListener($this->container, $this->router);
-        
-        $expectedContext = new RequestContext();
-        $expectedContext->setHttpPort(99);
-        $this->router->expects($this->once())
-                     ->method('setContext')
-                     ->with($expectedContext);
-        
-        $event = $this->createGetResponseEventForUri('http://localhost:99/');
-        $listener->onCoreRequest($event);
+        return array(
+            array(80, 443, 'http://localhost/', 80, 443),
+            array(80, 443, 'http://localhost:90/', 90, 443),
+            array(80, 443, 'https://localhost/', 80, 443),
+            array(80, 443, 'https://localhost:90/', 80, 90),
+        );
     }
-    
+
     /**
      * @param string $uri
-     * @return GetResponseEvent 
+     *
+     * @return GetResponseEvent
      */
     private function createGetResponseEventForUri($uri)
     {
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
         $request = Request::create($uri);
         $request->attributes->set('_controller', null); // Prevents going in to routing process
-        $event = new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
-        
-        return $event;
+
+        return new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
     }
 }

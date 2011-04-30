@@ -143,7 +143,6 @@ class EntityChoiceList extends ArrayChoiceList
             $entities = $this->em->getRepository($this->class)->findAll();
         }
 
-        $propertyPath = null;
         $this->choices = array();
         $this->entities = array();
 

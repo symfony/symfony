@@ -445,7 +445,6 @@ class FrameworkExtension extends Extension
             }
 
             // Register translation resources
-            $resources = array();
             if ($dirs) {
                 $finder = new Finder();
                 $finder->files()->filter(function (\SplFileInfo $file) { return 2 === substr_count($file->getBasename(), '.'); })->in($dirs);

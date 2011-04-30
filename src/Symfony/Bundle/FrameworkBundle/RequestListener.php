@@ -82,8 +82,8 @@ class RequestListener
                 $request->getMethod(),
                 $request->getHost(),
                 $request->getScheme(),
-                $this->httpPort,
-                $this->httpsPort
+                $request->isSecure() ? $this->httpPort : $request->getPort(),
+                $request->isSecure() ? $request->getPort() : $this->httpsPort
             );
 
             if ($session = $request->getSession()) {

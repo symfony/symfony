@@ -8,6 +8,21 @@
 PR12 から beta1
 ---------------
 
+* CSRF シークレットの設定は、\ `secret` という必須のグローバル設定に変更されました（また、このシークレット値は CSRF 以外でも利用されます）
+
+    変更前:
+
+        framework:
+            csrf_protection:
+                secret: S3cr3t
+
+    変更後:
+
+        framework:
+            secret: S3cr3t
+
+* `File::getWebPath()` メソッドと `File::rename()` メソッドは削除されました。同様に `framework.document_root` コンフィギュレーションも削除されました。
+
 * `session` のコンフィギュレーションがリファクタリングされました
 
   * `class` オプションが削除されました（代わりに `session.class` パラメータを使ってください）
@@ -44,7 +59,7 @@ PR12 から beta1
         $container->removeDefinition('my_definition');
         $definition->replaceArgument(0, 'foo');
 
-* rememberme のコンフィギュレーションで、`token_provider key` サービスIDのサフィックスを指定するのではなく、サービスIDそのものを指定するように変更されました。
+* rememberme のコンフィギュレーションで、\ `token_provider key` サービスIDのサフィックスを指定するのではなく、サービスIDそのものを指定するように変更されました。
 
 PR11 から PR12
 --------------

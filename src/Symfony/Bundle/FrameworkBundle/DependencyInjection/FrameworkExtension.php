@@ -440,7 +440,7 @@ class FrameworkExtension extends Extension
                     $dirs[] = $dir;
                 }
             }
-            if (is_dir($dir = $container->getParameter('kernel.root_dir').'/translations')) {
+            if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/translations')) {
                 $dirs[] = $dir;
             }
 

@@ -41,7 +41,7 @@ class ProxyCacheWarmerTest extends \Symfony\Bundle\DoctrineBundle\Tests\TestCase
         $container->expects($this->at(2))
                   ->method('getParameter')
                   ->with($this->equalTo('doctrine.orm.entity_managers'))
-                  ->will($this->returnValue(array('default', 'foo')));
+                  ->will($this->returnValue(array('default' => 'doctrine.orm.default_entity_manager', 'foo' => 'doctrine.orm.foo_entity_manager')));
         $container->expects($this->at(3))
                   ->method('get')
                   ->with($this->equalTo('doctrine.orm.default_entity_manager'))

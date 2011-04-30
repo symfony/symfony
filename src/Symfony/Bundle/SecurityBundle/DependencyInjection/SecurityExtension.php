@@ -244,7 +244,6 @@ class SecurityExtension extends Extension
 
         // Register listeners
         $listeners = array();
-        $providers = array();
 
         // Channel listener
         $listeners[] = new Reference('security.channel_listener');

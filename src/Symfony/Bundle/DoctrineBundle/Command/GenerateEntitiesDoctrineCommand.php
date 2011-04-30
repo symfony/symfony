@@ -60,7 +60,7 @@ EOT
             $entityGenerator = $this->getEntityGenerator();
 
             foreach ($metadatas as $metadata) {
-                if ($filterEntity && $metadata->getReflClass()->getShortName() !== $filterEntity) {
+                if ($filterEntity && $metadata->getReflectionClass()->getShortName() !== $filterEntity) {
                     continue;
                 }
 

@@ -12,6 +12,7 @@
     <services>
         <service id="assetic.filter.compass" class="%assetic.filter.compass.class%">
             <tag name="assetic.filter" alias="compass" />
+            <argument>%assetic.read_from%</argument>
             <argument>%assetic.filter.compass.sass%</argument>
         </service>
     </services>

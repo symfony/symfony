@@ -32,15 +32,17 @@ class DropSchemaDoctrineCommand extends DropCommand
 
         $this
             ->setName('doctrine:schema:drop')
-            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.')
+            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
             ->setHelp(<<<EOT
-The <info>doctrine:schema:drop</info> command drops the default entity managers schema:
+The <info>doctrine:schema:drop</info> command drops the default entity
+managers schema:
 
-  <info>./app/console doctrine:schema:drop</info>
+<info>./app/console doctrine:schema:drop</info>
 
-You can also optionally specify the name of a entity manager to drop the schema for:
+You can also optionally specify the name of a entity manager to drop the
+schema for:
 
-  <info>./app/console doctrine:schema:drop --em=default</info>
+<info>./app/console doctrine:schema:drop --em=default</info>
 EOT
         );
     }

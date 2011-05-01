@@ -28,21 +28,23 @@ class GenerateEntitiesDoctrineCommand extends DoctrineCommand
     {
         $this
             ->setName('doctrine:generate:entities')
-            ->setDescription('Generate entity classes and method stubs from your mapping information.')
-            ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to initialize the entity or entities in.')
-            ->addOption('entity', null, InputOption::VALUE_OPTIONAL, 'The entity class to initialize (shortname without namespace).')
+            ->setDescription('Generate entity classes and method stubs from your mapping information')
+            ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to initialize the entity or entities in')
+            ->addOption('entity', null, InputOption::VALUE_OPTIONAL, 'The entity class to initialize (shortname without namespace)')
             ->setHelp(<<<EOT
-The <info>doctrine:generate:entities</info> command generates entity classes and method stubs from your mapping information:
+The <info>doctrine:generate:entities</info> command generates entity classes
+and method stubs from your mapping information:
 
 You have to limit generation of entities to an individual bundle:
 
-  <info>./app/console doctrine:generate:entities MyCustomBundle</info>
+<info>./app/console doctrine:generate:entities MyCustomBundle</info>
 
 Alternatively, you can limit generation to a single entity within a bundle:
 
-  <info>./app/console doctrine:generate:entities "MyCustomBundle" --entity="User"</info>
+<info>./app/console doctrine:generate:entities "MyCustomBundle" --entity="User"</info>
 
-You have to specify the shortname (without namespace) of the entity you want to filter for.
+You have to specify the shortname (without namespace) of the entity you want
+to filter for.
 EOT
         );
     }

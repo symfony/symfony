@@ -30,16 +30,18 @@ class ClearMetadataCacheDoctrineCommand extends MetadataCommand
 
         $this
             ->setName('doctrine:cache:clear-metadata')
-            ->setDescription('Clear all metadata cache for a entity manager.')
-            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.')
+            ->setDescription('Clear all metadata cache for a entity manager')
+            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
             ->setHelp(<<<EOT
-The <info>doctrine:cache:clear-metadata</info> command clears all metadata cache for the default entity manager:
+The <info>doctrine:cache:clear-metadata</info> command clears all metadata
+cache for the default entity manager:
 
-  <info>./app/console doctrine:cache:clear-metadata</info>
+<info>./app/console doctrine:cache:clear-metadata</info>
 
-You can also optionally specify the <comment>--em</comment> option to specify which entity manager to clear the cache for:
+You can also optionally specify the <comment>--em</comment> option to specify
+which entity manager to clear the cache for:
 
-  <info>./app/console doctrine:cache:clear-metadata --em=default</info>
+<info>./app/console doctrine:cache:clear-metadata --em=default</info>
 EOT
         );
     }

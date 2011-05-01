@@ -29,51 +29,107 @@ class GenerateEntitiesDoctrineCommand extends DoctrineCommand
         $this
             ->setName('doctrine:generate:entities')
             ->setDescription('Generate entity classes and method stubs from your mapping information')
-            ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to initialize the entity or entities in')
-            ->addOption('entity', null, InputOption::VALUE_OPTIONAL, 'The entity class to initialize (shortname without namespace)')
+            ->addArgument('name', InputArgument::REQUIRED, 'A bundle name, a namespace, or a class name')
             ->setHelp(<<<EOT
 The <info>doctrine:generate:entities</info> command generates entity classes
 and method stubs from your mapping information:
 
-You have to limit generation of entities to an individual bundle:
+You have to limit generation of entities:
 
-<info>./app/console doctrine:generate:entities MyCustomBundle</info>
+* To a bundle:
 
-Alternatively, you can limit generation to a single entity within a bundle:
+  <info>./app/console doctrine:generate:entities MyCustomBundle</info>
 
-<info>./app/console doctrine:generate:entities "MyCustomBundle" --entity="User"</info>
+* To a single entity:
 
-You have to specify the shortname (without namespace) of the entity you want
-to filter for.
+  <info>./app/console doctrine:generate:entities MyCustomBundle:User</info>
+  <info>./app/console doctrine:generate:entities MyCustomBundle/Entity/User</info>
+
+* To a namespace
+
+  <info>./app/console doctrine:generate:entities MyCustomBundle/Entity</info>
 EOT
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $bundleName = $input->getArgument('bundle');
-        $filterEntity = $input->getOption('entity');
+        try {
+            $bundle = $this->getApplication()->getKernel()->getBundle($input->getArgument('name'));
 
-        $foundBundle = $this->getApplication()->getKernel()->getBundle($bundleName);
+            $output->writeln(sprintf('Generating entities for bundle "<info>%s</info>"', $bundle->getName()));
+            list($metadatas, $path) = $this->getBundleInfo($bundle);
+        } catch (\InvalidArgumentException $e) {
+            $name = strtr($input->getArgument('name'), '/', '\\');
 
-        if ($metadatas = $this->getBundleMetadatas($foundBundle)) {
-            $output->writeln(sprintf('Generating entities for "<info>%s</info>"', $foundBundle->getName()));
-            $entityGenerator = $this->getEntityGenerator();
-
-            foreach ($metadatas as $metadata) {
-                if ($filterEntity && $metadata->getReflectionClass()->getShortName() !== $filterEntity) {
-                    continue;
-                }
-
-                if (strpos($metadata->name, $foundBundle->getNamespace()) === false) {
-                    throw new \RuntimeException(sprintf('Entity "%s" and bundle don\'t have a common namespace, generation failed because the target directory cannot be detected.', $metadata->name));
-                }
-
-                $output->writeln(sprintf('  > generating <comment>%s</comment>', $metadata->name));
-                $entityGenerator->generate(array($metadata), $this->findBasePathForBundle($foundBundle));
+            if (false !== strpos($name, ':')) {
+                $name = $this->getAliasedClassName($name);
             }
-        } else {
-            throw new \RuntimeException(sprintf('Bundle "%s" does not contain any mapped entities.', $bundleName));
+
+            if (class_exists($name)) {
+                $output->writeln(sprintf('Generating entity "<info>%s</info>"', $name));
+                list($metadatas, $path) = $this->getClassInfo($name);
+            } else {
+                $output->writeln(sprintf('Generating entities for namespace "<info>%s</info>"', $name));
+                list($metadatas, $path) = $this->getNamespaceInfo($name);
+            }
         }
+
+        $generator = $this->getEntityGenerator();
+        foreach ($metadatas as $metadata) {
+            $output->writeln(sprintf('  > generating <comment>%s</comment>', $metadata->name));
+            $generator->generate(array($metadata), $path);
+
+            if ($metadata->customRepositoryClassName) {
+                if (false === strpos($metadata->customRepositoryClassName, $namespace)) {
+                    continue
+                }
+
+                $generator->writeEntityRepositoryClass($metadata->customRepositoryClassName, $path);
+            }
+        }
+    }
+
+    private function getBundleInfo($bundle)
+    {
+        $namespace = $bundle->getNamespace();
+        if (!$metadatas = $this->findMetadatasByNamespace($namespace)) {
+            throw new \RuntimeException(sprintf('Bundle "%s" does not contain any mapped entities.', $bundle->getName()));
+        }
+
+        $path = $this->findBasePathForClass($bundle->getName(), $bundle->getNamespace(), $bundle->getPath());
+
+        return array($metadatas, $path);
+    }
+
+    private function getClassInfo($class)
+    {
+        if (!$metadatas = $this->findMetadatasByClass($class)) {
+            throw new \RuntimeException(sprintf('Entity "%s" is not a mapped entity.', $class));
+        }
+
+        $r = $metadatas[$class]->getReflectionClass();
+        if (!$r) {
+            throw new \RuntimeException('Unable to determine where to save the "%s" class.', $class);
+        }
+        $path = $this->findBasePathForClass($class, $r->getNamespacename(), dirname($r->getFilename()));
+
+        return array($metadatas, $path);
+    }
+
+    private function getNamespaceInfo($namespace)
+    {
+        if (!$metadatas = $this->findMetadatasByNamespace($namespace)) {
+            throw new \RuntimeException(sprintf('Namespace "%s" does not contain any mapped entities.', $namespace));
+        }
+
+        $first = reset($metadatas);
+        $r = $first->getReflectionClass();
+        if (!$r) {
+            throw new \RuntimeException('Unable to determine where to save the "%s" class.', $class);
+        }
+        $path = $this->findBasePathForClass($namespace, $r->getNamespacename(), dirname($r->getFilename()));
+
+        return array($metadatas, $path);
     }
 }

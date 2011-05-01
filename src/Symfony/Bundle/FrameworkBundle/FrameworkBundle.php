@@ -60,7 +60,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new AddCacheWarmerPass());
 
         if ($container->getParameter('kernel.debug')) {
-            $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_BEFORE_REMOVING);
+            $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_AFTER_REMOVING);
             $container->addCompilerPass(new CompilerDebugDumpPass(), PassConfig::TYPE_AFTER_REMOVING);
         }
     }

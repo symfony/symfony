@@ -9,41 +9,41 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineBundle\Command;
+namespace Symfony\Bundle\DoctrineBundle\Command\Proxy;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
-use Doctrine\ORM\Tools\Console\Command\ConvertMappingCommand;
+use Doctrine\DBAL\Tools\Console\Command\RunSqlCommand;
 
 /**
- * Convert Doctrine ORM metadata mapping information between the various supported
- * formats.
+ * Execute a SQL query and output the results.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jonathan H. Wage <jonwage@gmail.com>
  */
-class ConvertMappingDoctrineCommand extends ConvertMappingCommand
+class RunSqlDoctrineCommand extends RunSqlCommand
 {
     protected function configure()
     {
         parent::configure();
-        $this
-            ->setName('doctrine:mapping:convert')
-            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.')
-            ->setHelp(<<<EOT
-The <info>doctrine:mapping:convert</info> command converts mapping information between supported formats:
 
-  <info>./app/console doctrine:mapping:convert xml /path/to/output</info>
+        $this
+            ->setName('doctrine:query:sql')
+            ->addOption('connection', null, InputOption::VALUE_OPTIONAL, 'The connection to use for this command.')
+            ->setHelp(<<<EOT
+The <info>doctrine:query:sql</info> command executes the given DQL query and outputs the results:
+
+  <info>./app/console doctrine:query:sql "SELECT * from user"</info>
 EOT
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->setApplicationEntityManager($input->getOption('em'));
+        DoctrineCommandHelper::setApplicationConnection($this->getApplication(), $input->getOption('connection'));
 
         return parent::execute($input, $output);
     }

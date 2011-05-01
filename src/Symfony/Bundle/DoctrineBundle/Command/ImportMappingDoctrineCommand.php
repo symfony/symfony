@@ -74,8 +74,8 @@ EOT
             $exporter->setEntityGenerator($entityGenerator);
         }
 
-        $this->setApplicationEntityManager($input->getOption('em'));
-        $em = $this->getHelper('em')->getEntityManager();
+        $em = $this->getEntityManager($input->getOption('em'));
+
         $databaseDriver = new DatabaseDriver($em->getConnection()->getSchemaManager());
         $em->getConfiguration()->setMetadataDriverImpl($databaseDriver);
 

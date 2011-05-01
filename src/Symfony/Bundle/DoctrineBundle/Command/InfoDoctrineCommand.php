@@ -47,9 +47,8 @@ EOT
     {
         $entityManagerName = $input->getOption('em') ? $input->getOption('em') : $this->container->getParameter('doctrine.orm.default_entity_manager');
 
-        $this->setApplicationEntityManager($input->getOption('em'));
         /* @var $entityManager Doctrine\ORM\EntityManager */
-        $entityManager = $this->getHelper('em')->getEntityManager();
+        $entityManager = $this->getEntityManager($input->getOption('em'));
 
         $entityClassNames = $entityManager->getConfiguration()
                                           ->getMetadataDriverImpl()

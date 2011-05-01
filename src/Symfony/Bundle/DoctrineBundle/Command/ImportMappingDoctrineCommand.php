@@ -103,7 +103,8 @@ EOT
                 file_put_contents($path, $code);
             }
         } else {
-            $output->writeln('Database does not have any mapping information.'.PHP_EOL, 'ERROR');
+            $output->writeln('Database does not have any mapping information.', 'ERROR');
+            $output->writeln('', 'ERROR');
         }
     }
 }

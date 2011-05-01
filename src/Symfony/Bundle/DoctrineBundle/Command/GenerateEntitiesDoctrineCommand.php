@@ -65,16 +65,14 @@ EOT
                 }
 
                 if (strpos($metadata->name, $foundBundle->getNamespace()) === false) {
-                    throw new \RuntimeException(
-                        "Entity " . $metadata->name . " and bundle don't have a common namespace, ".
-                        "generation failed because the target directory cannot be detected.");
+                    throw new \RuntimeException(sprintf('Entity "%s" and bundle don\'t have a common namespace, generation failed because the target directory cannot be detected.', $metadata->name));
                 }
 
                 $output->writeln(sprintf('  > generating <comment>%s</comment>', $metadata->name));
                 $entityGenerator->generate(array($metadata), $this->findBasePathForBundle($foundBundle));
             }
         } else {
-            throw new \RuntimeException("Bundle " . $bundleName . " does not contain any mapped entities.");
+            throw new \RuntimeException(sprintf('Bundle "%s" does not contain any mapped entities.', $bundleName));
         }
     }
 }

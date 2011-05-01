@@ -59,9 +59,7 @@ EOT
 
                 if ($metadata->customRepositoryClassName) {
                     if (strpos($metadata->customRepositoryClassName, $foundBundle->getNamespace()) === false) {
-                        throw new \RuntimeException(
-                            "Repository " . $metadata->customRepositoryClassName . " and bundle don't have a common namespace, ".
-                            "generation failed because the target directory cannot be detected.");
+                        throw new \RuntimeException(sprintf('Repository "%s" and bundle don\'t have a common namespace, generation failed because the target directory cannot be detected.', $metadata->customRepositoryClassName));
                     }
 
                     $output->writeln(sprintf('  > <info>OK</info> generating <comment>%s</comment>', $metadata->customRepositoryClassName));
@@ -71,7 +69,7 @@ EOT
                 }
             }
         } else {
-            throw new \RuntimeException("Bundle " . $bundleName . " does not contain any mapped entities.");
+            throw new \RuntimeException(sprintf('Bundle "%s" does not contain any mapped entities.', $bundleName));
         }
     }
 }

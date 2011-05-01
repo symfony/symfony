@@ -11,13 +11,10 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Command;
 
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\Output;
-use Symfony\Component\HttpKernel\Util\Filesystem;
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
 
 /**
  * Database tool allows you to easily drop and create your configured databases.
@@ -50,11 +47,11 @@ EOT
         $connection = $this->getDoctrineConnection($input->getOption('connection'));
 
         $params = $connection->getParams();
-        $name = isset($params['path']) ? $params['path']:$params['dbname'];
+        $name = isset($params['path']) ? $params['path'] : $params['dbname'];
 
         unset($params['dbname']);
 
-        $tmpConnection = \Doctrine\DBAL\DriverManager::getConnection($params);
+        $tmpConnection = DriverManager::getConnection($params);
 
         try {
             $tmpConnection->getSchemaManager()->createDatabase($name);

@@ -16,9 +16,11 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Config\FileLocator;
 
 /**
  * A console command for retrieving information about services
@@ -28,7 +30,7 @@ use Symfony\Component\DependencyInjection\Definition;
 class ContainerDebugCommand extends Command
 {
     /**
-     * @var \Symfony\Component\DependencyInjection\ContainerBuilder
+     * @var ContainerBuilder
      */
     private $containerBuilder;
 
@@ -78,8 +80,7 @@ EOF
         if ($name) {
             $this->outputService($output, $name);
         } else {
-            $showPrivate = $input->getOption('show-private');
-            $this->outputServices($output, $serviceIds, $showPrivate);
+            $this->outputServices($output, $serviceIds, $input->getOption('show-private'));
         }
     }
 
@@ -94,7 +95,7 @@ EOF
 
         $output->writeln($this->getHelper('formatter')->formatSection('container', $label));
 
-        // loop through to find get space needed and filter private services
+        // loop through to get space needed and filter private services
         $maxName = 4;
         $maxScope = 6;
         foreach ($serviceIds as $key => $serviceId) {
@@ -174,18 +175,24 @@ EOF
     /**
      * Loads the ContainerBuilder from the cache.
      *
-     * @see ContainerBuilderDebugDumpPass
-     * @return \Symfony\Component\DependencyInjection\ContainerBuilder
+     * @return ContainerBuilder
      */
     private function getContainerBuilder()
     {
-        $cachedFile = ContainerBuilderDebugDumpPass::getBuilderCacheFilename($this->container);
+        if (!$this->getApplication()->getKernel()->isDebug()) {
+            throw new \LogicException(sprintf('Debug information about the container is only available in debug mode.'));
+        }
 
-        if (!file_exists($cachedFile)) {
+        if (!file_exists($cachedFile = $this->container->getParameter('debug.container.dump'))) {
             throw new \LogicException(sprintf('Debug information about the container could not be found. Please clear the cache and try again.'));
         }
 
-        return unserialize(file_get_contents($cachedFile));
+        $container = new ContainerBuilder();
+
+        $loader = new XmlFileLoader($container, new FileLocator());
+        $loader->load($cachedFile);
+
+        return $container;
     }
 
     /**

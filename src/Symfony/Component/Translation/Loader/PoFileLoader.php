@@ -44,7 +44,7 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
      * - Translator and extracted comments are treated as being the same type.
      * - Message IDs are allowed to have other encodings as just US-ASCII.
      *
-     * Items with an empty id are ignored. For more information see `merge()`.
+     * Items with an empty id are ignored.
      *
      * @param resource $stream
      * @return array
@@ -66,12 +66,12 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
 
             if ($line === '') {
                 if (is_array($item['translated'])) {
-                    $translated[$item['ids']['singular']] = stripslashes($item['translated'][0]));
+                    $translated[$item['ids']['singular']] = stripslashes($item['translated'][0]);
                     if (isset($item['ids']['plural'])) {
                         $translated[$item['ids']['plural']] = stripslashes(end($item['translated']));
                     }
                 }
-                else {
+                elseif($item['ids']['singular']) {
                     $translated[$item['ids']['singular']] = stripslashes($item['translated']);
                 }
                 $item = $defaults;

@@ -56,7 +56,7 @@ EOT
 
         $params = $connection->getParams();
 
-        $name = isset($params['path'])?$params['path']:(isset($params['dbname'])?$params['dbname']:false);
+        $name = isset($params['path']) ? $params['path'] : (isset($params['dbname']) ? $params['dbname'] : false);
 
         if (!$name) {
             throw new \InvalidArgumentException("Connection does not contain a 'path' or 'dbname' parameter and cannot be dropped.");
@@ -71,7 +71,8 @@ EOT
                 $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
             }
         } else {
-            $output->writeln('<error>ATTENTION:</error> This operation should not be executed in a production environment.' . PHP_EOL);
+            $output->writeln('<error>ATTENTION:</error> This operation should not be executed in a production environment.');
+            $output->writeln('');
             $output->writeln(sprintf('<info>Would drop the database named <comment>%s</comment>.</info>', $name));
             $output->writeln('Please run the operation with --force to execute');
             $output->writeln('<error>All data will be lost!</error>');

@@ -45,14 +45,11 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $entityManagerName = $input->getOption('em') ?
-            $input->getOption('em') :
-            $this->container->getParameter('doctrine.orm.default_entity_manager');
+        $entityManagerName = $input->getOption('em') ? $input->getOption('em') : $this->container->getParameter('doctrine.orm.default_entity_manager');
 
-        $entityManagerService = sprintf('doctrine.orm.%s_entity_manager', $entityManagerName);
-
+        $this->setApplicationEntityManager($input->getOption('em'));
         /* @var $entityManager Doctrine\ORM\EntityManager */
-        $entityManager = $this->container->get($entityManagerService);
+        $entityManager = $this->getHelper('em')->getEntityManager();
 
         $entityClassNames = $entityManager->getConfiguration()
                                           ->getMetadataDriverImpl()

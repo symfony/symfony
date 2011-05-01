@@ -9,45 +9,45 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineBundle\Command;
+namespace Symfony\Bundle\DoctrineBundle\Command\Proxy;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
-use Doctrine\ORM\Tools\Console\Command\SchemaTool\DropCommand;
+use Doctrine\ORM\Tools\Console\Command\SchemaTool\CreateCommand;
 
 /**
- * Command to drop the database schema for a set of classes based on their mappings.
+ * Command to create the database schema for a set of classes based on their mappings.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jonathan H. Wage <jonwage@gmail.com>
  */
-class DropSchemaDoctrineCommand extends DropCommand
+class CreateSchemaDoctrineCommand extends CreateCommand
 {
     protected function configure()
     {
         parent::configure();
 
         $this
-            ->setName('doctrine:schema:drop')
+            ->setName('doctrine:schema:create')
             ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.')
             ->setHelp(<<<EOT
-The <info>doctrine:schema:drop</info> command drops the default entity managers schema:
+The <info>doctrine:schema:create</info> command creates the default entity managers schema:
 
-  <info>./app/console doctrine:schema:drop</info>
+  <info>./app/console doctrine:schema:create</info>
 
-You can also optionally specify the name of a entity manager to drop the schema for:
+You can also optionally specify the name of a entity manager to create the schema for:
 
-  <info>./app/console doctrine:schema:drop --em=default</info>
+  <info>./app/console doctrine:schema:create --em=default</info>
 EOT
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->setApplicationEntityManager($input->getOption('em'));
+        DoctrineCommandHelper::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
 
         parent::execute($input, $output);
     }

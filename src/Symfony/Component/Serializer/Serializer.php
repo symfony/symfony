@@ -34,6 +34,7 @@ class Serializer implements SerializerInterface
     private $normalizers = array();
     private $encoders = array();
     private $normalizersCache = array();
+    private $denormalizersCache = array();
 
     /**
      * {@inheritDoc}
@@ -75,7 +76,7 @@ class Serializer implements SerializerInterface
 
         $class = get_class($data);
         if (isset($this->normalizersCache[$class][$format])) {
-            return $this->normalizersCache[$class][$format];
+            return $this->normalizersCache[$class][$format]->normalize($data, $format);
         }
 
         foreach ($this->normalizers as $normalizer) {
@@ -99,12 +100,12 @@ class Serializer implements SerializerInterface
         }
 
         if (isset($this->normalizersCache[$type][$format])) {
-            return $this->normalizersCache[$type][$format];
+            return $this->denormalizersCache[$type][$format]->denormalize($type, $format);
         }
 
         foreach ($this->normalizers as $normalizer) {
             if ($normalizer->supportsDenormalization($data, $type, $format)) {
-                $this->normalizersCache[$type][$format] = $normalizer;
+                $this->denormalizersCache[$type][$format] = $normalizer;
 
                 return $normalizer->denormalize($data, $class, $format);
             }

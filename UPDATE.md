@@ -38,27 +38,29 @@ beta1 to beta2
 
   After:
 
+    use Doctrine\ORM\Mapping as ORM;
+    use Symfony\Component\Validator\Constraints as Assert;
+
     /**
-     * @import("Doctrine\ORM\Mapping\*")
-     * @import("Doctrine\ODM\MongoDB\Mapping\*", alias="mongodb")
-     * @import("Symfony\Component\Validator\Constraints\*")
      * @ignorePhpDoc
-     * @Entity
+     *
+     * @ORM\Entity
      */
     class MyUser
     {
         /**
-         * @Id
-         * @mongodb:Id
-         * @GeneratedValue(strategy="AUTO")
-         * @Column(type="integer")
+         * @ORM\Id
+         * @ORM\GeneratedValue(strategy="AUTO")
+         * @ORM\Column(type="integer")
+         *
          * @var integer
          */
         private $id;
 
         /**
-         * @Column(type="string", nullable=false)
-         * @NotBlank
+         * @ORM\Column(type="string", nullable=false)
+         * @Assert\NotBlank
+         *
          * @var string
          */
         private $name;
@@ -78,6 +80,8 @@ beta1 to beta2
     private $foo;
 
   After:
+
+    use Symfony\Component\Validator\Constraints\Callback;
 
     /**
      * @Callback(...)

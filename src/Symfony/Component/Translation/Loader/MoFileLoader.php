@@ -13,7 +13,8 @@ namespace Symfony\Component\Translation\Loader;
 
 use Symfony\Component\Config\Resource\FileResource;
 
-class MoFileLoader extends ArrayLoader implements LoaderInterface {
+class MoFileLoader extends ArrayLoader implements LoaderInterface
+{
 
     /**
      * Magic used for validating the format of a MO file as well as
@@ -38,7 +39,8 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface {
      */
     const MO_HEADER_SIZE = 28;
 
-    public function load($resource, $locale, $domain = 'messages') {
+    public function load($resource, $locale, $domain = 'messages')
+    {
 
         $messages = $this->parse($resource);
 
@@ -66,9 +68,10 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface {
      * @return array
      * @throws InvalidArgumentException If stream content has an invalid format.
      */
-    protected function parse($resource) {
+    protected function parse($resource)
+    {
 
-        $stream = fopen($resource, 'r+');
+        $stream = fopen($resource, 'r');
 
         $stat = fstat($stream);
 
@@ -95,10 +98,10 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface {
             'offsetHashes' => null,
         );
         foreach ($header as &$value) {
-            $value = $this->_readLong($stream, $isBigEndian);
+            $value = $this->readLong($stream, $isBigEndian);
         }
         extract($header);
-        $data = array();
+        $messages = array();
 
         for ($i = 0; $i < $count; $i++) {
             $singularId = $pluralId = null;
@@ -106,8 +109,8 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface {
 
             fseek($stream, $offsetId + $i * 8);
 
-            $length = $this->_readLong($stream, $isBigEndian);
-            $offset = $this->_readLong($stream, $isBigEndian);
+            $length = $this->readLong($stream, $isBigEndian);
+            $offset = $this->readLong($stream, $isBigEndian);
 
             if ($length < 1) {
                 continue;
@@ -121,8 +124,8 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface {
             }
 
             fseek($stream, $offsetTranslated + $i * 8);
-            $length = $this->_readLong($stream, $isBigEndian);
-            $offset = $this->_readLong($stream, $isBigEndian);
+            $length = $this->readLong($stream, $isBigEndian);
+            $offset = $this->readLong($stream, $isBigEndian);
 
             fseek($stream, $offset);
             $translated = fread($stream, $length);
@@ -132,17 +135,22 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface {
             }
 
             $ids = array('singular' => $singularId, 'plural' => $pluralId);
-            $data = $this->merge($data, compact('ids', 'translated'));
+            $item = compact('ids', 'translated');
+
+            if (is_array($item['translated'])) {
+                $messages[$item['ids']['singular']] = stripslashes($item['translated'][0]);
+                if (isset($item['ids']['plural'])) {
+                    $messages[$item['ids']['plural']] = stripslashes(end($item['translated']));
+                }
+            }
+            elseif($item['ids']['singular']) {
+                $messages[$item['ids']['singular']] = stripslashes($item['translated']);
+            }
         }
 
         fclose($stream);
 
-        foreach ($data as $id => $item) {
-
-			$data[$id] = $item['translated'];
-        }
-
-        return $data;
+        return array_filter($messages);
     }
 
     /**
@@ -152,74 +160,10 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface {
      * @param boolean $isBigEndian
      * @return integer
      */
-    protected function _readLong($stream, $isBigEndian) {
+    protected function readLong($stream, $isBigEndian) {
         $result = unpack($isBigEndian ? 'N1' : 'V1', fread($stream, 4));
         $result = current($result);
         return (integer) substr($result, -8);
-    }
-
-
-
-    /**
-     * Merges an item into given data and unescapes fields.
-     *
-     * Please note that items with an id containing exclusively whitespace characters
-     * or are empty are **not** being merged. Whitespace characters are space, tab, vertical
-     * tab, line feed, carriage return and form feed.
-     *
-     * @param array $data Data to merge item into.
-     * @param array $item Item to merge into $data.
-     * @return array The merged data.
-     */
-    protected function merge(array $data, array $item) {
-        $filter = function ($value) use (&$filter) {
-            if (is_array($value)) {
-                return array_map($filter, $value);
-            }
-            return stripcslashes($value);
-        };
-        $fields = array('id', 'ids', 'translated');
-
-        foreach ($fields as $field) {
-            if (isset($item[$field])) {
-                $item[$field] = $filter($item[$field]);
-            }
-        }
-        if (isset($item['ids']['singular'])) {
-            $item['id'] = $item['ids']['singular'];
-        }
-        if (empty($item['id']) || ctype_space($item['id'])) {
-            return $data;
-        }
-
-                if (!isset($item['id'])) {
-            return $data;
-        }
-        $id = $item['id'];
-
-        $defaults = array(
-            'ids' => array(),
-            'translated' => null,
-            'flags' => array(),
-            'comments' => array(),
-            'occurrences' => array()
-        );
-        $item += $defaults;
-
-        if (!isset($data[$id])) {
-            $data[$id] = $item;
-            return $data;
-        }
-        foreach (array('ids', 'flags', 'comments', 'occurrences') as $field) {
-            $data[$id][$field] = array_merge($data[$id][$field], $item[$field]);
-        }
-        if (!isset($data[$id]['translated'])) {
-            $data[$id]['translated'] = $item['translated'];
-        } elseif (is_array($item['translated'])) {
-            $data[$id]['translated'] = (array) $data[$id]['translated'] + $item['translated'];
-        }
-
-        return $data;
     }
 
 }

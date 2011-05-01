@@ -13,7 +13,8 @@ namespace Symfony\Component\Translation\Loader;
 
 use Symfony\Component\Config\Resource\FileResource;
 
-class PoFileLoader extends ArrayLoader implements LoaderInterface {
+class PoFileLoader extends ArrayLoader implements LoaderInterface
+{
 
     public function load($resource, $locale, $domain = 'messages')
     {
@@ -60,7 +61,7 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
             'translated' => null,
         );
 
-        $translated = array();
+        $messages = array();
         $item = $defaults;
 
         while ($line = fgets($stream)) {
@@ -68,13 +69,13 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
 
             if ($line === '') {
                 if (is_array($item['translated'])) {
-                    $translated[$item['ids']['singular']] = stripslashes($item['translated'][0]);
+                    $messages[$item['ids']['singular']] = stripslashes($item['translated'][0]);
                     if (isset($item['ids']['plural'])) {
-                        $translated[$item['ids']['plural']] = stripslashes(end($item['translated']));
+                        $messages[$item['ids']['plural']] = stripslashes(end($item['translated']));
                     }
                 }
                 elseif($item['ids']['singular']) {
-                    $translated[$item['ids']['singular']] = stripslashes($item['translated']);
+                    $messages[$item['ids']['singular']] = stripslashes($item['translated']);
                 }
                 $item = $defaults;
 
@@ -101,6 +102,6 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
 
         fclose($stream);
 
-        return array_filter($translated);
+        return array_filter($messages);
     }
  }

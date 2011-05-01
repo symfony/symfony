@@ -9,45 +9,45 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineBundle\Command;
+namespace Symfony\Bundle\DoctrineBundle\Command\Proxy;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
-use Doctrine\ORM\Tools\Console\Command\SchemaTool\CreateCommand;
+use Doctrine\ORM\Tools\Console\Command\EnsureProductionSettingsCommand;
 
 /**
- * Command to create the database schema for a set of classes based on their mappings.
+ * Ensure the Doctrine ORM is configured properly for a production environment.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jonathan H. Wage <jonwage@gmail.com>
  */
-class CreateSchemaDoctrineCommand extends CreateCommand
+class EnsureProductionSettingsDoctrineCommand extends EnsureProductionSettingsCommand
 {
     protected function configure()
     {
         parent::configure();
 
         $this
-            ->setName('doctrine:schema:create')
+            ->setName('doctrine:ensure-production-settings')
             ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.')
             ->setHelp(<<<EOT
-The <info>doctrine:schema:create</info> command creates the default entity managers schema:
+The <info>doctrine:ensure-production-settings</info> command ensures that Doctrine is properly configured for a production environment.:
 
-  <info>./app/console doctrine:schema:create</info>
+  <info>./app/console doctrine:ensure-production-settings</info>
 
-You can also optionally specify the name of a entity manager to create the schema for:
+You can also optionally specify the <comment>--em</comment> option to specify which entity manager to use:
 
-  <info>./app/console doctrine:schema:create --em=default</info>
+  <info>./app/console doctrine:ensure-production-settings --em=default</info>
 EOT
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        DoctrineCommand::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
+        DoctrineCommandHelper::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
 
         parent::execute($input, $output);
     }

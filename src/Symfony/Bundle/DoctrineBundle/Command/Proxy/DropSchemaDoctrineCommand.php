@@ -9,42 +9,46 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineBundle\Command;
+namespace Symfony\Bundle\DoctrineBundle\Command\Proxy;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
-use Doctrine\ORM\Tools\Console\Command\ConvertMappingCommand;
+use Doctrine\ORM\Tools\Console\Command\SchemaTool\DropCommand;
 
 /**
- * Convert Doctrine ORM metadata mapping information between the various supported
- * formats.
+ * Command to drop the database schema for a set of classes based on their mappings.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jonathan H. Wage <jonwage@gmail.com>
  */
-class ConvertMappingDoctrineCommand extends ConvertMappingCommand
+class DropSchemaDoctrineCommand extends DropCommand
 {
     protected function configure()
     {
         parent::configure();
+
         $this
-            ->setName('doctrine:mapping:convert')
+            ->setName('doctrine:schema:drop')
             ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.')
             ->setHelp(<<<EOT
-The <info>doctrine:mapping:convert</info> command converts mapping information between supported formats:
+The <info>doctrine:schema:drop</info> command drops the default entity managers schema:
 
-  <info>./app/console doctrine:mapping:convert xml /path/to/output</info>
+  <info>./app/console doctrine:schema:drop</info>
+
+You can also optionally specify the name of a entity manager to drop the schema for:
+
+  <info>./app/console doctrine:schema:drop --em=default</info>
 EOT
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        DoctrineCommand::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
+        DoctrineCommandHelper::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
 
-        return parent::execute($input, $output);
+        parent::execute($input, $output);
     }
 }

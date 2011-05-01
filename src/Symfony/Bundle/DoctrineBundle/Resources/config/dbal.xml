@@ -26,6 +26,8 @@
 
         <service id="data_collector.doctrine" class="%doctrine.data_collector.class%" public="false">
             <tag name="data_collector" template="DoctrineBundle:Collector:db" id="db" />
+            <argument>%doctrine.dbal.connections%</argument>
+            <argument>%doctrine.orm.entity_managers%</argument>
             <argument type="service" id="doctrine.dbal.logger" />
         </service>
 
@@ -35,8 +37,8 @@
 
         <service id="doctrine.dbal.connection" class="%doctrine.dbal.connection.class%" factory-service="doctrine.dbal.connection_factory" factory-method="createConnection" abstract="true" />
 
-        <service id="doctrine.dbal.connection.event_manager" class="%doctrine.dbal.connection.event_manager.class%" abstract="true" />
+        <service id="doctrine.dbal.connection.event_manager" class="%doctrine.dbal.connection.event_manager.class%" public="false" abstract="true" />
 
-        <service id="doctrine.dbal.connection.configuration" class="%doctrine.dbal.configuration.class%" abstract="true" />
+        <service id="doctrine.dbal.connection.configuration" class="%doctrine.dbal.configuration.class%" public="false" abstract="true" />
     </services>
 </container>

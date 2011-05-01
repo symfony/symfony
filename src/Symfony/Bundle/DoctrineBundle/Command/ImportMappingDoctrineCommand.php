@@ -74,7 +74,8 @@ EOT
             $exporter->setEntityGenerator($entityGenerator);
         }
 
-        $em = $this->getEntityManager($this->container, $input->getOption('em'));
+        $em = $this->getEntityManager($input->getOption('em'));
+
         $databaseDriver = new DatabaseDriver($em->getConnection()->getSchemaManager());
         $em->getConfiguration()->setMetadataDriverImpl($databaseDriver);
 
@@ -102,7 +103,8 @@ EOT
                 file_put_contents($path, $code);
             }
         } else {
-            $output->writeln('Database does not have any mapping information.'.PHP_EOL, 'ERROR');
+            $output->writeln('Database does not have any mapping information.', 'ERROR');
+            $output->writeln('', 'ERROR');
         }
     }
 }

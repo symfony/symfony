@@ -23,10 +23,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class TwigExtensionTest extends TestCase
 {
-    /**
-     * @dataProvider getFormats
-     */
-    public function testLoadEmptyConfiguration($format)
+    public function testLoadEmptyConfiguration()
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());

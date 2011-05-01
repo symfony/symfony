@@ -23,10 +23,14 @@ use Symfony\Bundle\DoctrineBundle\Logger\DbalLogger;
  */
 class DoctrineDataCollector extends DataCollector
 {
-    protected $logger;
+    private $connections;
+    private $managers;
+    private $logger;
 
-    public function __construct(DbalLogger $logger = null)
+    public function __construct($connections, $managers, DbalLogger $logger = null)
     {
+        $this->connections = $connections;
+        $this->managers = $managers;
         $this->logger = $logger;
     }
 
@@ -36,8 +40,20 @@ class DoctrineDataCollector extends DataCollector
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         $this->data = array(
-            'queries' => null !== $this->logger ? $this->logger->queries : array(),
+            'queries'     => null !== $this->logger ? $this->logger->queries : array(),
+            'connections' => $this->connections,
+            'managers'    => $this->managers,
         );
+    }
+
+    public function getManagers()
+    {
+        return $this->data['managers'];
+    }
+
+    public function getConnections()
+    {
+        return $this->data['connections'];
     }
 
     public function getQueryCount()

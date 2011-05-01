@@ -44,6 +44,16 @@ beta1 to beta2
     Before: array('default', 'foo')
     After:  array('default' => 'doctrine.orm.default_entity_manager', 'foo' => 'doctrine.orm.foo_entity_manager'))
 
+* Application translations are now stored in the `Resources` directory:
+
+    Before:
+
+      app/translations/catalogue.fr.xml
+
+    After:
+
+      app/Resources/translations/catalogue.fr.xml
+
 PR12 to beta1
 -------------
 

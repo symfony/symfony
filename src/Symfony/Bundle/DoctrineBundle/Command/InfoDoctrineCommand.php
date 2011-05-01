@@ -45,14 +45,10 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $entityManagerName = $input->getOption('em') ?
-            $input->getOption('em') :
-            $this->container->getParameter('doctrine.orm.default_entity_manager');
-
-        $entityManagerService = sprintf('doctrine.orm.%s_entity_manager', $entityManagerName);
+        $entityManagerName = $input->getOption('em') ? $input->getOption('em') : $this->container->getParameter('doctrine.orm.default_entity_manager');
 
         /* @var $entityManager Doctrine\ORM\EntityManager */
-        $entityManager = $this->container->get($entityManagerService);
+        $entityManager = $this->getEntityManager($input->getOption('em'));
 
         $entityClassNames = $entityManager->getConfiguration()
                                           ->getMetadataDriverImpl()
@@ -67,17 +63,16 @@ EOT
             );
         }
 
-        $output->write(sprintf("Found <info>%d</info> entities mapped in entity manager <info>%s</info>:\n",
-            count($entityClassNames), $entityManagerName), true);
+        $output->writeln(sprintf("Found <info>%d</info> entities mapped in entity manager <info>%s</info>:", count($entityClassNames), $entityManagerName));
 
         foreach ($entityClassNames as $entityClassName) {
             try {
                 $cm = $entityManager->getClassMetadata($entityClassName);
-                $output->write("<info>[OK]</info>   " . $entityClassName, true);
+                $output->writeln(sprintf("<info>[OK]</info>   %s", $entityClassName));
             } catch (MappingException $e) {
-                $output->write("<error>[FAIL]</error> " . $entityClassName, true);
-                $output->write("<comment>" . $e->getMessage()."</comment>", true);
-                $output->write("", true);
+                $output->writeln("<error>[FAIL]</error> ".$entityClassName);
+                $output->writeln(sprintf("<comment>%s</comment>", $e->getMessage()));
+                $output->writeln('');
             }
         }
     }

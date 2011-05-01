@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
+use Symfony\Component\Routing\RequestContextAwareInterface;
+
 /**
  * UrlMatcherInterface is the interface that all URL matcher classes must implement.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-interface UrlMatcherInterface
+interface UrlMatcherInterface extends RequestContextAwareInterface
 {
     /**
      * Tries to match a URL with a set of routes.

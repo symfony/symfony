@@ -99,7 +99,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
         }
 
         // event manager
-        $container->setDefinition(sprintf('doctrine.dbal.%s_connection.event_manager', $name), new DefinitionDecorator('doctrine.dbal.connection.event_manager'));
+        $def = $container->setDefinition(sprintf('doctrine.dbal.%s_connection.event_manager', $name), new DefinitionDecorator('doctrine.dbal.connection.event_manager'));
 
         // connection
         if (isset($connection['charset'])) {

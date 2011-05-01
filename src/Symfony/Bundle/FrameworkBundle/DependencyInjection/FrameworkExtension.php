@@ -440,12 +440,11 @@ class FrameworkExtension extends Extension
                     $dirs[] = $dir;
                 }
             }
-            if (is_dir($dir = $container->getParameter('kernel.root_dir').'/translations')) {
+            if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/translations')) {
                 $dirs[] = $dir;
             }
 
             // Register translation resources
-            $resources = array();
             if ($dirs) {
                 $finder = new Finder();
                 $finder->files()->filter(function (\SplFileInfo $file) { return 2 === substr_count($file->getBasename(), '.'); })->in($dirs);

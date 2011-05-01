@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\RequestContext;
 
 /**
  * This Router is optimized to work with matcher and generator classes
@@ -51,9 +52,9 @@ class CachedRouter implements RouterInterface
     /**
      * Sets the request context.
      *
-     * @param array $context  The context
+     * @param RequestContext $context The context
      */
-    public function setContext(array $context = array())
+    public function setContext(RequestContext $context)
     {
         $this->matcher->setContext($context);
         $this->generator->setContext($context);

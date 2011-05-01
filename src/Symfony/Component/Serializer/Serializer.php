@@ -33,8 +33,8 @@ class Serializer implements SerializerInterface
 {
     private $normalizers = array();
     private $encoders = array();
-    private $normalizersCache = array();
-    private $denormalizersCache = array();
+    protected $normalizersCache = array();
+    protected $denormalizersCache = array();
 
     /**
      * {@inheritDoc}

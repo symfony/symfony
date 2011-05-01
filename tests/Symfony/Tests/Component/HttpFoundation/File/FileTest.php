@@ -13,6 +13,7 @@ namespace Symfony\Tests\Component\HttpFoundation\File;
 
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class FileTest extends \PHPUnit_Framework_TestCase
 {
@@ -94,8 +95,6 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
     public function testSizeFailing()
     {
-        $this->setExpectedException('Symfony\Component\HttpFoundation\File\Exception\FileException');
-
         $dir = __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'directory';
         $path = $dir.DIRECTORY_SEPARATOR.'test.copy.gif';
         @unlink($path);
@@ -103,7 +102,12 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
         $file = new File($path);
         @unlink($path);
-        $file->getSize();
+
+        try {
+            $file->getSize();
+            $this->fail('File::getSize should throw an exception.');
+        } catch (FileException $e) {
+        }
     }
 
     public function testMove()
@@ -156,8 +160,11 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
         $file = new File($path);
 
-        $this->setExpectedException('Symfony\Component\HttpFoundation\File\Exception\FileException');
-        $file->move($targetPath);
+        try {
+            $file->move($targetPath);
+            $this->fail('File::move should throw an exception.');
+        } catch (FileException $e) {
+        }
 
         $this->assertFileExists($path);
         $this->assertFileNotExists($path.$targetPath.'test.gif');

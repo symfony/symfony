@@ -26,6 +26,8 @@
 
         <service id="data_collector.doctrine" class="%doctrine.data_collector.class%" public="false">
             <tag name="data_collector" template="DoctrineBundle:Collector:db" id="db" />
+            <argument>%doctrine.dbal.connections%</argument>
+            <argument>%doctrine.orm.entity_managers%</argument>
             <argument type="service" id="doctrine.dbal.logger" />
         </service>
 

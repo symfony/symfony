@@ -43,4 +43,46 @@
             {% endfor %}
         </ul>
     {% endif %}
+
+    <h2>Database Connections</h2>
+
+    {% if collector.connections %}
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Service</th>
+            </tr>
+            {% for name, service in collector.connections %}
+                <tr>
+                    <th>{{ name }}</th>
+                    <td>{{ service }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>
+            <em>No entity managers.</em>
+        </p>
+    {% endif %}
+
+    <h2>Entity Managers</h2>
+
+    {% if collector.managers %}
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Service</th>
+            </tr>
+            {% for name, service in collector.managers %}
+                <tr>
+                    <th>{{ name }}</th>
+                    <td>{{ service }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>
+            <em>No entity managers.</em>
+        </p>
+    {% endif %}
 {% endblock %}

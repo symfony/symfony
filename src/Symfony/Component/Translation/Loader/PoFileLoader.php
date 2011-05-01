@@ -15,7 +15,8 @@ use Symfony\Component\Config\Resource\FileResource;
 
 class PoFileLoader extends ArrayLoader implements LoaderInterface {
 
-    public function load($resource, $locale, $domain = 'messages') {
+    public function load($resource, $locale, $domain = 'messages')
+    {
 
         $messages = $this->parse($resource);
 
@@ -49,7 +50,8 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
      * @param resource $stream
      * @return array
      */
-    public function parse($resource) {
+    protected function parse($resource)
+    {
 
         $stream = fopen($resource, 'r');
 
@@ -99,6 +101,6 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface {
 
         fclose($stream);
 
-		return array_filter($translated);
+        return array_filter($translated);
     }
  }

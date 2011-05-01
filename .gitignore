@@ -3,4 +3,5 @@ autoload.php
 /vendor/
 /.settings
 /.project
-.gitignore
+/.gitignore
+/.buildpath

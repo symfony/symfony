@@ -30,21 +30,24 @@ class GenerateEntityDoctrineCommand extends DoctrineCommand
     {
         $this
             ->setName('doctrine:generate:entity')
-            ->setDescription('Generate a new Doctrine entity inside a bundle.')
-            ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to initialize the entity in.')
-            ->addArgument('entity', InputArgument::REQUIRED, 'The entity class to initialize.')
-            ->addOption('mapping-type', null, InputOption::VALUE_OPTIONAL, 'The mapping type to to use for the entity.', 'xml')
-            ->addOption('fields', null, InputOption::VALUE_OPTIONAL, 'The fields to create with the new entity.')
+            ->setDescription('Generate a new Doctrine entity inside a bundle')
+            ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to initialize the entity in')
+            ->addArgument('entity', InputArgument::REQUIRED, 'The entity class to initialize')
+            ->addOption('mapping-type', null, InputOption::VALUE_OPTIONAL, 'The mapping type to to use for the entity', 'xml')
+            ->addOption('fields', null, InputOption::VALUE_OPTIONAL, 'The fields to create with the new entity')
             ->setHelp(<<<EOT
-The <info>doctrine:generate:entity</info> task initializes a new Doctrine entity inside a bundle:
+The <info>doctrine:generate:entity</info> task initializes a new Doctrine
+entity inside a bundle:
 
-  <info>./app/console doctrine:generate:entity "MyCustomBundle" "User\Group"</info>
+<info>./app/console doctrine:generate:entity "MyCustomBundle" "User\Group"</info>
 
-The above would initialize a new entity in the following entity namespace <info>Bundle\MyCustomBundle\Entity\User\Group</info>.
+The above would initialize a new entity in the following entity namespace
+<info>Bundle\MyCustomBundle\Entity\User\Group</info>.
 
-You can also optionally specify the fields you want to generate in the new entity:
+You can also optionally specify the fields you want to generate in the new
+entity:
 
-  <info>./app/console doctrine:generate:entity "MyCustomBundle" "User\Group" --fields="name:string(255) description:text"</info>
+<info>./app/console doctrine:generate:entity "MyCustomBundle" "User\Group" --fields="name:string(255) description:text"</info>
 EOT
         );
     }

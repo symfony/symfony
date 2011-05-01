@@ -27,21 +27,24 @@ class DropDatabaseDoctrineCommand extends DoctrineCommand
     {
         $this
             ->setName('doctrine:database:drop')
-            ->setDescription('Drop the configured databases.')
-            ->addOption('connection', null, InputOption::VALUE_OPTIONAL, 'The connection to use for this command.')
-            ->addOption('force', null, InputOption::VALUE_NONE, 'Set this parameter to execute this action.')
+            ->setDescription('Drop the configured databases')
+            ->addOption('connection', null, InputOption::VALUE_OPTIONAL, 'The connection to use for this command')
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Set this parameter to execute this action')
             ->setHelp(<<<EOT
-The <info>doctrine:database:drop</info> command drops the default connections database:
+The <info>doctrine:database:drop</info> command drops the default connections
+database:
 
-  <info>./app/console doctrine:database:drop</info>
+<info>./app/console doctrine:database:drop</info>
 
 The --force parameter has to be used to actually drop the database.
 
-You can also optionally specify the name of a connection to drop the database for:
+You can also optionally specify the name of a connection to drop the database
+for:
 
-  <info>./app/console doctrine:database:drop --connection=default</info>
+<info>./app/console doctrine:database:drop --connection=default</info>
 
-<error>Be careful: All data in a given database will be lost when executing this command.</error>
+<error>Be careful: All data in a given database will be lost when executing
+this command.</error>
 EOT
         );
     }

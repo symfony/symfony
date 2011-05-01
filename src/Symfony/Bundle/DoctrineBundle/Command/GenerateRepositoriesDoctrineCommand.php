@@ -29,13 +29,14 @@ class GenerateRepositoriesDoctrineCommand extends DoctrineCommand
     {
         $this
             ->setName('doctrine:generate:repositories')
-            ->setDescription('Generate repository classes from your mapping information.')
-            ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to initialize the repositories in.')
-            ->addOption('entity', null, InputOption::VALUE_OPTIONAL, 'The entity class to generate the repository for (shortname without namespace).')
+            ->setDescription('Generate repository classes from your mapping information')
+            ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to initialize the repositories in')
+            ->addOption('entity', null, InputOption::VALUE_OPTIONAL, 'The entity class to generate the repository for (shortname without namespace)')
             ->setHelp(<<<EOT
-The <info>doctrine:generate:repositories</info> command generates the configured entity repository classes from your mapping information:
+The <info>doctrine:generate:repositories</info> command generates the
+configured entity repository classes from your mapping information:
 
-  <info>./app/console doctrine:generate:repositories</info>
+<info>./app/console doctrine:generate:repositories</info>
 EOT
         );
     }

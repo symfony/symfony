@@ -31,18 +31,20 @@ class ImportMappingDoctrineCommand extends DoctrineCommand
     {
         $this
             ->setName('doctrine:mapping:import')
-            ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to import the mapping information to.')
-            ->addArgument('mapping-type', InputArgument::OPTIONAL, 'The mapping type to export the imported mapping information to.')
-            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.')
-            ->setDescription('Import mapping information from an existing database.')
+            ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to import the mapping information to')
+            ->addArgument('mapping-type', InputArgument::OPTIONAL, 'The mapping type to export the imported mapping information to')
+            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
+            ->setDescription('Import mapping information from an existing database')
             ->setHelp(<<<EOT
-The <info>doctrine:mapping:import</info> command imports mapping information from an existing database:
+The <info>doctrine:mapping:import</info> command imports mapping information
+from an existing database:
 
-  <info>./app/console doctrine:mapping:import "MyCustomBundle" xml</info>
+<info>./app/console doctrine:mapping:import "MyCustomBundle" xml</info>
 
-You can also optionally specify which entity manager to import from with the <info>--em</info> option:
+You can also optionally specify which entity manager to import from with the
+<info>--em</info> option:
 
-  <info>./app/console doctrine:mapping:import "MyCustomBundle" xml --em=default</info>
+<info>./app/console doctrine:mapping:import "MyCustomBundle" xml --em=default</info>
 EOT
         );
     }

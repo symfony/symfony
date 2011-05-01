@@ -12,6 +12,7 @@
     <services>
         <service id="assetic.filter.sass" class="%assetic.filter.sass.class%">
             <tag name="assetic.filter" alias="sass" />
+            <argument>%assetic.read_from%</argument>
             <argument>%assetic.filter.sass.bin%</argument>
         </service>
     </services>

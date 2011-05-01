@@ -40,29 +40,20 @@ abstract class DoctrineCommand extends Command
     /**
      * Convenience method to push the helper sets of a given entity manager into the application.
      *
-     * @param Application $application
      * @param string      $emName
      */
-    public static function setApplicationEntityManager(Application $application, $emName)
+    public function setApplicationEntityManager($emName)
     {
-        $container = $application->getKernel()->getContainer();
-        $em = self::getEntityManager($container, $emName);
-        $helperSet = $application->getHelperSet();
+        $em = self::getEntityManager($emName);
+        $helperSet = $this->getApplication()->getHelperSet();
         $helperSet->set(new ConnectionHelper($em->getConnection()), 'db');
         $helperSet->set(new EntityManagerHelper($em), 'em');
     }
 
-    public static function setApplicationConnection(Application $application, $connName)
+    public function setApplicationConnection($connName)
     {
-        $container = $application->getKernel()->getContainer();
-        $connName = $connName ? $connName : $container->getParameter('doctrine.dbal.default_connection');
-        $connServiceName = sprintf('doctrine.dbal.%s_connection', $connName);
-        if (!$container->has($connServiceName)) {
-            throw new \InvalidArgumentException(sprintf('Could not find Doctrine Connection named "%s"', $connName));
-        }
-
-        $connection = $container->get($connServiceName);
-        $helperSet = $application->getHelperSet();
+        $connection = $this->getDoctrineConnection($connName);
+        $helperSet = $this->getApplication()->getHelperSet();
         $helperSet->set(new ConnectionHelper($connection), 'db');
     }
 
@@ -81,15 +72,16 @@ abstract class DoctrineCommand extends Command
         return $entityGenerator;
     }
 
-    protected static function getEntityManager($container, $name = null)
+    protected function getEntityManager($name)
     {
-        $name = $name ? $name : $container->getParameter('doctrine.orm.default_entity_manager');
-        $serviceName = sprintf('doctrine.orm.%s_entity_manager', $name);
-        if (!$container->has($serviceName)) {
+        $name = $name ?: $this->container->getParameter('doctrine.orm.default_entity_manager');
+
+        $ems = $this->container->getParameter('doctrine.orm.entity_managers');
+        if (!isset($ems[$name])) {
             throw new \InvalidArgumentException(sprintf('Could not find Doctrine EntityManager named "%s"', $name));
         }
 
-        return $container->get($serviceName);
+        return $this->container->get($ems[$name]);
     }
 
     /**
@@ -100,31 +92,22 @@ abstract class DoctrineCommand extends Command
      */
     protected function getDoctrineConnection($name)
     {
-        $connectionName = $name ?: $this->container->getParameter('doctrine.dbal.default_connection');
-        $connectionName = sprintf('doctrine.dbal.%s_connection', $connectionName);
+        $name = $name ?: $this->container->getParameter('doctrine.dbal.default_connection');
 
-        if (!$this->container->has($connectionName)) {
+        $connections = $this->container->getParameter('doctrine.dbal.connections');
+        if (!isset($connections[$name])) {
             throw new \InvalidArgumentException(sprintf('<error>Could not find a connection named <comment>%s</comment></error>', $name));
         }
-        return $this->container->get($connectionName);
-    }
 
-    protected function getDoctrineEntityManagers()
-    {
-        $entityManagers = array();
-        foreach ($this->container->getParameter('doctrine.orm.entity_managers') as $id) {
-            $entityManagers[] = $this->container->get($id);
-        }
-
-        return $entityManagers;
+        return $this->container->get($connections[$name]);
     }
 
     protected function getBundleMetadatas(Bundle $bundle)
     {
         $namespace = $bundle->getNamespace();
         $bundleMetadatas = array();
-        $entityManagers = $this->getDoctrineEntityManagers();
-        foreach ($entityManagers as $key => $em) {
+        foreach ($this->container->getParameter('doctrine.orm.entity_managers') as $id) {
+            $em = $this->container->get($id);
             $cmf = new DisconnectedClassMetadataFactory();
             $cmf->setEntityManager($em);
             $metadatas = $cmf->getAllMetadata();

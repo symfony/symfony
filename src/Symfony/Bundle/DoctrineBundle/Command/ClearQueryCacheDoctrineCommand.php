@@ -46,7 +46,7 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        DoctrineCommand::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
+        $this->setApplicationEntityManager($input->getOption('em'));
 
         return parent::execute($input, $output);
     }

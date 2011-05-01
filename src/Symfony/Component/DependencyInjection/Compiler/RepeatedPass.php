@@ -51,7 +51,6 @@ class RepeatedPass implements CompilerPassInterface
         $compiler = $container->getCompiler();
         $this->repeat = false;
         foreach ($this->passes as $pass) {
-            $time = microtime(true);
             $pass->process($container);
         }
 

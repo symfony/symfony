@@ -123,4 +123,52 @@ class Registry
     {
         return $this->entityManagers;
     }
+
+    /**
+     * Reloads an entity manager.
+     *
+     * Useful when you need to close an entity manager (when doing a rollback for instance).
+     *
+     * @param string|EntityManager
+     *
+     * @return EntityManager
+     */
+    public function reloadEntityManager($name)
+    {
+        $id = null;
+        $em = null;
+        if (is_string($name)) {
+            if (!isset($this->entityManagers[$name])) {
+                throw new \InvalidArgumentException(sprintf('The "%s" entity manager does not exist.', $name));
+            }
+
+            $id = $this->entityManagers[$name];
+            $em = $this->container->get($id);
+        } elseif (is_object($name) && $name instanceof EntityManager) {
+            foreach ($this->entityManagers as $managerId) {
+                if ($this->container->get($managerId) === $name) {
+                    $id = $managerId;
+                    $em = $name;
+                    break;
+                }
+            }
+
+            if (null === $em) {
+                throw new \InvalidArgumentException(sprintf('Unable to reload entity manager "%s" as it is not managed by the service container.', $class));
+            }
+        } else {
+            throw new \InvalidArgumentException('The name argument must be a string or an EntityManager instance.');
+        }
+
+        if ($em->isOpen()) {
+            $em->clear();
+
+            return $em;
+        }
+
+        // force the creation of a new entity manager
+        $this->container->set($id, null);
+
+        return $this->container->get($id);
+    }
 }

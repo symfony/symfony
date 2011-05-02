@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 /**
  * Loads asset formulae from the filesystem.
  *
- * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ * @author Kris Wallsmith <kris@symfony.com>
  */
 class AssetFactory extends BaseAssetFactory
 {

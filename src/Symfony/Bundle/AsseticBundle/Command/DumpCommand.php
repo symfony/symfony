@@ -59,10 +59,10 @@ class DumpCommand extends Command
      * This method includes an infinite loop the continuously polls the asset
      * manager for changes.
      *
-     * @param LazyAssetManager $am      The asset manager
+     * @param LazyAssetManager $am       The asset manager
      * @param string           $basePath The base directory to write to
-     * @param OutputInterface  $output  The command output
-     * @param Boolean          $debug   Debug mode
+     * @param OutputInterface  $output   The command output
+     * @param Boolean          $debug    Debug mode
      */
     protected function watch(LazyAssetManager $am, $basePath, OutputInterface $output, $debug = false)
     {
@@ -144,7 +144,7 @@ class DumpCommand extends Command
      */
     protected function dumpAsset(AssetInterface $asset, $basePath, OutputInterface $output)
     {
-        $target = rtrim($basePath, '/') . '/' . $asset->getTargetUrl();
+        $target = rtrim($basePath, '/').'/'.str_replace('_controller/', '', $asset->getTargetUrl());
         if (!is_dir($dir = dirname($target))) {
             $output->writeln('<info>[dir+]</info> '.$dir);
             if (false === @mkdir($dir, 0777, true)) {

@@ -56,7 +56,7 @@ namespace Symfony\Component\ClassLoader;
  * found before giving up.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ * @author Kris Wallsmith <kris@symfony.com>
  *
  * @api
  */

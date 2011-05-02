@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 /**
  * Moves uploaded files to a permanent location
  *
+ * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  * @author Brent Shaffer <bshafs@gmail.com>
  */
 class MoveFileUploadListener implements EventSubscriberInterface

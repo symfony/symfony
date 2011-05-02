@@ -9,6 +9,26 @@ timeline closely anyway.
 beta1 to beta2
 --------------
 
+* With the introduction of a new Doctrine Registry class, the following
+  parameters have been removed (replaced by methods on the `doctrine.registry`
+  service):
+
+   * doctrine.orm.entity_managers
+   * doctrine.orm.default_entity_manager
+   * doctrine.dbal.default_connection
+
+  Before:
+
+        $container->getParameter('doctrine.orm.entity_managers')
+        $container->getParameter('doctrine.orm.default_entity_manager')
+        $container->getParameter('doctrine.orm.default_connection')
+
+  After:
+
+        $container->get('doctrine.registry')->getEntityManagerNames()
+        $container->get('doctrine.registry')->getDefaultEntityManagerName()
+        $container->get('doctrine.registry')->getDefaultConnectionName()
+
 * Doctrine event subscribers now use a unique "doctrine.event_subscriber" tag.
   Doctrine event listeners also use a unique "doctrine.event_listener" tag. To
   specify a connection, use the optional "connection" attribute.
@@ -38,11 +58,6 @@ beta1 to beta2
             tags:
                 - { name: doctrine.event_subscriber }                      # register for all connections
                 - { name: doctrine.event_subscriber, connection: default } # only for the default connection
-
-* The `doctrine.orm.entity_managers` is now hash of entity manager names/ids pairs:
-
-    Before: array('default', 'foo')
-    After:  array('default' => 'doctrine.orm.default_entity_manager', 'foo' => 'doctrine.orm.foo_entity_manager'))
 
 * Application translations are now stored in the `Resources` directory:
 

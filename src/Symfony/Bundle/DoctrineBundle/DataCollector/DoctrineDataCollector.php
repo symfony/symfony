@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\DoctrineBundle\Logger\DbalLogger;
+use Symfony\Bundle\DoctrineBundle\Registry;
 
 /**
  * DoctrineDataCollector.
@@ -27,10 +28,10 @@ class DoctrineDataCollector extends DataCollector
     private $managers;
     private $logger;
 
-    public function __construct($connections, $managers, DbalLogger $logger = null)
+    public function __construct(Registry $registry, DbalLogger $logger = null)
     {
-        $this->connections = $connections;
-        $this->managers = $managers;
+        $this->connections = $registry->getConnectionNames();
+        $this->managers = $registry->getEntityManagerNames();
         $this->logger = $logger;
     }
 

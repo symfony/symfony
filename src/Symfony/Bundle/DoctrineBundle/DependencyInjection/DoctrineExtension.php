@@ -230,7 +230,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $ormEmDef = new Definition('%doctrine.orm.entity_manager.class%', $ormEmArgs);
         $ormEmDef->setFactoryClass('%doctrine.orm.entity_manager.class%');
         $ormEmDef->setFactoryMethod('create');
-        $ormEmDef->addTag('doctrine.orm.entity_manager');
         $container->setDefinition($entityManagerService, $ormEmDef);
 
         $container->setAlias(

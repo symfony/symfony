@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\Extension\Core\EventListener\PrototypeStashListener;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 
 class CollectionType extends AbstractType
@@ -24,12 +25,16 @@ class CollectionType extends AbstractType
                 'property_path' => false,
                 'required' => false,
             ));
+
+            // stash the prototype during bind
+            $builder->addEventSubscriber(new PrototypeStashListener());
         }
 
-        $listener = new ResizeFormListener($builder->getFormFactory(),
-                $options['type'], $options['modifiable']);
-
-        $builder->addEventSubscriber($listener);
+        $builder->addEventSubscriber(new ResizeFormListener(
+            $builder->getFormFactory(),
+            $options['type'],
+            $options['modifiable']
+        ));
     }
 
     public function getDefaultOptions(array $options)

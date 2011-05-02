@@ -16,7 +16,7 @@ use Assetic\Factory\Loader\BasePhpFormulaLoader;
 /**
  * Loads formulae from Symfony2 PHP templates.
  *
- * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ * @author Kris Wallsmith <kris@symfony.com>
  */
 class AsseticHelperFormulaLoader extends BasePhpFormulaLoader
 {

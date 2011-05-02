@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\FixFileUploadListener;
+use Symfony\Component\Form\Extension\Core\EventListener\MoveFileUploadListener;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DataTransformerChain;
 use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\FileToStringTransformer;
@@ -40,9 +41,16 @@ class FileType extends AbstractType
             );
         }
 
+        if (is_null($options['path'])) {
+          // Temporary storage if path is null
+          $subscriber = new FixFileUploadListener($this->storage);
+        } else {
+          $subscriber = new MoveFileUploadListener($options['path']);
+        }
+
         $builder
             ->appendNormTransformer(new FileToArrayTransformer())
-            ->addEventSubscriber(new FixFileUploadListener($this->storage), 10)
+            ->addEventSubscriber($subscriber, 10)
             ->add('file', 'field')
             ->add('token', 'hidden')
             ->add('name', 'hidden');
@@ -57,6 +65,7 @@ class FileType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
+            'path' => null,
             'type' => 'string',
             'csrf_protection' => false,
         );

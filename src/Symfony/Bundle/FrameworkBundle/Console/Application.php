@@ -17,7 +17,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
-
+use Symfony\Component\Console\Output\ConsoleOutput;
 /**
  * Application.
  *
@@ -42,7 +42,19 @@ class Application extends BaseApplication
         $this->getDefinition()->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The Environment name.', 'dev'));
         $this->getDefinition()->addOption(new InputOption('--no-debug', null, InputOption::VALUE_NONE, 'Switches off debug mode.'));
 
-        $this->kernel->boot();
+        try {
+            $this->kernel->boot();
+        } catch (\Exception $e) {
+            if (!$this->getCatchExceptions()) {
+                throw $e;
+            }
+
+            $this->renderException($e, new ConsoleOutput());
+            $statusCode = $e->getCode();
+
+            $statusCode = is_numeric($statusCode) && $statusCode ? $statusCode : 1;
+            exit($statusCode);
+        }
 
         $this->registerCommands();
     }

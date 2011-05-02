@@ -269,6 +269,17 @@ class Application
     }
 
     /**
+     * Gets the status of catch exceptions or not flag during commands execution.
+     *
+     *
+     * @api
+     */
+    public function getCatchExceptions()
+    {
+        return $this->catchExceptions;
+    }
+
+    /**
      * Sets whether to automatically exit after a command execution or not.
      *
      * @param Boolean $boolean Whether to automatically exit after a command execution or not

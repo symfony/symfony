@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\DoctrineBundle;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Doctrine\DBAL\Connection;
 
 /**
  * References all Doctrine connections and entity managers in a given Container.
@@ -43,11 +44,23 @@ class Registry
         $this->defaultEntityManager = $defaultEntityManager;
     }
 
+    /**
+     * Gets the default connection name.
+     *
+     * @return string The default connection name
+     */
     public function getDefaultConnectionName()
     {
         return $this->defaultConnection;
     }
 
+    /**
+     * Gets the named connection.
+     *
+     * @param string $name The connection name (null for the default one)
+     *
+     * @return Connection
+     */
     public function getConnection($name = null)
     {
         if (null === $name) {
@@ -61,17 +74,34 @@ class Registry
         return $this->container->get($this->connections[$name]);
     }
 
+    /**
+     * Gets all connection names.
+     *
+     * @return array An array of connection names
+     */
     public function getConnectionNames()
     {
         return $this->connections;
     }
 
+    /**
+     * Gets the default entity manager name.
+     *
+     * @return string The default entity manager name
+     */
     public function getDefaultEntityManagerName()
     {
         return $this->defaultEntityManager;
     }
 
-    public function getEntityManager($name)
+    /**
+     * Gets the named entity manager.
+     *
+     * @param string $name The entity manager name (null for the default one)
+     *
+     * @return EntityManager
+     */
+    public function getEntityManager($name = null)
     {
         if (null === $name) {
             return $this->container->get($this->entityManagers[$this->defaultEntityManager]);
@@ -84,13 +114,24 @@ class Registry
         return $this->container->get($this->entityManagers[$name]);
     }
 
+    /**
+     * Gets all connection names.
+     *
+     * @return array An array of connection names
+     */
     public function getEntityManagerNames()
     {
         return $this->entityManagers;
     }
 
     /**
+     * Reloads an entity manager.
+     *
+     * Useful when you need to close an entity manager (when doing a rollback for instance).
+     *
      * @param string|EntityManager
+     *
+     * @return EntityManager
      */
     public function reloadEntityManager($name)
     {

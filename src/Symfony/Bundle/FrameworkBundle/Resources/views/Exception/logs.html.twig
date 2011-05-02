@@ -1,8 +1,7 @@
 <ol class="traces">
     {% for log in logs %}
         <li>
-            {% if 'EMERG' == log.priorityName or 'ERR' == log.priorityName or 'CRIT' == log.priorityName
-               or 'ALERT' == log.priorityName or 'ERROR' == log.priorityName or 'CRITICAL' == log.priorityName %}
+            {% if log.priorityName in ['EMERG', 'ERR', 'CRIT', 'ALERT', 'ERROR', 'CRITICAL'] %}
                 <em>{{ log.priorityName }}</em>
             {% else %}
                 {{ log.priorityName }}

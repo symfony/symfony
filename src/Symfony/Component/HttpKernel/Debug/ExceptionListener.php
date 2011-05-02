@@ -77,7 +77,7 @@ class ExceptionListener
         } catch (\Exception $e) {
             $message = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage());
             if (null !== $this->logger) {
-                if ($exception instanceof HttpExceptionInterface && $exception->getStatusCode() > 500) {
+                if ($exception instanceof HttpExceptionInterface && $exception->getStatusCode() >= 500) {
                     $this->logger->crit($message);
                 } else {
                     $this->logger->err($message);

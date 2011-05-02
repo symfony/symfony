@@ -42,7 +42,7 @@ abstract class DoctrineCommand extends Command
 
     protected function getEntityManager($name)
     {
-        return $this->container->get('doctrine.registry')->getEntityManager($name);
+        return $this->container->get('doctrine')->getEntityManager($name);
     }
 
     /**
@@ -53,14 +53,14 @@ abstract class DoctrineCommand extends Command
      */
     protected function getDoctrineConnection($name)
     {
-        return $this->container->get('doctrine.registry')->getConnection($name);
+        return $this->container->get('doctrine')->getConnection($name);
     }
 
     protected function getBundleMetadatas(Bundle $bundle)
     {
         $namespace = $bundle->getNamespace();
         $bundleMetadatas = array();
-        foreach ($this->container->get('doctrine.registry')->getEntityManagerNames() as $id) {
+        foreach ($this->container->get('doctrine')->getEntityManagerNames() as $id) {
             $em = $this->container->get($id);
             $cmf = new DisconnectedClassMetadataFactory();
             $cmf->setEntityManager($em);

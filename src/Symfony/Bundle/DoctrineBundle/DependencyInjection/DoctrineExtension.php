@@ -74,8 +74,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
         foreach (array_keys($config['connections']) as $name) {
             $connections[$name] = sprintf('doctrine.dbal.%s_connection', $name);
         }
-        $container->getDefinition('doctrine.registry')->replaceArgument(1, $connections);
-        $container->getDefinition('doctrine.registry')->replaceArgument(3, $config['default_connection']);
+        $container->getDefinition('doctrine')->replaceArgument(1, $connections);
+        $container->getDefinition('doctrine')->replaceArgument(3, $config['default_connection']);
 
         foreach ($config['connections'] as $name => $connection) {
             $this->loadDbalConnection($name, $connection, $container);
@@ -152,13 +152,13 @@ class DoctrineExtension extends AbstractDoctrineExtension
         foreach (array_keys($config['entity_managers']) as $name) {
             $this->entityManagers[$name] = sprintf('doctrine.orm.%s_entity_manager', $name);
         }
-        $container->getDefinition('doctrine.registry')->replaceArgument(2, $this->entityManagers);
+        $container->getDefinition('doctrine')->replaceArgument(2, $this->entityManagers);
 
         if (empty($config['default_entity_manager'])) {
             $tmp = array_keys($this->entityManagers);
             $config['default_entity_manager'] = reset($tmp);
         }
-        $container->getDefinition('doctrine.registry')->replaceArgument(4, $config['default_entity_manager']);
+        $container->getDefinition('doctrine')->replaceArgument(4, $config['default_entity_manager']);
 
         $options = array('auto_generate_proxy_classes', 'proxy_dir', 'proxy_namespace');
         foreach ($options as $key) {
@@ -232,7 +232,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $ormEmDef = new Definition('%doctrine.orm.entity_manager.class%', $ormEmArgs);
         $ormEmDef->setFactoryClass('%doctrine.orm.entity_manager.class%');
         $ormEmDef->setFactoryMethod('create');
-        $ormEmDef->addMethodCall('setRegistry', array(new Reference('doctrine.registry')));
+        $ormEmDef->addMethodCall('setRegistry', array(new Reference('doctrine')));
         $ormEmDef->addMethodCall('setName', array($entityManager['name']));
         $container->setDefinition($entityManagerService, $ormEmDef);
 

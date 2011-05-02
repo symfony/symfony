@@ -45,7 +45,7 @@ class ProxyCacheWarmerTest extends \Symfony\Bundle\DoctrineBundle\Tests\TestCase
                   ->will($this->returnValue(false));
         $container->expects($this->at(2))
                   ->method('get')
-                  ->with($this->equalTo('doctrine.registry'))
+                  ->with($this->equalTo('doctrine'))
                   ->will($this->returnValue($registry));
         $container->expects($this->at(3))
                   ->method('get')

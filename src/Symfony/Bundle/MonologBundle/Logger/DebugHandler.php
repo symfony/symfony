@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\MonologBundle\Logger;
 
+use Monolog\Logger;
 use Monolog\Handler\TestHandler;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
@@ -43,8 +44,12 @@ class DebugHandler extends TestHandler implements DebugLoggerInterface
      */
     public function countErrors()
     {
-        return isset($this->recordsByLevel[\Monolog\Logger::ERROR])
-            ? count($this->recordsByLevel[\Monolog\Logger::ERROR])
-            : 0;
+        $cnt = 0;
+        foreach (array(Logger::ERROR, Logger::CRITICAL, Logger::ALERT) as $level) {
+            if (isset($this->recordsByLevel[$level])) {
+                $cnt += count($this->recordsByLevel[$level])
+            }
+        }
+        return $cnt;
     }
 }

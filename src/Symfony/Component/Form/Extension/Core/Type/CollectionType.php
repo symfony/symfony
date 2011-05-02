@@ -13,6 +13,8 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 
 class CollectionType extends AbstractType
@@ -30,6 +32,18 @@ class CollectionType extends AbstractType
                 $options['type'], $options['modifiable']);
 
         $builder->addEventSubscriber($listener);
+    }
+
+    public function buildViewBottomUp(FormView $view, FormInterface $form)
+    {
+        $children = $view->getChildren();
+
+        // move the prototype aside so it's no longer a node in the view tree
+        if (isset($children['$$name$$'])) {
+            $view->set('prototype', $children['$$name$$']);
+            unset($children['$$name$$']);
+            $view->setChildren($children);
+        }
     }
 
     public function getDefaultOptions(array $options)

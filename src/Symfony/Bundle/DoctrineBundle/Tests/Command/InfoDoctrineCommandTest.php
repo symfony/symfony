@@ -25,9 +25,6 @@ class InfoDoctrineCommandTest extends TestCase
         $testContainer = $this->createYamlBundleTestContainer();
         $kernel = $this->getMock('Symfony\Component\HttpKernel\Kernel', array(), array(), '', false);
         $kernel->expects($this->once())
-               ->method('getBundles')
-               ->will($this->returnValue(array()));
-        $kernel->expects($this->once())
                ->method('getContainer')
                ->will($this->returnValue($testContainer));
         $application = new Application($kernel);

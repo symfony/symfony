@@ -10,7 +10,7 @@ beta1 to beta2
 --------------
 
 * With the introduction of a new Doctrine Registry class, the following
-  parameters have been removed (replaced by methods on the `doctrine.registry`
+  parameters have been removed (replaced by methods on the `doctrine`
   service):
 
    * doctrine.orm.entity_managers
@@ -25,9 +25,22 @@ beta1 to beta2
 
   After:
 
-        $container->get('doctrine.registry')->getEntityManagerNames()
-        $container->get('doctrine.registry')->getDefaultEntityManagerName()
-        $container->get('doctrine.registry')->getDefaultConnectionName()
+        $container->get('doctrine')->getEntityManagerNames()
+        $container->get('doctrine')->getDefaultEntityManagerName()
+        $container->get('doctrine')->getDefaultConnectionName()
+
+  But you don't really need to use these methods anymore, as to get an entity
+  manager, you can now use the registry directly:
+
+  Before:
+
+        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->get('doctrine.orm.foobar_entity_manager');
+
+  After:
+
+        $em = $this->get('doctrine')->getEntityManager();
+        $em = $this->get('doctrine')->getEntityManager('foobar');
 
 * Doctrine event subscribers now use a unique "doctrine.event_subscriber" tag.
   Doctrine event listeners also use a unique "doctrine.event_listener" tag. To

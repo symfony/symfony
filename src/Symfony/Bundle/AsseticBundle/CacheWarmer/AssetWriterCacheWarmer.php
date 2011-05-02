@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * The AssetWriterCacheWarmer processes and writes the asset files.
  * 
- * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ * @author Kris Wallsmith <kris@symfony.com>
  */
 class AssetWriterCacheWarmer implements CacheWarmerInterface
 {

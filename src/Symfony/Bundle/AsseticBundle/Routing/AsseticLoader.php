@@ -33,7 +33,7 @@ use Symfony\Component\Routing\RouteCollection;
  * In a production environment you should use the `assetic:dump` command to
  * create static asset files.
  *
- * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ * @author Kris Wallsmith <kris@symfony.com>
  */
 class AsseticLoader extends Loader
 {

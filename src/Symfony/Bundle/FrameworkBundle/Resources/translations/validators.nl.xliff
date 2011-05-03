@@ -60,7 +60,7 @@
             </trans-unit>
             <trans-unit id="15">
                 <source>The file is too large ({{ size }}). Allowed maximum size is {{ limit }}</source>
-                <target>Het bestand is te groot({{ size }}). Toegestane maximum grootte is {{ limit }}</target>
+                <target>Het bestand is te groot ({{ size }}). Toegestane maximum grootte is {{ limit }}</target>
             </trans-unit>
             <trans-unit id="16">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}</source>
@@ -108,11 +108,11 @@
             </trans-unit>
             <trans-unit id="27">
                 <source>This value should be instance of class {{ class }}</source>
-                <target>Deze waarde moet een instantie van de klasse {{ class }} zijn</target>
+                <target>Deze waarde zou een instantie van de klasse {{ class }} moeten zijn</target>
             </trans-unit>
             <trans-unit id="28">
                 <source>This field group should not contain extra fields</source>
-                <target>Deze veld groep mag geen extra velden bevatten</target>
+                <target>Deze veld groep zou geen extra velden mogen bevatten</target>
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file</source>
@@ -124,7 +124,7 @@
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal</source>
-                <target>De twee waarden moeten gelijk zijn</target>
+                <target>De twee waarden zouden gelijk moeten zijn</target>
             </trans-unit>
         </body>
     </file>

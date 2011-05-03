@@ -1,7 +1,3 @@
 phpunit.xml
 autoload.php
 /vendor/
-/.settings
-/.project
-/.gitignore
-/.buildpath

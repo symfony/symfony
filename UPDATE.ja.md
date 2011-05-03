@@ -5,6 +5,60 @@
 このドキュメントでは、フレームワークの "パブリックな" APIを使っている場合に必要な変更点についてのみ説明しています。
 フレームワークのコアコードを "ハック" している場合は、変更履歴を注意深く追跡する必要があるでしょう。
 
+beta1 から beta2
+----------------
+
+* `doctrine:generate:entities` コマンドの引数とオプションが変更されました。
+  新しい引数とオプションの詳細は、\ `./app/console doctrine:generate:entities --help` コマンドを実行して確認してください。
+
+* `doctrine:generate:repositories` コマンドは削除されました。
+  このコマンドに相当する機能は、\ `doctrine:generate:entities` コマンドに統合されました。
+
+* Doctrine イベントサブスクライバーは、ユニークな "doctrine.event_subscriber" タグを使うように変更されました。
+  また、Doctrine イベントリスナーは、ユニークな "doctrine.event_listener" タグを使うように変更されました。
+  コネクションを指定するには、オプションの "connection" 属性を使ってください。
+
+    変更前:
+
+        listener:
+            class: MyEventListener
+            tags:
+                - { name: doctrine.common.event_listener, event: name }
+                - { name: doctrine.dbal.default_event_listener, event: name }
+        subscriber:
+            class: MyEventSubscriber
+            tags:
+                - { name: doctrine.common.event_subscriber }
+                - { name: doctrine.dbal.default_event_subscriber }
+
+    変更後:
+
+        listener:
+            class: MyEventListener
+            tags:
+                - { name: doctrine.event_listener, event: name }                      # すべてのコネクションに対して登録
+                - { name: doctrine.event_listener, event: name, connection: default } # デフォルトコネクションにのみ登録
+        subscriber:
+            class: MyEventSubscriber
+            tags:
+                - { name: doctrine.event_subscriber }                      # すべてのコネクションに対して登録
+                - { name: doctrine.event_subscriber, connection: default } # デフォルトコネクションにのみ登録
+
+* `doctrine.orm.entity_managers` は、エンティティマネージャーの名前と ID のペアのハッシュに変更されました。
+
+    変更前:  array('default', 'foo')
+    変更後:  array('default' => 'doctrine.orm.default_entity_manager', 'foo' => 'doctrine.orm.foo_entity_manager'))
+
+* アプリケーションの翻訳ファイルは、\ `Resources` ディレクトリに保存されるように変更されました。
+
+    変更前:
+
+      app/translations/catalogue.fr.xml
+
+    変更後:
+
+      app/Resources/translations/catalogue.fr.xml
+
 PR12 から beta1
 ---------------
 

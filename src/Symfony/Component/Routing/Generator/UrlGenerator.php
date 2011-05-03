@@ -105,12 +105,14 @@ class UrlGenerator implements UrlGeneratorInterface
         foreach ($tokens as $token) {
             if ('variable' === $token[0]) {
                 if (false === $optional || !isset($defaults[$token[3]]) || (isset($parameters[$token[3]]) && $parameters[$token[3]] != $defaults[$token[3]])) {
-                    // check requirement
-                    if (!preg_match('#^'.$token[2].'$#', $tparams[$token[3]])) {
-                        throw new \InvalidArgumentException(sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $token[2], $tparams[$token[3]]));
+                    if (!$isEmpty = in_array($tparams[$token[3]], array(null, '', false), true)) {
+                        // check requirement
+                        if ($tparams[$token[3]] && !preg_match('#^'.$token[2].'$#', $tparams[$token[3]])) {
+                            throw new \InvalidArgumentException(sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $token[2], $tparams[$token[3]]));
+                        }
                     }
 
-                    if (!in_array($tparams[$token[3]], array(null, '', false), true) || !$optional) {
+                    if (!$isEmpty || !$optional) {
                         // %2F is not valid in a URL, so we don't encode it (which is fine as the requirements explicitly allowed it)
                         $url = $token[1].str_replace('%2F', '/', urlencode($tparams[$token[3]])).$url;
                     }

@@ -45,9 +45,8 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testHandleWithoutLogger($event, $event2)
     {
-        //store the current log_errors, and disable it temporarily
-        $logErrors = ini_get('log_errors');
-        ini_set('log_errors', 'Off');
+        // store the current error_log, and disable it temporarily
+        $errorLog = ini_set('error_log', file_exists('/dev/null') ? '/dev/null' : 'nul');
 
         $l = new ExceptionListener('foo');
         $l->onCoreException($event);
@@ -60,8 +59,8 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
             $this->assertSame('foo', $e->getMessage());
         }
 
-        //restore the old log_errors setting
-        ini_set('log_errors', $logErrors);
+        // restore the old error_log
+        ini_set('error_log', $errorLog);
     }
 
     /**
@@ -83,7 +82,7 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertEquals(3, $logger->countErrors());
-        $this->assertEquals(3, count($logger->getLogs('err')));
+        $this->assertEquals(3, count($logger->getLogs('crit')));
     }
 
     public function provider()
@@ -104,7 +103,7 @@ class TestLogger extends Logger implements DebugLoggerInterface
 {
     public function countErrors()
     {
-        return count($this->logs['err']);
+        return count($this->logs['crit']);
     }
 
     public function getDebugLogger()

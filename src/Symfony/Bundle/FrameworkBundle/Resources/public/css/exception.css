@@ -91,16 +91,16 @@ build: 56
     margin-left:20px;
 }
 
-/* fix for Opera not liking empty <li> */
-.sf-exceptionreset .traces li:after {
-    content: '\00A0'
-}
-
-.sf-exceptionreset #logs .traces em
+.sf-exceptionreset #logs .traces li.error
 {
     font-style:normal;
     color:#AA3333;
-    font-weight: bold;
+    background:#f9ecec;
+}
+
+/* fix for Opera not liking empty <li> */
+.sf-exceptionreset .traces li:after {
+    content: '\00A0'
 }
 
 .sf-exceptionreset .trace

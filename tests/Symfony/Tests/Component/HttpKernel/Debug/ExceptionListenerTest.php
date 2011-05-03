@@ -45,9 +45,9 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testHandleWithoutLogger($event, $event2)
     {
-        //store the current log_errors, and disable it temporarily
-        $logErrors = ini_get('log_errors');
-        ini_set('log_errors', 'Off');
+        // store the current log_errors, and disable it temporarily
+        $logErrors = ini_set('log_errors', false);
+        $errorLog = ini_set('error_log', '/dev/null');
 
         $l = new ExceptionListener('foo');
         $l->onCoreException($event);
@@ -60,8 +60,9 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
             $this->assertSame('foo', $e->getMessage());
         }
 
-        //restore the old log_errors setting
+        // restore the old settings
         ini_set('log_errors', $logErrors);
+        ini_set('error_log', $errorLog);
     }
 
     /**

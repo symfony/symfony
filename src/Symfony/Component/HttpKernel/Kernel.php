@@ -292,6 +292,16 @@ abstract class Kernel implements KernelInterface
     {
         return $this->name;
     }
+    
+    /**
+     * Checks if the Kernel is currently booted.
+     *
+     * @return Boolean true if kernel is booted, false otherwise
+     */
+    public function isBooted()
+    {
+        return $this->booted;
+    }
 
     /**
      * Gets the environment.

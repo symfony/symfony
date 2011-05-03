@@ -242,6 +242,10 @@ abstract class Kernel implements KernelInterface
             throw new \RuntimeException(sprintf('File name "%s" contains invalid characters (..).', $name));
         }
 
+        if (false === strpos($name, '/')) {
+            throw new \InvalidArgumentException(sprintf('A resource name must contain a path information (e.g. "@AcmeDemoBundle/Controller"), "%s" given.', $name));
+        }
+
         $name = substr($name, 1);
         list($bundleName, $path) = explode('/', $name, 2);
 

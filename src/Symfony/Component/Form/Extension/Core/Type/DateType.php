@@ -32,7 +32,9 @@ class DateType extends AbstractType
             \Locale::getDefault(),
             $options['format'],
             \IntlDateFormatter::NONE,
-            \DateTimeZone::UTC
+            \DateTimeZone::UTC,
+            \IntlDateFormatter::GREGORIAN,
+            $options['pattern']
         );
 
         if ($options['widget'] === 'text') {
@@ -94,8 +96,8 @@ class DateType extends AbstractType
 
             // set right order with respect to locale (e.g.: de_DE=dd.MM.yy; en_US=M/d/yy)
             // lookup various formats at http://userguide.icu-project.org/formatparse/datetime
-            if (preg_match('/^([yMd]+).+([yMd]+).+([yMd]+)$/', $pattern)) {
-                $pattern = preg_replace(array('/y+/', '/M+/', '/d+/'), array('{{ year }}', '{{ month }}', '{{ day }}'), $pattern);
+            if (preg_match('/^([E]?).+([yMd]+).+([yMd]+).+([yMd]+)$/', $pattern)) {
+                $pattern = preg_replace(array('/E+/','/y+/', '/M+/', '/d+/'), array('', '{{ year }}', '{{ month }}', '{{ day }}'), $pattern);
             } else {
                 // default fallback
                 $pattern = '{{ year }}-{{ month }}-{{ day }}';

@@ -55,6 +55,7 @@ class Configuration implements ConfigurationInterface
         $this->addTemplatingSection($rootNode);
         $this->addTranslatorSection($rootNode);
         $this->addValidationSection($rootNode);
+        $this->addAnnotationsSection($rootNode);
 
         return $treeBuilder;
     }
@@ -248,6 +249,27 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('enabled')->end()
                         ->scalarNode('cache')->end()
                         ->booleanNode('enable_annotations')->defaultFalse()->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addAnnotationsSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('annotations')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('cache')->defaultValue('file')->end()
+                        ->arrayNode('file_cache')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('dir')->defaultValue('%kernel.cache_dir%/annotations')->end()
+                                ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()

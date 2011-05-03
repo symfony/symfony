@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
+use Symfony\Component\Config\Loader\LoaderInterface;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Parameter;
@@ -118,6 +120,8 @@ class FrameworkExtension extends Extension
         if (isset($config['validation'])) {
             $this->registerValidationConfiguration($config['validation'], $container, $loader);
         }
+
+        $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
 
         $this->addClassesToCompile(array(
             'Symfony\\Component\\HttpFoundation\\ParameterBag',
@@ -530,6 +534,31 @@ class FrameworkExtension extends Extension
         }
 
         return $files;
+    }
+
+    private function registerAnnotationsConfiguration(array $config, ContainerBuilder $container,$loader)
+    {
+        $loader->load('annotations.xml');
+
+        if ('file' === $config['cache']) {
+            $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache']['dir']);
+            if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true)) {
+                throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
+            }
+
+            $container
+                ->getDefinition('annotations.cache.file_cache')
+                ->replaceArgument(0, $cacheDir)
+                ->replaceArgument(1, $config['file_cache']['debug'])
+            ;
+        } else if ('none' === $config['cache']) {
+            $container->setAlias('annotation_reader', 'annotations.reader');
+        } else {
+            $container
+                ->getDefinition('annotations.cached_reader')
+                ->replaceArgument(1, new Reference($config['cache']))
+            ;
+        }
     }
 
     /**

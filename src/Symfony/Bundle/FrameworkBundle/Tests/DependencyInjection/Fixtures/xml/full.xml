@@ -30,5 +30,8 @@
         </framework:templating>
         <framework:translator enabled="true" fallback="fr" />
         <framework:validation enabled="true" cache="apc" />
+        <framework:annotations cache="file">
+            <framework:file-cache dir="%kernel.cache_dir%/annotations" debug="true" />
+        </framework:annotations>
     </framework:config>
 </container>

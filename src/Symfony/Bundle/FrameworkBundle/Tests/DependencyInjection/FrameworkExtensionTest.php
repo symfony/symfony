@@ -161,6 +161,14 @@ abstract class FrameworkExtensionTest extends TestCase
         );
     }
 
+    public function testAnnotations()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertEquals($container->getParameter('kernel.cache_dir').'/annotations', $container->getDefinition('annotations.cache.file_cache')->getArgument(0));
+        $this->assertEquals('annotations.cached_reader', (string) $container->getAlias('annotation_reader'));
+    }
+
     public function testValidationAnnotations()
     {
         $container = $this->createContainerFromFile('validation_annotations');

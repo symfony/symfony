@@ -1,4 +1,10 @@
 doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                dbname: db
+
     orm:
         auto_generate_proxy_classes: false
         default_entity_manager: default

@@ -30,7 +30,7 @@ abstract class DoctrineCommandHelper
      */
     static public function setApplicationEntityManager(Application $application, $emName)
     {
-        $em = self::getEntityManager($application, $emName);
+        $em = $application->getKernel()->getContainer()->get('doctrine')->getEntityManager($name);
         $helperSet = $application->getHelperSet();
         $helperSet->set(new ConnectionHelper($em->getConnection()), 'db');
         $helperSet->set(new EntityManagerHelper($em), 'em');
@@ -38,42 +38,8 @@ abstract class DoctrineCommandHelper
 
     static public function setApplicationConnection(Application $application, $connName)
     {
-        $connection = self::getDoctrineConnection($application, $connName);
+        $connection = $application->getKernel()->getContainer()->get('doctrine')->getConnection($name);
         $helperSet = $application->getHelperSet();
         $helperSet->set(new ConnectionHelper($connection), 'db');
-    }
-
-    static protected function getEntityManager(Application $application, $name)
-    {
-        $container = $application->getKernel()->getContainer();
-
-        $name = $name ?: $container->getParameter('doctrine.orm.default_entity_manager');
-
-        $ems = $container->getParameter('doctrine.orm.entity_managers');
-        if (!isset($ems[$name])) {
-            throw new \InvalidArgumentException(sprintf('Could not find Doctrine EntityManager named "%s"', $name));
-        }
-
-        return $container->get($ems[$name]);
-    }
-
-    /**
-     * Get a doctrine dbal connection by symfony name.
-     *
-     * @param string $name
-     * @return Doctrine\DBAL\Connection
-     */
-    static protected function getDoctrineConnection(Application $application, $name)
-    {
-        $container = $application->getKernel()->getContainer();
-
-        $name = $name ?: $container->getParameter('doctrine.dbal.default_connection');
-
-        $connections = $container->getParameter('doctrine.dbal.connections');
-        if (!isset($connections[$name])) {
-            throw new \InvalidArgumentException(sprintf('<error>Could not find a connection named <comment>%s</comment></error>', $name));
-        }
-
-        return $container->get($connections[$name]);
     }
 }

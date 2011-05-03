@@ -373,7 +373,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar=&foo=bar', $request->getQueryString(), '->getQueryString() sorts keys alphabetically');
 
         $request->server->set('QUERY_STRING', 'him=John%20Doe&her=Jane+Doe');
-        $this->assertEquals('her=Jane+Doe&him=John+Doe', $request->getQueryString(), '->getQueryString() normalizes encoding');
+        $this->assertEquals('her=Jane%2BDoe&him=John%20Doe', $request->getQueryString(), '->getQueryString() normalizes encoding');
 
         $request->server->set('QUERY_STRING', 'foo[]=1&foo[]=2');
         $this->assertEquals('foo%5B%5D=1&foo%5B%5D=2', $request->getQueryString(), '->getQueryString() allows array notation');

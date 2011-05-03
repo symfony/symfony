@@ -67,7 +67,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
         $container->setAlias('database_connection', sprintf('doctrine.dbal.%s_connection', $config['default_connection']));
         $container->setAlias('doctrine.dbal.event_manager', new Alias(sprintf('doctrine.dbal.%s_connection.event_manager', $config['default_connection']), false));
-        $container->setParameter('doctrine.dbal.default_connection', $config['default_connection']);
 
         $container->getDefinition('doctrine.dbal.connection_factory')->replaceArgument(0, $config['types']);
 
@@ -75,7 +74,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
         foreach (array_keys($config['connections']) as $name) {
             $connections[$name] = sprintf('doctrine.dbal.%s_connection', $name);
         }
-        $container->setParameter('doctrine.dbal.connections', $connections);
+        $container->getDefinition('doctrine')->replaceArgument(1, $connections);
+        $container->getDefinition('doctrine')->replaceArgument(3, $config['default_connection']);
 
         foreach ($config['connections'] as $name => $connection) {
             $this->loadDbalConnection($name, $connection, $container);
@@ -148,18 +148,19 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('orm.xml');
 
-        $entityManagers = array();
+        $this->entityManagers = array();
         foreach (array_keys($config['entity_managers']) as $name) {
-            $entityManagers[$name] = sprintf('doctrine.orm.%s_entity_manager', $name);
+            $this->entityManagers[$name] = sprintf('doctrine.orm.%s_entity_manager', $name);
         }
-        $container->setParameter('doctrine.orm.entity_managers', $entityManagers);
+        $container->getDefinition('doctrine')->replaceArgument(2, $this->entityManagers);
 
         if (empty($config['default_entity_manager'])) {
-            $tmp = array_keys($entityManagers);
+            $tmp = array_keys($this->entityManagers);
             $config['default_entity_manager'] = reset($tmp);
         }
+        $container->getDefinition('doctrine')->replaceArgument(4, $config['default_entity_manager']);
 
-        $options = array('default_entity_manager', 'auto_generate_proxy_classes', 'proxy_dir', 'proxy_namespace');
+        $options = array('auto_generate_proxy_classes', 'proxy_dir', 'proxy_namespace');
         foreach ($options as $key) {
             $container->setParameter('doctrine.orm.'.$key, $config[$key]);
         }
@@ -180,7 +181,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
      */
     protected function loadOrmEntityManager(array $entityManager, ContainerBuilder $container)
     {
-        if ($entityManager['auto_mapping'] && count($container->getParameter('doctrine.orm.entity_managers')) > 1) {
+        if ($entityManager['auto_mapping'] && count($this->entityManagers) > 1) {
             throw new \LogicException('You cannot enable "auto_mapping" when several entity managers are defined.');
         }
 
@@ -227,6 +228,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             new Reference($connectionId),
             new Reference(sprintf('doctrine.orm.%s_configuration', $entityManager['name']))
         );
+
         $ormEmDef = new Definition('%doctrine.orm.entity_manager.class%', $ormEmArgs);
         $ormEmDef->setFactoryClass('%doctrine.orm.entity_manager.class%');
         $ormEmDef->setFactoryMethod('create');

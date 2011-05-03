@@ -46,7 +46,7 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $entityManagerName = $input->getOption('em') ? $input->getOption('em') : $this->container->getParameter('doctrine.orm.default_entity_manager');
+        $entityManagerName = $input->getOption('em') ? $input->getOption('em') : $this->container->get('doctrine')->getDefaultEntityManagerName();
 
         /* @var $entityManager Doctrine\ORM\EntityManager */
         $entityManager = $this->getEntityManager($input->getOption('em'));

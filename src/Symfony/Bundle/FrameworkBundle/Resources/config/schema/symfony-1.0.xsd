@@ -17,6 +17,7 @@
             <xsd:element name="templating" type="templating" minOccurs="0" maxOccurs="1" />
             <xsd:element name="translator" type="translator" minOccurs="0" maxOccurs="1" />
             <xsd:element name="validation" type="validation" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="file-upload" type="file_upload" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
         <xsd:attribute name="cache-warmer" type="cache_warmer" />
@@ -38,6 +39,11 @@
     <xsd:complexType name="csrf_protection">
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="field-name" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="file_upload">
+        <xsd:attribute name="path" type="xsd:string" />
+        <xsd:attribute name="size" type="xsd:integer" />
     </xsd:complexType>
 
     <xsd:complexType name="esi">

@@ -6,6 +6,10 @@ $container->loadFromExtension('framework', array(
         'enabled'    => true,
         'field_name' => '_csrf',
     ),
+    'file_upload' => array(
+        'path'  => '/path/to/cache',
+        'size'  => 1234,
+    ),
     'esi' => array(
         'enabled' => true,
     ),

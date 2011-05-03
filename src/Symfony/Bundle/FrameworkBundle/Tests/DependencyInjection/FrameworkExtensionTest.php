@@ -31,6 +31,16 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('s3cr3t', $container->getParameterBag()->resolveValue($container->findDefinition('form.csrf_provider')->getArgument(1)));
     }
 
+    public function testFileUploadConfiguration()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $def = $container->getDefinition('form.temporary_storage');
+
+        $this->assertEquals('/path/to/cache', $def->getArgument(2));
+        $this->assertEquals('1234', $def->getArgument(3));
+    }
+
     public function testEsi()
     {
         $container = $this->createContainerFromFile('full');

@@ -9,7 +9,7 @@
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
         <parameter key="form.type_guesser.validator.class">Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser</parameter>
         <parameter key="form.csrf_provider.class">Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider</parameter>
-        <parameter key="file.temporary_storage.class">Symfony\Component\HttpFoundation\File\SessionBasedTemporaryStorage</parameter>
+        <parameter key="form.temporary_storage.class">Symfony\Component\HttpFoundation\File\SessionBasedTemporaryStorage</parameter>
     </parameters>
 
     <services>
@@ -57,11 +57,12 @@
             <argument>%kernel.secret%</argument>
         </service>
 
-        <!-- TemporaryStorage - where should we put this? -->
-        <service id="file.temporary_storage" class="%file.temporary_storage.class%">
+        <!-- TemporaryStorage -->
+        <service id="form.temporary_storage" class="%form.temporary_storage.class%">
             <argument type="service" id="session" />
             <argument>%kernel.secret%</argument>
-            <argument>%kernel.cache_dir%/upload</argument>
+            <argument /> <!-- Temporary storage folder -->
+            <argument /> <!-- Temporary storage folder size in Bytes -->
         </service>
 
         <!-- CoreExtension -->
@@ -98,7 +99,7 @@
         </service>
         <service id="form.type.file" class="Symfony\Component\Form\Extension\Core\Type\FileType">
             <tag name="form.type" alias="file" />
-            <argument type="service" id="file.temporary_storage" />
+            <argument type="service" id="form.temporary_storage" />
         </service>
         <service id="form.type.hidden" class="Symfony\Component\Form\Extension\Core\Type\HiddenType">
             <tag name="form.type" alias="hidden" />

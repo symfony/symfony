@@ -91,6 +91,10 @@ class FrameworkExtension extends Extension
             $this->registerCsrfProtectionConfiguration($config['csrf_protection'], $container);
         }
 
+        if (isset($config['file_upload'])) {
+            $this->registerFileUploadConfiguration($config['file_upload'], $container);
+        }
+
         if (isset($config['esi'])) {
             $this->registerEsiConfiguration($config['esi'], $loader);
         }
@@ -163,6 +167,21 @@ class FrameworkExtension extends Extension
             ->getDefinition('form.type_extension.csrf')
             ->replaceArgument(0, $config['enabled'])
             ->replaceArgument(1, $config['field_name'])
+        ;
+    }
+
+    /**
+     * Loads the file upload configuration.
+     *
+     * @param array            $config    A file upload configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     */
+    private function registerFileUploadConfiguration(array $config, ContainerBuilder $container)
+    {
+        $container
+            ->getDefinition('form.temporary_storage')
+            ->replaceArgument(2, $config['path'])
+            ->replaceArgument(3, $config['size'])
         ;
     }
 

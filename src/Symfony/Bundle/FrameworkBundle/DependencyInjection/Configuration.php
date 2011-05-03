@@ -267,7 +267,7 @@ class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->scalarNode('dir')->defaultValue('%kernel.cache_dir%/annotations')->end()
-                                ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
+                                ->booleanNode('debug')->defaultValue($this->debug)->end()
                             ->end()
                         ->end()
                     ->end()

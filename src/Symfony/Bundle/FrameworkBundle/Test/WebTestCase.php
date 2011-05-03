@@ -156,8 +156,7 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function tearDown()
     {
-        if ($this->kernel !== null && $this->kernel->isBooted())
-        {
+        if ($this->kernel !== null && $this->kernel->isBooted()) {
             $this->kernel->shutdown();
         }
     }

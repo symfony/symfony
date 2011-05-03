@@ -180,7 +180,6 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
 
     protected function fetch($db, $query, array $args = array())
     {
-        $return = array();
         $stmt = $this->prepareStatement($db, $query);
 
         foreach ($args as $arg => $val) {

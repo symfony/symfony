@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineBundle\Command;
+namespace Symfony\Bundle\DoctrineBundle\Command\Proxy;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -32,22 +32,24 @@ class UpdateSchemaDoctrineCommand extends UpdateCommand
 
         $this
             ->setName('doctrine:schema:update')
-            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.')
+            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
             ->setHelp(<<<EOT
-The <info>doctrine:schema:update</info> command updates the default entity managers schema:
+The <info>doctrine:schema:update</info> command updates the default entity
+managers schema:
 
-  <info>./app/console doctrine:schema:update</info>
+<info>./app/console doctrine:schema:update</info>
 
-You can also optionally specify the name of a entity manager to update the schema for:
+You can also optionally specify the name of a entity manager to update the
+schema for:
 
-  <info>./app/console doctrine:schema:update --em=default</info>
+<info>./app/console doctrine:schema:update --em=default</info>
 EOT
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        DoctrineCommand::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
+        DoctrineCommandHelper::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
 
         parent::execute($input, $output);
     }

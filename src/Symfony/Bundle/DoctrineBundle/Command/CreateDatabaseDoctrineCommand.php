@@ -11,13 +11,10 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Command;
 
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\Output;
-use Symfony\Component\HttpKernel\Util\Filesystem;
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
 
 /**
  * Database tool allows you to easily drop and create your configured databases.
@@ -31,16 +28,18 @@ class CreateDatabaseDoctrineCommand extends DoctrineCommand
     {
         $this
             ->setName('doctrine:database:create')
-            ->setDescription('Create the configured databases.')
-            ->addOption('connection', null, InputOption::VALUE_OPTIONAL, 'The connection to use for this command.')
+            ->setDescription('Create the configured databases')
+            ->addOption('connection', null, InputOption::VALUE_OPTIONAL, 'The connection to use for this command')
             ->setHelp(<<<EOT
-The <info>doctrine:database:create</info> command creates the default connections database:
+The <info>doctrine:database:create</info> command creates the default
+connections database:
 
-  <info>./app/console doctrine:database:create</info>
+<info>./app/console doctrine:database:create</info>
 
-You can also optionally specify the name of a connection to create the database for:
+You can also optionally specify the name of a connection to create the
+database for:
 
-  <info>./app/console doctrine:database:create --connection=default</info>
+<info>./app/console doctrine:database:create --connection=default</info>
 EOT
         );
     }
@@ -50,11 +49,11 @@ EOT
         $connection = $this->getDoctrineConnection($input->getOption('connection'));
 
         $params = $connection->getParams();
-        $name = isset($params['path']) ? $params['path']:$params['dbname'];
+        $name = isset($params['path']) ? $params['path'] : $params['dbname'];
 
         unset($params['dbname']);
 
-        $tmpConnection = \Doctrine\DBAL\DriverManager::getConnection($params);
+        $tmpConnection = DriverManager::getConnection($params);
 
         try {
             $tmpConnection->getSchemaManager()->createDatabase($name);

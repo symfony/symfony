@@ -154,7 +154,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
         $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getFactoryClass());
         $this->assertEquals('create', $definition->getFactoryMethod());
-        $this->assertArrayHasKey('doctrine.orm.entity_manager', $definition->getTags());
 
         $this->assertEquals(array('default' => 'doctrine.orm.default_entity_manager'), $container->getParameter('doctrine.orm.entity_managers'), "Set of the existing EntityManagers names is incorrect.");
 
@@ -196,7 +195,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
         $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getFactoryClass());
         $this->assertEquals('create', $definition->getFactoryMethod());
-        $this->assertArrayHasKey('doctrine.orm.entity_manager', $definition->getTags());
 
         $this->assertDICConstructorArguments($definition, array(
             new Reference('database_connection'), new Reference('doctrine.orm.default_configuration')
@@ -235,7 +233,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
         $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getFactoryClass());
         $this->assertEquals('create', $definition->getFactoryMethod());
-        $this->assertArrayHasKey('doctrine.orm.entity_manager', $definition->getTags());
 
         $this->assertDICConstructorArguments($definition, array(
             new Reference('database_connection'), new Reference('doctrine.orm.default_configuration')
@@ -275,7 +272,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
         $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getFactoryClass());
         $this->assertEquals('create', $definition->getFactoryMethod());
-        $this->assertArrayHasKey('doctrine.orm.entity_manager', $definition->getTags());
 
         $this->assertDICConstructorArguments($definition, array(
             new Reference('doctrine.dbal.default_connection'), new Reference('doctrine.orm.default_configuration')
@@ -308,7 +304,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
         $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getFactoryClass());
         $this->assertEquals('create', $definition->getFactoryMethod());
-        $this->assertArrayHasKey('doctrine.orm.entity_manager', $definition->getTags());
 
         $arguments = $definition->getArguments();
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[0]);
@@ -330,7 +325,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
         $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getFactoryClass());
         $this->assertEquals('create', $definition->getFactoryMethod());
-        $this->assertArrayHasKey('doctrine.orm.entity_manager', $definition->getTags());
 
         $arguments = $definition->getArguments();
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[0]);

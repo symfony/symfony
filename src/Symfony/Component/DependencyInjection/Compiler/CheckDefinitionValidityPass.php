@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * into account which is contained in the definition itself.
  *
  * Later passes can rely on the following, and specifically do not need to
- * perform these checks themself:
+ * perform these checks themselves:
  *
  * - non synthetic, non abstract services always have a class set
  * - synthetic services are always public

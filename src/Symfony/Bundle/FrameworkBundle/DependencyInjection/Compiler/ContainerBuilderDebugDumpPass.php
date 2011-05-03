@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Dumper\XmlDumper;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\Config\ConfigCache;
 
@@ -27,22 +27,8 @@ class ContainerBuilderDebugDumpPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        $cache = new ConfigCache(self::getBuilderCacheFilename($container), false);
-
-        $cache->write(serialize($container));
-    }
-
-    /**
-     * Calculates the cache filename to be used to cache the ContainerBuilder
-     *
-     * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-     *
-     * @return string
-     */
-    static public function getBuilderCacheFilename(ContainerInterface $container)
-    {
-        $class = $container->getParameter('kernel.container_class');
-
-        return $container->getParameter('kernel.cache_dir').'/'.$class.'Builder.cache';
+        $dumper = new XmlDumper($container);
+        $cache = new ConfigCache($container->getParameter('debug.container.dump'), false);
+        $cache->write($dumper->dump());
     }
 }

@@ -36,15 +36,19 @@
 
     <xsd:simpleType name="level">
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="error" />
-            <xsd:enumeration value="warning" />
-            <xsd:enumeration value="info" />
             <xsd:enumeration value="debug" />
+            <xsd:enumeration value="info" />
+            <xsd:enumeration value="warning" />
+            <xsd:enumeration value="error" />
+            <xsd:enumeration value="critical" />
+            <xsd:enumeration value="alert" />
 
             <xsd:enumeration value="100" />
             <xsd:enumeration value="200" />
             <xsd:enumeration value="300" />
             <xsd:enumeration value="400" />
+            <xsd:enumeration value="500" />
+            <xsd:enumeration value="550" />
         </xsd:restriction>
     </xsd:simpleType>
 </xsd:schema>

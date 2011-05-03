@@ -9,45 +9,42 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineBundle\Command;
+namespace Symfony\Bundle\DoctrineBundle\Command\Proxy;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
-use Doctrine\ORM\Tools\Console\Command\GenerateProxiesCommand;
+use Doctrine\ORM\Tools\Console\Command\ConvertMappingCommand;
 
 /**
- * Generate the Doctrine ORM entity proxies to your cache directory.
+ * Convert Doctrine ORM metadata mapping information between the various supported
+ * formats.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jonathan H. Wage <jonwage@gmail.com>
  */
-class GenerateProxiesDoctrineCommand extends GenerateProxiesCommand
+class ConvertMappingDoctrineCommand extends ConvertMappingCommand
 {
     protected function configure()
     {
         parent::configure();
-
         $this
-            ->setName('doctrine:generate:proxies')
-            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.')
+            ->setName('doctrine:mapping:convert')
+            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
             ->setHelp(<<<EOT
-The <info>doctrine:generate:proxies</info> command generates proxy classes for your default entity manager:
+The <info>doctrine:mapping:convert</info> command converts mapping information
+between supported formats:
 
-  <info>./app/console doctrine:generate:proxies</info>
-
-You can specify the entity manager you want to generate the proxies for:
-
-  <info>./app/console doctrine:generate:proxies --em=name</info>
+<info>./app/console doctrine:mapping:convert xml /path/to/output</info>
 EOT
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        DoctrineCommand::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
+        DoctrineCommandHelper::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
 
         return parent::execute($input, $output);
     }

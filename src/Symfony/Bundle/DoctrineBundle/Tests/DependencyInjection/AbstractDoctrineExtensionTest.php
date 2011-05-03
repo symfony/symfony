@@ -120,8 +120,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('Doctrine\ORM\Mapping\Driver\DriverChain', $container->getParameter('doctrine.orm.metadata.driver_chain.class'));
         $this->assertEquals('Doctrine\ORM\Mapping\Driver\AnnotationDriver', $container->getParameter('doctrine.orm.metadata.annotation.class'));
         $this->assertEquals('Doctrine\Common\Annotations\AnnotationReader', $container->getParameter('doctrine.orm.metadata.annotation_reader.class'));
-        $this->assertEquals('Doctrine\ORM\Mapping\Driver\XmlDriver', $container->getParameter('doctrine.orm.metadata.xml.class'));
-        $this->assertEquals('Doctrine\ORM\Mapping\Driver\YamlDriver', $container->getParameter('doctrine.orm.metadata.yml.class'));
+        $this->assertEquals('Symfony\Bundle\DoctrineBundle\Mapping\Driver\XmlDriver', $container->getParameter('doctrine.orm.metadata.xml.class'));
+        $this->assertEquals('Symfony\Bundle\DoctrineBundle\Mapping\Driver\YamlDriver', $container->getParameter('doctrine.orm.metadata.yml.class'));
 
         $config = array(
             'proxy_namespace' => 'MyProxies',
@@ -554,12 +554,12 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $ymlDef = $container->getDefinition('doctrine.orm.default_yml_metadata_driver');
         $this->assertDICConstructorArguments($ymlDef, array(
-            array(__DIR__ .DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'Bundles'.DIRECTORY_SEPARATOR.'YamlBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'doctrine'.DIRECTORY_SEPARATOR.'metadata')
+            array(__DIR__ .DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'Bundles'.DIRECTORY_SEPARATOR.'YamlBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config')
         ));
 
         $xmlDef = $container->getDefinition('doctrine.orm.default_xml_metadata_driver');
         $this->assertDICConstructorArguments($xmlDef, array(
-            array(__DIR__ .DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'Bundles'.DIRECTORY_SEPARATOR.'XmlBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'doctrine'.DIRECTORY_SEPARATOR.'metadata')
+            array(__DIR__ .DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'Bundles'.DIRECTORY_SEPARATOR.'XmlBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config')
         ));
     }
 
@@ -602,12 +602,12 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $ymlDef = $container->getDefinition('doctrine.orm.em2_yml_metadata_driver');
         $this->assertDICConstructorArguments($ymlDef, array(
-            array(__DIR__ .DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'Bundles'.DIRECTORY_SEPARATOR.'YamlBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'doctrine'.DIRECTORY_SEPARATOR.'metadata')
+            array(__DIR__ .DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'Bundles'.DIRECTORY_SEPARATOR.'YamlBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config')
         ));
 
         $xmlDef = $container->getDefinition('doctrine.orm.em2_xml_metadata_driver');
         $this->assertDICConstructorArguments($xmlDef, array(
-            array(__DIR__ .DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'Bundles'.DIRECTORY_SEPARATOR.'XmlBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'doctrine'.DIRECTORY_SEPARATOR.'metadata')
+            array(__DIR__ .DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'Bundles'.DIRECTORY_SEPARATOR.'XmlBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config')
         ));
     }
 

@@ -9,6 +9,20 @@ timeline closely anyway.
 beta1 to beta2
 --------------
 
+* The Doctrine metadata files has moved from
+  ``Resources/config/doctrine/metadata/orm/`` to ``Resources/config/`` and the
+  extension from ``.dcm.yml`` to ``.orm.dcm.yml``
+
+  Before:
+
+        Resources/config/doctrine/metadata/orm/Bundle.Entity.dcm.xml
+        Resources/config/doctrine/metadata/orm/Bundle.Entity.dcm.yml
+
+  After:
+
+        Resources/config/Bundle.Entity.orm.dcm.xml
+        Resources/config/Bundle.Entity.orm.dcm.yml
+
 * With the introduction of a new Doctrine Registry class, the following
   parameters have been removed (replaced by methods on the `doctrine`
   service):

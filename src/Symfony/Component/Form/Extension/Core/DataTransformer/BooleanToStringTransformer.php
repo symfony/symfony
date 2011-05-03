@@ -27,7 +27,10 @@ class BooleanToStringTransformer implements DataTransformerInterface
      * Transforms a Boolean into a string.
      *
      * @param  Boolean $value   Boolean value.
+     *
      * @return string           String value.
+     *
+     * @throws UnexpectedTypeException if the given value is not a Boolean
      */
     public function transform($value)
     {
@@ -46,7 +49,10 @@ class BooleanToStringTransformer implements DataTransformerInterface
      * Transforms a string into a Boolean.
      *
      * @param  string $value  String value.
+     *
      * @return Boolean        Boolean value.
+     *
+     * @throws UnexpectedTypeException if the given value is not a string
      */
     public function reverseTransform($value)
     {

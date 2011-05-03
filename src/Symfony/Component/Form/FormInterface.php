@@ -86,11 +86,11 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Updates the field with default data.
      *
-     * @param array $data The data
+     * @param array $appData The data formatted as expected for the underlying object
      *
      * @return Form The current form
      */
-    function setData($data);
+    function setData($appData);
 
     /**
      * Returns the data in the format needed for the underlying object.

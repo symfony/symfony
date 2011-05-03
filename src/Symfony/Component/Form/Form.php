@@ -120,7 +120,7 @@ class Form implements \IteratorAggregate, FormInterface
      * The form data in application format
      * @var mixed
      */
-    private $data;
+    private $appData;
 
     /**
      * The form data in normalized format
@@ -223,25 +223,18 @@ class Form implements \IteratorAggregate, FormInterface
             }
         }
 
-        foreach ($types as $type) {
-            if (!$type instanceof FormTypeInterface) {
-                throw new UnexpectedTypeException($type, 'Symfony\Component\Form\FormTypeInterface');
-            }
-        }
-
         $this->name = (string) $name;
-        $this->types = $types;
         $this->dispatcher = $dispatcher;
         $this->types = $types;
         $this->clientTransformers = $clientTransformers;
         $this->normTransformers = $normTransformers;
-        $this->validators = $validators;
         $this->dataMapper = $dataMapper;
-        $this->required = $required;
-        $this->readOnly = $readOnly;
-        $this->attributes = $attributes;
-        $this->errorBubbling = $errorBubbling;
+        $this->validators = $validators;
+        $this->required = (Boolean) $required;
+        $this->readOnly = (Boolean) $readOnly;
+        $this->errorBubbling = (Boolean) $errorBubbling;
         $this->emptyData = $emptyData;
+        $this->attributes = $attributes;
 
         $this->setData(null);
     }
@@ -388,30 +381,30 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Updates the field with default data.
      *
-     * @param array $data The data
+     * @param array $appData The data formatted as expected for the underlying object
      *
      * @return Form The current form
      */
-    public function setData($data)
+    public function setData($appData)
     {
-        $event = new DataEvent($this, $data);
+        $event = new DataEvent($this, $appData);
         $this->dispatcher->dispatch(Events::preSetData, $event);
 
         // Hook to change content of the data
-        $event = new FilterDataEvent($this, $data);
+        $event = new FilterDataEvent($this, $appData);
         $this->dispatcher->dispatch(Events::onSetData, $event);
-        $data = $event->getData();
+        $appData = $event->getData();
 
         // Treat data as strings unless a value transformer exists
-        if (!$this->clientTransformers && !$this->normTransformers && is_scalar($data)) {
-            $data = (string) $data;
+        if (!$this->clientTransformers && !$this->normTransformers && is_scalar($appData)) {
+            $appData = (string) $appData;
         }
 
         // Synchronize representations - must not change the content!
-        $normData = $this->appToNorm($data);
+        $normData = $this->appToNorm($appData);
         $clientData = $this->normToClient($normData);
 
-        $this->data = $data;
+        $this->appData = $appData;
         $this->normData = $normData;
         $this->clientData = $clientData;
         $this->synchronized = true;
@@ -421,7 +414,7 @@ class Form implements \IteratorAggregate, FormInterface
             $this->dataMapper->mapDataToForms($clientData, $this->children);
         }
 
-        $event = new DataEvent($this, $data);
+        $event = new DataEvent($this, $appData);
         $this->dispatcher->dispatch(Events::postSetData, $event);
 
         return $this;
@@ -434,7 +427,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getData()
     {
-        return $this->data;
+        return $this->appData;
     }
 
     /**
@@ -556,7 +549,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         $this->bound = true;
-        $this->data = $appData;
+        $this->appData = $appData;
         $this->normData = $normData;
         $this->clientData = $clientData;
         $this->extraData = $extraData;
@@ -675,7 +668,7 @@ class Form implements \IteratorAggregate, FormInterface
             }
         }
 
-        return array() === $this->data || null === $this->data || '' === $this->data;
+        return array() === $this->appData || null === $this->appData || '' === $this->appData;
     }
 
     /**

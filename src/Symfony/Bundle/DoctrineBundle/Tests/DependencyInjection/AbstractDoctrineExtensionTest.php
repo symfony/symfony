@@ -33,7 +33,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $loader->load(array(array(), array('dbal' => array('default_connection' => 'foo')), array()), $container);
 
         // doctrine.dbal.default_connection
-        $this->assertEquals('foo', $container->getParameter('doctrine.dbal.default_connection'), '->load() overrides existing configuration options');
+        $this->assertEquals('foo', $container->getDefinition('doctrine')->getArgument(3), '->load() overrides existing configuration options');
     }
 
     public function testDbalLoad()
@@ -153,7 +153,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getFactoryClass());
         $this->assertEquals('create', $definition->getFactoryMethod());
 
-        $this->assertEquals(array('default' => 'doctrine.orm.default_entity_manager'), $container->getParameter('doctrine.orm.entity_managers'), "Set of the existing EntityManagers names is incorrect.");
+        $this->assertEquals(array('default' => 'doctrine.orm.default_entity_manager'), $container->getDefinition('doctrine')->getArgument(2), "Set of the existing EntityManagers names is incorrect.");
 
         $arguments = $definition->getArguments();
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[0]);
@@ -345,7 +345,9 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer();
         $loader = new DoctrineExtension();
 
-        $loader->load(array(array('orm' => array('default_entity_manager' => 'default', 'entity_managers' => array('default' => array('mappings' => array('YamlBundle' => array())))))), $container);
+        $config = $this->getConnectionConfig();
+        $config['orm'] = array('default_entity_manager' => 'default', 'entity_managers' => array('default' => array('mappings' => array('YamlBundle' => array()))));
+        $loader->load(array($config), $container);
 
         $definition = $container->getDefinition('doctrine.orm.default_configuration');
         $this->assertDICDefinitionMethodCallOnce($definition, 'setEntityNamespaces',
@@ -358,7 +360,9 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer();
         $loader = new DoctrineExtension();
 
-        $loader->load(array(array('orm' => array('default_entity_manager' => 'default', 'entity_managers' => array('default' => array('mappings' => array('YamlBundle' => array('alias' => 'yml'))))))), $container);
+        $config = $this->getConnectionConfig();
+        $config['orm'] = array('default_entity_manager' => 'default', 'entity_managers' => array('default' => array('mappings' => array('YamlBundle' => array('alias' => 'yml')))));
+        $loader->load(array($config), $container);
 
         $definition = $container->getDefinition('doctrine.orm.default_configuration');
         $this->assertDICDefinitionMethodCallOnce($definition, 'setEntityNamespaces',
@@ -371,7 +375,9 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer('YamlBundle');
         $loader = new DoctrineExtension();
 
-        $loader->load(array(array('orm' => array('default_entity_manager' => 'default', 'entity_managers' => array('default' => array('mappings' => array('YamlBundle' => array())))))), $container);
+        $config = $this->getConnectionConfig();
+        $config['orm'] = array('default_entity_manager' => 'default', 'entity_managers' => array('default' => array('mappings' => array('YamlBundle' => array()))));
+        $loader->load(array($config), $container);
 
         $definition = $container->getDefinition('doctrine.orm.default_metadata_driver');
         $this->assertDICDefinitionMethodCallOnce($definition, 'addDriver', array(
@@ -385,7 +391,9 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer('XmlBundle');
         $loader = new DoctrineExtension();
 
-        $loader->load(array(array('orm' => array('default_entity_manager' => 'default', 'entity_managers' => array('default' => array('mappings' => array('XmlBundle' => array())))))), $container);
+        $config = $this->getConnectionConfig();
+        $config['orm'] = array('default_entity_manager' => 'default', 'entity_managers' => array('default' => array('mappings' => array('XmlBundle' => array()))));
+        $loader->load(array($config), $container);
 
         $definition = $container->getDefinition('doctrine.orm.default_metadata_driver');
         $this->assertDICDefinitionMethodCallOnce($definition, 'addDriver', array(
@@ -399,7 +407,9 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer('AnnotationsBundle');
         $loader = new DoctrineExtension();
 
-        $loader->load(array(array('orm' => array('default_entity_manager' => 'default', 'entity_managers' => array('default' => array('mappings' => array('AnnotationsBundle' => array())))))), $container);
+        $config = $this->getConnectionConfig();
+        $config['orm'] = array('default_entity_manager' => 'default', 'entity_managers' => array('default' => array('mappings' => array('AnnotationsBundle' => array()))));
+        $loader->load(array($config), $container);
 
         $definition = $container->getDefinition('doctrine.orm.default_metadata_driver');
         $this->assertDICDefinitionMethodCallOnce($definition, 'addDriver', array(
@@ -413,18 +423,21 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer(array('XmlBundle', 'AnnotationsBundle'));
         $loader = new DoctrineExtension();
 
-        $loader->load(array(array('orm' => array(
+        $config1 = $this->getConnectionConfig();
+        $config1['orm'] = array(
             'auto_generate_proxy_classes' => true,
             'default_entity_manager' => 'default',
             'entity_managers' => array(
                 'default' => array('mappings' => array('AnnotationsBundle' => array()))
-            ))),
-            array('orm' => array(
-                'auto_generate_proxy_classes' => false,
-                'default_entity_manager' => 'default',
-                'entity_managers' => array(
-                    'default' => array('mappings' => array('XmlBundle' => array()))
-        )))), $container);
+        ));
+        $config2 = $this->getConnectionConfig();
+        $config2['orm'] = array(
+            'auto_generate_proxy_classes' => false,
+            'default_entity_manager' => 'default',
+            'entity_managers' => array(
+                'default' => array('mappings' => array('XmlBundle' => array()))
+        ));
+        $loader->load(array($config1, $config2), $container);
 
         $definition = $container->getDefinition('doctrine.orm.default_metadata_driver');
         $this->assertDICDefinitionMethodCallAt(0, $definition, 'addDriver', array(
@@ -561,7 +574,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $this->compileContainer($container);
 
-        $this->assertEquals(array('em1' => 'doctrine.orm.em1_entity_manager', 'em2' => 'doctrine.orm.em2_entity_manager'), $container->getParameter('doctrine.orm.entity_managers'), "Set of the existing EntityManagers names is incorrect.");
+        $this->assertEquals(array('em1' => 'doctrine.orm.em1_entity_manager', 'em2' => 'doctrine.orm.em2_entity_manager'), $container->getDefinition('doctrine')->getArgument(2), "Set of the existing EntityManagers names is incorrect.");
 
         $def1 = $container->getDefinition('doctrine.orm.em1_metadata_driver');
         $def2 = $container->getDefinition('doctrine.orm.em2_metadata_driver');
@@ -603,7 +616,9 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer('AnnotationsBundle', 'Vendor');
         $loader = new DoctrineExtension();
 
-        $loader->load(array(array('orm' => array('default_entity_manager' => 'default', 'entity_managers' => array('default' => array('mappings' => array('AnnotationsBundle' => array())))))), $container);
+        $config = $this->getConnectionConfig();
+        $config['orm'] = array('default_entity_manager' => 'default', 'entity_managers' => array('default' => array('mappings' => array('AnnotationsBundle' => array()))));
+        $loader->load(array($config), $container);
 
         $calls = $container->getDefinition('doctrine.orm.default_metadata_driver')->getMethodCalls();
         $this->assertEquals('doctrine.orm.default_annotation_metadata_driver', (string) $calls[0][1][0]);
@@ -734,5 +749,10 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container->getCompilerPassConfig()->setOptimizationPasses(array(new ResolveDefinitionTemplatesPass()));
         $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->compile();
+    }
+
+    protected function getConnectionConfig()
+    {
+        return array('dbal' => array('connections' => array('default' => array('password' => 'foo'))));
     }
 }

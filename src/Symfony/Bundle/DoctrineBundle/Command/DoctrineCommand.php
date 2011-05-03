@@ -42,14 +42,7 @@ abstract class DoctrineCommand extends Command
 
     protected function getEntityManager($name)
     {
-        $name = $name ?: $this->container->getParameter('doctrine.orm.default_entity_manager');
-
-        $ems = $this->container->getParameter('doctrine.orm.entity_managers');
-        if (!isset($ems[$name])) {
-            throw new \InvalidArgumentException(sprintf('Could not find Doctrine EntityManager named "%s"', $name));
-        }
-
-        return $this->container->get($ems[$name]);
+        return $this->container->get('doctrine')->getEntityManager($name);
     }
 
     /**
@@ -60,21 +53,14 @@ abstract class DoctrineCommand extends Command
      */
     protected function getDoctrineConnection($name)
     {
-        $name = $name ?: $this->container->getParameter('doctrine.dbal.default_connection');
-
-        $connections = $this->container->getParameter('doctrine.dbal.connections');
-        if (!isset($connections[$name])) {
-            throw new \InvalidArgumentException(sprintf('<error>Could not find a connection named <comment>%s</comment></error>', $name));
-        }
-
-        return $this->container->get($connections[$name]);
+        return $this->container->get('doctrine')->getConnection($name);
     }
 
     protected function getBundleMetadatas(Bundle $bundle)
     {
         $namespace = $bundle->getNamespace();
         $bundleMetadatas = array();
-        foreach ($this->container->getParameter('doctrine.orm.entity_managers') as $id) {
+        foreach ($this->container->get('doctrine')->getEntityManagerNames() as $id) {
             $em = $this->container->get($id);
             $cmf = new DisconnectedClassMetadataFactory();
             $cmf->setEntityManager($em);

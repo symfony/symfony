@@ -14,6 +14,7 @@
         <parameter key="doctrine.dbal.connection_factory.class">Symfony\Bundle\DoctrineBundle\ConnectionFactory</parameter>
         <parameter key="doctrine.dbal.events.mysql_session_init.class">Doctrine\DBAL\Event\Listeners\MysqlSessionInit</parameter>
         <parameter key="doctrine.dbal.events.oracle_session_init.class">Doctrine\DBAL\Event\Listeners\OracleSessionInit</parameter>
+        <parameter key="doctrine.class">Symfony\Bundle\DoctrineBundle\Registry</parameter>
     </parameters>
 
     <services>
@@ -26,8 +27,7 @@
 
         <service id="data_collector.doctrine" class="%doctrine.data_collector.class%" public="false">
             <tag name="data_collector" template="DoctrineBundle:Collector:db" id="db" />
-            <argument>%doctrine.dbal.connections%</argument>
-            <argument>%doctrine.orm.entity_managers%</argument>
+            <argument type="service" id="doctrine" />
             <argument type="service" id="doctrine.dbal.logger" />
         </service>
 
@@ -40,5 +40,13 @@
         <service id="doctrine.dbal.connection.event_manager" class="%doctrine.dbal.connection.event_manager.class%" public="false" abstract="true" />
 
         <service id="doctrine.dbal.connection.configuration" class="%doctrine.dbal.configuration.class%" public="false" abstract="true" />
+
+        <service id="doctrine" class="%doctrine.class%">
+            <argument type="service" id="service_container" />
+            <argument type="collection" /> <!-- connections -->
+            <argument type="collection" /> <!-- entity managers -->
+            <argument /> <!-- default connection name -->
+            <argument /> <!-- default entity manager name -->
+        </service>
     </services>
 </container>

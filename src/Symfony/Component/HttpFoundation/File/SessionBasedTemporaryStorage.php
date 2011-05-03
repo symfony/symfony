@@ -20,9 +20,9 @@ class SessionBasedTemporaryStorage extends TemporaryStorage
 {
     private $session;
 
-    public function __construct(Session $session, $secret, $directory)
+    public function __construct(Session $session, $secret, $directory, $size = 0)
     {
-        parent::__construct($secret, $directory);
+        parent::__construct($secret, $directory, $size);
 
         $this->session = $session;
     }

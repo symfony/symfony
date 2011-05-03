@@ -82,6 +82,20 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                     array('variable', '/', '[^/]*?', 'bar'),
                     array('text', '/foo'),
                 )),
+
+            array(
+                'Route with an optional variable as the first segment',
+                array('/{bar}', array('bar' => 'bar')),
+                '', '#^/(?:(?P<bar>[^/]*?))?$#x', array('bar'), array(
+                    array('variable', '/', '[^/]*?', 'bar'),
+                )),
+
+            array(
+                'Route with an optional variable as the first segment with requirements',
+                array('/{bar}', array('bar' => 'bar'), array('bar' => '(foo|bar)')),
+                '', '#^/(?:(?P<bar>(foo|bar)))?$#x', array('bar'), array(
+                    array('variable', '/', '(foo|bar)', 'bar'),
+                )),
         );
     }
 }

@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 /**
  * Adds a few formats to each request.
  *
- * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ * @author Kris Wallsmith <kris@symfony.com>
  */
 class RequestListener
 {

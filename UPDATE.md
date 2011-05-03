@@ -89,6 +89,13 @@ beta1 to beta2
      */
     private  $foo;
 
+* The `doctrine:generate:entities` arguments and options changed. Run
+  `./app/console doctrine:generate:entities --help` for more information about
+  the new syntax.
+
+* The `doctrine:generate:repositories` command has been removed. The
+  functionality has been moved to the `doctrine:generate:entities`.
+
 * Doctrine event subscribers now use a unique "doctrine.event_subscriber" tag.
   Doctrine event listeners also use a unique "doctrine.event_listener" tag. To
   specify a connection, use the optional "connection" attribute.

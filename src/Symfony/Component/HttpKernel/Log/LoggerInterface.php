@@ -18,8 +18,6 @@ namespace Symfony\Component\HttpKernel\Log;
  */
 interface LoggerInterface
 {
-    function log($message, $priority);
-
     function emerg($message);
 
     function alert($message);

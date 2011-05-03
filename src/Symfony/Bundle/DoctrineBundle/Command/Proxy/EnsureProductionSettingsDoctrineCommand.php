@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineBundle\Command;
+namespace Symfony\Bundle\DoctrineBundle\Command\Proxy;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -32,22 +32,24 @@ class EnsureProductionSettingsDoctrineCommand extends EnsureProductionSettingsCo
 
         $this
             ->setName('doctrine:ensure-production-settings')
-            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.')
+            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
             ->setHelp(<<<EOT
-The <info>doctrine:ensure-production-settings</info> command ensures that Doctrine is properly configured for a production environment.:
+The <info>doctrine:ensure-production-settings</info> command ensures that
+Doctrine is properly configured for a production environment.:
 
-  <info>./app/console doctrine:ensure-production-settings</info>
+<info>./app/console doctrine:ensure-production-settings</info>
 
-You can also optionally specify the <comment>--em</comment> option to specify which entity manager to use:
+You can also optionally specify the <comment>--em</comment> option to specify
+which entity manager to use:
 
-  <info>./app/console doctrine:ensure-production-settings --em=default</info>
+<info>./app/console doctrine:ensure-production-settings --em=default</info>
 EOT
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        DoctrineCommand::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
+        DoctrineCommandHelper::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
 
         parent::execute($input, $output);
     }

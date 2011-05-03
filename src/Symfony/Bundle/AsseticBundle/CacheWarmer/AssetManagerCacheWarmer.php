@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * The AssetManagerCacheWarmer warms up the formula loader.
  *
- * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ * @author Kris Wallsmith <kris@symfony.com>
  */
 class AssetManagerCacheWarmer implements CacheWarmerInterface
 {

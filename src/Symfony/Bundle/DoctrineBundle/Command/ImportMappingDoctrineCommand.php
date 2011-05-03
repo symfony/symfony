@@ -15,10 +15,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\Output;
-use Doctrine\ORM\Tools\Console\Command\ConvertMappingCommand;
-use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
-use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use Doctrine\ORM\Mapping\Driver\DatabaseDriver;
 use Doctrine\ORM\Tools\DisconnectedClassMetadataFactory;
 use Doctrine\ORM\Tools\Export\ClassMetadataExporter;
@@ -35,18 +31,20 @@ class ImportMappingDoctrineCommand extends DoctrineCommand
     {
         $this
             ->setName('doctrine:mapping:import')
-            ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to import the mapping information to.')
-            ->addArgument('mapping-type', InputArgument::OPTIONAL, 'The mapping type to export the imported mapping information to.')
-            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.')
-            ->setDescription('Import mapping information from an existing database.')
+            ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to import the mapping information to')
+            ->addArgument('mapping-type', InputArgument::OPTIONAL, 'The mapping type to export the imported mapping information to')
+            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
+            ->setDescription('Import mapping information from an existing database')
             ->setHelp(<<<EOT
-The <info>doctrine:mapping:import</info> command imports mapping information from an existing database:
+The <info>doctrine:mapping:import</info> command imports mapping information
+from an existing database:
 
-  <info>./app/console doctrine:mapping:import "MyCustomBundle" xml</info>
+<info>./app/console doctrine:mapping:import "MyCustomBundle" xml</info>
 
-You can also optionally specify which entity manager to import from with the <info>--em</info> option:
+You can also optionally specify which entity manager to import from with the
+<info>--em</info> option:
 
-  <info>./app/console doctrine:mapping:import "MyCustomBundle" xml --em=default</info>
+<info>./app/console doctrine:mapping:import "MyCustomBundle" xml --em=default</info>
 EOT
         );
     }
@@ -74,7 +72,8 @@ EOT
             $exporter->setEntityGenerator($entityGenerator);
         }
 
-        $em = $this->getEntityManager($this->container, $input->getOption('em'));
+        $em = $this->getEntityManager($input->getOption('em'));
+
         $databaseDriver = new DatabaseDriver($em->getConnection()->getSchemaManager());
         $em->getConfiguration()->setMetadataDriverImpl($databaseDriver);
 
@@ -102,7 +101,8 @@ EOT
                 file_put_contents($path, $code);
             }
         } else {
-            $output->writeln('Database does not have any mapping information.'.PHP_EOL, 'ERROR');
+            $output->writeln('Database does not have any mapping information.', 'ERROR');
+            $output->writeln('', 'ERROR');
         }
     }
 }

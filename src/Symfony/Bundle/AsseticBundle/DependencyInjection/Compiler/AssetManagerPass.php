@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 /**
  * Adds services tagged as assets to the asset manager.
  *
- * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ * @author Kris Wallsmith <kris@symfony.com>
  */
 class AssetManagerPass implements CompilerPassInterface
 {

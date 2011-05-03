@@ -71,15 +71,22 @@ class RouteCompiler implements RouteCompilerInterface
         // compute the matching regexp
         $regex = '';
         $indent = 1;
-        foreach ($tokens as $i => $token) {
-            if ('text' === $token[0]) {
-                $regex .= str_repeat(' ', $indent * 4).preg_quote($token[1], '#')."\n";
-            } else {
-                if ($i >= $firstOptional) {
-                    $regex .= str_repeat(' ', $indent * 4)."(?:\n";
-                    ++$indent;
+        if (1 === count($tokens) && 0 === $firstOptional) {
+            $token = $tokens[0];
+            ++$indent;
+            $regex .= str_repeat(' ', $indent * 4).sprintf("%s(?:\n", preg_quote($token[1], '#'));
+            $regex .= str_repeat(' ', $indent * 4).sprintf("(?P<%s>%s)\n", $token[3], $token[2]);
+        } else {
+            foreach ($tokens as $i => $token) {
+                if ('text' === $token[0]) {
+                    $regex .= str_repeat(' ', $indent * 4).preg_quote($token[1], '#')."\n";
+                } else {
+                    if ($i >= $firstOptional) {
+                        $regex .= str_repeat(' ', $indent * 4)."(?:\n";
+                        ++$indent;
+                    }
+                    $regex .= str_repeat(' ', $indent * 4).sprintf("%s(?P<%s>%s)\n", preg_quote($token[1], '#'), $token[3], $token[2]);
                 }
-                $regex .= str_repeat(' ', $indent * 4).sprintf("%s(?P<%s>%s)\n", preg_quote($token[1], '#'), $token[3], $token[2]);
             }
         }
         while (--$indent) {

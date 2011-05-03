@@ -18,7 +18,7 @@ use Symfony\Component\Templating\Helper\Helper;
 /**
  * The "assetic" templating helper.
  *
- * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ * @author Kris Wallsmith <kris@symfony.com>
  */
 abstract class AsseticHelper extends Helper
 {

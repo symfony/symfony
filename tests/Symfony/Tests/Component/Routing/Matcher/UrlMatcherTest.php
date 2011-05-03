@@ -119,5 +119,14 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 
         $matcher = new UrlMatcher($coll, new RequestContext());
         $this->assertEquals(array('foo' => 'bar', '_route' => 'bar'), $matcher->match('/foo/bar/bar'));
+
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/{bar}'));
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        try {
+            $matcher->match('/');
+            $this->fail();
+        } catch (NotFoundException $e) {
+        }
     }
 }

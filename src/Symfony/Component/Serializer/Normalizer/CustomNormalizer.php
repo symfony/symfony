@@ -22,7 +22,7 @@ class CustomNormalizer implements NormalizerInterface
     public function normalize($object, $format = null)
     {
         if (!$object instanceof NormalizableInterface) {
-            throw new \RuntimeException('Object does not implemented NormalizableInterface.');
+            throw new \InvalidArgumentException('Object does not implemented NormalizableInterface.');
         }
 
         return $object->normalize($this, $format);
@@ -34,12 +34,12 @@ class CustomNormalizer implements NormalizerInterface
     public function denormalize($data, $type, $format = null)
     {
         if (!class_exists($type)) {
-            throw new \RuntimeException(sprintf('The class "%s" does not exist.', $type));
+            throw new \InvalidArgumentException(sprintf('The class "%s" does not exist.', $type));
         }
 
         $object = new $type;
         if (!$object instanceof NormalizableInterface) {
-            throw new \RuntimeException('Object does not implemented NormalizableInterface.');
+            throw new \InvalidArgumentException('Object does not implemented NormalizableInterface.');
         }
 
         $object->denormalize($this, $data, $format);

@@ -71,7 +71,7 @@ class Serializer implements SerializerInterface
         } else if (null === $data || is_scalar($data)) {
             return $data;
         } else if (!is_object($data)) {
-            throw new \RuntimeException('Cannot normalize value of type: '.gettype($data));
+            throw new \InvalidArgumentException('Cannot normalize value of type: '.gettype($data));
         }
 
         $class = get_class($data);

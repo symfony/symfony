@@ -120,7 +120,7 @@ abstract class DoctrineCommand extends Command
         $pos = strpos($name, ':');
         $alias = substr($name, 0, $pos);
 
-        foreach ($this->container->getParameter('doctrine.orm.entity_managers') as $id) {
+        foreach ($this->container->get('doctrine')->getEntityManagerNames() as $id) {
             $em = $this->container->get($id);
 
             try {

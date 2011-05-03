@@ -82,7 +82,7 @@ EOT
 
             if ($metadata->customRepositoryClassName) {
                 if (false === strpos($metadata->customRepositoryClassName, $namespace)) {
-                    continue
+                    continue;
                 }
 
                 $generator->writeEntityRepositoryClass($metadata->customRepositoryClassName, $path);

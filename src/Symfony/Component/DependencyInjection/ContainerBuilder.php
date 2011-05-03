@@ -698,6 +698,20 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
         }
 
+        $properties = $this->resolveServices($this->getParameterBag()->resolveValue($definition->getProperties()));
+        $outsideClass = new \ReflectionClass($service);
+        foreach ($properties as $name => $value) {
+            $class = $outsideClass;
+            do {
+                if ($class->hasProperty($name)) {
+                    $property = $class->getProperty($name);
+                    $property->setAccessible(true);
+                    $property->setValue($service, $value);
+                    continue 2;
+                }
+            } while (false !== $class = $class->getParentClass());
+        }
+
         if ($callable = $definition->getConfigurator()) {
             if (is_array($callable) && is_object($callable[0]) && $callable[0] instanceof Reference) {
                 $callable[0] = $this->get((string) $callable[0]);

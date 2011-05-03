@@ -32,15 +32,7 @@ class Registry
         $this->container = $container;
         $this->connections = $connections;
         $this->entityManagers = $entityManagers;
-
-        if (!isset($this->connections[$defaultConnection])) {
-            throw new \LogicException(sprintf('Default connection "%s" is not defined.', $defaultConnection));
-        }
         $this->defaultConnection = $defaultConnection;
-
-        if (!isset($this->entityManagers[$defaultEntityManager])) {
-            throw new \LogicException(sprintf('Default entity manager "%s" is not defined.', $defaultEntityManager));
-        }
         $this->defaultEntityManager = $defaultEntityManager;
     }
 
@@ -64,7 +56,7 @@ class Registry
     public function getConnection($name = null)
     {
         if (null === $name) {
-            return $this->container->get($this->connections[$this->defaultConnection]);
+            $name = $this->defaultConnection;
         }
 
         if (!isset($this->connections[$name])) {
@@ -104,7 +96,7 @@ class Registry
     public function getEntityManager($name = null)
     {
         if (null === $name) {
-            return $this->container->get($this->entityManagers[$this->defaultEntityManager]);
+            $name = $this->defaultEntityManager;
         }
 
         if (!isset($this->entityManagers[$name])) {

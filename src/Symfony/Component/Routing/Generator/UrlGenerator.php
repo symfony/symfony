@@ -114,7 +114,7 @@ class UrlGenerator implements UrlGeneratorInterface
 
                     if (!$isEmpty || !$optional) {
                         // %2F is not valid in a URL, so we don't encode it (which is fine as the requirements explicitly allowed it)
-                        $url = $token[1].str_replace('%2F', '/', urlencode($tparams[$token[3]])).$url;
+                        $url = $token[1].str_replace('%2F', '/', rawurlencode($tparams[$token[3]])).$url;
                     }
 
                     $optional = false;

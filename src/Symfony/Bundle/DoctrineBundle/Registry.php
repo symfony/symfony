@@ -103,7 +103,16 @@ class Registry
             throw new \InvalidArgumentException(sprintf('Doctrine EntityManager named "%s" does not exist.', $name));
         }
 
-        return $this->container->get($this->entityManagers[$name]);
+        $em = $this->container->get($this->entityManagers[$name]);
+
+        if (!$em->isOpen()) {
+            // force the creation of a new entity manager
+            // if the current one is closed
+            $this->container->set($this->entityManagers[$name], null);
+            $em = $this->container->get($this->entityManagers[$name]);
+        }
+
+        return $em;
     }
 
     /**

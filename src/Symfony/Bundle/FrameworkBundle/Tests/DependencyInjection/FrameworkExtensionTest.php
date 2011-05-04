@@ -39,6 +39,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertEquals('/path/to/cache', $def->getArgument(2));
         $this->assertEquals('1234', $def->getArgument(3));
+        $this->assertEquals('100', $def->getArgument(4));
     }
 
     public function testEsi()

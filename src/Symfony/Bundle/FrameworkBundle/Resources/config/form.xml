@@ -63,6 +63,7 @@
             <argument>%kernel.secret%</argument>
             <argument /> <!-- Temporary storage folder -->
             <argument /> <!-- Temporary storage folder size in Bytes -->
+            <argument /> <!-- Max age in minutes -->
         </service>
 
         <!-- CoreExtension -->

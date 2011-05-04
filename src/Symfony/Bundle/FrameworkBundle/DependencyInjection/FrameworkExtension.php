@@ -182,6 +182,7 @@ class FrameworkExtension extends Extension
             ->getDefinition('form.temporary_storage')
             ->replaceArgument(2, $config['path'])
             ->replaceArgument(3, $config['size'])
+            ->replaceArgument(4, $config['max_age_min'])
         ;
     }
 

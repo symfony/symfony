@@ -4,8 +4,9 @@ framework:
         enabled:    true
         field_name: _csrf
     file_upload:
-        path:       /path/to/cache
-        size:       1234
+        path:           /path/to/cache
+        size:           1234
+        max_age_min:    100
     esi:
         enabled: true
     profiler:

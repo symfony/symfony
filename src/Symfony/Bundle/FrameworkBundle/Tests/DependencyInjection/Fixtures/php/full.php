@@ -7,8 +7,9 @@ $container->loadFromExtension('framework', array(
         'field_name' => '_csrf',
     ),
     'file_upload' => array(
-        'path'  => '/path/to/cache',
-        'size'  => 1234,
+        'path'          => '/path/to/cache',
+        'size'          => 1234,
+        'max_age_min'   => 100
     ),
     'esi' => array(
         'enabled' => true,

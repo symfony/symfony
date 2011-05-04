@@ -774,6 +774,13 @@ EOF;
      */
     private function exportParameters($parameters, $indent = 12)
     {
+        $max_length = 0;
+
+        foreach (array_keys($parameters) as $key) {
+            $length = strlen(var_export($key, true));
+            $max_length = $length > $max_length ? $length : $max_length;
+        }
+
         $php = array();
         foreach ($parameters as $key => $value) {
             if (is_array($value)) {
@@ -788,7 +795,7 @@ EOF;
                 $value = var_export($value, true);
             }
 
-            $php[] = sprintf('%s%s => %s,', str_repeat(' ', $indent), var_export($key, true), $value);
+            $php[] = sprintf('%s%-'.$max_length.'s => %s,', str_repeat(' ', $indent), var_export($key, true), $value);
         }
 
         return sprintf("array(\n%s\n%s)", implode("\n", $php), str_repeat(' ', $indent - 4));

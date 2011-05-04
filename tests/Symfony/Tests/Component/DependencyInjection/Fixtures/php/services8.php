@@ -31,9 +31,9 @@ class ProjectServiceContainer extends Container
     protected function getDefaultParameters()
     {
         return array(
-            'foo' => '%baz%',
-            'baz' => 'bar',
-            'bar' => 'foo is %%foo bar',
+            'foo'    => '%baz%',
+            'baz'    => 'bar',
+            'bar'    => 'foo is %%foo bar',
             'values' => array(
                 0 => true,
                 1 => false,

@@ -154,7 +154,7 @@ class ProjectServiceContainer extends Container
         return array(
             'baz_class' => 'BazClass',
             'foo_class' => 'FooClass',
-            'foo' => 'bar',
+            'foo'       => 'bar',
         );
     }
 }

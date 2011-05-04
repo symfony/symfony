@@ -38,6 +38,7 @@ class CollectionType extends AbstractType
             'modifiable' => false,
             'prototype'  => true,
             'type' => 'text',
+            'csrf_protection' => false,
         );
     }
 

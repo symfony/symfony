@@ -192,6 +192,23 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testWidgetById()
+    {
+        $form = $this->factory->createNamed('text', 'text_id');
+        $html = $this->renderWidget($form->createView());
+
+        $this->assertMatchesXpath($html,
+'/div
+    [
+        ./input
+        [@type="text"]
+        [@id="text_id"]
+    ]
+    [@id="container"]
+'
+        );
+    }
+
     public function testCheckedCheckbox()
     {
         $form = $this->factory->createNamed('checkbox', 'na&me', true, array(

@@ -75,6 +75,19 @@ class SecurityExtension extends Extension
         $container->setParameter('security.access.always_authenticate_before_granting', $config['always_authenticate_before_granting']);
         $container->setParameter('security.authentication.hide_user_not_found', $config['hide_user_not_found']);
 
+        if (isset($config['firewalls'])) {
+            foreach ($config['firewalls'] as $firewallconfig) {
+                if (!empty($firewallconfig['session_concurrency']['max_sessions'])) {
+                    $container->getDefinition('security.authentication.concurrent_session_strategy')
+                        ->replaceArgument(1, $firewallconfig['session_concurrency']['max_sessions'])
+                        ->replaceArgument(2, $config['session_fixation_strategy']);
+                    $container->setDefinition('security.authentication.session_strategy', $container->getDefinition('security.authentication.concurrent_session_strategy'));
+
+                    break;
+                }
+            }
+        }
+
         $this->createFirewalls($config, $container);
         $this->createAuthorization($config, $container);
         $this->createRoleHierarchy($config, $container);
@@ -318,6 +331,11 @@ class SecurityExtension extends Extension
             $listeners[] = new Reference($this->createSwitchUserListener($container, $id, $firewall['switch_user'], $defaultProvider));
         }
 
+        // Concurrent session listener
+        if (isset($firewall['session_concurrency'])) {
+            $listeners[] = new Reference($this->createConcurrentSessionListener($container, $id, $firewall['session_concurrency']));
+        }
+
         // Determine default entry point
         if (isset($firewall['entry_point'])) {
             $defaultEntryPoint = $firewall['entry_point'];
@@ -543,6 +561,15 @@ class SecurityExtension extends Extension
         $listener->replaceArgument(7, $config['role']);
 
         return $switchUserListenerId;
+    }
+
+    private function createConcurrentSessionListener($container, $id, $config)
+    {
+        $concurrentSessionListenerId = 'security.authentication.concurrentsession_listener'.$id;
+        $listener = $container->setDefinition($concurrentSessionListenerId, new DefinitionDecorator('security.authentication.concurrentsession_listener'));
+        $listener->replaceArgument(2, $config['target_url']);
+
+        return $concurrentSessionListenerId;
     }
 
     private function createRequestMatcher($container, $path = null, $host = null, $methods = null, $ip = null, array $attributes = array())

@@ -105,7 +105,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
         // connection
         if (isset($connection['charset'])) {
             if ((isset($connection['driver']) && stripos($connection['driver'], 'mysql') !== false) ||
-                 (isset($connection['driverClass']) && stripos($connection['driverClass'], 'mysql') !== false)) {
+                 (isset($connection['driver_class']) && stripos($connection['driver_class'], 'mysql') !== false)) {
                 $mysqlSessionInit = new Definition('%doctrine.dbal.events.mysql_session_init.class%');
                 $mysqlSessionInit->setArguments(array($connection['charset']));
                 $mysqlSessionInit->setPublic(false);
@@ -119,19 +119,39 @@ class DoctrineExtension extends AbstractDoctrineExtension
             }
         }
 
-        if (isset($connection['platform_service'])) {
-            $connection['platform'] = new Reference($connection['platform_service']);
-            unset($connection['platform_service']);
-        }
+        $options = $this->getConnectionOptions($connection);
 
         $container
             ->setDefinition(sprintf('doctrine.dbal.%s_connection', $name), new DefinitionDecorator('doctrine.dbal.connection'))
             ->setArguments(array(
-                $connection,
+                $options,
                 new Reference(sprintf('doctrine.dbal.%s_connection.configuration', $name)),
                 new Reference(sprintf('doctrine.dbal.%s_connection.event_manager', $name)),
             ))
         ;
+    }
+
+    protected function getConnectionOptions($connection)
+    {
+        $options = $connection;
+
+        if (isset($options['platform_service'])) {
+            $options['platform'] = new Reference($options['platform_service']);
+            unset($options['platform_service']);
+        }
+
+        foreach (array(
+            'options' => 'driverOptions',
+            'driver_class' => 'driverClass',
+            'wrapper_class' => 'wrapperClass',
+        ) as $old => $new) {
+            if (isset($options[$old])) {
+                $options[$new] = $options[$old];
+                unset($options[$old]);
+            }
+        }
+
+        return $options;
     }
 
     /**

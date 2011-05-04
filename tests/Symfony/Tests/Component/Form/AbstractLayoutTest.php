@@ -664,8 +664,9 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         ./input[@type="file"][@id="na&me_file"]
         /following-sibling::input[@type="hidden"][@id="na&me_token"]
         /following-sibling::input[@type="hidden"][@id="na&me_name"]
+        /following-sibling::input[@type="hidden"][@id="na&me_originalName"]
     ]
-    [count(./input)=3]
+    [count(./input)=4]
 '
         );
     }

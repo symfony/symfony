@@ -87,7 +87,7 @@ class Registry
     }
 
     /**
-     * Gets the named entity manager.
+     * Gets a named entity manager.
      *
      * @param string $name The entity manager name (null for the default one)
      *
@@ -103,16 +103,39 @@ class Registry
             throw new \InvalidArgumentException(sprintf('Doctrine EntityManager named "%s" does not exist.', $name));
         }
 
-        $em = $this->container->get($this->entityManagers[$name]);
+        return $this->container->get($this->entityManagers[$name]);
+    }
 
-        if (!$em->isOpen()) {
-            // force the creation of a new entity manager
-            // if the current one is closed
-            $this->container->set($this->entityManagers[$name], null);
-            $em = $this->container->get($this->entityManagers[$name]);
+    /**
+     * Resets a named entity manager.
+     *
+     * This method is useful when an entity manager has been closed
+     * because of a rollbacked transaction AND when you think that
+     * it makes sense to get a new one to replace the closed one.
+     *
+     * Be warned that you will get a brand new entity manager as
+     * the existing one is not useable anymore. This means that any
+     * other object with a dependency on this entity manager will
+     * hold an obsolete reference. You can inject the registry instead
+     * to avoid this problem.
+     *
+     * @param string $name The entity manager name (null for the default one)
+     *
+     * @return EntityManager
+     */
+    public function resetEntityManager($name = null)
+    {
+        if (null === $name) {
+            $name = $this->defaultEntityManager;
         }
 
-        return $em;
+        if (!isset($this->entityManagers[$name])) {
+            throw new \InvalidArgumentException(sprintf('Doctrine EntityManager named "%s" does not exist.', $name));
+        }
+
+        // force the creation of a new entity manager
+        // if the current one is closed
+        $this->container->set($this->entityManagers[$name], null);
     }
 
     /**

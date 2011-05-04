@@ -51,6 +51,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      * @return string           A value as produced by PHP's date() function
      *
      * @throws UnexpectedTypeException if the given value is not a \DateTime instance
+     * @throws TransformationFailedException if the output timezone is not supported
      */
     public function transform($value)
     {
@@ -62,7 +63,11 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
             throw new UnexpectedTypeException($value, '\DateTime');
         }
 
-        $value->setTimezone(new \DateTimeZone($this->outputTimezone));
+        try {
+            $value->setTimezone(new \DateTimeZone($this->outputTimezone));
+        } catch (\Exception $e) {
+            throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
+        }
 
         return $value->format($this->format);
     }
@@ -76,6 +81,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      *
      * @throws UnexpectedTypeException if the given value is not a string
      * @throws TransformationFailedException if the date could not be parsed
+     * @throws TransformationFailedException if the input timezone is not supported
      */
     public function reverseTransform($value)
     {
@@ -93,10 +99,10 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
             if ($this->inputTimezone !== $this->outputTimezone) {
                 $dateTime->setTimeZone(new \DateTimeZone($this->inputTimezone));
             }
-
-            return $dateTime;
         } catch (\Exception $e) {
-            throw new TransformationFailedException('Invalid date format.', $e->getCode(), $e);
+            throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
         }
+
+        return $dateTime;
     }
 }

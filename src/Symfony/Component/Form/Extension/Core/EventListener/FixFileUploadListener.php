@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\EventListener;
 
 use Symfony\Component\Form\Events;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\File;
@@ -42,17 +43,19 @@ class FixFileUploadListener implements EventSubscriberInterface
         $form = $event->getForm();
         $data = $event->getData();
 
-        if (!is_array($data)) {
-            return;
+        if (null === $data) {
+            $data = array();
         }
 
-        // TODO should be disableable
+        if (!is_array($data)) {
+            throw new UnexpectedTypeException($data, 'array');
+        }
 
-        // TESTME
-        $data = array_merge(array(
+        $data = array_replace(array(
             'file' => '',
             'token' => '',
             'name' => '',
+            'originalName' => '',
         ), $data);
 
         // Newly uploaded file
@@ -61,14 +64,15 @@ class FixFileUploadListener implements EventSubscriberInterface
             $directory = $this->storage->getTempDir($data['token']);
             $data['file']->move($directory);
             $data['name'] = $data['file']->getName();
+            $data['originalName'] = $data['file']->getOriginalName();
         }
 
         // Existing uploaded file
         if (!$data['file'] && $data['token'] && $data['name']) {
-            $path = $this->storage->getTempDir($data['token']) . DIRECTORY_SEPARATOR . $data ['name'];
+            $path = $this->storage->getTempDir($data['token']) . DIRECTORY_SEPARATOR . $data['name'];
 
             if (file_exists($path)) {
-                $data['file'] = new File($path);
+                $data['file'] = new UploadedFile($path, $data['originalName'], null, null, null, true);
             }
         }
 

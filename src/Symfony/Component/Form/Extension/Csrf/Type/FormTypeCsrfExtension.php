@@ -13,6 +13,8 @@ namespace Symfony\Component\Form\Extension\Csrf\Type;
 
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\FormInterface;
 
 class FormTypeCsrfExtension extends AbstractTypeExtension
 {
@@ -34,7 +36,19 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
                 $csrfOptions['csrf_provider'] = $options['csrf_provider'];
             }
 
-            $builder->add($options['csrf_field_name'], 'csrf', $csrfOptions);
+            $builder->add($options['csrf_field_name'], 'csrf', $csrfOptions)
+                ->setAttribute('csrf_field_name', $options['csrf_field_name']);
+        }
+    }
+
+    public function buildViewBottomUp(FormView $view, FormInterface $form)
+    {
+        if ($view->hasParent() && $form->hasAttribute('csrf_field_name')) {
+            $name = $form->getAttribute('csrf_field_name');
+
+            if (isset($view[$name])) {
+                unset($view[$name]);
+            }
         }
     }
 

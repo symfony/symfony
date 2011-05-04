@@ -74,13 +74,6 @@
     {{ block('field_widget') }}
 {% endblock hidden_widget %}
 
-{% block csrf_widget %}
-    {% if not form.hasParent or not form.getParent.hasParent %}
-        {% set type = type|default('hidden') %}
-        {{ block('field_widget') }}
-    {% endif %}
-{% endblock csrf_widget %}
-
 {% block hidden_row %}
     {{ form_widget(form) }}
 {% endblock hidden_row %}

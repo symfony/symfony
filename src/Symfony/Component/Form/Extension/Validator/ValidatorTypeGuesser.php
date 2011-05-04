@@ -64,6 +64,18 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function guessMinLength($class, $property)
+    {
+        $guesser = $this;
+
+        return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
+            return $guesser->guessMinLengthForConstraint($constraint);
+        });
+    }
+
+    /**
      * Iterates over the constraints of a property, executes a constraints on
      * them and returns the best guess
      *
@@ -291,6 +303,28 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                     Guess::HIGH_CONFIDENCE
                 );
             case 'Symfony\Component\Validator\Constraints\Max':
+                return new ValueGuess(
+                    strlen((string)$constraint->limit),
+                    Guess::HIGH_CONFIDENCE
+                );
+        }
+    }
+
+    /**
+     * Guesses a field's minimum length based on the given constraint
+     *
+     * @param  Constraint $constraint  The constraint to guess for
+     * @return Guess       The guess for the minimum length
+     */
+    public function guessMinLengthForConstraint(Constraint $constraint)
+    {
+        switch (get_class($constraint)) {
+            case 'Symfony\Component\Validator\Constraints\MinLength':
+                return new ValueGuess(
+                    $constraint->limit,
+                    Guess::HIGH_CONFIDENCE
+                );
+            case 'Symfony\Component\Validator\Constraints\Min':
                 return new ValueGuess(
                     strlen((string)$constraint->limit),
                     Guess::HIGH_CONFIDENCE

@@ -53,6 +53,13 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
         });
     }
 
+    public function guessMinLength($class, $property)
+    {
+        return $this->guess(function ($guesser) use ($class, $property) {
+            return $guesser->guessMinLength($class, $property);
+        });
+    }
+
     /**
      * Executes a closure for each guesser and returns the best guess from the
      * return values

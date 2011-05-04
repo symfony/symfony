@@ -22,51 +22,49 @@ class TemporaryStorageTest extends \PHPUnit_Framework_TestCase
     {
         $storage = new TemporaryStorage('secret', __DIR__.'/Fixtures/test.gif');
     }
-    
+
     /**
      * @expectedException Symfony\Component\HttpFoundation\File\Exception\UnexpectedTypeException
      */
     public function testGetTempDirThrowsAnExceptionIfTokenIsNotAString()
     {
         $storage = new TemporaryStorage('secret', __DIR__.'/Fixtures/storage');
-        $storage->getTempDir(array());        
+        $storage->getTempDir(array());
     }
-    
+
     public function testDoNotTruncateWhenSizeIsZero()
-    {        
+    {
         $path = __DIR__.'/Fixtures/storage';
-        $storage = new TemporaryStorage('secret', $path);        
+        $storage = new TemporaryStorage('secret', $path);
         $file = new \SplFileObject($path.'/foo', 'w');
         $file->fwrite("foobar");
-        
-        $this->assertFalse($storage->truncate());
-        
+
+        $this->assertTrue(file_exists($path.'/foo'));
+
         unlink($file);
     }
-    
+
     public function testTruncateOlderFilesWhenSizeIsExceeded()
     {
         $path = __DIR__.'/Fixtures/storage';
-        
+
         $files = array(
             $path.'/sub1/foo_1',
             $path.'/sub1/foo_2',
             $path.'/sub2/foo_3',
             $path.'/sub2/foo_4',
         );
-                
+
         foreach ($files as $i => $file) {
             $file = new \SplFileObject($file, 'w');
-            $size = $file->fwrite("foobar");            
+            $size = $file->fwrite("foobar");
             if ($i % 2) {
                 touch($file, time() - 500);
             }
         }
-               
-        $storage = new TemporaryStorage('secret', $path, 2 * $size);        
-               
-        $this->assertTrue($storage->truncate());
-        
+
+        $storage = new TemporaryStorage('secret', $path, 2 * $size);
+
         foreach ($files as $i => $file) {
             if ($i % 2) {
                 $this->assertFalse(file_exists($file));
@@ -74,32 +72,30 @@ class TemporaryStorageTest extends \PHPUnit_Framework_TestCase
                 $this->assertTrue(file_exists($file));
                 unlink($file);
             }
-        }        
+        }
     }
-    
+
     public function testDoNotTruncateWhenSizeIsNotExceeded()
     {
         $path = __DIR__.'/Fixtures/storage';
-        
+
         $files = array(
             $path.'/sub1/foo_1',
             $path.'/sub1/foo_2',
             $path.'/sub2/foo_3',
             $path.'/sub2/foo_4',
         );
-                
+
         foreach ($files as $i => $file) {
             $file = new \SplFileObject($file, 'w');
-            $size = $file->fwrite("foobar");            
+            $size = $file->fwrite("foobar");
         }
-               
-        $storage = new TemporaryStorage('secret', $path, 4 * $size);        
-               
-        $this->assertFalse($storage->truncate());
-        
+
+        $storage = new TemporaryStorage('secret', $path, 4 * $size);
+
         foreach ($files as $i => $file) {
             $this->assertTrue(file_exists($file));
             unlink($file);
-        }        
-    }           
+        }
+    }
 }

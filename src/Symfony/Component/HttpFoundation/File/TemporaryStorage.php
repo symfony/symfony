@@ -45,6 +45,8 @@ class TemporaryStorage
         $this->directory = realpath($directory);
         $this->secret = $secret;
         $this->size = max((int) $size, 0);
+
+        $this->truncate();
     }
 
     protected function generateHashInfo($token)

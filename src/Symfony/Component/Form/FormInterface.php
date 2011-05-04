@@ -50,6 +50,8 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
 
     function getData();
 
+    function getNormData();
+
     function getClientData();
 
     function isBound();

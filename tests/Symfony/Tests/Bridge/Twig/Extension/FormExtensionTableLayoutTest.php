@@ -29,9 +29,13 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
 
         $loader = new StubFilesystemLoader(array(
             __DIR__.'/../../../../../../src/Symfony/Bundle/TwigBundle/Resources/views/Form',
+            __DIR__,
         ));
 
-        $this->extension = new FormExtension(array('table_layout.html.twig'));
+        $this->extension = new FormExtension(array(
+            'table_layout.html.twig',
+            'custom_widgets.html.twig',
+        ));
 
         $environment = new \Twig_Environment($loader);
         $environment->addExtension($this->extension);

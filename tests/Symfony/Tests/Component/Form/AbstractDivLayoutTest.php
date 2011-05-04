@@ -35,6 +35,21 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         );
     }
 
+    public function testRowForwardsVariables()
+    {
+        $view = $this->factory->createNamed('text', 'name')->createView();
+        $html = $this->renderRow($view, array('label' => 'foo&bar'));
+
+        $this->assertMatchesXpath($html,
+'/div
+    [
+        ./label[@for="name"][.="[trans]foo&bar[/trans]"]
+        /following-sibling::input[@id="name"]
+    ]
+'
+        );
+    }
+
     public function testRepeatedRow()
     {
         $form = $this->factory->createNamed('repeated', 'name');

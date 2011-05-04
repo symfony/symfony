@@ -103,6 +103,24 @@ beta1 to beta2
 
       app/Resources/translations/catalogue.fr.xml
 
+* The option "modifiable" of the "collection" form type was split into two
+  options "allow_add" and "allow_delete".
+
+    Before:
+
+      $builder->add('tags', 'collection', array(
+          'type' => 'text',
+          'modifiable' => true,
+      ));
+
+    After:
+
+      $builder->add('tags', 'collection', array(
+          'type' => 'text',
+          'allow_add' => true,
+          'allow_delete' => true,
+      ));
+
 PR12 to beta1
 -------------
 

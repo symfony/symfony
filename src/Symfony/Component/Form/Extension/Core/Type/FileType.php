@@ -45,7 +45,8 @@ class FileType extends AbstractType
             ->addEventSubscriber(new FixFileUploadListener($this->storage), 10)
             ->add('file', 'field')
             ->add('token', 'hidden')
-            ->add('name', 'hidden');
+            ->add('name', 'hidden')
+            ->add('originalName', 'hidden');
     }
 
     public function buildViewBottomUp(FormView $view, FormInterface $form)

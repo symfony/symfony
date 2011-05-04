@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Doctrine\ORM\Tools\EntityRepositoryGenerator;
 
 /**
  * Generate entity classes from mapping information
@@ -58,7 +59,7 @@ EOT
             $bundle = $this->getApplication()->getKernel()->getBundle($input->getArgument('name'));
 
             $output->writeln(sprintf('Generating entities for bundle "<info>%s</info>"', $bundle->getName()));
-            list($metadatas, $path) = $this->getBundleInfo($bundle);
+            list($metadatas, $namespace, $path) = $this->getBundleInfo($bundle);
         } catch (\InvalidArgumentException $e) {
             $name = strtr($input->getArgument('name'), '/', '\\');
 
@@ -68,14 +69,15 @@ EOT
 
             if (class_exists($name)) {
                 $output->writeln(sprintf('Generating entity "<info>%s</info>"', $name));
-                list($metadatas, $path) = $this->getClassInfo($name);
+                list($metadatas, $namespace, $path) = $this->getClassInfo($name);
             } else {
                 $output->writeln(sprintf('Generating entities for namespace "<info>%s</info>"', $name));
-                list($metadatas, $path) = $this->getNamespaceInfo($name);
+                list($metadatas, $namespace, $path) = $this->getNamespaceInfo($name);
             }
         }
 
         $generator = $this->getEntityGenerator();
+        $repoGenerator = new EntityRepositoryGenerator();
         foreach ($metadatas as $metadata) {
             $output->writeln(sprintf('  > generating <comment>%s</comment>', $metadata->name));
             $generator->generate(array($metadata), $path);
@@ -85,7 +87,7 @@ EOT
                     continue;
                 }
 
-                $generator->writeEntityRepositoryClass($metadata->customRepositoryClassName, $path);
+                $repoGenerator->writeEntityRepositoryClass($metadata->customRepositoryClassName, $path);
             }
         }
     }
@@ -99,7 +101,7 @@ EOT
 
         $path = $this->findBasePathForClass($bundle->getName(), $bundle->getNamespace(), $bundle->getPath());
 
-        return array($metadatas, $path);
+        return array($metadatas, $bundle->getNamespace(), $path);
     }
 
     private function getClassInfo($class)
@@ -114,7 +116,7 @@ EOT
         }
         $path = $this->findBasePathForClass($class, $r->getNamespacename(), dirname($r->getFilename()));
 
-        return array($metadatas, $path);
+        return array($metadatas, $r->getNamespacename(), $path);
     }
 
     private function getNamespaceInfo($namespace)
@@ -130,6 +132,6 @@ EOT
         }
         $path = $this->findBasePathForClass($namespace, $r->getNamespacename(), dirname($r->getFilename()));
 
-        return array($metadatas, $path);
+        return array($metadatas, $namespace, $path);
     }
 }

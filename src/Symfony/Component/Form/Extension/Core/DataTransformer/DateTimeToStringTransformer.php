@@ -32,6 +32,8 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      * @param string $inputTimezone  The name of the input timezone
      * @param string $outputTimezone The name of the output timezone
      * @param string $format         The date format
+     *
+     * @throws UnexpectedTypeException if a timezone is not a string
      */
     public function __construct($inputTimezone = null, $outputTimezone = null, $format = 'Y-m-d H:i:s')
     {

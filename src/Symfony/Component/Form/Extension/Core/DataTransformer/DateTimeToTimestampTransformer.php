@@ -69,7 +69,7 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
         try {
             $dateTime = new \DateTime(sprintf("@%s %s", $value, $this->outputTimezone));
 
-            if ($this->inputTimezone != $this->outputTimezone) {
+            if ($this->inputTimezone !== $this->outputTimezone) {
                 $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
             }
 

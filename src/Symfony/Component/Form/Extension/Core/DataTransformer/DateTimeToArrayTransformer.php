@@ -26,7 +26,17 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
 
     private $fields;
 
-    public function __construct($inputTimezone = null, $outputTimezone = null, $fields = null, $pad = false)
+    /**
+     * Constructor.
+     *
+     * @param string  $inputTimezone    The input timezone
+     * @param string  $outputTimezone   The output timezone
+     * @param array   $fields           The date fields
+     * @param Boolean $pad              Wether to use padding
+     *
+     * @throws UnexpectedTypeException if a timezone is not a string
+     */
+    public function __construct($inputTimezone = null, $outputTimezone = null, array $fields = null, $pad = false)
     {
         parent::__construct($inputTimezone, $outputTimezone);
 

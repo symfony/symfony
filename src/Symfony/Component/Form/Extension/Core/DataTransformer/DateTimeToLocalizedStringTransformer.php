@@ -31,12 +31,13 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @see BaseDateTimeTransformer::formats for available format options
      *
-     * @param type $inputTimezone   The name of the input timezone
-     * @param type $outputTimezone  The name of the output timezone
-     * @param type $dateFormat      The date format
-     * @param type $timeFormat      The time format
+     * @param string  $inputTimezone   The name of the input timezone
+     * @param string  $outputTimezone  The name of the output timezone
+     * @param integer $dateFormat      The date format
+     * @param integer $timeFormat      The time format
      *
      * @throws UnexpectedTypeException If a format is not supported
+     * @throws UnexpectedTypeException if a timezone is not a string
      */
     public function __construct($inputTimezone = null, $outputTimezone = null, $dateFormat = null, $timeFormat = null)
     {

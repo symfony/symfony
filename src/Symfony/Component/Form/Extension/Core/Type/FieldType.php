@@ -44,6 +44,7 @@ class FieldType extends AbstractType
             ->setAttribute('property_path', $options['property_path'])
             ->setAttribute('error_mapping', $options['error_mapping'])
             ->setAttribute('max_length', $options['max_length'])
+            ->setAttribute('pattern', $options['pattern'])
             ->setAttribute('label', $options['label'] ?: $this->humanize($builder->getName()))
             ->setData($options['data'])
             ->addValidator(new DefaultValidator());
@@ -73,6 +74,7 @@ class FieldType extends AbstractType
         $view->set('read_only', $form->isReadOnly());
         $view->set('required', $form->isRequired());
         $view->set('max_length', $form->getAttribute('max_length'));
+        $view->set('pattern', $form->getAttribute('pattern'));
         $view->set('size', null);
         $view->set('label', $form->getAttribute('label'));
         $view->set('multipart', false);
@@ -94,6 +96,7 @@ class FieldType extends AbstractType
             'required' => true,
             'read_only' => false,
             'max_length' => null,
+            'pattern' => null,
             'property_path' => null,
             'by_reference' => true,
             'error_bubbling' => false,

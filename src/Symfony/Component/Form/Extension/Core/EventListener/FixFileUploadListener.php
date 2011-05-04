@@ -40,6 +40,11 @@ class FixFileUploadListener implements EventSubscriberInterface
     public function onBindClientData(FilterDataEvent $event)
     {
         $form = $event->getForm();
+        $data = $event->getData();
+
+        if (!is_array($data)) {
+            return;
+        }
 
         // TODO should be disableable
 
@@ -48,7 +53,7 @@ class FixFileUploadListener implements EventSubscriberInterface
             'file' => '',
             'token' => '',
             'name' => '',
-        ), $event->getData());
+        ), $data);
 
         // Newly uploaded file
         if ($data['file'] instanceof UploadedFile && $data['file']->isValid()) {

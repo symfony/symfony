@@ -101,9 +101,8 @@ class FormHelper extends Helper
     {
         $template = null;
         $blocks = $view->get('types');
-        if ('widget' === $section || 'row' === $section) {
-            array_unshift($blocks, '_'.$view->get('id'));
-        }
+        array_unshift($blocks, '_'.$view->get('id'));
+
         foreach ($blocks as &$block) {
             $block = $block.'_'.$section;
             $template = $this->lookupTemplate($block);

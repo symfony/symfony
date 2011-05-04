@@ -122,6 +122,13 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
 
         $this->assertEquals($dateTime->format('d.m.Y H:i'), $transformer->transform($input));
     }
+    
+    public function testTransform_differentPatterns()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::FULL, \IntlDateFormatter::FULL, \IntlDateFormatter::GREGORIAN, 'MM*yyyy*dd HH|mm|ss');
+
+        $this->assertEquals('02*2010*03 04|05|06', $transformer->transform($this->dateTime));
+    }
 
     /**
      * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
@@ -216,6 +223,13 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         $dateTime->setTimezone(new \DateTimeZone('America/New_York'));
 
         $this->assertDateTimeEquals($dateTime, $transformer->reverseTransform('03.02.2010 04:05', null));
+    }
+    
+    public function testReverseTransform_differentPatterns()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::FULL, \IntlDateFormatter::FULL, \IntlDateFormatter::GREGORIAN, 'MM*yyyy*dd HH|mm|ss');
+
+        $this->assertDateTimeEquals($this->dateTime, $transformer->reverseTransform('02*2010*03 04|05|06', null));
     }
 
     public function testReverseTransform_empty()

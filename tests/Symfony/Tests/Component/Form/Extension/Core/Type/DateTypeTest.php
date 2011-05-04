@@ -178,6 +178,78 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals($text, $form->getClientData());
     }
 
+    public function testSubmitFromInputDateTimeDifferentPattern()
+    {
+        $form = $this->factory->create('date', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'pattern' => 'MM*yyyy*dd',
+            'widget' => 'text',
+            'input' => 'datetime',
+        ));
+
+        $form->bind('06*2010*02');
+
+        $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
+        $this->assertEquals('06*2010*02', $form->getClientData());
+    }
+
+    public function testSubmitFromInputStringDifferentPattern()
+    {
+        $form = $this->factory->create('date', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'pattern' => 'MM*yyyy*dd',
+            'widget' => 'text',
+            'input' => 'string',
+        ));
+
+        $form->bind('06*2010*02');
+
+        $this->assertEquals('2010-06-02', $form->getData());
+        $this->assertEquals('06*2010*02', $form->getClientData());
+    }
+
+    public function testSubmitFromInputTimestampDifferentPattern()
+    {
+        $form = $this->factory->create('date', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'pattern' => 'MM*yyyy*dd',
+            'widget' => 'text',
+            'input' => 'timestamp',
+        ));
+
+        $form->bind('06*2010*02');
+
+        $dateTime = new \DateTime('2010-06-02 UTC');
+
+        $this->assertEquals($dateTime->format('U'), $form->getData());
+        $this->assertEquals('06*2010*02', $form->getClientData());
+    }
+
+    public function testSubmitFromInputRawDifferentPattern()
+    {
+        $form = $this->factory->create('date', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'pattern' => 'MM*yyyy*dd',
+            'widget' => 'text',
+            'input' => 'array',
+        ));
+
+        $form->bind('06*2010*02');
+
+        $output = array(
+            'day' => '2',
+            'month' => '6',
+            'year' => '2010',
+        );
+
+        $this->assertEquals($output, $form->getData());
+        $this->assertEquals('06*2010*02', $form->getClientData());
+    }
+
     public function testSetData_differentTimezones()
     {
         $form = $this->factory->create('date', null, array(
@@ -477,6 +549,17 @@ class DateTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertSame('{{ day }}.{{ month }}.{{ year }}', $view->get('date_pattern'));
+    }
+    
+    public function testPassDatePatternToView_differentPattern()
+    {
+        $form = $this->factory->create('date', null, array(
+            'pattern' => 'MM*yyyy*dd'
+        ));
+        
+        $view = $form->createView();
+
+        $this->assertSame('{{ month }}*{{ year }}*{{ day }}', $view->get('date_pattern'));
     }
 
     public function testDontPassDatePatternIfText()

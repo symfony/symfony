@@ -150,8 +150,10 @@ class ExceptionListener
             $this->logger->debug('Calling Authentication entry point');
         }
 
-        // session isn't required when using http basic authentication mechanism for example
-        if ($request->hasSession()) {
+        // session isn't required when using http basic authentication mechanism
+        // for example so the value has to be set only when the session is
+        // activated in the project
+        if (null !== $request->getSession()) {
             $request->getSession()->set('_security.target_path', $request->getUri());
         }
 

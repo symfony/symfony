@@ -45,15 +45,15 @@ class CollectionFormTest extends TypeTestCase
         $this->assertEquals('foo@baz.com', $form[0]->getData());
     }
 
-    public function testSetDataAdjustsSizeIfModifiable()
+    public function testSetDataAddsPrototypeIfAllowAdd()
     {
         $form = $this->factory->create('collection', null, array(
             'type' => 'field',
-            'modifiable' => true,
+            'allow_add' => true,
             'prototype' => true,
         ));
-        $form->setData(array('foo@foo.com', 'foo@bar.com'));
 
+        $form->setData(array('foo@foo.com', 'foo@bar.com'));
         $this->assertTrue($form[0] instanceof Form);
         $this->assertTrue($form[1] instanceof Form);
         $this->assertTrue($form['$$name$$'] instanceof Form);
@@ -75,20 +75,6 @@ class CollectionFormTest extends TypeTestCase
         $form->setData(new \stdClass());
     }
 
-    public function testModifiableCollectionsContainExtraForm()
-    {
-        $form = $this->factory->create('collection', null, array(
-            'type' => 'field',
-            'modifiable' => true,
-            'prototype' => true,
-        ));
-        $form->setData(array('foo@bar.com'));
-
-        $this->assertTrue($form['0'] instanceof Form);
-        $this->assertTrue($form['$$name$$'] instanceof Form);
-        $this->assertEquals(2, count($form));
-    }
-
     public function testNotResizedIfBoundWithMissingData()
     {
         $form = $this->factory->create('collection', null, array(
@@ -103,11 +89,11 @@ class CollectionFormTest extends TypeTestCase
         $this->assertEquals(null, $form[1]->getData());
     }
 
-    public function testResizedIfBoundWithMissingDataAndModifiable()
+    public function testResizedDownIfBoundWithMissingDataAndAllowDelete()
     {
         $form = $this->factory->create('collection', null, array(
             'type' => 'field',
-            'modifiable' => true,
+            'allow_delete' => true,
         ));
         $form->setData(array('foo@foo.com', 'bar@bar.com'));
         $form->bind(array('foo@bar.com'));
@@ -115,6 +101,7 @@ class CollectionFormTest extends TypeTestCase
         $this->assertTrue($form->has('0'));
         $this->assertFalse($form->has('1'));
         $this->assertEquals('foo@bar.com', $form[0]->getData());
+        $this->assertEquals(array('foo@bar.com'), $form->getData());
     }
 
     public function testNotResizedIfBoundWithExtraData()
@@ -130,11 +117,11 @@ class CollectionFormTest extends TypeTestCase
         $this->assertEquals('foo@foo.com', $form[0]->getData());
     }
 
-    public function testResizedUpIfBoundWithExtraDataAndModifiable()
+    public function testResizedUpIfBoundWithExtraDataAndAllowAdd()
     {
         $form = $this->factory->create('collection', null, array(
             'type' => 'field',
-            'modifiable' => true,
+            'allow_add' => true,
         ));
         $form->setData(array('foo@bar.com'));
         $form->bind(array('foo@foo.com', 'bar@bar.com'));
@@ -146,29 +133,14 @@ class CollectionFormTest extends TypeTestCase
         $this->assertEquals(array('foo@foo.com', 'bar@bar.com'), $form->getData());
     }
 
-    public function testModifableButNoPrototype()
+    public function testAllowAddButNoPrototype()
     {
         $form = $this->factory->create('collection', null, array(
             'type' => 'field',
-            'modifiable' => true,
+            'allow_add' => true,
             'prototype' => false,
         ));
 
         $this->assertFalse($form->has('$$name$$'));
-    }
-
-    public function testResizedDownIfBoundWithLessDataAndModifiable()
-    {
-        $form = $this->factory->create('collection', null, array(
-            'type' => 'field',
-            'modifiable' => true,
-        ));
-        $form->setData(array('foo@bar.com', 'bar@bar.com'));
-        $form->bind(array('foo@foo.com'));
-
-        $this->assertTrue($form->has('0'));
-        $this->assertFalse($form->has('1'));
-        $this->assertEquals('foo@foo.com', $form[0]->getData());
-        $this->assertEquals(array('foo@foo.com'), $form->getData());
     }
 }

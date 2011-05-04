@@ -43,7 +43,7 @@ class Cookie
      *
      * @api
      */
-    public function __construct($name, $value, $expires = null, $path = '/', $domain = '', $secure = false, $httponly = false)
+    public function __construct($name, $value, $expires = null, $path = '/', $domain = '', $secure = false, $httponly = true)
     {
         $this->name     = $name;
         $this->value    = $value;

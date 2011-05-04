@@ -4,23 +4,23 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false</source>
-                <target>Denne værdi skal være falsk</target>
+                <target>Værdien skal være falsk</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true</source>
-                <target>Denne værdi skal være sand</target>
+                <target>Værdien skal være sand</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}</source>
-                <target>Denne værdi skal være af typen {{ type }}</target>
+                <target>Værdien skal være af typen {{ type }}</target>
             </trans-unit>
             <trans-unit id="4">
                 <source>This value should be blank</source>
-                <target>Denne værdi skal være blank</target>
+                <target>Værdien skal være blank</target>
             </trans-unit>
             <trans-unit id="5">
                 <source>This value should be one of the given choices</source>
-                <target>Denne værdi skal være en af de givne muligheder</target>
+                <target>Værdien skal være en af de givne muligheder</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You should select at least {{ limit }} choices</source>
@@ -40,15 +40,15 @@
             </trans-unit>
             <trans-unit id="10">
                 <source>This value is not a valid date</source>
-                <target>Denne værdi er ikke en gyldig dato</target>
+                <target>Værdien er ikke en gyldig dato</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid datetime</source>
-                <target>Denne værdi er ikke en gyldig dato og tid</target>
+                <target>Værdien er ikke en gyldig dato og tid</target>
             </trans-unit>
             <trans-unit id="12">
                 <source>This value is not a valid email address</source>
-                <target>Denne værdi er ikke en gyldig e-mail adresse</target>
+                <target>Værdien er ikke en gyldig e-mail adresse</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>The file could not be found</source>
@@ -56,59 +56,59 @@
             </trans-unit>
             <trans-unit id="14">
                 <source>The file is not readable</source>
-                <target>Filen er ikke læsbar</target>
+                <target>Filen kan ikke læses</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>The file is too large ({{ size }}). Allowed maximum size is {{ limit }}</source>
-                <target>Filen er for stor ({{ size }}). Tilladt maksimale værdi er {{ limit }}</target>
+                <target>Filen er for stor ({{ size }}). Tilladte maksimale størrelse {{ limit }}</target>
             </trans-unit>
             <trans-unit id="16">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}</source>
-                <target>Mimetpen af denne fil er ugyldig ({{ type }}). Tilladte mimetyper er {{ types }}</target>
+                <target>Mimetypen af filen er ugyldig ({{ type }}). Tilladte mimetyper er {{ types }}</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>This value should be {{ limit }} or less</source>
-                <target>Denne værdi skal være {{ limit }} eller mindre</target>
+                <target>Værdien skal være {{ limit }} eller mindre</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value is too long. It should have {{ limit }} characters or less</source>
-                <target>Denne værdi er for stor. Den skal have {{ limit }} bogstaver eller mindre</target>
+                <target>Værdien er for lang. Den skal have {{ limit }} bogstaver eller mindre</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>This value should be {{ limit }} or more</source>
-                <target>Denne værdi skal være {{ limit }} eller mere</target>
+                <target>Værdien skal være {{ limit }} eller mere</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>This value is too short. It should have {{ limit }} characters or more</source>
-                <target>Denne værdi er for kort. Den skal have {{ limit }} bogstaver eller flere</target>
+                <target>Værdien er for kort. Den skal have {{ limit }} tegn eller flere</target>
             </trans-unit>
             <trans-unit id="21">
                 <source>This value should not be blank</source>
-                <target>Denne værdi må ikke være blank</target>
+                <target>Værdien må ikke være blank</target>
             </trans-unit>
             <trans-unit id="22">
                 <source>This value should not be null</source>
-                <target>Denne værdi må ikke være null</target>
+                <target>Værdien må ikke være tom (null)</target>
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should be null</source>
-                <target>Denne værdi skal være null</target>
+                <target>Værdien skal være tom (null)</target>
             </trans-unit>
             <trans-unit id="24">
                 <source>This value is not valid</source>
-                <target>Denne værdi er ikke gyldig</target>
+                <target>Værdien er ikke gyldig</target>
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not a valid time</source>
-                <target>Denne værdi er ikke en gyldig tid</target>
+                <target>Værdien er ikke en gyldig tid</target>
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid URL</source>
-                <target>Denne værdi er ikke en gyldig URL</target>
+                <target>Værdien er ikke en gyldig URL</target>
             </trans-unit>
             <trans-unit id="27">
                 <source>This value should be instance of class {{ class }}</source>
-                <target>Denne værdi skal være instance af klassen {{ class }}</target>
+                <target>Værdien skal være instans af klassen {{ class }}</target>
             </trans-unit>
             <trans-unit id="28">
                 <source>This field group should not contain extra fields</source>
@@ -116,7 +116,7 @@
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file</source>
-                <target>Den oploaded fil var for stor. Opload venligst en mindre fil</target>
+                <target>Den oploadede fil var for stor. Opload venligst en mindre fil</target>
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid</source>

@@ -285,7 +285,7 @@ abstract class Client
         $process = new PhpProcess($this->getScript($request));
         $process->run();
 
-        if (!$process->isSuccessful()) {
+        if (!$process->isSuccessful() || !preg_match('/^O\:\d+\:/', $process->getOutput())) {
             throw new \RuntimeException($process->getErrorOutput());
         }
 

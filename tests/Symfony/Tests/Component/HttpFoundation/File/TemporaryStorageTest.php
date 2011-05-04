@@ -44,7 +44,7 @@ class TemporaryStorageTest extends \PHPUnit_Framework_TestCase
         unlink($file);
     }
 
-    public function testTruncateOlderFilesWhenSizeIsExceeded()
+    public function testTruncateFilesWhenSizeIsExceeded()
     {
         $path = __DIR__.'/Fixtures/storage';
 
@@ -96,6 +96,37 @@ class TemporaryStorageTest extends \PHPUnit_Framework_TestCase
         foreach ($files as $i => $file) {
             $this->assertTrue(file_exists($file));
             unlink($file);
+        }
+    }
+
+    public function testTruncateOldFiles()
+    {
+        $path = __DIR__.'/Fixtures/storage';
+
+        $files = array(
+            $path.'/sub1/foo_1',
+            $path.'/sub1/foo_2',
+            $path.'/sub2/foo_3',
+            $path.'/sub2/foo_4',
+        );
+
+        foreach ($files as $i => $file) {
+            $file = new \SplFileObject($file, 'w');
+            $size = $file->fwrite("foobar");
+            if ($i % 2) {
+                touch($file, time() - 35 * 60);
+            }
+        }
+
+        $storage = new TemporaryStorage('secret', $path, 0, 30);
+
+        foreach ($files as $i => $file) {
+            if ($i % 2) {
+                $this->assertFalse(file_exists($file));
+            } else {
+                $this->assertTrue(file_exists($file));
+                unlink($file);
+            }
         }
     }
 }

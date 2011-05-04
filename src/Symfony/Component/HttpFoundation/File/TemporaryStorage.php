@@ -23,6 +23,7 @@ class TemporaryStorage
     private $directory;
     private $secret;
     private $size;
+    private $ttlMin;
 
     /**
      * Constructor.
@@ -31,10 +32,12 @@ class TemporaryStorage
      * @param sting    $directory   The base directory
      * @param integer  $size        The maximum size for the temporary storage (in Bytes)
      *                              Should be set to 0 for an unlimited size.
+     * @param integer  $ttlMin      The time to live in minutes (a positive number)
+     *                              Should be set to null for an infinite ttl
      *
      * @throws DirectoryCreationException if the directory does not exist or fails to be created
      */
-    public function __construct($secret, $directory, $size = 0)
+    public function __construct($secret, $directory, $size = 0, $ttlMin = null)
     {
         if (!is_dir($directory)) {
             if (file_exists($directory) || false === mkdir($directory, 0777, true)) {
@@ -45,6 +48,7 @@ class TemporaryStorage
         $this->directory = realpath($directory);
         $this->secret = $secret;
         $this->size = max((int) $size, 0);
+        $this->ttlMin = null === $ttlMin ? null : max((int) $ttlMin, 0);
 
         $this->truncate();
     }
@@ -101,7 +105,7 @@ class TemporaryStorage
     {
         $truncated = false;
 
-        if ($this->size == 0) {
+        if ($this->size == 0 && null === $this->ttlMin) {
             return false;
         }
 
@@ -122,17 +126,31 @@ class TemporaryStorage
             }
         }
 
-        uasort($files, function($f1, $f2) { return $f1['mtime'] > $f2['mtime']; });
-
-        $file = reset($files);
-        while ($size > $this->size) {
-            $truncated = true;
-            $path = key($files);
-            if (false === @unlink($path)) {
-                throw new FileException(sprintf('Unable to delete the file "%s"', $path));
+        if (null != $this->ttlMin) {
+            $keepAfter = time() - 60 * $this->ttlMin;
+            foreach ($files as $path => $file) {
+                if ($file['mtime'] < $keepAfter) {
+                    $truncated = true;
+                    if (false === @unlink($path)) {
+                        throw new FileException(sprintf('Unable to delete the file "%s"', $path));
+                    }
+                    $size -= $file['size'];
+                }
             }
-            $size -= $file['size'];
-            $file = next($files);
+        }
+
+        if ($this->size > 0) {
+            uasort($files, function($f1, $f2) { return $f1['mtime'] > $f2['mtime']; });
+            $file = reset($files);
+            while ($size > $this->size) {
+                $truncated = true;
+                $path = key($files);
+                if (false === @unlink($path)) {
+                    throw new FileException(sprintf('Unable to delete the file "%s"', $path));
+                }
+                $size -= $file['size'];
+                $file = next($files);
+            }
         }
 
         return $truncated;

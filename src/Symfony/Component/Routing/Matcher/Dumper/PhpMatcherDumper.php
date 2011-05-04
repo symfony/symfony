@@ -75,7 +75,7 @@ EOF;
         foreach ($routes as $name => $route) {
             if ($route instanceof RouteCollection) {
                 $indent = '';
-                if (count($route->all()) > 1 && $prefix = $route->getPrefix()) {
+                if (count($route->all()) > 1 && $prefix = $route->getStaticPrefix()) {
                     $code[] = sprintf("        if (0 === strpos(\$pathinfo, '%s')) {", $prefix);
                     $indent = '    ';
                 }

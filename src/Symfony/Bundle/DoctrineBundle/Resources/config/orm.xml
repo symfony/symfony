@@ -58,5 +58,7 @@
         </service>
 
         <service id="doctrine.orm.configuration" class="%doctrine.orm.configuration.class%" abstract="true" public="false" />
+
+        <service id="doctrine.orm.entity_manager.abstract" class="%doctrine.orm.entity_manager.class%" factory-class="%doctrine.orm.entity_manager.class%" factory-method="create" abstract="true" />
     </services>
 </container>

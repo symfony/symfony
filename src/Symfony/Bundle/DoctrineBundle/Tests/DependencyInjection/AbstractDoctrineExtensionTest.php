@@ -157,7 +157,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $arguments = $definition->getArguments();
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[0]);
-        $this->assertEquals('database_connection', (string) $arguments[0]);
+        $this->assertEquals('doctrine.dbal.default_connection', (string) $arguments[0]);
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[1]);
         $this->assertEquals('doctrine.orm.default_configuration', (string) $arguments[1]);
 
@@ -195,7 +195,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('create', $definition->getFactoryMethod());
 
         $this->assertDICConstructorArguments($definition, array(
-            new Reference('database_connection'), new Reference('doctrine.orm.default_configuration')
+            new Reference('doctrine.dbal.default_connection'), new Reference('doctrine.orm.default_configuration')
         ));
     }
 
@@ -233,7 +233,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('create', $definition->getFactoryMethod());
 
         $this->assertDICConstructorArguments($definition, array(
-            new Reference('database_connection'), new Reference('doctrine.orm.default_configuration')
+            new Reference('doctrine.dbal.default_connection'), new Reference('doctrine.orm.default_configuration')
         ));
     }
 

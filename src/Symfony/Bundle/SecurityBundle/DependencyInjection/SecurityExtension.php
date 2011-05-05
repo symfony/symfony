@@ -115,11 +115,17 @@ class SecurityExtension extends Extension
         }
         $container->getDefinition('security.acl.voter.basic_permissions')->addArgument($config['voter']['allow_if_object_identity_unavailable']);
 
+        // custom ACL provider
         if (isset($config['provider'])) {
             $container->setAlias('security.acl.provider', $config['provider']);
             return;
         }
 
+        $this->configureDbalAclProvider($config, $container, $loader);
+    }
+
+    private function configureDbalAclProvider(array $config, ContainerBuilder $container, $loader)
+    {
         $loader->load('security_acl_dbal.xml');
 
         if (isset($config['connection'])) {
@@ -132,7 +138,6 @@ class SecurityExtension extends Extension
         $container->setParameter('security.acl.dbal.oid_table_name', $config['tables']['object_identity']);
         $container->setParameter('security.acl.dbal.oid_ancestors_table_name', $config['tables']['object_identity_ancestors']);
         $container->setParameter('security.acl.dbal.sid_table_name', $config['tables']['security_identity']);
-
     }
 
     /**

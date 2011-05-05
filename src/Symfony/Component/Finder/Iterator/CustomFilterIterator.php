@@ -27,7 +27,7 @@ class CustomFilterIterator extends \FilterIterator
      * Constructor.
      *
      * @param \Iterator $iterator The Iterator to filter
-     * @param array     $filters  An array of \Closure
+     * @param array     $filters  An array of \Closure or callback
      */
     public function __construct(\Iterator $iterator, array $filters)
     {
@@ -46,7 +46,13 @@ class CustomFilterIterator extends \FilterIterator
         $fileinfo = $this->current();
 
         foreach ($this->filters as $filter) {
-            if (false === $filter($fileinfo)) {
+            if($filter instanceof \Closure) {
+                if (false === $filter($fileinfo)) {
+                    return false;
+                }
+            }
+
+            if(false === call_user_func($filter, $fileinfo)) {
                 return false;
             }
         }

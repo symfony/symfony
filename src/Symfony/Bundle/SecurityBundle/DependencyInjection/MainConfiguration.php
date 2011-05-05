@@ -86,6 +86,7 @@ class MainConfiguration implements ConfigurationInterface
                                 ->scalarNode('prefix')->defaultValue('sf2_acl_')->end()
                             ->end()
                         ->end()
+                        ->scalarNode('provider')->end()
                         ->arrayNode('tables')
                             ->addDefaultsIfNotSet()
                             ->children()

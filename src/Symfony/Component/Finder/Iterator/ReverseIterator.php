@@ -36,7 +36,7 @@ class ReverseIterator implements \IteratorAggregate
     /**
      * Return an \ArrayIterator with elements in reverse order
      *
-     * @return Boolean Returns the reversed rraversable
+     * @return \ArrayIterator Returns the reversed input
      */
     public function getIterator()
     {

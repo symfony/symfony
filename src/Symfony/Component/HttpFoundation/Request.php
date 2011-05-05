@@ -308,10 +308,26 @@ class Request
         return $this->session;
     }
 
-    public function hasSession()
+    /**
+     * Whether the request contains a Session which was started in one of the
+     * previous requests.
+     *
+     * @return boolean
+     */
+    public function hasPreviousSession()
     {
         // the check for $this->session avoids malicious users trying to fake a session cookie with proper name
         return $this->cookies->has(session_name()) && null !== $this->session;
+    }
+
+    /**
+     * Whether the request contains a Session object.
+     *
+     * @return boolean
+     */
+    public function hasSession()
+    {
+        return null !== $this->session;
     }
 
     public function setSession(Session $session)

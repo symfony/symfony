@@ -315,7 +315,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
     protected function getMappingResourceConfigDirectory()
     {
-        return 'Resources/config';
+        return 'Resources/config/doctrine';
     }
 
     /**

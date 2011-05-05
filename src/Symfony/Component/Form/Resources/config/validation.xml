@@ -11,8 +11,5 @@
         <value>validateFormData</value>
       </value>
     </constraint>
-    <property name="children">
-      <constraint name="Valid" />
-    </property>
   </class>
 </constraint-mapping>

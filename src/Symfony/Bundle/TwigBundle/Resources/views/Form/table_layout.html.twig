@@ -12,7 +12,7 @@
         </td>
     </tr>
 {% endspaceless %}
-{% endblock field_row %}
+{% endblock %}
 
 {% block form_errors %}
 {% spaceless %}
@@ -24,7 +24,7 @@
     </tr>
     {% endif %}
 {% endspaceless %}
-{% endblock form_errors %}
+{% endblock %}
 
 {% block hidden_row %}
 {% spaceless %}
@@ -34,13 +34,13 @@
         </td>
     </tr>
 {% endspaceless %}
-{% endblock hidden_row %}
+{% endblock %}
 
 {% block repeated_errors %}
 {% spaceless %}
     {{ block('form_errors') }}
 {% endspaceless %}
-{% endblock repeated_errors %}
+{% endblock %}
 
 {% block form_widget %}
 {% spaceless %}
@@ -49,4 +49,4 @@
         {{ form_rest(form) }}
     </table>
 {% endspaceless %}
-{% endblock form_widget %}
+{% endblock %}

@@ -11,6 +11,12 @@
 
 namespace Symfony\Tests\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\HeaderBag;
+
+use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
+
+use Symfony\Component\HttpFoundation\Session;
+
 use Symfony\Component\HttpFoundation\Request;
 
 class RequestTest extends \PHPUnit_Framework_TestCase
@@ -720,5 +726,25 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($request->isSecure());
         $this->assertEquals(443, $request->getPort());
+    }
+
+    public function testHasSession()
+    {
+        $request = new Request;
+
+        $this->assertFalse($request->hasSession());
+        $request->setSession(new Session(new ArraySessionStorage()));
+        $this->assertTrue($request->hasSession());
+    }
+
+    public function testHasPreviousSession()
+    {
+        $request = new Request;
+
+        $this->assertFalse($request->hasPreviousSession());
+        $request->cookies->set(session_name(), 'foo');
+        $this->assertFalse($request->hasPreviousSession());
+        $request->setSession(new Session(new ArraySessionStorage()));
+        $this->assertTrue($request->hasPreviousSession());
     }
 }

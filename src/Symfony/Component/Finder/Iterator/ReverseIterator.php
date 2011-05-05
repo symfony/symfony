@@ -30,7 +30,7 @@ class ReverseIterator implements \IteratorAggregate
     public function __construct(\Traversable $iterator, $preserve_keys = false)
     {
         $this->iterator = $iterator;
-        $this->preserve_keys = (bool) $preserve_keys;
+        $this->preserve_keys = (boolean) $preserve_keys;
     }
 
     /**

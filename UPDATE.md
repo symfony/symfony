@@ -9,6 +9,9 @@ timeline closely anyway.
 beta1 to beta2
 --------------
 
+* The ``error_handler`` setting has been removed. The ``ErrorHandler`` class
+  is now managed directly by Symfony SE in ``AppKernel``.
+
 * The Doctrine metadata files has moved from
   ``Resources/config/doctrine/metadata/orm/`` to ``Resources/config/`` and the
   extension from ``.dcm.yml`` to ``.orm.dcm.yml``

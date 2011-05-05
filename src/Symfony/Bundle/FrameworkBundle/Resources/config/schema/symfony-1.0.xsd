@@ -43,8 +43,8 @@
 
     <xsd:complexType name="file_upload">
         <xsd:attribute name="path" type="xsd:string" />
-        <xsd:attribute name="size" type="xsd:integer" />
-        <xsd:attribute name="max-age-min" type="xsd:integer" />
+        <xsd:attribute name="size" type="xsd:nonNegativeInteger" />
+        <xsd:attribute name="max-age-min" type="xsd:nonNegativeInteger" />
     </xsd:complexType>
 
     <xsd:complexType name="esi">

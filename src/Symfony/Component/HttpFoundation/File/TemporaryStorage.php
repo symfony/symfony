@@ -33,11 +33,11 @@ class TemporaryStorage
      * @param integer  $size        The maximum size for the temporary storage (in Bytes)
      *                              Should be set to 0 for an unlimited size.
      * @param integer  $ttlMin      The time to live in minutes (a positive number)
-     *                              Should be set to null for an infinite ttl
+     *                              Should be set to 0 for an infinite ttl
      *
      * @throws DirectoryCreationException if the directory does not exist or fails to be created
      */
-    public function __construct($secret, $directory, $size = 0, $ttlMin = null)
+    public function __construct($secret, $directory, $size = 0, $ttlMin = 0)
     {
         if (!is_dir($directory)) {
             if (file_exists($directory) || false === mkdir($directory, 0777, true)) {
@@ -48,7 +48,7 @@ class TemporaryStorage
         $this->directory = realpath($directory);
         $this->secret = $secret;
         $this->size = max((int) $size, 0);
-        $this->ttlMin = null === $ttlMin ? null : max((int) $ttlMin, 0);
+        $this->ttlMin = max((int) $ttlMin, 0);
 
         $this->truncate();
     }
@@ -105,7 +105,7 @@ class TemporaryStorage
     {
         $truncated = false;
 
-        if ($this->size == 0 && null === $this->ttlMin) {
+        if (0 == $this->size && 0 == $this->ttlMin) {
             return false;
         }
 
@@ -126,7 +126,7 @@ class TemporaryStorage
             }
         }
 
-        if (null != $this->ttlMin) {
+        if ($this->ttlMin > 0) {
             $keepAfter = time() - 60 * $this->ttlMin;
             foreach ($files as $path => $file) {
                 if ($file['mtime'] < $keepAfter) {
@@ -155,5 +155,4 @@ class TemporaryStorage
 
         return $truncated;
     }
-
 }

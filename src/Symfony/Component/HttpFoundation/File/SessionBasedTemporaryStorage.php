@@ -29,11 +29,11 @@ class SessionBasedTemporaryStorage extends TemporaryStorage
      * @param integer  $size        The maximum size for the temporary storage (in Bytes)
      *                              Should be set to 0 for an unlimited size.
      * @param integer  $ttlMin      The time to live in minutes (a positive number)
-     *                              Should be set to null for an infinite ttl
+     *                              Should be set to 0 for an infinite ttl
      *
      * @throws DirectoryCreationException if the directory does not exist or fails to be created
      */
-    public function __construct(Session $session, $secret, $directory, $size = 0, $ttlMin = null)
+    public function __construct(Session $session, $secret, $directory, $size = 0, $ttlMin = 0)
     {
         parent::__construct($secret, $directory, $size, $ttlMin);
 

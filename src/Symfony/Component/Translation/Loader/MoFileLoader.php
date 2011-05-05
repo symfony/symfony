@@ -13,9 +13,11 @@ namespace Symfony\Component\Translation\Loader;
 
 use Symfony\Component\Config\Resource\FileResource;
 
+/**
+ * @author Union of RAD (http://union-of-rad.org)
+ */
 class MoFileLoader extends ArrayLoader implements LoaderInterface
 {
-
     /**
      * Magic used for validating the format of a MO file as well as
      * detecting if the machine used to create that file was little endian.
@@ -41,7 +43,6 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
 
     public function load($resource, $locale, $domain = 'messages')
     {
-
         $messages = $this->parse($resource);
 
         // empty file
@@ -51,7 +52,7 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
 
         // not an array
         if (!is_array($messages)) {
-            throw new \InvalidArgumentException(sprintf('The file "%s" must contain a YAML array.', $resource));
+            throw new \InvalidArgumentException(sprintf('The file "%s" must contain a valid mo file.', $resource));
         }
 
         $catalogue = parent::load($messages, $locale, $domain);
@@ -70,7 +71,6 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
      */
     protected function parse($resource)
     {
-
         $stream = fopen($resource, 'r');
 
         $stat = fstat($stream);
@@ -165,5 +165,4 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
         $result = current($result);
         return (integer) substr($result, -8);
     }
-
 }

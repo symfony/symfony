@@ -13,12 +13,13 @@ namespace Symfony\Component\Translation\Loader;
 
 use Symfony\Component\Config\Resource\FileResource;
 
+/**
+ * @author Union of RAD (http://union-of-rad.org)
+ */
 class PoFileLoader extends ArrayLoader implements LoaderInterface
 {
-
     public function load($resource, $locale, $domain = 'messages')
     {
-
         $messages = $this->parse($resource);
 
         // empty file
@@ -28,7 +29,7 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
 
         // not an array
         if (!is_array($messages)) {
-            throw new \InvalidArgumentException(sprintf('The file "%s" must contain a valid pot file.', $resource));
+            throw new \InvalidArgumentException(sprintf('The file "%s" must contain a valid po file.', $resource));
         }
 
         $catalogue = parent::load($messages, $locale, $domain);
@@ -53,7 +54,6 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
      */
     protected function parse($resource)
     {
-
         $stream = fopen($resource, 'r');
 
         $defaults = array(

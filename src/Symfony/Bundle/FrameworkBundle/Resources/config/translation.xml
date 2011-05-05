@@ -11,8 +11,8 @@
         <parameter key="translation.loader.php.class">Symfony\Component\Translation\Loader\PhpFileLoader</parameter>
         <parameter key="translation.loader.yml.class">Symfony\Component\Translation\Loader\YamlFileLoader</parameter>
         <parameter key="translation.loader.xliff.class">Symfony\Component\Translation\Loader\XliffFileLoader</parameter>
-    	<parameter key="translation.loader.po.class">Symfony\Component\Translation\Loader\PoFileLoader</parameter>
-    	<parameter key="translation.loader.mo.class">Symfony\Component\Translation\Loader\MoFileLoader</parameter>
+        <parameter key="translation.loader.po.class">Symfony\Component\Translation\Loader\PoFileLoader</parameter>
+        <parameter key="translation.loader.mo.class">Symfony\Component\Translation\Loader\MoFileLoader</parameter>
     </parameters>
 
     <services>

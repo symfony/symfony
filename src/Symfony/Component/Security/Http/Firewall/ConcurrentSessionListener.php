@@ -49,15 +49,11 @@ class ConcurrentSessionListener implements ListenerInterface
         $this->handlers[] = $handler;
     }
 
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
-    }
-
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
-    }
-
+    /**
+     * Handles the number of simultaneous sessions for a single user.
+     *
+     * @param GetResponseEvent $event A GetResponseEvent instance
+     */
     public function handle(GetResponseEvent $event)
     {
         $request = $event->getRequest();

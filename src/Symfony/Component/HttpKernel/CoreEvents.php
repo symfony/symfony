@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpKernel;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-final class Events
+final class CoreEvents
 {
     /**
      * The onCoreRequest event occurs at the very beginning of request
@@ -29,7 +29,7 @@ final class Events
      *
      * @var string
      */
-    const onCoreRequest = 'onCoreRequest';
+    const request = 'core.request';
 
     /**
      * The onCoreException event occurs when an uncaught exception appears
@@ -41,7 +41,7 @@ final class Events
      *
      * @var string
      */
-    const onCoreException = 'onCoreException';
+    const exception = 'core.exception';
 
     /**
      * The onCoreView event occurs when the return value of a controller
@@ -54,7 +54,7 @@ final class Events
      *
      * @var string
      */
-    const onCoreView = 'onCoreView';
+    const view = 'core.view';
 
     /**
      * The onCoreController event occurs once a controller was found for
@@ -66,7 +66,7 @@ final class Events
      *
      * @var string
      */
-    const onCoreController = 'onCoreController';
+    const controller = 'core.controller';
 
     /**
      * The onCoreController event occurs once a response was created for
@@ -78,5 +78,5 @@ final class Events
      *
      * @var string
      */
-    const onCoreResponse = 'onCoreResponse';
+    const response = 'core.response';
 }

@@ -9,6 +9,23 @@ timeline closely anyway.
 beta1 to beta2
 --------------
 
+* The ``error_handler`` setting has been removed. The ``ErrorHandler`` class
+  is now managed directly by Symfony SE in ``AppKernel``.
+
+* The Doctrine metadata files has moved from
+  ``Resources/config/doctrine/metadata/orm/`` to ``Resources/config/`` and the
+  extension from ``.dcm.yml`` to ``.orm.dcm.yml``
+
+  Before:
+
+        Resources/config/doctrine/metadata/orm/Bundle.Entity.dcm.xml
+        Resources/config/doctrine/metadata/orm/Bundle.Entity.dcm.yml
+
+  After:
+
+        Resources/config/Bundle.Entity.orm.dcm.xml
+        Resources/config/Bundle.Entity.orm.dcm.yml
+
 * With the introduction of a new Doctrine Registry class, the following
   parameters have been removed (replaced by methods on the `doctrine`
   service):
@@ -88,6 +105,24 @@ beta1 to beta2
     After:
 
       app/Resources/translations/catalogue.fr.xml
+
+* The option "modifiable" of the "collection" form type was split into two
+  options "allow_add" and "allow_delete".
+
+    Before:
+
+      $builder->add('tags', 'collection', array(
+          'type' => 'text',
+          'modifiable' => true,
+      ));
+
+    After:
+
+      $builder->add('tags', 'collection', array(
+          'type' => 'text',
+          'allow_add' => true,
+          'allow_delete' => true,
+      ));
 
 PR12 to beta1
 -------------

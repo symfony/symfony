@@ -30,4 +30,24 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
 
         $this->assertEquals(0, count($form));
     }
+
+    public function testCsrfTokenIsOnlyIncludedInRootView()
+    {
+        $view =
+            $this->factory->createBuilder('form', null, array(
+                'csrf_field_name' => 'csrf',
+            ))
+            ->add('notCsrf', 'text')
+            ->add(
+                $this->factory->createNamedBuilder('form', 'child', null, array(
+                    'csrf_field_name' => 'csrf',
+                ))
+                ->add('notCsrf', 'text')
+            )
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals(array('csrf', 'notCsrf', 'child'), array_keys(iterator_to_array($view)));
+        $this->assertEquals(array('notCsrf'), array_keys(iterator_to_array($view['child'])));
+    }
 }

@@ -40,7 +40,6 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('cache_warmer')->defaultValue(!$this->debug)->end()
                 ->scalarNode('charset')->end()
                 ->scalarNode('secret')->isRequired()->end()
-                ->scalarNode('error_handler')->end()
                 ->scalarNode('exception_controller')->defaultValue('Symfony\\Bundle\\FrameworkBundle\\Controller\\ExceptionController::showAction')->end()
                 ->scalarNode('ide')->defaultNull()->end()
                 ->booleanNode('test')->end()

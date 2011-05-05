@@ -711,4 +711,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(null, $request->setRequestFormat('foo'));
         $this->assertEquals('foo', $request->getRequestFormat(null));
     }
+
+    public function testForwardedSecure()
+    {
+        $request = new Request();
+        $request->headers->set('X-Forwarded-Proto', 'https');
+        $request->headers->set('X-Forwarded-Port', 443);
+
+        $this->assertTrue($request->isSecure());
+        $this->assertEquals(443, $request->getPort());
+    }
 }

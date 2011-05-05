@@ -58,7 +58,7 @@
         </service>
 
         <!-- TemporaryStorage -->
-        <service id="form.temporary_storage" class="%form.temporary_storage.class%">
+        <service id="form.temporary_storage" class="%form.temporary_storage.class%" public="false">
             <argument type="service" id="session" />
             <argument>%kernel.secret%</argument>
             <argument /> <!-- Temporary storage folder -->

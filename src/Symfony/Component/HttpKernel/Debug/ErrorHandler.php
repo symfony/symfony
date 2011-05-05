@@ -31,18 +31,25 @@ class ErrorHandler
     private $level;
 
     /**
-     * Constructor.
+     * Register the error handler.
      *
      * @param integer $level The level at which the conversion to Exception is done (null to use the error_reporting() value and 0 to disable)
+     *
+     * @return The registered error handler
      */
-    public function __construct($level = null)
+    static public function register($level = null)
     {
-        $this->level = null === $level ? error_reporting() : $level;
+        $handler = new static();
+        $handler->setLevel($level);
+
+        set_error_handler(array($handler, 'handle'));
+
+        return $handler;
     }
 
-    public function register()
+    public function setLevel($level)
     {
-        set_error_handler(array($this, 'handle'));
+        $this->level = null === $level ? error_reporting() : $level;
     }
 
     /**

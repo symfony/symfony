@@ -147,14 +147,14 @@ class Form implements \IteratorAggregate, FormInterface
      * and back
      * @var array An array of DataTransformerInterface
      */
-    private $normTransformers = array();
+    private $normTransformers;
 
     /**
      * The transformers for transforming from normalized to client format and
      * back
      * @var array An array of DataTransformerInterface
      */
-    private $clientTransformers = array();
+    private $clientTransformers;
 
     /**
      * Whether the data in application, normalized and client format is
@@ -168,7 +168,7 @@ class Form implements \IteratorAggregate, FormInterface
      * The validators attached to this form
      * @var array
      */
-    private $validators = array();
+    private $validators;
 
     /**
      * Whether this form may only be read, but not bound
@@ -186,13 +186,13 @@ class Form implements \IteratorAggregate, FormInterface
      * Key-value store for arbitrary attributes attached to this form
      * @var array
      */
-    private $attributes = array();
+    private $attributes;
 
     /**
      * The FormTypeInterface instances used to create this form
      * @var array An array of FormTypeInterface
      */
-    private $types = array();
+    private $types;
 
     public function __construct($name, EventDispatcherInterface $dispatcher,
         array $types = array(), array $clientTransformers = array(),
@@ -904,8 +904,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     private function normToApp($value)
     {
-        foreach (array_reverse($this->normTransformers) as $transformer) {
-            $value = $transformer->reverseTransform($value);
+        for ($i = count($this->normTransformers) - 1; $i >= 0; $i--) {
+            $value = $this->normTransformers[$i]->reverseTransform($value);
         }
 
         return $value;
@@ -946,8 +946,8 @@ class Form implements \IteratorAggregate, FormInterface
             return '' === $value ? null : $value;
         }
 
-        foreach (array_reverse($this->clientTransformers) as $transformer) {
-            $value = $transformer->reverseTransform($value);
+        for ($i = count($this->clientTransformers) - 1; $i >= 0; $i--) {
+            $value = $this->clientTransformers[$i]->reverseTransform($value);
         }
 
         return $value;

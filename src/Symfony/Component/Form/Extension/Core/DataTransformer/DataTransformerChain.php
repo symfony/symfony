@@ -78,8 +78,8 @@ class DataTransformerChain implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        foreach (array_reverse($this->transformers) as $transformer) {
-            $value = $transformer->reverseTransform($value);
+        for ($i = count($this->transformers) - 1; $i >= 0; $i--) {
+            $value = $this->transformers[$i]->reverseTransform($value);
         }
 
         return $value;

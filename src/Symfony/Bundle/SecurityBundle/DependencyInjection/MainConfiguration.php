@@ -234,7 +234,7 @@ class MainConfiguration implements ConfigurationInterface
                 ->canBeUnset()
                 ->children()
                     ->scalarNode('max_sessions')->defaultNull()->end()
-                    ->scalarNode('target_url')->defaultValue('/')->end()
+                    ->scalarNode('expiration_url')->defaultValue('/')->end()
                 ->end()
             ->end()
         ;

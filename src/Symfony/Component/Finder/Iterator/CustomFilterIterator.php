@@ -46,14 +46,10 @@ class CustomFilterIterator extends \FilterIterator
         $fileinfo = $this->current();
 
         foreach ($this->filters as $filter) {
-            if($filter instanceof \Closure) {
-                if (false === $filter($fileinfo)) {
+            if(is_callable($filter)) {
+                if (false === call_user_func($filter, $fileinfo)) {
                     return false;
                 }
-            }
-
-            if(false === call_user_func($filter, $fileinfo)) {
-                return false;
             }
         }
 

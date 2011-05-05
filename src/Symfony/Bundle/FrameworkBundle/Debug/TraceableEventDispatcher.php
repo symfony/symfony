@@ -68,30 +68,40 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     /**
      * {@inheritDoc}
      */
-    protected function triggerListener($listener, $eventName, Event $event)
+    protected function doDispatch($listeners, $eventName, Event $event)
     {
-        parent::triggerListener($listener, $eventName, $event);
+        foreach ($listeners as $listener) {
+            if ($listener instanceof \Closure) {
+                $listener->__invoke($event);
+            } else {
+                $listener->$eventName($event);
+            }
 
-        if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Notified event "%s" to listener "%s".', $eventName, get_class($listener)));
-        }
+            if (null !== $this->logger) {
+                $this->logger->debug(sprintf('Notified event "%s" to listener "%s".', $eventName, get_class($listener)));
+            }
 
-        $this->called[$eventName.'.'.get_class($listener)] = $this->getListenerInfo($listener, $eventName);
+            $this->called[$eventName.'.'.get_class($listener)] = $this->getListenerInfo($listener, $eventName);
 
-        if ($event->isPropagationStopped() && null !== $this->logger) {
-            $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s".', get_class($listener), $eventName));
+            if ($event->isPropagationStopped()) {
+                if (null !== $this->logger) {
+                    $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s".', get_class($listener), $eventName));
 
-            $skippedListeners = $this->getListeners($eventName);
-            $skipped = false;
+                    $skippedListeners = $this->getListeners($eventName);
+                    $skipped = false;
 
-            foreach ($skippedListeners as $skippedListener) {
-                if ($skipped) {
-                    $this->logger->debug(sprintf('Listener "%s" was not called for event "%s".', get_class($skippedListener), $eventName));
+                    foreach ($skippedListeners as $skippedListener) {
+                        if ($skipped) {
+                            $this->logger->debug(sprintf('Listener "%s" was not called for event "%s".', get_class($skippedListener), $eventName));
+                        }
+
+                        if ($skippedListener === $listener) {
+                            $skipped = true;
+                        }
+                    }
                 }
 
-                if ($skippedListener === $listener) {
-                    $skipped = true;
-                }
+                break;
             }
         }
     }

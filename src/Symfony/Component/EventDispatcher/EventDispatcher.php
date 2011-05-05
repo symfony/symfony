@@ -102,32 +102,24 @@ class EventDispatcher implements EventDispatcherInterface
      *
      * @api
      */
-    public function addListener($eventNames, $listener, $priority = 0)
+    public function addListener($eventName, $listener, $priority = 0)
     {
-        foreach ((array) $eventNames as $eventName) {
-            if (!isset($this->listeners[$eventName][$priority])) {
-                $this->listeners[$eventName][$priority] = new \SplObjectStorage();
-            }
-
-            $this->listeners[$eventName][$priority]->attach($listener);
-            unset($this->sorted[$eventName]);
-        }
+        $this->listeners[$eventName][$priority][] = $listener;
+        unset($this->sorted[$eventName]);
     }
 
     /**
      * @see EventDispatcherInterface::removeListener
      */
-    public function removeListener($eventNames, $listener)
+    public function removeListener($eventName, $listener)
     {
-        foreach ((array) $eventNames as $eventName) {
-            if (!isset($this->listeners[$eventName])) {
-                continue;
-            }
+        if (!isset($this->listeners[$eventName])) {
+            return;
+        }
 
-            foreach (array_keys($this->listeners[$eventName]) as $priority) {
-                if (isset($this->listeners[$eventName][$priority][$listener])) {
-                    unset($this->listeners[$eventName][$priority][$listener], $this->sorted[$eventName]);
-                }
+        foreach ($this->listeners[$eventName] as $priority => $listeners) {
+            if (false !== ($key = array_search($listener, $listeners))) {
+                unset($this->listeners[$eventName][$priority][$key], $this->sorted[$eventName]);
             }
         }
     }
@@ -137,7 +129,12 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function addSubscriber(EventSubscriberInterface $subscriber, $priority = 0)
     {
-        $this->addListener($subscriber->getSubscribedEvents(), $subscriber, $priority);
+        foreach ((array) $subscriber->getSubscribedEvents() as $eventName => $method) {
+            if (is_numeric($eventName)) {
+                $eventName = $method;
+            }
+            $this->addListener($eventName, array($subscriber, $method), $priority);
+        }
     }
 
     /**
@@ -145,7 +142,12 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function removeSubscriber(EventSubscriberInterface $subscriber)
     {
-        $this->removeListener($subscriber->getSubscribedEvents(), $subscriber);
+        foreach ((array) $subscriber->getSubscribedEvents() as $eventName => $method) {
+            if (is_numeric($eventName)) {
+                $eventName = $method;
+            }
+            $this->removeListener($eventName, array($subscriber, $method));
+        }
     }
 
     /**
@@ -161,10 +163,13 @@ class EventDispatcher implements EventDispatcherInterface
     protected function doDispatch($listeners, $eventName, Event $event)
     {
         foreach ($listeners as $listener) {
-            if ($listener instanceof \Closure) {
-                $listener->__invoke($event);
-            } else {
+            // TODO: remove this before final release, temporary transitional code
+            if (is_object($listener) && method_exists($listener, $eventName)) {
                 $listener->$eventName($event);
+                //trigger_error('Event listeners should now be registered using a complete callback as the listener instead of just an instance. Adjust your code ASAP.', E_USER_DEPRECATED);
+            } else {
+                // only this call should remain
+                call_user_func($listener, $event);
             }
 
             if ($event->isPropagationStopped()) {

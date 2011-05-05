@@ -48,21 +48,26 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
      *
      * @throws \RuntimeException if the listener method is not callable
      */
-    public function addListener($eventNames, $listener, $priority = 0)
+    public function addListener($eventName, $listener, $priority = 0)
     {
-        if (!$listener instanceof \Closure) {
-            foreach ((array) $eventNames as $method) {
-                if (!is_callable(array($listener, $method))) {
-                    $msg = sprintf('The event method "%s()" is not callable on the class "%s".', $method, get_class($listener));
-                    if (null !== $this->logger) {
-                        $this->logger->err($msg);
-                    }
-                    throw new \RuntimeException($msg);
-                }
+        if (!is_callable($listener)) {
+            if (is_string($listener)) {
+                $type = '[string] '.$listener;
+            } elseif (is_array($listener)) {
+                $type = '[array] '.$listener[0].', '.$listener[1];
+            } elseif (is_object($listener)) {
+                $type = '[object] '.get_class($listener);
+            } else {
+                $type = '[?] '.var_export($listener, true);
             }
+            $msg = sprintf('The given callback (%s) for event "%s" is not callable.', $type, $eventName);
+            if (null !== $this->logger) {
+                $this->logger->err($msg);
+            }
+            throw new \RuntimeException($msg);
         }
 
-        parent::addListener($eventNames, $listener, $priority);
+        parent::addListener($eventName, $listener, $priority);
     }
 
     /**
@@ -71,28 +76,40 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     protected function doDispatch($listeners, $eventName, Event $event)
     {
         foreach ($listeners as $listener) {
-            if ($listener instanceof \Closure) {
-                $listener->__invoke($event);
-            } else {
+            // TODO: remove this before final release, temporary transitional code
+            if (is_object($listener) && method_exists($listener, $eventName)) {
                 $listener->$eventName($event);
+                trigger_error('Event listeners should now be registered using a complete callback as the listener instead of just an instance. Adjust your code ASAP.', E_USER_DEPRECATED);
+            } else {
+                // only this call should remain
+                call_user_func($listener, $event);
             }
+
+            $info = $this->getListenerInfo($listener, $eventName);
 
             if (null !== $this->logger) {
-                $this->logger->debug(sprintf('Notified event "%s" to listener "%s".', $eventName, get_class($listener)));
+                $this->logger->debug(sprintf('Notified event "%s" to listener "%s".', $eventName, $info['pretty']));
             }
 
-            $this->called[$eventName.'.'.get_class($listener)] = $this->getListenerInfo($listener, $eventName);
+            $this->called[$eventName.'.'.$info['pretty']] = $info;
 
             if ($event->isPropagationStopped()) {
                 if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s".', get_class($listener), $eventName));
+                    $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s".', $info['pretty'], $eventName));
 
                     $skippedListeners = $this->getListeners($eventName);
                     $skipped = false;
 
                     foreach ($skippedListeners as $skippedListener) {
                         if ($skipped) {
-                            $this->logger->debug(sprintf('Listener "%s" was not called for event "%s".', get_class($skippedListener), $eventName));
+                            $typeDef = is_object($skippedListener)
+                                ? get_class($skippedListener)
+                                : is_array($skippedListener)
+                                    ? is_object($skippedListener[0])
+                                        ? get_class($skippedListener[0])
+                                        : implode('::', $skippedListener)
+                                    : implode('::', $skippedListener);
+                            $this->logger->debug(sprintf('Listener "%s" was not called for event "%s".', $typeDef, $eventName));
                         }
 
                         if ($skippedListener === $listener) {
@@ -121,10 +138,11 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     {
         $notCalled = array();
 
-        foreach (array_keys($this->getListeners()) as $name) {
-            foreach ($this->getListeners($name) as $listener) {
-                if (!isset($this->called[$name.'.'.get_class($listener)])) {
-                    $notCalled[$name.'.'.get_class($listener)] = $this->getListenerInfo($listener, $name);
+        foreach ($this->getListeners() as $name => $listeners) {
+            foreach ($listeners as $listener) {
+                $info = $this->getListenerInfo($listener, $name);
+                if (!isset($this->called[$name.'.'.$info['pretty']])) {
+                    $notCalled[$name.'.'.$info['pretty']] = $info;
                 }
             }
         }
@@ -144,11 +162,33 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     {
         $info = array('event' => $eventName);
         if ($listener instanceof \Closure) {
-            $info += array('type' => 'Closure');
-        } else {
-            $class = get_class($listener);
+            $info += array(
+                'type' => 'Closure',
+                'pretty' => 'closure'
+            );
+        } elseif (is_string($listener)) {
             try {
-                $r = new \ReflectionMethod($class, $eventName);
+                $r = new \ReflectionFunction($listener);
+                $file = $r->getFileName();
+                $line = $r->getStartLine();
+            } catch (\ReflectionException $e) {
+                $file = null;
+                $line = null;
+            }
+            $info += array(
+                'type'  => 'Function',
+                'function' => $listener,
+                'file'  => $file,
+                'line'  => $line,
+                'pretty' => $listener,
+            );
+        } elseif (is_array($listener) || (is_object($listener) && is_callable($listener))) {
+            if (!is_array($listener)) {
+                $listener = array($listener, '__invoke');
+            }
+            $class = get_class($listener[0]);
+            try {
+                $r = new \ReflectionMethod($class, $listener[1]);
                 $file = $r->getFileName();
                 $line = $r->getStartLine();
             } catch (\ReflectionException $e) {
@@ -158,8 +198,10 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
             $info += array(
                 'type'  => 'Method',
                 'class' => $class,
+                'method' => $listener[1],
                 'file'  => $file,
-                'line'  => $line
+                'line'  => $line,
+                'pretty' => $class.'::'.$listener[1],
             );
         }
 

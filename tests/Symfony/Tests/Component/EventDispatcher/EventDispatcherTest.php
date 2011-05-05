@@ -42,7 +42,8 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testAddListener()
     {
-        $this->dispatcher->addListener(array('preFoo', 'postFoo'), $this->listener);
+        $this->dispatcher->addListener('preFoo', array($this->listener, 'preFoo'));
+        $this->dispatcher->addListener('postFoo', array($this->listener, 'postFoo'));
         $this->assertTrue($this->dispatcher->hasListeners(self::preFoo));
         $this->assertTrue($this->dispatcher->hasListeners(self::postFoo));
         $this->assertEquals(1, count($this->dispatcher->getListeners(self::preFoo)));
@@ -55,12 +56,19 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $listener1 = new TestEventListener();
         $listener2 = new TestEventListener();
         $listener3 = new TestEventListener();
+        $listener1->name = '1';
+        $listener2->name = '2';
+        $listener3->name = '3';
 
-        $this->dispatcher->addListener('preFoo', $listener1, -10);
-        $this->dispatcher->addListener('preFoo', $listener2);
-        $this->dispatcher->addListener('preFoo', $listener3, 10);
+        $this->dispatcher->addListener('preFoo', array($listener1, 'preFoo'), -10);
+        $this->dispatcher->addListener('preFoo', array($listener2, 'preFoo'), 10);
+        $this->dispatcher->addListener('preFoo', array($listener3, 'preFoo'));
 
-        $expected = array($listener3, $listener2, $listener1);
+        $expected = array(
+            array($listener2, 'preFoo'),
+            array($listener3, 'preFoo'),
+            array($listener1, 'preFoo'),
+        );
 
         $this->assertSame($expected, $this->dispatcher->getListeners('preFoo'));
     }
@@ -91,7 +99,8 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testDispatch()
     {
-        $this->dispatcher->addListener(array('preFoo', 'postFoo'), $this->listener);
+        $this->dispatcher->addListener('preFoo', array($this->listener, 'preFoo'));
+        $this->dispatcher->addListener('postFoo', array($this->listener, 'postFoo'));
         $this->dispatcher->dispatch(self::preFoo);
         $this->assertTrue($this->listener->preFooInvoked);
         $this->assertFalse($this->listener->postFooInvoked);
@@ -103,7 +112,8 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $listener = function () use (&$invoked) {
             $invoked++;
         };
-        $this->dispatcher->addListener(array('preFoo', 'postFoo'), $listener);
+        $this->dispatcher->addListener('preFoo', $listener);
+        $this->dispatcher->addListener('postFoo', $listener);
         $this->dispatcher->dispatch(self::preFoo);
         $this->assertEquals(1, $invoked);
     }
@@ -143,9 +153,9 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveListener()
     {
-        $this->dispatcher->addListener(array('preBar'), $this->listener);
+        $this->dispatcher->addListener('preBar', $this->listener);
         $this->assertTrue($this->dispatcher->hasListeners(self::preBar));
-        $this->dispatcher->removeListener(array('preBar'), $this->listener);
+        $this->dispatcher->removeListener('preBar', $this->listener);
         $this->assertFalse($this->dispatcher->hasListeners(self::preBar));
         $this->dispatcher->removeListener(array('notExists'), $this->listener);
     }
@@ -160,7 +170,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveSubscriber()
     {
-        $eventSubscriber = new TestEventSubscriber();
+        $eventSubscriber = new TestEventSubscriber2();
         $this->dispatcher->addSubscriber($eventSubscriber);
         $this->assertTrue($this->dispatcher->hasListeners(self::preFoo));
         $this->assertTrue($this->dispatcher->hasListeners(self::postFoo));
@@ -191,6 +201,14 @@ class TestEventListener
 }
 
 class TestEventSubscriber implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents()
+    {
+        return array('preFoo' => 'preFoo', 'postFoo' => 'postFoo');
+    }
+}
+
+class TestEventSubscriber2 implements EventSubscriberInterface
 {
     public static function getSubscribedEvents()
     {

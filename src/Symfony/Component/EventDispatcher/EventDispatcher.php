@@ -106,9 +106,6 @@ class EventDispatcher implements EventDispatcherInterface
     {
         foreach ((array) $eventNames as $eventName) {
             if (!isset($this->listeners[$eventName][$priority])) {
-                if (!isset($this->listeners[$eventName])) {
-                    $this->listeners[$eventName] = array();
-                }
                 $this->listeners[$eventName][$priority] = new \SplObjectStorage();
             }
 

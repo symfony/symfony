@@ -25,12 +25,12 @@ class ReverseIterator implements \IteratorAggregate
      * Constructor.
      *
      * @param \Traversable $iterator The \Traversable to reverse
-     * @param boolean $preserve_keys If set to TRUE keys are preserved
+     * @param Boolean $preserve_keys If set to TRUE keys are preserved
      */
     public function __construct(\Traversable $iterator, $preserve_keys = false)
     {
         $this->iterator = $iterator;
-        $this->preserve_keys = (boolean) $preserve_keys;
+        $this->preserve_keys = (Boolean) $preserve_keys;
     }
 
     /**

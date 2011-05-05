@@ -27,14 +27,12 @@ namespace Symfony\Component\EventDispatcher;
  * manager.
  *
  * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link    www.doctrine-project.org
- * @since   2.0
- * @version $Revision: 3938 $
  * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
  * @author  Jonathan Wage <jonwage@gmail.com>
  * @author  Roman Borschel <roman@code-factory.org>
  * @author  Bernhard Schussek <bschussek@gmail.com>
  * @author  Fabien Potencier <fabien@symfony.com>
+ * @author  Jordi Boggiano <j.boggiano@seld.be>
  *
  * @api
  */
@@ -58,13 +56,7 @@ class EventDispatcher implements EventDispatcherInterface
             $event = new Event();
         }
 
-        foreach ($this->getListeners($eventName) as $listener) {
-            $this->triggerListener($listener, $eventName, $event);
-
-            if ($event->isPropagationStopped()) {
-                break;
-            }
-        }
+        $this->doDispatch($this->getListeners($eventName), $eventName, $event);
     }
 
     /**
@@ -161,22 +153,27 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * Triggers the listener method for an event.
+     * Triggers the listeners of an event.
      *
      * This method can be overridden to add functionality that is executed
      * for each listener.
      *
-     * @param object $listener The event listener on which to invoke the listener method.
-     * @param string $eventName The name of the event to dispatch. The name of the event is
-     *                          the name of the method that is invoked on listeners.
-     * @param Event $event The event arguments to pass to the event handlers/listeners.
+     * @param array[callback] $listeners The event listeners.
+     * @param string $eventName The name of the event to dispatch.
+     * @param Event $event The event object to pass to the event handlers/listeners.
      */
-    protected function triggerListener($listener, $eventName, Event $event)
+    protected function doDispatch($listeners, $eventName, Event $event)
     {
-        if ($listener instanceof \Closure) {
-            $listener->__invoke($event);
-        } else {
-            $listener->$eventName($event);
+        foreach ($listeners as $listener) {
+            if ($listener instanceof \Closure) {
+                $listener->__invoke($event);
+            } else {
+                $listener->$eventName($event);
+            }
+
+            if ($event->isPropagationStopped()) {
+                break;
+            }
         }
     }
 

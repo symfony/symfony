@@ -9,7 +9,7 @@ $container->loadFromExtension('framework', array(
     'file_upload' => array(
         'path'          => '/path/to/cache',
         'size'          => 1234,
-        'max_age_min'   => 100
+        'max_age_sec'   => 100
     ),
     'esi' => array(
         'enabled' => true,

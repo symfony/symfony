@@ -118,7 +118,7 @@ class TemporaryStorageTest extends \PHPUnit_Framework_TestCase
             }
         }
 
-        $storage = new TemporaryStorage('secret', $path, 0, 30);
+        $storage = new TemporaryStorage('secret', $path, 0, 30 * 60);
 
         foreach ($files as $i => $file) {
             if ($i % 2) {

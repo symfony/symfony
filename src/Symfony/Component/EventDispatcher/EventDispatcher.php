@@ -74,7 +74,6 @@ class EventDispatcher implements EventDispatcherInterface
             return $this->sorted[$eventName];
         }
 
-        $sorted = array();
         foreach (array_keys($this->listeners) as $eventName) {
             if (!isset($this->sorted[$eventName])) {
                 $this->sortListeners($eventName);
@@ -85,7 +84,7 @@ class EventDispatcher implements EventDispatcherInterface
             }
         }
 
-        return $sorted;
+        return $this->sorted;
     }
 
     /**

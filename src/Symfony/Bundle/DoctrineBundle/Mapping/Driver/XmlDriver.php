@@ -20,7 +20,7 @@ use Doctrine\ORM\Mapping\Driver\XmlDriver as BaseXmlDriver;
  */
 class XmlDriver extends BaseXmlDriver
 {
-    protected $_globalFile = 'doctrine';
+    protected $_globalFile = 'mapping';
     protected $_classCache;
     protected $_fileExtension = '.orm.dcm.xml';
 

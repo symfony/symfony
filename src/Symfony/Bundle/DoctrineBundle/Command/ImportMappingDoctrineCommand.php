@@ -58,7 +58,7 @@ EOT
         if ('annotation' === $type) {
             $destPath .= '/Entity';
         } else {
-            $destPath .= '/Resources/config';
+            $destPath .= '/Resources/config/doctrine';
         }
         if ('yaml' === $type) {
             $type = 'yml';

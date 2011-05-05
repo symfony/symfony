@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\Events;
+use Symfony\Component\HttpKernel\CoreEvents;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -49,7 +49,7 @@ class ContextListener implements ListenerInterface
         $this->contextKey = $contextKey;
 
         if (null !== $dispatcher) {
-            $dispatcher->addListener(Events::onCoreResponse, $this);
+            $dispatcher->addListener(CoreEvents::response, array($this, 'core.response'));
         }
     }
 

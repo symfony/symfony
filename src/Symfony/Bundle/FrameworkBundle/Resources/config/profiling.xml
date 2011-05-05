@@ -24,9 +24,9 @@
         </service>
 
         <service id="profiler_listener" class="%profiler_listener.class%">
-            <tag name="kernel.listener" event="onCoreResponse" priority="-100" />
-            <tag name="kernel.listener" event="onCoreException" />
-            <tag name="kernel.listener" event="onCoreRequest" />
+            <tag name="kernel.listener" event="core.response" method="onCoreResponse" priority="-100" />
+            <tag name="kernel.listener" event="core.exception" method="onCoreException" />
+            <tag name="kernel.listener" event="core.request" method="onCoreRequest" />
             <argument type="service" id="service_container" />
             <argument type="service" id="profiler.request_matcher" on-invalid="null" />
             <argument>%profiler_listener.only_exceptions%</argument>

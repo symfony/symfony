@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterfac
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Events as KernelEvents;
+use Symfony\Component\HttpKernel\CoreEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
-use Symfony\Component\Security\Http\Events;
+use Symfony\Component\Security\Http\SecurityEvents;
 
 /**
  * The AbstractAuthenticationListener is the preferred base class for all
@@ -216,7 +216,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 
         if (null !== $this->dispatcher) {
             $loginEvent = new InteractiveLoginEvent($request, $token);
-            $this->dispatcher->dispatch(Events::onSecurityInteractiveLogin, $loginEvent);
+            $this->dispatcher->dispatch(SecurityEvents::interactiveLogin, $loginEvent);
         }
 
         if (null !== $this->successHandler) {

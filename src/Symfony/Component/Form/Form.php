@@ -557,6 +557,30 @@ class Form implements \IteratorAggregate, FormInterface
         return $this->clientData;
     }
 
+    /**
+     * Returns an array of the data displayed to the client.
+     *
+     * @return array An array of data
+     */
+    public function getClientDataArray()
+    {
+        $callback = function(FormInterface $form) use(& $callback)
+        {
+            if (!$form->hasChildren()) {
+                return $form->getClientData();
+            }
+
+            $data = array();
+            foreach ($form as $name => $child) {
+                $data[$name] = $callback($child);
+            }
+
+            return $data;
+        };
+
+        return $callback($this);
+    }
+
     public function getExtraData()
     {
         return $this->extraData;

@@ -968,6 +968,29 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($parent, $view->getParent());
     }
 
+    public function testGetClientDataArray()
+    {
+        $addressForm = $this->getBuilder('address')->getForm();
+        $addressForm->add($this->getBuilder('city')->getForm());
+        $addressForm->add($this->getBuilder('state')->getForm());
+
+        $personForm = $this->getBuilder('person')->getForm();
+        $personForm->add($this->getBuilder('name')->getForm());
+        $personForm->add($addressForm);
+
+        $data = array(
+            'name' => 'Kris Wallsmith',
+            'address' => array(
+                'city' => 'Portland',
+                'state' => 'Oregon',
+            ),
+        );
+
+        $personForm->bind($data);
+
+        $this->assertEquals($data, $personForm->getClientDataArray());
+    }
+
     protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null)
     {
         return new FormBuilder($name, $this->factory, $dispatcher ?: $this->dispatcher);

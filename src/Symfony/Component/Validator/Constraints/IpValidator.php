@@ -38,11 +38,54 @@ class IpValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        $flag = null;
-        if ($constraint->version == Ip::V4) {
-            $flag = FILTER_FLAG_IPV4;
-        } elseif ($constraint->version == Ip::V6) {
-            $flag = FILTER_FLAG_IPV6;
+        switch ($constraint->version) {
+            case Ip::V4:
+               $flag = FILTER_FLAG_IPV4;
+               break;
+
+            case Ip::V6:
+               $flag = FILTER_FLAG_IPV6;
+               break;
+
+            case Ip::V4_NO_PRIV:
+               $flag = FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE;
+               break;
+
+            case Ip::V6_NO_PRIV:
+               $flag = FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE;
+               break;
+
+            case Ip::ALL_NO_PRIV:
+               $flag = FILTER_FLAG_NO_PRIV_RANGE;
+               break;
+
+            case Ip::V4_NO_RES:
+               $flag = FILTER_FLAG_IPV4 | FILTER_FLAG_NO_RES_RANGE;
+               break;
+
+            case Ip::V6_NO_RES:
+               $flag = FILTER_FLAG_IPV6 | FILTER_FLAG_NO_RES_RANGE;
+               break;
+
+            case Ip::ALL_NO_RES:
+               $flag = FILTER_FLAG_NO_RES_RANGE;
+               break;
+
+            case Ip::V4_ONLY_PUBLIC:
+               $flag = FILTER_FLAG_IPV4 | FILTER_FLAG_NO_RES_RANGE | FILTER_FLAG_NO_RES_RANGE;
+               break;
+
+            case Ip::V6_ONLY_PUBLIC:
+               $flag = FILTER_FLAG_IPV6 | FILTER_FLAG_NO_RES_RANGE | FILTER_FLAG_NO_RES_RANGE;
+               break;
+
+            case Ip::ALL_ONLY_PUBLIC:
+               $flag = FILTER_FLAG_NO_RES_RANGE | FILTER_FLAG_NO_RES_RANGE;
+               break;
+
+            default:
+                $flag = null;
+                break;
         }
 
         if (!filter_var($value, FILTER_VALIDATE_IP, $flag)) {

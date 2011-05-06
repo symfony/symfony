@@ -232,17 +232,21 @@ class Crawler extends \SplObjectStorage
      *       return $node->nodeValue;
      *     });
      *
-     * @param \Closure $closure An anonymous function
+     * @param function $closure An anonymous function
      *
      * @return array An array of values returned by the anonymous function
      *
      * @api
      */
-    public function each(\Closure $closure)
+    public function each($closure)
     {
+        if (!is_callable($closure)) {
+            throw new \InvalidArgumentException('The argument should be a function');
+        }
+        
         $data = array();
         foreach ($this as $i => $node) {
-            $data[] = $closure($node, $i);
+            $data[] = call_user_func($closure, $node, $i);
         }
 
         return $data;
@@ -253,17 +257,21 @@ class Crawler extends \SplObjectStorage
      *
      * To remove a node from the list, the anonymous function must return false.
      *
-     * @param \Closure $closure An anonymous function
+     * @param function $closure An anonymous function
      *
      * @return Crawler A Crawler instance with the selected nodes.
      *
      * @api
      */
-    public function reduce(\Closure $closure)
+    public function reduce($closure)
     {
+        if (!is_callable($closure)) {
+            throw new \InvalidArgumentException('The argument should be a function');
+        }
+        
         $nodes = array();
         foreach ($this as $i => $node) {
-            if (false !== $closure($node, $i)) {
+            if (false !== call_user_func($closure, $node, $i)) {
                 $nodes[] = $node;
             }
         }

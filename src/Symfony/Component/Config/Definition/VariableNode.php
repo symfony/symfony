@@ -49,8 +49,9 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
      * {@inheritDoc}
      */
     public function getDefaultValue()
-    {
-        return $this->defaultValue instanceof \Closure ? call_user_func($this->defaultValue) : $this->defaultValue;
+    {       
+        $value = $this->defaultValue;
+        return !is_string($value) && is_callable($value) ? call_user_func($value) : $value;
     }
 
     /**

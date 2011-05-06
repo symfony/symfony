@@ -167,6 +167,30 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->dispatcher->hasListeners(self::preFoo));
         $this->assertFalse($this->dispatcher->hasListeners(self::postFoo));
     }
+    
+    public function testCallableObjectListener()
+    {
+        $listener = new CallableEventListener();
+        $this->dispatcher->addListener('onEvent', $listener);
+        $this->dispatcher->dispatch('onEvent');
+        $this->assertTrue($listener->onEvent, 'The event method is invoked when available');
+    }    
+}
+
+class CallableEventListener 
+{
+    public $onInvoke = false;
+    public $onEvent = false;
+    
+    public function __invoke(Event $e)
+    {
+        $this->onInvoke = true;
+    }
+    
+    public function onEvent(Event $e)
+    {
+        $this->onEvent = true;
+    }
 }
 
 class TestEventListener

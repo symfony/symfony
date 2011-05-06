@@ -228,7 +228,7 @@ class Finder implements \IteratorAggregate
      *
      * This can be slow as all the matching files and directories must be retrieved for comparison.
      *
-     * @param  Closure $closure An anonymous function
+     * @param  function $closure An anonymous function
      *
      * @return Finder The current Finder instance
      *
@@ -236,8 +236,12 @@ class Finder implements \IteratorAggregate
      *
      * @api
      */
-    public function sort(\Closure $closure)
+    public function sort($closure)
     {
+        if (!is_callable($closure)) {
+            throw new \InvalidArgumentException('The parameter should be a function');
+        }
+        
         $this->sort = $closure;
 
         return $this;
@@ -285,7 +289,7 @@ class Finder implements \IteratorAggregate
      * The anonymous function receives a \SplFileInfo and must return false
      * to remove files.
      *
-     * @param  Closure $closure An anonymous function
+     * @param  function $closure An anonymous function
      *
      * @return Finder The current Finder instance
      *
@@ -293,8 +297,12 @@ class Finder implements \IteratorAggregate
      *
      * @api
      */
-    public function filter(\Closure $closure)
+    public function filter($closure)
     {
+        if (!is_callable($closure)) {
+            throw new \InvalidArgumentException('The parameter should be callable');
+        }
+        
         $this->filters[] = $closure;
 
         return $this;

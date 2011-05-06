@@ -50,7 +50,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
      */
     public function addListener($eventNames, $listener, $priority = 0)
     {
-        if (!$listener instanceof \Closure) {
+        if (!is_callable($listener)) {
             foreach ((array) $eventNames as $method) {
                 if (!is_callable(array($listener, $method))) {
                     $msg = sprintf('The event method "%s()" is not callable on the class "%s".', $method, get_class($listener));
@@ -133,7 +133,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     private function getListenerInfo($listener, $eventName)
     {
         $info = array('event' => $eventName);
-        if ($listener instanceof \Closure) {
+        if (is_callable($listener)) {
             $info += array('type' => 'Closure');
         } else {
             $class = get_class($listener);

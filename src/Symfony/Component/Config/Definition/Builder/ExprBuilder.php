@@ -51,11 +51,15 @@ class ExprBuilder
      *
      * The default one tests if the value is true.
      *
-     * @param \Closure $closure
+     * @param function $closure
      * @return ExprBuilder
      */
-    public function ifTrue(\Closure $closure = null)
+    public function ifTrue($closure = null)
     {
+        if (!is_callable($closure)) {
+            throw new \InvalidArgumentException('The parameter should be a function');
+        }
+        
         if (null === $closure) {
             $closure = function($v) { return true === $v; };
         }
@@ -132,12 +136,16 @@ class ExprBuilder
     /**
      * Sets the closure to run if the test pass.
      *
-     * @param \Closure $closure
+     * @param function $closure
      *
      * @return ExprBuilder
      */
-    public function then(\Closure $closure)
+    public function then($closure)
     {
+        if (!is_callable($closure)) {
+            throw new \InvalidArgumentException('The parameter should be a function');
+        }
+        
         $this->thenPart = $closure;
 
         return $this;

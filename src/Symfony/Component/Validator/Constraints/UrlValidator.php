@@ -44,9 +44,9 @@ class UrlValidator extends ConstraintValidator
         if (strpos($value, '::')) { // IPv6 address in URL
             $pattern = sprintf(self::PATTERN, implode('|', $constraint->protocols));
             $invalid = !preg_match($pattern, $value));
-	} else {
+        } else {
             $invalid = !filter_var($value, FILTER_VALIDATE_URL);
-	}
+        }
 
         if ($invalid) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));

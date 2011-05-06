@@ -34,18 +34,6 @@ class FirePHPHandler extends BaseFirePHPHandler
     private $response;
 
     /**
-     * {@inheritDoc}
-     */
-    protected function sendHeader($header, $content)
-    {
-        if ($this->response) {
-            $this->response->headers->set($header, $content);
-        } else {
-            $this->headers[$header] = $content;
-        }
-    }
-
-    /**
      * Adds the headers to the response once it's created
      */
     public function onCoreResponse(FilterResponseEvent $event)
@@ -59,5 +47,17 @@ class FirePHPHandler extends BaseFirePHPHandler
             $this->response->headers->set($header, $content);
         }
         $this->headers = array();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function sendHeader($header, $content)
+    {
+        if ($this->response) {
+            $this->response->headers->set($header, $content);
+        } else {
+            $this->headers[$header] = $content;
+        }
     }
 }

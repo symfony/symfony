@@ -72,15 +72,15 @@ class IpValidator extends ConstraintValidator
                break;
 
             case Ip::V4_ONLY_PUBLIC:
-               $flag = FILTER_FLAG_IPV4 | FILTER_FLAG_NO_RES_RANGE | FILTER_FLAG_NO_RES_RANGE;
+               $flag = FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE;
                break;
 
             case Ip::V6_ONLY_PUBLIC:
-               $flag = FILTER_FLAG_IPV6 | FILTER_FLAG_NO_RES_RANGE | FILTER_FLAG_NO_RES_RANGE;
+               $flag = FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE;
                break;
 
             case Ip::ALL_ONLY_PUBLIC:
-               $flag = FILTER_FLAG_NO_RES_RANGE | FILTER_FLAG_NO_RES_RANGE;
+               $flag = FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE;
                break;
 
             default:

@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class CustomNormalizer implements NormalizerInterface
+class CustomNormalizer extends SerializerAwareNormalizer
 {
     /**
      * {@inheritdoc}
@@ -25,7 +25,7 @@ class CustomNormalizer implements NormalizerInterface
             throw new \InvalidArgumentException('Object does not implemented NormalizableInterface.');
         }
 
-        return $object->normalize($this, $format);
+        return $object->normalize($this->serializer, $format);
     }
 
     /**
@@ -42,7 +42,7 @@ class CustomNormalizer implements NormalizerInterface
             throw new \InvalidArgumentException('Object does not implemented NormalizableInterface.');
         }
 
-        $object->denormalize($this, $data, $format);
+        $object->denormalize($this->serializer, $data, $format);
 
         return $object;
     }

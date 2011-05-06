@@ -11,6 +11,8 @@ namespace Symfony\Component\Serializer\Normalizer;
  * with this source code in the file LICENSE.
  */
 
+use Symfony\Component\Serializer\SerializerInterface;
+
 /**
  * Defines the most basic interface a class must implement to be normalizable
  *
@@ -27,16 +29,13 @@ interface NormalizableInterface
      * It is important to understand that the normalize() call should normalize
      * recursively all child objects of the implementor.
      *
-     * @param NormalizerInterface $normalizer The normalizer is given so that you
-     *   can use it to normalize objects contained within this object, eventually
-     *   grabbing the serializer from it to access other normalizers.
+     * @param SerializerInterface $serializer The serializer is given so that you
+     *   can use it to normalize objects contained within this object
      * @param string|null $format The format is optionally given to be able to normalize differently
      *   based on different output formats.
-     * @param array|null $properties If provided, this is a (subset) list of
-     *   properties that should be exported from the object.
      * @return array|scalar
      */
-    function normalize(NormalizerInterface $normalizer, $format, $properties = null);
+    function normalize(SerializerInterface $serializer, $format = null);
 
     /**
      * Denormalizes the object back from an array of scalars|arrays.
@@ -44,12 +43,11 @@ interface NormalizableInterface
      * It is important to understand that the normalize() call should denormalize
      * recursively all child objects of the implementor.
      *
-     * @param NormalizerInterface $normalizer The normalizer is given so that you
-     *   can use it to denormalize objects contained within this object, eventually
-     *   grabbing the serializer from it to access other normalizers.
+     * @param SerializerInterface $serializer The serializer is given so that you
+     *   can use it to denormalize objects contained within this object
      * @param array|scalar $data The data from which to re-create the object.
      * @param string|null $format The format is optionally given to be able to denormalize differently
      *   based on different input formats.
      */
-    function denormalize(NormalizerInterface $normalizer, $data, $format = null);
+    function denormalize(SerializerInterface $normalizer, $data, $format = null);
 }

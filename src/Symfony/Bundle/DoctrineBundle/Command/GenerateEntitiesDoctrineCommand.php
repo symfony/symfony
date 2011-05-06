@@ -31,6 +31,7 @@ class GenerateEntitiesDoctrineCommand extends DoctrineCommand
             ->setName('doctrine:generate:entities')
             ->setDescription('Generate entity classes and method stubs from your mapping information')
             ->addArgument('name', InputArgument::REQUIRED, 'A bundle name, a namespace, or a class name')
+            ->addOption('path', null, InputOption::VALUE_REQUIRED, 'The path where to generate entities when it cannot be guessed')
             ->setHelp(<<<EOT
 The <info>doctrine:generate:entities</info> command generates entity classes
 and method stubs from your mapping information:
@@ -49,6 +50,13 @@ You have to limit generation of entities:
 * To a namespace
 
   <info>./app/console doctrine:generate:entities MyCustomBundle/Entity</info>
+
+If the entities are not stored in a bundle, and if the classes do not exist,
+the command has no way to guess where they should be generated. In this case,
+you must provide the <comment>--path</comment> option:
+
+  <info>./app/console doctrine:generate:entities Blog/Entity --path=src/</info>
+
 EOT
         );
     }
@@ -69,10 +77,10 @@ EOT
 
             if (class_exists($name)) {
                 $output->writeln(sprintf('Generating entity "<info>%s</info>"', $name));
-                list($metadatas, $namespace, $path) = $this->getClassInfo($name);
+                list($metadatas, $namespace, $path) = $this->getClassInfo($name, $input->getOption('path'));
             } else {
                 $output->writeln(sprintf('Generating entities for namespace "<info>%s</info>"', $name));
-                list($metadatas, $namespace, $path) = $this->getNamespaceInfo($name);
+                list($metadatas, $namespace, $path) = $this->getNamespaceInfo($name, $input->getOption('path'));
             }
         }
 
@@ -104,33 +112,36 @@ EOT
         return array($metadatas, $bundle->getNamespace(), $path);
     }
 
-    private function getClassInfo($class)
+    private function getClassInfo($class, $path)
     {
         if (!$metadatas = $this->findMetadatasByClass($class)) {
             throw new \RuntimeException(sprintf('Entity "%s" is not a mapped entity.', $class));
         }
 
-        $r = $metadatas[$class]->getReflectionClass();
-        if (!$r) {
-            throw new \RuntimeException('Unable to determine where to save the "%s" class.', $class);
+        if (class_exists($class)) {
+            $r = $metadatas[$class]->getReflectionClass();
+            $path = $this->findBasePathForClass($class, $r->getNamespacename(), dirname($r->getFilename()));
+        } elseif (!$path) {
+            throw new \RuntimeException(sprintf('Unable to determine where to save the "%s" class (use the --path option).', $class));
         }
-        $path = $this->findBasePathForClass($class, $r->getNamespacename(), dirname($r->getFilename()));
 
         return array($metadatas, $r->getNamespacename(), $path);
     }
 
-    private function getNamespaceInfo($namespace)
+    private function getNamespaceInfo($namespace, $path)
     {
         if (!$metadatas = $this->findMetadatasByNamespace($namespace)) {
             throw new \RuntimeException(sprintf('Namespace "%s" does not contain any mapped entities.', $namespace));
         }
 
         $first = reset($metadatas);
-        $r = $first->getReflectionClass();
-        if (!$r) {
-            throw new \RuntimeException('Unable to determine where to save the "%s" class.', $class);
+        $class = key($metadatas);
+        if (class_exists($class)) {
+            $r = $first->getReflectionClass();
+            $path = $this->findBasePathForClass($namespace, $r->getNamespacename(), dirname($r->getFilename()));
+        } elseif (!$path) {
+            throw new \RuntimeException(sprintf('Unable to determine where to save the "%s" class (use the --path option).', $class));
         }
-        $path = $this->findBasePathForClass($namespace, $r->getNamespacename(), dirname($r->getFilename()));
 
         return array($metadatas, $namespace, $path);
     }

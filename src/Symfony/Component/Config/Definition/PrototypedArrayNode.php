@@ -161,7 +161,10 @@ class PrototypedArrayNode extends ArrayNode
 
         if (count($value) < $this->minNumberOfElements) {
             $msg = sprintf('The path "%s" should have at least %d element(s) defined.', $this->getPath(), $this->minNumberOfElements);
-            throw new InvalidConfigurationException($msg);
+            $ex = new InvalidConfigurationException($msg);
+            $ex->setPath($this->getPath());
+
+            throw $ex;
         }
 
         return $value;
@@ -186,7 +189,10 @@ class PrototypedArrayNode extends ArrayNode
             if (null !== $this->keyAttribute && is_array($v)) {
                 if (!isset($v[$this->keyAttribute]) && is_int($k)) {
                     $msg = sprintf('The attribute "%s" must be set for path "%s".', $this->keyAttribute, $this->getPath());
-                    throw new InvalidConfigurationException($msg);
+                    $ex = new InvalidConfigurationException($msg);
+                    $ex->setPath($this->getPath());
+
+                    throw $ex;
                 } else if (isset($v[$this->keyAttribute])) {
                     $k = $v[$this->keyAttribute];
 
@@ -203,7 +209,10 @@ class PrototypedArrayNode extends ArrayNode
 
                 if (array_key_exists($k, $normalized)) {
                     $msg = sprintf('Duplicate key "%s" for path "%s".', $k, $this->getPath());
-                    throw new DuplicateKeyException($msg);
+                    $ex = new DuplicateKeyException($msg);
+                    $ex->setPath($this->getPath());
+
+                    throw $ex;
                 }
             }
 
@@ -249,11 +258,14 @@ class PrototypedArrayNode extends ArrayNode
             // no conflict
             if (!array_key_exists($k, $leftSide)) {
                 if (!$this->allowNewKeys) {
-                    throw new InvalidConfigurationException(sprintf(
+                    $ex = new InvalidConfigurationException(sprintf(
                         'You are not allowed to define new elements for path "%s". ' .
                         'Please define all elements for this path in one config file.',
                         $this->getPath()
                     ));
+                    $ex->setPath($this->getPath());
+
+                    throw $ex;
                 }
 
                 $leftSide[$k] = $v;

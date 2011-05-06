@@ -16,9 +16,9 @@
                 <mapping name="AnnotationsBundle" />
             </entity-manager>
             <entity-manager name="em2">
-                <mapping name="YamlBundle" dir="Resources/config" alias="yml" />
+                <mapping name="YamlBundle" dir="Resources/config/doctrine" alias="yml" />
                 <mapping name="manual" type="xml" prefix="Fixtures\Bundles\XmlBundle"
-                    dir="%kernel.root_dir%/../src/Symfony/Bundle/DoctrineBundle/Tests/DependencyInjection/Fixtures/Bundles/XmlBundle/Resources/config"
+                    dir="%kernel.root_dir%/../src/Symfony/Bundle/DoctrineBundle/Tests/DependencyInjection/Fixtures/Bundles/XmlBundle/Resources/config/doctrine"
                     alias="TestAlias"
                 />
             </entity-manager>

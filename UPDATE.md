@@ -13,8 +13,8 @@ beta1 to beta2
   is now managed directly by Symfony SE in ``AppKernel``.
 
 * The Doctrine metadata files has moved from
-  ``Resources/config/doctrine/metadata/orm/`` to ``Resources/config/`` and the
-  extension from ``.dcm.yml`` to ``.orm.dcm.yml``
+  ``Resources/config/doctrine/metadata/orm/`` to ``Resources/config/doctrine``
+  and the extension from ``.dcm.yml`` to ``.orm.yml``
 
   Before:
 
@@ -23,8 +23,8 @@ beta1 to beta2
 
   After:
 
-        Resources/config/Bundle.Entity.orm.dcm.xml
-        Resources/config/Bundle.Entity.orm.dcm.yml
+        Resources/config/doctrine/Bundle.Entity.orm.xml
+        Resources/config/doctrine/Bundle.Entity.orm.yml
 
 * With the introduction of a new Doctrine Registry class, the following
   parameters have been removed (replaced by methods on the `doctrine`

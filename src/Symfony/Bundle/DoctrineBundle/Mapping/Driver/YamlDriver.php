@@ -20,9 +20,9 @@ use Doctrine\ORM\Mapping\Driver\YamlDriver as BaseYamlDriver;
  */
 class YamlDriver extends BaseYamlDriver
 {
-    protected $_globalFile = 'doctrine';
+    protected $_globalFile = 'mapping';
     protected $_classCache;
-    protected $_fileExtension = '.orm.dcm.yml';
+    protected $_fileExtension = '.orm.yml';
 
     public function isTransient($className)
     {

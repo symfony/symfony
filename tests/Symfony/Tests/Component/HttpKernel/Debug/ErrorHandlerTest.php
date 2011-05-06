@@ -24,44 +24,35 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testConstruct()
     {
-        $e = new ErrorHandler(3);
+        $handler = ErrorHandler::register(3);
 
-        $this->assertInstanceOf('Symfony\Component\HttpKernel\Debug\ErrorHandler',$e);
-
-        $level = new \ReflectionProperty(get_class($e),'level');
+        $level = new \ReflectionProperty($handler, 'level');
         $level->setAccessible(true);
 
-        $this->assertEquals(3,$level->getValue($e));
-    }
+        $this->assertEquals(3, $level->getValue($handler));
 
-    public function testRegister()
-    {
-        $e = new ErrorHandler(3);
-        $e = $this->getMock(get_class($e), array('handle'));
-        $e->expects($this->once())->method('handle');
-
-        $e->register();
-
-        try{
-            trigger_error('foo');
-        }catch(\Exception $e){
-        }
+        restore_error_handler();
     }
 
     public function testHandle()
     {
-        $e = new ErrorHandler(0);
-        $this->assertFalse($e->handle(0,'foo','foo.php',12,'foo'));
+        $handler = ErrorHandler::register(0);
+        $this->assertFalse($handler->handle(0, 'foo', 'foo.php', 12, 'foo'));
 
-        $e = new ErrorHandler(3);
-        $this->assertFalse($e->handle(4,'foo','foo.php',12,'foo'));
+        restore_error_handler();
 
-        $e = new ErrorHandler(3);
-        try{
-            $e->handle(1, 'foo', 'foo.php', 12,'foo');
-        }catch(\ErrorException $e){
-            $this->assertSame('1: foo in foo.php line 12',$e->getMessage());
+        $handler = ErrorHandler::register(3);
+        $this->assertFalse($handler->handle(4, 'foo', 'foo.php', 12, 'foo'));
+
+        restore_error_handler();
+
+        $handler = ErrorHandler::register(3);
+        try {
+            $handler->handle(1, 'foo', 'foo.php', 12, 'foo');
+        } catch (\ErrorException $e) {
+            $this->assertSame('1: foo in foo.php line 12', $e->getMessage());
         }
-    }
 
+        restore_error_handler();
+    }
 }

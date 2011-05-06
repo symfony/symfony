@@ -263,11 +263,11 @@ abstract class AbstractDoctrineExtension extends Extension
         }
         $container->addResource(new FileResource($resource));
 
-        if (($files = glob($dir.'/'.$configPath.'/*.xml')) && count($files)) {
+        if (($files = glob($dir.'/'.$configPath.'/*.orm.xml')) && count($files)) {
             return 'xml';
-        } elseif (($files = glob($dir.'/'.$configPath.'/*.yml')) && count($files)) {
+        } elseif (($files = glob($dir.'/'.$configPath.'/*.orm.yml')) && count($files)) {
             return 'yml';
-        } elseif (($files = glob($dir.'/'.$configPath.'/*.php')) && count($files)) {
+        } elseif (($files = glob($dir.'/'.$configPath.'/*.orm.php')) && count($files)) {
             return 'php';
         }
 

@@ -96,6 +96,34 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType('array', $matcher->match('/foo'));
         $matcher = new UrlMatcher($collection, new RequestContext('', 'head'), array());
         $this->assertInternalType('array', $matcher->match('/foo'));
+
+        // route with an optional variable as the first segment
+        $collection = new RouteCollection();
+        $collection->add('bar', new Route('/{bar}/foo', array('bar' => 'bar'), array('bar' => 'foo|bar')));
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        $this->assertEquals(array('_route' => 'bar', 'bar' => 'bar'), $matcher->match('/bar/foo'));
+        $this->assertEquals(array('_route' => 'bar', 'bar' => 'foo'), $matcher->match('/foo/foo'));
+
+        $collection = new RouteCollection();
+        $collection->add('bar', new Route('/{bar}', array('bar' => 'bar'), array('bar' => 'foo|bar')));
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        $this->assertEquals(array('_route' => 'bar', 'bar' => 'foo'), $matcher->match('/foo'));
+        $this->assertEquals(array('_route' => 'bar', 'bar' => 'bar'), $matcher->match('/'));
+    }
+
+    public function testMatchWithPrefixes()
+    {
+        $collection1 = new RouteCollection();
+        $collection1->add('foo', new Route('/{foo}'));
+
+        $collection2 = new RouteCollection();
+        $collection2->addCollection($collection1, '/b');
+
+        $collection = new RouteCollection();
+        $collection->addCollection($collection2, '/a');
+
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        $this->assertEquals(array('_route' => 'foo', 'foo' => 'foo'), $matcher->match('/a/b/foo'));
     }
 
     public function testMatchRegression()
@@ -106,5 +134,14 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 
         $matcher = new UrlMatcher($coll, new RequestContext());
         $this->assertEquals(array('foo' => 'bar', '_route' => 'bar'), $matcher->match('/foo/bar/bar'));
+
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/{bar}'));
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        try {
+            $matcher->match('/');
+            $this->fail();
+        } catch (NotFoundException $e) {
+        }
     }
 }

@@ -18,7 +18,7 @@ use Symfony\Component\Templating\Loader\LoaderInterface;
 /**
  * A file resource.
  *
- * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ * @author Kris Wallsmith <kris@symfony.com>
  */
 class FileResource implements ResourceInterface
 {

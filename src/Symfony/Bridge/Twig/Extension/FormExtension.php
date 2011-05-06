@@ -27,10 +27,12 @@ class FormExtension extends \Twig_Extension
     protected $templates;
     protected $environment;
     protected $themes;
+    protected $varStack;
 
     public function __construct(array $resources = array())
     {
         $this->themes = new \SplObjectStorage();
+        $this->varStack = new \SplObjectStorage();
         $this->resources = $resources;
     }
 
@@ -156,9 +158,8 @@ class FormExtension extends \Twig_Extension
     {
         $templates = $this->getTemplates($view);
         $blocks = $view->get('types');
-        if ('widget' === $section || 'row' === $section) {
-            array_unshift($blocks, '_'.$view->get('id'));
-        }
+        array_unshift($blocks, '_'.$view->get('id'));
+
         foreach ($blocks as &$block) {
             $block = $block.'_'.$section;
 
@@ -167,7 +168,15 @@ class FormExtension extends \Twig_Extension
                     $view->setRendered();
                 }
 
-                return $templates[$block]->renderBlock($block, array_merge($view->all(), $variables));
+                $this->varStack[$view] = array_replace(
+                    $view->all(),
+                    isset($this->varStack[$view]) ? $this->varStack[$view] : array(),
+                    $variables
+                );
+
+                $html = $templates[$block]->renderBlock($block, $this->varStack[$view]);
+
+                return $html;
             }
         }
 

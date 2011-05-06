@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper;
 /**
  * The dynamic "assetic" templating helper.
  *
- * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ * @author Kris Wallsmith <kris@symfony.com>
  */
 class DynamicAsseticHelper extends AsseticHelper
 {

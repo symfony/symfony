@@ -32,11 +32,12 @@ class RunSqlDoctrineCommand extends RunSqlCommand
 
         $this
             ->setName('doctrine:query:sql')
-            ->addOption('connection', null, InputOption::VALUE_OPTIONAL, 'The connection to use for this command.')
+            ->addOption('connection', null, InputOption::VALUE_OPTIONAL, 'The connection to use for this command')
             ->setHelp(<<<EOT
-The <info>doctrine:query:sql</info> command executes the given DQL query and outputs the results:
+The <info>doctrine:query:sql</info> command executes the given DQL query and
+outputs the results:
 
-  <info>./app/console doctrine:query:sql "SELECT * from user"</info>
+<info>./app/console doctrine:query:sql "SELECT * from user"</info>
 EOT
         );
     }

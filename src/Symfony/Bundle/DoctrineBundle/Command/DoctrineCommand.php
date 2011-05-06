@@ -17,6 +17,8 @@ use Doctrine\ORM\Tools\DisconnectedClassMetadataFactory;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\EntityGenerator;
+use Doctrine\ORM\Version as DoctrineVersion;
+use Doctrine\ORM\ORMException;
 
 /**
  * Base class for Doctrine console commands to extend from.
@@ -29,7 +31,7 @@ abstract class DoctrineCommand extends Command
     {
         $entityGenerator = new EntityGenerator();
 
-        if (version_compare(\Doctrine\ORM\Version::VERSION, "2.0.2-DEV") >= 0) {
+        if (version_compare(DoctrineVersion::VERSION, "2.0.2-DEV") >= 0) {
             $entityGenerator->setAnnotationPrefix("orm:");
         }
         $entityGenerator->setGenerateAnnotations(false);
@@ -37,19 +39,13 @@ abstract class DoctrineCommand extends Command
         $entityGenerator->setRegenerateEntityIfExists(false);
         $entityGenerator->setUpdateEntityIfExists(true);
         $entityGenerator->setNumSpaces(4);
+
         return $entityGenerator;
     }
 
     protected function getEntityManager($name)
     {
-        $name = $name ?: $this->container->getParameter('doctrine.orm.default_entity_manager');
-
-        $ems = $this->container->getParameter('doctrine.orm.entity_managers');
-        if (!isset($ems[$name])) {
-            throw new \InvalidArgumentException(sprintf('Could not find Doctrine EntityManager named "%s"', $name));
-        }
-
-        return $this->container->get($ems[$name]);
+        return $this->container->get('doctrine')->getEntityManager($name);
     }
 
     /**
@@ -60,33 +56,44 @@ abstract class DoctrineCommand extends Command
      */
     protected function getDoctrineConnection($name)
     {
-        $name = $name ?: $this->container->getParameter('doctrine.dbal.default_connection');
-
-        $connections = $this->container->getParameter('doctrine.dbal.connections');
-        if (!isset($connections[$name])) {
-            throw new \InvalidArgumentException(sprintf('<error>Could not find a connection named <comment>%s</comment></error>', $name));
-        }
-
-        return $this->container->get($connections[$name]);
+        return $this->container->get('doctrine')->getConnection($name);
     }
 
-    protected function getBundleMetadatas(Bundle $bundle)
+    protected function findMetadatasByNamespace($namespace)
     {
-        $namespace = $bundle->getNamespace();
-        $bundleMetadatas = array();
-        foreach ($this->container->getParameter('doctrine.orm.entity_managers') as $id) {
-            $em = $this->container->get($id);
-            $cmf = new DisconnectedClassMetadataFactory();
-            $cmf->setEntityManager($em);
-            $metadatas = $cmf->getAllMetadata();
-            foreach ($metadatas as $metadata) {
-                if (strpos($metadata->name, $namespace) === 0) {
-                    $bundleMetadatas[$metadata->name] = $metadata;
-                }
+        $metadatas = array();
+        foreach ($this->findAllMetadatas() as $name => $metadata) {
+            if (strpos($name, $namespace) === 0) {
+                $metadatas[$name] = $metadata;
             }
         }
 
-        return $bundleMetadatas;
+        return $metadatas;
+    }
+
+    protected function findMetadatasByClass($entity)
+    {
+        foreach ($this->findAllMetadatas() as $name => $metadata) {
+            if ($name === $entity) {
+                return array($name => $metadata);
+            }
+        }
+
+        return array();
+    }
+
+    protected function findAllMetadatas()
+    {
+        $metadatas = array();
+        foreach ($this->container->get('doctrine')->getEntityManagerNames() as $id) {
+            $cmf = new DisconnectedClassMetadataFactory();
+            $cmf->setEntityManager($this->container->get($id));
+            foreach ($cmf->getAllMetadata() as $metadata) {
+                $metadatas[$metadata->name] = $metadata;
+            }
+        }
+
+        return $metadatas;
     }
 
     /**
@@ -95,16 +102,33 @@ abstract class DoctrineCommand extends Command
      * @param Bundle $bundle
      * @return string
      */
-    protected function findBasePathForBundle($bundle)
+    protected function findBasePathForClass($name, $namespace, $path)
     {
-        $path = str_replace('\\', '/', $bundle->getNamespace());
-        $search = str_replace('\\', '/', $bundle->getPath());
-        $destination = str_replace('/'.$path, '', $search, $c);
+        $namespace = str_replace('\\', '/', $namespace);
+        $search = str_replace('\\', '/', $path);
+        $destination = str_replace('/'.$namespace, '', $search, $c);
 
         if ($c != 1) {
-            throw new \RuntimeException(sprintf('Can\'t find base path for bundle (path: "%s", destination: "%s").', $path, $destination));
+            throw new \RuntimeException(sprintf('Can\'t find base path for "%s" (path: "%s", destination: "%s").', $name, $path, $destination));
         }
 
         return $destination;
+    }
+
+    protected function getAliasedClassName($name)
+    {
+        $pos = strpos($name, ':');
+        $alias = substr($name, 0, $pos);
+
+        foreach ($this->container->get('doctrine')->getEntityManagerNames() as $id) {
+            $em = $this->container->get($id);
+
+            try {
+                return $em->getConfiguration()->getEntityNamespace($alias).'\\'.substr($name, $pos + 1);
+            } catch (ORMException $e) {
+            }
+        }
+
+        throw new \RuntimeException(sprintf('Entity "%s" does not exist.', $name));
     }
 }

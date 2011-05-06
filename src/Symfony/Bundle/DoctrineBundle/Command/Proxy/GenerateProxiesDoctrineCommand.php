@@ -32,15 +32,16 @@ class GenerateProxiesDoctrineCommand extends GenerateProxiesCommand
 
         $this
             ->setName('doctrine:generate:proxies')
-            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.')
+            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
             ->setHelp(<<<EOT
-The <info>doctrine:generate:proxies</info> command generates proxy classes for your default entity manager:
+The <info>doctrine:generate:proxies</info> command generates proxy classes for
+your default entity manager:
 
-  <info>./app/console doctrine:generate:proxies</info>
+<info>./app/console doctrine:generate:proxies</info>
 
 You can specify the entity manager you want to generate the proxies for:
 
-  <info>./app/console doctrine:generate:proxies --em=name</info>
+<info>./app/console doctrine:generate:proxies --em=name</info>
 EOT
         );
     }

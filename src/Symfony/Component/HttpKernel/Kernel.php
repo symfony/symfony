@@ -71,13 +71,10 @@ abstract class Kernel implements KernelInterface
         $this->classes = array();
 
         if ($this->debug) {
-            ini_set('display_errors', 1);
-            error_reporting(-1);
-
             $this->startTime = microtime(true);
-        } else {
-            ini_set('display_errors', 0);
         }
+
+        $this->init();
     }
 
     public function __clone()
@@ -88,6 +85,10 @@ abstract class Kernel implements KernelInterface
 
         $this->booted = false;
         $this->container = null;
+    }
+
+    public function init()
+    {
     }
 
     /**
@@ -242,8 +243,11 @@ abstract class Kernel implements KernelInterface
             throw new \RuntimeException(sprintf('File name "%s" contains invalid characters (..).', $name));
         }
 
-        $name = substr($name, 1);
-        list($bundleName, $path) = explode('/', $name, 2);
+        $bundleName = substr($name, 1);
+        $path = '';
+        if (false !== strpos($bundleName, '/')) {
+            list($bundleName, $path) = explode('/', $bundleName, 2);
+        }
 
         $isResource = 0 === strpos($path, 'Resources') && null !== $dir;
         $overridePath = substr($path, 9);
@@ -280,7 +284,7 @@ abstract class Kernel implements KernelInterface
             return $first && $isResource ? $files[0] : $files;
         }
 
-        throw new \InvalidArgumentException(sprintf('Unable to find file "@%s".', $name));
+        throw new \InvalidArgumentException(sprintf('Unable to find file "%s".', $name));
     }
 
     /**

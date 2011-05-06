@@ -44,9 +44,15 @@ class CustomNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($obj->xmlFoo);
     }
 
-    public function testSupports()
+    public function testSupportsNormalization()
     {
-        $this->assertTrue($this->normalizer->supports(new \ReflectionClass(get_class(new ScalarDummy))));
-        $this->assertFalse($this->normalizer->supports(new \ReflectionClass('stdClass')));
+        $this->assertTrue($this->normalizer->supportsNormalization(new ScalarDummy));
+        $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass));
+    }
+
+    public function testSupportsDenormalization()
+    {
+        $this->assertTrue($this->normalizer->supportsDenormalization(array(), 'Symfony\Tests\Component\Serializer\Fixtures\ScalarDummy'));
+        $this->assertFalse($this->normalizer->supportsDenormalization(array(), 'stdClass'));
     }
 }

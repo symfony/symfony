@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 
 /**
- * Defines the interface of serializers
+ * Defines the interface of normalizers.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */

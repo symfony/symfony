@@ -32,16 +32,6 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->normalizer->normalize($obj, 'any'));
     }
 
-    public function testNormalizeRestricted()
-    {
-        $obj = new GetSetDummy;
-        $obj->setFoo('foo');
-        $obj->setBar('bar');
-        $this->assertEquals(
-            array('foo' => 'foo'),
-            $this->normalizer->normalize($obj, 'any', array('foo')));
-    }
-
     public function testDenormalize()
     {
         $obj = $this->normalizer->denormalize(

@@ -2,8 +2,6 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\SerializerInterface;
-
 /*
  * This file is part of the Symfony framework.
  *
@@ -14,59 +12,58 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 
 /**
- * Defines the interface of serializers
+ * Defines the interface of serializers.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 interface NormalizerInterface
 {
     /**
      * Normalizes an object into a set of arrays/scalars
      *
-     * @param object $object object to normalize
+     * @param mixed  $data   data to normalize
      * @param string $format format the normalization result will be encoded as
-     * @param array $properties a list of properties to extract, if null all properties are returned
+     *
      * @return array|scalar
      * @api
      */
-    function normalize($object, $format, $properties = null);
+    function normalize($data, $format = null);
 
     /**
      * Denormalizes data back into an object of the given class
      *
-     * @param mixed $data data to restore
-     * @param string $class the expected class to instantiate
+     * @param mixed  $data   data to restore
+     * @param string $class  the expected class to instantiate
      * @param string $format format the given data was extracted from
+     *
+     * @throws UnsupportedException if input data, class, or format is not supported
+     *
      * @return object
      * @api
      */
-    function denormalize($data, $class, $format = null);
+    function denormalize($data, $type, $format = null);
 
     /**
-     * Checks whether the given class is supported by this normalizer
+     * Whether normalization is supported by the implementation.
      *
-     * @param ReflectionClass $class
-     * @param string          $format format the given data was extracted from
+     * @param mixed  $data   data to normalize
+     * @param string $format format the normalization result will be encoded as
      *
      * @return Boolean
-     *
      * @api
      */
-    function supports(\ReflectionClass $class, $format = null);
+    function supportsNormalization($data, $format = null);
 
     /**
-     * Sets the owning Serializer object
+     * Whether deormalization is supported by the implementation.
      *
-     * @param SerializerInterface $serializer
+     * @param mixed  $data   data to normalize
+     * @param string $type
+     * @param string $format format the normalization result will be encoded as
+     *
+     * @return Boolean
      * @api
      */
-    function setSerializer(SerializerInterface $serializer);
-
-    /**
-     * Gets the owning Serializer object
-     *
-     * @return SerializerInterface
-     * @api
-     */
-    function getSerializer();
+    function supportsDenormalization($data, $type, $format = null);
 }

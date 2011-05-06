@@ -2,8 +2,6 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\SerializerInterface;
-
 /*
  * This file is part of the Symfony framework.
  *
@@ -16,36 +14,48 @@ use Symfony\Component\Serializer\SerializerInterface;
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class CustomNormalizer extends AbstractNormalizer
+class CustomNormalizer extends SerializerAwareNormalizer
 {
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format, $properties = null)
+    public function normalize($object, $format = null)
     {
-        return $object->normalize($this, $format, $properties);
+        if (!$object instanceof NormalizableInterface) {
+            throw new \InvalidArgumentException('Object does not implemented NormalizableInterface.');
+        }
+
+        return $object->normalize($this->serializer, $format);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null)
+    public function denormalize($data, $type, $format = null)
     {
-        $object = new $class;
-        $object->denormalize($this, $data, $format);
+        if (!class_exists($type)) {
+            throw new \InvalidArgumentException(sprintf('The class "%s" does not exist.', $type));
+        }
+
+        $object = new $type;
+        if (!$object instanceof NormalizableInterface) {
+            throw new \InvalidArgumentException('Object does not implemented NormalizableInterface.');
+        }
+
+        $object->denormalize($this->serializer, $data, $format);
+
         return $object;
     }
 
-    /**
-     * Checks if the given class implements the NormalizableInterface.
-     *
-     * @param ReflectionClass $class  A ReflectionClass instance of the class
-     *                                to serialize into or from.
-     * @param string          $format The format being (de-)serialized from or into.
-     * @return Boolean
-     */
-    public function supports(\ReflectionClass $class, $format = null)
+    public function supportsNormalization($data, $format = null)
     {
-        return $class->implementsInterface('Symfony\Component\Serializer\Normalizer\NormalizableInterface');
+        return $data instanceof NormalizableInterface;
+    }
+
+    public function supportsDenormalization($data, $type, $format = null)
+    {
+        $class = new \ReflectionClass($type);
+
+        return $class->isSubclassOf('Symfony\Component\Serializer\Normalizer\NormalizableInterface');
     }
 }

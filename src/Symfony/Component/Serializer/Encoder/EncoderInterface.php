@@ -29,4 +29,13 @@ interface EncoderInterface
      * @api
      */
     function encode($data, $format);
-}
+
+    /**
+     * Decodes a string into PHP data
+     *
+     * @param string $data data to decode
+     * @param string $format format to decode from
+     * @return mixed
+     * @api
+     */
+    function decode($data, $format);}

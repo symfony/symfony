@@ -15,11 +15,11 @@ use Symfony\Component\Serializer\SerializerAwareInterface;
  */
 
 /**
- * Abstract Encoder implementation
+ * Serializer Aware Encoder implementation
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-abstract class AbstractEncoder implements SerializerAwareInterface, EncoderInterface
+abstract class SerializerAwareEncoder implements SerializerAwareInterface, EncoderInterface
 {
     protected $serializer;
 
@@ -29,13 +29,5 @@ abstract class AbstractEncoder implements SerializerAwareInterface, EncoderInter
     public function setSerializer(SerializerInterface $serializer)
     {
         $this->serializer = $serializer;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSerializer()
-    {
-        return $this->serializer;
     }
 }

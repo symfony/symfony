@@ -24,10 +24,9 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        $serializer = new Serializer;
-        $this->encoder = new XmlEncoder;
-        $serializer->setEncoder('xml', $this->encoder);
-        $serializer->addNormalizer(new CustomNormalizer);
+        $this->serializer = new Serializer;
+        $this->serializer->setEncoder('xml', $this->encoder = new XmlEncoder);
+        $this->serializer->addNormalizer(new CustomNormalizer);
     }
 
     public function testEncodeScalar()
@@ -38,7 +37,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $expected = '<?xml version="1.0"?>'."\n".
             '<response><![CDATA[foo]]></response>'."\n";
 
-        $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
+        $this->assertEquals($expected, $this->serializer->serialize($obj, 'xml'));
     }
 
     public function testSetRootNodeName()
@@ -50,7 +49,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $expected = '<?xml version="1.0"?>'."\n".
             '<test><![CDATA[foo]]></test>'."\n";
 
-        $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
+        $this->assertEquals($expected, $this->serializer->serialize($obj, 'xml'));
     }
 
     public function testAttributes()
@@ -79,7 +78,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
             '<Bar>3</Bar>'.
             '<a><![CDATA[b]]></a>'.
             '</response>'."\n";
-        $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
+        $this->assertEquals($expected, $this->serializer->serialize($obj, 'xml'));
     }
 
     public function testElementNameValid()
@@ -98,44 +97,33 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
             '<föo_bär><![CDATA[a]]></föo_bär>'.
             '</response>'."\n";
 
-        $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
+        $this->assertEquals($expected, $this->serializer->serialize($obj, 'xml'));
     }
 
-    public function testEncodeSimpleXML()
-    {
-        $xml = simplexml_load_string('<firstname>Peter</firstname>');
-        $array = array('person' => $xml);
-
-        $expected = '<?xml version="1.0"?>'."\n".
-            '<response><person><firstname>Peter</firstname></person></response>'."\n";
-
-        $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
-    }
-    
     public function testEncodeScalarRootAttributes()
     {
         $array = array(
           '#' => 'Paul',
-          '@gender' => 'm'  
+          '@gender' => 'm'
         );
-        
+
         $expected = '<?xml version="1.0"?>'."\n".
             '<response gender="m"><![CDATA[Paul]]></response>'."\n";
-        
-        $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
+
+        $this->assertEquals($expected, $this->serializer->serialize($array, 'xml'));
     }
-    
+
     public function testEncodeRootAttributes()
     {
         $array = array(
           'firstname' => 'Paul',
-          '@gender' => 'm'  
+          '@gender' => 'm'
         );
-        
+
         $expected = '<?xml version="1.0"?>'."\n".
             '<response gender="m"><firstname><![CDATA[Paul]]></firstname></response>'."\n";
-        
-        $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
+
+        $this->assertEquals($expected, $this->serializer->serialize($array, 'xml'));
     }
 
     public function testEncodeScalarWithAttribute()
@@ -147,7 +135,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $expected = '<?xml version="1.0"?>'."\n".
             '<response><person gender="M"><![CDATA[Peter]]></person></response>'."\n";
 
-        $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
+        $this->assertEquals($expected, $this->serializer->serialize($array, 'xml'));
     }
 
     public function testDecodeScalar()
@@ -155,7 +143,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $source = '<?xml version="1.0"?>'."\n".
             '<response>foo</response>'."\n";
 
-        $this->assertEquals('foo', $this->encoder->decode($source, 'xml'));
+        $this->assertEquals('foo', $this->serializer->decode($source, 'xml'));
     }
 
     public function testEncode()
@@ -163,7 +151,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $source = $this->getXmlSource();
         $obj = $this->getObject();
 
-        $this->assertEquals($source, $this->encoder->encode($obj, 'xml'));
+        $this->assertEquals($source, $this->serializer->serialize($obj, 'xml'));
     }
 
     public function testDecode()
@@ -171,7 +159,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $source = $this->getXmlSource();
         $obj = $this->getObject();
 
-        $this->assertEquals(get_object_vars($obj), $this->encoder->decode($source, 'xml'));
+        $this->assertEquals(get_object_vars($obj), $this->serializer->decode($source, 'xml'));
     }
 
     public function testDecodeScalarWithAttribute()
@@ -183,34 +171,34 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
             'person' => array('@gender' => 'M', '#' => 'Peter'),
         );
 
-        $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
+        $this->assertEquals($expected, $this->serializer->decode($source, 'xml'));
     }
-    
+
     public function testDecodeScalarRootAttributes()
     {
         $source = '<?xml version="1.0"?>'."\n".
             '<person gender="M">Peter</person>'."\n";
-            
+
         $expected = array(
             '#' => 'Peter',
             '@gender' => 'M'
         );
-        
-        $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
+
+        $this->assertEquals($expected, $this->serializer->decode($source, 'xml'));
     }
-    
+
     public function testDecodeRootAttributes()
     {
         $source = '<?xml version="1.0"?>'."\n".
             '<person gender="M"><firstname>Peter</firstname><lastname>Mac Calloway</lastname></person>'."\n";
-            
+
         $expected = array(
             'firstname' => 'Peter',
             'lastname' => 'Mac Calloway',
             '@gender' => 'M'
         );
-        
-        $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
+
+        $this->assertEquals($expected, $this->serializer->decode($source, 'xml'));
     }
 
     public function testDecodeArray()
@@ -230,7 +218,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
             ))
         );
 
-        $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
+        $this->assertEquals($expected, $this->serializer->decode($source, 'xml'));
     }
 
     protected function getXmlSource()

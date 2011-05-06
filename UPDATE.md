@@ -106,6 +106,18 @@ beta1 to beta2
 
       app/Resources/translations/catalogue.fr.xml
 
+* The interfaces of the Serializer component have been changed:
+
+    - many implementation specific methods have been removed from the interfaces
+      (these methods still exist on the actual implementation)
+    - supports() has been split into supportsNormalization(), and 
+      supportsDenormalization()
+    - DecoderInterface has been removed, the Encoder must now implement both
+      methods encode() and decode(); this was expected already anyway
+    - de/normalizeObject methods have been removed in favor of the generic
+      de/normalize methods
+    - a deserialize method has been added to the SerializerInterface
+
 * The option "modifiable" of the "collection" form type was split into two
   options "allow_add" and "allow_delete".
 

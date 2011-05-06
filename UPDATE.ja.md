@@ -8,6 +8,50 @@
 beta1 から beta2
 ----------------
 
+* ``error_handler`` の設定が削除されました。\ ``ErrorHandler`` クラスは Symfony Standard Edition の ``AppKernel`` で直接管理されるように変更されました。
+
+* Doctrine のメタデータ用のディレクトリが、\ ``Resources/config/doctrine/metadata/orm/`` から ``Resources/config/doctrine`` に変更され、各ファイルの拡張子が ``.dcm.yml`` から ``.orm.yml`` に変更されました。
+
+  変更前:
+
+        Resources/config/doctrine/metadata/orm/Bundle.Entity.dcm.xml
+        Resources/config/doctrine/metadata/orm/Bundle.Entity.dcm.yml
+
+  変更後:
+
+        Resources/config/doctrine/Bundle.Entity.orm.xml
+        Resources/config/doctrine/Bundle.Entity.orm.yml
+
+* 新しい Doctrine Registry クラスの導入により、次のパラメータは削除されました（\ `doctrine` サービスのメソッドに置き換えられました）。
+
+   * doctrine.orm.entity_managers
+   * doctrine.orm.default_entity_manager
+   * doctrine.dbal.default_connection
+
+  変更前:
+
+        $container->getParameter('doctrine.orm.entity_managers')
+        $container->getParameter('doctrine.orm.default_entity_manager')
+        $container->getParameter('doctrine.orm.default_connection')
+
+  変更後:
+
+        $container->get('doctrine')->getEntityManagerNames()
+        $container->get('doctrine')->getDefaultEntityManagerName()
+        $container->get('doctrine')->getDefaultConnectionName()
+
+  ただし、これらのメソッドを使わなくても、次のようにして Registry オブジェクトから直接 EntityManager オブジェクトを取得できます。
+
+  変更前:
+
+        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->get('doctrine.orm.foobar_entity_manager');
+
+  変更後:
+
+        $em = $this->get('doctrine')->getEntityManager();
+        $em = $this->get('doctrine')->getEntityManager('foobar');
+
 * `doctrine:generate:entities` コマンドの引数とオプションが変更されました。
   新しい引数とオプションの詳細は、\ `./app/console doctrine:generate:entities --help` コマンドを実行して確認してください。
 
@@ -44,20 +88,32 @@ beta1 から beta2
                 - { name: doctrine.event_subscriber }                      # すべてのコネクションに対して登録
                 - { name: doctrine.event_subscriber, connection: default } # デフォルトコネクションにのみ登録
 
-* `doctrine.orm.entity_managers` は、エンティティマネージャーの名前と ID のペアのハッシュに変更されました。
-
-    変更前:  array('default', 'foo')
-    変更後:  array('default' => 'doctrine.orm.default_entity_manager', 'foo' => 'doctrine.orm.foo_entity_manager'))
-
 * アプリケーションの翻訳ファイルは、\ `Resources` ディレクトリに保存されるように変更されました。
 
     変更前:
 
-      app/translations/catalogue.fr.xml
+        app/translations/catalogue.fr.xml
 
     変更後:
 
-      app/Resources/translations/catalogue.fr.xml
+        app/Resources/translations/catalogue.fr.xml
+
+* "collection" フォームタイプの "modifiable" オプションは、2 つのオプション "allow_add" と "allow_delete" に分割されました。
+
+    変更前:
+
+        $builder->add('tags', 'collection', array(
+            'type' => 'text',
+            'modifiable' => true,
+        ));
+
+    変更後:
+
+        $builder->add('tags', 'collection', array(
+            'type' => 'text',
+            'allow_add' => true,
+            'allow_delete' => true,
+        ));
 
 PR12 から beta1
 ---------------

@@ -23,8 +23,7 @@ class MonthChoiceList extends PaddedChoiceList
      */
     public function __construct(\IntlDateFormatter $formatter, array $months)
     {
-        parent::__construct($months, 2, '0', STR_PAD_LEFT);
-
+        parent::__construct(array_combine($months, $months), 2, '0', STR_PAD_LEFT);
         $this->formatter = $formatter;
     }
 
@@ -42,7 +41,7 @@ class MonthChoiceList extends PaddedChoiceList
 
             foreach ($this->choices as $choice => $value) {
                 // It's important to specify the first day of the month here!
-                $this->choices[$choice] = $this->formatter->format(gmmktime(0, 0, 0, $choice, 1));
+                $this->choices[$choice] = $this->formatter->format(gmmktime(0, 0, 0, $value, 1));
             }
 
             // I'd like to clone the formatter above, but then we get a

@@ -43,11 +43,8 @@ class PaddedChoiceList extends ArrayChoiceList
     {
         parent::load();
 
-        $choices = $this->choices;
-        $this->choices = array();
-
-        foreach ($choices as $value) {
-            $this->choices[$value] = str_pad($value, $this->padLength, $this->padString, $this->padType);
+        foreach ($this->choices as $key => $choice) {
+            $this->choices[$key] = str_pad($choice, $this->padLength, $this->padString, $this->padType);
         }
     }
 }

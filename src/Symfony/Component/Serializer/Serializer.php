@@ -46,7 +46,14 @@ class Serializer implements SerializerInterface
      */
     public function serialize($data, $format)
     {
-        return $this->encode($data, $format);
+        return $this->encode($this->normalize($data, $format), $format);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function deserialize($data, $type, $format) {
+        return $this->denormalize($this->decode($data, $format), $type, $format);
     }
 
     /**
@@ -95,8 +102,11 @@ class Serializer implements SerializerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize($data, $format)
+    public function normalize($data, $format = null)
     {
+        if (!$this->isStructuredType($data)) {
+            return $data;
+        }
         if (is_array($data)) {
             foreach ($data as $key => $val) {
                 $data[$key] = $this->isStructuredType($val) ? $this->normalize($val, $format) : $val;
@@ -107,6 +117,14 @@ class Serializer implements SerializerInterface
             return $this->normalizeObject($data, $format);
         }
         throw new \UnexpectedValueException('An unexpected value could not be normalized: '.var_export($data, true));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function denormalize($data, $type, $format = null)
+    {
+        return $this->denormalizeObject($data, $type, $format);
     }
 
     /**

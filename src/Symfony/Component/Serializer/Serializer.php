@@ -113,6 +113,13 @@ class Serializer implements SerializerInterface
             }
             return $data;
         }
+        if ($data instanceof Traversable) {
+            $normalized = array();
+            foreach ($data as $key => $val) {
+                $normalized[$key] = $this->isStructuredType($val) ? $this->normalize($val, $format) : $val;
+            }
+            return $normalized;
+        }
         if (is_object($data)) {
             return $this->normalizeObject($data, $format);
         }

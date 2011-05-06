@@ -15,8 +15,6 @@ use Symfony\Component\Validator\Exception\ValidatorException;
 
 class PropertyMetadata extends MemberMetadata
 {
-    private $reflClass;
-
     /**
      * Constructor.
      *
@@ -25,12 +23,10 @@ class PropertyMetadata extends MemberMetadata
      */
     public function __construct($class, $name)
     {
-        $this->reflClass = new \ReflectionClass($class);
-
-        if (!$this->reflClass->hasMethod('__get') && !property_exists($class, $name)) {
+        if (!method_exists($class,"__get") && !property_exists($class, $name)) {
             throw new ValidatorException(sprintf('Property %s does not exists in class %s', $name, $class));
         }
-        
+
         parent::__construct($class, $name, $name);
     }
 
@@ -39,11 +35,12 @@ class PropertyMetadata extends MemberMetadata
      */
     public function getValue($object)
     {
-        if ($this->reflClass->hasMethod('__get')) {
-            // needed to support magic method __get
+        if (method_exists($object,"__get")) {
             $property = $this->getName();
+            
             return $object->$property;
         }
+        
         return $this->getReflectionMember()->getValue($object);
     }
 

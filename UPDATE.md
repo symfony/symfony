@@ -124,6 +124,9 @@ beta1 to beta2
           'allow_delete' => true,
       ));
 
+* Serializer: The NormalizerInterface's `supports()` method has been split in
+  two methods: `supportsNormalization` and `supportsDenormalization`.
+
 PR12 to beta1
 -------------
 
@@ -210,11 +213,11 @@ PR11 to PR12
         <app:engine>twig</app:engine>
         <twig:extension>twig.extension.debug</twig:extension>
 
-* Fixes a critical security issue which allowed all users to switch to 
+* Fixes a critical security issue which allowed all users to switch to
   arbitrary accounts when the SwitchUserListener was activated. Configurations
   which do not use the SwitchUserListener are not affected.
 
-* The Dependency Injection Container now strongly validates the references of 
+* The Dependency Injection Container now strongly validates the references of
   all your services at the end of its compilation process. If you have invalid
   references this will result in a compile-time exception instead of a run-time
   exception (the previous behavior).

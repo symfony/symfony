@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 
 /**
- * Defines the interface of serializers
+ * Defines the interface of normalizers.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
@@ -43,16 +43,25 @@ interface NormalizerInterface
     function denormalize($data, $class, $format = null);
 
     /**
-     * Checks whether the given class is supported by this normalizer
+     * Checks whether the given class is supported for normalization by this normalizer
      *
-     * @param ReflectionClass $class
-     * @param string          $format format the given data was extracted from
-     *
+     * @param mixed   $data   Data to normalize.
+     * @param string  $format The format being (de-)serialized from or into.
      * @return Boolean
-     *
      * @api
      */
-    function supports(\ReflectionClass $class, $format = null);
+    function supportsNormalization($data, $format = null);
+
+    /**
+     * Checks whether the given class is supported for denormalization by this normalizer
+     *
+     * @param mixed   $data   Data to denormalize from.
+     * @param string  $type   The class to which the data should be denormalized.
+     * @param string  $format The format being deserialized from.
+     * @return Boolean
+     * @api
+     */
+    function supportsDenormalization($data, $type, $format = null);
 
     /**
      * Sets the owning Serializer object

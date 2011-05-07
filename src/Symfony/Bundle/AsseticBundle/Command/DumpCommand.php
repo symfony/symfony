@@ -28,6 +28,7 @@ class DumpCommand extends Command
 {
     private $basePath;
     private $am;
+    private $debug;
 
     protected function configure()
     {
@@ -45,12 +46,13 @@ class DumpCommand extends Command
 
         $this->basePath = $input->getArgument('write_to') ?: $this->container->getParameter('assetic.write_to');
         $this->am = $this->container->get('assetic.asset_manager');
+        $this->debug = $this->container->getParameter('assetic.debug');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if ($input->getOption('watch')) {
-            return $this->watch($output, $this->container->getParameter('kernel.debug'));
+            return $this->watch($output);
         }
 
         foreach ($this->am->getNames() as $name) {
@@ -65,11 +67,10 @@ class DumpCommand extends Command
      * manager for changes.
      *
      * @param OutputInterface $output The command output
-     * @param Boolean         $debug  Debug mode
      */
-    protected function watch(OutputInterface $output, $debug = false)
+    protected function watch(OutputInterface $output)
     {
-        if (!$debug) {
+        if (!$this->debug) {
             throw new \RuntimeException('The --watch option is only available in debug mode.');
         }
 

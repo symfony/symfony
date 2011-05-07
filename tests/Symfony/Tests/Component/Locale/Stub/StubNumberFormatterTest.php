@@ -368,6 +368,12 @@ class StubNumberFormatterTest extends LocaleTestCase
         $formatter->format(1, StubNumberFormatter::TYPE_CURRENCY);
     }
 
+    public function testFormatTypeCurrencyReturnStub()
+    {
+        $formatter = $this->getStubFormatterWithDecimalStyle();
+        $this->assertFalse(@$formatter->format(1, StubNumberFormatter::TYPE_CURRENCY));
+    }
+
     /**
      * @dataProvider formatTypeCurrencyProvider
      * @expectedException PHPUnit_Framework_Error_Warning

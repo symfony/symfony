@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\MonologBundle\Logger;
+namespace Symfony\Bridge\Monolog\Handler;
 
 use Monolog\Handler\FirePHPHandler as BaseFirePHPHandler;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;

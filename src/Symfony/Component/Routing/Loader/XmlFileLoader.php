@@ -35,10 +35,11 @@ class XmlFileLoader extends FileLoader
      */
     public function load($file, $type = null)
     {
-        $xml = $this->loadFile($file);
+        $path = $this->locator->locate($file);
+        $xml = $this->loadFile($path);
 
         $collection = new RouteCollection();
-        $collection->addResource(new FileResource($file));
+        $collection->addResource(new FileResource($path));
 
         // process routes and imports
         foreach ($xml->documentElement->childNodes as $node) {
@@ -48,13 +49,13 @@ class XmlFileLoader extends FileLoader
 
             switch ($node->tagName) {
                 case 'route':
-                    $this->parseRoute($collection, $node, $file);
+                    $this->parseRoute($collection, $node, $path);
                     break;
                 case 'import':
                     $resource = (string) $node->getAttribute('resource');
                     $type = (string) $node->getAttribute('type');
                     $prefix = (string) $node->getAttribute('prefix');
-                    $this->setCurrentDir(dirname($file));
+                    $this->setCurrentDir(dirname($path));
                     $collection->addCollection($this->import($resource, ('' !== $type ? $type : null), false, $file), $prefix);
                     break;
                 default:

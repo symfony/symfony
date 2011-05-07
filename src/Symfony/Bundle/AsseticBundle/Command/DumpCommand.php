@@ -72,7 +72,7 @@ class DumpCommand extends Command
      *
      * @param OutputInterface $output The command output
      */
-    protected function watch(OutputInterface $output)
+    private function watch(OutputInterface $output)
     {
         $refl = new \ReflectionClass('Assetic\\AssetManager');
         $prop = $refl->getProperty('assets');
@@ -119,7 +119,7 @@ class DumpCommand extends Command
      *
      * @return AssetInterface|Boolean The asset if it should be dumped
      */
-    protected function checkAsset($name, array &$previously)
+    private function checkAsset($name, array &$previously)
     {
         $formula = $this->am->hasFormula($name) ? serialize($this->am->getFormula($name)) : null;
         $asset = $this->am->get($name);
@@ -145,7 +145,7 @@ class DumpCommand extends Command
      * @param string          $name   An asset name
      * @param OutputInterface $output The command output
      */
-    protected function dumpAsset($name, OutputInterface $output)
+    private function dumpAsset($name, OutputInterface $output)
     {
         $asset = $this->am->get($name);
         $formula = $this->am->getFormula($name);
@@ -169,7 +169,7 @@ class DumpCommand extends Command
      *
      * @throws RuntimeException If there is a problem writing the asset
      */
-    protected function doDump(AssetInterface $asset, OutputInterface $output)
+    private function doDump(AssetInterface $asset, OutputInterface $output)
     {
         $target = rtrim($this->basePath, '/').'/'.str_replace('_controller/', '', $asset->getTargetUrl());
         if (!is_dir($dir = dirname($target))) {

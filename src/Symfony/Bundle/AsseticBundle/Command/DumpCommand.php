@@ -51,13 +51,19 @@ class DumpCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($input->getOption('watch')) {
-            return $this->watch($output);
+        if (!$input->getOption('watch')) {
+            foreach ($this->am->getNames() as $name) {
+                $this->dumpAsset($this->am->get($name), $output);
+            }
+
+            return;
         }
 
-        foreach ($this->am->getNames() as $name) {
-            $this->dumpAsset($this->am->get($name), $output);
+        if (!$this->debug) {
+            throw new \RuntimeException('The --watch option is only available in debug mode.');
         }
+
+        $this->watch($output);
     }
 
     /**
@@ -70,10 +76,6 @@ class DumpCommand extends Command
      */
     protected function watch(OutputInterface $output)
     {
-        if (!$this->debug) {
-            throw new \RuntimeException('The --watch option is only available in debug mode.');
-        }
-
         $refl = new \ReflectionClass('Assetic\\AssetManager');
         $prop = $refl->getProperty('assets');
         $prop->setAccessible(true);

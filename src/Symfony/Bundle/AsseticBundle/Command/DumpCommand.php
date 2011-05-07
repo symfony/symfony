@@ -28,7 +28,6 @@ class DumpCommand extends Command
 {
     private $basePath;
     private $am;
-    private $debug;
 
     protected function configure()
     {
@@ -46,20 +45,19 @@ class DumpCommand extends Command
 
         $this->basePath = $input->getArgument('write_to') ?: $this->container->getParameter('assetic.write_to');
         $this->am = $this->container->get('assetic.asset_manager');
-        $this->debug = $this->container->getParameter('assetic.debug');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if (!$input->getOption('watch')) {
             foreach ($this->am->getNames() as $name) {
-                $this->dumpAsset($this->am->get($name), $output);
+                $this->dumpAsset($name, $output);
             }
 
             return;
         }
 
-        if (!$this->debug) {
+        if (!$this->am->isDebug()) {
             throw new \RuntimeException('The --watch option is only available in debug mode.');
         }
 
@@ -141,12 +139,37 @@ class DumpCommand extends Command
     /**
      * Writes an asset.
      *
+     * If the application or asset is in debug mode, each leaf asset will be
+     * dumped as well.
+     *
+     * @param string          $name   An asset name
+     * @param OutputInterface $output The command output
+     */
+    protected function dumpAsset($name, OutputInterface $output)
+    {
+        $asset = $this->am->get($name);
+        $formula = $this->am->getFormula($name);
+
+        // start by dumping the main asset
+        $this->doDump($asset, $output);
+
+        // dump each leaf if debug
+        if (isset($formula[2]['debug']) ? $formula[2]['debug'] : $this->am->isDebug()) {
+            foreach ($asset as $leaf) {
+                $this->doDump($leaf, $output);
+            }
+        }
+    }
+
+    /**
+     * Performs the asset dump.
+     *
      * @param AssetInterface  $asset  An asset
      * @param OutputInterface $output The command output
      *
      * @throws RuntimeException If there is a problem writing the asset
      */
-    protected function dumpAsset(AssetInterface $asset, OutputInterface $output)
+    protected function doDump(AssetInterface $asset, OutputInterface $output)
     {
         $target = rtrim($this->basePath, '/').'/'.str_replace('_controller/', '', $asset->getTargetUrl());
         if (!is_dir($dir = dirname($target))) {

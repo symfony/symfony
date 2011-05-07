@@ -17,6 +17,7 @@ use Symfony\Component\Console\Output\NullOutput;
 
 class DumpCommandTest extends \PHPUnit_Framework_TestCase
 {
+    private $writeTo;
     private $application;
     private $definition;
     private $kernel;
@@ -28,6 +29,8 @@ class DumpCommandTest extends \PHPUnit_Framework_TestCase
         if (!class_exists('Assetic\\AssetManager')) {
             $this->markTestSkipped('Assetic is not available.');
         }
+
+        $this->writeTo = sys_get_temp_dir().'/assetic_dump';
 
         $this->application = $this->getMockBuilder('Symfony\\Bundle\\FrameworkBundle\\Console\\Application')
             ->disableOriginalConstructor()
@@ -56,6 +59,10 @@ class DumpCommandTest extends \PHPUnit_Framework_TestCase
         $this->kernel->expects($this->any())
             ->method('getContainer')
             ->will($this->returnValue($this->container));
+        $this->container->expects($this->any())
+            ->method('getParameter')
+            ->with('assetic.write_to')
+            ->will($this->returnValue($this->writeTo));
         $this->container->expects($this->once())
             ->method('get')
             ->with('assetic.asset_manager')
@@ -65,6 +72,14 @@ class DumpCommandTest extends \PHPUnit_Framework_TestCase
         $this->command->setApplication($this->application);
     }
 
+    protected function tearDown()
+    {
+        if (is_dir($this->writeTo)) {
+            array_map('unlink', glob($this->writeTo.'/*'));
+            rmdir($this->writeTo);
+        }
+    }
+
     public function testEmptyAssetManager()
     {
         $this->am->expects($this->once())
@@ -72,5 +87,36 @@ class DumpCommandTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(array()));
 
         $this->command->run(new ArrayInput(array()), new NullOutput());
+    }
+
+    public function testDumpOne()
+    {
+        $asset = $this->getMock('Assetic\\Asset\\AssetInterface');
+
+        $this->am->expects($this->once())
+            ->method('getNames')
+            ->will($this->returnValue(array('test_asset')));
+        $this->am->expects($this->once())
+            ->method('get')
+            ->with('test_asset')
+            ->will($this->returnValue($asset));
+        $this->am->expects($this->once())
+            ->method('getFormula')
+            ->with('test_asset')
+            ->will($this->returnValue(array()));
+        $this->am->expects($this->once())
+            ->method('isDebug')
+            ->will($this->returnValue(false));
+        $asset->expects($this->once())
+            ->method('getTargetUrl')
+            ->will($this->returnValue('test_asset.css'));
+        $asset->expects($this->once())
+            ->method('dump')
+            ->will($this->returnValue('/* test_asset */'));
+
+        $this->command->run(new ArrayInput(array()), new NullOutput());
+
+        $this->assertFileExists($this->writeTo.'/test_asset.css');
+        $this->assertEquals('/* test_asset */', file_get_contents($this->writeTo.'/test_asset.css'));
     }
 }

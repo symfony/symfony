@@ -40,12 +40,10 @@ class YamlFileLoader extends FileLoader
      */
     public function load($file, $type = null)
     {
-        $path = $this->locator->locate($file);
-
-        $config = Yaml::load($path);
+        $config = Yaml::load($file);
 
         $collection = new RouteCollection();
-        $collection->addResource(new FileResource($path));
+        $collection->addResource(new FileResource($file));
 
         // empty file
         if (null === $config) {
@@ -63,10 +61,10 @@ class YamlFileLoader extends FileLoader
             if (isset($config['resource'])) {
                 $type = isset($config['type']) ? $config['type'] : null;
                 $prefix = isset($config['prefix']) ? $config['prefix'] : null;
-                $this->setCurrentDir(dirname($path));
+                $this->setCurrentDir(dirname($file));
                 $collection->addCollection($this->import($config['resource'], $type, false, $file), $prefix);
             } elseif (isset($config['pattern'])) {
-                $this->parseRoute($collection, $name, $config, $path);
+                $this->parseRoute($collection, $name, $config, $file);
             } else {
                 throw new \InvalidArgumentException(sprintf('Unable to parse the "%s" route.', $name));
             }

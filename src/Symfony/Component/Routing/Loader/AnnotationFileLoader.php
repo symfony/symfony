@@ -56,11 +56,9 @@ class AnnotationFileLoader extends FileLoader
      */
     public function load($file, $type = null)
     {
-        $path = $this->locator->locate($file);
-
         $collection = new RouteCollection();
-        if ($class = $this->findClass($path)) {
-            $collection->addResource(new FileResource($path));
+        if ($class = $this->findClass($file)) {
+            $collection->addResource(new FileResource($file));
             $collection->addCollection($this->loader->load($class, $type));
         }
 

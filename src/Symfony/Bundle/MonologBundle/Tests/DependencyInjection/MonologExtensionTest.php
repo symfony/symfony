@@ -189,6 +189,17 @@ class MonologExtensionTest extends TestCase
     }
 
     /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testExceptionWhenInvalidHandler()
+    {
+        $container = new ContainerBuilder();
+        $loader = new MonologExtension();
+
+        $loader->load(array(array('handlers' => array('main' => array('type' => 'invalid_handler')))), $container);
+    }
+
+    /**
      * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
     public function testExceptionWhenUsingFingerscrossedWithoutHandler()

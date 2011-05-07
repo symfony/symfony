@@ -188,13 +188,18 @@ class MonologExtension extends Extension
             ));
             break;
 
-        default:
-            // Handler using the constructor of AbstractHandler without adding their own arguments
+        // Handlers using the constructor of AbstractHandler without adding their own arguments
+        case 'test':
+        case 'null':
+        case 'debug':
             $definition->setArguments(array(
                 $handler['level'],
                 $handler['bubble'],
             ));
             break;
+
+        default:
+            throw new \InvalidArgumentException(sprintf('Invalid handler type "%s" given for handler "%s"', $handler['type'], $name));
         }
 
         if (!empty($handler['formatter'])) {

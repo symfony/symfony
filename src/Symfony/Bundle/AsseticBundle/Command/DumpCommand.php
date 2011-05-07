@@ -27,6 +27,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class DumpCommand extends Command
 {
     private $basePath;
+    private $am;
 
     protected function configure()
     {
@@ -43,18 +44,17 @@ class DumpCommand extends Command
         parent::initialize($input, $output);
 
         $this->basePath = $input->getArgument('write_to') ?: $this->container->getParameter('assetic.write_to');
+        $this->am = $this->container->get('assetic.asset_manager');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $am = $this->container->get('assetic.asset_manager');
-
         if ($input->getOption('watch')) {
-            return $this->watch($am, $output, $this->container->getParameter('kernel.debug'));
+            return $this->watch($output, $this->container->getParameter('kernel.debug'));
         }
 
-        foreach ($am->getNames() as $name) {
-            $this->dumpAsset($am->get($name), $output);
+        foreach ($this->am->getNames() as $name) {
+            $this->dumpAsset($this->am->get($name), $output);
         }
     }
 
@@ -64,11 +64,10 @@ class DumpCommand extends Command
      * This method includes an infinite loop the continuously polls the asset
      * manager for changes.
      *
-     * @param LazyAssetManager $am     The asset manager
-     * @param OutputInterface  $output The command output
-     * @param Boolean          $debug  Debug mode
+     * @param OutputInterface $output The command output
+     * @param Boolean         $debug  Debug mode
      */
-    protected function watch(LazyAssetManager $am, OutputInterface $output, $debug = false)
+    protected function watch(OutputInterface $output, $debug = false)
     {
         if (!$debug) {
             throw new \RuntimeException('The --watch option is only available in debug mode.');
@@ -88,15 +87,15 @@ class DumpCommand extends Command
         $error = '';
         while (true) {
             try {
-                foreach ($am->getNames() as $name) {
-                    if ($asset = $this->checkAsset($am, $name, $previously)) {
+                foreach ($this->am->getNames() as $name) {
+                    if ($asset = $this->checkAsset($name, $previously)) {
                         $this->dumpAsset($asset, $output);
                     }
                 }
 
                 // reset the asset manager
-                $prop->setValue($am, array());
-                $am->load();
+                $prop->setValue($this->am, array());
+                $this->am->load();
 
                 file_put_contents($cache, serialize($previously));
                 $error = '';
@@ -114,16 +113,15 @@ class DumpCommand extends Command
     /**
      * Checks if an asset should be dumped.
      *
-     * @param LazyAssetManager $am          The asset manager
-     * @param string           $name        The asset name
-     * @param array            &$previously An array of previous visits
+     * @param string $name        The asset name
+     * @param array  &$previously An array of previous visits
      *
      * @return AssetInterface|Boolean The asset if it should be dumped
      */
-    protected function checkAsset(LazyAssetManager $am, $name, array &$previously)
+    protected function checkAsset($name, array &$previously)
     {
-        $formula = $am->hasFormula($name) ? serialize($am->getFormula($name)) : null;
-        $asset = $am->get($name);
+        $formula = $this->am->hasFormula($name) ? serialize($this->am->getFormula($name)) : null;
+        $asset = $this->am->get($name);
         $mtime = $asset->getLastModified();
 
         if (isset($previously[$name])) {

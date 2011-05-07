@@ -26,6 +26,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class DumpCommand extends Command
 {
+    private $basePath;
+
     protected function configure()
     {
         $this
@@ -36,20 +38,23 @@ class DumpCommand extends Command
         ;
     }
 
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        parent::initialize($input, $output);
+
+        $this->basePath = $input->getArgument('write_to') ?: $this->container->getParameter('assetic.write_to');
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!$basePath = $input->getArgument('write_to')) {
-            $basePath = $this->container->getParameter('assetic.write_to');
-        }
-
         $am = $this->container->get('assetic.asset_manager');
 
         if ($input->getOption('watch')) {
-            return $this->watch($am, $basePath, $output, $this->container->getParameter('kernel.debug'));
+            return $this->watch($am, $output, $this->container->getParameter('kernel.debug'));
         }
 
         foreach ($am->getNames() as $name) {
-            $this->dumpAsset($am->get($name), $basePath, $output);
+            $this->dumpAsset($am->get($name), $output);
         }
     }
 
@@ -59,12 +64,11 @@ class DumpCommand extends Command
      * This method includes an infinite loop the continuously polls the asset
      * manager for changes.
      *
-     * @param LazyAssetManager $am       The asset manager
-     * @param string           $basePath The base directory to write to
-     * @param OutputInterface  $output   The command output
-     * @param Boolean          $debug    Debug mode
+     * @param LazyAssetManager $am     The asset manager
+     * @param OutputInterface  $output The command output
+     * @param Boolean          $debug  Debug mode
      */
-    protected function watch(LazyAssetManager $am, $basePath, OutputInterface $output, $debug = false)
+    protected function watch(LazyAssetManager $am, OutputInterface $output, $debug = false)
     {
         if (!$debug) {
             throw new \RuntimeException('The --watch option is only available in debug mode.');
@@ -74,7 +78,7 @@ class DumpCommand extends Command
         $prop = $refl->getProperty('assets');
         $prop->setAccessible(true);
 
-        $cache = sys_get_temp_dir().'/assetic_watch_'.substr(sha1($basePath), 0, 7);
+        $cache = sys_get_temp_dir().'/assetic_watch_'.substr(sha1($this->basePath), 0, 7);
         if (file_exists($cache)) {
             $previously = unserialize(file_get_contents($cache));
         } else {
@@ -86,7 +90,7 @@ class DumpCommand extends Command
             try {
                 foreach ($am->getNames() as $name) {
                     if ($asset = $this->checkAsset($am, $name, $previously)) {
-                        $this->dumpAsset($asset, $basePath, $output);
+                        $this->dumpAsset($asset, $output);
                     }
                 }
 
@@ -136,15 +140,14 @@ class DumpCommand extends Command
     /**
      * Writes an asset.
      *
-     * @param AssetInterface  $asset   An asset
-     * @param string          $basePath The base directory to write to
-     * @param OutputInterface $output  The command output
+     * @param AssetInterface  $asset  An asset
+     * @param OutputInterface $output The command output
      *
      * @throws RuntimeException If there is a problem writing the asset
      */
-    protected function dumpAsset(AssetInterface $asset, $basePath, OutputInterface $output)
+    protected function dumpAsset(AssetInterface $asset, OutputInterface $output)
     {
-        $target = rtrim($basePath, '/').'/'.str_replace('_controller/', '', $asset->getTargetUrl());
+        $target = rtrim($this->basePath, '/').'/'.str_replace('_controller/', '', $asset->getTargetUrl());
         if (!is_dir($dir = dirname($target))) {
             $output->writeln('<info>[dir+]</info> '.$dir);
             if (false === @mkdir($dir, 0777, true)) {

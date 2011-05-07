@@ -34,9 +34,11 @@ class PhpFileLoader extends FileLoader
         // the loader variable is exposed to the included file below
         $loader = $this;
 
-        $collection = include $file;
-        $this->setCurrentDir(dirname($file));
-        $collection->addResource(new FileResource($file));
+        $path = $this->locator->locate($file);
+
+        $collection = include $path;
+        $this->setCurrentDir(dirname($path));
+        $collection->addResource(new FileResource($path));
 
         return $collection;
     }

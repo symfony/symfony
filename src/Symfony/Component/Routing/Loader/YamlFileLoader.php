@@ -41,7 +41,6 @@ class YamlFileLoader extends FileLoader
     public function load($file, $type = null)
     {
         $path = $this->locator->locate($file);
-
         $config = Yaml::load($path);
 
         $collection = new RouteCollection();

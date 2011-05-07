@@ -36,7 +36,6 @@ class XmlFileLoader extends FileLoader
     public function load($file, $type = null)
     {
         $path = $this->locator->locate($file);
-
         $xml = $this->loadFile($path);
 
         $collection = new RouteCollection();

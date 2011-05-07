@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Loader;
 
+use Symfony\Component\Routing\Loader\AnnotationGlobLoader;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Exception\FileLoaderImportException;
 
@@ -60,7 +61,7 @@ abstract class FileLoader extends Loader
             $loader = $this->resolve($resource, $type);
 
             if ($loader instanceof FileLoader && null !== $this->currentDir) {
-                $resource = $this->locator->locate($resource, $this->currentDir);
+                $resource = $loader->locator->locate($resource, $this->currentDir);
             }
 
             return $loader->load($resource);

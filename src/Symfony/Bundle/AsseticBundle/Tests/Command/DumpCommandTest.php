@@ -119,4 +119,47 @@ class DumpCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($this->writeTo.'/test_asset.css');
         $this->assertEquals('/* test_asset */', file_get_contents($this->writeTo.'/test_asset.css'));
     }
+
+    public function testDumpDebug()
+    {
+        $asset = $this->getMock('Assetic\\Asset\\AssetCollection');
+        $leaf = $this->getMock('Assetic\\Asset\\AssetInterface');
+
+        $this->am->expects($this->once())
+            ->method('getNames')
+            ->will($this->returnValue(array('test_asset')));
+        $this->am->expects($this->once())
+            ->method('get')
+            ->with('test_asset')
+            ->will($this->returnValue($asset));
+        $this->am->expects($this->once())
+            ->method('getFormula')
+            ->with('test_asset')
+            ->will($this->returnValue(array()));
+        $this->am->expects($this->once())
+            ->method('isDebug')
+            ->will($this->returnValue(true));
+        $asset->expects($this->once())
+            ->method('getTargetUrl')
+            ->will($this->returnValue('test_asset.css'));
+        $asset->expects($this->once())
+            ->method('dump')
+            ->will($this->returnValue('/* test_asset */'));
+        $asset->expects($this->once())
+            ->method('getIterator')
+            ->will($this->returnValue(new \ArrayIterator(array($leaf))));
+        $leaf->expects($this->once())
+            ->method('getTargetUrl')
+            ->will($this->returnValue('test_leaf.css'));
+        $leaf->expects($this->once())
+            ->method('dump')
+            ->will($this->returnValue('/* test_leaf */'));
+
+        $this->command->run(new ArrayInput(array()), new NullOutput());
+
+        $this->assertFileExists($this->writeTo.'/test_asset.css');
+        $this->assertFileExists($this->writeTo.'/test_leaf.css');
+        $this->assertEquals('/* test_asset */', file_get_contents($this->writeTo.'/test_asset.css'));
+        $this->assertEquals('/* test_leaf */', file_get_contents($this->writeTo.'/test_leaf.css'));
+    }
 }

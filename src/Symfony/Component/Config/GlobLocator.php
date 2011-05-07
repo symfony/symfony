@@ -12,7 +12,7 @@
 namespace Symfony\Component\Config;
 
 /**
- * FileLocator uses an array of pre-defined paths to find files.
+ * GlobLocator uses an array of pre-defined paths to find files by glob pattern.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

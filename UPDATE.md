@@ -127,6 +127,9 @@ beta1 to beta2
 * Serializer: The NormalizerInterface's `supports()` method has been split in
   two methods: `supportsNormalization` and `supportsDenormalization`.
 
+* Serializer: `AbstractEncoder` & `AbstractNormalizer` were renamed to
+  `SerializerAwareEncoder` & `SerializerAwareNormalizer`.
+
 PR12 to beta1
 -------------
 

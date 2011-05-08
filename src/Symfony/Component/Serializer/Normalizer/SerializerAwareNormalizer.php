@@ -15,11 +15,11 @@ use Symfony\Component\Serializer\SerializerAwareInterface;
  */
 
 /**
- * Abstract Normalizer implementation
+ * SerializerAware Normalizer implementation
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-abstract class AbstractNormalizer implements SerializerAwareInterface, NormalizerInterface
+abstract class SerializerAwareNormalizer implements SerializerAwareInterface, NormalizerInterface
 {
     protected $serializer;
 

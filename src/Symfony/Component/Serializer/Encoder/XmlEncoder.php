@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  * @author John Wards <jwards@whiteoctober.co.uk>
  * @author Fabian Vogler <fabian@equivalence.ch>
  */
-class XmlEncoder extends AbstractEncoder implements DecoderInterface, NormalizationAwareInterface
+class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, NormalizationAwareInterface
 {
     private $dom;
     private $format;

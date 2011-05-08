@@ -7,14 +7,18 @@
                         http://symfony.com/schema/dic/doctrine http://symfony.com/schema/dic/doctrine/doctrine-1.0.xsd">
 
     <config>
+        <dbal default-connection="default">
+            <connection name="default" dbname="db" />
+        </dbal>
+
         <orm default-entity-manager="em2">
             <entity-manager name="em1">
                 <mapping name="AnnotationsBundle" />
             </entity-manager>
             <entity-manager name="em2">
-                <mapping name="YamlBundle" dir="Resources/config/doctrine/metadata" alias="yml" />
+                <mapping name="YamlBundle" dir="Resources/config/doctrine" alias="yml" />
                 <mapping name="manual" type="xml" prefix="Fixtures\Bundles\XmlBundle"
-                    dir="%kernel.root_dir%/../src/Symfony/Bundle/DoctrineBundle/Tests/DependencyInjection/Fixtures/Bundles/XmlBundle/Resources/config/doctrine/metadata"
+                    dir="%kernel.root_dir%/../src/Symfony/Bundle/DoctrineBundle/Tests/DependencyInjection/Fixtures/Bundles/XmlBundle/Resources/config/doctrine"
                     alias="TestAlias"
                 />
             </entity-manager>

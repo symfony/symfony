@@ -74,8 +74,8 @@ class Configuration implements ConfigurationInterface
                             'path',
                             'memory',
                             'unix_socket',
-                            'wrapper_class', 'wrapper-class', 'wrapperClass',
-                            'platform_service', 'platform-service', 'platform-service',
+                            'wrapper_class',
+                            'platform_service',
                             'charset',
                             'logging'
                         ) as $key) {
@@ -128,21 +128,12 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('platform_service')->end()
                     ->scalarNode('charset')->end()
                     ->booleanNode('logging')->defaultValue($this->debug)->end()
-                ->end()
-                ->fixXmlConfig('driver_class', 'driverClass')
-                ->children()
-                    ->scalarNode('driverClass')->end()
-                ->end()
-                ->fixXmlConfig('options', 'driverOptions')
-                ->children()
-                    ->arrayNode('driverOptions')
+                    ->scalarNode('driver_class')->end()
+                    ->scalarNode('wrapper_class')->end()
+                    ->arrayNode('options')
                         ->useAttributeAsKey('key')
                         ->prototype('scalar')->end()
                     ->end()
-                ->end()
-                ->fixXmlConfig('wrapper_class', 'wrapperClass')
-                ->children()
-                    ->scalarNode('wrapperClass')->end()
                 ->end()
             ->end()
         ;

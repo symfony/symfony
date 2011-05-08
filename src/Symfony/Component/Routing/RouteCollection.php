@@ -134,8 +134,12 @@ class RouteCollection implements \IteratorAggregate
 
         $this->prefix = $prefix.$this->prefix;
 
-        foreach ($this->all() as $route) {
-            $route->setPattern($prefix.$route->getPattern());
+        foreach ($this->routes as $name => $route) {
+            if ($route instanceof RouteCollection) {
+                $route->addPrefix($prefix);
+            } else {
+                $route->setPattern($prefix.$route->getPattern());
+            }
         }
     }
 

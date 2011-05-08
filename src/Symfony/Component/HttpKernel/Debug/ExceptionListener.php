@@ -49,7 +49,12 @@ class ExceptionListener
         $request = $event->getRequest();
 
         if (null !== $this->logger) {
-            $this->logger->err(sprintf('%s: %s (uncaught exception)', get_class($exception), $exception->getMessage()));
+            $message = sprintf('%s: %s (uncaught exception)', get_class($exception), $exception->getMessage());
+            if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
+                $this->logger->crit($message);
+            } else {
+                $this->logger->err($message);
+            }
         } else {
             error_log(sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
         }
@@ -77,7 +82,7 @@ class ExceptionListener
         } catch (\Exception $e) {
             $message = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage());
             if (null !== $this->logger) {
-                if ($exception instanceof HttpExceptionInterface && $exception->getStatusCode() >= 500) {
+                if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
                     $this->logger->crit($message);
                 } else {
                     $this->logger->err($message);

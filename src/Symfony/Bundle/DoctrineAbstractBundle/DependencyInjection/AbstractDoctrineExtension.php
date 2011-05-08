@@ -263,11 +263,12 @@ abstract class AbstractDoctrineExtension extends Extension
         }
         $container->addResource(new FileResource($resource));
 
-        if (($files = glob($dir.'/'.$configPath.'/*.xml')) && count($files)) {
+        $extension = $this->getMappingResourceExtension();
+        if (($files = glob($dir.'/'.$configPath.'/*.'.$extension.'.xml')) && count($files)) {
             return 'xml';
-        } elseif (($files = glob($dir.'/'.$configPath.'/*.yml')) && count($files)) {
+        } elseif (($files = glob($dir.'/'.$configPath.'/*.'.$extension.'.yml')) && count($files)) {
             return 'yml';
-        } elseif (($files = glob($dir.'/'.$configPath.'/*.php')) && count($files)) {
+        } elseif (($files = glob($dir.'/'.$configPath.'/*.'.$extension.'.php')) && count($files)) {
             return 'php';
         }
 
@@ -306,4 +307,11 @@ abstract class AbstractDoctrineExtension extends Extension
      * @return string
      */
     abstract protected function getMappingResourceConfigDirectory();
+
+    /**
+     * Extension used by the mapping files.
+     *
+     * @return string
+     */
+    abstract protected function getMappingResourceExtension();
 }

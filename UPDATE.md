@@ -42,8 +42,6 @@ beta1 to beta2
     use Symfony\Component\Validator\Constraints as Assert;
 
     /**
-     * @ignorePhpDoc
-     *
      * @ORM\Entity
      */
     class MyUser
@@ -89,6 +87,56 @@ beta1 to beta2
      */
     private  $foo;
 
+* The ``error_handler`` setting has been removed. The ``ErrorHandler`` class
+  is now managed directly by Symfony SE in ``AppKernel``.
+
+* The Doctrine metadata files has moved from
+  ``Resources/config/doctrine/metadata/orm/`` to ``Resources/config/doctrine``
+  and the extension from ``.dcm.yml`` to ``.orm.yml``
+
+  Before:
+
+        Resources/config/doctrine/metadata/orm/Bundle.Entity.dcm.xml
+        Resources/config/doctrine/metadata/orm/Bundle.Entity.dcm.yml
+
+  After:
+
+        Resources/config/doctrine/Bundle.Entity.orm.xml
+        Resources/config/doctrine/Bundle.Entity.orm.yml
+
+* With the introduction of a new Doctrine Registry class, the following
+  parameters have been removed (replaced by methods on the `doctrine`
+  service):
+
+   * doctrine.orm.entity_managers
+   * doctrine.orm.default_entity_manager
+   * doctrine.dbal.default_connection
+
+  Before:
+
+        $container->getParameter('doctrine.orm.entity_managers')
+        $container->getParameter('doctrine.orm.default_entity_manager')
+        $container->getParameter('doctrine.orm.default_connection')
+
+  After:
+
+        $container->get('doctrine')->getEntityManagerNames()
+        $container->get('doctrine')->getDefaultEntityManagerName()
+        $container->get('doctrine')->getDefaultConnectionName()
+
+  But you don't really need to use these methods anymore, as to get an entity
+  manager, you can now use the registry directly:
+
+  Before:
+
+        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->get('doctrine.orm.foobar_entity_manager');
+
+  After:
+
+        $em = $this->get('doctrine')->getEntityManager();
+        $em = $this->get('doctrine')->getEntityManager('foobar');
+
 * The `doctrine:generate:entities` arguments and options changed. Run
   `./app/console doctrine:generate:entities --help` for more information about
   the new syntax.
@@ -126,11 +174,6 @@ beta1 to beta2
                 - { name: doctrine.event_subscriber }                      # register for all connections
                 - { name: doctrine.event_subscriber, connection: default } # only for the default connection
 
-* The `doctrine.orm.entity_managers` is now hash of entity manager names/ids pairs:
-
-    Before: array('default', 'foo')
-    After:  array('default' => 'doctrine.orm.default_entity_manager', 'foo' => 'doctrine.orm.foo_entity_manager'))
-
 * Application translations are now stored in the `Resources` directory:
 
     Before:
@@ -140,6 +183,27 @@ beta1 to beta2
     After:
 
       app/Resources/translations/catalogue.fr.xml
+
+* The option "modifiable" of the "collection" form type was split into two
+  options "allow_add" and "allow_delete".
+
+    Before:
+
+      $builder->add('tags', 'collection', array(
+          'type' => 'text',
+          'modifiable' => true,
+      ));
+
+    After:
+
+      $builder->add('tags', 'collection', array(
+          'type' => 'text',
+          'allow_add' => true,
+          'allow_delete' => true,
+      ));
+
+* Serializer: The NormalizerInterface's `supports()` method has been split in
+  two methods: `supportsNormalization` and `supportsDenormalization`.
 
 PR12 to beta1
 -------------
@@ -227,11 +291,11 @@ PR11 to PR12
         <app:engine>twig</app:engine>
         <twig:extension>twig.extension.debug</twig:extension>
 
-* Fixes a critical security issue which allowed all users to switch to 
+* Fixes a critical security issue which allowed all users to switch to
   arbitrary accounts when the SwitchUserListener was activated. Configurations
   which do not use the SwitchUserListener are not affected.
 
-* The Dependency Injection Container now strongly validates the references of 
+* The Dependency Injection Container now strongly validates the references of
   all your services at the end of its compilation process. If you have invalid
   references this will result in a compile-time exception instead of a run-time
   exception (the previous behavior).

@@ -68,6 +68,14 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
             array('def' => 'test')
         ));
 
+        // prefixes
+        $collection1 = new RouteCollection();
+        $collection1->add('foo', new Route('/{foo}'));
+        $collection1->add('bar', new Route('/{bar}'));
+        $collection2 = new RouteCollection();
+        $collection2->addCollection($collection1, '/b');
+        $collection->addCollection($collection2, '/a');
+
         $dumper = new PhpMatcherDumper($collection, new RequestContext());
         $this->assertStringEqualsFile(__DIR__.'/../../Fixtures/dumper/url_matcher1.php', $dumper->dump(), '->dump() dumps basic routes to the correct PHP file.');
 

@@ -70,7 +70,7 @@ class EntityToIdTransformer implements DataTransformerInterface
         }
 
         if (!($entity = $this->choiceList->getEntity($key))) {
-            throw new TransformationFailedException('The entity with key "%s" could not be found', $key);
+            throw new TransformationFailedException(sprintf('The entity with key "%s" could not be found', $key));
         }
 
         return $entity;

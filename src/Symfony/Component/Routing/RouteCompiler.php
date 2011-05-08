@@ -47,7 +47,7 @@ class RouteCompiler implements RouteCompilerInterface
                 if ($pos !== $len) {
                     $seps[] = $pattern[$pos];
                 }
-                $regexp = sprintf('[^%s]*?', preg_quote(implode('', array_unique($seps)), '#'));
+                $regexp = sprintf('[^%s]+?', preg_quote(implode('', array_unique($seps)), '#'));
             }
 
             $tokens[] = array('variable', $match[0][0][0], $regexp, $var);

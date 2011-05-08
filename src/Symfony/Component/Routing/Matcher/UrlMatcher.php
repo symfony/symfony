@@ -125,7 +125,7 @@ class UrlMatcher implements UrlMatcherInterface
         $parameters = $defaults;
         foreach ($params as $key => $value) {
             if (!is_int($key)) {
-                $parameters[$key] = urldecode($value);
+                $parameters[$key] = rawurldecode($value);
             }
         }
 

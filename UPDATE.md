@@ -147,7 +147,7 @@ PR12 to beta1
 * The `File::getWebPath()` and `File::rename()` methods have been removed, as
   well as the `framework.document_root` configuration setting.
 
-* The `File::getDefaultExtension()` method has beean renamed to `File::guessExtension()`.
+* The `File::getDefaultExtension()` method has been renamed to `File::guessExtension()`.
   The renamed method now returns null if it cannot guess the extension.
 
 * The `session` configuration has been refactored:

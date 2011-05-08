@@ -162,7 +162,9 @@ class Serializer implements SerializerInterface
     public function addNormalizer(NormalizerInterface $normalizer)
     {
         $this->normalizers[] = $normalizer;
-        $normalizer->setSerializer($this);
+        if ($normalizer instanceof SerializerAwareInterface) {
+            $normalizer->setSerializer($this);
+        }
     }
 
     /**
@@ -187,7 +189,9 @@ class Serializer implements SerializerInterface
     public function setEncoder($format, EncoderInterface $encoder)
     {
         $this->encoders[$format] = $encoder;
-        $encoder->setSerializer($this);
+        if ($encoder instanceof SerializerAwareInterface) {
+            $encoder->setSerializer($this);
+        }
     }
 
     /**

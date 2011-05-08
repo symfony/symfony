@@ -62,14 +62,27 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('facility')->defaultValue('user')->end() // syslog
                             ->scalarNode('max_files')->defaultValue(0)->end() // rotating
                             ->scalarNode('action_level')->defaultValue('WARNING')->end() // fingers_crossed
+                            ->booleanNode('stop_buffering')->defaultTrue()->end()// fingers_crossed
                             ->scalarNode('buffer_size')->defaultValue(0)->end() // fingers_crossed and buffer
                             ->scalarNode('handler')->end() // fingers_crossed and buffer
+                            ->scalarNode('from_email')->end() // swift_mailer and native_mailer
+                            ->scalarNode('to_email')->end() // swift_mailer and native_mailer
+                            ->scalarNode('subject')->end() // swift_mailer and native_mailer
+                            ->scalarNode('email_prototype')->end() // swift_mailer
                             ->scalarNode('formatter')->end()
                         ->end()
                         ->append($this->getProcessorsNode())
                         ->validate()
                             ->ifTrue(function($v) { return ('fingers_crossed' === $v['type'] || 'buffer' === $v['type']) && 1 !== count($v['handler']); })
                             ->thenInvalid('The handler has to be specified to use a FingersCrossedHandler')
+                        ->end()
+                        ->validate()
+                            ->ifTrue(function($v) { return 'swift_mailer' === $v['type'] && empty($v['email_prototype']) && (empty($v['from_email']) || empty($v['to_email']) || empty($v['subject'])); })
+                            ->thenInvalid('The sender, recipient and subject or an email prototype have to be specified to use a SwiftMailerHandler')
+                        ->end()
+                        ->validate()
+                            ->ifTrue(function($v) { return 'native_mailer' === $v['type'] && (empty($v['from_email']) || empty($v['to_email']) || empty($v['subject'])); })
+                            ->thenInvalid('The sender, recipient and subject have to be specified to use a NativeMailerHandler')
                         ->end()
                         ->validate()
                             ->ifTrue(function($v) { return 'service' === $v['type'] && !isset($v['id']); })

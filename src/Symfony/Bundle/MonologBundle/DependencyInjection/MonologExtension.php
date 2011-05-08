@@ -146,6 +146,7 @@ class MonologExtension extends Extension
                 $handler['action_level'],
                 $handler['buffer_size'],
                 $handler['bubble'],
+                $handler['stop_buffering'],
             ));
             break;
 
@@ -165,6 +166,37 @@ class MonologExtension extends Extension
             $definition->setArguments(array(
                 $handler['ident'],
                 $handler['facility'],
+                $handler['level'],
+                $handler['bubble'],
+            ));
+            break;
+
+        case 'swift_mailer':
+            if (isset($handler['email_prototype'])) {
+                $prototype = $this->parseDefinition($handler['email_prototype']);
+            } else {
+                $message = new Definition('Swift_Message');
+                $message->setPublic(false);
+                $message->addMethodCall('setFrom', $handler['from_email']);
+                $message->addMethodCall('setTo', $handler['to_email']);
+                $message->addMethodCall('setSubject', $handler['subject']);
+                $messageId = sprintf('%s.mail_prototype', $handlerId);
+                $container->setDefinition($messageId, $message);
+                $prototype = new Reference($messageId);
+            }
+            $definition->setArguments(array(
+                new Reference('mailer'),
+                $prototype,
+                $handler['level'],
+                $handler['bubble'],
+            ));
+            break;
+
+        case 'native_mailer':
+            $definition->setArguments(array(
+                $handler['to_email'],
+                $handler['subject'],
+                $handler['from_email'],
                 $handler['level'],
                 $handler['bubble'],
             ));
@@ -203,10 +235,16 @@ class MonologExtension extends Extension
     private function addProcessors(Definition $definition, array $processors)
     {
         foreach (array_reverse($processors) as $processor) {
-            if (0 === strpos($processor, '@')) {
-                $processor = new Reference(substr($processor, 1));
-            }
-            $definition->addMethodCall('pushProcessor', array($processor));
+            $definition->addMethodCall('pushProcessor', array($this->parseDefinition($processor)));
         }
+    }
+
+    private function parseDefinition($definition)
+    {
+        if (0 === strpos($processor, '@')) {
+            return new Reference(substr($definition, 1));
+        }
+
+        return $definition;
     }
 }

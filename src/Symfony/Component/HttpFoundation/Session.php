@@ -272,7 +272,7 @@ class Session implements \Serializable
     public function save()
     {
         if (false === $this->started) {
-            $this->start();
+            return;
         }
 
         if (isset($this->attributes['_flash'])) {

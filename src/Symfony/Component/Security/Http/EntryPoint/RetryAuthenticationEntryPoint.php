@@ -53,6 +53,10 @@ class RetryAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 
         $url = $scheme.'://'.$request->getHost().$port.$request->getBaseUrl().$request->getPathInfo().$qs;
 
+        if (null !== $request->getSession()) {
+            $request->getSession()->set('_security.target_path', $request->getUri());
+        }
+
         return new RedirectResponse($url, 301);
     }
 }

@@ -4,6 +4,7 @@ namespace Symfony\Component\Serializer;
 
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
+use Symfony\Component\Serializer\Encoder\DecoderInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -149,8 +150,8 @@ class Serializer implements SerializerInterface
      */
     public function decode($data, $format)
     {
-        if (!$this->hasEncoder($format)) {
-            throw new \UnexpectedValueException('No encoder registered to decode the '.$format.' format');
+        if (!$this->hasDecoder($format)) {
+            throw new \UnexpectedValueException('No encoder registered can decode the '.$format.' format');
         }
         return $this->encoders[$format]->decode($data, $format);
     }
@@ -211,6 +212,14 @@ class Serializer implements SerializerInterface
     public function hasEncoder($format)
     {
         return isset($this->encoders[$format]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasDecoder($format)
+    {
+        return isset($this->encoders[$format]) && $this->encoders[$format] instanceof DecoderInterface;
     }
 
     /**

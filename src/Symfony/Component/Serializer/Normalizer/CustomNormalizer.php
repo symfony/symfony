@@ -21,9 +21,9 @@ class CustomNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format, $properties = null)
+    public function normalize($object, $format)
     {
-        return $object->normalize($this, $format, $properties);
+        return $object->normalize($this, $format);
     }
 
     /**

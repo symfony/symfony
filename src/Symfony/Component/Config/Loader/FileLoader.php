@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Config\Loader;
 
-use Symfony\Component\Routing\Loader\AnnotationGlobLoader;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Exception\FileLoaderImportException;
 

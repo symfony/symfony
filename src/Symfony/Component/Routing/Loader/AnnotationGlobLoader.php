@@ -20,7 +20,7 @@ use Symfony\Component\Config\Resource\DirectoryResource;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class AnnotationGlobLoader extends AnnotationFileLoader
+class AnnotationGlobLoader extends AnnotationDirectoryLoader
 {
     /**
      * Loads from annotations from a directory glob pattern.
@@ -36,16 +36,7 @@ class AnnotationGlobLoader extends AnnotationFileLoader
     {
         $collection = new RouteCollection();
         foreach ($paths as $path) {
-            $collection->addResource(new DirectoryResource($path, '/\.php$/'));
-            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
-                if (!$file->isFile() || '.php' !== substr($file->getFilename(), -4)) {
-                    continue;
-                }
-
-                if ($class = $this->findClass($file)) {
-                    $collection->addCollection($this->loader->load($class, $type));
-                }
-            }
+            $collection->addCollection(parent::load($path, $type));
         }
 
         return $collection;

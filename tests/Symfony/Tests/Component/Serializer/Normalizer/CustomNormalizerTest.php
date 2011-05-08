@@ -21,7 +21,6 @@ class CustomNormalizerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->normalizer = new CustomNormalizer;
-        $this->normalizer->setSerializer($this->getMock('Symfony\Component\Serializer\Serializer'));
     }
 
     public function testSerialize()

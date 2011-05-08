@@ -112,10 +112,6 @@ class MonologExtension extends Extension
             return $handlerId;
 
         case 'stream':
-            if (!isset($handler['path'])) {
-                $handler['path'] = '%kernel.logs_dir%/%kernel.environment%.log';
-            }
-
             $definition->setArguments(array(
                 $handler['path'],
                 $handler['level'],
@@ -132,22 +128,15 @@ class MonologExtension extends Extension
             break;
 
         case 'rotating_file':
-            if (!isset($handler['path'])) {
-                $handler['path'] = '%kernel.logs_dir%/%kernel.environment%.log';
-            }
-
             $definition->setArguments(array(
                 $handler['path'],
-                isset($handler['max_files']) ? $handler['max_files'] : 0,
+                $handler['max_files'],
                 $handler['level'],
                 $handler['bubble'],
             ));
             break;
 
         case 'fingers_crossed':
-            if (!isset($handler['action_level'])) {
-                $handler['action_level'] = 'WARNING';
-            }
             $handler['action_level'] = is_int($handler['action_level']) ? $handler['action_level'] : constant('Monolog\Logger::'.strtoupper($handler['action_level']));
             $nestedHandlerId = $this->getHandlerId($handler['handler']);
             array_push($this->nestedHandlers, $nestedHandlerId);
@@ -155,7 +144,7 @@ class MonologExtension extends Extension
             $definition->setArguments(array(
                 new Reference($nestedHandlerId),
                 $handler['action_level'],
-                isset($handler['buffer_size']) ? $handler['buffer_size'] : 0,
+                $handler['buffer_size'],
                 $handler['bubble'],
             ));
             break;
@@ -166,20 +155,13 @@ class MonologExtension extends Extension
 
             $definition->setArguments(array(
                 new Reference($nestedHandlerId),
-                isset($handler['buffer_size']) ? $handler['buffer_size'] : 0,
+                $handler['buffer_size'],
                 $handler['level'],
                 $handler['bubble'],
             ));
             break;
 
         case 'syslog':
-            if (!isset($handler['ident'])) {
-                $handler['ident'] = false;
-            }
-            if (!isset($handler['facility'])) {
-                $handler['facility'] = 'user';
-            }
-
             $definition->setArguments(array(
                 $handler['ident'],
                 $handler['facility'],

@@ -57,12 +57,12 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('priority')->defaultValue(0)->end()
                             ->scalarNode('level')->defaultValue('DEBUG')->end()
                             ->booleanNode('bubble')->defaultFalse()->end()
-                            ->scalarNode('path')->end() // stream and rotating
-                            ->scalarNode('ident')->end() // syslog
-                            ->scalarNode('facility')->end() // syslog
-                            ->scalarNode('max_files')->end() // rotating
-                            ->scalarNode('action_level')->end() // fingers_crossed
-                            ->scalarNode('buffer_size')->end() // fingers_crossed and buffer
+                            ->scalarNode('path')->defaultValue('%kernel.logs_dir%/%kernel.environment%.log')->end() // stream and rotating
+                            ->scalarNode('ident')->defaultFalse()->end() // syslog
+                            ->scalarNode('facility')->defaultValue('user')->end() // syslog
+                            ->scalarNode('max_files')->defaultValue(0)->end() // rotating
+                            ->scalarNode('action_level')->defaultValue('WARNING')->end() // fingers_crossed
+                            ->scalarNode('buffer_size')->defaultValue(0)->end() // fingers_crossed and buffer
                             ->scalarNode('handler')->end() // fingers_crossed and buffer
                             ->scalarNode('formatter')->end()
                         ->end()

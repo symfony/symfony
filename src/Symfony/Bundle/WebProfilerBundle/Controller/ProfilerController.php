@@ -19,7 +19,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /**
  * ProfilerController.
  *
- * @ignorePhpDoc
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ProfilerController extends ContainerAware

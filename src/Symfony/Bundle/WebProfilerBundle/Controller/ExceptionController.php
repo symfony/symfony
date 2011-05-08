@@ -20,7 +20,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\ExceptionController as BaseExcepti
 /**
  * ExceptionController.
  *
- * @ignorePhpDoc
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ExceptionController extends BaseExceptionController

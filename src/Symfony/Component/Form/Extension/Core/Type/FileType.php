@@ -14,9 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\FixFileUploadListener;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DataTransformerChain;
 use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\FileToStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\FileToArrayTransformer;
@@ -45,7 +43,8 @@ class FileType extends AbstractType
             ->addEventSubscriber(new FixFileUploadListener($this->storage), 10)
             ->add('file', 'field')
             ->add('token', 'hidden')
-            ->add('name', 'hidden');
+            ->add('name', 'hidden')
+            ->add('originalName', 'hidden');
     }
 
     public function buildViewBottomUp(FormView $view, FormInterface $form)

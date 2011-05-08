@@ -13,13 +13,15 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 
 class CollectionType extends AbstractType
 {
     public function buildForm(FormBuilder $builder, array $options)
     {
-        if ($options['modifiable'] && $options['prototype']) {
+        if ($options['allow_add'] && $options['prototype']) {
             $builder->add('$$name$$', $options['type'], array(
                 'property_path' => false,
                 'required' => false,
@@ -27,15 +29,24 @@ class CollectionType extends AbstractType
         }
 
         $listener = new ResizeFormListener($builder->getFormFactory(),
-                $options['type'], $options['modifiable']);
+                $options['type'], $options['allow_add'], $options['allow_delete']);
 
-        $builder->addEventSubscriber($listener);
+        $builder->addEventSubscriber($listener)
+            ->setAttribute('allow_add', $options['allow_add'])
+            ->setAttribute('allow_delete', $options['allow_delete']);
+    }
+
+    public function buildView(FormView $view, FormInterface $form)
+    {
+        $view->set('allow_add', $form->getAttribute('allow_add'));
+        $view->set('allow_delete', $form->getAttribute('allow_delete'));
     }
 
     public function getDefaultOptions(array $options)
     {
         return array(
-            'modifiable' => false,
+            'allow_add' => false,
+            'allow_delete' => false,
             'prototype'  => true,
             'type' => 'text',
         );

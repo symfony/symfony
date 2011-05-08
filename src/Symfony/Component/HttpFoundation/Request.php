@@ -413,7 +413,7 @@ class Request
 
     public function getPort()
     {
-        return $this->server->get('SERVER_PORT');
+        return $this->headers->get('X-Forwarded-Port') ?: $this->server->get('SERVER_PORT');
     }
 
     /**
@@ -501,8 +501,8 @@ class Request
                 $parts[] = $segment;
                 $order[] = $segment;
             } else {
-                $tmp = explode('=', urldecode($segment), 2);
-                $parts[] = urlencode($tmp[0]).'='.urlencode($tmp[1]);
+                $tmp = explode('=', rawurldecode($segment), 2);
+                $parts[] = rawurlencode($tmp[0]).'='.rawurlencode($tmp[1]);
                 $order[] = $tmp[0];
             }
         }

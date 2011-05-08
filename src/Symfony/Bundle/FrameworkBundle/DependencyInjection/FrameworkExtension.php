@@ -69,17 +69,6 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('kernel.secret', $config['secret']);
 
-        if (isset($config['error_handler'])) {
-            if (false === $config['error_handler']) {
-                $container->getDefinition('error_handler')->setMethodCalls(array());
-            } else {
-                $container
-                    ->getDefinition('error_handler')->addMethodCall('register', array())
-                    ->replaceArgument(0, $config['error_handler'])
-                ;
-            }
-        }
-
         $container->getDefinition('exception_listener')->replaceArgument(0, $config['exception_controller']);
 
         if (!empty($config['test'])) {

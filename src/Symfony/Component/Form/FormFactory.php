@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 

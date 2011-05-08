@@ -46,7 +46,7 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $entityManagerName = $input->getOption('em') ? $input->getOption('em') : $this->container->getParameter('doctrine.orm.default_entity_manager');
+        $entityManagerName = $input->getOption('em') ? $input->getOption('em') : $this->container->get('doctrine')->getDefaultEntityManagerName();
 
         /* @var $entityManager Doctrine\ORM\EntityManager */
         $entityManager = $this->getEntityManager($input->getOption('em'));
@@ -60,7 +60,7 @@ EOT
                 'You do not have any mapped Doctrine ORM entities for any of your bundles. '.
                 'Create a class inside the Entity namespace of any of your bundles and provide '.
                 'mapping information for it with Annotations directly in the classes doc blocks '.
-                'or with XML/YAML in your bundles Resources/config/doctrine/metadata/orm directory.'
+                'or with XML/YAML in your bundles Resources/config/doctrine/ directory.'
             );
         }
 

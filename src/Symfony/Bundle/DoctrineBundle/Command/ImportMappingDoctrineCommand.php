@@ -58,7 +58,7 @@ EOT
         if ('annotation' === $type) {
             $destPath .= '/Entity';
         } else {
-            $destPath .= '/Resources/config/doctrine/metadata/orm';
+            $destPath .= '/Resources/config/doctrine';
         }
         if ('yaml' === $type) {
             $type = 'yml';
@@ -89,9 +89,9 @@ EOT
                 $className = $class->name;
                 $class->name = $bundle->getNamespace().'\\Entity\\'.$className;
                 if ('annotation' === $type) {
-                    $path = $destPath.'/'.$className.'.php';
+                    $path = $destPath.'/'.$className.'.orm.php';
                 } else {
-                    $path = $destPath.'/'.str_replace('\\', '.', $class->name).'.dcm.'.$type;
+                    $path = $destPath.'/'.str_replace('\\', '.', $class->name).'.orm.'.$type;
                 }
                 $output->writeln(sprintf('  > writing <comment>%s</comment>', $path));
                 $code = $exporter->exportClassMetadata($class);

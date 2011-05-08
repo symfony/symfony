@@ -13,9 +13,9 @@
 
         <orm>
             <mapping name="AnnotationsBundle" />
-            <mapping name="YamlBundle" dir="Resources/config/doctrine/metadata" alias="yml" />
+            <mapping name="YamlBundle" dir="Resources/config/doctrine" alias="yml" />
             <mapping name="manual" type="xml" prefix="Fixtures\Bundles\XmlBundle"
-                dir="%kernel.root_dir%/../src/Symfony/Bundle/DoctrineBundle/Tests/DependencyInjection/Fixtures/Bundles/XmlBundle/Resources/config/doctrine/metadata"
+                dir="%kernel.root_dir%/../src/Symfony/Bundle/DoctrineBundle/Tests/DependencyInjection/Fixtures/Bundles/XmlBundle/Resources/config/doctrine"
                 alias="TestAlias"
             />
         </orm>

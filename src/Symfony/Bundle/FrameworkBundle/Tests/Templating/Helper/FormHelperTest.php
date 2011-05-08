@@ -33,7 +33,8 @@ class FormHelperTest extends AbstractDivLayoutTest
         parent::setUp();
 
         $root = realpath(__DIR__.'/../../../Resources/views/Form');
-        $templateNameParser = new StubTemplateNameParser($root);
+        $rootCustom = realpath(__DIR__.'/Resources');
+        $templateNameParser = new StubTemplateNameParser($root, $rootCustom);
         $loader = new FilesystemLoader(array());
         $engine = new PhpEngine($templateNameParser, $loader);
 

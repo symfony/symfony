@@ -29,9 +29,13 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
         $loader = new StubFilesystemLoader(array(
             __DIR__.'/../../../../../../src/Symfony/Bundle/TwigBundle/Resources/views/Form',
+            __DIR__,
         ));
 
-        $this->extension = new FormExtension(array('div_layout.html.twig'));
+        $this->extension = new FormExtension(array(
+            'div_layout.html.twig',
+            'custom_widgets.html.twig',
+        ));
 
         $environment = new \Twig_Environment($loader);
         $environment->addExtension($this->extension);

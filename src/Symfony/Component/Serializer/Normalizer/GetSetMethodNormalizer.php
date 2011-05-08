@@ -108,22 +108,36 @@ class GetSetMethodNormalizer extends AbstractNormalizer
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function supportsNormalization($data, $format = null)
+    {
+        return $this->supports(get_class($data));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function supportsDenormalization($data, $type, $format = null)
+    {
+        return $this->supports($type);
+    }
+
+    /**
      * Checks if the given class has any get{Property} method.
      *
-     * @param ReflectionClass $class  A ReflectionClass instance of the class
-     *                                to serialize into or from.
-     * @param string          $format The format being (de-)serialized from or into.
-     * @return Boolean Whether the class has any getters.
+     * @param string $class
+     * @return Boolean
      */
-    public function supports(\ReflectionClass $class, $format = null)
+    private function supports($class)
     {
+        $class = new \ReflectionClass($type);
         $methods = $class->getMethods(\ReflectionMethod::IS_PUBLIC);
         foreach ($methods as $method) {
             if ($this->isGetMethod($method)) {
                 return true;
             }
         }
-
         return false;
     }
 

@@ -14,16 +14,10 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\Exception\FormException;
-use Symfony\Component\Form\Exception\MissingOptionsException;
-use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Exception\DanglingFieldException;
-use Symfony\Component\Form\Exception\FieldDefinitionException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Form represents a form.

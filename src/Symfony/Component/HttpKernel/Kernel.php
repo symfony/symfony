@@ -71,13 +71,10 @@ abstract class Kernel implements KernelInterface
         $this->classes = array();
 
         if ($this->debug) {
-            ini_set('display_errors', 1);
-            error_reporting(-1);
-
             $this->startTime = microtime(true);
-        } else {
-            ini_set('display_errors', 0);
         }
+
+        $this->init();
     }
 
     public function __clone()
@@ -88,6 +85,10 @@ abstract class Kernel implements KernelInterface
 
         $this->booted = false;
         $this->container = null;
+    }
+
+    public function init()
+    {
     }
 
     /**

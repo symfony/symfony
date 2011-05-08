@@ -82,7 +82,7 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertEquals(3, $logger->countErrors());
-        $this->assertEquals(3, count($logger->getLogs('err')));
+        $this->assertEquals(3, count($logger->getLogs('crit')));
     }
 
     public function provider()
@@ -103,7 +103,7 @@ class TestLogger extends Logger implements DebugLoggerInterface
 {
     public function countErrors()
     {
-        return count($this->logs['err']);
+        return count($this->logs['crit']);
     }
 
     public function getDebugLogger()

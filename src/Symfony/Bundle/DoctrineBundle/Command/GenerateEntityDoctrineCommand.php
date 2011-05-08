@@ -103,7 +103,7 @@ EOT
             $mappingPath = $mappingCode = false;
         } else {
             $mappingType = 'yaml' == $mappingType ? 'yml' : $mappingType;
-            $mappingPath = $bundle->getPath().'/Resources/config/doctrine/metadata/orm/'.str_replace('\\', '.', $fullEntityClassName).'.dcm.'.$mappingType;
+            $mappingPath = $bundle->getPath().'/Resources/config/doctrine/'.str_replace('\\', '.', $fullEntityClassName).'.orm.'.$mappingType;
             $mappingCode = $exporter->exportClassMetadata($class);
 
             $entityGenerator = $this->getEntityGenerator();

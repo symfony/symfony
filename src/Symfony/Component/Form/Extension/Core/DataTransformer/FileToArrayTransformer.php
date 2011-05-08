@@ -26,8 +26,6 @@ class FileToArrayTransformer implements DataTransformerInterface
         if (null === $file || '' === $file) {
             return array(
                 'file' => '',
-                'token' => '',
-                'name' => '',
             );
         }
 
@@ -37,8 +35,6 @@ class FileToArrayTransformer implements DataTransformerInterface
 
         return array(
             'file' => $file,
-            'token' => '',
-            'name' => '',
         );
     }
 

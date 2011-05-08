@@ -77,7 +77,7 @@ class MonologExtensionTest extends TestCase
 
         $handler = $container->getDefinition('monolog.handler.main');
         $this->assertDICDefinitionClass($handler, '%monolog.handler.fingers_crossed.class%');
-        $this->assertDICConstructorArguments($handler, array(new Reference('monolog.handler.nested'), \Monolog\Logger::ERROR, 0, false));
+        $this->assertDICConstructorArguments($handler, array(new Reference('monolog.handler.nested'), \Monolog\Logger::ERROR, 0, false, true));
     }
 
     public function testLoadWithOverwriting()
@@ -110,7 +110,7 @@ class MonologExtensionTest extends TestCase
 
         $handler = $container->getDefinition('monolog.handler.main');
         $this->assertDICDefinitionClass($handler, '%monolog.handler.fingers_crossed.class%');
-        $this->assertDICConstructorArguments($handler, array(new Reference('monolog.handler.nested'), \Monolog\Logger::ERROR, 0, false));
+        $this->assertDICConstructorArguments($handler, array(new Reference('monolog.handler.nested'), \Monolog\Logger::ERROR, 0, false, true));
     }
 
     public function testLoadWithNewAtEnd()

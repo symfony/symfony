@@ -251,9 +251,10 @@ SELECTCLAUSE;
     {
         $sql = <<<SELECTCLAUSE
             SELECT a.ancestor_id
-            FROM acl_object_identities o
-            INNER JOIN acl_classes c ON c.id = o.class_id
-            INNER JOIN acl_object_identity_ancestors a ON a.object_identity_id = o.id
+            FROM
+                {$this->options['oid_table_name']} o
+            INNER JOIN {$this->options['class_table_name']} c ON c.id = o.class_id
+            INNER JOIN {$this->options['oid_ancestors_table_name']} a ON a.object_identity_id = o.id
                WHERE (
 SELECTCLAUSE;
 

@@ -47,7 +47,7 @@ class Serializer implements SerializerInterface
      */
     public function serialize($data, $format)
     {
-        return $this->encode($this->normalize($data, $format), $format);
+        return $this->encode($data, $format);
     }
 
     /**

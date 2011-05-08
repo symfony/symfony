@@ -43,7 +43,7 @@ class Serializer implements SerializerInterface
         if (!$this->hasEncoder($format)) {
             throw new \UnexpectedValueException('No encoder registered for the '.$format.' format');
         }
-        if ($this->getEncoder($format) instanceof NormalizationAwareInterface) {
+        if (!$this->getEncoder($format) instanceof NormalizationAwareInterface) {
             $data = $this->normalize($data);
         }
         return $this->encode($data, $format);

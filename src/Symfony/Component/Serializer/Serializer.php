@@ -59,19 +59,19 @@ class Serializer implements SerializerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalizeObject($object, $format, $properties = null)
+    public function normalizeObject($object, $format)
     {
         if (!$this->normalizers) {
             throw new \LogicException('You must register at least one normalizer to be able to normalize objects.');
         }
         $class = get_class($object);
         if (isset($this->normalizerCache[$class][$format])) {
-            return $this->normalizerCache[$class][$format]->normalize($object, $format, $properties);
+            return $this->normalizerCache[$class][$format]->normalize($object, $format);
         }
         foreach ($this->normalizers as $normalizer) {
             if ($normalizer->supportsNormalization($object, $class, $format)) {
                 $this->normalizerCache[$class][$format] = $normalizer;
-                return $normalizer->normalize($object, $format, $properties);
+                return $normalizer->normalize($object, $format);
             }
         }
         throw new \UnexpectedValueException('Could not normalize object of type '.$class.', no supporting normalizer found.');

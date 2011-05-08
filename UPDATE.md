@@ -130,6 +130,7 @@ beta1 to beta2
 * Serializer: `AbstractEncoder` & `AbstractNormalizer` were renamed to
   `SerializerAwareEncoder` & `SerializerAwareNormalizer`.
 
+* Serializer: The `$properties` argument has been dropped from all interfaces.
 PR12 to beta1
 -------------
 

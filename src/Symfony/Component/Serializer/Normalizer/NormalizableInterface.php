@@ -32,11 +32,9 @@ interface NormalizableInterface
      *   grabbing the serializer from it to access other normalizers.
      * @param string|null $format The format is optionally given to be able to normalize differently
      *   based on different output formats.
-     * @param array|null $properties If provided, this is a (subset) list of
-     *   properties that should be exported from the object.
      * @return array|scalar
      */
-    function normalize(NormalizerInterface $normalizer, $format, $properties = null);
+    function normalize(NormalizerInterface $normalizer, $format);
 
     /**
      * Denormalizes the object back from an array of scalars|arrays.

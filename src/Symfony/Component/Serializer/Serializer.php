@@ -35,15 +35,6 @@ class Serializer implements SerializerInterface
     protected $denormalizerCache = array();
 
     /**
-     * @param mixed $value value to test
-     * @return Boolean whether the type is a structured type (array + objects)
-     */
-    public function isStructuredType($value)
-    {
-        return null !== $value && !is_scalar($value);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function serialize($data, $format)
@@ -104,7 +95,7 @@ class Serializer implements SerializerInterface
      */
     public function normalize($data, $format = null)
     {
-        if (!$this->isStructuredType($data)) {
+        if (null === $value || is_scalar($value)) {
             return $data;
         }
         if ($data instanceof Traversable) {

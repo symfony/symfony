@@ -5,6 +5,7 @@ namespace Symfony\Component\Serializer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
+use Symfony\Component\Serializer\Encoder\NormalizationAwareInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -39,6 +40,12 @@ class Serializer implements SerializerInterface
      */
     public function serialize($data, $format)
     {
+        if (!$this->hasEncoder($format)) {
+            throw new \UnexpectedValueException('No encoder registered for the '.$format.' format');
+        }
+        if ($this->getEncoder($format) instanceof NormalizationAwareInterface) {
+            $data = $this->normalize($data);
+        }
         return $this->encode($data, $format);
     }
 

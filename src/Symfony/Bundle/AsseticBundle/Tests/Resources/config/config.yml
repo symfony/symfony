@@ -21,10 +21,6 @@ assetic:
     bundles:        [ TestBundle ]
     assets:
         jquery: js/jquery.js
-        foo:
-            - foo.css
-            - bar.css
-            filters: ?yui_css
         app_css:
             inputs:
                 - css/main.css

@@ -71,9 +71,6 @@ class FrameworkExtension extends Extension
 
         if (!empty($config['test'])) {
             $loader->load('test.xml');
-            if (isset($config['session'])) {
-                $config['session']['storage_id'] = 'session.storage.filesystem';
-            }
         }
 
         if (isset($config['csrf_protection'])) {

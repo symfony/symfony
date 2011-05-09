@@ -40,9 +40,9 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      * 
      * @dataProvider codeProvider
      */
-    public function testProcessResponses($expected,$getter,$code)
+    public function testProcessResponses($expected, $getter, $code)
     {
-        $p = new Process(sprintf('php -r "%s"',$code));
+        $p = new Process(sprintf('php -r "%s"', $code));
         $p->run();
         
         $this->assertSame($expected, $p->$getter());
@@ -54,7 +54,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
             //expected output / getter / code to execute
             //array(1,'getExitCode','exit(1);'),
             //array(true,'isSuccessful','exit();'),
-            array('output','getOutput','echo \"output\";'),
+            array('output', 'getOutput', 'echo \"output\";'),
         );
     }
     
@@ -74,5 +74,4 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         
         return $defaults;
     }
-
 }

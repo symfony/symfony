@@ -131,7 +131,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
      */
     private function supports($class)
     {
-        $class = new \ReflectionClass($type);
+        $class = new \ReflectionClass($class);
         $methods = $class->getMethods(\ReflectionMethod::IS_PUBLIC);
         foreach ($methods as $method) {
             if ($this->isGetMethod($method)) {

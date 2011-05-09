@@ -150,6 +150,22 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
         )), $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
+    public function testAcl()
+    {
+        $container = $this->getContainer('container1');
+
+        $this->assertTrue($container->hasDefinition('security.acl.dbal.provider'));
+        $this->assertEquals('security.acl.dbal.provider', (string) $container->getAlias('security.acl.provider'));
+    }
+
+    public function testCustomAclProvider()
+    {
+        $container = $this->getContainer('custom_acl_provider');
+
+        $this->assertFalse($container->hasDefinition('security.acl.dbal.provider'));
+        $this->assertEquals('foo', (string) $container->getAlias('security.acl.provider'));
+    }
+
     protected function getContainer($file)
     {
         $container = new ContainerBuilder();

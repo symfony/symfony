@@ -31,9 +31,9 @@
 
         <service id="assetic.asset_factory" class="%assetic.asset_factory.class%" public="false">
             <argument type="service" id="kernel" />
+            <argument type="service" id="service_container" />
             <argument>%assetic.read_from%</argument>
             <argument>%assetic.debug%</argument>
-            <call method="setFilterManager"><argument type="service" id="assetic.filter_manager" /></call>
         </service>
 
         <service id="assetic.config_cache" class="%assetic.config_cache.class%" public="false">

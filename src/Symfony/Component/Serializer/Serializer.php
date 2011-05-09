@@ -59,7 +59,7 @@ class Serializer implements SerializerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalizeObject($object, $format)
+    public function normalizeObject($object, $format = null)
     {
         if (!$this->normalizers) {
             throw new \LogicException('You must register at least one normalizer to be able to normalize objects.');
@@ -102,7 +102,7 @@ class Serializer implements SerializerInterface
      */
     public function normalize($data, $format = null)
     {
-        if (null === $value || is_scalar($value)) {
+        if (null === $data || is_scalar($data)) {
             return $data;
         }
         if ($data instanceof Traversable) {

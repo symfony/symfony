@@ -28,7 +28,7 @@ interface NormalizerInterface
      * @return array|scalar
      * @api
      */
-    function normalize($object, $format);
+    function normalize($object, $format = null);
 
     /**
      * Denormalizes data back into an object of the given class

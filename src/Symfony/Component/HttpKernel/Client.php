@@ -120,13 +120,11 @@ EOF;
             } elseif ($value instanceof UploadedFile) {
                 // Create an uploaded file instance with security disabled,
                 // in order to be able to move local files
-                $filtered[$key] = new UploadedFile(
-                    $value->getPathname(), 
-                    $value->getOriginalBasename(), 
-                    $value->getMimeType(), 
-                    $value->getSize(), 
-                    $value->getError(),
-                    false
+                $filtered[$key] = new PersistedFile(
+                    $value->getPathname(),
+                    $value->getOriginalBasename(),
+                    $value->getMimeType(),
+                    $value->getSize()
                 );
             } else {
                 $filtered[$key] = $value;

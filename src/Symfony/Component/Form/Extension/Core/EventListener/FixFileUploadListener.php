@@ -16,6 +16,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\PersistedFile;
 use Symfony\Component\HttpFoundation\File\TemporaryStorage;
 
 /**
@@ -57,20 +58,19 @@ class FixFileUploadListener implements EventSubscriberInterface
             'originalName'  => '',
         ), $data);
 
-
         if ($data['file'] instanceof UploadedFile && $data['file']->isValid()) {
             // Newly uploaded file
             $data['token'] = (string) rand(100000, 999999);
             $directory = $this->storage->getTempDir($data['token']);
             $data['name'] = $data['file']->getBasename();
-            $data['originalName'] = $data['file']->getOriginalBasename();
+            $data['originalName'] = $data['file']->getClientOriginalName();
             $data['file']->move($directory);
         } else if ($data['token'] && $data['name']) {
             // Existing uploaded file
             $path = $this->storage->getTempDir($data['token']) . DIRECTORY_SEPARATOR . $data['name'];
 
             if (file_exists($path)) {
-                $data['file'] = new UploadedFile($path, $data['originalName'], null, null, null, true);
+                $data['file'] = new PersistedFile($path, $data['originalName']);
             }
         } else {
             // Clear other fields if we still don't have a file, but keep

@@ -33,12 +33,10 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             UPLOAD_ERR_OK
         );
 
-        $this->assertAttributeEquals('application/octet-stream', 'mimeType', $file);
+        $this->assertEquals('application/octet-stream', $file->getClientMimeType());
 
         if (extension_loaded('fileinfo')) {
             $this->assertEquals('image/gif', $file->getMimeType());
-        } else {
-            $this->assertEquals('application/octet-stream', $file->getMimeType());
         }
     }
 
@@ -52,8 +50,7 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             UPLOAD_ERR_OK
         );
 
-        $this->assertAttributeEquals('application/octet-stream', 'mimeType', $file);
-        $this->assertEquals('application/octet-stream', $file->getMimeType());
+        $this->assertEquals('application/octet-stream', $file->getClientMimeType());
     }
 
     public function testErrorIsOkByDefault()
@@ -69,7 +66,7 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(UPLOAD_ERR_OK, $file->getError());
     }
 
-    public function testGetOriginalName()
+    public function testGetClientOriginalName()
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -79,13 +76,13 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             null
         );
 
-        $this->assertEquals('original.gif', $file->getOriginalBasename());
+        $this->assertEquals('original.gif', $file->getClientOriginalName());
     }
 
     /**
      * @expectedException Symfony\Component\HttpFoundation\File\Exception\FileException
      */
-    public function testMoveLocalFileWithSecureSetToTrue()
+    public function testMoveLocalFileIsNotAllowed()
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -99,35 +96,7 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         $movedFile = $file->move(__DIR__.'/Fixtures/directory');
     }
 
-    public function testMoveLocalFileWithSecureSetToFalse()
-    {
-        $path = __DIR__.'/Fixtures/test.copy.gif';
-        $targetDir = __DIR__.'/Fixtures/directory';
-        $targetPath = $targetDir.'/test.copy.gif';
-        @unlink($path);
-        @unlink($targetPath);
-        copy(__DIR__.'/Fixtures/test.gif', $path);
-
-        $file = new UploadedFile(
-            $path,
-            'original.gif',
-            'image/gif',
-            filesize($path),
-            UPLOAD_ERR_OK,
-            false
-        );
-
-        $movedFile = $file->move($targetDir);
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\File', $movedFile);
-
-        $this->assertTrue(file_exists($targetPath));
-        $this->assertFalse(file_exists($path));
-        $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
-
-        @unlink($targetPath);
-    }
-
-    public function testGetOriginalNameSanitizeFilename()
+    public function testGetClientOriginalNameSanitizeFilename()
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -137,6 +106,6 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             null
         );
 
-        $this->assertEquals('original.gif', $file->getOriginalBasename());
+        $this->assertEquals('original.gif', $file->getClientOriginalName());
     }
 }

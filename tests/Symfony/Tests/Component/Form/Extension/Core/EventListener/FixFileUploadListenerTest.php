@@ -14,6 +14,7 @@ namespace Symfony\Tests\Component\Form\Extension\Core\EventListener;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\Extension\Core\EventListener\FixFileUploadListener;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\PersistedFile;
 
 class FixFileUploadListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -69,13 +70,15 @@ class FixFileUploadListenerTest extends \PHPUnit_Framework_TestCase
     {
         $test = $this;
 
-        $this->storage->expects($this->any())
+        $this->storage
+            ->expects($this->any())
             ->method('getTempDir')
             ->will($this->returnCallback(function ($token) use ($test) {
                 $test->assertSame('abcdef', $token);
 
                 return __DIR__.DIRECTORY_SEPARATOR.'Fixtures';
-            }));
+            }))
+        ;
 
         $data = array(
             'file'          => '',
@@ -91,7 +94,7 @@ class FixFileUploadListenerTest extends \PHPUnit_Framework_TestCase
         $filter->onBindClientData($event);
 
         $this->assertEquals(array(
-            'file' => new UploadedFile(
+            'file' => new PersistedFile(
                 __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'randomhash',
                 'original.jpg',
                 null,
@@ -122,9 +125,12 @@ class FixFileUploadListenerTest extends \PHPUnit_Framework_TestCase
         );
 
         $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
-        $form->expects($this->any())
+
+        $form
+            ->expects($this->any())
             ->method('getNormData')
-            ->will($this->returnValue($existingData));
+            ->will($this->returnValue($existingData))
+        ;
 
         $event = new FilterDataEvent($form, null);
 
@@ -160,7 +166,7 @@ class FixFileUploadListenerTest extends \PHPUnit_Framework_TestCase
         ;
         $file
             ->expects($this->any())
-            ->method('getOriginalBasename')
+            ->method('getClientOriginalName')
             ->will($this->returnValue($originalName))
         ;
         $file

@@ -123,6 +123,10 @@ beta1 to beta2
           'allow_add' => true,
           'allow_delete' => true,
       ));
+      
+* Request::hasSession() has been renamed to Request::hasPreviousSession(). The
+  method hasSession() still exists, but only checks if the request contains a
+  session object, not if the session was started in a previous request.
 
 * Serializer: The NormalizerInterface's `supports()` method has been split in
   two methods: `supportsNormalization` and `supportsDenormalization`.

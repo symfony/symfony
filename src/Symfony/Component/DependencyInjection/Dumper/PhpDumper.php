@@ -374,7 +374,8 @@ class PhpDumper extends Dumper
     {
         $code = '';
         foreach ($definition->getProperties() as $name => $value) {
-            $code .= sprintf("        \$%s = new \ReflectionProperty(\$%s, %s);\n", $refName = $this->getNextVariableName(), $variableName, var_export($name, true));
+            $declaringClass = $this->getReflectionProperty($definition->getClass(), $name)->getDeclaringClass()->getName();
+            $code .= sprintf("        \$%s = new \ReflectionProperty(%s, %s);\n", $refName = $this->getNextVariableName(), var_export($declaringClass, true), var_export($name, true));
             $code .= sprintf("        \$%s->setAccessible(true);\n", $refName);
             $code .= sprintf("        \$%s->setValue(\$%s, %s);\n", $refName, $variableName, $this->dumpValue($value));
         }
@@ -1053,6 +1054,19 @@ EOF;
 
             return sprintf('$this->get(\'%s\')', $id);
         }
+    }
+
+    private function getReflectionProperty($className, $name)
+    {
+        $class = new \ReflectionClass($className);
+
+        do {
+            if ($class->hasProperty($name)) {
+                return $class->getProperty($name);
+            }
+        } while (false !== $class = $class->getParentClass());
+
+        throw new \RuntimeException(sprintf('The class "%s", and none of its parent classes have a property named "%s".', $className, $name));
     }
 
     /**

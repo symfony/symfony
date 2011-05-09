@@ -20,7 +20,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 use Symfony\Component\Form\Extension\Core\Validator\DefaultValidator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Validator\ValidatorInterface;
 
 class FieldType extends AbstractType
 {

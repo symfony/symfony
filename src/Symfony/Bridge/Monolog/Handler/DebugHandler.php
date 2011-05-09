@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\MonologBundle\Logger;
+namespace Symfony\Bridge\Monolog\Handler;
 
-use Monolog\Logger as MonologLogger;
+use Monolog\Logger;
 use Monolog\Handler\TestHandler;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
@@ -46,7 +46,7 @@ class DebugHandler extends TestHandler implements DebugLoggerInterface
     public function countErrors()
     {
         $cnt = 0;
-        foreach (array(MonologLogger::ERROR, MonologLogger::CRITICAL, MonologLogger::ALERT) as $level) {
+        foreach (array(Logger::ERROR, Logger::CRITICAL, Logger::ALERT) as $level) {
             if (isset($this->recordsByLevel[$level])) {
                 $cnt += count($this->recordsByLevel[$level]);
             }

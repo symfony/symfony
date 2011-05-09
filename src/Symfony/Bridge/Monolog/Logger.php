@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\MonologBundle\Logger;
+namespace Symfony\Bridge\Monolog;
 
 use Monolog\Logger as BaseLogger;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
@@ -34,10 +34,5 @@ class Logger extends BaseLogger implements LoggerInterface
                 return $handler;
             }
         }
-    }
-
-    public function log($message, $level)
-    {
-        return $this->addRecord($level, $message);
     }
 }

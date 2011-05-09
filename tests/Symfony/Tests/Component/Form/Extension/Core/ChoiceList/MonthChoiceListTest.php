@@ -68,6 +68,17 @@ class MonthChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($names, $list->getChoices());
     }
 
+    public function testUsingAClosureToReturnTheMonthList()
+    {
+        $this->formatter->setPattern('dd.MMMM.yy');
+
+        $list = new MonthChoiceList($this->formatter, function () { return array(1, 4); });
+
+        $names = array(1 => 'January', 4 => 'April');
+        $this->assertSame($names, $list->getChoices());
+    }
+
+
     public function testFormattedMonthsLongWithDifferentTimezone()
     {
         $this->formatter = new \IntlDateFormatter(

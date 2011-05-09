@@ -47,7 +47,11 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      * Transforms a normalized format into a localized money string.
      *
      * @param  number $value  Normalized number
+     *
      * @return string         Localized money string.
+     *
+     * @throws UnexpectedTypeException if the given value is not numeric
+     * @throws TransformationFailedException if the value can not be transformed
      */
     public function transform($value)
     {
@@ -66,7 +70,11 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      * Transforms a localized money string into a normalized format.
      *
      * @param string $value Localized money string
+     *
      * @return number Normalized number
+     *
+     * @throws UnexpectedTypeException if the given value is not a string
+     * @throws TransformationFailedException if the value can not be transformed
      */
     public function reverseTransform($value)
     {

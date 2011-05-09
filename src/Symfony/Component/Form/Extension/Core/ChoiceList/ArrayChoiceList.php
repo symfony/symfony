@@ -19,6 +19,13 @@ class ArrayChoiceList implements ChoiceListInterface
 
     protected $loaded = false;
 
+    /**
+     * Constructor.
+     *
+     * @param array|\Closure $choices An array of choices or a function returning an array
+     *
+     * @throws UnexpectedTypeException if the type of the choices parameter is not supported
+     */
     public function __construct($choices)
     {
         if (!is_array($choices) && !$choices instanceof \Closure) {
@@ -28,6 +35,11 @@ class ArrayChoiceList implements ChoiceListInterface
         $this->choices = $choices;
     }
 
+    /**
+     * Returns a list of choices
+     *
+     * @return array
+     */
     public function getChoices()
     {
         if (!$this->loaded) {
@@ -38,7 +50,9 @@ class ArrayChoiceList implements ChoiceListInterface
     }
 
     /**
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface::getChoices
+     * Initializes the list of choices.
+     *
+     * @throws UnexpectedTypeException if the function does not return an array
      */
     protected function load()
     {

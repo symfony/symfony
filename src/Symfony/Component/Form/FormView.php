@@ -100,7 +100,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
         $this->rendered = true;
     }
 
-    public function setParent(self $parent)
+    public function setParent(self $parent = null)
     {
         $this->parent = $parent;
     }

@@ -23,10 +23,14 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
 {
     /**
-     * Transforms a DateTime object into a timestamp in the configured timezone
+     * Transforms a DateTime object into a timestamp in the configured timezone.
      *
      * @param  DateTime $value  A DateTime object
+     *
      * @return integer          A timestamp
+     *
+     * @throws UnexpectedTypeException if the given value is not an instance of \DateTime
+     * @throws TransformationFailedException if the output timezone is not supported
      */
     public function transform($value)
     {
@@ -38,16 +42,24 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
             throw new UnexpectedTypeException($value, '\DateTime');
         }
 
-        $value->setTimezone(new \DateTimeZone($this->outputTimezone));
+        try {
+            $value->setTimezone(new \DateTimeZone($this->outputTimezone));
+        } catch (\Exception $e) {
+            throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
+        }
 
-        return (int)$value->format('U');
+        return (int) $value->format('U');
     }
 
     /**
      * Transforms a timestamp in the configured timezone into a DateTime object
      *
-     * @param  string $value  A value as produced by PHP's date() function
-     * @return DateTime       A DateTime object
+     * @param  string $value  A timestamp
+     *
+     * @return \DateTime      An instance of \DateTime
+     *
+     * @throws UnexpectedTypeException if the given value is not a timestamp
+     * @throws TransformationFailedException if the given timestamp is invalid
      */
     public function reverseTransform($value)
     {
@@ -59,19 +71,16 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
             throw new UnexpectedTypeException($value, 'numeric');
         }
 
-        $outputTimezone = $this->outputTimezone;
-        $inputTimezone = $this->inputTimezone;
-
         try {
-            $dateTime = new \DateTime("@$value $outputTimezone");
+            $dateTime = new \DateTime(sprintf("@%s %s", $value, $this->outputTimezone));
 
-            if ($inputTimezone != $outputTimezone) {
-                $dateTime->setTimezone(new \DateTimeZone($inputTimezone));
+            if ($this->inputTimezone !== $this->outputTimezone) {
+                $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
             }
-
-            return $dateTime;
         } catch (\Exception $e) {
-            throw new TransformationFailedException('Expected a valid timestamp. ' . $e->getMessage(), 0, $e);
+            throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
         }
+
+        return $dateTime;
     }
 }

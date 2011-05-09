@@ -45,7 +45,11 @@ class DataTransformerChain implements DataTransformerInterface
      * by this method.
      *
      * @param  mixed $value  The original value
+     *
      * @return mixed         The transformed value
+     *
+     * @throws Symfony\Component\Form\Exception\TransformationFailedException
+     * @throws Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function transform($value)
     {
@@ -66,11 +70,15 @@ class DataTransformerChain implements DataTransformerInterface
      * by this method.
      *
      * @param  mixed $value  The transformed value
+     *
      * @return mixed         The reverse-transformed value
+     *
+     * @throws Symfony\Component\Form\Exception\TransformationFailedException
+     * @throws Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function reverseTransform($value)
     {
-        for ($i = count($this->transformers) - 1; $i >= 0; --$i) {
+        for ($i = count($this->transformers) - 1; $i >= 0; $i--) {
             $value = $this->transformers[$i]->reverseTransform($value);
         }
 

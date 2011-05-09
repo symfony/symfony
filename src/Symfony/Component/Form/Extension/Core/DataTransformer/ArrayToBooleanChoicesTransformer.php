@@ -25,17 +25,19 @@ class ArrayToBooleanChoicesTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transforms a single choice or an array of choices to a format appropriate
-     * for the nested checkboxes/radio buttons.
+     * Transforms an array of choices to a format appropriate for the nested
+     * checkboxes/radio buttons.
      *
      * The result is an array with the options as keys and true/false as values,
      * depending on whether a given option is selected. If this field is rendered
      * as select tag, the value is not modified.
      *
-     * @param  mixed $array  An array if "multiple" is set to true, a scalar
-     *                       value otherwise.
-     * @return mixed         An array if "expanded" or "multiple" is set to true,
-     *                       a scalar value otherwise.
+     * @param  mixed $array  An array
+     *
+     * @return mixed         An array
+     *
+     * @throws UnexpectedTypeException if the given value is not an array
+     * @throws TransformationFailedException if the choices can not be retrieved
      */
     public function transform($array)
     {
@@ -47,27 +49,31 @@ class ArrayToBooleanChoicesTransformer implements DataTransformerInterface
             throw new UnexpectedTypeException($array, 'array');
         }
 
-        $choices = $this->choiceList->getChoices();
+        try {
+            $choices = $this->choiceList->getChoices();
+        } catch (\Exception $e) {
+            throw new TransformationFailedException('Can not get the choice list', $e->getCode(), $e);
+        }
 
-        foreach ($choices as $choice => $_) {
-            $choices[$choice] = in_array($choice, $array, true);
+        foreach (array_keys($choices) as $key) {
+            $choices[$key] = in_array($key, $array, true);
         }
 
         return $choices;
     }
 
     /**
-     * Transforms a checkbox/radio button array to a single choice or an array
-     * of choices.
+     * Transforms a checkbox/radio button array to an array of choices.
      *
      * The input value is an array with the choices as keys and true/false as
      * values, depending on whether a given choice is selected. The output
-     * is an array with the selected choices or a single selected choice.
+     * is an array with the selected choices.
      *
-     * @param  mixed $value  An array if "expanded" or "multiple" is set to true,
-     *                       a scalar value otherwise.
-     * @return mixed $value  An array if "multiple" is set to true, a scalar
-     *                       value otherwise.
+     * @param  mixed $value  An array
+     *
+     * @return mixed $value  An array
+     *
+     * @throws UnexpectedTypeException if the given value is not an array
      */
     public function reverseTransform($value)
     {

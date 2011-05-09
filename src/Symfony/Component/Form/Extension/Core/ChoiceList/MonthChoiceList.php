@@ -16,18 +16,24 @@ class MonthChoiceList extends PaddedChoiceList
     private $formatter;
 
     /**
-     * Generates an array of localized month choices
+     * Generates an array of localized month choices.
      *
      * @param IntlDateFormatter $formatter An IntlDateFormatter instance
-     * @param array             $months    The month numbers to generate
+     * @param array|\Closure    $months    An array of months as number
+     *                                     (1 for January, 2 for February, ...)
      */
-    public function __construct(\IntlDateFormatter $formatter, array $months)
+    public function __construct(\IntlDateFormatter $formatter, $months)
     {
         parent::__construct($months, 2, '0', STR_PAD_LEFT);
 
         $this->formatter = $formatter;
     }
 
+    /**
+     * Initializes the list of months.
+     *
+     * @throws UnexpectedTypeException if the function does not return an array
+     */
     protected function load()
     {
         parent::load();

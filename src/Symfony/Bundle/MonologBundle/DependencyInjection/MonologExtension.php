@@ -179,9 +179,9 @@ class MonologExtension extends Extension
                 $message->setFactoryService('mailer');
                 $message->setFactoryMethod('createMessage');
                 $message->setPublic(false);
-                $message->addMethodCall('setFrom', $handler['from_email']);
-                $message->addMethodCall('setTo', $handler['to_email']);
-                $message->addMethodCall('setSubject', $handler['subject']);
+                $message->addMethodCall('setFrom', array($handler['from_email']));
+                $message->addMethodCall('setTo', array($handler['to_email']));
+                $message->addMethodCall('setSubject', array($handler['subject']));
                 $messageId = sprintf('%s.mail_prototype', $handlerId);
                 $container->setDefinition($messageId, $message);
                 $prototype = new Reference($messageId);
@@ -243,7 +243,7 @@ class MonologExtension extends Extension
 
     private function parseDefinition($definition)
     {
-        if (0 === strpos($processor, '@')) {
+        if (0 === strpos($definition, '@')) {
             return new Reference(substr($definition, 1));
         }
 

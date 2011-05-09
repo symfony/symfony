@@ -79,8 +79,8 @@ class MonologExtension extends Extension
                 'Monolog\\Handler\\StreamHandler',
                 'Monolog\\Handler\\FingersCrossedHandler',
                 'Monolog\\Logger',
-                'Symfony\\Bundle\\MonologBundle\\Logger\\Logger',
-                'Symfony\\Bundle\\MonologBundle\\Logger\\DebugHandler',
+                'Symfony\\Bridge\\Monolog\\Logger',
+                'Symfony\\Bridge\\Monolog\\Handler\\DebugHandler',
             ));
         }
     }

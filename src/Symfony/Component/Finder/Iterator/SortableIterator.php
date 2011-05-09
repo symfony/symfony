@@ -49,9 +49,8 @@ class SortableIterator extends \ArrayIterator
             throw new \InvalidArgumentException(sprintf('The SortableIterator takes a \Closure or a valid built-in sort algorithm as an argument (%s given).', $sort));
         }
 
-        $array = new \ArrayObject(iterator_to_array($iterator));
-        $array->uasort($sort);
+        parent::__construct(iterator_to_array($iterator));
 
-        parent::__construct($array);
+        $this->uasort($sort);
     }
 }

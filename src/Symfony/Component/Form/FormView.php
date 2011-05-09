@@ -152,13 +152,11 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     public function getIterator()
     {
-        if (isset($this->children)) {
+        if (count($this->children)) {
             $this->rendered = true;
-
-            return new \ArrayIterator($this->children);
         }
 
-        return new \ArrayIterator(array());
+        return new \ArrayIterator($this->children);
     }
 
     public function isChoiceGroup($choice)

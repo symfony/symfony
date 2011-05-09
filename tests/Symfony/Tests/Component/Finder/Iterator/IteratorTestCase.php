@@ -15,7 +15,7 @@ require_once __DIR__.'/Iterator.php';
 
 abstract class IteratorTestCase extends \PHPUnit_Framework_TestCase
 {
-    protected function assertIterator($expected, \Iterator $iterator)
+    protected function assertIterator($expected, \Traversable $iterator)
     {
         $values = array_map(function (\SplFileInfo $fileinfo) { return $fileinfo->getPathname(); }, iterator_to_array($iterator));
 
@@ -25,7 +25,7 @@ abstract class IteratorTestCase extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, array_values($values));
     }
 
-    protected function assertOrderedIterator($expected, \Iterator $iterator)
+    protected function assertOrderedIterator($expected, \Traversable $iterator)
     {
         $values = array_map(function (\SplFileInfo $fileinfo) { return $fileinfo->getPathname(); }, iterator_to_array($iterator));
 

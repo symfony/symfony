@@ -14,7 +14,7 @@ namespace Symfony\Component\Translation\Loader;
 use Symfony\Component\Config\Resource\FileResource;
 
 /**
- * @author Union of RAD (http://union-of-rad.org)
+ * @copyright Copyright (c) 2010, Union of RAD http://union-of-rad.org (http://lithify.me/)
  */
 class MoFileLoader extends ArrayLoader implements LoaderInterface
 {

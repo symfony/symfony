@@ -101,9 +101,13 @@ class Configuration implements ConfigurationInterface
                                     }
                                 }
 
-                                // organize arbitrary options
+                                // organize inputs and arbitrary options
+                                $inputsKey = isset($v['input']) ? 'input' : 'inputs';
                                 foreach ($v as $key => $value) {
-                                    if (!in_array($key, array('input', 'inputs', 'filter', 'filters', 'option', 'options'))) {
+                                    if (is_integer($key)) {
+                                        $v[$inputsKey][] = $value;
+                                        unset($v[$key]);
+                                    } elseif (!in_array($key, array('input', 'inputs', 'filter', 'filters', 'option', 'options'))) {
                                         $v['options'][$key] = $value;
                                         unset($v[$key]);
                                     }

@@ -150,6 +150,10 @@ class XmlDumper extends Dumper
             $this->convertParameters($parameters, 'property', $service, 'name');
         }
 
+        if ($parameters = $definition->getLookupMethods()) {
+            $this->convertParameters($parameters, 'lookup_method', $service, 'name');
+        }
+
         $this->addMethodCalls($definition->getMethodCalls(), $service);
 
         if ($callable = $definition->getConfigurator()) {

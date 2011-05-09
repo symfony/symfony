@@ -176,6 +176,8 @@ class MonologExtension extends Extension
                 $prototype = $this->parseDefinition($handler['email_prototype']);
             } else {
                 $message = new Definition('Swift_Message');
+                $message->setFactoryService('mailer');
+                $message->setFactoryMethod('createMessage');
                 $message->setPublic(false);
                 $message->addMethodCall('setFrom', $handler['from_email']);
                 $message->addMethodCall('setTo', $handler['to_email']);

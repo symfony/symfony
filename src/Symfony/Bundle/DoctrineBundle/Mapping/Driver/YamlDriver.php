@@ -22,7 +22,7 @@ class YamlDriver extends BaseYamlDriver
 {
     protected $_globalFile = 'mapping';
     protected $_classCache;
-    protected $_fileExtension = '.orm.dcm.yml';
+    protected $_fileExtension = '.orm.yml';
 
     public function isTransient($className)
     {

@@ -62,6 +62,11 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $crawler->addHtmlContent('<html><div class="foo"></html>', 'UTF-8');
 
         $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->addHtmlContent() adds nodes from an HTML string');
+
+        $crawler->addHtmlContent('<html><head><base href="http://symfony.com"></head><a href="/contact"></a></html>', 'UTF-8');
+
+        $this->assertEquals('http://symfony.com', $crawler->filter('base')->attr('href'), '->addHtmlContent() adds nodes from an HTML string');
+        $this->assertEquals('http://symfony.com/contact', $crawler->filter('a')->link()->getUri(), '->addHtmlContent() adds nodes from an HTML string');
     }
 
     /**

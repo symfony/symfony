@@ -318,6 +318,11 @@ class DoctrineExtension extends AbstractDoctrineExtension
         return 'Resources/config/doctrine';
     }
 
+    protected function getMappingResourceExtension()
+    {
+        return 'orm';
+    }
+
     /**
      * Loads a configured entity managers cache drivers.
      *

@@ -77,7 +77,7 @@ class MonologExtensionTest extends TestCase
 
         $handler = $container->getDefinition('monolog.handler.main');
         $this->assertDICDefinitionClass($handler, '%monolog.handler.fingers_crossed.class%');
-        $this->assertDICConstructorArguments($handler, array(new Reference('monolog.handler.nested'), \Monolog\Logger::ERROR, 0, false));
+        $this->assertDICConstructorArguments($handler, array(new Reference('monolog.handler.nested'), \Monolog\Logger::ERROR, 0, false, true));
     }
 
     public function testLoadWithOverwriting()
@@ -110,7 +110,7 @@ class MonologExtensionTest extends TestCase
 
         $handler = $container->getDefinition('monolog.handler.main');
         $this->assertDICDefinitionClass($handler, '%monolog.handler.fingers_crossed.class%');
-        $this->assertDICConstructorArguments($handler, array(new Reference('monolog.handler.nested'), \Monolog\Logger::ERROR, 0, false));
+        $this->assertDICConstructorArguments($handler, array(new Reference('monolog.handler.nested'), \Monolog\Logger::ERROR, 0, false, true));
     }
 
     public function testLoadWithNewAtEnd()
@@ -186,6 +186,17 @@ class MonologExtensionTest extends TestCase
         $handler = $container->getDefinition('monolog.handler.last');
         $this->assertDICDefinitionClass($handler, '%monolog.handler.stream.class%');
         $this->assertDICConstructorArguments($handler, array('/tmp/last.log', \Monolog\Logger::ERROR, true));
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testExceptionWhenInvalidHandler()
+    {
+        $container = new ContainerBuilder();
+        $loader = new MonologExtension();
+
+        $loader->load(array(array('handlers' => array('main' => array('type' => 'invalid_handler')))), $container);
     }
 
     /**

@@ -14,7 +14,7 @@ beta1 to beta2
 
 * The Doctrine metadata files has moved from
   ``Resources/config/doctrine/metadata/orm/`` to ``Resources/config/doctrine``
-  and the extension from ``.dcm.yml`` to ``.orm.dcm.yml``
+  and the extension from ``.dcm.yml`` to ``.orm.yml``
 
   Before:
 
@@ -23,8 +23,8 @@ beta1 to beta2
 
   After:
 
-        Resources/config/doctrine/Bundle.Entity.orm.dcm.xml
-        Resources/config/doctrine/Bundle.Entity.orm.dcm.yml
+        Resources/config/doctrine/Bundle.Entity.orm.xml
+        Resources/config/doctrine/Bundle.Entity.orm.yml
 
 * With the introduction of a new Doctrine Registry class, the following
   parameters have been removed (replaced by methods on the `doctrine`
@@ -124,6 +124,9 @@ beta1 to beta2
           'allow_delete' => true,
       ));
 
+* Serializer: The NormalizerInterface's `supports()` method has been split in
+  two methods: `supportsNormalization` and `supportsDenormalization`.
+
 PR12 to beta1
 -------------
 
@@ -143,6 +146,9 @@ PR12 to beta1
 
 * The `File::getWebPath()` and `File::rename()` methods have been removed, as
   well as the `framework.document_root` configuration setting.
+
+* The `File::getDefaultExtension()` method has been renamed to `File::guessExtension()`.
+  The renamed method now returns null if it cannot guess the extension.
 
 * The `session` configuration has been refactored:
 
@@ -210,11 +216,11 @@ PR11 to PR12
         <app:engine>twig</app:engine>
         <twig:extension>twig.extension.debug</twig:extension>
 
-* Fixes a critical security issue which allowed all users to switch to 
+* Fixes a critical security issue which allowed all users to switch to
   arbitrary accounts when the SwitchUserListener was activated. Configurations
   which do not use the SwitchUserListener are not affected.
 
-* The Dependency Injection Container now strongly validates the references of 
+* The Dependency Injection Container now strongly validates the references of
   all your services at the end of its compilation process. If you have invalid
   references this will result in a compile-time exception instead of a run-time
   exception (the previous behavior).

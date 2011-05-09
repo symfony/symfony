@@ -23,7 +23,7 @@ class PropertyMetadata extends MemberMetadata
      */
     public function __construct($class, $name)
     {
-        if (!method_exists($class,"__get") && !property_exists($class, $name)) {
+        if (!method_exists($class, "__get") && !property_exists($class, $name)) {
             throw new ValidatorException(sprintf('Property %s does not exists in class %s', $name, $class));
         }
 
@@ -35,7 +35,7 @@ class PropertyMetadata extends MemberMetadata
      */
     public function getValue($object)
     {
-        if (method_exists($object,"__get")) {
+        if (method_exists($object, "__get")) {
             $property = $this->getName();
             
             return $object->$property;

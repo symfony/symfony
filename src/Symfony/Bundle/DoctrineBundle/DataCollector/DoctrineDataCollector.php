@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\DoctrineBundle\Logger\DbalLogger;
+use Symfony\Bundle\DoctrineBundle\Registry;
 
 /**
  * DoctrineDataCollector.
@@ -23,10 +24,14 @@ use Symfony\Bundle\DoctrineBundle\Logger\DbalLogger;
  */
 class DoctrineDataCollector extends DataCollector
 {
-    protected $logger;
+    private $connections;
+    private $managers;
+    private $logger;
 
-    public function __construct(DbalLogger $logger = null)
+    public function __construct(Registry $registry, DbalLogger $logger = null)
     {
+        $this->connections = $registry->getConnectionNames();
+        $this->managers = $registry->getEntityManagerNames();
         $this->logger = $logger;
     }
 
@@ -36,8 +41,20 @@ class DoctrineDataCollector extends DataCollector
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         $this->data = array(
-            'queries' => null !== $this->logger ? $this->logger->queries : array(),
+            'queries'     => null !== $this->logger ? $this->logger->queries : array(),
+            'connections' => $this->connections,
+            'managers'    => $this->managers,
         );
+    }
+
+    public function getManagers()
+    {
+        return $this->data['managers'];
+    }
+
+    public function getConnections()
+    {
+        return $this->data['connections'];
     }
 
     public function getQueryCount()

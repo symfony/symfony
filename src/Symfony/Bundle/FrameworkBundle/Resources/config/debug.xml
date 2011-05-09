@@ -6,6 +6,7 @@
 
     <parameters>
         <parameter key="debug.event_dispatcher.class">Symfony\Bundle\FrameworkBundle\Debug\TraceableEventDispatcher</parameter>
+        <parameter key="debug.container.dump">%kernel.cache_dir%/%kernel.container_class%.xml</parameter>
     </parameters>
 
     <services>

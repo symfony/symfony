@@ -34,7 +34,7 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertAttributeEquals('application/octet-stream', 'mimeType', $file);
-        
+
         if (extension_loaded('fileinfo')) {
             $this->assertEquals('image/gif', $file->getMimeType());
         } else {
@@ -81,7 +81,7 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('original.gif', $file->getOriginalBasename());
     }
-    
+
     /**
      * @expectedException Symfony\Component\HttpFoundation\File\Exception\FileException
      */
@@ -95,10 +95,10 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             UPLOAD_ERR_OK,
             true
         );
-        
+
         $movedFile = $file->move(__DIR__.'/Fixtures/directory');
-    }    
-    
+    }
+
     public function testMoveLocalFileWithSecureSetToFalse()
     {
         $path = __DIR__.'/Fixtures/test.copy.gif';
@@ -107,7 +107,7 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         @unlink($path);
         @unlink($targetPath);
         copy(__DIR__.'/Fixtures/test.gif', $path);
-        
+
         $file = new UploadedFile(
             $path,
             'original.gif',
@@ -116,14 +116,27 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             UPLOAD_ERR_OK,
             false
         );
-        
+
         $movedFile = $file->move($targetDir);
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\File', $movedFile);        
-        
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\File', $movedFile);
+
         $this->assertTrue(file_exists($targetPath));
         $this->assertFalse(file_exists($path));
         $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
 
-        @unlink($targetPath);                
-    }        
+        @unlink($targetPath);
+    }
+
+    public function testGetOriginalNameSanitizeFilename()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            '../../original.gif',
+            'image/gif',
+            filesize(__DIR__.'/Fixtures/test.gif'),
+            null
+        );
+
+        $this->assertEquals('original.gif', $file->getOriginalBasename());
+    }
 }

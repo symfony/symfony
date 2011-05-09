@@ -13,7 +13,7 @@ namespace Symfony\Tests\Component\HttpFoundation\File;
 
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
-use Symfony\Component\HttpFoundation\File\Exception\DirectoryNotFoundException;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class FileTest extends \PHPUnit_Framework_TestCase
 {
@@ -52,21 +52,6 @@ class FileTest extends \PHPUnit_Framework_TestCase
         new File(__DIR__.'/Fixtures/not_here');
     }
 
-    /**
-     * @expectedException Symfony\Component\HttpFoundation\File\Exception\FileException
-     */
-    public function testSizeFailing()
-    {
-        $dir = __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'directory';
-        $path = $dir.DIRECTORY_SEPARATOR.'test.copy.gif';
-        @unlink($path);
-        copy(__DIR__.'/Fixtures/test.gif', $path);
-
-        $file = new File($path);
-        @unlink($path);
-        $file->getSize();
-    }
-
     public function testMove()
     {
         $path = __DIR__.'/Fixtures/test.copy.gif';
@@ -78,8 +63,8 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
         $file = new File($path);
         $movedFile = $file->move($targetDir);
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\File', $movedFile);        
-        
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\File', $movedFile);
+
         $this->assertTrue(file_exists($targetPath));
         $this->assertFalse(file_exists($path));
         $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
@@ -105,24 +90,25 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
         @unlink($targetPath);
     }
-    
+
     public function testMoveToAnUnexistentDirectory()
     {
-        $path = __DIR__.'/Fixtures/test.copy.gif';
+        $sourcePath = __DIR__.'/Fixtures/test.copy.gif';
         $targetDir = __DIR__.'/Fixtures/directory/sub';
         $targetPath = $targetDir.'/test.copy.gif';
-        @unlink($path);
+        @unlink($sourcePath);
         @unlink($targetPath);
         @rmdir($targetDir);
-        copy(__DIR__.'/Fixtures/test.gif', $path);
+        copy(__DIR__.'/Fixtures/test.gif', $sourcePath);
 
-        $file = new File($path);
+        $file = new File($sourcePath);
         $movedFile = $file->move($targetDir);
 
-        $this->assertTrue(file_exists($targetPath));
-        $this->assertFalse(file_exists($path));
+        $this->assertFileExists($targetPath);
+        $this->assertFileNotExists($sourcePath);
         $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
-       
+
+        @unlink($sourcePath);
         @unlink($targetPath);
         @rmdir($targetDir);
     }

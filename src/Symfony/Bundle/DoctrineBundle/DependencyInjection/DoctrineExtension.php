@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bundle\DoctrineAbstractBundle\DependencyInjection\AbstractDoctrineExtension;
 use Symfony\Component\Config\FileLocator;
@@ -59,16 +60,23 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('dbal.xml');
 
-        if (empty ($config['default_connection'])) {
+        if (empty($config['default_connection'])) {
             $keys = array_keys($config['connections']);
             $config['default_connection'] = reset($keys);
         }
+        $this->defaultConnection = $config['default_connection'];
 
-        $container->setAlias('database_connection', sprintf('doctrine.dbal.%s_connection', $config['default_connection']));
-        $container->setAlias('doctrine.dbal.event_manager', new Alias(sprintf('doctrine.dbal.%s_connection.event_manager', $config['default_connection']), false));
-        $container->setParameter('doctrine.dbal.default_connection', $config['default_connection']);
+        $container->setAlias('database_connection', sprintf('doctrine.dbal.%s_connection', $this->defaultConnection));
+        $container->setAlias('doctrine.dbal.event_manager', new Alias(sprintf('doctrine.dbal.%s_connection.event_manager', $this->defaultConnection), false));
 
         $container->getDefinition('doctrine.dbal.connection_factory')->replaceArgument(0, $config['types']);
+
+        $connections = array();
+        foreach (array_keys($config['connections']) as $name) {
+            $connections[$name] = sprintf('doctrine.dbal.%s_connection', $name);
+        }
+        $container->getDefinition('doctrine')->replaceArgument(1, $connections);
+        $container->getDefinition('doctrine')->replaceArgument(3, $this->defaultConnection);
 
         foreach ($config['connections'] as $name => $connection) {
             $this->loadDbalConnection($name, $connection, $container);
@@ -84,32 +92,24 @@ class DoctrineExtension extends AbstractDoctrineExtension
      */
     protected function loadDbalConnection($name, array $connection, ContainerBuilder $container)
     {
-        $containerDef = new Definition('%doctrine.dbal.configuration.class%');
-        $containerDef->setPublic(false);
+        // configuration
+        $configuration = $container->setDefinition(sprintf('doctrine.dbal.%s_connection.configuration', $name), new DefinitionDecorator('doctrine.dbal.connection.configuration'));
         if (isset($connection['logging']) && $connection['logging']) {
-            $containerDef->addMethodCall('setSQLLogger', array(new Reference('doctrine.dbal.logger')));
+            $configuration->addMethodCall('setSQLLogger', array(new Reference('doctrine.dbal.logger')));
             unset ($connection['logging']);
         }
-        $container->setDefinition(sprintf('doctrine.dbal.%s_connection.configuration', $name), $containerDef);
-
-        $driverDef = new Definition('Doctrine\DBAL\Connection');
-        $driverDef->setFactoryService('doctrine.dbal.connection_factory');
-        $driverDef->setFactoryMethod('createConnection');
-        $container->setDefinition(sprintf('doctrine.dbal.%s_connection', $name), $driverDef);
 
         // event manager
-        $eventManagerId = sprintf('doctrine.dbal.%s_connection.event_manager', $name);
-        $eventManagerDef = new Definition('%doctrine.dbal.event_manager.class%');
-        $eventManagerDef->setPublic(false);
-        $container->setDefinition($eventManagerId, $eventManagerDef);
+        $def = $container->setDefinition(sprintf('doctrine.dbal.%s_connection.event_manager', $name), new DefinitionDecorator('doctrine.dbal.connection.event_manager'));
 
+        // connection
         if (isset($connection['charset'])) {
-            if ( (isset($connection['driver']) && stripos($connection['driver'], 'mysql') !== false) ||
-                 (isset($connection['driverClass']) && stripos($connection['driverClass'], 'mysql') !== false)) {
+            if ((isset($connection['driver']) && stripos($connection['driver'], 'mysql') !== false) ||
+                 (isset($connection['driver_class']) && stripos($connection['driver_class'], 'mysql') !== false)) {
                 $mysqlSessionInit = new Definition('%doctrine.dbal.events.mysql_session_init.class%');
                 $mysqlSessionInit->setArguments(array($connection['charset']));
                 $mysqlSessionInit->setPublic(false);
-                $mysqlSessionInit->addTag(sprintf('doctrine.dbal.%s_event_subscriber', $name));
+                $mysqlSessionInit->addTag('doctrine.event_subscriber', array('connection' => $name));
 
                 $container->setDefinition(
                     sprintf('doctrine.dbal.%s_connection.events.mysqlsessioninit', $name),
@@ -119,16 +119,39 @@ class DoctrineExtension extends AbstractDoctrineExtension
             }
         }
 
-        if (isset($connection['platform_service'])) {
-            $connection['platform'] = new Reference($connection['platform_service']);
-            unset ($connection['platform_service']);
+        $options = $this->getConnectionOptions($connection);
+
+        $container
+            ->setDefinition(sprintf('doctrine.dbal.%s_connection', $name), new DefinitionDecorator('doctrine.dbal.connection'))
+            ->setArguments(array(
+                $options,
+                new Reference(sprintf('doctrine.dbal.%s_connection.configuration', $name)),
+                new Reference(sprintf('doctrine.dbal.%s_connection.event_manager', $name)),
+            ))
+        ;
+    }
+
+    protected function getConnectionOptions($connection)
+    {
+        $options = $connection;
+
+        if (isset($options['platform_service'])) {
+            $options['platform'] = new Reference($options['platform_service']);
+            unset($options['platform_service']);
         }
 
-        $driverDef->setArguments(array(
-            $connection,
-            new Reference(sprintf('doctrine.dbal.%s_connection.configuration', $name)),
-            new Reference(sprintf('doctrine.dbal.%s_connection.event_manager', $name))
-        ));
+        foreach (array(
+            'options' => 'driverOptions',
+            'driver_class' => 'driverClass',
+            'wrapper_class' => 'wrapperClass',
+        ) as $old => $new) {
+            if (isset($options[$old])) {
+                $options[$new] = $options[$old];
+                unset($options[$old]);
+            }
+        }
+
+        return $options;
     }
 
     /**
@@ -146,13 +169,19 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('orm.xml');
 
-        $entityManagers = array_keys($config['entity_managers']);
-
-        if (empty ($config['default_entity_manager'])) {
-            $config['default_entity_manager'] = reset($entityManagers);
+        $this->entityManagers = array();
+        foreach (array_keys($config['entity_managers']) as $name) {
+            $this->entityManagers[$name] = sprintf('doctrine.orm.%s_entity_manager', $name);
         }
+        $container->getDefinition('doctrine')->replaceArgument(2, $this->entityManagers);
 
-        $options = array('default_entity_manager', 'auto_generate_proxy_classes', 'proxy_dir', 'proxy_namespace');
+        if (empty($config['default_entity_manager'])) {
+            $tmp = array_keys($this->entityManagers);
+            $config['default_entity_manager'] = reset($tmp);
+        }
+        $container->getDefinition('doctrine')->replaceArgument(4, $config['default_entity_manager']);
+
+        $options = array('auto_generate_proxy_classes', 'proxy_dir', 'proxy_namespace');
         foreach ($options as $key) {
             $container->setParameter('doctrine.orm.'.$key, $config[$key]);
         }
@@ -163,8 +192,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
             $entityManager['name'] = $name;
             $this->loadOrmEntityManager($entityManager, $container);
         }
-
-        $container->setParameter('doctrine.orm.entity_managers', $entityManagers);
     }
 
     /**
@@ -175,62 +202,60 @@ class DoctrineExtension extends AbstractDoctrineExtension
      */
     protected function loadOrmEntityManager(array $entityManager, ContainerBuilder $container)
     {
-        $configServiceName = sprintf('doctrine.orm.%s_configuration', $entityManager['name']);
+        if ($entityManager['auto_mapping'] && count($this->entityManagers) > 1) {
+            throw new \LogicException('You cannot enable "auto_mapping" when several entity managers are defined.');
+        }
 
-        $ormConfigDef = new Definition('%doctrine.orm.configuration.class%');
-        $ormConfigDef->setPublic(false);
-        $container->setDefinition($configServiceName, $ormConfigDef);
+        $ormConfigDef = $container->setDefinition(sprintf('doctrine.orm.%s_configuration', $entityManager['name']), new DefinitionDecorator('doctrine.orm.configuration'));
 
         $this->loadOrmEntityManagerMappingInformation($entityManager, $ormConfigDef, $container);
         $this->loadOrmCacheDrivers($entityManager, $container);
 
-        $uniqueMethods = array(
-            'setMetadataCacheImpl'          => new Reference(sprintf('doctrine.orm.%s_metadata_cache', $entityManager['name'])),
-            'setQueryCacheImpl'             => new Reference(sprintf('doctrine.orm.%s_query_cache', $entityManager['name'])),
-            'setResultCacheImpl'            => new Reference(sprintf('doctrine.orm.%s_result_cache', $entityManager['name'])),
-            'setMetadataDriverImpl'         => new Reference('doctrine.orm.'.$entityManager['name'].'_metadata_driver'),
-            'setProxyDir'                   => '%doctrine.orm.proxy_dir%',
-            'setProxyNamespace'             => '%doctrine.orm.proxy_namespace%',
-            'setAutoGenerateProxyClasses'   => '%doctrine.orm.auto_generate_proxy_classes%',
-            'setClassMetadataFactoryName'   => $entityManager['class_metadata_factory_name'],
+        $methods = array(
+            'setMetadataCacheImpl'        => new Reference(sprintf('doctrine.orm.%s_metadata_cache', $entityManager['name'])),
+            'setQueryCacheImpl'           => new Reference(sprintf('doctrine.orm.%s_query_cache', $entityManager['name'])),
+            'setResultCacheImpl'          => new Reference(sprintf('doctrine.orm.%s_result_cache', $entityManager['name'])),
+            'setMetadataDriverImpl'       => new Reference('doctrine.orm.'.$entityManager['name'].'_metadata_driver'),
+            'setProxyDir'                 => '%doctrine.orm.proxy_dir%',
+            'setProxyNamespace'           => '%doctrine.orm.proxy_namespace%',
+            'setAutoGenerateProxyClasses' => '%doctrine.orm.auto_generate_proxy_classes%',
+            'setClassMetadataFactoryName' => $entityManager['class_metadata_factory_name'],
         );
-        foreach ($uniqueMethods as $method => $arg) {
+        foreach ($methods as $method => $arg) {
             $ormConfigDef->addMethodCall($method, array($arg));
         }
 
         foreach ($entityManager['hydrators'] as $name => $class) {
-            $ormConfigDef->addMethodCall('addCustomHydrationMode', array ($name, $class));
+            $ormConfigDef->addMethodCall('addCustomHydrationMode', array($name, $class));
         }
 
         if (!empty($entityManager['dql'])) {
             foreach ($entityManager['dql']['string_functions'] as $name => $function) {
-                $ormConfigDef->addMethodCall('addCustomStringFunction', array ($name, $function));
+                $ormConfigDef->addMethodCall('addCustomStringFunction', array($name, $function));
             }
             foreach ($entityManager['dql']['numeric_functions'] as $name => $function) {
-                $ormConfigDef->addMethodCall('addCustomNumericFunction', array ($name, $function));
+                $ormConfigDef->addMethodCall('addCustomNumericFunction', array($name, $function));
             }
             foreach ($entityManager['dql']['datetime_functions'] as $name => $function) {
-                $ormConfigDef->addMethodCall('addCustomDatetimeFunction', array ($name, $function));
+                $ormConfigDef->addMethodCall('addCustomDatetimeFunction', array($name, $function));
             }
         }
 
-        $entityManagerService = sprintf('doctrine.orm.%s_entity_manager', $entityManager['name']);
-        $connectionId = isset($entityManager['connection']) ? sprintf('doctrine.dbal.%s_connection', $entityManager['connection']) : 'database_connection';
-        $eventManagerID = isset($entityManager['connection']) ? sprintf('doctrine.dbal.%s_connection.event_manager', $entityManager['connection']) : 'doctrine.dbal.event_manager';
+        if (!isset($entityManager['connection'])) {
+            $entityManager['connection'] = $this->defaultConnection;
+        }
 
-        $ormEmArgs = array(
-            new Reference($connectionId),
-            new Reference(sprintf('doctrine.orm.%s_configuration', $entityManager['name']))
-        );
-        $ormEmDef = new Definition('%doctrine.orm.entity_manager.class%', $ormEmArgs);
-        $ormEmDef->setFactoryClass('%doctrine.orm.entity_manager.class%');
-        $ormEmDef->setFactoryMethod('create');
-        $ormEmDef->addTag('doctrine.orm.entity_manager');
-        $container->setDefinition($entityManagerService, $ormEmDef);
+        $container
+            ->setDefinition(sprintf('doctrine.orm.%s_entity_manager', $entityManager['name']), new DefinitionDecorator('doctrine.orm.entity_manager.abstract'))
+            ->setArguments(array(
+                new Reference(sprintf('doctrine.dbal.%s_connection', $entityManager['connection'])),
+                new Reference(sprintf('doctrine.orm.%s_configuration', $entityManager['name']))
+            ))
+        ;
 
         $container->setAlias(
             sprintf('doctrine.orm.%s_entity_manager.event_manager', $entityManager['name']),
-            new Alias($eventManagerID, false)
+            new Alias(sprintf('doctrine.dbal.%s_connection.event_manager', $entityManager['connection']), false)
         );
     }
 
@@ -280,7 +305,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
     protected function getObjectManagerElementName($name)
     {
-        return 'doctrine.orm.' . $name;
+        return 'doctrine.orm.'.$name;
     }
 
     protected function getMappingObjectDefaultName()
@@ -290,7 +315,12 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
     protected function getMappingResourceConfigDirectory()
     {
-        return 'Resources/config/doctrine/metadata/orm';
+        return 'Resources/config/doctrine';
+    }
+
+    protected function getMappingResourceExtension()
+    {
+        return 'orm';
     }
 
     /**
@@ -334,10 +364,10 @@ class DoctrineExtension extends AbstractDoctrineExtension
     {
         switch ($cacheDriver['type']) {
             case 'memcache':
-                $memcacheClass = !empty ($cacheDriver['class']) ? $cacheDriver['class'] : '%doctrine.orm.cache.memcache.class%';
-                $memcacheInstanceClass = !empty ($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%doctrine.orm.cache.memcache_instance.class%';
-                $memcacheHost = !empty ($cacheDriver['host']) ? $cacheDriver['host'] : '%doctrine.orm.cache.memcache_host%';
-                $memcachePort = !empty ($cacheDriver['port']) ? $cacheDriver['port'] : '%doctrine.orm.cache.memcache_port%';
+                $memcacheClass = !empty($cacheDriver['class']) ? $cacheDriver['class'] : '%doctrine.orm.cache.memcache.class%';
+                $memcacheInstanceClass = !empty($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%doctrine.orm.cache.memcache_instance.class%';
+                $memcacheHost = !empty($cacheDriver['host']) ? $cacheDriver['host'] : '%doctrine.orm.cache.memcache_host%';
+                $memcachePort = !empty($cacheDriver['port']) ? $cacheDriver['port'] : '%doctrine.orm.cache.memcache_port%';
                 $cacheDef = new Definition($memcacheClass);
                 $memcacheInstance = new Definition($memcacheInstanceClass);
                 $memcacheInstance->addMethodCall('connect', array(
@@ -352,7 +382,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 $cacheDef = new Definition('%'.sprintf('doctrine.orm.cache.%s.class', $cacheDriver['type']).'%');
                 break;
             default:
-                throw new \InvalidArgumentException(sprintf('%s is unrecognized cache driver.', $cacheDriver['type']));
+                throw new \InvalidArgumentException(sprintf('"%s" is an unrecognized Doctrine cache driver.', $cacheDriver['type']));
         }
 
         $cacheDef->setPublic(false);

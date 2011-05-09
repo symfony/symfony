@@ -147,7 +147,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     public function offsetUnset($name)
     {
-        throw new \BadMethodCallException('Not supported');
+        unset($this->children[$name]);
     }
 
     public function getIterator()

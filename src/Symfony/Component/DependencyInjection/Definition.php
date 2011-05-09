@@ -227,6 +227,22 @@ class Definition
     }
 
     /**
+     * Gets an argument to pass to the service constructor/factory method.
+     *
+     * @param integer $index
+     *
+     * @return mixed The argument value
+     */
+    public function getArgument($index)
+    {
+        if ($index < 0 || $index > count($this->arguments) - 1) {
+            throw new \OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, count($this->arguments) - 1));
+        }
+
+        return $this->arguments[$index];
+    }
+
+    /**
      * Sets the methods to call after service initialization.
      *
      * @param  array $calls An array of method calls

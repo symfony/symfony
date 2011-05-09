@@ -259,6 +259,9 @@ class XmlFileLoader extends FileLoader
         // resolve definitions
         krsort($definitions);
         foreach ($definitions as $id => $def) {
+            // anonymous services are always private
+            $def[0]['public'] = false;
+
             $this->parseDefinition($id, $def[0], $def[1]);
 
             $oNode = dom_import_simplexml($def[0]);

@@ -487,35 +487,17 @@ class File extends \SplFileInfo
     }
 
     /**
-     * Returns the size of this file.
-     *
-     * @return integer The file size in bytes
-     * 
-     * @throws FileException if an error occurs
-     */
-    public function getSize()
-    {
-        try {
-            $size = parent::getSize();
-        } catch (\RuntimeException $e) {
-            throw new FileException(sprintf('Could not read the file size of "%s"', $this->getPathname()), $e->getCode(), $e);
-        }
-        
-        return $size;
-    }
-
-    /**
      * Moves the file to a new location.
      *
      * @param string $directory The destination folder
      * @param string $name      The new file name
-     * 
+     *
      * @return File A File object representing the new file
-     * 
+     *
      * @throws FileException if the target file could not be created
      */
     public function move($directory, $name = null)
-    {        
+    {
         if (!is_dir($directory)) {
             if (false === @mkdir($directory, 0777, true)) {
                 throw new FileException(sprintf('Unable to create the "%s" directory', $directory));
@@ -523,16 +505,16 @@ class File extends \SplFileInfo
         } elseif (!is_writable($directory)) {
             throw new FileException(sprintf('Unable to write in the "%s" directory', $directory));
         }
-                                
+
         $target = $directory.DIRECTORY_SEPARATOR.(null === $name ? $this->getBasename() : basename($name));
-        
-        if (!@rename($this->getPathname(), $target)) {           
+
+        if (!@rename($this->getPathname(), $target)) {
             $error = error_get_last();
-            throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));            
+            throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
         }
 
         chmod($target, 0666);
-        
+
         return new File($target);
     }
 }

@@ -7,20 +7,14 @@
     <parameters>
         <parameter key="event_dispatcher.class">Symfony\Bundle\FrameworkBundle\ContainerAwareEventDispatcher</parameter>
         <parameter key="http_kernel.class">Symfony\Bundle\FrameworkBundle\HttpKernel</parameter>
-        <parameter key="error_handler.class">Symfony\Component\HttpKernel\Debug\ErrorHandler</parameter>
         <parameter key="filesystem.class">Symfony\Component\HttpKernel\Util\Filesystem</parameter>
         <parameter key="cache_warmer.class">Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate</parameter>
-        <parameter key="cache_warmer.autoloader_map.class">Symfony\Bundle\FrameworkBundle\CacheWarmer\ClassMapCacheWarmer</parameter>
         <parameter key="file_locator.class">Symfony\Component\HttpKernel\Config\FileLocator</parameter>
     </parameters>
 
     <services>
         <service id="event_dispatcher" class="%event_dispatcher.class%">
             <argument type="service" id="service_container" />
-        </service>
-
-        <service id="error_handler" class="%error_handler.class%">
-            <argument /> <!-- level (null by default) -->
         </service>
 
         <service id="http_kernel" class="%http_kernel.class%">
@@ -31,11 +25,6 @@
 
         <service id="cache_warmer" class="%cache_warmer.class%">
             <argument type="collection" />
-        </service>
-
-        <service id="cache_warmer.autoload_map" class="%cache_warmer.autoloader_map.class%" public="false">
-            <tag name="kernel.cache_warmer" />
-            <argument type="service" id="service_container" />
         </service>
 
         <!--

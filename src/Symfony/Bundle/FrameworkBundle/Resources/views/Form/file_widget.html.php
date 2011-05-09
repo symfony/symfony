@@ -8,4 +8,5 @@
 
     <?php echo $view['form']->widget($form['token']) ?>
     <?php echo $view['form']->widget($form['name']) ?>
+    <?php echo $view['form']->widget($form['originalName']) ?>
 </div>

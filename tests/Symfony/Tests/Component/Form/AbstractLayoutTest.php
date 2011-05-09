@@ -30,7 +30,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher = new EventDispatcher();
         $this->csrfProvider = $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface');
-        $storage = new \Symfony\Component\HttpFoundation\File\TemporaryStorage('foo', 1, \sys_get_temp_dir());
+        $storage = new \Symfony\Component\HttpFoundation\File\TemporaryStorage('foo', \sys_get_temp_dir());
 
         $this->factory = new FormFactory(array(
             new CoreExtension($storage),
@@ -188,6 +188,23 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         /following-sibling::li[.="[trans]Error 2[/trans]"]
     ]
     [count(./li)=2]
+'
+        );
+    }
+
+    public function testWidgetById()
+    {
+        $form = $this->factory->createNamed('text', 'text_id');
+        $html = $this->renderWidget($form->createView());
+
+        $this->assertMatchesXpath($html,
+'/div
+    [
+        ./input
+        [@type="text"]
+        [@id="text_id"]
+    ]
+    [@id="container"]
 '
         );
     }
@@ -463,19 +480,6 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testCsrfWithNonRootParent()
-    {
-        $form = $this->factory->createNamed('csrf', 'na&me', null, array(
-            'property_path' => 'name',
-        ));
-        $form->setParent($this->factory->create('form'));
-        $form->getParent()->setParent($this->factory->create('form'));
-
-        $html = $this->renderWidget($form->createView());
-
-        $this->assertEquals('', trim($html));
-    }
-
     public function testDateTime()
     {
         $form = $this->factory->createNamed('datetime', 'na&me', '2011-02-03 04:05:06', array(
@@ -647,8 +651,9 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         ./input[@type="file"][@id="na&me_file"]
         /following-sibling::input[@type="hidden"][@id="na&me_token"]
         /following-sibling::input[@type="hidden"][@id="na&me_name"]
+        /following-sibling::input[@type="hidden"][@id="na&me_originalName"]
     ]
-    [count(./input)=3]
+    [count(./input)=4]
 '
         );
     }

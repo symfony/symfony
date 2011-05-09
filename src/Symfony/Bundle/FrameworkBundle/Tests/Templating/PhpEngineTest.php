@@ -35,7 +35,7 @@ class PhpEngineTest extends TestCase
     {
         $container = new Container();
         $loader = $this->getMockForAbstractClass('Symfony\Component\Templating\Loader\Loader');
-        $engine = new PhpEngine(new TemplateNameParser(), $container, $loader, $app = new GlobalVariables($container));
+        $engine = new PhpEngine(new TemplateNameParser(), $container, $loader, new GlobalVariables($container));
 
         $container->set('request', null);
 

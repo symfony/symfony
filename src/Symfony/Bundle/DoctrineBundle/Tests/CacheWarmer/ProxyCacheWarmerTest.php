@@ -29,6 +29,11 @@ class ProxyCacheWarmerTest extends \Symfony\Bundle\DoctrineBundle\Tests\TestCase
             __DIR__ . "/../DependencyInjection/Fixtures/Bundles/AnnotationsBundle/Entity")
         );
 
+        $registry = $this->getMockBuilder('Symfony\Bundle\DoctrineBundle\Registry')->disableOriginalConstructor()->getMock();
+        $registry->expects($this->at(0))
+                  ->method('getEntityManagerNames')
+                  ->will($this->returnValue(array('default' => 'doctrine.orm.default_entity_manager', 'foo' => 'doctrine.orm.foo_entity_manager')));
+
         $container = $this->getMock('Symfony\Component\DependencyInjection\Container');
         $container->expects($this->at(0))
                   ->method('getParameter')
@@ -39,9 +44,9 @@ class ProxyCacheWarmerTest extends \Symfony\Bundle\DoctrineBundle\Tests\TestCase
                   ->with($this->equalTo('doctrine.orm.auto_generate_proxy_classes'))
                   ->will($this->returnValue(false));
         $container->expects($this->at(2))
-                  ->method('getParameter')
-                  ->with($this->equalTo('doctrine.orm.entity_managers'))
-                  ->will($this->returnValue(array('default', 'foo')));
+                  ->method('get')
+                  ->with($this->equalTo('doctrine'))
+                  ->will($this->returnValue($registry));
         $container->expects($this->at(3))
                   ->method('get')
                   ->with($this->equalTo('doctrine.orm.default_entity_manager'))

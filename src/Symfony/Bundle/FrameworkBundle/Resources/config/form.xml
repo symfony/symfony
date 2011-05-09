@@ -9,9 +9,7 @@
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
         <parameter key="form.type_guesser.validator.class">Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser</parameter>
         <parameter key="form.csrf_provider.class">Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider</parameter>
-
         <parameter key="file.temporary_storage.class">Symfony\Component\HttpFoundation\File\SessionBasedTemporaryStorage</parameter>
-        <parameter key="file.temporary_storage.secret">abcdef</parameter>
     </parameters>
 
     <services>
@@ -56,13 +54,13 @@
         <!-- CsrfProvider -->
         <service id="form.csrf_provider" class="%form.csrf_provider.class%">
             <argument type="service" id="session" />
-            <argument /> <!-- secret -->
+            <argument>%kernel.secret%</argument>
         </service>
 
         <!-- TemporaryStorage - where should we put this? -->
         <service id="file.temporary_storage" class="%file.temporary_storage.class%">
             <argument type="service" id="session" />
-            <argument>%file.temporary_storage.secret%</argument>
+            <argument>%kernel.secret%</argument>
             <argument>%kernel.cache_dir%/upload</argument>
         </service>
 
@@ -161,6 +159,8 @@
         </service>
         <service id="form.type_extension.csrf" class="Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension">
             <tag name="form.type_extension" alias="form" />
+            <argument /> <!-- enabled -->
+            <argument /> <!-- field_name -->
         </service>
     </services>
 </container>

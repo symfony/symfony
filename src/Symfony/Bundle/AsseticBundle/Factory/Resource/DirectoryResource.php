@@ -17,7 +17,7 @@ use Symfony\Component\Templating\Loader\LoaderInterface;
 /**
  * A directory resource that creates Symfony2 templating resources.
  *
- * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ * @author Kris Wallsmith <kris@symfony.com>
  */
 class DirectoryResource extends BaseDirectoryResource
 {

@@ -65,12 +65,12 @@ class EntityToIdTransformer implements DataTransformerInterface
             return null;
         }
 
-        if (!is_numeric($key)) {
+        if (count($this->choiceList->getIdentifier()) > 1 && !is_numeric($key)) {
             throw new UnexpectedTypeException($key, 'numeric');
         }
 
         if (!($entity = $this->choiceList->getEntity($key))) {
-            throw new TransformationFailedException('The entity with key "%s" could not be found', $key);
+            throw new TransformationFailedException(sprintf('The entity with key "%s" could not be found', $key));
         }
 
         return $entity;

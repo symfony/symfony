@@ -6,8 +6,8 @@ one. It only discusses changes that need to be done when using the "public"
 API of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.
 
-PR12 to beta1
--------------
+beta1 to beta2
+--------------
 
 * The `File` class has been refactored:
 
@@ -16,6 +16,147 @@ PR12 to beta1
   * `getExtension()` return the extension without the leading '.';
 
   * `move()` returns a new File instance to represent the moved file.
+
+* The ``error_handler`` setting has been removed. The ``ErrorHandler`` class
+  is now managed directly by Symfony SE in ``AppKernel``.
+
+* The Doctrine metadata files has moved from
+  ``Resources/config/doctrine/metadata/orm/`` to ``Resources/config/doctrine``
+  and the extension from ``.dcm.yml`` to ``.orm.yml``
+
+  Before:
+
+        Resources/config/doctrine/metadata/orm/Bundle.Entity.dcm.xml
+        Resources/config/doctrine/metadata/orm/Bundle.Entity.dcm.yml
+
+  After:
+
+        Resources/config/doctrine/Bundle.Entity.orm.xml
+        Resources/config/doctrine/Bundle.Entity.orm.yml
+
+* With the introduction of a new Doctrine Registry class, the following
+  parameters have been removed (replaced by methods on the `doctrine`
+  service):
+
+   * doctrine.orm.entity_managers
+   * doctrine.orm.default_entity_manager
+   * doctrine.dbal.default_connection
+
+  Before:
+
+        $container->getParameter('doctrine.orm.entity_managers')
+        $container->getParameter('doctrine.orm.default_entity_manager')
+        $container->getParameter('doctrine.orm.default_connection')
+
+  After:
+
+        $container->get('doctrine')->getEntityManagerNames()
+        $container->get('doctrine')->getDefaultEntityManagerName()
+        $container->get('doctrine')->getDefaultConnectionName()
+
+  But you don't really need to use these methods anymore, as to get an entity
+  manager, you can now use the registry directly:
+
+  Before:
+
+        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->get('doctrine.orm.foobar_entity_manager');
+
+  After:
+
+        $em = $this->get('doctrine')->getEntityManager();
+        $em = $this->get('doctrine')->getEntityManager('foobar');
+
+* The `doctrine:generate:entities` arguments and options changed. Run
+  `./app/console doctrine:generate:entities --help` for more information about
+  the new syntax.
+
+* The `doctrine:generate:repositories` command has been removed. The
+  functionality has been moved to the `doctrine:generate:entities`.
+
+* Doctrine event subscribers now use a unique "doctrine.event_subscriber" tag.
+  Doctrine event listeners also use a unique "doctrine.event_listener" tag. To
+  specify a connection, use the optional "connection" attribute.
+
+    Before:
+
+        listener:
+            class: MyEventListener
+            tags:
+                - { name: doctrine.common.event_listener, event: name }
+                - { name: doctrine.dbal.default_event_listener, event: name }
+        subscriber:
+            class: MyEventSubscriber
+            tags:
+                - { name: doctrine.common.event_subscriber }
+                - { name: doctrine.dbal.default_event_subscriber }
+
+    After:
+
+        listener:
+            class: MyEventListener
+            tags:
+                - { name: doctrine.event_listener, event: name }                      # register for all connections
+                - { name: doctrine.event_listener, event: name, connection: default } # only for the default connection
+        subscriber:
+            class: MyEventSubscriber
+            tags:
+                - { name: doctrine.event_subscriber }                      # register for all connections
+                - { name: doctrine.event_subscriber, connection: default } # only for the default connection
+
+* Application translations are now stored in the `Resources` directory:
+
+    Before:
+
+      app/translations/catalogue.fr.xml
+
+    After:
+
+      app/Resources/translations/catalogue.fr.xml
+
+* The option "modifiable" of the "collection" form type was split into two
+  options "allow_add" and "allow_delete".
+
+    Before:
+
+      $builder->add('tags', 'collection', array(
+          'type' => 'text',
+          'modifiable' => true,
+      ));
+
+    After:
+
+      $builder->add('tags', 'collection', array(
+          'type' => 'text',
+          'allow_add' => true,
+          'allow_delete' => true,
+      ));
+
+* Serializer: The NormalizerInterface's `supports()` method has been split in
+  two methods: `supportsNormalization` and `supportsDenormalization`.
+
+PR12 to beta1
+-------------
+
+* The CSRF secret configuration has been moved to a mandatory global `secret`
+  setting (as the secret is now used for everything and not just CSRF):
+
+    Before:
+
+        framework:
+            csrf_protection:
+                secret: S3cr3t
+
+    After:
+
+        framework:
+            secret: S3cr3t
+
+* The `File::getWebPath()` and `File::rename()` methods have been removed, as
+  well as the `framework.document_root` configuration setting.
+
+* The `File::getDefaultExtension()` method has been renamed to `File::guessExtension()`.
+  The renamed method now returns null if it cannot guess the extension.
 
 * The `session` configuration has been refactored:
 
@@ -83,11 +224,11 @@ PR11 to PR12
         <app:engine>twig</app:engine>
         <twig:extension>twig.extension.debug</twig:extension>
 
-* Fixes a critical security issue which allowed all users to switch to 
+* Fixes a critical security issue which allowed all users to switch to
   arbitrary accounts when the SwitchUserListener was activated. Configurations
   which do not use the SwitchUserListener are not affected.
 
-* The Dependency Injection Container now strongly validates the references of 
+* The Dependency Injection Container now strongly validates the references of
   all your services at the end of its compilation process. If you have invalid
   references this will result in a compile-time exception instead of a run-time
   exception (the previous behavior).

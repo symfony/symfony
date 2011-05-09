@@ -55,7 +55,15 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
     {
         $xml = simplexml_load_string($data);
         if (!$xml->count()) {
-            return (string) $xml;
+            if (!$xml->attributes()) {
+                return (string) $xml;
+            }
+            $data = array();
+            foreach ($xml->attributes() as $attrkey => $attr) {
+                $data['@'.$attrkey] = (string) $attr;
+            }
+            $data['#'] = (string) $xml;
+            return $data;
         }
         return $this->parseXml($xml);
     }
@@ -157,14 +165,14 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
     private function parseXml($node)
     {
         $data = array();
+        if ($node->attributes()) {
+            foreach ($node->attributes() as $attrkey => $attr) {
+                $data['@'.$attrkey] = (string) $attr;
+            }
+        }
         foreach ($node->children() as $key => $subnode) {
             if ($subnode->count()) {
                 $value = $this->parseXml($subnode);
-                if ($subnode->attributes()) {
-                    foreach ($subnode->attributes() as $attrkey => $attr) {
-                        $value['@'.$attrkey] = (string) $attr;
-                    }
-                }
             } elseif ($subnode->attributes()) {
                 $value = array();
                 foreach ($subnode->attributes() as $attrkey => $attr) {
@@ -216,14 +224,14 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
                     $append = $this->selectNodeType($parentNode, $data);
                 } elseif (is_array($data) && false === is_numeric($key)) {
                     /**
-                    * Is this array fully numeric keys?
-                    */
+                     * Is this array fully numeric keys?
+                     */
                     if (ctype_digit(implode('', array_keys($data)))) {
                         /**
-                        * Create nodes to append to $parentNode based on the $key of this array
-                        * Produces <xml><item>0</item><item>1</item></xml>
-                        * From array("item" => array(0,1));
-                        */
+                         * Create nodes to append to $parentNode based on the $key of this array
+                         * Produces <xml><item>0</item><item>1</item></xml>
+                         * From array("item" => array(0,1));
+                         */
                         foreach ($data as $subData) {
                             $append = $this->appendNode($parentNode, $subData, $key);
                         }

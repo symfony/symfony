@@ -5,15 +5,16 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="doctrine.dbal.default_connection">default</parameter>
+        <parameter key="doctrine.dbal.connection.class">Doctrine\DBAL\Connection</parameter>
         <parameter key="doctrine.dbal.logger.debug.class">Doctrine\DBAL\Logging\DebugStack</parameter>
         <parameter key="doctrine.dbal.logger.class">Symfony\Bundle\DoctrineBundle\Logger\DbalLogger</parameter>
         <parameter key="doctrine.dbal.configuration.class">Doctrine\DBAL\Configuration</parameter>
         <parameter key="doctrine.data_collector.class">Symfony\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector</parameter>
-        <parameter key="doctrine.dbal.event_manager.class">Doctrine\Common\EventManager</parameter>
+        <parameter key="doctrine.dbal.connection.event_manager.class">Doctrine\Common\EventManager</parameter>
         <parameter key="doctrine.dbal.connection_factory.class">Symfony\Bundle\DoctrineBundle\ConnectionFactory</parameter>
         <parameter key="doctrine.dbal.events.mysql_session_init.class">Doctrine\DBAL\Event\Listeners\MysqlSessionInit</parameter>
         <parameter key="doctrine.dbal.events.oracle_session_init.class">Doctrine\DBAL\Event\Listeners\OracleSessionInit</parameter>
+        <parameter key="doctrine.class">Symfony\Bundle\DoctrineBundle\Registry</parameter>
     </parameters>
 
     <services>
@@ -26,11 +27,26 @@
 
         <service id="data_collector.doctrine" class="%doctrine.data_collector.class%" public="false">
             <tag name="data_collector" template="DoctrineBundle:Collector:db" id="db" />
+            <argument type="service" id="doctrine" />
             <argument type="service" id="doctrine.dbal.logger" />
         </service>
 
         <service id="doctrine.dbal.connection_factory" class="%doctrine.dbal.connection_factory.class%">
             <argument /> <!-- Types -->
+        </service>
+
+        <service id="doctrine.dbal.connection" class="%doctrine.dbal.connection.class%" factory-service="doctrine.dbal.connection_factory" factory-method="createConnection" abstract="true" />
+
+        <service id="doctrine.dbal.connection.event_manager" class="%doctrine.dbal.connection.event_manager.class%" public="false" abstract="true" />
+
+        <service id="doctrine.dbal.connection.configuration" class="%doctrine.dbal.configuration.class%" public="false" abstract="true" />
+
+        <service id="doctrine" class="%doctrine.class%">
+            <argument type="service" id="service_container" />
+            <argument type="collection" /> <!-- connections -->
+            <argument type="collection" /> <!-- entity managers -->
+            <argument /> <!-- default connection name -->
+            <argument /> <!-- default entity manager name -->
         </service>
     </services>
 </container>

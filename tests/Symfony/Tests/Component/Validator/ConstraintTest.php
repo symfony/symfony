@@ -78,6 +78,11 @@ class ConstraintTest extends \PHPUnit_Framework_TestCase
         new ConstraintC();
     }
 
+    public function testRequiredOptionsPassed()
+    {
+        new ConstraintC(array('option1' => 'default'));
+    }
+
     public function testGroupsAreConvertedToArray()
     {
         $constraint = new ConstraintA(array('groups' => 'Foo'));

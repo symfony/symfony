@@ -29,11 +29,11 @@ class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
         
         //not executable PHP_PATH
         putenv('PHP_PATH=/not/executable/php');
-        $this->assertFalse($f->find(),'::find() returns false for not executable php');
+        $this->assertFalse($f->find(), '::find() returns false for not executable php');
         
         //executable PHP_PATH
         putenv('PHP_PATH='.$current); 
-        $this->assertEquals($f->find(),$current,'::find() returns the executable php');
+        $this->assertEquals($f->find(), $current, '::find() returns the executable php');
     }
 
     /**
@@ -48,7 +48,7 @@ class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
         $current = $f->find();
         
         //TODO maybe php executable is custom or even windows
-        $this->assertEquals($f->find(),PHP_BINDIR.DIRECTORY_SEPARATOR.'php','::find() returns the executable php with suffixes');
+        $this->assertEquals($f->find(), PHP_BINDIR.DIRECTORY_SEPARATOR.'php', '::find() returns the executable php with suffixes');
     }
     
     /**
@@ -67,10 +67,10 @@ class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
         
         //not executable PHP_PEAR_PHP_BIN
         putenv('PHP_PEAR_PHP_BIN=/not/executable/php');
-        $this->assertFalse($f->find(),'::find() returns false for not executable php');
+        $this->assertFalse($f->find(), '::find() returns false for not executable php');
         
         //executable PHP_PEAR_PHP_BIN
         putenv('PHP_PEAR_PHP_BIN='.$current); 
-        $this->assertEquals($f->find(),$current,'::find() returns the executable php');
+        $this->assertEquals($f->find(), $current, '::find() returns the executable php');
     }
 }

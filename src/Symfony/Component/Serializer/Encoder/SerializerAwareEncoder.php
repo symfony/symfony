@@ -30,12 +30,4 @@ abstract class SerializerAwareEncoder implements SerializerAwareInterface, Encod
     {
         $this->serializer = $serializer;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSerializer()
-    {
-        return $this->serializer;
-    }
 }

@@ -30,12 +30,4 @@ abstract class SerializerAwareNormalizer implements SerializerAwareInterface, No
     {
         $this->serializer = $serializer;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSerializer()
-    {
-        return $this->serializer;
-    }
 }

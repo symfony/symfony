@@ -17,6 +17,7 @@ class AssetFactoryTest extends \PHPUnit_Framework_TestCase
 {
     protected $kernel;
     protected $factory;
+    protected $container;
 
     protected function setUp()
     {
@@ -25,7 +26,8 @@ class AssetFactoryTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->kernel = $this->getMock('Symfony\\Component\\HttpKernel\\KernelInterface');
-        $this->factory = new AssetFactory($this->kernel, '/path/to/web');
+        $this->container = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerInterface');
+        $this->factory = new AssetFactory($this->kernel, $this->container, '/path/to/web');
     }
 
     public function testBundleNotation()

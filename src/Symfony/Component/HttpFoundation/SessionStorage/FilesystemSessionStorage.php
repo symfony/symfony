@@ -44,7 +44,7 @@ class FilesystemSessionStorage extends NativeSessionStorage
             $this->options['httponly']
         );
 
-        if (!ini_get('session.use_cookies') && $this->options['id'] && $this->options['id'] != session_id()) {
+        if (!ini_get('session.use_cookies') && isset($this->options['id']) && $this->options['id'] && $this->options['id'] != session_id()) {
             session_id($this->options['id']);
         }
 

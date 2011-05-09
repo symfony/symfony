@@ -64,8 +64,7 @@ EOT
         }
 
         if (!function_exists('symlink') && $input->getOption('symlink')) {
-            throw new \InvalidArgumentException('The symlink()-Function is not available on your system.'
-                    . ' You need to install the assets without the --symlink option.');
+            throw new \InvalidArgumentException('The symlink() function is not available on your system. You need to install the assets without the --symlink option.');
         }
 
         $filesystem = $this->container->get('filesystem');

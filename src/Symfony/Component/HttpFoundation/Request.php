@@ -121,13 +121,23 @@ class Request
     }
 
     /**
-     * Creates a new request with values from PHP's super globals.
+     * Creates a new request with values from PHP's super globals. Note that if the request method
+     * is PUT, then the php://input stream will also be processed for request values.
      *
      * @return Request A new request
      */
     static public function createFromGlobals()
     {
-        return new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
+        $content = null;
+        $request = array();
+        if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'PUT') {
+          $content = file_get_contents('php://input');
+          parse_str($content, $request);
+        }
+
+        $request = array_merge($request, $_POST);
+
+        return new static($_GET, $request, array(), $_COOKIE, $_FILES, $_SERVER, $content);
     }
 
     /**

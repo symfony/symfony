@@ -66,4 +66,18 @@ interface ParameterBagInterface
      * @return Boolean true if the parameter name is defined, false otherwise
      */
     function has($name);
+
+    /**
+     * Replaces parameter placeholders (%name%) by their values for all parameters.
+     */
+    public function resolve();
+
+    /**
+     * Replaces parameter placeholders (%name%) by their values.
+     *
+     * @param  mixed $value A value
+     *
+     * @throws NonExistentParameterException if a placeholder references a parameter that does not exist
+     */
+    public function resolveValue($value);
 }

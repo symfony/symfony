@@ -17,7 +17,6 @@ class GenerateLookupMethodClassesPassTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->container = new ContainerBuilder();
-        $this->container->setParameter('kernel.cache_dir', sys_get_temp_dir());
     }
 
     protected function tearDown()
@@ -56,7 +55,7 @@ class GenerateLookupMethodClassesPassTest extends \PHPUnit_Framework_TestCase
 
     private function process()
     {
-        $pass = new GenerateLookupMethodClassesPass();
+        $pass = new GenerateLookupMethodClassesPass($this->dir);
         $pass->process($this->container);
     }
 }

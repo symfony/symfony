@@ -17,12 +17,18 @@ class GenerateLookupMethodClassesPass implements CompilerPassInterface
     private $generatedClasses = array();
     private $container;
     private $currentId;
+    private $cacheDir;
+
+    public function __construct($cacheDir)
+    {
+        $this->cacheDir = $cacheDir;
+    }
 
     public function process(ContainerBuilder $container)
     {
         $this->container = $container;
         $this->generatedClasses = array();
-        $this->cleanUpCacheDir($cacheDir = $container->getParameter('kernel.cache_dir').'/lookup_method_classes');
+        $this->cleanUpCacheDir($this->cacheDir);
 
         foreach ($container->getDefinitions() as $id => $definition) {
             if ($definition->isSynthetic() || $definition->isAbstract()) {
@@ -33,7 +39,7 @@ class GenerateLookupMethodClassesPass implements CompilerPassInterface
             }
 
             $this->currentId = $id;
-            $this->generateClass($definition, $cacheDir);
+            $this->generateClass($definition, $this->cacheDir);
         }
     }
 

@@ -459,6 +459,10 @@ class PhpDumper extends Dumper
         $this->referenceVariables = array();
         $this->variableCount = 0;
 
+        if ($definition->getLookupMethods()) {
+            throw new \RuntimeException(sprintf('You have set lookup methods for service "%s", but the GenerateLookupMethodClassesPass was not enabled.', $id));
+        }
+
         $return = '';
         if ($definition->isSynthetic()) {
             $return = sprintf('@throws \RuntimeException always since this service is expected to be injected dynamically');

@@ -27,6 +27,7 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 use Symfony\Component\HttpKernel\DependencyInjection\AddClassesToCachePass;
+use Symfony\Component\DependencyInjection\Compiler\GenerateLookupMethodClassesPass;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension as DIExtension;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
@@ -577,8 +578,15 @@ abstract class Kernel implements KernelInterface
         }
         $container->addObjectResource($this);
 
+        $passConfig = $container->getCompilerPassConfig();
+
         // ensure these extensions are implicitly loaded
-        $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($extensions));
+        $passConfig->setMergePass(new MergeExtensionConfigurationPass($extensions));
+
+        // enable method injection
+        $passes = $passConfig->getRemovingPasses();
+        array_unshift($passes, new GenerateLookupMethodClassesPass($this->getCacheDir().'/lookup_method_classes'));
+        $passConfig->setRemovingPasses($passes);
 
         if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
             $container->merge($cont);

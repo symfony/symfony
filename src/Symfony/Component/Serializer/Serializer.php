@@ -32,6 +32,7 @@ class Serializer implements SerializerInterface
 {
     private $normalizers = array();
     private $encoders = array();
+    private $decoders = array();
     protected $normalizerCache = array();
     protected $denormalizerCache = array();
 
@@ -149,9 +150,9 @@ class Serializer implements SerializerInterface
     public function decode($data, $format)
     {
         if (!$this->hasDecoder($format)) {
-            throw new \UnexpectedValueException('No encoder registered can decode the '.$format.' format');
+            throw new \UnexpectedValueException('No decoder registered for the '.$format.' format');
         }
-        return $this->encoders[$format]->decode($data, $format);
+        return $this->decoders[$format]->decode($data, $format);
     }
 
     /**
@@ -195,6 +196,17 @@ class Serializer implements SerializerInterface
     /**
      * {@inheritdoc}
      */
+    public function setDecoder($format, DecoderInterface $decoder)
+    {
+        $this->decoders[$format] = $decoder;
+        if ($decoder instanceof SerializerAwareInterface) {
+            $decoder->setSerializer($this);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getEncoders()
     {
         return $this->encoders;
@@ -203,9 +215,25 @@ class Serializer implements SerializerInterface
     /**
      * {@inheritdoc}
      */
+    public function getDecoders()
+    {
+        return $this->decoders;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getEncoder($format)
     {
         return $this->encoders[$format];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDecoder($format)
+    {
+        return $this->decoders[$format];
     }
 
     /**
@@ -221,7 +249,7 @@ class Serializer implements SerializerInterface
      */
     public function hasDecoder($format)
     {
-        return isset($this->encoders[$format]) && $this->encoders[$format] instanceof DecoderInterface;
+        return isset($this->decoders[$format]);
     }
 
     /**
@@ -230,5 +258,13 @@ class Serializer implements SerializerInterface
     public function removeEncoder($format)
     {
         unset($this->encoders[$format]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeDecoder($format)
+    {
+        unset($this->decoders[$format]);
     }
 }

@@ -56,6 +56,7 @@ class PassConfig
         );
 
         $this->removingPasses = array(
+            new GenerateLookupMethodClassesPass(),
             new RemovePrivateAliasesPass(),
             new RemoveAbstractDefinitionsPass(),
             new ReplaceAliasByActualDefinitionPass(),

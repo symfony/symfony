@@ -78,7 +78,7 @@ namespace Symfony\Component\DependencyInjection\LookupMethodClasses;
  * You can modify this class by changing your "lookup_method" configuration
  * for service "%s".
  */
-class %s extends %s
+class %s extends \%s
 {
     private $__symfonyDependencyInjectionContainer;
 %s
@@ -157,7 +157,7 @@ EOF;
                 $this->container->getDefinition($id)->setPublic(true);
             }
 
-            return '$this->__symfonyDependencyInjectionContainer->get('.var_export($id, true).', '.var_export($value->getInvalidBehavior(), true).');';
+            return '$this->__symfonyDependencyInjectionContainer->get('.var_export($id, true).', '.var_export($value->getInvalidBehavior(), true).')';
         } else if (is_array($value) || is_scalar($value) || null === $value) {
             return var_export($value, true);
         }

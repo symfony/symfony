@@ -22,6 +22,13 @@ class FormFactory implements FormFactoryInterface
 
     private $guesser;
 
+    /**
+     * Constructor.
+     *
+     * @param array $extensions An array of FormExtensionInterface
+     *
+     * @throws UnexpectedTypeException if any extension does not implement FormExtensionInterface
+     */
     public function __construct(array $extensions)
     {
         foreach ($extensions as $extension) {

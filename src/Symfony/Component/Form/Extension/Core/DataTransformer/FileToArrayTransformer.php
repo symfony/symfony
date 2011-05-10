@@ -21,23 +21,38 @@ use Symfony\Component\HttpFoundation\File\File;
  */
 class FileToArrayTransformer implements DataTransformerInterface
 {
+    /**
+     * Convert a File instance to a file representation
+     *
+     * @param File $file The file
+     *
+     * @return array The file representation
+     *
+     * @throws UnexpectedTypeException if the file is not an instance of File
+     */
     public function transform($file)
     {
         if (null === $file || '' === $file) {
-            return array(
-                'file' => '',
-            );
+            return array('file' => '');
         }
 
         if (!$file instanceof File) {
             throw new UnexpectedTypeException($file, 'Symfony\Component\HttpFoundation\File\File');
         }
 
-        return array(
-            'file' => $file,
-        );
+        return array('file' => $file);
     }
 
+    /**
+     * Transfom a file internal representation to a File instance
+     *
+     * @param File $array the file representation
+     *
+     * @return File The file
+     *
+     * @throws UnexpectedTypeException if the file representation is not an array
+     * @throws TransformationFailedException if the file representation is invalid
+     */
     public function reverseTransform($array)
     {
         if (null === $array || '' === $array || array() === $array) {

@@ -217,9 +217,16 @@ class FormBuilder
         return $this;
     }
 
+    /**
+     * Clears the client transformers.
+     *
+     * @return FormBuilder The current builder
+     */
     public function resetClientTransformers()
     {
         $this->clientTransformers = array();
+
+        return $this;
     }
 
     public function getClientTransformers()
@@ -390,12 +397,16 @@ class FormBuilder
      * Removes the field with the given name.
      *
      * @param string $name
+     *
+     * @return FormBuilder The current builder
      */
     public function remove($name)
     {
         if (isset($this->children[$name])) {
             unset($this->children[$name]);
         }
+
+        return $this;
     }
 
     /**

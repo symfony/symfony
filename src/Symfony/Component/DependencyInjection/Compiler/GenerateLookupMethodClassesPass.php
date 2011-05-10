@@ -2,6 +2,8 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Parameter;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -9,9 +11,12 @@ use Symfony\Component\DependencyInjection\Reference;
 class GenerateLookupMethodClassesPass implements CompilerPassInterface
 {
     private $generatedClasses = array();
+    private $container;
+    private $currentId;
 
     public function process(ContainerBuilder $container)
     {
+        $this->container = $container;
         $this->generatedClasses = array();
         $this->cleanUpCacheDir($cacheDir = $container->getParameter('kernel.cache_dir').'/lookup_method_classes');
 
@@ -23,7 +28,8 @@ class GenerateLookupMethodClassesPass implements CompilerPassInterface
                 continue;
             }
 
-            $this->generateClass($id, $definition, $cacheDir);
+            $this->currentId = $id;
+            $this->generateClass($definition, $cacheDir);
         }
     }
 
@@ -52,7 +58,7 @@ class GenerateLookupMethodClassesPass implements CompilerPassInterface
         }
     }
 
-    private function generateClass($id, Definition $definition, $cacheDir)
+    private function generateClass(Definition $definition, $cacheDir)
     {
         $code = <<<'EOF'
 <?php
@@ -122,15 +128,36 @@ EOF;
             $lookupMethods .= sprintf($lookupMethod,
                 $method->isPublic() ? 'public' : 'protected',
                 $name,
-                'foo' // FIXME: refactor PhpDumper::dumpValue code
+                $this->dumpValue($value)
             );
         }
 
-        $code = sprintf($code, $require, $id, $className, $class->getName(), $lookupMethods);
+        $code = sprintf($code, $require, $this->currentId, $className, $class->getName(), $lookupMethods);
         file_put_contents($cacheDir.'/'.$className.'.php', $code);
         require_once $cacheDir.'/'.$className.'.php';
         $definition->setClass('Symfony\Component\DependencyInjection\LookupMethodClasses\\'.$className);
         $definition->setFile($cacheDir.'/'.$className.'.php');
         $definition->setProperty('__symfonyDependencyInjectionContainer', new Reference('service_container'));
+        $definition->setLookupMethods(array());
+    }
+
+    private function dumpValue($value)
+    {
+        if ($value instanceof Parameter) {
+            return var_export($this->container->getParameter((string) $value), true);
+        } else if ($value instanceof Reference) {
+            $id = (string) $value;
+            if ($this->container->hasAlias($id)) {
+                $this->container->setAlias($id, (string) $this->container->getAlias());
+            } else if ($this->container->hasDefinition($id)) {
+                $this->container->getDefinition($id)->setPublic(true);
+            }
+
+            return '$this->__symfonyDependencyInjectionContainer->get('.var_export($id, true).', '.var_export($value->getInvalidBehavior(), true).');';
+        } else if (is_array($value) || is_scalar($value) || null === $value) {
+            return var_export($value, true);
+        }
+
+        throw new \RuntimeException(sprintf('Invalid value for lookup method of service "%s": %s', $this->currentId, json_encode($value)));
     }
 }

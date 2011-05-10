@@ -13,10 +13,49 @@ namespace Symfony\Component\Form;
 
 interface FormTypeInterface
 {
+    /**
+     * Builds the form.
+     *
+     * This method gets called for each type in the hierarchy starting form the
+     * top most type.
+     * Type extensions can further modify the form.
+     *
+     * @see FormTypeExtensionInterface::buildForm()
+     *
+     * @param FormBuilder   $builder The form builder
+     * @param array         $options The options
+     */
     function buildForm(FormBuilder $builder, array $options);
 
+    /**
+     * Builds the form view.
+     *
+     * This method gets called for each type in the hierarchy starting form the
+     * top most type.
+     * Type extensions can further modify the view.
+     *
+     * @see FormTypeExtensionInterface::buildView()
+     *
+     * @param FormView      $view The view
+     * @param FormInterface $form The form
+     */
     function buildView(FormView $view, FormInterface $form);
 
+    /**
+     * Builds the form view.
+     *
+     * This method gets called for each type in the hierarchy starting form the
+     * top most type.
+     * Type extensions can further modify the view.
+     *
+     * Children views have been built when this method gets called so you get
+     * a chance to modify them.
+     *
+     * @see FormTypeExtensionInterface::buildViewBottomUp()
+     *
+     * @param FormView      $view The view
+     * @param FormInterface $form The form
+     */
     function buildViewBottomUp(FormView $view, FormInterface $form);
 
     function createBuilder($name, FormFactoryInterface $factory, array $options);
@@ -35,7 +74,7 @@ interface FormTypeInterface
      *
      * @param array $options
      *
-     * @return string The name of the parent type
+     * @return string|null The name of the parent type if any otherwise null
      */
     function getParent(array $options);
 

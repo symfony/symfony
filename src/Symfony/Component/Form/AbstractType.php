@@ -15,20 +15,75 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 abstract class AbstractType implements FormTypeInterface
 {
+    /**
+     * The extensions for this type
+     * @var array An array of FormTypeExtensionInterface instances
+     */
     private $extensions = array();
 
+    /**
+     * Builds the form.
+     *
+     * This method gets called for each type in the hierarchy starting form the
+     * top most type.
+     * Type extensions can further modify the form.
+     *
+     * @see FormTypeExtensionInterface::buildForm()
+     *
+     * @param FormBuilder   $builder The form builder
+     * @param array         $options The options
+     */
     public function buildForm(FormBuilder $builder, array $options)
     {
     }
 
+    /**
+     * Builds the form view.
+     *
+     * This method gets called for each type in the hierarchy starting form the
+     * top most type.
+     * Type extensions can further modify the view.
+     *
+     * @see FormTypeExtensionInterface::buildView()
+     *
+     * @param FormView      $view The view
+     * @param FormInterface $form The form
+     */
     public function buildView(FormView $view, FormInterface $form)
     {
     }
 
+    /**
+     * Builds the form view.
+     *
+     * This method gets called for each type in the hierarchy starting form the
+     * top most type.
+     * Type extensions can further modify the view.
+     *
+     * Children views have been built while this method gets called so you get
+     * a chance to modify them.
+     *
+     * @see FormTypeExtensionInterface::buildViewBottomUp()
+     *
+     * @param FormView      $view The view
+     * @param FormInterface $form The form
+     */
     public function buildViewBottomUp(FormView $view, FormInterface $form)
     {
     }
 
+    /**
+     * Returns a builder for the current type.
+     *
+     * The builder is retrieved by going up in the type hierarchy when a type does
+     * not provide one.
+     *
+     * @param string                $name       The name of the builder
+     * @param FormFactoryInterface  $factory    The form factory
+     * @param array                 $options    The options
+     *
+     * @return FormBuilder|null A form builder or null when the type does not have a builder
+     */
     public function createBuilder($name, FormFactoryInterface $factory, array $options)
     {
         return null;
@@ -51,7 +106,7 @@ abstract class AbstractType implements FormTypeInterface
      *
      * @param array $options
      *
-     * @return string The name of the parent type
+     * @return string|null The name of the parent type if any otherwise null
      */
     public function getParent(array $options)
     {
@@ -60,6 +115,8 @@ abstract class AbstractType implements FormTypeInterface
 
     /**
      * Returns the name of this type.
+     *
+     * The default name type is the class name without the Form nor Type suffix
      *
      * @return string The name of this type
      */

@@ -70,7 +70,7 @@ interface ParameterBagInterface
     /**
      * Replaces parameter placeholders (%name%) by their values for all parameters.
      */
-    public function resolve();
+    function resolve();
 
     /**
      * Replaces parameter placeholders (%name%) by their values.
@@ -79,5 +79,5 @@ interface ParameterBagInterface
      *
      * @throws NonExistentParameterException if a placeholder references a parameter that does not exist
      */
-    public function resolveValue($value);
+    function resolveValue($value);
 }

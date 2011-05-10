@@ -17,6 +17,13 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class ArrayToChoicesTransformer implements DataTransformerInterface
 {
+    /**
+     * @param array $array
+     *
+     * @return array
+     *
+     * @throws UnexpectedTypeException if the given value is not an array
+     */
     public function transform($array)
     {
         if (null === $array) {
@@ -30,6 +37,13 @@ class ArrayToChoicesTransformer implements DataTransformerInterface
         return FormUtil::toArrayKeys($array);
     }
 
+    /**
+     * @param array $array
+     *
+     * @return array
+     *
+     * @throws UnexpectedTypeException if the given value is not an array
+     */
     public function reverseTransform($array)
     {
         if (null === $array) {

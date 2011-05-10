@@ -73,7 +73,7 @@ class ParameterBag
     /**
      * Returns a parameter by name.
      *
-     * @param string  $key     The key
+     * @param string  $path    The key
      * @param mixed   $default The default value
      * @param boolean $deep
      */

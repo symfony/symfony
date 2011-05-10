@@ -91,7 +91,10 @@ class DialogHelper extends Helper
             $value = $this->ask($output, $question, null);
 
             try {
-                return $validator($value);
+                $validatorResult = $validator($value);
+                if(false !== $validatorResult) {
+                    return $validatorResult;
+                }    
             } catch (\Exception $error) {
             }
         }

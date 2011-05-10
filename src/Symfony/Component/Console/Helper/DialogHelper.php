@@ -92,7 +92,7 @@ class DialogHelper extends Helper
 
             try {
                 $validatorResult = $validator($value);
-                if(false !== $validatorResult) {
+                if (false !== $validatorResult) {
                     return $validatorResult;
                 }    
             } catch (\Exception $error) {

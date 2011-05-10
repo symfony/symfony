@@ -52,11 +52,11 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         }
 
         if (!in_array($dateFormat, self::$formats, true)) {
-            throw new \InvalidArgumentException(sprintf('The value $dateFormat is expected to be one of "%s". Is "%s"', implode('", "', self::$formats), $dateFormat));
+            throw new UnexpectedTypeException($dateFormat, implode('", "', self::$formats));
         }
 
         if (!in_array($timeFormat, self::$formats, true)) {
-            throw new \InvalidArgumentException(sprintf('The value $timeFormat is expected to be one of "%s". Is "%s"', implode('", "', self::$formats), $timeFormat));
+            throw new UnexpectedTypeException($timeFormat, implode('", "', self::$formats));
         }
 
         $this->dateFormat = $dateFormat;
@@ -106,6 +106,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @throws UnexpectedTypeException if the given value is not a string
      * @throws TransformationFailedException if the date could not be parsed
+     * @throws TransformationFailedException if the input timezone is not supported
      */
     public function reverseTransform($value)
     {
@@ -127,7 +128,11 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         $dateTime = new \DateTime(sprintf('@%s UTC', $timestamp));
 
         if ('UTC' !== $this->inputTimezone) {
-            $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
+            try {
+                $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
+            } catch (\Exception $e) {
+                throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
+            }
         }
 
         return $dateTime;

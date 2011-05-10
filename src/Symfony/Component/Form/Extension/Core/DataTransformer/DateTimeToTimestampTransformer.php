@@ -30,6 +30,7 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
      * @return integer          A timestamp
      *
      * @throws UnexpectedTypeException if the given value is not an instance of \DateTime
+     * @throws TransformationFailedException if the output timezone is not supported
      */
     public function transform($value)
     {
@@ -41,7 +42,11 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
             throw new UnexpectedTypeException($value, '\DateTime');
         }
 
-        $value->setTimezone(new \DateTimeZone($this->outputTimezone));
+        try {
+            $value->setTimezone(new \DateTimeZone($this->outputTimezone));
+        } catch (\Exception $e) {
+            throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
+        }
 
         return (int) $value->format('U');
     }
@@ -72,10 +77,10 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
             if ($this->inputTimezone !== $this->outputTimezone) {
                 $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
             }
-
-            return $dateTime;
         } catch (\Exception $e) {
-            throw new TransformationFailedException('Invalid timestamp format.', $e->getCode(), $e);
+            throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
         }
+
+        return $dateTime;
     }
 }

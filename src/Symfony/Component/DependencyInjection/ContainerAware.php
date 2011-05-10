@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 /**
  * A simple implementation of ContainerAwareInterface.
  *

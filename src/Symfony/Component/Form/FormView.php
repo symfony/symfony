@@ -17,7 +17,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 {
     private $vars = array(
         'value' => null,
-        'attr' => array(),
+        'attr'  => array(),
     );
 
     private $parent;
@@ -56,6 +56,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * @param $name
      * @param $default
+     *
      * @return mixed
      */
     public function get($name, $default = null)
@@ -85,71 +86,144 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
         return $this->all();
     }
 
+    /**
+     * Sets the value for an attribute.
+     *
+     * @param string $name  The name of the attribute
+     * @param string $value The value
+     */
     public function setAttribute($name, $value)
     {
         $this->vars['attr'][$name] = $value;
     }
 
+    /**
+     * Returns whether the attached form is rendered.
+     *
+     * @return Boolean Whether the form is rendered
+     */
     public function isRendered()
     {
         return $this->rendered;
     }
 
+    /**
+     * Marks the attached form as rendered
+     */
     public function setRendered()
     {
         $this->rendered = true;
     }
 
-    public function setParent(self $parent)
+    /**
+     * Sets the parent view.
+     *
+     * @param FormView $parent The parent view
+     */
+    public function setParent(self $parent = null)
     {
         $this->parent = $parent;
     }
 
+    /**
+     * Returns the parent view.
+     *
+     * @return FormView The parent view
+     */
     public function getParent()
     {
         return $this->parent;
     }
 
+    /**
+     * Retuns whether this view has a parent.
+     *
+     * @return Boolean Whether this view has a parent
+     */
     public function hasParent()
     {
         return null !== $this->parent;
     }
 
+    /**
+     * Sets the children view.
+     *
+     * @param array $children The children as instances of FormView
+     */
     public function setChildren(array $children)
     {
         $this->children = $children;
     }
 
+    /**
+     * Returns the children.
+     *
+     * @return array The children as instances of FormView
+     */
     public function getChildren()
     {
         return $this->children;
     }
 
+    /**
+     * Returns wether this view has children.
+     *
+     * @return Boolean Whether this view has children
+     */
     public function hasChildren()
     {
         return count($this->children) > 0;
     }
 
+    /**
+     * Returns a child by name (implements \ArrayAccess).
+     *
+     * @param string $name The child name
+     *
+     * @return FormView The child view
+     */
     public function offsetGet($name)
     {
         return $this->children[$name];
     }
 
+    /**
+     * Returns whether the given child exists (implements \ArrayAccess).
+     *
+     * @param string $name The child name
+     *
+     * @return Boolean Whether the child view exists
+     */
     public function offsetExists($name)
     {
         return isset($this->children[$name]);
     }
 
+    /**
+     * Implements \ArrayAccess.
+     *
+     * @throws \BadMethodCallException always as setting a child by name is not allowed
+     */
     public function offsetSet($name, $value)
     {
         throw new \BadMethodCallException('Not supported');
     }
 
+    /**
+     * Removes a child (implements \ArrayAccess).
+     *
+     * @param string $name The child name
+     */
     public function offsetUnset($name)
     {
         unset($this->children[$name]);
     }
 
+    /**
+     * Returns an iterator to iterate over children (implements \IteratorAggregate)
+     *
+     * @return \ArrayIterator The iterator
+     */
     public function getIterator()
     {
         if (count($this->children)) {
@@ -159,11 +233,25 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
         return new \ArrayIterator($this->children);
     }
 
+    /**
+     * Returns whether the given choice is a group.
+     *
+     * @param mixed $choice A choice
+     *
+     * @return Boolean Whether the choice is a group
+     */
     public function isChoiceGroup($choice)
     {
         return is_array($choice) || $choice instanceof \Traversable;
     }
 
+    /**
+     * Returns whether the given choice is selected.
+     *
+     * @param mixed $choice The choice
+     *
+     * @return Boolean Whether the choice is selected
+     */
     public function isChoiceSelected($choice)
     {
         $choice = FormUtil::toArrayKey($choice);
@@ -178,8 +266,9 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * @see Countable
-     * @return integer
+     * Implements \Countable.
+     *
+     * @return integer The number of children views
      */
     public function count()
     {

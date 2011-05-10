@@ -24,6 +24,17 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
 {
     private $format;
 
+    /**
+     * Transforms a \DateTime instance to a string
+     *
+     * @see \DateTime::format() for supported formats
+     *
+     * @param string $inputTimezone  The name of the input timezone
+     * @param string $outputTimezone The name of the output timezone
+     * @param string $format         The date format
+     *
+     * @throws UnexpectedTypeException if a timezone is not a string
+     */
     public function __construct($inputTimezone = null, $outputTimezone = null, $format = 'Y-m-d H:i:s')
     {
         parent::__construct($inputTimezone, $outputTimezone);
@@ -36,7 +47,10 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      * and timezone
      *
      * @param  DateTime $value  A DateTime object
+     *
      * @return string           A value as produced by PHP's date() function
+     *
+     * @throws UnexpectedTypeException if the given value is not a \DateTime instance
      */
     public function transform($value)
     {
@@ -54,10 +68,14 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
     }
 
     /**
-     * Transforms a date string in the configured timezone into a DateTime object
+     * Transforms a date string in the configured timezone into a DateTime object.
      *
      * @param  string $value  A value as produced by PHP's date() function
-     * @return DateTime       A DateTime object
+     *
+     * @return \DateTime      An instance of \DateTime
+     *
+     * @throws UnexpectedTypeException if the given value is not a string
+     * @throws TransformationFailedException if the date could not be parsed
      */
     public function reverseTransform($value)
     {
@@ -69,19 +87,16 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        $outputTimezone = $this->outputTimezone;
-        $inputTimezone = $this->inputTimezone;
-
         try {
-            $dateTime = new \DateTime("$value $outputTimezone");
+            $dateTime = new \DateTime(sprintf("%s %s", $value, $this->outputTimezone));
 
-            if ($inputTimezone != $outputTimezone) {
-                $dateTime->setTimeZone(new \DateTimeZone($inputTimezone));
+            if ($this->inputTimezone !== $this->outputTimezone) {
+                $dateTime->setTimeZone(new \DateTimeZone($this->inputTimezone));
             }
 
             return $dateTime;
         } catch (\Exception $e) {
-            throw new TransformationFailedException('Expected a valid date string. ' . $e->getMessage(), 0, $e);
+            throw new TransformationFailedException('Invalid date format.', $e->getCode(), $e);
         }
     }
 }

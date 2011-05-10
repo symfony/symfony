@@ -34,16 +34,35 @@ abstract class AbstractType implements FormTypeInterface
         return null;
     }
 
+    /**
+     * Returns the default options for this type.
+     *
+     * @param array $options
+     *
+     * @return array The default options
+     */
     public function getDefaultOptions(array $options)
     {
         return array();
     }
 
+    /**
+     * Returns the name of the parent type.
+     *
+     * @param array $options
+     *
+     * @return string The name of the parent type
+     */
     public function getParent(array $options)
     {
         return 'form';
     }
 
+    /**
+     * Returns the name of this type.
+     *
+     * @return string The name of this type
+     */
     public function getName()
     {
         preg_match('/\\\\(\w+?)(Form)?(Type)?$/i', get_class($this), $matches);
@@ -51,6 +70,13 @@ abstract class AbstractType implements FormTypeInterface
         return strtolower($matches[1]);
     }
 
+    /**
+     * Adds extensions for this type.
+     *
+     * @param array $extensions An array of FormTypeExtensionInterface
+     *
+     * @throws UnexpectedTypeException if any extension does not implement FormTypeExtensionInterface
+     */
     public function setExtensions(array $extensions)
     {
         foreach ($extensions as $extension) {
@@ -62,6 +88,11 @@ abstract class AbstractType implements FormTypeInterface
         $this->extensions = $extensions;
     }
 
+    /**
+     * Returns the extensions associated with this type.
+     *
+     * @return array An array of FormTypeExtensionInterface
+     */
     public function getExtensions()
     {
         return $this->extensions;

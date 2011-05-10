@@ -27,6 +27,13 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
         $this->keys = $keys;
     }
 
+    /**
+     * Duplicates the given value through the array.
+     *
+     * @param mixed $value The value
+     *
+     * @return array The array
+     */
     public function transform($value)
     {
         $result = array();
@@ -38,9 +45,19 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
         return $result;
     }
 
+    /**
+     * Extracts the duplicated value from an array.
+     *
+     * @param array $array
+     *
+     * @return mixed The value
+     *
+     * @throws UnexpectedTypeException if the given value is not an array
+     * @throws TransformationFailedException if the given array can not be transformed
+     */
     public function reverseTransform($array)
     {
-        if (!is_array($array) ) {
+        if (!is_array($array)) {
             throw new UnexpectedTypeException($array, 'array');
         }
 
@@ -51,7 +68,8 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
             if (!empty($array[$key])) {
                 if ($array[$key] !== $result) {
                     throw new TransformationFailedException(
-                            'All values in the array should be the same');
+                        'All values in the array should be the same'
+                    );
                 }
             } else {
                 $emptyKeys[] = $key;
@@ -59,13 +77,14 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
         }
 
         if (count($emptyKeys) > 0) {
-            if (count($emptyKeys) === count($this->keys)) {
+            if (count($emptyKeys) == count($this->keys)) {
                 // All keys empty
                 return null;
             }
 
-            throw new TransformationFailedException(sprintf(
-                    'The keys "%s" should not be empty', implode('", "', $emptyKeys)));
+            throw new TransformationFailedException(
+                 sprintf('The keys "%s" should not be empty', implode('", "', $emptyKeys)
+            ));
         }
 
         return $result;

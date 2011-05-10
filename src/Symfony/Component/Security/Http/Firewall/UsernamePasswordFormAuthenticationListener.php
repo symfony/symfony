@@ -70,8 +70,8 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
             }
         }
 
-        $username = trim($request->get($this->options['username_parameter']));
-        $password = $request->get($this->options['password_parameter']);
+        $username = trim($request->get($this->options['username_parameter'], null, true));
+        $password = $request->get($this->options['password_parameter'], null, true);
 
         $request->getSession()->set(SecurityContextInterface::LAST_USERNAME, $username);
 

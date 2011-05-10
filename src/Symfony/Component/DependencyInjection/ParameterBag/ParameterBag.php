@@ -69,7 +69,7 @@ class ParameterBag implements ParameterBagInterface
      *
      * @return mixed  The parameter value
      *
-     * @throws  \InvalidArgumentException if the parameter is not defined
+     * @throws  NonExistentParameterException if the parameter is not defined
      */
     public function get($name)
     {
@@ -126,7 +126,7 @@ class ParameterBag implements ParameterBagInterface
      *
      * @param  mixed $value A value
      *
-     * @throws \InvalidArgumentException if a placeholder references a parameter that does not exist
+     * @throws NonExistentParameterException if a placeholder references a parameter that does not exist
      */
     public function resolveValue($value)
     {

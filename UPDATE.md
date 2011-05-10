@@ -131,6 +131,7 @@ beta1 to beta2
   `SerializerAwareEncoder` & `SerializerAwareNormalizer`.
 
 * Serializer: The `$properties` argument has been dropped from all interfaces.
+
 PR12 to beta1
 -------------
 

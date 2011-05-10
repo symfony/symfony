@@ -2,12 +2,16 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Parameter;
-
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Generates the classes which implement the requested lookup methods.
+ *
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ */
 class GenerateLookupMethodClassesPass implements CompilerPassInterface
 {
     private $generatedClasses = array();

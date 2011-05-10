@@ -78,6 +78,7 @@ EOT
                     $type = isset($e[1]) ? $e[1] : 'string';
                     preg_match_all('/(.*)\((.*)\)/', $type, $matches);
                     $type = isset($matches[1][0]) ? $matches[1][0] : $type;
+                    $type = !in_array('string', 'integer', 'smallint', 'bigint', 'boolean', 'decimal', 'date', 'time', 'datetime', 'text', 'object', 'array', 'float') ? 'string' : $type;
                     $length = isset($matches[2][0]) ? $matches[2][0] : null;
                     $class->mapField(array(
                         'fieldName' => $name,

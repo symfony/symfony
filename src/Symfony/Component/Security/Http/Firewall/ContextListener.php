@@ -62,7 +62,7 @@ class ContextListener implements ListenerInterface
     {
         $request = $event->getRequest();
 
-        $session = $request->hasSession() ? $request->getSession() : null;
+        $session = $request->hasPreviousSession() ? $request->getSession() : null;
 
         if (null === $session || null === $token = $session->get('_security_'.$this->contextKey)) {
             $this->context->setToken(null);

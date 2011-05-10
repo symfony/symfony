@@ -60,9 +60,10 @@ class EsiResponseCacheStrategy implements EsiResponseCacheStrategyInterface
             return;
         }
 
-        $maxAge = min($this->maxAges);
-        $response->setSharedMaxAge($maxAge);
+        if (null !== $maxAge = min($this->maxAges)) {
+            $response->setSharedMaxAge($maxAge);
+            $response->headers->set('Age', $maxAge - min($this->ttls));
+        }
         $response->setMaxAge(0);
-        $response->headers->set('Age', $maxAge - min($this->ttls));
     }
 }

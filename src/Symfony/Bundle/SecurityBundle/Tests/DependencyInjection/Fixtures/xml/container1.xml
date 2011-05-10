@@ -6,6 +6,8 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <config>
+        <acl />
+    
         <encoder class="JMS\FooBundle\Entity\User1" algorithm="plaintext" />
 
         <encoder class="JMS\FooBundle\Entity\User2" algorithm="sha1" encode-as-base64="false" iterations="5" />

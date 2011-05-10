@@ -35,6 +35,14 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
 
     private $precision;
 
+    /**
+     * Constructor.
+     *
+     * @see self::$types for a list of supported types
+     *
+     * @param integer $precision The precision
+     * @param string  $type      One of the supported types
+     */
     public function __construct($precision = null, $type = null)
     {
         if (is_null($precision)) {
@@ -46,7 +54,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
         }
 
         if (!in_array($type, self::$types, true)) {
-            throw new \InvalidArgumentException(sprintf('The option "type" is expected to be one of "%s"', implode('", "', self::$types)));
+            throw new UnexpectedTypeException($type, implode('", "', self::$types));
         }
 
         $this->type = $type;
@@ -57,7 +65,11 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      * Transforms between a normalized format (integer or float) into a percentage value.
      *
      * @param  number $value  Normalized value.
+     *
      * @return number         Percentage value.
+     *
+     * @throws UnexpectedTypeException if the given value is not numeric
+     * @throws TransformationFailedException if the value could not be transformed
      */
     public function transform($value)
     {
@@ -88,7 +100,11 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      * Transforms between a percentage value into a normalized format (integer or float).
      *
      * @param  number $value  Percentage value.
+     *
      * @return number         Normalized value.
+     *
+     * @throws UnexpectedTypeException if the given value is not a string
+     * @throws TransformationFailedException if the value could not be transformed
      */
     public function reverseTransform($value)
     {

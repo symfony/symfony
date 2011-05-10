@@ -15,15 +15,15 @@ abstract class FormUtil
 {
     public static function toArrayKey($value)
     {
-        if ((string)(int)$value === (string)$value) {
-            return (int)$value;
+        if ((string) (int) $value === (string) $value) {
+            return (int) $value;
         }
 
         if (is_bool($value)) {
-            return (int)$value;
+            return (int) $value;
         }
 
-        return (string)$value;
+        return (string) $value;
     }
 
     public static function toArrayKeys(array $array)

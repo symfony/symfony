@@ -18,6 +18,13 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
 {
     private $guessers = array();
 
+    /**
+     * Constructor.
+     *
+     * @param array $guessers Guessers as instances of FormTypeGuesserInterface
+     *
+     * @throws UnexpectedTypeException if any guesser does not implement FormTypeGuesserInterface
+     */
     public function __construct(array $guessers)
     {
         foreach ($guessers as $guesser) {

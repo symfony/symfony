@@ -40,21 +40,6 @@ class FormFactory implements FormFactoryInterface
         $this->extensions = $extensions;
     }
 
-    private function loadGuesser()
-    {
-        $guessers = array();
-
-        foreach ($this->extensions as $extension) {
-            $guesser = $extension->getTypeGuesser();
-
-            if ($guesser) {
-                $guessers[] = $guesser;
-            }
-        }
-
-        $this->guesser = new FormTypeGuesserChain($guessers);
-    }
-
     public function getType($name)
     {
         $type = null;
@@ -197,5 +182,20 @@ class FormFactory implements FormFactoryInterface
         }
 
         return $this->createNamedBuilder($type, $property, $data, $options);
+    }
+
+    private function loadGuesser()
+    {
+        $guessers = array();
+
+        foreach ($this->extensions as $extension) {
+            $guesser = $extension->getTypeGuesser();
+
+            if ($guesser) {
+                $guessers[] = $guesser;
+            }
+        }
+
+        $this->guesser = new FormTypeGuesserChain($guessers);
     }
 }

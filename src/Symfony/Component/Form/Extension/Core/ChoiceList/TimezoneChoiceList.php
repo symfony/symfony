@@ -16,21 +16,16 @@ namespace Symfony\Component\Form\Extension\Core\ChoiceList;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class TimezoneChoiceList extends ArrayChoiceList
+class TimezoneChoiceList implements ChoiceListInterface
 {
     /**
      * Stores the available timezone choices
      * @var array
      */
-    protected static $timezones = array();
-
-    public function __construct()
-    {
-        parent::__construct(array());
-    }
+    protected static $timezones;
 
     /**
-     * Loads the timezone choices
+     * Returns the timezone choices.
      *
      * The choices are generated from the ICU function
      * \DateTimeZone::listIdentifiers(). They are cached during a single request,
@@ -39,11 +34,9 @@ class TimezoneChoiceList extends ArrayChoiceList
      *
      * @return array  The timezone choices
      */
-    protected function load()
+    public function getChoices()
     {
-        parent::load();
-
-        if (count(self::$timezones) == 0) {
+        if (count(static::$timezones) == 0) {
             foreach (\DateTimeZone::listIdentifiers() as $timezone) {
                 $parts = explode('/', $timezone);
 
@@ -58,14 +51,14 @@ class TimezoneChoiceList extends ArrayChoiceList
                     $name = $parts[0];
                 }
 
-                if (!isset(self::$timezones[$region])) {
-                    self::$timezones[$region] = array();
+                if (!isset(static::$timezones[$region])) {
+                    static::$timezones[$region] = array();
                 }
 
-                self::$timezones[$region][$timezone] = str_replace('_', ' ', $name);
+                static::$timezones[$region][$timezone] = str_replace('_', ' ', $name);
             }
         }
 
-        $this->choices = self::$timezones;
+        return static::$timezones;
     }
 }

@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 
 /**
- * Defines the interface of encoders
+ * Defines the interface of encoders that are able to decode their own format
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */

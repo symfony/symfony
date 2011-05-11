@@ -14,25 +14,13 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 
 /**
- * Encodes JSON data
+ * Defines the interface of encoders that will normalize data themselves
+ *
+ * Implementing this interface essentially just tells the Serializer that the
+ * data should not be pre-normalized before being passed to this Encoder.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class JsonEncoder implements EncoderInterface, DecoderInterface
+interface NormalizationAwareInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function encode($data, $format)
-    {
-        return json_encode($data);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function decode($data, $format)
-    {
-        return json_decode($data, true);
-    }
 }

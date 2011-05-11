@@ -288,7 +288,7 @@ class HttpCache implements HttpKernelInterface
         if (!$this->isFreshEnough($request, $entry)) {
             $this->record($request, 'stale');
 
-            return $this->validate($request, $entry);
+            return $this->validate($request, $entry, $catch);
         }
 
         $this->record($request, 'fresh');
@@ -305,11 +305,12 @@ class HttpCache implements HttpKernelInterface
      * GET request with the backend.
      *
      * @param Request  $request A Request instance
-     * @param Response $entry A Response instance to validate
+     * @param Response $entry   A Response instance to validate
+     * @param Boolean  $catch   Whether to process exceptions
      *
      * @return Response A Response instance
      */
-    protected function validate(Request $request, Response $entry)
+    protected function validate(Request $request, Response $entry, $catch = false)
     {
         $subRequest = clone $request;
 
@@ -327,7 +328,7 @@ class HttpCache implements HttpKernelInterface
         $etags = array_unique(array_merge($cachedEtags, $requestEtags));
         $subRequest->headers->set('if_none_match', $etags ? implode(', ', $etags) : '');
 
-        $response = $this->forward($subRequest, false, $entry);
+        $response = $this->forward($subRequest, $catch, $entry);
 
         if (304 == $response->getStatusCode()) {
             $this->record($request, 'valid');

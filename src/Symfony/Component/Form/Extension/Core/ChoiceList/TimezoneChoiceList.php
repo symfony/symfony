@@ -22,7 +22,7 @@ class TimezoneChoiceList implements ChoiceListInterface
      * Stores the available timezone choices
      * @var array
      */
-    protected static $timezones;
+    static protected $timezones;
 
     /**
      * Returns the timezone choices.
@@ -32,31 +32,34 @@ class TimezoneChoiceList implements ChoiceListInterface
      * so multiple timezone fields on the same page don't lead to unnecessary
      * overhead.
      *
-     * @return array  The timezone choices
+     * @return array The timezone choices
      */
     public function getChoices()
     {
-        if (count(static::$timezones) == 0) {
-            foreach (\DateTimeZone::listIdentifiers() as $timezone) {
-                $parts = explode('/', $timezone);
+        if (null !== static::$timezones) {
+            return static::$timezones;
+        }
 
-                if (count($parts) > 2) {
-                    $region = $parts[0];
-                    $name = $parts[1].' - '.$parts[2];
-                } else if (count($parts) > 1) {
-                    $region = $parts[0];
-                    $name = $parts[1];
-                } else {
-                    $region = 'Other';
-                    $name = $parts[0];
-                }
+        static::$timezones = array();
+        foreach (\DateTimeZone::listIdentifiers() as $timezone) {
+            $parts = explode('/', $timezone);
 
-                if (!isset(static::$timezones[$region])) {
-                    static::$timezones[$region] = array();
-                }
-
-                static::$timezones[$region][$timezone] = str_replace('_', ' ', $name);
+            if (count($parts) > 2) {
+                $region = $parts[0];
+                $name = $parts[1].' - '.$parts[2];
+            } else if (count($parts) > 1) {
+                $region = $parts[0];
+                $name = $parts[1];
+            } else {
+                $region = 'Other';
+                $name = $parts[0];
             }
+
+            if (!isset(static::$timezones[$region])) {
+                static::$timezones[$region] = array();
+            }
+
+            static::$timezones[$region][$timezone] = str_replace('_', ' ', $name);
         }
 
         return static::$timezones;

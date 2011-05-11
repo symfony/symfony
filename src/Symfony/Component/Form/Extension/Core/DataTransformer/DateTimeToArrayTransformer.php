@@ -56,6 +56,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      * @return array               Localized date.
      *
      * @throws UnexpectedTypeException if the given value is not an instance of \DateTime
+     * @throws TransformationFailedException if the output timezone is not supported
      */
     public function transform($dateTime)
     {
@@ -74,8 +75,13 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             throw new UnexpectedTypeException($dateTime, '\DateTime');
         }
 
+
         if ($this->inputTimezone !== $this->outputTimezone) {
-            $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
+            try {
+                $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
+            } catch (\Exception $e) {
+                throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
+            }
         }
 
         $result = array_intersect_key(array(
@@ -106,6 +112,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      *
      * @throws UnexpectedTypeException if the given value is not an array
      * @throws TransformationFailedException if the value could not bet transformed
+     * @throws TransformationFailedException if the input timezone is not supported
      */
     public function reverseTransform($value)
     {
@@ -146,12 +153,12 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
                 empty($value['second']) ? '0' : $value['second'],
                 $this->outputTimezone
             ));
+
+            if ($this->inputTimezone !== $this->outputTimezone) {
+                $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
+            }
         } catch (\Exception $e) {
             throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
-        }
-
-        if ($this->inputTimezone !== $this->outputTimezone) {
-            $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
         }
 
         return $dateTime;

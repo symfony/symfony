@@ -41,7 +41,7 @@ class DateType extends AbstractType
             // Only pass a subset of the options to children
             $yearOptions = array(
                 'choice_list' => new PaddedChoiceList(
-                    $options['years'], 4, '0', STR_PAD_LEFT
+                    array_combine($options['years'], $options['years']), 4, '0', STR_PAD_LEFT
                 ),
             );
             $monthOptions = array(
@@ -51,7 +51,7 @@ class DateType extends AbstractType
             );
             $dayOptions = array(
                 'choice_list' => new PaddedChoiceList(
-                    $options['days'], 2, '0', STR_PAD_LEFT
+                    array_combine($options['days'], $options['days']), 2, '0', STR_PAD_LEFT
                 ),
             );
 

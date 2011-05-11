@@ -15,6 +15,10 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container)
     {
+        if (!$container->hasDefinition('doctrine')) {
+            return;
+        }
+
         $this->container = $container;
         $this->connections = $container->getDefinition('doctrine')->getArgument(1);
 

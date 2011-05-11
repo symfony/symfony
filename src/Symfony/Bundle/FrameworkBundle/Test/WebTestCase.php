@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\Test\WebTestCase as BaseWebTestCase;
  * WebTestCase is the base class for functional tests.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @link   http://symfony.com/doc/2.0/book/testing.html#functional-tests
  */
 abstract class WebTestCase extends BaseWebTestCase
 {

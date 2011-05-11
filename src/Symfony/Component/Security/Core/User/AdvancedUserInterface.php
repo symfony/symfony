@@ -15,6 +15,7 @@ namespace Symfony\Component\Security\Core\User;
  * AdvancedUserInterface adds status flags to a regular account.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @link   http://symfony.com/doc/2.0/book/security/users.html#advanceduserinterface
  */
 interface AdvancedUserInterface extends UserInterface
 {

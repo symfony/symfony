@@ -54,6 +54,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * @link   http://symfony.com/doc/2.0/book/service_container.html#what-is-a-service-container
  */
 class Container implements ContainerInterface
 {

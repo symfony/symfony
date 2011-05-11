@@ -13,6 +13,8 @@ namespace Symfony\Component\Validator;
 
 /**
  * An array-acting object that holds many ConstrainViolation instances.
+ *
+ * @link http://symfony.com/doc/2.0/book/validation.html
  */
 class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayAccess
 {

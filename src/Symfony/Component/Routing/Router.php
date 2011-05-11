@@ -19,6 +19,7 @@ use Symfony\Component\Config\ConfigCache;
  * routing system for easier use.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @link   http://symfony.com/doc/2.0/book/routing.html
  */
 class Router implements RouterInterface
 {

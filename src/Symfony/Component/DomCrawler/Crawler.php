@@ -17,6 +17,7 @@ use Symfony\Component\CssSelector\Parser as CssParser;
  * Crawler eases navigation of a list of \DOMNode objects.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @link   http://symfony.com/doc/2.0/book/testing.html#the-crawler
  *
  * @api
  */

@@ -23,6 +23,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @link   http://symfony.com/doc/2.0/book/validation.html#using-the-validator-service
  */
 class Validator implements ValidatorInterface
 {

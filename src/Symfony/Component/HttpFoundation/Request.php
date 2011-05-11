@@ -108,13 +108,6 @@ class Request
         $this->server = new ServerBag($server);
         $this->headers = new HeaderBag($this->server->getHeaders());
 
-        if ('application/x-www-form-urlencoded' == $this->server->get('CONTENT_TYPE')
-            && in_array(strtoupper($this->server->get('REQUEST_METHOD', 'GET'), array('PUT', 'DELETE'))
-        ) {
-            parse_str($this->getContent(), $data);
-            $this->request = new ParameterBag($data);
-        }
-
         $this->content = $content;
         $this->languages = null;
         $this->charsets = null;
@@ -134,7 +127,16 @@ class Request
      */
     static public function createFromGlobals()
     {
-        return new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
+        $request = new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
+
+        if ('application/x-www-form-urlencoded' == $request->server->get('CONTENT_TYPE')
+            && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET'), array('PUT', 'DELETE'))
+        ) {
+            parse_str($this->getContent(), $data);
+            $request->request = new ParameterBag($data);
+        }
+
+        return $request;
     }
 
     /**

@@ -242,7 +242,9 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function getInvalidReservedIpsV6()
     {
-        // Empty array as I cannot find any reserved IP6 address
+        // Quoting after official filter documentation:
+        // "FILTER_FLAG_NO_RES_RANGE = This flag does not apply to IPv6 addresses."
+        // Full description: http://php.net/manual/en/filter.filters.flags.php
         return array();
     }
 

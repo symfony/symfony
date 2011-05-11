@@ -162,7 +162,7 @@ class FormBuilder
      *
      * @param DataTransformerInterface $clientTransformer
      */
-    public function appendNormTransformer(DataTransformerInterface $normTransformer = null)
+    public function appendNormTransformer(DataTransformerInterface $normTransformer)
     {
         $this->normTransformers[] = $normTransformer;
 
@@ -198,7 +198,7 @@ class FormBuilder
      *
      * @param DataTransformerInterface $clientTransformer
      */
-    public function appendClientTransformer(DataTransformerInterface $clientTransformer = null)
+    public function appendClientTransformer(DataTransformerInterface $clientTransformer)
     {
         $this->clientTransformers[] = $clientTransformer;
 
@@ -210,7 +210,7 @@ class FormBuilder
      *
      * @param DataTransformerInterface $clientTransformer
      */
-    public function prependClientTransformer(DataTransformerInterface $clientTransformer = null)
+    public function prependClientTransformer(DataTransformerInterface $clientTransformer)
     {
         array_unshift($this->clientTransformers, $clientTransformer);
 

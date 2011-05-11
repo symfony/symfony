@@ -15,6 +15,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Util\VirtualFormAwareIterator;
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class PropertyPathMapper implements DataMapperInterface
 {
@@ -29,15 +30,22 @@ class PropertyPathMapper implements DataMapperInterface
         $this->dataClass = $dataClass;
     }
 
+    /**
+     *
+     * @param dataClass $data
+     * @param array $forms
+     *
+     * @throws UnexpectedTypeException if the type of the data parameter is not supported
+     */
     public function mapDataToForms($data, array $forms)
     {
         if (!empty($data) && !is_array($data) && !is_object($data)) {
-            throw new \InvalidArgumentException(sprintf('Expected argument of type object or array, %s given', gettype($data)));
+            throw new UnexpectedTypeException($data, 'Object, array or empty');
         }
 
         if (!empty($data)) {
-            if ($this->dataClass && !$data instanceof $this->dataClass) {
-                throw new FormException(sprintf('Form data should be instance of %s', $this->dataClass));
+            if (null !== $this->dataClass && !$data instanceof $this->dataClass) {
+                throw new UnexpectedTypeException($data, $this->dataClass);
             }
 
             $iterator = new VirtualFormAwareIterator($forms);

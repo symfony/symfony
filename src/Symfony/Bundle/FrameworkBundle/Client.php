@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Response;
 class Client extends BaseClient
 {
     private $hasPerformedRequest = false;
-    
+
     /**
      * Returns the container.
      *
@@ -70,6 +70,8 @@ class Client extends BaseClient
      */
     protected function doRequest($request)
     {
+        // avoid shutting down the Kernel if no request has been performed yet
+        // WebTestCase::createClient() boots the Kernel but do not handle a request
         if ($this->hasPerformedRequest) {
             $this->kernel->shutdown();
         } else {

@@ -25,6 +25,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class Client extends BaseClient
 {
+    private $hasPerformedRequest = false;
+    
     /**
      * Returns the container.
      *
@@ -68,7 +70,11 @@ class Client extends BaseClient
      */
     protected function doRequest($request)
     {
-        $this->kernel->shutdown();
+        if ($this->hasPerformedRequest) {
+            $this->kernel->shutdown();
+        } else {
+            $this->hasPerformedRequest = true;
+        }
 
         return $this->kernel->handle($request);
     }

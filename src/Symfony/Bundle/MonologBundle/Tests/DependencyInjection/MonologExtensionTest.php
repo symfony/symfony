@@ -224,6 +224,28 @@ class MonologExtensionTest extends TestCase
     /**
      * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
+    public function testExceptionWhenUsingGroupWithoutMembers()
+    {
+        $container = new ContainerBuilder();
+        $loader = new MonologExtension();
+
+        $loader->load(array(array('handlers' => array('main' => array('type' => 'group')))), $container);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     */
+    public function testExceptionWhenUsingGroupWithOnlyOneMember()
+    {
+        $container = new ContainerBuilder();
+        $loader = new MonologExtension();
+
+        $loader->load(array(array('handlers' => array('main' => array('type' => 'group', 'members' => array('test'))))), $container);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     */
     public function testExceptionWhenUsingServiceWithoutId()
     {
         $container = new ContainerBuilder();

@@ -162,6 +162,20 @@ class MonologExtension extends Extension
             ));
             break;
 
+        case 'group':
+            $references = array();
+            foreach ($handler['members'] as $nestedHandler) {
+                $nestedHandlerId = $this->getHandlerId($nestedHandler);
+                array_push($this->nestedHandlers, $nestedHandlerId);
+                $references[] = new Reference($nestedHandlerId);
+            }
+
+            $definition->setArguments(array(
+                $references,
+                $handler['bubble'],
+            ));
+            break;
+
         case 'syslog':
             $definition->setArguments(array(
                 $handler['ident'],

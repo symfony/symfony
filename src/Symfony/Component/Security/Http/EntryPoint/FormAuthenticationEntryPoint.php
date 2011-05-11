@@ -28,6 +28,7 @@ class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
     private $loginPath;
     private $useForward;
     private $httpKernel;
+    private $disallowRedirectLoop;
 
     /**
      * Constructor
@@ -35,12 +36,14 @@ class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
      * @param HttpKernelInterface $kernel
      * @param string              $loginPath  The path to the login form
      * @param Boolean             $useForward Whether to forward or redirect to the login form
+     * @param Boolean             $disallowRedirectLoop Whether to throw an exception when a redirect loop is detected
      */
-    public function __construct(HttpKernelInterface $kernel, $loginPath, $useForward = false)
+    public function __construct(HttpKernelInterface $kernel, $loginPath, $useForward = false, $disallowRedirectLoop = false)
     {
         $this->httpKernel = $kernel;
         $this->loginPath = $loginPath;
         $this->useForward = (Boolean) $useForward;
+        $this->disallowRedirectLoop = $disallowRedirectLoop;
     }
 
     /**
@@ -52,6 +55,12 @@ class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
             return $this->httpKernel->handle(Request::create($this->loginPath), HttpKernelInterface::SUB_REQUEST);
         }
 
-        return new RedirectResponse(0 !== strpos($this->loginPath, 'http') ? $request->getUriForPath($this->loginPath) : $this->loginPath, 302);
+        $loginPath = 0 !== strpos($this->loginPath, 'http') ? $request->getUriForPath($this->loginPath) : $this->loginPath;
+
+        if ($this->disallowRedirectLoop && $request->getUri() == $loginPath) {
+            throw new \LogicException(sprintf('Redirect loop detected when trying to redirect to the login page. Be sure that the login URL (%s) is under a firewall that allows anonymous users.', $this->loginPath));
+        }
+
+        return new RedirectResponse($loginPath, 302);
     }
 }

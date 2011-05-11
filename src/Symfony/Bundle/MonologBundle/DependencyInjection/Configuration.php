@@ -65,6 +65,7 @@ class Configuration implements ConfigurationInterface
                             ->booleanNode('stop_buffering')->defaultTrue()->end()// fingers_crossed
                             ->scalarNode('buffer_size')->defaultValue(0)->end() // fingers_crossed and buffer
                             ->scalarNode('handler')->end() // fingers_crossed and buffer
+                            ->arrayNode('members')->prototype('scalar')->end()->end() // group
                             ->scalarNode('from_email')->end() // swift_mailer and native_mailer
                             ->scalarNode('to_email')->end() // swift_mailer and native_mailer
                             ->scalarNode('subject')->end() // swift_mailer and native_mailer
@@ -74,7 +75,11 @@ class Configuration implements ConfigurationInterface
                         ->append($this->getProcessorsNode())
                         ->validate()
                             ->ifTrue(function($v) { return ('fingers_crossed' === $v['type'] || 'buffer' === $v['type']) && 1 !== count($v['handler']); })
-                            ->thenInvalid('The handler has to be specified to use a FingersCrossedHandler')
+                            ->thenInvalid('The handler has to be specified to use a FingersCrossedHandler or BufferHandler')
+                        ->end()
+                        ->validate()
+                            ->ifTrue(function($v) { return 'group' === $v['type'] && count($v['members']) < 2; })
+                            ->thenInvalid('At least two members have to be specified to use a GroupHandler')
                         ->end()
                         ->validate()
                             ->ifTrue(function($v) { return 'swift_mailer' === $v['type'] && empty($v['email_prototype']) && (empty($v['from_email']) || empty($v['to_email']) || empty($v['subject'])); })

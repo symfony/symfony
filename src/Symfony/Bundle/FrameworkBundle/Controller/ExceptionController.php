@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
@@ -74,14 +75,14 @@ class ExceptionController extends ContainerAware
 
         // when not in debug, try to find a template for the specific HTTP status code and format
         if (!$debug) {
-            $template = 'FrameworkBundle:Exception:'.$name.$code.'.'.$format.'.twig';
+            $template = new TemplateReference('FrameworkBundle', 'Exception', $name.$code, $format, 'twig');
             if ($templating->exists($template)) {
                 return $template;
             }
         }
 
         // try to find a template for the given format
-        $template = 'FrameworkBundle:Exception:'.$name.'.'.$format.'.twig';
+        $template = new TemplateReference('FrameworkBundle', 'Exception', $name, $format, 'twig');
         if ($templating->exists($template)) {
             return $template;
         }
@@ -89,6 +90,6 @@ class ExceptionController extends ContainerAware
         // default to a generic HTML exception
         $this->container->get('request')->setRequestFormat('html');
 
-        return 'FrameworkBundle:Exception:'.$name.'.html.twig';
+        return new TemplateReference('FrameworkBundle', 'Exception', $name, 'html', 'twig');
     }
 }

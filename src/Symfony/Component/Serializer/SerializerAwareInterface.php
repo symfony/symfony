@@ -27,12 +27,4 @@ interface SerializerAwareInterface
      * @api
      */
     function setSerializer(SerializerInterface $serializer);
-
-    /**
-     * Gets the owning Serializer object
-     *
-     * @return SerializerInterface
-     * @api
-     */
-    function getSerializer();
 }

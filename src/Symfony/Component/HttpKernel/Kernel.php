@@ -121,6 +121,10 @@ abstract class Kernel implements KernelInterface
      */
     public function shutdown()
     {
+        if (false === $this->booted) {
+            return;
+        }
+
         $this->booted = false;
 
         foreach ($this->getBundles() as $bundle) {
@@ -295,16 +299,6 @@ abstract class Kernel implements KernelInterface
     public function getName()
     {
         return $this->name;
-    }
-    
-    /**
-     * Checks if the Kernel is currently booted.
-     *
-     * @return Boolean true if kernel is booted, false otherwise
-     */
-    public function isBooted()
-    {
-        return $this->booted;
     }
 
     /**

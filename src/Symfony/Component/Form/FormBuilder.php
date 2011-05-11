@@ -137,6 +137,20 @@ class FormBuilder
     }
 
     /**
+     * Renames the form.
+     *
+     * @param string $name The form name
+     *
+     * @return FormBuilder The current builder
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
      * Returns the name of the form.
      *
      * @return string The form name

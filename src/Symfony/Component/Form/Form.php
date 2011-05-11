@@ -459,7 +459,7 @@ class Form implements \IteratorAggregate, FormInterface
     public function bind($clientData)
     {
         if ($this->readOnly) {
-            return;
+            return $this;
         }
 
         if (is_scalar($clientData) || null === $clientData) {

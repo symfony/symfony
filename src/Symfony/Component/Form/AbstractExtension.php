@@ -39,6 +39,57 @@ abstract class AbstractExtension implements FormExtensionInterface
      */
     private $typeGuesserLoaded = false;
 
+    public function getType($name)
+    {
+        if (null === $this->types) {
+            $this->initTypes();
+        }
+
+        if (!isset($this->types[$name])) {
+            throw new FormException(sprintf('The type "%s" can not be loaded by this extension', $name));
+        }
+
+        return $this->types[$name];
+    }
+
+    public function hasType($name)
+    {
+        if (null === $this->types) {
+            $this->initTypes();
+        }
+
+        return isset($this->types[$name]);
+    }
+
+    public function getTypeExtensions($name)
+    {
+        if (null === $this->typeExtensions) {
+            $this->initTypeExtensions();
+        }
+
+        return isset($this->typeExtensions[$name])
+            ? $this->typeExtensions[$name]
+            : array();
+    }
+
+    public function hasTypeExtensions($name)
+    {
+        if (null === $this->typeExtensions) {
+            $this->initTypeExtensions();
+        }
+
+        return isset($this->typeExtensions[$name]) && count($this->typeExtensions[$name]) > 0;
+    }
+
+    public function getTypeGuesser()
+    {
+        if (!$this->typeGuesserLoaded) {
+            $this->initTypeGuesser();
+        }
+
+        return $this->typeGuesser;
+    }
+
     protected function loadTypes()
     {
         return array();
@@ -103,56 +154,5 @@ abstract class AbstractExtension implements FormExtensionInterface
         }
 
         $this->guesser = $guesser;
-    }
-
-    public function getType($name)
-    {
-        if (null === $this->types) {
-            $this->initTypes();
-        }
-
-        if (!isset($this->types[$name])) {
-            throw new FormException(sprintf('The type "%s" can not be loaded by this extension', $name));
-        }
-
-        return $this->types[$name];
-    }
-
-    public function hasType($name)
-    {
-        if (null === $this->types) {
-            $this->initTypes();
-        }
-
-        return isset($this->types[$name]);
-    }
-
-    function getTypeExtensions($name)
-    {
-        if (null === $this->typeExtensions) {
-            $this->initTypeExtensions();
-        }
-
-        return isset($this->typeExtensions[$name])
-            ? $this->typeExtensions[$name]
-            : array();
-    }
-
-    function hasTypeExtensions($name)
-    {
-        if (null === $this->typeExtensions) {
-            $this->initTypeExtensions();
-        }
-
-        return isset($this->typeExtensions[$name]) && count($this->typeExtensions[$name]) > 0;
-    }
-
-    public function getTypeGuesser()
-    {
-        if (!$this->typeGuesserLoaded) {
-            $this->initTypeGuesser();
-        }
-
-        return $this->typeGuesser;
     }
 }

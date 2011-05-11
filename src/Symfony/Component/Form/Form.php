@@ -877,6 +877,51 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
+     * Creates a view.
+     *
+     * @param FormView $parent The parent view
+     *
+     * @return FormView The view
+     */
+    public function createView(FormView $parent = null)
+    {
+        if (null === $parent && $this->parent) {
+            $parent = $this->parent->createView();
+        }
+
+        $view = new FormView();
+
+        $view->setParent($parent);
+
+        $types = (array) $this->types;
+        $childViews = array();
+
+        foreach ($types as $type) {
+            $type->buildView($view, $this);
+
+            foreach ($type->getExtensions() as $typeExtension) {
+                $typeExtension->buildView($view, $this);
+            }
+        }
+
+        foreach ($this->children as $key => $child) {
+            $childViews[$key] = $child->createView($view);
+        }
+
+        $view->setChildren($childViews);
+
+        foreach ($types as $type) {
+            $type->buildViewBottomUp($view, $this);
+
+            foreach ($type->getExtensions() as $typeExtension) {
+                $typeExtension->buildViewBottomUp($view, $this);
+            }
+        }
+
+        return $view;
+    }
+
+    /**
      * Normalizes the value if a normalization transformer is set.
      *
      * @param  mixed $value  The value to transform
@@ -948,50 +993,5 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         return $value;
-    }
-
-    /**
-     * Creates a view.
-     *
-     * @param FormView $parent The parent view
-     *
-     * @return FormView The view
-     */
-    public function createView(FormView $parent = null)
-    {
-        if (null === $parent && $this->parent) {
-            $parent = $this->parent->createView();
-        }
-
-        $view = new FormView();
-
-        $view->setParent($parent);
-
-        $types = (array) $this->types;
-        $childViews = array();
-
-        foreach ($types as $type) {
-            $type->buildView($view, $this);
-
-            foreach ($type->getExtensions() as $typeExtension) {
-                $typeExtension->buildView($view, $this);
-            }
-        }
-
-        foreach ($this->children as $key => $child) {
-            $childViews[$key] = $child->createView($view);
-        }
-
-        $view->setChildren($childViews);
-
-        foreach ($types as $type) {
-            $type->buildViewBottomUp($view, $this);
-
-            foreach ($type->getExtensions() as $typeExtension) {
-                $typeExtension->buildViewBottomUp($view, $this);
-            }
-        }
-
-        return $view;
     }
 }

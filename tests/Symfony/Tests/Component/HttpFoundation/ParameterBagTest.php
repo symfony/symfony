@@ -56,6 +56,13 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($bag->get('null', 'default'), '->get() returns null if null is set');
     }
 
+    public function testGetDoesNotUseDeepByDefault()
+    {
+        $bag = new ParameterBag(array('foo' => array('bar' => 'moo')));
+
+        $this->assertNull($bag->get('foo[bar]'));
+    }
+
     /**
      * @dataProvider getInvalidPaths
      * @expectedException \InvalidArgumentException
@@ -65,7 +72,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
     {
         $bag = new ParameterBag(array('foo' => array('bar' => 'moo')));
 
-        $bag->getDeep($path);
+        $bag->get($path, null, true);
     }
 
     public function getInvalidPaths()
@@ -85,10 +92,10 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
     {
         $bag = new ParameterBag(array('foo' => array('bar' => array('moo' => 'boo'))));
 
-        $this->assertEquals(array('moo' => 'boo'), $bag->getDeep('foo[bar]'));
-        $this->assertEquals('boo', $bag->getDeep('foo[bar][moo]'));
-        $this->assertEquals('default', $bag->getDeep('foo[bar][foo]', 'default'));
-        $this->assertEquals('default', $bag->getDeep('bar[moo][foo]', 'default'));
+        $this->assertEquals(array('moo' => 'boo'), $bag->get('foo[bar]', null, true));
+        $this->assertEquals('boo', $bag->get('foo[bar][moo]', null, true));
+        $this->assertEquals('default', $bag->get('foo[bar][foo]', 'default', true));
+        $this->assertEquals('default', $bag->get('bar[moo][foo]', 'default', true));
     }
 
     /**

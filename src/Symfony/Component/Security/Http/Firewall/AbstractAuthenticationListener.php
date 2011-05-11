@@ -246,7 +246,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             return $this->options['default_target_path'];
         }
 
-        if ($targetUrl = $request->get($this->options['target_path_parameter'])) {
+        if ($targetUrl = $request->get($this->options['target_path_parameter'], null, true)) {
             return $targetUrl;
         }
 

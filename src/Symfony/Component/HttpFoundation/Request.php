@@ -298,9 +298,9 @@ class Request
     //  * slow
     //  * prefer to get from a "named" source
     // This method is mainly useful for libraries that want to provide some flexibility
-    public function get($key, $default = null)
+    public function get($key, $default = null, $deep = false)
     {
-        return $this->query->get($key, $this->attributes->get($key, $this->request->get($key, $default)));
+        return $this->query->get($key, $this->attributes->get($key, $this->request->get($key, $default, $deep), $deep), $deep);
     }
 
     public function getSession()

@@ -131,6 +131,9 @@ beta1 to beta2
 * Serializer: The NormalizerInterface's `supports()` method has been split in
   two methods: `supportsNormalization` and `supportsDenormalization`.
 
+* ParameterBag::getDeep() has been removed, and is replaced with a boolean flag
+  on the ParameterBag::get() method.
+
 PR12 to beta1
 -------------
 

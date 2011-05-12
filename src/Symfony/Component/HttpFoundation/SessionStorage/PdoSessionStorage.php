@@ -247,7 +247,7 @@ class PdoSessionStorage extends NativeSessionStorage
 
         //mysql specific code to prevent duplicate sess_id due to race condition
         if ('mysql' === $this->db->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
-            $sql .= ' ON DUPLICATE KEY UPDATE '.$dbTimeCol.'='.$dbTimeCol.'+1';
+            $sql .= ' ON DUPLICATE KEY UPDATE '.$dbTimeCol.'='.$dbTimeCol;
         }
 
         $stmt = $this->db->prepare($sql);

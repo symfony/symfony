@@ -31,12 +31,4 @@ class Min extends \Symfony\Component\Validator\Constraint
     {
         return array('limit');
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTargets()
-    {
-        return self::PROPERTY_CONSTRAINT;
-    }
 }

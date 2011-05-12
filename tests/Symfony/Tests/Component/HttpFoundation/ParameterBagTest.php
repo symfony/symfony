@@ -66,7 +66,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getInvalidPaths
      * @expectedException \InvalidArgumentException
-     * @covers Symfony\Component\HttpFoundation\ParameterBag::getDeep
      */
     public function testGetDeepWithInvalidPaths($path)
     {
@@ -85,9 +84,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-	 * @covers Symfony\Component\HttpFoundation\ParameterBag::getDeep
-     */
     public function testGetDeep()
     {
         $bag = new ParameterBag(array('foo' => array('bar' => array('moo' => 'boo'))));
@@ -167,4 +163,3 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $bag->getInt('unknown'), '->getInt() returns zero if a parameter is not defined');
     }
 }
-

@@ -76,6 +76,7 @@ class MonologExtension extends Extension
                 'Monolog\\Formatter\\LineFormatter',
                 'Monolog\\Handler\\HandlerInterface',
                 'Monolog\\Handler\\AbstractHandler',
+                'Monolog\\Handler\\AbstractProcessingHandler',
                 'Monolog\\Handler\\StreamHandler',
                 'Monolog\\Handler\\FingersCrossedHandler',
                 'Monolog\\Logger',

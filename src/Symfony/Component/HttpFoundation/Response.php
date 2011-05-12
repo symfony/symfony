@@ -101,16 +101,16 @@ class Response
         $this->fixContentType();
 
         // status
-        $content .= sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText)."\n";
+        $content .= sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText)."\r\n";
 
         // headers
         foreach ($this->headers->all() as $name => $values) {
             foreach ($values as $value) {
-                $content .= "$name: $value\n";
+                $content .= "$name: $value\r\n";
             }
         }
 
-        $content .= "\n".$this->getContent();
+        $content .= "\r\n".$this->getContent();
 
         return $content;
     }

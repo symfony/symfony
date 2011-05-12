@@ -40,12 +40,18 @@ class ResizeFormListener implements EventSubscriberInterface
      */
     private $allowAdd;
 
-    public function __construct(FormFactoryInterface $factory, $type, $allowAdd = false, $allowDelete = false)
+    /**
+     * @var array
+     */
+    private $typeOptions;
+
+    public function __construct(FormFactoryInterface $factory, $type, $allowAdd = false, $allowDelete = false, array $typeOptions = array())
     {
         $this->factory = $factory;
         $this->type = $type;
         $this->allowAdd = $allowAdd;
         $this->allowDelete = $allowDelete;
+        $this->typeOptions = $typeOptions;
     }
 
     public static function getSubscribedEvents()
@@ -79,9 +85,9 @@ class ResizeFormListener implements EventSubscriberInterface
 
         // Then add all rows again in the correct order
         foreach ($data as $name => $value) {
-            $form->add($this->factory->createNamed($this->type, $name, null, array(
+            $form->add($this->factory->createNamed($this->type, $name, null, array_merge(array(
                 'property_path' => '['.$name.']',
-            )));
+            ), $this->typeOptions)));
         }
     }
 
@@ -111,9 +117,9 @@ class ResizeFormListener implements EventSubscriberInterface
         if ($this->allowAdd) {
             foreach ($data as $name => $value) {
                 if (!$form->has($name)) {
-                    $form->add($this->factory->createNamed($this->type, $name, null, array(
+                    $form->add($this->factory->createNamed($this->type, $name, null, array_merge(array(
                         'property_path' => '['.$name.']',
-                    )));
+                    ), $this->typeOptions)));
                 }
             }
         }

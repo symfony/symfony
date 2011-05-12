@@ -15,6 +15,14 @@ class ApcCache implements CacheInterface
 
     public function has($class)
     {
+        if (!function_exists('apc_exists')) {
+            $exists = false;
+
+            apc_fetch($this->prefix.$class, $exists);
+
+            return $exists;
+        }
+
         return apc_exists($this->prefix.$class);
     }
 

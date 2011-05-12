@@ -31,6 +31,10 @@
         <xsd:attribute name="buffer-size" type="xsd:integer" />
         <xsd:attribute name="max-files" type="xsd:integer" />
         <xsd:attribute name="handler" type="xsd:string" />
+        <xsd:attribute name="from_email" type="xsd:string" />
+        <xsd:attribute name="to_email" type="xsd:string" />
+        <xsd:attribute name="subject" type="xsd:string" />
+        <xsd:attribute name="email_prototype" type="xsd:string" />
         <xsd:attribute name="formatter" type="xsd:string" />
     </xsd:complexType>
 

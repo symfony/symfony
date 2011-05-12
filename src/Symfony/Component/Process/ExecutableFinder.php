@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Process;
 
+use Symfony\Component\Process\Exception\FileNotExecutableException;
+use Symfony\Component\Process\Exception\ExecutableNotFoundException;
+
 /**
  * Generic executable finder.
  *
@@ -35,22 +38,51 @@ class ExecutableFinder
      * Finds an executable by name.
      *
      * @param string $name    The executable name (without the extension)
-     * @param string $default The default to return if no executable is found
+     *
+     * @throws ExecutableNotFoundException
      *
      * @return string The executable path or default value
      */
-    public function find($name, $default = null)
+    public function get($name)
     {
         $dirs = explode(PATH_SEPARATOR, getenv('PATH') ? getenv('PATH') : getenv('Path'));
         $suffixes = DIRECTORY_SEPARATOR == '\\' ? (getenv('PATHEXT') ? explode(PATH_SEPARATOR, getenv('PATHEXT')) : $this->suffixes) : array('');
+        $firstFound = null;
         foreach ($suffixes as $suffix) {
             foreach ($dirs as $dir) {
-                if (is_file($file = $dir.DIRECTORY_SEPARATOR.$name.$suffix) && is_executable($file)) {
-                    return $file;
+                if (is_file($file = $dir.DIRECTORY_SEPARATOR.$name.$suffix)) {
+                    if (is_executable($file)) {
+                        return $file;
+                    }
+
+                    if (null !== $firstFound) {
+                        $firstFound = $file;
+                    }
                 }
             }
         }
 
-        return $default;
+        if (null !== $firstFound) {
+            throw new FileNotExecutableException($firstFound);
+        }
+
+        throw new ExecutableNotFoundException($name);
+    }
+
+    /**
+     * Finds an executable by name
+     *
+     * @param string $name
+     * @param string $default The default to return if no executable is found
+     *
+     * @return string
+     */
+    public function find($name, $default = null)
+    {
+        try {
+            return $this->get($name);
+        } catch (\Exception $ex) {
+            return $default;
+        }
     }
 }

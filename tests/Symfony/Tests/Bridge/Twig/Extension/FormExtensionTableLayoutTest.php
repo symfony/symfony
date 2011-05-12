@@ -25,6 +25,10 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
 {
     protected function setUp()
     {
+        if (!class_exists('Twig_Environment')) {
+            $this->markTestSkipped('Twig is not available.');
+        }
+
         parent::setUp();
 
         $loader = new StubFilesystemLoader(array(

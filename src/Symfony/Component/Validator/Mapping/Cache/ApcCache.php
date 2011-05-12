@@ -15,16 +15,16 @@ class ApcCache implements CacheInterface
 
     public function has($class)
     {
-        return apc_exists($this->prefix.$class);
+        return \apc_exists($this->prefix.$class);
     }
 
     public function read($class)
     {
-        return apc_fetch($this->prefix.$class);
+        return \apc_fetch($this->prefix.$class);
     }
 
     public function write(ClassMetadata $metadata)
     {
-        apc_store($this->prefix.$metadata->getClassName(), $metadata);
+        \apc_store($this->prefix.$metadata->getClassName(), $metadata);
     }
 }

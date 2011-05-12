@@ -130,7 +130,7 @@ class Request
         $request = new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
 
         if ('application/x-www-form-urlencoded' == $request->server->get('CONTENT_TYPE')
-            && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET'), array('PUT', 'DELETE'))
+            && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), array('PUT', 'DELETE'))
         ) {
             parse_str($this->getContent(), $data);
             $request->request = new ParameterBag($data);

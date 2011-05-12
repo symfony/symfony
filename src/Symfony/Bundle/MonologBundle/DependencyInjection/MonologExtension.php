@@ -76,6 +76,7 @@ class MonologExtension extends Extension
                 'Monolog\\Formatter\\LineFormatter',
                 'Monolog\\Handler\\HandlerInterface',
                 'Monolog\\Handler\\AbstractHandler',
+                'Monolog\\Handler\\AbstractProcessingHandler',
                 'Monolog\\Handler\\StreamHandler',
                 'Monolog\\Handler\\FingersCrossedHandler',
                 'Monolog\\Logger',
@@ -158,6 +159,20 @@ class MonologExtension extends Extension
                 new Reference($nestedHandlerId),
                 $handler['buffer_size'],
                 $handler['level'],
+                $handler['bubble'],
+            ));
+            break;
+
+        case 'group':
+            $references = array();
+            foreach ($handler['members'] as $nestedHandler) {
+                $nestedHandlerId = $this->getHandlerId($nestedHandler);
+                array_push($this->nestedHandlers, $nestedHandlerId);
+                $references[] = new Reference($nestedHandlerId);
+            }
+
+            $definition->setArguments(array(
+                $references,
                 $handler['bubble'],
             ));
             break;

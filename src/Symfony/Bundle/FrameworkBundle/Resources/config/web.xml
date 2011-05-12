@@ -5,7 +5,8 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="request_listener.class">Symfony\Bundle\FrameworkBundle\RequestListener</parameter>
+        <parameter key="request_attribute_initializing_listener.class">Symfony\Bundle\FrameworkBundle\Listener\RequestAttributeInitializingListener</parameter>
+        <parameter key="session_initializing_listener.class">Symfony\Bundle\FrameworkBundle\Listener\SessionInitializingListener</parameter>
         <parameter key="controller_resolver.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver</parameter>
         <parameter key="controller_name_converter.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser</parameter>
         <parameter key="response_listener.class">Symfony\Component\HttpKernel\ResponseListener</parameter>
@@ -26,14 +27,18 @@
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
-        <service id="request_listener" class="%request_listener.class%">
+        <service id="request_attribute_initializing_listener" class="%request_attribute_initializing_listener.class%">
             <tag name="kernel.listener" event="onCoreRequest" />
             <tag name="monolog.logger" channel="request" />
-            <argument type="service" id="service_container" />
             <argument type="service" id="router" />
             <argument>%request_listener.http_port%</argument>
             <argument>%request_listener.https_port%</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
+        </service>
+        
+        <service id="session_initializing_listener" class="%session_initializing_listener.class%">
+            <tag name="kernel.listener" event="onCoreRequest" priority="255" />
+            <property name="container" type="service" id="service_container" />
         </service>
 
         <service id="response_listener" class="%response_listener.class%">

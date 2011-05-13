@@ -69,7 +69,8 @@ class DateTimeType extends AbstractType
             $timeParts[] = 'second';
         }
 
-        $builder->appendClientTransformer(new DataTransformerChain(array(
+        $builder
+            ->appendClientTransformer(new DataTransformerChain(array(
                 new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], $parts),
                 new ArrayToPartsTransformer(array(
                     'date' => array('year', 'month', 'day'),
@@ -77,7 +78,8 @@ class DateTimeType extends AbstractType
                 )),
             )))
             ->add('date', 'date', $dateOptions)
-            ->add('time', 'time', $timeOptions);
+            ->add('time', 'time', $timeOptions)
+        ;
 
         if ($options['input'] === 'string') {
             $builder->appendNormTransformer(new ReversedTransformer(
@@ -97,28 +99,28 @@ class DateTimeType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'input' => 'datetime',
-            'with_seconds' => false,
+            'input'         => 'datetime',
+            'with_seconds'  => false,
             'data_timezone' => null,
             'user_timezone' => null,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
-            'by_reference' => false,
-            'date_pattern' => null,
-            'date_widget' => null,
-            'date_format' => null,
-            'time_pattern' => null,
-            'time_widget' => null,
-            'time_format' => null,
+            'by_reference'  => false,
+            'date_pattern'  => null,
+            'date_widget'   => null,
+            'date_format'   => null,
+            'time_pattern'  => null,
+            'time_widget'   => null,
+            'time_format'   => null,
             /* Defaults for date field */
-            'years' => range(date('Y') - 5, date('Y') + 5),
-            'months' => range(1, 12),
-            'days' => range(1, 31),
+            'years'         => range(date('Y') - 5, date('Y') + 5),
+            'months'        => range(1, 12),
+            'days'          => range(1, 31),
             /* Defaults for time field */
-            'hours' => range(0, 23),
-            'minutes' => range(0, 59),
-            'seconds' => range(0, 59),
-            'with_seconds' => false,
+            'hours'         => range(0, 23),
+            'minutes'       => range(0, 59),
+            'seconds'       => range(0, 59),
+            'with_seconds'  => false,
         );
     }
 

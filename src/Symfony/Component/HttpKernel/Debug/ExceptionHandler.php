@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 
 /**
- * DebugExceptionHandler converts an exception to a Response object.
+ * ExceptionHandler converts an exception to a Response object.
  *
  * It is mostly useful in debug mode to replace the default PHP/XDebug
  * output with something prettier and more useful.
@@ -25,8 +25,22 @@ use Symfony\Component\HttpKernel\Exception\FlattenException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DebugExceptionHandler
+class ExceptionHandler
 {
+    /**
+     * Register the exception handler.
+     *
+     * @return The registered exception handler
+     */
+    static public function register($level = null)
+    {
+        $handler = new static();
+
+        set_exception_handler(array($handler, 'handle'));
+
+        return $handler;
+    }
+
     /**
      * Returns a Response for the given Exception.
      *
@@ -39,11 +53,6 @@ class DebugExceptionHandler
         $exception = FlattenException::create($exception);
 
         return new Response($this->decorate($exception, $this->getContent($exception)), 500);
-    }
-
-    public function __invoke(\Exception $exception)
-    {
-        $this->handle($exception)->send();
     }
 
     private function getContent($exception)

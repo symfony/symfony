@@ -70,8 +70,27 @@ class EmailValidatorTest extends \PHPUnit_Framework_TestCase
         return array(
             array('example'),
             array('example@'),
-            array('example@localhost'),
             array('example@example.com@example.com'),
+        );
+    }
+
+
+    /**
+     * @dataProvider getInvalidEmailsCompat
+     */
+    public function testInvalidEmailsCompat($email)
+    {
+        if (filter_var('valid-before-php533@localhost', FILTER_VALIDATE_EMAIL)) {
+            $this->markTestSkipped('FILTER_VALIDATE_EMAIL returns true for non fully qualified domain names');
+        } else {
+            $this->assertFalse($this->validator->isValid($email, new Email()));
+        }
+    }
+
+    public function getInvalidEmailsCompat()
+    {
+        return array(
+            array('example@localhost'),
         );
     }
 

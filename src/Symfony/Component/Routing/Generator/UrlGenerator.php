@@ -14,6 +14,9 @@ namespace Symfony\Component\Routing\Generator;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Exception\Generator\InvalidParameterException;
+use Symfony\Component\Routing\Exception\Generator\NotExistingRouteException;
+use Symfony\Component\Routing\Exception\Generator\MissingMandatoryParametersException;
 
 /**
  * UrlGenerator generates URL based on a set of routes.
@@ -74,7 +77,7 @@ class UrlGenerator implements UrlGeneratorInterface
     public function generate($name, array $parameters = array(), $absolute = false)
     {
         if (null === $route = $this->routes->get($name)) {
-            throw new \InvalidArgumentException(sprintf('Route "%s" does not exist.', $name));
+            throw new NotExistingRouteException(sprintf('Route "%s" does not exist.', $name));
         }
 
         if (!isset($this->cache[$name])) {
@@ -97,7 +100,7 @@ class UrlGenerator implements UrlGeneratorInterface
 
         // all params must be given
         if ($diff = array_diff_key($variables, $tparams)) {
-            throw new \InvalidArgumentException(sprintf('The "%s" route has some missing mandatory parameters (%s).', $name, implode(', ', $diff)));
+            throw new MissingMandatoryParametersException(sprintf('The "%s" route has some missing mandatory parameters (%s).', $name, implode(', ', $diff)));
         }
 
         $url = '';
@@ -108,7 +111,7 @@ class UrlGenerator implements UrlGeneratorInterface
                     if (!$isEmpty = in_array($tparams[$token[3]], array(null, '', false), true)) {
                         // check requirement
                         if ($tparams[$token[3]] && !preg_match('#^'.$token[2].'$#', $tparams[$token[3]])) {
-                            throw new \InvalidArgumentException(sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $token[2], $tparams[$token[3]]));
+                            throw new InvalidParameterException(sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $token[2], $tparams[$token[3]]));
                         }
                     }
 

@@ -151,7 +151,7 @@
 
 {% block date_widget %}
 {% spaceless %}
-    {% if widget == 'text' %}
+    {% if widget == 'single-text' %}
         {{ block('text_widget') }}
     {% else %}
         <div {{ block('attributes') }}>

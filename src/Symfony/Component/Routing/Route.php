@@ -99,8 +99,25 @@ class Route
     public function setOptions(array $options)
     {
         $this->options = array_merge(array(
-            'compiler_class'     => 'Symfony\\Component\\Routing\\RouteCompiler',
+            'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler',
         ), $options);
+
+        return $this;
+    }
+
+    /**
+     * Sets an option value.
+     *
+     * This method implements a fluent interface.
+     *
+     * @param string $name  An option name
+     * @param mixed  $value The option value
+     *
+     * @return Route The current Route instance
+     */
+    public function setOption($name, $value)
+    {
+        $this->options[$name] = $value;
 
         return $this;
     }

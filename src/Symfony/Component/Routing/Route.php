@@ -189,10 +189,14 @@ class Route
      *
      * @param string $name    A variable name
      * @param mixed  $default The default value
+     *
+     * @return Route The current Route instance
      */
     public function setDefault($name, $default)
     {
         $this->defaults[$name] = $default;
+
+        return $this;
     }
 
     /**
@@ -240,10 +244,14 @@ class Route
      *
      * @param string $key The key
      * @param string $regex The regex
+     *
+     * @return Route The current Route instance
      */
     public function setRequirement($key, $regex)
     {
-        return $this->requirements[$key] = $this->sanitizeRequirement($key, $regex);
+        $this->requirements[$key] = $this->sanitizeRequirement($key, $regex);
+
+        return $this;
     }
 
     /**

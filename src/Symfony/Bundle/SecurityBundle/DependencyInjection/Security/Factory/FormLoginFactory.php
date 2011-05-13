@@ -32,6 +32,7 @@ class FormLoginFactory extends AbstractFactory
         $this->addOption('csrf_parameter', '_csrf_token');
         $this->addOption('csrf_page_id', 'form_login');
         $this->addOption('post_only', true);
+        $this->addOption('disallow_redirect_loop', true);
     }
 
     public function getPosition()
@@ -93,6 +94,7 @@ class FormLoginFactory extends AbstractFactory
             ->setDefinition($entryPointId, new DefinitionDecorator('security.authentication.form_entry_point'))
             ->addArgument($config['login_path'])
             ->addArgument($config['use_forward'])
+            ->addArgument($config['disallow_redirect_loop'])
         ;
 
         return $entryPointId;

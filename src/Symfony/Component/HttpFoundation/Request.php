@@ -132,7 +132,7 @@ class Request
         if ('application/x-www-form-urlencoded' == $request->server->get('CONTENT_TYPE')
             && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), array('PUT', 'DELETE'))
         ) {
-            parse_str($this->getContent(), $data);
+            parse_str($request->getContent(), $data);
             $request->request = new ParameterBag($data);
         }
 

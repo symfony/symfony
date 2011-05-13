@@ -31,8 +31,8 @@
             <tag name="monolog.logger" channel="request" />
             <argument type="service" id="service_container" />
             <argument type="service" id="router" />
-            <argument /> <!-- HTTP port -->
-            <argument /> <!-- HTTPS port -->
+            <argument>%request_listener.http_port%</argument>
+            <argument>%request_listener.https_port%</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
@@ -44,7 +44,7 @@
         <service id="exception_listener" class="%exception_listener.class%">
             <tag name="kernel.listener" event="onCoreException" priority="-128" />
             <tag name="monolog.logger" channel="request" />
-            <argument /> <!-- controller name -->
+            <argument>%exception_listener.controller%</argument>
             <argument type="service" id="logger" on-invalid="null" />
         </service>
     </services>

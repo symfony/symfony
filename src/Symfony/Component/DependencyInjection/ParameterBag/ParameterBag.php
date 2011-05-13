@@ -143,7 +143,7 @@ class ParameterBag implements ParameterBagInterface
             return $value;
         }
 
-        if (preg_match('/^%([^%]+)%$/', $value, $match)) {
+        if (preg_match('/^%([^%:]+)%$/', $value, $match)) {
             // we do this to deal with non string values (Boolean, integer, ...)
             // the preg_replace_callback converts them to strings
             return $this->get(strtolower($match[1]));
@@ -162,6 +162,25 @@ class ParameterBag implements ParameterBagInterface
      */
     private function resolveValueCallback($match)
     {
+        if (preg_match('/^([^:]+):(.+)$/', $match[1], $subMatch)) {
+            switch($subMatch[1]) {
+                case 'CONSTANT':
+                    if (!defined($subMatch[2])) {
+                        throw new \InvalidArgumentException('You have requested a non-existent constant "' . $subMatch[2] . '".');
+                    }
+                    return constant($subMatch[2]);
+                    break;
+                case 'ENV':
+                    if (!isset($_SERVER[$subMatch[2]])) {
+                        throw new \InvalidArgumentException('You have requested a non-existent environment variable "' . $subMatch[2] . '".');
+                    }
+                    return $_SERVER[$subMatch[2]];
+                    break;
+                default:
+                    throw new \InvalidArgumentException('You have specified an unsupported parameter discriminator "' . $match[1] . '".');
+                    break;
+            }
+        }
         return $this->get(strtolower($match[1]));
     }
 }

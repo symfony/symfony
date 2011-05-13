@@ -38,10 +38,14 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * @param string $name
      * @param mixed $value
+     *
+     * @return FormView The current view
      */
     public function set($name, $value)
     {
         $this->vars[$name] = $value;
+
+        return $this;
     }
 
     /**
@@ -91,10 +95,14 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @param string $name  The name of the attribute
      * @param string $value The value
+     *
+     * @return FormView The current view
      */
     public function setAttribute($name, $value)
     {
         $this->vars['attr'][$name] = $value;
+
+        return $this;
     }
 
     /**
@@ -109,20 +117,28 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Marks the attached form as rendered
+     *
+     * @return FormView The current view
      */
     public function setRendered()
     {
         $this->rendered = true;
+
+        return $this;
     }
 
     /**
      * Sets the parent view.
      *
      * @param FormView $parent The parent view
+     *
+     * @return FormView The current view
      */
     public function setParent(FormView $parent = null)
     {
         $this->parent = $parent;
+
+        return $this;
     }
 
     /**
@@ -149,10 +165,14 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * Sets the children view.
      *
      * @param array $children The children as instances of FormView
+     *
+     * @return FormView The current view
      */
     public function setChildren(array $children)
     {
         $this->children = $children;
+
+        return $this;
     }
 
     /**

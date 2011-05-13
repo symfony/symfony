@@ -598,6 +598,35 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./input
+            [@id="na&me_month"]
+            [@type="text"]
+            [@value="2"]
+        /following-sibling::input
+            [@id="na&me_day"]
+            [@type="text"]
+            [@value="3"]
+        /following-sibling::input
+            [@id="na&me_year"]
+            [@type="text"]
+            [@value="2011"]
+    ]
+    [count(./input)=3]
+'
+        );
+    }
+
+    public function testDateSingleText()
+    {
+        $form = $this->factory->createNamed('date', 'na&me', '2011-02-03', array(
+            'property_path' => 'name',
+            'input' => 'string',
+            'widget' => 'single-text',
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="text"]
     [@name="na&me"]

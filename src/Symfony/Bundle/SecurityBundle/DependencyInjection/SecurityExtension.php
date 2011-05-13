@@ -62,7 +62,7 @@ class SecurityExtension extends Extension
 
         // set some global scalars
         $container->setParameter('security.access.denied_url', $config['access_denied_url']);
-        $container->getDefinition('security.authentication.session_strategy')->replaceArgument(0, $config['session_fixation_strategy']);
+        $container->setParameter('security.authentication.session_strategy.strategy', $config['session_fixation_strategy']);
         $container
             ->getDefinition('security.access.decision_manager')
             ->addArgument($config['access_decision_manager']['strategy'])

@@ -159,8 +159,8 @@
         </service>
         <service id="form.type_extension.csrf" class="Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension">
             <tag name="form.type_extension" alias="form" />
-            <argument /> <!-- enabled -->
-            <argument /> <!-- field_name -->
+            <argument>%form.type_extension.csrf.enabled%</argument>
+            <argument>%form.type_extension.csrf.field_name%</argument>
         </service>
     </services>
 </container>

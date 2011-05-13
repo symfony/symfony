@@ -31,6 +31,14 @@ class FooType extends AbstractType
             'data' => null,
             'required' => false,
             'max_length' => null,
+            'a_or_b' => 'a',
+        );
+    }
+
+    public function getAllowedOptionValues(array $options)
+    {
+        return array(
+            'a_or_b' => array('a', 'b'),
         );
     }
 

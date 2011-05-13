@@ -114,6 +114,7 @@ class FormFactory implements FormFactoryInterface
         $types = array();
         $knownOptions = array();
         $passedOptions = array_keys($options);
+        $optionValues = array();
 
         if (!array_key_exists('data', $options)) {
             $options['data'] = $data;
@@ -127,12 +128,14 @@ class FormFactory implements FormFactoryInterface
             }
 
             $defaultOptions = $type->getDefaultOptions($options);
+            $optionValues = array_merge_recursive($optionValues, $type->getAllowedOptionValues($options));
 
             foreach ($type->getExtensions() as $typeExtension) {
-                $defaultOptions = array_merge($defaultOptions, $typeExtension->getDefaultOptions($options));
+                $defaultOptions = array_replace($defaultOptions, $typeExtension->getDefaultOptions($options));
+                $optionValues = array_merge_recursive($optionValues, $typeExtension->getAllowedOptionValues($options));
             }
 
-            $options = array_merge($defaultOptions, $options);
+            $options = array_replace($defaultOptions, $options);
             $knownOptions = array_merge($knownOptions, array_keys($defaultOptions));
             array_unshift($types, $type);
             $type = $type->getParent($options);
@@ -153,6 +156,12 @@ class FormFactory implements FormFactoryInterface
 
         if (count($diff) > 0) {
             throw new CreationException(sprintf('The option "%s" does not exist', $diff[0]));
+        }
+
+        foreach ($optionValues as $option => $allowedValues) {
+            if (!in_array($options[$option], $allowedValues, true)) {
+                throw new CreationException(sprintf('The option "%s" has the value "%s", but is expected to be one of "%s"', $option, $options[$option], implode('", "', $allowedValues)));
+            }
         }
 
         for ($i = 0, $l = count($types); $i < $l && !$builder; ++$i) {

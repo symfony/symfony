@@ -14,9 +14,9 @@ namespace Symfony\Component\Routing\Generator;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\Exception\Generator\InvalidParameterException;
-use Symfony\Component\Routing\Exception\Generator\NotExistingRouteException;
-use Symfony\Component\Routing\Exception\Generator\MissingMandatoryParametersException;
+use Symfony\Component\Routing\Exception\InvalidParameterException;
+use Symfony\Component\Routing\Exception\NotExistingRouteException;
+use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 
 /**
  * UrlGenerator generates URL based on a set of routes.
@@ -72,7 +72,7 @@ class UrlGenerator implements UrlGeneratorInterface
      *
      * @return string The generated URL
      *
-     * @throws \InvalidArgumentException When route doesn't exist
+     * @throws Symfony\Component\Routing\Exception\NotExistingRouteException When route doesn't exist
      */
     public function generate($name, array $parameters = array(), $absolute = false)
     {
@@ -88,7 +88,8 @@ class UrlGenerator implements UrlGeneratorInterface
     }
 
     /**
-     * @throws \InvalidArgumentException When route has some missing mandatory parameters
+     * @throws Symfony\Component\Routing\Exception\MissingMandatoryParametersException When route has some missing mandatory parameters
+     * @throws Symfony\Component\Routing\Exception\InvalidParameterException When a parameter value is not correct
      */
     protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $absolute)
     {

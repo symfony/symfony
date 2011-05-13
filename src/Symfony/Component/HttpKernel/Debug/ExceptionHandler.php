@@ -32,7 +32,7 @@ class ExceptionHandler
      *
      * @return The registered exception handler
      */
-    static public function register($level = null)
+    static public function register()
     {
         $handler = new static();
 
@@ -52,7 +52,9 @@ class ExceptionHandler
     {
         $exception = FlattenException::create($exception);
 
-        return new Response($this->decorate($exception, $this->getContent($exception)), 500);
+        $response = new Response($this->decorate($exception, $this->getContent($exception)), 500);
+
+        $response->send();
     }
 
     private function getContent($exception)

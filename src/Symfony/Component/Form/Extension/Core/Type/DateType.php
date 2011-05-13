@@ -37,7 +37,7 @@ class DateType extends AbstractType
 
         if ($options['widget'] === 'text') {
             $builder->appendClientTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $options['format'], \IntlDateFormatter::NONE));
-        } elseif ($options['widget'] == 'choice') {
+        } else {
             // Only pass a subset of the options to children
             $yearOptions = array(
                 'choice_list' => new PaddedChoiceList(
@@ -59,8 +59,6 @@ class DateType extends AbstractType
                 ->add('month', 'choice', $monthOptions)
                 ->add('day', 'choice', $dayOptions)
                 ->appendClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], array('year', 'month', 'day')));
-        } else {
-            throw new FormException('The "widget" option must be set to either "text" or "choice".');
         }
 
         if ($options['input'] === 'string') {
@@ -121,6 +119,28 @@ class DateType extends AbstractType
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference' => false,
+        );
+    }
+
+    public function getAllowedOptionValues(array $options)
+    {
+        return array(
+            'input' => array(
+                'datetime',
+                'string',
+                'timestamp',
+                'array',
+            ),
+            'widget' => array(
+                'text',
+                'choice',
+            ),
+            'format' => array(
+                \IntlDateFormatter::FULL,
+                \IntlDateFormatter::LONG,
+                \IntlDateFormatter::MEDIUM,
+                \IntlDateFormatter::SHORT,
+             ),
         );
     }
 

@@ -61,6 +61,16 @@ class FileType extends AbstractType
         );
     }
 
+    public function getAllowedOptionValues(array $options)
+    {
+        return array(
+            'type' => array(
+                'string',
+                'file',
+            ),
+        );
+    }
+
     public function getName()
     {
         return 'file';

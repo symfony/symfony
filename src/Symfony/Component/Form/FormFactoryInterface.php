@@ -24,4 +24,6 @@ interface FormFactoryInterface
     function createNamedBuilder($type, $name, $data = null, array $options = array());
 
     function createBuilderForProperty($class, $property, $data = null, array $options = array());
+
+    function getType($name);
 }

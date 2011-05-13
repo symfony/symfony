@@ -163,7 +163,7 @@ class ParameterBag implements ParameterBagInterface
     private function resolveValueCallback($match)
     {
         if (preg_match('/^([^:]+):(.+)$/', $match[1], $subMatch)) {
-            switch($subMatch[1]) {
+            switch ($subMatch[1]) {
                 case 'CONSTANT':
                     if (!defined($subMatch[2])) {
                         throw new \InvalidArgumentException('You have requested a non-existent constant "' . $subMatch[2] . '".');

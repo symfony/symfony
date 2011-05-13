@@ -12,6 +12,13 @@ class FooTypeBarExtension extends AbstractTypeExtension
         $builder->setAttribute('bar', 'x');
     }
 
+    public function getAllowedOptionValues(array $options)
+    {
+        return array(
+            'a_or_b' => array('c'),
+        );
+    }
+
     public function getExtendedType()
     {
         return 'foo';

@@ -163,6 +163,9 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getExtensions')
             ->will($this->returnValue(array()));
         $type->expects($this->any())
+            ->method('getAllowedOptionValues')
+            ->will($this->returnValue(array()));
+        $type->expects($this->any())
             ->method('getDefaultOptions')
             ->will($this->returnValue(array(
                 'required' => false,
@@ -185,6 +188,9 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('foo'));
         $type->expects($this->any())
             ->method('getExtensions')
+            ->will($this->returnValue(array()));
+        $type->expects($this->any())
+            ->method('getAllowedOptionValues')
             ->will($this->returnValue(array()));
         $type->expects($this->any())
             ->method('getDefaultOptions')
@@ -211,6 +217,9 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getExtensions')
             ->will($this->returnValue(array()));
         $type->expects($this->any())
+            ->method('getAllowedOptionValues')
+            ->will($this->returnValue(array()));
+        $type->expects($this->any())
             ->method('getDefaultOptions')
             ->will($this->returnValue(array(
                 'data' => null,
@@ -233,6 +242,9 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('foo'));
         $type->expects($this->any())
             ->method('getExtensions')
+            ->will($this->returnValue(array()));
+        $type->expects($this->any())
+            ->method('getAllowedOptionValues')
             ->will($this->returnValue(array()));
         $type->expects($this->any())
             ->method('getDefaultOptions')
@@ -260,6 +272,31 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->factory->createNamedBuilder('foo', 'bar', null, array(
             'invalid' => 'xyz',
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\CreationException
+     */
+    public function testCreateNamedBuilderExpectsOptionsToBeInValidRange()
+    {
+        $type = new FooType();
+        $this->extension1->addType($type);
+
+        $this->factory->createNamedBuilder('foo', 'bar', null, array(
+            'a_or_b' => 'c',
+        ));
+    }
+
+    public function testCreateNamedBuilderAllowsExtensionsToExtendAllowedOptionValues()
+    {
+        $type = new FooType();
+        $this->extension1->addType($type);
+        $this->extension1->addTypeExtension(new FooTypeBarExtension());
+
+        // no exception this time
+        $this->factory->createNamedBuilder('foo', 'bar', null, array(
+            'a_or_b' => 'c',
         ));
     }
 

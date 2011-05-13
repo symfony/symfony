@@ -34,7 +34,7 @@ class FileToStringTransformer implements DataTransformerInterface
     public function transform($file)
     {
         if (null === $file || '' === $file) {
-            return '';
+            return null;
         }
 
         if (!$file instanceof File) {

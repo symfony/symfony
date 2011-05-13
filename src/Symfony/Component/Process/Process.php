@@ -100,7 +100,7 @@ class Process
             }
         };
 
-        $descriptors = array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', 'r'));
+        $descriptors = array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', 'a'));
 
         $process = proc_open($this->commandline, $descriptors, $pipes, $this->cwd, $this->env, $this->options);
 

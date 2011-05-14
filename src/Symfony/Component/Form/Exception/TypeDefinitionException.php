@@ -9,9 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Validator\Constraints;
+namespace Symfony\Component\Form\Exception;
 
-class DateTimeValidator extends DateValidator
+/**
+ * Thrown when a form type is configured incorrectly
+ *
+ * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ */
+class TypeDefinitionException extends FormException
 {
-    const PATTERN = '/^(\d{4})-(\d{2})-(\d{2}) (0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/';
 }

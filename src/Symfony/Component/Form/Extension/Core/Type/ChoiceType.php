@@ -65,7 +65,8 @@ class ChoiceType extends AbstractType
         $builder->setAttribute('choice_list', $options['choice_list'])
             ->setAttribute('preferred_choices', $options['preferred_choices'])
             ->setAttribute('multiple', $options['multiple'])
-            ->setAttribute('expanded', $options['expanded']);
+            ->setAttribute('expanded', $options['expanded'])
+            ->setAttribute('empty_value', $options['empty_value']);
 
         if ($options['expanded']) {
             if ($options['multiple']) {
@@ -94,7 +95,7 @@ class ChoiceType extends AbstractType
         $view->set('preferred_choices', array_intersect_key($choices, $preferred));
         $view->set('choices', array_diff_key($choices, $preferred));
         $view->set('separator', '-------------------');
-        $view->set('empty_value', '');
+        $view->set('empty_value', $form->getAttribute('empty_value'));
 
         if ($view->get('multiple') && !$view->get('expanded')) {
             // Add "[]" to the name in case a select tag with multiple options is
@@ -117,6 +118,7 @@ class ChoiceType extends AbstractType
             'preferred_choices' => array(),
             'csrf_protection' => false,
             'empty_data' => $multiple || $expanded ? array() : '',
+            'empty_value' => null,
             'error_bubbling' => false,
         );
     }

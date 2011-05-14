@@ -17,7 +17,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class EmailValidator extends ConstraintValidator
 {
-
     public function isValid($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {
@@ -29,21 +28,26 @@ class EmailValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
+        $valid = filter_var($value, FILTER_VALIDATE_EMAIL);
 
-        if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+        if ($valid) {
+            $host = substr($value, strpos($value, '@') + 1);
+
+            // Likely not a FQDN, bug in PHP FILTER_VALIDATE_EMAIL prior to PHP 5.3.3
+            if (version_compare(PHP_VERSION, '5.3.3', '<') && strpos($host, '.') === false) {
+                $valid = false;
+            }
+
+            // Do not check MX records if host is invalid
+            if ($valid && $constraint->checkMX) {
+                $valid = $this->checkMX($host));
+            }
+        }
+
+        if (!$valid) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;
-        }
-
-        if ($constraint->checkMX) {
-            $host = substr($value, strpos($value, '@') + 1);
-
-            if (!$this->checkMX($host)) {
-                $this->setMessage($constraint->message, array('{{ value }}' => $value));
-
-                return false;
-            }
         }
 
         return true;

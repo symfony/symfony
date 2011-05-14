@@ -30,18 +30,15 @@ class EmailValidator extends ConstraintValidator
         $value = (string) $value;
         $valid = filter_var($value, FILTER_VALIDATE_EMAIL);
 
-        if ($valid) {
-            $host = substr($value, strpos($value, '@') + 1);
-
+        $host = substr($value, strpos($value, '@') + 1);
+        if ($valid && version_compare(PHP_VERSION, '5.3.3', '<') && strpos($host, '.') === false) {
             // Likely not a FQDN, bug in PHP FILTER_VALIDATE_EMAIL prior to PHP 5.3.3
-            if (version_compare(PHP_VERSION, '5.3.3', '<') && strpos($host, '.') === false) {
-                $valid = false;
-            }
+            $valid = false;
+        }
 
-            // Do not check MX records if host is invalid
-            if ($valid && $constraint->checkMX) {
-                $valid = $this->checkMX($host));
-            }
+        // Check MX records
+        if ($valid && $constraint->checkMX) {
+            $valid = $this->checkMX($host);
         }
 
         if (!$valid) {

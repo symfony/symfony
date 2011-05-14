@@ -228,7 +228,7 @@ class Session implements \Serializable
 
     public function getFlash($name, $default = null)
     {
-        return array_key_exists($name, $this->attributes['_flash']) ? $this->attributes['_flash'][$name] : $default;
+        return array_key_exists($name, $this->getFlashes()) ? $this->attributes['_flash'][$name] : $default;
     }
 
     public function setFlash($name, $value)

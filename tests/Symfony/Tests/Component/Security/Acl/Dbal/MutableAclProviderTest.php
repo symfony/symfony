@@ -337,6 +337,28 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($parentAcl->getId(), $reloadedAcl->getParentAcl()->getId());
     }
 
+    public function testUpdateAclUpdatesChildAclsCorrectly()
+    {
+        $provider = $this->getProvider();
+        $acl = $provider->createAcl(new ObjectIdentity(1, 'Foo'));
+
+        $parentAcl = $provider->createAcl(new ObjectIdentity(1, 'Bar'));
+        $acl->setParentAcl($parentAcl);
+        $provider->updateAcl($acl);
+
+        $parentParentAcl = $provider->createAcl(new ObjectIdentity(1, 'Baz'));
+        $parentAcl->setParentAcl($parentParentAcl);
+        $provider->updateAcl($parentAcl);
+
+        $newParentParentAcl = $provider->createAcl(new ObjectIdentity(2, 'Baz'));
+        $parentAcl->setParentAcl($newParentParentAcl);
+        $provider->updateAcl($parentAcl);
+
+        $reloadProvider = $this->getProvider();
+        $reloadedAcl = $reloadProvider->findAcl(new ObjectIdentity(1, 'Foo'));
+        $this->assertEquals($newParentParentAcl->getId(), $reloadedAcl->getParentAcl()->getParentAcl()->getId());
+    }
+
     /**
      * Data must have the following format:
      * array(

@@ -15,10 +15,12 @@ require_once __DIR__.'/../Fixtures/Entity.php';
 
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
 use Symfony\Tests\Component\Validator\Fixtures\Entity;
+use Symfony\Tests\Component\Validator\Fixtures\MagicGetter;
 
 class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
 {
     const CLASSNAME = 'Symfony\Tests\Component\Validator\Fixtures\Entity';
+    const MAGIC_CLASSNAME = 'Symfony\Tests\Component\Validator\Fixtures\MagicGetter';
 
     public function testInvalidPropertyName()
     {
@@ -33,6 +35,22 @@ class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
         $metadata = new PropertyMetadata(self::CLASSNAME, 'internal');
 
         $this->assertEquals('foobar', $metadata->getValue($entity));
+    }
+
+    public function testGetValueFromMagicGet()
+    {
+        $entity = new MagicGetter;
+        $metadata = new PropertyMetadata(self::MAGIC_CLASSNAME, 'amagicproperty');
+
+        $this->assertEquals('Magic Get Value', $metadata->getValue($entity));
+    }
+
+    public function testInvalidValueFromMagicGet()
+    {
+        $entity = new MagicGetter;
+        $metadata = new PropertyMetadata(self::MAGIC_CLASSNAME, 'amagicproperty');
+
+        $this->assertNotEquals('Not a Magic Get Value', $metadata->getValue($entity));
     }
 }
 

@@ -18,6 +18,7 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\SessionUnavailableException;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Events as KernelEvents;
@@ -121,6 +122,14 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         try {
             if (null === $returnValue = $this->attemptAuthentication($request)) {
                 return;
+            }
+
+            if (!$request->hasSession()) {
+                throw new \RuntimeException('This authentication method requires a session.');
+            }
+
+            if (!$request->hasPreviousSession()) {
+                throw new SessionUnavailableException('Your session has timed-out, or you have disabled cookies.');
             }
 
             if ($returnValue instanceof TokenInterface) {

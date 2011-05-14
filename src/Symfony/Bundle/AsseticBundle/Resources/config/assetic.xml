@@ -10,6 +10,8 @@
         <parameter key="assetic.asset_manager_cache_warmer.class">Symfony\Bundle\AsseticBundle\CacheWarmer\AssetManagerCacheWarmer</parameter>
         <parameter key="assetic.cached_formula_loader.class">Assetic\Factory\Loader\CachedFormulaLoader</parameter>
         <parameter key="assetic.config_cache.class">Assetic\Cache\ConfigCache</parameter>
+        <parameter key="assetic.config_loader.class">Symfony\Bundle\AsseticBundle\Factory\Loader\ConfigurationLoader</parameter>
+        <parameter key="assetic.config_resource.class">Symfony\Bundle\AsseticBundle\Factory\Resource\ConfigurationResource</parameter>
         <parameter key="assetic.coalescing_directory_resource.class">Assetic\Factory\Resource\CoalescingDirectoryResource</parameter>
         <parameter key="assetic.directory_resource.class">Symfony\Bundle\AsseticBundle\Factory\Resource\DirectoryResource</parameter>
         <parameter key="assetic.filter_manager.class">Symfony\Bundle\AsseticBundle\FilterManager</parameter>
@@ -31,9 +33,17 @@
 
         <service id="assetic.asset_factory" class="%assetic.asset_factory.class%" public="false">
             <argument type="service" id="kernel" />
+            <argument type="service" id="service_container" />
             <argument>%assetic.read_from%</argument>
             <argument>%assetic.debug%</argument>
-            <call method="setFilterManager"><argument type="service" id="assetic.filter_manager" /></call>
+        </service>
+
+        <service id="assetic.config_loader" class="%assetic.config_loader.class%" public="false">
+            <tag name="assetic.formula_loader" alias="config" />
+        </service>
+        <service id="assetic.config_resource" class="%assetic.config_resource.class%" public="false">
+            <tag name="assetic.formula_resource" loader="config" />
+            <argument type="collection" /> <!-- configured formulae -->
         </service>
 
         <service id="assetic.config_cache" class="%assetic.config_cache.class%" public="false">

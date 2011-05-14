@@ -68,9 +68,13 @@ class FormHelper extends Helper
         return $this->renderSection($view, 'enctype');
     }
 
-    public function widget(FormView $view, array $variables = array())
+    public function widget(FormView $view, array $variables = array(), $resources = null)
     {
-        return trim($this->renderSection($view, 'widget', $variables));
+        if (null !== $resources && !is_array($resources)) {
+            $resources = array($resources);
+        }
+
+        return trim($this->renderSection($view, 'widget', $variables, $resources));
     }
 
     /**
@@ -101,7 +105,7 @@ class FormHelper extends Helper
         return $this->renderSection($view, 'rest', $variables);
     }
 
-    protected function renderSection(FormView $view, $section, array $variables = array())
+    protected function renderSection(FormView $view, $section, array $variables = array(), array $resources = null)
     {
         $template = null;
         $blocks = $view->get('types');
@@ -109,7 +113,8 @@ class FormHelper extends Helper
 
         foreach ($blocks as &$block) {
             $block = $block.'_'.$section;
-            $template = $this->lookupTemplate($block);
+            $theme = isset($resources['theme']) ? $resources['theme'] : null;
+            $template = $this->lookupTemplate($block, $theme);
 
             if ($template) {
                 break;
@@ -144,19 +149,18 @@ class FormHelper extends Helper
         return $html;
     }
 
-    protected function lookupTemplate($templateName)
+    protected function lookupTemplate($templateName, $theme = null)
     {
         if (isset(self::$cache[$templateName])) {
             return self::$cache[$templateName];
         }
 
-        $template = $templateName.'.html.php';
-/*
-        if ($this->templateDir) {
-            $template = $this->templateDir.':'.$template;
+        if ($theme) {
+            $template = $theme;
+        } else {
+            $template = 'FrameworkBundle:Form:'.$templateName.'.html.php';
         }
-*/
-$template = 'FrameworkBundle:Form:'.$template;
+
         if (!$this->engine->exists($template)) {
             $template = false;
         }

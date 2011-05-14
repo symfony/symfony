@@ -60,4 +60,13 @@ class XmlDriver extends BaseXmlDriver
             }
         }
     }
+
+    protected function _findMappingFile($className)
+    {
+        if (false !== $pos = strrpos($className, '\\')) {
+            $className = substr($className, $pos+1);
+        }
+
+        return parent::_findMappingFile($className);
+    }
 }

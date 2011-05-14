@@ -139,6 +139,10 @@ beta1 to beta2
 
 * Serializer: The `$properties` argument has been dropped from all interfaces.
 
+* Form: Renamed option value "text" of "widget" option of the "date" type was 
+  renamed to "single-text". "text" indicates to use separate text boxes now
+  (like for the "time" type).
+
 PR12 to beta1
 -------------
 

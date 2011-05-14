@@ -11,13 +11,15 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\Controller;
 
+use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
+
 use Symfony\Bundle\WebProfilerBundle\Controller\ExceptionController;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\DependencyInjection\Definition;
 
-class ExceptionControllerTest extends \PHPUnit_Framework_TestCase
+class ExceptionControllerTest extends TestCase
 {
     protected $controller;
     protected $container;
@@ -26,6 +28,8 @@ class ExceptionControllerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        parent::setUp();
+
         $this->flatten = $this->getMock('Symfony\Component\HttpKernel\Exception\FlattenException');
         $this->flatten->expects($this->once())->method('getStatusCode')->will($this->returnValue(404));
         $this->controller = new ExceptionController();

@@ -77,6 +77,61 @@ class DelegatingValidator implements FormValidatorInterface
         }
     }
 
+    /**
+     * Validates the data of a form
+     *
+     * This method is called automatically during the validation process.
+     *
+     * @param FormInterface    $form    The validated form
+     * @param ExecutionContext $context The current validation context
+     */
+    public static function validateFormData(FormInterface $form, ExecutionContext $context)
+    {
+        if (is_object($form->getData()) || is_array($form->getData())) {
+            $propertyPath = $context->getPropertyPath();
+            $graphWalker = $context->getGraphWalker();
+
+            // The Execute constraint is called on class level, so we need to
+            // set the property manually
+            $context->setCurrentProperty('data');
+
+            // Adjust the property path accordingly
+            if (!empty($propertyPath)) {
+                $propertyPath .= '.';
+            }
+
+            $propertyPath .= 'data';
+
+            foreach (self::getFormValidationGroups($form) as $group) {
+                $graphWalker->walkReference($form->getData(), $group, $propertyPath, true);
+            }
+        }
+    }
+
+    static protected function getFormValidationGroups(FormInterface $form)
+    {
+        $groups = null;
+
+        if ($form->hasAttribute('validation_groups')) {
+            $groups = $form->getAttribute('validation_groups');
+        }
+
+        $currentForm = $form;
+        while (!$groups && $currentForm->hasParent()) {
+            $currentForm = $currentForm->getParent();
+
+            if ($currentForm->hasAttribute('validation_groups')) {
+                $groups = $currentForm->getAttribute('validation_groups');
+            }
+        }
+
+        if (null === $groups) {
+            $groups = array('Default');
+        }
+
+        return (array) $groups;
+    }
+
     private function buildFormPathMapping(FormInterface $form, array &$mapping, $formPath = '', $namePath = '')
     {
         if ($formPath) {
@@ -177,60 +232,5 @@ class DelegatingValidator implements FormValidatorInterface
                 $mapping[$pattern] = $forms[$form];
             }
         }
-    }
-
-    /**
-     * Validates the data of a form
-     *
-     * This method is called automatically during the validation process.
-     *
-     * @param FormInterface    $form    The validated form
-     * @param ExecutionContext $context The current validation context
-     */
-    public static function validateFormData(FormInterface $form, ExecutionContext $context)
-    {
-        if (is_object($form->getData()) || is_array($form->getData())) {
-            $propertyPath = $context->getPropertyPath();
-            $graphWalker = $context->getGraphWalker();
-
-            // The Execute constraint is called on class level, so we need to
-            // set the property manually
-            $context->setCurrentProperty('data');
-
-            // Adjust the property path accordingly
-            if (!empty($propertyPath)) {
-                $propertyPath .= '.';
-            }
-
-            $propertyPath .= 'data';
-
-            foreach (self::getFormValidationGroups($form) as $group) {
-                $graphWalker->walkReference($form->getData(), $group, $propertyPath, true);
-            }
-        }
-    }
-
-    static protected function getFormValidationGroups(FormInterface $form)
-    {
-        $groups = null;
-
-        if ($form->hasAttribute('validation_groups')) {
-            $groups = $form->getAttribute('validation_groups');
-        }
-
-        $currentForm = $form;
-        while (!$groups && $currentForm->hasParent()) {
-            $currentForm = $currentForm->getParent();
-
-            if ($currentForm->hasAttribute('validation_groups')) {
-                $groups = $currentForm->getAttribute('validation_groups');
-            }
-        }
-
-        if (null === $groups) {
-            $groups = array('Default');
-        }
-
-        return (array) $groups;
     }
 }

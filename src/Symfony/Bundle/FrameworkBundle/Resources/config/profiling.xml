@@ -17,20 +17,20 @@
         </service>
 
         <service id="profiler.storage" class="" public="false">
-            <argument /> <!-- DSN -->
-            <argument /> <!-- Username -->
-            <argument /> <!-- Password -->
-            <argument /> <!-- Lifetime -->
+            <argument>%profiler.storage.dsn%</argument>
+            <argument>%profiler.storage.username%</argument>
+            <argument>%profiler.storage.password%</argument>
+            <argument>%profiler.storage.lifetime%</argument>
         </service>
 
         <service id="profiler_listener" class="%profiler_listener.class%">
-            <tag name="kernel.listener" event="onCoreResponse" />
+            <tag name="kernel.listener" event="onCoreResponse" priority="-100" />
             <tag name="kernel.listener" event="onCoreException" />
             <tag name="kernel.listener" event="onCoreRequest" />
             <argument type="service" id="service_container" />
             <argument type="service" id="profiler.request_matcher" on-invalid="null" />
-            <argument /> <!-- Only exceptions? -->
-            <argument /> <!-- Only master requests? -->
+            <argument>%profiler_listener.only_exceptions%</argument>
+            <argument>%profiler_listener.only_master_requests%</argument>
         </service>
     </services>
 </container>

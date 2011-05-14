@@ -30,15 +30,15 @@ class TimeType extends AbstractType
 
         if ($options['widget'] === 'choice') {
             $hourOptions['choice_list'] =  new PaddedChoiceList(
-                $options['hours'], 2, '0', STR_PAD_LEFT
+                array_combine($options['hours'], $options['hours']), 2, '0', STR_PAD_LEFT
             );
             $minuteOptions['choice_list'] = new PaddedChoiceList(
-                $options['minutes'], 2, '0', STR_PAD_LEFT
+                array_combine($options['minutes'], $options['minutes']), 2, '0', STR_PAD_LEFT
             );
 
             if ($options['with_seconds']) {
                 $secondOptions['choice_list'] = new PaddedChoiceList(
-                    $options['seconds'], 2, '0', STR_PAD_LEFT
+                    array_combine($options['seconds'], $options['seconds']), 2, '0', STR_PAD_LEFT
                 );
             }
         }
@@ -93,6 +93,22 @@ class TimeType extends AbstractType
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference' => false,
+        );
+    }
+
+    public function getAllowedOptionValues(array $options)
+    {
+        return array(
+            'input' => array(
+                'datetime',
+                'string',
+                'timestamp',
+                'array',
+            ),
+            'widget' => array(
+                'text',
+                'choice',
+            ),
         );
     }
 

@@ -42,7 +42,6 @@ class EntityType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         $defaultOptions = array(
-            'template' => 'choice',
             'multiple' => false,
             'expanded' => false,
             'em' => $this->em,

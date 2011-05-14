@@ -41,22 +41,6 @@ class DefaultCsrfProvider implements CsrfProviderInterface
     }
 
     /**
-     * Returns the ID of the user session
-     *
-     * Automatically starts the session if necessary.
-     *
-     * @return string  The session ID
-     */
-    protected function getSessionId()
-    {
-        if (!session_id()) {
-            session_start();
-        }
-
-        return session_id();
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function generateCsrfToken($pageId)
@@ -70,5 +54,21 @@ class DefaultCsrfProvider implements CsrfProviderInterface
     public function isCsrfTokenValid($pageId, $token)
     {
         return $token === $this->generateCsrfToken($pageId);
+    }
+
+    /**
+     * Returns the ID of the user session
+     *
+     * Automatically starts the session if necessary.
+     *
+     * @return string  The session ID
+     */
+    protected function getSessionId()
+    {
+        if (!session_id()) {
+            session_start();
+        }
+
+        return session_id();
     }
 }

@@ -16,56 +16,52 @@ namespace Symfony\Component\Form\Extension\Core\ChoiceList;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-class TimezoneChoiceList extends ArrayChoiceList
+class TimezoneChoiceList implements ChoiceListInterface
 {
     /**
      * Stores the available timezone choices
      * @var array
      */
-    protected static $timezones = array();
-
-    public function __construct()
-    {
-        parent::__construct(array());
-    }
+    static protected $timezones;
 
     /**
-     * Loads the timezone choices
+     * Returns the timezone choices.
      *
      * The choices are generated from the ICU function
      * \DateTimeZone::listIdentifiers(). They are cached during a single request,
      * so multiple timezone fields on the same page don't lead to unnecessary
      * overhead.
      *
-     * @return array  The timezone choices
+     * @return array The timezone choices
      */
-    protected function load()
+    public function getChoices()
     {
-        parent::load();
-
-        if (count(self::$timezones) == 0) {
-            foreach (\DateTimeZone::listIdentifiers() as $timezone) {
-                $parts = explode('/', $timezone);
-
-                if (count($parts) > 2) {
-                    $region = $parts[0];
-                    $name = $parts[1].' - '.$parts[2];
-                } else if (count($parts) > 1) {
-                    $region = $parts[0];
-                    $name = $parts[1];
-                } else {
-                    $region = 'Other';
-                    $name = $parts[0];
-                }
-
-                if (!isset(self::$timezones[$region])) {
-                    self::$timezones[$region] = array();
-                }
-
-                self::$timezones[$region][$timezone] = str_replace('_', ' ', $name);
-            }
+        if (null !== static::$timezones) {
+            return static::$timezones;
         }
 
-        $this->choices = self::$timezones;
+        static::$timezones = array();
+        foreach (\DateTimeZone::listIdentifiers() as $timezone) {
+            $parts = explode('/', $timezone);
+
+            if (count($parts) > 2) {
+                $region = $parts[0];
+                $name = $parts[1].' - '.$parts[2];
+            } else if (count($parts) > 1) {
+                $region = $parts[0];
+                $name = $parts[1];
+            } else {
+                $region = 'Other';
+                $name = $parts[0];
+            }
+
+            if (!isset(static::$timezones[$region])) {
+                static::$timezones[$region] = array();
+            }
+
+            static::$timezones[$region][$timezone] = str_replace('_', ' ', $name);
+        }
+
+        return static::$timezones;
     }
 }

@@ -123,12 +123,12 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         $this->assertEquals($dateTime->format('d.m.Y H:i'), $transformer->transform($input));
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
     public function testTransformRequiresValidDateTime()
     {
         $transformer = new DateTimeToLocalizedStringTransformer();
-
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
-
         $transformer->transform('2010-01-01');
     }
 
@@ -225,35 +225,37 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         $this->assertSame(null, $transformer->reverseTransform('', null));
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
     public function testReverseTransformRequiresString()
     {
         $transformer = new DateTimeToLocalizedStringTransformer();
-
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
-
         $transformer->reverseTransform(12345, null);
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     */
     public function testReverseTransformWrapsIntlErrors()
     {
         $transformer = new DateTimeToLocalizedStringTransformer();
-
-        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
-
         $transformer->reverseTransform('12345', null);
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
     public function testValidateDateFormatOption()
     {
-        $this->setExpectedException('\InvalidArgumentException');
-
         new DateTimeToLocalizedStringTransformer(null, null, 'foobar');
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
     public function testValidateTimeFormatOption()
     {
-        $this->setExpectedException('\InvalidArgumentException');
-
         new DateTimeToLocalizedStringTransformer(null, null, null, 'foobar');
     }
 }

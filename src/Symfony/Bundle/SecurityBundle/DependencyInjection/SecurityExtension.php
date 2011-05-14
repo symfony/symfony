@@ -62,7 +62,7 @@ class SecurityExtension extends Extension
 
         // set some global scalars
         $container->setParameter('security.access.denied_url', $config['access_denied_url']);
-        $container->getDefinition('security.authentication.session_strategy')->replaceArgument(0, $config['session_fixation_strategy']);
+        $container->setParameter('security.authentication.session_strategy.strategy', $config['session_fixation_strategy']);
         $container
             ->getDefinition('security.access.decision_manager')
             ->addArgument($config['access_decision_manager']['strategy'])
@@ -110,12 +110,26 @@ class SecurityExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('security_acl.xml');
 
-        if (isset($config['connection'])) {
-            $container->setAlias('security.acl.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']));
-        }
-
         if (isset($config['cache']['id'])) {
             $container->setAlias('security.acl.cache', $config['cache']['id']);
+        }
+        $container->getDefinition('security.acl.voter.basic_permissions')->addArgument($config['voter']['allow_if_object_identity_unavailable']);
+
+        // custom ACL provider
+        if (isset($config['provider'])) {
+            $container->setAlias('security.acl.provider', $config['provider']);
+            return;
+        }
+
+        $this->configureDbalAclProvider($config, $container, $loader);
+    }
+
+    private function configureDbalAclProvider(array $config, ContainerBuilder $container, $loader)
+    {
+        $loader->load('security_acl_dbal.xml');
+
+        if (isset($config['connection'])) {
+            $container->setAlias('security.acl.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']));
         }
         $container->getDefinition('security.acl.cache.doctrine')->addArgument($config['cache']['prefix']);
 
@@ -124,8 +138,6 @@ class SecurityExtension extends Extension
         $container->setParameter('security.acl.dbal.oid_table_name', $config['tables']['object_identity']);
         $container->setParameter('security.acl.dbal.oid_ancestors_table_name', $config['tables']['object_identity_ancestors']);
         $container->setParameter('security.acl.dbal.sid_table_name', $config['tables']['security_identity']);
-
-        $container->getDefinition('security.acl.voter.basic_permissions')->addArgument($config['voter']['allow_if_object_identity_unavailable']);
     }
 
     /**
@@ -593,3 +605,4 @@ class SecurityExtension extends Extension
         return 'http://symfony.com/schema/dic/security';
     }
 }
+

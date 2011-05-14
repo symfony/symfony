@@ -65,7 +65,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
 
     public function testDecode()
     {
-        $this->serializer->setEncoder('json', new JsonEncoder());
+        $this->serializer->setDecoder('json', new JsonEncoder());
         $data = array('foo', array(5, 3));
         $result = $this->serializer->decode(json_encode($data), 'json');
         $this->assertEquals($data, $result);

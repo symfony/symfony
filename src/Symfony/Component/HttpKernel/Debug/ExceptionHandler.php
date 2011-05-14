@@ -1,0 +1,166 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\HttpKernel\Debug;
+
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\FlattenException;
+
+/**
+ * ExceptionHandler converts an exception to a Response object.
+ *
+ * It is mostly useful in debug mode to replace the default PHP/XDebug
+ * output with something prettier and more useful.
+ *
+ * As this class is mainly used during Kernel boot, where nothing is yet
+ * available, the Response content is always HTML.
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ */
+class ExceptionHandler
+{
+    /**
+     * Register the exception handler.
+     *
+     * @return The registered exception handler
+     */
+    static public function register()
+    {
+        $handler = new static();
+
+        set_exception_handler(array($handler, 'handle'));
+
+        return $handler;
+    }
+
+    /**
+     * Returns a Response for the given Exception.
+     *
+     * @param \Exception $exception An \Exception instance
+     *
+     * @return Response A Response instance
+     */
+    public function handle(\Exception $exception)
+    {
+        $exception = FlattenException::create($exception);
+
+        $response = new Response($this->decorate($exception, $this->getContent($exception)), 500);
+
+        $response->send();
+    }
+
+    private function getContent($exception)
+    {
+        $message = nl2br($exception->getMessage());
+        $class = $this->abbrClass($exception->getClass());
+        $count = count($exception->getAllPrevious());
+        $content = '';
+        foreach ($exception->toArray() as $position => $e) {
+            $ind = $count - $position + 1;
+            $total = $count + 1;
+            $class = $this->abbrClass($e['class']);
+            $message = nl2br($e['message']);
+            $content .= "<div class=\"block_exception clear_fix\"><h1><span>$ind/$total</span> $class: $message</h1></div><div class=\"block\"><ol class=\"traces list_exception\">";
+            foreach ($e['trace'] as $i => $trace) {
+                $content .= '<li>';
+                if ($trace['function']) {
+                    $content .= sprintf('at %s%s%s()', $this->abbrClass($trace['class']), $trace['type'], $trace['function']);
+                }
+                if (isset($trace['file']) && isset($trace['line'])) {
+                    $content .= sprintf(' in %s line %s', $trace['file'], $trace['line']);
+                }
+                $content .= '</li>';
+            }
+
+            $content .= '</ol></div>';
+        }
+
+        return '<div class="sf-exceptionreset">'.$content.'</div>';
+    }
+
+    private function decorate($exception, $content)
+    {
+        $title = sprintf('%s (%s %s)', $exception->getMessage(), $exception->getStatusCode(), Response::$statusTexts[$exception->getStatusCode()]);
+
+        return <<<EOF
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta name="robots" content="noindex,nofollow" />
+        <title>{$title}</title>
+        <style>
+            /* Copyright (c) 2010, Yahoo! Inc. All rights reserved. Code licensed under the BSD License: http://developer.yahoo.com/yui/license.html */
+            html{color:#000;background:#FFF;}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0;}table{border-collapse:collapse;border-spacing:0;}fieldset,img{border:0;}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal;}li{list-style:none;}caption,th{text-align:left;}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal;}q:before,q:after{content:'';}abbr,acronym{border:0;font-variant:normal;}sup{vertical-align:text-top;}sub{vertical-align:text-bottom;}input,textarea,select{font-family:inherit;font-size:inherit;font-weight:inherit;}input,textarea,select{*font-size:100%;}legend{color:#000;}
+
+            html { background: #eee; padding: 10px }
+            body { font: 11px Verdana, Arial, sans-serif; color: #333 }
+            img { border: 0; }
+            .clear { clear:both; height:0; font-size:0; line-height:0; }
+            .clear_fix:after { display:block; height:0; clear:both; visibility:hidden; }
+            .clear_fix { display:inline-block; }
+            * html .clear_fix { height:1%; }
+            .clear_fix { display:block; }
+            #content { width:970px; margin:0 auto; }
+            .sf-exceptionreset, .sf-exceptionreset .block { margin: auto }
+            .sf-exceptionreset abbr { border-bottom: 1px dotted #000; cursor: help; }
+            .sf-exceptionreset p { font-size:14px; line-height:20px; color:#868686; padding-bottom:20px }
+            .sf-exceptionreset strong { font-weight:bold; }
+            .sf-exceptionreset a { color:#6c6159; }
+            .sf-exceptionreset a img { border:none; }
+            .sf-exceptionreset a:hover { text-decoration:underline; }
+            .sf-exceptionreset em { font-style:italic; }
+            .sf-exceptionreset h1 { font: 20px Georgia, "Times New Roman", Times, serif }
+            .sf-exceptionreset h1 span { background-color: #fff; color: #333; padding: 6px; float: left; margin-right: 10px; }
+            .sf-exceptionreset .traces li { font-size:12px; padding: 2px 4px; list-style-type:decimal; margin-left:20px; }
+            .sf-exceptionreset .block { background-color:#FFFFFF; padding:10px 28px; margin-bottom:20px;
+                -webkit-border-bottom-right-radius: 16px;
+                -webkit-border-bottom-left-radius: 16px;
+                -moz-border-radius-bottomright: 16px;
+                -moz-border-radius-bottomleft: 16px;
+                border-bottom-right-radius: 16px;
+                border-bottom-left-radius: 16px;
+                border-bottom:1px solid #ccc;
+                border-right:1px solid #ccc;
+                border-left:1px solid #ccc;
+            }
+            .sf-exceptionreset .block_exception { background-color:#ddd; color: #333; padding:20px;
+                -webkit-border-top-left-radius: 16px;
+                -webkit-border-top-right-radius: 16px;
+                -moz-border-radius-topleft: 16px;
+                -moz-border-radius-topright: 16px;
+                border-top-left-radius: 16px;
+                border-top-right-radius: 16px;
+                border-top:1px solid #ccc;
+                border-right:1px solid #ccc;
+                border-left:1px solid #ccc;
+            }
+            .sf-exceptionreset li a { background:none; color:#868686; text-decoration:none; }
+            .sf-exceptionreset li a:hover { background:none; color:#313131; text-decoration:underline; }
+            .sf-exceptionreset ol { padding: 10px 0; }
+        </style>
+    </head>
+    <body>
+        <div id="content">
+            $content
+        </div>
+    </body>
+</html>
+EOF;
+    }
+
+    private function abbrClass($class)
+    {
+        $parts = explode('\\', $class);
+
+        return sprintf("<abbr title=\"%s\">%s</abbr>", $class, array_pop($parts));
+    }
+}

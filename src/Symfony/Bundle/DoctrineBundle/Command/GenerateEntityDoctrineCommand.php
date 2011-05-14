@@ -59,7 +59,7 @@ EOT
     {
         $bundle = $this->getApplication()->getKernel()->getBundle($input->getArgument('bundle'));
 
-        $entity = $input->getArgument('entity');
+        $entity = str_replace('/', '\\', $input->getArgument('entity'));
         $fullEntityClassName = $bundle->getNamespace().'\\Entity\\'.$entity;
         $mappingType = $input->getOption('mapping-type');
 
@@ -92,7 +92,7 @@ EOT
         $cme = new ClassMetadataExporter();
         $exporter = $cme->getExporter($mappingType);
 
-        $entityPath = $bundle->getPath().'/Entity/'.$entity.'.php';
+        $entityPath = $bundle->getPath().'/Entity/'.str_replace('\\', '/', $entity).'.php';
         if (file_exists($entityPath)) {
             throw new \RuntimeException(sprintf("Entity %s already exists.", $class->name));
         }
@@ -130,6 +130,5 @@ EOT
             }
             file_put_contents($mappingPath, $mappingCode);
         }
-
     }
 }

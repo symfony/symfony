@@ -127,7 +127,16 @@ class Request
      */
     static public function createFromGlobals()
     {
-        return new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
+        $request = new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
+
+        if (0 === strpos($request->server->get('CONTENT_TYPE'), 'application/x-www-form-urlencoded')
+            && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), array('PUT', 'DELETE'))
+        ) {
+            parse_str($request->getContent(), $data);
+            $request->request = new ParameterBag($data);
+        }
+
+        return $request;
     }
 
     /**
@@ -298,9 +307,9 @@ class Request
     //  * slow
     //  * prefer to get from a "named" source
     // This method is mainly useful for libraries that want to provide some flexibility
-    public function get($key, $default = null)
+    public function get($key, $default = null, $deep = false)
     {
-        return $this->query->get($key, $this->attributes->get($key, $this->request->get($key, $default)));
+        return $this->query->get($key, $this->attributes->get($key, $this->request->get($key, $default, $deep), $deep), $deep);
     }
 
     public function getSession()
@@ -308,10 +317,26 @@ class Request
         return $this->session;
     }
 
-    public function hasSession()
+    /**
+     * Whether the request contains a Session which was started in one of the
+     * previous requests.
+     *
+     * @return boolean
+     */
+    public function hasPreviousSession()
     {
         // the check for $this->session avoids malicious users trying to fake a session cookie with proper name
         return $this->cookies->has(session_name()) && null !== $this->session;
+    }
+
+    /**
+     * Whether the request contains a Session object.
+     *
+     * @return boolean
+     */
+    public function hasSession()
+    {
+        return null !== $this->session;
     }
 
     public function setSession(Session $session)

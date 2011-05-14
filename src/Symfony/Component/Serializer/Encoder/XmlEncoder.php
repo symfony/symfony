@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  * @author John Wards <jwards@whiteoctober.co.uk>
  * @author Fabian Vogler <fabian@equivalence.ch>
  */
-class XmlEncoder extends AbstractEncoder implements DecoderInterface
+class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, NormalizationAwareInterface
 {
     private $dom;
     private $format;
@@ -38,7 +38,7 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
         $this->dom = new \DOMDocument();
         $this->format = $format;
 
-        if ($this->serializer->isStructuredType($data)) {
+        if (null !== $data && !is_scalar($data)) {
             $root = $this->dom->createElement($this->rootNodeName);
             $this->dom->appendChild($root);
             $this->buildXml($root, $data);
@@ -248,16 +248,16 @@ class XmlEncoder extends AbstractEncoder implements DecoderInterface
         }
         if (is_object($data)) {
             $data = $this->serializer->normalizeObject($data, $this->format);
-            if (!$this->serializer->isStructuredType($data)) {
-                // top level data object is normalized into a scalar
-                if (!$parentNode->parentNode->parentNode) {
-                    $root = $parentNode->parentNode;
-                    $root->removeChild($parentNode);
-                    return $this->appendNode($root, $data, $this->rootNodeName);
-                }
-                return $this->appendNode($parentNode, $data, 'data');
+            if (null !== $data && !is_scalar($data)) {
+                return $this->buildXml($parentNode, $data);
             }
-            return $this->buildXml($parentNode, $data);
+            // top level data object was normalized into a scalar
+            if (!$parentNode->parentNode->parentNode) {
+                $root = $parentNode->parentNode;
+                $root->removeChild($parentNode);
+                return $this->appendNode($root, $data, $this->rootNodeName);
+            }
+            return $this->appendNode($parentNode, $data, 'data');
         }
         throw new \UnexpectedValueException('An unexpected value could not be serialized: '.var_export($data, true));
     }

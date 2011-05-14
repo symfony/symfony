@@ -52,11 +52,11 @@
         </service>
 
         <service id="validator.mapping.loader.xml_files_loader" class="%validator.mapping.loader.xml_files_loader.class%" public="false">
-            <argument /> <!-- mapping files -->
+            <argument type="collection">%validator.mapping.loader.xml_files_loader.mapping_files%</argument>
         </service>
 
         <service id="validator.mapping.loader.yaml_files_loader" class="%validator.mapping.loader.yaml_files_loader.class%" public="false">
-            <argument /> <!-- mapping files -->
+            <argument type="collection">%validator.mapping.loader.yaml_files_loader.mapping_files%</argument>
         </service>
     </services>
 </container>

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle;
+namespace Symfony\Bundle\FrameworkBundle\Listener;
 
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -27,7 +27,7 @@ use Symfony\Component\Routing\RequestContext;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RequestListener
+class RequestAttributeInitializingListener
 {
     private $router;
     private $logger;

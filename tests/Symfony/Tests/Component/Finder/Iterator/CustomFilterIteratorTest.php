@@ -18,6 +18,14 @@ require_once __DIR__.'/IteratorTestCase.php';
 class CustomFilterIteratorTest extends IteratorTestCase
 {
     /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testWithInvalidFilter()
+    {
+        new CustomFilterIterator(new Iterator(), array('foo'));
+    }
+
+    /**
      * @dataProvider getAcceptData
      */
     public function testAccept($filters, $expected)
@@ -34,6 +42,7 @@ class CustomFilterIteratorTest extends IteratorTestCase
         return array(
             array(array(function (\SplFileInfo $fileinfo) { return false; }), array()),
             array(array(function (\SplFileInfo $fileinfo) { return preg_match('/^test/', $fileinfo) > 0; }), array('test.php', 'test.py')),
+            array(array('is_dir'), array()),
         );
     }
 }

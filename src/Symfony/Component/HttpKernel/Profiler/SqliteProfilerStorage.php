@@ -31,6 +31,10 @@ class SqliteProfilerStorage extends PdoProfilerStorage
             }
             if (class_exists('SQLite3')) {
                 $db = new \SQLite3(substr($this->dsn, 7, strlen($this->dsn)), \SQLITE3_OPEN_READWRITE | \SQLITE3_OPEN_CREATE);
+                if (method_exists($db, 'busyTimeout')) {
+                    // busyTimeout only exists for PHP >= 5.3.3
+                    $db->busyTimeout(1000);
+                }
             } elseif (class_exists('PDO') && in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
                 $db = new \PDO($this->dsn);
             } else {

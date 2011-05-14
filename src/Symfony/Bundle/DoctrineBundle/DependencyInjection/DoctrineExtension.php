@@ -69,14 +69,14 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $container->setAlias('database_connection', sprintf('doctrine.dbal.%s_connection', $this->defaultConnection));
         $container->setAlias('doctrine.dbal.event_manager', new Alias(sprintf('doctrine.dbal.%s_connection.event_manager', $this->defaultConnection), false));
 
-        $container->getDefinition('doctrine.dbal.connection_factory')->replaceArgument(0, $config['types']);
+        $container->setParameter('doctrine.dbal.connection_factory.types', $config['types']);
 
         $connections = array();
         foreach (array_keys($config['connections']) as $name) {
             $connections[$name] = sprintf('doctrine.dbal.%s_connection', $name);
         }
-        $container->getDefinition('doctrine')->replaceArgument(1, $connections);
-        $container->getDefinition('doctrine')->replaceArgument(3, $this->defaultConnection);
+        $container->setParameter('doctrine.connections', $connections);
+        $container->setParameter('doctrine.default_connection', $this->defaultConnection);
 
         foreach ($config['connections'] as $name => $connection) {
             $this->loadDbalConnection($name, $connection, $container);
@@ -173,13 +173,13 @@ class DoctrineExtension extends AbstractDoctrineExtension
         foreach (array_keys($config['entity_managers']) as $name) {
             $this->entityManagers[$name] = sprintf('doctrine.orm.%s_entity_manager', $name);
         }
-        $container->getDefinition('doctrine')->replaceArgument(2, $this->entityManagers);
+        $container->setParameter('doctrine.entity_managers', $this->entityManagers);
 
         if (empty($config['default_entity_manager'])) {
             $tmp = array_keys($this->entityManagers);
             $config['default_entity_manager'] = reset($tmp);
         }
-        $container->getDefinition('doctrine')->replaceArgument(4, $config['default_entity_manager']);
+        $container->setParameter('doctrine.default_entity_manager', $config['default_entity_manager']);
 
         $options = array('auto_generate_proxy_classes', 'proxy_dir', 'proxy_namespace');
         foreach ($options as $key) {

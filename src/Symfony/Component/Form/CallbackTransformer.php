@@ -25,11 +25,11 @@ class CallbackTransformer implements DataTransformerInterface
 
     public function transform($data)
     {
-        return $this->transform->__invoke($data);
+        return call_user_func($this->transform, $data);
     }
 
     public function reverseTransform($data)
     {
-        return $this->reverseTransform->__invoke($data);
+        return call_user_func($this->reverseTransform, $data);
     }
 }

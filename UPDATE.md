@@ -201,9 +201,25 @@ beta1 to beta2
           'allow_add' => true,
           'allow_delete' => true,
       ));
+      
+* Request::hasSession() has been renamed to Request::hasPreviousSession(). The
+  method hasSession() still exists, but only checks if the request contains a
+  session object, not if the session was started in a previous request.
 
 * Serializer: The NormalizerInterface's `supports()` method has been split in
   two methods: `supportsNormalization` and `supportsDenormalization`.
+
+* ParameterBag::getDeep() has been removed, and is replaced with a boolean flag
+  on the ParameterBag::get() method.
+
+* Serializer: `AbstractEncoder` & `AbstractNormalizer` were renamed to
+  `SerializerAwareEncoder` & `SerializerAwareNormalizer`.
+
+* Serializer: The `$properties` argument has been dropped from all interfaces.
+
+* Form: Renamed option value "text" of "widget" option of the "date" type was 
+  renamed to "single-text". "text" indicates to use separate text boxes now
+  (like for the "time" type).
 
 PR12 to beta1
 -------------
@@ -224,6 +240,9 @@ PR12 to beta1
 
 * The `File::getWebPath()` and `File::rename()` methods have been removed, as
   well as the `framework.document_root` configuration setting.
+
+* The `File::getDefaultExtension()` method has been renamed to `File::guessExtension()`.
+  The renamed method now returns null if it cannot guess the extension.
 
 * The `session` configuration has been refactored:
 

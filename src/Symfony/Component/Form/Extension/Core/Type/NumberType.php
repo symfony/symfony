@@ -28,7 +28,22 @@ class NumberType extends AbstractType
             // default precision is locale specific (usually around 3)
             'precision' => null,
             'grouping' => false,
-            'rounding_mode' => NumberToLocalizedStringTransformer::ROUND_HALFUP,
+            'rounding_mode' => \NumberFormatter::ROUND_HALFUP,
+        );
+    }
+
+    public function getAllowedOptionValues(array $options)
+    {
+        return array(
+            'rounding_mode' => array(
+                \NumberFormatter::ROUND_FLOOR,
+                \NumberFormatter::ROUND_DOWN,
+                \NumberFormatter::ROUND_HALFDOWN,
+                \NumberFormatter::ROUND_HALFEVEN,
+                \NumberFormatter::ROUND_HALFUP,
+                \NumberFormatter::ROUND_UP,
+                \NumberFormatter::ROUND_CEILING,
+            ),
         );
     }
 

@@ -163,7 +163,7 @@ class ProfilerController extends ContainerAware
             'profiler'     => $profiler,
             'templates'    => $this->getTemplates($profiler),
             'profiler_url' => $url,
-            'verbose'      => $this->container->get('web_profiler.debug.toolbar')->getVerbose()
+            'verbose'      => $this->container->get('web_profiler.debug_toolbar')->getVerbose()
         ));
     }
 

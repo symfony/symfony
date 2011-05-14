@@ -58,7 +58,7 @@
         </service>
 
         <service id="security.authentication.session_strategy" class="%security.authentication.session_strategy.class%" public="false">
-            <argument /> <!-- Strategy -->
+            <argument>%security.authentication.session_strategy.strategy%</argument>
         </service>
 
         <service id="security.encoder_factory.generic" class="%security.encoder_factory.generic.class%" public="false">

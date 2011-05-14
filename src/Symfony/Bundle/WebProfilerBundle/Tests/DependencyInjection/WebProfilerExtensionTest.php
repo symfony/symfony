@@ -80,7 +80,7 @@ class WebProfilerExtensionTest extends \PHPUnit_Framework_TestCase
         $extension = new WebProfilerExtension();
         $extension->load(array(array()), $this->container);
 
-        $this->assertFalse($this->container->has('web_profiler.debug.toolbar'));
+        $this->assertFalse($this->container->has('web_profiler.debug_toolbar'));
 
         $this->assertSaneContainer($this->getDumpedContainer());
     }
@@ -95,7 +95,7 @@ class WebProfilerExtensionTest extends \PHPUnit_Framework_TestCase
         $extension = new WebProfilerExtension();
         $extension->load(array(array('toolbar' => $debug)), $this->container);
 
-        $this->assertTrue($debug === $this->container->has('web_profiler.debug.toolbar'), '->load() registers web_profiler.debug.toolbar only when toolbar is true');
+        $this->assertTrue($debug === $this->container->has('web_profiler.debug_toolbar'), '->load() registers web_profiler.debug_toolbar only when toolbar is true');
 
         $this->assertSaneContainer($this->getDumpedContainer());
     }

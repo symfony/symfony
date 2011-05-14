@@ -49,7 +49,7 @@ class ExceptionListener
         $request = $event->getRequest();
 
         if (null !== $this->logger) {
-            $message = sprintf('%s: %s (uncaught exception)', get_class($exception), $exception->getMessage());
+            $message = sprintf('%s: %s (uncaught exception) at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine());
             if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
                 $this->logger->crit($message);
             } else {

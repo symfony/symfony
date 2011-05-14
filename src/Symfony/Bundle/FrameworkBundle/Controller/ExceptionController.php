@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
@@ -45,21 +46,11 @@ class ExceptionController extends ContainerAware
             $currentContent .= ob_get_clean();
         }
 
-        $name = $this->container->get('kernel')->isDebug() ? 'exception' : 'error';
-        if ($this->container->get('kernel')->isDebug() && 'html' == $format) {
-            $name = 'exception_full';
-        }
-        $template = 'FrameworkBundle:Exception:'.$name.'.'.$format.'.twig';
-
         $templating = $this->container->get('templating');
-        if (!$templating->exists($template)) {
-            $this->container->get('request')->setRequestFormat('html');
-            $template = 'FrameworkBundle:Exception:'.$name.'.html.twig';
-        }
-
         $code = $exception->getStatusCode();
+
         $response = $templating->renderResponse(
-            $template,
+            $this->findTemplate($templating, $format, $code, $this->container->get('kernel')->isDebug()),
             array(
                 'status_code'    => $code,
                 'status_text'    => Response::$statusTexts[$code],
@@ -73,5 +64,32 @@ class ExceptionController extends ContainerAware
         $response->headers->replace($exception->getHeaders());
 
         return $response;
+    }
+
+    protected function findTemplate($templating, $format, $code, $debug)
+    {
+        $name = $debug ? 'exception' : 'error';
+        if ($debug && 'html' == $format) {
+            $name = 'exception_full';
+        }
+
+        // when not in debug, try to find a template for the specific HTTP status code and format
+        if (!$debug) {
+            $template = new TemplateReference('FrameworkBundle', 'Exception', $name.$code, $format, 'twig');
+            if ($templating->exists($template)) {
+                return $template;
+            }
+        }
+
+        // try to find a template for the given format
+        $template = new TemplateReference('FrameworkBundle', 'Exception', $name, $format, 'twig');
+        if ($templating->exists($template)) {
+            return $template;
+        }
+
+        // default to a generic HTML exception
+        $this->container->get('request')->setRequestFormat('html');
+
+        return new TemplateReference('FrameworkBundle', 'Exception', $name, 'html', 'twig');
     }
 }

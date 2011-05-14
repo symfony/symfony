@@ -62,20 +62,14 @@ class FrameworkExtension extends Extension
         $config = $processor->processConfiguration($configuration, $configs);
 
         $container->setParameter('kernel.cache_warmup', $config['cache_warmer']);
-
         if (isset($config['charset'])) {
             $container->setParameter('kernel.charset', $config['charset']);
         }
-
         $container->setParameter('kernel.secret', $config['secret']);
-
-        $container->getDefinition('exception_listener')->replaceArgument(0, $config['exception_controller']);
+        $container->setParameter('exception_listener.controller', $config['exception_controller']);
 
         if (!empty($config['test'])) {
             $loader->load('test.xml');
-            if (isset($config['session'])) {
-                $config['session']['storage_id'] = 'session.storage.filesystem';
-            }
         }
 
         if (isset($config['csrf_protection'])) {
@@ -152,11 +146,8 @@ class FrameworkExtension extends Extension
      */
     private function registerCsrfProtectionConfiguration(array $config, ContainerBuilder $container)
     {
-        $container
-            ->getDefinition('form.type_extension.csrf')
-            ->replaceArgument(0, $config['enabled'])
-            ->replaceArgument(1, $config['field_name'])
-        ;
+        $container->setParameter('form.type_extension.csrf.enabled', $config['enabled']);
+        $container->setParameter('form.type_extension.csrf.field_name', $config['field_name']);
     }
 
     /**
@@ -184,10 +175,8 @@ class FrameworkExtension extends Extension
         $loader->load('profiling.xml');
         $loader->load('collectors.xml');
 
-        $container->getDefinition('profiler_listener')
-            ->replaceArgument(2, $config['only_exceptions'])
-            ->replaceArgument(3, $config['only_master_requests'])
-        ;
+        $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);
+        $container->setParameter('profiler_listener.only_master_requests', $config['only_master_requests']);
 
         // Choose storage class based on the DSN
         $supported = array(
@@ -199,13 +188,12 @@ class FrameworkExtension extends Extension
             throw new \LogicException(sprintf('Driver "%s" is not supported for the profiler.', $class));
         }
 
-        $container->getDefinition('profiler.storage')
-            ->replaceArgument(0, $config['dsn'])
-            ->replaceArgument(1, $config['username'])
-            ->replaceArgument(2, $config['password'])
-            ->replaceArgument(3, $config['lifetime'])
-            ->setClass($supported[$class])
-        ;
+        $container->setParameter('profiler.storage.dsn', $config['dsn']);
+        $container->setParameter('profiler.storage.username', $config['username']);
+        $container->setParameter('profiler.storage.password', $config['password']);
+        $container->setParameter('profiler.storage.lifetime', $config['lifetime']);
+
+        $container->getDefinition('profiler.storage')->setClass($supported[$class]);
 
         if (isset($config['matcher'])) {
             if (isset($config['matcher']['service'])) {
@@ -236,8 +224,8 @@ class FrameworkExtension extends Extension
     {
         $loader->load('routing.xml');
 
+        $container->setParameter('router.resource', $config['resource']);
         $router = $container->findDefinition('router.real');
-        $router->replaceArgument(1, $config['resource']);
 
         if (isset($config['type'])) {
             $argument = $router->getArgument(2);
@@ -250,9 +238,8 @@ class FrameworkExtension extends Extension
             $container->setAlias('router', 'router.cached');
         }
 
-        $def = $container->getDefinition('request_listener');
-        $def->replaceArgument(2, $config['http_port']);
-        $def->replaceArgument(3, $config['https_port']);
+        $container->setParameter('request_listener.http_port', $config['http_port']);
+        $container->setParameter('request_listener.https_port', $config['https_port']);
 
         $this->addClassesToCompile(array(
             'Symfony\\Component\\Routing\\RouterInterface',
@@ -280,7 +267,7 @@ class FrameworkExtension extends Extension
         if (!empty($config['auto_start'])) {
             $session->addMethodCall('start');
         }
-        $session->replaceArgument(1, $config['default_locale']);
+        $container->setParameter('session.default_locale', $config['default_locale']);
 
         // session storage
         $container->setAlias('session.storage', $config['storage_id']);
@@ -322,10 +309,7 @@ class FrameworkExtension extends Extension
             'macvim'   => 'mvim://open?url=file://%f&line=%l',
         );
 
-        $container
-            ->getDefinition('templating.helper.code')
-            ->replaceArgument(0, str_replace('%', '%%', isset($links[$ide]) ? $links[$ide] : $ide))
-        ;
+        $container->setParameter('templating.helper.code.file_link_format', str_replace('%', '%%', isset($links[$ide]) ? $links[$ide] : $ide));
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('templating_debug.xml');
@@ -338,12 +322,10 @@ class FrameworkExtension extends Extension
                 $package['version'],
             ));
         }
-        $container
-            ->getDefinition('templating.helper.assets')
-            ->replaceArgument(1, isset($config['assets_base_urls']) ? $config['assets_base_urls'] : array())
-            ->replaceArgument(2, $config['assets_version'])
-            ->replaceArgument(3, $packages)
-        ;
+
+        $container->setParameter('templating.helper.assets.assets_base_urls', isset($config['assets_base_urls']) ? $config['assets_base_urls'] : array());
+        $container->setParameter('templating.helper.assets.assets_version', $config['assets_version']);
+        $container->setParameter('templating.helper.assets.packages', $packages);
 
         if (!empty($config['loaders'])) {
             $loaders = array_map(function($loader) { return new Reference($loader); }, $config['loaders']);
@@ -357,11 +339,12 @@ class FrameworkExtension extends Extension
             }
         }
 
+        $container->setParameter('templating.loader.cache.path', null);
         if (isset($config['cache'])) {
             // Wrap the existing loader with cache (must happen after loaders are registered)
             $container->setDefinition('templating.loader.wrapped', $container->findDefinition('templating.loader'));
             $loaderCache = $container->getDefinition('templating.loader.cache');
-            $loaderCache->replaceArgument(1, $config['cache']);
+            $container->setParameter('templating.loader.cache.path', $config['cache']);
 
             $container->setDefinition('templating.loader', $loaderCache);
         }
@@ -466,15 +449,8 @@ class FrameworkExtension extends Extension
 
         $loader->load('validator.xml');
 
-        $container
-            ->getDefinition('validator.mapping.loader.xml_files_loader')
-            ->replaceArgument(0, $this->getValidatorXmlMappingFiles($container))
-        ;
-
-        $container
-            ->getDefinition('validator.mapping.loader.yaml_files_loader')
-            ->replaceArgument(0, $this->getValidatorYamlMappingFiles($container))
-        ;
+        $container->setParameter('validator.mapping.loader.xml_files_loader.mapping_files', $this->getValidatorXmlMappingFiles($container));
+        $container->setParameter('validator.mapping.loader.yaml_files_loader.mapping_files', $this->getValidatorYamlMappingFiles($container));
 
         if ($config['enable_annotations']) {
             $loaderChain = $container->getDefinition('validator.mapping.loader.loader_chain');

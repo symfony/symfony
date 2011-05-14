@@ -5,16 +5,19 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="monolog.logger.class">Symfony\Bundle\MonologBundle\Logger\Logger</parameter>
+        <parameter key="monolog.logger.class">Symfony\Bridge\Monolog\Logger</parameter>
         <parameter key="monolog.handler.stream.class">Monolog\Handler\StreamHandler</parameter>
         <parameter key="monolog.handler.fingers_crossed.class">Monolog\Handler\FingersCrossedHandler</parameter>
+        <parameter key="monolog.handler.group.class">Monolog\Handler\GroupHandler</parameter>
         <parameter key="monolog.handler.buffer.class">Monolog\Handler\BufferHandler</parameter>
         <parameter key="monolog.handler.rotating_file.class">Monolog\Handler\RotatingFileHandler</parameter>
         <parameter key="monolog.handler.syslog.class">Monolog\Handler\SyslogHandler</parameter>
         <parameter key="monolog.handler.null.class">Monolog\Handler\NullHandler</parameter>
         <parameter key="monolog.handler.test.class">Monolog\Handler\TestHandler</parameter>
-        <parameter key="monolog.handler.firephp.class">Symfony\Bundle\MonologBundle\Logger\FirePHPHandler</parameter>
-        <parameter key="monolog.handler.debug.class">Symfony\Bundle\MonologBundle\Logger\DebugHandler</parameter>
+        <parameter key="monolog.handler.firephp.class">Symfony\Bridge\Monolog\Handler\FirePHPHandler</parameter>
+        <parameter key="monolog.handler.debug.class">Symfony\Bridge\Monolog\Handler\DebugHandler</parameter>
+        <parameter key="monolog.handler.swift_mailer.class">Monolog\Handler\SwiftMailerHandler</parameter>
+        <parameter key="monolog.handler.native_mailer.class">Monolog\Handler\NativeMailerHandler</parameter>
     </parameters>
 
     <services>

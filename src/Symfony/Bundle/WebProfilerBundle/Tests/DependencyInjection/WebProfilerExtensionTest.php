@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\DependencyInjection;
 
+use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
+
 use Symfony\Bundle\WebProfilerBundle\DependencyInjection\WebProfilerExtension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Container;
@@ -25,7 +27,7 @@ use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Scope;
 
-class WebProfilerExtensionTest extends \PHPUnit_Framework_TestCase
+class WebProfilerExtensionTest extends TestCase
 {
     private $kernel;
     /**
@@ -49,6 +51,7 @@ class WebProfilerExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        parent::setUp();
 
         $this->kernel = $this->getMock('Symfony\\Component\\HttpKernel\\KernelInterface');
 

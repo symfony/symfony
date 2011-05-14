@@ -59,7 +59,7 @@ class ArrayChoiceList implements ChoiceListInterface
         $this->loaded = true;
 
         if ($this->choices instanceof \Closure) {
-            $this->choices = $this->choices->__invoke();
+            $this->choices = call_user_func($this->choices);
 
             if (!is_array($this->choices)) {
                 throw new UnexpectedTypeException($this->choices, 'array');

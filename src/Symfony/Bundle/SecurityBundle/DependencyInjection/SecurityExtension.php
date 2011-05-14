@@ -62,13 +62,13 @@ class SecurityExtension extends Extension
 
         // set some global scalars
         $container->setParameter('security.access.denied_url', $config['access_denied_url']);
+        $container->setParameter('security.access.allow_if_all_abstain', $config['access_decision_manager']['allow_if_all_abstain']);
+        $container->setParameter('security.access.allow_if_equal_granted_denied', $config['access_decision_manager']['allow_if_equal_granted_denied']);
+
+        $strategy = sprintf('security.access.%s_access_strategy', $config['access_decision_manager']['strategy']);
+        $container->setAlias('security.access.strategy', $strategy);
+
         $container->getDefinition('security.authentication.session_strategy')->replaceArgument(0, $config['session_fixation_strategy']);
-        $container
-            ->getDefinition('security.access.decision_manager')
-            ->addArgument($config['access_decision_manager']['strategy'])
-            ->addArgument($config['access_decision_manager']['allow_if_all_abstain'])
-            ->addArgument($config['access_decision_manager']['allow_if_equal_granted_denied'])
-        ;
         $container->setParameter('security.access.always_authenticate_before_granting', $config['always_authenticate_before_granting']);
 
         $this->createFirewalls($config, $container);
@@ -86,6 +86,9 @@ class SecurityExtension extends Extension
 
         // add some required classes for compilation
         $this->addClassesToCompile(array(
+            'Symfony\\Component\\HttpFoundation\\RequestMatcher',
+            'Symfony\\Component\\HttpFoundation\\RequestMatcherInterface',
+
             'Symfony\\Component\\Security\\Http\\Firewall',
             'Symfony\\Component\\Security\\Http\\FirewallMapInterface',
             'Symfony\\Component\\Security\\Core\\SecurityContext',
@@ -95,16 +98,14 @@ class SecurityExtension extends Extension
             'Symfony\\Component\\Security\\Core\\Authentication\\AuthenticationManagerInterface',
             'Symfony\\Component\\Security\\Core\\Authorization\\AccessDecisionManager',
             'Symfony\\Component\\Security\\Core\\Authorization\\AccessDecisionManagerInterface',
-            'Symfony\\Component\\Security\\Core\\Authorization\\Strategy\AccessStrategyInterface',
             'Symfony\\Component\\Security\\Core\\Authorization\\Strategy\AccessStrategy',
-           'Symfony\\Component\\Security\\Core\\Authorization\\Strategy\AffirmativeAccessStrategy',
-           'Symfony\\Component\\Security\\Core\\Authorization\\Strategy\ConsensusAccessStrategy',
-           'Symfony\\Component\\Security\\Core\\Authorization\\Strategy\UnanimousAccessStrategy', 'Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface',
+            'Symfony\\Component\\Security\\Core\\Authorization\\Strategy\AccessStrategyInterface',
+            'Symfony\\Component\\Security\\Core\\Authorization\\Strategy\AffirmativeAccessStrategy',
+            'Symfony\\Component\\Security\\Core\\Authorization\\Strategy\ConsensusAccessStrategy',
+            'Symfony\\Component\\Security\\Core\\Authorization\\Strategy\UnanimousAccessStrategy',
+            'Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface',
             'Symfony\\Bundle\\SecurityBundle\\Security\\FirewallMap',
             'Symfony\\Bundle\\SecurityBundle\\Security\\FirewallContext',
-
-            'Symfony\\Component\\HttpFoundation\\RequestMatcher',
-            'Symfony\\Component\\HttpFoundation\\RequestMatcherInterface',
         ));
     }
 

@@ -96,6 +96,22 @@ class TimeType extends AbstractType
         );
     }
 
+    public function getAllowedOptionValues(array $options)
+    {
+        return array(
+            'input' => array(
+                'datetime',
+                'string',
+                'timestamp',
+                'array',
+            ),
+            'widget' => array(
+                'text',
+                'choice',
+            ),
+        );
+    }
+
     public function getName()
     {
         return 'time';

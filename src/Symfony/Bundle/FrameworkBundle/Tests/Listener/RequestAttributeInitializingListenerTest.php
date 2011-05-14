@@ -11,20 +11,19 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests;
 
+use Symfony\Bundle\FrameworkBundle\Listener\RequestAttributeInitializingListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Routing\RequestContext;
-use Symfony\Bundle\FrameworkBundle\RequestListener;
 
-class RequestListenerTest extends \PHPUnit_Framework_TestCase
+class RequestAttributeInitializingListenerTest extends \PHPUnit_Framework_TestCase
 {
     private $container;
     private $router;
 
     protected function setUp()
     {
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')
                              ->disableOriginalConstructor()
                              ->getMock();
@@ -35,7 +34,7 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testPort($defaultHttpPort, $defaultHttpsPort, $uri, $expectedHttpPort, $expectedHttpsPort)
     {
-        $listener = new RequestListener($this->container, $this->router, $defaultHttpPort, $defaultHttpsPort);
+        $listener = new RequestAttributeInitializingListener($this->router, $defaultHttpPort, $defaultHttpsPort);
 
         $expectedContext = new RequestContext();
         $expectedContext->setHttpPort($expectedHttpPort);

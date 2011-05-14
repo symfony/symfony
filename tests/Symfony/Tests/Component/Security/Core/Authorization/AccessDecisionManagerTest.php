@@ -18,86 +18,81 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
 {
     public function testSupportsClass()
     {
-        $manager = new AccessDecisionManager(array(
+        $strategy = $this->getAccessStrategy(array(
             $this->getVoterSupportsClass(true),
             $this->getVoterSupportsClass(false),
         ));
+
+        $manager = new AccessDecisionManager($strategy);
         $this->assertTrue($manager->supportsClass('FooClass'));
 
-        $manager = new AccessDecisionManager(array(
+        $strategy = $this->getAccessStrategy(array(
             $this->getVoterSupportsClass(false),
             $this->getVoterSupportsClass(false),
         ));
+
+        $manager = new AccessDecisionManager($strategy);
         $this->assertFalse($manager->supportsClass('FooClass'));
     }
 
     public function testSupportsAttribute()
     {
-        $manager = new AccessDecisionManager(array(
+        $strategy = $this->getAccessStrategy(array(
             $this->getVoterSupportsAttribute(true),
             $this->getVoterSupportsAttribute(false),
         ));
+
+        $manager = new AccessDecisionManager($strategy);
         $this->assertTrue($manager->supportsAttribute('foo'));
 
-        $manager = new AccessDecisionManager(array(
+        $strategy = $this->getAccessStrategy(array(
             $this->getVoterSupportsAttribute(false),
             $this->getVoterSupportsAttribute(false),
         ));
+
+        $manager = new AccessDecisionManager($strategy);
         $this->assertFalse($manager->supportsAttribute('foo'));
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testSetVotersEmpty()
-    {
-        $manager = new AccessDecisionManager(array());
-    }
-
-    /**
-     * @dataProvider getStrategyTests
-     */
-    public function testStrategies($strategy, $voters, $allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions, $expected)
+    public function testDecide()
     {
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $manager = new AccessDecisionManager($voters, $strategy, $allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions);
 
-        $this->assertSame($expected, $manager->decide($token, array('ROLE_FOO')));
+        $strategy = $this->getMockAccessStrategy(true);
+        $manager = new AccessDecisionManager($strategy);
+
+        $this->assertSame(true, $manager->decide($token, array('ROLE_FOO')));
+
+        $strategy = $this->getMockAccessStrategy(false);
+        $manager = new AccessDecisionManager($strategy);
+
+        $this->assertSame(false, $manager->decide($token, array('ROLE_FOO')));
     }
 
-    public function getStrategyTests()
+    private function getMockAccessStrategy($result)
     {
-        return array(
-            // affirmative
-            array('affirmative', $this->getVoters(1, 0, 0), false, true, true),
-            array('affirmative', $this->getVoters(1, 2, 0), false, true, true),
-            array('affirmative', $this->getVoters(0, 1, 0), false, true, false),
-            array('affirmative', $this->getVoters(0, 0, 1), false, true, false),
-            array('affirmative', $this->getVoters(0, 0, 1), true, true, true),
+        $strategy = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\Strategy\AccessStrategy')
+                 ->disableOriginalConstructor()
+                 ->getMock();
 
-            // consensus
-            array('consensus', $this->getVoters(1, 0, 0), false, true, true),
-            array('consensus', $this->getVoters(1, 2, 0), false, true, false),
-            array('consensus', $this->getVoters(2, 1, 0), false, true, true),
+        $strategy->expects($this->any())
+                 ->method('decide')
+                 ->will($this->returnValue($result));
 
-            array('consensus', $this->getVoters(0, 0, 1), false, true, false),
+        return $strategy;
+    }
 
-            array('consensus', $this->getVoters(0, 0, 1), true, true, true),
+    private function getAccessStrategy($voters)
+    {
+        $strategy = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\Strategy\AccessStrategy')
+                 ->disableOriginalConstructor()
+                 ->getMock();
 
-            array('consensus', $this->getVoters(2, 2, 0), false, true, true),
-            array('consensus', $this->getVoters(2, 2, 1), false, true, true),
+        $strategy->expects($this->any())
+                 ->method('getVoters')
+                 ->will($this->returnValue($voters));
 
-            array('consensus', $this->getVoters(2, 2, 0), false, false, false),
-            array('consensus', $this->getVoters(2, 2, 1), false, false, false),
-
-            // unanimous
-            array('unanimous', $this->getVoters(1, 0, 0), false, true, true),
-            array('unanimous', $this->getVoters(1, 0, 1), false, true, true),
-            array('unanimous', $this->getVoters(1, 1, 0), false, true, false),
-
-            array('unanimous', $this->getVoters(0, 0, 2), false, true, false),
-            array('unanimous', $this->getVoters(0, 0, 2), true, true, true),
-        );
+        return $strategy;
     }
 
     protected function getVoters($grants, $denies, $abstains)

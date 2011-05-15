@@ -21,14 +21,14 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Sets the parent form.
      *
-     * @param FormInterface $parent  The parent form
+     * @param FormInterface $parent The parent form
      */
     function setParent(FormInterface $parent = null);
 
     /**
      * Returns the parent form.
      *
-     * @return FormInterface  The parent form
+     * @return FormInterface The parent form
      */
     function getParent();
 
@@ -49,7 +49,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns whether a child with the given name exists.
      *
-     * @param  string $name
+     * @param string $name
      *
      * @return Boolean
      */
@@ -65,7 +65,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns all children in this group.
      *
-     * @return array
+     * @return array An array of FormInterface instances
      */
     function getChildren();
 
@@ -79,7 +79,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns all errors.
      *
-     * @return array  An array of FormError instances that occurred during binding
+     * @return array An array of FormError instances that occurred during binding
      */
     function getErrors();
 

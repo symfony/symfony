@@ -40,6 +40,6 @@ class StaticAsseticHelper extends AsseticHelper
 
     protected function getAssetUrl(AssetInterface $asset, $options = array())
     {
-        return $this->assetsHelper->getUrl($asset->getTargetUrl(), isset($options['package']) ? $options['package'] : null);
+        return $this->assetsHelper->getUrl($asset->getTargetPath(), isset($options['package']) ? $options['package'] : null);
     }
 }

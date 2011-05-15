@@ -20,7 +20,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         }
 
         $this->container = $container;
-        $this->connections = $container->getDefinition('doctrine')->getArgument(1);
+        $this->connections = $container->getParameter('doctrine.connections');
 
         foreach ($container->findTaggedServiceIds('doctrine.event_subscriber') as $subscriberId => $instances) {
             $this->registerSubscriber($subscriberId, $instances);

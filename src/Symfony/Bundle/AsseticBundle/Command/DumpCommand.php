@@ -171,7 +171,7 @@ class DumpCommand extends Command
      */
     private function doDump(AssetInterface $asset, OutputInterface $output)
     {
-        $target = rtrim($this->basePath, '/').'/'.str_replace('_controller/', '', $asset->getTargetUrl());
+        $target = rtrim($this->basePath, '/').'/'.str_replace('_controller/', '', $asset->getTargetPath());
         if (!is_dir($dir = dirname($target))) {
             $output->writeln('<info>[dir+]</info> '.$dir);
             if (false === @mkdir($dir, 0777, true)) {

@@ -68,7 +68,7 @@ class ProfilerListener
      */
     public function onCoreException(GetResponseForExceptionEvent $event)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+        if ($this->onlyMasterRequests && HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;
         }
 
@@ -90,6 +90,7 @@ class ProfilerListener
             return;
         }
 
+        $exception = $this->exception;
         $this->exception = null;
 
         if (null !== $this->matcher && !$this->matcher->matches($event->getRequest())) {
@@ -102,6 +103,6 @@ class ProfilerListener
             $profiler->setParent($parent['request']['profiler']->getToken());
         }
 
-        $profiler->collect($event->getRequest(), $event->getResponse(), $this->exception);
+        $profiler->collect($event->getRequest(), $event->getResponse(), $exception);
     }
 }

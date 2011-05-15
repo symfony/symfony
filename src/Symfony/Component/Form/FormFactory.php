@@ -13,9 +13,17 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Exception\TypeDefinitionException;
+use Symfony\Component\Form\Exception\CreationException;
 
 class FormFactory implements FormFactoryInterface
 {
+    private static $requiredOptions = array(
+        'data',
+        'required',
+        'max_length',
+    );
+
     /**
      * Extensions
      * @var array An array of FormExtensionInterface
@@ -53,6 +61,40 @@ class FormFactory implements FormFactoryInterface
     }
 
     /**
+     * Returns whether the given type is supported.
+     *
+     * @param string $name The name of the type
+     *
+     * @return Boolean Whether the type is supported
+     */
+    public function hasType($name)
+    {
+        if (isset($this->types[$name])) {
+            return true;
+        }
+
+        try {
+            $this->loadType($name);
+        } catch (FormException $e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Add a type.
+     *
+     * @param FormTypeInterface $type The type
+     */
+    public function addType(FormTypeInterface $type)
+    {
+        $this->loadTypeExtensions($type);
+
+        $this->types[$type->getName()] = $type;
+    }
+
+    /**
      * Returns a type by name.
      *
      * This methods registers the type extensions from the form extensions.
@@ -65,39 +107,12 @@ class FormFactory implements FormFactoryInterface
      */
     public function getType($name)
     {
-        $type = null;
-
-        if ($name instanceof FormTypeInterface) {
-            $type = $name;
-            $name = $type->getName();
+        if (!is_string($name)) {
+            throw new UnexpectedTypeException($name, 'string');
         }
 
         if (!isset($this->types[$name])) {
-            if (!$type) {
-                foreach ($this->extensions as $extension) {
-                    if ($extension->hasType($name)) {
-                        $type = $extension->getType($name);
-                        break;
-                    }
-                }
-
-                if (!$type) {
-                    throw new FormException(sprintf('Could not load type "%s"', $name));
-                }
-            }
-
-            $typeExtensions = array();
-
-            foreach ($this->extensions as $extension) {
-                $typeExtensions = array_merge(
-                    $typeExtensions,
-                    $extension->getTypeExtensions($name)
-                );
-            }
-
-            $type->setExtensions($typeExtensions);
-
-            $this->types[$name] = $type;
+            $this->loadType($name);
         }
 
         return $this->types[$name];
@@ -196,37 +211,63 @@ class FormFactory implements FormFactoryInterface
         $types = array();
         $knownOptions = array();
         $passedOptions = array_keys($options);
+        $optionValues = array();
 
         if (!array_key_exists('data', $options)) {
             $options['data'] = $data;
         }
 
         while (null !== $type) {
-            $type = $this->getType($type);
-
-            $defaultOptions = $type->getDefaultOptions($options);
-
-            foreach ($type->getExtensions() as $typeExtension) {
-                $defaultOptions = array_merge($defaultOptions, $typeExtension->getDefaultOptions($options));
+            if ($type instanceof FormTypeInterface) {
+                $this->addType($type);
+            } else {
+                $type = $this->getType($type);
             }
 
-            $options = array_merge($defaultOptions, $options);
+            $defaultOptions = $type->getDefaultOptions($options);
+            $optionValues = array_merge_recursive($optionValues, $type->getAllowedOptionValues($options));
+
+            foreach ($type->getExtensions() as $typeExtension) {
+                $defaultOptions = array_replace($defaultOptions, $typeExtension->getDefaultOptions($options));
+                $optionValues = array_merge_recursive($optionValues, $typeExtension->getAllowedOptionValues($options));
+            }
+
+            $options = array_replace($defaultOptions, $options);
             $knownOptions = array_merge($knownOptions, array_keys($defaultOptions));
             array_unshift($types, $type);
             $type = $type->getParent($options);
         }
 
-        $extraOptions = array_diff($passedOptions, $knownOptions);
+        $type = end($types);
+        $diff = array_diff(self::$requiredOptions, $knownOptions);
 
-        if (count($extraOptions) > 0) {
-            throw new FormException(sprintf('The options "%s" do not exist', implode('", "', $extraOptions)));
+        if (count($diff) > 0) {
+            throw new TypeDefinitionException(sprintf('Type "%s" should support the option(s) "%s"', $type->getName(), implode('", "', $diff)));
+        }
+
+        $diff = array_diff($passedOptions, $knownOptions);
+
+        if (count($diff) > 1) {
+            throw new CreationException(sprintf('The options "%s" do not exist', implode('", "', $diff)));
+        }
+
+        if (count($diff) > 0) {
+            throw new CreationException(sprintf('The option "%s" does not exist', $diff[0]));
+        }
+
+        foreach ($optionValues as $option => $allowedValues) {
+            if (!in_array($options[$option], $allowedValues, true)) {
+                throw new CreationException(sprintf('The option "%s" has the value "%s", but is expected to be one of "%s"', $option, $options[$option], implode('", "', $allowedValues)));
+            }
         }
 
         for ($i = 0, $l = count($types); $i < $l && !$builder; ++$i) {
             $builder = $types[$i]->createBuilder($name, $this, $options);
         }
 
-        // TODO check if instance exists
+        if (!$builder) {
+            throw new TypeDefinitionException(sprintf('Type "%s" or any of its parents should return a FormBuilder instance from createBuilder()', $type->getName()));
+        }
 
         $builder->setTypes($types);
 
@@ -300,5 +341,51 @@ class FormFactory implements FormFactoryInterface
         }
 
         $this->guesser = new FormTypeGuesserChain($guessers);
+    }
+
+    /**
+     * Loads a type.
+     *
+     * @param string $name The type name
+     *
+     * @throws FormException if the type is not provided by any registered extension
+     */
+    private function loadType($name)
+    {
+        $type = null;
+
+        foreach ($this->extensions as $extension) {
+            if ($extension->hasType($name)) {
+                $type = $extension->getType($name);
+                break;
+            }
+        }
+
+        if (!$type) {
+            throw new FormException(sprintf('Could not load type "%s"', $name));
+        }
+
+        $this->loadTypeExtensions($type);
+
+        $this->types[$name] = $type;
+    }
+
+    /**
+     * Loads the extensions for a given type.
+     *
+     * @param FormTypeInterface $type The type
+     */
+    private function loadTypeExtensions(FormTypeInterface $type)
+    {
+        $typeExtensions = array();
+
+        foreach ($this->extensions as $extension) {
+            $typeExtensions = array_merge(
+                $typeExtensions,
+                $extension->getTypeExtensions($type->getName())
+            );
+        }
+
+        $type->setExtensions($typeExtensions);
     }
 }

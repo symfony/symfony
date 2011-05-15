@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Mapping\Driver;
 
+use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\Mapping\Driver\YamlDriver as BaseYamlDriver;
 
 /**
@@ -64,9 +65,19 @@ class YamlDriver extends BaseYamlDriver
     protected function _findMappingFile($className)
     {
         if (false !== $pos = strrpos($className, '\\')) {
-            $className = substr($className, $pos+1);
+            $namespace = substr($className, 0, $pos);
+            $shortName = substr($className, $pos+1);
+        } else {
+            $namespace = '';
+            $shortName = $className;
         }
 
-        return parent::_findMappingFile($className);
+        foreach ($this->_paths as $prefix => $path) {
+            if ($prefix === $namespace && file_exists($filename = $path.'/'.$shortName.$this->_fileExtension)) {
+                return $filename;
+            }
+        }
+
+        throw MappingException::mappingFileNotFound($className, $shortName.$this->_fileExtension);
     }
 }

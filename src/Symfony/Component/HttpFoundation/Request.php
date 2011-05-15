@@ -377,6 +377,8 @@ class Request
     /**
      * Returns the path being requested relative to the executed script.
      *
+     * The path info always starts with a /.
+     *
      * Suppose this request is instantiated from /mysite on localhost:
      *
      *  * http://localhost/mysite              returns an empty string
@@ -416,6 +418,8 @@ class Request
 
     /**
      * Returns the root url from which this request is executed.
+     *
+     * The base URL never ends with a /.
      *
      * This is similar to getBasePath(), except that it also includes the
      * script filename (e.g. index.php) if one exists.
@@ -976,10 +980,10 @@ class Request
         $baseUrl = $this->getBaseUrl();
 
         if (null === ($requestUri = $this->getRequestUri())) {
-            return '';
+            return '/';
         }
 
-        $pathInfo = '';
+        $pathInfo = '/';
 
         // Remove the query string from REQUEST_URI
         if ($pos = strpos($requestUri, '?')) {
@@ -988,7 +992,7 @@ class Request
 
         if ((null !== $baseUrl) && (false === ($pathInfo = substr($requestUri, strlen($baseUrl))))) {
             // If substr() returns false then PATH_INFO is set to an empty string
-            return '';
+            return '/';
         } elseif (null === $baseUrl) {
             return $requestUri;
         }

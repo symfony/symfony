@@ -32,7 +32,8 @@ assetic:
             inputs: css/widget.sass
             filters: sass
     filters:
-        sass: ~
+        sass:
+            apply_to: "\.sass$"
         yui_css:
             jar: %kernel.root_dir/java/yui-compressor-2.4.6.jar
     twig:

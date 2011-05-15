@@ -55,9 +55,6 @@ class DateTimeType extends AbstractType
         if (isset($options['time_widget'])) {
             $timeOptions['widget'] = $options['time_widget'];
         }
-        if (isset($options['time_format'])) {
-            $timeOptions['format'] = $options['time_format'];
-        }
 
         $timeOptions['input'] = 'array';
 
@@ -109,7 +106,6 @@ class DateTimeType extends AbstractType
             'date_format' => null,
             'time_pattern' => null,
             'time_widget' => null,
-            'time_format' => null,
             /* Defaults for date field */
             'years' => range(date('Y') - 5, date('Y') + 5),
             'months' => range(1, 12),
@@ -119,6 +115,35 @@ class DateTimeType extends AbstractType
             'minutes' => range(0, 59),
             'seconds' => range(0, 59),
             'with_seconds' => false,
+        );
+    }
+
+    public function getAllowedOptionValues(array $options)
+    {
+        return array(
+            'input' => array(
+                'datetime',
+                'string',
+                'timestamp',
+                'array',
+            ),
+            'date_widget' => array(
+                null, // inherit default from DateType
+                'text',
+                'choice',
+            ),
+            'date_format' => array(
+                null, // inherit default from DateType
+                \IntlDateFormatter::FULL,
+                \IntlDateFormatter::LONG,
+                \IntlDateFormatter::MEDIUM,
+                \IntlDateFormatter::SHORT,
+             ),
+            'time_widget' => array(
+                null, // inherit default from TimeType
+                'text',
+                'choice',
+            ),
         );
     }
 

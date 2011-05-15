@@ -100,4 +100,10 @@ interface FormFactoryInterface
      * @throws FormException if any given option is not applicable to the form type
      */
     function createBuilderForProperty($class, $property, $data = null, array $options = array());
+
+    function getType($name);
+
+    function hasType($name);
+
+    function addType(FormTypeInterface $type);
 }

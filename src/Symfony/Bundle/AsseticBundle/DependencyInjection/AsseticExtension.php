@@ -52,6 +52,19 @@ class AsseticExtension extends Extension
         $container->setParameter('assetic.node.bin', $config['node']);
         $container->setParameter('assetic.sass.bin', $config['sass']);
 
+        // register formulae
+        $formulae = array();
+        foreach ($config['assets'] as $name => $formula) {
+            $formulae[$name] = array($formula['inputs'], $formula['filters'], $formula['options']);
+        }
+
+        if ($formulae) {
+            $container->getDefinition('assetic.config_resource')->replaceArgument(0, $formulae);
+        } else {
+            $container->removeDefinition('assetic.config_loader');
+            $container->removeDefinition('assetic.config_resource');
+        }
+
         // register filters
         foreach ($config['filters'] as $name => $filter) {
             if (isset($filter['resource'])) {
@@ -72,7 +85,7 @@ class AsseticExtension extends Extension
         }
 
         // twig functions
-        $container->getDefinition('assetic.twig_extension')->replaceArgument(2, $config['twig']['functions']);
+        $container->setParameter('assetic.twig_extension.functions', $config['twig']['functions']);
 
         // choose dynamic or static
         if ($parameterBag->resolveValue($parameterBag->get('assetic.use_controller'))) {

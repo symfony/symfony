@@ -70,6 +70,15 @@ interface FormTypeInterface
     function getDefaultOptions(array $options);
 
     /**
+     * Returns the allowed option values for each option (if any).
+     *
+     * @param array $options
+     *
+     * @return array The allowed option values
+     */
+    function getAllowedOptionValues(array $options);
+
+    /**
      * Returns the name of the parent type.
      *
      * @param array $options

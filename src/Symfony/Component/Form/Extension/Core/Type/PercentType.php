@@ -30,6 +30,16 @@ class PercentType extends AbstractType
         );
     }
 
+    public function getAllowedOptionValues(array $options)
+    {
+        return array(
+            'type' => array(
+                'fractional',
+                'integer',
+            ),
+        );
+    }
+
     public function getParent(array $options)
     {
         return 'field';

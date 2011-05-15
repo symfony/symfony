@@ -205,7 +205,7 @@ abstract class AbstractDoctrineExtension extends Extension
                 ));
             } else {
                 $mappingDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.'.$driverType.'.class%'), array(
-                    array_values($driverPaths)
+                    $driverPaths
                 ));
             }
             $mappingDriverDef->setPublic(false);

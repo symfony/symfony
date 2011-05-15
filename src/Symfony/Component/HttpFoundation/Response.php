@@ -96,17 +96,19 @@ class Response
      */
     public function __toString()
     {
-        $content = '';
-
         $this->fixContentType();
 
         // status
-        $content .= sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText)."\r\n";
+        $content = sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText)."\r\n";
+
+        $beautifier = function ($name) {
+            return preg_replace('/\-(.)/e', "'-'.strtoupper('\\1')", ucfirst($name));
+        };
 
         // headers
         foreach ($this->headers->all() as $name => $values) {
             foreach ($values as $value) {
-                $content .= "$name: $value\r\n";
+                $content .= sprintf("%s: %s\r\n", $beautifier($name), $value);
             }
         }
 

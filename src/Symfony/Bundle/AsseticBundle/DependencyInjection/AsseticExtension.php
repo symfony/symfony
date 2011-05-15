@@ -93,6 +93,8 @@ class AsseticExtension extends Extension
 
                     $container->setDefinition('assetic.filter.'.$name.'.worker'.$i, $worker);
                 }
+
+                unset($filter['apply_to']);
             }
 
             foreach ($filter as $key => $value) {

@@ -47,7 +47,7 @@ class AssetFactory extends BaseAssetFactory
      * Please note this is a naive implementation of globs in that it doesn't
      * attempt to support bundle inheritance within the glob pattern itself.
      */
-    protected function parseInput($input)
+    protected function parseInput($input, array $options = array())
     {
         // expand bundle notation
         if ('@' == $input[0] && false !== strpos($input, '/')) {
@@ -60,7 +60,7 @@ class AssetFactory extends BaseAssetFactory
             }
         }
 
-        return parent::parseInput($input);
+        return parent::parseInput($input, $options);
     }
 
     protected function createAssetReference($name)

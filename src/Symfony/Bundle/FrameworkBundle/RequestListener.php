@@ -108,7 +108,9 @@ class RequestListener
 
             $request->attributes->add($parameters);
         } catch (NotFoundException $e) {
-            $message = sprintf('No route found for "%s %s"', $request->getMethod(), $request->getPathInfo());
+            // translate the empty string into the more expressive "/"
+            $pathInfo = $request->getPathInfo() ? $request->getPathInfo() : '/';
+            $message = sprintf('No route found for "%s %s"', $request->getMethod(), $pathInfo);
             if (null !== $this->logger) {
                 $this->logger->err($message);
             }

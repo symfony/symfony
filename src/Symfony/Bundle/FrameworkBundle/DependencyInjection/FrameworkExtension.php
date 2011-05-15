@@ -462,6 +462,8 @@ class FrameworkExtension extends Extension
             $arguments = $loaderChain->getArguments();
             array_unshift($arguments[0], new Reference('validator.mapping.loader.annotation_loader'));
             $loaderChain->setArguments($arguments);
+        } else {
+            $container->setParameter('validator.mapping.loader.annotation_loader.namespaces', array());
         }
 
         if (isset($config['cache'])) {

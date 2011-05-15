@@ -165,6 +165,7 @@ class Request
             'REMOTE_ADDR'          => '127.0.0.1',
             'SCRIPT_NAME'          => '',
             'SCRIPT_FILENAME'      => '',
+            'SERVER_PROTOCOL'      => 'HTTP/1.1',
         );
 
         $components = parse_url($uri);
@@ -281,6 +282,19 @@ class Request
     }
 
     /**
+     * Returns the request as a string.
+     *
+     * @return string The request
+     */
+    public function __toString()
+    {
+        return
+            sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))."\r\n".
+            $this->headers."\r\n".
+            $this->getContent();
+    }
+
+    /**
      * Overrides the PHP global variables according to this request instance.
      *
      * It overrides $_GET, $_POST, $_REQUEST, $_SERVER, $_COOKIE, and $_FILES.
@@ -377,6 +391,8 @@ class Request
     /**
      * Returns the path being requested relative to the executed script.
      *
+     * The path info always starts with a /.
+     *
      * Suppose this request is instantiated from /mysite on localhost:
      *
      *  * http://localhost/mysite              returns an empty string
@@ -416,6 +432,8 @@ class Request
 
     /**
      * Returns the root url from which this request is executed.
+     *
+     * The base URL never ends with a /.
      *
      * This is similar to getBasePath(), except that it also includes the
      * script filename (e.g. index.php) if one exists.
@@ -976,10 +994,10 @@ class Request
         $baseUrl = $this->getBaseUrl();
 
         if (null === ($requestUri = $this->getRequestUri())) {
-            return '';
+            return '/';
         }
 
-        $pathInfo = '';
+        $pathInfo = '/';
 
         // Remove the query string from REQUEST_URI
         if ($pos = strpos($requestUri, '?')) {
@@ -988,7 +1006,7 @@ class Request
 
         if ((null !== $baseUrl) && (false === ($pathInfo = substr($requestUri, strlen($baseUrl))))) {
             // If substr() returns false then PATH_INFO is set to an empty string
-            return '';
+            return '/';
         } elseif (null === $baseUrl) {
             return $requestUri;
         }

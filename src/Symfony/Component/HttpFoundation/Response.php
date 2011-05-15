@@ -98,23 +98,10 @@ class Response
     {
         $this->fixContentType();
 
-        // status
-        $content = sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText)."\r\n";
-
-        $beautifier = function ($name) {
-            return preg_replace('/\-(.)/e', "'-'.strtoupper('\\1')", ucfirst($name));
-        };
-
-        // headers
-        foreach ($this->headers->all() as $name => $values) {
-            foreach ($values as $value) {
-                $content .= sprintf("%s: %s\r\n", $beautifier($name), $value);
-            }
-        }
-
-        $content .= "\r\n".$this->getContent();
-
-        return $content;
+        return
+            sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText)."\r\n".
+            $this->headers."\r\n".
+            $this->getContent();
     }
 
     /**

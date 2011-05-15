@@ -24,10 +24,22 @@ class FormFactory implements FormFactoryInterface
         'max_length',
     );
 
+    /**
+     * Extensions
+     * @var array An array of FormExtensionInterface
+     */
     private $extensions = array();
 
+    /**
+     * All known types (cache)
+     * @var array An array of FormTypeInterface
+     */
     private $types = array();
 
+    /**
+     * The guesser chain
+     * @var FormTypeGuesserChain
+     */
     private $guesser;
 
     /**
@@ -48,6 +60,13 @@ class FormFactory implements FormFactoryInterface
         $this->extensions = $extensions;
     }
 
+    /**
+     * Returns whether the given type is supported.
+     *
+     * @param string $name The name of the type
+     *
+     * @return Boolean Whether the type is supported
+     */
     public function hasType($name)
     {
         if (isset($this->types[$name])) {
@@ -63,6 +82,11 @@ class FormFactory implements FormFactoryInterface
         return true;
     }
 
+    /**
+     * Add a type.
+     *
+     * @param FormTypeInterface $type The type
+     */
     public function addType(FormTypeInterface $type)
     {
         $this->loadTypeExtensions($type);
@@ -70,6 +94,17 @@ class FormFactory implements FormFactoryInterface
         $this->types[$type->getName()] = $type;
     }
 
+    /**
+     * Returns a type by name.
+     *
+     * This methods registers the type extensions from the form extensions.
+     *
+     * @param string|FormTypeInterface $name The name of the type or a type instance
+     *
+     * @return FormTypeInterface The type
+     *
+     * @throws FormException if the type can not be retrieved from any extension
+     */
     public function getType($name)
     {
         if (!is_string($name)) {
@@ -83,24 +118,74 @@ class FormFactory implements FormFactoryInterface
         return $this->types[$name];
     }
 
+    /**
+     * Returns a form.
+     *
+     * @see createBuilder()
+     *
+     * @param string|FormTypeInterface  $type       The type of the form
+     * @param mixed                     $data       The initial data
+     * @param array                     $options    The options
+     *
+     * @return Form The form named after the type
+     *
+     * @throws FormException if any given option is not applicable to the given type
+     */
     public function create($type, $data = null, array $options = array())
     {
         return $this->createBuilder($type, $data, $options)->getForm();
     }
 
+    /**
+     * Returns a form.
+     *
+     * @see createNamedBuilder()
+     *
+     * @param string|FormTypeInterface  $type       The type of the form
+     * @param string                    $name       The name of the form
+     * @param mixed                     $data       The initial data
+     * @param array                     $options    The options
+     *
+     * @return Form The form
+     *
+     * @throws FormException if any given option is not applicable to the given type
+     */
     public function createNamed($type, $name, $data = null, array $options = array())
     {
         return $this->createNamedBuilder($type, $name, $data, $options)->getForm();
     }
 
     /**
-     * @inheritDoc
+     * Returns a form for a property of a class.
+     *
+     * @see createBuilderForProperty()
+     *
+     * @param string $class     The fully qualified class name
+     * @param string $property  The name of the property to guess for
+     * @param mixed  $data      The initial data
+     * @param array  $options   The options for the builder
+     *
+     * @return Form The form named after the property
+     *
+     * @throws FormException if any given option is not applicable to the form type
      */
     public function createForProperty($class, $property, $data = null, array $options = array())
     {
         return $this->createBuilderForProperty($class, $property, $data, $options)->getForm();
     }
 
+    /**
+     * Returns a form builder
+     *
+     * @param string|FormTypeInterface  $type       The type of the form
+     * @param string                    $name       The name of the form
+     * @param mixed                     $data       The initial data
+     * @param array                     $options    The options
+     *
+     * @return FormBuilder The form builder
+     *
+     * @throws FormException if any given option is not applicable to the given type
+     */
     public function createBuilder($type, $data = null, array $options = array())
     {
         $name = is_object($type) ? $type->getName() : $type;
@@ -108,6 +193,18 @@ class FormFactory implements FormFactoryInterface
         return $this->createNamedBuilder($type, $name, $data, $options);
     }
 
+    /**
+     * Returns a form builder.
+     *
+     * @param string|FormTypeInterface  $type       The type of the form
+     * @param string                    $name       The name of the form
+     * @param mixed                     $data       The initial data
+     * @param array                     $options    The options
+     *
+     * @return FormBuilder The form builder
+     *
+     * @throws FormException if any given option is not applicable to the given type
+     */
     public function createNamedBuilder($type, $name, $data = null, array $options = array())
     {
         $builder = null;
@@ -185,6 +282,21 @@ class FormFactory implements FormFactoryInterface
         return $builder;
     }
 
+    /**
+     * Returns a form builder for a property of a class.
+     *
+     * If any of the 'max_length', 'required' and type options can be guessed,
+     * and are not provided in the options argument, the guessed value is used.
+     *
+     * @param string $class     The fully qualified class name
+     * @param string $property  The name of the property to guess for
+     * @param mixed  $data      The initial data
+     * @param array  $options   The options for the builder
+     *
+     * @return FormBuilder The form builder named after the property
+     *
+     * @throws FormException if any given option is not applicable to the form type
+     */
     public function createBuilderForProperty($class, $property, $data = null, array $options = array())
     {
         if (!$this->guesser) {
@@ -213,6 +325,9 @@ class FormFactory implements FormFactoryInterface
         return $this->createNamedBuilder($type, $property, $data, $options);
     }
 
+    /**
+     * Initializes the guesser chain.
+     */
     private function loadGuesser()
     {
         $guessers = array();
@@ -228,6 +343,13 @@ class FormFactory implements FormFactoryInterface
         $this->guesser = new FormTypeGuesserChain($guessers);
     }
 
+    /**
+     * Loads a type.
+     *
+     * @param string $name The type name
+     *
+     * @throws FormException if the type is not provided by any registered extension
+     */
     private function loadType($name)
     {
         $type = null;
@@ -248,6 +370,11 @@ class FormFactory implements FormFactoryInterface
         $this->types[$name] = $type;
     }
 
+    /**
+     * Loads the extensions for a given type.
+     *
+     * @param FormTypeInterface $type The type
+     */
     private function loadTypeExtensions(FormTypeInterface $type)
     {
         $typeExtensions = array();

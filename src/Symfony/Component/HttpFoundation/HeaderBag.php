@@ -44,6 +44,10 @@ class HeaderBag
      */
     public function __toString()
     {
+        if (!$this->headers) {
+            return '';
+        }
+
         $beautifier = function ($name) {
             return preg_replace('/\-(.)/e', "'-'.strtoupper('\\1')", ucfirst($name));
         };

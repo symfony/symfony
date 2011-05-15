@@ -54,6 +54,7 @@ class HeaderBag
 
         $max = max(array_map('strlen', array_keys($this->headers))) + 1;
         $content = '';
+        ksort($this->headers);
         foreach ($this->headers as $name => $values) {
             foreach ($values as $value) {
                 $content .= sprintf("%-{$max}s %s\r\n", $beautifier($name).':', $value);

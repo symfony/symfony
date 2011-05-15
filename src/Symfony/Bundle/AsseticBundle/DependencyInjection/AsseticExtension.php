@@ -81,12 +81,18 @@ class AsseticExtension extends Extension
             }
 
             if (isset($filter['apply_to'])) {
-                $worker = new DefinitionDecorator('assetic.worker.ensure_filter');
-                $worker->replaceArgument(0, '/'.$filter['apply_to'].'/');
-                $worker->replaceArgument(1, new Reference('assetic.filter.'.$name));
-                $worker->addTag('assetic.factory_worker');
+                if (!is_array($filter['apply_to'])) {
+                    $filter['apply_to'] = array($filter['apply_to']);
+                }
 
-                $container->setDefinition('assetic.filter.'.$name.'.worker', $worker);
+                foreach ($filter['apply_to'] as $i => $pattern) {
+                    $worker = new DefinitionDecorator('assetic.worker.ensure_filter');
+                    $worker->replaceArgument(0, '/'.$pattern.'/');
+                    $worker->replaceArgument(1, new Reference('assetic.filter.'.$name));
+                    $worker->addTag('assetic.factory_worker');
+
+                    $container->setDefinition('assetic.filter.'.$name.'.worker'.$i, $worker);
+                }
             }
 
             foreach ($filter as $key => $value) {

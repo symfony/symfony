@@ -141,7 +141,7 @@ PR12 から beta1
 
   * `storage_id` オプションには、サービスIDの一部ではなく、サービスIDそのものを指定するように変更されました。
 
-* `DoctrineMigrationsBundle` と `DoctrineFixturesBundle` の 2 つのバンドルは、symfony コアから独立し、個別のリポジトリで管理されるようになりました。
+* `DoctrineMigrationsBundle` と `DoctrineFixturesBundle` の 2 つのバンドルは、Symfony コアから独立し、個別のリポジトリで管理されるようになりました。
 
 * フォームフレームワークの大きなリファクタリングが行われました（詳細はドキュメントを参照してください）
 

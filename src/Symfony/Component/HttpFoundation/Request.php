@@ -452,6 +452,10 @@ class Request
     {
         $host = $this->headers->get('HOST');
         if (!empty($host)) {
+            
+            // Remove port number from host
+            $host = preg_replace('/:\d+$/', '', $host);            
+            
             return $host;
         }
 

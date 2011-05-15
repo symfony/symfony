@@ -165,6 +165,7 @@ class Request
             'REMOTE_ADDR'          => '127.0.0.1',
             'SCRIPT_NAME'          => '',
             'SCRIPT_FILENAME'      => '',
+            'SERVER_PROTOCOL'      => 'HTTP/1.1',
         );
 
         $components = parse_url($uri);
@@ -278,6 +279,32 @@ class Request
         $this->files      = clone $this->files;
         $this->server     = clone $this->server;
         $this->headers    = clone $this->headers;
+    }
+
+    /**
+     * Returns the request as a string.
+     *
+     * @return string The request
+     */
+    public function __toString()
+    {
+        // status
+        $content = sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))."\r\n";
+
+        $beautifier = function ($name) {
+            return preg_replace('/\-(.)/e', "'-'.strtoupper('\\1')", ucfirst($name));
+        };
+
+        // headers
+        foreach ($this->headers->all() as $name => $values) {
+            foreach ($values as $value) {
+                $content .= sprintf("%s: %s\r\n", $beautifier($name), $value);
+            }
+        }
+
+        $content .= "\r\n".$this->getContent();
+
+        return $content;
     }
 
     /**

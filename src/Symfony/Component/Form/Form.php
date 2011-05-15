@@ -77,7 +77,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * The children of this form
-     * @var array
+     * @var array An array of FormInterface instances
      */
     private $children = array();
 
@@ -89,7 +89,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * The errors of this form
-     * @var array
+     * @var array An array of FromError instances
      */
     private $errors = array();
 
@@ -165,7 +165,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * The validators attached to this form
-     * @var array
+     * @var array An array of FormValidatorInterface instances
      */
     private $validators;
 
@@ -252,7 +252,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns the supported types.
+     * Returns the types used by this form.
      *
      * @return array An array of FormTypeInterface
      */

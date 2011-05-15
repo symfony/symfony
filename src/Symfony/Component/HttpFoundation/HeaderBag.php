@@ -38,6 +38,27 @@ class HeaderBag
     }
 
     /**
+     * Returns the headers as a string.
+     *
+     * @return string The headers
+     */
+    public function __toString()
+    {
+        $beautifier = function ($name) {
+            return preg_replace('/\-(.)/e', "'-'.strtoupper('\\1')", ucfirst($name));
+        };
+
+        $content = '';
+        foreach ($this->headers as $name => $values) {
+            foreach ($values as $value) {
+                $content .= sprintf("%s: %s\r\n", $beautifier($name), $value);
+            }
+        }
+
+        return $content;
+    }
+
+    /**
      * Returns the headers.
      *
      * @return array An array of headers

@@ -108,7 +108,7 @@ class DumpCommandTest extends \PHPUnit_Framework_TestCase
             ->method('isDebug')
             ->will($this->returnValue(false));
         $asset->expects($this->once())
-            ->method('getTargetUrl')
+            ->method('getTargetPath')
             ->will($this->returnValue('test_asset.css'));
         $asset->expects($this->once())
             ->method('dump')
@@ -140,7 +140,7 @@ class DumpCommandTest extends \PHPUnit_Framework_TestCase
             ->method('isDebug')
             ->will($this->returnValue(true));
         $asset->expects($this->once())
-            ->method('getTargetUrl')
+            ->method('getTargetPath')
             ->will($this->returnValue('test_asset.css'));
         $asset->expects($this->once())
             ->method('dump')
@@ -149,7 +149,7 @@ class DumpCommandTest extends \PHPUnit_Framework_TestCase
             ->method('getIterator')
             ->will($this->returnValue(new \ArrayIterator(array($leaf))));
         $leaf->expects($this->once())
-            ->method('getTargetUrl')
+            ->method('getTargetPath')
             ->will($this->returnValue('test_leaf.css'));
         $leaf->expects($this->once())
             ->method('dump')

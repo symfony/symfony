@@ -10,6 +10,10 @@ class ApcCache implements CacheInterface
 
     public function __construct($prefix)
     {
+        if (!extension_loaded('apc')) {
+            throw new \RuntimeException('Unable to use ApcCache to cache validator mappings as APC is not enabled.');
+        }
+
         $this->prefix = $prefix;
     }
 

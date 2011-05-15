@@ -42,15 +42,23 @@ class AssetFactory extends BaseAssetFactory
     }
 
     /**
-     * Adds support for bundle notation and globs.
+     * Adds support for bundle notation file and glob assets.
      *
-     * Please note this is a naive implementation of globs in that it doesn't
+     * FIXME: This is a naive implementation of globs in that it doesn't
      * attempt to support bundle inheritance within the glob pattern itself.
      */
     protected function parseInput($input, array $options = array())
     {
         // expand bundle notation
         if ('@' == $input[0] && false !== strpos($input, '/')) {
+            // use the bundle path as this asset's root
+            $bundle = substr($input, 1);
+            if (false !== $pos = strpos($bundle, '/')) {
+                $bundle = substr($bundle, 0, $pos);
+            }
+            $options['root'] = array($this->kernel->getBundle($bundle)->getPath());
+
+            // canonicalize the input
             if (false !== $pos = strpos($input, '*')) {
                 // locateResource() does not support globs so we provide a naive implementation here
                 list($before, $after) = explode('*', $input, 2);

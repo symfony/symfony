@@ -46,15 +46,15 @@ class ChoiceType extends AbstractType
 
             foreach ($options['choices'] as $choice => $value) {
                 if ($options['multiple']) {
-                    $builder->add((string)$choice, 'checkbox', array(
-                        'value' => $choice,
-                        'label' => $value,
+                    $builder->add((string) $choice, 'checkbox', array(
+                        'value'     => $choice,
+                        'label'     => $value,
                         // The user can check 0 or more checkboxes. If required
                         // is true, he is required to check all of them.
-                        'required' => false,
+                        'required'  => false,
                     ));
                 } else {
-                    $builder->add((string)$choice, 'radio', array(
+                    $builder->add((string) $choice, 'radio', array(
                         'value' => $choice,
                         'label' => $value,
                     ));
@@ -62,17 +62,21 @@ class ChoiceType extends AbstractType
             }
         }
 
-        $builder->setAttribute('choice_list', $options['choice_list'])
+        $builder
+            ->setAttribute('choice_list', $options['choice_list'])
             ->setAttribute('preferred_choices', $options['preferred_choices'])
             ->setAttribute('multiple', $options['multiple'])
-            ->setAttribute('expanded', $options['expanded']);
+            ->setAttribute('expanded', $options['expanded'])
+        ;
 
         if ($options['expanded']) {
             if ($options['multiple']) {
                 $builder->appendClientTransformer(new ArrayToBooleanChoicesTransformer($options['choice_list']));
             } else {
-                $builder->appendClientTransformer(new ScalarToBooleanChoicesTransformer($options['choice_list']));
-                $builder->addEventSubscriber(new FixRadioInputListener(), 10);
+                $builder
+                    ->appendClientTransformer(new ScalarToBooleanChoicesTransformer($options['choice_list']))
+                    ->addEventSubscriber(new FixRadioInputListener(), 10)
+                ;
             }
         } else {
             if ($options['multiple']) {
@@ -110,14 +114,14 @@ class ChoiceType extends AbstractType
         $expanded = isset($options['expanded']) && $options['expanded'];
 
         return array(
-            'multiple' => false,
-            'expanded' => false,
-            'choice_list' => null,
-            'choices' => array(),
+            'multiple'          => false,
+            'expanded'          => false,
+            'choice_list'       => null,
+            'choices'           => array(),
             'preferred_choices' => array(),
-            'csrf_protection' => false,
-            'empty_data' => $multiple || $expanded ? array() : '',
-            'error_bubbling' => false,
+            'csrf_protection'   => false,
+            'empty_data'        => $multiple || $expanded ? array() : '',
+            'error_bubbling'    => false,
         );
     }
 

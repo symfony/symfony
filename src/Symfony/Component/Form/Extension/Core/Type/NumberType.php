@@ -19,15 +19,19 @@ class NumberType extends AbstractType
 {
     public function buildForm(FormBuilder $builder, array $options)
     {
-        $builder->appendClientTransformer(new NumberToLocalizedStringTransformer($options['precision'], $options['grouping'], $options['rounding_mode']));
+        $builder->appendClientTransformer(new NumberToLocalizedStringTransformer(
+            $options['precision'],
+            $options['grouping'],
+            $options['rounding_mode']
+        ));
     }
 
     public function getDefaultOptions(array $options)
     {
         return array(
             // default precision is locale specific (usually around 3)
-            'precision' => null,
-            'grouping' => false,
+            'precision'     => null,
+            'grouping'      => false,
             'rounding_mode' => \NumberFormatter::ROUND_HALFUP,
         );
     }

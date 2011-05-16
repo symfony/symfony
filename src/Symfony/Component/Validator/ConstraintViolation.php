@@ -58,7 +58,7 @@ class ConstraintViolation
 
         foreach ($this->messageParameters as $key => $value) {
             if (is_array($value)) {
-                $value = print_r($value, true);
+                $value = 'Array';
             }
 
             $message = str_replace($key, $value, $message);

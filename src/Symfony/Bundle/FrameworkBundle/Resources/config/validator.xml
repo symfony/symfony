@@ -15,6 +15,9 @@
         <parameter key="validator.mapping.loader.xml_files_loader.class">Symfony\Component\Validator\Mapping\Loader\XmlFilesLoader</parameter>
         <parameter key="validator.mapping.loader.yaml_files_loader.class">Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader</parameter>
         <parameter key="validator.validator_factory.class">Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory</parameter>
+        <parameter key="validator.mapping.loader.annotation_loader.namespaces" type="collection" />
+        <parameter key="validator.mapping.loader.xml_files_loader.mapping_files" type="collection" />
+        <parameter key="validator.mapping.loader.yaml_files_loader.mapping_files" type="collection" />
     </parameters>
 
     <services>
@@ -52,11 +55,11 @@
         </service>
 
         <service id="validator.mapping.loader.xml_files_loader" class="%validator.mapping.loader.xml_files_loader.class%" public="false">
-            <argument type="collection">%validator.mapping.loader.xml_files_loader.mapping_files%</argument>
+            <argument>%validator.mapping.loader.xml_files_loader.mapping_files%</argument>
         </service>
 
         <service id="validator.mapping.loader.yaml_files_loader" class="%validator.mapping.loader.yaml_files_loader.class%" public="false">
-            <argument type="collection">%validator.mapping.loader.yaml_files_loader.mapping_files%</argument>
+            <argument>%validator.mapping.loader.yaml_files_loader.mapping_files%</argument>
         </service>
     </services>
 </container>

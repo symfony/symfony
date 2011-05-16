@@ -14,7 +14,7 @@ namespace Symfony\Tests\Component\Validator\Mapping\Loader;
 require_once __DIR__.'/../../Fixtures/Entity.php';
 require_once __DIR__.'/../../Fixtures/ConstraintA.php';
 
-use Annotations\Reader;
+use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -28,7 +28,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        if (!class_exists('Annotations\Reader')) {
+        if (!class_exists('Doctrine\Common\Annotations\Reader')) {
             $this->markTestSkipped('Unmet dependency: Annotations is required for this test');
         }
     }

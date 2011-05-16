@@ -11,7 +11,7 @@
 
 namespace Symfony\Tests\Component\Validator;
 
-use Annotations\Reader;
+use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\ValidatorContext;
 use Symfony\Component\Validator\ValidatorFactory;
@@ -76,7 +76,7 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildDefaultFromAnnotations()
     {
-        if (!class_exists('Annotations\Reader')) {
+        if (!class_exists('Doctrine\Common\Annotations\Reader')) {
             $this->markTestSkipped('Annotations is required for this test');
         }
         $factory = ValidatorFactory::buildDefault();
@@ -91,7 +91,7 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildDefaultFromAnnotationsWithCustomNamespaces()
     {
-        if (!class_exists('Annotations\Reader')) {
+        if (!class_exists('Doctrine\Common\Annotations\Reader')) {
             $this->markTestSkipped('Annotations is required for this test');
         }
         $factory = ValidatorFactory::buildDefault(array(), true);
@@ -145,7 +145,7 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildDefaultFromMultipleLoaders()
     {
-        if (!class_exists('Annotations\Reader')) {
+        if (!class_exists('Doctrine\Common\Annotations\Reader')) {
             $this->markTestSkipped('Annotations is required for this test');
         }
         $xmlPath = __DIR__.'/Mapping/Loader/constraint-mapping.xml';

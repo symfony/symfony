@@ -44,7 +44,7 @@ install_git doctrine git://github.com/doctrine/doctrine2.git 2.0.4
 install_git doctrine-dbal git://github.com/doctrine/dbal.git 2.0.4
 
 # Doctrine Common
-install_git doctrine-common git://github.com/doctrine/common.git 2.0.2
+install_git doctrine-common git://github.com/doctrine/common.git origin/3.0.x
 
 # Doctrine migrations
 install_git doctrine-migrations git://github.com/doctrine/migrations.git

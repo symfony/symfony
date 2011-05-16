@@ -30,7 +30,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     public function buildForm(FormBuilder $builder, array $options)
     {
         if ($options['csrf_protection']) {
-            $csrfOptions = array('page_id' => $options['csrf_page_id']);
+            $csrfOptions = array('intention' => $options['intention']);
 
             if ($options['csrf_provider']) {
                 $csrfOptions['csrf_provider'] = $options['csrf_provider'];
@@ -58,7 +58,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
             'csrf_protection' => $this->enabled,
             'csrf_field_name' => $this->fieldName,
             'csrf_provider'   => null,
-            'csrf_page_id'    => get_class($this),
+            'intention'  => 'unknown',
         );
     }
 

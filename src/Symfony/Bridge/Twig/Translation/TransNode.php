@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Twig\Node;
+namespace Symfony\Bridge\Twig\Translation;
 
 /**
  *

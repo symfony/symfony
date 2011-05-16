@@ -11,7 +11,7 @@
 
 namespace Symfony\Tests\Bridge\Twig\Extension;
 
-use Symfony\Bridge\Twig\Extension\TranslationExtension;
+use Symfony\Bridge\Twig\Translation\TranslationExtension;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Tests\Bridge\Twig\TestCase;

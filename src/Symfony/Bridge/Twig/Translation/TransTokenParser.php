@@ -9,16 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Twig\TokenParser;
-
-use Symfony\Bridge\Twig\Node\TransNode;
+namespace Symfony\Bridge\Twig\Translation;
 
 /**
  *
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TransChoiceTokenParser extends TransTokenParser
+class TransTokenParser extends \Twig_TokenParser
 {
     /**
      * Parses a token and returns a node.
@@ -33,39 +31,39 @@ class TransChoiceTokenParser extends TransTokenParser
         $stream = $this->parser->getStream();
 
         $vars = new \Twig_Node_Expression_Array(array(), $lineno);
-
-        $count = $this->parser->getExpressionParser()->parseExpression();
-
         $domain = new \Twig_Node_Expression_Constant('messages', $lineno);
+        if (!$stream->test(\Twig_Token::BLOCK_END_TYPE)) {
+            if ($stream->test('with')) {
+                // {% trans with vars %}
+                $stream->next();
+                $vars = $this->parser->getExpressionParser()->parseExpression();
+            }
 
-        if ($stream->test('with')) {
-            // {% transchoice count with vars %}
-            $stream->next();
-            $vars = $this->parser->getExpressionParser()->parseExpression();
+            if ($stream->test('from')) {
+                // {% trans from "messages" %}
+                $stream->next();
+                $domain = $this->parser->getExpressionParser()->parseExpression();
+            } elseif (!$stream->test(\Twig_Token::BLOCK_END_TYPE)) {
+                throw new \Twig_Error_Syntax('Unexpected token. Twig was looking for the "with" or "from" keyword.');
+            }
         }
 
-        if ($stream->test('from')) {
-            // {% transchoice count from "messages" %}
-            $stream->next();
-            $domain = $this->parser->getExpressionParser()->parseExpression();
-        }
-
+        // {% trans %}message{% endtrans %}
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
-
-        $body = $this->parser->subparse(array($this, 'decideTransChoiceFork'), true);
+        $body = $this->parser->subparse(array($this, 'decideTransFork'), true);
 
         if (!$body instanceof \Twig_Node_Text && !$body instanceof \Twig_Node_Expression) {
-            throw new \Twig_Error_Syntax('A message must be a simple text.');
+            throw new \Twig_Error_Syntax('A message must be a simple text');
         }
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
-        return new TransNode($body, $domain, $count, $vars, $lineno, $this->getTag());
+        return new TransNode($body, $domain, null, $vars, $lineno, $this->getTag());
     }
 
-    public function decideTransChoiceFork($token)
+    public function decideTransFork($token)
     {
-        return $token->test(array('endtranschoice'));
+        return $token->test(array('endtrans'));
     }
 
     /**
@@ -75,6 +73,6 @@ class TransChoiceTokenParser extends TransTokenParser
      */
     public function getTag()
     {
-        return 'transchoice';
+        return 'trans';
     }
 }

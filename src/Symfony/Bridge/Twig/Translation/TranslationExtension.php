@@ -9,10 +9,8 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Twig\Extension;
+namespace Symfony\Bridge\Twig\Translation;
 
-use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
-use Symfony\Bridge\Twig\TokenParser\TransChoiceTokenParser;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**

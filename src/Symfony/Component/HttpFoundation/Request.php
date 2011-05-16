@@ -468,11 +468,7 @@ class Request
      */
     public function getHttpHost()
     {
-        $host = $this->headers->get('HOST');
-        if (!empty($host)) {
-            return $host;
-        }
-
+        $host   = $this->getHost();
         $scheme = $this->getScheme();
         $name   = $this->server->get('SERVER_NAME');
         $port   = $this->getPort();

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Validator\Mapping\Loader;
 
-use Annotations\ReaderInterface;
+use Doctrine\Common\Annotations\ReaderInterface;
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints\GroupSequence;

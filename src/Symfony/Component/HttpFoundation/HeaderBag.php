@@ -44,14 +44,20 @@ class HeaderBag
      */
     public function __toString()
     {
+        if (!$this->headers) {
+            return '';
+        }
+
         $beautifier = function ($name) {
             return preg_replace('/\-(.)/e', "'-'.strtoupper('\\1')", ucfirst($name));
         };
 
+        $max = max(array_map('strlen', array_keys($this->headers))) + 1;
         $content = '';
+        ksort($this->headers);
         foreach ($this->headers as $name => $values) {
             foreach ($values as $value) {
-                $content .= sprintf("%s: %s\r\n", $beautifier($name), $value);
+                $content .= sprintf("%-{$max}s %s\r\n", $beautifier($name).':', $value);
             }
         }
 

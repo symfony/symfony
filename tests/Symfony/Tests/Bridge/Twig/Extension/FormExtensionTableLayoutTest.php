@@ -15,7 +15,7 @@ require_once __DIR__.'/Fixtures/StubTranslator.php';
 require_once __DIR__.'/Fixtures/StubFilesystemLoader.php';
 
 use Symfony\Component\Form\FormView;
-use Symfony\Bridge\Twig\Extension\FormExtension;
+use Symfony\Bridge\Twig\Form\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Tests\Component\Form\AbstractTableLayoutTest;
 use Symfony\Tests\Bridge\Twig\Extension\Fixtures\StubTranslator;

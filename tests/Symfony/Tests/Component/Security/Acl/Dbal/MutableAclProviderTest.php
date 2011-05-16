@@ -12,7 +12,7 @@
 namespace Symfony\Tests\Component\Security\Acl\Dbal;
 
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
-use Symfony\Component\Security\Acl\Model\FieldAwareEntryInterface;
+use Symfony\Component\Security\Acl\Model\FieldEntryInterface;
 use Symfony\Component\Security\Acl\Model\AuditableEntryInterface;
 use Symfony\Component\Security\Acl\Model\EntryInterface;
 use Symfony\Component\Security\Acl\Domain\Entry;
@@ -47,7 +47,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
             self::assertSame($a->isAuditFailure(), $b->isAuditFailure());
         }
 
-        if ($a instanceof FieldAwareEntryInterface) {
+        if ($a instanceof FieldEntryInterface) {
             self::assertSame($a->getField(), $b->getField());
         }
     }

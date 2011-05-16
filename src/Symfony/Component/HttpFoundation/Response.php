@@ -82,10 +82,13 @@ class Response
      */
     public function __construct($content = '', $status = 200, $headers = array())
     {
+        $this->headers = new ResponseHeaderBag($headers);
         $this->setContent($content);
         $this->setStatusCode($status);
         $this->setProtocolVersion('1.0');
-        $this->headers = new ResponseHeaderBag($headers);
+        if (!$this->headers->has('Date')) {
+            $this->setDate(new \DateTime(null, new \DateTimeZone('UTC')));
+        }
         $this->charset = 'UTF-8';
     }
 
@@ -329,20 +332,24 @@ class Response
     /**
      * Returns the Date header as a DateTime instance.
      *
-     * When no Date header is present, the current time is returned.
-     *
      * @return \DateTime A \DateTime instance
      *
      * @throws \RuntimeException when the header is not parseable
      */
     public function getDate()
     {
-        if (null === $date = $this->headers->getDate('Date')) {
-            $date = new \DateTime(null, new \DateTimeZone('UTC'));
-            $this->headers->set('Date', $date->format('D, d M Y H:i:s').' GMT');
-        }
+        return $this->headers->getDate('Date');
+    }
 
-        return $date;
+    /**
+     * Sets the Date header.
+     *
+     * @param \DateTime $date A \DateTime instance
+     */
+    public function setDate(\DateTime $date)
+    {
+        $date->setTimezone(new \DateTimeZone('UTC'));
+        $this->headers->set('Date', $date->format('D, d M Y H:i:s').' GMT');
     }
 
     /**

@@ -9,6 +9,8 @@ timeline closely anyway.
 beta1 to beta2
 --------------
 
+* The form component's ``csrf_page_id`` option has been renamed to ``intention``.
+
 * The ``error_handler`` setting has been removed. The ``ErrorHandler`` class
   is now managed directly by Symfony SE in ``AppKernel``.
 

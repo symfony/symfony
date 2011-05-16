@@ -115,6 +115,20 @@ beta1 から beta2
             'allow_delete' => true,
         ));
 
+* Request::hasSession() メソッドの名前は Request::hasPreviousSession() に変更されました。hasSession() メソッドはまだ存在しますが、
+  セッションが以前のリクエストから開始されたかどうかではなく、リクエストがセッションオブジェクトを含んでいるかチェックするのみです。
+
+* Serializer: NormalizerInterface の `supports()` メソッドは `supportsNormalization` と `supportsDenormalization` の 2 つのメソッドに分割されました。
+
+* ParameterBag::getDeep() メソッドは削除され、ParameterBag::get() メソッドの真偽値の引数に置き換えられました。
+
+* Serializer: `AbstractEncoder` と `AbstractNormalizer` はそれぞれ `SerializerAwareEncoder` と `SerializerAwareNormalizer` に名前が変更されました。
+
+* Serializer: すべてのインターフェイスから `$properties` という引数が除かれました。
+
+* Form: オプションの値である "date" タイプの "widget" の "text" は "single-text" に名前が変更されました。
+  "text" は現在は個々のテキストボックスを示します ("time" タイプのように) 。
+
 PR12 から beta1
 ---------------
 
@@ -132,6 +146,9 @@ PR12 から beta1
             secret: S3cr3t
 
 * `File::getWebPath()` メソッドと `File::rename()` メソッドは削除されました。同様に `framework.document_root` コンフィギュレーションも削除されました。
+
+* `File::getDefaultExtension()` メソッドの名前は `File::guessExtension()` に変更されました。
+  また、拡張子を推測できなかった場合は null を返すように変更されました。
 
 * `session` のコンフィギュレーションがリファクタリングされました
 

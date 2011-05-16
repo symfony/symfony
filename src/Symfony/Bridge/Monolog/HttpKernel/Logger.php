@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Monolog;
+namespace Symfony\Bridge\Monolog\HttpKernel;
 
 use Monolog\Logger as BaseLogger;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;

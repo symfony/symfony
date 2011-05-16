@@ -19,7 +19,8 @@ use Symfony\Component\Console\Output\Output;
 use Doctrine\ORM\Tools\Console\Command\SchemaTool\CreateCommand;
 
 /**
- * Command to create the database schema for a set of classes based on their mappings.
+ * Command to execute the SQL needed to generate the database schema for
+ * a given entity manager.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jonathan H. Wage <jonwage@gmail.com>
@@ -32,17 +33,21 @@ class CreateSchemaDoctrineCommand extends CreateCommand
 
         $this
             ->setName('doctrine:schema:create')
+            ->setDescription('Executes (or dumps) the SQL needed to generate the database schema.')
             ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command')
             ->setHelp(<<<EOT
-The <info>doctrine:schema:create</info> command creates the default entity
-managers schema:
+The <info>doctrine:schema:create</info> command executes the SQL needed to
+generate the database schema for the default entity manager:
 
 <info>./app/console doctrine:schema:create</info>
 
-You can also optionally specify the name of a entity manager to create the
-schema for:
+You can also generate the database schema for a specific entity manager:
 
 <info>./app/console doctrine:schema:create --em=default</info>
+
+Finally, instead of executing the SQL, you can output the SQL:
+
+<info>./app/console doctrine:schema:create --dump-sql</info>
 EOT
         );
     }

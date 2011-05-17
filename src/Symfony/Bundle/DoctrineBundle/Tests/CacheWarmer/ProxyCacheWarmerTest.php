@@ -29,7 +29,7 @@ class ProxyCacheWarmerTest extends \Symfony\Bundle\DoctrineBundle\Tests\TestCase
             __DIR__ . "/../DependencyInjection/Fixtures/Bundles/AnnotationsBundle/Entity")
         );
 
-        $registry = $this->getMockBuilder('Symfony\Bundle\DoctrineBundle\Registry')->disableOriginalConstructor()->getMock();
+        $registry = $this->getMockBuilder('Symfony\Bridge\Doctrine\Registry')->disableOriginalConstructor()->getMock();
         $registry->expects($this->at(0))
                   ->method('getEntityManagerNames')
                   ->will($this->returnValue(array('default' => 'doctrine.orm.default_entity_manager', 'foo' => 'doctrine.orm.foo_entity_manager')));

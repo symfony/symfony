@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineBundle\Mapping\Driver;
+namespace Symfony\Bridge\Doctrine\Mapping\Driver;
 
 use Doctrine\ORM\Mapping\Driver\YamlDriver as BaseYamlDriver;
 

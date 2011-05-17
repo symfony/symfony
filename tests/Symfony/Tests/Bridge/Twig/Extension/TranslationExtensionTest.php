@@ -14,9 +14,8 @@ namespace Symfony\Tests\Bridge\Twig\Extension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\MessageSelector;
-use Symfony\Tests\Bridge\Twig\TestCase;
 
-class TranslationExtensionTest extends TestCase
+class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {

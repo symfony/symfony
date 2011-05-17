@@ -11,8 +11,7 @@ namespace Symfony\Component\Validator;
  * file that was distributed with this source code.
  */
 
-use Annotations\Reader;
-
+use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;

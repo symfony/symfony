@@ -12,11 +12,11 @@
 namespace Symfony\Component\DependencyInjection\Exception;
 
 /**
- * Exception
+ * ExceptionInterface
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bulat Shakirzyanov <bulat@theopenskyproject.com>
  */
-interface Exception
+interface ExceptionInterface
 {
 }

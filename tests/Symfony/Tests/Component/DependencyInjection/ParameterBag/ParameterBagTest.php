@@ -14,8 +14,19 @@ namespace Symfony\Tests\Component\DependencyInjection\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Exception\NonExistentParameterException;
 
+/**
+ * Used for testing global constants
+ */
+define('PARAMETER_BAG_TEST_CONSTANT', 'bar');
+
 class ParameterBagTest extends \PHPUnit_Framework_TestCase
 {
+
+    /**
+     * Used for testing class constants
+     */
+    const TEST_RESOLVE_VALUE_CONSANTS = 'bar';
+
     /**
      * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::__construct
      */
@@ -110,6 +121,61 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         } catch (NonExistentParameterException $e) {
             $this->assertEquals('You have requested a non-existent parameter "foobar".', $e->getMessage(), '->resolveValue() throws a NonExistentParameterException if a placeholder references a non-existent parameter');
         }
+
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::resolveValue
+     */
+    public function testResolveValueUnknownDiscriminators()
+    {
+
+        try {
+            $bag = new ParameterBag(array());
+            $bag->resolveValue('%FOO:foobar%', array());
+            $this->fail('->resolveValue() throws an InvalidArgumentException if a placeholder references an unsupported parameter discriminator');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals('You have specified an unsupported parameter discriminator "FOO:foobar".', $e->getMessage(), '->resolveValue() throws a InvalidArgumentException if a placeholder references an unsupported parameter discriminator');
+        }
+
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::resolveValue
+     */
+    public function testResolveValueConstants()
+    {
+  
+        try {
+            $bag = new ParameterBag(array());
+            $bag->resolveValue('%CONSTANT:foobar%', array());
+            $this->fail('->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent constant');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals('You have requested a non-existent constant "foobar".', $e->getMessage(), '->resolveValue() throws a InvalidArgumentException if a placeholder references a non-existent constant');
+        }
+
+        $this->assertEquals('I\'m a bar', $bag->resolveValue('I\'m a %CONSTANT:PARAMETER_BAG_TEST_CONSTANT%'), '->resolveValue() replaces placeholders by their values (constants)');
+        $this->assertEquals('I\'m a bar', $bag->resolveValue('I\'m a %CONSTANT:\Symfony\Tests\Component\DependencyInjection\ParameterBag\ParameterBagTest::TEST_RESOLVE_VALUE_CONSANTS%'), '->resolveValue() replaces placeholders by their values (class constants)');
+
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::resolveValue
+     */
+    public function testResolveValueEnv()
+    {
+  
+        try {
+            $bag = new ParameterBag(array());
+            $bag->resolveValue('%ENV:DOES_NOT_EXIST%', array());
+            $this->fail('->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent environment variable');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals('You have requested a non-existent environment variable "DOES_NOT_EXIST".', $e->getMessage(), '->resolveValue() throws a InvalidArgumentException if a placeholder references a non-existent environment variable');
+        }
+
+        $_SERVER['CONSTANT:PARAMETER_BAG_TEST_DOES_NOW_EXIST'] = 'bar';
+        $this->assertEquals('I\'m a bar', $bag->resolveValue('I\'m a %ENV:CONSTANT:PARAMETER_BAG_TEST_DOES_NOW_EXIST%'), '->resolveValue() replaces placeholders by their values (environment variable)');
+
     }
 
     /**

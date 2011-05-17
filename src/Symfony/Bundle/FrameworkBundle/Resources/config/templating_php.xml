@@ -37,7 +37,7 @@
             <argument type="service" id="request" strict="false" />
             <argument>%templating.helper.assets.assets_base_urls%</argument>
             <argument>%templating.helper.assets.assets_version%</argument>
-            <argument>%templating.helper.assets.packages%</argument>
+            <argument type="collection" /> <!-- packages -->
         </service>
 
         <service id="templating.helper.request" class="%templating.helper.request.class%">

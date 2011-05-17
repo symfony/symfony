@@ -11,8 +11,7 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Tests;
 
-use Annotations\Reader;
-
+use Doctrine\Common\Annotations\Reader;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -26,9 +25,6 @@ class TestCase extends \PHPUnit_Framework_TestCase
     {
         if (!class_exists('Doctrine\\Common\\Version')) {
             $this->markTestSkipped('Doctrine is not available.');
-        }
-        if (!class_exists('Annotations\Reader')) {
-            $this->markTestSkipped('Annotations is not available.');
         }
     }
 

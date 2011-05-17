@@ -38,8 +38,10 @@ class CollectionType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form)
     {
-        $view->set('allow_add', $form->getAttribute('allow_add'));
-        $view->set('allow_delete', $form->getAttribute('allow_delete'));
+        $view
+            ->set('allow_add', $form->getAttribute('allow_add'))
+            ->set('allow_delete', $form->getAttribute('allow_delete'))
+        ;
     }
 
     public function getDefaultOptions(array $options)

@@ -21,8 +21,10 @@ class CheckboxType extends AbstractType
 {
     public function buildForm(FormBuilder $builder, array $options)
     {
-        $builder->appendClientTransformer(new BooleanToStringTransformer())
-            ->setAttribute('value', $options['value']);
+        $builder
+            ->appendClientTransformer(new BooleanToStringTransformer())
+            ->setAttribute('value', $options['value'])
+        ;
     }
 
     public function buildView(FormView $view, FormInterface $form)

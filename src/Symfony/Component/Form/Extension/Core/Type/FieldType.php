@@ -35,7 +35,8 @@ class FieldType extends AbstractType
             $options['property_path'] = new PropertyPath($options['property_path']);
         }
 
-        $builder->setRequired($options['required'])
+        $builder
+            ->setRequired($options['required'])
             ->setReadOnly($options['read_only'])
             ->setErrorBubbling($options['error_bubbling'])
             ->setEmptyData($options['empty_data'])
@@ -45,7 +46,8 @@ class FieldType extends AbstractType
             ->setAttribute('max_length', $options['max_length'])
             ->setAttribute('label', $options['label'] ?: $this->humanize($builder->getName()))
             ->setData($options['data'])
-            ->addValidator(new DefaultValidator());
+            ->addValidator(new DefaultValidator())
+        ;
 
         if ($options['trim']) {
             $builder->addEventSubscriber(new TrimListener());
@@ -89,17 +91,17 @@ class FieldType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         $defaultOptions = array(
-            'data' => null,
-            'data_class' => null,
-            'trim' => true,
-            'required' => true,
-            'read_only' => false,
-            'max_length' => null,
-            'property_path' => null,
-            'by_reference' => true,
-            'error_bubbling' => false,
-            'error_mapping' => array(),
-            'label' => null,
+            'data'              => null,
+            'data_class'        => null,
+            'trim'              => true,
+            'required'          => true,
+            'read_only'         => false,
+            'max_length'        => null,
+            'property_path'     => null,
+            'by_reference'      => true,
+            'error_bubbling'    => false,
+            'error_mapping'     => array(),
+            'label'             => null,
         );
 
         $class = isset($options['data_class']) ? $options['data_class'] : null;

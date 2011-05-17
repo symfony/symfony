@@ -12,7 +12,7 @@
 namespace Symfony\Component\Routing\Matcher;
 
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
-use Symfony\Component\Routing\Exception\NotFoundException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
@@ -67,7 +67,7 @@ class UrlMatcher implements UrlMatcherInterface
      *
      * @return array An array of parameters
      *
-     * @throws NotFoundException         If the resource could not be found
+     * @throws ResourceNotFoundException If the resource could not be found
      * @throws MethodNotAllowedException If the resource was found but the request method is not allowed
      */
     public function match($pathinfo)
@@ -80,7 +80,7 @@ class UrlMatcher implements UrlMatcherInterface
 
         throw 0 < count($this->allow)
             ? new MethodNotAllowedException(array_unique(array_map('strtolower', $this->allow)))
-            : new NotFoundException();
+            : new ResourceNotFoundException();
     }
 
     protected function matchCollection($pathinfo, RouteCollection $routes)

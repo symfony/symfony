@@ -77,7 +77,7 @@ EOF
     public function generate(\$name, array \$parameters = array(), \$absolute = false)
     {
         if (!isset(self::\$declaredRouteNames[\$name])) {
-            throw new NotExistingRouteException(sprintf('Route "%s" does not exist.', \$name));
+            throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', \$name));
         }
 
         \$escapedName = str_replace('.', '__', \$name);
@@ -103,7 +103,7 @@ EOF;
 <?php
 
 use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\Exception\NotExistingRouteException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 
 /**

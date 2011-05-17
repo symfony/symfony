@@ -89,8 +89,8 @@ class DumpCommand extends Command
         while (true) {
             try {
                 foreach ($this->am->getNames() as $name) {
-                    if ($asset = $this->checkAsset($name, $previously)) {
-                        $this->dumpAsset($asset, $output);
+                    if ($this->checkAsset($name, $previously)) {
+                        $this->dumpAsset($name, $output);
                     }
                 }
 
@@ -117,7 +117,7 @@ class DumpCommand extends Command
      * @param string $name        The asset name
      * @param array  &$previously An array of previous visits
      *
-     * @return AssetInterface|Boolean The asset if it should be dumped
+     * @return Boolean Whether the asset should be dumped
      */
     private function checkAsset($name, array &$previously)
     {
@@ -133,7 +133,7 @@ class DumpCommand extends Command
 
         $previously[$name] = array('mtime' => $mtime, 'formula' => $formula);
 
-        return $changed ? $asset : false;
+        return $changed;
     }
 
     /**

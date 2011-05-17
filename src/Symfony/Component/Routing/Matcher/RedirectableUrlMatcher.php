@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
-use Symfony\Component\Routing\Matcher\Exception\NotFoundException;
+use Symfony\Component\Routing\Exception\NotFoundException;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>

@@ -9,6 +9,20 @@ timeline closely anyway.
 beta1 to beta2
 --------------
 
+* The Routing Exceptions have been moved:
+
+    Before:
+
+    Symfony\Component\Routing\Matcher\Exception\Exception
+    Symfony\Component\Routing\Matcher\Exception\NotFoundException
+    Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException
+
+    After:
+
+    Symfony\Component\Routing\Exception\Exception
+    Symfony\Component\Routing\Exception\NotFoundException
+    Symfony\Component\Routing\Exception\MethodNotAllowedException
+
 * The ``error_handler`` setting has been removed. The ``ErrorHandler`` class
   is now managed directly by Symfony SE in ``AppKernel``.
 

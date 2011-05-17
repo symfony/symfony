@@ -321,7 +321,7 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('templating.helper.assets.assets_base_urls', isset($config['assets_base_urls']) ? $config['assets_base_urls'] : array());
         $container->setParameter('templating.helper.assets.assets_version', $config['assets_version']);
-        $container->setParameter('templating.helper.assets.packages', $packages);
+        $container->getDefinition('templating.helper.assets')->replaceArgument(3, $packages);
 
         if (!empty($config['loaders'])) {
             $loaders = array_map(function($loader) { return new Reference($loader); }, $config['loaders']);

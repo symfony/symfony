@@ -206,8 +206,8 @@ EOF
         return <<<EOF
 <?php
 
-use Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException;
-use Symfony\Component\Routing\Matcher\Exception\NotFoundException;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\NotFoundException;
 use Symfony\Component\Routing\RequestContext;
 
 /**

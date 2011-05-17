@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Routing\Matcher\Exception;
+namespace Symfony\Component\Routing\Exception;
 
 /**
  * The resource was not found.

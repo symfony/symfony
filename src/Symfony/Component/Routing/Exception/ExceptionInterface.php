@@ -12,10 +12,10 @@
 namespace Symfony\Component\Routing\Exception;
 
 /**
- * Exception
+ * ExceptionInterface
  *
  * @author Alexandre Salomé <alexandre.salome@gmail.com>
  */
-interface Exception
+interface ExceptionInterface
 {
 }

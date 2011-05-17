@@ -16,6 +16,6 @@ namespace Symfony\Component\Routing\Exception;
  *
  * @author Alexandre Salomé <alexandre.salome@gmail.com>
  */
-class InvalidParameterException extends \InvalidArgumentException implements Exception
+class InvalidParameterException extends \InvalidArgumentException implements ExceptionInterface
 {
 }

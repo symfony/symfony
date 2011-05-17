@@ -27,7 +27,7 @@ interface UrlMatcherInterface extends RequestContextAwareInterface
      *
      * @return array An array of parameters
      *
-     * @throws NotFoundException         If the resource could not be found
+     * @throws ResourceNotFoundException If the resource could not be found
      * @throws MethodNotAllowedException If the resource was found but the request method is not allowed
      */
     function match($pathinfo);

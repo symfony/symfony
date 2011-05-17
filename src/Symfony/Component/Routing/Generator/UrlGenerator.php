@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
-use Symfony\Component\Routing\Exception\NotExistingRouteException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 
 /**
@@ -72,12 +72,12 @@ class UrlGenerator implements UrlGeneratorInterface
      *
      * @return string The generated URL
      *
-     * @throws Symfony\Component\Routing\Exception\NotExistingRouteException When route doesn't exist
+     * @throws Symfony\Component\Routing\Exception\RouteNotFoundException When route doesn't exist
      */
     public function generate($name, array $parameters = array(), $absolute = false)
     {
         if (null === $route = $this->routes->get($name)) {
-            throw new NotExistingRouteException(sprintf('Route "%s" does not exist.', $name));
+            throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', $name));
         }
 
         if (!isset($this->cache[$name])) {

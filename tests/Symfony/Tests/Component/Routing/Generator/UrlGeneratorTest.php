@@ -131,7 +131,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Routing\Exception\NotExistingRouteException
+     * @expectedException Symfony\Component\Routing\Exception\RouteNotFoundException
      */
     public function testGenerateWithoutRoutes()
     {

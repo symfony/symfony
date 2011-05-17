@@ -12,12 +12,10 @@
 namespace Symfony\Component\Routing\Exception;
 
 /**
- * The resource was not found.
+ * Exception thrown when a route does not exists
  *
- * This exception should trigger an HTTP 404 response in your application code.
- *
- * @author Kris Wallsmith <kris@symfony.com>
+ * @author Alexandre Salomé <alexandre.salome@gmail.com>
  */
-class NotFoundException extends \RuntimeException implements Exception
+class RouteNotFoundException extends \InvalidArgumentException implements Exception
 {
 }

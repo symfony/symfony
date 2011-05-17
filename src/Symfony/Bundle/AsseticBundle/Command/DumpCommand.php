@@ -51,6 +51,10 @@ class DumpCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output->writeln(sprintf('Dumping all <comment>%s</comment> assets.', $input->getOption('env')));
+        $output->writeln(sprintf('Debug mode is <comment>%s</comment>.', $input->getOption('no-debug') ? 'off' : 'on'));
+        $output->writeln('');
+
         if (!$input->getOption('watch')) {
             foreach ($this->am->getNames() as $name) {
                 $this->dumpAsset($name, $output);

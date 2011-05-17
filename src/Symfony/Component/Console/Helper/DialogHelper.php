@@ -70,16 +70,20 @@ class DialogHelper extends Helper
     /**
      * Asks for a value and validates the response.
      *
+     * The validator receives the data to validate. It must return the
+     * validated data when the data is valid and throw an exception
+     * otherwise.
+     *
      * @param OutputInterface $output
      * @param string|array    $question
-     * @param Closure         $validator
+     * @param callback        $validator A PHP callback
      * @param integer         $attempts Max number of times to ask before giving up (false by default, which means infinite)
      *
      * @return mixed
      *
      * @throws \Exception When any of the validator returns an error
      */
-    public function askAndValidate(OutputInterface $output, $question, \Closure $validator, $attempts = false)
+    public function askAndValidate(OutputInterface $output, $question, $validator, $attempts = false)
     {
         // @codeCoverageIgnoreStart
         $error = null;
@@ -91,7 +95,7 @@ class DialogHelper extends Helper
             $value = $this->ask($output, $question, null);
 
             try {
-                return $validator($value);
+                return call_user_func($validator, $value));
             } catch (\Exception $error) {
             }
         }

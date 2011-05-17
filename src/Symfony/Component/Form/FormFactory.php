@@ -131,7 +131,7 @@ class FormFactory implements FormFactoryInterface
      *
      * @throws FormException if any given option is not applicable to the given type
      */
-    public function create($type, $data = null, array $options = array())
+    public function create($type = 'form', $data = null, array $options = array())
     {
         return $this->createBuilder($type, $data, $options)->getForm();
     }
@@ -186,7 +186,7 @@ class FormFactory implements FormFactoryInterface
      *
      * @throws FormException if any given option is not applicable to the given type
      */
-    public function createBuilder($type, $data = null, array $options = array())
+    public function createBuilder($type = 'form', $data = null, array $options = array())
     {
         $name = is_object($type) ? $type->getName() : $type;
 

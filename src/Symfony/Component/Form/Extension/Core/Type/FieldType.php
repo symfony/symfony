@@ -64,18 +64,20 @@ class FieldType extends AbstractType
             $name = $form->getName();
         }
 
-        $view->set('form', $view);
-        $view->set('id', $id);
-        $view->set('name', $name);
-        $view->set('errors', $form->getErrors());
-        $view->set('value', $form->getClientData());
-        $view->set('read_only', $form->isReadOnly());
-        $view->set('required', $form->isRequired());
-        $view->set('max_length', $form->getAttribute('max_length'));
-        $view->set('size', null);
-        $view->set('label', $form->getAttribute('label'));
-        $view->set('multipart', false);
-        $view->set('attr', array());
+        $view
+            ->set('form', $view)
+            ->set('id', $id)
+            ->set('name', $name)
+            ->set('errors', $form->getErrors())
+            ->set('value', $form->getClientData())
+            ->set('read_only', $form->isReadOnly())
+            ->set('required', $form->isRequired())
+            ->set('max_length', $form->getAttribute('max_length'))
+            ->set('size', null)
+            ->set('label', $form->getAttribute('label'))
+            ->set('multipart', false)
+            ->set('attr', array())
+        ;
 
         $types = array();
         foreach (array_reverse((array) $form->getTypes()) as $type) {

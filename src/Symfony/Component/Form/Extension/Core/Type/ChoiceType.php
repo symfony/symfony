@@ -89,12 +89,14 @@ class ChoiceType extends AbstractType
         $choices = $form->getAttribute('choice_list')->getChoices();
         $preferred = array_flip($form->getAttribute('preferred_choices'));
 
-        $view->set('multiple', $form->getAttribute('multiple'));
-        $view->set('expanded', $form->getAttribute('expanded'));
-        $view->set('preferred_choices', array_intersect_key($choices, $preferred));
-        $view->set('choices', array_diff_key($choices, $preferred));
-        $view->set('separator', '-------------------');
-        $view->set('empty_value', '');
+        $view
+            ->set('multiple', $form->getAttribute('multiple'))
+            ->set('expanded', $form->getAttribute('expanded'))
+            ->set('preferred_choices', array_intersect_key($choices, $preferred))
+            ->set('choices', array_diff_key($choices, $preferred))
+            ->set('separator', '-------------------')
+            ->set('empty_value', '')
+        ;
 
         if ($view->get('multiple') && !$view->get('expanded')) {
             // Add "[]" to the name in case a select tag with multiple options is

@@ -36,6 +36,7 @@ class DumpCommand extends Command
             ->setDescription('Dumps all assets to the filesystem')
             ->addArgument('write_to', InputArgument::OPTIONAL, 'Override the configured asset root')
             ->addOption('watch', null, InputOption::VALUE_NONE, 'Check for changes every second, debug mode only')
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Force an initial generation of all assets (used with --watch)')
         ;
     }
 
@@ -61,7 +62,7 @@ class DumpCommand extends Command
             throw new \RuntimeException('The --watch option is only available in debug mode.');
         }
 
-        $this->watch($output);
+        $this->watch($input, $output);
     }
 
     /**
@@ -72,17 +73,17 @@ class DumpCommand extends Command
      *
      * @param OutputInterface $output The command output
      */
-    private function watch(OutputInterface $output)
+    private function watch(InputInterface $input, OutputInterface $output)
     {
         $refl = new \ReflectionClass('Assetic\\AssetManager');
         $prop = $refl->getProperty('assets');
         $prop->setAccessible(true);
 
         $cache = sys_get_temp_dir().'/assetic_watch_'.substr(sha1($this->basePath), 0, 7);
-        if (file_exists($cache)) {
-            $previously = unserialize(file_get_contents($cache));
-        } else {
+        if ($input->getOption('force') || !file_exists($cache)) {
             $previously = array();
+        } else {
+            $previously = unserialize(file_get_contents($cache));
         }
 
         $error = '';

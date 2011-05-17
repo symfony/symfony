@@ -111,7 +111,7 @@ class UploadedFile extends File
      */
     public function getExtension()
     {
-        if ($this->moved) {
+        if (!$this->moved) {
             return parent::getExtension();
         }
 

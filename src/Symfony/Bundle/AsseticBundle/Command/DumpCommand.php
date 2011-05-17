@@ -37,6 +37,7 @@ class DumpCommand extends Command
             ->addArgument('write_to', InputArgument::OPTIONAL, 'Override the configured asset root')
             ->addOption('watch', null, InputOption::VALUE_NONE, 'Check for changes every second, debug mode only')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Force an initial generation of all assets (used with --watch)')
+            ->addOption('period', null, InputOption::VALUE_REQUIRED, 'Set the polling period in seconds (used with --watch)', 1)
         ;
     }
 
@@ -102,7 +103,7 @@ class DumpCommand extends Command
                 file_put_contents($cache, serialize($previously));
                 $error = '';
 
-                sleep(1);
+                sleep($input->getOption('period'));
             } catch (\Exception $e) {
                 if ($error != $msg = $e->getMessage()) {
                     $output->writeln('<error>[error]</error> '.$msg);

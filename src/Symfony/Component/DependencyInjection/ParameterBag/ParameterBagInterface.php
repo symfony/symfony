@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\ParameterBag;
 
-use Symfony\Component\DependencyInjection\Exception\NonExistentParameterException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 
 /**
  * ParameterBagInterface.
@@ -46,7 +46,7 @@ interface ParameterBagInterface
      *
      * @return mixed  The parameter value
      *
-     * @throws NonExistentParameterException if the parameter is not defined
+     * @throws ParameterNotFoundException if the parameter is not defined
      */
     function get($name);
 
@@ -77,7 +77,7 @@ interface ParameterBagInterface
      *
      * @param  mixed $value A value
      *
-     * @throws NonExistentParameterException if a placeholder references a parameter that does not exist
+     * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
      */
     function resolveValue($value);
 }

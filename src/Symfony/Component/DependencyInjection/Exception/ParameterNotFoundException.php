@@ -16,7 +16,7 @@ namespace Symfony\Component\DependencyInjection\Exception;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class NonExistentParameterException extends InvalidArgumentException
+class ParameterNotFoundException extends InvalidArgumentException
 {
     private $key;
     private $sourceId;

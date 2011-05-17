@@ -195,7 +195,7 @@ class EventDispatcher implements EventDispatcherInterface
     private function getListenerInfo($listener)
     {
         if (is_object($listener)) {
-            return array(spl_object_hash($listener), !$listener instanceof \Closure);
+            return array(spl_object_hash($listener), !is_callable($listener));
         }
 
         if (!is_callable($listener)) {

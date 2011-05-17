@@ -13,6 +13,7 @@ namespace Symfony\Bundle\AsseticBundle\Tests\Command;
 
 use Symfony\Bundle\AsseticBundle\Command\DumpCommand;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 
 class DumpCommandTest extends \PHPUnit_Framework_TestCase
@@ -52,7 +53,10 @@ class DumpCommandTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(array()));
         $this->definition->expects($this->any())
             ->method('getOptions')
-            ->will($this->returnValue(array()));
+            ->will($this->returnValue(array(
+                new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The Environment name.', 'dev'),
+                new InputOption('--no-debug', null, InputOption::VALUE_NONE, 'Switches off debug mode.'),
+            )));
         $this->application->expects($this->any())
             ->method('getKernel')
             ->will($this->returnValue($this->kernel));

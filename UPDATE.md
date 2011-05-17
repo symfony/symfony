@@ -24,7 +24,7 @@ beta1 to beta2
     Symfony\Component\Routing\Exception\MethodNotAllowedException
 
 * The form component's ``csrf_page_id`` option has been renamed to
-  ``csrf_intention``.
+  ``intention``.
 
 * The ``error_handler`` setting has been removed. The ``ErrorHandler`` class
   is now managed directly by Symfony SE in ``AppKernel``.

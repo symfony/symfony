@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Http\Session;
 
-use Symfony\Component\Security\Core\User\UserInterface;
-
 /**
  * SessionInformation.
  *
@@ -23,14 +21,14 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class SessionInformation
 {
     protected $sessionId;
-    protected $user;
+    protected $username;
     protected $expired;
     protected $lastRequest;
 
-    public function __construct($sessionId, UserInterface $user)
+    public function __construct($sessionId, $username)
     {
         $this->sessionId = $sessionId;
-        $this->user = $user;
+        $this->username = $username;
     }
 
     /**
@@ -54,13 +52,13 @@ class SessionInformation
     }
 
     /**
-     * Obtains the user.
+     * Obtains the username.
      *
-     * @return UserInterface
+     * @return string
      */
-    public function getUser()
+    public function getUsername()
     {
-        return $this->user;
+        return $this->username;
     }
 
     /**

@@ -59,7 +59,7 @@ class EventDispatcher implements EventDispatcherInterface
         }
 
         foreach ($this->getListeners($eventName) as $listener) {
-            $this->triggerListener($listener, $eventName, $event);
+            $this->triggerListener($listener, $event);
 
             if ($event->isPropagationStopped()) {
                 break;
@@ -113,15 +113,25 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function addListener($eventNames, $listener, $priority = 0)
     {
+        list($listenerId, $isObject) = $this->getListenerInfo($listener);
+
         foreach ((array) $eventNames as $eventName) {
             if (!isset($this->listeners[$eventName][$priority])) {
                 if (!isset($this->listeners[$eventName])) {
                     $this->listeners[$eventName] = array();
                 }
-                $this->listeners[$eventName][$priority] = new \SplObjectStorage();
+                $this->listeners[$eventName][$priority] = array();
             }
 
-            $this->listeners[$eventName][$priority]->attach($listener);
+            if ($isObject) {
+                $cListener = array($listener, $eventName);
+                $cListenerId = $listenerId.'#'.$eventName;
+            } else {
+                $cListener = $listener;
+                $cListenerId = $listenerId;
+            }
+
+            $this->listeners[$eventName][$priority][$cListenerId] = $cListener;
             unset($this->sorted[$eventName]);
         }
     }
@@ -131,14 +141,22 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function removeListener($eventNames, $listener)
     {
+        list($listenerId, $isObject) = $this->getListenerInfo($listener);
+
         foreach ((array) $eventNames as $eventName) {
             if (!isset($this->listeners[$eventName])) {
                 continue;
             }
 
-            foreach (array_keys($this->listeners[$eventName]) as $priority) {
-                if (isset($this->listeners[$eventName][$priority][$listener])) {
-                    unset($this->listeners[$eventName][$priority][$listener], $this->sorted[$eventName]);
+            if ($isObject) {
+                $cListenerId = $listenerId.'#'.$eventName;
+            } else {
+                $cListenerId = $listenerId;
+            }
+
+            foreach ($this->listeners[$eventName] as $priority => $listeners) {
+                if (isset($listeners[$cListenerId])) {
+                    unset($this->listeners[$eventName][$priority][$cListenerId], $this->sorted[$eventName]);
                 }
             }
         }
@@ -167,17 +185,33 @@ class EventDispatcher implements EventDispatcherInterface
      * for each listener.
      *
      * @param object $listener The event listener on which to invoke the listener method.
-     * @param string $eventName The name of the event to dispatch. The name of the event is
-     *                          the name of the method that is invoked on listeners.
      * @param Event $event The event arguments to pass to the event handlers/listeners.
      */
-    protected function triggerListener($listener, $eventName, Event $event)
+    protected function triggerListener($listener, Event $event)
     {
-        if ($listener instanceof \Closure) {
-            $listener->__invoke($event);
-        } else {
-            $listener->$eventName($event);
+        call_user_func($listener, $event);
+    }
+
+    private function getListenerInfo($listener)
+    {
+        if (is_object($listener)) {
+            return array(spl_object_hash($listener), !$listener instanceof \Closure);
         }
+
+        if (!is_callable($listener)) {
+            throw new \InvalidArgumentException('$listener must be an object, or a valid callable.');
+        }
+
+        if (is_array($listener)) {
+            if (is_object($listener[0])) {
+                return array(spl_object_hash($listener[0]).'#'.$listener[1], false);
+            } else {
+                return array($listener[0].'#'.$listener[1], false);
+            }
+        }
+
+        // function name
+        return array($listener, false);
     }
 
     /**

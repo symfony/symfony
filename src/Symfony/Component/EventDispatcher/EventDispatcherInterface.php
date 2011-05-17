@@ -39,7 +39,7 @@ interface EventDispatcherInterface
      * Adds an event listener that listens on the specified events.
      *
      * @param string|array $eventNames The event(s) to listen on.
-     * @param object $listener The listener object.
+     * @param object|callable $listener The listener object.
      * @param integer $priority The higher this value, the earlier an event
      *                          listener will be triggered in the chain.
      *                          Defaults to 0.

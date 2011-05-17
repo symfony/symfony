@@ -131,7 +131,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Routing\Exception\NotExistingRouteException
      */
     public function testGenerateWithoutRoutes()
     {
@@ -140,7 +140,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Routing\Exception\MissingMandatoryParametersException
      */
     public function testGenerateForRouteWithoutManditoryParameter()
     {
@@ -149,7 +149,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Routing\Exception\InvalidParameterException
      */
     public function testGenerateForRouteWithInvalidOptionalParameter()
     {
@@ -158,7 +158,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Routing\Exception\InvalidParameterException
      */
     public function testGenerateForRouteWithInvalidManditoryParameter()
     {

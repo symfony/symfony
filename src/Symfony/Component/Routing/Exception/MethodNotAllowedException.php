@@ -18,7 +18,7 @@ namespace Symfony\Component\Routing\Exception;
  *
  * @author Kris Wallsmith <kris@symfony.com>
  */
-class MethodNotAllowedException extends \RuntimeException implements Exception
+class MethodNotAllowedException extends \RuntimeException implements ExceptionInterface
 {
     protected $allowedMethods;
 

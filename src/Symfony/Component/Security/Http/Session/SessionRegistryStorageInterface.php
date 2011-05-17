@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Http\Session;
 
-use Symfony\Component\Security\Core\User\UserInterface;
-
 /**
  * SessionRegistryStorageInterface.
  *
@@ -30,32 +28,6 @@ interface SessionRegistryStorageInterface
     function getUsers();
 
     /**
-     * Obtains all the known session IDs for the specified user.
-     *
-     * @param UserInterface $user
-     * @return array an array ob session identifiers.
-     */
-    function getSessionIds(UserInterface $user);
-
-    /**
-     * Adds one session ID to the specified users array
-     *
-     * @param string $sessionId the session identifier key.
-     * @param UserInterface $user
-     * @return void
-     */
-    function addSessionId($sessionId, UserInterface $user);
-
-    /**
-     * Removes one session ID from the specified users array.
-     *
-     * @param string $sessionId the session identifier key.
-     * @param UserInterface $user
-     * @return void
-     */
-    function removeSessionId($sessionId, UserInterface $user);
-
-    /**
      * Obtains the maintained information for one session.
      *
      * @param string $sessionId the session identifier key.
@@ -64,13 +36,21 @@ interface SessionRegistryStorageInterface
     function getSessionInformation($sessionId);
 
     /**
+     * Obtains the maintained information for one user.
+     *
+     * @param string $sessionId the session identifier key.
+     * @return SessionInformation a SessionInformation object.
+     */
+    function getSessionInformations($username, $includeExpiredSessions);
+
+    /**
      * Adds information for one session.
      *
      * @param string $sessionId the session identifier key.
      * @param SessionInformation a SessionInformation object.
      * @return void
      */
-    function setSessionInformation($sessionId, SessionInformation $sessionInformation);
+    function setSessionInformation(SessionInformation $sessionInformation);
 
     /**
      * Deletes the maintained information of one session.

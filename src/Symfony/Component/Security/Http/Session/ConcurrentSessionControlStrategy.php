@@ -54,7 +54,7 @@ class ConcurrentSessionControlStrategy extends SessionAuthenticationStrategy
         parent::onAuthentication($request, $token);
 
         if ($originalSessionId != $request->getSession()->getId()) {
-            $this->onSessionChange($originalSessionId, $request->getSession()->getId(), $token);
+            $this->onSessionChange($originalSessionId, $request->getSession()->getId());
         }
 
         $sessions       = $this->registry->getAllSessions($user);
@@ -143,8 +143,8 @@ class ConcurrentSessionControlStrategy extends SessionAuthenticationStrategy
      * @param TokenInterface $token
      * @return void
      */
-    protected function onSessionChange($originalSessionId, $newSessionId, TokenInterface $token)
+    protected function onSessionChange($originalSessionId, $newSessionId)
     {
-        $this->registry->removeSessionInformation($originalSessionId, $token->getUser());
+        $this->registry->removeSessionInformation($originalSessionId);
     }
 }

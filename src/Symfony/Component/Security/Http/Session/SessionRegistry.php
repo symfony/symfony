@@ -52,17 +52,7 @@ class SessionRegistry
      */
     public function getAllSessions(UserInterface $user, $includeExpiredSessions = false)
     {
-        $sessions = new $this->sessionInformationIteratorClass();
-
-        foreach ($this->sessionRegistryStorage->getSessionIds($user) as $sessionId) {
-            if ($sessionInformation = $this->getSessionInformation($sessionId)) {
-                if ($includeExpiredSessions === true || $sessionInformation->isExpired() === false) {
-                    $sessions->add($sessionInformation);
-                }
-            }
-        }
-
-        return $sessions;
+        return $this->sessionRegistryStorage->getSessionInformations($user->getUsername(), $includeExpiredSessions);
     }
 
     /**
@@ -84,7 +74,7 @@ class SessionRegistry
      */
     public function setSessionInformation(SessionInformation $sessionInformation)
     {
-        $this->sessionRegistryStorage->setSessionInformation($sessionInformation->getSessionId(), $sessionInformation);
+        $this->sessionRegistryStorage->setSessionInformation($sessionInformation);
     }
 
     /**
@@ -110,11 +100,10 @@ class SessionRegistry
      */
     public function registerNewSession($sessionId, UserInterface $user)
     {
-        $sessionInformation = new $this->sessionInformationClass($sessionId, $user);
+        $sessionInformation = new $this->sessionInformationClass($sessionId, $user->getUsername());
         $sessionInformation->refreshLastRequest();
 
-        $this->sessionRegistryStorage->setSessionInformation($sessionId, $sessionInformation);
-        $this->sessionRegistryStorage->addSessionId($sessionId, $user);
+        $this->sessionRegistryStorage->setSessionInformation($sessionInformation);
     }
 
     /**
@@ -124,9 +113,8 @@ class SessionRegistry
      * @param UserInterface $user the specified user.
      * @return void
      */
-    public function removeSessionInformation($sessionId, UserInterface $user)
+    public function removeSessionInformation($sessionId)
     {
         $this->sessionRegistryStorage->removeSessionInformation($sessionId);
-        $this->sessionRegistryStorage->removeSessionId($sessionId, $user);
     }
 }

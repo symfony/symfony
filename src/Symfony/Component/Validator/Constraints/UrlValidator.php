@@ -15,23 +15,14 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * Validates whether a value is a valid URL
+ *
+ * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Joseph Bielawski <stloyd@gmail.com>
+ */
 class UrlValidator extends ConstraintValidator
 {
-    const PATTERN = '~^
-            (%s)://                                 # protocol
-            (
-                ([a-z0-9-]+\.)+[a-z]{2,6}               # a domain name
-                    |                                     #  or
-                \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}      # a IP address
-                    |                                     #  or
-                \[
-                    (?:(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){6})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:::(?:(?:(?:[0-9a-f]{1,4})):){5})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:[0-9a-f]{1,4})))?::(?:(?:(?:[0-9a-f]{1,4})):){4})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,1}(?:(?:[0-9a-f]{1,4})))?::(?:(?:(?:[0-9a-f]{1,4})):){3})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,2}(?:(?:[0-9a-f]{1,4})))?::(?:(?:(?:[0-9a-f]{1,4})):){2})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,3}(?:(?:[0-9a-f]{1,4})))?::(?:(?:[0-9a-f]{1,4})):)(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,4}(?:(?:[0-9a-f]{1,4})))?::)(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,5}(?:(?:[0-9a-f]{1,4})))?::)(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,6}(?:(?:[0-9a-f]{1,4})))?::))))
-                \]  # a IPv6 address
-            )
-            (:[0-9]+)?                              # a port (optional)
-            (/?|/\S+)                               # a /, nothing or a / with something
-        $~ix';
-
     public function isValid($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {
@@ -43,10 +34,34 @@ class UrlValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
+        $valid = false;
 
-        $pattern = sprintf(self::PATTERN, implode('|', $constraint->protocols));
+        // Check for an IPv6 address in URL
+        if ((false !== $firstBracert = strpos($value, '://[')) && false !== $secondBracert = strpos($value, ']')) {
+            $ip = substr($value, $firstBracert += 4, $secondBracert - $firstBracert);
+            $valid = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6);
 
-        if (!preg_match($pattern, $value)) {
+            if ($valid) {
+                // IPv6 is valid, so lets replace it and check the rest of value
+                // Thats need to be done as filter_var can't validate URL with IPv6
+                $valid = filter_var(str_replace('['.$ip.']', 'example.com', $value), FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED);
+            }
+        } else {
+            $valid = filter_var($value, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED);
+        }
+
+        // filter_var don't allow to specify what protocol allowed in URL
+        if ($valid) {
+            foreach ($constraint->protocols as $protocol) {
+                if (stripos($value, $protocol . '://') === 0) {
+                    break;
+                }
+
+                $valid = false;
+            }
+        }
+
+        if (!$valid) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;

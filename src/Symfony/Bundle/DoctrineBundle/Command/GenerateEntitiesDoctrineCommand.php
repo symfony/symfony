@@ -32,6 +32,8 @@ class GenerateEntitiesDoctrineCommand extends DoctrineCommand
             ->setDescription('Generate entity classes and method stubs from your mapping information')
             ->addArgument('name', InputArgument::REQUIRED, 'A bundle name, a namespace, or a class name')
             ->addOption('path', null, InputOption::VALUE_REQUIRED, 'The path where to generate entities when it cannot be guessed')
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Force to overwrite existing entities files.')
+            ->addOption('annotate', null, InputOption::VALUE_NONE, 'Should we annotate generated entity classes')
             ->setHelp(<<<EOT
 The <info>doctrine:generate:entities</info> command generates entity classes
 and method stubs from your mapping information:
@@ -56,6 +58,16 @@ the command has no way to guess where they should be generated. In this case,
 you must provide the <comment>--path</comment> option:
 
   <info>./app/console doctrine:generate:entities Blog/Entity --path=src/</info>
+
+You should provide the <comment>--force</comment> option if you dont mind to back up files
+before to generate entities:
+
+  <info>./app/console doctrine:generate:entities Blog/Entity --force</info>
+
+If you want that generated entity classes are annotated with ORM mapping,
+you can provide the <comment>--annotate</comment> option:
+
+  <info>./app/console doctrine:generate:entities Blog/Entity --annotate</info>
 
 EOT
         );
@@ -85,6 +97,8 @@ EOT
         }
 
         $generator = $this->getEntityGenerator();
+        $generator->setGenerateAnnotations(($input->getOption('annotate') !== false));
+        $generator->setBackupExisting(($input->getOption('force') === true));
         $repoGenerator = new EntityRepositoryGenerator();
         foreach ($metadatas as $metadata) {
             $output->writeln(sprintf('  > generating <comment>%s</comment>', $metadata->name));

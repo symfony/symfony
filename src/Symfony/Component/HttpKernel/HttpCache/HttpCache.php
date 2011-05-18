@@ -497,7 +497,9 @@ class HttpCache implements HttpKernelInterface
                 $entry->setContent($new->getContent());
                 $entry->setStatusCode($new->getStatusCode());
                 $entry->setProtocolVersion($new->getProtocolVersion());
-                $entry->setCookies($new->getCookies());
+                foreach ($new->headers->getCookies() as $cookie) {
+                    $entry->headers->setCookie($cookie);
+                }
             } else {
                 // backend is slow as hell, send a 503 response (to avoid the dog pile effect)
                 $entry->setStatusCode(503);

@@ -69,7 +69,18 @@ class FrameworkExtension extends Extension
             $loader->load('test.xml');
         }
 
-        $this->registerFormConfiguration($config, $container, $loader);
+        if (isset($config['session'])) {
+            $this->registerSessionConfiguration($config['session'], $container, $loader);
+        }
+
+        if ($hasForm = isset($config['form']) && !empty($config['form']['enabled'])) {
+            $this->registerFormConfiguration($config, $container, $loader);
+            $config['validation']['enabled'] = true;
+        }
+
+        if (!empty($config['validation']['enabled'])) {
+            $this->registerValidationConfiguration($config['validation'], $container, $loader);
+        }
 
         if (isset($config['esi'])) {
             $this->registerEsiConfiguration($config['esi'], $loader);
@@ -83,20 +94,12 @@ class FrameworkExtension extends Extension
             $this->registerRouterConfiguration($config['router'], $container, $loader);
         }
 
-        if (isset($config['session'])) {
-            $this->registerSessionConfiguration($config['session'], $container, $loader);
-        }
-
         if (isset($config['templating'])) {
             $this->registerTemplatingConfiguration($config['templating'], $config['ide'], $container, $loader);
         }
 
         if (isset($config['translator'])) {
             $this->registerTranslatorConfiguration($config['translator'], $container);
-        }
-
-        if (isset($config['validation'])) {
-            $this->registerValidationConfiguration($config['validation'], $container, $loader);
         }
 
         $this->addClassesToCompile(array(
@@ -151,7 +154,7 @@ class FrameworkExtension extends Extension
             $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
         }
 
-        if (isset($config['session'])) {
+        if ($container->hasDefinition('session')) {
             $container->removeDefinition('file.temporary_storage');
             $container->setDefinition('file.temporary_storage', $container->getDefinition('file.temporary_storage.session'));
             $container->removeDefinition('file.temporary_storage.session');
@@ -453,10 +456,6 @@ class FrameworkExtension extends Extension
      */
     private function registerValidationConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (empty($config['enabled'])) {
-            return;
-        }
-
         $loader->load('validator.xml');
 
         $container->setParameter('validator.mapping.loader.xml_files_loader.mapping_files', $this->getValidatorXmlMappingFiles($container));

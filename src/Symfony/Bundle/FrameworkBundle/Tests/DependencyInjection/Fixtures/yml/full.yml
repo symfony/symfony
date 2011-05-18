@@ -1,5 +1,6 @@
 framework:
     secret: s3cr3t
+    form: ~
     csrf_protection:
         enabled:    true
         field_name: _csrf

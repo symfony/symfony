@@ -52,7 +52,7 @@ class FileType extends AbstractType
     {
         $view->set('multipart', true);
         $view['file']->set('type', 'file');
-        $view['file']->set('value', null);
+        $view['file']->set('value', '');
     }
 
     public function getDefaultOptions(array $options)

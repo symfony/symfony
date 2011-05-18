@@ -343,8 +343,9 @@ class HttpCache implements HttpKernelInterface
             }
 
             $entry = clone $entry;
+            $entry->headers->remove('Date');
 
-            foreach (array('Expires', 'Cache-Control', 'ETag', 'Last-Modified') as $name) {
+            foreach (array('Date', 'Expires', 'Cache-Control', 'ETag', 'Last-Modified') as $name) {
                 if ($response->headers->has($name)) {
                     $entry->headers->set($name, $response->headers->get($name));
                 }

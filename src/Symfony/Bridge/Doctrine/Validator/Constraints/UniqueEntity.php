@@ -48,4 +48,9 @@ class UniqueEntity extends Constraint
     {
         return self::CLASS_CONSTRAINT;
     }
+    
+    public function getDefaultOption()
+    {
+        return 'fields';
+    }
 }

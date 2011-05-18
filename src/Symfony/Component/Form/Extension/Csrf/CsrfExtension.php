@@ -34,7 +34,12 @@ class CsrfExtension extends AbstractExtension
     protected function loadTypeExtensions()
     {
         return array(
+            new Type\ChoiceTypeCsrfExtension(),
+            new Type\DateTypeCsrfExtension(),
+            new Type\FileTypeCsrfExtension(),
             new Type\FormTypeCsrfExtension(),
+            new Type\RepeatedTypeCsrfExtension(),
+            new Type\TimeTypeCsrfExtension(),
         );
     }
 }

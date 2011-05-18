@@ -159,6 +159,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form->bind('new');
 
         $this->assertEquals('initial', $form->getData());
+        $this->assertTrue($form->isBound());
     }
 
     public function testNeverRequiredIfParentNotRequired()
@@ -295,6 +296,14 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->form->bind('foobar');
 
         $this->assertTrue($this->form->isValid());
+    }
+
+    public function testValidIfBoundAndReadOnly()
+    {
+        $form = $this->getBuilder()->setReadOnly(true)->getForm();
+        $form->bind('foobar');
+
+        $this->assertTrue($form->isValid());
     }
 
     public function testNotValidIfNotBound()

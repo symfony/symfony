@@ -29,6 +29,9 @@ class CollectionFormTest extends TypeTestCase
     {
         $form = $this->factory->create('collection', null, array(
             'type' => 'field',
+            'options' => array(
+                'max_length' => 20,
+            ),
         ));
         $form->setData(array('foo@foo.com', 'foo@bar.com'));
 
@@ -37,18 +40,24 @@ class CollectionFormTest extends TypeTestCase
         $this->assertEquals(2, count($form));
         $this->assertEquals('foo@foo.com', $form[0]->getData());
         $this->assertEquals('foo@bar.com', $form[1]->getData());
+        $this->assertEquals(20, $form[0]->getAttribute('max_length'));
+        $this->assertEquals(20, $form[1]->getAttribute('max_length'));
 
         $form->setData(array('foo@baz.com'));
         $this->assertTrue($form[0] instanceof Form);
         $this->assertFalse(isset($form[1]));
         $this->assertEquals(1, count($form));
         $this->assertEquals('foo@baz.com', $form[0]->getData());
+        $this->assertEquals(20, $form[0]->getAttribute('max_length'));
     }
 
     public function testSetDataAddsPrototypeIfAllowAdd()
     {
         $form = $this->factory->create('collection', null, array(
             'type' => 'field',
+            'options' => array(
+                'max_length' => 20,
+            ),
             'allow_add' => true,
             'prototype' => true,
         ));
@@ -57,12 +66,14 @@ class CollectionFormTest extends TypeTestCase
         $this->assertTrue($form[0] instanceof Form);
         $this->assertTrue($form[1] instanceof Form);
         $this->assertTrue($form['$$name$$'] instanceof Form);
+        $this->assertEquals(20, $form['$$name$$']->getAttribute('max_length'));
         $this->assertEquals(3, count($form));
 
         $form->setData(array('foo@baz.com'));
         $this->assertTrue($form[0] instanceof Form);
         $this->assertFalse(isset($form[1]));
         $this->assertTrue($form['$$name$$'] instanceof Form);
+        $this->assertEquals(20, $form['$$name$$']->getAttribute('max_length'));
         $this->assertEquals(2, count($form));
     }
 
@@ -142,92 +153,5 @@ class CollectionFormTest extends TypeTestCase
         ));
 
         $this->assertFalse($form->has('$$name$$'));
-    }
-
-    public function testSetTypeOptions()
-    {
-        $form = $this->factory->create('collection', null, array(
-            'type' => 'field',
-            'type_options' => array(
-                'required' => false,
-                'max_length' => 20
-            ),
-        ));
-        $form->setData(array('foo@foo.com', 'foo@bar.com'));
-
-        $this->assertFalse($form[0]->isRequired());
-        $this->assertFalse($form[1]->isRequired());
-        $this->assertEquals(20, $form[0]->getAttribute('max_length'));
-        $this->assertEquals(20, $form[1]->getAttribute('max_length'));
-
-        $form->bind(array('foo@bar.com', 'bar@foo.com'));
-
-        $this->assertFalse($form[0]->isRequired());
-        $this->assertFalse($form[1]->isRequired());
-        $this->assertEquals(20, $form[0]->getAttribute('max_length'));
-        $this->assertEquals(20, $form[1]->getAttribute('max_length'));
-
-        //Test with prototype and extra field
-        $form = $this->factory->create('collection', null, array(
-            'allow_add' => true,
-            'prototype' => true,
-            'type' => 'field',
-            'type_options' => array(
-                'required' => false,
-                'max_length' => 20
-            ),
-        ));
-
-        $form->setData(array('foo@foo.com'));
-
-        $this->assertFalse($form[0]->isRequired());
-        $this->assertEquals(20, $form[0]->getAttribute('max_length'));
-
-        $form->bind(array('foo@bar.com', 'bar@foo.com'));
-
-        $this->assertFalse($form[0]->isRequired());
-        $this->assertFalse($form[1]->isRequired());
-        $this->assertEquals(20, $form[0]->getAttribute('max_length'));
-        $this->assertEquals(20, $form[1]->getAttribute('max_length'));
-
-    }
-
-    public function testSetTypeOptionsWithoutOptions()
-    {
-        $form = $this->factory->create('collection', null, array(
-            'type' => 'field',
-        ));
-        $form->setData(array('foo@foo.com', 'foo@bar.com'));
-
-        $this->assertTrue($form[0]->isRequired());
-        $this->assertTrue($form[1]->isRequired());
-        $this->assertNull($form[0]->getAttribute('max_length'));
-        $this->assertNull($form[1]->getAttribute('max_length'));
-
-        $form->bind(array('foo@bar.com', 'bar@foo.com'));
-
-        $this->assertTrue($form[0]->isRequired());
-        $this->assertTrue($form[1]->isRequired());
-        $this->assertNull($form[0]->getAttribute('max_length'));
-        $this->assertNull($form[1]->getAttribute('max_length'));
-
-        //Test with prototype and extra field
-        $form = $this->factory->create('collection', null, array(
-            'allow_add' => true,
-            'prototype' => true,
-            'type' => 'field',
-        ));
-
-        $form->setData(array('foo@foo.com'));
-
-        $this->assertTrue($form[0]->isRequired());
-        $this->assertNull($form[0]->getAttribute('max_length'));
-
-        $form->bind(array('foo@bar.com', 'bar@foo.com'));
-
-        $this->assertTrue($form[0]->isRequired());
-        $this->assertTrue($form[1]->isRequired());
-        $this->assertNull($form[0]->getAttribute('max_length'));
-        $this->assertNull($form[1]->getAttribute('max_length'));
     }
 }

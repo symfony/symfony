@@ -150,4 +150,14 @@ abstract class WebTestCase extends BaseWebTestCase
             isset($options['debug']) ? $options['debug'] : true
         );
     }
+
+    /**
+     * Shuts the kernel down if it was used in the test.
+     */
+    protected function tearDown()
+    {
+        if (null !== $this->kernel) {
+            $this->kernel->shutdown();
+        }
+    }
 }

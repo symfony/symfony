@@ -16,14 +16,14 @@ use Symfony\Component\Serializer\SerializerInterface;
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class CustomNormalizer extends AbstractNormalizer
+class CustomNormalizer extends SerializerAwareNormalizer
 {
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format, $properties = null)
+    public function normalize($object, $format = null)
     {
-        return $object->normalize($this, $format, $properties);
+        return $object->normalize($this->serializer, $format);
     }
 
     /**
@@ -32,7 +32,7 @@ class CustomNormalizer extends AbstractNormalizer
     public function denormalize($data, $class, $format = null)
     {
         $object = new $class;
-        $object->denormalize($this, $data, $format);
+        $object->denormalize($this->serializer, $data, $format);
         return $object;
     }
 

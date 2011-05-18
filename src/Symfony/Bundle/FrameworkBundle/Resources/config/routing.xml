@@ -55,7 +55,7 @@
 
         <service id="router.real" class="%router.class%">
             <argument type="service" id="routing.loader" />
-            <argument /> <!-- routing resource -->
+            <argument>%router.resource%</argument>
             <argument type="collection">
                 <argument key="cache_dir">%kernel.cache_dir%</argument>
                 <argument key="debug">%kernel.debug%</argument>

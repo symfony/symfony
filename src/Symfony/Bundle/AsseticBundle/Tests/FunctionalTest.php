@@ -43,33 +43,39 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $filesystem->remove($this->cacheDir);
     }
 
-    /**
-     * @dataProvider provideAmDebugAndAssetCount
-     */
-    public function testKernel($debug, $count)
+    public function testRoutes()
     {
-        $kernel = new TestKernel('test', $debug);
+        $countRoutes = function($router)
+        {
+            $count = 0;
+            foreach ($router->getRouteCollection()->all() as $name => $route) {
+                if (0 === strpos($name, '_assetic_')) {
+                    ++$count;
+                }
+            }
+
+            return $count;
+        };
+
+        $kernel = new TestKernel('test', false);
         $kernel->boot();
 
-        $this->assertEquals($count, count($kernel->getContainer()->get('assetic.asset_manager')->getNames()));
-    }
+        $am = $kernel->getContainer()->get('assetic.asset_manager');
+        $names = $am->getNames();
+        $baseline = $expected = count($names);
 
-    /**
-     * @dataProvider provideRouterDebugAndAssetCount
-     */
-    public function testRoutes($debug, $count)
-    {
-        $kernel = new TestKernel('test', $debug);
-        $kernel->boot();
-
-        $matches = 0;
-        foreach (array_keys($kernel->getContainer()->get('router')->getRouteCollection()->all()) as $name) {
-            if (0 === strpos($name, '_assetic_')) {
-                ++$matches;
+        foreach ($names as $name) {
+            $asset = $am->get($name);
+            foreach ($asset as $leaf) {
+                ++$expected;
             }
         }
 
-        $this->assertEquals($count, $matches);
+        $this->assertEquals($baseline, $countRoutes($kernel->getContainer()->get('router')));
+
+        $kernel = new TestKernel('test', true);
+        $kernel->boot();
+        $this->assertEquals($expected, $countRoutes($kernel->getContainer()->get('router')));
     }
 
     public function testTwigRenderDebug()
@@ -100,21 +106,5 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(3, count($crawler->filter('link[href$=".css"]')));
         $this->assertEquals(2, count($crawler->filter('script[src$=".js"]')));
-    }
-
-    public function provideAmDebugAndAssetCount()
-    {
-        return array(
-            array(true, 3),
-            array(false, 3),
-        );
-    }
-
-    public function provideRouterDebugAndAssetCount()
-    {
-        return array(
-            array(true, 9),
-            array(false, 3),
-        );
     }
 }

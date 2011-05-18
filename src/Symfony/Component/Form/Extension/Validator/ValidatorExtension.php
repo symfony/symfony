@@ -24,15 +24,15 @@ class ValidatorExtension extends AbstractExtension
         $this->validator = $validator;
     }
 
+    public function loadTypeGuesser()
+    {
+        return new ValidatorTypeGuesser($this->validator->getMetadataFactory());
+    }
+
     protected function loadTypeExtensions()
     {
         return array(
             new Type\FieldTypeValidatorExtension($this->validator),
         );
-    }
-
-    public function loadTypeGuesser()
-    {
-        return new ValidatorTypeGuesser($this->validator->getMetadataFactory());
     }
 }

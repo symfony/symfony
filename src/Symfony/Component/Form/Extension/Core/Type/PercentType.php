@@ -26,7 +26,17 @@ class PercentType extends AbstractType
     {
         return array(
             'precision' => 0,
-            'type' => 'fractional',
+            'type'      => 'fractional',
+        );
+    }
+
+    public function getAllowedOptionValues(array $options)
+    {
+        return array(
+            'type' => array(
+                'fractional',
+                'integer',
+            ),
         );
     }
 

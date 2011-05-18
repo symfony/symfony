@@ -17,6 +17,7 @@ class AssetFactoryTest extends \PHPUnit_Framework_TestCase
 {
     protected $kernel;
     protected $factory;
+    protected $container;
 
     protected function setUp()
     {
@@ -25,19 +26,32 @@ class AssetFactoryTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->kernel = $this->getMock('Symfony\\Component\\HttpKernel\\KernelInterface');
-        $this->factory = new AssetFactory($this->kernel, '/path/to/web');
+        $this->container = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerInterface');
+        $this->factory = new AssetFactory($this->kernel, $this->container, '/path/to/web');
     }
 
     public function testBundleNotation()
     {
         $input = '@MyBundle/Resources/css/main.css';
+        $bundle = $this->getMock('Symfony\\Component\\HttpKernel\\Bundle\\BundleInterface');
 
+        $this->kernel->expects($this->once())
+            ->method('getBundle')
+            ->with('MyBundle')
+            ->will($this->returnValue($bundle));
         $this->kernel->expects($this->once())
             ->method('locateResource')
             ->with($input)
-            ->will($this->returnValue('/path/to/bundle/Resources/css/main.css'));
+            ->will($this->returnValue('/path/to/MyBundle/Resources/css/main.css'));
+        $bundle->expects($this->once())
+            ->method('getPath')
+            ->will($this->returnValue('/path/to/MyBundle'));
 
-        $this->factory->createAsset($input);
+        $coll = $this->factory->createAsset($input)->all();
+        $asset = $coll[0];
+
+        $this->assertEquals('/path/to/MyBundle', $asset->getSourceRoot(), '->createAsset() sets the asset root');
+        $this->assertEquals('Resources/css/main.css', $asset->getSourcePath(), '->createAsset() sets the asset path');
     }
 
     /**
@@ -45,12 +59,25 @@ class AssetFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testBundleGlobNotation($input)
     {
+        $bundle = $this->getMock('Symfony\\Component\\HttpKernel\\Bundle\\BundleInterface');
+
+        $this->kernel->expects($this->once())
+            ->method('getBundle')
+            ->with('MyBundle')
+            ->will($this->returnValue($bundle));
         $this->kernel->expects($this->once())
             ->method('locateResource')
             ->with('@MyBundle/Resources/css/')
-            ->will($this->returnValue('/path/to/bundle/Resources/css/'));
+            ->will($this->returnValue('/path/to/MyBundle/Resources/css/'));
+        $bundle->expects($this->once())
+            ->method('getPath')
+            ->will($this->returnValue('/path/to/MyBundle'));
 
-        $this->factory->createAsset($input);
+        $coll = $this->factory->createAsset($input)->all();
+        $asset = $coll[0];
+
+        $this->assertEquals('/path/to/MyBundle', $asset->getSourceRoot(), '->createAsset() sets the asset root');
+        $this->assertNull($asset->getSourcePath(), '->createAsset() sets the asset path to null');
     }
 
     public function getGlobs()

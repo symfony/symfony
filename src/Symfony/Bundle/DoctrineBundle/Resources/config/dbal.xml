@@ -32,7 +32,7 @@
         </service>
 
         <service id="doctrine.dbal.connection_factory" class="%doctrine.dbal.connection_factory.class%">
-            <argument /> <!-- Types -->
+            <argument>%doctrine.dbal.connection_factory.types%</argument>
         </service>
 
         <service id="doctrine.dbal.connection" class="%doctrine.dbal.connection.class%" factory-service="doctrine.dbal.connection_factory" factory-method="createConnection" abstract="true" />
@@ -43,10 +43,10 @@
 
         <service id="doctrine" class="%doctrine.class%">
             <argument type="service" id="service_container" />
-            <argument type="collection" /> <!-- connections -->
-            <argument type="collection" /> <!-- entity managers -->
-            <argument /> <!-- default connection name -->
-            <argument /> <!-- default entity manager name -->
+            <argument>%doctrine.connections%</argument>
+            <argument>%doctrine.entity_managers%</argument>
+            <argument>%doctrine.default_connection%</argument>
+            <argument>%doctrine.default_entity_manager%</argument>
         </service>
     </services>
 </container>

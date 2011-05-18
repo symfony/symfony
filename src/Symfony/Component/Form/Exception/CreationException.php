@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Routing\Matcher\Exception;
+namespace Symfony\Component\Form\Exception;
 
 /**
- * A matching exception.
+ * Thrown when a form could not be constructed by a FormFactory
  *
- * @author Kris Wallsmith <kris@symfony.com>
+ * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-interface Exception
+class CreationException extends FormException
 {
 }

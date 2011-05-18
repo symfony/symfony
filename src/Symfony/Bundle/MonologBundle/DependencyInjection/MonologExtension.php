@@ -76,11 +76,12 @@ class MonologExtension extends Extension
                 'Monolog\\Formatter\\LineFormatter',
                 'Monolog\\Handler\\HandlerInterface',
                 'Monolog\\Handler\\AbstractHandler',
+                'Monolog\\Handler\\AbstractProcessingHandler',
                 'Monolog\\Handler\\StreamHandler',
                 'Monolog\\Handler\\FingersCrossedHandler',
                 'Monolog\\Logger',
-                'Symfony\\Bundle\\MonologBundle\\Logger\\Logger',
-                'Symfony\\Bundle\\MonologBundle\\Logger\\DebugHandler',
+                'Symfony\\Bridge\\Monolog\\Logger',
+                'Symfony\\Bridge\\Monolog\\Handler\\DebugHandler',
             ));
         }
     }
@@ -162,6 +163,20 @@ class MonologExtension extends Extension
             ));
             break;
 
+        case 'group':
+            $references = array();
+            foreach ($handler['members'] as $nestedHandler) {
+                $nestedHandlerId = $this->getHandlerId($nestedHandler);
+                array_push($this->nestedHandlers, $nestedHandlerId);
+                $references[] = new Reference($nestedHandlerId);
+            }
+
+            $definition->setArguments(array(
+                $references,
+                $handler['bubble'],
+            ));
+            break;
+
         case 'syslog':
             $definition->setArguments(array(
                 $handler['ident'],
@@ -176,10 +191,12 @@ class MonologExtension extends Extension
                 $prototype = $this->parseDefinition($handler['email_prototype']);
             } else {
                 $message = new Definition('Swift_Message');
+                $message->setFactoryService('mailer');
+                $message->setFactoryMethod('createMessage');
                 $message->setPublic(false);
-                $message->addMethodCall('setFrom', $handler['from_email']);
-                $message->addMethodCall('setTo', $handler['to_email']);
-                $message->addMethodCall('setSubject', $handler['subject']);
+                $message->addMethodCall('setFrom', array($handler['from_email']));
+                $message->addMethodCall('setTo', array($handler['to_email']));
+                $message->addMethodCall('setSubject', array($handler['subject']));
                 $messageId = sprintf('%s.mail_prototype', $handlerId);
                 $container->setDefinition($messageId, $message);
                 $prototype = new Reference($messageId);
@@ -241,7 +258,7 @@ class MonologExtension extends Extension
 
     private function parseDefinition($definition)
     {
-        if (0 === strpos($processor, '@')) {
+        if (0 === strpos($definition, '@')) {
             return new Reference(substr($definition, 1));
         }
 

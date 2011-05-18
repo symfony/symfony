@@ -35,32 +35,37 @@ class DateType extends AbstractType
             \DateTimeZone::UTC
         );
 
-        if ($options['widget'] === 'text') {
+        if ($options['widget'] === 'single-text') {
             $builder->appendClientTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $options['format'], \IntlDateFormatter::NONE));
-        } elseif ($options['widget'] == 'choice') {
-            // Only pass a subset of the options to children
-            $yearOptions = array(
-                'choice_list' => new PaddedChoiceList(
-                    $options['years'], 4, '0', STR_PAD_LEFT
-                ),
-            );
-            $monthOptions = array(
-                'choice_list' => new MonthChoiceList(
-                    $formatter, $options['months']
-                ),
-            );
-            $dayOptions = array(
-                'choice_list' => new PaddedChoiceList(
-                    $options['days'], 2, '0', STR_PAD_LEFT
-                ),
-            );
-
-            $builder->add('year', 'choice', $yearOptions)
-                ->add('month', 'choice', $monthOptions)
-                ->add('day', 'choice', $dayOptions)
-                ->appendClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], array('year', 'month', 'day')));
         } else {
-            throw new FormException('The "widget" option must be set to either "text" or "choice".');
+            $yearOptions = $monthOptions = $dayOptions = array();
+            $widget = $options['widget'];
+
+            if ($widget === 'choice') {
+                // Only pass a subset of the options to children
+                $yearOptions = array(
+                    'choice_list' => new PaddedChoiceList(
+                        array_combine($options['years'], $options['years']), 4, '0', STR_PAD_LEFT
+                    ),
+                );
+                $monthOptions = array(
+                    'choice_list' => new MonthChoiceList(
+                        $formatter, $options['months']
+                    ),
+                );
+                $dayOptions = array(
+                    'choice_list' => new PaddedChoiceList(
+                        array_combine($options['days'], $options['days']), 2, '0', STR_PAD_LEFT
+                    ),
+                );
+            }
+
+            $builder
+                ->add('year', $widget, $yearOptions)
+                ->add('month', $widget, $monthOptions)
+                ->add('day', $widget, $dayOptions)
+                ->appendClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], array('year', 'month', 'day')))
+            ;
         }
 
         if ($options['input'] === 'string') {
@@ -81,7 +86,8 @@ class DateType extends AbstractType
 
         $builder
             ->setAttribute('formatter', $formatter)
-            ->setAttribute('widget', $options['widget']);
+            ->setAttribute('widget', $options['widget'])
+        ;
     }
 
     public function buildViewBottomUp(FormView $view, FormInterface $form)
@@ -108,25 +114,48 @@ class DateType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'years' => range(date('Y') - 5, date('Y') + 5),
-            'months' => range(1, 12),
-            'days' => range(1, 31),
-            'widget' => 'choice',
-            'input' => 'datetime',
-            'pattern' => null,
-            'format' => \IntlDateFormatter::MEDIUM,
-            'data_timezone' => null,
-            'user_timezone' => null,
-            'csrf_protection' => false,
+            'years'             => range(date('Y') - 5, date('Y') + 5),
+            'months'            => range(1, 12),
+            'days'              => range(1, 31),
+            'widget'            => 'choice',
+            'input'             => 'datetime',
+            'pattern'           => null,
+            'format'            => \IntlDateFormatter::MEDIUM,
+            'data_timezone'     => null,
+            'user_timezone'     => null,
+            'csrf_protection'   => false,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
-            'by_reference' => false,
+            'by_reference'      => false,
+        );
+    }
+
+    public function getAllowedOptionValues(array $options)
+    {
+        return array(
+            'input'     => array(
+                'datetime',
+                'string',
+                'timestamp',
+                'array',
+            ),
+            'widget'    => array(
+                'single-text',
+                'text',
+                'choice',
+            ),
+            'format'    => array(
+                \IntlDateFormatter::FULL,
+                \IntlDateFormatter::LONG,
+                \IntlDateFormatter::MEDIUM,
+                \IntlDateFormatter::SHORT,
+             ),
         );
     }
 
     public function getParent(array $options)
     {
-        return $options['widget'] === 'text' ? 'field' : 'form';
+        return $options['widget'] === 'single-text' ? 'field' : 'form';
     }
 
     public function getName()

@@ -15,7 +15,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        if (!class_exists('Monolog\Logger')) {
+        if (!class_exists('Monolog\\Logger')) {
             $this->markTestSkipped('Monolog is not available.');
         }
     }

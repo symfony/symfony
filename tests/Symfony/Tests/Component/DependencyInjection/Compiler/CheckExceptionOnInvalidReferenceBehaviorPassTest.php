@@ -22,7 +22,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends \PHPUnit_Framewor
     }
 
     /**
-     * @expectedException Symfony\Component\DependencyInjection\Exception\NonExistentServiceException
+     * @expectedException Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      */
     public function testProcessThrowsExceptionOnInvalidReference()
     {
@@ -37,7 +37,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends \PHPUnit_Framewor
     }
 
     /**
-     * @expectedException Symfony\Component\DependencyInjection\Exception\NonExistentServiceException
+     * @expectedException Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      */
     public function testProcessThrowsExceptionOnInvalidReferenceFromInlinedDefinition()
     {

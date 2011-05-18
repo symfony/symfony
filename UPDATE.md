@@ -13,9 +13,36 @@ beta1 to beta2
 
   * It nows extends `\SplFileInfo` and rely on its base methods;
 
-  * `getExtension()` return the extension without the leading '.';
+  * `move()` returns a new File instance to represent the moved file and creates
+    the target folder when it does not exist.
 
-  * `move()` returns a new File instance to represent the moved file.
+* The `UploadedFile` class has been refactored:
+
+  * It now handles only uploaded files. Persisted files are handled by the
+    `PersistedFile` class
+
+  * The information received while uploading the file are available via the
+    `getClientOriginalName()`, `getClientMimeType()` and `getClientSize()`
+    methods.
+
+* Persisted files are handled by the `PersistedFile` class.
+
+* The Routing Exceptions have been moved:
+
+    Before:
+
+    Symfony\Component\Routing\Matcher\Exception\Exception
+    Symfony\Component\Routing\Matcher\Exception\NotFoundException
+    Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException
+
+    After:
+
+    Symfony\Component\Routing\Exception\Exception
+    Symfony\Component\Routing\Exception\NotFoundException
+    Symfony\Component\Routing\Exception\MethodNotAllowedException
+
+* The form component's ``csrf_page_id`` option has been renamed to
+  ``intention``.
 
 * The ``error_handler`` setting has been removed. The ``ErrorHandler`` class
   is now managed directly by Symfony SE in ``AppKernel``.
@@ -132,8 +159,24 @@ beta1 to beta2
           'allow_delete' => true,
       ));
 
+* Request::hasSession() has been renamed to Request::hasPreviousSession(). The
+  method hasSession() still exists, but only checks if the request contains a
+  session object, not if the session was started in a previous request.
+
 * Serializer: The NormalizerInterface's `supports()` method has been split in
   two methods: `supportsNormalization` and `supportsDenormalization`.
+
+* ParameterBag::getDeep() has been removed, and is replaced with a boolean flag
+  on the ParameterBag::get() method.
+
+* Serializer: `AbstractEncoder` & `AbstractNormalizer` were renamed to
+  `SerializerAwareEncoder` & `SerializerAwareNormalizer`.
+
+* Serializer: The `$properties` argument has been dropped from all interfaces.
+
+* Form: Renamed option value "text" of "widget" option of the "date" type was
+  renamed to "single-text". "text" indicates to use separate text boxes now
+  (like for the "time" type).
 
 PR12 to beta1
 -------------

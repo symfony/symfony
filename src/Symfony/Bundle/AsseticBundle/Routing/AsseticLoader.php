@@ -99,7 +99,7 @@ class AsseticLoader extends Loader
         );
 
         // remove the fake front controller
-        $pattern = str_replace('_controller/', '', $asset->getTargetUrl());
+        $pattern = str_replace('_controller/', '', $asset->getTargetPath());
 
         if ($format = pathinfo($pattern, PATHINFO_EXTENSION)) {
             $defaults['_format'] = $format;

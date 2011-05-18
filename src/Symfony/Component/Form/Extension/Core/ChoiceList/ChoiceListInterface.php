@@ -13,5 +13,10 @@ namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
 interface ChoiceListInterface
 {
+    /**
+     * Returns a list of choices
+     *
+     * @return array
+     */
     function getChoices();
 }

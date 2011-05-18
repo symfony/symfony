@@ -27,7 +27,7 @@ class AsseticNode extends BaseAsseticNode
             ->raw('isset($context[\'assetic\'][\'use_controller\']) && $context[\'assetic\'][\'use_controller\'] ? ')
             ->subcompile($this->getPathFunction($name))
             ->raw(' : ')
-            ->subcompile($this->getAssetFunction($asset->getTargetUrl()))
+            ->subcompile($this->getAssetFunction($asset->getTargetPath()))
         ;
     }
 

@@ -769,21 +769,22 @@ EOF;
      * Exports parameters.
      *
      * @param array $parameters
+     * @param string $path
      * @param integer $indent
      * @return string
      */
-    private function exportParameters($parameters, $indent = 12)
+    private function exportParameters($parameters, $path = '', $indent = 12)
     {
         $php = array();
         foreach ($parameters as $key => $value) {
             if (is_array($value)) {
-                $value = $this->exportParameters($value, $indent + 4);
+                $value = $this->exportParameters($value, $path.'/'.$key, $indent + 4);
             } elseif ($value instanceof Variable) {
-                throw new \InvalidArgumentException(sprintf('you cannot dump a container with parameters that contain variable references. Variable "%s" found.', $value));
+                throw new \InvalidArgumentException(sprintf('You cannot dump a container with parameters that contain variable references. Variable "%s" found in "%s".', $value, $path.'/'.$key));
             } elseif ($value instanceof Definition) {
-                throw new \InvalidArgumentException(sprintf('You cannot dump a container with parameters that contain service definitions. Definition for "%s" found.', $value->getClass()));
+                throw new \InvalidArgumentException(sprintf('You cannot dump a container with parameters that contain service definitions. Definition for "%s" found in "%s".', $value->getClass(), $path.'/'.$key));
             } elseif ($value instanceof Reference) {
-                throw new \InvalidArgumentException(sprintf('You cannot dump a container with parameters that contain references to other services (reference to service %s found).', $value));
+                throw new \InvalidArgumentException(sprintf('You cannot dump a container with parameters that contain references to other services (reference to service "%s" found in "%s").', $value, $path.'/'.$key));
             } else {
                 $value = var_export($value, true);
             }

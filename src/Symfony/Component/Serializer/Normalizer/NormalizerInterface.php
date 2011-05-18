@@ -25,11 +25,10 @@ interface NormalizerInterface
      *
      * @param object $object object to normalize
      * @param string $format format the normalization result will be encoded as
-     * @param array $properties a list of properties to extract, if null all properties are returned
      * @return array|scalar
      * @api
      */
-    function normalize($object, $format, $properties = null);
+    function normalize($object, $format = null);
 
     /**
      * Denormalizes data back into an object of the given class
@@ -62,20 +61,4 @@ interface NormalizerInterface
      * @api
      */
     function supportsDenormalization($data, $type, $format = null);
-
-    /**
-     * Sets the owning Serializer object
-     *
-     * @param SerializerInterface $serializer
-     * @api
-     */
-    function setSerializer(SerializerInterface $serializer);
-
-    /**
-     * Gets the owning Serializer object
-     *
-     * @return SerializerInterface
-     * @api
-     */
-    function getSerializer();
 }

@@ -6,6 +6,7 @@ require_once __DIR__.'/../Fixtures/ScalarDummy.php';
 
 use Symfony\Tests\Component\Serializer\Fixtures\ScalarDummy;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 /*
  * This file is part of the Symfony framework.
@@ -21,7 +22,7 @@ class CustomNormalizerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->normalizer = new CustomNormalizer;
-        $this->normalizer->setSerializer($this->getMock('Symfony\Component\Serializer\Serializer'));
+        $this->normalizer->setSerializer(new Serializer);
     }
 
     public function testSerialize()

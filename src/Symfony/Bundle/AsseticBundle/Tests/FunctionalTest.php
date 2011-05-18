@@ -43,41 +43,6 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $filesystem->remove($this->cacheDir);
     }
 
-    public function testRoutes()
-    {
-        $countRoutes = function($router)
-        {
-            $count = 0;
-            foreach ($router->getRouteCollection()->all() as $name => $route) {
-                if (0 === strpos($name, '_assetic_')) {
-                    ++$count;
-                }
-            }
-
-            return $count;
-        };
-
-        $kernel = new TestKernel('test', false);
-        $kernel->boot();
-
-        $am = $kernel->getContainer()->get('assetic.asset_manager');
-        $names = $am->getNames();
-        $baseline = $expected = count($names);
-
-        foreach ($names as $name) {
-            $asset = $am->get($name);
-            foreach ($asset as $leaf) {
-                ++$expected;
-            }
-        }
-
-        $this->assertEquals($baseline, $countRoutes($kernel->getContainer()->get('router')));
-
-        $kernel = new TestKernel('test', true);
-        $kernel->boot();
-        $this->assertEquals($expected, $countRoutes($kernel->getContainer()->get('router')));
-    }
-
     public function testTwigRenderDebug()
     {
         $kernel = new TestKernel('test', true);

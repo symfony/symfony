@@ -111,6 +111,8 @@ class TransNode extends \Twig_Node
             }
         }
 
+        $msg = preg_replace('/\\\%/', '%', $msg);
+
         return array(new \Twig_Node_Expression_Constant(trim($msg), $body->getLine()), $vars);
     }
 }

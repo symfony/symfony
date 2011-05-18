@@ -35,7 +35,7 @@ class RadioType extends AbstractType
         ;
 
         if ($view->hasParent()) {
-            $view->set('name', $view->getParent()->get('name'));
+            $view->set('full_name', $view->getParent()->get('full_name'));
         }
     }
 

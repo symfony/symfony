@@ -58,7 +58,7 @@ class FieldType extends AbstractType
     {
         if ($view->hasParent()) {
             $parentId = $view->getParent()->get('id');
-            $parentName = $view->getParent()->get('name');
+            $parentName = $view->getParent()->get('full_name');
             $id = sprintf('%s_%s', $parentId, $form->getName());
             $name = sprintf('%s[%s]', $parentName, $form->getName());
         } else {
@@ -69,7 +69,8 @@ class FieldType extends AbstractType
         $view
             ->set('form', $view)
             ->set('id', $id)
-            ->set('name', $name)
+            ->set('name', $form->getName())
+            ->set('full_name', $name)
             ->set('errors', $form->getErrors())
             ->set('value', $form->getClientData())
             ->set('read_only', $form->isReadOnly())

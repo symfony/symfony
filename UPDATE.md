@@ -167,6 +167,9 @@ beta1 to beta2
 * Form: Renamed option value "text" of "widget" option of the "date" type was 
   renamed to "single-text". "text" indicates to use separate text boxes now
   (like for the "time" type).
+  
+* Form: Renamed view variable "name" to "full_name". The variable "name" now
+  contains the local, short name (equivalent to $form->getName()).
 
 PR12 to beta1
 -------------

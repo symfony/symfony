@@ -25,9 +25,10 @@ interface PermissionMapInterface
      * these bitmasks.
      *
      * @param string $permission
-     * @return array
+     * @param object $object
+     * @return array may return null if permission/object combination is not supported
      */
-    function getMasks($permission);
+    function getMasks($permission, $object);
 
     /**
      * Whether this map contains the given permission

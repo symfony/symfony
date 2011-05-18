@@ -208,6 +208,13 @@
 {% endspaceless %}
 {% endblock url_widget %}
 
+{% block search_widget %}
+{% spaceless %}
+    {% set type = type|default('search') %}
+    {{ block('field_widget') }}
+{% endspaceless %}
+{% endblock search_widget %}
+
 {% block percent_widget %}
 {% spaceless %}
     {% set type = type|default('text') %}

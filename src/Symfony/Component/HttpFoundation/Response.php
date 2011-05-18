@@ -100,10 +100,45 @@ class Response
     public function __toString()
     {
         $this->fixContentType();
+        
+        // cookies
+        $cookies = '';
+        foreach ($this->headers->getCookies() as $cookie) {
+            $cookies .= 'Set-Cookie: '.urlencode($cookie->getName()).'=';
+
+            if (null === $cookie->getValue()) {
+                $cookies .= 'deleted; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+            } else {
+                $cookies .= urlencode($cookie->getValue());
+
+                if ($cookie->getExpiresTime() > 0) {
+                    $cookies .= '; expires='.date("D, d-M-Y H:i:s T", $cookie->getExpiresTime());
+                }
+            }
+
+            if (null !== $cookie->getPath()) {
+                $cookies .= '; path='.$cookie->getPath();
+            }
+
+            if (null !== $cookie->getDomain()) {
+                $cookies .= '; domain='.$cookie->getDomain();
+            }
+
+            if (true === $cookie->isSecure()) {
+                $cookies .= '; secure';
+            }
+
+            if (true === $cookie->isHttpOnly()) {
+                $cookies .= '; httponly';
+            }
+
+            $cookies .= "\r\n";
+        }
 
         return
             sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText)."\r\n".
-            $this->headers."\r\n".
+            $this->headers.
+            $cookies."\r\n".
             $this->getContent();
     }
 

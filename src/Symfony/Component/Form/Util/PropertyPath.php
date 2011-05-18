@@ -142,7 +142,7 @@ class PropertyPath implements \IteratorAggregate
      */
     public function isProperty($index)
     {
-        return !$this->isIndex($index);
+        return !$this->isIndex[$index];
     }
 
     /**
@@ -231,28 +231,22 @@ class PropertyPath implements \IteratorAggregate
      */
     protected function readPropertyPath(&$objectOrArray, $currentIndex)
     {
-        if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
-            throw new UnexpectedTypeException($objectOrArray, 'object or array');
-        }
-
-        $property = $this->elements[$currentIndex];
-
-        if (is_object($objectOrArray)) {
-            $value = $this->readProperty($objectOrArray, $currentIndex);
-        // arrays need to be treated separately (due to PHP bug?)
-        // http://bugs.php.net/bug.php?id=52133
-        } else {
-            if (!array_key_exists($property, $objectOrArray)) {
-                $objectOrArray[$property] = $currentIndex + 1 < $this->length ? array() : null;
+        for (;$currentIndex < $this->length; ++$currentIndex) {
+            if (is_object($objectOrArray)) {
+                $value = $this->readProperty($objectOrArray, $currentIndex);
+            // arrays need to be treated separately (due to PHP bug?)
+            // http://bugs.php.net/bug.php?id=52133
+            } else if (is_array($objectOrArray)){
+                $property = $this->elements[$currentIndex];
+                if (!array_key_exists($property, $objectOrArray)) {
+                    $objectOrArray[$property] = $currentIndex + 1 < $this->length ? array() : null;
+                }
+                $value =& $objectOrArray[$property];
+            } else {
+                throw new UnexpectedTypeException($objectOrArray, 'object or array');
             }
 
-            $value =& $objectOrArray[$property];
-        }
-
-        ++$currentIndex;
-
-        if ($currentIndex < $this->length) {
-            return $this->readPropertyPath($value, $currentIndex);
+            $objectOrArray =& $value;
         }
 
         return $value;
@@ -268,29 +262,32 @@ class PropertyPath implements \IteratorAggregate
      */
     protected function writePropertyPath(&$objectOrArray, $currentIndex, $value)
     {
-        if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
-            throw new UnexpectedTypeException($objectOrArray, 'object or array');
-        }
+        $length = $this->length - 1;
 
-        $property = $this->elements[$currentIndex];
+        for (;$currentIndex < $length; ++$currentIndex) {
 
-        if ($currentIndex + 1 < $this->length) {
             if (is_object($objectOrArray)) {
                 $nestedObject = $this->readProperty($objectOrArray, $currentIndex);
             // arrays need to be treated separately (due to PHP bug?)
             // http://bugs.php.net/bug.php?id=52133
-            } else {
+            } else if (is_array($objectOrArray)) {
+                $property = $this->elements[$currentIndex];
                 if (!array_key_exists($property, $objectOrArray)) {
                     $objectOrArray[$property] = array();
                 }
-
                 $nestedObject =& $objectOrArray[$property];
+            } else {
+                throw new UnexpectedTypeException($objectOrArray, 'object or array');
             }
 
-            $this->writePropertyPath($nestedObject, $currentIndex + 1, $value);
-        } else {
-            $this->writeProperty($objectOrArray, $currentIndex, $value);
+            $objectOrArray =& $nestedObject;
         }
+
+        if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
+            throw new UnexpectedTypeException($objectOrArray, 'object or array');
+        }
+
+        $this->writeProperty($objectOrArray, $currentIndex, $value);
     }
 
     /**
@@ -311,9 +308,10 @@ class PropertyPath implements \IteratorAggregate
 
             return $object[$property];
         } else {
+            $camelProp = $this->camelize($property);
             $reflClass = new \ReflectionClass($object);
-            $getter = 'get'.$this->camelize($property);
-            $isser = 'is'.$this->camelize($property);
+            $getter = 'get'.$camelProp;
+            $isser = 'is'.$camelProp;
 
             if ($reflClass->hasMethod($getter)) {
                 if (!$reflClass->getMethod($getter)->isPublic()) {

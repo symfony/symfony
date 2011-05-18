@@ -29,9 +29,6 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/graphviz/services1.dot', $dumper->dump(), '->dump() dumps an empty container as an empty dot file');
 
-        $container = new ContainerBuilder();
-        $dumper = new GraphvizDumper($container);
-
         $container = include self::$fixturesPath.'/containers/container9.php';
         $dumper = new GraphvizDumper($container);
         $this->assertEquals(str_replace('%path%', __DIR__, file_get_contents(self::$fixturesPath.'/graphviz/services9.dot')), $dumper->dump(), '->dump() dumps services');

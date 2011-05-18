@@ -73,6 +73,10 @@ class ApcUniversalClassLoader extends UniversalClassLoader
      */
     public function __construct($prefix)
     {
+        if (!extension_loaded('apc')) {
+            throw new \RuntimeException('Unable to use ApcUniversalClassLoader as APC is not enabled.');
+        }
+
         $this->prefix = $prefix;
     }
 

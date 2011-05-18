@@ -9,14 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DependencyInjection\Exception;
+namespace Symfony\Component\Routing\Exception;
 
 /**
- * Exception
+ * Exception thrown when a parameter is not valid
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Bulat Shakirzyanov <bulat@theopenskyproject.com>
+ * @author Alexandre Salomé <alexandre.salome@gmail.com>
  */
-interface Exception
+class InvalidParameterException extends \InvalidArgumentException implements ExceptionInterface
 {
 }

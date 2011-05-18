@@ -44,7 +44,7 @@
 
 {% block form_widget %}
 {% spaceless %}
-    <table {{ block('attributes') }}>
+    <table {{ block('container_attributes') }}>
         {{ block('field_rows') }}
         {{ form_rest(form) }}
     </table>

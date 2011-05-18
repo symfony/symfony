@@ -51,6 +51,6 @@ class AsseticHelperForTest extends AsseticHelper
 {
     protected function getAssetUrl(AssetInterface $asset, $options = array())
     {
-        return $asset->getTargetUrl();
+        return $asset->getTargetPath();
     }
 }

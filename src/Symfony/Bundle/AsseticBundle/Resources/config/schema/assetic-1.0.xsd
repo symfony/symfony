@@ -28,6 +28,17 @@
         <xsd:attribute name="name" type="xsd:string" use="required" />
     </xsd:complexType>
 
+    <xsd:complexType name="asset">
+        <xsd:sequence>
+            <xsd:element name="input" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
+            <xsd:element name="filter" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="output" type="xsd:string" />
+        <xsd:attribute name="debug" type="xsd:string" />
+        <xsd:anyAttribute namespace="##any" processContents="lax" />
+    </xsd:complexType>
+
     <xsd:complexType name="filter">
         <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="resource" type="xsd:string" />

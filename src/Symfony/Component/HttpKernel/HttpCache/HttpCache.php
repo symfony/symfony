@@ -325,10 +325,11 @@ class HttpCache implements HttpKernelInterface
         // Add our cached etag validator to the environment.
         // We keep the etags from the client to handle the case when the client
         // has a different private valid entry which is not cached here.
-        $cachedEtags = array($entry->getEtag());
+        $cachedEtags = $entry->getEtag() ? array($entry->getEtag()) : array();
         $requestEtags = $request->getEtags();
-        $etags = array_unique(array_merge($cachedEtags, $requestEtags));
-        $subRequest->headers->set('if_none_match', $etags ? implode(', ', $etags) : '');
+        if ($etags = array_unique(array_merge($cachedEtags, $requestEtags))) {
+            $subRequest->headers->set('if_none_match', implode(', ', $etags));
+        }
 
         $response = $this->forward($subRequest, $catch, $entry);
 

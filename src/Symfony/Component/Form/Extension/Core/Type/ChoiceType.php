@@ -106,7 +106,7 @@ class ChoiceType extends AbstractType
             // Add "[]" to the name in case a select tag with multiple options is
             // displayed. Otherwise only one of the selected options is sent in the
             // POST request.
-            $view->set('name', $view->get('name').'[]');
+            $view->set('full_name', $view->get('full_name').'[]');
         }
     }
 

@@ -13,6 +13,7 @@ namespace Symfony\Bundle\AsseticBundle\Templating;
 
 use Assetic\Asset\AssetInterface;
 use Assetic\Factory\AssetFactory;
+use Assetic\Util\TraversableString;
 use Symfony\Component\Templating\Helper\Helper;
 
 /**
@@ -23,18 +24,15 @@ use Symfony\Component\Templating\Helper\Helper;
 abstract class AsseticHelper extends Helper
 {
     protected $factory;
-    protected $debug;
 
     /**
      * Constructor.
      *
      * @param AssetFactory $factory The asset factory
-     * @param Boolean      $debug   The debug mode
      */
-    public function __construct(AssetFactory $factory, $debug = false)
+    public function __construct(AssetFactory $factory)
     {
         $this->factory = $factory;
-        $this->debug = $debug;
     }
 
     /**
@@ -43,7 +41,7 @@ abstract class AsseticHelper extends Helper
     public function javascripts($inputs = array(), $filters = array(), array $options = array())
     {
         if (!isset($options['output'])) {
-            $options['output'] = 'js/*';
+            $options['output'] = 'js/*.js';
         }
 
         return $this->getAssetUrls($inputs, $filters, $options);
@@ -55,7 +53,7 @@ abstract class AsseticHelper extends Helper
     public function stylesheets($inputs = array(), $filters = array(), array $options = array())
     {
         if (!isset($options['output'])) {
-            $options['output'] = 'css/*';
+            $options['output'] = 'css/*.css';
         }
 
         return $this->getAssetUrls($inputs, $filters, $options);
@@ -109,7 +107,11 @@ abstract class AsseticHelper extends Helper
         }
 
         if (!isset($options['debug'])) {
-            $options['debug'] = $this->debug;
+            $options['debug'] = $this->factory->isDebug();
+        }
+
+        if (!isset($options['combine'])) {
+            $options['combine'] = !$options['debug'];
         }
 
         if (isset($options['single']) && $options['single'] && 1 < count($inputs)) {
@@ -117,23 +119,25 @@ abstract class AsseticHelper extends Helper
         }
 
         if (!isset($options['name'])) {
-            $options['name'] = $this->factory->generateAssetName($inputs, $filters);
+            $options['name'] = $this->factory->generateAssetName($inputs, $filters, $options);
         }
 
-        $coll = $this->factory->createAsset($inputs, $filters, $options);
+        $asset = $this->factory->createAsset($inputs, $filters, $options);
 
-        if (!$options['debug']) {
-            return array($this->getAssetUrl($coll, $options));
+        $one = $this->getAssetUrl($asset, $options);
+        $many = array();
+        if ($options['combine']) {
+            $many[] = $one;
+        } else {
+            $i = 0;
+            foreach ($asset as $leaf) {
+                $many[] = $this->getAssetUrl($leaf, array_replace($options, array(
+                    'name' => $options['name'].'_'.$i++,
+                )));
+            }
         }
 
-        $urls = array();
-        foreach ($coll as $leaf) {
-            $urls[] = $this->getAssetUrl($leaf, array_replace($options, array(
-                'name' => $options['name'].'_'.count($urls),
-            )));
-        }
-
-        return $urls;
+        return new TraversableString($one, $many);
     }
 
     /**

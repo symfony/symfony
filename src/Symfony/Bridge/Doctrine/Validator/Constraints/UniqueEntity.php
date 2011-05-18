@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class UniqueEntity extends Constraint
 {
     public $message = 'This value is already used.';
-    public $em = false;
+    public $em = null;
     public $fields = array();
     
     public function getRequiredOptions()

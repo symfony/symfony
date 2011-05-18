@@ -121,7 +121,6 @@ class ChoiceType extends AbstractType
             'choice_list'       => null,
             'choices'           => array(),
             'preferred_choices' => array(),
-            'csrf_protection'   => false,
             'empty_data'        => $multiple || $expanded ? array() : '',
             'error_bubbling'    => false,
         );

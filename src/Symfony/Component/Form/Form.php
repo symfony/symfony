@@ -24,13 +24,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * A form is composed of a validator schema and a widget form schema.
  *
- * Form also takes care of CSRF protection by default.
- *
- * A CSRF secret can be any random string. If set to false, it disables the
- * CSRF protection, and if set to null, it forces the form to use the global
- * CSRF secret. If the global CSRF secret is also null, then a random one
- * is generated on the fly.
- *
  * To implement your own form fields, you need to have a thorough understanding
  * of the data flow within a form field. A form field stores its data in three
  * different representations:

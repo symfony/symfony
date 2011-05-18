@@ -59,7 +59,6 @@ class FileType extends AbstractType
     {
         return array(
             'type'              => 'string',
-            'csrf_protection'   => false,
         );
     }
 

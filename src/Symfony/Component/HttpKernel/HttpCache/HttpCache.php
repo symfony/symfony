@@ -182,6 +182,8 @@ class HttpCache implements HttpKernelInterface
 
         $this->restoreResponseBody($request, $response);
 
+        $response->setDate(new \DateTime(null, new \DateTimeZone('UTC')));
+
         if (HttpKernelInterface::MASTER_REQUEST === $type && $this->options['debug']) {
             $response->headers->set('X-Symfony-Cache', $this->getLog());
         }
@@ -340,9 +342,8 @@ class HttpCache implements HttpKernelInterface
             }
 
             $entry = clone $entry;
-            $entry->headers->remove('Date');
 
-            foreach (array('Date', 'Expires', 'Cache-Control', 'ETag', 'Last-Modified') as $name) {
+            foreach (array('Expires', 'Cache-Control', 'ETag', 'Last-Modified') as $name) {
                 if ($response->headers->has($name)) {
                     $entry->headers->set($name, $response->headers->get($name));
                 }

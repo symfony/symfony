@@ -26,12 +26,12 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPathReturnsAbsolutePath()
     {
-        $this->assertEquals(__DIR__.'/Fixtures/test.gif', $this->file->getPath());
+        $this->assertEquals(__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.gif', $this->file->getPath());
     }
 
     public function test__toString()
     {
-        $this->assertEquals(__DIR__.'/Fixtures/test.gif', (string) $this->file);
+        $this->assertEquals(__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.gif', (string) $this->file);
     }
 
     public function testGetNameReturnsNameWithExtension()
@@ -52,7 +52,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDirectoryReturnsDirectoryName()
     {
-        $this->assertEquals(__DIR__.'/Fixtures', $this->file->getDirectory());
+        $this->assertEquals(__DIR__.DIRECTORY_SEPARATOR.'Fixtures', $this->file->getDirectory());
     }
 
     public function testGetMimeTypeUsesMimeTypeGuessers()
@@ -152,7 +152,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
     public function testMoveFailing()
     {
-        $path = __DIR__.'/Fixtures/test.copy.gif';
+        $path = __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.copy.gif';
         $targetPath = '/thisfolderwontexist';
         @unlink($path);
         @unlink($targetPath);

@@ -24,31 +24,39 @@ class CollectionType extends AbstractType
         if ($options['allow_add'] && $options['prototype']) {
             $builder->add('$$name$$', $options['type'], array(
                 'property_path' => false,
-                'required' => false,
+                'required'      => false,
             ));
         }
 
-        $listener = new ResizeFormListener($builder->getFormFactory(),
-                $options['type'], $options['allow_add'], $options['allow_delete']);
+        $listener = new ResizeFormListener(
+            $builder->getFormFactory(),
+            $options['type'],
+            $options['allow_add'],
+            $options['allow_delete']
+        );
 
-        $builder->addEventSubscriber($listener)
+        $builder
+            ->addEventSubscriber($listener)
             ->setAttribute('allow_add', $options['allow_add'])
-            ->setAttribute('allow_delete', $options['allow_delete']);
+            ->setAttribute('allow_delete', $options['allow_delete'])
+        ;
     }
 
     public function buildView(FormView $view, FormInterface $form)
     {
-        $view->set('allow_add', $form->getAttribute('allow_add'));
-        $view->set('allow_delete', $form->getAttribute('allow_delete'));
+        $view
+            ->set('allow_add', $form->getAttribute('allow_add'))
+            ->set('allow_delete', $form->getAttribute('allow_delete'))
+        ;
     }
 
     public function getDefaultOptions(array $options)
     {
         return array(
-            'allow_add' => false,
-            'allow_delete' => false,
-            'prototype'  => true,
-            'type' => 'text',
+            'allow_add'     => false,
+            'allow_delete'  => false,
+            'prototype'     => true,
+            'type'          => 'text',
         );
     }
 

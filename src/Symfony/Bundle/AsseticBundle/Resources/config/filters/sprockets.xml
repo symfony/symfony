@@ -12,7 +12,6 @@
     <services>
         <service id="assetic.filter.sprockets" class="%assetic.filter.sprockets.class%">
             <tag name="assetic.filter" alias="sprockets" />
-            <argument>%assetic.read_from%</argument>
             <argument>%assetic.filter.sprockets.bin%</argument>
         </service>
     </services>

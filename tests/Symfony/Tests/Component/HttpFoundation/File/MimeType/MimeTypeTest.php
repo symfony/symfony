@@ -82,12 +82,17 @@ class MimeTypeTest extends \PHPUnit_Framework_TestCase
         if (strstr(PHP_OS, 'WIN')) {
             $this->markTestSkipped('Can not verify chmod operations on Windows');
         }
+
         $path = __DIR__.'/../Fixtures/to_delete';
         touch($path);
         chmod($path, 0333);
 
-        $this->setExpectedException('Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException');
-        MimeTypeGuesser::getInstance()->guess($path);
+        if (substr(sprintf('%o', fileperms($path)), -4) == '0333') {
+            $this->setExpectedException('Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException');
+            MimeTypeGuesser::getInstance()->guess($path);
+        } else {
+            $this->markTestSkipped('Can not verify chmod operations, change of file permissions failed');
+        }
     }
 
     public static function tearDownAfterClass()

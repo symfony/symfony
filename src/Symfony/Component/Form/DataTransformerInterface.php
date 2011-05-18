@@ -40,8 +40,10 @@ interface DataTransformerInterface
      * passed.
      *
      * @param  mixed $value              The value in the original representation
+     *
      * @return mixed                     The value in the transformed representation
-     * @throws UnexpectedTypeException   when the argument is no string
+     *
+     * @throws UnexpectedTypeException   when the argument is not a string
      * @throws DataTransformerException  when the transformation fails
      */
     function transform($value);
@@ -65,8 +67,10 @@ interface DataTransformerInterface
      * is passed.
      *
      * @param  mixed $value              The value in the transformed representation
-     * @throws UnexpectedTypeException   when the argument is not of the
-     *                                   expected type
+     *
+     * @return mixed                     The value in the original representation
+     *
+     * @throws UnexpectedTypeException   when the argument is not of the expected type
      * @throws DataTransformerException  when the transformation fails
      */
     function reverseTransform($value);

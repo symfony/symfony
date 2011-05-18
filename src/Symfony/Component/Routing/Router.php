@@ -24,12 +24,13 @@ class Router implements RouterInterface
 {
     private $matcher;
     private $generator;
-    private $options;
     private $defaults;
     private $context;
     private $loader;
     private $collection;
     private $resource;
+
+    protected $options;
 
     /**
      * Constructor.

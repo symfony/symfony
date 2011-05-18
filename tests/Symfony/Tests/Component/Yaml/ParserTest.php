@@ -110,6 +110,31 @@ bar: 1
 EOF
         ), $b, '->parse() is able to dump objects');
     }
+
+    public function testNonUtf8Exception()
+    {
+        if (!function_exists('mb_detect_encoding')) {
+            $this->markTestSkipped('Exceptions for non-utf8 charsets require the mb_detect_encoding() function.');
+
+            return;
+        }
+
+        $yamls = array(
+            iconv("UTF-8", "ISO-8859-1", "foo: 'äöüß'"),
+            iconv("UTF-8", "ISO-8859-15", "euro: '€'"),
+            iconv("UTF-8", "CP1252", "cp1252: '©ÉÇáñ'")
+        );
+
+        foreach ($yamls as $yaml) {
+            try {
+                $this->parser->parse($yaml);
+
+                $this->fail('charsets other than UTF-8 are rejected.');
+            } catch (\Exception $e) {
+                 $this->assertInstanceOf('Symfony\Component\Yaml\ParserException', $e, 'charsets other than UTF-8 are rejected.');
+            }
+        }
+    }
 }
 
 class B

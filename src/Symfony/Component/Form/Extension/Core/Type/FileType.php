@@ -44,7 +44,8 @@ class FileType extends AbstractType
             ->add('file', 'field')
             ->add('token', 'hidden')
             ->add('name', 'hidden')
-            ->add('originalName', 'hidden');
+            ->add('originalName', 'hidden')
+        ;
     }
 
     public function buildViewBottomUp(FormView $view, FormInterface $form)
@@ -56,8 +57,8 @@ class FileType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'type' => 'string',
-            'csrf_protection' => false,
+            'type'              => 'string',
+            'csrf_protection'   => false,
         );
     }
 

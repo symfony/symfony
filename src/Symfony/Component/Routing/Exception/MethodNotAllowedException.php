@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Routing\Matcher\Exception;
+namespace Symfony\Component\Routing\Exception;
 
 /**
  * The resource was found but the request method is not allowed.
@@ -18,7 +18,7 @@ namespace Symfony\Component\Routing\Matcher\Exception;
  *
  * @author Kris Wallsmith <kris@symfony.com>
  */
-class MethodNotAllowedException extends \RuntimeException implements Exception
+class MethodNotAllowedException extends \RuntimeException implements ExceptionInterface
 {
     protected $allowedMethods;
 

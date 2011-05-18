@@ -9,17 +9,37 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Doctrine\Validator;
+namespace Symfony\Bridge\Doctrine\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-class UniqueEntity extends \Symfony\Component\Validator\Constraint
+/**
+ * Constraint for the Unique Entity validator
+ * 
+ * @author Benjamin Eberlei <kontakt@beberlei.de>
+ */
+class UniqueEntity extends Constraint
 {
     public $message = 'This value is already used.';
-    public $entityManagerName = false;
+    public $em = false;
     public $fields = array();
+    
+    public function getRequiredOptions()
+    {
+        return array('fields');
+    }
+    
+    /**
+     * The validator must be defined as a service with this name.
+     * 
+     * @return string
+     */
+    public function validatedBy()
+    {
+        return 'doctrine.orm.validator.unique';
+    }
     
     /**
      * {@inheritDoc}

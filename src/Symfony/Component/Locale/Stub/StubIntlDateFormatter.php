@@ -160,8 +160,16 @@ class StubIntlDateFormatter
      */
     public function format($timestamp)
     {
-        if (!is_int($timestamp)) {
+        // intl allows timestamps to be passed as arrays - we don't
+        if (is_array($timestamp)) {
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'timestamp', $timestamp, 'Only integer unix timestamps are supported');
+        }
+
+        if (!is_int($timestamp)) {
+            // behave like the intl extension
+            StubIntl::setErrorCode(StubIntl::U_ILLEGAL_ARGUMENT_ERROR);
+
+            return false;
         }
 
         $transformer = new FullTransformer($this->getPattern(), $this->getTimeZoneId());
@@ -310,6 +318,8 @@ class StubIntlDateFormatter
         if (null !== $position) {
             throw new MethodArgumentNotImplementedException(__METHOD__, 'position');
         }
+
+        StubIntl::setErrorCode(StubIntl::U_ZERO_ERROR);
 
         $dateTime = $this->createDateTime(0);
         $transformer = new FullTransformer($this->getPattern(), $this->getTimeZoneId());

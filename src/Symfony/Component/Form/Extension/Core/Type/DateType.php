@@ -119,7 +119,6 @@ class DateType extends AbstractType
             'days'              => range(1, 31),
             'widget'            => 'choice',
             'input'             => 'datetime',
-            'pattern'           => null,
             'format'            => \IntlDateFormatter::MEDIUM,
             'data_timezone'     => null,
             'user_timezone'     => null,

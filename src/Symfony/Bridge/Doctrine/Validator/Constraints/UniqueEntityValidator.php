@@ -44,9 +44,10 @@ class UniqueEntityValidator extends ConstraintValidator
      */
     public function isValid($entity, Constraint $constraint)
     {
-        if (!is_array($constraint->fields)) {
+        if (!is_array($constraint->fields) && !is_string($constraint->fields)) {
             throw new UnexpectedTypeException($constraint->fields, 'array');
         }
+        $fields = (array)$constraint->fields;
         if (count($constraint->fields) == 0) {
             throw new ConstraintDefinitionException("At least one field has to specified.");
         }
@@ -57,7 +58,7 @@ class UniqueEntityValidator extends ConstraintValidator
         $class = $em->getClassMetadata($className);
         
         $criteria = array();
-        foreach ($constraint->fields as $fieldName) {
+        foreach ($fields as $fieldName) {
             if (!isset($class->reflFields[$fieldName])) {
                 throw new ConstraintDefinitionException("Only field names mapped by Doctrine can be validated for uniqueness.");
             }
@@ -70,7 +71,7 @@ class UniqueEntityValidator extends ConstraintValidator
         
         if (count($result) > 0 && $result[0] !== $entity) {
             $oldPath = $this->context->getPropertyPath();
-            $this->context->setPropertyPath( empty($oldPath) ? $constraint->fields[0] : $oldPath . "." . $constraint->fields[0]);
+            $this->context->setPropertyPath( empty($oldPath) ? $fields[0] : $oldPath . "." . $fields[0]);
             $this->context->addViolation($constraint->message, array(), $criteria[$constraint->fields[0]]);
             $this->context->setPropertyPath($oldPath);
         }

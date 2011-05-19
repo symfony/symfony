@@ -36,7 +36,7 @@ class Session implements \Serializable
     {
         $this->storage = $storage;
         $this->defaultLocale = $defaultLocale;
-        $this->attributes = array('_flash' => array(), '_locale' => $this->getDefaultLocale());
+        $this->attributes = array('_flash' => array(), '_locale' => $this->defaultLocale);
         $this->started = false;
     }
 
@@ -58,7 +58,7 @@ class Session implements \Serializable
         }
 
         if (!isset($this->attributes['_locale'])) {
-            $this->attributes['_locale'] = $this->getDefaultLocale();
+            $this->attributes['_locale'] = $this->defaultLocale;
         }
 
         // flag current flash messages to be removed at shutdown
@@ -296,10 +296,5 @@ class Session implements \Serializable
         list($this->storage, $this->defaultLocale) = unserialize($serialized);
         $this->attributes = array();
         $this->started = false;
-    }
-
-    private function getDefaultLocale()
-    {
-        return $this->defaultLocale;
     }
 }

@@ -8,7 +8,7 @@
 <?php else: ?>
     <select
         <?php echo $view['form']->attributes() ?>
-        name="<?php echo $view->escape($name) ?>"
+        name="<?php echo $view->escape($full_name) ?>"
         <?php if ($read_only): ?> disabled="disabled"<?php endif ?>
         <?php if ($multiple): ?> multiple="multiple"<?php endif ?>
     >

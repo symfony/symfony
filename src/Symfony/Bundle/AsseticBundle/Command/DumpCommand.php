@@ -36,6 +36,8 @@ class DumpCommand extends Command
             ->setDescription('Dumps all assets to the filesystem')
             ->addArgument('write_to', InputArgument::OPTIONAL, 'Override the configured asset root')
             ->addOption('watch', null, InputOption::VALUE_NONE, 'Check for changes every second, debug mode only')
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Force an initial generation of all assets (used with --watch)')
+            ->addOption('period', null, InputOption::VALUE_REQUIRED, 'Set the polling period in seconds (used with --watch)', 1)
         ;
     }
 
@@ -49,6 +51,10 @@ class DumpCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output->writeln(sprintf('Dumping all <comment>%s</comment> assets.', $input->getOption('env')));
+        $output->writeln(sprintf('Debug mode is <comment>%s</comment>.', $input->getOption('no-debug') ? 'off' : 'on'));
+        $output->writeln('');
+
         if (!$input->getOption('watch')) {
             foreach ($this->am->getNames() as $name) {
                 $this->dumpAsset($name, $output);
@@ -61,7 +67,7 @@ class DumpCommand extends Command
             throw new \RuntimeException('The --watch option is only available in debug mode.');
         }
 
-        $this->watch($output);
+        $this->watch($input, $output);
     }
 
     /**
@@ -72,25 +78,25 @@ class DumpCommand extends Command
      *
      * @param OutputInterface $output The command output
      */
-    private function watch(OutputInterface $output)
+    private function watch(InputInterface $input, OutputInterface $output)
     {
         $refl = new \ReflectionClass('Assetic\\AssetManager');
         $prop = $refl->getProperty('assets');
         $prop->setAccessible(true);
 
         $cache = sys_get_temp_dir().'/assetic_watch_'.substr(sha1($this->basePath), 0, 7);
-        if (file_exists($cache)) {
-            $previously = unserialize(file_get_contents($cache));
-        } else {
+        if ($input->getOption('force') || !file_exists($cache)) {
             $previously = array();
+        } else {
+            $previously = unserialize(file_get_contents($cache));
         }
 
         $error = '';
         while (true) {
             try {
                 foreach ($this->am->getNames() as $name) {
-                    if ($asset = $this->checkAsset($name, $previously)) {
-                        $this->dumpAsset($asset, $output);
+                    if ($this->checkAsset($name, $previously)) {
+                        $this->dumpAsset($name, $output);
                     }
                 }
 
@@ -101,7 +107,7 @@ class DumpCommand extends Command
                 file_put_contents($cache, serialize($previously));
                 $error = '';
 
-                sleep(1);
+                sleep($input->getOption('period'));
             } catch (\Exception $e) {
                 if ($error != $msg = $e->getMessage()) {
                     $output->writeln('<error>[error]</error> '.$msg);
@@ -117,7 +123,7 @@ class DumpCommand extends Command
      * @param string $name        The asset name
      * @param array  &$previously An array of previous visits
      *
-     * @return AssetInterface|Boolean The asset if it should be dumped
+     * @return Boolean Whether the asset should be dumped
      */
     private function checkAsset($name, array &$previously)
     {
@@ -133,7 +139,7 @@ class DumpCommand extends Command
 
         $previously[$name] = array('mtime' => $mtime, 'formula' => $formula);
 
-        return $changed ? $asset : false;
+        return $changed;
     }
 
     /**

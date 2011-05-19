@@ -11,8 +11,8 @@
 
 namespace Symfony\Tests\Component\Routing\Matcher;
 
-use Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException;
-use Symfony\Component\Routing\Matcher\Exception\NotFoundException;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -69,7 +69,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         try {
             $matcher->match('/no-match');
             $this->fail();
-        } catch (NotFoundException $e) {}
+        } catch (ResourceNotFoundException $e) {}
         $this->assertEquals(array('_route' => 'foo', 'bar' => 'baz'), $matcher->match('/foo/baz'));
 
         // test that defaults are merged
@@ -141,7 +141,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         try {
             $matcher->match('/');
             $this->fail();
-        } catch (NotFoundException $e) {
+        } catch (ResourceNotFoundException $e) {
         }
     }
 }

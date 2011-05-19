@@ -2,6 +2,7 @@
 
 $container->loadFromExtension('framework', array(
     'secret' => 's3cr3t',
+    'form' => null,
     'csrf_protection' => array(
         'enabled'    => true,
         'field_name' => '_csrf',

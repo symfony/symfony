@@ -13,6 +13,7 @@ namespace Symfony\Bundle\DoctrineBundle;
 
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Bundle\DoctrineBundle\DependencyInjection\Compiler\RegisterEventListenersAndSubscribersPass;
+use Symfony\Bundle\DoctrineBundle\DependencyInjection\Compiler\AddValidatorNamespaceAliasPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -29,5 +30,6 @@ class DoctrineBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new RegisterEventListenersAndSubscribersPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
+        $container->addCompilerPass(new AddValidatorNamespaceAliasPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
     }
 }

@@ -87,6 +87,31 @@ beta1 to beta2
      */
     private  $foo;
 
+* Forms must now be explicitly enabled (automatically done in Symfony SE):
+
+        form: ~
+
+        # equivalent to
+        form:
+            enabled: true
+
+* The Routing Exceptions have been moved:
+
+  Before:
+
+        Symfony\Component\Routing\Matcher\Exception\Exception
+        Symfony\Component\Routing\Matcher\Exception\NotFoundException
+        Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException
+
+  After:
+
+        Symfony\Component\Routing\Exception\Exception
+        Symfony\Component\Routing\Exception\NotFoundException
+        Symfony\Component\Routing\Exception\MethodNotAllowedException
+
+* The form component's ``csrf_page_id`` option has been renamed to
+  ``intention``.
+
 * The ``error_handler`` setting has been removed. The ``ErrorHandler`` class
   is now managed directly by Symfony SE in ``AppKernel``.
 
@@ -220,6 +245,9 @@ beta1 to beta2
 * Form: Renamed option value "text" of "widget" option of the "date" type was 
   renamed to "single-text". "text" indicates to use separate text boxes now
   (like for the "time" type).
+  
+* Form: Renamed view variable "name" to "full_name". The variable "name" now
+  contains the local, short name (equivalent to $form->getName()).
 
 PR12 to beta1
 -------------

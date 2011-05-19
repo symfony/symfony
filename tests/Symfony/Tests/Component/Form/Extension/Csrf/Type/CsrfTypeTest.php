@@ -36,12 +36,12 @@ class CsrfTypeTest extends TypeTestCase
     {
         $this->provider->expects($this->once())
             ->method('generateCsrfToken')
-            ->with('%PAGE_ID%')
+            ->with('%INTENTION%')
             ->will($this->returnValue('token'));
 
         $form = $this->factory->create('csrf', null, array(
             'csrf_provider' => $this->provider,
-            'page_id' => '%PAGE_ID%'
+            'intention' => '%INTENTION%'
         ));
 
         $this->assertEquals('token', $form->getData());
@@ -51,12 +51,12 @@ class CsrfTypeTest extends TypeTestCase
     {
         $this->provider->expects($this->once())
             ->method('isCsrfTokenValid')
-            ->with('%PAGE_ID%', 'token')
+            ->with('%INTENTION%', 'token')
             ->will($this->returnValue(true));
 
         $form = $this->factory->create('csrf', null, array(
             'csrf_provider' => $this->provider,
-            'page_id' => '%PAGE_ID%'
+            'intention' => '%INTENTION%'
         ));
         $form->bind('token');
 
@@ -70,7 +70,7 @@ class CsrfTypeTest extends TypeTestCase
 
         $form = $this->factory->create('csrf', null, array(
             'csrf_provider' => $this->provider,
-            'page_id' => '%PAGE_ID%'
+            'intention' => '%INTENTION%'
         ));
         $form->setParent($this->getNonRootForm());
         $form->bind('token');
@@ -80,23 +80,23 @@ class CsrfTypeTest extends TypeTestCase
     {
         $this->provider->expects($this->at(0))
             ->method('generateCsrfToken')
-            ->with('%PAGE_ID%')
+            ->with('%INTENTION%')
             ->will($this->returnValue('token1'));
         $this->provider->expects($this->at(1))
             ->method('isCsrfTokenValid')
-            ->with('%PAGE_ID%', 'invalid')
+            ->with('%INTENTION%', 'invalid')
             ->will($this->returnValue(false));
 
         // The token is regenerated to avoid stalled tokens, for example when
         // the session ID changed
         $this->provider->expects($this->at(2))
             ->method('generateCsrfToken')
-            ->with('%PAGE_ID%')
+            ->with('%INTENTION%')
             ->will($this->returnValue('token2'));
 
         $form = $this->factory->create('csrf', null, array(
             'csrf_provider' => $this->provider,
-            'page_id' => '%PAGE_ID%'
+            'intention' => '%INTENTION%'
         ));
         $form->bind('invalid');
 

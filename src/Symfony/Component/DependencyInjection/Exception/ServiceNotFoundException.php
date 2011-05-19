@@ -7,7 +7,7 @@ namespace Symfony\Component\DependencyInjection\Exception;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class NonExistentServiceException extends InvalidArgumentException
+class ServiceNotFoundException extends InvalidArgumentException
 {
     private $id;
     private $sourceId;

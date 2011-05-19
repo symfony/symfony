@@ -79,7 +79,7 @@ EOT
 
         $cme = new ClassMetadataExporter();
         $exporter = $cme->getExporter($type);
-        $exporter->setOverwriteExistingFiles(($input->getOption('force') !== false));
+        $exporter->setOverwriteExistingFiles($input->getOption('force'));
 
         if ('annotation' === $type) {
             $entityGenerator = $this->getEntityGenerator();

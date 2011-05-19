@@ -145,7 +145,7 @@ class CookieTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo=bar; expires=Fri, 20-May-2011 15:25:52 GMT; path=/; domain=.myfoodomain.com; secure; httponly', $cookie->__toString(), '->__toString() returns string representation of the cookie');
         
         $cookie = new Cookie('foo', null, 1, '/', '.myfoodomain.com');
-
-        $this->assertEquals('foo=deleted; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.myfoodomain.com; httponly', $cookie->__toString(), '->__toString() returns string representation of a cleared cookie if value is NULL');
+ 
+        $this->assertEquals('foo=deleted; expires=' . gmdate("D, d-M-Y H:i:s T", time()-31536001) . '; path=/; domain=.myfoodomain.com; httponly', $cookie->__toString(), '->__toString() returns string representation of a cleared cookie if value is NULL');
     }
 }

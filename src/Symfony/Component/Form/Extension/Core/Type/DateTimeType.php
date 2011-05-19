@@ -37,9 +37,6 @@ class DateTimeType extends AbstractType
             'with_seconds',
         )));
 
-        if (isset($options['date_pattern'])) {
-            $dateOptions['pattern'] = $options['date_pattern'];
-        }
         if (isset($options['date_widget'])) {
             $dateOptions['widget'] = $options['date_widget'];
         }
@@ -49,9 +46,6 @@ class DateTimeType extends AbstractType
 
         $dateOptions['input'] = 'array';
 
-        if (isset($options['time_pattern'])) {
-            $timeOptions['pattern'] = $options['time_pattern'];
-        }
         if (isset($options['time_widget'])) {
             $timeOptions['widget'] = $options['time_widget'];
         }
@@ -103,10 +97,8 @@ class DateTimeType extends AbstractType
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference'  => false,
-            'date_pattern'  => null,
             'date_widget'   => null,
             'date_format'   => null,
-            'time_pattern'  => null,
             'time_widget'   => null,
             /* Defaults for date field */
             'years'         => range(date('Y') - 5, date('Y') + 5),

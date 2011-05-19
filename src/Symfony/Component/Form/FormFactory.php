@@ -305,12 +305,21 @@ class FormFactory implements FormFactoryInterface
 
         $typeGuess = $this->guesser->guessType($class, $property);
         $maxLengthGuess = $this->guesser->guessMaxLength($class, $property);
+        $minLengthGuess = $this->guesser->guessMinLength($class, $property);
         $requiredGuess = $this->guesser->guessRequired($class, $property);
 
         $type = $typeGuess ? $typeGuess->getType() : 'text';
 
         if ($maxLengthGuess) {
             $options = array_merge(array('max_length' => $maxLengthGuess->getValue()), $options);
+        }
+
+        if ($minLengthGuess) {
+            if ($maxLengthGuess) {
+                $options = array_merge(array('pattern' => '.{'.$minLengthGuess->getValue().','.$maxLengthGuess->getValue().'}'), $options);
+            } else {
+                $options = array_merge(array('pattern' => '.{'.$minLengthGuess->getValue().',}'), $options);
+            }
         }
 
         if ($requiredGuess) {

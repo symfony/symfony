@@ -60,6 +60,39 @@ class Cookie
         $this->secure = (Boolean) $secure;
         $this->httpOnly = (Boolean) $httpOnly;
     }
+    
+    public function __toString()
+    {
+        $str = urlencode($this->getName()).'=';
+
+        if (null === $this->getValue()) {
+                $str .= 'deleted; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        } else {
+            $str .= urlencode($this->getValue());
+
+            if ($this->getExpiresTime() > 0) {
+                $str .= '; expires='.gmdate("D, d-M-Y H:i:s T", $this->getExpiresTime());
+            }
+        }
+
+        if (null !== $this->getPath()) {
+            $str .= '; path='.$this->getPath();
+        }
+
+        if (null !== $this->getDomain()) {
+            $str .= '; domain='.$this->getDomain();
+        }
+
+        if (true === $this->isSecure()) {
+            $str .= '; secure';
+        }
+
+        if (true === $this->isHttpOnly()) {
+            $str .= '; httponly';
+        }
+
+        return $str;
+    }
 
     public function getName()
     {

@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\TwigBundle\Extension;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;
 
 /**
  *
@@ -81,35 +80,6 @@ class TemplatingExtension extends \Twig_Extension
     public function getAssetsVersion($packageName = null)
     {
         return $this->container->get('templating.helper.assets')->getVersion($packageName);
-    }
-
-    /**
-     * Returns the Response content for a given controller or URI.
-     *
-     * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
-     * @param array  $attributes An array of request attributes
-     * @param array  $options    An array of options
-     *
-     * @see Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver::render()
-     */
-    public function renderAction($controller, array $attributes = array(), array $options = array())
-    {
-        $options['attributes'] = $attributes;
-
-        return $this->container->get('http_kernel')->render($controller, $options);
-    }
-
-    /**
-     * Returns the token parser instance to add to the existing list.
-     *
-     * @return array An array of Twig_TokenParser instances
-     */
-    public function getTokenParsers()
-    {
-        return array(
-            // {% render 'BlogBundle:Post:list' with { 'limit': 2 }, { 'alt': 'BlogBundle:Post:error' } %}
-            new RenderTokenParser(),
-        );
     }
 
     public function abbrClass($class)

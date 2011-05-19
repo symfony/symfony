@@ -60,10 +60,12 @@ class DateType extends AbstractType
                 );
             }
 
-            $builder->add('year', $widget, $yearOptions)
+            $builder
+                ->add('year', $widget, $yearOptions)
                 ->add('month', $widget, $monthOptions)
                 ->add('day', $widget, $dayOptions)
-                ->appendClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], array('year', 'month', 'day')));
+                ->appendClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], array('year', 'month', 'day')))
+            ;
         }
 
         if ($options['input'] === 'string') {
@@ -84,7 +86,8 @@ class DateType extends AbstractType
 
         $builder
             ->setAttribute('formatter', $formatter)
-            ->setAttribute('widget', $options['widget']);
+            ->setAttribute('widget', $options['widget'])
+        ;
     }
 
     public function buildViewBottomUp(FormView $view, FormInterface $form)
@@ -111,37 +114,37 @@ class DateType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'years' => range(date('Y') - 5, date('Y') + 5),
-            'months' => range(1, 12),
-            'days' => range(1, 31),
-            'widget' => 'choice',
-            'input' => 'datetime',
-            'pattern' => null,
-            'format' => \IntlDateFormatter::MEDIUM,
-            'data_timezone' => null,
-            'user_timezone' => null,
-            'csrf_protection' => false,
+            'years'             => range(date('Y') - 5, date('Y') + 5),
+            'months'            => range(1, 12),
+            'days'              => range(1, 31),
+            'widget'            => 'choice',
+            'input'             => 'datetime',
+            'pattern'           => null,
+            'format'            => \IntlDateFormatter::MEDIUM,
+            'data_timezone'     => null,
+            'user_timezone'     => null,
+            'csrf_protection'   => false,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
-            'by_reference' => false,
+            'by_reference'      => false,
         );
     }
 
     public function getAllowedOptionValues(array $options)
     {
         return array(
-            'input' => array(
+            'input'     => array(
                 'datetime',
                 'string',
                 'timestamp',
                 'array',
             ),
-            'widget' => array(
+            'widget'    => array(
                 'single-text',
                 'text',
                 'choice',
             ),
-            'format' => array(
+            'format'    => array(
                 \IntlDateFormatter::FULL,
                 \IntlDateFormatter::LONG,
                 \IntlDateFormatter::MEDIUM,

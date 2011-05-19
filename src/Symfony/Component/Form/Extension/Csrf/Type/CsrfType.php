@@ -30,26 +30,28 @@ class CsrfType extends AbstractType
     public function buildForm(FormBuilder $builder, array $options)
     {
         $csrfProvider = $options['csrf_provider'];
-        $pageId = $options['page_id'];
+        $intention = $options['intention'];
+
+        $validator = function (FormInterface $form) use ($csrfProvider, $intention)
+        {
+            if ((!$form->hasParent() || $form->getParent()->isRoot())
+                && !$csrfProvider->isCsrfTokenValid($intention, $form->getData())) {
+                $form->addError(new FormError('The CSRF token is invalid. Please try to resubmit the form'));
+                $form->setData($csrfProvider->generateCsrfToken($intention));
+            }
+        };
 
         $builder
-        ->setData($csrfProvider->generateCsrfToken($pageId))
-        ->addValidator(new CallbackValidator(
-        function (FormInterface $form) use ($csrfProvider, $pageId) {
-            if ((!$form->hasParent() || $form->getParent()->isRoot())
-            && !$csrfProvider->isCsrfTokenValid($pageId, $form->getData())) {
-                $form->addError(new FormError('The CSRF token is invalid. Please try to resubmit the form'));
-                $form->setData($csrfProvider->generateCsrfToken($pageId));
-            }
-        }
-        ));
+            ->setData($csrfProvider->generateCsrfToken($intention))
+            ->addValidator(new CallbackValidator($validator))
+        ;
     }
 
     public function getDefaultOptions(array $options)
     {
         return array(
             'csrf_provider' => $this->csrfProvider,
-            'page_id' => null,
+            'intention' => null,
             'property_path' => false,
         );
     }

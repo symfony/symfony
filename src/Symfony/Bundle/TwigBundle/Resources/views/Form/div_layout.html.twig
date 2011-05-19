@@ -48,6 +48,13 @@
 {% endspaceless %}
 {% endblock attributes %}
 
+{% block container_attributes %}
+{% spaceless %}
+    id="{{ id }}" 
+    {% for attrname,attrvalue in attr %}{{attrname}}="{{attrvalue}}" {% endfor %}
+{% endspaceless %}
+{% endblock container_attributes %}
+    
 {% block field_widget %}
 {% spaceless %}
     {% set type = type|default('text') %}
@@ -103,7 +110,7 @@
 {% block choice_widget %}
 {% spaceless %}
     {% if expanded %}
-        <div {{ block('attributes') }}>
+        <div {{ block('container_attributes') }}>
         {% for choice, child in form %}
             {{ form_widget(child) }}
             {{ form_label(child) }}
@@ -140,7 +147,7 @@
 
 {% block datetime_widget %}
 {% spaceless %}
-    <div {{ block('attributes') }}>
+    <div {{ block('container_attributes') }}>
         {{ form_errors(form.date) }}
         {{ form_errors(form.time) }}
         {{ form_widget(form.date) }}
@@ -154,7 +161,7 @@
     {% if widget == 'single-text' %}
         {{ block('text_widget') }}
     {% else %}
-        <div {{ block('attributes') }}>
+        <div {{ block('container_attributes') }}>
             {{ date_pattern|replace({
                 '{{ year }}': form_widget(form.year),
                 '{{ month }}': form_widget(form.month),
@@ -167,7 +174,7 @@
 
 {% block time_widget %}
 {% spaceless %}
-    <div {{ block('attributes') }}>
+    <div {{ block('container_attributes') }}>
         {{ form_widget(form.hour, { 'attr': { 'size': '1' } }) }}:{{ form_widget(form.minute, { 'attr': { 'size': '1' } }) }}{% if with_seconds %}:{{ form_widget(form.second, { 'attr': { 'size': '1' } }) }}{% endif %}
     </div>
 {% endspaceless %}
@@ -210,7 +217,7 @@
 
 {% block file_widget %}
 {% spaceless %}
-    <div {{ block('attributes') }}>
+    <div {{ block('container_attributes') }}>
         {{ form_widget(form.file) }}
         {{ form_widget(form.token) }}
         {{ form_widget(form.name) }}
@@ -244,7 +251,7 @@
 
 {% block form_widget %}
 {% spaceless %}
-    <div {{ block('attributes') }}>
+    <div {{ block('container_attributes') }}>
         {{ block('field_rows') }}
         {{ form_rest(form) }}
     </div>

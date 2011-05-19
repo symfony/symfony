@@ -44,9 +44,7 @@ class ResponseHeaderBag extends HeaderBag
             $cookies .= 'Set-Cookie: '.$cookie."\r\n";
         }
 
-        return
-            parent::__toString().
-            $cookies;
+        return parent::__toString().$cookies;
     }
 
     /**

@@ -194,6 +194,10 @@ class Session implements \Serializable
      */
     public function getLocale()
     {
+        if (!isset($this->attributes['_locale'])) {
+            $this->attributes['_locale'] = $this->defaultLocale;
+        }
+
         return $this->attributes['_locale'];
     }
 

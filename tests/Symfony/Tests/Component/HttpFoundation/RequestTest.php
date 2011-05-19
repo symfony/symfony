@@ -462,11 +462,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->setMethod('POST');
         $request->server->set('X-HTTP-METHOD-OVERRIDE', 'delete');
         $this->assertEquals('DELETE', $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override if defined and POST');
-
-        $request = new Request();
-        $request->setMethod('GET');
-        $request->query->set('_method', 'purge');
-        $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method from _method if defined and GET');
     }
 
     /**

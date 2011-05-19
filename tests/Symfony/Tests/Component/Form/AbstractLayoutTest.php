@@ -939,6 +939,22 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testSearch()
+    {
+        $form = $this->factory->createNamed('search', 'na&me', 'foo&bar', array(
+            'property_path' => 'name',
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/input
+    [@type="search"]
+    [@name="na&me"]
+    [@value="foo&bar"]
+    [not(@maxlength)]
+'
+        );
+    }
+
     public function testTime()
     {
         $form = $this->factory->createNamed('time', 'na&me', '04:05:06', array(

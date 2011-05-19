@@ -119,11 +119,9 @@ class DateType extends AbstractType
             'days'              => range(1, 31),
             'widget'            => 'choice',
             'input'             => 'datetime',
-            'pattern'           => null,
             'format'            => \IntlDateFormatter::MEDIUM,
             'data_timezone'     => null,
             'user_timezone'     => null,
-            'csrf_protection'   => false,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference'      => false,

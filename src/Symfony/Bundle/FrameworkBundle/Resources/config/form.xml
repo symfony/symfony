@@ -8,8 +8,8 @@
         <parameter key="form.extension.class">Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension</parameter>
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
         <parameter key="form.type_guesser.validator.class">Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser</parameter>
-        <parameter key="form.csrf_provider.class">Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider</parameter>
-        <parameter key="file.temporary_storage.class">Symfony\Component\HttpFoundation\File\SessionBasedTemporaryStorage</parameter>
+        <parameter key="file.temporary_storage.class">Symfony\Component\HttpFoundation\File\TemporaryStorage</parameter>
+        <parameter key="file.temporary_storage.session.class">Symfony\Component\HttpFoundation\File\SessionBasedTemporaryStorage</parameter>
     </parameters>
 
     <services>
@@ -51,15 +51,14 @@
             <argument type="service" id="validator.mapping.class_metadata_factory" />
         </service>
 
-        <!-- CsrfProvider -->
-        <service id="form.csrf_provider" class="%form.csrf_provider.class%">
+        <!-- TemporaryStorage - where should we put this? -->
+        <service id="file.temporary_storage.session" class="%file.temporary_storage.session.class%">
             <argument type="service" id="session" />
             <argument>%kernel.secret%</argument>
+            <argument>%kernel.cache_dir%/upload</argument>
         </service>
 
-        <!-- TemporaryStorage - where should we put this? -->
         <service id="file.temporary_storage" class="%file.temporary_storage.class%">
-            <argument type="service" id="session" />
             <argument>%kernel.secret%</argument>
             <argument>%kernel.cache_dir%/upload</argument>
         </service>
@@ -130,6 +129,9 @@
         <service id="form.type.repeated" class="Symfony\Component\Form\Extension\Core\Type\RepeatedType">
             <tag name="form.type" alias="repeated" />
         </service>
+        <service id="form.type.search" class="Symfony\Component\Form\Extension\Core\Type\SearchType">
+            <tag name="form.type" alias="search" />
+        </service>
         <service id="form.type.textarea" class="Symfony\Component\Form\Extension\Core\Type\TextareaType">
             <tag name="form.type" alias="textarea" />
         </service>
@@ -150,17 +152,6 @@
         <service id="form.type_extension.field" class="Symfony\Component\Form\Extension\Validator\Type\FieldTypeValidatorExtension">
             <tag name="form.type_extension" alias="field" />
             <argument type="service" id="validator" />
-        </service>
-
-        <!-- CsrfExtension -->
-        <service id="form.type.csrf" class="Symfony\Component\Form\Extension\Csrf\Type\CsrfType">
-            <tag name="form.type" alias="csrf" />
-            <argument type="service" id="form.csrf_provider" />
-        </service>
-        <service id="form.type_extension.csrf" class="Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension">
-            <tag name="form.type_extension" alias="form" />
-            <argument>%form.type_extension.csrf.enabled%</argument>
-            <argument>%form.type_extension.csrf.field_name%</argument>
         </service>
     </services>
 </container>

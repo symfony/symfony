@@ -41,7 +41,6 @@ class FrameworkExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
         $loader->load('web.xml');
-        $loader->load('form.xml');
         $loader->load('services.xml');
 
         // A translator must always be registered (as support is included by
@@ -70,8 +69,17 @@ class FrameworkExtension extends Extension
             $loader->load('test.xml');
         }
 
-        if (isset($config['csrf_protection'])) {
-            $this->registerCsrfProtectionConfiguration($config['csrf_protection'], $container);
+        if (isset($config['session'])) {
+            $this->registerSessionConfiguration($config['session'], $container, $loader);
+        }
+
+        if ($hasForm = isset($config['form']) && !empty($config['form']['enabled'])) {
+            $this->registerFormConfiguration($config, $container, $loader);
+            $config['validation']['enabled'] = true;
+        }
+
+        if (!empty($config['validation']['enabled'])) {
+            $this->registerValidationConfiguration($config['validation'], $container, $loader);
         }
 
         if (isset($config['esi'])) {
@@ -86,20 +94,12 @@ class FrameworkExtension extends Extension
             $this->registerRouterConfiguration($config['router'], $container, $loader);
         }
 
-        if (isset($config['session'])) {
-            $this->registerSessionConfiguration($config['session'], $container, $loader);
-        }
-
         if (isset($config['templating'])) {
             $this->registerTemplatingConfiguration($config['templating'], $config['ide'], $container, $loader);
         }
 
         if (isset($config['translator'])) {
             $this->registerTranslatorConfiguration($config['translator'], $container);
-        }
-
-        if (isset($config['validation'])) {
-            $this->registerValidationConfiguration($config['validation'], $container, $loader);
         }
 
         $this->addClassesToCompile(array(
@@ -135,15 +135,32 @@ class FrameworkExtension extends Extension
     }
 
     /**
-     * Loads the CSRF protection configuration.
+     * Loads Form configuration.
      *
-     * @param array            $config    A CSRF protection configuration array
+     * @param array            $config    A configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
      */
-    private function registerCsrfProtectionConfiguration(array $config, ContainerBuilder $container)
+    private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        $container->setParameter('form.type_extension.csrf.enabled', $config['enabled']);
-        $container->setParameter('form.type_extension.csrf.field_name', $config['field_name']);
+        $loader->load('form.xml');
+        if (isset($config['csrf_protection'])) {
+            if (!isset($config['session'])) {
+                throw new \LogicException('CSRF protection needs that sessions are enabled.');
+            }
+            $loader->load('form_csrf.xml');
+
+            $container->setParameter('form.type_extension.csrf.enabled', $config['csrf_protection']['enabled']);
+            $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
+        }
+
+        if ($container->hasDefinition('session')) {
+            $container->removeDefinition('file.temporary_storage');
+            $container->setDefinition('file.temporary_storage', $container->getDefinition('file.temporary_storage.session'));
+            $container->removeDefinition('file.temporary_storage.session');
+        } else {
+            $container->removeDefinition('file.temporary_storage.session');
+        }
     }
 
     /**
@@ -439,10 +456,6 @@ class FrameworkExtension extends Extension
      */
     private function registerValidationConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (empty($config['enabled'])) {
-            return;
-        }
-
         $loader->load('validator.xml');
 
         $container->setParameter('validator.mapping.loader.xml_files_loader.mapping_files', $this->getValidatorXmlMappingFiles($container));

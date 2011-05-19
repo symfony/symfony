@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\DependencyInjection\Exception;
 
-use \InvalidArgumentException as BaseInvalidArgumentException;
-
 /**
- * InvalidArgumentException
+ * ExceptionInterface
  *
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Bulat Shakirzyanov <bulat@theopenskyproject.com>
  */
-class InvalidArgumentException extends BaseInvalidArgumentException implements ExceptionInterface
+interface ExceptionInterface
 {
 }

@@ -4,7 +4,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Definition;
 
-use Symfony\Component\DependencyInjection\Exception\NonExistentServiceException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -47,7 +47,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPass implements CompilerPassInterf
                 $destId = (string) $argument;
 
                 if (!$this->container->has($destId)) {
-                    throw new NonExistentServiceException($destId, $this->sourceId);
+                    throw new ServiceNotFoundException($destId, $this->sourceId);
                 }
             }
         }

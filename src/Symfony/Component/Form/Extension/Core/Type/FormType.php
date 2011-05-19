@@ -42,10 +42,10 @@ class FormType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         $defaultOptions = array(
-            'virtual' => false,
+            'virtual'           => false,
             // Errors in forms bubble by default, so that form errors will
             // end up as global errors in the root form
-            'error_bubbling' => true,
+            'error_bubbling'    => true,
         );
 
         if (empty($options['data_class'])) {

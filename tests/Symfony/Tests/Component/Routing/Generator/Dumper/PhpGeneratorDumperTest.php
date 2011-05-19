@@ -84,6 +84,20 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
         $projectUrlGenerator->generate('Test', array());
     }
 
+    /**
+     * @expectedException Symfony\Component\Routing\Exception\RouteNotFoundException
+     */
+    public function testGenerateNonExistingRoute()
+    {
+        $this->routeCollection->add('Test', new Route('/test'));
+
+        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump(array('class' => 'NonExistingRoutesUrlGenerator')));
+        include ($this->testTmpFilepath);
+
+        $projectUrlGenerator = new \NonExistingRoutesUrlGenerator(new RequestContext());
+        $url = $projectUrlGenerator->generate('NonExisting', array());
+    }
+
     public function testDumpForRouteWithDefaults()
     {
         $this->routeCollection->add('Test', new Route('/testing/{foo}', array('foo' => 'bar')));

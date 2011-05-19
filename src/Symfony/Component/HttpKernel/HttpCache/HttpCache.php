@@ -182,6 +182,8 @@ class HttpCache implements HttpKernelInterface
 
         $this->restoreResponseBody($request, $response);
 
+        $response->setDate(new \DateTime(null, new \DateTimeZone('UTC')));
+
         if (HttpKernelInterface::MASTER_REQUEST === $type && $this->options['debug']) {
             $response->headers->set('X-Symfony-Cache', $this->getLog());
         }
@@ -323,10 +325,11 @@ class HttpCache implements HttpKernelInterface
         // Add our cached etag validator to the environment.
         // We keep the etags from the client to handle the case when the client
         // has a different private valid entry which is not cached here.
-        $cachedEtags = array($entry->getEtag());
+        $cachedEtags = $entry->getEtag() ? array($entry->getEtag()) : array();
         $requestEtags = $request->getEtags();
-        $etags = array_unique(array_merge($cachedEtags, $requestEtags));
-        $subRequest->headers->set('if_none_match', $etags ? implode(', ', $etags) : '');
+        if ($etags = array_unique(array_merge($cachedEtags, $requestEtags))) {
+            $subRequest->headers->set('if_none_match', implode(', ', $etags));
+        }
 
         $response = $this->forward($subRequest, $catch, $entry);
 
@@ -494,7 +497,9 @@ class HttpCache implements HttpKernelInterface
                 $entry->setContent($new->getContent());
                 $entry->setStatusCode($new->getStatusCode());
                 $entry->setProtocolVersion($new->getProtocolVersion());
-                $entry->setCookies($new->getCookies());
+                foreach ($new->headers->getCookies() as $cookie) {
+                    $entry->headers->setCookie($cookie);
+                }
             } else {
                 // backend is slow as hell, send a 503 response (to avoid the dog pile effect)
                 $entry->setStatusCode(503);

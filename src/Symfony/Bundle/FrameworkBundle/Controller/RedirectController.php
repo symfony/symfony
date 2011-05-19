@@ -86,7 +86,7 @@ class RedirectController extends ContainerAware
             $port = ':'.$httpsPort;
         }
 
-        $url = $scheme.'://'.$request->getHttpHost().$port.$request->getBaseUrl().$path.$qs;
+        $url = $scheme.'://'.$request->getHost().$port.$request->getBaseUrl().$path.$qs;
 
         return new RedirectResponse($url, $permanent ? 301 : 302);
     }

@@ -12,7 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\NonExistentParameterException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 
 /**
  * Resolves all parameter placeholders "%somevalue%" to their real values.
@@ -45,7 +45,7 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
                 $definition->setMethodCalls($calls);
 
                 $definition->setProperties($this->resolveValue($definition->getProperties()));
-            } catch (NonExistentParameterException $e) {
+            } catch (ParameterNotFoundException $e) {
                 $e->setSourceId($id);
 
                 throw $e;
@@ -62,7 +62,7 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
         foreach ($parameterBag->all() as $key => $value) {
             try {
                 $parameterBag->set($key, $this->resolveValue($value));
-            } catch (NonExistentParameterException $e) {
+            } catch (ParameterNotFoundException $e) {
                 $e->setSourceKey($key);
 
                 throw $e;

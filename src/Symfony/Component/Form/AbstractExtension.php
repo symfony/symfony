@@ -20,25 +20,38 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 abstract class AbstractExtension implements FormExtensionInterface
 {
     /**
-     * @var array
+     * The types provided by this extension
+     * @var array An array of FormTypeInterface
      */
     private $types;
 
     /**
-     * @var array
+     * The type extensions provided by this extension
+     * @var array An array of FormTypeExtensionInterface
      */
     private $typeExtensions;
 
     /**
+     * The type guesser provided by this extension
      * @var FormTypeGuesserInterface
      */
     private $typeGuesser;
 
     /**
+     * Whether the type guesser has been loaded
      * @var Boolean
      */
     private $typeGuesserLoaded = false;
 
+    /**
+     * Returns a type by name.
+     *
+     * @param string $name The name of the type
+     *
+     * @return FormTypeInterface The type
+     *
+     * @throws FormException if the given type is not supported by this extension
+     */
     public function getType($name)
     {
         if (null === $this->types) {
@@ -52,6 +65,13 @@ abstract class AbstractExtension implements FormExtensionInterface
         return $this->types[$name];
     }
 
+    /**
+     * Returns whether the given type is supported.
+     *
+     * @param string $name The name of the type
+     *
+     * @return Boolean Whether the type is supported by this extension
+     */
     public function hasType($name)
     {
         if (null === $this->types) {
@@ -61,6 +81,13 @@ abstract class AbstractExtension implements FormExtensionInterface
         return isset($this->types[$name]);
     }
 
+    /**
+     * Returns the extensions for the given type.
+     *
+     * @param string $name The name of the type
+     *
+     * @return array An array of extensions as FormTypeExtensionInterface instances
+     */
     public function getTypeExtensions($name)
     {
         if (null === $this->typeExtensions) {
@@ -72,6 +99,13 @@ abstract class AbstractExtension implements FormExtensionInterface
             : array();
     }
 
+    /**
+     * Returns whether this extension provides type extensions for the given type.
+     *
+     * @param string $name The name of the type
+     *
+     * @return Boolean Whether the given type has extensions
+     */
     public function hasTypeExtensions($name)
     {
         if (null === $this->typeExtensions) {
@@ -81,6 +115,11 @@ abstract class AbstractExtension implements FormExtensionInterface
         return isset($this->typeExtensions[$name]) && count($this->typeExtensions[$name]) > 0;
     }
 
+    /**
+     * Returns the type guesser provided by this extension.
+     *
+     * @return FormTypeGuesserInterface|null The type guesser
+     */
     public function getTypeGuesser()
     {
         if (!$this->typeGuesserLoaded) {
@@ -90,69 +129,92 @@ abstract class AbstractExtension implements FormExtensionInterface
         return $this->typeGuesser;
     }
 
+    /**
+     * Registers the types.
+     *
+     * @return array An array of FormTypeInterface instances
+     */
     protected function loadTypes()
     {
         return array();
     }
 
+    /**
+     * Registers the type extensions.
+     *
+     * @return array An array of FormTypeExtensionInterface instances
+     */
     protected function loadTypeExtensions()
     {
         return array();
     }
 
+    /**
+     * Registers the type guesser.
+     *
+     * @return FormTypeGuesserInterface|null A type guesser
+     */
     protected function loadTypeGuesser()
     {
         return null;
     }
 
+    /**
+     * Initializes the types.
+     *
+     * @throws UnexpectedTypeException if any registered type is not an instance of FormTypeInterface
+     */
     private function initTypes()
     {
-        $types = $this->loadTypes();
-        $typesByName = array();
+        $this->types = array();
 
-        foreach ($types as $type) {
+        foreach ($this->loadTypes() as $type) {
             if (!$type instanceof FormTypeInterface) {
                 throw new UnexpectedTypeException($type, 'Symfony\Component\Form\FormTypeInterface');
             }
 
-            $typesByName[$type->getName()] = $type;
+            $this->types[$type->getName()] = $type;
         }
-
-        $this->types = $typesByName;
     }
 
+    /**
+     * Initializes the type extensions.
+     *
+     * @throws UnexpectedTypeException if any registered type extension is not
+     *                                 an instance of FormTypeExtensionInterface
+     */
     private function initTypeExtensions()
     {
-        $extensions = $this->loadTypeExtensions();
-        $extensionsByType = array();
+        $this->typeExtensions = array();
 
-        foreach ($extensions as $extension) {
+        foreach ($this->loadTypeExtensions() as $extension) {
             if (!$extension instanceof FormTypeExtensionInterface) {
                 throw new UnexpectedTypeException($extension, 'Symfony\Component\Form\FormTypeExtensionInterface');
             }
 
             $type = $extension->getExtendedType();
 
-            if (!isset($extensionsByType[$type])) {
-                $extensionsByType[$type] = array();
+            if (!isset($this->typeExtensions[$type])) {
+                $this->typeExtensions[$type] = array();
             }
 
-            $extensionsByType[$type][] = $extension;
+            $this->typeExtensions[$type][] = $extension;
         }
-
-        $this->typeExtensions = $extensionsByType;
     }
 
+    /**
+     * Initializes the type guesser.
+     *
+     * @throws UnexpectedTypeException if the type guesser is not an instance of FormTypeGuesserInterface
+     */
     private function initTypeGuesser()
     {
         $this->typeGuesserLoaded = true;
 
-        $guesser = $this->loadTypeGuesser();
+        $this->guesser = $this->loadTypeGuesser();
 
-        if (!$guesser instanceof FormTypeGuesserInterface) {
-            throw new UnexpectedTypeException($guesser, 'Symfony\Component\Form\FormTypeGuesserInterface');
+        if (!$this->guesser instanceof FormTypeGuesserInterface) {
+            throw new UnexpectedTypeException($this->guesser, 'Symfony\Component\Form\FormTypeGuesserInterface');
         }
-
-        $this->guesser = $guesser;
     }
 }

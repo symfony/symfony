@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Annotations;
 
-use Doctrine\Common\Annotations\ReaderInterface;
+use Doctrine\Common\Annotations\Reader;
 
 /**
  * Allows the reader to be used in-place of Doctrine's reader.
@@ -11,11 +11,11 @@ use Doctrine\Common\Annotations\ReaderInterface;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class Reader implements ReaderInterface
+class IndexedReader implements Reader
 {
     private $delegate;
 
-    public function __construct(ReaderInterface $reader)
+    public function __construct(Reader $reader)
     {
         $this->delegate = $reader;
     }

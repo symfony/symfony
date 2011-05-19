@@ -7,7 +7,7 @@
     <parameters>
         <parameter key="annotations.cache.file_cache.class">Doctrine\Common\Annotations\Cache\FileCache</parameter>
 
-        <parameter key="annotations.reader.class">Doctrine\Common\Annotations\Reader</parameter>
+        <parameter key="annotations.reader.class">Doctrine\Common\Annotations\AnnotationReader</parameter>
         <parameter key="annotations.cached_reader.class">Doctrine\Common\Annotations\CachedReader</parameter>
     </parameters>
 

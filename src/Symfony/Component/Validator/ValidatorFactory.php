@@ -11,7 +11,7 @@ namespace Symfony\Component\Validator;
  * file that was distributed with this source code.
  */
 
-use Doctrine\Common\Annotations\Reader;
+use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
@@ -125,7 +125,7 @@ class ValidatorFactory implements ValidatorContextInterface
         }
 
         if ($annotations) {
-            $loaders[] = new AnnotationLoader(new Reader());
+            $loaders[] = new AnnotationLoader(new AnnotationReader());
         }
 
         if ($staticMethod) {

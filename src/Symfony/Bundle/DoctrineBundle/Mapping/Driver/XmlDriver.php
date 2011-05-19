@@ -69,12 +69,14 @@ class XmlDriver extends BaseXmlDriver
                 continue;
             }
 
-            $subPath = strtr(substr($className, strlen($prefix)+1), '\\', '.');
-            if (file_exists($filename = $path.'/'.$subPath.$this->fileExtension)) {
+            $filename = $path.'/'.strtr(substr($className, strlen($prefix)+1), '\\', '.').$this->_fileExtension;
+            if (file_exists($filename)) {
                 return $filename;
             }
+
+            throw MappingException::mappingFileNotFound($className, $filename);
         }
 
-        throw MappingException::mappingFileNotFound($className, substr($className, strrpos($className, '\\')).$this->_fileExtension);
+        throw MappingException::mappingFileNotFound($className, substr($className, strrpos($className, '\\') + 1).$this->_fileExtension);
     }
 }

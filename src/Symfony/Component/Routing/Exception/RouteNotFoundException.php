@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Routing\Matcher\Exception;
+namespace Symfony\Component\Routing\Exception;
 
 /**
- * A matching exception.
+ * Exception thrown when a route does not exists
  *
- * @author Kris Wallsmith <kris@symfony.com>
+ * @author Alexandre Salomé <alexandre.salome@gmail.com>
  */
-interface Exception
+class RouteNotFoundException extends \InvalidArgumentException implements ExceptionInterface
 {
 }

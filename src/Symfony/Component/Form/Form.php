@@ -24,13 +24,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * A form is composed of a validator schema and a widget form schema.
  *
- * Form also takes care of CSRF protection by default.
- *
- * A CSRF secret can be any random string. If set to false, it disables the
- * CSRF protection, and if set to null, it forces the form to use the global
- * CSRF secret. If the global CSRF secret is also null, then a random one
- * is generated on the fly.
- *
  * To implement your own form fields, you need to have a thorough understanding
  * of the data flow within a form field. A form field stores its data in three
  * different representations:
@@ -459,7 +452,9 @@ class Form implements \IteratorAggregate, FormInterface
     public function bind($clientData)
     {
         if ($this->readOnly) {
-            return;
+            $this->bound = true;
+
+            return $this;
         }
 
         if (is_scalar($clientData) || null === $clientData) {
@@ -558,6 +553,8 @@ class Form implements \IteratorAggregate, FormInterface
         foreach ($this->validators as $validator) {
             $validator->validate($this);
         }
+
+        return $this;
     }
 
     /**
@@ -567,6 +564,8 @@ class Form implements \IteratorAggregate, FormInterface
      * transformed and written into the form data (an object or an array).
      *
      * @param Request $request    The request to bind to the form
+     *
+     * @return Form This form
      *
      * @throws FormException if the method of the request is not one of GET, POST or PUT
      */
@@ -588,7 +587,7 @@ class Form implements \IteratorAggregate, FormInterface
                 throw new FormException(sprintf('The request method "%s" is not supported', $request->getMethod()));
         }
 
-        $this->bind($data);
+        return $this->bind($data);
     }
 
     /**
@@ -604,9 +603,11 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Adds an error to the field.
+     * Adds an error to this form.
      *
-     * @see FormInterface
+     * @param FormError $error
+     *
+     * @return Form The current form
      */
     public function addError(FormError $error)
     {
@@ -615,6 +616,8 @@ class Form implements \IteratorAggregate, FormInterface
         } else {
             $this->errors[] = $error;
         }
+
+        return $this;
     }
 
     /**
@@ -754,6 +757,8 @@ class Form implements \IteratorAggregate, FormInterface
      * Adds a child to the form.
      *
      * @param FormInterface $child The FormInterface to add as a child
+     *
+     * @return Form the current form
      */
     public function add(FormInterface $child)
     {
@@ -764,12 +769,16 @@ class Form implements \IteratorAggregate, FormInterface
         if ($this->dataMapper) {
             $this->dataMapper->mapDataToForm($this->getClientData(), $child);
         }
+
+        return $this;
     }
 
     /**
      * Removes a child from the form.
      *
      * @param string $name The name of the child to remove
+     *
+     * @return Form the current form
      */
     public function remove($name)
     {
@@ -778,6 +787,8 @@ class Form implements \IteratorAggregate, FormInterface
 
             unset($this->children[$name]);
         }
+
+        return $this;
     }
 
     /**

@@ -46,7 +46,7 @@ class Configuration implements ConfigurationInterface
             ->end()
         ;
 
-        $this->addCsrfProtectionSection($rootNode);
+        $this->addFormSection($rootNode);
         $this->addEsiSection($rootNode);
         $this->addProfilerSection($rootNode);
         $this->addRouterSection($rootNode);
@@ -59,10 +59,18 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    private function addCsrfProtectionSection(ArrayNodeDefinition $rootNode)
+    private function addFormSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
             ->children()
+                ->arrayNode('form')
+                    ->canBeUnset()
+                    ->treatNullLike(array('enabled' => true))
+                    ->treatTrueLike(array('enabled' => true))
+                    ->children()
+                        ->booleanNode('enabled')->defaultTrue()->end()
+                    ->end()
+                ->end()
                 ->arrayNode('csrf_protection')
                     ->canBeUnset()
                     ->treatNullLike(array('enabled' => true))
@@ -85,7 +93,7 @@ class Configuration implements ConfigurationInterface
                     ->treatNullLike(array('enabled' => true))
                     ->treatTrueLike(array('enabled' => true))
                     ->children()
-                        ->booleanNode('enabled')->end()
+                        ->booleanNode('enabled')->defaultTrue()->end()
                     ->end()
                 ->end()
             ->end()
@@ -229,6 +237,8 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('translator')
                     ->canBeUnset()
+                    ->treatNullLike(array('enabled' => true))
+                    ->treatTrueLike(array('enabled' => true))
                     ->children()
                         ->booleanNode('enabled')->defaultTrue()->end()
                         ->scalarNode('fallback')->defaultValue('en')->end()
@@ -244,8 +254,10 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('validation')
                     ->canBeUnset()
+                    ->treatNullLike(array('enabled' => true))
+                    ->treatTrueLike(array('enabled' => true))
                     ->children()
-                        ->booleanNode('enabled')->end()
+                    ->booleanNode('enabled')->defaultTrue()->end()
                         ->scalarNode('cache')->end()
                         ->booleanNode('enable_annotations')->defaultFalse()->end()
                     ->end()

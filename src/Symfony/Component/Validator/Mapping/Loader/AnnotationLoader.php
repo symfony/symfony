@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Validator\Mapping\Loader;
 
-use Doctrine\Common\Annotations\ReaderInterface;
+use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints\GroupSequence;
@@ -21,7 +21,7 @@ class AnnotationLoader implements LoaderInterface
 {
     protected $reader;
 
-    public function __construct(ReaderInterface $reader)
+    public function __construct(Reader $reader)
     {
         $this->reader = $reader;
     }

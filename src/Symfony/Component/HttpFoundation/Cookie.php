@@ -65,8 +65,8 @@ class Cookie
     {
         $str = urlencode($this->getName()).'=';
 
-        if (null === $this->getValue()) {
-                $str .= 'deleted; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        if ('' === (string) $this->getValue()) {
+            $str .= 'deleted; expires='.gmdate("D, d-M-Y H:i:s T", time()-31536001);
         } else {
             $str .= urlencode($this->getValue());
 

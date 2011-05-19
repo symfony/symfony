@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Constraint;
 
 /**
  * Validates that a value is a valid IP address
@@ -19,7 +20,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @author Joseph Bielawski <stloyd@gmail.com>
  */
-class Ip extends \Symfony\Component\Validator\Constraint
+class Ip extends Constraint
 {
     const V4 = '4';
     const V6 = '6';

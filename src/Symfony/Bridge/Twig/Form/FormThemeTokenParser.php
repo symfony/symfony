@@ -9,9 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Twig\TokenParser;
-
-use Symfony\Bridge\Twig\Node\FormThemeNode;
+namespace Symfony\Bridge\Twig\Form;
 
 /**
  *

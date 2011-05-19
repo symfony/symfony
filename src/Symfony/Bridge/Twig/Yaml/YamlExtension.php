@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Twig\Extension;
+namespace Symfony\Bridge\Twig\Yaml;
 
 use Symfony\Component\Yaml\Dumper as YamlDumper;
 

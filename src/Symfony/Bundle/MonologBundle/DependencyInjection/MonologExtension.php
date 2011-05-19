@@ -80,8 +80,8 @@ class MonologExtension extends Extension
                 'Monolog\\Handler\\StreamHandler',
                 'Monolog\\Handler\\FingersCrossedHandler',
                 'Monolog\\Logger',
-                'Symfony\\Bridge\\Monolog\\Logger',
-                'Symfony\\Bridge\\Monolog\\Handler\\DebugHandler',
+                'Symfony\\Bridge\\Monolog\\HttpKernel\\Logger',
+                'Symfony\\Bridge\\Monolog\\HttpKernel\\Handler\\DebugHandler',
             ));
         }
     }

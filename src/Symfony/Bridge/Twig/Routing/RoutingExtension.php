@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Twig\Extension;
+namespace Symfony\Bridge\Twig\Routing;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 

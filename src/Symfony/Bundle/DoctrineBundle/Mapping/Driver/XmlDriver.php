@@ -69,8 +69,8 @@ class XmlDriver extends BaseXmlDriver
                 continue;
             }
 
-            $subPath = strtr(substr($className, strlen($prefix)), '\\', '/');
-            if (file_exists($filename = $path.$subPath.$this->fileExtension)) {
+            $subPath = strtr(substr($className, strlen($prefix)+1), '\\', '.');
+            if (file_exists($filename = $path.'/'.$subPath.$this->fileExtension)) {
                 return $filename;
             }
         }

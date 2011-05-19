@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Tests;
 
+use Symfony\Bundle\DoctrineBundle\Annotations\IndexedReader;
+
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\EntityManager;
@@ -38,7 +40,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
         $config->setAutoGenerateProxyClasses(true);
         $config->setProxyDir(\sys_get_temp_dir());
         $config->setProxyNamespace('SymfonyTests\Doctrine');
-        $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+        $config->setMetadataDriverImpl(new AnnotationDriver(new IndexedReader(new AnnotationReader()), $paths));
         $config->setQueryCacheImpl(new \Doctrine\Common\Cache\ArrayCache());
         $config->setMetadataCacheImpl(new \Doctrine\Common\Cache\ArrayCache());
 

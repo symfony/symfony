@@ -45,7 +45,7 @@
 
         <service id="twig.extension.actions" class="Symfony\Bundle\TwigBundle\Extension\ActionsExtension" public="false">
             <tag name="twig.extension" />
-            <argument type="service" id="http_kernel" />
+            <argument type="service" id="templating.helper.actions" />
         </service>
 
         <service id="twig.extension.routing" class="Symfony\Bridge\Twig\Extension\RoutingExtension" public="false">

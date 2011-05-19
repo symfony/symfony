@@ -38,9 +38,9 @@
             <argument type="service" id="translator" />
         </service>
 
-        <service id="twig.extension.helpers" class="Symfony\Bundle\TwigBundle\Extension\TemplatingExtension" public="false">
+        <service id="twig.extension.assets" class="Symfony\Bundle\TwigBundle\Extension\AssetsExtension" public="false">
             <tag name="twig.extension" />
-            <argument type="service" id="service_container" />
+            <argument type="service" id="templating.helper.assets" />
         </service>
 
         <service id="twig.extension.actions" class="Symfony\Bundle\TwigBundle\Extension\ActionsExtension" public="false">

@@ -70,7 +70,7 @@ class Cookie
         } else {
             $str .= urlencode($this->getValue());
 
-            if ($this->getExpiresTime() > 0) {
+            if ($this->getExpiresTime() !== 0) {
                 $str .= '; expires='.gmdate("D, d-M-Y H:i:s T", $this->getExpiresTime());
             }
         }

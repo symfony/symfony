@@ -63,16 +63,16 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
         $bag->set('Last-Modified', 'abcde');
         $this->assertEquals('private, must-revalidate', $bag->get('Cache-Control'));
     }
-    
+
     public function testToStringIncludesCookieHeaders()
     {
         $bag = new ResponseHeaderBag(array());
         $bag->setCookie(new Cookie('foo', 'bar'));
-        
+
         $this->assertContains("Set-Cookie: foo=bar; path=/; httponly", explode("\r\n", $bag->__toString()));
-        
+
         $bag->clearCookie('foo');
 
-        $this->assertContains("Set-Cookie: foo=deleted; expires=Thu, 01 Jan 1970 00:00:00 GMT; httponly", explode("\r\n", $bag->__toString()));
+        $this->assertContains("Set-Cookie: foo=deleted; expires=".gmdate("D, d-M-Y H:i:s T", time() - 31536001)."; httponly", explode("\r\n", $bag->__toString()));
     }
 }

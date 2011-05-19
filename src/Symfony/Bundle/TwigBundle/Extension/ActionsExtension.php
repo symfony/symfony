@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\TwigBundle\Extension;
 
 use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;
-use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Bundle\FrameworkBundle\Templating\Helper\ActionsHelper;
 
 /**
  * Twig extension for Symfony actions helper
@@ -23,13 +23,18 @@ use Symfony\Component\HttpKernel\HttpKernel;
 class ActionsExtension extends \Twig_Extension
 {
     /**
-     * @var Symfony\Component\HttpKernel\HttpKernel
+     * @var Symfony\Bundle\FrameworkBundle\Templating\Helper\ActionsHelper
      */
-    private $kernel;
+    private $helper;
 
-    public function __construct(HttpKernel $kernel)
+    /**
+     * Construct the extension with a HTTP Kernel
+     *
+     * @param HttpKernel $kernel The kernel to use for sub-requests
+     */
+    public function __construct(ActionsHelper $helper)
     {
-        $this->kernel = $kernel;
+        $this->helper = $helper;
     }
 
     /**
@@ -43,9 +48,7 @@ class ActionsExtension extends \Twig_Extension
      */
     public function renderAction($controller, array $attributes = array(), array $options = array())
     {
-        $options['attributes'] = $attributes;
-
-        return $this->kernel->render($controller, $options);
+        return $this->helper->render($controller, $attributes, $options);
     }
 
     /**

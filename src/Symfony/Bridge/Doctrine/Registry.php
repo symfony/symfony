@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineBundle;
+namespace Symfony\Bridge\Doctrine;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Doctrine\DBAL\Connection;

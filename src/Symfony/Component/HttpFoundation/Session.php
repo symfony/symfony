@@ -287,7 +287,9 @@ class Session implements \Serializable
 
     public function __destruct()
     {
-        $this->save();
+        if (true === $this->started) {
+            $this->save();
+        }
     }
 
     public function serialize()

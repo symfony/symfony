@@ -29,7 +29,7 @@ class FormType extends AbstractType
     {
         $multipart = false;
 
-        foreach ($view as $child) {
+        foreach ($view->getChildren() as $child) {
             if ($child->get('multipart')) {
                 $multipart = true;
                 break;

@@ -57,21 +57,28 @@ class FieldType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form)
     {
+        $name = $form->getName();
+
         if ($view->hasParent()) {
             $parentId = $view->getParent()->get('id');
-            $parentName = $view->getParent()->get('full_name');
-            $id = sprintf('%s_%s', $parentId, $form->getName());
-            $name = sprintf('%s[%s]', $parentName, $form->getName());
+            $parentFullName = $view->getParent()->get('full_name');
+            $id = sprintf('%s_%s', $parentId, $name);
+            $fullName = sprintf('%s[%s]', $parentFullName, $name);
         } else {
-            $id = $form->getName();
-            $name = $form->getName();
+            $id = $name;
+            $fullName = $name;
+        }
+
+        $types = array();
+        foreach (array_reverse((array) $form->getTypes()) as $type) {
+            $types[] = $type->getName();
         }
 
         $view
             ->set('form', $view)
             ->set('id', $id)
-            ->set('name', $form->getName())
-            ->set('full_name', $name)
+            ->set('name', $name)
+            ->set('full_name', $fullName)
             ->set('errors', $form->getErrors())
             ->set('value', $form->getClientData())
             ->set('read_only', $form->isReadOnly())
@@ -82,13 +89,8 @@ class FieldType extends AbstractType
             ->set('label', $form->getAttribute('label'))
             ->set('multipart', false)
             ->set('attr', array())
+            ->set('types', $types)
         ;
-
-        $types = array();
-        foreach (array_reverse((array) $form->getTypes()) as $type) {
-            $types[] = $type->getName();
-        }
-        $view->set('types', $types);
     }
 
     public function getDefaultOptions(array $options)

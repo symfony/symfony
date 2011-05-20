@@ -29,11 +29,11 @@ class FileBagTest extends \PHPUnit_Framework_TestCase
         $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain', 100, 0);
 
         $bag = new FileBag(array('file' => array(
-            'name' => basename($tmpFile),
-            'type' => 'text/plain',
-            'tmp_name' => $tmpFile,
-            'error' => 0,
-            'size' => 100
+            'name'      => basename($tmpFile),
+            'type'      => 'text/plain',
+            'tmp_name'  => $tmpFile,
+            'error'     => UPLOAD_ERR_OK,
+            'size'      => 100
         )));
 
         $this->assertEquals($file, $bag->get('file'));
@@ -42,11 +42,11 @@ class FileBagTest extends \PHPUnit_Framework_TestCase
     public function testShouldSetEmptyUploadedFilesToNull()
     {
         $bag = new FileBag(array('file' => array(
-            'name' => '',
-            'type' => '',
-            'tmp_name' => '',
-            'error' => UPLOAD_ERR_NO_FILE,
-            'size' => 0
+            'name'      => '',
+            'type'      => '',
+            'tmp_name'  => '',
+            'error'     => UPLOAD_ERR_NO_FILE,
+            'size'      => 0
         )));
 
         $this->assertEquals(null, $bag->get('file'));
@@ -59,21 +59,11 @@ class FileBagTest extends \PHPUnit_Framework_TestCase
 
         $bag = new FileBag(array(
             'child' => array(
-                'name' => array(
-                    'file' => basename($tmpFile),
-                ),
-                'type' => array(
-                    'file' => 'text/plain',
-                ),
-                'tmp_name' => array(
-                    'file' => $tmpFile,
-                ),
-                'error' => array(
-                    'file' => 0,
-                ),
-                'size' => array(
-                    'file' => 100,
-                ),
+                'name'      => array('file' => basename($tmpFile)),
+                'type'      => array('file' => 'text/plain'),
+                'tmp_name'  => array('file' => $tmpFile),
+                'error'     => array('file' => UPLOAD_ERR_OK),
+                'size'      => array('file' => 100),
             )
         ));
 
@@ -88,21 +78,11 @@ class FileBagTest extends \PHPUnit_Framework_TestCase
 
         $bag = new FileBag(array(
             'child' => array(
-                'name' => array(
-                    'sub' => array('file' => basename($tmpFile))
-                ),
-                'type' => array(
-                    'sub' => array('file' => 'text/plain')
-                ),
-                'tmp_name' => array(
-                    'sub' => array('file' => $tmpFile)
-                ),
-                'error' => array(
-                    'sub' => array('file' => 0)
-                ),
-                'size' => array(
-                    'sub' => array('file' => 100)
-                ),
+                'name'      => array('sub' => array('file' => basename($tmpFile))),
+                'type'      => array('sub' => array('file' => 'text/plain')),
+                'tmp_name'  => array('sub' => array('file' => $tmpFile)),
+                'error'     => array('sub' => array('file' => 0)),
+                'size'      => array('sub' => array('file' => 100)),
             )
         ));
 

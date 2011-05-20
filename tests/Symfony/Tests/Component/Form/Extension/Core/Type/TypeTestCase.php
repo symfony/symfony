@@ -31,7 +31,8 @@ abstract class TypeTestCase extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->storage = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\TemporaryStorage')
+        $this->storage = $this
+            ->getMockBuilder('Symfony\Component\HttpFoundation\File\TemporaryStorage')
             ->disableOriginalConstructor()
             ->getMock();
         $this->factory = new FormFactory($this->getExtensions());

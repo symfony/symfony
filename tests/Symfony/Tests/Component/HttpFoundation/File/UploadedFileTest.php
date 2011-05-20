@@ -12,6 +12,7 @@
 namespace Symfony\Tests\Component\HttpFoundation\File;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class UploadedFileTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,11 +33,10 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             UPLOAD_ERR_OK
         );
 
-        $this->assertAttributeEquals('application/octet-stream', 'mimeType', $file);
+        $this->assertEquals('application/octet-stream', $file->getClientMimeType());
+
         if (extension_loaded('fileinfo')) {
             $this->assertEquals('image/gif', $file->getMimeType());
-        } else {
-            $this->assertEquals('application/octet-stream', $file->getMimeType());
         }
     }
 
@@ -50,8 +50,7 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             UPLOAD_ERR_OK
         );
 
-        $this->assertAttributeEquals('application/octet-stream', 'mimeType', $file);
-        $this->assertEquals('application/octet-stream', $file->getMimeType());
+        $this->assertEquals('application/octet-stream', $file->getClientMimeType());
     }
 
     public function testErrorIsOkByDefault()
@@ -67,7 +66,7 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(UPLOAD_ERR_OK, $file->getError());
     }
 
-    public function testGetOriginalName()
+    public function testGetClientOriginalName()
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -77,10 +76,27 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             null
         );
 
-        $this->assertEquals('original.gif', $file->getOriginalName());
+        $this->assertEquals('original.gif', $file->getClientOriginalName());
     }
-    
-    public function testGetOriginalNameSanitizeFilename()
+
+    /**
+     * @expectedException Symfony\Component\HttpFoundation\File\Exception\FileException
+     */
+    public function testMoveLocalFileIsNotAllowed()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'original.gif',
+            'image/gif',
+            filesize(__DIR__.'/Fixtures/test.gif'),
+            UPLOAD_ERR_OK,
+            true
+        );
+
+        $movedFile = $file->move(__DIR__.'/Fixtures/directory');
+    }
+
+    public function testGetClientOriginalNameSanitizeFilename()
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -90,6 +106,6 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             null
         );
 
-        $this->assertEquals('original.gif', $file->getOriginalName());
-    }    
+        $this->assertEquals('original.gif', $file->getClientOriginalName());
+    }
 }

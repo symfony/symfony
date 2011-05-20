@@ -51,7 +51,7 @@ class FileToStringTransformerTest extends \PHPUnit_Framework_TestCase
         $r = $this->transformer->reverseTransform($path);
 
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\File', $file);
-        $this->assertEquals($path, realpath($r->getPath()));
+        $this->assertEquals($path, realpath($r->getPathname()));
 
     }
 

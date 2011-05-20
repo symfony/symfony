@@ -16,6 +16,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\PersistedFile;
 use Symfony\Component\HttpFoundation\File\TemporaryStorage;
 
 /**
@@ -51,33 +52,29 @@ class FixFileUploadListener implements EventSubscriberInterface
         }
 
         $data = array_replace(array(
-            'file' => '',
-            'token' => '',
-            'name' => '',
-            'originalName' => '',
+            'file'          => '',
+            'token'         => '',
+            'name'          => '',
+            'originalName'  => '',
         ), $data);
 
-        // Newly uploaded file
         if ($data['file'] instanceof UploadedFile && $data['file']->isValid()) {
-            $data['token'] = (string)rand(100000, 999999);
+            // Newly uploaded file
+            $data['token'] = (string) rand(100000, 999999);
             $directory = $this->storage->getTempDir($data['token']);
+            $data['name'] = $data['file']->getBasename();
+            $data['originalName'] = $data['file']->getClientOriginalName();
             $data['file']->move($directory);
-            $data['name'] = $data['file']->getName();
-            $data['originalName'] = $data['file']->getOriginalName();
-        }
-
-        // Existing uploaded file
-        if (!$data['file'] && $data['token'] && $data['name']) {
+        } else if ($data['token'] && $data['name']) {
+            // Existing uploaded file
             $path = $this->storage->getTempDir($data['token']) . DIRECTORY_SEPARATOR . $data['name'];
 
             if (file_exists($path)) {
-                $data['file'] = new UploadedFile($path, $data['originalName'], null, null, null, true);
+                $data['file'] = new PersistedFile($path, $data['originalName']);
             }
-        }
-
-        // Clear other fields if we still don't have a file, but keep
-        // possible existing files of the field
-        if (!$data['file']) {
+        } else {
+            // Clear other fields if we still don't have a file, but keep
+            // possible existing files of the field
             $data = $form->getNormData();
         }
 

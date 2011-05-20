@@ -14,12 +14,11 @@ namespace Symfony\Tests\Component\Form\Extension\Core\EventListener;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\Extension\Core\EventListener\FixFileUploadListener;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\PersistedFile;
 
 class FixFileUploadListenerTest extends \PHPUnit_Framework_TestCase
 {
     private $storage;
-
-    private $destination;
 
     public function setUp()
     {
@@ -41,15 +40,16 @@ class FixFileUploadListenerTest extends \PHPUnit_Framework_TestCase
             }));
 
         $file = $this->createUploadedFileMock('randomhash', 'original.jpg', true);
+
         $file->expects($this->once())
             ->method('move')
             ->with(__DIR__.DIRECTORY_SEPARATOR.'tmp');
 
         $data = array(
-            'file' => $file,
-            'token' => '',
-            'name' => '',
-            'originalName' => '',
+            'file'          => $file,
+            'token'         => '',
+            'name'          => '',
+            'originalName'  => '',
         );
 
         $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
@@ -59,10 +59,10 @@ class FixFileUploadListenerTest extends \PHPUnit_Framework_TestCase
         $filter->onBindClientData($event);
 
         $this->assertEquals(array(
-            'file' => $file,
-            'name' => 'randomhash',
-            'originalName' => 'original.jpg',
-            'token' => $passedToken,
+            'file'          => $file,
+            'name'          => 'randomhash',
+            'originalName'  => 'original.jpg',
+            'token'         => $passedToken,
         ), $event->getData());
     }
 
@@ -70,19 +70,21 @@ class FixFileUploadListenerTest extends \PHPUnit_Framework_TestCase
     {
         $test = $this;
 
-        $this->storage->expects($this->any())
+        $this->storage
+            ->expects($this->any())
             ->method('getTempDir')
             ->will($this->returnCallback(function ($token) use ($test) {
                 $test->assertSame('abcdef', $token);
 
                 return __DIR__.DIRECTORY_SEPARATOR.'Fixtures';
-            }));
+            }))
+        ;
 
         $data = array(
-            'file' => '',
-            'token' => 'abcdef',
-            'name' => 'randomhash',
-            'originalName' => 'original.jpg',
+            'file'          => '',
+            'token'         => 'abcdef',
+            'name'          => 'randomhash',
+            'originalName'  => 'original.jpg',
         );
 
         $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
@@ -92,7 +94,7 @@ class FixFileUploadListenerTest extends \PHPUnit_Framework_TestCase
         $filter->onBindClientData($event);
 
         $this->assertEquals(array(
-            'file' => new UploadedFile(
+            'file' => new PersistedFile(
                 __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'randomhash',
                 'original.jpg',
                 null,
@@ -117,15 +119,18 @@ class FixFileUploadListenerTest extends \PHPUnit_Framework_TestCase
                 null,
                 true // already moved
              ),
-            'name' => 'randomhash',
-            'originalName' => 'original.jpg',
-            'token' => 'abcdef',
+            'name'          => 'randomhash',
+            'originalName'  => 'original.jpg',
+            'token'         => 'abcdef',
         );
 
         $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');
-        $form->expects($this->any())
+
+        $form
+            ->expects($this->any())
             ->method('getNormData')
-            ->will($this->returnValue($existingData));
+            ->will($this->returnValue($existingData))
+        ;
 
         $event = new FilterDataEvent($form, null);
 
@@ -149,18 +154,26 @@ class FixFileUploadListenerTest extends \PHPUnit_Framework_TestCase
 
     private function createUploadedFileMock($name, $originalName, $valid)
     {
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
+        $file = $this
+            ->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
             ->disableOriginalConstructor()
-            ->getMock();
-        $file->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue($name));
-        $file->expects($this->any())
-            ->method('getOriginalName')
-            ->will($this->returnValue($originalName));
-        $file->expects($this->any())
+            ->getMock()
+        ;
+        $file
+            ->expects($this->any())
+            ->method('getBasename')
+            ->will($this->returnValue($name))
+        ;
+        $file
+            ->expects($this->any())
+            ->method('getClientOriginalName')
+            ->will($this->returnValue($originalName))
+        ;
+        $file
+            ->expects($this->any())
             ->method('isValid')
-            ->will($this->returnValue($valid));
+            ->will($this->returnValue($valid))
+        ;
 
         return $file;
     }

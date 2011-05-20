@@ -9,6 +9,25 @@ timeline closely anyway.
 beta1 to beta2
 --------------
 
+* The `File` class has been refactored:
+
+  * It nows extends `\SplFileInfo` and rely on its base methods;
+
+  * `move()` returns a new File instance to represent the moved file and creates
+    the target folder when it does not exist.
+
+* The `UploadedFile` class has been refactored:
+
+  * It now handles only uploaded files. Persisted files are handled by the
+    `PersistedFile` class
+
+  * The information received while uploading the file are available via the
+    `getClientOriginalName()`, `getClientMimeType()` and `getClientSize()`
+    methods.
+
+* Persisted files are handled by the `PersistedFile` class.
+
+
 * Forms must now be explicitly enabled (automatically done in Symfony SE):
 
         form: ~
@@ -148,7 +167,7 @@ beta1 to beta2
           'allow_add' => true,
           'allow_delete' => true,
       ));
-      
+
 * Request::hasSession() has been renamed to Request::hasPreviousSession(). The
   method hasSession() still exists, but only checks if the request contains a
   session object, not if the session was started in a previous request.
@@ -164,10 +183,10 @@ beta1 to beta2
 
 * Serializer: The `$properties` argument has been dropped from all interfaces.
 
-* Form: Renamed option value "text" of "widget" option of the "date" type was 
+* Form: Renamed option value "text" of "widget" option of the "date" type was
   renamed to "single-text". "text" indicates to use separate text boxes now
   (like for the "time" type).
-  
+
 * Form: Renamed view variable "name" to "full_name". The variable "name" now
   contains the local, short name (equivalent to $form->getName()).
 

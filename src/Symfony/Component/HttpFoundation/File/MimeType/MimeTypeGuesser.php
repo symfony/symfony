@@ -96,9 +96,12 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
      * returns a value that is not NULL, this method terminates and returns the
      * value.
      *
-     * @param  string $path   The path to the file
-     * @return string         The mime type or NULL, if none could be guessed
-     * @throws FileException  If the file does not exist
+     * @param  string $path The path to the file
+     * 
+     * @return string|null The mime type or null, if none could be guessed
+     * 
+     * @throws FileNotFoundException if the file does not exist
+     * @throws AccessDeniedException if the file is not readable
      */
     public function guess($path)
     {

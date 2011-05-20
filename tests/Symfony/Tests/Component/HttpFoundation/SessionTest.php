@@ -172,6 +172,12 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('fr', $this->session->getLocale(), 'locale is fr');
     }
 
+    public function testLocaleAfterClear()
+    {
+        $this->session->clear();
+        $this->assertEquals('en', $this->session->getLocale());
+    }
+
     public function testGetId()
     {
         $this->assertSame(null, $this->session->getId());

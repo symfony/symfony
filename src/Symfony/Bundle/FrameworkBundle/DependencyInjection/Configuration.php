@@ -179,21 +179,56 @@ class Configuration implements ConfigurationInterface
 
     private function addTemplatingSection(ArrayNodeDefinition $rootNode)
     {
+        $organizeUrls = function($urls)
+        {
+            $urls += array(
+                'http' => array(),
+                'ssl'  => array(),
+            );
+
+            foreach ($urls as $i => $url) {
+                if (is_integer($i)) {
+                    if (0 === strpos($url, 'https://') || 0 === strpos($url, '//')) {
+                        $urls['http'][] = $urls['ssl'][] = $url;
+                    } else {
+                        $urls['http'][] = $url;
+                    }
+                    unset($urls[$i]);
+                }
+            }
+
+            return $urls;
+        };
+
         $rootNode
             ->children()
                 ->arrayNode('templating')
                     ->canBeUnset()
                     ->children()
                         ->scalarNode('assets_version')->defaultValue(null)->end()
+                        ->scalarNode('assets_version_format')->defaultValue(null)->end()
                     ->end()
                     ->fixXmlConfig('assets_base_url')
                     ->children()
                         ->arrayNode('assets_base_urls')
+                            ->addDefaultsIfNotSet()
+                            ->defaultValue(array('http' => array(), 'ssl' => array()))
                             ->beforeNormalization()
-                                ->ifTrue(function($v){ return !is_array($v); })
-                                ->then(function($v){ return array($v); })
+                                ->ifTrue(function($v) { return !is_array($v); })
+                                ->then(function($v) { return array($v); })
                             ->end()
-                            ->prototype('scalar')->end()
+                            ->beforeNormalization()
+                                ->always()
+                                ->then($organizeUrls)
+                            ->end()
+                            ->children()
+                                ->arrayNode('http')
+                                    ->prototype('scalar')->end()
+                                ->end()
+                                ->arrayNode('ssl')
+                                    ->prototype('scalar')->end()
+                                ->end()
+                            ->end()
                         ->end()
                         ->scalarNode('cache')->end()
                         ->scalarNode('cache_warmer')->defaultFalse()->end()
@@ -228,8 +263,26 @@ class Configuration implements ConfigurationInterface
                                 ->fixXmlConfig('base_url')
                                 ->children()
                                     ->scalarNode('version')->defaultNull()->end()
+                                    ->scalarNode('version_format')->defaultNull()->end()
                                     ->arrayNode('base_urls')
-                                        ->prototype('scalar')->end()
+                                        ->addDefaultsIfNotSet()
+                                        ->defaultValue(array('http' => array(), 'ssl' => array()))
+                                        ->beforeNormalization()
+                                            ->ifTrue(function($v) { return !is_array($v); })
+                                            ->then(function($v) { return array($v); })
+                                        ->end()
+                                        ->beforeNormalization()
+                                            ->always()
+                                            ->then($organizeUrls)
+                                        ->end()
+                                        ->children()
+                                            ->arrayNode('http')
+                                                ->prototype('scalar')->end()
+                                            ->end()
+                                            ->arrayNode('ssl')
+                                                ->prototype('scalar')->end()
+                                            ->end()
+                                        ->end()
                                     ->end()
                                 ->end()
                             ->end()

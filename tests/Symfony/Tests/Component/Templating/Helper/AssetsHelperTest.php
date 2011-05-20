@@ -16,26 +16,6 @@ use Symfony\Component\Templating\Helper\AssetsHelper;
 
 class AssetsHelperTest extends \PHPUnit_Framework_TestCase
 {
-    public function testConstructor()
-    {
-        $helper = new AssetsHelper('foo', 'http://www.example.com', 'abcd');
-        $this->assertEquals('/foo/', $helper->getBasePath(), '__construct() takes a base path as its first argument');
-        $this->assertEquals(new AssetPackage('http://www.example.com', 'abcd'), $helper->getPackage(), '->__construct() creates a default asset package');
-    }
-
-    public function testGetSetBasePath()
-    {
-        $helper = new AssetsHelper();
-        $helper->setBasePath('foo/');
-        $this->assertEquals('/foo/', $helper->getBasePath(), '->setBasePath() prepends a / if needed');
-        $helper->setBasePath('/foo');
-        $this->assertEquals('/foo/', $helper->getBasePath(), '->setBasePath() appends a / is needed');
-        $helper->setBasePath('');
-        $this->assertEquals('/', $helper->getBasePath(), '->setBasePath() returns / if no base path is defined');
-        $helper->setBasePath('0');
-        $this->assertEquals('/0/', $helper->getBasePath(), '->setBasePath() returns /0/ if 0 is given');
-    }
-
     public function testGetVersion()
     {
         $helper = new AssetsHelper(null, array(), 'foo');

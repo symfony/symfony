@@ -116,7 +116,7 @@ class UploadedFile extends File
      * It is extracted from the request from which the file has been uploaded.
      * Then is should not be considered as a safe value.
      *
-     * @return integer|null The mime type
+     * @return integer|null The file size
      */
     public function getClientSize()
     {

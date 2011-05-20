@@ -32,7 +32,7 @@ class PersistedFileTest extends \PHPUnit_Framework_TestCase
         @unlink($targetPath);
         copy(__DIR__.'/Fixtures/test.gif', $path);
 
-        $file = new PersistedFile($path);
+        $file = new PersistedFile($path, 'originalName');
 
         $movedFile = $file->move($targetDir);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\File', $movedFile);

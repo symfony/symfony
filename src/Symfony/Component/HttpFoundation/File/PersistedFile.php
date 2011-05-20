@@ -29,7 +29,7 @@ class PersistedFile extends UploadedFile
      * @throws FileException         If file_uploads is disabled
      * @throws FileNotFoundException If the file does not exist
      */
-    public function __construct($path, $originalName = null, $mimeType = null, $size = null)
+    public function __construct($path, $originalName, $mimeType = null, $size = null)
     {
         parent::__construct($path, $originalName, $mimeType, $size, UPLOAD_ERR_OK);
 

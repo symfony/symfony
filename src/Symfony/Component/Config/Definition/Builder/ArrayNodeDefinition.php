@@ -30,6 +30,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     protected $allowNewKeys;
     protected $key;
     protected $removeKeyItem;
+    protected $priority;
+    protected $removePriorityItem;
     protected $addDefaults;
     protected $nodeBuilder;
 
@@ -174,6 +176,41 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
+     * Set the attribute which value is to be used as priority.
+     *
+     * Transforms
+     *
+     *     array(
+     *         array('foo' => 'bar'),
+     *         array('foo' => 'foobar', 'priority' => 100),
+     *         array('foo' => 'foofoo', 'priority' => 200),
+     *     )
+     *
+     * to
+     *
+     *     array(
+     *         array('foo' => 'foofoo'),
+     *         array('foo' => 'foobar'),
+     *         array('foo' => 'bar'),
+     *     )
+     *
+     * If you'd like "priority" attribute to still be present in the resulting
+     * array, then you can set the second argument of this method to false.
+     *
+     * @param string  $name                 The name of the priority attribute
+     * @param Boolean $removePriorityItem   Whether or not the priority item should be removed.
+     *
+     * @return ArrayNodeDefinition
+     */
+    public function useAttributeAsPriority($name, $removePriorityItem = true)
+    {
+        $this->priority = $name;
+        $this->removePriorityItem = $removePriorityItem;
+
+        return $this;
+    }
+
+    /**
      * Sets whether the node can be unset.
      *
      * @param Boolean $allow
@@ -292,6 +329,10 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         } else {
             if (null !== $this->key) {
                 $node->setKeyAttribute($this->key, $this->removeKeyItem);
+            }
+
+            if (null !== $this->priority) {
+                $node->setPriorityAttribute($this->priority, $this->removePriorityItem);
             }
 
             if (true === $this->atLeastOne) {

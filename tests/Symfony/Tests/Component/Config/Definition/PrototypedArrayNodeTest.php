@@ -105,4 +105,53 @@ class PrototypedArrayNodeTest extends \PHPUnit_Framework_TestCase
         $expected['item_name'] = array('id' => 'item_name', 'foo' => 'bar');
         $this->assertEquals($expected, $normalized);
     }
+
+    public function testMappedAttributePriorityIsRemoved()
+    {
+        $node = new PrototypedArrayNode('root');
+        $node->setPriorityAttribute('priority', true);
+
+        // each item under the root is an array, with one scalar item
+        $prototype= new ArrayNode(null, $node);
+        $prototype->addChild(new ScalarNode('foo'));
+        $node->setPrototype($prototype);
+
+        $children = array();
+        $children[] = array('foo' => 'bar');
+        $children[] = array('foo' => 'foobar', 'priority' => 100);
+        $children[] = array('foo' => 'foofoo', 'priority' => 200);
+        $children[] = array('foo' => 'foofoobar', 'priority' => -100);
+        $normalized = $node->normalize($children);
+
+        $expected = array(
+            array('foo' => 'foofoo'),
+            array('foo' => 'foobar'),
+            array('foo' => 'bar'),
+            array('foo' => 'foofoobar'),
+        );
+        $this->assertEquals($expected, $normalized);
+    }
+
+    public function testMappedAttributePriorityNotRemoved()
+    {
+        $node = new PrototypedArrayNode('root');
+        $node->setPriorityAttribute('priority', false);
+
+        // each item under the root is an array, with two scalar items
+        $prototype= new ArrayNode(null, $node);
+        $prototype->addChild(new ScalarNode('foo'));
+        $prototype->addChild(new ScalarNode('priority')); // the priority attribute will remain
+        $node->setPrototype($prototype);
+
+        $children = array();
+        $children[] = array('foo' => 'bar');
+        $children[] = array('foo' => 'foobar', 'priority' => 100);
+        $normalized = $node->normalize($children);
+
+        $expected = array(
+            array('foo' => 'foobar', 'priority' => 100),
+            array('foo' => 'bar'),
+        );
+        $this->assertEquals($expected, $normalized);
+    }
 }

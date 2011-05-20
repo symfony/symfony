@@ -26,6 +26,9 @@ class PrototypedArrayNode extends ArrayNode
     protected $prototype;
     protected $keyAttribute;
     protected $removeKeyAttribute;
+    protected $priorityAttribute;
+    protected $priorityDefaultValue;
+    protected $removePriorityAttribute;
     protected $minNumberOfElements;
     protected $defaultValue;
 
@@ -40,6 +43,7 @@ class PrototypedArrayNode extends ArrayNode
         parent::__construct($name, $parent);
 
         $this->minNumberOfElements = 0;
+        $this->priorityDefaultValue = 0;
     }
 
     /**
@@ -77,6 +81,35 @@ class PrototypedArrayNode extends ArrayNode
     {
         $this->keyAttribute = $attribute;
         $this->removeKeyAttribute = $remove;
+    }
+
+    /**
+     * The name of the attribute which value should be used as priority.
+     *
+     * For example, if "priority" is the priorityAttribute, then:
+     *
+     *     array(
+     *     	   array('foo' => 'bar'),
+     *         array('foo' => 'foobar', 'priority' => 100),
+     *     )
+     *
+     * becomes
+     *
+     *     array(
+     *         array('foo' => 'foobar'),
+     *         array('foo' => 'bar'),
+     *     )
+     *
+     * If $remove is false, the resulting array will still have the
+     * "priority" key in it.
+     *
+     * @param string  $attribute    The name of the attribute which value is to be used as a priority
+     * @param Boolean $remove       Whether or not to remove the attribute
+     */
+    public function setPriorityAttribute($attribute, $remove = true)
+    {
+        $this->priorityAttribute = $attribute;
+        $this->removePriorityAttribute = $remove;
     }
 
     /**
@@ -185,7 +218,26 @@ class PrototypedArrayNode extends ArrayNode
         $value = $this->remapXml($value);
 
         $normalized = array();
+        $keys = array();
         foreach ($value as $k => $v) {
+            $priority = $this->priorityDefaultValue;
+            if (null !== $this->priorityAttribute && is_array($v) && isset($v[$this->priorityAttribute])) {
+                if (!is_scalar($v[$this->priorityAttribute])) {
+                    $msg = sprintf('The attribute "%s" must be integer, float or string for path "%s"', $this->priorityAttribute, $this->getPath());
+                    $ex = new InvalidConfigurationException($msg);
+                    $ex->setPath($this->getPath());
+
+                    throw $ex;
+                } else {
+                    $priority = $v[$this->priorityAttribute];
+
+                    // remove the priority attribute when required
+                    if ($this->removePriorityAttribute) {
+                        unset($v[$this->priorityAttribute]);
+                    }
+                }
+            }
+
             if (null !== $this->keyAttribute && is_array($v)) {
                 if (!isset($v[$this->keyAttribute]) && is_int($k)) {
                     $msg = sprintf('The attribute "%s" must be set for path "%s".', $this->keyAttribute, $this->getPath());
@@ -207,7 +259,7 @@ class PrototypedArrayNode extends ArrayNode
                     }
                 }
 
-                if (array_key_exists($k, $normalized)) {
+                if (isset($keys[$k])) {
                     $msg = sprintf('Duplicate key "%s" for path "%s".', $k, $this->getPath());
                     $ex = new DuplicateKeyException($msg);
                     $ex->setPath($this->getPath());
@@ -217,14 +269,21 @@ class PrototypedArrayNode extends ArrayNode
             }
 
             $this->prototype->setName($k);
+
             if (null !== $this->keyAttribute) {
-                $normalized[$k] = $this->prototype->normalize($v);
+                $keys[$k] = true;
+                $normalized[$priority][$k] = $this->prototype->normalize($v);
             } else {
-                $normalized[] = $this->prototype->normalize($v);
+                $normalized[$priority][] = $this->prototype->normalize($v);
             }
         }
 
-        return $normalized;
+        $sorted = array();
+        krsort($normalized);
+        foreach ($normalized as $items) {
+            $sorted = array_merge($sorted, $items);
+        }
+        return $sorted;
     }
 
     /**

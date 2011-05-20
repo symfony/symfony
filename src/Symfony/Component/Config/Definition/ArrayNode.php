@@ -27,6 +27,8 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 class ArrayNode extends BaseNode implements PrototypeNodeInterface
 {
     protected $xmlRemappings;
+    protected $removeKeyAttribute;
+    protected $removePriorityAttribute;
     protected $children;
     protected $allowFalse;
     protected $allowNewKeys;
@@ -47,6 +49,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         $this->children = array();
         $this->xmlRemappings = array();
         $this->removeKeyAttribute = true;
+        $this->removePriorityAttribute = true;
         $this->allowFalse = false;
         $this->addIfNotSet = false;
         $this->allowNewKeys = true;

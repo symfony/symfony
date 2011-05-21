@@ -13,6 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -56,7 +58,7 @@ class FrameworkExtension extends Extension
             $container->setAlias('debug.controller_resolver', 'controller_resolver');
         }
 
-        $configuration = new Configuration($container->getParameter('kernel.debug'));
+        $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
         if (isset($config['charset'])) {
@@ -144,6 +146,11 @@ class FrameworkExtension extends Extension
             'Symfony\\Bundle\\FrameworkBundle\\ContainerAwareEventDispatcher',
             'Symfony\\Bundle\\FrameworkBundle\\HttpKernel',
         ));
+    }
+
+    public function getConfiguration(array $config, ContainerBuilder $container)
+    {
+        return new Configuration($container->getParameter('kernel.debug'));
     }
 
     /**

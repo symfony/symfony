@@ -79,6 +79,16 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
+     * Retrieves the name of the attribute which value should be used as key.
+     * 
+     * @return string The name of the attribute
+     */
+    public function getKeyAttribute()
+    {
+        return $this->keyAttribute;
+    }
+
+    /**
      * Sets the default value of this node.
      *
      * @param string $value
@@ -121,6 +131,16 @@ class PrototypedArrayNode extends ArrayNode
     public function setPrototype(PrototypeNodeInterface $node)
     {
         $this->prototype = $node;
+    }
+    
+    /**
+     * Retrieves the prototype
+     * 
+     * @return PrototypeNodeInterface The prototype
+     */
+    public function getPrototype()
+    {
+        return $this->prototype;
     }
 
     /**

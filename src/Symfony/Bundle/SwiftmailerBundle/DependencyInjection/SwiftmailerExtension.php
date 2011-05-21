@@ -43,7 +43,7 @@ class SwiftmailerExtension extends Extension
         $loader->load('swiftmailer.xml');
         $container->setAlias('mailer', 'swiftmailer.mailer');
 
-        $configuration = new Configuration($container->getParameter('kernel.debug'));
+        $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
         if (null === $config['transport']) {
@@ -144,5 +144,10 @@ class SwiftmailerExtension extends Extension
     public function getNamespace()
     {
         return 'http://symfony.com/schema/dic/swiftmailer';
+    }
+
+    public function getConfiguration(array $config, ContainerBuilder $container)
+    {
+        return new Configuration($container->getParameter('kernel.debug'));
     }
 }

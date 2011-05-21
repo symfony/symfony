@@ -27,17 +27,39 @@ class DateType extends AbstractType
 {
     public function buildForm(FormBuilder $builder, array $options)
     {
+        $format = $options['format'];
+        $pattern = null;
+        
+        $allowedFormatOptionValues = array(
+            \IntlDateFormatter::FULL,
+            \IntlDateFormatter::LONG,
+            \IntlDateFormatter::MEDIUM,
+            \IntlDateFormatter::SHORT,
+        );
+        
+        // If $format is not in the allowed options, it's considered as the pattern of the formatter if it is a string
+        if (!in_array($format, $allowedFormatOptionValues, true)) {
+            if (is_string($format)) {
+                $defaultOptions = $this->getDefaultOptions($options);
+                
+                $format = $defaultOptions['format'];
+                $pattern = $options['format'];
+            } else {
+                throw new FormException('The "format" option must be one of the IntlDateFormatter constants (FULL, LONG, MEDIUM, SHORT) or a string representing a custom pattern');
+            }
+        }
+        
         $formatter = new \IntlDateFormatter(
             \Locale::getDefault(),
-            $options['format'],
+            $format,
             \IntlDateFormatter::NONE,
             \DateTimeZone::UTC,
             \IntlDateFormatter::GREGORIAN,
-            $options['pattern']
+            $pattern
         );
 
         if ($options['widget'] === 'single-text') {
-            $builder->appendClientTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $options['format'], \IntlDateFormatter::NONE, \IntlDateFormatter::GREGORIAN, $formatter->getPattern()));
+            $builder->appendClientTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $format, \IntlDateFormatter::NONE, \IntlDateFormatter::GREGORIAN, $pattern));
         } else {
             $yearOptions = $monthOptions = $dayOptions = array();
             $widget = $options['widget'];
@@ -139,12 +161,6 @@ class DateType extends AbstractType
                 'text',
                 'choice',
             ),
-            'format'    => array(
-                \IntlDateFormatter::FULL,
-                \IntlDateFormatter::LONG,
-                \IntlDateFormatter::MEDIUM,
-                \IntlDateFormatter::SHORT,
-             ),
         );
     }
 

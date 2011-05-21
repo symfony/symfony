@@ -156,7 +156,7 @@ class Serializer implements SerializerInterface
             return $this->denormalizerCache[$class][$format]->denormalize($data, $class, $format);
         }
         foreach ($this->normalizers as $normalizer) {
-            if ($normalizer->supportsDenormalization($class, $format)) {
+            if ($normalizer->supportsDenormalization($data, $class, $format)) {
                 $this->denormalizerCache[$class][$format] = $normalizer;
                 return $normalizer->denormalize($data, $class, $format);
             }

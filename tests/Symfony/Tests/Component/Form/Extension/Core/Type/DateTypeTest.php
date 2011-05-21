@@ -250,6 +250,44 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals('06*2010*02', $form->getClientData());
     }
 
+    /**
+     * This test is to check that the strings '0', '1', '2', '3' are no accepted
+     * as valid IntlDateFormatter constants for FULL, LONG, MEDIUM or SHORT respectively.
+     */
+    public function testFormatOptionCustomPatternCollapsingIntlDateFormatterConstant()
+    {
+        $form = $this->factory->create('date', null, array(
+            'format' => '0',
+            'widget' => 'single-text',
+            'input' => 'string',
+        ));
+
+        $form->setData('2010-06-02');
+
+        // This would be what would be outputed if '0' was mistaken for \IntlDateFormatter::FULL
+        $this->assertNotEquals('Mittwoch, 02. Juni 2010', $form->getClientData());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testValidateFormatOptionGivenWrongConstants()
+    {
+        $form = $this->factory->create('date', null, array(
+            'format' => 105,
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testValidateFormatOptionGivenArrayValue()
+    {
+        $form = $this->factory->create('date', null, array(
+            'format' => array(),
+        ));
+    }
+
     public function testSetData_differentTimezones()
     {
         $form = $this->factory->create('date', null, array(

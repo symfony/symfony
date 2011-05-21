@@ -40,7 +40,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * @throws UnexpectedTypeException If a format is not supported
      * @throws UnexpectedTypeException if a timezone is not a string
      */
-    public function __construct($inputTimezone = null, $outputTimezone = null, $dateFormat = null, $timeFormat = null, $calendar = null, $pattern = null)
+    public function __construct($inputTimezone = null, $outputTimezone = null, $dateFormat = null, $timeFormat = null, $calendar = \IntlDateFormatter::GREGORIAN, $pattern = null)
     {
         parent::__construct($inputTimezone, $outputTimezone);
 

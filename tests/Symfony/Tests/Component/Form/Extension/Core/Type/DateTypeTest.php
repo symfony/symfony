@@ -183,8 +183,8 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'pattern' => 'MM*yyyy*dd',
-            'widget' => 'text',
+            'format' => 'MM*yyyy*dd',
+            'widget' => 'single-text',
             'input' => 'datetime',
         ));
 
@@ -199,8 +199,8 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'pattern' => 'MM*yyyy*dd',
-            'widget' => 'text',
+            'format' => 'MM*yyyy*dd',
+            'widget' => 'single-text',
             'input' => 'string',
         ));
 
@@ -215,8 +215,8 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'pattern' => 'MM*yyyy*dd',
-            'widget' => 'text',
+            'format' => 'MM*yyyy*dd',
+            'widget' => 'single-text',
             'input' => 'timestamp',
         ));
 
@@ -233,8 +233,8 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'pattern' => 'MM*yyyy*dd',
-            'widget' => 'text',
+            'format' => 'MM*yyyy*dd',
+            'widget' => 'single-text',
             'input' => 'array',
         ));
 
@@ -551,10 +551,10 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertSame('{{ day }}.{{ month }}.{{ year }}', $view->get('date_pattern'));
     }
     
-    public function testPassDatePatternToView_differentPattern()
+    public function testPassDatePatternToViewDifferentPattern()
     {
         $form = $this->factory->create('date', null, array(
-            'pattern' => 'MM*yyyy*dd'
+            'format' => 'MM*yyyy*dd'
         ));
         
         $view = $form->createView();

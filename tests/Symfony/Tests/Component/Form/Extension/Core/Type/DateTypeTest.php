@@ -269,7 +269,7 @@ class DateTypeTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedException Symfony\Component\Form\Exception\CreationException
      */
     public function testValidateFormatOptionGivenWrongConstants()
     {
@@ -279,7 +279,7 @@ class DateTypeTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedException Symfony\Component\Form\Exception\CreationException
      */
     public function testValidateFormatOptionGivenArrayValue()
     {

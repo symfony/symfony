@@ -41,7 +41,7 @@ class Cookie
      * @param  string  $domain   The domain that the cookie is available
      * @param  Boolean $secure   Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
      * @param  Boolean $httponly The cookie httponly flag
-     * @param  bool    $passedRawValue $value is raw or urldecoded
+     * @param  Boolean $passedRawValue $value is raw or urldecoded
      *
      * @api
      */
@@ -201,7 +201,7 @@ class Cookie
     }
 
     /**
-     * Gets the value of the cookie.
+     * Gets the raw value of the cookie.
      *
      * @return string The cookie value
      *

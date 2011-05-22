@@ -29,6 +29,7 @@ class Cookie
     protected $domain;
     protected $secure;
     protected $httponly;
+    protected $rawValue;
 
     /**
      * Sets a cookie.
@@ -40,13 +41,20 @@ class Cookie
      * @param  string  $domain   The domain that the cookie is available
      * @param  Boolean $secure   Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
      * @param  Boolean $httponly The cookie httponly flag
+     * @param  bool    $passedRawValue $value is raw or urldecoded
      *
      * @api
      */
-    public function __construct($name, $value, $expires = null, $path = '/', $domain = '', $secure = false, $httponly = true)
+    public function __construct($name, $value, $expires = null, $path = '/', $domain = '', $secure = false, $httponly = true, $passedRawValue = false)
     {
         $this->name     = $name;
-        $this->value    = $value;
+        if ($passedRawValue) {
+            $this->value    = urldecode($value);
+            $this->rawValue = $value;
+        } else {
+            $this->value    = $value;
+            $this->rawValue = urlencode($value);
+        }
         $this->expires  = null === $expires ? null : (integer) $expires;
         $this->path     = empty($path) ? '/' : $path;
         $this->domain   = $domain;
@@ -63,7 +71,7 @@ class Cookie
      */
     public function __toString()
     {
-        $cookie = sprintf('%s=%s', $this->name, urlencode($this->value));
+        $cookie = sprintf('%s=%s', $this->name, $this->rawValue);
 
         if (null !== $this->expires) {
             $cookie .= '; expires='.substr(\DateTime::createFromFormat('U', $this->expires, new \DateTimeZone('UTC'))->format(static::DATE_FORMAT), 0, -5);
@@ -110,12 +118,13 @@ class Cookie
 
         $values = array(
             'name'     => trim($name),
-            'value'    => urldecode(trim($value)),
+            'value'    => trim($value),
             'expires'  =>  null,
             'path'     => '/',
             'domain'   => '',
             'secure'   => false,
             'httponly' => false,
+            'passedRawValue' => true,
         );
 
         if (null !== $url) {
@@ -162,7 +171,8 @@ class Cookie
             $values['path'],
             $values['domain'],
             $values['secure'],
-            $values['httponly']
+            $values['httponly'],
+            $values['passedRawValue']
         );
     }
 
@@ -188,6 +198,18 @@ class Cookie
     public function getValue()
     {
         return $this->value;
+    }
+
+    /**
+     * Gets the value of the cookie.
+     *
+     * @return string The cookie value
+     *
+     * @api
+     */
+    public function getRawValue()
+    {
+        return $this->rawValue;
     }
 
     /**

@@ -54,6 +54,7 @@ class Configuration implements ConfigurationInterface
         $this->addTemplatingSection($rootNode);
         $this->addTranslatorSection($rootNode);
         $this->addValidationSection($rootNode);
+        $this->addAnnotationsSection($rootNode);
 
         return $treeBuilder;
     }
@@ -255,28 +256,29 @@ class Configuration implements ConfigurationInterface
                     ->canBeUnset()
                     ->treatNullLike(array('enabled' => true))
                     ->treatTrueLike(array('enabled' => true))
-                    // For XML, namespace is a child of validation, so it must be moved under annotations
-                    ->beforeNormalization()
-                        ->ifTrue(function($v) { return is_array($v) && !empty($v['annotations']) && !empty($v['namespace']); })
-                        ->then(function($v){
-                            $v['annotations'] = array('namespace' => $v['namespace']);
-                            unset($v['namespace']);
-                            return $v;
-                        })
-                    ->end()
                     ->children()
-                        ->booleanNode('enabled')->defaultTrue()->end()
+                    ->booleanNode('enabled')->defaultTrue()->end()
                         ->scalarNode('cache')->end()
-                        ->arrayNode('annotations')
-                            ->canBeUnset()
-                            ->treatNullLike(array())
-                            ->treatTrueLike(array())
-                            ->fixXmlConfig('namespace')
+                        ->booleanNode('enable_annotations')->defaultFalse()->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addAnnotationsSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('annotations')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('cache')->defaultValue('file')->end()
+                        ->arrayNode('file_cache')
+                            ->addDefaultsIfNotSet()
                             ->children()
-                                ->arrayNode('namespaces')
-                                    ->useAttributeAsKey('prefix')
-                                    ->prototype('scalar')->end()
-                                ->end()
+                                ->scalarNode('dir')->defaultValue('%kernel.cache_dir%/annotations')->end()
+                                ->booleanNode('debug')->defaultValue($this->debug)->end()
                             ->end()
                         ->end()
                     ->end()

@@ -11,6 +11,7 @@ namespace Symfony\Component\Validator;
  * file that was distributed with this source code.
  */
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
@@ -89,10 +90,6 @@ class ValidatorFactory implements ValidatorContextInterface
      *                                      found. Can be empty.
      * @param  Boolean $annotations         Whether to use annotations for
      *                                      retrieving mapping information
-     * @param  array $annotationNamespaces  The annotation namespaces used
-     *                                      for finding the annotation classes.
-     *                                      The namespace "validation" is used
-     *                                      by default
      * @param  string $staticMethod         The name of the static method to
      *                                      use, if static method loading should
      *                                      be enabled
@@ -100,7 +97,7 @@ class ValidatorFactory implements ValidatorContextInterface
      *                                      has neither the extension ".xml" nor
      *                                      ".yml" nor ".yaml"
      */
-    public static function buildDefault(array $mappingFiles = array(), $annotations = true, $annotationNamespaces = null, $staticMethod = null)
+    public static function buildDefault(array $mappingFiles = array(), $annotations = true, $staticMethod = null)
     {
         $xmlMappingFiles = array();
         $yamlMappingFiles = array();
@@ -128,7 +125,7 @@ class ValidatorFactory implements ValidatorContextInterface
         }
 
         if ($annotations) {
-            $loaders[] = new AnnotationLoader($annotationNamespaces);
+            $loaders[] = new AnnotationLoader(new AnnotationReader());
         }
 
         if ($staticMethod) {

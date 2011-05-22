@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Parameter;
@@ -101,6 +102,8 @@ class FrameworkExtension extends Extension
         if (isset($config['translator'])) {
             $this->registerTranslatorConfiguration($config['translator'], $container);
         }
+
+        $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
 
         $this->addClassesToCompile(array(
             'Symfony\\Component\\HttpFoundation\\ParameterBag',
@@ -461,16 +464,7 @@ class FrameworkExtension extends Extension
         $container->setParameter('validator.mapping.loader.xml_files_loader.mapping_files', $this->getValidatorXmlMappingFiles($container));
         $container->setParameter('validator.mapping.loader.yaml_files_loader.mapping_files', $this->getValidatorYamlMappingFiles($container));
 
-        if (isset($config['annotations'])) {
-            $namespaces = array('assert' => 'Symfony\\Component\\Validator\\Constraints\\');
-            // Register prefixes for constraint namespaces
-            if (!empty($config['annotations']['namespaces'])) {
-                $namespaces = array_merge($namespaces, $config['annotations']['namespaces']);
-            }
-
-            // Register annotation loader
-            $container->setParameter('validator.mapping.loader.annotation_loader.namespaces', $namespaces);
-
+        if ($config['enable_annotations']) {
             $loaderChain = $container->getDefinition('validator.mapping.loader.loader_chain');
             $arguments = $loaderChain->getArguments();
             array_unshift($arguments[0], new Reference('validator.mapping.loader.annotation_loader'));
@@ -518,6 +512,31 @@ class FrameworkExtension extends Extension
         }
 
         return $files;
+    }
+
+    private function registerAnnotationsConfiguration(array $config, ContainerBuilder $container,$loader)
+    {
+        $loader->load('annotations.xml');
+
+        if ('file' === $config['cache']) {
+            $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache']['dir']);
+            if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true)) {
+                throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
+            }
+
+            $container
+                ->getDefinition('annotations.cache.file_cache')
+                ->replaceArgument(0, $cacheDir)
+                ->replaceArgument(1, $config['file_cache']['debug'])
+            ;
+        } else if ('none' === $config['cache']) {
+            $container->setAlias('annotation_reader', 'annotations.reader');
+        } else {
+            $container
+                ->getDefinition('annotations.cached_reader')
+                ->replaceArgument(1, new Reference($config['cache']))
+            ;
+        }
     }
 
     /**

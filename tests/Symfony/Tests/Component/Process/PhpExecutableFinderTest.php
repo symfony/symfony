@@ -48,7 +48,9 @@ class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
         $current = $f->find();
         
         //TODO maybe php executable is custom or even windows
-        $this->assertEquals($f->find(), PHP_BINDIR.DIRECTORY_SEPARATOR.'php', '::find() returns the executable php with suffixes');
+        if (false === strstr(PHP_OS, 'WIN')) {
+            $this->assertEquals($current, PHP_BINDIR.DIRECTORY_SEPARATOR.'php', '::find() returns the executable php with suffixes');
+        }
     }
     
     /**

@@ -13,6 +13,9 @@ beta1 to beta2
   in a class must now be imported (just like you import PHP namespaces with the
   "use" statement):
 
+* Also make sure to use the branch ``3.0.x`` of ``https://github.com/doctrine/common``
+as the ``master`` branch is not yet updated with the changes required for this to work.
+
   Before:
 
     /**
@@ -27,7 +30,7 @@ beta1 to beta2
          * @var integer
          */
         private $id;
-        
+
         /**
          * @orm:Column(type="string", nullable=false)
          * @assert:NotBlank
@@ -64,14 +67,14 @@ beta1 to beta2
         private $name;
     }
 
-* The config under "framework.validation.annotations" has been removed and was 
+* The config under "framework.validation.annotations" has been removed and was
   replaced with a boolean flag "framework.validation.enable_annotations" which
   defaults to false.
 
 * The Set constraint has been removed as it is not required anymore.
 
   Before:
-  
+
     /**
      * @assert:Set({@assert:Callback(...), @assert:Callback(...)})
      */
@@ -226,7 +229,7 @@ beta1 to beta2
           'allow_add' => true,
           'allow_delete' => true,
       ));
-      
+
 * Request::hasSession() has been renamed to Request::hasPreviousSession(). The
   method hasSession() still exists, but only checks if the request contains a
   session object, not if the session was started in a previous request.
@@ -242,10 +245,10 @@ beta1 to beta2
 
 * Serializer: The `$properties` argument has been dropped from all interfaces.
 
-* Form: Renamed option value "text" of "widget" option of the "date" type was 
+* Form: Renamed option value "text" of "widget" option of the "date" type was
   renamed to "single-text". "text" indicates to use separate text boxes now
   (like for the "time" type).
-  
+
 * Form: Renamed view variable "name" to "full_name". The variable "name" now
   contains the local, short name (equivalent to $form->getName()).
 

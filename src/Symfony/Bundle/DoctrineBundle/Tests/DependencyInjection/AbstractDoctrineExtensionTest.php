@@ -35,7 +35,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         // doctrine.dbal.default_connection
         $this->assertEquals('%doctrine.default_connection%', $container->getDefinition('doctrine')->getArgument(3), '->load() overrides existing configuration options');
         $this->assertEquals('foo', $container->getParameter('doctrine.default_connection'), '->load() overrides existing configuration options');
-        
+
     }
 
     public function testDbalLoad()
@@ -121,7 +121,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('Doctrine\Common\Cache\XcacheCache', $container->getParameter('doctrine.orm.cache.xcache.class'));
         $this->assertEquals('Doctrine\ORM\Mapping\Driver\DriverChain', $container->getParameter('doctrine.orm.metadata.driver_chain.class'));
         $this->assertEquals('Doctrine\ORM\Mapping\Driver\AnnotationDriver', $container->getParameter('doctrine.orm.metadata.annotation.class'));
-        $this->assertEquals('Doctrine\Common\Annotations\AnnotationReader', $container->getParameter('doctrine.orm.metadata.annotation_reader.class'));
         $this->assertEquals('Symfony\Bundle\DoctrineBundle\Mapping\Driver\XmlDriver', $container->getParameter('doctrine.orm.metadata.xml.class'));
         $this->assertEquals('Symfony\Bundle\DoctrineBundle\Mapping\Driver\YamlDriver', $container->getParameter('doctrine.orm.metadata.yml.class'));
 

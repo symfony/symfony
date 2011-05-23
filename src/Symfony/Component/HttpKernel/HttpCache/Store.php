@@ -314,18 +314,21 @@ class Store implements StoreInterface
     private function save($key, $data)
     {
         $path = $this->getPath($key);
-        if (!is_dir(dirname($path)) && false === @mkdir(dirname($path), 0777, true)) {
+        if (!is_dir(dirname($path)) && !is_writable(dirname(dirname($path)))) {
+            return false;
+        }
+
+        if (false === mkdir(dirname($path), 0777, true)) {
             return false;
         }
 
         $tmpFile = tempnam(dirname($path), basename($path));
-        if (false === $fp = @fopen($tmpFile, 'wb')) {
+
+        if (false === is_writable($tmpFile)) {
             return false;
         }
-        @fwrite($fp, $data);
-        @fclose($fp);
 
-        if ($data != file_get_contents($tmpFile)) {
+        if (false === file_put_contents($tmpFile, $data, LOCK_EX)) {
             return false;
         }
 

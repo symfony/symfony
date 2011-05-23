@@ -20,25 +20,31 @@ class RangeType extends ChoiceType
 {
     public function buildForm(FormBuilder $builder, Array $options)
     {
-        if (!$options['range'] || !count($options['range'])) {
-            throw new FormException('The option "range" is required and must be an array of the start and end values');
-        }
-
-        if ($options['range'] && !is_array($options['range'])) {
-            throw new UnexpectedTypeException('The option "range" must be an array');
+        if (!$options['start']) {
+            throw new FormException('The option "start" is required');
         }
         
-        $range = call_user_func_array('range', $options['range']);
+        if (!$options['end']) {
+            throw new FormException('The option "end" is required');
+        }
+        
+        $range = call_user_func_array('range', array(
+            $options['start'],
+            $options['end'],
+            $options['step']
+        ));
         
         $options['choices'] += array_combine($range, $range);
         
         parent::buildForm($builder, $options);
     }
-
+    
     public function getDefaultOptions(Array $options)
     {
         return array_merge(parent::getDefaultOptions($options), array(
-            'range' => array(),
+            'start' => null,
+            'end'   => null,
+            'step'  => 1,
         ));
     }
 

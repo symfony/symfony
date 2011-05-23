@@ -30,3 +30,13 @@ class BazClass
     {
     }
 }
+
+class BarUserClass
+{
+    public $bar;
+
+    public function __construct(BarClass $bar)
+    {
+        $this->bar = $bar;
+    }
+}

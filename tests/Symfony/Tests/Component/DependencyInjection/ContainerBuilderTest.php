@@ -470,6 +470,23 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $container->compile();
     }
 
+    public function testPrivateServiceUser()
+    {
+        $fooDefinition     = new Definition('BarClass');
+        $fooUserDefinition = new Definition('BarUserClass', array(new Reference('bar')));
+        $container         = new ContainerBuilder();
+
+        $fooDefinition->setPublic(false);
+
+        $container->addDefinitions(array(
+            'bar'       => $fooDefinition,
+            'bar_user'  => $fooUserDefinition
+        ));
+
+        $container->compile();
+        $this->assertInstanceOf('BarClass', $container->get('bar_user')->bar);
+    }
+
     /**
      * @expectedException BadMethodCallException
      */

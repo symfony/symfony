@@ -439,7 +439,7 @@ class FrameworkExtension extends Extension
             // Register translation resources
             if ($dirs) {
                 $finder = new Finder();
-                $finder->files()->filter(function (\SplFileInfo $file) { return 2 === substr_count($file->getBasename(), '.'); })->in($dirs);
+                $finder->files()->filter(function (\SplFileInfo $file) { return (FALSE === strpos($file->getRealPath(), DIRECTORY_SEPARATOR . '.') && 2 === substr_count($file->getBasename(), '.')); })->in($dirs);
                 foreach ($finder as $file) {
                     // filename is domain.locale.format
                     list($domain, $locale, $format) = explode('.', $file->getBasename());

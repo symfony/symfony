@@ -770,11 +770,6 @@ class Request
         return preg_split('/\s*,\s*/', $this->headers->get('if_none_match'), null, PREG_SPLIT_NO_EMPTY);
     }
 
-    /**
-     * Checks whether cached response must be successfully revalidated by the origin server.
-     * 
-     * @return Boolean
-     */
     public function isNoCache()
     {
         return $this->headers->hasCacheControlDirective('no-cache') || 'no-cache' == $this->headers->get('Pragma');

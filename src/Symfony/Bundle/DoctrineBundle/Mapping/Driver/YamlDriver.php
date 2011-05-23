@@ -40,7 +40,7 @@ class YamlDriver extends BaseYamlDriver
 
         if ($this->_paths) {
             foreach ((array) $this->_paths as $prefix => $path) {
-                if ( ! is_dir($path)) {
+                if (!is_dir($path)) {
                     throw MappingException::fileMappingDriversRequireConfiguredDirectoryPath($path);
                 }
 

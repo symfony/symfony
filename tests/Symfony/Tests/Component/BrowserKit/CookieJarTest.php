@@ -95,4 +95,40 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
             array('http://www.example.com/foo/bar', array('foo_nothing', 'foo_path', 'foo_domain')),
         );
     }
+
+    public function testDomain()
+    {
+        $uri = "http://example.com/";
+        $domain = 'example.com';
+        $parts = parse_url($uri);
+
+        $cookieJar = new CookieJar();
+        $cookieJar->set($cookie = new Cookie('foo', 'bar', null, '/', $domain));
+
+        $this->assertNotEmpty($cookieJar->allValues($uri), '->allValues() returns the cookie for a given URI and domain');
+    }
+
+    public function testSubDomain()
+    {
+        $uri = "http://example.com/";
+        $domain = '.example.com';
+        $parts = parse_url($uri);
+
+        $cookieJar = new CookieJar();
+        $cookieJar->set($cookie = new Cookie('foo', 'bar', null, '/', $domain));
+
+        $this->assertNotEmpty($cookieJar->allValues($uri), '->allValues() returns the cookie for a given URI and subdomain');
+    }
+
+    public function testEmptyPath()
+    {
+        $uri = "http://example.com";
+        $domain = 'example.com';
+        $parts = parse_url($uri);
+        
+        $cookieJar = new CookieJar();
+        $cookieJar->set($cookie = new Cookie('foo', 'bar', null, '/', $domain));
+
+        $this->assertNotEmpty($cookieJar->allValues($uri), '->allValues() returns the cookie for a given URI with empty path');
+    }
 }

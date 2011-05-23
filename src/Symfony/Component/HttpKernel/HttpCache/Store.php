@@ -51,7 +51,9 @@ class Store implements StoreInterface
     {
         // unlock everything
         foreach ($this->locks as $lock) {
-            @unlink($lock);
+            if (is_writable($lock)) {
+                unlink($lock);
+            }
         }
 
         $error = error_get_last();
@@ -72,12 +74,16 @@ class Store implements StoreInterface
      */
     public function lock(Request $request)
     {
-        if (false !== $lock = @fopen($path = $this->getPath($this->getCacheKey($request).'.lck'), 'x')) {
-            fclose($lock);
+        $path = $this->getPath($this->getCacheKey($request).'.lck');
 
-            $this->locks[] = $path;
+        if (is_writable(dirname($path))) {
+            if (false !== $lock = fopen($path, 'x')) {
+                fclose($lock);
 
-            return true;
+                $this->locks[] = $path;
+
+                return true;
+            }
         }
 
         return $path;
@@ -90,7 +96,13 @@ class Store implements StoreInterface
      */
     public function unlock(Request $request)
     {
-        return @unlink($this->getPath($this->getCacheKey($request).'.lck'));
+        $path = $this->getPath($this->getCacheKey($request).'.lck');
+
+        if (is_writable($path)) {
+            return unlink($path);
+        }
+
+        return false;
     }
 
     /**
@@ -332,7 +344,7 @@ class Store implements StoreInterface
             return false;
         }
 
-        if (false === @rename($tmpFile, $path)) {
+        if (false === rename($tmpFile, $path)) {
             return false;
         }
 

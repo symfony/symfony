@@ -35,8 +35,8 @@ class FieldType extends AbstractType
         } else {
             $options['property_path'] = new PropertyPath($options['property_path']);
         }
-        if (!is_array($options['attributes'])) {
-            throw new FormException('attributes option should be array');
+        if (!is_array($options['attr'])) {
+            throw new FormException('The "attr" option must be "array".');
         }
         
         $builder
@@ -50,7 +50,7 @@ class FieldType extends AbstractType
             ->setAttribute('max_length', $options['max_length'])
             ->setAttribute('pattern', $options['pattern'])
             ->setAttribute('label', $options['label'] ?: $this->humanize($builder->getName()))
-            ->setAttribute('attributes', $options['attributes'] ?: array())
+            ->setAttribute('attr', $options['attr'] ?: array())
             ->setData($options['data'])
             ->addValidator(new DefaultValidator())
         ;
@@ -93,7 +93,7 @@ class FieldType extends AbstractType
             ->set('size', null)
             ->set('label', $form->getAttribute('label'))
             ->set('multipart', false)
-            ->set('attr', $form->getAttribute('attributes'))
+            ->set('attr', $form->getAttribute('attr'))
             ->set('types', $types)
         ;
     }
@@ -113,7 +113,7 @@ class FieldType extends AbstractType
             'error_bubbling'    => false,
             'error_mapping'     => array(),
             'label'             => null,
-            'attributes'        => array(),
+            'attr'              => array(),
         );
 
         $class = isset($options['data_class']) ? $options['data_class'] : null;

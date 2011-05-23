@@ -7,12 +7,16 @@
     <parameters>
         <parameter key="assetic.filter.jpegtran.class">Assetic\Filter\JpegtranFilter</parameter>
         <parameter key="assetic.filter.jpegtran.bin">/usr/bin/jpegtran</parameter>
+        <parameter key="assetic.filter.jpegtran.optimize">false</parameter>
     </parameters>
 
     <services>
         <service id="assetic.filter.jpegtran" class="%assetic.filter.jpegtran.class%">
             <tag name="assetic.filter" alias="jpegtran" />
             <argument>%assetic.filter.jpegtran.bin%</argument>
+            <call method="setOptimize">
+                <argument>%assetic.filter.jpegtran.optimize%</argument>
+            </call>
         </service>
     </services>
 </container>

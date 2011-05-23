@@ -91,7 +91,7 @@ EOT
                 if ('annotation' === $type) {
                     $path = $destPath.'/'.$className.'.orm.php';
                 } else {
-                    $path = $destPath.'/'.str_replace('\\', '.', $class->name).'.orm.'.$type;
+                    $path = $destPath.'/'.$className.'.orm.'.$type;
                 }
                 $output->writeln(sprintf('  > writing <comment>%s</comment>', $path));
                 $code = $exporter->exportClassMetadata($class);

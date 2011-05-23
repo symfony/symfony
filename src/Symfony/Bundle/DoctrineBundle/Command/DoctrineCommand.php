@@ -30,10 +30,6 @@ abstract class DoctrineCommand extends Command
     protected function getEntityGenerator()
     {
         $entityGenerator = new EntityGenerator();
-
-        if (version_compare(DoctrineVersion::VERSION, "2.0.2-DEV") >= 0) {
-            $entityGenerator->setAnnotationPrefix("orm:");
-        }
         $entityGenerator->setGenerateAnnotations(false);
         $entityGenerator->setGenerateStubMethods(true);
         $entityGenerator->setRegenerateEntityIfExists(false);

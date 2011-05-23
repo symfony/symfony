@@ -198,9 +198,9 @@ class FieldTypeTest extends TypeTestCase
     
     public function testGetAttributesIsEmpty()
     {
-        $form = $this->factory->create('field', null, array('attributes' => array()));
+        $form = $this->factory->create('field', null, array('attr' => array()));
 
-        $this->assertEquals(0, count($form->getAttribute('attributes')));
+        $this->assertEquals(0, count($form->getAttribute('attr')));
     }
 
     /**
@@ -208,7 +208,7 @@ class FieldTypeTest extends TypeTestCase
      */
     public function testAttributesException()
     {
-        $form = $this->factory->create('field', null, array('attributes' => ''));
+        $form = $this->factory->create('field', null, array('attr' => ''));
     }
 
 }

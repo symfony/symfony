@@ -18,6 +18,7 @@
             <xsd:element name="templating" type="templating" minOccurs="0" maxOccurs="1" />
             <xsd:element name="translator" type="translator" minOccurs="0" maxOccurs="1" />
             <xsd:element name="validation" type="validation" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="annotations" type="annotations" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
         <xsd:attribute name="cache-warmer" type="cache_warmer" />
@@ -121,20 +122,21 @@
     </xsd:complexType>
 
     <xsd:complexType name="validation">
-        <xsd:sequence>
-            <xsd:element name="namespace" type="validation_namespace" minOccurs="0" maxOccurs="1" />
-        </xsd:sequence>
-
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="cache" type="xsd:string" />
-        <xsd:attribute name="annotations" type="xsd:boolean" />
+        <xsd:attribute name="enable-annotations" type="xsd:boolean" />
     </xsd:complexType>
+    
+    <xsd:complexType name="annotations">
+        <xsd:sequence>
+            <xsd:element name="file-cache" type="annotations.file_cache" minOccurs="0" maxOccurs="1" />
+        </xsd:sequence>
 
-    <xsd:complexType name="validation_namespace">
-        <xsd:simpleContent>
-            <xsd:extension base="xsd:string">
-                <xsd:attribute name="prefix" type="xsd:string" />
-            </xsd:extension>
-        </xsd:simpleContent>
+        <xsd:attribute name="cache" type="xsd:string" />
+    </xsd:complexType>
+    
+    <xsd:complexType name="annotations.file_cache">
+        <xsd:attribute name="dir" type="xsd:string" />
+        <xsd:attribute name="debug" type="xsd:string" />
     </xsd:complexType>
 </xsd:schema>

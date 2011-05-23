@@ -9,6 +9,84 @@ timeline closely anyway.
 beta1 to beta2
 --------------
 
+* The annotation parsing process has been changed. All annotations which are used
+  in a class must now be imported (just like you import PHP namespaces with the
+  "use" statement):
+
+  Before:
+
+    /**
+     * @orm:Entity
+     */
+    class MyUser
+    {
+        /**
+         * @orm:Id
+         * @orm:GeneratedValue(strategy = "AUTO")
+         * @orm:Column(type="integer")
+         * @var integer
+         */
+        private $id;
+        
+        /**
+         * @orm:Column(type="string", nullable=false)
+         * @assert:NotBlank
+         * @var string
+         */
+        private $name;
+    }
+
+  After:
+
+    use Doctrine\ORM\Mapping as ORM;
+    use Symfony\Component\Validator\Constraints as Assert;
+
+    /**
+     * @ORM\Entity
+     */
+    class MyUser
+    {
+        /**
+         * @ORM\Id
+         * @ORM\GeneratedValue(strategy="AUTO")
+         * @ORM\Column(type="integer")
+         *
+         * @var integer
+         */
+        private $id;
+
+        /**
+         * @ORM\Column(type="string", nullable=false)
+         * @Assert\NotBlank
+         *
+         * @var string
+         */
+        private $name;
+    }
+
+* The config under "framework.validation.annotations" has been removed and was 
+  replaced with a boolean flag "framework.validation.enable_annotations" which
+  defaults to false.
+
+* The Set constraint has been removed as it is not required anymore.
+
+  Before:
+  
+    /**
+     * @assert:Set({@assert:Callback(...), @assert:Callback(...)})
+     */
+    private $foo;
+
+  After:
+
+    use Symfony\Component\Validator\Constraints\Callback;
+
+    /**
+     * @Callback(...)
+     * @Callback(...)
+     */
+    private  $foo;
+
 * Forms must now be explicitly enabled (automatically done in Symfony SE):
 
         form: ~
@@ -168,6 +246,9 @@ beta1 to beta2
 * Form: Renamed option value "text" of "widget" option of the "date" type was 
   renamed to "single-text". "text" indicates to use separate text boxes now
   (like for the "time" type).
+  
+* Form: Renamed view variable "name" to "full_name". The variable "name" now
+  contains the local, short name (equivalent to $form->getName()).
 
 PR12 to beta1
 -------------

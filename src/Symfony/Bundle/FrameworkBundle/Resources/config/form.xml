@@ -129,6 +129,9 @@
         <service id="form.type.repeated" class="Symfony\Component\Form\Extension\Core\Type\RepeatedType">
             <tag name="form.type" alias="repeated" />
         </service>
+        <service id="form.type.search" class="Symfony\Component\Form\Extension\Core\Type\SearchType">
+            <tag name="form.type" alias="search" />
+        </service>
         <service id="form.type.textarea" class="Symfony\Component\Form\Extension\Core\Type\TextareaType">
             <tag name="form.type" alias="textarea" />
         </service>

@@ -62,10 +62,6 @@ class EmailValidator extends ConstraintValidator
      */
     private function checkMX($host)
     {
-        if (function_exists('checkdnsrr')) {
-            return checkdnsrr($host, 'MX');
-        }
-
-        throw new \LogicException('Could not retrieve DNS record information. Remove check_mx = true to prevent this warning');
+        return checkdnsrr($host, 'MX');
     }
 }

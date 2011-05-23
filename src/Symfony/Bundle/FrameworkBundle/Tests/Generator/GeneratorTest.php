@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Util;
+namespace Symfony\Bundle\FrameworkBundle\Tests\Generator;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Bundle\FrameworkBundle\Util\Mustache;
+use Symfony\Bundle\FrameworkBundle\Generator\Generator;
 use Symfony\Component\HttpKernel\Util\Filesystem;
 
-class MustacheTest extends TestCase
+class GeneratorTest extends TestCase
 {
     protected $dir;
 
@@ -23,7 +23,7 @@ class MustacheTest extends TestCase
     {
         $dir = __DIR__.'/fixtures/';
 
-        $this->dir = sys_get_temp_dir().'/mustache';
+        $this->dir = sys_get_temp_dir().'/symfony2gen';
         $filesystem = new Filesystem();
         $filesystem->mirror($dir, $this->dir);
     }
@@ -39,19 +39,19 @@ class MustacheTest extends TestCase
         $template = 'Hi {{ you }}, my name is {{ me }}!';
         $expected = 'Hi {{ you }}, my name is Kris!';
 
-        $this->assertEquals(Mustache::renderString($template, array('me' => 'Kris')), $expected, '::renderString() does not modify unknown parameters');
+        $this->assertEquals(Generator::renderString($template, array('me' => 'Kris')), $expected, '::renderString() does not modify unknown parameters');
     }
 
     public function testRenderFile()
     {
-        Mustache::renderFile($this->dir.'/template.txt', array('me' => 'Fabien'));
+        Generator::renderFile($this->dir.'/template.txt', array('me' => 'Fabien'));
 
         $this->assertEquals('Hello Fabien', file_get_contents($this->dir.'/template.txt'), '::renderFile() renders a file');
     }
 
     public function testRenderDir()
     {
-        Mustache::renderDir($this->dir, array('me' => 'Fabien'));
+        Generator::renderDir($this->dir, array('me' => 'Fabien'));
 
         $this->assertEquals('Hello Fabien', file_get_contents($this->dir.'/template.txt'), '::renderDir() renders a directory');
         $this->assertEquals('Hello Fabien', file_get_contents($this->dir.'/foo/bar.txt'), '::renderDir() renders a directory');

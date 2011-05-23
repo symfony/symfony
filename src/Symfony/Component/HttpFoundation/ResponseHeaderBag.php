@@ -33,6 +33,19 @@ class ResponseHeaderBag extends HeaderBag
             $this->set('cache-control', '');
         }
     }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function __toString()
+    {
+        $cookies = '';
+        foreach ($this->cookies as $cookie) {
+            $cookies .= 'Set-Cookie: '.$cookie."\r\n";
+        }
+
+        return parent::__toString().$cookies;
+    }
 
     /**
      * {@inheritdoc}

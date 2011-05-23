@@ -43,3 +43,8 @@ framework:
     validation:
         enabled: true
         cache:   apc
+    annotations:
+        cache:   file
+        file_cache:
+            dir:   %kernel.cache_dir%/annotations
+            debug: true

@@ -142,7 +142,7 @@ class PropertyPath implements \IteratorAggregate
      */
     public function isProperty($index)
     {
-        return !$this->isIndex($index);
+        return !$this->isIndex[$index];
     }
 
     /**
@@ -186,7 +186,25 @@ class PropertyPath implements \IteratorAggregate
      */
     public function getValue($objectOrArray)
     {
-        return $this->readPropertyPath($objectOrArray, 0);
+        for ($i = 0; $i < $this->length; ++$i) {
+            if (is_object($objectOrArray)) {
+                $value = $this->readProperty($objectOrArray, $i);
+            // arrays need to be treated separately (due to PHP bug?)
+            // http://bugs.php.net/bug.php?id=52133
+            } else if (is_array($objectOrArray)){
+                $property = $this->elements[$i];
+                if (!array_key_exists($property, $objectOrArray)) {
+                    $objectOrArray[$property] = $i + 1 < $this->length ? array() : null;
+                }
+                $value =& $objectOrArray[$property];
+            } else {
+                throw new UnexpectedTypeException($objectOrArray, 'object or array');
+            }
+
+            $objectOrArray =& $value;
+        }
+
+        return $value;
     }
 
     /**
@@ -219,78 +237,30 @@ class PropertyPath implements \IteratorAggregate
      */
     public function setValue(&$objectOrArray, $value)
     {
-        $this->writePropertyPath($objectOrArray, 0, $value);
-    }
+        for ($i = 0, $l = $this->length - 1; $i < $l; ++$i) {
 
-    /**
-     * Recursive implementation of getValue()
-     *
-     * @param  object|array $objectOrArray  The object or array to traverse
-     * @param  integer $currentIndex        The current index in the property path
-     * @return mixed                        The value at the end of the path
-     */
-    protected function readPropertyPath(&$objectOrArray, $currentIndex)
-    {
-        if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
-            throw new UnexpectedTypeException($objectOrArray, 'object or array');
-        }
-
-        $property = $this->elements[$currentIndex];
-
-        if (is_object($objectOrArray)) {
-            $value = $this->readProperty($objectOrArray, $currentIndex);
-        // arrays need to be treated separately (due to PHP bug?)
-        // http://bugs.php.net/bug.php?id=52133
-        } else {
-            if (!array_key_exists($property, $objectOrArray)) {
-                $objectOrArray[$property] = $currentIndex + 1 < $this->length ? array() : null;
-            }
-
-            $value =& $objectOrArray[$property];
-        }
-
-        ++$currentIndex;
-
-        if ($currentIndex < $this->length) {
-            return $this->readPropertyPath($value, $currentIndex);
-        }
-
-        return $value;
-    }
-
-    /**
-     * Recursive implementation of setValue()
-     *
-     * @param object|array $objectOrArray  The object or array to traverse
-     * @param integer $currentIndex        The current index in the property path
-     * @param mixed $value                 The value to set at the end of the
-     *                                     property path
-     */
-    protected function writePropertyPath(&$objectOrArray, $currentIndex, $value)
-    {
-        if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
-            throw new UnexpectedTypeException($objectOrArray, 'object or array');
-        }
-
-        $property = $this->elements[$currentIndex];
-
-        if ($currentIndex + 1 < $this->length) {
             if (is_object($objectOrArray)) {
-                $nestedObject = $this->readProperty($objectOrArray, $currentIndex);
+                $nestedObject = $this->readProperty($objectOrArray, $i);
             // arrays need to be treated separately (due to PHP bug?)
             // http://bugs.php.net/bug.php?id=52133
-            } else {
+            } else if (is_array($objectOrArray)) {
+                $property = $this->elements[$i];
                 if (!array_key_exists($property, $objectOrArray)) {
                     $objectOrArray[$property] = array();
                 }
-
                 $nestedObject =& $objectOrArray[$property];
+            } else {
+                throw new UnexpectedTypeException($objectOrArray, 'object or array');
             }
 
-            $this->writePropertyPath($nestedObject, $currentIndex + 1, $value);
-        } else {
-            $this->writeProperty($objectOrArray, $currentIndex, $value);
+            $objectOrArray =& $nestedObject;
         }
+
+        if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
+            throw new UnexpectedTypeException($objectOrArray, 'object or array');
+        }
+
+        $this->writeProperty($objectOrArray, $i, $value);
     }
 
     /**
@@ -311,9 +281,10 @@ class PropertyPath implements \IteratorAggregate
 
             return $object[$property];
         } else {
+            $camelProp = $this->camelize($property);
             $reflClass = new \ReflectionClass($object);
-            $getter = 'get'.$this->camelize($property);
-            $isser = 'is'.$this->camelize($property);
+            $getter = 'get'.$camelProp;
+            $isser = 'is'.$camelProp;
 
             if ($reflClass->hasMethod($getter)) {
                 if (!$reflClass->getMethod($getter)->isPublic()) {

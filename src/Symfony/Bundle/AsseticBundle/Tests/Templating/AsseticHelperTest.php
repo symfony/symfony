@@ -34,7 +34,7 @@ class AsseticHelperTest extends \PHPUnit_Framework_TestCase
         $helper = new AsseticHelperForTest(new AssetFactory('/foo', $debug), $debug);
         $urls = $helper->javascripts(array('js/jquery.js', 'js/jquery.plugin.js'));
 
-        $this->assertInternalType('array', $urls, '->javascripts() returns an array');
+        $this->assertInstanceOf('Traversable', $urls, '->javascripts() returns an array');
         $this->assertEquals($count, count($urls), $message);
     }
 

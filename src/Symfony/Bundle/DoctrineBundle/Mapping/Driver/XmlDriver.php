@@ -36,6 +36,30 @@ class XmlDriver extends BaseXmlDriver
             $this->initialize();
         }
 
+        $classes = array();
+
+        if ($this->_paths) {
+            foreach ((array) $this->_paths as $prefix => $path) {
+                if ( ! is_dir($path)) {
+                    throw MappingException::fileMappingDriversRequireConfiguredDirectoryPath($path);
+                }
+
+                $iterator = new \RecursiveIteratorIterator(
+                    new \RecursiveDirectoryIterator($path),
+                    \RecursiveIteratorIterator::LEAVES_ONLY
+                );
+
+                foreach ($iterator as $file) {
+                    if (($fileName = $file->getBasename($this->_fileExtension)) == $file->getBasename()) {
+                        continue;
+                    }
+
+                    // NOTE: All files found here means classes are not transient!
+                    $classes[] = $prefix.'\\'.str_replace('.', '\\', $fileName);
+                }
+            }
+        }
+
         return array_merge(parent::getAllClassNames(), array_keys($this->_classCache));
     }
 

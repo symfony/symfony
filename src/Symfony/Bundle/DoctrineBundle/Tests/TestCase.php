@@ -83,7 +83,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
                     'mappings' => array('YamlBundle' => array(
                         'type' => 'yml',
                         'dir' => __DIR__ . "/DependencyInjection/Fixtures/Bundles/YamlBundle/Resources/config/doctrine",
-                        'prefix' => 'Fixtures\Bundles\YamlBundle',
+                        'prefix' => 'Fixtures\Bundles\YamlBundle\Entity',
                     )
                 )
             )))

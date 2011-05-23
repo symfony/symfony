@@ -15,30 +15,44 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class RangeTypeTest extends TypeTestCase
 {
-    private $range = array(1, 3);
-
     /**
      * @expectedException Symfony\Component\Form\Exception\FormException
      */
-    public function testRangeOptionExpectsArray()
+    public function testStartOptionIsRequired()
     {
         $form = $this->factory->create('range', null, array(
-            'range' => new \ArrayObject,
+            'start' => null,
+            'end'   => 3,
+            'step'  => 1,
         ));
     }
 
     /**
      * @expectedException Symfony\Component\Form\Exception\FormException
      */
-    public function testRequiresChoicesOrChoiceListOption()
+    public function testEndOptionIsRequired()
     {
-        $this->factory->create('range', 'name');
+        $form = $this->factory->create('range', null, array(
+            'start' => 1,
+            'end'   => null,
+            'step'  => 1,
+        ));
+    }
+
+    public function testStepOptionIsOptional()
+    {
+        $form = $this->factory->create('range', null, array(
+            'start' => 1,
+            'end'   => 3,
+        ));
     }
 
     public function testRangeCreatesChoices()
     {
         $form = $this->factory->create('range', null, array(
-            'range' => $this->range,
+            'start' => 1,
+            'end'   => 3,
+            'step'  => 1,
         ));
         
         $view = $form->createView();
@@ -46,4 +60,24 @@ class RangeTypeTest extends TypeTestCase
         $this->assertSame(array(1 => 1, 2 => 2, 3 => 3), $view->get('choices'));
     }
 
+    public function testRangeAppendsToExistingChoices()
+    {
+        $form = $this->factory->create('range', null, array(
+            'start'     => 1,
+            'end'       => 3,
+            'step'      => 1,
+            'choices'   => array(
+                0 => 0,
+            )
+        ));
+        
+        $view = $form->createView();
+        
+        $this->assertSame(array(
+            0 => 0,
+            1 => 1,
+            2 => 2,
+            3 => 3
+        ), $view->get('choices'));
+    }
 }

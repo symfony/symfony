@@ -37,6 +37,8 @@ class CodeHelper extends Helper
             } else {
                 $this->fileLinkFormat = 'file://%f#%l';
             }
+        } else {
+            $this->fileLinkFormat = $fileLinkFormat;
         }
 
         $this->rootDir = str_replace('\\', '/', $rootDir).'/';

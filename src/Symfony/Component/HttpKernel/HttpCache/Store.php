@@ -329,7 +329,7 @@ class Store implements StoreInterface
         if (!is_dir(dirname($path)) && !is_writable($this->root)) {
             return false;
         }
-        
+
         if (false === file_exists(dirname($path))) {
             if (false === mkdir(dirname($path), 0777, true)) {
                 return false;

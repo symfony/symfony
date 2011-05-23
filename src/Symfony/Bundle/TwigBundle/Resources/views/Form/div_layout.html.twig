@@ -133,6 +133,10 @@
 {% endspaceless %}
 {% endblock choice_widget %}
 
+{% block range_widget %}
+    {{ block('choice_widget') }}
+{% endblock range_widget %}
+
 {% block checkbox_widget %}
 {% spaceless %}
     <input type="checkbox" {{ block('attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />

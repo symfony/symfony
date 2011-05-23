@@ -37,6 +37,7 @@ class CoreExtension extends AbstractExtension
             new Type\BirthdayType(),
             new Type\CheckboxType(),
             new Type\ChoiceType(),
+            new Type\RangeType(),
             new Type\CollectionType(),
             new Type\CountryType(),
             new Type\DateType(),

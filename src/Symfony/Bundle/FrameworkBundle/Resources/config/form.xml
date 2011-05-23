@@ -80,6 +80,9 @@
         <service id="form.type.choice" class="Symfony\Component\Form\Extension\Core\Type\ChoiceType">
             <tag name="form.type" alias="choice" />
         </service>
+        <service id="form.type.range" class="Symfony\Component\Form\Extension\Core\Type\RangeType">
+            <tag name="form.type" alias="range" />
+        </service>
         <service id="form.type.collection" class="Symfony\Component\Form\Extension\Core\Type\CollectionType">
             <tag name="form.type" alias="collection" />
         </service>

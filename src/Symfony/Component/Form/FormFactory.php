@@ -252,7 +252,7 @@ class FormFactory implements FormFactoryInterface
         }
 
         if (count($diff) > 0) {
-            throw new CreationException(sprintf('The option "%s" does not exist', $diff[0]));
+            throw new CreationException(sprintf('The option "%s" does not exist', current($diff)));
         }
 
         foreach ($optionValues as $option => $allowedValues) {

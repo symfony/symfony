@@ -489,6 +489,22 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $container->compile();
         $container->setDefinition('a', new Definition());
     }
+
+    /**
+     * @expectedException Symfony\Component\DependencyInjection\Exception\RuntimeException
+     */
+    public function testThrowsExceptionWhenGetUnavailableService()
+    {
+        $definition = $this->getMock('Symfony\\Component\\DependencyInjection\\Definition');
+        $definition->expects($this->any())->method('getFactoryMethod')->will($this->returnValue(null));
+
+        $bag = $this->getMock('Symfony\\Component\\DependencyInjection\\ParameterBag\\ParameterBag');
+        $bag->expects($this->any())->method('resolveValue')->will($this->returnValue(null));
+
+        $container = new ContainerBuilder($bag);
+        $container->setDefinition('a', $definition);
+        $container->get('a');
+    }
 }
 
 

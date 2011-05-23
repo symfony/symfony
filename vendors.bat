@@ -44,7 +44,7 @@ goto install_git
 :Install_Doctrine_Common
 set VENDOR_DIR=doctrine-common
 set VENDOR_URL=git://github.com/doctrine/common.git
-set VERSION=2.0.2
+set VERSION=origin/3.0.x
 set NEXT_STEP=Install_Doctrine_Migrations
 goto install_git
 

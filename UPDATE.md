@@ -9,9 +9,9 @@ timeline closely anyway.
 beta1 to beta2
 --------------
 
-* The annotation parsing process has been changed. All annotations which are used
-  in a class must now be imported (just like you import PHP namespaces with the
-  "use" statement):
+* The annotation parsing process has been changed (it now uses Doctrine Common
+  3.0). All annotations which are used in a class must now be imported (just
+  like you import PHP namespaces with the "use" statement):
 
   Before:
 

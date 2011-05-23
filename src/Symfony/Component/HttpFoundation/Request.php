@@ -771,7 +771,7 @@ class Request
     }
 
     /**
-     * Whether the cache is disabled.
+     * Checks whether the request instructs proxies in the path not to cache the request.
      * 
      * @return Boolean
      */

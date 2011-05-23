@@ -771,7 +771,7 @@ class Request
     }
 
     /**
-     * Checks whether the request instructs proxies in the path not to cache the request.
+     * Checks whether cached response must be successfully revalidated by the origin server.
      * 
      * @return Boolean
      */

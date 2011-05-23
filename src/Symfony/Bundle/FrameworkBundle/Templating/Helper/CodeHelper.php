@@ -35,7 +35,7 @@ class CodeHelper extends Helper
             if (ini_get('xdebug.file_link_format') {
                 $this->fileLinkFormat = ini_get('xdebug.file_link_format');
             } else {
-                $this->fileLinkFormat = 'file://%f#%l';
+                $this->fileLinkFormat = '%f@%l';
             }
         } else {
             $this->fileLinkFormat = $fileLinkFormat;

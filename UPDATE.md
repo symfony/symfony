@@ -250,6 +250,10 @@ beta1 to beta2
 * Form: Renamed view variable "name" to "full_name". The variable "name" now
   contains the local, short name (equivalent to $form->getName()).
 
+* If you use another program like Doxygen that uses @ prefixed annotations, you must use the @IgnoreAnnotation("...") annotation in the _class_ doc-block to ignore any non-symfony/non-doctrine annotations.
+
+  Example:  @IgnoreAnnotation("param") will prevent "@param ..." from throwing an Exception.
+
 PR12 to beta1
 -------------
 

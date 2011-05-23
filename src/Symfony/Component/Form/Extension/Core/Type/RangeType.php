@@ -18,7 +18,6 @@ use Symfony\Component\Form\FormBuilder;
 
 class RangeType extends ChoiceType
 {
-
     public function buildForm(FormBuilder $builder, Array $options)
     {
         if (!$options['range'] || !count($options['range'])) {
@@ -47,5 +46,4 @@ class RangeType extends ChoiceType
     {
         return 'range';
     }
-
 }

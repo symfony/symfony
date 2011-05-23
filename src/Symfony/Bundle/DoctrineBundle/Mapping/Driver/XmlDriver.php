@@ -60,7 +60,7 @@ class XmlDriver extends BaseXmlDriver
             }
         }
 
-        return array_merge(parent::getAllClassNames(), array_keys($this->_classCache));
+        return array_merge($classes, array_keys($this->_classCache));
     }
 
     public function getElement($className)

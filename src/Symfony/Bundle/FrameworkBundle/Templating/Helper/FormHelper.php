@@ -135,7 +135,7 @@ class FormHelper extends Helper
             $variables
         );
 
-        array_push($this->viewStack, $view);
+        $this->viewStack[] = $view;
 
         $html = $this->engine->render($template, $this->varStack[$view]);
 
@@ -156,7 +156,7 @@ class FormHelper extends Helper
             $template = $this->templateDir.':'.$template;
         }
 */
-$template = 'FrameworkBundle:Form:'.$template;
+        $template = 'FrameworkBundle:Form:'.$template;
         if (!$this->engine->exists($template)) {
             $template = false;
         }

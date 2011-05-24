@@ -193,4 +193,13 @@ class FormTypeTest extends TypeTestCase
 
         $this->assertTrue($view->get('multipart'));
     }
+
+    public function testCreateViewDoNoMarkItAsRendered()
+    {
+        $form = $this->factory->create('form');
+        $form->add($this->factory->create('form'));
+        $view = $form->createView();
+
+        $this->assertFalse($view->isRendered());
+    }
 }

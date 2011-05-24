@@ -16,7 +16,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
-use Symfony\Bundle\FrameworkBundle\Util\Mustache;
+use Symfony\Bundle\FrameworkBundle\Generator\Generator;
 
 /**
  * Initializes a new bundle.
@@ -105,7 +105,7 @@ EOT
         $filesystem->mirror(__DIR__.'/../Resources/skeleton/bundle/generic', $targetDir);
         $filesystem->mirror(__DIR__.'/../Resources/skeleton/bundle/'.$input->getOption('format'), $targetDir);
 
-        Mustache::renderDir($targetDir, array(
+        Generator::renderDir($targetDir, array(
             'namespace' => $namespace,
             'bundle'    => $bundle,
         ));

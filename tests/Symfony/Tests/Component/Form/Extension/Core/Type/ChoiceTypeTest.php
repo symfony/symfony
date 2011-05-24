@@ -312,7 +312,7 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertSame(array('b' => 'B', 'd' => 'D'), $view->get('preferred_choices'));
     }
 
-    public function testAdjustNameForMultipleNonExpanded()
+    public function testAdjustFullNameForMultipleNonExpanded()
     {
         $form = $this->factory->createNamed('choice', 'name', null, array(
             'multiple' => true,
@@ -321,6 +321,6 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertSame('name[]', $view->get('name'));
+        $this->assertSame('name[]', $view->get('full_name'));
     }
 }

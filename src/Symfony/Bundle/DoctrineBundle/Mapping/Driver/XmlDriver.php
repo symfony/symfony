@@ -50,7 +50,9 @@ class XmlDriver extends BaseXmlDriver
                 );
 
                 foreach ($iterator as $file) {
-                    if (($fileName = $file->getBasename($this->_fileExtension)) == $file->getBasename()) {
+                    $fileName = $file->getBasename($this->_fileExtension);
+
+                    if ($fileName == $file->getBasename() || $fileName == $this->_globalFile) {
                         continue;
                     }
 

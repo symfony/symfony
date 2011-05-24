@@ -128,15 +128,8 @@
     </xsd:complexType>
     
     <xsd:complexType name="annotations">
-        <xsd:sequence>
-            <xsd:element name="file-cache" type="annotations.file_cache" minOccurs="0" maxOccurs="1" />
-        </xsd:sequence>
-
         <xsd:attribute name="cache" type="xsd:string" />
-    </xsd:complexType>
-    
-    <xsd:complexType name="annotations.file_cache">
-        <xsd:attribute name="dir" type="xsd:string" />
         <xsd:attribute name="debug" type="xsd:string" />
+        <xsd:attribute name="file-cache-dir" type="xsd:string" />
     </xsd:complexType>
 </xsd:schema>

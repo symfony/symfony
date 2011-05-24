@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\Extension;
 
-use Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  *
@@ -19,16 +19,16 @@ use Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper;
  */
 class CodeExtension extends \Twig_Extension
 {
-    private $helper;
+    private $container;
 
     /**
      * Constructor of Twig Extension to provide functions for code formatting
      *
      * @param Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper $helper Helper to use
      */
-    public function __construct(CodeHelper $helper)
+    public function __construct(ContainerInterface $container)
     {
-        $this->helper = $helper;
+        $this->container = $container;
     }
 
     /**
@@ -50,42 +50,42 @@ class CodeExtension extends \Twig_Extension
 
     public function abbrClass($class)
     {
-        return $this->helper->abbrClass($class);
+        return $this->container->get('templating.helper.code')->abbrClass($class);
     }
 
     public function abbrMethod($method)
     {
-        return $this->helper->abbrMethod($method);
+        return $this->container->get('templating.helper.code')->abbrMethod($method);
     }
 
     public function formatArgs($args)
     {
-        return $this->helper->formatArgs($args);
+        return $this->container->get('templating.helper.code')->formatArgs($args);
     }
 
     public function formatArgsAsText($args)
     {
-        return $this->helper->formatArgsAsText($args);
+        return $this->container->get('templating.helper.code')->formatArgsAsText($args);
     }
 
     public function fileExcerpt($file, $line)
     {
-        return $this->helper->fileExcerpt($file, $line);
+        return $this->container->get('templating.helper.code')->fileExcerpt($file, $line);
     }
 
     public function formatFile($file, $line, $text = null)
     {
-        return $this->helper->formatFile($file, $line, $text);
+        return $this->container->get('templating.helper.code')->formatFile($file, $line, $text);
     }
 
     public function getFileLink($file, $line)
     {
-        return $this->helper->getFileLink($file, $line);
+        return $this->container->get('templating.helper.code')->getFileLink($file, $line);
     }
 
     public function formatFileFromText($text)
     {
-        return $this->helper->formatFileFromText($text);
+        return $this->container->get('templating.helper.code')->formatFileFromText($text);
     }
 
     public function getName()

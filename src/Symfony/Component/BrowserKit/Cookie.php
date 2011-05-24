@@ -34,27 +34,27 @@ class Cookie
     /**
      * Sets a cookie.
      *
-     * @param  string  $name     The cookie name
-     * @param  string  $value    The value of the cookie
-     * @param  string  $expires  The time the cookie expires
-     * @param  string  $path     The path on the server in which the cookie will be available on
-     * @param  string  $domain   The domain that the cookie is available
-     * @param  Boolean $secure   Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
-     * @param  Boolean $httponly The cookie httponly flag
-     * @param  Boolean $passedRawValue $value is raw or urldecoded
+     * @param  string  $name         The cookie name
+     * @param  string  $value        The value of the cookie
+     * @param  string  $expires      The time the cookie expires
+     * @param  string  $path         The path on the server in which the cookie will be available on
+     * @param  string  $domain       The domain that the cookie is available
+     * @param  Boolean $secure       Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
+     * @param  Boolean $httponly     The cookie httponly flag
+     * @param  Boolean $encodedValue Whether the value is encoded or not
      *
      * @api
      */
-    public function __construct($name, $value, $expires = null, $path = '/', $domain = '', $secure = false, $httponly = true, $passedRawValue = false)
+    public function __construct($name, $value, $expires = null, $path = '/', $domain = '', $secure = false, $httponly = true, $encodedValue = false)
     {
-        $this->name     = $name;
-        if ($passedRawValue) {
+        if ($encodedValue) {
             $this->value    = urldecode($value);
             $this->rawValue = $value;
         } else {
             $this->value    = $value;
             $this->rawValue = urlencode($value);
         }
+        $this->name     = $name;
         $this->expires  = null === $expires ? null : (integer) $expires;
         $this->path     = empty($path) ? '/' : $path;
         $this->domain   = $domain;

@@ -128,11 +128,7 @@ class CookieJar
                 continue;
             }
 
-            if ($returnsRawValue) {
-                $cookies[$cookie->getName()] = $cookie->getRawValue();
-            } else {
-                $cookies[$cookie->getName()] = $cookie->getValue();
-            }
+            $cookies[$cookie->getName()] = $returnsRawValue ? $cookie->getRawValue() : $cookie->getValue();
         }
 
         return $cookies;
@@ -145,7 +141,8 @@ class CookieJar
      *
      * @return array An array of cookie values
      */
-    public function allRawValues($uri) {
+    public function allRawValues($uri)
+    {
         return $this->allValues($uri, true);
     }
 

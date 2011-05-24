@@ -15,12 +15,10 @@
     </xsd:complexType>
 
     <xsd:complexType name="handler">
-        <xsd:choice minOccurs="0" maxOccurs="unbounded">
-            <xsd:element name="processor" type="xsd:string" />
-        </xsd:choice>
-        <xsd:choice minOccurs="0" maxOccurs="unbounded">
-            <xsd:element name="member" type="xsd:string" />
-        </xsd:choice>
+        <xsd:sequence>
+            <xsd:element name="processor" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="member" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
         <xsd:attribute name="type" type="xsd:string" use="required" />
         <xsd:attribute name="priority" type="xsd:integer" />
         <xsd:attribute name="level" type="level" />

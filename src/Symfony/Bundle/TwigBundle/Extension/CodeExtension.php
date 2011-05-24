@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\TwigBundle\Extension;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper;
 
 /**

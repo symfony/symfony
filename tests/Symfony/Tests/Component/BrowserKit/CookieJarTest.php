@@ -113,5 +113,4 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($values, array_keys($cookieJar->allRawValues($uri)), '->allRawValues() returns the cookie for a given URI');
     }
-
 }

@@ -49,17 +49,17 @@
 
         <service id="twig.extension.assets" class="%twig.extension.assets.class%" public="false">
             <tag name="twig.extension" />
-            <argument type="service" id="templating.helper.assets" />
+            <argument type="service" id="service_container" />
         </service>
 
         <service id="twig.extension.actions" class="%twig.extension.actions.class%" public="false">
             <tag name="twig.extension" />
-            <argument type="service" id="templating.helper.actions" />
+            <argument type="service" id="service_container" />
         </service>
 
         <service id="twig.extension.code" class="%twig.extension.code.class%" public="false">
             <tag name="twig.extension" />
-            <argument type="service" id="templating.helper.code" />
+            <argument type="service" id="service_container" />
         </service>
 
         <service id="twig.extension.routing" class="%twig.extension.routing.class%" public="false">

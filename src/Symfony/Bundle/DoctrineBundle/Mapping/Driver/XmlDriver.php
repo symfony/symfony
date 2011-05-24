@@ -50,7 +50,15 @@ class XmlDriver extends BaseXmlDriver
                 );
 
                 foreach ($iterator as $file) {
-                    if (($fileName = $file->getBasename($this->_fileExtension)) == $file->getBasename()) {
+
+                    $fileName = $file->getBasename($this->_fileExtension);
+
+                    if ($fileName == $file->getBasename()) {
+                        continue;
+                    }
+
+                    // check if file is not global file
+                    if ($fileName == $this->_globalFile) {
                         continue;
                     }
 

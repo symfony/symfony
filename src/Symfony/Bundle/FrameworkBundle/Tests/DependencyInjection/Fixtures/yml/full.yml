@@ -45,6 +45,5 @@ framework:
         cache:   apc
     annotations:
         cache:   file
-        file_cache:
-            dir:   %kernel.cache_dir%/annotations
-            debug: true
+        debug:   true
+        file_cache_dir: %kernel.cache_dir%/annotations

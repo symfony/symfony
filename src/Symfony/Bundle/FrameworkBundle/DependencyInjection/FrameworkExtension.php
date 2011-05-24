@@ -517,23 +517,24 @@ class FrameworkExtension extends Extension
         $loader->load('annotations.xml');
 
         if ('file' === $config['cache']) {
-            $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache']['dir']);
+            $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
             if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true)) {
                 throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
             }
 
             $container
-                ->getDefinition('annotations.cache.file_cache')
-                ->replaceArgument(0, $cacheDir)
-                ->replaceArgument(1, $config['file_cache']['debug'])
+                ->getDefinition('annotations.file_cache_reader')
+                ->replaceArgument(1, $cacheDir)
+                ->replaceArgument(2, $config['debug'])
             ;
-        } else if ('none' === $config['cache']) {
-            $container->setAlias('annotation_reader', 'annotations.reader');
-        } else {
+            $container->setAlias('annotation_reader', 'annotations.file_cache_reader');
+        } else if('none' !== $config['cache']) {
             $container
                 ->getDefinition('annotations.cached_reader')
                 ->replaceArgument(1, new Reference($config['cache']))
+                ->replaceArgument(2, $config['debug'])
             ;
+            $container->setAlias('annotation_reader', 'annotations.cached_reader');
         }
     }
 

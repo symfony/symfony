@@ -536,6 +536,13 @@ class FrameworkExtension extends Extension
             ;
             $container->setAlias('annotation_reader', 'annotations.cached_reader');
         }
+
+        if (isset($config['autoload'])) {
+            $container
+                ->getDefinition('annotations.reader')
+                ->addMethodCall('setAutoloadAnnotations', array($config['autoload']))
+            ;
+        }
     }
 
     /**

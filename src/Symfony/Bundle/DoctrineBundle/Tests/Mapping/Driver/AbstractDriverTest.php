@@ -55,6 +55,10 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        if (!class_exists('Doctrine\\Common\\Version')) {
+            $this->markTestSkipped('Doctrine is not available.');
+        }
+
         $this->dir = sys_get_temp_dir().'/abstract_driver_test';
         @mkdir($this->dir, 0777, true);
     }

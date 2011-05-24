@@ -18,7 +18,6 @@ use Symfony\Bundle\FrameworkBundle\Templating\Helper\ActionsHelper;
  * Twig extension for Symfony actions helper
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @author Alexandre Salomé <alexandre.salome@gmail.com>
  */
 class ActionsExtension extends \Twig_Extension
 {

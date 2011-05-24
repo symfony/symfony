@@ -15,7 +15,6 @@ use Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- * @author Alexandre Salomé <alexandre.salome@gmail.com>
  */
 class AssetsExtension extends \Twig_Extension
 {

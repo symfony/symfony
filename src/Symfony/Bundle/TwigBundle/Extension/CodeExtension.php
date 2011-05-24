@@ -16,7 +16,6 @@ use Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper;
 /**
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @author Alexandre Salomé <alexandre.salome@gmail.com>
  */
 class CodeExtension extends \Twig_Extension
 {

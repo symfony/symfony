@@ -20,7 +20,7 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class UserSecurityIdentity implements SecurityIdentityInterface
+final class UserSecurityIdentity implements SecurityIdentityInterface
 {
     private $username;
     private $class;

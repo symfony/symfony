@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Util;
+namespace Symfony\Bundle\FrameworkBundle\Generator;
 
 /**
- * Mustache.
+ * Generator is the base class for all generators.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Mustache
+class Generator
 {
     /**
      * Renders a single line. Looks for {{ var }}

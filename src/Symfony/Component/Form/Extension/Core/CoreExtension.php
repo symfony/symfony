@@ -52,6 +52,7 @@ class CoreExtension extends AbstractExtension
             new Type\PercentType(),
             new Type\RadioType(),
             new Type\RepeatedType(),
+            new Type\SearchType(),
             new Type\TextareaType(),
             new Type\TextType(),
             new Type\TimeType(),

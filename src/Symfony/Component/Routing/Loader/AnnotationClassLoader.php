@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing\Loader;
 
-use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\Routing\Annotation\Route as RouteAnnotation;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\Route;
@@ -59,14 +59,13 @@ abstract class AnnotationClassLoader implements LoaderInterface
 {
     protected $reader;
     protected $routeAnnotationClass  = 'Symfony\\Component\\Routing\\Annotation\\Route';
-    protected $routesAnnotationClass = 'Symfony\\Component\\Routing\\Annotation\\Routes';
 
     /**
      * Constructor.
      *
-     * @param AnnotationReader $reader
+     * @param Reader $reader
      */
-    public function __construct(AnnotationReader $reader)
+    public function __construct(Reader $reader)
     {
         $this->reader = $reader;
     }
@@ -79,16 +78,6 @@ abstract class AnnotationClassLoader implements LoaderInterface
     public function setRouteAnnotationClass($class)
     {
         $this->routeAnnotationClass = $class;
-    }
-
-    /**
-     * Sets the annotation class to read routes properties from.
-     *
-     * @param string $class A fully-qualified class name
-     */
-    public function setRoutesAnnotationClass($class)
-    {
-        $this->routesAnnotationClass = $class;
     }
 
     /**
@@ -137,12 +126,10 @@ abstract class AnnotationClassLoader implements LoaderInterface
         $collection->addResource(new FileResource($class->getFileName()));
 
         foreach ($class->getMethods() as $method) {
-            if ($annots = $this->reader->getMethodAnnotation($method, $this->routesAnnotationClass)) {
-                foreach ($annots->getRoutes() as $annot) {
+            foreach ($this->reader->getMethodAnnotations($method) as $annot) {
+                if ($annot instanceof $this->routeAnnotationClass) {
                     $this->addRoute($collection, $annot, $globals, $class, $method);
                 }
-            } elseif ($annot = $this->reader->getMethodAnnotation($method, $this->routeAnnotationClass)) {
-                $this->addRoute($collection, $annot, $globals, $class, $method);
             }
         }
 

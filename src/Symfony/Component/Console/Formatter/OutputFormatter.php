@@ -125,48 +125,20 @@ class OutputFormatter implements OutputFormatterInterface
      */
     public function format($message)
     {
-        $message = preg_replace_callback(
-            $this->getBeginStyleRegex(), array($this, 'replaceBeginStyle'), $message
-        );
-
-        return preg_replace_callback(
-            $this->getEndStyleRegex(), array($this, 'replaceEndStyle'), $message
-        );
+        return preg_replace_callback('#<([a-z][a-z0-9_=;-]+)>(.*?)</\\1?>#i', array($this, 'replaceStyle'), $message);
     }
 
     /**
-     * Gets regex for a style start.
-     *
-     * @return  string
-     */
-    protected function getBeginStyleRegex()
-    {
-        return '#<([a-z][a-z0-9\-_=;]+)>#i';
-    }
-
-    /**
-     * Gets regex for a style end.
-     *
-     * @return  string
-     */
-    protected function getEndStyleRegex()
-    {
-        return '#</([a-z][a-z0-9\-_]*)?>#i';
-    }
-
-    /**
-     * Replaces the starting style of the output.
+     * Replaces style of the output.
      *
      * @param array $match
      *
      * @return string The replaced style
-     *
-     * @throws \InvalidArgumentException When style is unknown
      */
-    private function replaceBeginStyle($match)
+    private function replaceStyle($match)
     {
         if (!$this->isDecorated()) {
-            return '';
+            return $match[2];
         }
 
         if (isset($this->styles[strtolower($match[1])])) {
@@ -179,37 +151,7 @@ class OutputFormatter implements OutputFormatterInterface
             }
         }
 
-        return $style->getBeginStyle();
-    }
-
-    /**
-     * Replaces the end style.
-     *
-     * @param string $match The text to match
-     *
-     * @return string The end style
-     */
-    private function replaceEndStyle($match)
-    {
-        if (!$this->isDecorated()) {
-            return '';
-        }
-
-        if (!isset($match[1])) {
-            $match[1] = '';
-        }
-
-        if ('' == $match[1]) {
-            $style = new OutputFormatterStyle();
-        } else {
-            if (!isset($this->styles[strtolower($match[1])])) {
-                return $match[0];
-            }
-
-            $style = $this->styles[strtolower($match[1])];
-        }
-
-        return $style->getEndStyle();
+        return $style->apply($match[2]);
     }
 
     /**

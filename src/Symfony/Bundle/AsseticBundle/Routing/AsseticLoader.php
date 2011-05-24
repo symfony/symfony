@@ -67,8 +67,11 @@ class AsseticLoader extends Loader
 
             $this->loadRouteForAsset($routes, $asset, $name);
 
+            $debug = isset($formula[2]['debug']) ? $formula[2]['debug'] : $this->am->isDebug();
+            $combine = isset($formula[2]['combine']) ? $formula[2]['combine'] : !$debug;
+
             // add a route for each "leaf" in debug mode
-            if (isset($formula[2]['debug']) ? $formula[2]['debug'] : $this->am->isDebug()) {
+            if (!$combine) {
                 $i = 0;
                 foreach ($asset as $leaf) {
                     $this->loadRouteForAsset($routes, $leaf, $name, $i++);

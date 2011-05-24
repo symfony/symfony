@@ -91,7 +91,7 @@ class UploadedFile extends File
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getMimeType()
     {
@@ -99,7 +99,7 @@ class UploadedFile extends File
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getSize()
     {
@@ -107,7 +107,7 @@ class UploadedFile extends File
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getExtension()
     {
@@ -160,7 +160,7 @@ class UploadedFile extends File
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function move($directory, $name = null)
     {

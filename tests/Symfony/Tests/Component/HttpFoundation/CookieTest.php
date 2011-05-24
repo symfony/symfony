@@ -137,4 +137,15 @@ class CookieTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($cookie->isCleared(), '->isCleared() returns true if the cookie has expired');
     }
+    
+    public function testToString()
+    {
+        $cookie = new Cookie('foo', 'bar', strtotime('Fri, 20-May-2011 15:25:52 GMT'), '/', '.myfoodomain.com', true);
+
+        $this->assertEquals('foo=bar; expires=Fri, 20-May-2011 15:25:52 GMT; path=/; domain=.myfoodomain.com; secure; httponly', $cookie->__toString(), '->__toString() returns string representation of the cookie');
+        
+        $cookie = new Cookie('foo', null, 1, '/', '.myfoodomain.com');
+ 
+        $this->assertEquals('foo=deleted; expires=' . gmdate("D, d-M-Y H:i:s T", time()-31536001) . '; path=/; domain=.myfoodomain.com; httponly', $cookie->__toString(), '->__toString() returns string representation of a cleared cookie if value is NULL');
+    }
 }

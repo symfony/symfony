@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Mapping\Driver;
 
+use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\Mapping\Driver\XmlDriver as BaseXmlDriver;
 
 /**
@@ -35,7 +36,31 @@ class XmlDriver extends BaseXmlDriver
             $this->initialize();
         }
 
-        return array_merge(parent::getAllClassNames(), array_keys($this->_classCache));
+        $classes = array();
+
+        if ($this->_paths) {
+            foreach ((array) $this->_paths as $prefix => $path) {
+                if (!is_dir($path)) {
+                    throw MappingException::fileMappingDriversRequireConfiguredDirectoryPath($path);
+                }
+
+                $iterator = new \RecursiveIteratorIterator(
+                    new \RecursiveDirectoryIterator($path),
+                    \RecursiveIteratorIterator::LEAVES_ONLY
+                );
+
+                foreach ($iterator as $file) {
+                    if (($fileName = $file->getBasename($this->_fileExtension)) == $file->getBasename()) {
+                        continue;
+                    }
+
+                    // NOTE: All files found here means classes are not transient!
+                    $classes[] = $prefix.'\\'.str_replace('.', '\\', $fileName);
+                }
+            }
+        }
+
+        return array_merge($classes, array_keys($this->_classCache));
     }
 
     public function getElement($className)
@@ -59,5 +84,23 @@ class XmlDriver extends BaseXmlDriver
                 $this->_classCache = array_merge($this->_classCache, $this->_loadMappingFile($file));
             }
         }
+    }
+
+    protected function _findMappingFile($className)
+    {
+        foreach ($this->_paths as $prefix => $path) {
+            if (0 !== strpos($className, $prefix.'\\')) {
+                continue;
+            }
+
+            $filename = $path.'/'.strtr(substr($className, strlen($prefix)+1), '\\', '.').$this->_fileExtension;
+            if (file_exists($filename)) {
+                return $filename;
+            }
+
+            throw MappingException::mappingFileNotFound($className, $filename);
+        }
+
+        throw MappingException::mappingFileNotFound($className, substr($className, strrpos($className, '\\') + 1).$this->_fileExtension);
     }
 }

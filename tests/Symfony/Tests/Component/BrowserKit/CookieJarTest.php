@@ -99,18 +99,12 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @dataProvider provideAllValuesValues
-     */
-    public function testAllRawValues($uri, $values)
+    public function testEncodedValues()
     {
         $cookieJar = new CookieJar();
-        $cookieJar->set($cookie1 = new Cookie('foo_nothing', 'foo'));
-        $cookieJar->set($cookie2 = new Cookie('foo_expired', 'foo', time() - 86400));
-        $cookieJar->set($cookie3 = new Cookie('foo_path', 'foo', null, '/foo'));
-        $cookieJar->set($cookie4 = new Cookie('foo_domain', 'foo', null, '/', 'example.com'));
-        $cookieJar->set($cookie5 = new Cookie('foo_secure', 'foo', null, '/', '', true));
+        $cookieJar->set($cookie = new Cookie('foo', 'bar%3Dbaz', null, '/', '', false, true, true));
 
-        $this->assertEquals($values, array_keys($cookieJar->allRawValues($uri)), '->allRawValues() returns the cookie for a given URI');
+        $this->assertEquals(array('foo' => 'bar=baz'), $cookieJar->allValues('/'));
+        $this->assertEquals(array('foo' => 'bar%3Dbaz'), $cookieJar->allRawValues('/'));
     }
 }

@@ -41,7 +41,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function guessType($class, $property)
     {
@@ -136,7 +136,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function guessRequired($class, $property)
     {
@@ -160,7 +160,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function guessMaxLength($class, $property)
     {
@@ -182,7 +182,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function guessMinLength($class, $property)
     {

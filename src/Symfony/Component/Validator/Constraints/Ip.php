@@ -63,7 +63,7 @@ class Ip extends \Symfony\Component\Validator\Constraint
     public $message = 'This is not a valid IP address';
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function __construct($options = null)
     {

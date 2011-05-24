@@ -11,21 +11,18 @@
 
 namespace Symfony\Bundle\TwigBundle\Extension;
 
-use Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class AssetsExtension extends \Twig_Extension
 {
-    /**
-     * @var Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper
-     */
-    private $helper;
+    private $container;
 
-    public function __construct(AssetsHelper $helper)
+    public function __construct(ContainerInterface $container)
     {
-        $this->helper = $helper;
+        $this->container = $container;
     }
 
     /**
@@ -53,7 +50,7 @@ class AssetsExtension extends \Twig_Extension
      */
     public function getAssetUrl($path, $packageName = null)
     {
-        return $this->helper->getUrl($path, $packageName);
+        return $this->container->get('templating.helper.assets')->getUrl($path, $packageName);
     }
 
     /**
@@ -64,7 +61,7 @@ class AssetsExtension extends \Twig_Extension
      */
     public function getAssetsVersion($packageName = null)
     {
-        return $this->helper->getVersion($packageName);
+        return $this->container->get('templating.helper.assets')->getVersion($packageName);
     }
 
     /**

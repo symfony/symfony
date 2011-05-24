@@ -257,7 +257,7 @@ class Configuration implements ConfigurationInterface
                     ->treatNullLike(array('enabled' => true))
                     ->treatTrueLike(array('enabled' => true))
                     ->children()
-                    ->booleanNode('enabled')->defaultTrue()->end()
+                        ->booleanNode('enabled')->defaultTrue()->end()
                         ->scalarNode('cache')->end()
                         ->booleanNode('enable_annotations')->defaultFalse()->end()
                     ->end()

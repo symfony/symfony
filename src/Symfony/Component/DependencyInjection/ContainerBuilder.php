@@ -742,8 +742,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             foreach ($value as &$v) {
                 $v = $this->resolveServices($v);
             }
-        } else if (is_object($value) && $value instanceof Reference) {
+        } elseif (is_object($value) && $value instanceof Reference) {
             $value = $this->get((string) $value, $value->getInvalidBehavior());
+        } elseif (is_object($value) && $value instanceof Definition) {
+            $value = $this->createService($value, null);
         }
 
         return $value;

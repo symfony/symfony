@@ -10,6 +10,15 @@
  * file that was distributed with this source code.
  */
 
+/*
+
+CAUTION: This file installs the dependencies needed to run the Symfony2 test suite.
+If you want to create a new project, download the Symfony Standard Edition instead:
+
+http://symfony.com/download
+
+*/
+
 if (!is_dir($vendorDir = dirname(__FILE__).'/vendor')) {
     mkdir($vendorDir, 0777, true);
 }

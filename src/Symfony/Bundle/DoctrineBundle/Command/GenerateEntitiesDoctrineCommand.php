@@ -33,7 +33,6 @@ class GenerateEntitiesDoctrineCommand extends DoctrineCommand
             ->addArgument('name', InputArgument::REQUIRED, 'A bundle name, a namespace, or a class name')
             ->addOption('path', null, InputOption::VALUE_REQUIRED, 'The path where to generate entities when it cannot be guessed')
             ->addOption('no-backup', null, InputOption::VALUE_NONE, 'Do not backup existing entities files.')
-            ->addOption('annotate', null, InputOption::VALUE_NONE, 'Should we annotate generated entity classes')
             ->setHelp(<<<EOT
 The <info>doctrine:generate:entities</info> command generates entity classes
 and method stubs from your mapping information:
@@ -64,11 +63,6 @@ before to generate entities:
 
   <info>./app/console doctrine:generate:entities Blog/Entity --no-backup</info>
 
-If you want that generated entity classes are annotated with ORM mapping,
-you can provide the <comment>--annotate</comment> option:
-
-  <info>./app/console doctrine:generate:entities Blog/Entity --annotate</info>
-
 EOT
         );
     }
@@ -97,7 +91,6 @@ EOT
         }
 
         $generator = $this->getEntityGenerator();
-        $generator->setGenerateAnnotations($input->getOption('annotate'));
         $generator->setBackupExisting(!$input->getOption('no-backup'));
         $repoGenerator = new EntityRepositoryGenerator();
         foreach ($metadatas as $metadata) {

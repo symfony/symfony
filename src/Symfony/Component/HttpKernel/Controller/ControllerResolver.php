@@ -71,7 +71,7 @@ class ControllerResolver implements ControllerResolverInterface
         }
 
         if (null !== $this->logger) {
-            $this->logger->info(sprintf('Using controller "%s::%s"', get_class($controller), $method));
+            $this->logger->debug(sprintf('Using controller "%s::%s"', get_class($controller), $method));
         }
 
         return array($controller, $method);

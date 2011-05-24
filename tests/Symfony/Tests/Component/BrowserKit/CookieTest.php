@@ -33,6 +33,8 @@ class CookieTest extends \PHPUnit_Framework_TestCase
             array('foo=bar; secure'),
             array('foo=bar; httponly'),
             array('foo=bar; domain=google.com; path=/foo; secure; httponly'),
+            array('foo=bar=baz'),
+            array('foo=bar%3Dbaz'),
         );
     }
 
@@ -70,6 +72,17 @@ class CookieTest extends \PHPUnit_Framework_TestCase
     {
         $cookie = new Cookie('foo', 'bar');
         $this->assertEquals('bar', $cookie->getValue(), '->getValue() returns the cookie value');
+
+        $cookie = new Cookie('foo', 'bar%3Dbaz', null, '/', '', false, true, true); // raw value
+        $this->assertEquals('bar=baz', $cookie->getValue(), '->getValue() returns the urldecoded cookie value');
+    }
+
+    public function testGetRawValue()
+    {
+        $cookie = new Cookie('foo', 'bar=baz'); // decoded value
+        $this->assertEquals('bar%3Dbaz', $cookie->getRawValue(), '->getRawValue() returns the urlencoded cookie value');
+        $cookie = new Cookie('foo', 'bar%3Dbaz', null, '/', '', false, true, true); // raw value
+        $this->assertEquals('bar%3Dbaz', $cookie->getRawValue(), '->getRawValue() returns the non-urldecoded cookie value');
     }
 
     public function testGetPath()

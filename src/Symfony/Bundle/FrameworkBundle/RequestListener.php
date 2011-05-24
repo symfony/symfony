@@ -103,7 +103,7 @@ class RequestListener
             $parameters = $this->router->match($request->getPathInfo());
 
             if (null !== $this->logger) {
-                $this->logger->info(sprintf('Matched route "%s" (parameters: %s)', $parameters['_route'], $this->parametersToString($parameters)));
+                $this->logger->debug(sprintf('Matched route "%s" (parameters: %s)', $parameters['_route'], $this->parametersToString($parameters)));
             }
 
             $request->attributes->add($parameters);

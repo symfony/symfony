@@ -108,12 +108,15 @@ class CookieJar
     {
         $this->flushExpiredCookies();
 
-        $parts = parse_url($uri);
+        $parts = array_replace(array('path' => '/'), parse_url($uri));
 
         $cookies = array();
         foreach ($this->cookieJar as $cookie) {
-            if ($cookie->getDomain() && $cookie->getDomain() != substr($parts['host'], -strlen($cookie->getDomain()))) {
-                continue;
+            if ($cookie->getDomain()) {
+                $domain = ltrim($cookie->getDomain(), '.');
+                if ($domain != substr($parts['host'], -strlen($domain))) {
+                    continue;
+                }
             }
 
             if ($cookie->getPath() != substr($parts['path'], 0, strlen($cookie->getPath()))) {

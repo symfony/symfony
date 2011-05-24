@@ -100,11 +100,12 @@ class CookieJar
     /**
      * Returns not yet expired cookie values for the given URI.
      *
-     * @param string $uri A URI
+     * @param string  $uri A URI
+     * @param Boolean $returnsRawValue returnes raw value or urldecoded value
      *
      * @return array An array of cookie values
      */
-    public function allValues($uri)
+    public function allValues($uri, $returnsRawValue = false)
     {
         $this->flushExpiredCookies();
 
@@ -127,10 +128,25 @@ class CookieJar
                 continue;
             }
 
-            $cookies[$cookie->getName()] = $cookie->getValue();
+            if ($returnsRawValue) {
+                $cookies[$cookie->getName()] = $cookie->getRawValue();
+            } else {
+                $cookies[$cookie->getName()] = $cookie->getValue();
+            }
         }
 
         return $cookies;
+    }
+
+    /**
+     * Returns not yet expired raw cookie values for the given URI.
+     *
+     * @param string $uri A URI
+     *
+     * @return array An array of cookie values
+     */
+    public function allRawValues($uri) {
+        return $this->allValues($uri, true);
     }
 
     /**

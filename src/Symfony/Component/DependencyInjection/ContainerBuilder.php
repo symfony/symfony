@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 
@@ -648,6 +649,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private function createService(Definition $definition, $id)
     {
+
         if (null !== $definition->getFile()) {
             require_once $this->getParameterBag()->resolveValue($definition->getFile());
         }
@@ -665,7 +667,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
             $service = call_user_func_array(array($factory, $definition->getFactoryMethod()), $arguments);
         } else {
-            $r = new \ReflectionClass($this->getParameterBag()->resolveValue($definition->getClass()));
+            if (null === ($value = $this->getParameterBag()->resolveValue($definition->getClass()))) {
+                throw new RuntimeException('Unable to retrieve a value for the class definition. Maybe you tried direct access using $container->get(...) instead of using the Definition / Reference classes?');
+            }
+
+            $r = new \ReflectionClass($value);
 
             $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
         }

@@ -668,7 +668,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $service = call_user_func_array(array($factory, $definition->getFactoryMethod()), $arguments);
         } else {
             if (null === ($value = $this->getParameterBag()->resolveValue($definition->getClass()))) {
-                throw new RuntimeException('Unable to retrieve a value for the class definition. Maybe you tried direct access using $container->get(...) instead of using the Definition / Reference classes?', $definition->getClass());
+                throw new RuntimeException('Unable to retrieve a value for the class definition. Maybe you tried direct access using $container->get(...) instead of using the Definition / Reference classes?');
             }
 
             $r = new \ReflectionClass($value);

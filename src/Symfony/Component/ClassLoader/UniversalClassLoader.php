@@ -41,6 +41,9 @@ namespace Symfony\Component\ClassLoader;
  *         'Swift_' => __DIR__.'/Swift',
  *     ));
  *
+ *     // register some other class file extensions
+ *     $loader->registerExtensions(array('.class.php', '.inc.php'));
+ *
  *     // activate the autoloader
  *     $loader->register();
  *
@@ -58,6 +61,7 @@ class UniversalClassLoader
 {
     private $namespaces = array();
     private $prefixes = array();
+    private $extensions = array('.php');
     private $namespaceFallback = array();
     private $prefixFallback = array();
 
@@ -79,6 +83,16 @@ class UniversalClassLoader
     public function getPrefixes()
     {
         return $this->prefixes;
+    }
+
+    /**
+     * Gets the configured class file extensions.
+     *
+     * @return array A hash with class file extensions
+     */
+    public function getExtensions()
+    {
+        return $this->extensions;
     }
 
     /**
@@ -180,6 +194,36 @@ class UniversalClassLoader
     }
 
     /**
+     * Registers an array of class file extensions.
+     *
+     * @param array $extensions An array of extensions
+     *
+     * @api
+     */
+    public function registerExtensions(array $extensions)
+    {
+        foreach ($extensions as $extension) {
+            if (!in_array($extension, $this->extensions)) {
+                $this->extensions[] = $extension;
+            }
+        }
+    }
+
+    /**
+     * Registers a class file extension.
+     *
+     * @param string $extension  The class file extension
+     *
+     * @api
+     */
+    public function registerExtension($extension)
+    {
+        if (!in_array($extension, $this->extensions)) {
+            $this->extensions[] = $extension;
+        }
+    }
+
+    /**
      * Registers this instance as an autoloader.
      *
      * @param Boolean $prepend Whether to prepend the autoloader or not
@@ -223,18 +267,22 @@ class UniversalClassLoader
                 foreach ($dirs as $dir) {
                     if (0 === strpos($namespace, $ns)) {
                         $className = substr($class, $pos + 1);
-                        $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $className).'.php';
-                        if (file_exists($file)) {
-                            return $file;
+                        $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $className);
+                        foreach($this->extensions as $extension) {
+                            if (file_exists($file . $extension)) {
+                                return $file . $extension;
+                            }
                         }
                     }
                 }
             }
 
             foreach ($this->namespaceFallback as $dir) {
-                $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
-                if (file_exists($file)) {
-                    return $file;
+                $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $class);
+                 foreach($this->extensions as $extension) {
+                    if (file_exists($file . $extension)) {
+                        return $file . $extension;
+                    }
                 }
             }
         } else {
@@ -242,18 +290,22 @@ class UniversalClassLoader
             foreach ($this->prefixes as $prefix => $dirs) {
                 foreach ($dirs as $dir) {
                     if (0 === strpos($class, $prefix)) {
-                        $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
-                        if (file_exists($file)) {
-                            return $file;
+                        $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class);
+                         foreach($this->extensions as $extension) {
+                            if (file_exists($file . $extension)) {
+                                return $file . $extension;
+                            }
                         }
                     }
                 }
             }
 
             foreach ($this->prefixFallback as $dir) {
-                $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
-                if (file_exists($file)) {
-                    return $file;
+                $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class);
+                 foreach($this->extensions as $extension) {
+                    if (file_exists($file . $extension)) {
+                        return $file . $extension;
+                    }
                 }
             }
         }

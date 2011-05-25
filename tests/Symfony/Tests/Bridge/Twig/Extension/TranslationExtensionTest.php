@@ -25,6 +25,13 @@ class TranslationExtensionTest extends TestCase
         }
     }
 
+    public function testEscaping()
+    {
+        $output = $this->getTemplate('{% trans %}Percent: %value%%% (%msg%){% endtrans %}')->render(array('value' => 12, 'msg' => 'approx.'));
+
+        $this->assertEquals('Percent: 12% (approx.)', $output);
+    }
+
     /**
      * @dataProvider getTransTests
      */

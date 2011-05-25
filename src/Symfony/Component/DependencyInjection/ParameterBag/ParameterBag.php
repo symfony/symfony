@@ -12,6 +12,8 @@
 namespace Symfony\Component\DependencyInjection\ParameterBag;
 
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
+use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  *
@@ -124,16 +126,21 @@ class ParameterBag implements ParameterBagInterface
     /**
      * Replaces parameter placeholders (%name%) by their values.
      *
-     * @param  mixed $value A value
+     * @param mixed $value A value
+     * @param array $resolving An array of keys that are being resolved (used internally to detect circular references)
+     *
+     * @return mixed The resolved value
      *
      * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
+     * @throws ParameterCircularReferenceException if a circular reference if detected
+     * @throws RuntimeException when a given parameter has a type problem.
      */
-    public function resolveValue($value)
+    public function resolveValue($value, array $resolving = array())
     {
         if (is_array($value)) {
             $args = array();
             foreach ($value as $k => $v) {
-                $args[$this->resolveValue($k)] = $this->resolveValue($v);
+                $args[$this->resolveValue($k, $resolving)] = $this->resolveValue($v, $resolving);
             }
 
             return $args;
@@ -143,25 +150,55 @@ class ParameterBag implements ParameterBagInterface
             return $value;
         }
 
-        if (preg_match('/^%([^%]+)%$/', $value, $match)) {
-            // we do this to deal with non string values (Boolean, integer, ...)
-            // the preg_replace_callback converts them to strings
-            return $this->get(strtolower($match[1]));
-        }
-
-        return str_replace('%%', '%', preg_replace_callback(array('/(?<!%)%([^%]+)%/'), array($this, 'resolveValueCallback'), $value));
+        return $this->resolveString($value, $resolving);
     }
 
     /**
-     * Value callback
+     * Resolves parameters inside a string
      *
-     * @see resolveValue
+     * @param string $value     The string to resolve
+     * @param array  $resolving An array of keys that are being resolved (used internally to detect circular references)
      *
-     * @param array $match
-     * @return string
+     * @return string The resolved string
+     *
+     * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
+     * @throws ParameterCircularReferenceException if a circular reference if detected
+     * @throws RuntimeException when a given parameter has a type problem.
      */
-    private function resolveValueCallback($match)
+    public function resolveString($value, array $resolving = array())
     {
-        return $this->get(strtolower($match[1]));
+        // we do this to deal with non string values (Boolean, integer, ...)
+        // as the preg_replace_callback throw an exception when trying
+        // a non-string in a parameter value
+        if (preg_match('/^%([^%]+)%$/', $value, $match)) {
+            $key = strtolower($match[1]);
+
+            if (isset($resolving[$key])) {
+                throw new ParameterCircularReferenceException(array_keys($resolving));
+            }
+
+            $resolving[$key] = true;
+
+            return $this->resolveValue($this->get($key), $resolving);
+        }
+
+        $self = $this;
+        return str_replace('%%', '%', preg_replace_callback('/(?<!%)%([^%]+)%/', function ($match) use ($self, $resolving) {
+            $key = strtolower($match[1]);
+
+            if (isset($resolving[$key])) {
+                throw new ParameterCircularReferenceException(array_keys($resolving));
+            }
+
+            $resolved = $self->get($key);
+
+            if (!is_string($resolved)) {
+                throw new RuntimeException('A parameter cannot contain a non-string parameter.');
+            }
+
+            $resolving[$key] = true;
+
+            return $self->resolveString($resolved, $resolving);
+        }, $value));
     }
 }

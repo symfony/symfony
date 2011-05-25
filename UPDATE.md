@@ -6,6 +6,28 @@ one. It only discusses changes that need to be done when using the "public"
 API of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.
 
+beta2 to beta3
+--------------
+
+* The settings under "framework.annotations" have changed slightly:
+
+  Before:
+  
+    framework:
+        annotations:
+            cache: file
+            file_cache:
+                debug: true
+                dir: /foo
+                
+  After:
+     
+    framework:
+        annotations:
+            cache: file
+            debug: true
+            file_cache_dir: /foo
+
 beta1 to beta2
 --------------
 

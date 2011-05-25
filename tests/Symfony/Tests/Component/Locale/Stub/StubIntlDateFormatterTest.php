@@ -66,12 +66,31 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-    * @dataProvider formatProvider
-    */
+     * @dataProvider formatProvider
+     */
     public function testFormatIntl($pattern, $timestamp, $expected, $errorCode = 0, $errorMessage = 'U_ZERO_ERROR')
     {
         $this->skipIfIntlExtensionIsNotLoaded();
         $this->skipIfICUVersionIsTooOld();
+        $formatter = $this->createIntlFormatter($pattern);
+        $this->assertSame($expected, $formatter->format($timestamp));
+        $this->assertSame($errorMessage, intl_get_error_message());
+        $this->assertSame($errorCode, intl_get_error_code());
+        $this->assertSame($errorCode != 0, intl_is_failure(intl_get_error_code()));
+    }
+
+    /**
+     * @dataProvider formatErrorProvider
+     */
+    public function testFormatErrorIntl($pattern, $timestamp, $expected, $errorCode = 0, $errorMessage = 'U_ZERO_ERROR')
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $this->skipIfICUVersionIsTooOld();
+
+        if (version_compare(PHP_VERSION, '5.3.3') > 0) {
+            $this->markTestSkipped('The intl error messages were change in PHP 5.3.3.');
+        }
+
         $formatter = $this->createIntlFormatter($pattern);
         $this->assertSame($expected, $formatter->format($timestamp));
         $this->assertSame($errorMessage, intl_get_error_message());
@@ -255,13 +274,18 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array('zzz', 0, 'GMT+00:00'),
             array('zzzz', 0, 'GMT+00:00'),
             array('zzzzz', 0, 'GMT+00:00'),
-
-            /* errors */
-            array('y-M-d', '0', false, 1, 'datefmt_format: takes either an array  or an integer timestamp value : U_ILLEGAL_ARGUMENT_ERROR'),
-            array('y-M-d', 'foobar', false, 1, 'datefmt_format: takes either an array  or an integer timestamp value : U_ILLEGAL_ARGUMENT_ERROR'),
         );
 
         return $formatData;
+    }
+
+    public function formatErrorProvider()
+    {
+        /* errors */
+        return array(
+            array('y-M-d', '0', false, 1, 'datefmt_format: takes either an array  or an integer timestamp value : U_ILLEGAL_ARGUMENT_ERROR'),
+            array('y-M-d', 'foobar', false, 1, 'datefmt_format: takes either an array  or an integer timestamp value : U_ILLEGAL_ARGUMENT_ERROR'),
+        );
     }
 
     /**

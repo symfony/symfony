@@ -107,7 +107,7 @@ EOT
         }
     }
 
-    private function getBundleInfo($bundle)
+    protected function getBundleInfo($bundle)
     {
         $namespace = $bundle->getNamespace();
         if (!$metadatas = $this->findMetadatasByNamespace($namespace)) {
@@ -119,7 +119,7 @@ EOT
         return array($metadatas, $bundle->getNamespace(), $path);
     }
 
-    private function getClassInfo($class, $path)
+    protected function getClassInfo($class, $path)
     {
         if (!$metadatas = $this->findMetadatasByClass($class)) {
             throw new \RuntimeException(sprintf('Entity "%s" is not a mapped entity.', $class));
@@ -135,7 +135,7 @@ EOT
         return array($metadatas, $r->getNamespacename(), $path);
     }
 
-    private function getNamespaceInfo($namespace, $path)
+    protected function getNamespaceInfo($namespace, $path)
     {
         if (!$metadatas = $this->findMetadatasByNamespace($namespace)) {
             throw new \RuntimeException(sprintf('Namespace "%s" does not contain any mapped entities.', $namespace));

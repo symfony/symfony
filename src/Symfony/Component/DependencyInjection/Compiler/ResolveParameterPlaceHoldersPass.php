@@ -97,12 +97,21 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
      *
      * @param string $value The string to resolve
      * @return string The resolved string
-     * @throws \RuntimeException when a given parameter has a type problem.
+     * @throws \RuntimeException when a given parameter has a type problem
+     * @throws ParameterNotFoundException when a placeholder references to himself
      */
     public function resolveString($value)
     {
         if (preg_match('/^%[^%]+%$/', $value)) {
-            return $this->resolveValue($this->parameterBag->resolveValue($value));
+            $value = $this->parameterBag->resolveValue($value);
+
+            // Prevent infinity loop when a placeholder references to himself
+            // More info: https://github.com/symfony/symfony/issues/1019
+            if (is_string($value) && preg_match('/^%.+%$/', $value)) {
+                throw new ParameterNotFoundException($value);
+            }
+
+            return $this->resolveValue($value);
         }
 
         $self = $this;

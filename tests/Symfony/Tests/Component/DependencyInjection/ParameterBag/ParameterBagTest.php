@@ -14,6 +14,7 @@ namespace Symfony\Tests\Component\DependencyInjection\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 class ParameterBagTest extends \PHPUnit_Framework_TestCase
 {
@@ -117,9 +118,9 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $bag = new ParameterBag(array('foo' => 'a %bar%', 'bar' => array()));
         try {
             $bag->resolveValue('%foo%');
-            $this->fail('->resolveValue() throws a LogicException when a parameter embeds another non-string parameter');
-        } catch (\LogicException $e) {
-            $this->assertEquals('A parameter cannot contain a non-string parameter.', $e->getMessage(), '->resolveValue() throws a LogicException when a parameter embeds another non-string parameter');
+            $this->fail('->resolveValue() throws a RuntimeException when a parameter embeds another non-string parameter');
+        } catch (RuntimeException $e) {
+            $this->assertEquals('A parameter cannot contain a non-string parameter.', $e->getMessage(), '->resolveValue() throws a RuntimeException when a parameter embeds another non-string parameter');
         }
 
         $bag = new ParameterBag(array('foo' => '%bar%', 'bar' => '%foobar%', 'foobar' => '%foo%'));

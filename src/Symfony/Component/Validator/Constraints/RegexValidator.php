@@ -35,7 +35,7 @@ class RegexValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        if ($constraint->match XOR preg_match($constraint->pattern, $value)) {
+        if ($constraint->match xor preg_match($constraint->pattern, $value)) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;

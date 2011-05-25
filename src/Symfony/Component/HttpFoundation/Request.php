@@ -490,7 +490,7 @@ class Request
     {
         $scheme = $this->getScheme();
         $host   = $this->getHost();
-        if(!$host) {
+        if (!$host) {
             $host = $this->server->get('SERVER_NAME');
         }
         $port   = $this->getPort();

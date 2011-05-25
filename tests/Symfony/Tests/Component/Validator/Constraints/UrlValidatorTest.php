@@ -76,6 +76,8 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
             array('google.com'),
             array('http:/google.com'),
             array('http://google.com::aa'),
+            array('http://google.foobar'),
+            array('ftp://google.fr'),
         );
     }
 

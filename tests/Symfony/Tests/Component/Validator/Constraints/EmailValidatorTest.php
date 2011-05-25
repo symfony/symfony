@@ -48,6 +48,17 @@ class EmailValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->validator->isValid($email, new Email()));
     }
 
+    /**
+     * @dataProvider getValidEmails
+     */
+    public function testValidEmailsAndCheckMX($email)
+    {
+        $validator = new EmailValidator();
+        $validator->checkMX = true;
+
+        $this->assertTrue($validator->isValid($email, new Email()));
+    }
+
     public function getValidEmails()
     {
         return array(

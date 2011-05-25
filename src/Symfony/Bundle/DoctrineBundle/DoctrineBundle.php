@@ -30,4 +30,11 @@ class DoctrineBundle extends Bundle
 
         $container->addCompilerPass(new RegisterEventListenersAndSubscribersPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
     }
+
+    public function boot()
+    {
+        // force Doctrine annotations to be loaded
+        // should be removed when a better solution is found in Doctrine
+        class_exists('Doctrine\ORM\Mapping\Driver\AnnotationDriver');
+    }
 }

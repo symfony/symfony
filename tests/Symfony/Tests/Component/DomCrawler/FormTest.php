@@ -142,13 +142,13 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testGetMethod()
     {
         $form = $this->createForm('<form><input type="submit" /></form>');
-        $this->assertEquals('get', $form->getMethod(), '->getMethod() returns get if no method is defined');
+        $this->assertEquals('GET', $form->getMethod(), '->getMethod() returns get if no method is defined');
 
         $form = $this->createForm('<form method="post"><input type="submit" /></form>');
-        $this->assertEquals('post', $form->getMethod(), '->getMethod() returns the method attribute value of the form');
+        $this->assertEquals('POST', $form->getMethod(), '->getMethod() returns the method attribute value of the form');
 
         $form = $this->createForm('<form method="post"><input type="submit" /></form>', 'put');
-        $this->assertEquals('put', $form->getMethod(), '->getMethod() returns the method defined in the constructor if provided');
+        $this->assertEquals('PUT', $form->getMethod(), '->getMethod() returns the method defined in the constructor if provided');
     }
 
     public function testGetSetValue()

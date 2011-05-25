@@ -26,13 +26,15 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * Available options:
      *
-     *  * name:     The cookie name (_SESS by default)
-     *  * id:       The session id (null by default)
-     *  * lifetime: Cookie lifetime
-     *  * path:     Cookie path
-     *  * domain:   Cookie domain
-     *  * secure:   Cookie secure
-     *  * httponly: Cookie http only
+     *  * name:         The cookie name (_SESS by default)
+     *  * id:           The session id (null by default)
+     *  * save_path:    The session save path (null by default)
+     *  * save_handler: The session save handler (null by default)
+     *  * lifetime:     Cookie lifetime
+     *  * path:         Cookie path
+     *  * domain:       Cookie domain
+     *  * secure:       Cookie secure
+     *  * httponly:     Cookie http only
      *
      * The default values for most options are those returned by the session_get_cookie_params() function
      *
@@ -73,6 +75,14 @@ class NativeSessionStorage implements SessionStorageInterface
 
         // disable native cache limiter as this is managed by HeaderBag directly
         session_cache_limiter(false);
+
+        if (!empty($this->options['save_path'])) {
+            session_save_path($this->options['save_path']);
+        }
+
+        if (!empty($this->options['save_path'])) {
+            session_module_name($this->options['save_handler']);
+        }
 
         if (!ini_get('session.use_cookies') && isset($this->options['id']) && $this->options['id'] && $this->options['id'] != session_id()) {
             session_id($this->options['id']);

@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Exception\CircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -50,7 +50,7 @@ class CheckCircularReferencesPass implements CompilerPassInterface
             $this->currentPath[] = $id = $node->getId();
 
             if ($this->currentId === $id) {
-                throw new CircularReferenceException($this->currentId, $this->currentPath);
+                throw new ServiceCircularReferenceException($this->currentId, $this->currentPath);
             }
 
             $this->checkOutEdges($node->getOutEdges());

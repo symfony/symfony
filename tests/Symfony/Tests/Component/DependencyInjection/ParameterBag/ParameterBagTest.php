@@ -13,6 +13,7 @@ namespace Symfony\Tests\Component\DependencyInjection\ParameterBag;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
+use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 
 class ParameterBagTest extends \PHPUnit_Framework_TestCase
 {
@@ -119,6 +120,22 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
             $this->fail('->resolveValue() throws a LogicException when a parameter embeds another non-string parameter');
         } catch (\LogicException $e) {
             $this->assertEquals('A parameter cannot contain a non-string parameter.', $e->getMessage(), '->resolveValue() throws a LogicException when a parameter embeds another non-string parameter');
+        }
+
+        $bag = new ParameterBag(array('foo' => '%bar%', 'bar' => '%foobar%', 'foobar' => '%foo%'));
+        try {
+            $bag->resolveValue('%foo%');
+            $this->fail('->resolveValue() throws a ParameterCircularReferenceException when a parameter has a circular reference');
+        } catch (ParameterCircularReferenceException $e) {
+            $this->assertEquals('Circular reference detected for parameter "foo" ("foo" > "bar" > "foobar" > "foo").', $e->getMessage(), '->resolveValue() throws a ParameterCircularReferenceException when a parameter has a circular reference');
+        }
+
+        $bag = new ParameterBag(array('foo' => 'a %bar%', 'bar' => 'a %foobar%', 'foobar' => 'a %foo%'));
+        try {
+            $bag->resolveValue('%foo%');
+            $this->fail('->resolveValue() throws a ParameterCircularReferenceException when a parameter has a circular reference');
+        } catch (ParameterCircularReferenceException $e) {
+            $this->assertEquals('Circular reference detected for parameter "foo" ("foo" > "bar" > "foobar" > "foo").', $e->getMessage(), '->resolveValue() throws a ParameterCircularReferenceException when a parameter has a circular reference');
         }
     }
 

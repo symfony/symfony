@@ -70,7 +70,7 @@ class PdoSessionStorage extends NativeSessionStorage
 
         // use to prevent the sessions database from growing endlessly
         // if session.gc_probability is on 0 (like Debian system)
-        if ((int) ini_get('session.gc_probability') == 0) {
+        if ((int) ini_get('session.gc_probability') <= 0) {
             if (rand(1, ini_get('session.gc_divisor') + 1) === 1) {
                 $this->sessionGC($this->options['lifetime']);
             }

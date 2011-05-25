@@ -131,5 +131,6 @@
         <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="debug" type="xsd:string" />
         <xsd:attribute name="file-cache-dir" type="xsd:string" />
+        <xsd:attribute name="autoload" type="xsd:string" />
     </xsd:complexType>
 </xsd:schema>

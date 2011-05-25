@@ -5,62 +5,214 @@
 このドキュメントでは、フレームワークの "パブリックな" APIを使っている場合に必要な変更点についてのみ説明しています。
 フレームワークのコアコードを "ハック" している場合は、変更履歴を注意深く追跡する必要があるでしょう。
 
+beta2 から beta3
+----------------
+
+* `framework.annotations` に属する設定が少し変更されました。
+
+  変更前:
+
+    framework:
+        annotations:
+            cache: file
+            file_cache:
+                debug: true
+                dir: /foo
+
+  変更後:
+
+    framework:
+        annotations:
+            cache: file
+            debug: true
+            file_cache_dir: /foo
+
 beta1 から beta2
 ----------------
 
-* ``error_handler`` の設定が削除されました。\ ``ErrorHandler`` クラスは Symfony Standard Edition の ``AppKernel`` で直接管理されるように変更されました。
-
-* Doctrine のメタデータ用のディレクトリが、\ ``Resources/config/doctrine/metadata/orm/`` から ``Resources/config/doctrine`` に変更され、各ファイルの拡張子が ``.dcm.yml`` から ``.orm.yml`` に変更されました。
+* アノテーションのパース処理が変更され、Doctrine Common 3.0 を利用するようになりました。
+  クラス内で使うアノテーションは、インポートする必要があります（`use` で PHP の名前空間をインポートするのと同様です）。
 
   変更前:
+
+``` php
+<?php
+
+/**
+ * @orm:Entity
+ */
+class AcmeUser
+{
+    /**
+     * @orm:Id
+     * @orm:GeneratedValue(strategy = "AUTO")
+     * @orm:Column(type="integer")
+     * @var integer
+     */
+    private $id;
+
+    /**
+     * @orm:Column(type="string", nullable=false)
+     * @assert:NotBlank
+     * @var string
+     */
+    private $name;
+}
+```
+  変更後:
+
+``` php
+<?php
+
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
+/**
+ * @ORM\Entity
+ */
+class AcmeUser
+{
+    /**
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column(type="integer")
+     *
+     * @var integer
+     */
+    private $id;
+
+    /**
+     * @ORM\Column(type="string", nullable=false)
+     * @Assert\NotBlank
+     *
+     * @var string
+     */
+    private $name;
+}
+```
+
+* `Set` 制約の記述が変更され、必要なくなったため削除されました。
+
+変更前:
+
+``` php
+<?php
+
+/**
+ * @orm:Entity
+ */
+class AcmeEntity
+{
+    /**
+     * @assert:Set({@assert:Callback(...), @assert:Callback(...)})
+     */
+    private $foo;
+}
+```
+変更後:
+
+``` php
+<?php
+
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\Callback;
+
+/**
+ * @ORM\Entity
+ */
+class AcmeEntity
+{
+    /**
+     * @Callback(...)
+     * @Callback(...)
+     */
+    private $foo;
+}
+```
+
+* `framework.validation.annotations` に属するコンフィギュレーションは削除され、`framework.validation.enable_annotations` の真偽値に置き換えられました（デフォルトでは `false` です）。
+
+* フォームを使う場合は、明示的に有効化するよう変更されました（Symfony Standard Edition のコンフィギュレーションではデフォルトで有効に設定されています）。
+
+        framework:
+            form: ~
+
+    これは、次のように記述しても同じです。
+
+        framework:
+            form:
+                enabled: true
+
+* Routing コンポーネントの例外を移動しました。
+
+    変更前:
+
+        Symfony\Component\Routing\Matcher\Exception\Exception
+        Symfony\Component\Routing\Matcher\Exception\NotFoundException
+        Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException
+
+    変更後:
+
+        Symfony\Component\Routing\Exception\Exception
+        Symfony\Component\Routing\Exception\NotFoundException
+        Symfony\Component\Routing\Exception\MethodNotAllowedException
+
+* Form コンポーネントの `csrf_page_id` オプションの名前は、`intention` に変更されました。
+
+* `error_handler` の設定が削除されました。`ErrorHandler` クラスは Symfony Standard Edition の `AppKernel` で直接管理されるように変更されました。
+
+* Doctrine のメタデータ用のディレクトリが、`Resources/config/doctrine/metadata/orm/` から `Resources/config/doctrine` に変更され、各ファイルの拡張子が `.dcm.yml` から ``.orm.yml`` に変更されました。
+  また、ファイル名は短いクラス名のみに変更されました。
+
+    変更前:
 
         Resources/config/doctrine/metadata/orm/Bundle.Entity.dcm.xml
         Resources/config/doctrine/metadata/orm/Bundle.Entity.dcm.yml
 
-  変更後:
+    変更後:
 
-        Resources/config/doctrine/Bundle.Entity.orm.xml
-        Resources/config/doctrine/Bundle.Entity.orm.yml
+        Resources/config/doctrine/Entity.orm.xml
+        Resources/config/doctrine/Entity.orm.yml
 
-* 新しい Doctrine Registry クラスの導入により、次のパラメータは削除されました（\ `doctrine` サービスのメソッドに置き換えられました）。
+* 新しい Doctrine Registry クラスの導入により、次のパラメータは削除されました（`doctrine` サービスのメソッドに置き換えられました）。
 
-   * doctrine.orm.entity_managers
-   * doctrine.orm.default_entity_manager
-   * doctrine.dbal.default_connection
+   * `doctrine.orm.entity_managers`
+   * `doctrine.orm.default_entity_manager`
+   * `doctrine.dbal.default_connection`
 
-  変更前:
+    変更前:
 
         $container->getParameter('doctrine.orm.entity_managers')
         $container->getParameter('doctrine.orm.default_entity_manager')
         $container->getParameter('doctrine.orm.default_connection')
 
-  変更後:
+    変更後:
 
         $container->get('doctrine')->getEntityManagerNames()
         $container->get('doctrine')->getDefaultEntityManagerName()
         $container->get('doctrine')->getDefaultConnectionName()
 
-  ただし、これらのメソッドを使わなくても、次のようにして Registry オブジェクトから直接 EntityManager オブジェクトを取得できます。
+    ただし、これらのメソッドを使わなくても、次のようにして Registry オブジェクトから直接 EntityManager オブジェクトを取得できます。
 
-  変更前:
+    変更前:
 
         $em = $this->get('doctrine.orm.entity_manager');
         $em = $this->get('doctrine.orm.foobar_entity_manager');
 
-  変更後:
+    変更後:
 
         $em = $this->get('doctrine')->getEntityManager();
         $em = $this->get('doctrine')->getEntityManager('foobar');
 
 * `doctrine:generate:entities` コマンドの引数とオプションが変更されました。
-  新しい引数とオプションの詳細は、\ `./app/console doctrine:generate:entities --help` コマンドを実行して確認してください。
+  新しい引数とオプションの詳細は、`./app/console doctrine:generate:entities --help` コマンドを実行して確認してください。
 
 * `doctrine:generate:repositories` コマンドは削除されました。
-  このコマンドに相当する機能は、\ `doctrine:generate:entities` コマンドに統合されました。
+  このコマンドに相当する機能は、`doctrine:generate:entities` コマンドに統合されました。
 
-* Doctrine イベントサブスクライバーは、ユニークな "doctrine.event_subscriber" タグを使うように変更されました。
-  また、Doctrine イベントリスナーは、ユニークな "doctrine.event_listener" タグを使うように変更されました。
-  コネクションを指定するには、オプションの "connection" 属性を使ってください。
+* Doctrine イベントサブスクライバーは、ユニークな `doctrine.event_subscriber` タグを使うように変更されました。
+  また、Doctrine イベントリスナーは、ユニークな `doctrine.event_listener` タグを使うように変更されました。
+  コネクションを指定するには、オプションの `connection` 属性を使ってください。
 
     変更前:
 
@@ -88,7 +240,7 @@ beta1 から beta2
                 - { name: doctrine.event_subscriber }                      # すべてのコネクションに対して登録
                 - { name: doctrine.event_subscriber, connection: default } # デフォルトコネクションにのみ登録
 
-* アプリケーションの翻訳ファイルは、\ `Resources` ディレクトリに保存されるように変更されました。
+* アプリケーションの翻訳ファイルは、`Resources` ディレクトリに保存されるように変更されました。
 
     変更前:
 
@@ -98,7 +250,7 @@ beta1 から beta2
 
         app/Resources/translations/catalogue.fr.xml
 
-* "collection" フォームタイプの "modifiable" オプションは、2 つのオプション "allow_add" と "allow_delete" に分割されました。
+* `collection` フォームタイプの `modifiable` オプションは、2 つのオプション "allow_add" と "allow_delete" に分割されました。
 
     変更前:
 
@@ -115,12 +267,12 @@ beta1 から beta2
             'allow_delete' => true,
         ));
 
-* Request::hasSession() メソッドの名前は Request::hasPreviousSession() に変更されました。hasSession() メソッドはまだ存在しますが、
+* `Request::hasSession()` メソッドの名前は `Request::hasPreviousSession()` に変更されました。`hasSession()` メソッドはまだ存在しますが、
   セッションが以前のリクエストから開始されたかどうかではなく、リクエストがセッションオブジェクトを含んでいるかチェックするのみです。
 
-* Serializer: NormalizerInterface の `supports()` メソッドは `supportsNormalization` と `supportsDenormalization` の 2 つのメソッドに分割されました。
+* Serializer: NormalizerInterface の `supports()` メソッドは `supportsNormalization()` と `supportsDenormalization()` の 2 つのメソッドに分割されました。
 
-* ParameterBag::getDeep() メソッドは削除され、ParameterBag::get() メソッドの真偽値の引数に置き換えられました。
+* `ParameterBag::getDeep()` メソッドは削除され、`ParameterBag::get()` メソッドの真偽値の引数に置き換えられました。
 
 * Serializer: `AbstractEncoder` と `AbstractNormalizer` はそれぞれ `SerializerAwareEncoder` と `SerializerAwareNormalizer` に名前が変更されました。
 
@@ -129,10 +281,12 @@ beta1 から beta2
 * Form: オプションの値である "date" タイプの "widget" の "text" は "single-text" に名前が変更されました。
   "text" は現在は個々のテキストボックスを示します ("time" タイプのように) 。
 
+* Form: ビュー変数 `name` が `full_name` に変更されました。`name` 変数には `$form->getName()` と同じ値である、ローカルの短い名前が格納されるようになりました。
+
 PR12 から beta1
 ---------------
 
-* CSRF シークレットの設定は、\ `secret` という必須のグローバル設定に変更されました（また、このシークレット値は CSRF 以外でも利用されます）
+* CSRF シークレットの設定は、`secret` という必須のグローバル設定に変更されました（また、このシークレット値は CSRF 以外でも利用されます）
 
     変更前:
 
@@ -164,29 +318,29 @@ PR12 から beta1
 
 * `trans` タグで、翻訳するメッセージを引数として受け取る形式が廃止されました:
 
-    {% trans "foo" %}
-    {% trans foo %}
+        {% trans "foo" %}
+        {% trans foo %}
 
-  次のような長い形式か、フィルタ形式を使ってください:
+    次のような長い形式か、フィルタ形式を使ってください:
 
-    {% trans %}foo{% endtrans %}
-    {{ foo|trans }}
+        {% trans %}foo{% endtrans %}
+        {{ foo|trans }}
 
-  こうすることで、タグとフィルタの使用方法が明確になり、自動出力エスケープのルールが適用された場合により分かりやすくなります（詳細はドキュメントを参照してください）。
+    こうすることで、タグとフィルタの使用方法が明確になり、自動出力エスケープのルールが適用された場合により分かりやすくなります（詳細はドキュメントを参照してください）。
 
-* DependencyInjection コンポーネントの ContainerBuilder クラスと Definition クラスのいくつかのメソッドの名前が、より分かりやすく一貫性のある名前に変更されました:
+* DependencyInjection コンポーネントの `ContainerBuilder` クラスと `Definition` クラスのいくつかのメソッドの名前が、より分かりやすく一貫性のある名前に変更されました:
 
-  変更前:
+    変更前:
 
         $container->remove('my_definition');
         $definition->setArgument(0, 'foo');
 
-  変更後:
+    変更後:
 
         $container->removeDefinition('my_definition');
         $definition->replaceArgument(0, 'foo');
 
-* rememberme のコンフィギュレーションで、\ `token_provider key` サービスIDのサフィックスを指定するのではなく、サービスIDそのものを指定するように変更されました。
+* rememberme のコンフィギュレーションで、`token_provider key` サービスIDのサフィックスを指定するのではなく、サービスIDそのものを指定するように変更されました。
 
 PR11 から PR12
 --------------
@@ -214,9 +368,9 @@ PR11 から PR12
 PR10 から PR11
 --------------
 
-* エクステンションのコンフィギュレーションクラスには、\ `Symfony\Component\Config\Definition\ConfigurationInterface`\ インターフェイスを実装する必要があります。この部分の後方互換性は維持されていますが、今後の開発のために、エクステンションにこのインターフェイスを実装しておいてください。
+* エクステンションのコンフィギュレーションクラスには、`Symfony\Component\Config\Definition\ConfigurationInterface` インターフェイスを実装する必要があります。この部分の後方互換性は維持されていますが、今後の開発のために、エクステンションにこのインターフェイスを実装しておいてください。
 
-* Monologのオプション "fingerscrossed" は "fingers_crossed" に名前が変更されました。
+* Monologのオプション `fingerscrossed` は `fingers_crossed` に名前が変更されました。
 
 PR9 から PR10
 -------------
@@ -310,11 +464,11 @@ PR8 から PR9
 
 * Asseticのフィルターは明示的にロードする必要があります:
 
-    assetic:
-        filters:
-            cssrewrite: ~
-            yui_css:
-                jar: "/path/to/yuicompressor.jar"
-            my_filter:
-                resource: "%kernel.root_dir%/config/my_filter.xml"
-                foo:      bar
+        assetic:
+            filters:
+                cssrewrite: ~
+                yui_css:
+                    jar:      "/path/to/yuicompressor.jar"
+                my_filter:
+                    resource: "%kernel.root_dir%/config/my_filter.xml"
+                    foo:      bar

@@ -124,9 +124,12 @@ class ParameterBag implements ParameterBagInterface
     /**
      * Replaces parameter placeholders (%name%) by their values.
      *
-     * @param  mixed $value A value
+     * @param mixed $value A value
+     *
+     * @return mixed The resolved value
      *
      * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
+     * @throws \LogicException when a given parameter has a type problem.
      */
     public function resolveValue($value)
     {
@@ -143,25 +146,36 @@ class ParameterBag implements ParameterBagInterface
             return $value;
         }
 
-        if (preg_match('/^%([^%]+)%$/', $value, $match)) {
-            // we do this to deal with non string values (Boolean, integer, ...)
-            // the preg_replace_callback converts them to strings
-            return $this->get(strtolower($match[1]));
-        }
-
-        return str_replace('%%', '%', preg_replace_callback(array('/(?<!%)%([^%]+)%/'), array($this, 'resolveValueCallback'), $value));
+        return $this->resolveString($value);
     }
 
     /**
-     * Value callback
+     * Resolves parameters inside a string
      *
-     * @see resolveValue
+     * @param string $value The string to resolve
+     * @return string The resolved string
      *
-     * @param array $match
-     * @return string
+     * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
+     * @throws \LogicException when a given parameter has a type problem.
      */
-    private function resolveValueCallback($match)
+    public function resolveString($value)
     {
-        return $this->get(strtolower($match[1]));
+        if (preg_match('/^%([^%]+)%$/', $value, $match)) {
+            // we do this to deal with non string values (Boolean, integer, ...)
+            // as the preg_replace_callback throw an exception when trying
+            // a non-string in a parameter value
+            return $this->resolveValue($this->get(strtolower($match[1])));
+        }
+
+        $self = $this;
+        return str_replace('%%', '%', preg_replace_callback('/(?<!%)%([^%]+)%/', function ($match) use ($self) {
+            $resolved = $self->get(strtolower($match[1]));
+
+            if (!is_string($resolved)) {
+                throw new \LogicException('A parameter cannot contain a non-string parameter.');
+            }
+
+            return $self->resolveString($resolved);
+        }, $value));
     }
 }

@@ -94,21 +94,31 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('I\'m a bar %foo bar', $bag->resolveValue('I\'m a %foo% %%foo %foo%'), '->resolveValue() supports % escaping by doubling it');
 
         $bag = new ParameterBag(array('foo' => true));
-        $this->assertTrue($bag->resolveValue('%foo%') === true, '->resolveValue() replaces arguments that are just a placeholder by their value without casting them to strings');
+        $this->assertSame(true, $bag->resolveValue('%foo%'), '->resolveValue() replaces arguments that are just a placeholder by their value without casting them to strings');
+        $bag = new ParameterBag(array('foo' => null));
+        $this->assertSame(null, $bag->resolveValue('%foo%'), '->resolveValue() replaces arguments that are just a placeholder by their value without casting them to strings');
 
         $bag = new ParameterBag(array());
         try {
-            $bag->resolveValue('%foobar%', array());
+            $bag->resolveValue('%foobar%');
             $this->fail('->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent parameter');
         } catch (ParameterNotFoundException $e) {
             $this->assertEquals('You have requested a non-existent parameter "foobar".', $e->getMessage(), '->resolveValue() throws a ParameterNotFoundException if a placeholder references a non-existent parameter');
         }
 
         try {
-            $bag->resolveValue('foo %foobar% bar', array());
+            $bag->resolveValue('foo %foobar% bar');
             $this->fail('->resolveValue() throws a ParameterNotFoundException if a placeholder references a non-existent parameter');
         } catch (ParameterNotFoundException $e) {
             $this->assertEquals('You have requested a non-existent parameter "foobar".', $e->getMessage(), '->resolveValue() throws a ParameterNotFoundException if a placeholder references a non-existent parameter');
+        }
+
+        $bag = new ParameterBag(array('foo' => 'a %bar%', 'bar' => array()));
+        try {
+            $bag->resolveValue('%foo%');
+            $this->fail('->resolveValue() throws a LogicException when a parameter embeds another non-string parameter');
+        } catch (\LogicException $e) {
+            $this->assertEquals('A parameter cannot contain a non-string parameter.', $e->getMessage(), '->resolveValue() throws a LogicException when a parameter embeds another non-string parameter');
         }
     }
 

@@ -104,12 +104,14 @@ class TransNode extends \Twig_Node
             $current[$name] = true;
         }
 
-        preg_match_all('/\%([^\%]+)\%/', $msg, $matches);
+        preg_match_all('/\%([^(\\\%)]+?)\%/', $msg, $matches);
         foreach ($matches[1] as $var) {
             if (!isset($current['%'.$var.'%'])) {
                 $vars->setNode('%'.$var.'%', new \Twig_Node_Expression_Name($var, $body->getLine()));
             }
         }
+
+        $msg = preg_replace('/\\\%/', '%', $msg);
 
         return array(new \Twig_Node_Expression_Constant(trim($msg), $body->getLine()), $vars);
     }

@@ -38,6 +38,31 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getLoadClassWithExtensionTests
+     */
+    public function testLoadClassWithExtension($className, $testClassName, $message)
+    {
+        $loader = new UniversalClassLoader();
+        $loader->registerNamespace('Namespaced', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->registerPrefix('Pearlike_', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->registerExtension('.class.php');
+        $loader->registerExtension('.inc');
+        $loader->registerExtensions(array('.inc.php', '.lib.php'));
+        $loader->loadClass($testClassName);
+        $this->assertTrue(class_exists($className), $message);
+    }
+
+    public function getLoadClassWithExtensionTests()
+    {
+        return array(
+            array('\\Namespaced\\Foz', 'Namespaced\\Foz',   '->loadClass() loads Namespaced\Foz class'),
+            array('\\Pearlike_Far',    'Pearlike_Far',      '->loadClass() loads Pearlike_Far class'),
+            array('\\Namespaced\\Boo', '\\Namespaced\\Boo', '->loadClass() loads Namespaced\Boo class with a leading slash'),
+            array('\\Pearlike_Boz',    '\\Pearlike_Boz',    '->loadClass() loads Pearlike_Boz class with a leading slash'),
+        );;
+    }
+
+    /**
      * @dataProvider getLoadClassFromFallbackTests
      */
     public function testLoadClassFromFallback($className, $testClassName, $message)

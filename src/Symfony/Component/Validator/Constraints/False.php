@@ -14,12 +14,4 @@ namespace Symfony\Component\Validator\Constraints;
 class False extends \Symfony\Component\Validator\Constraint
 {
     public $message = 'This value should be false';
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTargets()
-    {
-        return self::PROPERTY_CONSTRAINT;
-    }
 }

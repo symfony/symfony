@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 class ParameterBag implements ParameterBagInterface
 {
     protected $parameters;
+    protected $resolved;
 
     /**
      * Constructor.
@@ -32,6 +33,7 @@ class ParameterBag implements ParameterBagInterface
     {
         $this->parameters = array();
         $this->add($parameters);
+        $this->resolved = false;
     }
 
     /**
@@ -112,15 +114,24 @@ class ParameterBag implements ParameterBagInterface
      */
     public function resolve()
     {
+        if ($this->resolved) {
+            return;
+        }
+
+        $parameters = array();
         foreach ($this->parameters as $key => $value) {
             try {
-                $this->parameters[$key] = $this->resolveValue($value);
+                $value = $this->resolveValue($value);
+                $parameters[$key] = is_string($value) ? str_replace('%%', '%', $value) : $value;
             } catch (ParameterNotFoundException $e) {
                 $e->setSourceKey($key);
 
                 throw $e;
             }
         }
+
+        $this->parameters = $parameters;
+        $this->resolved = true;
     }
 
     /**
@@ -179,13 +190,12 @@ class ParameterBag implements ParameterBagInterface
 
             $resolving[$key] = true;
 
-            return $this->resolveValue($this->get($key), $resolving);
+            return $this->resolved ? $this->get($key) : $this->resolveValue($this->get($key), $resolving);
         }
 
         $self = $this;
-        return str_replace('%%', '%', preg_replace_callback('/(?<!%)%([^%]+)%/', function ($match) use ($self, $resolving) {
+        return preg_replace_callback('/(?<!%)%([^%]+)%/', function ($match) use ($self, $resolving) {
             $key = strtolower($match[1]);
-
             if (isset($resolving[$key])) {
                 throw new ParameterCircularReferenceException(array_keys($resolving));
             }
@@ -198,7 +208,12 @@ class ParameterBag implements ParameterBagInterface
 
             $resolving[$key] = true;
 
-            return $self->resolveString($resolved, $resolving);
-        }, $value));
+            return $self->isResolved() ? $resolved : $self->resolveString($resolved, $resolving);
+        }, $value);
+    }
+
+    public function isResolved()
+    {
+        return $this->resolved;
     }
 }

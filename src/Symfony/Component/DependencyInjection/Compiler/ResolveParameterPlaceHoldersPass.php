@@ -31,7 +31,6 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $parameterBag = $container->getParameterBag();
-        $parameterBag->resolve();
 
         foreach ($container->getDefinitions() as $id => $definition) {
             try {
@@ -58,5 +57,7 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
             $aliases[$parameterBag->resolveValue($name)] = $parameterBag->resolveValue($target);
         }
         $container->setAliases($aliases);
+
+        $parameterBag->resolve();
     }
 }

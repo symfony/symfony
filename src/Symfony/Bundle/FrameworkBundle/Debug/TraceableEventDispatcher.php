@@ -52,15 +52,15 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     {
         if (!is_callable($listener)) {
             if (is_string($listener)) {
-                $type = '[string] '.$listener;
+                $typeDefinition = '[string] '.$listener;
             } elseif (is_array($listener)) {
-                $type = '[array] '.$listener[0].', '.$listener[1];
+                $typeDefinition = '[array] '.$listener[0].', '.$listener[1];
             } elseif (is_object($listener)) {
-                $type = '[object] '.get_class($listener);
+                $typeDefinition = '[object] '.get_class($listener);
             } else {
-                $type = '[?] '.var_export($listener, true);
+                $typeDefinition = '[?] '.var_export($listener, true);
             }
-            $msg = sprintf('The given callback (%s) for event "%s" is not callable.', $type, $eventName);
+            $msg = sprintf('The given callback (%s) for event "%s" is not callable.', $typeDefinition, $eventName);
             if (null !== $this->logger) {
                 $this->logger->err($msg);
             }
@@ -102,14 +102,18 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
 
                     foreach ($skippedListeners as $skippedListener) {
                         if ($skipped) {
-                            $typeDef = is_object($skippedListener)
-                                ? get_class($skippedListener)
-                                : is_array($skippedListener)
-                                    ? is_object($skippedListener[0])
-                                        ? get_class($skippedListener[0])
-                                        : implode('::', $skippedListener)
-                                    : implode('::', $skippedListener);
-                            $this->logger->debug(sprintf('Listener "%s" was not called for event "%s".', $typeDef, $eventName));
+                            if (is_object($skippedListener)) {
+                                $typeDefinition = get_class($skippedListener);
+                            } elseif (is_array($skippedListener)) {
+                                if (is_object($skippedListener[0])) {
+                                    $typeDefinition = get_class($skippedListener);
+                                } else {
+                                    $typeDefinition = implode('::', $skippedListener);
+                                }
+                            } else {
+                                $typeDefinition = $skippedListener;
+                            }
+                            $this->logger->debug(sprintf('Listener "%s" was not called for event "%s".', $typeDefinition, $eventName));
                         }
 
                         if ($skippedListener === $listener) {

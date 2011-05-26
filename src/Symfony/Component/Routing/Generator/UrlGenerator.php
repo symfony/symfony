@@ -101,7 +101,7 @@ class UrlGenerator implements UrlGeneratorInterface
 
         // all params must be given
         if ($diff = array_diff_key($variables, $tparams)) {
-            throw new MissingMandatoryParametersException(sprintf('The "%s" route has some missing mandatory parameters (%s).', $name, implode(', ', array_keys($diff))));
+            throw new MissingMandatoryParametersException(sprintf('The "%s" route has some missing mandatory parameters ("%s").', $name, implode('", "', array_keys($diff))));
         }
 
         $url = '';

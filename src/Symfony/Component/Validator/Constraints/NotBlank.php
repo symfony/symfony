@@ -14,12 +14,4 @@ namespace Symfony\Component\Validator\Constraints;
 class NotBlank extends \Symfony\Component\Validator\Constraint
 {
     public $message = 'This value should not be blank';
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTargets()
-    {
-        return self::PROPERTY_CONSTRAINT;
-    }
 }

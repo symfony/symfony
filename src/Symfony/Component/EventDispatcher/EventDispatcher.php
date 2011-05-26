@@ -163,15 +163,7 @@ class EventDispatcher implements EventDispatcherInterface
     protected function doDispatch($listeners, $eventName, Event $event)
     {
         foreach ($listeners as $listener) {
-            // TODO: remove this before final release, temporary transitional code
-            if (is_object($listener) && method_exists($listener, $eventName)) {
-                $listener->$eventName($event);
-                //trigger_error('Event listeners should now be registered using a complete callback as the listener instead of just an instance. Adjust your code ASAP.', E_USER_DEPRECATED);
-            } else {
-                // only this call should remain
-                call_user_func($listener, $event);
-            }
-
+            call_user_func($listener, $event);
             if ($event->isPropagationStopped()) {
                 break;
             }

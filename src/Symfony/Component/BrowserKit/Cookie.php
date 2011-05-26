@@ -234,7 +234,7 @@ class Cookie
      */
     public function getPath()
     {
-        return (null !== $this->path)?$this->path:'/';
+        return null !== $this->path ? $this->path : '/';
     }
 
     /**

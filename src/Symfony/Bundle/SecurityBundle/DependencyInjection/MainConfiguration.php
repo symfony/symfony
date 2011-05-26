@@ -58,7 +58,7 @@ class MainConfiguration implements ConfigurationInterface
             // add a faux-entry for factories, so that no validation error is thrown
             ->fixXmlConfig('factory', 'factories')
             ->children()
-                ->arrayNode('factories')->ignoreExtraKeys()->end()
+                ->arrayNode('factories')->ignoreExtraKeys()->addDefaultsIfNotSet()->end()
             ->end()
         ;
 

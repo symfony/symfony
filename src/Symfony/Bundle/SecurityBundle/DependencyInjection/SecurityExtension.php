@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * SecurityExtension.
@@ -44,16 +45,8 @@ class SecurityExtension extends Extension
             return;
         }
 
-        $processor = new Processor();
-
-        // first assemble the factories
-        $factoriesConfig = new FactoryConfiguration();
-        $config = $processor->processConfiguration($factoriesConfig, $configs);
-        $factories = $this->createListenerFactories($container, $config);
-
-        // normalize and merge the actual configuration
-        $mainConfig = new MainConfiguration($factories);
-        $config = $processor->processConfiguration($mainConfig, $configs);
+        // process and flatten the configs
+        $config = $this->processConfigs($configs, $container->getParameterBag());
 
         // load services
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
@@ -107,6 +100,29 @@ class SecurityExtension extends Extension
             'Symfony\\Component\\HttpFoundation\\RequestMatcher',
             'Symfony\\Component\\HttpFoundation\\RequestMatcherInterface',
         ));
+    }
+
+    /**
+     * Takes in the config arrays, validates and flattens them into one array
+     *
+     * @param array $configs The raw array of configuration arrays
+     * @param \Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface $parameterBag
+     * @return array The flattened configuration
+     */
+    private function processConfigs(array $configs, ParameterBagInterface $parameterBag)
+    {
+        $processor = new Processor();
+
+        // first assemble the factories
+        $factoriesConfig = new FactoryConfiguration();
+        $config = $processor->processConfiguration($factoriesConfig, $configs);
+
+        $factories = $this->createListenerFactories($parameterBag, $config['factories']);
+
+        // normalize and merge the actual configuration
+        $mainConfig = new MainConfiguration($factories);
+
+        return $processor->processConfiguration($mainConfig, $configs);
     }
 
     private function aclLoad($config, ContainerBuilder $container)
@@ -174,7 +190,7 @@ class SecurityExtension extends Extension
         ));
 
         foreach ($config['access_control'] as $access) {
-            $matcher = $this->createRequestMatcher(
+            $matcher = $this->createRequestMatcherReference(
                 $container,
                 $access['path'],
                 $access['host'],
@@ -187,33 +203,39 @@ class SecurityExtension extends Extension
         }
     }
 
-    private function createFirewalls($config, ContainerBuilder $container)
+    /**
+     * Configures everything in the service container necessary for the configured firewalls
+     *
+     * @param  array $config The security configuration array
+     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+     */
+    private function createFirewalls(array $config, ContainerBuilder $container)
     {
         if (!isset($config['firewalls'])) {
             return;
         }
 
         $firewalls = $config['firewalls'];
-        $providerIds = $this->createUserProviders($config, $container);
+        $userProviderIds = $this->createUserProviders($config['providers'], $container);
 
-        // make the ContextListener aware of the configured user providers
+        // the ContextListener needs the user providers to load users from the session
         $definition = $container->getDefinition('security.context_listener');
         $arguments = $definition->getArguments();
         $userProviders = array();
-        foreach ($providerIds as $userProviderId) {
+        foreach ($userProviderIds as $userProviderId) {
             $userProviders[] = new Reference($userProviderId);
         }
         $arguments[1] = $userProviders;
         $definition->setArguments($arguments);
 
-        // create security listener factories
-        $factories = $this->createListenerFactories($container, $config);
+        // create and return the security factory objects
+        $factories = $this->createListenerFactories($container->getParameterBag(), $config['factories']);
 
         // load firewall map
         $mapDef = $container->getDefinition('security.firewall.map');
         $map = $authenticationProviders = array();
         foreach ($firewalls as $name => $firewall) {
-            list($matcher, $listeners, $exceptionListener) = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $factories);
+            list($matcher, $listeners, $exceptionListener) = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $userProviderIds, $factories);
 
             $contextId = 'security.firewall.map.context.'.$name;
             $context = $container->setDefinition($contextId, new DefinitionDecorator('security.firewall.context'));
@@ -235,116 +257,175 @@ class SecurityExtension extends Extension
         ;
     }
 
-    private function createFirewall(ContainerBuilder $container, $id, $firewall, &$authenticationProviders, $providerIds, array $factories)
+    /**
+     * Creates a firewall, which is three parts:
+     *
+     *   * A Reference to the request matcher service
+     *   * An array of Reference objects to firewall listening services
+     *   * A Reference to an exception listener for the firewall
+     *
+     * This also loads all of the authentication providers, which correspond
+     * to each firewall listener that's concerned with authentication. This
+     * works because an authentication listeners is called and passes a
+     * particular token to the authentication manager. The authentication
+     * manager then passes the token to the corresponding authentication
+     * provider to pass back the authenticated token (or throw an exception).
+     *
+     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+     * @param  string $firewallName The name of the firewall
+     * @param  array  $firewallConfig     The firewall array configuration
+     * @param  array  $authenticationProviders The authentication providers
+     * @param  array  $providerIds  The service ids of the user providers
+     * @param array   $factories    Array of security factory objects
+     *
+     * @return array An array of the Reference to the request matcher, listeners, and exception listener
+     */
+    private function createFirewall(ContainerBuilder $container, $firewallName, $firewallConfig, &$authenticationProviders, $providerIds, array $factories)
     {
-        // Matcher
-        $i = 0;
+        // request matcher
         $matcher = null;
-        if (isset($firewall['request_matcher'])) {
-            $matcher = new Reference($firewall['request_matcher']);
-        } else if (isset($firewall['pattern'])) {
-            $matcher = $this->createRequestMatcher($container, $firewall['pattern']);
+        if (isset($firewallConfig['request_matcher'])) {
+            // Use the request_matcher service id specified
+            $matcher = new Reference($firewallConfig['request_matcher']);
+        } else if (isset($firewallConfig['pattern'])) {
+            // Create a request matcher based on the given firewall pattern
+            $matcher = $this->createRequestMatcherReference($container, $firewallConfig['pattern']);
         }
 
         // Security disabled?
-        if (false === $firewall['security']) {
+        if (false === $firewallConfig['security']) {
+            // return the request matcher, but no listeners to act on the request
             return array($matcher, array(), null);
         }
 
-        // Provider id (take the first registered provider if none defined)
-        if (isset($firewall['provider'])) {
-            $defaultProvider = $this->getUserProviderId($firewall['provider']);
+        // Determine the user provider for the firewall (use the first if none specified)
+        if (isset($firewallConfig['provider'])) {
+            $defaultUserProviderId = $this->getUserProviderId($firewallConfig['provider']);
+
+            // make sure the referenced provider id is valid
+            if (!in_array($defaultUserProviderId, $providerIds)) {
+                throw new \LogicException(sprintf('"%s" is not a valid provider under firewall "%s".', $firewallConfig['provider'], $firewallName));
+            }
         } else {
-            $defaultProvider = reset($providerIds);
+            $defaultUserProviderId = reset($providerIds);
         }
 
         // Register listeners
         $listeners = array();
 
-        // Channel listener
+        // Add the channel listener to this firewall (handles http <-> https)
         $listeners[] = new Reference('security.channel_listener');
 
-        // Context serializer listener
-        if (false === $firewall['stateless']) {
-            $contextKey = $id;
-            if (isset($firewall['context'])) {
-                $contextKey = $firewall['context'];
-            }
+        // Add the Context listener (handles storing authentication on the listener)
+        if (false === $firewallConfig['stateless']) {
+            $contextKey = isset($firewallConfig['context']) ? $firewallConfig['context'] : $firewallName;
 
             $listeners[] = new Reference($this->createContextListener($container, $contextKey));
         }
 
-        // Logout listener
-        if (isset($firewall['logout'])) {
-            $listenerId = 'security.logout_listener.'.$id;
+        // add and configure the Logout listener
+        if (isset($firewallConfig['logout'])) {
+            $listenerId = 'security.logout_listener.'.$firewallName;
             $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.logout_listener'));
-            $listener->replaceArgument(1, $firewall['logout']['path']);
-            $listener->replaceArgument(2, $firewall['logout']['target']);
+            $listener->replaceArgument(1, $firewallConfig['logout']['path']);
+            $listener->replaceArgument(2, $firewallConfig['logout']['target']);
             $listeners[] = new Reference($listenerId);
 
             // add logout success handler
-            if (isset($firewall['logout']['success_handler'])) {
-                $listener->replaceArgument(3, new Reference($firewall['logout']['success_handler']));
+            if (isset($firewallConfig['logout']['success_handler'])) {
+                $listener->replaceArgument(3, new Reference($firewallConfig['logout']['success_handler']));
             }
 
-            // add session logout handler
-            if (true === $firewall['logout']['invalidate_session'] && false === $firewall['stateless']) {
+            // to totally invalidate the session, add the handler that does that
+            if (true === $firewallConfig['logout']['invalidate_session'] && false === $firewallConfig['stateless']) {
                 $listener->addMethodCall('addHandler', array(new Reference('security.logout.handler.session')));
             }
 
-            // add cookie logout handler
-            if (count($firewall['logout']['delete_cookies']) > 0) {
-                $cookieHandlerId = 'security.logout.handler.cookie_clearing.'.$id;
+            // If at least one cookie is set to be deleted, add the cookie logout handler
+            if (count($firewallConfig['logout']['delete_cookies']) > 0) {
+                $cookieHandlerId = 'security.logout.handler.cookie_clearing.'.$firewallName;
                 $cookieHandler = $container->setDefinition($cookieHandlerId, new DefinitionDecorator('security.logout.handler.cookie_clearing'));
-                $cookieHandler->addArgument($firewall['logout']['delete_cookies']);
+                $cookieHandler->addArgument($firewallConfig['logout']['delete_cookies']);
 
                 $listener->addMethodCall('addHandler', array(new Reference($cookieHandlerId)));
             }
 
             // add custom handlers
-            foreach ($firewall['logout']['handlers'] as $handlerId) {
+            foreach ($firewallConfig['logout']['handlers'] as $handlerId) {
                 $listener->addMethodCall('addHandler', array(new Reference($handlerId)));
             }
         }
 
         // Authentication listeners
-        list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $authenticationProviders, $defaultProvider, $factories);
+        list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $firewallName, $firewallConfig, $authenticationProviders, $defaultUserProviderId, $providerIds, $factories);
 
         $listeners = array_merge($listeners, $authListeners);
 
-        // Access listener
+        // Add the Access listener (enforces access controls)
         $listeners[] = new Reference('security.access_listener');
 
-        // Switch user listener
-        if (isset($firewall['switch_user'])) {
-            $listeners[] = new Reference($this->createSwitchUserListener($container, $id, $firewall['switch_user'], $defaultProvider));
+        // Add the Switch user listener
+        if (isset($firewallConfig['switch_user'])) {
+            $listeners[] = new Reference($this->createSwitchUserListener($container, $firewallName, $firewallConfig['switch_user'], $defaultUserProviderId));
         }
 
-        // Determine default entry point
-        if (isset($firewall['entry_point'])) {
-            $defaultEntryPoint = $firewall['entry_point'];
-        }
+        // Allow the user to override the entry point
+        $entryPoint = isset($firewallConfig['entry_point']) ? $firewallConfig['entry_point'] : $defaultEntryPoint;
 
-        // Exception listener
-        $exceptionListener = new Reference($this->createExceptionListener($container, $firewall, $id, $defaultEntryPoint));
+        // Add the exception listener (which initiates the authentication when access is denied)
+        $exceptionListener = new Reference($this->createExceptionListener(
+            $container,
+            $firewallConfig,
+            $firewallName,
+            $entryPoint
+        ));
 
         return array($matcher, $listeners, $exceptionListener);
     }
 
-    private function createContextListener($container, $contextKey)
+    /**
+     * Returns a service id that refers to a ContextListener with the given
+     * context key.
+     *
+     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+     * @param  string $contextKey The identifier for this context listener
+     *
+     * @return string The service id to the context listener
+     */
+    private function createContextListener(ContainerBuilder $container, $contextKey)
     {
         if (isset($this->contextListeners[$contextKey])) {
             return $this->contextListeners[$contextKey];
         }
 
-        $listenerId = 'security.context_listener.'.count($this->contextListeners);
+        $listenerId = 'security.context_listener.'.$contextKey;
         $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.context_listener'));
         $listener->replaceArgument(2, $contextKey);
 
         return $this->contextListeners[$contextKey] = $listenerId;
     }
 
-    private function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider, array $factories)
+    /**
+     * Reads and loads any authentication factories specified in the firewall configuration.
+     *
+     * The goal of this method is to return an array of authentication Reference
+     * listeners as well as the default entry point service id.
+     *
+     * Each factory represents another listener on the firewall. Each factory
+     * also returns an additional authentication provider, which is pushed
+     * onto the authenticationProviders array.
+     *
+     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+     * @param  string $firewallName The name of the firewall being configured
+     * @param  array $firewallConfig The raw firewall configuration array
+     * @param  array $authenticationProviders The authentication providers
+     * @param  string $defaultUserProviderId The service id for the default user provider
+     * @param array $providerIds The available, valid user provider ids
+     * @param array $factories The array of security factory objects
+     *
+     * @return array of listener references and the default entry point service id
+     */
+    private function createAuthenticationListeners(ContainerBuilder $container, $firewallName, $firewallConfig, &$authenticationProviders, $defaultUserProviderId, array $providerIds, array $factories)
     {
         $listeners = array();
         $hasListeners = false;
@@ -352,13 +433,21 @@ class SecurityExtension extends Extension
 
         foreach ($this->listenerPositions as $position) {
             foreach ($factories[$position] as $factory) {
+                // normalize the factory keys
                 $key = str_replace('-', '_', $factory->getKey());
 
-                if (isset($firewall[$key])) {
-                    $userProvider = isset($firewall[$key]['provider']) ? $this->getUserProviderId($firewall[$key]['provider']) : $defaultProvider;
+                // if a particular firewall's key is included in the config, configure it
+                if (isset($firewallConfig[$key])) {
+                    $userProvider = isset($firewallConfig[$key]['provider']) ? $this->getUserProviderId($firewallConfig[$key]['provider']) : $defaultUserProviderId;
 
-                    list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
+                    // make sure the referenced provider id is valid
+                    if (!in_array($userProvider, $providerIds)) {
+                        throw new \LogicException(sprintf('"%s" is not a valid provider under firewall "%s", listener "%s".', $firewallConfig[$key]['provider'], $firewallName, $key));
+                    }
 
+                    list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $firewallName, $firewallConfig[$key], $userProvider, $defaultEntryPoint);
+
+                    // save the authentication listener and provider
                     $listeners[] = new Reference($listenerId);
                     $authenticationProviders[] = $provider;
                     $hasListeners = true;
@@ -367,19 +456,19 @@ class SecurityExtension extends Extension
         }
 
         // Anonymous
-        if (isset($firewall['anonymous'])) {
-            $listenerId = 'security.authentication.listener.anonymous.'.$id;
+        if (isset($firewallConfig['anonymous'])) {
+            $listenerId = 'security.authentication.listener.anonymous.'.$firewallName;
             $container
                 ->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.anonymous'))
-                ->replaceArgument(1, $firewall['anonymous']['key'])
+                ->replaceArgument(1, $firewallConfig['anonymous']['key'])
             ;
 
             $listeners[] = new Reference($listenerId);
 
-            $providerId = 'security.authentication.provider.anonymous.'.$id;
+            $providerId = 'security.authentication.provider.anonymous.'.$firewallName;
             $container
                 ->setDefinition($providerId, new DefinitionDecorator('security.authentication.provider.anonymous'))
-                ->replaceArgument(0, $firewall['anonymous']['key'])
+                ->replaceArgument(0, $firewallConfig['anonymous']['key'])
             ;
 
             $authenticationProviders[] = $providerId;
@@ -387,7 +476,7 @@ class SecurityExtension extends Extension
         }
 
         if (false === $hasListeners) {
-            throw new \LogicException(sprintf('No authentication listener registered for pattern "%s".', isset($firewall['pattern']) ? $firewall['pattern'] : ''));
+            throw new \LogicException(sprintf('No authentication listener registered for firewall "%s".', $firewallName));
         }
 
         return array($listeners, $defaultEntryPoint);
@@ -437,11 +526,11 @@ class SecurityExtension extends Extension
     }
 
     // Parses user providers and returns an array of their ids
-    private function createUserProviders($config, ContainerBuilder $container)
+    private function createUserProviders($providersConfig, ContainerBuilder $container)
     {
         $providerIds = array();
-        foreach ($config['providers'] as $name => $provider) {
-            $id = $this->createUserDaoProvider($name, $provider, $container);
+        foreach ($providersConfig as $name => $provider) {
+            $id = $this->getUserDaoProviderId($name, $provider, $container);
             $providerIds[] = $id;
         }
 
@@ -449,7 +538,7 @@ class SecurityExtension extends Extension
     }
 
     // Parses a <provider> tag and returns the id for the related user provider service
-    private function createUserDaoProvider($name, $provider, ContainerBuilder $container, $master = true)
+    private function getUserDaoProviderId($name, $provider, ContainerBuilder $container)
     {
         $name = $this->getUserProviderId(strtolower($name));
 
@@ -457,7 +546,7 @@ class SecurityExtension extends Extension
         if (isset($provider['id'])) {
             $container->setAlias($name, new Alias($provider['id'], false));
 
-            return $provider['id'];
+            return $name;
         }
 
         // Chain provider
@@ -507,37 +596,62 @@ class SecurityExtension extends Extension
         return 'security.user.provider.concrete.'.$name;
     }
 
-    private function createExceptionListener($container, $config, $id, $defaultEntryPoint)
+    /**
+     * Configures and returns the exception listener service id for the given
+     * firewall based on the firewall configuration and entry point.
+     *
+     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+     * @param  array $firewallConfig The firewall configuration
+     * @param  string $firewallName The name of the firewall
+     * @param  $entryPointId The service id to the entry point to use
+     *
+     * @return string The exception listener service id
+     */
+    private function createExceptionListener(ContainerBuilder $container, $firewallConfig, $firewallName, $entryPointId)
     {
-        $exceptionListenerId = 'security.exception_listener.'.$id;
+        $exceptionListenerId = 'security.exception_listener.'.$firewallName;
         $listener = $container->setDefinition($exceptionListenerId, new DefinitionDecorator('security.exception_listener'));
-        $listener->replaceArgument(2, null === $defaultEntryPoint ? null : new Reference($defaultEntryPoint));
+        $listener->replaceArgument(2, null === $entryPointId ? null : new Reference($entryPointId));
 
         // access denied handler setup
-        if (isset($config['access_denied_handler'])) {
-            $listener->replaceArgument(4, new Reference($config['access_denied_handler']));
-        } else if (isset($config['access_denied_url'])) {
-            $listener->replaceArgument(3, $config['access_denied_url']);
+        if (isset($firewallConfig['access_denied_handler'])) {
+            $listener->replaceArgument(4, new Reference($firewallConfig['access_denied_handler']));
+        } else if (isset($firewallConfig['access_denied_url'])) {
+            $listener->replaceArgument(3, $firewallConfig['access_denied_url']);
         }
 
         return $exceptionListenerId;
     }
 
-    private function createSwitchUserListener($container, $id, $config, $defaultProvider)
+    private function createSwitchUserListener($container, $firewallName, $switchUserConfig, $defaultProvider)
     {
-        $userProvider = isset($config['provider']) ? $this->getUserProviderId($config['provider']) : $defaultProvider;
+        $userProvider = isset($switchUserConfig['provider']) ? $this->getUserProviderId($switchUserConfig['provider']) : $defaultProvider;
 
-        $switchUserListenerId = 'security.authentication.switchuser_listener.'.$id;
+        $switchUserListenerId = 'security.authentication.switchuser_listener.'.$firewallName;
         $listener = $container->setDefinition($switchUserListenerId, new DefinitionDecorator('security.authentication.switchuser_listener'));
         $listener->replaceArgument(1, new Reference($userProvider));
-        $listener->replaceArgument(3, $id);
-        $listener->replaceArgument(6, $config['parameter']);
-        $listener->replaceArgument(7, $config['role']);
+        $listener->replaceArgument(3, $firewallName);
+        $listener->replaceArgument(6, $switchUserConfig['parameter']);
+        $listener->replaceArgument(7, $switchUserConfig['role']);
 
         return $switchUserListenerId;
     }
 
-    private function createRequestMatcher($container, $path = null, $host = null, $methods = null, $ip = null, array $attributes = array())
+    /**
+     * Creates a RequestMatcher instance based on the given parameters and
+     * returns a Reference referring to the service.
+     *
+     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+     * @param string $path The path/pattern that the request matcher should match
+     * @param string $host The host pattern to match
+     * @param string|array $methods The array of HTTP methods to match
+     * @param string $ip A specific ip address or range to match
+     * @param array $attributes Any other request attributes to match
+     * @return array|\Symfony\Component\DependencyInjection\Reference
+     *
+     * @return \Symfony\Component\DependencyInjection\Reference
+     */
+    private function createRequestMatcherReference(ContainerBuilder $container, $path, $host = null, $methods = null, $ip = null, array $attributes = array())
     {
         $serialized = serialize(array($path, $host, $methods, $ip, $attributes));
         $id = 'security.request_matcher.'.md5($serialized).sha1($serialized);
@@ -561,15 +675,27 @@ class SecurityExtension extends Extension
         return $this->requestMatchers[$id] = new Reference($id);
     }
 
-    private function createListenerFactories(ContainerBuilder $container, $config)
+    /**
+     * Returns an array of security factory objects.
+     *
+     * This function is responsible for loading all of the given security
+     * factory resource files (including those under the "factories" key.
+     *
+     * This looks for services in those resources tagged with "security.listener.factory"
+     * and returns an array of those instantiated objects. Those services
+     * are sub-grouped in the array based on their position (e.g. pre_auth).
+     *
+     * @return array
+     */
+    private function createListenerFactories(ParameterBagInterface $parameterBag, $factoriesConfig)
     {
+        // only load the factories once
         if (null !== $this->factories) {
             return $this->factories;
         }
 
         // load service templates
         $c = new ContainerBuilder();
-        $parameterBag = $container->getParameterBag();
 
         $locator = new FileLocator(__DIR__.'/../Resources/config');
         $resolver = new LoaderResolver(array(
@@ -582,7 +708,7 @@ class SecurityExtension extends Extension
         $loader->load('security_factories.xml');
 
         // load user-created listener factories
-        foreach ($config['factories'] as $factory) {
+        foreach ($factoriesConfig as $factory) {
             $loader->load($parameterBag->resolveValue($factory));
         }
 

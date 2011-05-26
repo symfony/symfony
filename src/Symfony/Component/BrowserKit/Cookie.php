@@ -45,7 +45,7 @@ class Cookie
      *
      * @api
      */
-    public function __construct($name, $value, $expires = null, $path = '/', $domain = '', $secure = false, $httponly = true, $encodedValue = false)
+    public function __construct($name, $value, $expires = null, $path = null, $domain = '', $secure = false, $httponly = true, $encodedValue = false)
     {
         if ($encodedValue) {
             $this->value    = urldecode($value);
@@ -56,7 +56,7 @@ class Cookie
         }
         $this->name     = $name;
         $this->expires  = null === $expires ? null : (integer) $expires;
-        $this->path     = empty($path) ? '/' : $path;
+        $this->path     = empty($path) ? null : $path;
         $this->domain   = $domain;
         $this->secure   = (Boolean) $secure;
         $this->httponly = (Boolean) $httponly;
@@ -81,7 +81,7 @@ class Cookie
             $cookie .= '; domain='.$this->domain;
         }
 
-        if ('/' !== $this->path) {
+        if (null !== $this->path) {
             $cookie .= '; path='.$this->path;
         }
 
@@ -120,7 +120,7 @@ class Cookie
             'name'     => trim($name),
             'value'    => trim($value),
             'expires'  =>  null,
-            'path'     => '/',
+            'path'     => null,
             'domain'   => '',
             'secure'   => false,
             'httponly' => false,
@@ -128,10 +128,11 @@ class Cookie
         );
 
         if (null !== $url) {
-            if ((false === $parts = parse_url($url)) || !isset($parts['host']) || !isset($parts['path'])) {
+            if ((false === $urlParts = parse_url($url)) || !isset($urlParts['host']) || !isset($urlParts['path'])) {
                 throw new \InvalidArgumentException(sprintf('The URL "%s" is not valid.', $url));
             }
-
+            $parts = array_merge($urlParts, $parts);
+            
             $values['domain'] = $parts['host'];
             $values['path'] = substr($parts['path'], 0, strrpos($parts['path'], '/'));
         }
@@ -233,7 +234,7 @@ class Cookie
      */
     public function getPath()
     {
-        return $this->path;
+        return (null !== $this->path)?$this->path:'/';
     }
 
     /**

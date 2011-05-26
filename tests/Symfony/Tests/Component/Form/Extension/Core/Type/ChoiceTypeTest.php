@@ -157,6 +157,20 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertSame('', $form['e']->getClientData());
     }
 
+    public function testBindSingleExpandedWithFalseDoesNotHaveExtraFields()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'expanded' => true,
+            'choices' => $this->choices,
+        ));
+        
+        $form->bind(false);
+        
+        $this->assertEmpty($form->getExtraData());
+        $this->assertNull($form->getData());
+    }
+
     public function testBindSingleExpandedNumericChoices()
     {
         $form = $this->factory->create('choice', null, array(

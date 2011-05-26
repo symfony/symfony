@@ -63,20 +63,20 @@ class XmlFileLoader extends FileLoader
      */
     protected function parseNode(RouteCollection $collection, \DOMElement $node, $path)
     {
-      switch ($node->tagName) {
-          case 'route':
-              $this->parseRoute($collection, $node, $path);
-              break;
-          case 'import':
-              $resource = (string) $node->getAttribute('resource');
-              $type = (string) $node->getAttribute('type');
-              $prefix = (string) $node->getAttribute('prefix');
-              $this->setCurrentDir(dirname($path));
-              $collection->addCollection($this->import($resource, ('' !== $type ? $type : null), false, $file), $prefix);
-              break;
-          default:
-              throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));
-      }
+        switch ($node->tagName) {
+            case 'route':
+                $this->parseRoute($collection, $node, $path);
+                break;
+            case 'import':
+                $resource = (string) $node->getAttribute('resource');
+                $type = (string) $node->getAttribute('type');
+                $prefix = (string) $node->getAttribute('prefix');
+                $this->setCurrentDir(dirname($path));
+                $collection->addCollection($this->import($resource, ('' !== $type ? $type : null), false, $file), $prefix);
+                break;
+            default:
+                throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));
+        }
     }
 
     /**

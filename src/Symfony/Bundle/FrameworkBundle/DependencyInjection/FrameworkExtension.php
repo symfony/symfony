@@ -325,7 +325,7 @@ class FrameworkExtension extends Extension
             'macvim'   => 'mvim://open?url=file://%f&line=%l',
         );
 
-        $container->setParameter('templating.helper.code.file_link_format', str_replace('%', '%%', isset($links[$ide]) ? $links[$ide] : $ide));
+        $container->setParameter('templating.helper.code.file_link_format', str_replace('%', '#', isset($links[$ide]) ? $links[$ide] : $ide));
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('templating_debug.xml');

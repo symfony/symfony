@@ -45,11 +45,11 @@ class ContextListener implements ListenerInterface
     private $userProviders;
 
     /**
-     * @param \Symfony\Component\Security\Core\SecurityContext $context
+     * @param SecurityContext $context
      * @param array   $userProviders The available user providers to load users from
      * @param string $contextKey The key used when storing information to the session
-     * @param \Symfony\Component\HttpKernel\Log\LoggerInterface $logger
-     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+     * @param LoggerInterface $logger
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(SecurityContext $context, array $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {

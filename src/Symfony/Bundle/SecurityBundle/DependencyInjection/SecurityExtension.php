@@ -106,7 +106,7 @@ class SecurityExtension extends Extension
      * Takes in the config arrays, validates and flattens them into one array
      *
      * @param array $configs The raw array of configuration arrays
-     * @param \Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface $parameterBag
+     * @param ParameterBagInterface $parameterBag
      * @return array The flattened configuration
      */
     private function processConfigs(array $configs, ParameterBagInterface $parameterBag)
@@ -206,8 +206,8 @@ class SecurityExtension extends Extension
     /**
      * Configures everything in the service container necessary for the configured firewalls
      *
-     * @param  array $config The security configuration array
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+     * @param array $config The security configuration array
+     * @param ContainerBuilder $container
      */
     private function createFirewalls(array $config, ContainerBuilder $container)
     {
@@ -271,11 +271,11 @@ class SecurityExtension extends Extension
      * manager then passes the token to the corresponding authentication
      * provider to pass back the authenticated token (or throw an exception).
      *
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
-     * @param  string $firewallName The name of the firewall
-     * @param  array  $firewallConfig     The firewall array configuration
-     * @param  array  $authenticationProviders The authentication providers
-     * @param  array  $providerIds  The service ids of the user providers
+     * @param ContainerBuilder $container
+     * @param string $firewallName The name of the firewall
+     * @param array  $firewallConfig     The firewall array configuration
+     * @param array  $authenticationProviders The authentication providers
+     * @param array  $providerIds  The service ids of the user providers
      * @param array   $factories    Array of security factory objects
      *
      * @return array An array of the Reference to the request matcher, listeners, and exception listener
@@ -387,8 +387,8 @@ class SecurityExtension extends Extension
      * Returns a service id that refers to a ContextListener with the given
      * context key.
      *
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
-     * @param  string $contextKey The identifier for this context listener
+     * @param ContainerBuilder $container
+     * @param string $contextKey The identifier for this context listener
      *
      * @return string The service id to the context listener
      */
@@ -415,11 +415,11 @@ class SecurityExtension extends Extension
      * also returns an additional authentication provider, which is pushed
      * onto the authenticationProviders array.
      *
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
-     * @param  string $firewallName The name of the firewall being configured
-     * @param  array $firewallConfig The raw firewall configuration array
-     * @param  array $authenticationProviders The authentication providers
-     * @param  string $defaultUserProviderId The service id for the default user provider
+     * @param ContainerBuilder $container
+     * @param string $firewallName The name of the firewall being configured
+     * @param array $firewallConfig The raw firewall configuration array
+     * @param array $authenticationProviders The authentication providers
+     * @param string $defaultUserProviderId The service id for the default user provider
      * @param array $providerIds The available, valid user provider ids
      * @param array $factories The array of security factory objects
      *
@@ -600,10 +600,10 @@ class SecurityExtension extends Extension
      * Configures and returns the exception listener service id for the given
      * firewall based on the firewall configuration and entry point.
      *
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
-     * @param  array $firewallConfig The firewall configuration
-     * @param  string $firewallName The name of the firewall
-     * @param  $entryPointId The service id to the entry point to use
+     * @param ContainerBuilder $container
+     * @param array $firewallConfig The firewall configuration
+     * @param string $firewallName The name of the firewall
+     * @param $entryPointId The service id to the entry point to use
      *
      * @return string The exception listener service id
      */
@@ -641,7 +641,7 @@ class SecurityExtension extends Extension
      * Creates a RequestMatcher instance based on the given parameters and
      * returns a Reference referring to the service.
      *
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+     * @param ContainerBuilder $container
      * @param string $path The path/pattern that the request matcher should match
      * @param string $host The host pattern to match
      * @param string|array $methods The array of HTTP methods to match
@@ -649,7 +649,7 @@ class SecurityExtension extends Extension
      * @param array $attributes Any other request attributes to match
      * @return array|\Symfony\Component\DependencyInjection\Reference
      *
-     * @return \Symfony\Component\DependencyInjection\Reference
+     * @return Reference
      */
     private function createRequestMatcherReference(ContainerBuilder $container, $path, $host = null, $methods = null, $ip = null, array $attributes = array())
     {

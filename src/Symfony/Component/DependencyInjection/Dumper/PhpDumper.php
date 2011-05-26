@@ -1000,7 +1000,7 @@ EOF;
                 $that = $this;
                 $replaceParameters = function ($match) use ($that)
                 {
-                    return sprintf("'.".$that->dumpParameter(strtolower($match[2])).".'");
+                    return "'.".$that->dumpParameter(strtolower($match[2])).".'";
                 };
 
                 $code = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, var_export($value, true)));

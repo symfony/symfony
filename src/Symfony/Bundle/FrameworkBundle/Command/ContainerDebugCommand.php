@@ -43,6 +43,7 @@ class ContainerDebugCommand extends Command
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)  or search (foo*)'),
                 new InputOption('show-private', null, InputOption::VALUE_NONE, 'Use to show public *and* private services'),
+                new InputOption('parameters', null, InputOption::VALUE_NONE, 'Use to dump parameters instead of services')
             ))
             ->setName('container:debug')
             ->setDescription('Displays current services for an application')
@@ -59,6 +60,10 @@ By default, private services are hidden. You can display all services by
 using the --show-private flag:
 
   <info>container:debug --show-private</info>
+  
+Use the --parameters flag to show all container parameters.
+
+  <info>container:debug --parameters</info>
 EOF
             )
         ;
@@ -72,6 +77,11 @@ EOF
         $name = $input->getArgument('name');
 
         $this->containerBuilder = $this->getContainerBuilder();
+        
+        if ($input->getOption('parameters')) {
+            return $this->outputParameters($output);
+        }
+        
         $serviceIds = $this->containerBuilder->getServiceIds();
 
         // sort so that it reads like an index of services
@@ -81,6 +91,33 @@ EOF
             $this->outputService($output, $name);
         } else {
             $this->outputServices($output, $serviceIds, $input->getOption('show-private'));
+        }
+    }
+    
+    /**
+     * Renders service container parameters
+     * 
+     * @param OutputInterface $output 
+     */
+    protected function outputParameters(OutputInterface $output)
+    {
+        $parameters = $this->containerBuilder->getParameterBag()->all();
+        
+        $maxKey = 0;
+        
+        foreach ($parameters as $key => $value) {
+            if ($maxKey < strlen($key)) {
+                $maxKey = strlen($key);
+            }
+        }
+        
+        $format = '%-'.$maxKey.'s %s';
+        
+        $output->writeln('<comment>Container parameters</comment>');
+        $output->writeln(sprintf($format, '<comment>Key</comment>', '<comment>Name</comment>'));
+        
+        foreach ($parameters as $key => $parameter) {
+            $output->writeln(sprintf($format, $key, $parameter));
         }
     }
 

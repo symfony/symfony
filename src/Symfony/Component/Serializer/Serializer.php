@@ -204,7 +204,7 @@ class Serializer implements SerializerInterface
      */
     public function hasEncoder($format)
     {
-        return isset($this->encoder[$format]) && $this->encoder[$format] instanceof EncoderInterface;
+        return isset($this->encoder[$format]);
     }
 
     /**

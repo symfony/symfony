@@ -123,7 +123,7 @@ class DateTimeType extends AbstractType
             ),
             'date_widget'   => array(
                 null, // inherit default from DateType
-                'single-text',
+                'single_text',
                 'text',
                 'choice',
             ),

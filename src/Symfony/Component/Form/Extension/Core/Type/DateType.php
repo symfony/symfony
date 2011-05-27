@@ -34,7 +34,7 @@ class DateType extends AbstractType
             \DateTimeZone::UTC
         );
 
-        if ($options['widget'] === 'single-text') {
+        if ($options['widget'] === 'single_text') {
             $builder->appendClientTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $options['format'], \IntlDateFormatter::NONE));
         } else {
             $yearOptions = $monthOptions = $dayOptions = array();
@@ -135,7 +135,7 @@ class DateType extends AbstractType
                 'array',
             ),
             'widget'    => array(
-                'single-text',
+                'single_text',
                 'text',
                 'choice',
             ),
@@ -150,7 +150,7 @@ class DateType extends AbstractType
 
     public function getParent(array $options)
     {
-        return $options['widget'] === 'single-text' ? 'field' : 'form';
+        return $options['widget'] === 'single_text' ? 'field' : 'form';
     }
 
     public function getName()

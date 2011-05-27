@@ -623,7 +623,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $form = $this->factory->createNamed('date', 'na&me', '2011-02-03', array(
             'property_path' => 'name',
             'input' => 'string',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),

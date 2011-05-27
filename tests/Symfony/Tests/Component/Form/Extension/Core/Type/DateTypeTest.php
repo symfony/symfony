@@ -50,7 +50,7 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
             'input' => 'datetime',
         ));
 
@@ -65,7 +65,7 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
             'input' => 'string',
         ));
 
@@ -80,7 +80,7 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
             'input' => 'timestamp',
         ));
 
@@ -97,7 +97,7 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
             'input' => 'array',
         ));
 
@@ -185,7 +185,7 @@ class DateTypeTest extends LocalizedTestCase
             'user_timezone' => 'Pacific/Tahiti',
             // don't do this test with DateTime, because it leads to wrong results!
             'input' => 'string',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
         ));
 
         $form->setData('2010-06-02');
@@ -200,7 +200,7 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
             'years' => array(2010, 2011),
         ));
 
@@ -216,7 +216,7 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
             'years' => array(2010, 2011),
         ));
 
@@ -252,7 +252,7 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
             'years' => array(2010, 2012),
         ));
 
@@ -268,7 +268,7 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
             'months' => array(6, 7),
         ));
 
@@ -284,7 +284,7 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
             'months' => array(6, 7),
         ));
 
@@ -320,7 +320,7 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
             'months' => array(6, 8),
         ));
 
@@ -336,7 +336,7 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
             'days' => array(6, 7),
         ));
 
@@ -352,7 +352,7 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
             'days' => array(6, 7),
         ));
 
@@ -390,7 +390,7 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
             'days' => array(6, 8),
         ));
 
@@ -406,7 +406,7 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
         ));
 
         $form->bind('7.6.2010');
@@ -482,7 +482,7 @@ class DateTypeTest extends LocalizedTestCase
     public function testDontPassDatePatternIfText()
     {
         $form = $this->factory->create('date', null, array(
-            'widget' => 'single-text',
+            'widget' => 'single_text',
         ));
         $view = $form->createView();
 
@@ -492,10 +492,10 @@ class DateTypeTest extends LocalizedTestCase
     public function testPassWidgetToView()
     {
         $form = $this->factory->create('date', null, array(
-            'widget' => 'single-text',
+            'widget' => 'single_text',
         ));
         $view = $form->createView();
 
-        $this->assertSame('single-text', $view->get('widget'));
+        $this->assertSame('single_text', $view->get('widget'));
     }
 }

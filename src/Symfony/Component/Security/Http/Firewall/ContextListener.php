@@ -47,6 +47,7 @@ class ContextListener implements ListenerInterface
         $this->context = $context;
         $this->userProviders = $userProviders;
         $this->contextKey = $contextKey;
+        $this->logger = $logger;
 
         if (null !== $dispatcher) {
             $dispatcher->addListener(Events::onCoreResponse, $this);

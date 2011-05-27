@@ -1,7 +1,7 @@
 {% block field_rows %}
 {% spaceless %}
     {{ form_errors(form) }}
-    {% for child in form.children %}
+    {% for child in form %}
         {{ form_row(child) }}
     {% endfor %}
 {% endspaceless %}
@@ -27,7 +27,7 @@
 
 {% block field_rest %}
 {% spaceless %}
-    {% for child in form.children %}
+    {% for child in form %}
         {% if not child.rendered %}
             {{ form_row(child) }}
         {% endif %}

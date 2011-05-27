@@ -20,7 +20,7 @@ class WebTestCase extends BaseWebTestCase
         }
 
         $fs = new Filesystem();
-        $fs->remove($testCase);
+        $fs->remove($dir);
     }
 
     protected function getKernelClass()

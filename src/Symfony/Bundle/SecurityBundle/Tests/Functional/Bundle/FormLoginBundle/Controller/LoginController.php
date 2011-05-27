@@ -24,6 +24,11 @@ class LoginController extends ContainerAware
         ));
     }
 
+    public function afterLoginAction()
+    {
+        return $this->container->get('templating')->renderResponse('FormLoginBundle:Login:after_login.html.twig');
+    }
+
     public function loginCheckAction()
     {
         return new Response('', 400);

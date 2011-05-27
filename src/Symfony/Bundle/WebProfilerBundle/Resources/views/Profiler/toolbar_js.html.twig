@@ -9,6 +9,7 @@
             xhr = new ActiveXObject('Microsoft.XMLHTTP');
         }
         xhr.open('GET', '{{ path("_wdt", { "token": token }) }}', false);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
         xhr.send('');
         wdt.innerHTML = xhr.responseText;
         wdt.style.display = 'block';

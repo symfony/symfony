@@ -40,9 +40,9 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
     {
         $entity1 = new SingleIdentEntity(1, 'Foo');
         $entity2 = new SingleIdentEntity(2, 'Bar');
-    
+
         // no persist here!
-    
+
         $choiceList = new EntityChoiceList(
             $this->em,
             self::SINGLE_IDENT_CLASS,
@@ -53,7 +53,7 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
                 $entity2,
             )
         );
-    
+
         // triggers loading -> exception
         $choiceList->getChoices();
     }

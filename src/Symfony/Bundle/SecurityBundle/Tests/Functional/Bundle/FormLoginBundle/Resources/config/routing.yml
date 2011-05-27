@@ -1,0 +1,7 @@
+form_login:
+    pattern: /login
+    defaults: { _controller: FormLoginBundle:Login:login }
+    
+form_login_check:
+    pattern: /login_check
+    defaults: { _controller: FormLoginBundle:Login:loginCheck }

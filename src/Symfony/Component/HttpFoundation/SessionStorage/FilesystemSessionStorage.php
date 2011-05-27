@@ -12,7 +12,10 @@
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
 /**
- * FilesystemSessionStorage.
+ * FilesystemSessionStorage simulates sessions for functional tests.
+ *
+ * This storage does not start the session (session_start())
+ * as it is not "available" when running tests on the command line.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

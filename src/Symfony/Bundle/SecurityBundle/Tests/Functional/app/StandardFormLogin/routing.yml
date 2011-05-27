@@ -1,0 +1,2 @@
+_form_login_bundle:
+    resource: @FormLoginBundle/Resources/config/routing.yml

@@ -64,11 +64,11 @@
         </service>
 
         <service id="swiftmailer.plugin.blackhole" class="%swiftmailer.plugin.blackhole.class%" public="false" />
-		
-		<service id="swiftmailer.plugin.antiflood" class="%swiftmailer.plugin.antiflood.class%" public="false">
-			<argument>%swiftmailer.antiflood.treshold%</argument>
-			<argument>%swiftmailer.antiflood.sleep%</argument>
-		</service>
+        
+        <service id="swiftmailer.plugin.antiflood" class="%swiftmailer.plugin.antiflood.class%" public="false">
+            <argument>%swiftmailer.antiflood.treshold%</argument>
+            <argument>%swiftmailer.antiflood.sleep%</argument>
+        </service>
 
         <service id="swiftmailer.plugin.messagelogger" class="%swiftmailer.plugin.messagelogger.class%" />
 

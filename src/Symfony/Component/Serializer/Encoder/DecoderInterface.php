@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-interface DecoderInterface
+interface DecoderInterface extends EncoderInterface
 {
     /**
      * Decodes a string into PHP data

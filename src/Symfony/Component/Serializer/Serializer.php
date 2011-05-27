@@ -30,9 +30,8 @@ use Symfony\Component\Serializer\Encoder\NormalizationAwareInterface;
  */
 class Serializer implements SerializerInterface
 {
-    private $normalizers = array();
-    private $encoders = array();
-    private $decoders = array();
+    protected $normalizers = array();
+    protected $encoders = array();
     protected $normalizerCache = array();
     protected $denormalizerCache = array();
 
@@ -112,19 +111,15 @@ class Serializer implements SerializerInterface
      */
     public function decode($data, $format)
     {
-        if (!isset($this->decoders[$format])) {
+        if (!isset($this->encoders[$format])) {
             throw new \UnexpectedValueException('No decoder registered for the '.$format.' format');
         }
 
-        return $this->decoders[$format]->decode($data, $format);
+        return $this->encoders[$format]->decode($data, $format);
     }
 
     /**
-     * Normalizes an object into a set of arrays/scalars
-     *
-     * @param object $object object to normalize
-     * @param string $format format name, present to give the option to normalizers to act differently based on formats
-     * @return array|scalar
+     * {@inheritdoc}
      */
     public function normalizeObject($object, $format = null)
     {
@@ -146,12 +141,7 @@ class Serializer implements SerializerInterface
     }
 
     /**
-     * Denormalizes data back into an object of the given class
-     *
-     * @param mixed $data data to restore
-     * @param string $class the expected class to instantiate
-     * @param string $format format name, present to give the option to normalizers to act differently based on formats
-     * @return object
+     * {@inheritdoc}
      */
     public function denormalizeObject($data, $class, $format = null)
     {
@@ -172,7 +162,7 @@ class Serializer implements SerializerInterface
     }
 
     /**
-     * @param NormalizerInterface $normalizer
+     * {@inheritdoc}
      */
     public function addNormalizer(NormalizerInterface $normalizer)
     {
@@ -183,15 +173,7 @@ class Serializer implements SerializerInterface
     }
 
     /**
-     * @return array[]NormalizerInterface
-     */
-    public function getNormalizers()
-    {
-        return $this->normalizers;
-    }
-
-    /**
-     * @param NormalizerInterface $normalizer
+     * {@inheritdoc}
      */
     public function removeNormalizer(NormalizerInterface $normalizer)
     {
@@ -199,8 +181,7 @@ class Serializer implements SerializerInterface
     }
 
     /**
-     * @param string           $format  format name
-     * @param EncoderInterface $encoder
+     * {@inheritdoc}
      */
     public function setEncoder($format, EncoderInterface $encoder)
     {
@@ -211,35 +192,7 @@ class Serializer implements SerializerInterface
     }
 
     /**
-     * @param string           $format  format name
-     * @param DecoderInterface $decoder
-     */
-    public function setDecoder($format, DecoderInterface $decoder)
-    {
-        $this->decoders[$format] = $decoder;
-        if ($decoder instanceof SerializerAwareInterface) {
-            $decoder->setSerializer($this);
-        }
-    }
-
-    /**
-     * @return array[]EncoderInterface
-     */
-    public function getEncoders()
-    {
-        return $this->encoders;
-    }
-
-    /**
-     * @return array[]DecoderInterface
-     */
-    public function getDecoders()
-    {
-        return $this->decoders;
-    }
-
-    /**
-     * @return EncoderInterface
+     * {@inheritdoc}
      */
     public function getEncoder($format)
     {
@@ -247,48 +200,26 @@ class Serializer implements SerializerInterface
     }
 
     /**
-     * @return DecoderInterface
-     */
-    public function getDecoder($format)
-    {
-        return $this->decoders[$format];
-    }
-
-    /**
-     * Checks whether the serializer has an encoder registered for the given format
-     *
-     * @param string $format format name
-     * @return Boolean
+     * {@inheritdoc}
      */
     public function hasEncoder($format)
     {
-        return isset($this->encoders[$format]);
+        return isset($this->encoder[$format]) && $this->encoder[$format] instanceof EncoderInterface;
     }
 
     /**
-     * Checks whether the serializer has a decoder registered for the given format
-     *
-     * @param string $format format name
-     * @return Boolean
+     * {@inheritdoc}
      */
     public function hasDecoder($format)
     {
-        return isset($this->decoders[$format]);
+        return isset($this->encoder[$format]) && $this->encoder[$format] instanceof DecoderInterface;
     }
 
     /**
-     * @param string $format format name
+     * {@inheritdoc}
      */
     public function removeEncoder($format)
     {
         unset($this->encoders[$format]);
-    }
-
-    /**
-     * @param string $format format name
-     */
-    public function removeDecoder($format)
-    {
-        unset($this->decoders[$format]);
     }
 }

@@ -28,6 +28,7 @@ class FormExtension extends \Twig_Extension
     protected $environment;
     protected $themes;
     protected $varStack;
+    protected $rendered = array();
 
     public function __construct(array $resources = array())
     {
@@ -165,8 +166,13 @@ class FormExtension extends \Twig_Extension
 
         foreach ($blocks as &$block) {
             $block = $block.'_'.$section;
+            $formItem = $block.'_'.$view->get('id');
 
             if (isset($templates[$block])) {
+                if (isset($this->rendered[$formItem])) {
+                    return;
+                }
+
                 if ('widget' === $section || 'row' === $section) {
                     $view->setRendered();
                 }
@@ -177,9 +183,9 @@ class FormExtension extends \Twig_Extension
                     $variables
                 );
 
-                $html = $templates[$block]->renderBlock($block, $this->varStack[$view]);
+                $this->rendered[$formItem] = true;
 
-                return $html;
+                return $templates[$block]->renderBlock($block, $this->varStack[$view]);
             }
         }
 

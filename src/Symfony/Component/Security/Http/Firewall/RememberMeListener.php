@@ -88,7 +88,7 @@ class RememberMeListener implements ListenerInterface
             }
         } catch (AuthenticationException $failed) {
             if (null !== $this->logger) {
-                $this->logger->debug(
+                $this->logger->warn(
                     'SecurityContext not populated with remember-me token as the'
                    .' AuthenticationManager rejected the AuthenticationToken returned'
                    .' by the RememberMeServices: '.$failed->getMessage()

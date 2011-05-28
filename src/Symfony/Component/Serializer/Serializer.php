@@ -196,7 +196,9 @@ class Serializer implements SerializerInterface
      */
     public function getEncoder($format)
     {
-        return $this->encoders[$format];
+        if (isset($this->encoders[$format])) {
+            return $this->encoders[$format];
+        }
     }
 
     /**
@@ -220,6 +222,8 @@ class Serializer implements SerializerInterface
      */
     public function removeEncoder($format)
     {
-        unset($this->encoders[$format]);
+        if (isset($this->encoders[$format])) {
+            unset($this->encoders[$format]);
+        }
     }
 }

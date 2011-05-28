@@ -40,6 +40,7 @@ class WebTestCase extends BaseWebTestCase
 
         return new $class(
             $options['test_case'],
+            isset($options['root_config']) ? $options['root_config'] : 'config.yml',
             isset($options['environment']) ? $options['environment'] : 'test',
             isset($options['debug']) ? $options['debug'] : true
         );

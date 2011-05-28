@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Listener;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
@@ -25,6 +27,11 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 class SessionInitializingListener
 {
     private $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     public function onCoreRequest(GetResponseEvent $event)
     {

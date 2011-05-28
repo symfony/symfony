@@ -1,5 +1,5 @@
 imports:
-    - { type: file, resource: ./../config/default.yml }
+    - { resource: ./../config/default.yml }
 
 security:
     encoders:
@@ -11,6 +11,9 @@ security:
                 johannes: { password: test, roles: [ROLE_USER] }
             
     firewalls:
+        # This firewall doesn't make sense in combination with the rest of the
+        # configuration file, but it's here for testing purposes (do not use 
+        # this file in a real world scenario though)
         login_form:
             pattern: ^/login$
             security: false
@@ -18,6 +21,9 @@ security:
         default:
             form_login:
                 check_path: /login_check
+            anonymous: ~
 
     access_control:
+        - { path: ^/unprotected_resource$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/highly_protected_resource$, roles: IS_ADMIN }
         - { path: .*, roles: IS_AUTHENTICATED_FULLY }

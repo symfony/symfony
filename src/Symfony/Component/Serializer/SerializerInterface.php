@@ -124,20 +124,20 @@ interface SerializerInterface
     function getEncoder($format);
 
     /**
-     * Checks whether the serializer has an encoder registered for the given format
+     * Checks whether the serializer can serialize the given format
      *
      * @param string $format format name
      * @return Boolean
      */
-    function hasEncoder($format);
+    function supportsSerialization($format);
 
     /**
-     * Checks whether the serializer has a decoder registered for the given format
+     * Checks whether the serializer can deserialize the given format
      *
      * @param string $format format name
      * @return Boolean
      */
-    function hasDecoder($format);
+    function supportsDeserialization($format);
 
     /**
      * @param string $format format name

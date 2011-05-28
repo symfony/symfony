@@ -204,7 +204,7 @@ class Serializer implements SerializerInterface
     /**
      * {@inheritdoc}
      */
-    public function hasEncoder($format)
+    public function supportsSerialization($format)
     {
         return isset($this->encoders[$format]);
     }
@@ -212,7 +212,7 @@ class Serializer implements SerializerInterface
     /**
      * {@inheritdoc}
      */
-    public function hasDecoder($format)
+    public function supportsDeserialization($format)
     {
         return isset($this->encoders[$format]) && $this->encoders[$format] instanceof DecoderInterface;
     }

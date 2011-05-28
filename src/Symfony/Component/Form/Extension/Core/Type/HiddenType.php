@@ -18,8 +18,7 @@ class HiddenType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            // Force hidden fields to be not required
-            // More info: https://github.com/symfony/symfony/issues/1091
+            // hidden fields cannot have a required attribute
             'required'       => false,
             // Pass errors to the parent
             'error_bubbling' => true,

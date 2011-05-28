@@ -1,4 +1,4 @@
-<?php if ($widget == 'single-text'): ?>
+<?php if ($widget == 'single_text'): ?>
     <input type="text"
         <?php echo $view['form']->attributes() ?>
         name="<?php echo $view->escape($full_name) ?>"

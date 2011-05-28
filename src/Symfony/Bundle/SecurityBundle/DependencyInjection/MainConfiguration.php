@@ -231,6 +231,13 @@ class MainConfiguration implements ConfigurationInterface
                     ->scalarNode('role')->defaultValue('ROLE_ALLOWED_TO_SWITCH')->end()
                 ->end()
             ->end()
+            ->arrayNode('session_concurrency')
+                ->canBeUnset()
+                ->children()
+                    ->scalarNode('max_sessions')->defaultNull()->end()
+                    ->scalarNode('expiration_url')->defaultValue('/')->end()
+                ->end()
+            ->end()
         ;
 
         foreach ($factories as $factoriesAtPosition) {

@@ -94,7 +94,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
         }
 
         try {
-            $dateTime = new \DateTime(sprintf("%s %s", $value, $this->outputTimezone));
+            $dateTime = \DateTime::createFromFormat($this->format, $value, new \DateTimeZone($this->outputTimezone));
 
             if ($this->inputTimezone !== $this->outputTimezone) {
                 $dateTime->setTimeZone(new \DateTimeZone($this->inputTimezone));

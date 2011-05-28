@@ -38,7 +38,7 @@
         
         <service id="session_initializing_listener" class="%session_initializing_listener.class%">
             <tag name="kernel.listener" event="onCoreRequest" priority="255" />
-            <property name="container" type="service" id="service_container" />
+            <argument type="service" id="service_container" />
         </service>
 
         <service id="response_listener" class="%response_listener.class%">

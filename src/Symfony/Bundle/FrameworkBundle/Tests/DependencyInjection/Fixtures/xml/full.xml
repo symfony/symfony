@@ -8,6 +8,7 @@
 
     <framework:config secret="s3cr3t">
         <framework:csrf-protection enabled="true" field-name="_csrf" />
+        <framework:form />
         <framework:esi enabled="true" />
         <framework:profiler only-exceptions="true" />
         <framework:router cache-warmer="true" resource="%kernel.root_dir%/config/routing.xml" type="xml" />
@@ -30,5 +31,6 @@
         </framework:templating>
         <framework:translator enabled="true" fallback="fr" />
         <framework:validation enabled="true" cache="apc" />
+        <framework:annotations cache="file" debug="true" file-cache-dir="%kernel.cache_dir%/annotations" />
     </framework:config>
 </container>

@@ -84,7 +84,7 @@ class NativeSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getId()
     {

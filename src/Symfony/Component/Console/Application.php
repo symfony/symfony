@@ -724,7 +724,7 @@ class Application
             $output->writeln("\n");
 
             if (OutputInterface::VERBOSITY_VERBOSE === $output->getVerbosity()) {
-                $output->writeln('</comment>Exception trace:</comment>');
+                $output->writeln('<comment>Exception trace:</comment>');
 
                 // exception related properties
                 $trace = $e->getTrace();

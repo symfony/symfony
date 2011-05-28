@@ -12,6 +12,7 @@
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
 use Symfony\Component\Locale\Exception\NotImplementedException;
+use Symfony\Component\Locale\Stub\StubIntl;
 use Symfony\Component\Locale\Stub\DateFormat\MonthTransformer;
 
 /**
@@ -275,6 +276,8 @@ class FullTransformer
 
         // If month is false, return immediately (intl behavior)
         if (false === $month) {
+            StubIntl::setErrorCode(StubIntl::U_PARSE_ERROR);
+
             return false;
         }
 

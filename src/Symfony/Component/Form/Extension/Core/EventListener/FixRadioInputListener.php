@@ -27,7 +27,7 @@ class FixRadioInputListener implements EventSubscriberInterface
     {
         $data = $event->getData();
 
-        $event->setData(count((array)$data) === 0 ? array() : array($data => true));
+        $event->setData(empty($data) ? array() : array($data => true));
     }
 
     public static function getSubscribedEvents()

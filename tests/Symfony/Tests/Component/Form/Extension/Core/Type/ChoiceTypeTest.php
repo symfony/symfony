@@ -157,6 +157,20 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertSame('', $form['e']->getClientData());
     }
 
+    public function testBindSingleExpandedWithFalseDoesNotHaveExtraFields()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'expanded' => true,
+            'choices' => $this->choices,
+        ));
+        
+        $form->bind(false);
+        
+        $this->assertEmpty($form->getExtraData());
+        $this->assertNull($form->getData());
+    }
+
     public function testBindSingleExpandedNumericChoices()
     {
         $form = $this->factory->create('choice', null, array(
@@ -312,7 +326,7 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertSame(array('b' => 'B', 'd' => 'D'), $view->get('preferred_choices'));
     }
 
-    public function testAdjustNameForMultipleNonExpanded()
+    public function testAdjustFullNameForMultipleNonExpanded()
     {
         $form = $this->factory->createNamed('choice', 'name', null, array(
             'multiple' => true,
@@ -321,6 +335,6 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertSame('name[]', $view->get('name'));
+        $this->assertSame('name[]', $view->get('full_name'));
     }
 }

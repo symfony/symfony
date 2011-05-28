@@ -46,7 +46,7 @@ class Configuration implements ConfigurationInterface
             ->end()
         ;
 
-        $this->addCsrfProtectionSection($rootNode);
+        $this->addFormSection($rootNode);
         $this->addEsiSection($rootNode);
         $this->addProfilerSection($rootNode);
         $this->addRouterSection($rootNode);
@@ -54,14 +54,23 @@ class Configuration implements ConfigurationInterface
         $this->addTemplatingSection($rootNode);
         $this->addTranslatorSection($rootNode);
         $this->addValidationSection($rootNode);
+        $this->addAnnotationsSection($rootNode);
 
         return $treeBuilder;
     }
 
-    private function addCsrfProtectionSection(ArrayNodeDefinition $rootNode)
+    private function addFormSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
             ->children()
+                ->arrayNode('form')
+                    ->canBeUnset()
+                    ->treatNullLike(array('enabled' => true))
+                    ->treatTrueLike(array('enabled' => true))
+                    ->children()
+                        ->booleanNode('enabled')->defaultTrue()->end()
+                    ->end()
+                ->end()
                 ->arrayNode('csrf_protection')
                     ->canBeUnset()
                     ->treatNullLike(array('enabled' => true))
@@ -84,7 +93,7 @@ class Configuration implements ConfigurationInterface
                     ->treatNullLike(array('enabled' => true))
                     ->treatTrueLike(array('enabled' => true))
                     ->children()
-                        ->booleanNode('enabled')->end()
+                        ->booleanNode('enabled')->defaultTrue()->end()
                     ->end()
                 ->end()
             ->end()
@@ -228,6 +237,8 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('translator')
                     ->canBeUnset()
+                    ->treatNullLike(array('enabled' => true))
+                    ->treatTrueLike(array('enabled' => true))
                     ->children()
                         ->booleanNode('enabled')->defaultTrue()->end()
                         ->scalarNode('fallback')->defaultValue('en')->end()
@@ -243,30 +254,28 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('validation')
                     ->canBeUnset()
-                    // For XML, namespace is a child of validation, so it must be moved under annotations
-                    ->beforeNormalization()
-                        ->ifTrue(function($v) { return is_array($v) && !empty($v['annotations']) && !empty($v['namespace']); })
-                        ->then(function($v){
-                            $v['annotations'] = array('namespace' => $v['namespace']);
-                            unset($v['namespace']);
-                            return $v;
-                        })
-                    ->end()
+                    ->treatNullLike(array('enabled' => true))
+                    ->treatTrueLike(array('enabled' => true))
                     ->children()
-                        ->booleanNode('enabled')->end()
+                    ->booleanNode('enabled')->defaultTrue()->end()
                         ->scalarNode('cache')->end()
-                        ->arrayNode('annotations')
-                            ->canBeUnset()
-                            ->treatNullLike(array())
-                            ->treatTrueLike(array())
-                            ->fixXmlConfig('namespace')
-                            ->children()
-                                ->arrayNode('namespaces')
-                                    ->useAttributeAsKey('prefix')
-                                    ->prototype('scalar')->end()
-                                ->end()
-                            ->end()
-                        ->end()
+                        ->booleanNode('enable_annotations')->defaultFalse()->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addAnnotationsSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('annotations')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('cache')->defaultValue('file')->end()
+                        ->scalarNode('file_cache_dir')->defaultValue('%kernel.cache_dir%/annotations')->end()
+                        ->booleanNode('debug')->defaultValue($this->debug)->end()
                     ->end()
                 ->end()
             ->end()

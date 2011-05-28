@@ -326,6 +326,11 @@ class Request
         return $this->query->get($key, $this->attributes->get($key, $this->request->get($key, $default, $deep), $deep), $deep);
     }
 
+    /**
+     * Gets the Session.
+     * 
+     * @return Session|null The session
+     */
     public function getSession()
     {
         return $this->session;
@@ -353,6 +358,11 @@ class Request
         return null !== $this->session;
     }
 
+    /**
+     * Sets the Session.
+     * 
+     * @param Session $session The Session
+     */
     public function setSession(Session $session)
     {
         $this->session = $session;
@@ -449,11 +459,21 @@ class Request
         return $this->baseUrl;
     }
 
+    /**
+     * Gets the request's scheme.
+     * 
+     * @return string
+     */
     public function getScheme()
     {
         return $this->isSecure() ? 'https' : 'http';
     }
 
+    /**
+     * Returns the port on which the request is made.
+     * 
+     * @return string
+     */
     public function getPort()
     {
         return $this->headers->get('X-Forwarded-Port') ?: $this->server->get('SERVER_PORT');
@@ -468,18 +488,21 @@ class Request
      */
     public function getHttpHost()
     {
-        $host   = $this->getHost();
         $scheme = $this->getScheme();
-        $name   = $this->server->get('SERVER_NAME');
         $port   = $this->getPort();
 
         if (('http' == $scheme && $port == 80) || ('https' == $scheme && $port == 443)) {
-            return $name;
+            return $this->getHost();
         }
 
-        return $name.':'.$port;
+        return $this->getHost().':'.$port;
     }
 
+    /**
+     * Returns the requested URI.
+     * 
+     * @return string
+     */
     public function getRequestUri()
     {
         if (null === $this->requestUri) {
@@ -550,6 +573,11 @@ class Request
         return implode('&', $parts);
     }
 
+    /**
+     * Checks whether the request is secure or not.
+     * 
+     * @return Boolean
+     */
     public function isSecure()
     {
         return (
@@ -586,6 +614,11 @@ class Request
         return trim($host);
     }
 
+    /**
+     * Sets the request method.
+     * 
+     * @param string $method
+     */
     public function setMethod($method)
     {
         $this->method = null;
@@ -602,7 +635,7 @@ class Request
         if (null === $this->method) {
             $this->method = strtoupper($this->server->get('REQUEST_METHOD', 'GET'));
             if ('POST' === $this->method) {
-                $this->method = strtoupper($this->request->get('_method', 'POST'));
+                $this->method = strtoupper($this->server->get('X-HTTP-METHOD-OVERRIDE', $this->request->get('_method', 'POST')));
             }
         }
 
@@ -689,6 +722,11 @@ class Request
         $this->format = $format;
     }
 
+    /**
+     * Checks whether the method is safe or not.
+     * 
+     * @return Boolean
+     */
     public function isMethodSafe()
     {
         return in_array($this->getMethod(), array('GET', 'HEAD'));
@@ -720,6 +758,11 @@ class Request
         return $this->content;
     }
 
+    /**
+     * Gets the Etags.
+     * 
+     * @return array The entity tags
+     */
     public function getETags()
     {
         return preg_split('/\s*,\s*/', $this->headers->get('if_none_match'), null, PREG_SPLIT_NO_EMPTY);

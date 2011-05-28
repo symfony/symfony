@@ -6,72 +6,211 @@ one. It only discusses changes that need to be done when using the "public"
 API of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.
 
+beta2 to beta3
+--------------
+
+* The settings under "framework.annotations" have changed slightly:
+
+  Before:
+  
+    framework:
+        annotations:
+            cache: file
+            file_cache:
+                debug: true
+                dir: /foo
+                
+  After:
+     
+    framework:
+        annotations:
+            cache: file
+            debug: true
+            file_cache_dir: /foo
+
 beta1 to beta2
 --------------
+
+* The annotation parsing process has been changed (it now uses Doctrine Common
+  3.0). All annotations which are used in a class must now be imported (just
+  like you import PHP namespaces with the "use" statement):
+
+  Before:
+
+``` php
+<?php
+
+/**
+ * @orm:Entity
+ */
+class AcmeUser
+{
+    /**
+     * @orm:Id
+     * @orm:GeneratedValue(strategy = "AUTO")
+     * @orm:Column(type="integer")
+     * @var integer
+     */
+    private $id;
+
+    /**
+     * @orm:Column(type="string", nullable=false)
+     * @assert:NotBlank
+     * @var string
+     */
+    private $name;
+}
+```
+  After:
+
+``` php
+<?php
+
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
+/**
+ * @ORM\Entity
+ */
+class AcmeUser
+{
+    /**
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column(type="integer")
+     *
+     * @var integer
+     */
+    private $id;
+
+    /**
+     * @ORM\Column(type="string", nullable=false)
+     * @Assert\NotBlank
+     *
+     * @var string
+     */
+    private $name;
+}
+```
+
+* The `Set` constraint has been removed as it is not required anymore.
+
+Before:
+
+``` php
+<?php
+
+/**
+ * @orm:Entity
+ */
+class AcmeEntity
+{
+    /**
+     * @assert:Set({@assert:Callback(...), @assert:Callback(...)})
+     */
+    private $foo;
+}
+```
+After:
+
+``` php
+<?php
+
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\Callback;
+
+/**
+ * @ORM\Entity
+ */
+class AcmeEntity
+{
+    /**
+     * @Callback(...)
+     * @Callback(...)
+     */
+    private $foo;
+}
+```
+
+* The config under `framework.validation.annotations` has been removed and was 
+  replaced with a boolean flag `framework.validation.enable_annotations` which
+  defaults to false.
+
+* Forms must now be explicitly enabled (automatically done in Symfony SE):
+
+        framework:
+            form: ~
+
+    Which is equivalent to:
+
+        framework:
+            form:
+                enabled: true
 
 * The Routing Exceptions have been moved:
 
     Before:
 
-    Symfony\Component\Routing\Matcher\Exception\Exception
-    Symfony\Component\Routing\Matcher\Exception\NotFoundException
-    Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException
+        Symfony\Component\Routing\Matcher\Exception\Exception
+        Symfony\Component\Routing\Matcher\Exception\NotFoundException
+        Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException
 
     After:
 
-    Symfony\Component\Routing\Exception\Exception
-    Symfony\Component\Routing\Exception\NotFoundException
-    Symfony\Component\Routing\Exception\MethodNotAllowedException
+        Symfony\Component\Routing\Exception\Exception
+        Symfony\Component\Routing\Exception\NotFoundException
+        Symfony\Component\Routing\Exception\MethodNotAllowedException
 
-* The form component's ``csrf_page_id`` option has been renamed to
-  ``intention``.
+* The form component's `csrf_page_id` option has been renamed to
+  `intention`.
 
-* The ``error_handler`` setting has been removed. The ``ErrorHandler`` class
-  is now managed directly by Symfony SE in ``AppKernel``.
+* The `error_handler` setting has been removed. The `ErrorHandler` class
+  is now managed directly by Symfony SE in `AppKernel`.
 
 * The Doctrine metadata files has moved from
-  ``Resources/config/doctrine/metadata/orm/`` to ``Resources/config/doctrine``
-  and the extension from ``.dcm.yml`` to ``.orm.yml``
+  `Resources/config/doctrine/metadata/orm/` to `Resources/config/doctrine`,
+  the extension from `.dcm.yml` to `.orm.yml`, and the file name has been
+  changed to the short class name.
 
-  Before:
+    Before:
 
         Resources/config/doctrine/metadata/orm/Bundle.Entity.dcm.xml
         Resources/config/doctrine/metadata/orm/Bundle.Entity.dcm.yml
 
-  After:
+    After:
 
-        Resources/config/doctrine/Bundle.Entity.orm.xml
-        Resources/config/doctrine/Bundle.Entity.orm.yml
+        Resources/config/doctrine/Entity.orm.xml
+        Resources/config/doctrine/Entity.orm.yml
 
 * With the introduction of a new Doctrine Registry class, the following
   parameters have been removed (replaced by methods on the `doctrine`
   service):
 
-   * doctrine.orm.entity_managers
-   * doctrine.orm.default_entity_manager
-   * doctrine.dbal.default_connection
+   * `doctrine.orm.entity_managers`
+   * `doctrine.orm.default_entity_manager`
+   * `doctrine.dbal.default_connection`
 
-  Before:
+    Before:
 
         $container->getParameter('doctrine.orm.entity_managers')
         $container->getParameter('doctrine.orm.default_entity_manager')
         $container->getParameter('doctrine.orm.default_connection')
 
-  After:
+    After:
 
         $container->get('doctrine')->getEntityManagerNames()
         $container->get('doctrine')->getDefaultEntityManagerName()
         $container->get('doctrine')->getDefaultConnectionName()
 
-  But you don't really need to use these methods anymore, as to get an entity
-  manager, you can now use the registry directly:
+    But you don't really need to use these methods anymore, as to get an entity
+    manager, you can now use the registry directly:
 
-  Before:
+    Before:
 
         $em = $this->get('doctrine.orm.entity_manager');
         $em = $this->get('doctrine.orm.foobar_entity_manager');
 
-  After:
+    After:
 
         $em = $this->get('doctrine')->getEntityManager();
         $em = $this->get('doctrine')->getEntityManager('foobar');
@@ -117,48 +256,51 @@ beta1 to beta2
 
     Before:
 
-      app/translations/catalogue.fr.xml
+        app/translations/catalogue.fr.xml
 
     After:
 
-      app/Resources/translations/catalogue.fr.xml
+        app/Resources/translations/catalogue.fr.xml
 
-* The option "modifiable" of the "collection" form type was split into two
-  options "allow_add" and "allow_delete".
+* The option `modifiable` of the `collection` form type was split into two
+  options `allow_add` and `allow_delete`.
 
     Before:
 
-      $builder->add('tags', 'collection', array(
-          'type' => 'text',
-          'modifiable' => true,
-      ));
+        $builder->add('tags', 'collection', array(
+            'type' => 'text',
+            'modifiable' => true,
+        ));
 
     After:
 
-      $builder->add('tags', 'collection', array(
-          'type' => 'text',
-          'allow_add' => true,
-          'allow_delete' => true,
-      ));
+        $builder->add('tags', 'collection', array(
+            'type' => 'text',
+            'allow_add' => true,
+            'allow_delete' => true,
+        ));
       
-* Request::hasSession() has been renamed to Request::hasPreviousSession(). The
-  method hasSession() still exists, but only checks if the request contains a
+* `Request::hasSession()` has been renamed to `Request::hasPreviousSession()`. The
+  method `hasSession()` still exists, but only checks if the request contains a
   session object, not if the session was started in a previous request.
 
 * Serializer: The NormalizerInterface's `supports()` method has been split in
-  two methods: `supportsNormalization` and `supportsDenormalization`.
+  two methods: `supportsNormalization()` and `supportsDenormalization()`.
 
-* ParameterBag::getDeep() has been removed, and is replaced with a boolean flag
-  on the ParameterBag::get() method.
+* `ParameterBag::getDeep()` has been removed, and is replaced with a boolean flag
+  on the `ParameterBag::get()` method.
 
 * Serializer: `AbstractEncoder` & `AbstractNormalizer` were renamed to
   `SerializerAwareEncoder` & `SerializerAwareNormalizer`.
 
 * Serializer: The `$properties` argument has been dropped from all interfaces.
 
-* Form: Renamed option value "text" of "widget" option of the "date" type was 
-  renamed to "single-text". "text" indicates to use separate text boxes now
-  (like for the "time" type).
+* Form: Renamed option value `text` of `widget` option of the `date` type was 
+  renamed to `single-text`. `text` indicates to use separate text boxes now
+  (like for the `time` type).
+  
+* Form: Renamed view variable `name` to `full_name`. The variable `name` now
+  contains the local, short name (equivalent to `$form->getName()`).
 
 PR12 to beta1
 -------------
@@ -201,27 +343,27 @@ PR12 to beta1
 
 * The `trans` tag does not accept a message as an argument anymore:
 
-    {% trans "foo" %}
-    {% trans foo %}
+        {% trans "foo" %}
+        {% trans foo %}
 
-  Use the long version the tags or the filter instead:
+    Use the long version the tags or the filter instead:
 
-    {% trans %}foo{% endtrans %}
-    {{ foo|trans }}
+        {% trans %}foo{% endtrans %}
+        {{ foo|trans }}
 
-  This has been done to clarify the usage of the tag and filter and also to
-  make it clearer when the automatic output escaping rules are applied (see
-  the doc for more information).
+    This has been done to clarify the usage of the tag and filter and also to
+    make it clearer when the automatic output escaping rules are applied (see
+    the doc for more information).
 
-* Some methods in the DependencyInjection component's ContainerBuilder and
-  Definition classes have been renamed to be more specific and consistent:
+* Some methods in the DependencyInjection component's `ContainerBuilder` and
+  `Definition` classes have been renamed to be more specific and consistent:
 
-  Before:
+    Before:
 
         $container->remove('my_definition');
         $definition->setArgument(0, 'foo');
 
-  After:
+    After:
 
         $container->removeDefinition('my_definition');
         $definition->replaceArgument(0, 'foo');
@@ -232,18 +374,18 @@ PR12 to beta1
 PR11 to PR12
 ------------
 
-* HttpFoundation\Cookie::getExpire() was renamed to getExpiresTime()
+* `HttpFoundation\Cookie::getExpire()` was renamed to `getExpiresTime()`
 
 * XML configurations have been normalized. All tags with only one attribute
   have been converted to tag content:
 
-  Before:
+    Before:
 
         <bundle name="MyBundle" />
         <app:engine id="twig" />
         <twig:extension id="twig.extension.debug" />
 
-  After:
+    After:
 
         <bundle>MyBundle</bundle>
         <app:engine>twig</app:engine>
@@ -266,7 +408,7 @@ PR10 to PR11
   that the BC is kept but implementing this interface in your extensions will
   allow for further developments.
 
-* The "fingerscrossed" Monolog option has been renamed to "fingers_crossed".
+* The `fingerscrossed` Monolog option has been renamed to `fingers_crossed`.
 
 PR9 to PR10
 -----------
@@ -364,11 +506,11 @@ PR8 to PR9
 
 * Assetic filters must be now explicitly loaded:
 
-    assetic:
-        filters:
-            cssrewrite: ~
-            yui_css:
-                jar: "/path/to/yuicompressor.jar"
-            my_filter:
-                resource: "%kernel.root_dir%/config/my_filter.xml"
-                foo:      bar
+        assetic:
+            filters:
+                cssrewrite: ~
+                yui_css:
+                    jar:      "/path/to/yuicompressor.jar"
+                my_filter:
+                    resource: "%kernel.root_dir%/config/my_filter.xml"
+                    foo:      bar

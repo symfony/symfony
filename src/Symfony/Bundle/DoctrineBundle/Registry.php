@@ -13,6 +13,8 @@ namespace Symfony\Bundle\DoctrineBundle;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Doctrine\DBAL\Connection;
+use Doctrine\ORM\Configuration;
+use Doctrine\ORM\ORMException;
 
 /**
  * References all Doctrine connections and entity managers in a given Container.
@@ -136,6 +138,29 @@ class Registry
         // force the creation of a new entity manager
         // if the current one is closed
         $this->container->set($this->entityManagers[$name], null);
+    }
+
+    /**
+     * Resolves a registered namespace alias to the full namespace.
+     *
+     * This method looks for the alias in all registered entity managers.
+     *
+     * @param string $alias The alias
+     *
+     * @return string The full namespace
+     *
+     * @see Configuration::getEntityNamespace
+     */
+    public function getEntityNamespace($alias)
+    {
+        foreach (array_keys($this->entityManagers) as $name) {
+            try {
+                return $this->getEntityManager($name)->getConfiguration()->getEntityNamespace($alias);
+            } catch (ORMException $e) {
+            }
+        }
+
+        throw ORMException::unknownEntityNamespace($alias);
     }
 
     /**

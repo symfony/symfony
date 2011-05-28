@@ -2,6 +2,7 @@
 
 $container->loadFromExtension('framework', array(
     'secret' => 's3cr3t',
+    'form' => null,
     'csrf_protection' => array(
         'enabled'    => true,
         'field_name' => '_csrf',
@@ -55,5 +56,10 @@ $container->loadFromExtension('framework', array(
     'validation' => array(
         'enabled' => true,
         'cache'   => 'apc',
+    ),
+    'annotations' => array(
+        'cache' => 'file',
+        'debug' => true,
+        'file_cache_dir' => '%kernel.cache_dir%/annotations',
     ),
 ));

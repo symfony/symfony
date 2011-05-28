@@ -1,5 +1,6 @@
 framework:
     secret: s3cr3t
+    form: ~
     csrf_protection:
         enabled:    true
         field_name: _csrf
@@ -42,3 +43,7 @@ framework:
     validation:
         enabled: true
         cache:   apc
+    annotations:
+        cache:   file
+        debug:   true
+        file_cache_dir: %kernel.cache_dir%/annotations

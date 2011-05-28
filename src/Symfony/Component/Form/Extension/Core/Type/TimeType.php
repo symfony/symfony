@@ -94,10 +94,8 @@ class TimeType extends AbstractType
             'widget'            => 'choice',
             'input'             => 'datetime',
             'with_seconds'      => false,
-            'pattern'           => null,
             'data_timezone'     => null,
             'user_timezone'     => null,
-            'csrf_protection'   => false,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference'      => false,

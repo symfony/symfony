@@ -97,7 +97,7 @@ class RouteCollection implements \IteratorAggregate
 
         if (isset($this->routes[$name])) {
             return $this->routes[$name];
-        };
+        }
     }
 
     /**

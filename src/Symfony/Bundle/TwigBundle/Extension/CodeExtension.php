@@ -12,16 +12,20 @@
 namespace Symfony\Bundle\TwigBundle\Extension;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;
 
 /**
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TemplatingExtension extends \Twig_Extension
+class CodeExtension extends \Twig_Extension
 {
-    protected $container;
+    private $container;
 
+    /**
+     * Constructor of Twig Extension to provide functions for code formatting
+     *
+     * @param Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper $helper Helper to use
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -41,74 +45,6 @@ class TemplatingExtension extends \Twig_Extension
             'format_file'           => new \Twig_Filter_Method($this, 'formatFile', array('is_safe' => array('html'))),
             'format_file_from_text' => new \Twig_Filter_Method($this, 'formatFileFromText', array('is_safe' => array('html'))),
             'file_link'             => new \Twig_Filter_Method($this, 'getFileLink', array('is_safe' => array('html'))),
-        );
-    }
-
-    /**
-     * Returns a list of functions to add to the existing list.
-     *
-     * @return array An array of functions
-     */
-    public function getFunctions()
-    {
-        return array(
-            'asset' => new \Twig_Function_Method($this, 'getAssetUrl'),
-            'assets_version' => new \Twig_Function_Method($this, 'getAssetsVersion'),
-        );
-    }
-
-    /**
-     * Returns the public path of an asset
-     *
-     * Absolute paths (i.e. http://...) are returned unmodified.
-     *
-     * @param string $path        A public path
-     * @param string $packageName The name of the asset package to use
-     *
-     * @return string A public path which takes into account the base path and URL path
-     */
-    public function getAssetUrl($path, $packageName = null)
-    {
-        return $this->container->get('templating.helper.assets')->getUrl($path, $packageName);
-    }
-
-    /**
-     * Returns the version of the assets in a package
-     *
-     * @param string $packageName
-     * @return int
-     */
-    public function getAssetsVersion($packageName = null)
-    {
-        return $this->container->get('templating.helper.assets')->getVersion($packageName);
-    }
-
-    /**
-     * Returns the Response content for a given controller or URI.
-     *
-     * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
-     * @param array  $attributes An array of request attributes
-     * @param array  $options    An array of options
-     *
-     * @see Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver::render()
-     */
-    public function renderAction($controller, array $attributes = array(), array $options = array())
-    {
-        $options['attributes'] = $attributes;
-
-        return $this->container->get('http_kernel')->render($controller, $options);
-    }
-
-    /**
-     * Returns the token parser instance to add to the existing list.
-     *
-     * @return array An array of Twig_TokenParser instances
-     */
-    public function getTokenParsers()
-    {
-        return array(
-            // {% render 'BlogBundle:Post:list' with { 'limit': 2 }, { 'alt': 'BlogBundle:Post:error' } %}
-            new RenderTokenParser(),
         );
     }
 
@@ -152,13 +88,8 @@ class TemplatingExtension extends \Twig_Extension
         return $this->container->get('templating.helper.code')->formatFileFromText($text);
     }
 
-    /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
-     */
     public function getName()
     {
-        return 'templating';
+        return 'code';
     }
 }

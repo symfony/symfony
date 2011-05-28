@@ -48,23 +48,36 @@ class XmlFileLoader extends FileLoader
                 continue;
             }
 
-            switch ($node->tagName) {
-                case 'route':
-                    $this->parseRoute($collection, $node, $path);
-                    break;
-                case 'import':
-                    $resource = (string) $node->getAttribute('resource');
-                    $type = (string) $node->getAttribute('type');
-                    $prefix = (string) $node->getAttribute('prefix');
-                    $this->setCurrentDir(dirname($path));
-                    $collection->addCollection($this->import($resource, ('' !== $type ? $type : null), false, $file), $prefix);
-                    break;
-                default:
-                    throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));
-            }
+            $this->parseNode($collection, $node, $path, $file);
         }
 
         return $collection;
+    }
+
+    /**
+     * Parses a node from a loaded XML file.
+     *
+     * @param RouteCollection $collection the collection to associate with the node
+     * @param DOMElement      $node the node to parse
+     * @param string          $path the path of the XML file being processed
+     * @param string          $file
+     */
+    protected function parseNode(RouteCollection $collection, \DOMElement $node, $path, $file)
+    {
+        switch ($node->tagName) {
+            case 'route':
+                $this->parseRoute($collection, $node, $path);
+                break;
+            case 'import':
+                $resource = (string) $node->getAttribute('resource');
+                $type = (string) $node->getAttribute('type');
+                $prefix = (string) $node->getAttribute('prefix');
+                $this->setCurrentDir(dirname($path));
+                $collection->addCollection($this->import($resource, ('' !== $type ? $type : null), false, $file), $prefix);
+                break;
+            default:
+                throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));
+        }
     }
 
     /**

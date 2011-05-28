@@ -1,0 +1,23 @@
+imports:
+    - { type: file, resource: ./../config/default.yml }
+
+security:
+    encoders:
+        Symfony\Component\Security\Core\User\User: plaintext
+        
+    providers:
+        in_memory:
+            users:
+                johannes: { password: test, roles: [ROLE_USER] }
+            
+    firewalls:
+        login_form:
+            pattern: ^/login$
+            security: false
+
+        default:
+            form_login:
+                check_path: /login_check
+
+    access_control:
+        - { path: .*, roles: IS_AUTHENTICATED_FULLY }

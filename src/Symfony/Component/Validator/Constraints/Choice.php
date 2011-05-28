@@ -30,12 +30,4 @@ class Choice extends \Symfony\Component\Validator\Constraint
     {
         return 'choices';
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTargets()
-    {
-        return self::PROPERTY_CONSTRAINT;
-    }
 }

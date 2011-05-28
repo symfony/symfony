@@ -56,10 +56,10 @@ class LinkTest extends \PHPUnit_Framework_TestCase
         $node = $dom->getElementsByTagName('a')->item(0);
         $link = new Link($node, 'http://example.com/');
 
-        $this->assertEquals('get', $link->getMethod(), '->getMethod() returns the method of the link');
+        $this->assertEquals('GET', $link->getMethod(), '->getMethod() returns the method of the link');
 
         $link = new Link($node, 'http://example.com/', 'post');
-        $this->assertEquals('post', $link->getMethod(), '->getMethod() returns the method of the link');
+        $this->assertEquals('POST', $link->getMethod(), '->getMethod() returns the method of the link');
     }
 
     /**

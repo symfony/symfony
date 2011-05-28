@@ -1,0 +1,21 @@
+framework:
+    charset:       UTF-8
+    secret:        test
+    csrf_protection:
+        enabled: true
+    router:        { resource: "%kernel.root_dir%/%kernel.test_case%/routing.yml" }
+    validation:    { enabled: true, enable_annotations: true }
+    templating:    { engines: ['twig'] }
+    form: ~
+    test: ~
+    session:
+        default_locale: en
+        lifetime:       3600
+        auto_start:     true
+        storage_id: session.storage.filesystem
+
+# Twig Configuration 
+twig:
+    debug:            %kernel.debug%
+    strict_variables: %kernel.debug%
+    extensions: []

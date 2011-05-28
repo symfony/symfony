@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Parameter;
@@ -41,7 +42,6 @@ class FrameworkExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
         $loader->load('web.xml');
-        $loader->load('form.xml');
         $loader->load('services.xml');
 
         // A translator must always be registered (as support is included by
@@ -70,8 +70,17 @@ class FrameworkExtension extends Extension
             $loader->load('test.xml');
         }
 
-        if (isset($config['csrf_protection'])) {
-            $this->registerCsrfProtectionConfiguration($config['csrf_protection'], $container);
+        if (isset($config['session'])) {
+            $this->registerSessionConfiguration($config['session'], $container, $loader);
+        }
+
+        if ($hasForm = isset($config['form']) && !empty($config['form']['enabled'])) {
+            $this->registerFormConfiguration($config, $container, $loader);
+            $config['validation']['enabled'] = true;
+        }
+
+        if (!empty($config['validation']['enabled'])) {
+            $this->registerValidationConfiguration($config['validation'], $container, $loader);
         }
 
         if (isset($config['esi'])) {
@@ -86,10 +95,6 @@ class FrameworkExtension extends Extension
             $this->registerRouterConfiguration($config['router'], $container, $loader);
         }
 
-        if (isset($config['session'])) {
-            $this->registerSessionConfiguration($config['session'], $container, $loader);
-        }
-
         if (isset($config['templating'])) {
             $this->registerTemplatingConfiguration($config['templating'], $config['ide'], $container, $loader);
         }
@@ -98,9 +103,7 @@ class FrameworkExtension extends Extension
             $this->registerTranslatorConfiguration($config['translator'], $container);
         }
 
-        if (isset($config['validation'])) {
-            $this->registerValidationConfiguration($config['validation'], $container, $loader);
-        }
+        $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
 
         $this->addClassesToCompile(array(
             'Symfony\\Component\\HttpFoundation\\ParameterBag',
@@ -135,15 +138,32 @@ class FrameworkExtension extends Extension
     }
 
     /**
-     * Loads the CSRF protection configuration.
+     * Loads Form configuration.
      *
-     * @param array            $config    A CSRF protection configuration array
+     * @param array            $config    A configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
      */
-    private function registerCsrfProtectionConfiguration(array $config, ContainerBuilder $container)
+    private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        $container->setParameter('form.type_extension.csrf.enabled', $config['enabled']);
-        $container->setParameter('form.type_extension.csrf.field_name', $config['field_name']);
+        $loader->load('form.xml');
+        if (isset($config['csrf_protection'])) {
+            if (!isset($config['session'])) {
+                throw new \LogicException('CSRF protection needs that sessions are enabled.');
+            }
+            $loader->load('form_csrf.xml');
+
+            $container->setParameter('form.type_extension.csrf.enabled', $config['csrf_protection']['enabled']);
+            $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
+        }
+
+        if ($container->hasDefinition('session')) {
+            $container->removeDefinition('file.temporary_storage');
+            $container->setDefinition('file.temporary_storage', $container->getDefinition('file.temporary_storage.session'));
+            $container->removeDefinition('file.temporary_storage.session');
+        } else {
+            $container->removeDefinition('file.temporary_storage.session');
+        }
     }
 
     /**
@@ -439,31 +459,16 @@ class FrameworkExtension extends Extension
      */
     private function registerValidationConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (empty($config['enabled'])) {
-            return;
-        }
-
         $loader->load('validator.xml');
 
         $container->setParameter('validator.mapping.loader.xml_files_loader.mapping_files', $this->getValidatorXmlMappingFiles($container));
         $container->setParameter('validator.mapping.loader.yaml_files_loader.mapping_files', $this->getValidatorYamlMappingFiles($container));
 
-        if (isset($config['annotations'])) {
-            $namespaces = array('assert' => 'Symfony\\Component\\Validator\\Constraints\\');
-            // Register prefixes for constraint namespaces
-            if (!empty($config['annotations']['namespaces'])) {
-                $namespaces = array_merge($namespaces, $config['annotations']['namespaces']);
-            }
-
-            // Register annotation loader
-            $container->setParameter('validator.mapping.loader.annotation_loader.namespaces', $namespaces);
-
+        if ($config['enable_annotations']) {
             $loaderChain = $container->getDefinition('validator.mapping.loader.loader_chain');
             $arguments = $loaderChain->getArguments();
             array_unshift($arguments[0], new Reference('validator.mapping.loader.annotation_loader'));
             $loaderChain->setArguments($arguments);
-        } else {
-            $container->setParameter('validator.mapping.loader.annotation_loader.namespaces', array());
         }
 
         if (isset($config['cache'])) {
@@ -505,6 +510,32 @@ class FrameworkExtension extends Extension
         }
 
         return $files;
+    }
+
+    private function registerAnnotationsConfiguration(array $config, ContainerBuilder $container,$loader)
+    {
+        $loader->load('annotations.xml');
+
+        if ('file' === $config['cache']) {
+            $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
+            if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true)) {
+                throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
+            }
+
+            $container
+                ->getDefinition('annotations.file_cache_reader')
+                ->replaceArgument(1, $cacheDir)
+                ->replaceArgument(2, $config['debug'])
+            ;
+            $container->setAlias('annotation_reader', 'annotations.file_cache_reader');
+        } else if('none' !== $config['cache']) {
+            $container
+                ->getDefinition('annotations.cached_reader')
+                ->replaceArgument(1, new Reference($config['cache']))
+                ->replaceArgument(2, $config['debug'])
+            ;
+            $container->setAlias('annotation_reader', 'annotations.cached_reader');
+        }
     }
 
     /**

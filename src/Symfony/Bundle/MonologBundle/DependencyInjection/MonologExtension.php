@@ -140,7 +140,7 @@ class MonologExtension extends Extension
         case 'fingers_crossed':
             $handler['action_level'] = is_int($handler['action_level']) ? $handler['action_level'] : constant('Monolog\Logger::'.strtoupper($handler['action_level']));
             $nestedHandlerId = $this->getHandlerId($handler['handler']);
-            array_push($this->nestedHandlers, $nestedHandlerId);
+            $this->nestedHandlers[] = $nestedHandlerId;
 
             $definition->setArguments(array(
                 new Reference($nestedHandlerId),
@@ -153,7 +153,7 @@ class MonologExtension extends Extension
 
         case 'buffer':
             $nestedHandlerId = $this->getHandlerId($handler['handler']);
-            array_push($this->nestedHandlers, $nestedHandlerId);
+            $this->nestedHandlers[] = $nestedHandlerId;
 
             $definition->setArguments(array(
                 new Reference($nestedHandlerId),
@@ -167,7 +167,7 @@ class MonologExtension extends Extension
             $references = array();
             foreach ($handler['members'] as $nestedHandler) {
                 $nestedHandlerId = $this->getHandlerId($nestedHandler);
-                array_push($this->nestedHandlers, $nestedHandlerId);
+                $this->nestedHandlers[] = $nestedHandlerId;
                 $references[] = new Reference($nestedHandlerId);
             }
 

@@ -107,8 +107,8 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $builder->register('baz', 'stdClass')->setArguments(array(new Reference('baz')));
         try {
             @$builder->get('baz');
-            $this->fail('->get() throws a CircularReferenceException if the service has a circular reference to itself');
-        } catch (\Symfony\Component\DependencyInjection\Exception\CircularReferenceException $e) {
+            $this->fail('->get() throws a ServiceCircularReferenceException if the service has a circular reference to itself');
+        } catch (\Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException $e) {
             $this->assertEquals('Circular reference detected for service "baz", path: "baz".', $e->getMessage(), '->get() throws a LogicException if the service has a circular reference to itself');
         }
 
@@ -468,6 +468,23 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $container->registerExtension($extension);
         $container->loadFromExtension('project', array('foo' => 'bar'));
         $container->compile();
+    }
+
+    public function testPrivateServiceUser()
+    {
+        $fooDefinition     = new Definition('BarClass');
+        $fooUserDefinition = new Definition('BarUserClass', array(new Reference('bar')));
+        $container         = new ContainerBuilder();
+
+        $fooDefinition->setPublic(false);
+
+        $container->addDefinitions(array(
+            'bar'       => $fooDefinition,
+            'bar_user'  => $fooUserDefinition
+        ));
+
+        $container->compile();
+        $this->assertInstanceOf('BarClass', $container->get('bar_user')->bar);
     }
 
     /**

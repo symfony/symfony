@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Role\Role;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class RoleSecurityIdentity implements SecurityIdentityInterface
+final class RoleSecurityIdentity implements SecurityIdentityInterface
 {
     private $role;
 

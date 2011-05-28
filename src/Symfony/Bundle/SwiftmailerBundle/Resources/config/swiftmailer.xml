@@ -15,6 +15,8 @@
         <parameter key="swiftmailer.plugin.redirecting.class">Swift_Plugins_RedirectingPlugin</parameter>
         <parameter key="swiftmailer.plugin.blackhole.class">Swift_Plugins_BlackholePlugin</parameter>
         <parameter key="swiftmailer.plugin.messagelogger.class">Symfony\Bundle\SwiftmailerBundle\Logger\MessageLogger</parameter>
+        <parameter key="swiftmailer.plugin.antiflood.class">Swift_Plugins_AntiFloodPlugin</parameter>
+
         <parameter key="swiftmailer.data_collector.class">Symfony\Bundle\SwiftmailerBundle\DataCollector\MessageDataCollector</parameter>
     </parameters>
 
@@ -62,6 +64,11 @@
         </service>
 
         <service id="swiftmailer.plugin.blackhole" class="%swiftmailer.plugin.blackhole.class%" public="false" />
+        
+        <service id="swiftmailer.plugin.antiflood" class="%swiftmailer.plugin.antiflood.class%" public="false">
+            <argument>%swiftmailer.antiflood.treshold%</argument>
+            <argument>%swiftmailer.antiflood.sleep%</argument>
+        </service>
 
         <service id="swiftmailer.plugin.messagelogger" class="%swiftmailer.plugin.messagelogger.class%" />
 

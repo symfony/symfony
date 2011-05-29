@@ -27,9 +27,11 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  *
  * $serializer->serialize($obj, 'xml')
  * $serializer->decode($data, 'xml')
- * $serializer->denormalizeObject($data, 'Class', 'xml')
+ * $serializer->denormalize($data, 'Class', 'xml')
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * @author Lukas Kahwe Smith <smith@pooteeweet.org>
  */
 class Serializer implements SerializerInterface
 {
@@ -38,10 +40,27 @@ class Serializer implements SerializerInterface
     protected $normalizerCache = array();
     protected $denormalizerCache = array();
 
+    public function __construct(array $normalizers = array(), array $encoders = array())
+    {
+        foreach ($normalizers as $normalizer) {
+            if ($normalizer instanceof SerializerAwareInterface) {
+                $normalizer->setSerializer($this);
+            }
+        }
+        $this->normalizers = $normalizers;
+
+        foreach ($encoders as $encoder) {
+            if ($encoder instanceof SerializerAwareInterface) {
+                $encoder->setSerializer($this);
+            }
+        }
+        $this->encoders = $encoders;
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function serialize($data, $format)
+    public final function serialize($data, $format)
     {
         if (!isset($this->encoders[$format])) {
             throw new UnexpectedValueException('No encoder registered for the '.$format.' format');

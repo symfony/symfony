@@ -3,6 +3,7 @@
 namespace Symfony\Component\Serializer\Encoder;
 
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /*
  * This file is part of the Symfony framework.
@@ -268,7 +269,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
 
             return $this->appendNode($parentNode, $data, 'data');
         }
-        throw new \UnexpectedValueException('An unexpected value could not be serialized: '.var_export($data, true));
+        throw new UnexpectedValueException('An unexpected value could not be serialized: '.var_export($data, true));
     }
 
     /**

@@ -6,6 +6,9 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\NormalizationAwareInterface;
+use Symfony\Component\Serializer\Exception\RuntimeException;
+use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /*
  * This file is part of the Symfony framework.
@@ -41,7 +44,7 @@ class Serializer implements SerializerInterface
     public function serialize($data, $format)
     {
         if (!isset($this->encoders[$format])) {
-            throw new \UnexpectedValueException('No encoder registered for the '.$format.' format');
+            throw new UnexpectedValueException('No encoder registered for the '.$format.' format');
         }
         if (!$this->encoders[$format] instanceof NormalizationAwareInterface) {
             $data = $this->normalize($data);
@@ -83,7 +86,7 @@ class Serializer implements SerializerInterface
 
             return $data;
         }
-        throw new \UnexpectedValueException('An unexpected value could not be normalized: '.var_export($data, true));
+        throw new UnexpectedValueException('An unexpected value could not be normalized: '.var_export($data, true));
     }
 
     /**
@@ -128,7 +131,7 @@ class Serializer implements SerializerInterface
     private function normalizeObject($object, $format = null)
     {
         if (!$this->normalizers) {
-            throw new \LogicException('You must register at least one normalizer to be able to normalize objects.');
+            throw new LogicException('You must register at least one normalizer to be able to normalize objects.');
         }
         $class = get_class($object);
         if (isset($this->normalizerCache[$class][$format])) {
@@ -141,7 +144,7 @@ class Serializer implements SerializerInterface
                 return $normalizer->normalize($object, $format);
             }
         }
-        throw new \UnexpectedValueException('Could not normalize object of type '.$class.', no supporting normalizer found.');
+        throw new UnexpectedValueException('Could not normalize object of type '.$class.', no supporting normalizer found.');
     }
 
     /**
@@ -155,7 +158,7 @@ class Serializer implements SerializerInterface
     private function denormalizeObject($data, $class, $format = null)
     {
         if (!$this->normalizers) {
-            throw new \LogicException('You must register at least one normalizer to be able to denormalize objects.');
+            throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
         }
         if (isset($this->denormalizerCache[$class][$format])) {
             return $this->denormalizerCache[$class][$format]->denormalize($data, $class, $format);
@@ -167,7 +170,7 @@ class Serializer implements SerializerInterface
                 return $normalizer->denormalize($data, $class, $format);
             }
         }
-        throw new \UnexpectedValueException('Could not denormalize object of type '.$class.', no supporting normalizer found.');
+        throw new UnexpectedValueException('Could not denormalize object of type '.$class.', no supporting normalizer found.');
     }
 
     /**
@@ -205,9 +208,11 @@ class Serializer implements SerializerInterface
      */
     public function getEncoder($format)
     {
-        if (isset($this->encoders[$format])) {
-            return $this->encoders[$format];
+        if (!isset($this->encoders[$format])) {
+            throw new RuntimeException(sprintf('No encoder found for format "%s".', $format));
         }
+
+        return $this->encoders[$format];
     }
 
     /**

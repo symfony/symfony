@@ -187,31 +187,17 @@ class Serializer implements SerializerInterface
     /**
      * {@inheritdoc}
      */
-    public function addNormalizer(NormalizerInterface $normalizer)
+    public function supportsSerialization($format)
     {
-        $this->normalizers[] = $normalizer;
-        if ($normalizer instanceof SerializerAwareInterface) {
-            $normalizer->setSerializer($this);
-        }
+        return isset($this->encoders[$format]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function removeNormalizer(NormalizerInterface $normalizer)
+    public function supportsDeserialization($format)
     {
-        unset($this->normalizers[array_search($normalizer, $this->normalizers, true)]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setEncoder($format, EncoderInterface $encoder)
-    {
-        $this->encoders[$format] = $encoder;
-        if ($encoder instanceof SerializerAwareInterface) {
-            $encoder->setSerializer($this);
-        }
+        return isset($this->encoders[$format]) && $this->encoders[$format] instanceof DecoderInterface;
     }
 
     /**
@@ -229,17 +215,12 @@ class Serializer implements SerializerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsSerialization($format)
+    public function setEncoder($format, EncoderInterface $encoder)
     {
-        return isset($this->encoders[$format]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDeserialization($format)
-    {
-        return isset($this->encoders[$format]) && $this->encoders[$format] instanceof DecoderInterface;
+        $this->encoders[$format] = $encoder;
+        if ($encoder instanceof SerializerAwareInterface) {
+            $encoder->setSerializer($this);
+        }
     }
 
     /**
@@ -250,5 +231,24 @@ class Serializer implements SerializerInterface
         if (isset($this->encoders[$format])) {
             unset($this->encoders[$format]);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addNormalizer(NormalizerInterface $normalizer)
+    {
+        $this->normalizers[] = $normalizer;
+        if ($normalizer instanceof SerializerAwareInterface) {
+            $normalizer->setSerializer($this);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeNormalizer(NormalizerInterface $normalizer)
+    {
+        unset($this->normalizers[array_search($normalizer, $this->normalizers, true)]);
     }
 }

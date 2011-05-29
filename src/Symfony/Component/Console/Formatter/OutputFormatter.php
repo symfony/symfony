@@ -155,7 +155,7 @@ class OutputFormatter implements OutputFormatterInterface
     }
 
     /**
-     * Tryes to create new style instance from string.
+     * Tries to create new style instance from string.
      *
      * @param   string  $string
      *

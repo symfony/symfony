@@ -65,9 +65,9 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        $iter = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->dir), \RecursiveIteratorIterator::CHILD_FIRST);
+        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->dir), \RecursiveIteratorIterator::CHILD_FIRST);
 
-        foreach ($iter as $path) {
+        foreach ($iterator as $path) {
             if ($path->isDir()) {
                 @rmdir($path);
             } else {

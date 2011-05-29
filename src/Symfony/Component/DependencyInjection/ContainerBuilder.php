@@ -208,7 +208,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Returns all Scope chilren.
+     * Returns all Scope children.
      *
      * @return array An array of scope children.
      */

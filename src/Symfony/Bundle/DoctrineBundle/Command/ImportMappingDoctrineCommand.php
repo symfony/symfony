@@ -49,8 +49,8 @@ You can also optionally specify which entity manager to import from with the
 
 <info>./app/console doctrine:mapping:import "MyCustomBundle" xml --em=default</info>
 
-If you dont want to map every entity that can be found in the database, use the
-<info>--filter</info> option. It will try to match the targetted mapped entity with the
+If you don't want to map every entity that can be found in the database, use the
+<info>--filter</info> option. It will try to match the targeted mapped entity with the
 provided pattern string.
 
 <info>./app/console doctrine:mapping:import "MyCustomBundle" xml --filter=MyMatchedEntity</info>

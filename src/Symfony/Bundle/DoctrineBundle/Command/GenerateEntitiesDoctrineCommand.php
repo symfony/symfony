@@ -59,7 +59,7 @@ you must provide the <comment>--path</comment> option:
 
   <info>./app/console doctrine:generate:entities Blog/Entity --path=src/</info>
 
-You should provide the <comment>--no-backup</comment> option if you dont mind to back up files
+You should provide the <comment>--no-backup</comment> option if you don't mind to back up files
 before to generate entities:
 
   <info>./app/console doctrine:generate:entities Blog/Entity --no-backup</info>

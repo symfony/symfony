@@ -264,7 +264,7 @@ class EntityChoiceList extends ArrayChoiceList
      * underlying class
      *
      * @param  string $property     The name of the property
-     * @return \ReflectionProperty  The reflection instsance
+     * @return \ReflectionProperty  The reflection instance
      */
     private function getReflProperty($property)
     {

@@ -32,7 +32,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      * @param string  $inputTimezone    The input timezone
      * @param string  $outputTimezone   The output timezone
      * @param array   $fields           The date fields
-     * @param Boolean $pad              Wether to use padding
+     * @param Boolean $pad              Whether to use padding
      *
      * @throws UnexpectedTypeException if a timezone is not a string
      */

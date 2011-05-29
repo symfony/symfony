@@ -130,7 +130,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @depends testToolbarIsInjected
      */
-    public function testToolbarIsNotInjectedOnUncompleteHtmlResponses()
+    public function testToolbarIsNotInjectedOnIncompleteHtmlResponses()
     {
         $response = new Response('<div>Some content</div>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');

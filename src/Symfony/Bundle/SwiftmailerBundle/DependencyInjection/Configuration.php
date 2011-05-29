@@ -81,7 +81,6 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->arrayNode('antiflood')
-                    ->defaultNull()
                     ->children()
                         ->scalarNode('treshold')->defaultValue(99)->end()
                         ->scalarNode('sleep')->defaultValue(0)->end()

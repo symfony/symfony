@@ -256,7 +256,7 @@ class HttpCache implements HttpKernelInterface
      * it triggers "miss" processing.
      *
      * @param Request $request A Request instance
-     * @param Boolean  $catch   whether to process exceptions
+     * @param Boolean $catch   whether to process exceptions
      *
      * @return Response A Response instance
      */

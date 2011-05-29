@@ -121,11 +121,7 @@ class Serializer implements SerializerInterface
      */
     public final function encode($data, $format)
     {
-        if (!isset($this->encoders[$format])) {
-            throw new \UnexpectedValueException('No encoder registered for the '.$format.' format');
-        }
-
-        return $this->encoders[$format]->encode($data, $format);
+        return $this->getEncoder($format)->encode($data, $format);
     }
 
     /**
@@ -133,11 +129,7 @@ class Serializer implements SerializerInterface
      */
     public final function decode($data, $format)
     {
-        if (!isset($this->encoders[$format])) {
-            throw new \UnexpectedValueException('No decoder registered for the '.$format.' format');
-        }
-
-        return $this->encoders[$format]->decode($data, $format);
+        return $this->getEncoder($format)->decode($data, $format);
     }
 
     /**

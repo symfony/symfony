@@ -254,7 +254,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
             return $append;
         }
         if (is_object($data)) {
-            $data = $this->serializer->normalizeObject($data, $this->format);
+            $data = $this->serializer->normalize($data, $this->format);
             if (null !== $data && !is_scalar($data)) {
                 return $this->buildXml($parentNode, $data);
             }
@@ -312,7 +312,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
         } elseif ($val instanceof \Traversable) {
             $this->buildXml($node, $val);
         } elseif (is_object($val)) {
-            return $this->buildXml($node, $this->serializer->normalizeObject($val, $this->format));
+            return $this->buildXml($node, $this->serializer->normalize($val, $this->format));
         } elseif (is_numeric($val)) {
             return $this->appendText($node, (string) $val);
         } elseif (is_string($val)) {

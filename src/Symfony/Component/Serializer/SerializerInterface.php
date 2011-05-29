@@ -84,46 +84,6 @@ interface SerializerInterface
     function decode($data, $format);
 
     /**
-     * Normalizes an object into a set of arrays/scalars
-     *
-     * @param object $object object to normalize
-     * @param string $format format name, present to give the option to normalizers to act differently based on formats
-     * @return array|scalar
-     */
-    function normalizeObject($object, $format = null);
-
-    /**
-     * Denormalizes data back into an object of the given class
-     *
-     * @param mixed $data data to restore
-     * @param string $class the expected class to instantiate
-     * @param string $format format name, present to give the option to normalizers to act differently based on formats
-     * @return object
-     */
-    function denormalizeObject($data, $class, $format = null);
-
-    /**
-     * @param NormalizerInterface $normalizer
-     */
-    function addNormalizer(NormalizerInterface $normalizer);
-
-    /**
-     * @param NormalizerInterface $normalizer
-     */
-    function removeNormalizer(NormalizerInterface $normalizer);
-
-    /**
-     * @param string           $format  format name
-     * @param EncoderInterface $encoder
-     */
-    function setEncoder($format, EncoderInterface $encoder);
-
-    /**
-     * @return EncoderInterface
-     */
-    function getEncoder($format);
-
-    /**
      * Checks whether the serializer can serialize the given format
      *
      * @param string $format format name
@@ -140,7 +100,28 @@ interface SerializerInterface
     function supportsDeserialization($format);
 
     /**
+     * @return EncoderInterface
+     */
+    function getEncoder($format);
+
+    /**
+     * @param string           $format  format name
+     * @param EncoderInterface $encoder
+     */
+    function setEncoder($format, EncoderInterface $encoder);
+
+    /**
      * @param string $format format name
      */
     function removeEncoder($format);
+
+    /**
+     * @param NormalizerInterface $normalizer
+     */
+    function addNormalizer(NormalizerInterface $normalizer);
+
+    /**
+     * @param NormalizerInterface $normalizer
+     */
+    function removeNormalizer(NormalizerInterface $normalizer);
 }

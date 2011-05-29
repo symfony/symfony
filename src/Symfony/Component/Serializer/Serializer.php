@@ -119,9 +119,13 @@ class Serializer implements SerializerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Normalizes an object into a set of arrays/scalars
+     *
+     * @param object $object object to normalize
+     * @param string $format format name, present to give the option to normalizers to act differently based on formats
+     * @return array|scalar
      */
-    public function normalizeObject($object, $format = null)
+    private function normalizeObject($object, $format = null)
     {
         if (!$this->normalizers) {
             throw new \LogicException('You must register at least one normalizer to be able to normalize objects.');
@@ -141,9 +145,14 @@ class Serializer implements SerializerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Denormalizes data back into an object of the given class
+     *
+     * @param mixed $data data to restore
+     * @param string $class the expected class to instantiate
+     * @param string $format format name, present to give the option to normalizers to act differently based on formats
+     * @return object
      */
-    public function denormalizeObject($data, $class, $format = null)
+    private function denormalizeObject($data, $class, $format = null)
     {
         if (!$this->normalizers) {
             throw new \LogicException('You must register at least one normalizer to be able to denormalize objects.');

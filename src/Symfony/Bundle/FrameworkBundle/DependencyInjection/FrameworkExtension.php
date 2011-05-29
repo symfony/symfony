@@ -421,7 +421,8 @@ class FrameworkExtension extends Extension
     {
         if (!empty($config['enabled'])) {
             // Use the "real" translator instead of the identity default
-            $container->setDefinition('translator', $translator = $container->findDefinition('translator.real'));
+            $container->setAlias('translator', 'translator.real');
+            $translator = $container->findDefinition('translator.real');
             $translator->addMethodCall('setFallbackLocale', array($config['fallback']));
 
             // Discover translation directories

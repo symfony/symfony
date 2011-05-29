@@ -73,9 +73,9 @@ class Serializer implements SerializerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function deserialize($data, $type, $format) {
+    public final function deserialize($data, $type, $format) {
         return $this->denormalize($this->decode($data, $format), $type, $format);
     }
 
@@ -109,7 +109,7 @@ class Serializer implements SerializerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function denormalize($data, $type, $format = null)
     {
@@ -119,7 +119,7 @@ class Serializer implements SerializerInterface
     /**
      * {@inheritdoc}
      */
-    public function encode($data, $format)
+    public final function encode($data, $format)
     {
         if (!isset($this->encoders[$format])) {
             throw new \UnexpectedValueException('No encoder registered for the '.$format.' format');
@@ -131,7 +131,7 @@ class Serializer implements SerializerInterface
     /**
      * {@inheritdoc}
      */
-    public function decode($data, $format)
+    public final function decode($data, $format)
     {
         if (!isset($this->encoders[$format])) {
             throw new \UnexpectedValueException('No decoder registered for the '.$format.' format');

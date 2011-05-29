@@ -34,8 +34,12 @@ beta2 to beta3
             file_cache_dir: /foo
 
 * In order to use Swiftmailer, you should now register its "init.php"
-  file via the autoloader ("app/autoloader.php"). For an example on how
-  this should be done, see the [Standard Distribution](https://github.com/symfony/symfony-standard/blob/v2.0.0BETA3/app/autoload.php#L27).
+  file via the autoloader ("app/autoloader.php") and remove the `Swift_`
+  prefix from the autoloader. For an example on how
+  this should be done, see the Standard Distribution
+  [autoload.php](https://github.com/symfony/symfony-standard/blob/v2.0.0BETA3/app/autoload.php#L18)
+  or the [change](https://github.com/symfony/symfony-standard/commit/69a78d30b07b5563ba972f2cc8f43326f64db8e2#app/autoload.php)
+  that was made to that file.
 
 beta1 to beta2
 --------------

@@ -137,8 +137,8 @@ class HttpKernel implements HttpKernelInterface
      * Filters a response object.
      *
      * @param Response $response A Response instance
-     * @param string   $message A error message in case the response is not a Response object
-     * @param integer  $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
+     * @param Request  $request  A error message in case the response is not a Response object
+     * @param integer  $type     The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
      *
      * @return Response The filtered Response instance
      *

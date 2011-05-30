@@ -2,7 +2,7 @@
 
 namespace Symfony\Tests\Component\Form\Fixtures;
 
-use Symfony\Component\Form\Events;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -49,9 +49,9 @@ class FixedFilterListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            Events::onBindClientData,
-            Events::onBindNormData,
-            Events::onSetData,
+            FormEvents::ON_BIND_CLIENT_DATA => 'onBindClientData',
+            FormEvents::ON_BIND_NORM_DATA => 'onBindNormData',
+            FormEvents::ON_SET_DATA => 'onSetData',
         );
     }
 }

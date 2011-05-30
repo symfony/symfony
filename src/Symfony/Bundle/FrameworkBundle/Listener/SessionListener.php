@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class SessionInitializingListener
+class SessionListener
 {
     private $container;
 

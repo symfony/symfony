@@ -99,7 +99,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
                                 $typeDefinition = get_class($skippedListener);
                             } elseif (is_array($skippedListener)) {
                                 if (is_object($skippedListener[0])) {
-                                    $typeDefinition = get_class($skippedListener);
+                                    $typeDefinition = get_class($skippedListener[0]);
                                 } else {
                                     $typeDefinition = implode('::', $skippedListener);
                                 }

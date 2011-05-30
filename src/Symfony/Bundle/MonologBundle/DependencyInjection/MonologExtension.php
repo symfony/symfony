@@ -128,6 +128,13 @@ class MonologExtension extends Extension
             $definition->addTag('kernel.listener', array('event' => 'onCoreResponse'));
             break;
 
+        case 'insight':
+            $definition->setArguments(array(
+                $handler['level'],
+                $handler['bubble'],
+            ));
+            break;
+
         case 'rotating_file':
             $definition->setArguments(array(
                 $handler['path'],

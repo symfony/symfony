@@ -18,10 +18,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 {
     /* Some pseudo events */
-    const preFoo = 'preFoo';
-    const postFoo = 'postFoo';
-    const preBar = 'preBar';
-    const postBar = 'postBar';
+    const preFoo = 'pre.foo';
+    const postFoo = 'post.foo';
+    const preBar = 'pre.bar';
+    const postBar = 'post.bar';
 
     private $dispatcher;
 
@@ -42,8 +42,8 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testAddListener()
     {
-        $this->dispatcher->addListener('preFoo', array($this->listener, 'preFoo'));
-        $this->dispatcher->addListener('postFoo', array($this->listener, 'postFoo'));
+        $this->dispatcher->addListener('pre.foo', array($this->listener, 'preFoo'));
+        $this->dispatcher->addListener('post.foo', array($this->listener, 'postFoo'));
         $this->assertTrue($this->dispatcher->hasListeners(self::preFoo));
         $this->assertTrue($this->dispatcher->hasListeners(self::postFoo));
         $this->assertEquals(1, count($this->dispatcher->getListeners(self::preFoo)));
@@ -60,9 +60,9 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $listener2->name = '2';
         $listener3->name = '3';
 
-        $this->dispatcher->addListener('preFoo', array($listener1, 'preFoo'), -10);
-        $this->dispatcher->addListener('preFoo', array($listener2, 'preFoo'), 10);
-        $this->dispatcher->addListener('preFoo', array($listener3, 'preFoo'));
+        $this->dispatcher->addListener('pre.foo', array($listener1, 'preFoo'), -10);
+        $this->dispatcher->addListener('pre.foo', array($listener2, 'preFoo'), 10);
+        $this->dispatcher->addListener('pre.foo', array($listener3, 'preFoo'));
 
         $expected = array(
             array($listener2, 'preFoo'),
@@ -70,7 +70,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
             array($listener1, 'preFoo'),
         );
 
-        $this->assertSame($expected, $this->dispatcher->getListeners('preFoo'));
+        $this->assertSame($expected, $this->dispatcher->getListeners('pre.foo'));
     }
 
     public function testGetAllListenersSortsByPriority()
@@ -82,16 +82,16 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $listener5 = new TestEventListener();
         $listener6 = new TestEventListener();
 
-        $this->dispatcher->addListener('preFoo', $listener1, -10);
-        $this->dispatcher->addListener('preFoo', $listener2);
-        $this->dispatcher->addListener('preFoo', $listener3, 10);
-        $this->dispatcher->addListener('postFoo', $listener4, -10);
-        $this->dispatcher->addListener('postFoo', $listener5);
-        $this->dispatcher->addListener('postFoo', $listener6, 10);
+        $this->dispatcher->addListener('pre.foo', $listener1, -10);
+        $this->dispatcher->addListener('pre.foo', $listener2);
+        $this->dispatcher->addListener('pre.foo', $listener3, 10);
+        $this->dispatcher->addListener('post.foo', $listener4, -10);
+        $this->dispatcher->addListener('post.foo', $listener5);
+        $this->dispatcher->addListener('post.foo', $listener6, 10);
 
         $expected = array(
-            'preFoo'  => array($listener3, $listener2, $listener1),
-            'postFoo' => array($listener6, $listener5, $listener4),
+            'pre.foo'  => array($listener3, $listener2, $listener1),
+            'post.foo' => array($listener6, $listener5, $listener4),
         );
 
         $this->assertSame($expected, $this->dispatcher->getListeners());
@@ -99,8 +99,8 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testDispatch()
     {
-        $this->dispatcher->addListener('preFoo', array($this->listener, 'preFoo'));
-        $this->dispatcher->addListener('postFoo', array($this->listener, 'postFoo'));
+        $this->dispatcher->addListener('pre.foo', array($this->listener, 'preFoo'));
+        $this->dispatcher->addListener('post.foo', array($this->listener, 'postFoo'));
         $this->dispatcher->dispatch(self::preFoo);
         $this->assertTrue($this->listener->preFooInvoked);
         $this->assertFalse($this->listener->postFooInvoked);
@@ -112,21 +112,21 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $listener = function () use (&$invoked) {
             $invoked++;
         };
-        $this->dispatcher->addListener('preFoo', $listener);
-        $this->dispatcher->addListener('postFoo', $listener);
+        $this->dispatcher->addListener('pre.foo', $listener);
+        $this->dispatcher->addListener('post.foo', $listener);
         $this->dispatcher->dispatch(self::preFoo);
         $this->assertEquals(1, $invoked);
     }
 
     public function testStopEventPropagation()
     {
-        $otherListener = new TestEventListener;
+        $otherListener = new TestEventListener();
 
         // postFoo() stops the propagation, so only one listener should
         // be executed
         // Manually set priority to enforce $this->listener to be called first
-        $this->dispatcher->addListener('postFoo', $this->listener, 10);
-        $this->dispatcher->addListener('postFoo', $otherListener);
+        $this->dispatcher->addListener('post.foo', array($this->listener, 'postFoo'), 10);
+        $this->dispatcher->addListener('post.foo', array($otherListener, 'preFoo'));
         $this->dispatcher->dispatch(self::postFoo);
         $this->assertTrue($this->listener->postFooInvoked);
         $this->assertFalse($otherListener->postFooInvoked);
@@ -144,20 +144,20 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $listener3 = function () use (&$invoked) {
             $invoked[] = '3';
         };
-        $this->dispatcher->addListener('preFoo', $listener1, -10);
-        $this->dispatcher->addListener('preFoo', $listener2);
-        $this->dispatcher->addListener('preFoo', $listener3, 10);
+        $this->dispatcher->addListener('pre.foo', $listener1, -10);
+        $this->dispatcher->addListener('pre.foo', $listener2);
+        $this->dispatcher->addListener('pre.foo', $listener3, 10);
         $this->dispatcher->dispatch(self::preFoo);
         $this->assertEquals(array('3', '2', '1'), $invoked);
     }
 
     public function testRemoveListener()
     {
-        $this->dispatcher->addListener('preBar', $this->listener);
+        $this->dispatcher->addListener('pre.bar', $this->listener);
         $this->assertTrue($this->dispatcher->hasListeners(self::preBar));
-        $this->dispatcher->removeListener('preBar', $this->listener);
+        $this->dispatcher->removeListener('pre.bar', $this->listener);
         $this->assertFalse($this->dispatcher->hasListeners(self::preBar));
-        $this->dispatcher->removeListener(array('notExists'), $this->listener);
+        $this->dispatcher->removeListener('notExists', $this->listener);
     }
 
     public function testAddSubscriber()
@@ -170,7 +170,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveSubscriber()
     {
-        $eventSubscriber = new TestEventSubscriber2();
+        $eventSubscriber = new TestEventSubscriber();
         $this->dispatcher->addSubscriber($eventSubscriber);
         $this->assertTrue($this->dispatcher->hasListeners(self::preFoo));
         $this->assertTrue($this->dispatcher->hasListeners(self::postFoo));
@@ -204,14 +204,6 @@ class TestEventSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents()
     {
-        return array('preFoo' => 'preFoo', 'postFoo' => 'postFoo');
-    }
-}
-
-class TestEventSubscriber2 implements EventSubscriberInterface
-{
-    public static function getSubscribedEvents()
-    {
-        return array('preFoo', 'postFoo');
+        return array('pre.foo' => 'preFoo', 'post.foo' => 'postFoo');
     }
 }

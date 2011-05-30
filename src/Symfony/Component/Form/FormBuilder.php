@@ -514,32 +514,7 @@ class FormBuilder
      * the group. Otherwise the existing field is overwritten.
      *
      * If you add a nested group, this group should also be represented in the
-     * object hierarchy. If you want to add a group that operates on the same
-     * hierarchy level, use merge().
-     *
-     * <code>
-     * class Entity
-     * {
-     *   public $location;
-     * }
-     *
-     * class Location
-     * {
-     *   public $longitude;
-     *   public $latitude;
-     * }
-     *
-     * $entity = new Entity();
-     * $entity->location = new Location();
-     *
-     * $form = new Form('entity', $entity, $validator);
-     *
-     * $locationGroup = new Form('location');
-     * $locationGroup->add(new TextField('longitude'));
-     * $locationGroup->add(new TextField('latitude'));
-     *
-     * $form->add($locationGroup);
-     * </code>
+     * object hierarchy.
      *
      * @param string|FormBuilder       $child
      * @param string|FormTypeInterface $type
@@ -571,6 +546,17 @@ class FormBuilder
         return $this;
     }
 
+    /**
+     * Creates a form builder.
+     *
+     * @param string                    $name    The name of the form or the name of the property
+     * @param string|FormTypeInterface  $type    The type of the form or null if name is a property
+     * @param array                     $options The options
+     *
+     * @return FormBuilder The builder
+     *
+     * @throws FormException if the data class is not set when creating a property builder
+     */
     public function create($name, $type = null, array $options = array())
     {
         if (null !== $type) {
@@ -596,6 +582,15 @@ class FormBuilder
         return $builder;
     }
 
+    /**
+     * Returns a child by name.
+     *
+     * @param string $name The name of the child
+     *
+     * @return FormBuilder The builder for the child
+     *
+     * @throws FormException if the given child does not exist
+     */
     public function get($name)
     {
         if (!isset($this->children[$name])) {

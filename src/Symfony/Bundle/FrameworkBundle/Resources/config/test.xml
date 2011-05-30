@@ -26,7 +26,7 @@
 
         <service id="test.session.listener" class="%test.session.listener.class%">
             <argument type="service" id="service_container" />
-            <tag name="kernel.listener" event="core.request" method="onCoreRequest" priority="128" />
+            <tag name="kernel.listener" event="core.request" method="onCoreRequest" priority="192" />
             <tag name="kernel.listener" event="core.response" method="onCoreResponse" priority="-128" />
         </service>
     </services>

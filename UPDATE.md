@@ -71,7 +71,7 @@ beta3 to beta4
          public static function getSubscribedEvents()
          {
         -    return Events::onBindNormData;
-        +    return array(FormEvents::ON_BIND_NORM_DATA, 'onBindNormData');
+        +    return array(FormEvents::ON_BIND_NORM_DATA => 'onBindNormData');
          }
 
 * Form DateType parameter single-text changed to single_text

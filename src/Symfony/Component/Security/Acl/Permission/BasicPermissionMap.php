@@ -28,7 +28,7 @@ class BasicPermissionMap implements PermissionMapInterface
     const PERMISSION_MASTER      = 'MASTER';
     const PERMISSION_OWNER       = 'OWNER';
 
-    private $map = array(
+    protected $_map = array(
         self::PERMISSION_VIEW => array(
             MaskBuilder::MASK_VIEW,
             MaskBuilder::MASK_EDIT,
@@ -86,11 +86,11 @@ class BasicPermissionMap implements PermissionMapInterface
      */
     public function getMasks($permission)
     {
-        if (!isset($this->map[$permission])) {
+        if (!isset($this->_map[$permission])) {
             throw new \InvalidArgumentException(sprintf('The permission "%s" is not supported by this implementation.', $permission));
         }
 
-        return $this->map[$permission];
+        return $this->_map[$permission];
     }
 
     /**
@@ -98,6 +98,6 @@ class BasicPermissionMap implements PermissionMapInterface
      */
     public function contains($permission)
     {
-        return isset($this->map[$permission]);
+        return isset($this->_map[$permission]);
     }
 }

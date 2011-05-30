@@ -35,7 +35,7 @@ class AssetsHelper extends Helper implements AssetPackageInterface
      * Constructor.
      *
      * @param string       $basePath The base path
-     * @param string|array $baseURLs The domain URL or an array of domain URLs
+     * @param string|array $baseUrls The domain URL or an array of domain URLs
      * @param string       $version  The version
      * @param array        $packages Asset packages indexed by name
      */

@@ -38,7 +38,7 @@ class ConnectionFactory
     /**
      * Create a connection by name.
      *
-     * @param string        $connectionName
+     * @param array         $params
      * @param Configuration $config
      * @param EventManager  $eventManager
      *

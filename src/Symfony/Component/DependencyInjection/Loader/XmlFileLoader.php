@@ -31,7 +31,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Loads an XML file.
      *
-     * @param mixed  $resource The resource
+     * @param mixed  $file The resource
      * @param string $type The resource type
      */
     public function load($file, $type = null)

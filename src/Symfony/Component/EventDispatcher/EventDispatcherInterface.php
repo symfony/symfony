@@ -61,10 +61,10 @@ interface EventDispatcherInterface
     /**
      * Removes an event listener from the specified events.
      *
-     * @param string|array $eventNames The event(s) to remove a listener from.
+     * @param string|array $eventName The event(s) to remove a listener from.
      * @param object $listener The listener object to remove.
      */
-    function removeListener($eventNames, $listener);
+    function removeListener($eventName, $listener);
 
     /**
      * Removes an event subscriber.

@@ -29,7 +29,7 @@ class EsiListenerTest extends \PHPUnit_Framework_TestCase
         $response = new Response('foo <esi:include src="" />');
         $listener = new EsiListener(new Esi());
 
-        $dispatcher->addListener(CoreEvents::RESPONSE, $listener);
+        $dispatcher->addListener(CoreEvents::RESPONSE, array($listener, 'onCoreResponse'));
         $event = new FilterResponseEvent($kernel, new Request(), HttpKernelInterface::SUB_REQUEST, $response);
         $dispatcher->dispatch(CoreEvents::RESPONSE, $event);
 
@@ -43,7 +43,7 @@ class EsiListenerTest extends \PHPUnit_Framework_TestCase
         $response = new Response('foo <esi:include src="" />');
         $listener = new EsiListener(new Esi());
 
-        $dispatcher->addListener(CoreEvents::RESPONSE, $listener);
+        $dispatcher->addListener(CoreEvents::RESPONSE, array($listener, 'onCoreResponse'));
         $event = new FilterResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response);
         $dispatcher->dispatch(CoreEvents::RESPONSE, $event);
 
@@ -57,7 +57,7 @@ class EsiListenerTest extends \PHPUnit_Framework_TestCase
         $response = new Response('foo');
         $listener = new EsiListener(new Esi());
 
-        $dispatcher->addListener(CoreEvents::RESPONSE, $listener);
+        $dispatcher->addListener(CoreEvents::RESPONSE, array($listener, 'onCoreResponse'));
         $event = new FilterResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response);
         $dispatcher->dispatch(CoreEvents::RESPONSE, $event);
 

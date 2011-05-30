@@ -91,6 +91,8 @@ class FormExtension extends \Twig_Extension
      *     <form action="..." method="post" {{ form_enctype(form) }}>
      *
      * @param FormView $view  The view for which to render the encoding type
+     *
+     * @return string The html markup
      */
     public function renderEnctype(FormView $view)
     {
@@ -102,12 +104,22 @@ class FormExtension extends \Twig_Extension
      *
      * @param FormView $view      The view to render as a row
      * @param array    $variables An array of variables
+     *
+     * @return string The html markup
      */
     public function renderRow(FormView $view, array $variables = array())
     {
         return $this->render($view, 'row', $variables);
     }
 
+    /**
+     * Renders views which have not already been rendered.
+     *
+     * @param FormView $view      The parent view
+     * @param array    $variables An array of variables
+     *
+     * @return string The html markup
+     */
     public function renderRest(FormView $view, array $variables = array())
     {
         return $this->render($view, 'rest', $variables);
@@ -123,11 +135,13 @@ class FormExtension extends \Twig_Extension
      * You can pass options during the call:
      *
      *     {{ form_widget(view, {'attr': {'class': 'foo'}}) }}
-     * 
+     *
      *     {{ form_widget(view, {'separator': '+++++'}) }}
      *
      * @param FormView        $view      The view to render
      * @param array           $variables Additional variables passed to the template
+     *
+     * @return string The html markup
      */
     public function renderWidget(FormView $view, array $variables = array())
     {
@@ -138,6 +152,8 @@ class FormExtension extends \Twig_Extension
      * Renders the errors of the given view
      *
      * @param FormView $view The view to render the errors for
+     *
+     * @return string The html markup
      */
     public function renderErrors(FormView $view)
     {
@@ -149,12 +165,31 @@ class FormExtension extends \Twig_Extension
      *
      * @param FormView $view  The view to render the label for
      * @param string   $label Label name
+     *
+     * @return string The html markup
      */
     public function renderLabel(FormView $view, $label = null)
     {
         return $this->render($view, 'label', null === $label ? array() : array('label' => $label));
     }
 
+    /**
+     * Renders a template.
+     *
+     * 1. This function first looks for a block named "_<view id>_<section>",
+     * 2. if such a block is not found the function will look for a block named
+     *    "<type name>_<section>",
+     * 3. the type name is recusrively replaced by the parent type name until a
+     *    corresponding block is found
+     *
+     * @param FormView  $view       The form view
+     * @param string    $section    The section to render (i.e. 'row', 'widget', 'label', ...)
+     * @param array     $variables  Additional variables
+     *
+     * @return string The html markup
+     *
+     * @throws FormException if no template block exists to render the given section of the view
+     */
     protected function render(FormView $view, $section, array $variables = array())
     {
         $templates = $this->getTemplates($view);
@@ -231,13 +266,19 @@ class FormExtension extends \Twig_Extension
         return $templates;
     }
 
-    protected function getBlockNames($resource)
+    /**
+     * Returns all the block defined in the template hierarchy.
+     *
+     * @param \Twig_Template $template
+     *
+     * @return array A list of block names
+     */
+    protected function getBlockNames(\Twig_Template $template)
     {
-        $names = $resource->getBlockNames();
-        $parent = $resource;
-        while (false !== $parent = $parent->getParent(array())) {
-            $names = array_merge($names, $parent->getBlockNames());
-        }
+        $names = array();
+        do {
+            $names = array_merge($names, $template->getBlockNames());
+        } while (false !== $template = $template->getParent(array()));
 
         return array_unique($names);
     }

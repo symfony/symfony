@@ -87,7 +87,7 @@ class BasicPermissionMap implements PermissionMapInterface
     public function getMasks($permission, $object)
     {
         if (!isset($this->map[$permission])) {
-            throw new \InvalidArgumentException(sprintf('The permission "%s" is not supported by this implementation.', $permission));
+            return null;
         }
 
         return $this->map[$permission];

@@ -29,7 +29,7 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->dispatcher = new EventDispatcher();
         $listener = new ResponseListener('UTF-8');
-        $this->dispatcher->addListener(CoreEvents::RESPONSE, $listener);
+        $this->dispatcher->addListener(CoreEvents::RESPONSE, array($listener, 'onCoreResponse'));
 
         $this->kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
 

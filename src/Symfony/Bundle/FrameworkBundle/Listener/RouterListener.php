@@ -27,7 +27,7 @@ use Symfony\Component\Routing\RequestContext;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RequestAttributeInitializingListener
+class RouterListener
 {
     private $router;
     private $logger;

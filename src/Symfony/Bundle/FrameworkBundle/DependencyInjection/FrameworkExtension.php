@@ -129,7 +129,7 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseForExceptionEvent',
             'Symfony\\Component\\HttpKernel\\Events',
 
-            'Symfony\\Bundle\\FrameworkBundle\\Listener\\RequestAttributeInitializingListener',
+            'Symfony\\Bundle\\FrameworkBundle\\Listener\\RouterListener',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameParser',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
@@ -296,7 +296,7 @@ class FrameworkExtension extends Extension
         $container->setParameter('session.storage.options', $options);
 
         $this->addClassesToCompile(array(
-            'Symfony\\Bundle\\FrameworkBundle\\Listener\\SessionInitializingListener',
+            'Symfony\\Bundle\\FrameworkBundle\\Listener\\SessionListener',
             'Symfony\\Component\\HttpFoundation\\SessionStorage\\SessionStorageInterface',
             $container->getDefinition('session')->getClass(),
         ));

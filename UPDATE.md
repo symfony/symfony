@@ -9,7 +9,72 @@ timeline closely anyway.
 beta3 to beta4
 --------------
 
-* Form DateType parameter single-text changed to single_text 
+* The event system has been made more flexible. A listener can now be any
+  valid PHP callable.
+
+    * `EventDispatcher::addListener($eventName, $listener, $priority = 0)`:
+      `$eventName` is the event name (cannot be an array anymore) and
+      `$listener` is a PHP callable.
+
+    * The events classes and constants have been renamed:
+
+        * `Symfony\Component\Form\Events` to `Symfony\Component\Form\FormEvents`
+
+            -Events::preBind = 'preBind'
+            -Events::postBind = 'postBind'
+            -Events::preSetData = 'preSetData'
+            -Events::postSetData = 'postSetData'
+            -Events::onBindClientData = 'onBindClientData'
+            -Events::onBindNormData = 'onBindNormData'
+            -Events::onSetData = 'onSetData'
+
+            +FormEvents::PRE_BIND = 'form.pre_bind'
+            +FormEvents::POST_BIND = 'form.post_bind'
+            +FormEvents::PRE_SET_DATA = 'form.pre_set_data'
+            +FormEvents::POST_SET_DATA = 'form.post_set_data'
+            +FormEvents::ON_BIND_CLIENT_DATA = 'form.on_bind_client_data'
+            +FormEvents::ON_BIND_NORM_DATA = 'form.on_bind_norm_data'
+            +FormEvents::ON_SET_DATA = 'form.on_set_data'
+
+        * `Symfony\Component\HttpKernel\Events` to `Symfony\Component\HttpKernel\CoreEvents`
+
+            -Events::onCoreRequest = 'onCoreRequest'
+            -Events::onCoreException = 'onCoreException'
+            -Events::onCoreView = 'onCoreView'
+            -Events::onCoreController = 'onCoreController'
+            -Events::onCoreResponse = 'onCoreResponse'
+
+            +CoreEvents::REQUEST = 'core.request'
+            +CoreEvents::EXCEPTION = 'core.exception'
+            +CoreEvents::VIEW = 'core.view'
+            +CoreEvents::CONTROLLER = 'core.controller'
+            +CoreEvents::RESPONSE = 'core.response'
+
+        * `Symfony\Component\Security\Http\Events` to `Symfony\Component\Security\Http\SecurityEvents`
+
+            -Events::onSecurityInteractiveLogin = 'onSecurityInteractiveLogin'
+            -Events::onSecuritySwitchUser = 'onSecuritySwitchUser'
+
+            +SecurityEvents::INTERACTIVE_LOGIN = 'security.interactive_login'
+            +SecurityEvents::SWITCH_USER = 'security.switch_user'
+
+    * `addListenerService` now only takes a single event name as its first
+      argument.
+
+    * Tags in configuration must now set the method to call:
+
+        -<tag name="kernel.listener" event="onCoreRequest" />
+        +<tag name="kernel.listener" event="core.request" method="onCoreRequest" />
+
+    * Subscribers must now always return a hash:
+
+         public static function getSubscribedEvents()
+         {
+        -    return Events::onBindNormData;
+        +    return array(FormEvents::ON_BIND_NORM_DATA, 'onBindNormData');
+         }
+
+* Form DateType parameter single-text changed to single_text
 
 beta2 to beta3
 --------------

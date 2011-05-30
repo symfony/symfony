@@ -27,7 +27,7 @@ class MergeCollectionListener implements EventSubscriberInterface
 {
     public static function getSubscribedEvents()
     {
-        return array(FormEvents::ON_BIND_NORM_DATA, 'onBindNormData');
+        return array(FormEvents::ON_BIND_NORM_DATA => 'onBindNormData');
     }
 
     public function onBindNormData(FilterDataEvent $event)

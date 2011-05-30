@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Core\EventListener;
 
-use Symfony\Component\Form\Events;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -33,6 +33,6 @@ class TrimListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return Events::onBindClientData;
+        return array(FormEvents::ON_BIND_CLIENT_DATA => 'onBindClientData');
     }
 }

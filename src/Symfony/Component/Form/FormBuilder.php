@@ -269,7 +269,7 @@ class FormBuilder
     /**
      * Adds an event listener for events on this field
      *
-     * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addEventListener
+     * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addListener
      *
      * @return FormBuilder The current builder
      */
@@ -283,7 +283,7 @@ class FormBuilder
     /**
      * Adds an event subscriber for events on this field
      *
-     * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addEventSubscriber
+     * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addSubscriber
      *
      * @return FormBuilder The current builder
      */

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Core\EventListener;
 
-use Symfony\Component\Form\Events;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -64,9 +64,9 @@ class ResizeFormListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            Events::preSetData,
-            Events::preBind,
-            Events::onBindNormData,
+            FormEvents::PRE_SET_DATA => 'preSetData',
+            FormEvents::PRE_BIND => 'preBind',
+            FormEvents::ON_BIND_NORM_DATA => 'onBindNormData',
         );
     }
 

@@ -40,7 +40,7 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
             throw new \InvalidArgumentException('$class must not be empty.');
         }
 
-        $this->username = $username;
+        $this->username = (string) $username;
         $this->class = $class;
     }
 

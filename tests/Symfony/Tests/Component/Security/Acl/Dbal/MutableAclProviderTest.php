@@ -12,7 +12,7 @@
 namespace Symfony\Tests\Component\Security\Acl\Dbal;
 
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
-use Symfony\Component\Security\Acl\Model\FieldAwareEntryInterface;
+use Symfony\Component\Security\Acl\Model\FieldEntryInterface;
 use Symfony\Component\Security\Acl\Model\AuditableEntryInterface;
 use Symfony\Component\Security\Acl\Model\EntryInterface;
 use Symfony\Component\Security\Acl\Domain\Entry;
@@ -47,7 +47,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
             self::assertSame($a->isAuditFailure(), $b->isAuditFailure());
         }
 
-        if ($a instanceof FieldAwareEntryInterface) {
+        if ($a instanceof FieldEntryInterface) {
             self::assertSame($a->getField(), $b->getField());
         }
     }
@@ -335,6 +335,28 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         $reloadedAcl = $reloadProvider->findAcl(new ObjectIdentity(1, 'Foo'));
         $this->assertNotSame($acl, $reloadedAcl);
         $this->assertSame($parentAcl->getId(), $reloadedAcl->getParentAcl()->getId());
+    }
+
+    public function testUpdateAclUpdatesChildAclsCorrectly()
+    {
+        $provider = $this->getProvider();
+        $acl = $provider->createAcl(new ObjectIdentity(1, 'Foo'));
+
+        $parentAcl = $provider->createAcl(new ObjectIdentity(1, 'Bar'));
+        $acl->setParentAcl($parentAcl);
+        $provider->updateAcl($acl);
+
+        $parentParentAcl = $provider->createAcl(new ObjectIdentity(1, 'Baz'));
+        $parentAcl->setParentAcl($parentParentAcl);
+        $provider->updateAcl($parentAcl);
+
+        $newParentParentAcl = $provider->createAcl(new ObjectIdentity(2, 'Baz'));
+        $parentAcl->setParentAcl($newParentParentAcl);
+        $provider->updateAcl($parentAcl);
+
+        $reloadProvider = $this->getProvider();
+        $reloadedAcl = $reloadProvider->findAcl(new ObjectIdentity(1, 'Foo'));
+        $this->assertEquals($newParentParentAcl->getId(), $reloadedAcl->getParentAcl()->getParentAcl()->getId());
     }
 
     /**

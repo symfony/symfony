@@ -212,6 +212,8 @@ class FormExtension extends \Twig_Extension
 
                 $html = $templates[$block]->renderBlock($block, $this->varStack[$view]);
 
+                unset($this->varStack[$view]);
+
                 return $html;
             }
         }

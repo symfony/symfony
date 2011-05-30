@@ -130,7 +130,9 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $form = $this->factory->createNamed('text', 'na&me', null, array(
             'property_path' => 'name',
         ));
-        $html = $this->renderLabel($form->createView());
+        $view = $form->createView();
+        $this->renderWidget($view, array('label' => 'foo'));
+        $html = $this->renderLabel($view);
 
         $this->assertMatchesXpath($html,
 '/label

@@ -25,10 +25,10 @@
     <span style="display: inline-block; min-height: 24px; width: 40px; float: right;">&nbsp;</span>
 
     {% for name, template in templates %}
-        {{ template.renderblock('toolbar', { 
-            'collector': profiler.get(name),
+        {{ template.renderblock('toolbar', {
+            'collector': profile.getcollector(name),
             'profiler_url': profiler_url,
-            'token': profiler.token,
+            'token': profile.token,
             'name': name,
             'verbose': verbose
           })

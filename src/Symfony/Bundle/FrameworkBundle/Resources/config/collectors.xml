@@ -20,7 +20,7 @@
             <argument type="service" id="kernel" />
         </service>
 
-        <service id="data_collector.request" class="%data_collector.request.class%" public="false">
+        <service id="data_collector.request" class="%data_collector.request.class%">
             <tag name="kernel.listener" event="onCoreController" />
             <tag name="data_collector" template="WebProfilerBundle:Collector:request" id="request" priority="255" />
         </service>

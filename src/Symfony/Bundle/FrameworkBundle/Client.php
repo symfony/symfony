@@ -58,7 +58,7 @@ class Client extends BaseClient
             return false;
         }
 
-        return $this->kernel->getContainer()->get('profiler')->loadFromResponse($this->response);
+        return $this->kernel->getContainer()->get('profiler')->loadProfileFromResponse($this->response);
     }
 
     /**

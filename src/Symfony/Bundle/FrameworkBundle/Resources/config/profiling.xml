@@ -6,11 +6,11 @@
 
     <parameters>
         <parameter key="profiler.class">Symfony\Component\HttpKernel\Profiler\Profiler</parameter>
-        <parameter key="profiler_listener.class">Symfony\Bundle\FrameworkBundle\Profiler\ProfilerListener</parameter>
+        <parameter key="profiler_listener.class">Symfony\Component\HttpKernel\ProfilerListener</parameter>
     </parameters>
 
     <services>
-        <service id="profiler" class="%profiler.class%" scope="request">
+        <service id="profiler" class="%profiler.class%">
             <tag name="monolog.logger" channel="profiler" />
             <argument type="service" id="profiler.storage" />
             <argument type="service" id="logger" on-invalid="null" />
@@ -26,8 +26,7 @@
         <service id="profiler_listener" class="%profiler_listener.class%">
             <tag name="kernel.listener" event="onCoreResponse" priority="-100" />
             <tag name="kernel.listener" event="onCoreException" />
-            <tag name="kernel.listener" event="onCoreRequest" />
-            <argument type="service" id="service_container" />
+            <argument type="service" id="profiler" />
             <argument type="service" id="profiler.request_matcher" on-invalid="null" />
             <argument>%profiler_listener.only_exceptions%</argument>
             <argument>%profiler_listener.only_master_requests%</argument>

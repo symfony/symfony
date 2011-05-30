@@ -39,6 +39,7 @@ namespace Symfony\Component\EventDispatcher;
 class EventDispatcher implements EventDispatcherInterface
 {
     private $listeners = array();
+    private $sorted = array();
 
     /**
      * @see EventDispatcherInterface::dispatch
@@ -66,15 +67,24 @@ class EventDispatcher implements EventDispatcherInterface
     public function getListeners($eventName = null)
     {
         if (null !== $eventName) {
-            return $this->sortListeners($eventName);
+            if (!isset($this->sorted[$eventName])) {
+                $this->sortListeners($eventName);
+            }
+
+            return $this->sorted[$eventName];
         }
 
-        $sorted = array();
         foreach (array_keys($this->listeners) as $eventName) {
-            $sorted[$eventName] = $this->sortListeners($eventName);
+            if (!isset($this->sorted[$eventName])) {
+                $this->sortListeners($eventName);
+            }
+
+            if ($this->sorted[$eventName]) {
+                $sorted[$eventName] = $this->sorted[$eventName];
+            }
         }
 
-        return $sorted;
+        return $this->sorted;
     }
 
     /**
@@ -95,6 +105,7 @@ class EventDispatcher implements EventDispatcherInterface
     public function addListener($eventName, $listener, $priority = 0)
     {
         $this->listeners[$eventName][$priority][] = $listener;
+        unset($this->sorted[$eventName]);
     }
 
     /**
@@ -108,7 +119,7 @@ class EventDispatcher implements EventDispatcherInterface
 
         foreach ($this->listeners[$eventName] as $priority => $listeners) {
             if (false !== ($key = array_search($listener, $listeners))) {
-                unset($this->listeners[$eventName][$priority][$key]);
+                unset($this->listeners[$eventName][$priority][$key], $this->sorted[$eventName]);
             }
         }
     }
@@ -160,12 +171,11 @@ class EventDispatcher implements EventDispatcherInterface
      */
     private function sortListeners($eventName)
     {
-        if (!isset($this->listeners[$eventName])) {
-            return array();
+        $this->sorted[$eventName] = array();
+
+        if (isset($this->listeners[$eventName])) {
+            krsort($this->listeners[$eventName]);
+            $this->sorted[$eventName] = call_user_func_array('array_merge', $this->listeners[$eventName]);
         }
-
-        krsort($this->listeners[$eventName]);
-
-        return call_user_func_array('array_merge', $this->listeners[$eventName]);
     }
 }

@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Http;
 
 final class SecurityEvents
 {
-    const interactiveLogin = 'security.interactive_login';
+    const INTERACTIVE_LOGIN = 'security.interactive_login';
 
-    const switchUser = 'security.switch_user';
+    const SWITCH_USER = 'security.switch_user';
 }

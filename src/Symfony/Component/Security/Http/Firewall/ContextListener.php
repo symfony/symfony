@@ -50,7 +50,7 @@ class ContextListener implements ListenerInterface
         $this->logger = $logger;
 
         if (null !== $dispatcher) {
-            $dispatcher->addListener(CoreEvents::response, array($this, 'core.response'));
+            $dispatcher->addListener(CoreEvents::RESPONSE, array($this, 'onCoreResponse'));
         }
     }
 

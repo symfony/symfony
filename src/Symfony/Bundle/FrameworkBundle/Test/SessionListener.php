@@ -55,7 +55,7 @@ class SessionListener
 
     /**
      * Checks if session was initialized and saves if current request is master
-     * Runs on 'onCoreResponse' in test environment
+     * Runs on 'core.response' in test environment
      *
      * @param FilterResponseEvent $event
      */

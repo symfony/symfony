@@ -125,7 +125,7 @@ class MonologExtension extends Extension
                 $handler['level'],
                 $handler['bubble'],
             ));
-            $definition->addTag('kernel.listener', array('event' => 'onCoreResponse'));
+            $definition->addTag('kernel.listener', array('event' => 'core.response', 'method' => 'onCoreResponse'));
             break;
 
         case 'rotating_file':

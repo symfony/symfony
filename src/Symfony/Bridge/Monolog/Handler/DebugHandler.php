@@ -28,6 +28,9 @@ class DebugHandler extends TestHandler implements DebugLoggerInterface
     public function getLogs()
     {
         $records = array();
+        if (!$this->records) {
+            return $records;
+        }
         foreach ($this->records as $record) {
             $records[] = array(
                 'timestamp' => $record['datetime']->getTimestamp(),

@@ -55,10 +55,6 @@ class FilesystemSessionStorage extends NativeSessionStorage
             session_id(hash('md5', uniqid(mt_rand(), true)));
         }
 
-        if (!is_dir($this->path)) {
-            mkdir($this->path, 0777, true);
-        }
-
         $file = $this->path.'/'.session_id().'.session';
 
         $this->data = file_exists($file) ? unserialize(file_get_contents($file)) : array();
@@ -91,6 +87,10 @@ class FilesystemSessionStorage extends NativeSessionStorage
     public function write($key, $data)
     {
         $this->data[$key] = $data;
+
+        if (!is_dir($this->path)) {
+            mkdir($this->path, 0777, true);
+        }
 
         file_put_contents($this->path.'/'.session_id().'.session', serialize($this->data));
     }

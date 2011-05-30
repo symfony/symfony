@@ -33,4 +33,18 @@ class SecurityRoutingIntegrationTest extends WebTestCase
 
         $this->assertNotEquals(404, $client->getResponse()->getStatusCode());
     }
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->deleteTmpDir('StandardFormLogin');
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->deleteTmpDir('StandardFormLogin');
+    }
 }

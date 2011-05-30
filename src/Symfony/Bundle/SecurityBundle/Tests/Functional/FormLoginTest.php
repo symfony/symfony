@@ -64,4 +64,11 @@ class FormLoginTest extends WebTestCase
 
         $this->deleteTmpDir('StandardFormLogin');
     }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->deleteTmpDir('StandardFormLogin');
+    }
 }

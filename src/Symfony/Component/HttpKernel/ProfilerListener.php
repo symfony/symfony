@@ -9,15 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Profiler;
+namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * ProfilerListener collects data for the current request by listening to the onCoreResponse event.
@@ -26,39 +26,28 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class ProfilerListener
 {
-    protected $container;
+    protected $profiler;
     protected $matcher;
     protected $onlyException;
     protected $onlyMasterRequests;
     protected $exception;
+    protected $children;
 
     /**
      * Constructor.
      *
-     * @param ContainerInterface      $container          A ContainerInterface instance
+     * @param Profiler                $profiler           A Profiler instance
      * @param RequestMatcherInterface $matcher            A RequestMatcher instance
      * @param Boolean                 $onlyException      true if the profiler only collects data when an exception occurs, false otherwise
      * @param Boolean                 $onlyMasterRequests true if the profiler only collects data when the request is a master request, false otherwise
      */
-    public function __construct(ContainerInterface $container, RequestMatcherInterface $matcher = null, $onlyException = false, $onlyMasterRequests = false)
+    public function __construct(Profiler $profiler, RequestMatcherInterface $matcher = null, $onlyException = false, $onlyMasterRequests = false)
     {
-        $this->container = $container;
+        $this->profiler = $profiler;
         $this->matcher = $matcher;
         $this->onlyException = (Boolean) $onlyException;
         $this->onlyMasterRequests = (Boolean) $onlyMasterRequests;
-    }
-
-    /**
-     * Handles the onCoreRequest event
-     *
-     * This method initialize the profiler to be able to get it as a scoped
-     * service when onCoreResponse() will collect the sub request
-     *
-     * @param GetResponseEvent $event A GetResponseEvent instance
-     */
-    public function onCoreRequest(GetResponseEvent $event)
-    {
-        $this->container->get('profiler');
+        $this->children = array();
     }
 
     /**
@@ -82,7 +71,8 @@ class ProfilerListener
      */
     public function onCoreResponse(FilterResponseEvent $event)
     {
-        if ($this->onlyMasterRequests && HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+        $master = HttpKernelInterface::MASTER_REQUEST === $event->getRequestType();
+        if ($this->onlyMasterRequests && !$master) {
             return;
         }
 
@@ -97,12 +87,17 @@ class ProfilerListener
             return;
         }
 
-        $profiler = $this->container->get('profiler');
-
-        if ($parent = $this->container->getCurrentScopedStack('request') && isset($parent['request']['profiler'])) {
-            $profiler->setParent($parent['request']['profiler']->getToken());
+        if ($profile = $this->profiler->collect($event->getRequest(), $event->getResponse(), $exception)) {
+            if ($master) {
+                $this->profiler->saveProfile($profile);
+                foreach ($this->children as $child) {
+                    $child->setParent($profile);
+                    $this->profiler->saveProfile($child);
+                }
+                $this->children = array();
+            } else {
+                $this->children[] = $profile;
+            }
         }
-
-        $profiler->collect($event->getRequest(), $event->getResponse(), $exception);
     }
 }

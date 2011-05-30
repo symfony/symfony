@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle;
+namespace Symfony\Bundle\FrameworkBundle\Listener;
 
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -17,28 +17,25 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Routing\RequestContext;
 
 /**
- * RequestListener.
+ * Initializes request attributes based on a matching route.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RequestListener
+class RouterListener
 {
     private $router;
     private $logger;
-    private $container;
     private $httpPort;
     private $httpsPort;
 
-    public function __construct(ContainerInterface $container, RouterInterface $router, $httpPort = 80, $httpsPort = 443, LoggerInterface $logger = null)
+    public function __construct(RouterInterface $router, $httpPort = 80, $httpsPort = 443, LoggerInterface $logger = null)
     {
-        $this->container = $container;
         $this->router = $router;
         $this->httpPort = $httpPort;
         $this->httpsPort = $httpsPort;
@@ -50,30 +47,6 @@ class RequestListener
         $request = $event->getRequest();
         $master = HttpKernelInterface::MASTER_REQUEST === $event->getRequestType();
 
-        $this->initializeSession($request, $master);
-
-        $this->initializeRequestAttributes($request, $master);
-    }
-
-    protected function initializeSession(Request $request, $master)
-    {
-        if (!$master) {
-            return;
-        }
-
-        // inject the session object if none is present
-        if (null === $request->getSession() && $this->container->has('session')) {
-            $request->setSession($this->container->get('session'));
-        }
-
-        // starts the session if a session cookie already exists in the request...
-        if ($request->hasPreviousSession()) {
-            $request->getSession()->start();
-        }
-    }
-
-    protected function initializeRequestAttributes(Request $request, $master)
-    {
         if ($master) {
             // set the context even if the parsing does not need to be done
             // to have correct link generation

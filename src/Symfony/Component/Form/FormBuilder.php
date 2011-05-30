@@ -273,9 +273,9 @@ class FormBuilder
      *
      * @return FormBuilder The current builder
      */
-    public function addEventListener($eventNames, $listener, $priority = 0)
+    public function addEventListener($eventName, $listener, $priority = 0)
     {
-        $this->dispatcher->addListener($eventNames, $listener, $priority);
+        $this->dispatcher->addListener($eventName, $listener, $priority);
 
         return $this;
     }

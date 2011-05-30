@@ -76,6 +76,7 @@ class DumpCommand extends Command
      * This method includes an infinite loop the continuously polls the asset
      * manager for changes.
      *
+     * @param InputInterface  $input  The command input
      * @param OutputInterface $output The command output
      */
     private function watch(InputInterface $input, OutputInterface $output)

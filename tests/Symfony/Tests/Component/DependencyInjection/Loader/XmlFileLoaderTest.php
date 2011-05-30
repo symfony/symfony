@@ -288,4 +288,26 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($loader->supports('foo.xml'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
     }
+
+    public function testNoNamingConflictsForAnonymousServices()
+    {
+        $container = new ContainerBuilder();
+
+        $loader1 = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml/extension1'));
+        $loader1->load('services.xml');
+        $services = $container->getDefinitions();
+        $this->assertEquals(2, count($services), '->load() attributes unique ids to anonymous services');        
+        $loader2 = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml/extension2'));
+        $loader2->load('services.xml');
+        $services = $container->getDefinitions();
+        $this->assertEquals(4, count($services), '->load() attributes unique ids to anonymous services');
+
+        $services = $container->getDefinitions();
+        $args1 = $services['extension1.foo']->getArguments();
+        $inner1 = $services[(string) $args1[0]];
+        $this->assertEquals('BarClass1', $inner1->getClass(), '->load() uses the same configuration as for the anonymous ones');
+        $args2 = $services['extension2.foo']->getArguments();
+        $inner2 = $services[(string) $args2[0]];
+        $this->assertEquals('BarClass2', $inner2->getClass(), '->load() uses the same configuration as for the anonymous ones');
+    }
 }

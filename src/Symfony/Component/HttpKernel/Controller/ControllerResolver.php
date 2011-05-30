@@ -71,7 +71,16 @@ class ControllerResolver implements ControllerResolverInterface
         }
 
         if (null !== $this->logger) {
-            $this->logger->info(sprintf('Using controller "%s::%s"', get_class($controller), $method));
+            if (true === constant('FIREPHP_ACTIVATED')) {
+                \FirePHP::to('request')
+                        ->console('Request')
+                        ->on('Request')
+                        ->group('request-route')
+                        ->label('Using controller')
+                        ->log(sprintf('%s::%s', get_class($controller), $method));
+            } else {
+               $this->logger->info(sprintf('Using controller "%s::%s"', get_class($controller), $method));
+            }
         }
 
         return array($controller, $method);

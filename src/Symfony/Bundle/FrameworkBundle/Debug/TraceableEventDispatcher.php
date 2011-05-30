@@ -73,13 +73,38 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
         parent::triggerListener($listener, $eventName, $event);
 
         if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Notified event "%s" to listener "%s".', $eventName, get_class($listener)));
+            if (true === constant('FIREPHP_ACTIVATED')) {
+                $console = \FirePHP::to('request')
+                                   ->console('Events')
+                                   ->on('Events')
+                                   ->label('Notified')
+                                   ->group('event-' . $eventName, sprintf('%s', $eventName));
+                if ($console->on('Details')->is(true)) {
+                    $details = $console->group('event-' . $eventName . '-' . md5(get_class($listener)), sprintf('%s', get_class($listener)))
+                                       ->options(array(
+                                           'encoder.maxDepth' => 3
+                                       ));
+                    $details->label('$listener')->log($listener);
+                    $details->label('$event')->log($event);
+                } else {
+                    $console->log(sprintf('%s', get_class($listener)));
+                }
+            } else {
+                $this->logger->debug(sprintf('Notified event "%s" to listener "%s".', $eventName, get_class($listener)));
+            }
         }
 
         $this->called[$eventName.'.'.get_class($listener)] = $this->getListenerInfo($listener, $eventName);
 
         if ($event->isPropagationStopped() && null !== $this->logger) {
-            $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s".', get_class($listener), $eventName));
+            if (true === constant('FIREPHP_ACTIVATED')) {
+                \FirePHP::to('request')
+                        ->console('Events')
+                        ->on('Events')
+                        ->log(sprintf('Listener "%s" stopped propagation of the event "%s".', get_class($listener), $eventName));
+            } else {
+               $this->logger->debug(sprintf('Listener "%s" stopped propagation of the event "%s".', get_class($listener), $eventName));
+            }
 
             $skippedListeners = $this->getListeners($eventName);
             $skipped = false;

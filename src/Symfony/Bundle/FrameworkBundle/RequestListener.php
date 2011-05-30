@@ -103,7 +103,18 @@ class RequestListener
             $parameters = $this->router->match($request->getPathInfo());
 
             if (null !== $this->logger) {
-                $this->logger->info(sprintf('Matched route "%s" (parameters: %s)', $parameters['_route'], $this->parametersToString($parameters)));
+                if (true === constant('FIREPHP_ACTIVATED')) {
+                    \FirePHP::to('request')
+                            ->console('Request')
+                            ->on('Request')
+                            ->label('Matched route')
+                            ->expand()
+                            ->group('request-route', sprintf('%s', $parameters['_route']))
+                            ->label('Parameters')
+                            ->log($parameters);
+                } else {
+                    $this->logger->info(sprintf('Matched route "%s" (parameters: %s)', $parameters['_route'], $this->parametersToString($parameters)));
+                }
             }
 
             $request->attributes->add($parameters);

@@ -25,7 +25,7 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $container->set('service.listener', $service);
 
         $dispatcher = new ContainerAwareEventDispatcher($container);
-        $dispatcher->addListenerService('onEvent', 'service.listener');
+        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
 
         $dispatcher->dispatch('onEvent', $event);
     }
@@ -46,8 +46,8 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $container->set('service.listener', $service);
 
         $dispatcher = new ContainerAwareEventDispatcher($container);
-        $dispatcher->addListenerService('onEvent', 'service.listener', 5);
-        $dispatcher->addListenerService('onEvent', 'service.listener', 10);
+        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'), 5);
+        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'), 10);
 
         $dispatcher->dispatch('onEvent', $event);
     }
@@ -67,7 +67,7 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $container->set('service.listener', $service, 'scope');
 
         $dispatcher = new ContainerAwareEventDispatcher($container);
-        $dispatcher->addListenerService('onEvent', 'service.listener');
+        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
 
         $container->leaveScope('scope');
         $dispatcher->dispatch('onEvent');
@@ -93,7 +93,7 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $container->set('service.listener', $service1, 'scope');
 
         $dispatcher = new ContainerAwareEventDispatcher($container);
-        $dispatcher->addListenerService('onEvent', 'service.listener');        
+        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
         $dispatcher->dispatch('onEvent', $event);
 
         $service2 = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Service');
@@ -118,6 +118,6 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
 class Service
 {
     function onEvent(Event $e)
-    {        
+    {
     }
 }

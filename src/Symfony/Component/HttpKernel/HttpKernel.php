@@ -89,7 +89,7 @@ class HttpKernel implements HttpKernelInterface
     {
         // request
         $event = new GetResponseEvent($this, $request, $type);
-        $this->dispatcher->dispatch(Events::onCoreRequest, $event);
+        $this->dispatcher->dispatch(CoreEvents::REQUEST, $event);
 
         if ($event->hasResponse()) {
             return $this->filterResponse($event->getResponse(), $request, $type);
@@ -101,7 +101,7 @@ class HttpKernel implements HttpKernelInterface
         }
 
         $event = new FilterControllerEvent($this, $controller, $request, $type);
-        $this->dispatcher->dispatch(Events::onCoreController, $event);
+        $this->dispatcher->dispatch(CoreEvents::CONTROLLER, $event);
         $controller = $event->getController();
 
         // controller arguments
@@ -113,7 +113,7 @@ class HttpKernel implements HttpKernelInterface
         // view
         if (!$response instanceof Response) {
             $event = new GetResponseForControllerResultEvent($this, $request, $type, $response);
-            $this->dispatcher->dispatch(Events::onCoreView, $event);
+            $this->dispatcher->dispatch(CoreEvents::VIEW, $event);
 
             if ($event->hasResponse()) {
                 $response = $event->getResponse();
@@ -148,7 +148,7 @@ class HttpKernel implements HttpKernelInterface
     {
         $event = new FilterResponseEvent($this, $request, $type, $response);
 
-        $this->dispatcher->dispatch(Events::onCoreResponse, $event);
+        $this->dispatcher->dispatch(CoreEvents::RESPONSE, $event);
 
         return $event->getResponse();
     }
@@ -165,7 +165,7 @@ class HttpKernel implements HttpKernelInterface
     private function handleException(\Exception $e, $request, $type)
     {
         $event = new GetResponseForExceptionEvent($this, $request, $type, $e);
-        $this->dispatcher->dispatch(Events::onCoreException, $event);
+        $this->dispatcher->dispatch(CoreEvents::EXCEPTION, $event);
 
         if (!$event->hasResponse()) {
             throw $e;

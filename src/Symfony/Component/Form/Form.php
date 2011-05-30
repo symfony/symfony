@@ -378,11 +378,11 @@ class Form implements \IteratorAggregate, FormInterface
     public function setData($appData)
     {
         $event = new DataEvent($this, $appData);
-        $this->dispatcher->dispatch(Events::preSetData, $event);
+        $this->dispatcher->dispatch(FormEvents::PRE_SET_DATA, $event);
 
         // Hook to change content of the data
         $event = new FilterDataEvent($this, $appData);
-        $this->dispatcher->dispatch(Events::onSetData, $event);
+        $this->dispatcher->dispatch(FormEvents::ON_SET_DATA, $event);
         $appData = $event->getData();
 
         // Treat data as strings unless a value transformer exists
@@ -405,7 +405,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         $event = new DataEvent($this, $appData);
-        $this->dispatcher->dispatch(Events::postSetData, $event);
+        $this->dispatcher->dispatch(FormEvents::POST_SET_DATA, $event);
 
         return $this;
     }
@@ -466,7 +466,7 @@ class Form implements \IteratorAggregate, FormInterface
         $this->errors = array();
 
         $event = new DataEvent($this, $clientData);
-        $this->dispatcher->dispatch(Events::preBind, $event);
+        $this->dispatcher->dispatch(FormEvents::PRE_BIND, $event);
 
         $appData = null;
         $normData = null;
@@ -475,7 +475,7 @@ class Form implements \IteratorAggregate, FormInterface
 
         // Hook to change content of the data bound by the browser
         $event = new FilterDataEvent($this, $clientData);
-        $this->dispatcher->dispatch(Events::onBindClientData, $event);
+        $this->dispatcher->dispatch(FormEvents::ON_BIND_CLIENT_DATA, $event);
         $clientData = $event->getData();
 
         if (count($this->children) > 0) {
@@ -532,7 +532,7 @@ class Form implements \IteratorAggregate, FormInterface
             // Hook to change content of the data in the normalized
             // representation
             $event = new FilterDataEvent($this, $normData);
-            $this->dispatcher->dispatch(Events::onBindNormData, $event);
+            $this->dispatcher->dispatch(FormEvents::ON_BIND_NORM_DATA, $event);
             $normData = $event->getData();
 
             // Synchronize representations - must not change the content!
@@ -548,7 +548,7 @@ class Form implements \IteratorAggregate, FormInterface
         $this->synchronized = $synchronized;
 
         $event = new DataEvent($this, $clientData);
-        $this->dispatcher->dispatch(Events::postBind, $event);
+        $this->dispatcher->dispatch(FormEvents::POST_BIND, $event);
 
         foreach ($this->validators as $validator) {
             $validator->validate($this);

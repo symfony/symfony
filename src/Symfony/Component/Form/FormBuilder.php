@@ -269,13 +269,13 @@ class FormBuilder
     /**
      * Adds an event listener for events on this field
      *
-     * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addEventListener
+     * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addListener
      *
      * @return FormBuilder The current builder
      */
-    public function addEventListener($eventNames, $listener, $priority = 0)
+    public function addEventListener($eventName, $listener, $priority = 0)
     {
-        $this->dispatcher->addListener($eventNames, $listener, $priority);
+        $this->dispatcher->addListener($eventName, $listener, $priority);
 
         return $this;
     }
@@ -283,7 +283,7 @@ class FormBuilder
     /**
      * Adds an event subscriber for events on this field
      *
-     * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addEventSubscriber
+     * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addSubscriber
      *
      * @return FormBuilder The current builder
      */

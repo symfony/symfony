@@ -674,7 +674,7 @@ class StubNumberFormatter
      * Check if the attribute is initialized (value set by client code).
      *
      * @param  string  $attr   The attribute name
-     * @return Boolean         true if the value was set by cliente, false otherwise
+     * @return Boolean         true if the value was set by client, false otherwise
      */
     private function isInitializedAttribute($attr)
     {

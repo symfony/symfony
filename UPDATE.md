@@ -6,6 +6,11 @@ one. It only discusses changes that need to be done when using the "public"
 API of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.
 
+beta3 to beta4
+--------------
+
+* Form DateType parameter single-text changed to single_text 
+
 beta2 to beta3
 --------------
 

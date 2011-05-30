@@ -152,7 +152,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * Retuns whether this view has a parent.
+     * Returns whether this view has a parent.
      *
      * @return Boolean Whether this view has a parent
      */
@@ -186,7 +186,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * Returns wether this view has children.
+     * Returns whether this view has children.
      *
      * @return Boolean Whether this view has children
      */

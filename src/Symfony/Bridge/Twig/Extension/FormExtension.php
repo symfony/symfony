@@ -120,15 +120,13 @@ class FormExtension extends \Twig_Extension
      *
      *     {{ form_widget(view) }}
      *
-     * You can pass attributes element during the call:
+     * You can pass options during the call:
      *
-     *     {{ form_widget(view, {'class': 'foo'}) }}
+     *     {{ form_widget(view, {'attr': {'class': 'foo'}}) }}
+     * 
+     *     {{ form_widget(view, {'separator': '+++++'}) }}
      *
-     * Some fields also accept additional variables as parameters:
-     *
-     *     {{ form_widget(view, {}, {'separator': '+++++'}) }}
-     *
-     * @param FormView        $view       The view to render
+     * @param FormView        $view      The view to render
      * @param array           $variables Additional variables passed to the template
      */
     public function renderWidget(FormView $view, array $variables = array())

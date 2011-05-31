@@ -32,9 +32,9 @@ beta3 to beta4
             +FormEvents::POST_BIND = 'form.post_bind'
             +FormEvents::PRE_SET_DATA = 'form.pre_set_data'
             +FormEvents::POST_SET_DATA = 'form.post_set_data'
-            +FormEvents::ON_BIND_CLIENT_DATA = 'form.on_bind_client_data'
-            +FormEvents::ON_BIND_NORM_DATA = 'form.on_bind_norm_data'
-            +FormEvents::ON_SET_DATA = 'form.on_set_data'
+            +FormEvents::BIND_CLIENT_DATA = 'form.bind_client_data'
+            +FormEvents::BIND_NORM_DATA = 'form.bind_norm_data'
+            +FormEvents::SET_DATA = 'form.set_data'
 
         * `Symfony\Component\HttpKernel\Events` to `Symfony\Component\HttpKernel\CoreEvents`
 
@@ -71,7 +71,7 @@ beta3 to beta4
          public static function getSubscribedEvents()
          {
         -    return Events::onBindNormData;
-        +    return array(FormEvents::ON_BIND_NORM_DATA => 'onBindNormData');
+        +    return array(FormEvents::BIND_NORM_DATA => 'onBindNormData');
          }
 
 * Form DateType parameter single-text changed to single_text

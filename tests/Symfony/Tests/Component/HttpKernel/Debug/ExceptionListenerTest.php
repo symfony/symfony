@@ -105,11 +105,6 @@ class TestLogger extends Logger implements DebugLoggerInterface
     {
         return count($this->logs['crit']);
     }
-
-    public function getDebugLogger()
-    {
-        return new static();
-    }
 }
 
 class TestKernel implements HttpKernelInterface

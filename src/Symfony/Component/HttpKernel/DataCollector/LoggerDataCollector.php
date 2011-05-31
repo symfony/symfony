@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\DataCollector;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 /**
  * LogDataCollector.
@@ -25,8 +26,8 @@ class LoggerDataCollector extends DataCollector
 
     public function __construct($logger = null)
     {
-        if (null !== $logger) {
-            $this->logger = $logger->getDebugLogger();
+        if (null !== $logger && $logger instanceof DebugLoggerInterface) {
+            $this->logger = $logger;
         }
     }
 

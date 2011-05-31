@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Symfony\Component\HttpKernel\Util\Filesystem;
@@ -20,7 +29,7 @@ class WebTestCase extends BaseWebTestCase
         }
 
         $fs = new Filesystem();
-        $fs->remove($testCase);
+        $fs->remove($dir);
     }
 
     protected function getKernelClass()
@@ -40,6 +49,7 @@ class WebTestCase extends BaseWebTestCase
 
         return new $class(
             $options['test_case'],
+            isset($options['root_config']) ? $options['root_config'] : 'config.yml',
             isset($options['environment']) ? $options['environment'] : 'test',
             isset($options['debug']) ? $options['debug'] : true
         );

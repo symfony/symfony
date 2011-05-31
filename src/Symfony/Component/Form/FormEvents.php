@@ -14,19 +14,19 @@ namespace Symfony\Component\Form;
 /**
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-final class Events
+final class FormEvents
 {
-    const preBind = 'preBind';
+    const PRE_BIND = 'form.pre_bind';
 
-    const postBind = 'postBind';
+    const POST_BIND = 'form.post_bind';
 
-    const preSetData = 'preSetData';
+    const PRE_SET_DATA = 'form.pre_set_data';
 
-    const postSetData = 'postSetData';
+    const POST_SET_DATA = 'form.post_set_data';
 
-    const onBindClientData = 'onBindClientData';
+    const BIND_CLIENT_DATA = 'form.bind_client_data';
 
-    const onBindNormData = 'onBindNormData';
+    const BIND_NORM_DATA = 'form.bind_norm_data';
 
-    const onSetData = 'onSetData';
+    const SET_DATA = 'form.set_data';
 }

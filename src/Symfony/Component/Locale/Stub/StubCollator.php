@@ -188,9 +188,9 @@ class StubCollator
     }
 
     /**
-     * Get current collator's strenght
+     * Get current collator's strength
      *
-     * @return Boolean|int   The current collator's strenght or false on failure
+     * @return Boolean|int   The current collator's strength or false on failure
      * @see    http://www.php.net/manual/en/collator.getstrength.php
      * @throws MethodNotImplementedException
      */

@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -22,6 +31,11 @@ class LoginController extends ContainerAware
             'last_username' => $this->container->get('request')->getSession()->get(SecurityContext::LAST_USERNAME),
             'error'         => $error,
         ));
+    }
+
+    public function afterLoginAction()
+    {
+        return $this->container->get('templating')->renderResponse('FormLoginBundle:Login:after_login.html.twig');
     }
 
     public function loginCheckAction()

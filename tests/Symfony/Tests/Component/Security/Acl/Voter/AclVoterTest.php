@@ -71,8 +71,8 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
         list($voter,, $permissionMap,,) = $this->getVoter();
         $permissionMap
             ->expects($this->atLeastOnce())
-            ->method('contains')
-            ->will($this->returnValue(false))
+            ->method('getMasks')
+            ->will($this->returnValue(null))
         ;
 
         $this->assertSame(VoterInterface::ACCESS_ABSTAIN, $voter->vote($this->getToken(), null, array('VIEW', 'EDIT', 'DELETE')));
@@ -86,8 +86,8 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
         list($voter,, $permissionMap,,) = $this->getVoter($allowIfObjectIdentityUnavailable);
         $permissionMap
             ->expects($this->once())
-            ->method('contains')
-            ->will($this->returnValue(true))
+            ->method('getMasks')
+            ->will($this->returnValue(array()))
         ;
 
         if ($allowIfObjectIdentityUnavailable) {
@@ -107,8 +107,8 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
         list($voter,, $permissionMap, $oidStrategy,) = $this->getVoter($allowIfUnavailable);
         $permissionMap
             ->expects($this->once())
-            ->method('contains')
-            ->will($this->returnValue(true))
+            ->method('getMasks')
+            ->will($this->returnValue(array()))
         ;
 
         $oidStrategy
@@ -137,8 +137,8 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
 
         $permissionMap
             ->expects($this->once())
-            ->method('contains')
-            ->will($this->returnValue(true))
+            ->method('getMasks')
+            ->will($this->returnValue(array()))
         ;
 
         $oidStrategy
@@ -170,11 +170,6 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
     {
         list($voter, $provider, $permissionMap, $oidStrategy, $sidStrategy) = $this->getVoter();
 
-        $permissionMap
-            ->expects($this->once())
-            ->method('contains')
-            ->will($this->returnValue(true))
-        ;
         $permissionMap
             ->expects($this->once())
             ->method('getMasks')
@@ -223,11 +218,6 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
 
         $permissionMap
             ->expects($this->once())
-            ->method('contains')
-            ->will($this->returnValue(true))
-        ;
-        $permissionMap
-            ->expects($this->once())
             ->method('getMasks')
             ->with($this->equalTo('VIEW'))
             ->will($this->returnValue($masks = array(1, 2, 3)))
@@ -269,11 +259,6 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
     {
         list($voter, $provider, $permissionMap, $oidStrategy, $sidStrategy) = $this->getVoter();
 
-        $permissionMap
-            ->expects($this->once())
-            ->method('contains')
-            ->will($this->returnValue(true))
-        ;
         $permissionMap
             ->expects($this->once())
             ->method('getMasks')
@@ -322,11 +307,6 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
 
         $permissionMap
             ->expects($this->once())
-            ->method('contains')
-            ->will($this->returnValue(true))
-        ;
-        $permissionMap
-            ->expects($this->once())
             ->method('getMasks')
             ->with($this->equalTo('VIEW'))
             ->will($this->returnValue($masks = array(1, 2, 3)))
@@ -367,11 +347,6 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
 
         $oid = new ObjectIdentity('someID','someType');
 
-        $permissionMap
-            ->expects($this->once())
-            ->method('contains')
-            ->will($this->returnValue(true))
-        ;
         $permissionMap
             ->expects($this->once())
             ->method('getMasks')

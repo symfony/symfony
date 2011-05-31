@@ -31,7 +31,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Loads an XML file.
      *
-     * @param mixed  $resource The resource
+     * @param mixed  $file The resource
      * @param string $type The resource type
      */
     public function load($file, $type = null)
@@ -44,19 +44,19 @@ class XmlFileLoader extends FileLoader
         $this->container->addResource(new FileResource($path));
 
         // anonymous services
-        $xml = $this->processAnonymousServices($xml, $file);
+        $xml = $this->processAnonymousServices($xml, $path);
 
         // imports
-        $this->parseImports($xml, $file);
+        $this->parseImports($xml, $path);
 
         // parameters
-        $this->parseParameters($xml, $file);
+        $this->parseParameters($xml, $path);
 
         // extensions
         $this->loadFromExtensions($xml);
 
         // services
-        $this->parseDefinitions($xml, $file);
+        $this->parseDefinitions($xml, $path);
     }
 
     /**

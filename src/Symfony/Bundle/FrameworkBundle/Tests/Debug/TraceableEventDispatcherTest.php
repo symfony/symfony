@@ -14,7 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Debug;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Debug\TraceableEventDispatcher;
 
-class TraceableEventDispactherTest extends TestCase
+class TraceableEventDispatcherTest extends TestCase
 {
 
     /**

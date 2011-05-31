@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Symfony\Component\HttpKernel\Util\Filesystem;
@@ -15,13 +24,19 @@ use Symfony\Component\HttpKernel\Kernel;
 class AppKernel extends Kernel
 {
     private $testCase;
+    private $rootConfig;
 
-    public function __construct($testCase, $environment, $debug)
+    public function __construct($testCase, $rootConfig, $environment, $debug)
     {
         if (!is_dir(__DIR__.'/'.$testCase)) {
             throw new \InvalidArgumentException(sprintf('The test case "%s" does not exist.', $testCase));
         }
         $this->testCase = $testCase;
+
+        if (!file_exists($filename = __DIR__.'/'.$testCase.'/'.$rootConfig)) {
+            throw new \InvalidArgumentException(sprintf('The root config "%s" does not exist.', $filename));
+        }
+        $this->rootConfig = $filename;
 
         parent::__construct($environment, $debug);
     }
@@ -52,11 +67,7 @@ class AppKernel extends Kernel
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
-        if (!file_exists($filename = $this->getRootDir().'/'.$this->testCase.'/config.yml')) {
-            throw new \RuntimeException(sprintf('The config file "%s" does not exist.', $filename));
-        }
-
-        $loader->load($filename);
+        $loader->load($this->rootConfig);
     }
 
     protected function getKernelParameters()

@@ -44,7 +44,7 @@ class FileToArrayTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transfom a file internal representation to a File instance
+     * Transform a file internal representation to a File instance
      *
      * @param File $array the file representation
      *

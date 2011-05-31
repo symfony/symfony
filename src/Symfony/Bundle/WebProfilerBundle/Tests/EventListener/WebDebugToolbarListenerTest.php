@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\WebProfilerBundle\Tests;
+namespace Symfony\Bundle\WebProfilerBundle\Tests\EventListener;
 
-use Symfony\Bundle\WebProfilerBundle\WebDebugToolbarListener;
+use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -130,7 +130,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @depends testToolbarIsInjected
      */
-    public function testToolbarIsNotInjectedOnUncompleteHtmlResponses()
+    public function testToolbarIsNotInjectedOnIncompleteHtmlResponses()
     {
         $response = new Response('<div>Some content</div>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');

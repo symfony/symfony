@@ -20,14 +20,34 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Logger extends BaseLogger implements LoggerInterface
+class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
 {
+    /**
+     * @see Symfony\Component\HttpKernel\Log\DebugLoggerInterface
+     */
+    public function getLogs()
+    {
+        if ($logger = $this->getDebugLogger()) {
+            return $logger->getLogs();
+        }
+    }
+
+    /**
+     * @see Symfony\Component\HttpKernel\Log\DebugLoggerInterface
+     */
+    public function countErrors()
+    {
+        if ($logger = $this->getDebugLogger()) {
+            return $logger->countErrors();
+        }
+    }
+
     /**
      * Returns a DebugLoggerInterface instance if one is registered with this logger.
      *
      * @return DebugLoggerInterface A DebugLoggerInterface instance or null if none is registered
      */
-    public function getDebugLogger()
+    private function getDebugLogger()
     {
         foreach ($this->handlers as $handler) {
             if ($handler instanceof DebugLoggerInterface) {

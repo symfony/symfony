@@ -36,6 +36,14 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     private $rendered = false;
 
     /**
+     * Array of already rendered fields. Every manual call of widget or row
+     * marks field as rendered and skips it in auto rendering.
+     *
+     * @var array
+     */
+    private $renderedFields = array();
+
+    /**
      * @param string $name
      * @param mixed $value
      *
@@ -123,6 +131,28 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     public function setRendered()
     {
         $this->rendered = true;
+
+        return $this;
+    }
+
+    /**
+     * Returns whether the field was already rendered.
+     *
+     * @return Boolean Whether the field was already rendered
+     */
+    public function isFieldRendered($field)
+    {
+        return isset($this->renderedFields[$field]);
+    }
+
+    /**
+     * Marks selected field as rendered.
+     *
+     * @return FormView The current view
+     */
+    public function setFieldRendered($field)
+    {
+        $this->renderedFields[$field] = true;
 
         return $this;
     }

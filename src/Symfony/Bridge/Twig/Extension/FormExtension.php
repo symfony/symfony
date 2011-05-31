@@ -90,7 +90,7 @@ class FormExtension extends \Twig_Extension
      *
      *     <form action="..." method="post" {{ form_enctype(form) }}>
      *
-     * @param FormView $view  The view for which to render the encoding type
+     * @param FormView $view The view for which to render the encoding type
      *
      * @return string The html markup
      */
@@ -138,10 +138,8 @@ class FormExtension extends \Twig_Extension
      *
      *     {{ form_widget(view, {'separator': '+++++'}) }}
      *
-     * @param FormView        $view      The view to render
-     * @param array           $variables Additional variables passed to the template
-     *
-     * @return string The html markup
+     * @param FormView $view      The view to render
+     * @param array    $variables Additional variables passed to the template
      */
     public function renderWidget(FormView $view, array $variables = array())
     {
@@ -202,11 +200,15 @@ class FormExtension extends \Twig_Extension
         array_unshift($blocks, '_'.$view->get('id'));
 
         foreach ($blocks as &$block) {
-            $block = $block.'_'.$section;
+            $block .= '_'.$section;
+            if ($view->isFieldRendered($block)) {
+                return;
+            }
 
             if (isset($templates[$block])) {
                 if ('widget' === $section || 'row' === $section) {
                     $view->setRendered();
+                    $view->setFieldRendered($block);
                 }
 
                 $this->varStack[$view] = array_replace(

@@ -63,11 +63,26 @@ class FormHelper extends Helper
         return $html;
     }
 
+    /**
+     * Renders the HTML enctype in the form tag, if necessary
+     *
+     * @param FormView $view The view for which to render the encoding type
+     *
+     * @return string
+     */
     public function enctype(FormView $view)
     {
         return $this->renderSection($view, 'enctype');
     }
 
+    /**
+     * Renders the HTML for a given view
+     *
+     * @param FormView $view      The view to render
+     * @param array    $variables Additional variables passed to the template
+     *
+     * @return string
+     */
     public function widget(FormView $view, array $variables = array())
     {
         return trim($this->renderSection($view, 'widget', $variables));
@@ -76,8 +91,8 @@ class FormHelper extends Helper
     /**
      * Renders the entire form field "row".
      *
-     * @param FormView $view
-     * @param array    $variables
+     * @param FormView $view      The view to render the row for
+     * @param array    $variables Additional variables passed to the template
      *
      * @return string
      */
@@ -86,6 +101,14 @@ class FormHelper extends Helper
         return $this->renderSection($view, 'row', $variables);
     }
 
+    /**
+     * Renders the label of the given view
+     *
+     * @param FormView $view  The view to render the label for
+     * @param string   $label Label name
+     *
+     * @return string
+     */
     public function label(FormView $view, $label = null, array $variables = array())
     {
         if ($label !== null) {
@@ -95,6 +118,13 @@ class FormHelper extends Helper
         return $this->renderSection($view, 'label', $variables);
     }
 
+    /**
+     * Renders the errors of the given view
+     *
+     * @param FormView $view The view to render the errors for
+     *
+     * @return string
+     */
     public function errors(FormView $view)
     {
         return $this->renderSection($view, 'errors');
@@ -112,10 +142,12 @@ class FormHelper extends Helper
         array_unshift($blocks, '_'.$view->get('id'));
 
         foreach ($blocks as &$block) {
-            $block = $block.'_'.$section;
-            $template = $this->lookupTemplate($block);
+            $block .= '_'.$section;
+            if ($view->isFieldRendered($block)) {
+                return;
+            }
 
-            if ($template) {
+            if ($template = $this->lookupTemplate($block)) {
                 break;
             }
         }
@@ -126,6 +158,7 @@ class FormHelper extends Helper
 
         if ('widget' === $section || 'row' === $section) {
             $view->setRendered();
+            $view->setFieldRendered($block);
         }
 
         return $this->render($view, $template, $variables);
@@ -155,13 +188,7 @@ class FormHelper extends Helper
             return self::$cache[$templateName];
         }
 
-        $template = $templateName.'.html.php';
-/*
-        if ($this->templateDir) {
-            $template = $this->templateDir.':'.$template;
-        }
-*/
-        $template = 'FrameworkBundle:Form:'.$template;
+        $template = 'FrameworkBundle:Form:'.$templateName.'.html.php';
         if (!$this->engine->exists($template)) {
             $template = false;
         }
@@ -171,6 +198,11 @@ class FormHelper extends Helper
         return $template;
     }
 
+    /**
+     * Returns the name of the extension.
+     *
+     * @return string The extension name
+     */
     public function getName()
     {
         return 'form';

@@ -28,6 +28,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * ContextListener manages the SecurityContext persistence through a session.
  *
+ * The listener serializes the security token and stores it on the session.
+ * On subsequent requests, the token is fetched from the session and set on
+ * the security context. During that process, the appropriate user provider
+ * is called so that the user can be refreshed (e.g. a user object corresponding
+ * to a user in a database will need to be refreshed).
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -38,6 +44,13 @@ class ContextListener implements ListenerInterface
     private $logger;
     private $userProviders;
 
+    /**
+     * @param SecurityContext $context
+     * @param array   $userProviders The available user providers to load users from
+     * @param string $contextKey The key used when storing information to the session
+     * @param LoggerInterface $logger
+     * @param EventDispatcherInterface $dispatcher
+     */
     public function __construct(SecurityContext $context, array $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         if (empty($contextKey)) {

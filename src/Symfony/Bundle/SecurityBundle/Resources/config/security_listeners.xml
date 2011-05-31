@@ -69,7 +69,7 @@
         <service id="security.context_listener" class="%security.context_listener.class%" public="false">
             <tag name="monolog.logger" channel="security" />
             <argument type="service" id="security.context" />
-            <argument type="collection"></argument>
+            <argument type="collection" />
             <argument /> <!-- Provider Key -->
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="event_dispatcher" on-invalid="null"/>

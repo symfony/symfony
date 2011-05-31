@@ -156,7 +156,7 @@ class Session implements \Serializable
             $this->start();
         }
 
-        $this->attributes = array();
+        $this->attributes = array('_flash' => array(), '_locale' => $this->defaultLocale);
     }
 
     /**

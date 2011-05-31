@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Bundle\SecurityBundle;
+namespace Symfony\Bundle\SecurityBundle\EventListener;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;

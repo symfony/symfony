@@ -9,7 +9,7 @@
         <parameter key="test.client.parameters" type="collection"></parameter>
         <parameter key="test.client.history.class">Symfony\Component\BrowserKit\History</parameter>
         <parameter key="test.client.cookiejar.class">Symfony\Component\BrowserKit\CookieJar</parameter>
-        <parameter key="test.session.listener.class">Symfony\Bundle\FrameworkBundle\Test\SessionListener</parameter>
+        <parameter key="test.session.listener.class">Symfony\Bundle\FrameworkBundle\EventListener\TestSessionListener</parameter>
     </parameters>
 
     <services>

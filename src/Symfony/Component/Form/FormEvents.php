@@ -24,9 +24,9 @@ final class FormEvents
 
     const POST_SET_DATA = 'form.post_set_data';
 
-    const ON_BIND_CLIENT_DATA = 'form.on_bind_client_data';
+    const BIND_CLIENT_DATA = 'form.bind_client_data';
 
-    const ON_BIND_NORM_DATA = 'form.on_bind_norm_data';
+    const BIND_NORM_DATA = 'form.bind_norm_data';
 
-    const ON_SET_DATA = 'form.on_set_data';
+    const SET_DATA = 'form.set_data';
 }

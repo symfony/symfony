@@ -40,6 +40,6 @@ class FixUrlProtocolListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(FormEvents::ON_BIND_NORM_DATA => 'onBindNormData');
+        return array(FormEvents::BIND_NORM_DATA => 'onBindNormData');
     }
 }

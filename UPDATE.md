@@ -9,6 +9,11 @@ timeline closely anyway.
 beta3 to beta4
 --------------
 
+* Some `UniversalClassLoader` methods have been renamed:
+
+    * `registerPrefixFallback` to `registerPrefixFallbacks`
+    * `registerNamespaceFallback` to `registerNamespaceFallbacks`
+
 * The event system has been made more flexible. A listener can now be any
   valid PHP callable.
 

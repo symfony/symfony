@@ -31,36 +31,46 @@ class GenerateEntityDoctrineCommand extends DoctrineCommand
         $this
             ->setName('doctrine:generate:entity')
             ->setDescription('Generate a new Doctrine entity inside a bundle')
-            ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to initialize the entity in')
-            ->addArgument('entity', InputArgument::REQUIRED, 'The entity class to initialize')
-            ->addOption('mapping-type', null, InputOption::VALUE_OPTIONAL, 'The mapping type to to use for the entity', 'xml')
-            ->addOption('fields', null, InputOption::VALUE_OPTIONAL, 'The fields to create with the new entity')
+            ->addArgument('entity', InputArgument::REQUIRED, 'The entity class name to initialize (shortcut notation)')
+            ->addArgument('fields', InputArgument::OPTIONAL, 'The fields to create with the new entity')
+            ->addOption('mapping-type', null, InputOption::VALUE_OPTIONAL, 'The mapping type to to use for the entity', 'yml')
             ->setHelp(<<<EOT
-The <info>doctrine:generate:entity</info> task initializes a new Doctrine
+The <info>doctrine:generate:entity</info> task generates a new Doctrine
 entity inside a bundle:
 
-<info>./app/console doctrine:generate:entity "MyCustomBundle" "User\Group"</info>
+<info>./app/console doctrine:generate:entity AcmeBlogBundle:Blog/Post</info>
 
 The above would initialize a new entity in the following entity namespace
-<info>Bundle\MyCustomBundle\Entity\User\Group</info>.
+<info>Acme\BlogBundle\Entity\Blog\Post</info>.
 
 You can also optionally specify the fields you want to generate in the new
 entity:
 
-<info>./app/console doctrine:generate:entity "MyCustomBundle" "User\Group" --fields="name:string(255) description:text"</info>
+<info>./app/console doctrine:generate:entity AcmeBlogBundle:Blog/Post "title:string(255) body:text"</info>
+
+By default, the command uses YAML for the mapping information; change it
+with <comment>--mapping-type</comment>:
+
+<info>./app/console doctrine:generate:entity AcmeBlogBundle:Blog/Post --mapping-type=annotation</info>
 EOT
         );
     }
 
     /**
-     * @throws \InvalidArgumentException When the bundle doesn't end with Bundle (Example: "Bundle\MySampleBundle")
+     * @throws \InvalidArgumentException When the bundle doesn't end with Bundle (Example: "Bundle/MySampleBundle")
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $bundle = $this->getApplication()->getKernel()->getBundle($input->getArgument('bundle'));
-
         $entity = str_replace('/', '\\', $input->getArgument('entity'));
-        $fullEntityClassName = $bundle->getNamespace().'\\Entity\\'.$entity;
+
+        if (false === $pos = strpos($entity, ':')) {
+            throw new \InvalidArgumentException(sprintf('The entity name must contain a : ("%s" given, expecting something like AcmeBlogBundle:Blog/Post)', $entity));
+        }
+
+        $bundle = substr($entity, 0, $pos);
+        $entity = substr($entity, $pos + 1);
+        $fullEntityClassName = $this->container->get('doctrine')->getEntityNamespace($bundle).'\\'.$entity;
+        $bundle = $this->getApplication()->getKernel()->getBundle($bundle);
         $mappingType = $input->getOption('mapping-type');
 
         $class = new ClassMetadataInfo($fullEntityClassName);
@@ -68,8 +78,7 @@ EOT
         $class->setIdGeneratorType(ClassMetadataInfo::GENERATOR_TYPE_AUTO);
 
         // Map the specified fields
-        $fields = $input->getOption('fields');
-        if ($fields) {
+        if ($fields = $input->getArgument('fields')) {
             $e = explode(' ', $fields);
             foreach ($e as $value) {
                 $e = explode(':', $value);
@@ -79,38 +88,34 @@ EOT
                     preg_match_all('/(.*)\((.*)\)/', $type, $matches);
                     $type = isset($matches[1][0]) ? $matches[1][0] : $type;
                     $length = isset($matches[2][0]) ? $matches[2][0] : null;
-                    $class->mapField(array(
-                        'fieldName' => $name,
-                        'type' => $type,
-                        'length' => $length
-                    ));
+                    $class->mapField(array('fieldName' => $name, 'type' => $type, 'length' => $length));
                 }
             }
         }
 
-        // Setup a new exporter for the mapping type specified
-        $cme = new ClassMetadataExporter();
-        $exporter = $cme->getExporter($mappingType);
-
         $entityPath = $bundle->getPath().'/Entity/'.str_replace('\\', '/', $entity).'.php';
         if (file_exists($entityPath)) {
-            throw new \RuntimeException(sprintf("Entity %s already exists.", $class->name));
+            throw new \RuntimeException(sprintf('Entity "%s" already exists.', $class->name));
         }
 
+        $entityGenerator = $this->getEntityGenerator();
         if ('annotation' === $mappingType) {
-            $exporter->setEntityGenerator($this->getEntityGenerator());
-            $entityCode = $exporter->exportClassMetadata($class);
+            $entityGenerator->setGenerateAnnotations(true);
+            $entityCode = $entityGenerator->generateEntityClass($class);
             $mappingPath = $mappingCode = false;
         } else {
+            // Setup a new exporter for the mapping type specified
+            $cme = new ClassMetadataExporter();
+            $exporter = $cme->getExporter($mappingType);
             $mappingType = 'yaml' == $mappingType ? 'yml' : $mappingType;
-            $mappingPath = $bundle->getPath().'/Resources/config/doctrine/'.str_replace('\\', '.', $fullEntityClassName).'.orm.'.$mappingType;
+            $mappingPath = $bundle->getPath().'/Resources/config/doctrine/'.str_replace('\\', '.', $entity).'.orm.'.$mappingType;
             $mappingCode = $exporter->exportClassMetadata($class);
 
-            $entityGenerator = $this->getEntityGenerator();
+            $entityGenerator->setGenerateAnnotations(false);
             $entityCode = $entityGenerator->generateEntityClass($class);
 
             if (file_exists($mappingPath)) {
-                throw new \RuntimeException(sprintf("Cannot generate entity when mapping <info>%s</info> already exists", $mappingPath));
+                throw new \RuntimeException(sprintf('Cannot generate entity when mapping "%s" already exists.', $mappingPath));
             }
         }
 

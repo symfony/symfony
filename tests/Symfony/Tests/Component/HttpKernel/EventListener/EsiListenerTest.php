@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\HttpKernel\HttpCache;
+namespace Symfony\Tests\Component\HttpKernel\EventListener;
 
 use Symfony\Component\HttpKernel\HttpCache\Esi;
-use Symfony\Component\HttpKernel\HttpCache\EsiListener;
+use Symfony\Component\HttpKernel\EventListener\EsiListener;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\CoreEvents;
 use Symfony\Component\HttpKernel\HttpKernelInterface;

@@ -6,7 +6,7 @@
 
     <parameters>
         <parameter key="profiler.class">Symfony\Component\HttpKernel\Profiler\Profiler</parameter>
-        <parameter key="profiler_listener.class">Symfony\Component\HttpKernel\ProfilerListener</parameter>
+        <parameter key="profiler_listener.class">Symfony\Component\HttpKernel\EventListener\ProfilerListener</parameter>
     </parameters>
 
     <services>

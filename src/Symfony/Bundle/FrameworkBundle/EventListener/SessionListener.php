@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Listener;
+namespace Symfony\Bundle\FrameworkBundle\EventListener;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 

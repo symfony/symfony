@@ -46,7 +46,7 @@ class MonthChoiceList extends PaddedChoiceList
 
             foreach ($this->choices as $choice => $value) {
                 // It's important to specify the first day of the month here!
-                $this->choices[$choice] = $this->formatter->format(gmmktime(0, 0, 0, $value, 1));
+                $this->choices[$choice] = $this->formatter->format(mktime(0, 0, 0, $value, 1));
             }
 
             // I'd like to clone the formatter above, but then we get a

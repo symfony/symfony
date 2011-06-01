@@ -51,9 +51,9 @@ class FormHelperTest extends AbstractDivLayoutTest
         return (string)$this->helper->enctype($view);
     }
 
-    protected function renderLabel(FormView $view, $label = null)
+    protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
-        return (string)$this->helper->label($view, $label);
+        return (string)$this->helper->label($view, $label, $vars);
     }
 
     protected function renderErrors(FormView $view)
@@ -75,5 +75,4 @@ class FormHelperTest extends AbstractDivLayoutTest
     {
         return (string)$this->helper->rest($view, $vars);
     }
-
 }

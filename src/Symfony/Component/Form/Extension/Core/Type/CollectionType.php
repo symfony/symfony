@@ -22,10 +22,8 @@ class CollectionType extends AbstractType
     public function buildForm(FormBuilder $builder, array $options)
     {
         if ($options['allow_add'] && $options['prototype']) {
-            $builder->add('$$name$$', $options['type'], array_replace(array(
-                'property_path' => false,
-                'required'      => false,
-            ), $options['options']));
+            $prototype = $builder->create('$$name$$', $options['type'], $options['options']);
+            $builder->setAttribute('prototype', $prototype->getForm());
         }
 
         $listener = new ResizeFormListener(
@@ -49,6 +47,10 @@ class CollectionType extends AbstractType
             ->set('allow_add', $form->getAttribute('allow_add'))
             ->set('allow_delete', $form->getAttribute('allow_delete'))
         ;
+
+        if ($form->hasAttribute('prototype')) {
+            $view->set('prototype', $form->getAttribute('prototype')->createView());
+        }
     }
 
     public function getDefaultOptions(array $options)

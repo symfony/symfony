@@ -67,30 +67,6 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->form->has('2'));
     }
 
-    public function testPreSetDataRemovesPrototypeRowIfNotAllowAdd()
-    {
-        $this->form->add($this->getForm('$$name$$'));
-
-        $data = array();
-        $event = new DataEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', array(), false, false);
-        $listener->preSetData($event);
-
-        $this->assertFalse($this->form->has('$$name$$'));
-    }
-
-    public function testPreSetDataDoesNotRemovePrototypeRowIfAllowAdd()
-    {
-        $this->form->add($this->getForm('$$name$$'));
-
-        $data = array();
-        $event = new DataEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', array(), true, false);
-        $listener->preSetData($event);
-
-        $this->assertTrue($this->form->has('$$name$$'));
-    }
-
     /**
      * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
      */

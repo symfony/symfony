@@ -27,7 +27,8 @@ class AssetFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->kernel = $this->getMock('Symfony\\Component\\HttpKernel\\KernelInterface');
         $this->container = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerInterface');
-        $this->factory = new AssetFactory($this->kernel, $this->container, '/path/to/web');
+        $this->parameterBag = $this->getMock('Symfony\\Component\\DependencyInjection\\ParameterBag\\ParameterBagInterface');
+        $this->factory = new AssetFactory($this->kernel, $this->container, $this->parameterBag, '/path/to/web');
     }
 
     public function testBundleNotation()
@@ -35,6 +36,9 @@ class AssetFactoryTest extends \PHPUnit_Framework_TestCase
         $input = '@MyBundle/Resources/css/main.css';
         $bundle = $this->getMock('Symfony\\Component\\HttpKernel\\Bundle\\BundleInterface');
 
+        $this->parameterBag->expects($this->once())
+            ->method('resolveValue')
+            ->will($this->returnCallback(function($v) { return $v; }));
         $this->kernel->expects($this->once())
             ->method('getBundle')
             ->with('MyBundle')
@@ -61,6 +65,9 @@ class AssetFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $bundle = $this->getMock('Symfony\\Component\\HttpKernel\\Bundle\\BundleInterface');
 
+        $this->parameterBag->expects($this->once())
+            ->method('resolveValue')
+            ->will($this->returnCallback(function($v) { return $v; }));
         $this->kernel->expects($this->once())
             ->method('getBundle')
             ->with('MyBundle')

@@ -9,6 +9,9 @@ timeline closely anyway.
 beta3 to beta4
 --------------
 
+* `Client::getProfiler` has been removed in favor of `Client::getProfile`,
+  which returns an instance of `Profile`.
+
 * Some `UniversalClassLoader` methods have been renamed:
 
     * `registerPrefixFallback` to `registerPrefixFallbacks`

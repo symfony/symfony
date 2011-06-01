@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Client as BaseClient;
 use Symfony\Component\HttpKernel\Profiler\Profiler as HttpProfiler;
+use Symfony\Component\HttpKernel\Profiler\Profile as HttpProfile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -48,11 +49,11 @@ class Client extends BaseClient
     }
 
     /**
-     * Gets a profiler for the current Response.
+     * Gets the profile associated with the current Response.
      *
-     * @return HttpProfiler A Profiler instance
+     * @return HttpProfile A Profile instance
      */
-    public function getProfiler()
+    public function getProfile()
     {
         if (!$this->kernel->getContainer()->has('profiler')) {
             return false;

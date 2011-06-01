@@ -13,9 +13,9 @@ namespace Symfony\Bridge\Doctrine\Validator\Constraints;
 
 use Symfony\Bundle\DoctrineBundle\Registry;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\ConstraintValidator;
 
 /**
  * Unique Entity Validator checks if one or a set of fields contain unique values.

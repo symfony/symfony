@@ -23,12 +23,36 @@ use Symfony\Component\Form\Exception\FormException;
  */
 class FormExtension extends \Twig_Extension
 {
+    /**
+     * @var array
+     */
     protected $resources;
+
+    /**
+     * @var \SplObjectStorage
+     */
     protected $templates;
+
+    /**
+     * @var \Twig_Environment
+     */
     protected $environment;
+
+    /**
+     * @var \SplObjectStorage
+     */
     protected $themes;
+
+    /**
+     * @var \SplObjectStorage
+     */
     protected $varStack;
 
+    /**
+     * Constructor
+     *
+     * @param array
+     */
     public function __construct(array $resources = array())
     {
         $this->themes = new \SplObjectStorage();
@@ -140,6 +164,8 @@ class FormExtension extends \Twig_Extension
      *
      * @param FormView $view      The view to render
      * @param array    $variables Additional variables passed to the template
+     *
+     * @return string The html markup
      */
     public function renderWidget(FormView $view, array $variables = array())
     {
@@ -161,8 +187,8 @@ class FormExtension extends \Twig_Extension
     /**
      * Renders the label of the given view
      *
-     * @param FormView $view  The view to render the label for
-     * @param string   $label Label name
+     * @param FormView $view      The view to render the label for
+     * @param string   $label     Label name
      * @param array    $variables Additional variables passed to the template
      *
      * @return string The html markup
@@ -185,9 +211,9 @@ class FormExtension extends \Twig_Extension
      * 3. the type name is recusrively replaced by the parent type name until a
      *    corresponding block is found
      *
-     * @param FormView  $view       The form view
-     * @param string    $section    The section to render (i.e. 'row', 'widget', 'label', ...)
-     * @param array     $variables  Additional variables
+     * @param FormView $view      The form view
+     * @param string   $section   The section to render (i.e. 'row', 'widget', 'label', ...)
+     * @param array    $variables Additional variables
      *
      * @return string The html markup
      *
@@ -201,14 +227,14 @@ class FormExtension extends \Twig_Extension
 
         foreach ($blocks as &$block) {
             $block .= '_'.$section;
-            if ($view->isFieldRendered($block)) {
+            if ($view->isBlockRendered($block)) {
                 return;
             }
 
             if (isset($templates[$block])) {
                 if ('widget' === $section || 'row' === $section) {
                     $view->setRendered();
-                    $view->setFieldRendered($block);
+                    $view->setBlockAsRendered($block);
                 }
 
                 $this->varStack[$view] = array_replace(

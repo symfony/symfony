@@ -17,33 +17,55 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Exception\FormException;
 
 /**
- *
+ * FormHelper for PhpEngine.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
 class FormHelper extends Helper
 {
+    /**
+     * @var array
+     */
     static protected $cache = array();
 
+    /**
+     * @var EngineInterface
+     */
     protected $engine;
 
+    /**
+     * @var \SplObjectStorage
+     */
     protected $varStack;
 
+    /**
+     * @var array
+     */
     protected $viewStack = array();
 
+    /**
+     * Constructor
+     *
+     * @param EngineInterface $engine
+     */
     public function __construct(EngineInterface $engine)
     {
         $this->engine = $engine;
         $this->varStack = new \SplObjectStorage();
     }
 
+    /**
+     * Renders the HTML attributes in the fields if necessary
+     *
+     * @return string
+     */
     public function attributes()
     {
         $html = '';
         $attr = array();
 
-        if (count($this->viewStack) > 0) {
+        if (!empty($this->viewStack)) {
             $view = end($this->viewStack);
             $vars = $this->varStack[$view];
 
@@ -104,8 +126,9 @@ class FormHelper extends Helper
     /**
      * Renders the label of the given view
      *
-     * @param FormView $view  The view to render the label for
-     * @param string   $label Label name
+     * @param FormView $view      The view to render the label for
+     * @param string   $label     Label name
+     * @param array    $variables Additional variables passed to the template
      *
      * @return string
      */
@@ -135,6 +158,23 @@ class FormHelper extends Helper
         return $this->renderSection($view, 'rest', $variables);
     }
 
+    /**
+     * Renders a template.
+     *
+     * 1. This function first looks for a block named "_<view id>_<section>",
+     * 2. if such a block is not found the function will look for a block named
+     *    "<type name>_<section>",
+     * 3. the type name is recusrively replaced by the parent type name until a
+     *    corresponding block is found
+     *
+     * @param FormView $view      The form view
+     * @param string   $section   The section to render (i.e. 'row', 'widget', 'label', ...)
+     * @param array    $variables Additional variables
+     *
+     * @return string The html markup
+     *
+     * @throws FormException if no template block exists to render the given section of the view
+     */
     protected function renderSection(FormView $view, $section, array $variables = array())
     {
         $template = null;
@@ -143,7 +183,7 @@ class FormHelper extends Helper
 
         foreach ($blocks as &$block) {
             $block .= '_'.$section;
-            if ($view->isFieldRendered($block)) {
+            if ($view->isBlockRendered($block)) {
                 return;
             }
 
@@ -158,12 +198,21 @@ class FormHelper extends Helper
 
         if ('widget' === $section || 'row' === $section) {
             $view->setRendered();
-            $view->setFieldRendered($block);
+            $view->setBlockAsRendered($block);
         }
 
         return $this->render($view, $template, $variables);
     }
 
+    /**
+     * Renders a template.
+     *
+     * @param FormView $view      The form view
+     * @param string   $template  The template name
+     * @param array    $variables Additional variables
+     *
+     * @return string The html markup
+     */
     public function render(FormView $view, $template, array $variables = array())
     {
         $this->varStack[$view] = array_replace(
@@ -182,6 +231,13 @@ class FormHelper extends Helper
         return $html;
     }
 
+    /**
+     * Lookup for given template name, and store info in cache
+     *
+     * @param string Short template name
+     *
+     * @return string|Boolean The full template name or false if template was not found
+     */
     protected function lookupTemplate($templateName)
     {
         if (isset(self::$cache[$templateName])) {
@@ -193,9 +249,7 @@ class FormHelper extends Helper
             $template = false;
         }
 
-        self::$cache[$templateName] = $template;
-
-        return $template;
+        return self::$cache[$templateName] = $template;
     }
 
     /**

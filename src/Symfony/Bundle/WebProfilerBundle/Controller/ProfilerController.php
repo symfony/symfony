@@ -32,23 +32,21 @@ class ProfilerController extends ContainerAware
      */
     public function panelAction($token)
     {
-        $this->container->get('profiler')->disable();
+        $profiler = $this->container->get('profiler');
+        $profiler->disable();
 
         $panel = $this->container->get('request')->query->get('panel', 'request');
-
-        $profiler = $this->container->get('profiler');
 
         if (!$profile = $profiler->loadProfile($token)) {
             return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:notfound.html.twig', array('token' => $token));
         }
 
-        if (!$profiler->has($panel)) {
-            throw new NotFoundHttpException(sprintf('Panel "%s" is not registered.', $panel));
+        if (!$profile->hasCollector($panel)) {
+            throw new NotFoundHttpException(sprintf('Panel "%s" is not available for token "%s".', $panel, $token));
         }
 
         return $this->container->get('templating')->renderResponse($this->getTemplateName($profiler, $panel), array(
             'token'     => $token,
-            'profiler'  => $profiler,
             'profile'   => $profile,
             'collector' => $profile->getCollector($panel),
             'panel'     => $panel,
@@ -111,7 +109,7 @@ class ProfilerController extends ContainerAware
             throw new \RuntimeException('Problem uploading the data (token already exists).');
         }
 
-        return new RedirectResponse($this->container->get('router')->generate('_profiler', array('token' => $token)));
+        return new RedirectResponse($this->container->get('router')->generate('_profiler', array('token' => $profile->getToken())));
     }
 
     /**
@@ -155,7 +153,6 @@ class ProfilerController extends ContainerAware
 
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:toolbar.html.twig', array(
             'position'     => $position,
-            'profiler'     => $profiler,
             'profile'      => $profile,
             'templates'    => $this->getTemplates($profiler),
             'profiler_url' => $url,
@@ -212,7 +209,6 @@ class ProfilerController extends ContainerAware
 
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:results.html.twig', array(
             'token'    => $token,
-            'profiler' => $profiler,
             'profile'  => $profile,
             'tokens'   => $profiler->find($ip, $url, $limit),
             'ip'       => $ip,

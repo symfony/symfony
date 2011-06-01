@@ -8,8 +8,6 @@
         <parameter key="form.extension.class">Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension</parameter>
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
         <parameter key="form.type_guesser.validator.class">Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser</parameter>
-        <parameter key="form.csrf_provider.class">Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider</parameter>
-        <parameter key="form.temporary_storage.class">Symfony\Component\HttpFoundation\File\SessionBasedTemporaryStorage</parameter>
         <parameter key="form.temporary_storage.class">Symfony\Component\HttpFoundation\File\TemporaryStorage</parameter>
         <parameter key="form.temporary_storage.session.class">Symfony\Component\HttpFoundation\File\SessionBasedTemporaryStorage</parameter>
     </parameters>

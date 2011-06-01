@@ -72,26 +72,33 @@ class RememberMeFactory implements SecurityFactoryInterface
         $rememberMeServices->replaceArgument(3, array_intersect_key($config, $this->options));
 
         // attach to remember-me aware listeners
-        $userProviders = array();
-        foreach ($container->findTaggedServiceIds('security.remember_me_aware') as $serviceId => $attributes) {
-            foreach ($attributes as $attribute) {
-                if (!isset($attribute['id']) || $attribute['id'] !== $id) {
-                    continue;
-                }
+        if (!$config['user_providers']) {
+            $userProviders = array();
+            foreach ($container->findTaggedServiceIds('security.remember_me_aware') as $serviceId => $attributes) {
+                foreach ($attributes as $attribute) {
+                    if (!isset($attribute['id']) || $attribute['id'] !== $id) {
+                        continue;
+                    }
 
-                if (!isset($attribute['provider'])) {
-                    throw new \RuntimeException('Each "security.remember_me_aware" tag must have a provider attribute.');
-                }
+                    if (!isset($attribute['provider'])) {
+                        throw new \RuntimeException('Each "security.remember_me_aware" tag must have a provider attribute.');
+                    }
 
-                $userProviders[] = new Reference($attribute['provider']);
-                $container
-                    ->getDefinition($serviceId)
-                    ->addMethodCall('setRememberMeServices', array(new Reference($rememberMeServicesId)))
-                ;
+                    $userProviders[] = new Reference($attribute['provider']);
+                    $container
+                        ->getDefinition($serviceId)
+                        ->addMethodCall('setRememberMeServices', array(new Reference($rememberMeServicesId)))
+                    ;
+                }
             }
-        }
-        if (count($userProviders) === 0) {
-            throw new \RuntimeException('You must configure at least one remember-me aware listener (such as form-login) for each firewall that has remember-me enabled.');
+            if (count($userProviders) === 0) {
+                throw new \RuntimeException('You must configure at least one remember-me aware listener (such as form-login) for each firewall that has remember-me enabled.');
+            }
+        } else {
+            $userProviders = array();
+            foreach ($config['user_providers'] as $providerName) {
+                $userProviders[] = new Reference('security.user.provider.concrete.'.$providerName);
+            }
         }
         $rememberMeServices->replaceArgument(0, $userProviders);
 
@@ -115,11 +122,18 @@ class RememberMeFactory implements SecurityFactoryInterface
 
     public function addConfiguration(NodeDefinition $node)
     {
+        $node->fixXmlConfig('user_provider');
         $builder = $node->children();
 
         $builder
             ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
             ->scalarNode('token_provider')->end()
+            ->arrayNode('user_providers')
+                ->beforeNormalization()
+                    ->ifString()->then(function($v) { return array($v); })
+                ->end()
+                ->prototype('scalar')->end()
+            ->end()
         ;
 
         foreach ($this->options as $name => $value) {

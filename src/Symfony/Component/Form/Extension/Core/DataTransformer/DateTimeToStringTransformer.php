@@ -95,10 +95,11 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
 
         try {
             $dateTime = \DateTime::createFromFormat($this->format, $value, new \DateTimeZone($this->outputTimezone));
-            $last_errors = \DateTime::getLastErrors();
-            if($last_errors['warning_count'] > 0 || $last_errors['error_count'] > 0){
-                throw new \Exception('Date is invalid.');
-            }
+            $errors = \DateTime::getLastErrors();
+            if ($errors['warning_count'] > 0 || $errors['error_count'] > 0) {
+                throw new \Exception('Date is invalid. List of warnings: "' . implode(', "',array_values($errors['warnings'])) . '" ' .
+                        'List of errors: "' . implode(', "',array_values($errors['errors'])) . '"');
+            }       
 
             if ($this->inputTimezone !== $this->outputTimezone) {
                 $dateTime->setTimeZone(new \DateTimeZone($this->inputTimezone));

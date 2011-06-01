@@ -53,9 +53,9 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         return (string)$this->extension->renderEnctype($view);
     }
 
-    protected function renderLabel(FormView $view, $label = null)
+    protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
-        return (string)$this->extension->renderLabel($view, $label);
+        return (string)$this->extension->renderLabel($view, $label, $vars);
     }
 
     protected function renderErrors(FormView $view)

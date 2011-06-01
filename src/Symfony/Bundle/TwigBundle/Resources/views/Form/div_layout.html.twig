@@ -37,7 +37,7 @@
 
 {% block field_label %}
 {% spaceless %}
-    <label for="{{ id }}">{{ label|trans }}</label>
+    <label for="{{ id }}"{% for attrname,attrvalue in attr %} {{attrname}}="{{attrvalue}}"{% endfor %}>{{ label|trans }}</label>
 {% endspaceless %}
 {% endblock field_label %}
 

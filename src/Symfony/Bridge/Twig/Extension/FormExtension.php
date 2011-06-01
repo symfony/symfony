@@ -151,10 +151,15 @@ class FormExtension extends \Twig_Extension
      *
      * @param FormView $view  The view to render the label for
      * @param string   $label Label name
+     * @param array    $variables Additional variables passed to the template
      */
-    public function renderLabel(FormView $view, $label = null)
+    public function renderLabel(FormView $view, $label = null, array $variables = array())
     {
-        return $this->render($view, 'label', null === $label ? array() : array('label' => $label));
+        if ($label !== null) {
+            $variables += array('label' => $label);
+        }
+
+        return $this->render($view, 'label', $variables);
     }
 
     protected function render(FormView $view, $section, array $variables = array())

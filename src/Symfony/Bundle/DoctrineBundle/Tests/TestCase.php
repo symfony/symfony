@@ -11,6 +11,10 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Tests;
 
+use Symfony\Bundle\DoctrineBundle\Annotations\IndexedReader;
+
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -36,7 +40,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
         $config->setAutoGenerateProxyClasses(true);
         $config->setProxyDir(\sys_get_temp_dir());
         $config->setProxyNamespace('SymfonyTests\Doctrine');
-        $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver($paths));
+        $config->setMetadataDriverImpl(new AnnotationDriver(new IndexedReader(new AnnotationReader()), $paths));
         $config->setQueryCacheImpl(new \Doctrine\Common\Cache\ArrayCache());
         $config->setMetadataCacheImpl(new \Doctrine\Common\Cache\ArrayCache());
 
@@ -56,6 +60,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
             'kernel.cache_dir'   => sys_get_temp_dir(),
             'kernel.root_dir'    => __DIR__ . "/../../../../" // src dir
         )));
+        $container->set('annotation_reader', new AnnotationReader());
         $loader = new DoctrineExtension();
         $container->registerExtension($loader);
         $loader->load(array(array(
@@ -77,8 +82,8 @@ class TestCase extends \PHPUnit_Framework_TestCase
                     'default' => array(
                     'mappings' => array('YamlBundle' => array(
                         'type' => 'yml',
-                        'dir' => __DIR__ . "/DependencyInjection/Fixtures/Bundles/YamlBundle/Resources/config/doctrine/metadata/orm",
-                        'prefix' => 'Fixtures\Bundles\YamlBundle',
+                        'dir' => __DIR__ . "/DependencyInjection/Fixtures/Bundles/YamlBundle/Resources/config/doctrine",
+                        'prefix' => 'Fixtures\Bundles\YamlBundle\Entity',
                     )
                 )
             )))

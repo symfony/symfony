@@ -161,7 +161,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             $sc->get('');
             $this->fail('->get() throws a \InvalidArgumentException exception if the service is empty');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\NonExistentServiceException', $e, '->get() throws a NonExistentServiceException exception if the service is empty');
+            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException', $e, '->get() throws a ServiceNotFoundException exception if the service is empty');
         }
         $this->assertNull($sc->get('', ContainerInterface::NULL_ON_INVALID_REFERENCE));
     }
@@ -172,9 +172,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $sc = new ProjectServiceContainer();
         try {
             $sc->get('circular');
-            $this->fail('->get() throws a CircularReferenceException if it contains circular reference');
+            $this->fail('->get() throws a ServiceCircularReferenceException if it contains circular reference');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Symfony\Component\DependencyInjection\Exception\CircularReferenceException', $e, '->get() throws a CircularReferenceException if it contains circular reference');
+            $this->assertInstanceOf('\Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException', $e, '->get() throws a ServiceCircularReferenceException if it contains circular reference');
             $this->assertStringStartsWith('Circular reference detected for service "circular"', $e->getMessage(), '->get() throws a \LogicException if it contains circular reference');
         }
     }

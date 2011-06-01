@@ -9,10 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Validator;
+namespace Symfony\Tests\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\TypeValidator;
+use Symfony\Component\Validator\ConstraintViolation;
 
 class TypeValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -82,6 +83,22 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
         $constraint = new Type(array('type' => $type));
 
         $this->assertFalse($this->validator->isValid($value, $constraint));
+    }
+    
+    public function testConstraintViolationCanHandleArrayValue()
+    {
+        $constraint = new Type(array('type' => 'string'));
+        $this->validator->isValid(array(0 => "Test"), $constraint);
+        
+        $violation = new ConstraintViolation(
+            '{{ value }}',
+            $this->validator->getMessageParameters(),
+            '',
+            '',
+            ''
+        );
+        
+        $this->assertEquals('Array', $violation->getMessage());
     }
 
     public function getInvalidValues()

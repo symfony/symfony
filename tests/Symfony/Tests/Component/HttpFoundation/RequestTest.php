@@ -11,6 +11,12 @@
 
 namespace Symfony\Tests\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\HeaderBag;
+
+use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
+
+use Symfony\Component\HttpFoundation\Session;
+
 use Symfony\Component\HttpFoundation\Request;
 
 class RequestTest extends \PHPUnit_Framework_TestCase
@@ -177,7 +183,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         // http://hostname:8080/index.php/path/info?query=string
 
         $server['HTTP_HOST'] = 'hostname:8080';
-        $server['SERVER_NAME'] = 'hostname';
+        $server['SERVER_NAME'] = 'servername';
         $server['SERVER_PORT'] = '8080';
 
         $server['QUERY_STRING'] = 'query=string';
@@ -196,7 +202,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         // Use std port number
         $server['HTTP_HOST'] = 'hostname';
-        $server['SERVER_NAME'] = 'hostname';
+        $server['SERVER_NAME'] = 'servername';
         $server['SERVER_PORT'] = '80';
 
         $request->initialize(array(), array(), array(), array(), array(), $server);
@@ -205,12 +211,12 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         // Without HOST HEADER
         unset($server['HTTP_HOST']);
-        $server['SERVER_NAME'] = 'hostname';
+        $server['SERVER_NAME'] = 'servername';
         $server['SERVER_PORT'] = '80';
 
         $request->initialize(array(), array(), array(), array(), array(), $server);
 
-        $this->assertEquals('http://hostname/index.php/path/info?query=string', $request->getUri(), '->getUri() with default port without HOST_HEADER');
+        $this->assertEquals('http://servername/index.php/path/info?query=string', $request->getUri(), '->getUri() with default port without HOST_HEADER');
 
         // Request with URL REWRITING (hide index.php)
         //   RewriteCond %{REQUEST_FILENAME} !-f
@@ -218,7 +224,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         // http://hostname:8080/path/info?query=string
         $server = array();
         $server['HTTP_HOST'] = 'hostname:8080';
-        $server['SERVER_NAME'] = 'hostname';
+        $server['SERVER_NAME'] = 'servername';
         $server['SERVER_PORT'] = '8080';
 
         $server['REDIRECT_QUERY_STRING'] = 'query=string';
@@ -236,7 +242,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         // Use std port number
         //  http://hostname/path/info?query=string
         $server['HTTP_HOST'] = 'hostname';
-        $server['SERVER_NAME'] = 'hostname';
+        $server['SERVER_NAME'] = 'servername';
         $server['SERVER_PORT'] = '80';
 
         $request->initialize(array(), array(), array(), array(), array(), $server);
@@ -245,12 +251,12 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         // Without HOST HEADER
         unset($server['HTTP_HOST']);
-        $server['SERVER_NAME'] = 'hostname';
+        $server['SERVER_NAME'] = 'servername';
         $server['SERVER_PORT'] = '80';
 
         $request->initialize(array(), array(), array(), array(), array(), $server);
 
-        $this->assertEquals('http://hostname/path/info?query=string', $request->getUri(), '->getUri() with rewrite, default port without HOST_HEADER');
+        $this->assertEquals('http://servername/path/info?query=string', $request->getUri(), '->getUri() with rewrite, default port without HOST_HEADER');
    }
 
     /**
@@ -276,7 +282,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         // http://hostname:8080/index.php/path/info?query=string
 
         $server['HTTP_HOST'] = 'hostname:8080';
-        $server['SERVER_NAME'] = 'hostname';
+        $server['SERVER_NAME'] = 'servername';
         $server['SERVER_PORT'] = '8080';
 
         $server['QUERY_STRING'] = 'query=string';
@@ -295,7 +301,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         // Use std port number
         $server['HTTP_HOST'] = 'hostname';
-        $server['SERVER_NAME'] = 'hostname';
+        $server['SERVER_NAME'] = 'servername';
         $server['SERVER_PORT'] = '80';
 
         $request->initialize(array(), array(), array(), array(), array(), $server);
@@ -304,12 +310,12 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         // Without HOST HEADER
         unset($server['HTTP_HOST']);
-        $server['SERVER_NAME'] = 'hostname';
+        $server['SERVER_NAME'] = 'servername';
         $server['SERVER_PORT'] = '80';
 
         $request->initialize(array(), array(), array(), array(), array(), $server);
 
-        $this->assertEquals('http://hostname/index.php/some/path', $request->getUriForPath('/some/path'), '->getUriForPath() with default port without HOST_HEADER');
+        $this->assertEquals('http://servername/index.php/some/path', $request->getUriForPath('/some/path'), '->getUriForPath() with default port without HOST_HEADER');
 
         // Request with URL REWRITING (hide index.php)
         //   RewriteCond %{REQUEST_FILENAME} !-f
@@ -317,7 +323,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         // http://hostname:8080/path/info?query=string
         $server = array();
         $server['HTTP_HOST'] = 'hostname:8080';
-        $server['SERVER_NAME'] = 'hostname';
+        $server['SERVER_NAME'] = 'servername';
         $server['SERVER_PORT'] = '8080';
 
         $server['REDIRECT_QUERY_STRING'] = 'query=string';
@@ -335,7 +341,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         // Use std port number
         //  http://hostname/path/info?query=string
         $server['HTTP_HOST'] = 'hostname';
-        $server['SERVER_NAME'] = 'hostname';
+        $server['SERVER_NAME'] = 'servername';
         $server['SERVER_PORT'] = '80';
 
         $request->initialize(array(), array(), array(), array(), array(), $server);
@@ -344,13 +350,13 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         // Without HOST HEADER
         unset($server['HTTP_HOST']);
-        $server['SERVER_NAME'] = 'hostname';
+        $server['SERVER_NAME'] = 'servername';
         $server['SERVER_PORT'] = '80';
 
         $request->initialize(array(), array(), array(), array(), array(), $server);
 
-        $this->assertEquals('http://hostname/some/path', $request->getUriForPath('/some/path'), '->getUriForPath() with rewrite, default port without HOST_HEADER');
-        $this->assertEquals('hostname', $request->getHttpHost());
+        $this->assertEquals('http://servername/some/path', $request->getUriForPath('/some/path'), '->getUriForPath() with rewrite, default port without HOST_HEADER');
+        $this->assertEquals('servername', $request->getHttpHost());
     }
 
     /**
@@ -373,7 +379,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar=&foo=bar', $request->getQueryString(), '->getQueryString() sorts keys alphabetically');
 
         $request->server->set('QUERY_STRING', 'him=John%20Doe&her=Jane+Doe');
-        $this->assertEquals('her=Jane+Doe&him=John+Doe', $request->getQueryString(), '->getQueryString() normalizes encoding');
+        $this->assertEquals('her=Jane%2BDoe&him=John%20Doe', $request->getQueryString(), '->getQueryString() normalizes encoding');
 
         $request->server->set('QUERY_STRING', 'foo[]=1&foo[]=2');
         $this->assertEquals('foo%5B%5D=1&foo%5B%5D=2', $request->getQueryString(), '->getQueryString() allows array notation');
@@ -447,6 +453,15 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->setMethod('POST');
         $request->request->set('_method', 'purge');
         $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method from _method if defined and POST');
+        
+        $request->setMethod('POST');
+        $request->server->set('X-HTTP-METHOD-OVERRIDE', 'delete');
+        $this->assertEquals('DELETE', $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override even though _method is set if defined and POST');
+        
+        $request = new Request();
+        $request->setMethod('POST');
+        $request->server->set('X-HTTP-METHOD-OVERRIDE', 'delete');
+        $this->assertEquals('DELETE', $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override if defined and POST');
     }
 
     /**
@@ -710,5 +725,35 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $this->assertEquals(null, $request->setRequestFormat('foo'));
         $this->assertEquals('foo', $request->getRequestFormat(null));
+    }
+
+    public function testForwardedSecure()
+    {
+        $request = new Request();
+        $request->headers->set('X-Forwarded-Proto', 'https');
+        $request->headers->set('X-Forwarded-Port', 443);
+
+        $this->assertTrue($request->isSecure());
+        $this->assertEquals(443, $request->getPort());
+    }
+
+    public function testHasSession()
+    {
+        $request = new Request;
+
+        $this->assertFalse($request->hasSession());
+        $request->setSession(new Session(new ArraySessionStorage()));
+        $this->assertTrue($request->hasSession());
+    }
+
+    public function testHasPreviousSession()
+    {
+        $request = new Request;
+
+        $this->assertFalse($request->hasPreviousSession());
+        $request->cookies->set(session_name(), 'foo');
+        $this->assertFalse($request->hasPreviousSession());
+        $request->setSession(new Session(new ArraySessionStorage()));
+        $this->assertTrue($request->hasPreviousSession());
     }
 }

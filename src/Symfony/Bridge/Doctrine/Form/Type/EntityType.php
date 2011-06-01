@@ -32,8 +32,10 @@ class EntityType extends AbstractType
     public function buildForm(FormBuilder $builder, array $options)
     {
         if ($options['multiple']) {
-            $builder->addEventSubscriber(new MergeCollectionListener())
-                ->prependClientTransformer(new EntitiesToArrayTransformer($options['choice_list']));
+            $builder
+                ->addEventSubscriber(new MergeCollectionListener())
+                ->prependClientTransformer(new EntitiesToArrayTransformer($options['choice_list']))
+            ;
         } else {
             $builder->prependClientTransformer(new EntityToIdTransformer($options['choice_list']));
         }
@@ -42,17 +44,16 @@ class EntityType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         $defaultOptions = array(
-            'template' => 'choice',
-            'multiple' => false,
-            'expanded' => false,
-            'em' => $this->em,
-            'class' => null,
-            'property' => null,
-            'query_builder' => null,
-            'choices' => array(),
+            'multiple'          => false,
+            'expanded'          => false,
+            'em'                => $this->em,
+            'class'             => null,
+            'property'          => null,
+            'query_builder'     => null,
+            'choices'           => array(),
             'preferred_choices' => array(),
-            'multiple' => false,
-            'expanded' => false,
+            'multiple'          => false,
+            'expanded'          => false,
         );
 
         $options = array_replace($defaultOptions, $options);

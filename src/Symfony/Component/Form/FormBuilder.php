@@ -18,38 +18,106 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormBuilder
 {
+    /**
+     * @var string
+     */
     private $name;
 
-    private $data;
+    /**
+     * The form data in application format
+     * @var mixed
+     */
+    private $appData;
 
+    /**
+     * The event dispatcher
+     *
+     * @var EventDispatcherInterface
+     */
     private $dispatcher;
 
+    /**
+     * The form factory
+     * @var FormFactoryInterface
+     */
     private $factory;
 
+    /**
+     * @var Boolean
+     */
     private $readOnly;
 
+    /**
+     * @var Boolean
+     */
     private $required;
 
+    /**
+     * The transformers for transforming from normalized to client format and
+     * back
+     * @var array An array of DataTransformerInterface
+     */
     private $clientTransformers = array();
 
+    /**
+     * The transformers for transforming from application to normalized format
+     * and back
+     * @var array An array of DataTransformerInterface
+     */
     private $normTransformers = array();
 
+    /**
+     * @var array An array of FormValidatorInterface
+     */
     private $validators = array();
 
+    /**
+     * Key-value store for arbitrary attributes attached to the form
+     * @var array
+     */
     private $attributes = array();
 
+    /**
+     * @var array An array of FormTypeInterface
+     */
     private $types = array();
 
+    /**
+     * @var string
+     */
     private $dataClass;
 
+    /**
+     * The children of the form
+     * @var array
+     */
     private $children = array();
 
+    /**
+     * @var DataMapperInterface
+     */
     private $dataMapper;
 
+    /**
+     * Whether added errors should bubble up to the parent
+     * @var Boolean
+     */
     private $errorBubbling = false;
 
+    /**
+     * Data used for the client data when no value is bound
+     * @var mixed
+     */
     private $emptyData = '';
 
+    /**
+     * Constructor.
+     *
+     * @param string                    $name
+     * @param FormFactoryInterface      $factory
+     * @param EventDispatcherInterface  $dispatcher
+     * @param string                    $dataClass
+     */
     public function __construct($name, FormFactoryInterface $factory, EventDispatcherInterface $dispatcher, $dataClass = null)
     {
         $this->name = $name;
@@ -58,35 +126,69 @@ class FormBuilder
         $this->dataClass = $dataClass;
     }
 
+    /**
+     * Returns the associated form factory.
+     *
+     * @return FormFactoryInterface The factory
+     */
     public function getFormFactory()
     {
         return $this->factory;
     }
 
+    /**
+     * Returns the name of the form.
+     *
+     * @return string The form name
+     */
     public function getName()
     {
         return $this->name;
     }
 
-    public function setData($data)
+    /**
+     * Updates the field with default data.
+     *
+     * @param array $appData The data formatted as expected for the underlying object
+     *
+     * @return FormBuilder The current builder
+     */
+    public function setData($appData)
     {
-        $this->data = $data;
+        $this->appData = $appData;
 
         return $this;
     }
 
+    /**
+     * Returns the data in the format needed for the underlying object.
+     *
+     * @return mixed
+     */
     public function getData()
     {
-        return $this->data;
+        return $this->appData;
     }
 
+    /**
+     * Set whether the form is read only
+     *
+     * @param Boolean $readOnly Whether the form is read only
+     *
+     * @return FormBuilder The current builder
+     */
     public function setReadOnly($readOnly)
     {
-        $this->readOnly = $readOnly;
+        $this->readOnly = (Boolean) $readOnly;
 
         return $this;
     }
 
+    /**
+     * Returns whether the form is read only.
+     *
+     * @return Boolean Whether the form is read only
+     */
     public function getReadOnly()
     {
         return $this->readOnly;
@@ -96,31 +198,57 @@ class FormBuilder
      * Sets whether this field is required to be filled out when bound.
      *
      * @param Boolean $required
+     *
+     * @return FormBuilder The current builder
      */
     public function setRequired($required)
     {
-        $this->required = $required;
+        $this->required = (Boolean) $required;
 
         return $this;
     }
 
+    /**
+     * Returns whether this field is required to be filled out when bound.
+     *
+     * @return Boolean Whether this field is required
+     */
     public function getRequired()
     {
         return $this->required;
     }
 
+    /**
+     * Sets whether errors bubble up to the parent.
+     *
+     * @param type $errorBubbling
+     *
+     * @return FormBuilder The current builder
+     */
     public function setErrorBubbling($errorBubbling)
     {
-        $this->errorBubbling = $errorBubbling;
+        $this->errorBubbling = (Boolean) $errorBubbling;
 
         return $this;
     }
 
+    /**
+     * Returns whether errors bubble up to the parent.
+     *
+     * @return Boolean
+     */
     public function getErrorBubbling()
     {
         return $this->errorBubbling;
     }
 
+    /**
+     * Adds a validator to the form.
+     *
+     * @param FormValidatorInterface $validator The validator
+     *
+     * @return FormBuilder The current builder
+     */
     public function addValidator(FormValidatorInterface $validator)
     {
         $this->validators[] = $validator;
@@ -128,6 +256,11 @@ class FormBuilder
         return $this;
     }
 
+    /**
+     * Returns the validators used by the form.
+     *
+     * @return array An array of FormValidatorInterface
+     */
     public function getValidators()
     {
         return $this->validators;
@@ -136,11 +269,13 @@ class FormBuilder
     /**
      * Adds an event listener for events on this field
      *
-     * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addEventListener
+     * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addListener
+     *
+     * @return FormBuilder The current builder
      */
-    public function addEventListener($eventNames, $listener, $priority = 0)
+    public function addEventListener($eventName, $listener, $priority = 0)
     {
-        $this->dispatcher->addListener($eventNames, $listener, $priority);
+        $this->dispatcher->addListener($eventName, $listener, $priority);
 
         return $this;
     }
@@ -148,7 +283,9 @@ class FormBuilder
     /**
      * Adds an event subscriber for events on this field
      *
-     * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addEventSubscriber
+     * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addSubscriber
+     *
+     * @return FormBuilder The current builder
      */
     public function addEventSubscriber(EventSubscriberInterface $subscriber, $priority = 0)
     {
@@ -161,8 +298,10 @@ class FormBuilder
      * Appends a transformer to the normalization transformer chain
      *
      * @param DataTransformerInterface $clientTransformer
+     *
+     * @return FormBuilder The current builder
      */
-    public function appendNormTransformer(DataTransformerInterface $normTransformer = null)
+    public function appendNormTransformer(DataTransformerInterface $normTransformer)
     {
         $this->normTransformers[] = $normTransformer;
 
@@ -173,14 +312,21 @@ class FormBuilder
      * Prepends a transformer to the client transformer chain
      *
      * @param DataTransformerInterface $normTransformer
+     *
+     * @return FormBuilder The current builder
      */
-    public function prependNormTransformer(DataTransformerInterface $normTransformer = null)
+    public function prependNormTransformer(DataTransformerInterface $normTransformer)
     {
         array_unshift($this->normTransformers, $normTransformer);
 
         return $this;
     }
 
+    /**
+     * Clears the normalization transformers.
+     *
+     * @return FormBuilder The current builder
+     */
     public function resetNormTransformers()
     {
         $this->normTransformers = array();
@@ -188,6 +334,11 @@ class FormBuilder
         return $this;
     }
 
+    /**
+     * Returns all the normalization transformers.
+     *
+     * @return array An array of DataTransformerInterface
+     */
     public function getNormTransformers()
     {
         return $this->normTransformers;
@@ -197,8 +348,10 @@ class FormBuilder
      * Appends a transformer to the client transformer chain
      *
      * @param DataTransformerInterface $clientTransformer
+     *
+     * @return FormBuilder The current builder
      */
-    public function appendClientTransformer(DataTransformerInterface $clientTransformer = null)
+    public function appendClientTransformer(DataTransformerInterface $clientTransformer)
     {
         $this->clientTransformers[] = $clientTransformer;
 
@@ -209,24 +362,46 @@ class FormBuilder
      * Prepends a transformer to the client transformer chain
      *
      * @param DataTransformerInterface $clientTransformer
+     *
+     * @return FormBuilder The current builder
      */
-    public function prependClientTransformer(DataTransformerInterface $clientTransformer = null)
+    public function prependClientTransformer(DataTransformerInterface $clientTransformer)
     {
         array_unshift($this->clientTransformers, $clientTransformer);
 
         return $this;
     }
 
+    /**
+     * Clears the client transformers.
+     *
+     * @return FormBuilder The current builder
+     */
     public function resetClientTransformers()
     {
         $this->clientTransformers = array();
+
+        return $this;
     }
 
+    /**
+     * Returns all the client transformers.
+     *
+     * @return array An array of DataTransformerInterface
+     */
     public function getClientTransformers()
     {
         return $this->clientTransformers;
     }
 
+    /**
+     * Sets the value for an attribute.
+     *
+     * @param string $name  The name of the attribute
+     * @param string $value The value of the attribute
+     *
+     * @return FormBuilder The current builder
+     */
     public function setAttribute($name, $value)
     {
         $this->attributes[$name] = $value;
@@ -234,21 +409,43 @@ class FormBuilder
         return $this;
     }
 
+    /**
+     * Returns the value of the attributes with the given name.
+     *
+     * @param string $name The name of the attribute
+     */
     public function getAttribute($name)
     {
         return $this->attributes[$name];
     }
 
+    /**
+     * Returns whether the form has an attribute with the given name.
+     *
+     * @param string $name The name of the attribute
+     */
     public function hasAttribute($name)
     {
         return isset($this->attributes[$name]);
     }
 
+    /**
+     * Returns all the attributes.
+     *
+     * @return array An array of attributes
+     */
     public function getAttributes()
     {
         return $this->attributes;
     }
 
+    /**
+     * Sets the data mapper used by the form.
+     *
+     * @param DataMapperInterface $dataMapper
+     *
+     * @return FormBuilder The current builder
+     */
     public function setDataMapper(DataMapperInterface $dataMapper)
     {
         $this->dataMapper = $dataMapper;
@@ -256,11 +453,23 @@ class FormBuilder
         return $this;
     }
 
+    /**
+     * Returns the data mapper used by the form.
+     *
+     * @return array An array of DataMapperInterface
+     */
     public function getDataMapper()
     {
         return $this->dataMapper;
     }
 
+    /**
+     * Set the types.
+     *
+     * @param array $types An array FormTypeInterface
+     *
+     * @return FormBuilder The current builder
+     */
     public function setTypes(array $types)
     {
         $this->types = $types;
@@ -268,11 +477,21 @@ class FormBuilder
         return $this;
     }
 
+    /**
+     * Return the types.
+     *
+     * @return array An array of FormTypeInterface
+     */
     public function getTypes()
     {
         return $this->types;
     }
 
+    /**
+     * Sets the data used for the client data when no value is bound.
+     *
+     * @param mixed $emptyData
+     */
     public function setEmptyData($emptyData)
     {
         $this->emptyData = $emptyData;
@@ -280,6 +499,11 @@ class FormBuilder
         return $this;
     }
 
+    /**
+     * Returns the data used for the client data when no value is bound.
+     *
+     * @return mixed
+     */
     public function getEmptyData()
     {
         return $this->emptyData;
@@ -290,37 +514,13 @@ class FormBuilder
      * the group. Otherwise the existing field is overwritten.
      *
      * If you add a nested group, this group should also be represented in the
-     * object hierarchy. If you want to add a group that operates on the same
-     * hierarchy level, use merge().
+     * object hierarchy.
      *
-     * <code>
-     * class Entity
-     * {
-     *   public $location;
-     * }
-     *
-     * class Location
-     * {
-     *   public $longitude;
-     *   public $latitude;
-     * }
-     *
-     * $entity = new Entity();
-     * $entity->location = new Location();
-     *
-     * $form = new Form('entity', $entity, $validator);
-     *
-     * $locationGroup = new Form('location');
-     * $locationGroup->add(new TextField('longitude'));
-     * $locationGroup->add(new TextField('latitude'));
-     *
-     * $form->add($locationGroup);
-     * </code>
-     *
-     * @param string                   $name
+     * @param string|FormBuilder       $child
      * @param string|FormTypeInterface $type
      * @param array                    $options
-     * @return FormInterface
+     *
+     * @return FormBuilder The current builder
      */
     public function add($child, $type = null, array $options = array())
     {
@@ -339,13 +539,24 @@ class FormBuilder
         }
 
         $this->children[$child] = array(
-            'type' => $type,
-            'options' => $options,
+            'type'      => $type,
+            'options'   => $options,
         );
 
         return $this;
     }
 
+    /**
+     * Creates a form builder.
+     *
+     * @param string                    $name    The name of the form or the name of the property
+     * @param string|FormTypeInterface  $type    The type of the form or null if name is a property
+     * @param array                     $options The options
+     *
+     * @return FormBuilder The builder
+     *
+     * @throws FormException if the data class is not set when creating a property builder
+     */
     public function create($name, $type = null, array $options = array())
     {
         if (null !== $type) {
@@ -371,6 +582,15 @@ class FormBuilder
         return $builder;
     }
 
+    /**
+     * Returns a child by name.
+     *
+     * @param string $name The name of the child
+     *
+     * @return FormBuilder The builder for the child
+     *
+     * @throws FormException if the given child does not exist
+     */
     public function get($name)
     {
         if (!isset($this->children[$name])) {
@@ -378,9 +598,11 @@ class FormBuilder
         }
 
         if (!$this->children[$name] instanceof FormBuilder) {
-            $this->children[$name] = $this->create($name,
+            $this->children[$name] = $this->create(
+                $name,
                 $this->children[$name]['type'],
-                $this->children[$name]['options']);
+                $this->children[$name]['options']
+            );
         }
 
         return $this->children[$name];
@@ -390,18 +612,23 @@ class FormBuilder
      * Removes the field with the given name.
      *
      * @param string $name
+     *
+     * @return FormBuilder The current builder
      */
     public function remove($name)
     {
         if (isset($this->children[$name])) {
             unset($this->children[$name]);
         }
+
+        return $this;
     }
 
     /**
      * Returns whether a field with the given name exists.
      *
      * @param  string $name
+     *
      * @return Boolean
      */
     public function has($name)
@@ -409,26 +636,11 @@ class FormBuilder
         return isset($this->children[$name]);
     }
 
-    protected function buildDispatcher()
-    {
-        return $this->dispatcher;
-    }
-
-    protected function buildChildren()
-    {
-        $children = array();
-
-        foreach ($this->children as $name => $builder) {
-            if (!$builder instanceof FormBuilder) {
-                $builder = $this->create($name, $builder['type'], $builder['options']);
-            }
-
-            $children[$builder->getName()] = $builder->getForm();
-        }
-
-        return $children;
-    }
-
+    /**
+     * Creates the form.
+     *
+     * @return Form The form
+     */
     public function getForm()
     {
         $instance = new Form(
@@ -455,5 +667,35 @@ class FormBuilder
         }
 
         return $instance;
+    }
+
+    /**
+     * Returns the event dispatcher.
+     *
+     * @return type
+     */
+    protected function buildDispatcher()
+    {
+        return $this->dispatcher;
+    }
+
+    /**
+     * Creates the children.
+     *
+     * @return array An array of Form
+     */
+    protected function buildChildren()
+    {
+        $children = array();
+
+        foreach ($this->children as $name => $builder) {
+            if (!$builder instanceof FormBuilder) {
+                $builder = $this->create($name, $builder['type'], $builder['options']);
+            }
+
+            $children[$builder->getName()] = $builder->getForm();
+        }
+
+        return $children;
     }
 }

@@ -48,7 +48,7 @@
             </trans-unit>
             <trans-unit id="12">
                 <source>This value is not a valid email address</source>
-                <target>Dieser Wert ist keine gültige Email-Adresse</target>
+                <target>Dieser Wert ist keine gültige E-Mail-Adresse</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>The file could not be found</source>

@@ -10,9 +10,12 @@
         <parameter key="assetic.asset_manager_cache_warmer.class">Symfony\Bundle\AsseticBundle\CacheWarmer\AssetManagerCacheWarmer</parameter>
         <parameter key="assetic.cached_formula_loader.class">Assetic\Factory\Loader\CachedFormulaLoader</parameter>
         <parameter key="assetic.config_cache.class">Assetic\Cache\ConfigCache</parameter>
+        <parameter key="assetic.config_loader.class">Symfony\Bundle\AsseticBundle\Factory\Loader\ConfigurationLoader</parameter>
+        <parameter key="assetic.config_resource.class">Symfony\Bundle\AsseticBundle\Factory\Resource\ConfigurationResource</parameter>
         <parameter key="assetic.coalescing_directory_resource.class">Assetic\Factory\Resource\CoalescingDirectoryResource</parameter>
         <parameter key="assetic.directory_resource.class">Symfony\Bundle\AsseticBundle\Factory\Resource\DirectoryResource</parameter>
         <parameter key="assetic.filter_manager.class">Symfony\Bundle\AsseticBundle\FilterManager</parameter>
+        <parameter key="assetic.worker.ensure_filter.class">Assetic\Factory\Worker\EnsureFilterWorker</parameter>
 
         <parameter key="assetic.node.paths" type="collection"></parameter>
         <parameter key="assetic.cache_dir">%kernel.cache_dir%/assetic</parameter>
@@ -31,9 +34,18 @@
 
         <service id="assetic.asset_factory" class="%assetic.asset_factory.class%" public="false">
             <argument type="service" id="kernel" />
+            <argument type="service" id="service_container" />
+            <argument type="service" id="assetic.parameter_bag" />
             <argument>%assetic.read_from%</argument>
             <argument>%assetic.debug%</argument>
-            <call method="setFilterManager"><argument type="service" id="assetic.filter_manager" /></call>
+        </service>
+
+        <service id="assetic.config_loader" class="%assetic.config_loader.class%" public="false">
+            <tag name="assetic.formula_loader" alias="config" />
+        </service>
+        <service id="assetic.config_resource" class="%assetic.config_resource.class%" public="false">
+            <tag name="assetic.formula_resource" loader="config" />
+            <argument type="collection" /> <!-- configured formulae -->
         </service>
 
         <service id="assetic.config_cache" class="%assetic.config_cache.class%" public="false">
@@ -44,5 +56,16 @@
             <tag name="kernel.cache_warmer" priority="10" />
             <argument type="service" id="service_container" />
         </service>
+
+        <service id="assetic.worker.ensure_filter" class="%assetic.worker.ensure_filter.class%" abstract="true" public="false">
+            <argument /> <!-- pattern -->
+            <argument /> <!-- filter -->
+        </service>
+
+        <service id="assetic.parameter_bag" class="Symfony\Component\DependencyInjection\ParameterBag\ParameterBag" public="false">
+            <argument type="service" id="assetic.parameters" />
+        </service>
+
+        <service id="assetic.parameters" class="stdClass" factory-service="service_container" factory-method="getDefaultParameters" public="false" />
     </services>
 </container>

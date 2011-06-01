@@ -33,7 +33,8 @@ class FormHelperTest extends AbstractDivLayoutTest
         parent::setUp();
 
         $root = realpath(__DIR__.'/../../../Resources/views/Form');
-        $templateNameParser = new StubTemplateNameParser($root);
+        $rootCustom = realpath(__DIR__.'/Resources');
+        $templateNameParser = new StubTemplateNameParser($root, $rootCustom);
         $loader = new FilesystemLoader(array());
         $engine = new PhpEngine($templateNameParser, $loader);
 
@@ -50,9 +51,9 @@ class FormHelperTest extends AbstractDivLayoutTest
         return (string)$this->helper->enctype($view);
     }
 
-    protected function renderLabel(FormView $view, $label = null)
+    protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
-        return (string)$this->helper->label($view, $label);
+        return (string)$this->helper->label($view, $label, $vars);
     }
 
     protected function renderErrors(FormView $view)
@@ -74,5 +75,4 @@ class FormHelperTest extends AbstractDivLayoutTest
     {
         return (string)$this->helper->rest($view, $vars);
     }
-
 }

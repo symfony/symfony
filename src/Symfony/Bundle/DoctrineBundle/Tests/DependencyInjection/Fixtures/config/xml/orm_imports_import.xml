@@ -7,6 +7,10 @@
                         http://symfony.com/schema/dic/doctrine http://symfony.com/schema/dic/doctrine/doctrine-1.0.xsd">
 
     <config>
+        <dbal default-connection="default">
+            <connection name="default" dbname="db" />
+        </dbal>
+
         <orm
             auto-generate-proxy-classes="false"
             default-entity-manager="default"

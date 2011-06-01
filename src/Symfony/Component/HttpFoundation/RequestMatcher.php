@@ -18,11 +18,11 @@ namespace Symfony\Component\HttpFoundation;
  */
 class RequestMatcher implements RequestMatcherInterface
 {
-    protected $path;
-    protected $host;
-    protected $methods;
-    protected $ip;
-    protected $attributes;
+    private $path;
+    private $host;
+    private $methods;
+    private $ip;
+    private $attributes;
 
     public function __construct($path = null, $host = null, $methods = null, $ip = null, array $attributes = array())
     {
@@ -105,8 +105,16 @@ class RequestMatcher implements RequestMatcherInterface
             }
         }
 
-        if (null !== $this->path && !preg_match('#'.str_replace('#', '\\#', $this->path).'#', $request->getPathInfo())) {
-            return false;
+        if (null !== $this->path) {
+            if (null !== $session = $request->getSession()) {
+                $path = strtr($this->path, array('{_locale}' => $session->getLocale(), '#' => '\\#'));
+            } else {
+                $path = str_replace('#', '\\#', $this->path);
+            }
+
+            if (!preg_match('#'.$path.'#', $request->getPathInfo())) {
+                return false;
+            }
         }
 
         if (null !== $this->host && !preg_match('#'.str_replace('#', '\\#', $this->host).'#', $request->getHost())) {

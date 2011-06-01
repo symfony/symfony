@@ -29,26 +29,34 @@ class Cookie
     protected $domain;
     protected $secure;
     protected $httponly;
+    protected $rawValue;
 
     /**
      * Sets a cookie.
      *
-     * @param  string  $name     The cookie name
-     * @param  string  $value    The value of the cookie
-     * @param  string  $expires  The time the cookie expires
-     * @param  string  $path     The path on the server in which the cookie will be available on
-     * @param  string  $domain   The domain that the cookie is available
-     * @param  Boolean $secure   Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
-     * @param  Boolean $httponly The cookie httponly flag
+     * @param  string  $name         The cookie name
+     * @param  string  $value        The value of the cookie
+     * @param  string  $expires      The time the cookie expires
+     * @param  string  $path         The path on the server in which the cookie will be available on
+     * @param  string  $domain       The domain that the cookie is available
+     * @param  Boolean $secure       Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
+     * @param  Boolean $httponly     The cookie httponly flag
+     * @param  Boolean $encodedValue Whether the value is encoded or not
      *
      * @api
      */
-    public function __construct($name, $value, $expires = null, $path = '/', $domain = '', $secure = false, $httponly = false)
+    public function __construct($name, $value, $expires = null, $path = null, $domain = '', $secure = false, $httponly = true, $encodedValue = false)
     {
+        if ($encodedValue) {
+            $this->value    = urldecode($value);
+            $this->rawValue = $value;
+        } else {
+            $this->value    = $value;
+            $this->rawValue = urlencode($value);
+        }
         $this->name     = $name;
-        $this->value    = $value;
         $this->expires  = null === $expires ? null : (integer) $expires;
-        $this->path     = empty($path) ? '/' : $path;
+        $this->path     = empty($path) ? null : $path;
         $this->domain   = $domain;
         $this->secure   = (Boolean) $secure;
         $this->httponly = (Boolean) $httponly;
@@ -63,7 +71,7 @@ class Cookie
      */
     public function __toString()
     {
-        $cookie = sprintf('%s=%s', $this->name, urlencode($this->value));
+        $cookie = sprintf('%s=%s', $this->name, $this->rawValue);
 
         if (null !== $this->expires) {
             $cookie .= '; expires='.substr(\DateTime::createFromFormat('U', $this->expires, new \DateTimeZone('UTC'))->format(static::DATE_FORMAT), 0, -5);
@@ -73,7 +81,7 @@ class Cookie
             $cookie .= '; domain='.$this->domain;
         }
 
-        if ('/' !== $this->path) {
+        if (null !== $this->path) {
             $cookie .= '; path='.$this->path;
         }
 
@@ -110,19 +118,21 @@ class Cookie
 
         $values = array(
             'name'     => trim($name),
-            'value'    => urldecode(trim($value)),
+            'value'    => trim($value),
             'expires'  =>  null,
-            'path'     => '/',
+            'path'     => null,
             'domain'   => '',
             'secure'   => false,
             'httponly' => false,
+            'passedRawValue' => true,
         );
 
         if (null !== $url) {
-            if ((false === $parts = parse_url($url)) || !isset($parts['host']) || !isset($parts['path'])) {
+            if ((false === $urlParts = parse_url($url)) || !isset($urlParts['host']) || !isset($urlParts['path'])) {
                 throw new \InvalidArgumentException(sprintf('The URL "%s" is not valid.', $url));
             }
-
+            $parts = array_merge($urlParts, $parts);
+            
             $values['domain'] = $parts['host'];
             $values['path'] = substr($parts['path'], 0, strrpos($parts['path'], '/'));
         }
@@ -162,7 +172,8 @@ class Cookie
             $values['path'],
             $values['domain'],
             $values['secure'],
-            $values['httponly']
+            $values['httponly'],
+            $values['passedRawValue']
         );
     }
 
@@ -191,6 +202,18 @@ class Cookie
     }
 
     /**
+     * Gets the raw value of the cookie.
+     *
+     * @return string The cookie value
+     *
+     * @api
+     */
+    public function getRawValue()
+    {
+        return $this->rawValue;
+    }
+
+    /**
      * Gets the expires time of the cookie.
      *
      * @return string The cookie expires time
@@ -211,7 +234,7 @@ class Cookie
      */
     public function getPath()
     {
-        return $this->path;
+        return null !== $this->path ? $this->path : '/';
     }
 
     /**

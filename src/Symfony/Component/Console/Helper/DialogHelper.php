@@ -32,7 +32,7 @@ class DialogHelper extends Helper
     public function ask(OutputInterface $output, $question, $default = null)
     {
         // @codeCoverageIgnoreStart
-        $output->writeln($question);
+        $output->write($question);
 
         $ret = trim(fgets(STDIN));
 
@@ -70,16 +70,21 @@ class DialogHelper extends Helper
     /**
      * Asks for a value and validates the response.
      *
+     * The validator receives the data to validate. It must return the
+     * validated data when the data is valid and throw an exception
+     * otherwise.
+     *
      * @param OutputInterface $output
      * @param string|array    $question
-     * @param Closure         $validator
+     * @param callback        $validator A PHP callback
      * @param integer         $attempts Max number of times to ask before giving up (false by default, which means infinite)
+     * @param string          $default  The default answer if none is given by the user
      *
      * @return mixed
      *
      * @throws \Exception When any of the validator returns an error
      */
-    public function askAndValidate(OutputInterface $output, $question, \Closure $validator, $attempts = false)
+    public function askAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $default = null)
     {
         // @codeCoverageIgnoreStart
         $error = null;
@@ -88,10 +93,10 @@ class DialogHelper extends Helper
                 $output->writeln($this->getHelperSet()->get('formatter')->formatBlock($error->getMessage(), 'error'));
             }
 
-            $value = $this->ask($output, $question, null);
+            $value = $this->ask($output, $question, $default);
 
             try {
-                return $validator($value);
+                return call_user_func($validator, $value);
             } catch (\Exception $error) {
             }
         }

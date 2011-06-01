@@ -46,7 +46,7 @@ class Process
      *
      * @api
      */
-    public function __construct($commandline, $cwd = null, array $env = array(), $stdin = null, $timeout = 60, array $options = array())
+    public function __construct($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array())
     {
         if (!function_exists('proc_open')) {
             throw new \RuntimeException('The Process class relies on proc_open, which is not available on your PHP installation.');
@@ -54,13 +54,17 @@ class Process
 
         $this->commandline = $commandline;
         $this->cwd = null === $cwd ? getcwd() : $cwd;
-        $this->env = array();
-        foreach ($env as $key => $value) {
-            $this->env[(binary) $key] = (binary) $value;
+        if (null !== $env) {
+            $this->env = array();
+            foreach ($env as $key => $value) {
+                $this->env[(binary) $key] = (binary) $value;
+            }
+        } else {
+            $this->env = null;
         }
         $this->stdin = $stdin;
         $this->timeout = $timeout;
-        $this->options = array_merge(array('suppress_errors' => true, 'binary_pipes' => true, 'bypass_shell' => true), $options);
+        $this->options = array_merge(array('suppress_errors' => true, 'binary_pipes' => true, 'bypass_shell' => false), $options);
     }
 
     /**
@@ -100,7 +104,14 @@ class Process
             }
         };
 
-        $descriptors = array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', 'w'));
+        // Workaround for http://bugs.php.net/bug.php?id=51800
+        if (strstr(PHP_OS, 'WIN')) {
+            $stderrPipeMode = 'a';
+        } else {
+            $stderrPipeMode = 'w';
+        }
+
+        $descriptors = array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', $stderrPipeMode));
 
         $process = proc_open($this->commandline, $descriptors, $pipes, $this->cwd, $this->env, $this->options);
 

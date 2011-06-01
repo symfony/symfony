@@ -42,7 +42,7 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
             'username_parameter' => '_username',
             'password_parameter' => '_password',
             'csrf_parameter'     => '_csrf_token',
-            'csrf_page_id'       => 'form_login',
+            'intention'          => 'authenticate',
             'post_only'          => true,
         ), $options), $successHandler, $failureHandler, $logger, $dispatcher);
 
@@ -63,15 +63,15 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
         }
 
         if (null !== $this->csrfProvider) {
-            $csrfToken = $request->get($this->options['csrf_parameter']);
+            $csrfToken = $request->get($this->options['csrf_parameter'], null, true);
 
-            if (false === $this->csrfProvider->isCsrfTokenValid($this->options['csrf_page_id'], $csrfToken)) {
+            if (false === $this->csrfProvider->isCsrfTokenValid($this->options['intention'], $csrfToken)) {
                 throw new InvalidCsrfTokenException('Invalid CSRF token.');
             }
         }
 
-        $username = trim($request->get($this->options['username_parameter']));
-        $password = $request->get($this->options['password_parameter']);
+        $username = trim($request->get($this->options['username_parameter'], null, true));
+        $password = $request->get($this->options['password_parameter'], null, true);
 
         $request->getSession()->set(SecurityContextInterface::LAST_USERNAME, $username);
 

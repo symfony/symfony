@@ -24,7 +24,7 @@ class IniFileLoader extends FileLoader
     /**
      * Loads a resource.
      *
-     * @param mixed  $resource The resource
+     * @param mixed  $file     The resource
      * @param string $type     The resource type
      *
      * @throws \InvalidArgumentException When ini file is not valid

@@ -11,7 +11,6 @@
     <services>
         <service id="assetic.filter.lessphp" class="%assetic.filter.lessphp.class%">
             <tag name="assetic.filter" alias="lessphp" />
-            <argument>%assetic.read_from%</argument>
         </service>
     </services>
 </container>

@@ -24,6 +24,8 @@ class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransfo
      */
     public function reverseTransform($value)
     {
-        return (int)parent::reverseTransform($value);
+        $value = parent::reverseTransform($value);
+
+        return null === $value ? null : (int) $value;
     }
 }

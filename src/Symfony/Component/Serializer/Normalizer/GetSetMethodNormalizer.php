@@ -33,15 +33,13 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Nils Adermann <naderman@naderman.de>
  */
-class GetSetMethodNormalizer extends AbstractNormalizer
+class GetSetMethodNormalizer extends SerializerAwareNormalizer
 {
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format, $properties = null)
+    public function normalize($object, $format = null)
     {
-        $propertyMap = (null === $properties) ? null : array_flip(array_map('strtolower', $properties));
-
         $reflectionObject = new \ReflectionObject($object);
         $reflectionMethods = $reflectionObject->getMethods(\ReflectionMethod::IS_PUBLIC);
 
@@ -50,14 +48,12 @@ class GetSetMethodNormalizer extends AbstractNormalizer
             if ($this->isGetMethod($method)) {
                 $attributeName = strtolower(substr($method->getName(), 3));
 
-                if (null === $propertyMap || isset($propertyMap[$attributeName])) {
-                    $attributeValue = $method->invoke($object);
-                    if ($this->serializer->isStructuredType($attributeValue)) {
-                        $attributeValue = $this->serializer->normalize($attributeValue, $format);
-                    }
-
-                    $attributes[$attributeName] = $attributeValue;
+                $attributeValue = $method->invoke($object);
+                if (null !== $attributeValue && !is_scalar($attributeValue)) {
+                    $attributeValue = $this->serializer->normalize($attributeValue, $format);
                 }
+
+                $attributes[$attributeName] = $attributeValue;
             }
         }
 
@@ -108,22 +104,36 @@ class GetSetMethodNormalizer extends AbstractNormalizer
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function supportsNormalization($data, $format = null)
+    {
+        return $this->supports(get_class($data));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function supportsDenormalization($data, $type, $format = null)
+    {
+        return $this->supports($type);
+    }
+
+    /**
      * Checks if the given class has any get{Property} method.
      *
-     * @param ReflectionClass $class  A ReflectionClass instance of the class
-     *                                to serialize into or from.
-     * @param string          $format The format being (de-)serialized from or into.
-     * @return Boolean Whether the class has any getters.
+     * @param string $class
+     * @return Boolean
      */
-    public function supports(\ReflectionClass $class, $format = null)
+    private function supports($class)
     {
+        $class = new \ReflectionClass($class);
         $methods = $class->getMethods(\ReflectionMethod::IS_PUBLIC);
         foreach ($methods as $method) {
             if ($this->isGetMethod($method)) {
                 return true;
             }
         }
-
         return false;
     }
 

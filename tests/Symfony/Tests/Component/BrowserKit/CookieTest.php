@@ -33,6 +33,8 @@ class CookieTest extends \PHPUnit_Framework_TestCase
             array('foo=bar; secure'),
             array('foo=bar; httponly'),
             array('foo=bar; domain=google.com; path=/foo; secure; httponly'),
+            array('foo=bar=baz'),
+            array('foo=bar%3Dbaz'),
         );
     }
 
@@ -40,6 +42,8 @@ class CookieTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals('foo=bar; domain=www.example.com', (string) Cookie::FromString('foo=bar', 'http://www.example.com/'));
         $this->assertEquals('foo=bar; domain=www.example.com; path=/foo', (string) Cookie::FromString('foo=bar', 'http://www.example.com/foo/bar'));
+        $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::FromString('foo=bar; path=/', 'http://www.example.com/foo/bar'));
+        $this->assertEquals('foo=bar; domain=www.myotherexample.com', (string) Cookie::FromString('foo=bar; domain=www.myotherexample.com', 'http://www.example.com/'));
     }
 
     public function testFromStringThrowsAnExceptionIfCookieIsNotValid()
@@ -70,6 +74,17 @@ class CookieTest extends \PHPUnit_Framework_TestCase
     {
         $cookie = new Cookie('foo', 'bar');
         $this->assertEquals('bar', $cookie->getValue(), '->getValue() returns the cookie value');
+
+        $cookie = new Cookie('foo', 'bar%3Dbaz', null, '/', '', false, true, true); // raw value
+        $this->assertEquals('bar=baz', $cookie->getValue(), '->getValue() returns the urldecoded cookie value');
+    }
+
+    public function testGetRawValue()
+    {
+        $cookie = new Cookie('foo', 'bar=baz'); // decoded value
+        $this->assertEquals('bar%3Dbaz', $cookie->getRawValue(), '->getRawValue() returns the urlencoded cookie value');
+        $cookie = new Cookie('foo', 'bar%3Dbaz', null, '/', '', false, true, true); // raw value
+        $this->assertEquals('bar%3Dbaz', $cookie->getRawValue(), '->getRawValue() returns the non-urldecoded cookie value');
     }
 
     public function testGetPath()
@@ -99,7 +114,7 @@ class CookieTest extends \PHPUnit_Framework_TestCase
     public function testIsHttponly()
     {
         $cookie = new Cookie('foo', 'bar');
-        $this->assertFalse($cookie->isHttpOnly(), '->isHttpOnly() returns false if not defined');
+        $this->assertTrue($cookie->isHttpOnly(), '->isHttpOnly() returns false if not defined');
 
         $cookie = new Cookie('foo', 'bar', 0, '/', 'foo.com', false, true);
         $this->assertTrue($cookie->isHttpOnly(), '->isHttpOnly() returns the cookie httponly flag');

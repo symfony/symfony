@@ -26,8 +26,10 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $def = $container->getDefinition('form.type_extension.csrf');
 
-        $this->assertTrue($def->getArgument(0));
-        $this->assertEquals('_csrf', $def->getArgument(1));
+        $this->assertTrue($container->getParameter('form.type_extension.csrf.enabled'));
+        $this->assertEquals('%form.type_extension.csrf.enabled%', $def->getArgument(0));
+        $this->assertEquals('_csrf', $container->getParameter('form.type_extension.csrf.field_name'));
+        $this->assertEquals('%form.type_extension.csrf.field_name%', $def->getArgument(1));
         $this->assertEquals('s3cr3t', $container->getParameterBag()->resolveValue($container->findDefinition('form.csrf_provider')->getArgument(1)));
     }
 
@@ -37,9 +39,13 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $def = $container->getDefinition('form.temporary_storage');
 
-        $this->assertEquals('/path/to/cache', $def->getArgument(2));
-        $this->assertEquals('1234', $def->getArgument(3));
-        $this->assertEquals('100', $def->getArgument(4));
+        $this->assertEquals('%form.temporary_storage.folder%', $def->getArgument(2));
+        $this->assertEquals('%form.temporary_storage.size%', $def->getArgument(3));
+        $this->assertEquals('%form.temporary_storage.ttl%', $def->getArgument(4));
+
+        $this->assertEquals('/path/to/cache', $container->getParameter('form.temporary_storage.folder'));
+        $this->assertEquals(1234, $container->getParameter('form.temporary_storage.size'));
+        $this->assertEquals(100, $container->getParameter('form.temporary_storage.ttl'));
     }
 
     public function testEsi()
@@ -55,7 +61,8 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('profiler'), '->registerProfilerConfiguration() loads profiling.xml');
         $this->assertTrue($container->hasDefinition('data_collector.config'), '->registerProfilerConfiguration() loads collectors.xml');
-        $this->assertTrue($container->getDefinition('profiler_listener')->getArgument(2));
+        $this->assertTrue($container->getParameter('profiler_listener.only_exceptions'));
+        $this->assertEquals('%profiler_listener.only_exceptions%', $container->getDefinition('profiler_listener')->getArgument(2));
     }
 
     public function testRouter()
@@ -64,7 +71,8 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('router.real'), '->registerRouterConfiguration() loads routing.xml');
         $arguments = $container->getDefinition('router.real')->getArguments();
-        $this->assertEquals($container->getParameter('kernel.root_dir').'/config/routing.xml', $arguments[1], '->registerRouterConfiguration() sets routing resource');
+        $this->assertEquals($container->getParameter('kernel.root_dir').'/config/routing.xml', $container->getParameter('router.resource'), '->registerRouterConfiguration() sets routing resource');
+        $this->assertEquals('%router.resource%', $arguments[1], '->registerRouterConfiguration() sets routing resource');
         $this->assertEquals('xml', $arguments[2]['resource_type'], '->registerRouterConfiguration() sets routing resource type');
         $this->assertTrue($container->getDefinition('router.cache_warmer')->hasTag('kernel.cache_warmer'), '->registerRouterConfiguration() tags router cache warmer if cache warming is set');
         $this->assertEquals('router.cached', (string) $container->getAlias('router'), '->registerRouterConfiguration() changes router alias to cached if cache warming is set');
@@ -85,7 +93,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('full');
 
         $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
-        $this->assertEquals('fr', $container->getDefinition('session')->getArgument(1));
+        $this->assertEquals('fr', $container->getParameter('session.default_locale'));
+        $this->assertEquals('%session.default_locale%', $container->getDefinition('session')->getArgument(1));
         $this->assertTrue($container->getDefinition('session')->hasMethodCall('start'));
         $this->assertEquals('session.storage.native', (string) $container->getAlias('session.storage'));
 
@@ -104,8 +113,10 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('templating.name_parser'), '->registerTemplatingConfiguration() loads templating.xml');
         $arguments = $container->getDefinition('templating.helper.assets')->getArguments();
-        $this->assertEquals('SomeVersionScheme', $arguments[2]);
-        $this->assertEquals(array('http://cdn.example.com'), $arguments[1]);
+        $this->assertEquals('%templating.helper.assets.assets_version%', $arguments[2]);
+        $this->assertEquals('SomeVersionScheme', $container->getParameter('templating.helper.assets.assets_version'));
+        $this->assertEquals('%templating.helper.assets.assets_base_urls%', $arguments[1]);
+        $this->assertEquals(array('http://cdn.example.com'), $container->getParameter('templating.helper.assets.assets_base_urls'));
 
         $this->assertTrue($container->getDefinition('templating.cache_warmer.template_paths')->hasTag('kernel.cache_warmer'), '->registerTemplatingConfiguration() tags templating cache warmer if cache warming is set');
         $this->assertEquals('templating.locator.cached', (string) $container->getAlias('templating.locator'), '->registerTemplatingConfiguration() changes templating.locator alias to cached if cache warming is set');
@@ -116,7 +127,8 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertEquals($container->getDefinition('templating.loader'), $container->getDefinition('templating.loader.cache'), '->registerTemplatingConfiguration() configures the loader to use cache');
 
-        $this->assertEquals('/path/to/cache', $container->getDefinition('templating.loader.cache')->getArgument(1));
+        $this->assertEquals('%templating.loader.cache.path%', $container->getDefinition('templating.loader.cache')->getArgument(1));
+        $this->assertEquals('/path/to/cache', $container->getParameter('templating.loader.cache.path'));
 
         $this->assertEquals(array('php', 'twig'), $container->getParameter('templating.engines'), '->registerTemplatingConfiguration() sets a templating.engines parameter');
     }
@@ -126,7 +138,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('full');
 
         $this->assertTrue($container->hasDefinition('translator.real'), '->registerTranslatorConfiguration() loads translation.xml');
-        $this->assertSame($container->getDefinition('translator.real'), $container->getDefinition('translator'), '->registerTranslatorConfiguration() redefines translator service from identity to real translator');
+        $this->assertEquals('translator.real', (string) $container->getAlias('translator'), '->registerTranslatorConfiguration() redefines translator service from identity to real translator');
 
         $resources = array();
         foreach ($container->getDefinition('translator.real')->getMethodCalls() as $call) {
@@ -163,8 +175,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('validator.mapping.loader.xml_files_loader'), '->registerValidationConfiguration() defines the XML loader');
         $this->assertTrue($container->hasDefinition('validator.mapping.loader.yaml_files_loader'), '->registerValidationConfiguration() defines the YAML loader');
 
-        $xmlFiles = $container->getDefinition('validator.mapping.loader.xml_files_loader')->getArgument(0);
-
+        $xmlFiles = $container->getParameter('validator.mapping.loader.xml_files_loader.mapping_files');
         $this->assertContains(
             realpath(__DIR__.'/../../../../Component/Form/Resources/config/validation.xml'),
             array_map('realpath', $xmlFiles),
@@ -172,15 +183,31 @@ abstract class FrameworkExtensionTest extends TestCase
         );
     }
 
+    public function testAnnotations()
+    {
+        if (!class_exists('Doctrine\\Common\\Version')) {
+            $this->markTestSkipped('Doctrine is not available.');
+        }
+
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertEquals($container->getParameter('kernel.cache_dir').'/annotations', $container->getDefinition('annotations.file_cache_reader')->getArgument(1));
+        $this->assertInstanceOf('Doctrine\Common\Annotations\FileCacheReader', $container->get('annotation_reader'));
+    }
+
     public function testValidationAnnotations()
     {
         $container = $this->createContainerFromFile('validation_annotations');
 
         $this->assertTrue($container->hasDefinition('validator.mapping.loader.annotation_loader'), '->registerValidationConfiguration() defines the annotation loader');
-
-        $argument = $container->getDefinition('validator.mapping.loader.annotation_loader')->getArgument(0);
-        $this->assertEquals('Symfony\\Component\\Validator\\Constraints\\', $argument['assert'], '->registerValidationConfiguration() loads the default "assert" prefix');
-        $this->assertEquals('Application\\Validator\\Constraints\\', $argument['app'], '->registerValidationConfiguration() loads custom validation namespaces');
+        $loaders = $container->getDefinition('validator.mapping.loader.loader_chain')->getArgument(0);
+        $found = false;
+        foreach ($loaders as $loader) {
+            if ('validator.mapping.loader.annotation_loader' === (string) $loader) {
+                $found = true;
+            }
+        }
+        $this->assertTrue($found, 'validator.mapping.loader.annotation_loader is added to the loader chain.');
     }
 
     public function testValidationPaths()
@@ -191,11 +218,11 @@ abstract class FrameworkExtensionTest extends TestCase
             'kernel.bundles' => array('TestBundle' => 'Symfony\Bundle\FrameworkBundle\Tests\TestBundle'),
         ));
 
-        $yamlArgs = $container->getDefinition('validator.mapping.loader.yaml_files_loader')->getArgument(0);
+        $yamlArgs = $container->getParameter('validator.mapping.loader.yaml_files_loader.mapping_files');
         $this->assertEquals(1, count($yamlArgs));
         $this->assertStringEndsWith('TestBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'validation.yml', $yamlArgs[0]);
 
-        $xmlArgs = $container->getDefinition('validator.mapping.loader.xml_files_loader')->getArgument(0);
+        $xmlArgs = $container->getParameter('validator.mapping.loader.xml_files_loader.mapping_files');
         $this->assertEquals(2, count($xmlArgs));
         $this->assertStringEndsWith('Component/Form/Resources/config/validation.xml', $xmlArgs[0]);
         $this->assertStringEndsWith('TestBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'validation.xml', $xmlArgs[1]);

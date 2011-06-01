@@ -12,7 +12,10 @@
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
 /**
- * FilesystemSessionStorage.
+ * FilesystemSessionStorage simulates sessions for functional tests.
+ *
+ * This storage does not start the session (session_start())
+ * as it is not "available" when running tests on the command line.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -44,16 +47,12 @@ class FilesystemSessionStorage extends NativeSessionStorage
             $this->options['httponly']
         );
 
-        if (!ini_get('session.use_cookies') && $this->options['id'] && $this->options['id'] != session_id()) {
+        if (!ini_get('session.use_cookies') && isset($this->options['id']) && $this->options['id'] && $this->options['id'] != session_id()) {
             session_id($this->options['id']);
         }
 
         if (!session_id()) {
             session_id(hash('md5', uniqid(mt_rand(), true)));
-        }
-
-        if (!is_dir($this->path)) {
-            mkdir($this->path, 0777, true);
         }
 
         $file = $this->path.'/'.session_id().'.session';
@@ -88,6 +87,10 @@ class FilesystemSessionStorage extends NativeSessionStorage
     public function write($key, $data)
     {
         $this->data[$key] = $data;
+
+        if (!is_dir($this->path)) {
+            mkdir($this->path, 0777, true);
+        }
 
         file_put_contents($this->path.'/'.session_id().'.session', serialize($this->data));
     }

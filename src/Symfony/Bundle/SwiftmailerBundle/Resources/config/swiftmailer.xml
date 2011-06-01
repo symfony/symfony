@@ -63,11 +63,11 @@
 
         <service id="swiftmailer.plugin.blackhole" class="%swiftmailer.plugin.blackhole.class%" public="false" />
 
-        <service id="swiftmailer.plugin.messagelogger" class="%swiftmailer.plugin.messagelogger.class%" public="false" />
+        <service id="swiftmailer.plugin.messagelogger" class="%swiftmailer.plugin.messagelogger.class%" />
 
         <service id="swiftmailer.data_collector" class="%swiftmailer.data_collector.class%" public="false">
-            <argument type="service" id="swiftmailer.plugin.messagelogger" />
-            <argument type="service" id="swiftmailer.mailer" />
+            <argument type="service" id="service_container" />
+            <argument>%swiftmailer.spool.enabled%</argument>
         </service>
 
         <service id="swiftmailer.transport" alias="swiftmailer.transport.smtp" public="false" />

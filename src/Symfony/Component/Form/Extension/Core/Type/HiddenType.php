@@ -12,13 +12,14 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilder;
 
 class HiddenType extends AbstractType
 {
     public function getDefaultOptions(array $options)
     {
         return array(
+            // hidden fields cannot have a required attribute
+            'required'       => false,
             // Pass errors to the parent
             'error_bubbling' => true,
         );

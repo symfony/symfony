@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Process;
 
-use Symfony\Component\Process\Exception\RuntimeException;
-
 /**
  * An executable finder specifically designed for the PHP executable.
  *

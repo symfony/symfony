@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Symfony\Bundle\DoctrineBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Reference;
@@ -15,8 +24,12 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container)
     {
+        if (!$container->hasDefinition('doctrine')) {
+            return;
+        }
+
         $this->container = $container;
-        $this->connections = $container->getParameter('doctrine.dbal.connections');
+        $this->connections = $container->getParameter('doctrine.connections');
 
         foreach ($container->findTaggedServiceIds('doctrine.event_subscriber') as $subscriberId => $instances) {
             $this->registerSubscriber($subscriberId, $instances);

@@ -20,7 +20,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 use Symfony\Component\Form\Extension\Core\Validator\DefaultValidator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Validator\ValidatorInterface;
 
 class FieldType extends AbstractType
 {
@@ -36,7 +35,8 @@ class FieldType extends AbstractType
             $options['property_path'] = new PropertyPath($options['property_path']);
         }
 
-        $builder->setRequired($options['required'])
+        $builder
+            ->setRequired($options['required'])
             ->setReadOnly($options['read_only'])
             ->setErrorBubbling($options['error_bubbling'])
             ->setEmptyData($options['empty_data'])
@@ -44,9 +44,11 @@ class FieldType extends AbstractType
             ->setAttribute('property_path', $options['property_path'])
             ->setAttribute('error_mapping', $options['error_mapping'])
             ->setAttribute('max_length', $options['max_length'])
+            ->setAttribute('pattern', $options['pattern'])
             ->setAttribute('label', $options['label'] ?: $this->humanize($builder->getName()))
             ->setData($options['data'])
-            ->addValidator(new DefaultValidator());
+            ->addValidator(new DefaultValidator())
+        ;
 
         if ($options['trim']) {
             $builder->addEventSubscriber(new TrimListener());
@@ -55,50 +57,57 @@ class FieldType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form)
     {
+        $name = $form->getName();
+
         if ($view->hasParent()) {
             $parentId = $view->getParent()->get('id');
-            $parentName = $view->getParent()->get('name');
-            $id = sprintf('%s_%s', $parentId, $form->getName());
-            $name = sprintf('%s[%s]', $parentName, $form->getName());
+            $parentFullName = $view->getParent()->get('full_name');
+            $id = sprintf('%s_%s', $parentId, $name);
+            $fullName = sprintf('%s[%s]', $parentFullName, $name);
         } else {
-            $id = $form->getName();
-            $name = $form->getName();
+            $id = $name;
+            $fullName = $name;
         }
-
-        $view->set('form', $view);
-        $view->set('id', $id);
-        $view->set('name', $name);
-        $view->set('errors', $form->getErrors());
-        $view->set('value', $form->getClientData());
-        $view->set('read_only', $form->isReadOnly());
-        $view->set('required', $form->isRequired());
-        $view->set('max_length', $form->getAttribute('max_length'));
-        $view->set('size', null);
-        $view->set('label', $form->getAttribute('label'));
-        $view->set('multipart', false);
-        $view->set('attr', array());
 
         $types = array();
         foreach (array_reverse((array) $form->getTypes()) as $type) {
             $types[] = $type->getName();
         }
-        $view->set('types', $types);
+
+        $view
+            ->set('form', $view)
+            ->set('id', $id)
+            ->set('name', $name)
+            ->set('full_name', $fullName)
+            ->set('errors', $form->getErrors())
+            ->set('value', $form->getClientData())
+            ->set('read_only', $form->isReadOnly())
+            ->set('required', $form->isRequired())
+            ->set('max_length', $form->getAttribute('max_length'))
+            ->set('pattern', $form->getAttribute('pattern'))
+            ->set('size', null)
+            ->set('label', $form->getAttribute('label'))
+            ->set('multipart', false)
+            ->set('attr', array())
+            ->set('types', $types)
+        ;
     }
 
     public function getDefaultOptions(array $options)
     {
         $defaultOptions = array(
-            'data' => null,
-            'data_class' => null,
-            'trim' => true,
-            'required' => true,
-            'read_only' => false,
-            'max_length' => null,
-            'property_path' => null,
-            'by_reference' => true,
-            'error_bubbling' => false,
-            'error_mapping' => array(),
-            'label' => null,
+            'data'              => null,
+            'data_class'        => null,
+            'trim'              => true,
+            'required'          => true,
+            'read_only'         => false,
+            'max_length'        => null,
+            'pattern'           => null,
+            'property_path'     => null,
+            'by_reference'      => true,
+            'error_bubbling'    => false,
+            'error_mapping'     => array(),
+            'label'             => null,
         );
 
         $class = isset($options['data_class']) ? $options['data_class'] : null;

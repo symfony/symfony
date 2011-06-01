@@ -99,8 +99,25 @@ class Route
     public function setOptions(array $options)
     {
         $this->options = array_merge(array(
-            'compiler_class'     => 'Symfony\\Component\\Routing\\RouteCompiler',
+            'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler',
         ), $options);
+
+        return $this;
+    }
+
+    /**
+     * Sets an option value.
+     *
+     * This method implements a fluent interface.
+     *
+     * @param string $name  An option name
+     * @param mixed  $value The option value
+     *
+     * @return Route The current Route instance
+     */
+    public function setOption($name, $value)
+    {
+        $this->options[$name] = $value;
 
         return $this;
     }
@@ -172,10 +189,14 @@ class Route
      *
      * @param string $name    A variable name
      * @param mixed  $default The default value
+     *
+     * @return Route The current Route instance
      */
     public function setDefault($name, $default)
     {
         $this->defaults[$name] = $default;
+
+        return $this;
     }
 
     /**
@@ -223,10 +244,14 @@ class Route
      *
      * @param string $key The key
      * @param string $regex The regex
+     *
+     * @return Route The current Route instance
      */
     public function setRequirement($key, $regex)
     {
-        return $this->requirements[$key] = $this->sanitizeRequirement($key, $regex);
+        $this->requirements[$key] = $this->sanitizeRequirement($key, $regex);
+
+        return $this;
     }
 
     /**

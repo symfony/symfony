@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Core\EventListener;
 
-use Symfony\Component\Form\Events;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -27,11 +27,11 @@ class FixRadioInputListener implements EventSubscriberInterface
     {
         $data = $event->getData();
 
-        $event->setData(count((array)$data) === 0 ? array() : array($data => true));
+        $event->setData(empty($data) ? array() : array($data => true));
     }
 
     public static function getSubscribedEvents()
     {
-        return Events::onBindClientData;
+        return array(FormEvents::BIND_CLIENT_DATA => 'onBindClientData');
     }
 }

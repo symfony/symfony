@@ -1,7 +1,7 @@
 {% block field_rows %}
 {% spaceless %}
     {{ form_errors(form) }}
-    {% for child in form.children %}
+    {% for child in form %}
         {{ form_row(child) }}
     {% endfor %}
 {% endspaceless %}
@@ -27,7 +27,7 @@
 
 {% block field_rest %}
 {% spaceless %}
-    {% for child in form.children %}
+    {% for child in form %}
         {% if not child.rendered %}
             {{ form_row(child) }}
         {% endif %}
@@ -37,17 +37,24 @@
 
 {% block field_label %}
 {% spaceless %}
-    <label for="{{ id }}">{{ label|trans }}</label>
+    <label for="{{ id }}"{% for attrname,attrvalue in attr %} {{attrname}}="{{attrvalue}}"{% endfor %}>{{ label|trans }}</label>
 {% endspaceless %}
 {% endblock field_label %}
 
 {% block attributes %}
 {% spaceless %}
-    id="{{ id }}" name="{{ name }}"{% if read_only %} disabled="disabled"{% endif %}{% if required %} required="required"{% endif %}{% if max_length %} maxlength="{{ max_length }}"{% endif %}
+    id="{{ id }}" name="{{ full_name }}"{% if read_only %} disabled="disabled"{% endif %}{% if required %} required="required"{% endif %}{% if max_length %} maxlength="{{ max_length }}"{% endif %}{% if pattern %} pattern="{{ pattern }}"{% endif %}
     {% for attrname,attrvalue in attr %}{{attrname}}="{{attrvalue}}" {% endfor %}
 {% endspaceless %}
 {% endblock attributes %}
 
+{% block container_attributes %}
+{% spaceless %}
+    id="{{ id }}" 
+    {% for attrname,attrvalue in attr %}{{attrname}}="{{attrvalue}}" {% endfor %}
+{% endspaceless %}
+{% endblock container_attributes %}
+    
 {% block field_widget %}
 {% spaceless %}
     {% set type = type|default('text') %}
@@ -73,13 +80,6 @@
     {% set type = type|default('hidden') %}
     {{ block('field_widget') }}
 {% endblock hidden_widget %}
-
-{% block csrf_widget %}
-    {% if not form.hasParent or not form.getParent.hasParent %}
-        {% set type = type|default('hidden') %}
-        {{ block('field_widget') }}
-    {% endif %}
-{% endblock csrf_widget %}
 
 {% block hidden_row %}
     {{ form_widget(form) }}
@@ -110,7 +110,7 @@
 {% block choice_widget %}
 {% spaceless %}
     {% if expanded %}
-        <div {{ block('attributes') }}>
+        <div {{ block('container_attributes') }}>
         {% for choice, child in form %}
             {{ form_widget(child) }}
             {{ form_label(child) }}
@@ -147,7 +147,7 @@
 
 {% block datetime_widget %}
 {% spaceless %}
-    <div {{ block('attributes') }}>
+    <div {{ block('container_attributes') }}>
         {{ form_errors(form.date) }}
         {{ form_errors(form.time) }}
         {{ form_widget(form.date) }}
@@ -158,10 +158,10 @@
 
 {% block date_widget %}
 {% spaceless %}
-    {% if widget == 'text' %}
+    {% if widget == 'single_text' %}
         {{ block('text_widget') }}
     {% else %}
-        <div {{ block('attributes') }}>
+        <div {{ block('container_attributes') }}>
             {{ date_pattern|replace({
                 '{{ year }}': form_widget(form.year),
                 '{{ month }}': form_widget(form.month),
@@ -174,7 +174,7 @@
 
 {% block time_widget %}
 {% spaceless %}
-    <div {{ block('attributes') }}>
+    <div {{ block('container_attributes') }}>
         {{ form_widget(form.hour, { 'attr': { 'size': '1' } }) }}:{{ form_widget(form.minute, { 'attr': { 'size': '1' } }) }}{% if with_seconds %}:{{ form_widget(form.second, { 'attr': { 'size': '1' } }) }}{% endif %}
     </div>
 {% endspaceless %}
@@ -208,6 +208,13 @@
 {% endspaceless %}
 {% endblock url_widget %}
 
+{% block search_widget %}
+{% spaceless %}
+    {% set type = type|default('search') %}
+    {{ block('field_widget') }}
+{% endspaceless %}
+{% endblock search_widget %}
+
 {% block percent_widget %}
 {% spaceless %}
     {% set type = type|default('text') %}
@@ -217,10 +224,11 @@
 
 {% block file_widget %}
 {% spaceless %}
-    <div {{ block('attributes') }}>
+    <div {{ block('container_attributes') }}>
         {{ form_widget(form.file) }}
         {{ form_widget(form.token) }}
         {{ form_widget(form.name) }}
+        {{ form_widget(form.originalName) }}
     </div>
 {% endspaceless %}
 {% endblock file_widget %}
@@ -250,7 +258,7 @@
 
 {% block form_widget %}
 {% spaceless %}
-    <div {{ block('attributes') }}>
+    <div {{ block('container_attributes') }}>
         {{ block('field_rows') }}
         {{ form_rest(form) }}
     </div>

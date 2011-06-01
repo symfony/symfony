@@ -208,7 +208,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Returns all Scope chilren.
+     * Returns all Scope children.
      *
      * @return array An array of scope children.
      */
@@ -698,6 +698,20 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
         }
 
+        $properties = $this->resolveServices($this->getParameterBag()->resolveValue($definition->getProperties()));
+        $outsideClass = new \ReflectionClass($service);
+        foreach ($properties as $name => $value) {
+            $class = $outsideClass;
+            do {
+                if ($class->hasProperty($name)) {
+                    $property = $class->getProperty($name);
+                    $property->setAccessible(true);
+                    $property->setValue($service, $value);
+                    continue 2;
+                }
+            } while (false !== $class = $class->getParentClass());
+        }
+
         if ($callable = $definition->getConfigurator()) {
             if (is_array($callable) && is_object($callable[0]) && $callable[0] instanceof Reference) {
                 $callable[0] = $this->get((string) $callable[0]);
@@ -728,8 +742,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             foreach ($value as &$v) {
                 $v = $this->resolveServices($v);
             }
-        } else if (is_object($value) && $value instanceof Reference) {
+        } elseif (is_object($value) && $value instanceof Reference) {
             $value = $this->get((string) $value, $value->getInvalidBehavior());
+        } elseif (is_object($value) && $value instanceof Definition) {
+            $value = $this->createService($value, null);
         }
 
         return $value;

@@ -25,13 +25,21 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
 {
     protected function setUp()
     {
+        if (!class_exists('Twig_Environment')) {
+            $this->markTestSkipped('Twig is not available.');
+        }
+
         parent::setUp();
 
         $loader = new StubFilesystemLoader(array(
             __DIR__.'/../../../../../../src/Symfony/Bundle/TwigBundle/Resources/views/Form',
+            __DIR__,
         ));
 
-        $this->extension = new FormExtension(array('table_layout.html.twig'));
+        $this->extension = new FormExtension(array(
+            'table_layout.html.twig',
+            'custom_widgets.html.twig',
+        ));
 
         $environment = new \Twig_Environment($loader);
         $environment->addExtension($this->extension);
@@ -45,9 +53,9 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
         return (string)$this->extension->renderEnctype($view);
     }
 
-    protected function renderLabel(FormView $view, $label = null)
+    protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
-        return (string)$this->extension->renderLabel($view, $label);
+        return (string)$this->extension->renderLabel($view, $label, $vars);
     }
 
     protected function renderErrors(FormView $view)

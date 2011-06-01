@@ -74,7 +74,7 @@ class NativeSessionStorage implements SessionStorageInterface
         // disable native cache limiter as this is managed by HeaderBag directly
         session_cache_limiter(false);
 
-        if (!ini_get('session.use_cookies') && $this->options['id'] && $this->options['id'] != session_id()) {
+        if (!ini_get('session.use_cookies') && isset($this->options['id']) && $this->options['id'] && $this->options['id'] != session_id()) {
             session_id($this->options['id']);
         }
 
@@ -84,7 +84,7 @@ class NativeSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getId()
     {

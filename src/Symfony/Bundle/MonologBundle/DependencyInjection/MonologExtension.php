@@ -76,11 +76,12 @@ class MonologExtension extends Extension
                 'Monolog\\Formatter\\LineFormatter',
                 'Monolog\\Handler\\HandlerInterface',
                 'Monolog\\Handler\\AbstractHandler',
+                'Monolog\\Handler\\AbstractProcessingHandler',
                 'Monolog\\Handler\\StreamHandler',
                 'Monolog\\Handler\\FingersCrossedHandler',
                 'Monolog\\Logger',
-                'Symfony\\Bundle\\MonologBundle\\Logger\\Logger',
-                'Symfony\\Bundle\\MonologBundle\\Logger\\DebugHandler',
+                'Symfony\\Bridge\\Monolog\\Logger',
+                'Symfony\\Bridge\\Monolog\\Handler\\DebugHandler',
             ));
         }
     }
@@ -112,10 +113,6 @@ class MonologExtension extends Extension
             return $handlerId;
 
         case 'stream':
-            if (!isset($handler['path'])) {
-                $handler['path'] = '%kernel.logs_dir%/%kernel.environment%.log';
-            }
-
             $definition->setArguments(array(
                 $handler['path'],
                 $handler['level'],
@@ -128,58 +125,59 @@ class MonologExtension extends Extension
                 $handler['level'],
                 $handler['bubble'],
             ));
-            $definition->addTag('kernel.listener', array('event' => 'onCoreResponse'));
+            $definition->addTag('kernel.listener', array('event' => 'core.response', 'method' => 'onCoreResponse'));
             break;
 
         case 'rotating_file':
-            if (!isset($handler['path'])) {
-                $handler['path'] = '%kernel.logs_dir%/%kernel.environment%.log';
-            }
-
             $definition->setArguments(array(
                 $handler['path'],
-                isset($handler['max_files']) ? $handler['max_files'] : 0,
+                $handler['max_files'],
                 $handler['level'],
                 $handler['bubble'],
             ));
             break;
 
         case 'fingers_crossed':
-            if (!isset($handler['action_level'])) {
-                $handler['action_level'] = 'WARNING';
-            }
             $handler['action_level'] = is_int($handler['action_level']) ? $handler['action_level'] : constant('Monolog\Logger::'.strtoupper($handler['action_level']));
             $nestedHandlerId = $this->getHandlerId($handler['handler']);
-            array_push($this->nestedHandlers, $nestedHandlerId);
+            $this->nestedHandlers[] = $nestedHandlerId;
 
             $definition->setArguments(array(
                 new Reference($nestedHandlerId),
                 $handler['action_level'],
-                isset($handler['buffer_size']) ? $handler['buffer_size'] : 0,
+                $handler['buffer_size'],
                 $handler['bubble'],
+                $handler['stop_buffering'],
             ));
             break;
 
         case 'buffer':
             $nestedHandlerId = $this->getHandlerId($handler['handler']);
-            array_push($this->nestedHandlers, $nestedHandlerId);
+            $this->nestedHandlers[] = $nestedHandlerId;
 
             $definition->setArguments(array(
                 new Reference($nestedHandlerId),
-                isset($handler['buffer_size']) ? $handler['buffer_size'] : 0,
+                $handler['buffer_size'],
                 $handler['level'],
                 $handler['bubble'],
             ));
             break;
 
-        case 'syslog':
-            if (!isset($handler['ident'])) {
-                $handler['ident'] = false;
-            }
-            if (!isset($handler['facility'])) {
-                $handler['facility'] = 'user';
+        case 'group':
+            $references = array();
+            foreach ($handler['members'] as $nestedHandler) {
+                $nestedHandlerId = $this->getHandlerId($nestedHandler);
+                $this->nestedHandlers[] = $nestedHandlerId;
+                $references[] = new Reference($nestedHandlerId);
             }
 
+            $definition->setArguments(array(
+                $references,
+                $handler['bubble'],
+            ));
+            break;
+
+        case 'syslog':
             $definition->setArguments(array(
                 $handler['ident'],
                 $handler['facility'],
@@ -188,13 +186,51 @@ class MonologExtension extends Extension
             ));
             break;
 
-        default:
-            // Handler using the constructor of AbstractHandler without adding their own arguments
+        case 'swift_mailer':
+            if (isset($handler['email_prototype'])) {
+                $prototype = $this->parseDefinition($handler['email_prototype']);
+            } else {
+                $message = new Definition('Swift_Message');
+                $message->setFactoryService('mailer');
+                $message->setFactoryMethod('createMessage');
+                $message->setPublic(false);
+                $message->addMethodCall('setFrom', array($handler['from_email']));
+                $message->addMethodCall('setTo', array($handler['to_email']));
+                $message->addMethodCall('setSubject', array($handler['subject']));
+                $messageId = sprintf('%s.mail_prototype', $handlerId);
+                $container->setDefinition($messageId, $message);
+                $prototype = new Reference($messageId);
+            }
+            $definition->setArguments(array(
+                new Reference('mailer'),
+                $prototype,
+                $handler['level'],
+                $handler['bubble'],
+            ));
+            break;
+
+        case 'native_mailer':
+            $definition->setArguments(array(
+                $handler['to_email'],
+                $handler['subject'],
+                $handler['from_email'],
+                $handler['level'],
+                $handler['bubble'],
+            ));
+            break;
+
+        // Handlers using the constructor of AbstractHandler without adding their own arguments
+        case 'test':
+        case 'null':
+        case 'debug':
             $definition->setArguments(array(
                 $handler['level'],
                 $handler['bubble'],
             ));
             break;
+
+        default:
+            throw new \InvalidArgumentException(sprintf('Invalid handler type "%s" given for handler "%s"', $handler['type'], $name));
         }
 
         if (!empty($handler['formatter'])) {
@@ -216,10 +252,16 @@ class MonologExtension extends Extension
     private function addProcessors(Definition $definition, array $processors)
     {
         foreach (array_reverse($processors) as $processor) {
-            if (0 === strpos($processor, '@')) {
-                $processor = new Reference(substr($processor, 1));
-            }
-            $definition->addMethodCall('pushProcessor', array($processor));
+            $definition->addMethodCall('pushProcessor', array($this->parseDefinition($processor)));
         }
+    }
+
+    private function parseDefinition($definition)
+    {
+        if (0 === strpos($definition, '@')) {
+            return new Reference(substr($definition, 1));
+        }
+
+        return $definition;
     }
 }

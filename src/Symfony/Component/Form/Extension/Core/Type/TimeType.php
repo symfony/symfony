@@ -30,15 +30,15 @@ class TimeType extends AbstractType
 
         if ($options['widget'] === 'choice') {
             $hourOptions['choice_list'] =  new PaddedChoiceList(
-                $options['hours'], 2, '0', STR_PAD_LEFT
+                array_combine($options['hours'], $options['hours']), 2, '0', STR_PAD_LEFT
             );
             $minuteOptions['choice_list'] = new PaddedChoiceList(
-                $options['minutes'], 2, '0', STR_PAD_LEFT
+                array_combine($options['minutes'], $options['minutes']), 2, '0', STR_PAD_LEFT
             );
 
             if ($options['with_seconds']) {
                 $secondOptions['choice_list'] = new PaddedChoiceList(
-                    $options['seconds'], 2, '0', STR_PAD_LEFT
+                    array_combine($options['seconds'], $options['seconds']), 2, '0', STR_PAD_LEFT
                 );
             }
         }
@@ -66,33 +66,55 @@ class TimeType extends AbstractType
         }
 
         $builder
-            ->appendClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], $parts, $options['widget'] === 'text'))
+            ->appendClientTransformer(new DateTimeToArrayTransformer(
+                $options['data_timezone'],
+                $options['user_timezone'],
+                $parts,
+                $options['widget'] === 'text'
+            ))
             ->setAttribute('widget', $options['widget'])
-            ->setAttribute('with_seconds', $options['with_seconds']);
+            ->setAttribute('with_seconds', $options['with_seconds'])
+        ;
     }
 
     public function buildView(FormView $view, FormInterface $form)
     {
-        $view->set('widget', $form->getAttribute('widget'));
-        $view->set('with_seconds', $form->getAttribute('with_seconds'));
+        $view
+            ->set('widget', $form->getAttribute('widget'))
+            ->set('with_seconds', $form->getAttribute('with_seconds'))
+        ;
     }
 
     public function getDefaultOptions(array $options)
     {
         return array(
-            'hours' => range(0, 23),
-            'minutes' => range(0, 59),
-            'seconds' => range(0, 59),
-            'widget' => 'choice',
-            'input' => 'datetime',
-            'with_seconds' => false,
-            'pattern' => null,
-            'data_timezone' => null,
-            'user_timezone' => null,
-            'csrf_protection' => false,
+            'hours'             => range(0, 23),
+            'minutes'           => range(0, 59),
+            'seconds'           => range(0, 59),
+            'widget'            => 'choice',
+            'input'             => 'datetime',
+            'with_seconds'      => false,
+            'data_timezone'     => null,
+            'user_timezone'     => null,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
-            'by_reference' => false,
+            'by_reference'      => false,
+        );
+    }
+
+    public function getAllowedOptionValues(array $options)
+    {
+        return array(
+            'input' => array(
+                'datetime',
+                'string',
+                'timestamp',
+                'array',
+            ),
+            'widget' => array(
+                'text',
+                'choice',
+            ),
         );
     }
 

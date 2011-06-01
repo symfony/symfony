@@ -3,7 +3,7 @@
 namespace Symfony\Tests\Component\Serializer\Fixtures;
 
 use Symfony\Component\Serializer\Normalizer\NormalizableInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class Dummy implements NormalizableInterface
 {
@@ -12,7 +12,7 @@ class Dummy implements NormalizableInterface
     public $baz;
     public $qux;
 
-    public function normalize(NormalizerInterface $normalizer, $format, $properties = null)
+    public function normalize(SerializerInterface $serializer, $format = null)
     {
         return array(
             'foo' => $this->foo,
@@ -22,7 +22,7 @@ class Dummy implements NormalizableInterface
         );
     }
 
-    public function denormalize(NormalizerInterface $normalizer, $data, $format = null)
+    public function denormalize(SerializerInterface $serializer, $data, $format = null)
     {
         $this->foo = $data['foo'];
         $this->bar = $data['bar'];

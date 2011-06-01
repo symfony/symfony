@@ -34,16 +34,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class FrameworkBundle extends Bundle
 {
-    /**
-     * Boots the Bundle.
-     */
-    public function boot()
-    {
-        if ($this->container->has('error_handler')) {
-            $this->container->get('error_handler');
-        }
-    }
-
     public function build(ContainerBuilder $container)
     {
         parent::build($container);

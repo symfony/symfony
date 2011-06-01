@@ -93,7 +93,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     abstract protected function renderEnctype(FormView $view);
 
-    abstract protected function renderLabel(FormView $view, $label = null);
+    abstract protected function renderLabel(FormView $view, $label = null, array $vars = array());
 
     abstract protected function renderErrors(FormView $view);
 
@@ -130,7 +130,9 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $form = $this->factory->createNamed('text', 'na&me', null, array(
             'property_path' => 'name',
         ));
-        $html = $this->renderLabel($form->createView());
+        $view = $form->createView();
+        $this->renderWidget($view, array('label' => 'foo'));
+        $html = $this->renderLabel($view);
 
         $this->assertMatchesXpath($html,
 '/label
@@ -171,6 +173,61 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testLabelWithCustomTextPassedAsOptionAndDirectly()
+    {
+        $form = $this->factory->createNamed('text', 'na&me', null, array(
+            'property_path' => 'name',
+            'label' => 'Custom label',
+        ));
+        $html = $this->renderLabel($form->createView(), 'Overridden label');
+
+        $this->assertMatchesXpath($html,
+'/label
+    [@for="na&me"]
+    [.="[trans]Overridden label[/trans]"]
+'
+        );
+    }
+
+    public function testLabelWithCustomOptionsPassedDirectly()
+    {
+        $form = $this->factory->createNamed('text', 'na&me', null, array(
+            'property_path' => 'name',
+        ));
+        $html = $this->renderLabel($form->createView(), null, array(
+            'attr' => array(
+                'class' => 'my&class'
+            ),
+        ));
+
+        $this->assertMatchesXpath($html,
+'/label
+    [@for="na&me"]
+    [@class="my&class"]
+'
+        );
+    }
+
+    public function testLabelWithCustomTextAndCustomOptionsPassedDirectly()
+    {
+        $form = $this->factory->createNamed('text', 'na&me', null, array(
+            'property_path' => 'name',
+        ));
+        $html = $this->renderLabel($form->createView(), 'Custom label', array(
+            'attr' => array(
+                'class' => 'my&class'
+            ),
+        ));
+
+        $this->assertMatchesXpath($html,
+'/label
+    [@for="na&me"]
+    [@class="my&class"]
+    [.="[trans]Custom label[/trans]"]
+'
+        );
+    }
+
     public function testErrors()
     {
         $form = $this->factory->createNamed('text', 'na&me', null, array(
@@ -188,6 +245,23 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         /following-sibling::li[.="[trans]Error 2[/trans]"]
     ]
     [count(./li)=2]
+'
+        );
+    }
+
+    public function testWidgetById()
+    {
+        $form = $this->factory->createNamed('text', 'text_id');
+        $html = $this->renderWidget($form->createView());
+
+        $this->assertMatchesXpath($html,
+'/div
+    [
+        ./input
+        [@type="text"]
+        [@id="text_id"]
+    ]
+    [@id="container"]
 '
         );
     }
@@ -463,19 +537,6 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testCsrfWithNonRootParent()
-    {
-        $form = $this->factory->createNamed('csrf', 'na&me', null, array(
-            'property_path' => 'name',
-        ));
-        $form->setParent($this->factory->create('form'));
-        $form->getParent()->setParent($this->factory->create('form'));
-
-        $html = $this->renderWidget($form->createView());
-
-        $this->assertEquals('', trim($html));
-    }
-
     public function testDateTime()
     {
         $form = $this->factory->createNamed('datetime', 'na&me', '2011-02-03 04:05:06', array(
@@ -594,6 +655,35 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./input
+            [@id="na&me_month"]
+            [@type="text"]
+            [@value="2"]
+        /following-sibling::input
+            [@id="na&me_day"]
+            [@type="text"]
+            [@value="3"]
+        /following-sibling::input
+            [@id="na&me_year"]
+            [@type="text"]
+            [@value="2011"]
+    ]
+    [count(./input)=3]
+'
+        );
+    }
+
+    public function testDateSingleText()
+    {
+        $form = $this->factory->createNamed('date', 'na&me', '2011-02-03', array(
+            'property_path' => 'name',
+            'input' => 'string',
+            'widget' => 'single_text',
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="text"]
     [@name="na&me"]
@@ -647,8 +737,9 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         ./input[@type="file"][@id="na&me_file"]
         /following-sibling::input[@type="hidden"][@id="na&me_token"]
         /following-sibling::input[@type="hidden"][@id="na&me_name"]
+        /following-sibling::input[@type="hidden"][@id="na&me_originalName"]
     ]
-    [count(./input)=3]
+    [count(./input)=4]
 '
         );
     }
@@ -901,6 +992,22 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@name="na&me"]
     [@value="foo&bar"]
     [@maxlength="123"]
+'
+        );
+    }
+
+    public function testSearch()
+    {
+        $form = $this->factory->createNamed('search', 'na&me', 'foo&bar', array(
+            'property_path' => 'name',
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/input
+    [@type="search"]
+    [@name="na&me"]
+    [@value="foo&bar"]
+    [not(@maxlength)]
 '
         );
     }

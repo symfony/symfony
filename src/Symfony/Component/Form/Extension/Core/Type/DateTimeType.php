@@ -37,9 +37,6 @@ class DateTimeType extends AbstractType
             'with_seconds',
         )));
 
-        if (isset($options['date_pattern'])) {
-            $dateOptions['pattern'] = $options['date_pattern'];
-        }
         if (isset($options['date_widget'])) {
             $dateOptions['widget'] = $options['date_widget'];
         }
@@ -49,14 +46,8 @@ class DateTimeType extends AbstractType
 
         $dateOptions['input'] = 'array';
 
-        if (isset($options['time_pattern'])) {
-            $timeOptions['pattern'] = $options['time_pattern'];
-        }
         if (isset($options['time_widget'])) {
             $timeOptions['widget'] = $options['time_widget'];
-        }
-        if (isset($options['time_format'])) {
-            $timeOptions['format'] = $options['time_format'];
         }
 
         $timeOptions['input'] = 'array';
@@ -69,7 +60,8 @@ class DateTimeType extends AbstractType
             $timeParts[] = 'second';
         }
 
-        $builder->appendClientTransformer(new DataTransformerChain(array(
+        $builder
+            ->appendClientTransformer(new DataTransformerChain(array(
                 new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], $parts),
                 new ArrayToPartsTransformer(array(
                     'date' => array('year', 'month', 'day'),
@@ -77,7 +69,8 @@ class DateTimeType extends AbstractType
                 )),
             )))
             ->add('date', 'date', $dateOptions)
-            ->add('time', 'time', $timeOptions);
+            ->add('time', 'time', $timeOptions)
+        ;
 
         if ($options['input'] === 'string') {
             $builder->appendNormTransformer(new ReversedTransformer(
@@ -97,28 +90,55 @@ class DateTimeType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'input' => 'datetime',
-            'with_seconds' => false,
+            'input'         => 'datetime',
+            'with_seconds'  => false,
             'data_timezone' => null,
             'user_timezone' => null,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
-            'by_reference' => false,
-            'date_pattern' => null,
-            'date_widget' => null,
-            'date_format' => null,
-            'time_pattern' => null,
-            'time_widget' => null,
-            'time_format' => null,
+            'by_reference'  => false,
+            'date_widget'   => null,
+            'date_format'   => null,
+            'time_widget'   => null,
             /* Defaults for date field */
-            'years' => range(date('Y') - 5, date('Y') + 5),
-            'months' => range(1, 12),
-            'days' => range(1, 31),
+            'years'         => range(date('Y') - 5, date('Y') + 5),
+            'months'        => range(1, 12),
+            'days'          => range(1, 31),
             /* Defaults for time field */
-            'hours' => range(0, 23),
-            'minutes' => range(0, 59),
-            'seconds' => range(0, 59),
-            'with_seconds' => false,
+            'hours'         => range(0, 23),
+            'minutes'       => range(0, 59),
+            'seconds'       => range(0, 59),
+            'with_seconds'  => false,
+        );
+    }
+
+    public function getAllowedOptionValues(array $options)
+    {
+        return array(
+            'input'         => array(
+                'datetime',
+                'string',
+                'timestamp',
+                'array',
+            ),
+            'date_widget'   => array(
+                null, // inherit default from DateType
+                'single_text',
+                'text',
+                'choice',
+            ),
+            'date_format'   => array(
+                null, // inherit default from DateType
+                \IntlDateFormatter::FULL,
+                \IntlDateFormatter::LONG,
+                \IntlDateFormatter::MEDIUM,
+                \IntlDateFormatter::SHORT,
+             ),
+            'time_widget'   => array(
+                null, // inherit default from TimeType
+                'text',
+                'choice',
+            ),
         );
     }
 

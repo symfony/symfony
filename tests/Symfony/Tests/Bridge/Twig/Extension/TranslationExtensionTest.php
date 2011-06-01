@@ -25,6 +25,13 @@ class TranslationExtensionTest extends TestCase
         }
     }
 
+    public function testEscaping()
+    {
+        $output = $this->getTemplate('{% trans %}Percent: %value%%% (%msg%){% endtrans %}')->render(array('value' => 12, 'msg' => 'approx.'));
+
+        $this->assertEquals('Percent: 12% (approx.)', $output);
+    }
+
     /**
      * @dataProvider getTransTests
      */
@@ -64,10 +71,6 @@ class TranslationExtensionTest extends TestCase
             array('{% transchoice count %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtranschoice %}',
                 'There is 5 apples (Symfony2)', array('count' => 5, 'name' => 'Symfony2')),
             array('{% transchoice count with { \'%name%\': \'Symfony2\' } %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtranschoice %}',
-                'There is 5 apples (Symfony2)', array('count' => 5)),
-            array('{% transchoice count for "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples" from "messages" %}',
-                'There is one apple', array('count' => 1)),
-            array('{% set text = "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%)" %}{% transchoice count for text with { \'%name%\': \'Symfony2\', \'%count%\': count } %}',
                 'There is 5 apples (Symfony2)', array('count' => 5)),
 
             // trans filter

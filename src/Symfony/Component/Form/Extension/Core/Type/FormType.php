@@ -15,23 +15,23 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class FormType extends AbstractType
 {
     public function buildForm(FormBuilder $builder, array $options)
     {
-        $builder->setAttribute('virtual', $options['virtual'])
-            ->setDataMapper(new PropertyPathMapper($options['data_class']));
+        $builder
+            ->setAttribute('virtual', $options['virtual'])
+            ->setDataMapper(new PropertyPathMapper($options['data_class']))
+        ;
     }
 
     public function buildViewBottomUp(FormView $view, FormInterface $form)
     {
         $multipart = false;
 
-        foreach ($view as $child) {
+        foreach ($view->getChildren() as $child) {
             if ($child->get('multipart')) {
                 $multipart = true;
                 break;
@@ -44,10 +44,10 @@ class FormType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         $defaultOptions = array(
-            'virtual' => false,
+            'virtual'           => false,
             // Errors in forms bubble by default, so that form errors will
             // end up as global errors in the root form
-            'error_bubbling' => true,
+            'error_bubbling'    => true,
         );
 
         if (empty($options['data_class'])) {

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Core\EventListener;
 
-use Symfony\Component\Form\Events;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -36,23 +36,37 @@ class ResizeFormListener implements EventSubscriberInterface
     private $type;
 
     /**
+     * @var array
+     */
+    private $options;
+
+    /**
+     * Whether children could be added to the group
      * @var Boolean
      */
-    private $resizeOnBind;
+    private $allowAdd;
 
-    public function __construct(FormFactoryInterface $factory, $type, $resizeOnBind = false)
+    /**
+     * Whether children could be removed from the group
+     * @var Boolean
+     */
+    private $allowDelete;
+
+    public function __construct(FormFactoryInterface $factory, $type, array $options = array(), $allowAdd = false, $allowDelete = false)
     {
         $this->factory = $factory;
         $this->type = $type;
-        $this->resizeOnBind = $resizeOnBind;
+        $this->allowAdd = $allowAdd;
+        $this->allowDelete = $allowDelete;
+        $this->options = $options;
     }
 
     public static function getSubscribedEvents()
     {
         return array(
-            Events::preSetData,
-            Events::preBind,
-            Events::onBindNormData,
+            FormEvents::PRE_SET_DATA => 'preSetData',
+            FormEvents::PRE_BIND => 'preBind',
+            FormEvents::BIND_NORM_DATA => 'onBindNormData',
         );
     }
 
@@ -71,25 +85,21 @@ class ResizeFormListener implements EventSubscriberInterface
 
         // First remove all rows except for the prototype row
         foreach ($form as $name => $child) {
-            if (!($this->resizeOnBind && '$$name$$' === $name)) {
+            if (!($this->allowAdd && '$$name$$' === $name)) {
                 $form->remove($name);
             }
         }
 
         // Then add all rows again in the correct order
         foreach ($data as $name => $value) {
-            $form->add($this->factory->createNamed($this->type, $name, null, array(
+            $form->add($this->factory->createNamed($this->type, $name, null, array_replace(array(
                 'property_path' => '['.$name.']',
-            )));
+            ), $this->options)));
         }
     }
 
     public function preBind(DataEvent $event)
     {
-        if (!$this->resizeOnBind) {
-            return;
-        }
-
         $form = $event->getForm();
         $data = $event->getData();
 
@@ -102,28 +112,28 @@ class ResizeFormListener implements EventSubscriberInterface
         }
 
         // Remove all empty rows except for the prototype row
-        foreach ($form as $name => $child) {
-            if (!isset($data[$name]) && '$$name$$' !== $name) {
-                $form->remove($name);
+        if ($this->allowDelete) {
+            foreach ($form as $name => $child) {
+                if (!isset($data[$name]) && '$$name$$' !== $name) {
+                    $form->remove($name);
+                }
             }
         }
 
         // Add all additional rows
-        foreach ($data as $name => $value) {
-            if (!$form->has($name)) {
-                $form->add($this->factory->createNamed($this->type, $name, null, array(
-                    'property_path' => '['.$name.']',
-                )));
+        if ($this->allowAdd) {
+            foreach ($data as $name => $value) {
+                if (!$form->has($name)) {
+                    $form->add($this->factory->createNamed($this->type, $name, null, array_replace(array(
+                        'property_path' => '['.$name.']',
+                    ), $this->options)));
+                }
             }
         }
     }
 
     public function onBindNormData(FilterDataEvent $event)
     {
-        if (!$this->resizeOnBind) {
-            return;
-        }
-
         $form = $event->getForm();
         $data = $event->getData();
 
@@ -135,9 +145,11 @@ class ResizeFormListener implements EventSubscriberInterface
             throw new UnexpectedTypeException($data, 'array or \Traversable');
         }
 
-        foreach ($data as $name => $child) {
-            if (!$form->has($name)) {
-                unset($data[$name]);
+        if ($this->allowDelete) {
+            foreach ($data as $name => $child) {
+                if (!$form->has($name)) {
+                    unset($data[$name]);
+                }
             }
         }
 

@@ -25,10 +25,12 @@ class PaddedChoiceList extends ArrayChoiceList
      * If the values are shorter than $padLength characters, they are padded with
      * zeros on the left side.
      *
-     * @param array   $values    The available choices
-     * @param integer $padLength The length to pad the choices
-     * @param string  $padString The padding character
-     * @param integer $padType   The direction of padding
+     * @param array|\Closure $values    The available choices
+     * @param integer        $padLength The length to pad the choices
+     * @param string         $padString The padding character
+     * @param integer        $padType   The direction of padding
+     *
+     * @throws UnexpectedTypeException if the type of the values parameter is not supported
      */
     public function __construct($values, $padLength, $padString, $padType = STR_PAD_LEFT)
     {
@@ -39,15 +41,19 @@ class PaddedChoiceList extends ArrayChoiceList
         $this->padType = $padType;
     }
 
+    /**
+     * Initializes the list of choices.
+     *
+     * Each choices is padded according to the format given in the constructor
+     *
+     * @throws UnexpectedTypeException if the function does not return an array
+     */
     protected function load()
     {
         parent::load();
 
-        $choices = $this->choices;
-        $this->choices = array();
-
-        foreach ($choices as $value) {
-            $this->choices[$value] = str_pad($value, $this->padLength, $this->padString, $this->padType);
+        foreach ($this->choices as $key => $choice) {
+            $this->choices[$key] = str_pad($choice, $this->padLength, $this->padString, $this->padType);
         }
     }
 }

@@ -28,11 +28,14 @@ class FormHelper extends Helper
 
     protected $engine;
 
-    protected $varStack = array();
+    protected $varStack;
+
+    protected $viewStack = array();
 
     public function __construct(EngineInterface $engine)
     {
         $this->engine = $engine;
+        $this->varStack = new \SplObjectStorage();
     }
 
     public function attributes()
@@ -40,8 +43,9 @@ class FormHelper extends Helper
         $html = '';
         $attr = array();
 
-        if (count($this->varStack) > 0) {
-            $vars = end($this->varStack);
+        if (count($this->viewStack) > 0) {
+            $view = end($this->viewStack);
+            $vars = $this->varStack[$view];
 
             if (isset($vars['attr'])) {
                 $attr = $vars['attr'];
@@ -82,9 +86,13 @@ class FormHelper extends Helper
         return $this->renderSection($view, 'row', $variables);
     }
 
-    public function label(FormView $view, $label = null)
+    public function label(FormView $view, $label = null, array $variables = array())
     {
-        return $this->renderSection($view, 'label', null === $label ? array() : array('label' => $label));
+        if ($label !== null) {
+            $variables += array('label' => $label);
+        }
+
+        return $this->renderSection($view, 'label', $variables);
     }
 
     public function errors(FormView $view)
@@ -101,9 +109,8 @@ class FormHelper extends Helper
     {
         $template = null;
         $blocks = $view->get('types');
-        if ('widget' === $section || 'row' === $section) {
-            array_unshift($blocks, '_'.$view->get('id'));
-        }
+        array_unshift($blocks, '_'.$view->get('id'));
+
         foreach ($blocks as &$block) {
             $block = $block.'_'.$section;
             $template = $this->lookupTemplate($block);
@@ -121,19 +128,23 @@ class FormHelper extends Helper
             $view->setRendered();
         }
 
-        return $this->render($template, array_merge($view->all(), $variables));
+        return $this->render($view, $template, $variables);
     }
 
-    public function render($template, array $variables = array())
+    public function render(FormView $view, $template, array $variables = array())
     {
-        array_push($this->varStack, array_merge(
-            count($this->varStack) > 0 ? end($this->varStack) : array(),
+        $this->varStack[$view] = array_replace(
+            $view->all(),
+            isset($this->varStack[$view]) ? $this->varStack[$view] : array(),
             $variables
-        ));
+        );
 
-        $html = $this->engine->render($template, end($this->varStack));
+        $this->viewStack[] = $view;
 
-        array_pop($this->varStack);
+        $html = $this->engine->render($template, $this->varStack[$view]);
+
+        array_pop($this->viewStack);
+        unset($this->varStack[$view]);
 
         return $html;
     }
@@ -150,7 +161,7 @@ class FormHelper extends Helper
             $template = $this->templateDir.':'.$template;
         }
 */
-$template = 'FrameworkBundle:Form:'.$template;
+        $template = 'FrameworkBundle:Form:'.$template;
         if (!$this->engine->exists($template)) {
             $template = false;
         }

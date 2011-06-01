@@ -1,7 +1,7 @@
 <?php
 
-use Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException;
-use Symfony\Component\Routing\Matcher\Exception\NotFoundException;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RequestContext;
 
 /**
@@ -88,6 +88,24 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             return array (  'def' => 'test',  '_route' => 'foofoo',);
         }
 
-        throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new NotFoundException();
+        if (0 === strpos($pathinfo, '/a')) {
+            if (0 === strpos($pathinfo, '/a/b')) {
+                // foo
+                if (0 === strpos($pathinfo, '/a/b') && preg_match('#^/a/b/(?P<foo>[^/]+?)$#x', $pathinfo, $matches)) {
+                    $matches['_route'] = 'foo';
+                    return $matches;
+                }
+        
+                // bar
+                if (0 === strpos($pathinfo, '/a/b') && preg_match('#^/a/b/(?P<bar>[^/]+?)$#x', $pathinfo, $matches)) {
+                    $matches['_route'] = 'bar';
+                    return $matches;
+                }
+        
+            }
+    
+        }
+
+        throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();
     }
 }

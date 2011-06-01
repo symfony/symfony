@@ -140,6 +140,7 @@ class FormHelper extends Helper
         $html = $this->engine->render($template, $this->varStack[$view]);
 
         array_pop($this->viewStack);
+        unset($this->varStack[$view]);
 
         return $html;
     }

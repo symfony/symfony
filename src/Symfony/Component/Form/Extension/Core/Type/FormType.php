@@ -21,8 +21,10 @@ class FormType extends AbstractType
 {
     public function buildForm(FormBuilder $builder, array $options)
     {
-        $builder->setAttribute('virtual', $options['virtual'])
-            ->setDataMapper(new PropertyPathMapper($options['data_class']));
+        $builder
+            ->setAttribute('virtual', $options['virtual'])
+            ->setDataMapper(new PropertyPathMapper($options['data_class']))
+        ;
     }
 
     public function buildViewBottomUp(FormView $view, FormInterface $form)

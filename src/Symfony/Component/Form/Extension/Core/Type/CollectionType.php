@@ -24,7 +24,7 @@ class CollectionType extends AbstractType
         if ($options['allow_add'] && $options['prototype']) {
             $builder->add('$$name$$', $options['type'], array_replace(array(
                 'property_path' => false,
-                'required' => false,
+                'required'      => false,
             ), $options['options']));
         }
 

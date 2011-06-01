@@ -186,6 +186,18 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
+     * Returns a given child.
+     *
+     * @param string name The name of the child
+     *
+     * @return FormView The child view
+     */
+    public function getChild($name)
+    {
+        return $this->children[$name];
+    }
+
+    /**
      * Returns whether this view has children.
      *
      * @return Boolean Whether this view has children
@@ -204,7 +216,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function offsetGet($name)
     {
-        return $this->children[$name];
+        return $this->getChild($name);
     }
 
     /**

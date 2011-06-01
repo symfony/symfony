@@ -50,15 +50,18 @@ class FileType extends AbstractType
 
     public function buildViewBottomUp(FormView $view, FormInterface $form)
     {
-        $view->set('multipart', true);
-        $view['file']->set('type', 'file');
-        $view['file']->set('value', '');
+        $view
+            ->set('multipart', true)
+            ->getChild('file')
+                ->set('type', 'file')
+                ->set('value', '')
+        ;
     }
 
     public function getDefaultOptions(array $options)
     {
         return array(
-            'type'              => 'string',
+            'type' => 'string',
         );
     }
 

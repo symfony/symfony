@@ -253,7 +253,7 @@ class MainConfiguration implements ConfigurationInterface
                 ;
 
                 if ($factory instanceof AbstractFactory) {
-                    $abstractFactoryKeys[] = str_replace('-', '_', $factory->getKey());
+                    $abstractFactoryKeys[] = $name;
                 }
 
                 $factory->addConfiguration($factoryNode);

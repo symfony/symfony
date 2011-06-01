@@ -123,4 +123,13 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
 
         $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
     }
+	
+	public function testReverseTransformExpectsDateExists()
+    {
+        $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', 'Y-m-d H:i:s');
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
+
+        $reverseTransformer->reverseTransform('2011-02-29 04:05:06', null);
+    }
 }

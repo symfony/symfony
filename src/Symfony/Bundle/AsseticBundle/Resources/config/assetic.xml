@@ -35,6 +35,7 @@
         <service id="assetic.asset_factory" class="%assetic.asset_factory.class%" public="false">
             <argument type="service" id="kernel" />
             <argument type="service" id="service_container" />
+            <argument type="service" id="assetic.parameter_bag" />
             <argument>%assetic.read_from%</argument>
             <argument>%assetic.debug%</argument>
         </service>
@@ -60,5 +61,11 @@
             <argument /> <!-- pattern -->
             <argument /> <!-- filter -->
         </service>
+
+        <service id="assetic.parameter_bag" class="Symfony\Component\DependencyInjection\ParameterBag\ParameterBag" public="false">
+            <argument type="service" id="assetic.parameters" />
+        </service>
+
+        <service id="assetic.parameters" class="stdClass" factory-service="service_container" factory-method="getDefaultParameters" public="false" />
     </services>
 </container>

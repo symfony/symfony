@@ -26,9 +26,14 @@ class AssetFactoryTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->kernel = $this->getMock('Symfony\\Component\\HttpKernel\\KernelInterface');
-        $this->container = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerInterface');
+        $this->container = $this->getMock('Symfony\\Component\\DependencyInjection\\Container');
         $this->parameterBag = $this->getMock('Symfony\\Component\\DependencyInjection\\ParameterBag\\ParameterBagInterface');
-        $this->factory = new AssetFactory($this->kernel, $this->container, $this->parameterBag, '/path/to/web');
+
+        $this->container->expects($this->any())
+            ->method('getParameterBag')
+            ->will($this->returnValue($this->parameterBag));
+
+        $this->factory = new AssetFactory($this->kernel, $this->container, '/path/to/web');
     }
 
     public function testBundleNotation()

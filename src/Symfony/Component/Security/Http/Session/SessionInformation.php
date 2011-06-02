@@ -29,6 +29,7 @@ class SessionInformation
     {
         $this->sessionId = $sessionId;
         $this->username = $username;
+        $this->refreshLastRequest();
     }
 
     /**
@@ -38,7 +39,7 @@ class SessionInformation
      */
     public function expireNow()
     {
-        $this->expired = time();
+        $this->expired = new \DateTime();
     }
 
     /**
@@ -78,7 +79,7 @@ class SessionInformation
      */
     public function isExpired()
     {
-        return $this->expired && $this->expired < time();
+        return $this->expired && $this->expired->getTimestamp() < time();
     }
 
     /**
@@ -88,6 +89,6 @@ class SessionInformation
      */
     public function refreshLastRequest()
     {
-        $this->lastRequest = time();
+        $this->lastRequest = new \DateTime();
     }
 }

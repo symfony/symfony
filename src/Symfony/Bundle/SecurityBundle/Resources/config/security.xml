@@ -26,7 +26,8 @@
         <parameter key="security.authentication.session_strategy.class">Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy</parameter>
         <parameter key="security.authentication.concurrent_session_strategy.class">Symfony\Component\Security\Http\Session\ConcurrentSessionControlStrategy</parameter>
         <parameter key="security.authentication.session_registry.class">Symfony\Component\Security\Http\Session\SessionRegistry</parameter>
-        <parameter key="security.authentication.session_information.class">Symfony\Component\Security\Http\Session\SessionInformation</parameter>
+        <parameter key="security.authentication.session_registry_storage.class">Symfony\Bundle\SecurityBundle\Doctrine\DoctrineSessionRegistryStorage</parameter>
+        <parameter key="security.authentication.session_information.class">Symfony\Bundle\SecurityBundle\Doctrine\DoctrineSessionInformation</parameter>
         <parameter key="security.authentication.session_information_iterator.class">Symfony\Component\Security\Http\Session\SessionInformationIterator</parameter>
 
         <parameter key="security.access.decision_manager.class">Symfony\Component\Security\Core\Authorization\AccessDecisionManager</parameter>
@@ -82,6 +83,10 @@
             <argument type="service" id="security.authentication.session_registry_storage" />
             <argument>%security.authentication.session_information.class%</argument>
             <argument>%security.authentication.session_information_iterator.class%</argument>
+        </service>
+
+        <service id="security.authentication.session_registry_storage" class="%security.authentication.session_registry_storage.class%" public="true">
+            <argument type="service" id="doctrine.orm.security_entity_manager" />
         </service>
 
         <service id="security.encoder_factory.generic" class="%security.encoder_factory.generic.class%" public="false">

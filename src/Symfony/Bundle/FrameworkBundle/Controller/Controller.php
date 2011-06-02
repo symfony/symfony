@@ -144,6 +144,10 @@ class Controller extends ContainerAware
      */
     public function getDoctrine()
     {
+        if (!$this->has('doctrine')) {
+            throw new \LogicException('The DoctrineBundle is not installed in your application.');
+        }
+
         return $this->get('doctrine');
     }
 

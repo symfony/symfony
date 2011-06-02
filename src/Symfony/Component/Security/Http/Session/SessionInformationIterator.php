@@ -138,7 +138,7 @@ class SessionInformationIterator implements \Iterator, \ArrayAccess
     {
         $sessionsSorted = array();
         foreach ($this->sessions as $session) {
-            $sessionsSorted[$session->getLastRequest()] = $session;
+            $sessionsSorted[$session->getLastRequest()->getTimestamp()] = $session;
         }
         krsort($sessionsSorted);
 

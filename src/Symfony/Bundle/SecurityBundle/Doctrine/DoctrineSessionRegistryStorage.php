@@ -5,7 +5,6 @@ namespace Symfony\Bundle\SecurityBundle\Doctrine;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\StaticPHPDriver;
 use Symfony\Component\Security\Http\Session\SessionInformation;
-use Symfony\Component\Security\Http\Session\SessionInformationIterator;
 use Symfony\Component\Security\Http\Session\SessionRegistryStorageInterface;
 
 class DoctrineSessionRegistryStorage implements SessionRegistryStorageInterface
@@ -36,24 +35,22 @@ class DoctrineSessionRegistryStorage implements SessionRegistryStorageInterface
      */
     public function getSessionInformation($sessionId)
     {
-        return $this->em->find('Symfony\Bundle\SecurityBundle\Doctrine\DoctrineSessionInformation', $sessionId);
+        return $this->em->find('Security:DoctrineSessionInformation', $sessionId);
     }
 
     /**
      * Obtains the maintained information for one user.
      *
-     * @param string $sessionId the session identifier key.
-     * @return SessionInformationIterator a SessionInformationIterator object.
+     * @param string $username The user identifier.
+     * @param boolean $includeExpiredSessions.
+     * @return array An array of SessionInformation objects.
      */
-    public function getSessionInformations($username, $includeExpiredSessions)
+    public function getSessionInformations($username, $includeExpiredSessions = false)
     {
-        $sessions = new SessionInformationIterator();
-
-        foreach ($this->em->getRepository('Symfony\Bundle\SecurityBundle\Doctrine\DoctrineSessionInformation')->findBy(array('username' => $username)) as $sessionInformation) {
-            $sessions->add($sessionInformation);
-        }
-
-        return $sessions;
+        $query = $this->em->createQuery(
+            'SELECT si FROM Security:DoctrineSessionInformation si'.($includeExpiredSessions ? '' : ' WHERE si.expired IS NULL').' ORDER BY si.lastRequest DESC'
+        );
+        return $query->getResult();
     }
 
     /**

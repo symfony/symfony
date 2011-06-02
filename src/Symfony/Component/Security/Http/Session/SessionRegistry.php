@@ -24,13 +24,11 @@ class SessionRegistry
 {
     protected $sessionRegistryStorage;
     protected $sessionInformationClass;
-    protected $sessionInformationIteratorClass;
 
-    public function __construct(SessionRegistryStorageInterface $sessionRegistryStorage, $sessionInformationClass, $sessionInformationIteratorClass)
+    public function __construct(SessionRegistryStorageInterface $sessionRegistryStorage, $sessionInformationClass)
     {
         $this->sessionRegistryStorage = $sessionRegistryStorage;
         $this->sessionInformationClass = $sessionInformationClass;
-        $this->sessionInformationIteratorClass = $sessionInformationIteratorClass;
     }
 
     /**
@@ -48,7 +46,7 @@ class SessionRegistry
      *
      * @param UserInterface $user the specified user.
      * @param boolean $includeExpiredSessions.
-     * @return SessionInformationIterator $sessions the known sessions.
+     * @return array An array of SessionInformation objects.
      */
     public function getAllSessions(UserInterface $user, $includeExpiredSessions = false)
     {

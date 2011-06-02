@@ -60,7 +60,7 @@ class ConcurrentSessionControlStrategy extends SessionAuthenticationStrategy
         $sessions       = $this->registry->getAllSessions($user);
         $maxSessions    = $this->getMaximumSessionsForThisUser($user);
 
-        if ($sessions->count() >= $maxSessions && $this->alwaysCreateSession !== true) {
+        if (count($sessions) >= $maxSessions && $this->alwaysCreateSession !== true) {
             if ($this->exceptionIfMaximumExceeded) {
                 throw new \RuntimeException(sprintf('Maximum of sessions (%s) exceeded', $maxSessions));
             }
@@ -107,18 +107,15 @@ class ConcurrentSessionControlStrategy extends SessionAuthenticationStrategy
     /**
      * Allows subclasses to customise behaviour when too many sessions are detected.
      *
-     * @param SessionInformationIterator $sessions
+     * @param array $sessions
      * @param integer $allowableSessions
      * @param SessionRegistry $registry
      * @return void
      */
-    protected function allowableSessionsExceeded(SessionInformationIterator $sessions, $allowableSessions, SessionRegistry $registry)
+    protected function allowableSessionsExceeded($sessions, $allowableSessions, SessionRegistry $registry)
     {
         // remove oldest sessions from registry
-        $count = 0;
-        $sessions->sort();
-
-        for ($i = $allowableSessions - 1; $i < $sessions->count(); $i++) {
+        for ($i = $allowableSessions - 1; $i < count($sessions); $i++) {
             $sessions[$i]->expireNow();
             $registry->setSessionInformation($sessions[$i]);
         }

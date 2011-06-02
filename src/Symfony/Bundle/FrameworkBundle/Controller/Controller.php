@@ -15,6 +15,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Form\FormTypeInterface;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilder;
 
 /**
  * Controller is a simple implementation of a Controller.
@@ -105,6 +108,33 @@ class Controller extends ContainerAware
     public function createNotFoundException($message = 'Not Found', \Exception $previous = null)
     {
         return new NotFoundHttpException($message, $previous);
+    }
+
+    /**
+     * Creates and returns a Form instance from the type of the form
+     *
+     * @param string|FormTypeInterface $type    The built type of the form
+     * @param mixed $data                       The initial data for the form
+     * @param array $options                    Options for the form
+     *
+     * @return Form
+     */
+    public function createForm($type, $data = null, array $options = array())
+    {
+        return $this->get('form.factory')->create($type, $data, $options);
+    }
+
+    /**
+     * Creates and returns a form builder instance
+     *
+     * @param mixed $data               The initial data for the form
+     * @param array $options            Options for the form
+     *
+     * @return FormBuilder
+     */
+    public function createFormBuilder($data = null, array $options = array())
+    {
+        return $this->get('form.factory')->createBuilder('form', $data, $options);
     }
 
     /**

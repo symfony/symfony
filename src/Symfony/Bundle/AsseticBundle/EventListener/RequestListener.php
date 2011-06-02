@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfony\Bundle\AsseticBundle\Listener;
+namespace Symfony\Bundle\AsseticBundle\EventListener;
 
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 

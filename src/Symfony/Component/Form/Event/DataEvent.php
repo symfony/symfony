@@ -34,7 +34,7 @@ class DataEvent extends Event
     /**
      * Returns the form at the source of the event.
      * 
-     * @return FormInterafce
+     * @return FormInterface
      */
     public function getForm()
     {

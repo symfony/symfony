@@ -11,6 +11,10 @@
 
 namespace Symfony\Tests\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
+
+use Symfony\Component\HttpFoundation\Session;
+
 use Symfony\Component\HttpFoundation\RequestMatcher;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -90,6 +94,22 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($matcher->matches($request));
 
         $matcher->matchMethod('/blog/.*');
+        $this->assertFalse($matcher->matches($request));
+    }
+
+    public function testPathWithLocale()
+    {
+        $matcher = new RequestMatcher();
+        $request = Request::create('/en/login');
+
+        $session = new Session(new ArraySessionStorage());
+        $session->setLocale('en');
+        $request->setSession($session);
+
+        $matcher->matchPath('^/{_locale}/login$');
+        $this->assertTrue($matcher->matches($request));
+
+        $session->setLocale('de');
         $this->assertFalse($matcher->matches($request));
     }
 

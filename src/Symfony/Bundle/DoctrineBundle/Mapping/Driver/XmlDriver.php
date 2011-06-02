@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\Mapping\Driver\XmlDriver as BaseXmlDriver;
 
 /**
- * XmlDriver that additionnaly looks for mapping information in a global file.
+ * XmlDriver that additionally looks for mapping information in a global file.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

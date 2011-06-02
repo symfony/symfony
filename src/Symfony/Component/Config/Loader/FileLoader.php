@@ -48,9 +48,10 @@ abstract class FileLoader extends Loader
     /**
      * Adds definitions and parameters from a resource.
      *
-     * @param mixed   $resource     A Resource
-     * @param string  $type         The resource type
-     * @param Boolean $ignoreErrors Whether to ignore import errors or not
+     * @param mixed   $resource       A Resource
+     * @param string  $type           The resource type
+     * @param Boolean $ignoreErrors   Whether to ignore import errors or not
+     * @param string  $sourceResource The original resource importing the new resource
      *
      * @return mixed
      */

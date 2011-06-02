@@ -40,7 +40,7 @@ class CallbackTransformer implements DataTransformerInterface
     /**
      * Transforms a value from the original representation to a transformed representation.
      *
-     * @param  mixed $value              The value in the original representation
+     * @param  mixed $data               The value in the original representation
      *
      * @return mixed                     The value in the transformed representation
      *
@@ -56,7 +56,7 @@ class CallbackTransformer implements DataTransformerInterface
      * Transforms a value from the transformed representation to its original
      * representation.
      *
-     * @param  mixed $value              The value in the transformed representation
+     * @param  mixed $data               The value in the transformed representation
      *
      * @return mixed                     The value in the original representation
      *

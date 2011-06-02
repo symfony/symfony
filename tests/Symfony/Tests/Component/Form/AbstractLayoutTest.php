@@ -93,7 +93,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     abstract protected function renderEnctype(FormView $view);
 
-    abstract protected function renderLabel(FormView $view, $label = null);
+    abstract protected function renderLabel(FormView $view, $label = null, array $vars = array());
 
     abstract protected function renderErrors(FormView $view);
 
@@ -130,7 +130,9 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $form = $this->factory->createNamed('text', 'na&me', null, array(
             'property_path' => 'name',
         ));
-        $html = $this->renderLabel($form->createView());
+        $view = $form->createView();
+        $this->renderWidget($view, array('label' => 'foo'));
+        $html = $this->renderLabel($view);
 
         $this->assertMatchesXpath($html,
 '/label
@@ -166,6 +168,61 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertMatchesXpath($html,
 '/label
     [@for="na&me"]
+    [.="[trans]Custom label[/trans]"]
+'
+        );
+    }
+
+    public function testLabelWithCustomTextPassedAsOptionAndDirectly()
+    {
+        $form = $this->factory->createNamed('text', 'na&me', null, array(
+            'property_path' => 'name',
+            'label' => 'Custom label',
+        ));
+        $html = $this->renderLabel($form->createView(), 'Overridden label');
+
+        $this->assertMatchesXpath($html,
+'/label
+    [@for="na&me"]
+    [.="[trans]Overridden label[/trans]"]
+'
+        );
+    }
+
+    public function testLabelWithCustomOptionsPassedDirectly()
+    {
+        $form = $this->factory->createNamed('text', 'na&me', null, array(
+            'property_path' => 'name',
+        ));
+        $html = $this->renderLabel($form->createView(), null, array(
+            'attr' => array(
+                'class' => 'my&class'
+            ),
+        ));
+
+        $this->assertMatchesXpath($html,
+'/label
+    [@for="na&me"]
+    [@class="my&class"]
+'
+        );
+    }
+
+    public function testLabelWithCustomTextAndCustomOptionsPassedDirectly()
+    {
+        $form = $this->factory->createNamed('text', 'na&me', null, array(
+            'property_path' => 'name',
+        ));
+        $html = $this->renderLabel($form->createView(), 'Custom label', array(
+            'attr' => array(
+                'class' => 'my&class'
+            ),
+        ));
+
+        $this->assertMatchesXpath($html,
+'/label
+    [@for="na&me"]
+    [@class="my&class"]
     [.="[trans]Custom label[/trans]"]
 '
         );
@@ -623,7 +680,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $form = $this->factory->createNamed('date', 'na&me', '2011-02-03', array(
             'property_path' => 'name',
             'input' => 'string',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),

@@ -13,7 +13,7 @@ namespace Symfony\Bundle\AsseticBundle\Factory\Loader;
 
 use Assetic\Factory\Loader\FormulaLoaderInterface;
 use Assetic\Factory\Resource\ResourceInterface;
-use Symfony\Bundle\AsseticBundle\Factory\ConfigurationResource;
+use Symfony\Bundle\AsseticBundle\Factory\Resource\ConfigurationResource;
 
 /**
  * Loads configured formulae.

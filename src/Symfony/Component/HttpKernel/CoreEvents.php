@@ -16,10 +16,10 @@ namespace Symfony\Component\HttpKernel;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-final class Events
+final class CoreEvents
 {
     /**
-     * The onCoreRequest event occurs at the very beginning of request
+     * The REQUEST event occurs at the very beginning of request
      * dispatching
      *
      * This event allows you to create a response for a request before any
@@ -29,10 +29,10 @@ final class Events
      *
      * @var string
      */
-    const onCoreRequest = 'onCoreRequest';
+    const REQUEST = 'core.request';
 
     /**
-     * The onCoreException event occurs when an uncaught exception appears
+     * The EXCEPTION event occurs when an uncaught exception appears
      *
      * This event allows you to create a response for a thrown exception or
      * to modify the thrown exception. The event listener method receives
@@ -41,10 +41,10 @@ final class Events
      *
      * @var string
      */
-    const onCoreException = 'onCoreException';
+    const EXCEPTION = 'core.exception';
 
     /**
-     * The onCoreView event occurs when the return value of a controller
+     * The VIEW event occurs when the return value of a controller
      * is not a Response instance
      *
      * This event allows you to create a response for the return value of the
@@ -54,10 +54,10 @@ final class Events
      *
      * @var string
      */
-    const onCoreView = 'onCoreView';
+    const VIEW = 'core.view';
 
     /**
-     * The onCoreController event occurs once a controller was found for
+     * The CONTROLLER event occurs once a controller was found for
      * handling a request
      *
      * This event allows you to change the controller that will handle the
@@ -66,10 +66,10 @@ final class Events
      *
      * @var string
      */
-    const onCoreController = 'onCoreController';
+    const CONTROLLER = 'core.controller';
 
     /**
-     * The onCoreController event occurs once a response was created for
+     * The RESPONSE event occurs once a response was created for
      * replying to a request
      *
      * This event allows you to modify or replace the response that will be
@@ -78,5 +78,5 @@ final class Events
      *
      * @var string
      */
-    const onCoreResponse = 'onCoreResponse';
+    const RESPONSE = 'core.response';
 }

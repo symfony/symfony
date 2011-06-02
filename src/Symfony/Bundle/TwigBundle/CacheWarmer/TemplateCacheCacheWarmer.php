@@ -32,8 +32,8 @@ class TemplateCacheCacheWarmer implements CacheWarmerInterface
     /**
      * Constructor.
      *
-     * @param ContainerInterface        $container The dependency injection container
-     * @param TemplatePathsCacheWarmer  $warmer    The template paths cache warmer
+     * @param ContainerInterface $container The dependency injection container
+     * @param TemplateFinder     $finder    The template paths cache warmer
      */
     public function __construct(ContainerInterface $container, TemplateFinder $finder)
     {

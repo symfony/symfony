@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Test;
+namespace Symfony\Bundle\FrameworkBundle\EventListener;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,14 +20,14 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * SessionListener.
+ * TestSessionListener.
  *
  * Saves session in test environment.
  *
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class SessionListener
+class TestSessionListener
 {
     protected $container;
 
@@ -55,7 +55,7 @@ class SessionListener
 
     /**
      * Checks if session was initialized and saves if current request is master
-     * Runs on 'onCoreResponse' in test environment
+     * Runs on 'core.response' in test environment
      *
      * @param FilterResponseEvent $event
      */

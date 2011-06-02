@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Symfony\Bundle\DoctrineBundle\Tests\Mapping\Driver;
 
 abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
@@ -65,9 +74,9 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        $iter = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->dir), \RecursiveIteratorIterator::CHILD_FIRST);
+        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->dir), \RecursiveIteratorIterator::CHILD_FIRST);
 
-        foreach ($iter as $path) {
+        foreach ($iterator as $path) {
             if ($path->isDir()) {
                 @rmdir($path);
             } else {

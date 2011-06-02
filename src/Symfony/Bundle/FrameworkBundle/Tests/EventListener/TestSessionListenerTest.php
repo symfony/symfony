@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Test;
+namespace Symfony\Bundle\FrameworkBundle\Tests\EventListener;
 
-use Symfony\Bundle\FrameworkBundle\Test\SessionListener;
+use Symfony\Bundle\FrameworkBundle\EventListener\TestSessionListener;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -24,14 +24,14 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
  *
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  */
-class SessionListenerTest extends \PHPUnit_Framework_TestCase
+class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
 {
     private $listener;
     private $session;
 
     public function setUp()
     {
-        $this->listener = new SessionListener($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface'));
+        $this->listener = new TestSessionListener($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface'));
         $this->session  = $this->getSession();
     }
 

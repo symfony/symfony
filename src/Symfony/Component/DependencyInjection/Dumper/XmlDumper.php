@@ -212,9 +212,10 @@ class XmlDumper extends Dumper
     /**
      * Converts parameters.
      *
-     * @param array $parameters
-     * @param string $type
+     * @param array      $parameters
+     * @param string     $type
      * @param DOMElement $parent
+     * @param string     $keyAttribute
      * @return void
      */
     private function convertParameters($parameters, $type, \DOMElement $parent, $keyAttribute = 'key')

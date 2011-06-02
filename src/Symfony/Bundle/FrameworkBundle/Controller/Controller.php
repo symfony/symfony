@@ -138,6 +138,16 @@ class Controller extends ContainerAware
     }
 
     /**
+     * Shortcut to return the Doctrine Registry class
+     *
+     * @return Symfony\Bundle\DoctrineBundle\Registry
+     */
+    public function getDoctrine()
+    {
+        return $this->get('doctrine');
+    }
+
+    /**
      * Returns true if the service id is defined.
      *
      * @param  string  $id The service id

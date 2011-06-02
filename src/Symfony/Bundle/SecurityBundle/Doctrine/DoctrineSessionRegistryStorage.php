@@ -48,8 +48,10 @@ class DoctrineSessionRegistryStorage implements SessionRegistryStorageInterface
     public function getSessionInformations($username, $includeExpiredSessions = false)
     {
         $query = $this->em->createQuery(
-            'SELECT si FROM Security:DoctrineSessionInformation si'.($includeExpiredSessions ? '' : ' WHERE si.expired IS NULL').' ORDER BY si.lastRequest DESC'
+            'SELECT si FROM Security:DoctrineSessionInformation si WHERE si.username = ?1'.($includeExpiredSessions ? '' : ' AND si.expired IS NULL').' ORDER BY si.lastRequest DESC'
         );
+        $query->setParameter(1, $username);
+
         return $query->getResult();
     }
 

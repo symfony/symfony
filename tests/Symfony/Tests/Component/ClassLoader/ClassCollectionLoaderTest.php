@@ -43,7 +43,7 @@ namespace Foo
 {
 class Foo {}
 }
-namespace   Bar 
+namespace   Bar
 {
 class Foo {}
 }

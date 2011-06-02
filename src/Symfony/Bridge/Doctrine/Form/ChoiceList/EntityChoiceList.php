@@ -181,7 +181,7 @@ class EntityChoiceList extends ArrayChoiceList
                 // entity ID for performance reasons
                 $id = current($this->getIdentifierValues($entity));
             }
-            
+
             if (null === $group) {
                 // Flat list of choices
                 $this->choices[$id] = $value;
@@ -189,7 +189,7 @@ class EntityChoiceList extends ArrayChoiceList
                 // Nested choices
                 $this->choices[$group][$id] = $value;
             }
-            
+
             $this->entities[$id] = $entity;
         }
     }

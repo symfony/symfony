@@ -15,8 +15,8 @@ class FilterDataEvent extends DataEvent
 {
     /**
      * Allows updating with some filtered data
-     * 
-     * @param mixed $data 
+     *
+     * @param mixed $data
      */
     public function setData($data)
     {

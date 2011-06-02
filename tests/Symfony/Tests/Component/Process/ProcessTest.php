@@ -20,13 +20,13 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * tests getter/setter
-     * 
+     *
      * @dataProvider methodProvider
      */
     public function testDefaultGetterSetter($fn)
     {
         $p = new Process('php');
-        
+
         $setter = 'set'.$fn;
         $getter = 'get'.$fn;
 
@@ -34,20 +34,20 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(array('foo'), $p->$getter(array('foo')));
     }
-    
+
     /**
      * tests results from sub processes
-     * 
+     *
      * @dataProvider codeProvider
      */
     public function testProcessResponses($expected, $getter, $code)
     {
         $p = new Process(sprintf('php -r "%s"', $code));
         $p->run();
-        
+
         $this->assertSame($expected, $p->$getter());
     }
-    
+
     public function codeProvider()
     {
         return array(
@@ -57,7 +57,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
             array('output', 'getOutput', 'echo \"output\";'),
         );
     }
-    
+
     /**
      * provides default method names for simple getter/setter
      */
@@ -71,7 +71,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
             array('Stdin'),
             array('Options')
         );
-        
+
         return $defaults;
     }
 }

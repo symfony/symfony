@@ -296,7 +296,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader1 = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml/extension1'));
         $loader1->load('services.xml');
         $services = $container->getDefinitions();
-        $this->assertEquals(2, count($services), '->load() attributes unique ids to anonymous services');        
+        $this->assertEquals(2, count($services), '->load() attributes unique ids to anonymous services');
         $loader2 = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml/extension2'));
         $loader2->load('services.xml');
         $services = $container->getDefinitions();

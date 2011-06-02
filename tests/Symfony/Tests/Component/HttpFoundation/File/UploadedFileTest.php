@@ -79,7 +79,7 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('original.gif', $file->getOriginalName());
     }
-    
+
     public function testGetOriginalNameSanitizeFilename()
     {
         $file = new UploadedFile(
@@ -91,5 +91,5 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals('original.gif', $file->getOriginalName());
-    }    
+    }
 }

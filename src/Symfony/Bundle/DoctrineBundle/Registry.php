@@ -115,7 +115,7 @@ class Registry
      * @param string $entityManagerNAme The entity manager name (null for the default one)
      * @return Doctrine\ORM\EntityRepository
      */
-    public function getRepository($entityName, $entityManagerName)
+    public function getRepository($entityName, $entityManagerName = null)
     {
         return $this->getEntityManager($entityManagerName)
             ->getRespository($entityName);

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -164,9 +164,9 @@ class ChoiceTypeTest extends TypeTestCase
             'expanded' => true,
             'choices' => $this->choices,
         ));
-        
+
         $form->bind(false);
-        
+
         $this->assertEmpty($form->getExtraData());
         $this->assertNull($form->getData());
     }

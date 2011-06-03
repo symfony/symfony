@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -21,7 +21,7 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 /**
  * Represents an Array node in the config tree.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class ArrayNode extends BaseNode implements PrototypeNodeInterface
@@ -36,7 +36,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param string $name The Node's name
      * @param NodeInterface $parent The node parent
      */
@@ -55,7 +55,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * Sets the xml remappings that should be performed.
-     *
+     * 
      * @param array $remappings an array of the form array(array(string, string))
      */
     public function setXmlRemappings(array $remappings)
@@ -66,7 +66,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Sets whether to add default values for this array if it has not been
      * defined in any of the configuration files.
-     *
+     * 
      * @param Boolean $boolean
      */
     public function setAddIfNotSet($boolean)
@@ -77,7 +77,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Sets whether false is allowed as value indicating that the array should
      * be unset.
-     *
+     * 
      * @param Boolean $allow
      */
     public function setAllowFalse($allow)
@@ -87,7 +87,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * Sets whether new keys can be defined in subsequent configurations.
-     *
+     * 
      * @param Boolean $allow
      */
     public function setAllowNewKeys($allow)
@@ -97,7 +97,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * Sets if deep merging should occur.
-     *
+     * 
      * @param Boolean $boolean
      */
     public function setPerformDeepMerging($boolean)
@@ -107,7 +107,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * Whether extra keys should just be ignore without an exception.
-     *
+     * 
      * @param Boolean $boolean To allow extra keys
      */
     public function setIgnoreExtraKeys($boolean)
@@ -117,7 +117,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * Sets the node Name.
-     *
+     * 
      * @param string $name The node's name
      */
     public function setName($name)
@@ -127,7 +127,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * Checks if the node has a default value.
-     *
+     * 
      * @return Boolean
      */
     public function hasDefaultValue()
@@ -137,7 +137,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * Retrieves the default value.
-     *
+     * 
      * @return array The default value
      * @throws \RuntimeException if the node has no default value
      */
@@ -159,7 +159,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * Adds a child node.
-     *
+     * 
      * @param NodeInterface $node The child node to add
      * @throws \InvalidArgumentException when the child node has no name
      * @throws \InvalidArgumentException when the child node's name is not unique
@@ -179,7 +179,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * Finalizes the value of this node.
-     *
+     * 
      * @param mixed $value
      * @return mixed The finalised value
      * @throws UnsetKeyException
@@ -221,7 +221,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * Validates the type of the value.
-     *
+     * 
      * @param mixed $value
      * @throws InvalidTypeException
      */
@@ -241,7 +241,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * Normalizes the value.
-     *
+     * 
      * @param mixed $value The value to normalize
      * @return mixed The normalized value
      */
@@ -275,7 +275,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * Remap multiple singular values to a single plural value
-     *
+     * 
      * @param array $value The source values
      * @return array The remaped values
      */
@@ -297,7 +297,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * Merges values together.
-     *
+     * 
      * @param mixed $leftSide The left side to merge.
      * @param mixed $rightSide The right side to merge.
      * @return mixed The merged values

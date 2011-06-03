@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,9 +13,9 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 /**
  * Compiler Pass Configuration
- *
+ * 
  * This class has a default configuration embedded.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class PassConfig
@@ -71,7 +71,7 @@ class PassConfig
 
     /**
      * Returns all passes in order to be processed.
-     *
+     * 
      * @return array An array of all passes to process
      */
     public function getPasses()
@@ -88,7 +88,7 @@ class PassConfig
 
     /**
      * Adds a pass.
-     *
+     * 
      * @param CompilerPassInterface $pass A Compiler pass
      * @param string $type The pass type
      * @throws \InvalidArgumentException when a pass type doesn't exist
@@ -106,7 +106,7 @@ class PassConfig
 
     /**
      * Gets all passes for the AfterRemoving pass.
-     *
+     * 
      * @return array An array of passes
      */
     public function getAfterRemovingPasses()
@@ -116,7 +116,7 @@ class PassConfig
 
     /**
      * Gets all passes for the BeforeOptimization pass.
-     *
+     * 
      * @return array An array of passes
      */
     public function getBeforeOptimizationPasses()
@@ -126,7 +126,7 @@ class PassConfig
 
     /**
      * Gets all passes for the BeforeRemoving pass.
-     *
+     * 
      * @return array An array of passes
      */
     public function getBeforeRemovingPasses()
@@ -136,7 +136,7 @@ class PassConfig
 
     /**
      * Gets all passes for the Optimization pass.
-     *
+     * 
      * @return array An array of passes
      */
     public function getOptimizationPasses()
@@ -146,7 +146,7 @@ class PassConfig
 
     /**
      * Gets all passes for the Removing pass.
-     *
+     * 
      * @return array An array of passes
      */
     public function getRemovingPasses()
@@ -156,7 +156,7 @@ class PassConfig
 
     /**
      * Gets all passes for the Merge pass.
-     *
+     * 
      * @return array An array of passes
      */
     public function getMergePass()
@@ -166,7 +166,7 @@ class PassConfig
 
     /**
      * Sets the Merge Pass.
-     *
+     * 
      * @param CompilerPassInterface $pass The merge pass
      */
     public function setMergePass(CompilerPassInterface $pass)
@@ -176,7 +176,7 @@ class PassConfig
 
     /**
      * Sets the AfterRemoving passes.
-     *
+     * 
      * @param array $passes An array of passes
      */
     public function setAfterRemovingPasses(array $passes)
@@ -186,7 +186,7 @@ class PassConfig
 
     /**
      * Sets the BeforeOptimization passes.
-     *
+     * 
      * @param array $passes An array of passes
      */
     public function setBeforeOptimizationPasses(array $passes)
@@ -196,7 +196,7 @@ class PassConfig
 
     /**
      * Sets the BeforeRemoving passes.
-     *
+     * 
      * @param array $passes An array of passes
      */
     public function setBeforeRemovingPasses(array $passes)
@@ -206,7 +206,7 @@ class PassConfig
 
     /**
      * Sets the Optimization passes.
-     *
+     * 
      * @param array $passes An array of passes
      */
     public function setOptimizationPasses(array $passes)
@@ -216,7 +216,7 @@ class PassConfig
 
     /**
      * Sets the Removing passes.
-     *
+     * 
      * @param array $passes An array of passes
      */
     public function setRemovingPasses(array $passes)

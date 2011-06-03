@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 /**
  * Takes care of converting the input from a single radio button
  * to an array.
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
 class FixRadioInputListener implements EventSubscriberInterface

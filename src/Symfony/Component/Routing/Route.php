@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\Routing;
 
 /**
  * A Route describes a route and its parameters.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Route
@@ -28,11 +28,11 @@ class Route
 
     /**
      * Constructor.
-     *
+     * 
      * Available options:
-     *
+     * 
      *  * compiler_class: A class name able to compile this route instance (RouteCompiler by default)
-     *
+     * 
      * @param string $pattern       The pattern to match
      * @param array  $defaults      An array of default parameter values
      * @param array  $requirements  An array of requirements for parameters (regexes)
@@ -48,7 +48,7 @@ class Route
 
     /**
      * Returns the pattern.
-     *
+     * 
      * @return string The pattern
      */
     public function getPattern()
@@ -58,11 +58,11 @@ class Route
 
     /**
      * Sets the pattern.
-     *
+     * 
      * This method implements a fluent interface.
-     *
+     * 
      * @param string $pattern The pattern
-     *
+     * 
      * @return Route The current Route instance
      */
     public function setPattern($pattern)
@@ -79,7 +79,7 @@ class Route
 
     /**
      * Returns the options.
-     *
+     * 
      * @return array The options
      */
     public function getOptions()
@@ -89,11 +89,11 @@ class Route
 
     /**
      * Sets the options.
-     *
+     * 
      * This method implements a fluent interface.
-     *
+     * 
      * @param array $options The options
-     *
+     * 
      * @return Route The current Route instance
      */
     public function setOptions(array $options)
@@ -107,12 +107,12 @@ class Route
 
     /**
      * Sets an option value.
-     *
+     * 
      * This method implements a fluent interface.
-     *
+     * 
      * @param string $name  An option name
      * @param mixed  $value The option value
-     *
+     * 
      * @return Route The current Route instance
      */
     public function setOption($name, $value)
@@ -124,9 +124,9 @@ class Route
 
     /**
      * Get an option value.
-     *
+     * 
      * @param string $name An option name
-     *
+     * 
      * @return mixed The option value
      */
     public function getOption($name)
@@ -136,7 +136,7 @@ class Route
 
     /**
      * Returns the defaults.
-     *
+     * 
      * @return array The defaults
      */
     public function getDefaults()
@@ -146,11 +146,11 @@ class Route
 
     /**
      * Sets the defaults.
-     *
+     * 
      * This method implements a fluent interface.
-     *
+     * 
      * @param array $defaults The defaults
-     *
+     * 
      * @return Route The current Route instance
      */
     public function setDefaults(array $defaults)
@@ -162,9 +162,9 @@ class Route
 
     /**
      * Gets a default value.
-     *
+     * 
      * @param string $name A variable name
-     *
+     * 
      * @return mixed The default value
      */
     public function getDefault($name)
@@ -174,9 +174,9 @@ class Route
 
     /**
      * Checks if a default value is set for the given variable.
-     *
+     * 
      * @param string $name A variable name
-     *
+     * 
      * @return Boolean true if the default value is set, false otherwise
      */
     public function hasDefault($name)
@@ -186,10 +186,10 @@ class Route
 
     /**
      * Sets a default value.
-     *
+     * 
      * @param string $name    A variable name
      * @param mixed  $default The default value
-     *
+     * 
      * @return Route The current Route instance
      */
     public function setDefault($name, $default)
@@ -201,7 +201,7 @@ class Route
 
     /**
      * Returns the requirements.
-     *
+     * 
      * @return array The requirements
      */
     public function getRequirements()
@@ -211,11 +211,11 @@ class Route
 
     /**
      * Sets the requirements.
-     *
+     * 
      * This method implements a fluent interface.
-     *
+     * 
      * @param array $requirements The requirements
-     *
+     * 
      * @return Route The current Route instance
      */
     public function setRequirements(array $requirements)
@@ -230,7 +230,7 @@ class Route
 
     /**
      * Returns the requirement for the given key.
-     *
+     * 
      * @param string $key The key
      * @return string The regex
      */
@@ -241,10 +241,10 @@ class Route
 
     /**
      * Sets a requirement for the given key.
-     *
+     * 
      * @param string $key The key
      * @param string $regex The regex
-     *
+     * 
      * @return Route The current Route instance
      */
     public function setRequirement($key, $regex)
@@ -256,7 +256,7 @@ class Route
 
     /**
      * Compiles the route.
-     *
+     * 
      * @return CompiledRoute A CompiledRoute instance
      */
     public function compile()

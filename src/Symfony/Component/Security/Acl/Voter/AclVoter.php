@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -28,7 +28,7 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
 /**
  * This voter can be used as a base class for implementing your own permissions.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class AclVoter implements VoterInterface
@@ -130,9 +130,9 @@ class AclVoter implements VoterInterface
     /**
      * You can override this method when writing a voter for a specific domain
      * class.
-     *
+     * 
      * @param string $class The class name
-     *
+     * 
      * @return Boolean
      */
     public function supportsClass($class)

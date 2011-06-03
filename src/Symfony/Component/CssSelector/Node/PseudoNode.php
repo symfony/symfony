@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,10 +15,10 @@ use Symfony\Component\CssSelector\SyntaxError;
 
 /**
  * PseudoNode represents a "selector:ident" node.
- *
+ * 
  * This component is a port of the Python lxml library,
  * which is copyright Infrae and distributed under the BSD license.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class PseudoNode implements NodeInterface
@@ -35,7 +35,7 @@ class PseudoNode implements NodeInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param NodeInterface $element The NodeInterface element
      * @param string $type Node type
      * @param string $ident The ident
@@ -81,7 +81,7 @@ class PseudoNode implements NodeInterface
     }
 
     /**
-     *
+     * 
      * @param XPathExpr $xpath The XPath expression
      * @return XPathExpr The modified XPath expression
      */
@@ -106,7 +106,7 @@ class PseudoNode implements NodeInterface
 
     /**
      * Marks this XPath expression as the first child.
-     *
+     * 
      * @param XPathExpr $xpath The XPath expression
      * @return XPathExpr The modified expression
      */
@@ -121,7 +121,7 @@ class PseudoNode implements NodeInterface
 
     /**
      * Sets the XPath  to be the last child.
-     *
+     * 
      * @param XPathExpr $xpath The XPath expression
      * @return XPathExpr The modified expression
      */
@@ -136,7 +136,7 @@ class PseudoNode implements NodeInterface
 
     /**
      * Sets the XPath expression to be the first of type.
-     *
+     * 
      * @param XPathExpr $xpath The XPath expression
      * @return XPathExpr The modified expression
      */
@@ -153,7 +153,7 @@ class PseudoNode implements NodeInterface
 
     /**
      * Sets the XPath expression to be the last of type.
-     *
+     * 
      * @param XPathExpr $xpath The XPath expression
      * @return XPathExpr The modified expression
      * @throws SyntaxError Because *:last-of-type is not implemented
@@ -171,7 +171,7 @@ class PseudoNode implements NodeInterface
 
     /**
      * Sets the XPath expression to be the only child.
-     *
+     * 
      * @param XPathExpr $xpath The XPath expression
      * @return XPathExpr The modified expression
      */
@@ -186,7 +186,7 @@ class PseudoNode implements NodeInterface
 
     /**
      * Sets the XPath expression to be only of type.
-     *
+     * 
      * @param XPathExpr $xpath The XPath expression
      * @return XPathExpr The modified expression
      * @throws SyntaxError Because *:only-of-type is not implemented
@@ -203,7 +203,7 @@ class PseudoNode implements NodeInterface
 
     /**
      * undocumented function
-     *
+     * 
      * @param XPathExpr $xpath The XPath expression
      * @return XPathExpr The modified expression
      */

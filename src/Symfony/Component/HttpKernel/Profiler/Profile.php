@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 
 /**
  * Profile.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Profile implements \Serializable
@@ -36,7 +36,7 @@ class Profile implements \Serializable
 
     /**
      * Sets the token.
-     *
+     * 
      * @param string $token The token
      */
     public function setToken($token)
@@ -46,7 +46,7 @@ class Profile implements \Serializable
 
     /**
      * Gets the token.
-     *
+     * 
      * @return string The token
      */
     public function getToken()
@@ -56,7 +56,7 @@ class Profile implements \Serializable
 
     /**
      * Sets the parent token
-     *
+     * 
      * @param Profile $parent The parent Profile
      */
     public function setParent(Profile $parent)
@@ -66,7 +66,7 @@ class Profile implements \Serializable
 
     /**
      * Returns the parent token.
-     *
+     * 
      * @return Profile The parent profile
      */
     public function getParent()
@@ -76,7 +76,7 @@ class Profile implements \Serializable
 
     /**
      * Returns the IP.
-     *
+     * 
      * @return string The IP
      */
     public function getIp()
@@ -91,7 +91,7 @@ class Profile implements \Serializable
 
     /**
      * Returns the URL.
-     *
+     * 
      * @return string The URL
      */
     public function getUrl()
@@ -106,7 +106,7 @@ class Profile implements \Serializable
 
     /**
      * Returns the time.
-     *
+     * 
      * @return string The time
      */
     public function getTime()
@@ -121,7 +121,7 @@ class Profile implements \Serializable
 
     /**
      * Finds children profilers.
-     *
+     * 
      * @return array An array of Profile
      */
     public function getChildren()

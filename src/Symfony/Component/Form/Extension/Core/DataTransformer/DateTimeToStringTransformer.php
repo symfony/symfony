@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,7 +16,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * Transforms between a date string and a DateTime object
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
@@ -26,13 +26,13 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
 
     /**
      * Transforms a \DateTime instance to a string
-     *
+     * 
      * @see \DateTime::format() for supported formats
-     *
+     * 
      * @param string $inputTimezone  The name of the input timezone
      * @param string $outputTimezone The name of the output timezone
      * @param string $format         The date format
-     *
+     * 
      * @throws UnexpectedTypeException if a timezone is not a string
      */
     public function __construct($inputTimezone = null, $outputTimezone = null, $format = 'Y-m-d H:i:s')
@@ -45,11 +45,11 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a DateTime object into a date string with the configured format
      * and timezone
-     *
+     * 
      * @param  DateTime $value  A DateTime object
-     *
+     * 
      * @return string           A value as produced by PHP's date() function
-     *
+     * 
      * @throws UnexpectedTypeException if the given value is not a \DateTime instance
      * @throws TransformationFailedException if the output timezone is not supported
      */
@@ -74,11 +74,11 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
 
     /**
      * Transforms a date string in the configured timezone into a DateTime object.
-     *
+     * 
      * @param  string $value  A value as produced by PHP's date() function
-     *
+     * 
      * @return \DateTime      An instance of \DateTime
-     *
+     * 
      * @throws UnexpectedTypeException if the given value is not a string
      * @throws TransformationFailedException if the date could not be parsed
      * @throws TransformationFailedException if the input timezone is not supported

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,10 +13,10 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 /**
  * This is a directed graph of your services.
- *
+ * 
  * This information can be used by your compiler passes instead of collecting
  * it themselves which improves performance quite a lot.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class ServiceReferenceGraph
@@ -33,7 +33,7 @@ class ServiceReferenceGraph
 
     /**
      * Checks if the graph has a specific node.
-     *
+     * 
      * @param string $id Id to check
      */
     public function hasNode($id)
@@ -43,7 +43,7 @@ class ServiceReferenceGraph
 
     /**
      * Gets a node by identifier.
-     *
+     * 
      * @param string $id The id to retrieve
      * @return ServiceReferenceGraphNode The node matching the supplied identifier
      * @throws \InvalidArgumentException
@@ -59,7 +59,7 @@ class ServiceReferenceGraph
 
     /**
      * Returns all nodes.
-     *
+     * 
      * @return array An array of all ServiceReferenceGraphNode objects
      */
     public function getNodes()
@@ -77,7 +77,7 @@ class ServiceReferenceGraph
 
     /**
      * Connects 2 nodes together in the Graph.
-     *
+     * 
      * @param string $sourceId
      * @param string $sourceValue
      * @param string $destId
@@ -96,7 +96,7 @@ class ServiceReferenceGraph
 
     /**
      * Creates a graph node.
-     *
+     * 
      * @param string $id
      * @param string $value
      * @return ServiceReferenceGraphNode

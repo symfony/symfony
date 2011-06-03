@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 /**
  * Transforms between a number type and a localized number with grouping
  * (each thousand) and comma separators.
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
@@ -55,11 +55,11 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
 
     /**
      * Transforms a number type into localized number.
-     *
+     * 
      * @param  integer|float $value  Number value.
-     *
+     * 
      * @return string Localized value.
-     *
+     * 
      * @throws UnexpectedTypeException if the given value is not numeric
      * @throws TransformationFailedException if the value can not be transformed
      */
@@ -85,11 +85,11 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
 
     /**
      * Transforms a localized number into an integer or float
-     *
+     * 
      * @param string $value The localized value
-     *
+     * 
      * @return integer|float The numeric value
-     *
+     * 
      * @throws UnexpectedTypeException if the given value is not a string
      * @throws TransformationFailedException if the value can not be transformed
      */
@@ -115,7 +115,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
 
     /**
      * Returns a preconfigured \NumberFormatter instance
-     *
+     * 
      * @return \NumberFormatter
      */
     protected function getNumberFormatter()

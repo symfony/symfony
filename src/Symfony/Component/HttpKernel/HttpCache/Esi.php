@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,13 +17,13 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * Esi implements the ESI capabilities to Request and Response instances.
- *
+ * 
  * For more information, read the following W3C notes:
- *
+ * 
  *  * ESI Language Specification 1.0 (http://www.w3.org/TR/esi-lang)
- *
+ * 
  *  * Edge Architecture Specification (http://www.w3.org/TR/edge-arch)
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Esi
@@ -32,7 +32,7 @@ class Esi
 
     /**
      * Constructor.
-     *
+     * 
      * @param array $contentTypes An array of content-type that should be parsed for ESI information.
      *                           (default: text/html, text/xml, and application/xml)
      */
@@ -43,7 +43,7 @@ class Esi
 
     /**
      * Returns a new cache strategy instance.
-     *
+     * 
      * @return EsiResponseCacheStrategyInterface A EsiResponseCacheStrategyInterface instance
      */
     public function createCacheStrategy()
@@ -53,9 +53,9 @@ class Esi
 
     /**
      * Checks that at least one surrogate has ESI/1.0 capability.
-     *
+     * 
      * @param Request $request A Request instance
-     *
+     * 
      * @return Boolean true if one surrogate has ESI/1.0 capability, false otherwise
      */
     public function hasSurrogateEsiCapability(Request $request)
@@ -69,7 +69,7 @@ class Esi
 
     /**
      * Adds ESI/1.0 capability to the given Request.
-     *
+     * 
      * @param Request $request A Request instance
      */
     public function addSurrogateEsiCapability(Request $request)
@@ -82,9 +82,9 @@ class Esi
 
     /**
      * Adds HTTP headers to specify that the Response needs to be parsed for ESI.
-     *
+     * 
      * This method only adds an ESI HTTP header if the Response has some ESI tags.
-     *
+     * 
      * @param Response $response A Response instance
      */
     public function addSurrogateControl(Response $response)
@@ -96,9 +96,9 @@ class Esi
 
     /**
      * Checks that the Response needs to be parsed for ESI tags.
-     *
+     * 
      * @param Response $response A Response instance
-     *
+     * 
      * @return Boolean true if the Response needs to be parsed, false otherwise
      */
     public function needsEsiParsing(Response $response)
@@ -112,7 +112,7 @@ class Esi
 
     /**
      * Renders an ESI tag.
-     *
+     * 
      * @param string  $uri          A URI
      * @param string  $alt          An alternate URI
      * @param Boolean $ignoreErrors Whether to ignore errors or not
@@ -135,7 +135,7 @@ class Esi
 
     /**
      * Replaces a Response ESI tags with the included resource content.
-     *
+     * 
      * @param Request  $request  A Request instance
      * @param Response $response A Response instance
      */
@@ -176,7 +176,7 @@ class Esi
 
     /**
      * Handles an ESI from the cache.
-     *
+     * 
      * @param HttpCache $cache        An HttpCache instance
      * @param string    $uri          The main URI
      * @param string    $alt          An alternative URI
@@ -207,9 +207,9 @@ class Esi
 
     /**
      * Handles an ESI include tag (called internally).
-     *
+     * 
      * @param array $attributes An array containing the attributes.
-     *
+     * 
      * @return string The response content for the include.
      */
     private function handleEsiIncludeTag($attributes)

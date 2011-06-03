@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,14 +13,14 @@ namespace Symfony\Component\DependencyInjection;
 
 /**
  * SimpleXMLElement class.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SimpleXMLElement extends \SimpleXMLElement
 {
     /**
      * Converts an attribute as a php type.
-     *
+     * 
      * @param string $name
      * @return mixed
      */
@@ -31,10 +31,10 @@ class SimpleXMLElement extends \SimpleXMLElement
 
     /**
      * Returns arguments as valid php types.
-     *
+     * 
      * @param string  $name
      * @param Boolean $lowercase
-     *
+     * 
      * @return mixed
      */
     public function getArgumentsAsPhp($name, $lowercase = true)
@@ -93,7 +93,7 @@ class SimpleXMLElement extends \SimpleXMLElement
 
     /**
      * Converts an xml value to a php type.
-     *
+     * 
      * @param mixed $value
      * @return mixed
      */

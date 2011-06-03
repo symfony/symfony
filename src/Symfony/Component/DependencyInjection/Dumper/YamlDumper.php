@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,16 +18,16 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * YamlDumper dumps a service container as a YAML string.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class YamlDumper extends Dumper
 {
     /**
      * Dumps the service container as an YAML string.
-     *
+     * 
      * @param  array  $options An array of options
-     *
+     * 
      * @return string A YAML string representing of the service container
      */
     public function dump(array $options = array())
@@ -37,7 +37,7 @@ class YamlDumper extends Dumper
 
     /**
      * Adds a service
-     *
+     * 
      * @param string $id
      * @param Definition $definition
      * @return string
@@ -110,7 +110,7 @@ class YamlDumper extends Dumper
 
     /**
      * Adds a service alias
-     *
+     * 
      * @param string $alias
      * @param string $id
      * @return void
@@ -126,7 +126,7 @@ class YamlDumper extends Dumper
 
     /**
      * Adds services
-     *
+     * 
      * @return string
      */
     private function addServices()
@@ -149,7 +149,7 @@ class YamlDumper extends Dumper
 
     /**
      * Adds parameters
-     *
+     * 
      * @return string
      */
     private function addParameters()
@@ -169,7 +169,7 @@ class YamlDumper extends Dumper
 
     /**
      * Dumps the value to YAML format
-     *
+     * 
      * @param mixed $value
      * @throws \RuntimeException When trying to dump object or resource
      */
@@ -195,7 +195,7 @@ class YamlDumper extends Dumper
 
     /**
      * Gets the service call.
-     *
+     * 
      * @param string    $id
      * @param Reference $reference
      * @return string
@@ -211,7 +211,7 @@ class YamlDumper extends Dumper
 
     /**
      * Gets parameter call.
-     *
+     * 
      * @param string $id
      * @return string
      */
@@ -222,7 +222,7 @@ class YamlDumper extends Dumper
 
     /**
      * Prepares parameters
-     *
+     * 
      * @param array $parameters
      * @return array
      */
@@ -244,7 +244,7 @@ class YamlDumper extends Dumper
 
     /**
      * Escapes arguments
-     *
+     * 
      * @param array $arguments
      * @return array
      */

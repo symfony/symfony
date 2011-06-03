@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\Config\Definition\Builder;
 
 /**
  * This class builds merge conditions.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class MergeBuilder
@@ -24,7 +24,7 @@ class MergeBuilder
 
     /**
      * Constructor
-     *
+     * 
      * @param NodeDefinition $node The related node
      */
     public function __construct(NodeDefinition $node)
@@ -36,7 +36,7 @@ class MergeBuilder
 
     /**
      * Sets whether the node can be unset.
-     *
+     * 
      * @param Boolean $allow
      * @return MergeBuilder
      */
@@ -49,9 +49,9 @@ class MergeBuilder
 
     /**
      * Sets whether the node can be overwritten.
-     *
+     * 
      * @param Boolean $deny Whether the overwriting is forbidden or not
-     *
+     * 
      * @return MergeBuilder
      */
     public function denyOverwrite($deny = true)
@@ -63,7 +63,7 @@ class MergeBuilder
 
     /**
      * Returns the related node.
-     *
+     * 
      * @return NodeDefinition
      */
     public function end()

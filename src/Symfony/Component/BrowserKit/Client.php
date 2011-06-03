@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -21,14 +21,14 @@ use Symfony\Component\BrowserKit\Client;
 
 /**
  * Client simulates a browser.
- *
+ * 
  * To make the actual request, you need to implement the doRequest() method.
- *
+ * 
  * If you want to be able to run requests in their own process (insulated flag),
  * you need to also implement the getScript() method.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * @api
  */
 abstract class Client
@@ -45,11 +45,11 @@ abstract class Client
 
     /**
      * Constructor.
-     *
+     * 
      * @param array     $server    The server parameters (equivalent of $_SERVER)
      * @param History   $history   A History instance to store the browser history
      * @param CookieJar $cookieJar A CookieJar instance to store the cookies
-     *
+     * 
      * @api
      */
     public function __construct(array $server = array(), History $history = null, CookieJar $cookieJar = null)
@@ -63,9 +63,9 @@ abstract class Client
 
     /**
      * Sets whether to automatically follow redirects or not.
-     *
+     * 
      * @param Boolean $followRedirect Whether to follow redirects
-     *
+     * 
      * @api
      */
     public function followRedirects($followRedirect = true)
@@ -75,11 +75,11 @@ abstract class Client
 
     /**
      * Sets the insulated flag.
-     *
+     * 
      * @param Boolean $insulated Whether to insulate the requests or not
-     *
+     * 
      * @throws \RuntimeException When Symfony Process Component is not installed
-     *
+     * 
      * @api
      */
     public function insulate($insulated = true)
@@ -95,9 +95,9 @@ abstract class Client
 
     /**
      * Sets server parameters.
-     *
+     * 
      * @param array $server An array of server parameters
-     *
+     * 
      * @api
      */
     public function setServerParameters(array $server)
@@ -110,7 +110,7 @@ abstract class Client
 
     /**
      * Sets single server parameter.
-     *
+     * 
      * @param string $key   A key of the parameter
      * @param string $value A value of the parameter
      */
@@ -121,7 +121,7 @@ abstract class Client
 
     /**
      * Gets single server parameter for specified key.
-     *
+     * 
      * @param string $key     A key of the parameter to get
      * @param string $default A default value when key is undefined
      * @return string A value of the parameter
@@ -133,9 +133,9 @@ abstract class Client
 
     /**
      * Returns the History instance.
-     *
+     * 
      * @return History A History instance
-     *
+     * 
      * @api
      */
     public function getHistory()
@@ -145,9 +145,9 @@ abstract class Client
 
     /**
      * Returns the CookieJar instance.
-     *
+     * 
      * @return CookieJar A CookieJar instance
-     *
+     * 
      * @api
      */
     public function getCookieJar()
@@ -157,9 +157,9 @@ abstract class Client
 
     /**
      * Returns the current Crawler instance.
-     *
+     * 
      * @return Crawler A Crawler instance
-     *
+     * 
      * @api
      */
     public function getCrawler()
@@ -169,9 +169,9 @@ abstract class Client
 
     /**
      * Returns the current Response instance.
-     *
+     * 
      * @return Response A Response instance
-     *
+     * 
      * @api
      */
     public function getResponse()
@@ -181,9 +181,9 @@ abstract class Client
 
     /**
      * Returns the current Request instance.
-     *
+     * 
      * @return Request A Request instance
-     *
+     * 
      * @api
      */
     public function getRequest()
@@ -193,9 +193,9 @@ abstract class Client
 
     /**
      * Clicks on a given link.
-     *
+     * 
      * @param Link $link A Link instance
-     *
+     * 
      * @api
      */
     public function click(Link $link)
@@ -205,10 +205,10 @@ abstract class Client
 
     /**
      * Submits a form.
-     *
+     * 
      * @param Form  $form   A Form instance
      * @param array $values An array of form field values
-     *
+     * 
      * @api
      */
     public function submit(Form $form, array $values = array())
@@ -220,7 +220,7 @@ abstract class Client
 
     /**
      * Calls a URI.
-     *
+     * 
      * @param string  $method        The request method
      * @param string  $uri           The URI to fetch
      * @param array   $parameters    The Request parameters
@@ -228,9 +228,9 @@ abstract class Client
      * @param array   $server        The server parameters (HTTP headers are referenced with a HTTP_ prefix as PHP does)
      * @param string  $content       The raw body data
      * @param Boolean $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
-     *
+     * 
      * @return Crawler
-     *
+     * 
      * @api
      */
     public function request($method, $uri, array $parameters = array(), array $files = array(), array $server = array(), $content = null, $changeHistory = true)
@@ -273,11 +273,11 @@ abstract class Client
 
     /**
      * Makes a request in another process.
-     *
+     * 
      * @param Request $request A Request instance
-     *
+     * 
      * @return Response A Response instance
-     *
+     * 
      * @throws \RuntimeException When processing returns exit code
      */
     protected function doRequestInProcess($request)
@@ -294,18 +294,18 @@ abstract class Client
 
     /**
      * Makes a request.
-     *
+     * 
      * @param Request $request A Request instance
-     *
+     * 
      * @return Response A Response instance
      */
     abstract protected function doRequest($request);
 
     /**
      * Returns the script to execute when the request must be insulated.
-     *
+     * 
      * @param Request $request A Request instance
-     *
+     * 
      * @throws \LogicException When this abstract class is not implemented
      */
     protected function getScript($request)
@@ -317,9 +317,9 @@ abstract class Client
 
     /**
      * Filters the request.
-     *
+     * 
      * @param Request $request The request to filter
-     *
+     * 
      * @return Request
      */
     protected function filterRequest(Request $request)
@@ -329,9 +329,9 @@ abstract class Client
 
     /**
      * Filters the Response.
-     *
+     * 
      * @param Response $response The Response to filter
-     *
+     * 
      * @return Response
      */
     protected function filterResponse($response)
@@ -341,11 +341,11 @@ abstract class Client
 
     /**
      * Creates a crawler.
-     *
+     * 
      * @param string $uri A uri
      * @param string $content Content for the crawler to use
      * @param string $type Content type
-     *
+     * 
      * @return Crawler
      */
     protected function createCrawlerFromContent($uri, $content, $type)
@@ -358,9 +358,9 @@ abstract class Client
 
     /**
      * Goes back in the browser history.
-     *
+     * 
      * @return Crawler
-     *
+     * 
      * @api
      */
     public function back()
@@ -370,9 +370,9 @@ abstract class Client
 
     /**
      * Goes forward in the browser history.
-     *
+     * 
      * @return Crawler
-     *
+     * 
      * @api
      */
     public function forward()
@@ -382,9 +382,9 @@ abstract class Client
 
     /**
      * Reloads the current browser.
-     *
+     * 
      * @return Crawler
-     *
+     * 
      * @api
      */
     public function reload()
@@ -394,11 +394,11 @@ abstract class Client
 
     /**
      * Follow redirects?
-     *
+     * 
      * @return Crawler
-     *
+     * 
      * @throws \LogicException If request was not a redirect
-     *
+     * 
      * @api
      */
     public function followRedirect()
@@ -412,9 +412,9 @@ abstract class Client
 
     /**
      * Restarts the client.
-     *
+     * 
      * It flushes all cookies.
-     *
+     * 
      * @api
      */
     public function restart()
@@ -425,7 +425,7 @@ abstract class Client
 
     /**
      * Takes a URI and converts it to absolute if it is not already absolute.
-     *
+     * 
      * @param string $uri A uri
      * @return string An absolute uri
      */
@@ -465,10 +465,10 @@ abstract class Client
 
     /**
      * Makes a request from a Request object directly.
-     *
+     * 
      * @param Request $request       A Request instance
      * @param Boolean $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
-     *
+     * 
      * @return Crawler
      */
     protected function requestFromRequest(Request $request, $changeHistory = true)

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -34,17 +34,17 @@ use Symfony\Component\Security\Http\SecurityEvents;
 /**
  * The AbstractAuthenticationListener is the preferred base class for all
  * browser-/HTTP-based authentication requests.
- *
+ * 
  * Subclasses likely have to implement the following:
  * - an TokenInterface to hold authentication related data
  * - an AuthenticationProvider to perform the actual authentication of the
  *   token, retrieve the UserInterface implementation from a database, and
  *   perform the specific account checks using the UserChecker
- *
+ * 
  * By default, this listener only is active for a specific path, e.g.
  * /login_check. If you want to change this behavior, you can overwrite the
  * requiresAuthentication() method.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -63,7 +63,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param SecurityContextInterface               $securityContext       A SecurityContext instance
      * @param AuthenticationManagerInterface         $authenticationManager An AuthenticationManagerInterface instance
      * @param SessionAuthenticationStrategyInterface $sessionStrategy
@@ -103,7 +103,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 
     /**
      * Sets the RememberMeServices implementation to use
-     *
+     * 
      * @param RememberMeServicesInterface $rememberMeServices
      */
     public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices)
@@ -113,7 +113,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 
     /**
      * Handles form based authentication.
-     *
+     * 
      * @param GetResponseEvent $event A GetResponseEvent instance
      */
     public final function handle(GetResponseEvent $event)
@@ -155,13 +155,13 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 
     /**
      * Whether this request requires authentication.
-     *
+     * 
      * The default implementation only processed requests to a specific path,
      * but a subclass could change this to only authenticate requests where a
      * certain parameters is present.
-     *
+     * 
      * @param Request $request
-     *
+     * 
      * @return Boolean
      */
     protected function requiresAuthentication(Request $request)
@@ -171,11 +171,11 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 
     /**
      * Performs authentication.
-     *
+     * 
      * @param  Request $request A Request instance
-     *
+     * 
      * @return TokenInterface The authenticated token, or null if full authentication is not possible
-     *
+     * 
      * @throws AuthenticationException if the authentication fails
      */
     abstract protected function attemptAuthentication(Request $request);
@@ -249,9 +249,9 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 
     /**
      * Builds the target URL according to the defined options.
-     *
+     * 
      * @param Request $request
-     *
+     * 
      * @return string
      */
     private function determineTargetUrl(Request $request)

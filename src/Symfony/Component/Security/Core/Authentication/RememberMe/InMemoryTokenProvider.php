@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -15,7 +15,7 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
 
 /**
  * This class is used for testing purposes, and is not really suited for production.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class InMemoryTokenProvider implements TokenProviderInterface

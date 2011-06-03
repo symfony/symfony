@@ -6,7 +6,7 @@ use Symfony\Component\Routing\RequestContext;
 
 /**
  * ProjectUrlMatcher
- *
+ * 
  * This class has been auto-generated
  * by the Symfony Routing Component.
  */
@@ -107,15 +107,15 @@ class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\Redirec
                     $matches['_route'] = 'foo';
                     return $matches;
                 }
-        
+
                 // bar
                 if (0 === strpos($pathinfo, '/a/b') && preg_match('#^/a/b/(?P<bar>[^/]+?)$#x', $pathinfo, $matches)) {
                     $matches['_route'] = 'bar';
                     return $matches;
                 }
-        
+
             }
-    
+
         }
 
         // secure

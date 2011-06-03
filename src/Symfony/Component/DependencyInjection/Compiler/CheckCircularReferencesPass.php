@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -16,12 +16,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Checks your services for circular references
- *
+ * 
  * References from method calls are ignored since we might be able to resolve
  * these references depending on the order in which services are called.
- *
+ * 
  * Circular reference from method calls will only be detected at run-time.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class CheckCircularReferencesPass implements CompilerPassInterface
@@ -31,7 +31,7 @@ class CheckCircularReferencesPass implements CompilerPassInterface
 
     /**
      * Checks the ContainerBuilder object for circular references.
-     *
+     * 
      * @param ContainerBuilder $container The ContainerBuilder instances
      */
     public function process(ContainerBuilder $container)
@@ -48,7 +48,7 @@ class CheckCircularReferencesPass implements CompilerPassInterface
 
     /**
      * Checks for circular references.
-     *
+     * 
      * @param array $edges An array of Nodes
      * @throws \RuntimeException When a circular reference is found.
      */

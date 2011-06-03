@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -77,7 +77,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * Guesses a field class name for a given constraint
-     *
+     * 
      * @param  Constraint $constraint  The constraint to guess for
      * @return TypeGuess  The guessed field class and options
      */
@@ -231,7 +231,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * Guesses whether a field is required based on the given constraint
-     *
+     * 
      * @param  Constraint $constraint  The constraint to guess for
      * @return Guess       The guess whether the field is required
      */
@@ -258,7 +258,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * Guesses a field's maximum length based on the given constraint
-     *
+     * 
      * @param  Constraint $constraint  The constraint to guess for
      * @return Guess       The guess for the maximum length
      */
@@ -280,7 +280,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * Guesses a field's minimum length based on the given constraint
-     *
+     * 
      * @param  Constraint $constraint  The constraint to guess for
      * @return Guess       The guess for the minimum length
      */
@@ -303,7 +303,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     /**
      * Iterates over the constraints of a property, executes a constraints on
      * them and returns the best guess
-     *
+     * 
      * @param string $class       The class to read the constraints from
      * @param string $property    The property for which to find constraints
      * @param \Closure $guessForConstraint   The closure that returns a guess

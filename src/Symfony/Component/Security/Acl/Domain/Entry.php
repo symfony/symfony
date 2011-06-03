@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 /**
  * Auditable ACE implementation
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class Entry implements AuditableEntryInterface
@@ -34,7 +34,7 @@ class Entry implements AuditableEntryInterface
 
     /**
      * Constructor
-     *
+     * 
      * @param integer                   $id
      * @param AclInterface              $acl
      * @param SecurityIdentityInterface $sid
@@ -122,10 +122,10 @@ class Entry implements AuditableEntryInterface
 
     /**
      * Turns on/off auditing on permissions denials.
-     *
+     * 
      * Do never call this method directly. Use the respective methods on the
      * AclInterface instead.
-     *
+     * 
      * @param Boolean $boolean
      * @return void
      */
@@ -136,10 +136,10 @@ class Entry implements AuditableEntryInterface
 
     /**
      * Turns on/off auditing on permission grants.
-     *
+     * 
      * Do never call this method directly. Use the respective methods on the
      * AclInterface instead.
-     *
+     * 
      * @param Boolean $boolean
      * @return void
      */
@@ -150,10 +150,10 @@ class Entry implements AuditableEntryInterface
 
     /**
      * Sets the permission mask
-     *
+     * 
      * Do never call this method directly. Use the respective methods on the
      * AclInterface instead.
-     *
+     * 
      * @param integer $mask
      * @return void
      */
@@ -164,10 +164,10 @@ class Entry implements AuditableEntryInterface
 
     /**
      * Sets the mask comparison strategy
-     *
+     * 
      * Do never call this method directly. Use the respective methods on the
      * AclInterface instead.
-     *
+     * 
      * @param string $strategy
      * @return void
      */
@@ -178,7 +178,7 @@ class Entry implements AuditableEntryInterface
 
     /**
      * Implementation of \Serializable
-     *
+     * 
      * @return string
      */
     public function serialize()
@@ -196,7 +196,7 @@ class Entry implements AuditableEntryInterface
 
     /**
      * Implementation of \Serializable
-     *
+     * 
      * @param string $serialized
      * @return void
      */

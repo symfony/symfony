@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -20,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * This HttpKernel is used to manage scope changes of the DI container.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class HttpKernel extends BaseHttpKernel
@@ -55,11 +55,11 @@ class HttpKernel extends BaseHttpKernel
 
     /**
      * Forwards the request to another controller.
-     *
+     * 
      * @param  string  $controller The controller name (a string like BlogBundle:Post:index)
      * @param  array   $attributes An array of request attributes
      * @param  array   $query      An array of request query parameters
-     *
+     * 
      * @return Response A Response instance
      */
     public function forward($controller, array $attributes = array(), array $query = array())
@@ -72,22 +72,22 @@ class HttpKernel extends BaseHttpKernel
 
     /**
      * Renders a Controller and returns the Response content.
-     *
+     * 
      * Note that this method generates an esi:include tag only when both the standalone
      * option is set to true and the request has ESI capability (@see Symfony\Component\HttpKernel\HttpCache\ESI).
-     *
+     * 
      * Available options:
-     *
+     * 
      *  * attributes: An array of request attributes (only when the first argument is a controller)
      *  * query: An array of request query parameters (only when the first argument is a controller)
      *  * ignore_errors: true to return an empty string in case of an error
      *  * alt: an alternative controller to execute in case of an error (can be a controller, a URI, or an array with the controller, the attributes, and the query arguments)
      *  * standalone: whether to generate an esi:include tag or not when ESI is supported
      *  * comment: a comment to add when returning an esi:include tag
-     *
+     * 
      * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
      * @param array  $options    An array of options
-     *
+     * 
      * @return string The Response content
      */
     public function render($controller, array $options = array())
@@ -159,13 +159,13 @@ class HttpKernel extends BaseHttpKernel
 
     /**
      * Generates an internal URI for a given controller.
-     *
+     * 
      * This method uses the "_internal" route, which should be available.
-     *
+     * 
      * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
      * @param array  $attributes An array of request attributes
      * @param array  $query      An array of request query parameters
-     *
+     * 
      * @return string An internal URI
      */
     public function generateInternalUri($controller, array $attributes = array(), array $query = array())

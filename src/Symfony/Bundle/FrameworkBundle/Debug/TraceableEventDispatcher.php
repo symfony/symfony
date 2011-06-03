@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,7 +19,7 @@ use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Extends the ContainerAwareEventDispatcher to add some debugging tools.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements TraceableEventDispatcherInterface
@@ -30,7 +30,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
 
     /**
      * Constructor.
-     *
+     * 
      * @param ContainerInterface $container A ContainerInterface instance
      * @param LoggerInterface    $logger    A LoggerInterface instance
      */
@@ -45,7 +45,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @throws \RuntimeException if the listener method is not callable
      */
     public function addListener($eventName, $listener, $priority = 0)
@@ -149,10 +149,10 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
 
     /**
      * Returns information about the listener
-     *
+     * 
      * @param object $listener  The listener
      * @param string $eventName The event name
-     *
+     * 
      * @return array Informations about the listener
      */
     private function getListenerInfo($listener, $eventName)

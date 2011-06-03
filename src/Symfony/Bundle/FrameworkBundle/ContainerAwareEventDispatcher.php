@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\EventDispatcher\Event;
 /**
  * Lazily loads listeners and subscribers from the dependency injection
  * container
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
@@ -44,7 +44,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
 
     /**
      * Constructor.
-     *
+     * 
      * @param ContainerInterface $container A ContainerInterface instance
      */
     public function __construct(ContainerInterface $container)
@@ -54,7 +54,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
 
     /**
      * Adds a service as event listener
-     *
+     * 
      * @param string   $eventName Event for which the listener is added
      * @param array    $callback  The service ID of the listener service & the method
      *                            name that has to be called
@@ -73,10 +73,10 @@ class ContainerAwareEventDispatcher extends EventDispatcher
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * Lazily loads listeners for this event from the dependency injection
      * container.
-     *
+     * 
      * @throws \InvalidArgumentException if the service is not defined
      */
     public function dispatch($eventName, Event $event = null)

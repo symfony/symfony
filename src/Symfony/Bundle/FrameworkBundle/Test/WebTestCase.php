@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Test\WebTestCase as BaseWebTestCase;
 
 /**
  * WebTestCase is the base class for functional tests.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class WebTestCase extends BaseWebTestCase
@@ -28,10 +28,10 @@ abstract class WebTestCase extends BaseWebTestCase
 
     /**
      * Creates a Client.
-     *
+     * 
      * @param array   $options An array of options to pass to the createKernel class
      * @param array   $server  An array of server parameters
-     *
+     * 
      * @return Client A Client instance
      */
     public function createClient(array $options = array(), array $server = array())
@@ -47,10 +47,10 @@ abstract class WebTestCase extends BaseWebTestCase
 
     /**
      * Finds the directory where the phpunit.xml(.dist) is stored.
-     *
+     * 
      * If you run tests with the PHPUnit CLI tool, everything will work as expected.
      * If not, override this method in your test classes.
-     *
+     * 
      * @return string The directory where phpunit.xml(.dist) is stored
      */
     protected function getPhpUnitXmlDir()
@@ -80,10 +80,10 @@ abstract class WebTestCase extends BaseWebTestCase
 
     /**
      * Finds the value of configuration flag from cli
-     *
+     * 
      * PHPUnit will use the last configuration argument on the command line, so this only returns
      * the last configuration argument
-     *
+     * 
      * @return string The value of the phpunit cli configuration option
      */
     private function getPhpUnitCliConfigArgument()
@@ -106,9 +106,9 @@ abstract class WebTestCase extends BaseWebTestCase
 
     /**
      * Attempts to guess the kernel location.
-     *
+     * 
      * When the Kernel is located, the file is required.
-     *
+     * 
      * @return string The Kernel class name
      */
     protected function getKernelClass()
@@ -131,14 +131,14 @@ abstract class WebTestCase extends BaseWebTestCase
 
     /**
      * Creates a Kernel.
-     *
+     * 
      * Available options:
-     *
+     * 
      *  * environment
      *  * debug
-     *
+     * 
      * @param array $options An array of options
-     *
+     * 
      * @return HttpKernelInterface A HttpKernelInterface instance
      */
     protected function createKernel(array $options = array())

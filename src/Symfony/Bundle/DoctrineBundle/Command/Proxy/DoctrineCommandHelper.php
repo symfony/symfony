@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,14 +18,14 @@ use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 /**
  * Provides some helper and convenience methods to configure doctrine commands in the context of bundles
  * and multiple connections/entity managers.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class DoctrineCommandHelper
 {
     /**
      * Convenience method to push the helper sets of a given entity manager into the application.
-     *
+     * 
      * @param Application $application
      * @param string      $emName
      */

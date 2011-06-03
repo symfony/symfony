@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,7 +19,7 @@ use Symfony\Component\Config\Loader\FileLoader;
 
 /**
  * YamlFileLoader loads Yaml routing files.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class YamlFileLoader extends FileLoader
@@ -30,12 +30,12 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Loads a Yaml file.
-     *
+     * 
      * @param string $file A Yaml file path
      * @param string $type The resource type
-     *
+     * 
      * @return RouteCollection A RouteCollection instance
-     *
+     * 
      * @throws \InvalidArgumentException When route can't be parsed
      */
     public function load($file, $type = null)
@@ -75,10 +75,10 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Returns true if this class supports the given resource.
-     *
+     * 
      * @param mixed  $resource A resource
      * @param string $type     The resource type
-     *
+     * 
      * @return Boolean True if this class supports the given resource, false otherwise
      */
     public function supports($resource, $type = null)
@@ -88,12 +88,12 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Parses a route and adds it to the RouteCollection.
-     *
+     * 
      * @param RouteCollection $collection A RouteCollection instance
      * @param string          $name       Route name
      * @param array           $config     Route definition
      * @param string          $file       A Yaml file path
-     *
+     * 
      * @throws \InvalidArgumentException When config pattern is not defined for the given route
      */
     protected function parseRoute(RouteCollection $collection, $name, $config, $file)
@@ -113,11 +113,11 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Normalize route configuration.
-     *
+     * 
      * @param array  $config A resource config
-     *
+     * 
      * @return array
-     *
+     * 
      * @throws InvalidArgumentException if one of the provided config keys is not supported
      */
     private function normalizeRouteConfig(array $config)

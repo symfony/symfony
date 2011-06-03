@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\Translation;
 
 /**
  * Returns the plural rules for a given locale.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class PluralizationRules
@@ -23,10 +23,10 @@ class PluralizationRules
 
     /**
      * Returns the plural position to use for the given locale and number.
-     *
+     * 
      * @param  integer $number The number
      * @param  string  $locale The locale
-     *
+     * 
      * @return integer The plural position
      */
     static public function get($number, $locale)
@@ -189,10 +189,10 @@ class PluralizationRules
 
     /**
      * Overrides the default plural rule for a given locale.
-     *
+     * 
      * @param string $rule   A PHP callable
      * @param string $locale The locale
-     *
+     * 
      * @return null
      */
     static public function set($rule, $locale)

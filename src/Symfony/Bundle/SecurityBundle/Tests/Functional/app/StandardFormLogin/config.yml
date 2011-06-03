@@ -4,15 +4,15 @@ imports:
 security:
     encoders:
         Symfony\Component\Security\Core\User\User: plaintext
-        
+
     providers:
         in_memory:
             users:
                 johannes: { password: test, roles: [ROLE_USER] }
-            
+
     firewalls:
         # This firewall doesn't make sense in combination with the rest of the
-        # configuration file, but it's here for testing purposes (do not use 
+        # configuration file, but it's here for testing purposes (do not use
         # this file in a real world scenario though)
         login_form:
             pattern: ^/login$

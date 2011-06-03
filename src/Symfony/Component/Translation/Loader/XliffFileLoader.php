@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,16 +16,16 @@ use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * XliffFileLoader loads translations from XLIFF files.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * @api
  */
 class XliffFileLoader implements LoaderInterface
 {
     /**
      * {@inheritdoc}
-     *
+     * 
      * @api
      */
     public function load($resource, $locale, $domain = 'messages')
@@ -44,7 +44,7 @@ class XliffFileLoader implements LoaderInterface
 
     /**
      * Validates and parses the given file into a SimpleXMLElement
-     *
+     * 
      * @param  string $file
      * @return SimpleXMLElement
      */
@@ -75,7 +75,7 @@ class XliffFileLoader implements LoaderInterface
 
     /**
      * Returns the XML errors of the internal XML parser
-     *
+     * 
      * @return array  An array of errors
      */
     private function getXmlErrors()

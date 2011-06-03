@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,18 +13,18 @@ namespace Symfony\Component\Finder;
 
 /**
  * Finder allows to build rules to find files and directories.
- *
+ * 
  * It is a thin wrapper around several specialized iterator classes.
- *
+ * 
  * All rules may be invoked several times.
- *
+ * 
  * All methods return the current Finder object to allow easy chaining:
- *
+ * 
  * $finder = new Finder();
  * $finder = $finder->files()->name('*.php')->in(__DIR__);
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * @api
  */
 class Finder implements \IteratorAggregate
@@ -55,9 +55,9 @@ class Finder implements \IteratorAggregate
 
     /**
      * Restricts the matching to directories only.
-     *
+     * 
      * @return Finder The current Finder instance
-     *
+     * 
      * @api
      */
     public function directories()
@@ -69,9 +69,9 @@ class Finder implements \IteratorAggregate
 
     /**
      * Restricts the matching to files only.
-     *
+     * 
      * @return Finder The current Finder instance
-     *
+     * 
      * @api
      */
     public function files()
@@ -83,19 +83,19 @@ class Finder implements \IteratorAggregate
 
     /**
      * Adds tests for the directory depth.
-     *
+     * 
      * Usage:
-     *
+     * 
      *   $finder->depth('> 1') // the Finder will start matching at level 1.
      *   $finder->depth('< 3') // the Finder will descend at most 3 levels of directories below the starting point.
-     *
+     * 
      * @param  int $level The depth level expression
-     *
+     * 
      * @return Finder The current Finder instance
-     *
+     * 
      * @see Symfony\Component\Finder\Iterator\DepthRangeFilterIterator
      * @see Symfony\Component\Finder\Comparator\NumberComparator
-     *
+     * 
      * @api
      */
     public function depth($level)
@@ -107,22 +107,22 @@ class Finder implements \IteratorAggregate
 
     /**
      * Adds tests for file dates (last modified).
-     *
+     * 
      * The date must be something that strtotime() is able to parse:
-     *
+     * 
      *   $finder->date('since yesterday');
      *   $finder->date('until 2 days ago');
      *   $finder->date('> now - 2 hours');
      *   $finder->date('>= 2005-10-15');
-     *
+     * 
      * @param  string $date A date rage string
-     *
+     * 
      * @return Finder The current Finder instance
-     *
+     * 
      * @see strtotime
      * @see Symfony\Component\Finder\Iterator\DateRangeFilterIterator
      * @see Symfony\Component\Finder\Comparator\DateComparator
-     *
+     * 
      * @api
      */
     public function date($date)
@@ -134,19 +134,19 @@ class Finder implements \IteratorAggregate
 
     /**
      * Adds rules that files must match.
-     *
+     * 
      * You can use patterns (delimited with / sign), globs or simple strings.
-     *
+     * 
      * $finder->name('*.php')
      * $finder->name('/\.php$/') // same as above
      * $finder->name('test.php')
-     *
+     * 
      * @param  string $pattern A pattern (a regexp, a glob, or a string)
-     *
+     * 
      * @return Finder The current Finder instance
-     *
+     * 
      * @see Symfony\Component\Finder\Iterator\FilenameFilterIterator
-     *
+     * 
      * @api
      */
     public function name($pattern)
@@ -158,13 +158,13 @@ class Finder implements \IteratorAggregate
 
     /**
      * Adds rules that files must not match.
-     *
+     * 
      * @param  string $pattern A pattern (a regexp, a glob, or a string)
-     *
+     * 
      * @return Finder The current Finder instance
-     *
+     * 
      * @see Symfony\Component\Finder\Iterator\FilenameFilterIterator
-     *
+     * 
      * @api
      */
     public function notName($pattern)
@@ -176,18 +176,18 @@ class Finder implements \IteratorAggregate
 
     /**
      * Adds tests for file sizes.
-     *
+     * 
      * $finder->size('> 10K');
      * $finder->size('<= 1Ki');
      * $finder->size(4);
-     *
+     * 
      * @param string $size A size range string
-     *
+     * 
      * @return Finder The current Finder instance
-     *
+     * 
      * @see Symfony\Component\Finder\Iterator\SizeRangeFilterIterator
      * @see Symfony\Component\Finder\Comparator\NumberComparator
-     *
+     * 
      * @api
      */
     public function size($size)
@@ -199,13 +199,13 @@ class Finder implements \IteratorAggregate
 
     /**
      * Excludes directories.
-     *
+     * 
      * @param  string $dir A directory to exclude
-     *
+     * 
      * @return Finder The current Finder instance
-     *
+     * 
      * @see Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator
-     *
+     * 
      * @api
      */
     public function exclude($dir)
@@ -217,13 +217,13 @@ class Finder implements \IteratorAggregate
 
     /**
      * Excludes "hidden" directories and files (starting with a dot).
-     *
+     * 
      * @param Boolean $ignoreDotFiles Whether to exclude "hidden" files or not
-     *
+     * 
      * @return Finder The current Finder instance
-     *
+     * 
      * @see Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator
-     *
+     * 
      * @api
      */
     public function ignoreDotFiles($ignoreDotFiles)
@@ -239,13 +239,13 @@ class Finder implements \IteratorAggregate
 
     /**
      * Forces the finder to ignore version control directories.
-     *
+     * 
      * @param Boolean $ignoreVCS Whether to exclude VCS files or not
-     *
+     * 
      * @return Finder The current Finder instance
-     *
+     * 
      * @see Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator
-     *
+     * 
      * @api
      */
     public function ignoreVCS($ignoreVCS)
@@ -266,17 +266,17 @@ class Finder implements \IteratorAggregate
 
     /**
      * Sorts files and directories by an anonymous function.
-     *
+     * 
      * The anonymous function receives two \SplFileInfo instances to compare.
-     *
+     * 
      * This can be slow as all the matching files and directories must be retrieved for comparison.
-     *
+     * 
      * @param  Closure $closure An anonymous function
-     *
+     * 
      * @return Finder The current Finder instance
-     *
+     * 
      * @see Symfony\Component\Finder\Iterator\SortableIterator
-     *
+     * 
      * @api
      */
     public function sort(\Closure $closure)
@@ -288,13 +288,13 @@ class Finder implements \IteratorAggregate
 
     /**
      * Sorts files and directories by name.
-     *
+     * 
      * This can be slow as all the matching files and directories must be retrieved for comparison.
-     *
+     * 
      * @return Finder The current Finder instance
-     *
+     * 
      * @see Symfony\Component\Finder\Iterator\SortableIterator
-     *
+     * 
      * @api
      */
     public function sortByName()
@@ -306,13 +306,13 @@ class Finder implements \IteratorAggregate
 
     /**
      * Sorts files and directories by type (directories before files), then by name.
-     *
+     * 
      * This can be slow as all the matching files and directories must be retrieved for comparison.
-     *
+     * 
      * @return Finder The current Finder instance
-     *
+     * 
      * @see Symfony\Component\Finder\Iterator\SortableIterator
-     *
+     * 
      * @api
      */
     public function sortByType()
@@ -324,16 +324,16 @@ class Finder implements \IteratorAggregate
 
     /**
      * Filters the iterator with an anonymous function.
-     *
+     * 
      * The anonymous function receives a \SplFileInfo and must return false
      * to remove files.
-     *
+     * 
      * @param  Closure $closure An anonymous function
-     *
+     * 
      * @return Finder The current Finder instance
-     *
+     * 
      * @see Symfony\Component\Finder\Iterator\CustomFilterIterator
-     *
+     * 
      * @api
      */
     public function filter(\Closure $closure)
@@ -345,9 +345,9 @@ class Finder implements \IteratorAggregate
 
     /**
      * Forces the following of symlinks.
-     *
+     * 
      * @return Finder The current Finder instance
-     *
+     * 
      * @api
      */
     public function followLinks()
@@ -359,13 +359,13 @@ class Finder implements \IteratorAggregate
 
     /**
      * Searches files and directories which match defined rules.
-     *
+     * 
      * @param  string|array $dirs A directory path or an array of directories
-     *
+     * 
      * @return Finder The current Finder instance
-     *
+     * 
      * @throws \InvalidArgumentException if one of the directory does not exist
-     *
+     * 
      * @api
      */
     public function in($dirs)
@@ -385,11 +385,11 @@ class Finder implements \IteratorAggregate
 
     /**
      * Returns an Iterator for the current Finder configuration.
-     *
+     * 
      * This method implements the IteratorAggregate interface.
-     *
+     * 
      * @return \Iterator An iterator
-     *
+     * 
      * @throws \LogicException if the in() method has not been called
      */
     public function getIterator()
@@ -416,9 +416,9 @@ class Finder implements \IteratorAggregate
 
     /**
      * Appends an existing set of files/directories to the finder.
-     *
+     * 
      * The set can be another Finder, an Iterator, an IteratorAggregate, or even a plain array.
-     *
+     * 
      * @param mixed $iterator
      */
     public function append($iterator)

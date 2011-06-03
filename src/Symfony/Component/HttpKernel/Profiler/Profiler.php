@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /**
  * Profiler.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Profiler
@@ -31,7 +31,7 @@ class Profiler
 
     /**
      * Constructor.
-     *
+     * 
      * @param ProfilerStorageInterface $storage A ProfilerStorageInterface instance
      * @param LoggerInterface          $logger  A LoggerInterface instance
      */
@@ -53,9 +53,9 @@ class Profiler
 
     /**
      * Loads the Profile for the given Response.
-     *
+     * 
      * @param Response $response A Response instance
-     *
+     * 
      * @return Profile A Profile instance
      */
     public function loadProfileFromResponse(Response $response)
@@ -69,9 +69,9 @@ class Profiler
 
     /**
      * Loads the Profile for the given token.
-     *
+     * 
      * @param string $token A token
-     *
+     * 
      * @return Profile A Profile instance
      */
     public function loadProfile($token)
@@ -81,9 +81,9 @@ class Profiler
 
     /**
      * Saves a Profile.
-     *
+     * 
      * @param Profile A Profile instance
-     *
+     * 
      * @return Boolean
      */
     public function saveProfile(Profile $profile)
@@ -105,7 +105,7 @@ class Profiler
 
     /**
      * Exports the current profiler data.
-     *
+     * 
      * @return string The exported data
      */
     public function export(Profile $profile)
@@ -115,9 +115,9 @@ class Profiler
 
     /**
      * Imports data into the profiler storage.
-     *
+     * 
      * @param string $data A data string as exported by the export() method
-     *
+     * 
      * @return Profile A Profile instance
      */
     public function import($data)
@@ -135,11 +135,11 @@ class Profiler
 
     /**
      * Finds profiler tokens for the given criteria.
-     *
+     * 
      * @param string $ip    The IP
      * @param string $url   The URL
      * @param string $limit The maximum number of tokens to return
-     *
+     * 
      * @return array An array of tokens
      */
     public function find($ip, $url, $limit)
@@ -149,11 +149,11 @@ class Profiler
 
     /**
      * Collects data for the given Response.
-     *
+     * 
      * @param Request    $request   A Request instance
      * @param Response   $response  A Response instance
      * @param \Exception $exception An exception instance if the request threw one
-     *
+     * 
      * @return Profile|false A Profile instance or false if the profiler is disabled
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
@@ -182,7 +182,7 @@ class Profiler
 
     /**
      * Gets the Collectors associated with this profiler.
-     *
+     * 
      * @return array An array of collectors
      */
     public function all()
@@ -192,7 +192,7 @@ class Profiler
 
     /**
      * Sets the Collectors associated with this profiler.
-     *
+     * 
      * @param array $collectors An array of collectors
      */
     public function set(array $collectors = array())
@@ -205,7 +205,7 @@ class Profiler
 
     /**
      * Adds a Collector.
-     *
+     * 
      * @param DataCollectorInterface $collector A DataCollectorInterface instance
      */
     public function add(DataCollectorInterface $collector)
@@ -215,7 +215,7 @@ class Profiler
 
     /**
      * Returns true if a Collector for the given name exists.
-     *
+     * 
      * @param string $name A collector name
      */
     public function has($name)
@@ -225,11 +225,11 @@ class Profiler
 
     /**
      * Gets a Collector by name.
-     *
+     * 
      * @param string $name A collector name
-     *
+     * 
      * @return DataCollectorInterface A DataCollectorInterface instance
-     *
+     * 
      * @throws \InvalidArgumentException if the collector does not exist
      */
     public function get($name)

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,14 +16,14 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 
 /**
  * This node represents a scalar value in the config tree.
- *
+ * 
  * The following values are considered scalars:
  *   * booleans
  *   * strings
  *   * null
  *   * integers
  *   * floats
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class ScalarNode extends VariableNode

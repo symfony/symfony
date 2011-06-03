@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -12,7 +12,7 @@ namespace Symfony\Component\Yaml;
 
 /**
  * Parser parses YAML strings to convert them to PHP arrays.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Parser
@@ -25,7 +25,7 @@ class Parser
 
     /**
      * Constructor
-     *
+     * 
      * @param integer $offset The offset of YAML document (used for line numbers in error messages)
      */
     public function __construct($offset = 0)
@@ -35,11 +35,11 @@ class Parser
 
     /**
      * Parses a YAML string to a PHP value.
-     *
+     * 
      * @param  string $value A YAML string
-     *
+     * 
      * @return mixed  A PHP value
-     *
+     * 
      * @throws ParserException If the YAML is not valid
      */
     public function parse($value)
@@ -224,7 +224,7 @@ class Parser
 
     /**
      * Returns the current line number (takes the offset into account).
-     *
+     * 
      * @return integer The current line number
      */
     private function getRealCurrentLineNb()
@@ -234,7 +234,7 @@ class Parser
 
     /**
      * Returns the current line indentation.
-     *
+     * 
      * @return integer The current line indentation
      */
     private function getCurrentLineIndentation()
@@ -244,11 +244,11 @@ class Parser
 
     /**
      * Returns the next embed block of YAML.
-     *
+     * 
      * @param integer $indentation The indent level at which the block is to be read, or null for default
-     *
+     * 
      * @return string A YAML string
-     *
+     * 
      * @throws ParserException When indentation problem are detected
      */
     private function getNextEmbedBlock($indentation = null)
@@ -297,7 +297,7 @@ class Parser
 
     /**
      * Moves the parser to the next line.
-     *
+     * 
      * @return Boolean
      */
     private function moveToNextLine()
@@ -321,11 +321,11 @@ class Parser
 
     /**
      * Parses a YAML value.
-     *
+     * 
      * @param  string $value A YAML value
-     *
+     * 
      * @return mixed  A PHP value
-     *
+     * 
      * @throws ParserException When reference does not exist
      */
     private function parseValue($value)
@@ -354,11 +354,11 @@ class Parser
 
     /**
      * Parses a folded scalar.
-     *
+     * 
      * @param  string  $separator   The separator that was used to begin this folded scalar (| or >)
      * @param  string  $indicator   The indicator that was used to begin this folded scalar (+ or -)
      * @param  integer $indentation The indentation that was used to begin this folded scalar
-     *
+     * 
      * @return string  The text value
      */
     private function parseFoldedScalar($separator, $indicator = '', $indentation = 0)
@@ -428,7 +428,7 @@ class Parser
 
     /**
      * Returns true if the next line is indented.
-     *
+     * 
      * @return Boolean Returns true if the next line is indented, false otherwise
      */
     private function isNextLineIndented()
@@ -456,7 +456,7 @@ class Parser
 
     /**
      * Returns true if the current line is blank or if it is a comment line.
-     *
+     * 
      * @return Boolean Returns true if the current line is empty or if it is a comment line, false otherwise
      */
     private function isCurrentLineEmpty()
@@ -466,7 +466,7 @@ class Parser
 
     /**
      * Returns true if the current line is blank.
-     *
+     * 
      * @return Boolean Returns true if the current line is blank, false otherwise
      */
     private function isCurrentLineBlank()
@@ -476,7 +476,7 @@ class Parser
 
     /**
      * Returns true if the current line is a comment line.
-     *
+     * 
      * @return Boolean Returns true if the current line is a comment line, false otherwise
      */
     private function isCurrentLineComment()
@@ -488,9 +488,9 @@ class Parser
 
     /**
      * Cleanups a YAML string to be parsed.
-     *
+     * 
      * @param  string $value The input YAML string
-     *
+     * 
      * @return string A cleaned up YAML string
      */
     private function cleanup($value)

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,18 +19,18 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * ExceptionController.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ExceptionController extends ContainerAware
 {
     /**
      * Converts an Exception to a Response.
-     *
+     * 
      * @param FlattenException     $exception A FlattenException instance
      * @param DebugLoggerInterface $logger    A DebugLoggerInterface instance
      * @param string               $format    The format to use for rendering (html, xml, ...)
-     *
+     * 
      * @throws \InvalidArgumentException When the exception template does not exist
      */
     public function showAction(FlattenException $exception, DebugLoggerInterface $logger = null, $format = 'html')

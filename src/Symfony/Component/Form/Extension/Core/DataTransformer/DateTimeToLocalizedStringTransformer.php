@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,7 +16,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * Transforms between a normalized time and a localized time string
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
@@ -28,14 +28,14 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 
     /**
      * Constructor.
-     *
+     * 
      * @see BaseDateTimeTransformer::formats for available format options
-     *
+     * 
      * @param string  $inputTimezone   The name of the input timezone
      * @param string  $outputTimezone  The name of the output timezone
      * @param integer $dateFormat      The date format
      * @param integer $timeFormat      The time format
-     *
+     * 
      * @throws UnexpectedTypeException If a format is not supported
      * @throws UnexpectedTypeException if a timezone is not a string
      */
@@ -65,11 +65,11 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 
     /**
      * Transforms a normalized date into a localized date string/array.
-     *
+     * 
      * @param  DateTime $dateTime  Normalized date.
-     *
+     * 
      * @return string|array        Localized date string/array.
-     *
+     * 
      * @throws UnexpectedTypeException if the given value is not an instance of \DateTime
      * @throws TransformationFailedException if the date could not be transformed
      */
@@ -99,11 +99,11 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 
     /**
      * Transforms a localized date string/array into a normalized date.
-     *
+     * 
      * @param  string|array $value Localized date string/array
-     *
+     * 
      * @return DateTime Normalized date
-     *
+     * 
      * @throws UnexpectedTypeException if the given value is not a string
      * @throws TransformationFailedException if the date could not be parsed
      * @throws TransformationFailedException if the input timezone is not supported
@@ -140,7 +140,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 
     /**
      * Returns a preconfigured IntlDateFormatter instance
-     *
+     * 
      * @return \IntlDateFormatter
      */
     protected function getIntlDateFormatter()

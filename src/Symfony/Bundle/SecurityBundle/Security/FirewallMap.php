@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -17,9 +17,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * This is a lazy-loading firewall map implementation
- *
+ * 
  * Listeners will only be initialized if we really need them.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class FirewallMap implements FirewallMapInterface

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,7 +15,7 @@ use Symfony\Component\Config\Definition\NodeInterface;
 
 /**
  * This class provides a fluent interface for defining a node.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 abstract class NodeDefinition implements NodeParentInterface
@@ -35,7 +35,7 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Constructor
-     *
+     * 
      * @param string                $name   The name of the node
      * @param NodeParentInterface   $parent The parent
      */
@@ -51,7 +51,7 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Sets the parent node
-     *
+     * 
      * @param NodeParentInterface $parent The parent
      */
     public function setParent(NodeParentInterface $parent)
@@ -63,7 +63,7 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Returns the parent node.
-     *
+     * 
      * @return NodeParentInterface The builder of the parent node
      */
     public function end()
@@ -73,9 +73,9 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Creates the node.
-     *
+     * 
      * @param Boolean $forceRootNode Whether to force this node as the root node
-     *
+     * 
      * @return NodeInterface
      */
     public function getNode($forceRootNode = false)
@@ -98,9 +98,9 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Sets the default value.
-     *
+     * 
      * @param mixed $value The default value
-     *
+     * 
      * @return NodeDefinition
      */
     public function defaultValue($value)
@@ -113,7 +113,7 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Sets the node as required.
-     *
+     * 
      * @return NodeDefinition
      */
     public function isRequired()
@@ -125,9 +125,9 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Sets the equivalent value used when the node contains null.
-     *
+     * 
      * @param mixed $value
-     *
+     * 
      * @return NodeDefinition
      */
     public function treatNullLike($value)
@@ -139,9 +139,9 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Sets the equivalent value used when the node contains true.
-     *
+     * 
      * @param mixed $value
-     *
+     * 
      * @return NodeDefinition
      */
     public function treatTrueLike($value)
@@ -153,9 +153,9 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Sets the equivalent value used when the node contains false.
-     *
+     * 
      * @param mixed $value
-     *
+     * 
      * @return NodeDefinition
      */
     public function treatFalseLike($value)
@@ -167,7 +167,7 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Sets null as the default value.
-     *
+     * 
      * @return NodeDefinition
      */
     public function defaultNull()
@@ -177,7 +177,7 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Sets true as the default value.
-     *
+     * 
      * @return NodeDefinition
      */
     public function defaultTrue()
@@ -187,7 +187,7 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Sets false as the default value.
-     *
+     * 
      * @return NodeDefinition
      */
     public function defaultFalse()
@@ -197,7 +197,7 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Gets the builder for normalization rules.
-     *
+     * 
      * @return NormalizationBuilder
      */
     protected function normalization()
@@ -211,7 +211,7 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Sets an expression to run before the normalization.
-     *
+     * 
      * @return ExprBuilder
      */
     public function beforeNormalization()
@@ -221,7 +221,7 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Denies the node value being empty.
-     *
+     * 
      * @return NodeDefinition
      */
     public function cannotBeEmpty()
@@ -233,7 +233,7 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Gets the builder for validation rules.
-     *
+     * 
      * @return ValidationBuilder
      */
     protected function validation()
@@ -247,11 +247,11 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Sets an expression to run for the validation.
-     *
+     * 
      * The expression receives the value of the node and must return it. It can
      * modify it.
      * An exception should be thrown when the node is not valid.
-     *
+     * 
      * @return ExprBuilder
      */
     public function validate()
@@ -261,7 +261,7 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Gets the builder for merging rules.
-     *
+     * 
      * @return MergeBuilder
      */
     protected function merge()
@@ -275,9 +275,9 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Sets whether the node can be overwritten.
-     *
+     * 
      * @param Boolean $deny Whether the overwriting is forbidden or not
-     *
+     * 
      * @return NodeDefinition
      */
     public function cannotBeOverwritten($deny = true)
@@ -289,7 +289,7 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Instantiate and configure the node according to this definition
-     *
+     * 
      * @return NodeInterface $node The node instance
      */
     abstract protected function createNode();

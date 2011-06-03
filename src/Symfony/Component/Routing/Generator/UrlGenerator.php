@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 
 /**
  * UrlGenerator generates URL based on a set of routes.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class UrlGenerator implements UrlGeneratorInterface
@@ -32,7 +32,7 @@ class UrlGenerator implements UrlGeneratorInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param RouteCollection $routes  A RouteCollection instance
      * @param RequestContext  $context The context
      */
@@ -45,7 +45,7 @@ class UrlGenerator implements UrlGeneratorInterface
 
     /**
      * Sets the request context.
-     *
+     * 
      * @param RequestContext $context The context
      */
     public function setContext(RequestContext $context)
@@ -55,7 +55,7 @@ class UrlGenerator implements UrlGeneratorInterface
 
     /**
      * Gets the request context.
-     *
+     * 
      * @return RequestContext The context
      */
     public function getContext()
@@ -65,13 +65,13 @@ class UrlGenerator implements UrlGeneratorInterface
 
     /**
      * Generates a URL from the given parameters.
-     *
+     * 
      * @param  string  $name       The name of the route
      * @param  array   $parameters An array of parameters
      * @param  Boolean $absolute   Whether to generate an absolute URL
-     *
+     * 
      * @return string The generated URL
-     *
+     * 
      * @throws Symfony\Component\Routing\Exception\RouteNotFoundException When route doesn't exist
      */
     public function generate($name, array $parameters = array(), $absolute = false)

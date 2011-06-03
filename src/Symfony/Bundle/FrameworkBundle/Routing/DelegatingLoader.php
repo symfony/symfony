@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,10 +18,10 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /**
  * DelegatingLoader delegates route loading to other loaders using a loader resolver.
- *
+ * 
  * This implementation resolves the _controller attribute from the short notation
  * to the fully-qualified form (from a:b:c to class:method).
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class DelegatingLoader extends BaseDelegatingLoader
@@ -31,7 +31,7 @@ class DelegatingLoader extends BaseDelegatingLoader
 
     /**
      * Constructor.
-     *
+     * 
      * @param ControllerNameParser    $parser   A ControllerNameParser instance
      * @param LoggerInterface         $logger   A LoggerInterface instance
      * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
@@ -46,10 +46,10 @@ class DelegatingLoader extends BaseDelegatingLoader
 
     /**
      * Loads a resource.
-     *
+     * 
      * @param mixed  $resource A resource
      * @param string $type     The resource type
-     *
+     * 
      * @return RouteCollection A RouteCollection instance
      */
     public function load($resource, $type = null)

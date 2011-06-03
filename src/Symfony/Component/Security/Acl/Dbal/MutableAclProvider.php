@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -29,7 +29,7 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 /**
  * An implementation of the MutableAclProviderInterface using Doctrine DBAL.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class MutableAclProvider extends AclProvider implements MutableAclProviderInterface, PropertyChangedListener
@@ -140,10 +140,10 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
     /**
      * Implementation of PropertyChangedListener
-     *
+     * 
      * This allows us to keep track of which values have been changed, so we don't
      * have to do a full introspection when ->updateAcl() is called.
-     *
+     * 
      * @param mixed $sender
      * @param string $propertyName
      * @param mixed $oldValue
@@ -337,7 +337,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
     /**
      * Constructs the SQL for deleting access control entries.
-     *
+     * 
      * @param integer $oidPK
      * @return string
      */
@@ -352,7 +352,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
     /**
      * Constructs the SQL for deleting a specific ACE.
-     *
+     * 
      * @param integer $acePK
      * @return string
      */
@@ -367,7 +367,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
     /**
      * Constructs the SQL for deleting an object identity.
-     *
+     * 
      * @param integer $pk
      * @return string
      */
@@ -382,7 +382,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
     /**
      * Constructs the SQL for deleting relation entries.
-     *
+     * 
      * @param integer $pk
      * @return string
      */
@@ -397,7 +397,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
     /**
      * Constructs the SQL for inserting an ACE.
-     *
+     * 
      * @param integer $classId
      * @param integer|null $objectIdentityId
      * @param string|null $field
@@ -446,7 +446,7 @@ QUERY;
 
     /**
      * Constructs the SQL for inserting a new class type.
-     *
+     * 
      * @param string $classType
      * @return string
      */
@@ -461,7 +461,7 @@ QUERY;
 
     /**
      * Constructs the SQL for inserting a relation entry.
-     *
+     * 
      * @param integer $objectIdentityId
      * @param integer $ancestorId
      * @return string
@@ -478,7 +478,7 @@ QUERY;
 
     /**
      * Constructs the SQL for inserting an object identity.
-     *
+     * 
      * @param string $identifier
      * @param integer $classId
      * @param Boolean $entriesInheriting
@@ -502,7 +502,7 @@ QUERY;
 
     /**
      * Constructs the SQL for inserting a security identity.
-     *
+     * 
      * @param SecurityIdentityInterface $sid
      * @throws \InvalidArgumentException
      * @return string
@@ -529,7 +529,7 @@ QUERY;
 
     /**
      * Constructs the SQL for selecting an ACE.
-     *
+     * 
      * @param integer $classId
      * @param integer $oid
      * @param string $field
@@ -555,7 +555,7 @@ QUERY;
     /**
      * Constructs the SQL for selecting the primary key associated with
      * the passed class type.
-     *
+     * 
      * @param string $classType
      * @return string
      */
@@ -570,7 +570,7 @@ QUERY;
 
     /**
      * Constructs the SQL for selecting the primary key of a security identity.
-     *
+     * 
      * @param SecurityIdentityInterface $sid
      * @throws \InvalidArgumentException
      * @return string
@@ -597,7 +597,7 @@ QUERY;
 
     /**
      * Constructs the SQL for updating an object identity.
-     *
+     * 
      * @param integer $pk
      * @param array $changes
      * @throws \InvalidArgumentException
@@ -619,7 +619,7 @@ QUERY;
 
     /**
      * Constructs the SQL for updating an ACE.
-     *
+     * 
      * @param integer $pk
      * @param array $sets
      * @throws \InvalidArgumentException
@@ -641,7 +641,7 @@ QUERY;
 
     /**
      * Creates the ACL for the passed object identity
-     *
+     * 
      * @param ObjectIdentityInterface $oid
      * @return void
      */
@@ -654,9 +654,9 @@ QUERY;
 
     /**
      * Returns the primary key for the passed class type.
-     *
+     * 
      * If the type does not yet exist in the database, it will be created.
-     *
+     * 
      * @param string $classType
      * @return integer
      */
@@ -673,10 +673,10 @@ QUERY;
 
     /**
      * Returns the primary key for the passed security identity.
-     *
+     * 
      * If the security identity does not yet exist in the database, it will be
      * created.
-     *
+     * 
      * @param SecurityIdentityInterface $sid
      * @return integer
      */
@@ -693,7 +693,7 @@ QUERY;
 
     /**
      * Deletes all ACEs for the given object identity primary key.
-     *
+     * 
      * @param integer $oidPK
      * @return void
      */
@@ -704,7 +704,7 @@ QUERY;
 
     /**
      * Deletes the object identity from the database.
-     *
+     * 
      * @param integer $pk
      * @return void
      */
@@ -715,7 +715,7 @@ QUERY;
 
     /**
      * Deletes all entries from the relations table from the database.
-     *
+     * 
      * @param integer $pk
      * @return void
      */
@@ -726,7 +726,7 @@ QUERY;
 
     /**
      * This regenerates the ancestor table which is used for fast read access.
-     *
+     * 
      * @param AclInterface $acl
      * @return void
      */
@@ -746,7 +746,7 @@ QUERY;
 
     /**
      * This processes changes on an ACE related property (classFieldAces, or objectFieldAces).
-     *
+     * 
      * @param string $name
      * @param array $changes
      * @return void
@@ -803,7 +803,7 @@ QUERY;
 
     /**
      * This processes changes on an ACE related property (classAces, or objectAces).
-     *
+     * 
      * @param string $name
      * @param array $changes
      * @return void
@@ -858,7 +858,7 @@ QUERY;
 
     /**
      * Persists the changes which were made to ACEs to the database.
-     *
+     * 
      * @param \SplObjectStorage $aces
      * @return void
      */

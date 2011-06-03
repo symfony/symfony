@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 
 /**
  * Base PDO storage for profiling information in a PDO database.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jan Schumann <js@schumann-it.com>
  */
@@ -29,7 +29,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param string  $dsn      A data source name
      * @param string  $username The username for the database
      * @param string  $password The password for the database
@@ -114,18 +114,18 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
 
     /**
      * Build SQL criteria to fetch records by ip and url
-     *
+     * 
      * @param string $ip    The IP
      * @param string $url   The URL
      * @param string $limit The maximum number of tokens to return
-     *
+     * 
      * @return array An array with (criteria, args)
      */
     abstract protected function buildCriteria($ip, $url, $limit);
 
     /**
      * Initializes the database
-     *
+     * 
      * @throws \RuntimeException When the requested database driver is not installed
      */
     abstract protected function initDb();
@@ -205,9 +205,9 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
 
     /**
      * Reads the child profiles for the given token.
-     *
+     * 
      * @param string $token The parent token
-     *
+     * 
      * @return array An array of Profile instance
      */
     protected function readChildren($token, $parent)

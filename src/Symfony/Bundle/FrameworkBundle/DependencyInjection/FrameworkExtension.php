@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -25,7 +25,7 @@ use Symfony\Component\Config\Definition\Processor;
 
 /**
  * FrameworkExtension.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jeremy Mikola <jmikola@gmail.com>
  */
@@ -33,7 +33,7 @@ class FrameworkExtension extends Extension
 {
     /**
      * Responds to the app.config configuration parameter.
-     *
+     * 
      * @param array            $configs
      * @param ContainerBuilder $container
      */
@@ -139,7 +139,7 @@ class FrameworkExtension extends Extension
 
     /**
      * Loads Form configuration.
-     *
+     * 
      * @param array            $config    A configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
@@ -168,7 +168,7 @@ class FrameworkExtension extends Extension
 
     /**
      * Loads the ESI configuration.
-     *
+     * 
      * @param array         $config An ESI configuration array
      * @param XmlFileLoader $loader An XmlFileLoader instance
      */
@@ -181,7 +181,7 @@ class FrameworkExtension extends Extension
 
     /**
      * Loads the profiler configuration.
-     *
+     * 
      * @param array            $config    A profiler configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
@@ -231,7 +231,7 @@ class FrameworkExtension extends Extension
 
     /**
      * Loads the router configuration.
-     *
+     * 
      * @param array            $config    A router configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
@@ -269,7 +269,7 @@ class FrameworkExtension extends Extension
 
     /**
      * Loads the session configuration.
-     *
+     * 
      * @param array            $config    A session configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
@@ -310,7 +310,7 @@ class FrameworkExtension extends Extension
 
     /**
      * Loads the templating configuration.
-     *
+     * 
      * @param array            $config    A templating configuration array
      * @param string           $ide
      * @param ContainerBuilder $container A ContainerBuilder instance
@@ -414,7 +414,7 @@ class FrameworkExtension extends Extension
 
     /**
      * Loads the translator configuration.
-     *
+     * 
      * @param array            $config    A translator configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
@@ -454,7 +454,7 @@ class FrameworkExtension extends Extension
 
     /**
      * Loads the validator configuration.
-     *
+     * 
      * @param array            $config    A validation configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
@@ -542,7 +542,7 @@ class FrameworkExtension extends Extension
 
     /**
      * Returns the base path for the XSD files.
-     *
+     * 
      * @return string The XSD base path
      */
     public function getXsdValidationBasePath()

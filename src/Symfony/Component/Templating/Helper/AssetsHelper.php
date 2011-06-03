@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,13 +16,13 @@ use Symfony\Component\Templating\Asset\AssetPackageInterface;
 
 /**
  * AssetsHelper is the base class for all helper classes that manages assets.
- *
+ * 
  * Usage:
- *
+ * 
  * <code>
  *   <img src="<?php echo $view['assets']->getUrl('foo.png') ?>" />
  * </code>
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class AssetsHelper extends Helper implements AssetPackageInterface
@@ -33,7 +33,7 @@ class AssetsHelper extends Helper implements AssetPackageInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param string       $basePath The base path
      * @param string|array $baseUrls The domain URL or an array of domain URLs
      * @param string       $version  The version
@@ -52,7 +52,7 @@ class AssetsHelper extends Helper implements AssetPackageInterface
 
     /**
      * Adds an asset package to the helper.
-     *
+     * 
      * @param string                $name    The package name
      * @param AssetPackageInterface $package The package
      */
@@ -63,11 +63,11 @@ class AssetsHelper extends Helper implements AssetPackageInterface
 
     /**
      * Returns an asset package.
-     *
+     * 
      * @param string $name The name of the package or null for the default package
-     *
+     * 
      * @return AssetPackageInterface An asset package
-     *
+     * 
      * @throws InvalidArgumentException If there is no package by that name
      */
     public function getPackage($name = null)
@@ -85,9 +85,9 @@ class AssetsHelper extends Helper implements AssetPackageInterface
 
     /**
      * Gets the version to add to public URL.
-     *
+     * 
      * @param string $packageName A package name
-     *
+     * 
      * @return string The current version
      */
     public function getVersion($packageName = null)
@@ -97,7 +97,7 @@ class AssetsHelper extends Helper implements AssetPackageInterface
 
     /**
      * Gets the base path.
-     *
+     * 
      * @return string The base path
      */
     public function getBasePath()
@@ -107,7 +107,7 @@ class AssetsHelper extends Helper implements AssetPackageInterface
 
     /**
      * Sets the base path.
-     *
+     * 
      * @param string $basePath The base path
      */
     public function setBasePath($basePath)
@@ -121,13 +121,13 @@ class AssetsHelper extends Helper implements AssetPackageInterface
 
     /**
      * Gets the base URL.
-     *
+     * 
      * If multiple base URLs have been defined a random one will be picked for each asset.
      * In other words: for one asset path the same base URL will always be picked among the available base URLs.
-     *
+     * 
      * @param string $path The path
      * @param string $packageName The package name
-     *
+     * 
      * @return string The base URL
      */
     public function getBaseUrl($path, $packageName = null)
@@ -137,12 +137,12 @@ class AssetsHelper extends Helper implements AssetPackageInterface
 
     /**
      * Returns the public path.
-     *
+     * 
      * Absolute paths (i.e. http://...) are returned unmodified.
-     *
+     * 
      * @param string $path        A public path
      * @param string $packageName The name of the asset package to use
-     *
+     * 
      * @return string A public path which takes into account the base path and URL path
      */
     public function getUrl($path, $packageName = null)
@@ -164,7 +164,7 @@ class AssetsHelper extends Helper implements AssetPackageInterface
 
     /**
      * Returns the canonical name of this helper.
-     *
+     * 
      * @return string The canonical name
      */
     public function getName()

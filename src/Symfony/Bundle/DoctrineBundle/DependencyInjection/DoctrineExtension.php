@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -23,7 +23,7 @@ use Symfony\Component\Config\Definition\Processor;
 
 /**
  * DoctrineExtension is an extension for the Doctrine DBAL and ORM library.
- *
+ * 
  * @author Jonathan H. Wage <jonwage@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Benjamin Eberlei <kontakt@beberlei.de>
@@ -47,11 +47,11 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
     /**
      * Loads the DBAL configuration.
-     *
+     * 
      * Usage example:
-     *
+     * 
      *      <doctrine:dbal id="myconn" dbname="sfweb" user="root" />
-     *
+     * 
      * @param array            $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
@@ -85,7 +85,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
     /**
      * Loads a configured DBAL connection.
-     *
+     * 
      * @param string           $name       The name of the connection
      * @param array            $connection A dbal connection configuration.
      * @param ContainerBuilder $container  A ContainerBuilder instance
@@ -156,11 +156,11 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
     /**
      * Loads the Doctrine ORM configuration.
-     *
+     * 
      * Usage example:
-     *
+     * 
      *     <doctrine:orm id="mydm" connection="myconn" />
-     *
+     * 
      * @param array            $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
@@ -196,7 +196,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
     /**
      * Loads a configured ORM entity manager.
-     *
+     * 
      * @param array $entityManager A configured ORM entity manager.
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
@@ -261,14 +261,14 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
     /**
      * Loads an ORM entity managers bundle mapping information.
-     *
+     * 
      * There are two distinct configuration possibilities for mapping information:
-     *
+     * 
      * 1. Specify a bundle and optionally details where the entity and mapping information reside.
      * 2. Specify an arbitrary mapping location.
-     *
+     * 
      * @example
-     *
+     * 
      *  doctrine.orm:
      *     mappings:
      *         MyBundle1: ~
@@ -284,10 +284,10 @@ class DoctrineExtension extends AbstractDoctrineExtension
      *             dir: %kernel.dir%/../src/vendor/DoctrineExtensions/lib/DoctrineExtensions/Entities
      *             prefix: DoctrineExtensions\Entities\
      *             alias: DExt
-     *
+     * 
      * In the case of bundles everything is really optional (which leads to autodetection for this bundle) but
      * in the mappings key everything except alias is a required argument.
-     *
+     * 
      * @param array $entityManager A configured ORM entity manager.
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
@@ -325,7 +325,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
     /**
      * Loads a configured entity managers cache drivers.
-     *
+     * 
      * @param array            $entityManager A configured ORM entity manager.
      * @param ContainerBuilder $container     A ContainerBuilder instance
      */
@@ -338,7 +338,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
     /**
      * Loads a configured entity managers metadata, query or result cache driver.
-     *
+     * 
      * @param array            $entityManager A configured ORM entity manager.
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param string           $cacheName
@@ -354,7 +354,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
     /**
      * Gets an entity manager cache driver definition for metadata, query and result caches.
-     *
+     * 
      * @param array            $entityManager The array configuring an entity manager.
      * @param array            $cacheDriver The cache driver configuration.
      * @param ContainerBuilder $container
@@ -395,7 +395,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
     /**
      * Returns the base path for the XSD files.
-     *
+     * 
      * @return string The XSD base path
      */
     public function getXsdValidationBasePath()
@@ -405,7 +405,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
     /**
      * Returns the namespace to be used for this extension (XML namespace).
-     *
+     * 
      * @return string The XML namespace
      */
     public function getNamespace()

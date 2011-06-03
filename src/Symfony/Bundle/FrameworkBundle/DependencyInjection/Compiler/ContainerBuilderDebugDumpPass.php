@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,7 +19,7 @@ use Symfony\Component\Config\ConfigCache;
 /**
  * Dumps the ContainerBuilder to a cache file so that it can be used by
  * debugging tools such as the container:debug console command.
- *
+ * 
  * @author Ryan Weaver <ryan@thatsquality.com>
  * @author Fabien Potencier <fabien@symfony.com>
  */

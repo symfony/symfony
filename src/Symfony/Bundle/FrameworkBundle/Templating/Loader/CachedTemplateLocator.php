@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,7 +16,7 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
  * CachedTemplateLocator locates templates in the cache.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class CachedTemplateLocator extends TemplateLocator
@@ -25,7 +25,7 @@ class CachedTemplateLocator extends TemplateLocator
 
     /**
      * Constructor.
-     *
+     * 
      * @param string               $cacheDir The cache path
      * @param FileLocatorInterface $locator  A FileLocatorInterface instance
      */
@@ -42,13 +42,13 @@ class CachedTemplateLocator extends TemplateLocator
 
     /**
      * Returns a full path for a given file.
-     *
+     * 
      * @param TemplateReferenceInterface $template    The template
      * @param string                     $currentPath Unused
      * @param Boolean                    $first       Unused
-     *
+     * 
      * @return string The full path for the file
-     *
+     * 
      * @throws \InvalidArgumentException When the template is not an instance of TemplateReferenceInterface
      * @throws \InvalidArgumentException When file is not found
      */
@@ -65,9 +65,9 @@ class CachedTemplateLocator extends TemplateLocator
 
     /**
      * Returns the template path from the cache
-     *
+     * 
      * @param TemplateReferenceInterface $template The template
-     *
+     * 
      * @return string|null The path when it is present in the cache, false otherwise
      */
     protected function getCachedTemplatePath(TemplateReferenceInterface $template)

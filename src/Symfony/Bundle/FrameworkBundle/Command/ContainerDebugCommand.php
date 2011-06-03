@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -24,7 +24,7 @@ use Symfony\Component\Config\FileLocator;
 
 /**
  * A console command for retrieving information about services
- *
+ * 
  * @author Ryan Weaver <ryan@thatsquality.com>
  */
 class ContainerDebugCommand extends Command
@@ -174,7 +174,7 @@ EOF
 
     /**
      * Loads the ContainerBuilder from the cache.
-     *
+     * 
      * @return ContainerBuilder
      */
     private function getContainerBuilder()
@@ -198,7 +198,7 @@ EOF
     /**
      * Given an array of service IDs, this returns the array of corresponding
      * Definition and Alias objects that those ids represent.
-     *
+     * 
      * @param string $serviceId The service id to resolve
      * @return \Symfony\Component\DependencyInjection\Definition|\Symfony\Component\DependencyInjection\Alias
      */

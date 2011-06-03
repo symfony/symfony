@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocator;
 
 /**
  * Computes the association between template names and their paths on the disk.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class TemplatePathsCacheWarmer extends CacheWarmer
@@ -27,7 +27,7 @@ class TemplatePathsCacheWarmer extends CacheWarmer
 
     /**
      * Constructor.
-     *
+     * 
      * @param TemplateFinderInterface   $finder  A template finder
      * @param TemplateLocator           $locator The template locator
      */
@@ -39,7 +39,7 @@ class TemplatePathsCacheWarmer extends CacheWarmer
 
     /**
      * Warms up the cache.
-     *
+     * 
      * @param string $cacheDir The cache directory
      */
     public function warmUp($cacheDir)
@@ -55,7 +55,7 @@ class TemplatePathsCacheWarmer extends CacheWarmer
 
     /**
      * Checks whether this warmer is optional or not.
-     *
+     * 
      * @return Boolean always false
      */
     public function isOptional()

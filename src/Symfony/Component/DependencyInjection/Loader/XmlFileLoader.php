@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -23,14 +23,14 @@ use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * XmlFileLoader loads XML files service definitions.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class XmlFileLoader extends FileLoader
 {
     /**
      * Loads an XML file.
-     *
+     * 
      * @param mixed  $file The resource
      * @param string $type The resource type
      */
@@ -61,10 +61,10 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Returns true if this class supports the given resource.
-     *
+     * 
      * @param mixed  $resource A resource
      * @param string $type     The resource type
-     *
+     * 
      * @return Boolean true if this class supports the given resource, false otherwise
      */
     public function supports($resource, $type = null)
@@ -74,7 +74,7 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Parses parameters
-     *
+     * 
      * @param SimpleXMLElement $xml
      * @param string $file
      * @return void
@@ -90,7 +90,7 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Parses imports
-     *
+     * 
      * @param SimpleXMLElement $xml
      * @param string $file
      * @return void
@@ -109,7 +109,7 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Parses multiple definitions
-     *
+     * 
      * @param SimpleXMLElement $xml
      * @param string $file
      * @return void
@@ -127,7 +127,7 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Parses an individual Definition
-     *
+     * 
      * @param string $id
      * @param SimpleXMLElement $service
      * @param string $file
@@ -201,7 +201,7 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Parses a XML file.
-     *
+     * 
      * @param string $file Path to a file
      * @throws \InvalidArgumentException When loading of XML file returns error
      */
@@ -222,7 +222,7 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Processes anonymous services
-     *
+     * 
      * @param SimpleXMLElement $xml
      * @param string $file
      * @return array An array of anonymous services
@@ -279,7 +279,7 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Validates an XML document.
-     *
+     * 
      * @param DOMDocument $dom
      * @param string $file
      */
@@ -291,11 +291,11 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Validates a documents XML schema.
-     *
+     * 
      * @param \DOMDocument $dom
      * @param string $file
      * @return void
-     *
+     * 
      * @throws \RuntimeException         When extension references a non-existent XSD file
      * @throws \InvalidArgumentException When xml doesn't validate its xsd schema
      */
@@ -366,11 +366,11 @@ EOF
 
     /**
      * Validates an extension.
-     *
+     * 
      * @param \DOMDocument $dom
      * @param string $file
      * @return void
-     *
+     * 
      * @throws  \InvalidArgumentException When non valid tag are found or no extension are found
      */
     private function validateExtensions(\DOMDocument $dom, $file)
@@ -389,7 +389,7 @@ EOF
 
     /**
      * Returns an array of XML errors.
-     *
+     * 
      * @return array
      */
     private function getXmlErrors()
@@ -413,7 +413,7 @@ EOF
 
     /**
      * Loads from an extension.
-     *
+     * 
      * @param SimpleXMLElement $xml
      * @return void
      */
@@ -435,21 +435,21 @@ EOF
 
     /**
      * Converts a \DomElement object to a PHP array.
-     *
+     * 
      * The following rules applies during the conversion:
-     *
+     * 
      *  * Each tag is converted to a key value or an array
      *    if there is more than one "value"
-     *
+     * 
      *  * The content of a tag is set under a "value" key (<foo>bar</foo>)
      *    if the tag also has some nested tags
-     *
+     * 
      *  * The attributes are converted to keys (<foo foo="bar"/>)
-     *
+     * 
      *  * The nested-tags are converted to keys (<foo><foo>bar</foo></foo>)
-     *
+     * 
      * @param \DomElement $element A \DomElement instance
-     *
+     * 
      * @return array A PHP array
      */
     static public function convertDomElementToArray(\DomElement $element)

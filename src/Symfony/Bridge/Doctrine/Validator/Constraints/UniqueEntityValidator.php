@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -28,7 +28,7 @@ class UniqueEntityValidator extends ConstraintValidator
      * @var Registry
      */
     private $registry;
-    
+
     /**
      * @param Registry $registry
      */
@@ -36,7 +36,7 @@ class UniqueEntityValidator extends ConstraintValidator
     {
         $this->registry = $registry;
     }
-    
+
     /**
      * @param object $entity
      * @param Constraint $constraint
@@ -51,31 +51,31 @@ class UniqueEntityValidator extends ConstraintValidator
         if (count($constraint->fields) == 0) {
             throw new ConstraintDefinitionException("At least one field has to specified.");
         }
-        
+
         $em = $this->registry->getEntityManager($constraint->em);
-        
+
         $className = $this->context->getCurrentClass();
         $class = $em->getClassMetadata($className);
-        
+
         $criteria = array();
         foreach ($fields as $fieldName) {
             if (!isset($class->reflFields[$fieldName])) {
                 throw new ConstraintDefinitionException("Only field names mapped by Doctrine can be validated for uniqueness.");
             }
-            
+
             $criteria[$fieldName] = $class->reflFields[$fieldName]->getValue($entity);
         }
-        
+
         $repository = $em->getRepository($className);
         $result = $repository->findBy($criteria);
-        
+
         if (count($result) > 0 && $result[0] !== $entity) {
             $oldPath = $this->context->getPropertyPath();
             $this->context->setPropertyPath( empty($oldPath) ? $fields[0] : $oldPath . "." . $fields[0]);
             $this->context->addViolation($constraint->message, array(), $criteria[$constraint->fields[0]]);
             $this->context->setPropertyPath($oldPath);
         }
-        
+
         return true; // all true, we added the violation already!
     }
 }

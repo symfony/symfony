@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\BrowserKit;
 
 /**
  * History.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class History
@@ -40,7 +40,7 @@ class History
 
     /**
      * Adds a Request to the history.
-     *
+     * 
      * @param Request $request A Request instance
      */
     public function add(Request $request)
@@ -52,7 +52,7 @@ class History
 
     /**
      * Returns true if the history is empty.
-     *
+     * 
      * @return Boolean true if the history is empty, false otherwise
      */
     public function isEmpty()
@@ -62,9 +62,9 @@ class History
 
     /**
      * Goes back in the history.
-     *
+     * 
      * @return Request A Request instance
-     *
+     * 
      * @throws \LogicException if the stack is already on the first page
      */
     public function back()
@@ -78,9 +78,9 @@ class History
 
     /**
      * Goes forward in the history.
-     *
+     * 
      * @return Request A Request instance
-     *
+     * 
      * @throws \LogicException if the stack is already on the last page
      */
     public function forward()
@@ -94,9 +94,9 @@ class History
 
     /**
      * Returns the current element in the history.
-     *
+     * 
      * @return Request A Request instance
-     *
+     * 
      * @throws \LogicException if the stack is empty
      */
     public function current()

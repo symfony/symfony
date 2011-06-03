@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,7 +16,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * Transforms between a normalized time and a localized time string/array.
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
@@ -28,12 +28,12 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
 
     /**
      * Constructor.
-     *
+     * 
      * @param string  $inputTimezone    The input timezone
      * @param string  $outputTimezone   The output timezone
      * @param array   $fields           The date fields
      * @param Boolean $pad              Whether to use padding
-     *
+     * 
      * @throws UnexpectedTypeException if a timezone is not a string
      */
     public function __construct($inputTimezone = null, $outputTimezone = null, array $fields = null, $pad = false)
@@ -50,11 +50,11 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
 
     /**
      * Transforms a normalized date into a localized date.
-     *
+     * 
      * @param  DateTime $dateTime  Normalized date.
-     *
+     * 
      * @return array               Localized date.
-     *
+     * 
      * @throws UnexpectedTypeException if the given value is not an instance of \DateTime
      * @throws TransformationFailedException if the output timezone is not supported
      */
@@ -105,11 +105,11 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
 
     /**
      * Transforms a localized date into a normalized date.
-     *
+     * 
      * @param  array $value  Localized date
-     *
+     * 
      * @return DateTime      Normalized date
-     *
+     * 
      * @throws UnexpectedTypeException if the given value is not an array
      * @throws TransformationFailedException if the value could not bet transformed
      * @throws TransformationFailedException if the input timezone is not supported

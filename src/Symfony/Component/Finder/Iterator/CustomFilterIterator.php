@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,10 +13,10 @@ namespace Symfony\Component\Finder\Iterator;
 
 /**
  * CustomFilterIterator filters files by applying anonymous functions.
- *
+ * 
  * The anonymous function receives a \SplFileInfo and must return false
  * to remove files.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class CustomFilterIterator extends \FilterIterator
@@ -25,7 +25,7 @@ class CustomFilterIterator extends \FilterIterator
 
     /**
      * Constructor.
-     *
+     * 
      * @param \Iterator $iterator The Iterator to filter
      * @param array     $filters  An array of PHP callbacks
      */
@@ -43,7 +43,7 @@ class CustomFilterIterator extends \FilterIterator
 
     /**
      * Filters the iterator values.
-     *
+     * 
      * @return Boolean true if the value should be kept, false otherwise
      */
     public function accept()

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -24,14 +24,14 @@ abstract class AbstractDoctrineExtension extends Extension
 {
     /**
      * Used inside metadata driver method to simplify aggregation of data.
-     *
+     * 
      * @var array
      */
     protected $aliasMap = array();
 
     /**
      * Used inside metadata driver method to simplify aggregation of data.
-     *
+     * 
      * @var array
      */
     protected $drivers = array();
@@ -96,9 +96,9 @@ abstract class AbstractDoctrineExtension extends Extension
 
     /**
      * Register the alias for this mapping driver.
-     *
+     * 
      * Aliases can be used in the Query languages of all the Doctrine object managers to simplify writing tasks.
-     *
+     * 
      * @param array $mappingConfig
      * @param string $mappingName
      * @return void
@@ -114,7 +114,7 @@ abstract class AbstractDoctrineExtension extends Extension
 
     /**
      * Register the mapping driver configuration for later use with the object managers metadata driver chain.
-     *
+     * 
      * @param array  $mappingConfig
      * @param string $mappingName
      * @return void
@@ -133,13 +133,13 @@ abstract class AbstractDoctrineExtension extends Extension
 
     /**
      * If this is a bundle controlled mapping all the missing information can be autodetected by this method.
-     *
+     * 
      * Returns false when autodetection failed, an array of the completed information otherwise.
-     *
+     * 
      * @param array            $bundleConfig
      * @param \ReflectionClass $bundle
      * @param ContainerBuilder $container    A ContainerBuilder instance
-     *
+     * 
      * @return array|false
      */
     protected function getMappingDriverBundleConfigDefaults(array $bundleConfig, \ReflectionClass $bundle, ContainerBuilder $container)
@@ -173,7 +173,7 @@ abstract class AbstractDoctrineExtension extends Extension
 
     /**
      * Register all the collected mapping information with the object manager by registering the appropriate mapping drivers.
-     *
+     * 
      * @param array            $objectManager
      * @param ContainerBuilder $container     A ContainerBuilder instance
      */
@@ -222,7 +222,7 @@ abstract class AbstractDoctrineExtension extends Extension
 
     /**
      * Assertion if the specified mapping information is valid.
-     *
+     * 
      * @param array  $mappingConfig
      * @param string $objectManagerName
      */
@@ -247,10 +247,10 @@ abstract class AbstractDoctrineExtension extends Extension
 
     /**
      * Detects what metadata driver to use for the supplied directory.
-     *
+     * 
      * @param string           $dir       A directory path
      * @param ContainerBuilder $container A ContainerBuilder instance
-     *
+     * 
      * @return string|null A metadata driver short name, if one can be detected
      */
     protected function detectMetadataDriver($dir, ContainerBuilder $container)
@@ -284,9 +284,9 @@ abstract class AbstractDoctrineExtension extends Extension
 
     /**
      * Prefixes the relative dependency injection container path with the object manager prefix.
-     *
+     * 
      * @example $name is 'entity_manager' then the result would be 'doctrine.orm.entity_manager'
-     *
+     * 
      * @param string $name
      * @return string
      */
@@ -294,23 +294,23 @@ abstract class AbstractDoctrineExtension extends Extension
 
     /**
      * Noun that describes the mapped objects such as Entity or Document.
-     *
+     * 
      * Will be used for autodetection of persistent objects directory.
-     *
+     * 
      * @return string
      */
     abstract protected function getMappingObjectDefaultName();
 
     /**
      * Relative path from the bundle root to the directory where mapping files reside.
-     *
+     * 
      * @return string
      */
     abstract protected function getMappingResourceConfigDirectory();
 
     /**
      * Extension used by the mapping files.
-     *
+     * 
      * @return string
      */
     abstract protected function getMappingResourceExtension();

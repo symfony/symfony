@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,20 +17,20 @@ use Symfony\Component\Routing\RouteCollection;
 
 /**
  * ApacheUrlMatcher matches URL based on Apache mod_rewrite matching (see ApacheMatcherDumper).
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ApacheUrlMatcher extends UrlMatcher
 {
     /**
      * Tries to match a URL based on Apache mod_rewrite matching.
-     *
+     * 
      * Returns false if no route matches the URL.
-     *
+     * 
      * @param string $pathinfo The pathinfo to be parsed
-     *
+     * 
      * @return array An array of parameters
-     *
+     * 
      * @throws MethodNotAllowedException If the current method is not allowed
      */
     public function match($pathinfo)

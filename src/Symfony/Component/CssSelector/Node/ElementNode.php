@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,10 +15,10 @@ use Symfony\Component\CssSelector\XPathExpr;
 
 /**
  * ElementNode represents a "namespace|element" node.
- *
+ * 
  * This component is a port of the Python lxml library,
  * which is copyright Infrae and distributed under the BSD license.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ElementNode implements NodeInterface
@@ -28,7 +28,7 @@ class ElementNode implements NodeInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param string $namespace Namespace
      * @param string $element Element
      */
@@ -48,7 +48,7 @@ class ElementNode implements NodeInterface
 
     /**
      * Formats the element into a string.
-     *
+     * 
      * @return string Element as an XPath string
      */
     public function formatElement()

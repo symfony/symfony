@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\Finder;
 
 /**
  * Extends \SplFileInfo to support relative paths
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SplFileInfo extends \SplFileInfo
@@ -23,7 +23,7 @@ class SplFileInfo extends \SplFileInfo
 
     /**
      * Constructor
-     *
+     * 
      * @param string $file             The file name
      * @param string $relativePath     The relative path
      * @param string $relativePathname The relative path name
@@ -37,7 +37,7 @@ class SplFileInfo extends \SplFileInfo
 
     /**
      * Returns the relative path
-     *
+     * 
      * @return string the relative path
      */
     public function getRelativePath()
@@ -47,7 +47,7 @@ class SplFileInfo extends \SplFileInfo
 
     /**
      * Returns the relative path name
-     *
+     * 
      * @return string the relative path name
      */
     public function getRelativePathname()

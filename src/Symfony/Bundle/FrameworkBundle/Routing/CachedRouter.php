@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Component\Routing\RequestContext;
 /**
  * This Router is optimized to work with matcher and generator classes
  * generated in the cache.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class CachedRouter implements RouterInterface
@@ -27,7 +27,7 @@ class CachedRouter implements RouterInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param string $cacheDir  The cache directory
      * @param string $matcher   The matcher class name
      * @param string $generator The generator class name
@@ -51,7 +51,7 @@ class CachedRouter implements RouterInterface
 
     /**
      * Sets the request context.
-     *
+     * 
      * @param RequestContext $context The context
      */
     public function setContext(RequestContext $context)
@@ -62,11 +62,11 @@ class CachedRouter implements RouterInterface
 
     /**
      * Generates a URL from the given parameters.
-     *
+     * 
      * @param  string  $name       The name of the route
      * @param  array   $parameters An array of parameters
      * @param  Boolean $absolute   Whether to generate an absolute URL
-     *
+     * 
      * @return string The generated URL
      */
     public function generate($name, array $parameters = array(), $absolute = false)
@@ -76,11 +76,11 @@ class CachedRouter implements RouterInterface
 
     /**
      * Tries to match a URL with a set of routes.
-     *
+     * 
      * Returns false if no route matches the URL.
-     *
+     * 
      * @param  string $url URL to be parsed
-     *
+     * 
      * @return array|false An array of parameters or false if no route matches
      */
     public function match($url)
@@ -90,7 +90,7 @@ class CachedRouter implements RouterInterface
 
     /**
      * Gets the UrlGenerator instance associated with this Router.
-     *
+     * 
      * @return UrlGeneratorInterface A UrlGeneratorInterface instance
      */
     public function getGenerator()

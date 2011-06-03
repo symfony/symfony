@@ -9,23 +9,23 @@ use Symfony\Component\Serializer\Encoder\NormalizationAwareInterface;
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
 
 /**
  * Serializer serializes and deserializes data
- *
+ * 
  * objects are turned into arrays by normalizers
  * arrays are turned into various output formats by encoders
- *
+ * 
  * $serializer->serialize($obj, 'xml')
  * $serializer->decode($data, 'xml')
  * $serializer->denormalizeObject($data, 'Class', 'xml')
- *
+ * 
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
 class Serializer implements SerializerInterface
@@ -116,7 +116,7 @@ class Serializer implements SerializerInterface
 
     /**
      * Normalizes an object into a set of arrays/scalars
-     *
+     * 
      * @param object $object object to normalize
      * @param string $format format name, present to give the option to normalizers to act differently based on formats
      * @return array|scalar
@@ -141,7 +141,7 @@ class Serializer implements SerializerInterface
 
     /**
      * Denormalizes data back into an object of the given class
-     *
+     * 
      * @param mixed $data data to restore
      * @param string $class the expected class to instantiate
      * @param string $format format name, present to give the option to normalizers to act differently based on formats
@@ -249,7 +249,7 @@ class Serializer implements SerializerInterface
 
     /**
      * Checks whether the serializer has an encoder registered for the given format
-     *
+     * 
      * @param string $format format name
      * @return Boolean
      */
@@ -260,7 +260,7 @@ class Serializer implements SerializerInterface
 
     /**
      * Checks whether the serializer has a decoder registered for the given format
-     *
+     * 
      * @param string $format format name
      * @return Boolean
      */

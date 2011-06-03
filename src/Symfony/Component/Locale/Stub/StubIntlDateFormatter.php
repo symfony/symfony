@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,7 +20,7 @@ use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedExceptio
 
 /**
  * Provides a stub IntlDateFormatter for the 'en' locale.
- *
+ * 
  * @author Igor Wiedler <igor@wiedler.ch>
  */
 class StubIntlDateFormatter
@@ -28,7 +28,7 @@ class StubIntlDateFormatter
     /**
      * Constants defined by the intl extension, not class constants in IntlDateFormatter
      * TODO: remove if the Form component drop the call to the intl_is_failure() function
-     *
+     * 
      * @see StubIntlDateFormatter::getErrorCode()
      * @see StubIntlDateFormatter::getErrorMessage()
      */
@@ -101,7 +101,7 @@ class StubIntlDateFormatter
 
     /**
      * Constructor
-     *
+     * 
      * @param  string  $locale   The locale code
      * @param  int     $datetype Type of date formatting, one of the format type constants
      * @param  int     $timetype Type of time formatting, one of the format type constants
@@ -133,7 +133,7 @@ class StubIntlDateFormatter
 
     /**
      * Static constructor
-     *
+     * 
      * @param  string  $locale   The locale code
      * @param  int     $datetype Type of date formatting, one of the format type constants
      * @param  int     $timetype Type of time formatting, one of the format type constants
@@ -152,7 +152,7 @@ class StubIntlDateFormatter
 
     /**
      * Format the date/time value (timestamp) as a string
-     *
+     * 
      * @param  mixed         $timestamp   Unix timestamp to format
      * @return string                     The formatted value
      * @see    http://www.php.net/manual/en/intldateformatter.format.php
@@ -180,7 +180,7 @@ class StubIntlDateFormatter
 
     /**
      * Returns the formatter's calendar
-     *
+     * 
      * @return int   The calendar being used by the formatter
      * @see    http://www.php.net/manual/en/intldateformatter.getcalendar.php
      */
@@ -191,7 +191,7 @@ class StubIntlDateFormatter
 
     /**
      * Returns the formatter's datetype
-     *
+     * 
      * @return int   The current value of the formatter
      * @see    http://www.php.net/manual/en/intldateformatter.getdatetype.php
      */
@@ -202,7 +202,7 @@ class StubIntlDateFormatter
 
     /**
      * Returns formatter's last error code. Always returns the U_ZERO_ERROR class constant value
-     *
+     * 
      * @return int   The error code from last formatter call
      * @see    http://www.php.net/manual/en/intldateformatter.geterrorcode.php
      */
@@ -213,7 +213,7 @@ class StubIntlDateFormatter
 
     /**
      * Returns formatter's last error message. Always returns the U_ZERO_ERROR_MESSAGE class constant value
-     *
+     * 
      * @return string  The error message from last formatter call
      * @see    http://www.php.net/manual/en/intldateformatter.geterrormessage.php
      */
@@ -224,7 +224,7 @@ class StubIntlDateFormatter
 
     /**
      * Returns the formatter's locale
-     *
+     * 
      * @param  int      $type   The locale name type to return between valid or actual (StubLocale::VALID_LOCALE or StubLocale::ACTUAL_LOCALE, respectively)
      * @return string           The locale name used to create the formatter
      * @see    http://www.php.net/manual/en/intldateformatter.getlocale.php
@@ -236,7 +236,7 @@ class StubIntlDateFormatter
 
     /**
      * Returns the formatter's pattern
-     *
+     * 
      * @return string   The pattern string used by the formatter
      * @see    http://www.php.net/manual/en/intldateformatter.getpattern.php
      */
@@ -247,7 +247,7 @@ class StubIntlDateFormatter
 
     /**
      * Returns the formatter's time type
-     *
+     * 
      * @return string   The time type used by the formatter
      * @see    http://www.php.net/manual/en/intldateformatter.gettimetype.php
      */
@@ -258,7 +258,7 @@ class StubIntlDateFormatter
 
     /**
      * Returns the formatter's timezone identifier
-     *
+     * 
      * @return string   The timezone identifier used by the formatter
      * @see    http://www.php.net/manual/en/intldateformatter.gettimezoneid.php
      */
@@ -273,7 +273,7 @@ class StubIntlDateFormatter
 
     /**
      * Returns whether the formatter is lenient
-     *
+     * 
      * @return string   The timezone identifier used by the formatter
      * @see    http://www.php.net/manual/en/intldateformatter.islenient.php
      * @throws MethodNotImplementedException
@@ -285,7 +285,7 @@ class StubIntlDateFormatter
 
     /**
      * Parse string to a field-based time value
-     *
+     * 
      * @param  string   $value      String to convert to a time value
      * @param  int      $position   Position at which to start the parsing in $value (zero-based).
      *                              If no error occurs before $value is consumed, $parse_pos will
@@ -302,7 +302,7 @@ class StubIntlDateFormatter
 
     /**
      * Parse string to a timestamp value
-     *
+     * 
      * @param  string   $value      String to convert to a time value
      * @param  int      $position   Position at which to start the parsing in $value (zero-based).
      *                              If no error occurs before $value is consumed, $parse_pos will
@@ -328,7 +328,7 @@ class StubIntlDateFormatter
 
     /**
      * Set the formatter's calendar
-     *
+     * 
      * @param  string  $calendar  The calendar to use. Default is IntlDateFormatter::GREGORIAN.
      * @return Boolean            true on success or false on failure
      * @see    http://www.php.net/manual/en/intldateformatter.setcalendar.php
@@ -341,12 +341,12 @@ class StubIntlDateFormatter
 
     /**
      * Set the leniency of the parser
-     *
+     * 
      * Define if the parser is strict or lenient in interpreting inputs that do not match the pattern
      * exactly. Enabling lenient parsing allows the parser to accept otherwise flawed date or time
      * patterns, parsing as much as possible to obtain a value. Extra space, unrecognized tokens, or
      * invalid values ("February 30th") are not accepted.
-     *
+     * 
      * @param  Boolean $lenient   Sets whether the parser is lenient or not, default is false (strict)
      * @return Boolean            true on success or false on failure
      * @see    http://www.php.net/manual/en/intldateformatter.setlenient.php
@@ -359,7 +359,7 @@ class StubIntlDateFormatter
 
     /**
      * Set the formatter's pattern
-     *
+     * 
      * @param  string  $pattern   A pattern string in conformance with the ICU IntlDateFormatter documentation
      * @return Boolean            true on success or false on failure
      * @see    http://www.php.net/manual/en/intldateformatter.setpattern.php
@@ -376,7 +376,7 @@ class StubIntlDateFormatter
 
     /**
      * Set the formatter's timezone identifier
-     *
+     * 
      * @param  string  $timeZoneId   The time zone ID string of the time zone to use.
      *                               If NULL or the empty string, the default time zone for the
      *                               runtime is used.
@@ -415,7 +415,7 @@ class StubIntlDateFormatter
     /**
      * Create and returns a DateTime object with the specified timestamp and with the
      * current time zone
-     *
+     * 
      * @param  int  $timestamp
      * @return DateTime
      */

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,7 +19,7 @@ use Symfony\Component\Templating\Loader\LoaderInterface;
 
 /**
  * PhpEngine is an engine able to render PHP templates.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class PhpEngine implements EngineInterface, \ArrayAccess
@@ -37,7 +37,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Constructor.
-     *
+     * 
      * @param TemplateNameParserInterface $parser  A TemplateNameParserInterface instance
      * @param LoaderInterface             $loader  A loader instance
      * @param array                       $helpers An array of helper instances
@@ -62,12 +62,12 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Renders a template.
-     *
+     * 
      * @param mixed $name       A template name or a TemplateReferenceInterface instance
      * @param array $parameters An array of parameters to pass to the template
-     *
+     * 
      * @return string The evaluated template as a string
-     *
+     * 
      * @throws \InvalidArgumentException if the template does not exist
      * @throws \RuntimeException         if the template cannot be rendered
      */
@@ -101,9 +101,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Returns true if the template exists.
-     *
+     * 
      * @param mixed $name A template name or a TemplateReferenceInterface instance
-     *
+     * 
      * @return Boolean true if the template exists, false otherwise
      */
     public function exists($name)
@@ -119,9 +119,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Returns true if this class is able to render the given template.
-     *
+     * 
      * @param mixed $name A template name or a TemplateReferenceInterface instance
-     *
+     * 
      * @return Boolean true if this class supports the given resource, false otherwise
      */
     public function supports($name)
@@ -133,10 +133,10 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Evaluates a template.
-     *
+     * 
      * @param Storage $template   The template to render
      * @param array   $parameters An array of parameters to pass to the template
-     *
+     * 
      * @return string|false The evaluated template, or false if the engine is unable to render the template
      */
     protected function evaluate(Storage $template, array $parameters = array())
@@ -163,11 +163,11 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Gets a helper value.
-     *
+     * 
      * @param string $name The helper name
-     *
+     * 
      * @return mixed The helper value
-     *
+     * 
      * @throws \InvalidArgumentException if the helper is not defined
      */
     public function offsetGet($name)
@@ -177,9 +177,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Returns true if the helper is defined.
-     *
+     * 
      * @param string  $name The helper name
-     *
+     * 
      * @return Boolean true if the helper is defined, false otherwise
      */
     public function offsetExists($name)
@@ -189,7 +189,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Sets a helper.
-     *
+     * 
      * @param HelperInterface $name  The helper instance
      * @param string          $value An alias
      */
@@ -200,7 +200,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Removes a helper.
-     *
+     * 
      * @param string $name The helper name
      */
     public function offsetUnset($name)
@@ -220,7 +220,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Sets the helpers.
-     *
+     * 
      * @params Helper[] $helpers An array of helper
      */
     public function setHelpers(array $helpers)
@@ -231,7 +231,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Sets a helper.
-     *
+     * 
      * @param HelperInterface $helper The helper instance
      * @param string          $alias  An alias
      */
@@ -247,9 +247,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Returns true if the helper if defined.
-     *
+     * 
      * @param string  $name The helper name
-     *
+     * 
      * @return Boolean true if the helper is defined, false otherwise
      */
     public function has($name)
@@ -259,11 +259,11 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Gets a helper value.
-     *
+     * 
      * @param string $name The helper name
-     *
+     * 
      * @return HelperInterface The helper instance
-     *
+     * 
      * @throws \InvalidArgumentException if the helper is not defined
      */
     public function get($name)
@@ -277,7 +277,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Decorates the current template with another one.
-     *
+     * 
      * @param string $template  The decorator logical name
      */
     public function extend($template)
@@ -287,10 +287,10 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Escapes a string by using the current charset.
-     *
+     * 
      * @param mixed  $value   A variable to escape
      * @param string $context The context name
-     *
+     * 
      * @return string The escaped value
      */
     public function escape($value, $context = 'html')
@@ -300,7 +300,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Sets the charset to use.
-     *
+     * 
      * @param string $charset The charset
      */
     public function setCharset($charset)
@@ -310,7 +310,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Gets the current charset.
-     *
+     * 
      * @return string The current charset
      */
     public function getCharset()
@@ -320,7 +320,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Adds an escaper for the given context.
-     *
+     * 
      * @param string $context The escaper context (html, js, ...)
      * @param mixed  $escaper A PHP callable
      */
@@ -331,9 +331,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Gets an escaper for a given context.
-     *
+     * 
      * @param string $context The context name
-     *
+     * 
      * @return mixed  $escaper A PHP callable
      */
     public function getEscaper($context)
@@ -356,7 +356,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Returns the assigned globals.
-     *
+     * 
      * @return array
      */
     public function getGlobals()
@@ -366,18 +366,18 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Initializes the built-in escapers.
-     *
+     * 
      * Each function specifies a way for applying a transformation to a string
      * passed to it. The purpose is for the string to be "escaped" so it is
      * suitable for the format it is being displayed in.
-     *
+     * 
      * For example, the string: "It's required that you enter a username & password.\n"
      * If this were to be displayed as HTML it would be sensible to turn the
      * ampersand into '&amp;' and the apostrophe into '&aps;'. However if it were
      * going to be used as a string in JavaScript to be displayed in an alert box
      * it would be right to leave the string as-is, but c-escape the apostrophe and
      * the new line.
-     *
+     * 
      * For each function there is a define to avoid problems with strings being
      * incorrectly specified.
      */
@@ -389,9 +389,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
             'html' =>
                 /**
                  * Runs the PHP function htmlspecialchars on the value passed.
-                 *
+                 * 
                  * @param string $value the value to escape
-                 *
+                 * 
                  * @return string the escaped value
                  */
                 function ($value) use ($that)
@@ -405,7 +405,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                 /**
                  * A function that escape all non-alphanumeric characters
                  * into their \xHH or \uHHHH representations
-                 *
+                 * 
                  * @param string $value the value to escape
                  * @return string the escaped value
                  */
@@ -445,13 +445,13 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Convert a string from one encoding to another.
-     *
+     * 
      * @param string $string The string to convert
      * @param string $to     The input encoding
      * @param string $from   The output encoding
-     *
+     * 
      * @return string The string with the new encoding
-     *
+     * 
      * @throws \RuntimeException if no suitable encoding function is found (iconv or mbstring)
      */
     public function convertEncoding($string, $to, $from)
@@ -467,7 +467,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Gets the loader associated with this engine.
-     *
+     * 
      * @return LoaderInterface A LoaderInterface instance
      */
     public function getLoader()
@@ -477,11 +477,11 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Loads the given template.
-     *
+     * 
      * @param mixed $name A template name or a TemplateReferenceInterface instance
-     *
+     * 
      * @return Storage A Storage instance
-     *
+     * 
      * @throws \InvalidArgumentException if the template cannot be found
      */
     protected function load($name)

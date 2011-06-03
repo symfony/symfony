@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Acl\Permission;
 /**
  * This class allows you to build cumulative permissions easily, or convert
  * masks to a human-readable format.
- *
+ * 
  * <code>
  *       $builder = new MaskBuilder();
  *       $builder
@@ -25,7 +25,7 @@ namespace Symfony\Component\Security\Acl\Permission;
  *       var_dump($builder->get());        // int(7)
  *       var_dump($builder->getPattern()); // string(32) ".............................ECV"
  * </code>
- *
+ * 
  * We have defined some commonly used base permissions which you can use:
  * - VIEW: the SID is allowed to view the domain object / field
  * - CREATE: the SID is allowed to create new instances of the domain object / fields
@@ -39,7 +39,7 @@ namespace Symfony\Component\Security\Acl\Permission;
  *           MASTER and OWNER permissions
  * - OWNER: the SID is owning the domain object in question and can perform any
  *          action on the domain object as well as grant any permission
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class MaskBuilder
@@ -71,7 +71,7 @@ class MaskBuilder
 
     /**
      * Constructor
-     *
+     * 
      * @param integer $mask optional; defaults to 0
      * @return void
      */
@@ -86,7 +86,7 @@ class MaskBuilder
 
     /**
      * Adds a mask to the permission
-     *
+     * 
      * @param mixed $mask
      * @return PermissionBuilder
      */
@@ -105,7 +105,7 @@ class MaskBuilder
 
     /**
      * Returns the mask of this permission
-     *
+     * 
      * @return integer
      */
     public function get()
@@ -115,7 +115,7 @@ class MaskBuilder
 
     /**
      * Returns a human-readable representation of the permission
-     *
+     * 
      * @return string
      */
     public function getPattern()
@@ -139,7 +139,7 @@ class MaskBuilder
 
     /**
      * Removes a mask from the permission
-     *
+     * 
      * @param mixed $mask
      * @return PermissionBuilder
      */
@@ -158,7 +158,7 @@ class MaskBuilder
 
     /**
      * Resets the PermissionBuilder
-     *
+     * 
      * @return PermissionBuilder
      */
     public function reset()
@@ -170,7 +170,7 @@ class MaskBuilder
 
     /**
      * Returns the code for the passed mask
-     *
+     * 
      * @param integer $mask
      * @throws \InvalidArgumentException
      * @throws \RuntimeException

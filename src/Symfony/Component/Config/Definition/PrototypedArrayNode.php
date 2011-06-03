@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 /**
  * Represents a prototyped Array node in the config tree.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class PrototypedArrayNode extends ArrayNode
@@ -31,7 +31,7 @@ class PrototypedArrayNode extends ArrayNode
 
     /**
      * Constructor.
-     *
+     * 
      * @param string $name The Node's name
      * @param NodeInterface $parent The node parent
      */
@@ -45,7 +45,7 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Sets the minimum number of elements that a prototype based node must
      * contain. By default this is zero, meaning no elements.
-     *
+     * 
      * @param integer $number
      */
     public function setMinNumberOfElements($number)
@@ -55,21 +55,21 @@ class PrototypedArrayNode extends ArrayNode
 
     /**
      * The name of the attribute which value should be used as key.
-     *
+     * 
      * This is only relevant for XML configurations, and only in combination
      * with a prototype based node.
-     *
+     * 
      * For example, if "id" is the keyAttribute, then:
-     *
+     * 
      *     array('id' => 'my_name', 'foo' => 'bar')
-     *
+     * 
      * becomes
-     *
+     * 
      *     'my_name' => array('foo' => 'bar')
-     *
+     * 
      * If $remove is false, the resulting array will still have the
      * "'id' => 'my_name'" item in it.
-     *
+     * 
      * @param string  $attribute The name of the attribute which value is to be used as a key
      * @param Boolean $remove Whether or not to remove the key
      */
@@ -81,7 +81,7 @@ class PrototypedArrayNode extends ArrayNode
 
     /**
      * Sets the default value of this node.
-     *
+     * 
      * @param string $value
      * @throws \InvalidArgumentException if the default value is not an array
      */
@@ -96,7 +96,7 @@ class PrototypedArrayNode extends ArrayNode
 
     /**
      * Checks if the node has a default value.
-     *
+     * 
      * @return Boolean
      */
     public function hasDefaultValue()
@@ -106,7 +106,7 @@ class PrototypedArrayNode extends ArrayNode
 
     /**
      * Retrieves the default value.
-     *
+     * 
      * @return array The default value
      */
     public function getDefaultValue()
@@ -116,7 +116,7 @@ class PrototypedArrayNode extends ArrayNode
 
     /**
      * Sets the node prototype.
-     *
+     * 
      * @param PrototypeNodeInterface $node
      */
     public function setPrototype(PrototypeNodeInterface $node)
@@ -126,7 +126,7 @@ class PrototypedArrayNode extends ArrayNode
 
     /**
      * Disable adding concrete children for prototyped nodes.
-     *
+     * 
      * @param NodeInterface $node The child node to add
      * @throws \RuntimeException Prototyped array nodes can't have concrete children.
      */
@@ -137,7 +137,7 @@ class PrototypedArrayNode extends ArrayNode
 
     /**
      * Finalizes the value of this node.
-     *
+     * 
      * @param mixed $value
      * @return mixed The finalised value
      * @throws UnsetKeyException
@@ -172,7 +172,7 @@ class PrototypedArrayNode extends ArrayNode
 
     /**
      * Normalizes the value.
-     *
+     * 
      * @param mixed $value The value to normalize
      * @return mixed The normalized value
      */
@@ -229,7 +229,7 @@ class PrototypedArrayNode extends ArrayNode
 
     /**
      * Merges values together.
-     *
+     * 
      * @param mixed $leftSide The left side to merge.
      * @param mixed $rightSide The right side to merge.
      * @return mixed The merged values

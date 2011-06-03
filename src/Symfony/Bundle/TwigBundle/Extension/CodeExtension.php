@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -14,7 +14,7 @@ namespace Symfony\Bundle\TwigBundle\Extension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class CodeExtension extends \Twig_Extension
@@ -23,7 +23,7 @@ class CodeExtension extends \Twig_Extension
 
     /**
      * Constructor of Twig Extension to provide functions for code formatting
-     *
+     * 
      * @param Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper $helper Helper to use
      */
     public function __construct(ContainerInterface $container)

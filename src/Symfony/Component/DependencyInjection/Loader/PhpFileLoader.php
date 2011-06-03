@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,17 +15,17 @@ use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * PhpFileLoader loads service definitions from a PHP file.
- *
+ * 
  * The PHP file is required and the $container variable can be
  * used form the file to change the container.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class PhpFileLoader extends FileLoader
 {
     /**
      * Loads a PHP file.
-     *
+     * 
      * @param mixed  $file The resource
      * @param string $type The resource type
      */
@@ -44,10 +44,10 @@ class PhpFileLoader extends FileLoader
 
     /**
      * Returns true if this class supports the given resource.
-     *
+     * 
      * @param mixed  $resource A resource
      * @param string $type     The resource type
-     *
+     * 
      * @return Boolean true if this class supports the given resource, false otherwise
      */
     public function supports($resource, $type = null)

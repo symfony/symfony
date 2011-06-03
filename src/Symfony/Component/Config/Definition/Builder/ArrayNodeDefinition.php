@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Component\Config\Definition\NodeInterface;
 
 /**
  * This class provides a fluent interface for defining an array node.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinitionInterface
@@ -52,7 +52,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Set a custom children builder
-     *
+     * 
      * @param NodeBuilder $builder A custom NodeBuilder
      */
     public function setBuilder(NodeBuilder $builder)
@@ -62,7 +62,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Returns a builder to add children nodes
-     *
+     * 
      * @return NodeBuilder
      */
     public function children()
@@ -72,9 +72,9 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Sets a prototype for child nodes.
-     *
+     * 
      * @param string $type the type of node
-     *
+     * 
      * @return NodeDefinition
      */
     public function prototype($type)
@@ -88,7 +88,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Adds the default value if the node is not set in the configuration.
-     *
+     * 
      * @return ArrayNodeDefinition
      */
     public function addDefaultsIfNotSet()
@@ -100,7 +100,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Requires the node to have at least one element.
-     *
+     * 
      * @return ArrayNodeDefinition
      */
     public function requiresAtLeastOneElement()
@@ -112,9 +112,9 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Disallows adding news keys in a subsequent configuration.
-     *
+     * 
      * If used all keys have to be defined in the same configuration file.
-     *
+     * 
      * @return ArrayNodeDefinition
      */
     public function disallowNewKeysInSubsequentConfigs()
@@ -126,10 +126,10 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Sets a normalization rule for XML configurations.
-     *
+     * 
      * @param string $singular The key to remap
      * @param string $plural   The plural of the key for irregular plurals
-     *
+     * 
      * @return ArrayNodeDefinition
      */
     public function fixXmlConfig($singular, $plural = null)
@@ -141,28 +141,28 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Set the attribute which value is to be used as key.
-     *
+     * 
      * This is useful when you have an indexed array that should be an
      * associative array. You can select an item from within the array
      * to be the key of the particular item. For example, if "id" is the
      * "key", then:
-     *
+     * 
      *     array(
      *         array('id' => 'my_name', 'foo' => 'bar'),
      *     )
-     *
+     * 
      * becomes
-     *
+     * 
      *     array(
      *         'my_name' => array('foo' => 'bar'),
      *     )
-     *
+     * 
      * If you'd like "'id' => 'my_name'" to still be present in the resulting
      * array, then you can set the second argument of this method to false.
-     *
+     * 
      * @param string  $name          The name of the key
      * @param Boolean $removeKeyItem Whether or not the key item should be removed.
-     *
+     * 
      * @return ArrayNodeDefinition
      */
     public function useAttributeAsKey($name, $removeKeyItem = true)
@@ -175,9 +175,9 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Sets whether the node can be unset.
-     *
+     * 
      * @param Boolean $allow
-     *
+     * 
      * @return ArrayNodeDefinition
      */
     public function canBeUnset($allow = true)
@@ -189,7 +189,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Disables the deep merging of the node.
-     *
+     * 
      * @return ArrayNodeDefinition
      */
     public function performNoDeepMerging()
@@ -202,11 +202,11 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Allows extra config keys to be specified under an array without
      * throwing an exception.
-     *
+     * 
      * Those config values are simply ignored. This should be used only
      * in special cases where you want to send an entire configuration
      * array through a special tree that processes only part of the array.
-     *
+     * 
      * @return ArrayNodeDefinition
      */
     public function ignoreExtraKeys()
@@ -218,7 +218,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Append a node definition.
-     *
+     * 
      *     $node = new ArrayNodeDefinition()
      *         ->children()
      *             ->scalarNode('foo')
@@ -226,7 +226,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      *         ->end()
      *         ->append($this->getBarNodeDefinition())
      *     ;
-     *
+     * 
      * @return ArrayNodeDefinition This node
      */
     public function append(NodeDefinition $node)
@@ -238,7 +238,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Returns a node builder to be used to add children and prototype
-     *
+     * 
      * @return NodeBuilder The node builder
      */
     protected function getNodeBuilder()

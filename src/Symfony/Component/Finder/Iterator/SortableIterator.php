@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\Finder\Iterator;
 
 /**
  * SortableIterator applies a sort on a given Iterator.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SortableIterator implements \IteratorAggregate
@@ -26,7 +26,7 @@ class SortableIterator implements \IteratorAggregate
 
     /**
      * Constructor.
-     *
+     * 
      * @param \Traversable     $iterator The Iterator to filter
      * @param integer|callback $sort     The sort type (SORT_BY_NAME, SORT_BY_TYPE, or a PHP callback)
      */

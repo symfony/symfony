@@ -20,16 +20,16 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
 
 /**
  * RememberMeListener implements authentication capabilities via a cookie
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class RememberMeListener implements ListenerInterface
@@ -42,7 +42,7 @@ class RememberMeListener implements ListenerInterface
 
     /**
      * Constructor
-     *
+     * 
      * @param SecurityContext                $securityContext
      * @param RememberMeServicesInterface    $rememberMeServices
      * @param AuthenticationManagerInterface $authenticationManager
@@ -60,7 +60,7 @@ class RememberMeListener implements ListenerInterface
 
     /**
      * Handles remember-me cookie based authentication.
-     *
+     * 
      * @param GetResponseEvent $event A GetResponseEvent instance
      */
     public function handle(GetResponseEvent $event)

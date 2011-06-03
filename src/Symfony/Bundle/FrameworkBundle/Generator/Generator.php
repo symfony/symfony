@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,17 +13,17 @@ namespace Symfony\Bundle\FrameworkBundle\Generator;
 
 /**
  * Generator is the base class for all generators.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Generator
 {
     /**
      * Renders a single line. Looks for {{ var }}
-     *
+     * 
      * @param string $string
      * @param array $parameters
-     *
+     * 
      * @return string
      */
     static public function renderString($string, array $parameters)
@@ -38,7 +38,7 @@ class Generator
 
     /**
      * Renders a file by replacing the contents of $file with rendered output.
-     *
+     * 
      * @param string $file filename for the file to be rendered
      * @param array $parameters
      */
@@ -49,7 +49,7 @@ class Generator
 
     /**
      * Renders a directory recursively
-     *
+     * 
      * @param string $dir Path to the directory that will be recursively rendered
      * @param array $parameters
      */

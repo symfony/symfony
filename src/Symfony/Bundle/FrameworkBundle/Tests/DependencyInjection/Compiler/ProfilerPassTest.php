@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -21,7 +21,7 @@ class ProfilerPassTest extends \PHPUnit_Framework_TestCase
      * Tests that collectors that specify a template but no "id" will throw
      * an exception (both are needed if the template is specified). Thus,
      * a fully-valid tag looks something like this:
-     *
+     * 
      *     <tag name="data_collector" template="YourBundle:Collector:templatename" id="your_collector_name" />
      */
     public function testTemplateNoIdThrowsException()

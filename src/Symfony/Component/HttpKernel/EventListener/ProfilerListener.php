@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 
 /**
  * ProfilerListener collects data for the current request by listening to the onCoreResponse event.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ProfilerListener
@@ -35,7 +35,7 @@ class ProfilerListener
 
     /**
      * Constructor.
-     *
+     * 
      * @param Profiler                $profiler           A Profiler instance
      * @param RequestMatcherInterface $matcher            A RequestMatcher instance
      * @param Boolean                 $onlyException      true if the profiler only collects data when an exception occurs, false otherwise
@@ -52,7 +52,7 @@ class ProfilerListener
 
     /**
      * Handles the onCoreException event.
-     *
+     * 
      * @param GetResponseForExceptionEvent $event A GetResponseForExceptionEvent instance
      */
     public function onCoreException(GetResponseForExceptionEvent $event)
@@ -66,7 +66,7 @@ class ProfilerListener
 
     /**
      * Handles the onCoreResponse event.
-     *
+     * 
      * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
     public function onCoreResponse(FilterResponseEvent $event)

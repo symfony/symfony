@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\Config\Definition\Builder;
 
 /**
  * This class provides a fluent interface for building a node.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class NodeBuilder implements NodeParentInterface
@@ -23,7 +23,7 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Constructor
-     *
+     * 
      */
     public function __construct()
     {
@@ -37,9 +37,9 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Set the parent node
-     *
+     * 
      * @param ParentNodeDefinitionInterface $parent The parent node
-     *
+     * 
      * @return NodeBuilder This node builder
      */
     public function setParent(ParentNodeDefinitionInterface $parent = null)
@@ -51,9 +51,9 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Creates a child array node
-     *
+     * 
      * @param string $name The name of the node
-     *
+     * 
      * @return ArrayNodeDefinition The child node
      */
     public function arrayNode($name)
@@ -63,9 +63,9 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Creates a child scalar node.
-     *
+     * 
      * @param string $name the name of the node
-     *
+     * 
      * @return ScalarNodeDefinition The child node
      */
     public function scalarNode($name)
@@ -75,9 +75,9 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Creates a child Boolean node.
-     *
+     * 
      * @param string $name The name of the node
-     *
+     * 
      * @return BooleanNodeDefinition The child node
      */
     public function booleanNode($name)
@@ -87,9 +87,9 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Creates a child variable node.
-     *
+     * 
      * @param string $name The name of the node
-     *
+     * 
      * @return VariableNodeDefinition The builder of the child node
      */
     public function variableNode($name)
@@ -99,7 +99,7 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Returns the parent node.
-     *
+     * 
      * @return ParentNodeDefinitionInterface The parent node
      */
     public function end()
@@ -109,12 +109,12 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Creates a child node.
-     *
+     * 
      * @param string $name The name of the node
      * @param string $type The type of the node
-     *
+     * 
      * @return NodeDefinition The child node
-     *
+     * 
      * @throws \RuntimeException When the node type is not registered
      * @throws \RuntimeException When the node class is not found
      */
@@ -141,7 +141,7 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Add or override a node Type
-     *
+     * 
      * @param string $type The name of the type
      * @param string $class The fully qualified name the node definition class
      */
@@ -154,11 +154,11 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Returns the class name of the node definition
-     *
+     * 
      * @param string $type The node type
-     *
+     * 
      * @return string The node definition class name
-     *
+     * 
      * @throws \RuntimeException When the node type is not registered
      * @throws \RuntimeException When the node class is not found
      */

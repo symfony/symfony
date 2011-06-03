@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -27,7 +27,7 @@ class AssetsExtension extends \Twig_Extension
 
     /**
      * Returns a list of functions to add to the existing list.
-     *
+     * 
      * @return array An array of functions
      */
     public function getFunctions()
@@ -40,12 +40,12 @@ class AssetsExtension extends \Twig_Extension
 
     /**
      * Returns the public path of an asset
-     *
+     * 
      * Absolute paths (i.e. http://...) are returned unmodified.
-     *
+     * 
      * @param string $path        A public path
      * @param string $packageName The name of the asset package to use
-     *
+     * 
      * @return string A public path which takes into account the base path and URL path
      */
     public function getAssetUrl($path, $packageName = null)
@@ -55,7 +55,7 @@ class AssetsExtension extends \Twig_Extension
 
     /**
      * Returns the version of the assets in a package
-     *
+     * 
      * @param string $packageName
      * @return int
      */
@@ -66,7 +66,7 @@ class AssetsExtension extends \Twig_Extension
 
     /**
      * Returns the name of the extension.
-     *
+     * 
      * @return string The extension name
      */
     public function getName()

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,7 +20,7 @@ use Symfony\Component\Console\Command\Command;
 
 /**
  * HelpCommand displays the help for a given command.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class HelpCommand extends Command
@@ -56,7 +56,7 @@ EOF
 
     /**
      * Sets the command
-     *
+     * 
      * @param Command $command The command to set
      */
     public function setCommand(Command $command)

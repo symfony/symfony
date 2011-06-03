@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,9 +13,9 @@ namespace Symfony\Component\Console\Input;
 
 /**
  * Represents a command line option.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * @api
  */
 class InputOption
@@ -33,15 +33,15 @@ class InputOption
 
     /**
      * Constructor.
-     *
+     * 
      * @param string  $name        The option name
      * @param string  $shortcut    The shortcut (can be null)
      * @param integer $mode        The option mode: One of the VALUE_* constants
      * @param string  $description A description text
      * @param mixed   $default     The default value (must be null for self::VALUE_REQUIRED or self::VALUE_NONE)
-     *
+     * 
      * @throws \InvalidArgumentException If option mode is invalid or incompatible
-     *
+     * 
      * @api
      */
     public function __construct($name, $shortcut = null, $mode = null, $description = '', $default = null)
@@ -80,7 +80,7 @@ class InputOption
 
     /**
      * Returns the shortcut.
-     *
+     * 
      * @return string The shortcut
      */
     public function getShortcut()
@@ -90,7 +90,7 @@ class InputOption
 
     /**
      * Returns the name.
-     *
+     * 
      * @return string The name
      */
     public function getName()
@@ -100,7 +100,7 @@ class InputOption
 
     /**
      * Returns true if the option accepts a value.
-     *
+     * 
      * @return Boolean true if value mode is not self::VALUE_NONE, false otherwise
      */
     public function acceptValue()
@@ -110,7 +110,7 @@ class InputOption
 
     /**
      * Returns true if the option requires a value.
-     *
+     * 
      * @return Boolean true if value mode is self::VALUE_REQUIRED, false otherwise
      */
     public function isValueRequired()
@@ -120,7 +120,7 @@ class InputOption
 
     /**
      * Returns true if the option takes an optional value.
-     *
+     * 
      * @return Boolean true if value mode is self::VALUE_OPTIONAL, false otherwise
      */
     public function isValueOptional()
@@ -130,7 +130,7 @@ class InputOption
 
     /**
      * Returns true if the option can take multiple values.
-     *
+     * 
      * @return Boolean true if mode is self::VALUE_IS_ARRAY, false otherwise
      */
     public function isArray()
@@ -140,7 +140,7 @@ class InputOption
 
     /**
      * Sets the default value.
-     *
+     * 
      * @param mixed $default The default value
      */
     public function setDefault($default = null)
@@ -162,7 +162,7 @@ class InputOption
 
     /**
      * Returns the default value.
-     *
+     * 
      * @return mixed The default value
      */
     public function getDefault()
@@ -172,7 +172,7 @@ class InputOption
 
     /**
      * Returns the description text.
-     *
+     * 
      * @return string The description text
      */
     public function getDescription()

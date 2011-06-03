@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -31,7 +31,7 @@ class FormBuilder
 
     /**
      * The event dispatcher
-     *
+     * 
      * @var EventDispatcherInterface
      */
     private $dispatcher;
@@ -112,7 +112,7 @@ class FormBuilder
 
     /**
      * Constructor.
-     *
+     * 
      * @param string                    $name
      * @param FormFactoryInterface      $factory
      * @param EventDispatcherInterface  $dispatcher
@@ -128,7 +128,7 @@ class FormBuilder
 
     /**
      * Returns the associated form factory.
-     *
+     * 
      * @return FormFactoryInterface The factory
      */
     public function getFormFactory()
@@ -138,7 +138,7 @@ class FormBuilder
 
     /**
      * Returns the name of the form.
-     *
+     * 
      * @return string The form name
      */
     public function getName()
@@ -148,9 +148,9 @@ class FormBuilder
 
     /**
      * Updates the field with default data.
-     *
+     * 
      * @param array $appData The data formatted as expected for the underlying object
-     *
+     * 
      * @return FormBuilder The current builder
      */
     public function setData($appData)
@@ -162,7 +162,7 @@ class FormBuilder
 
     /**
      * Returns the data in the format needed for the underlying object.
-     *
+     * 
      * @return mixed
      */
     public function getData()
@@ -172,9 +172,9 @@ class FormBuilder
 
     /**
      * Set whether the form is read only
-     *
+     * 
      * @param Boolean $readOnly Whether the form is read only
-     *
+     * 
      * @return FormBuilder The current builder
      */
     public function setReadOnly($readOnly)
@@ -186,7 +186,7 @@ class FormBuilder
 
     /**
      * Returns whether the form is read only.
-     *
+     * 
      * @return Boolean Whether the form is read only
      */
     public function getReadOnly()
@@ -196,9 +196,9 @@ class FormBuilder
 
     /**
      * Sets whether this field is required to be filled out when bound.
-     *
+     * 
      * @param Boolean $required
-     *
+     * 
      * @return FormBuilder The current builder
      */
     public function setRequired($required)
@@ -210,7 +210,7 @@ class FormBuilder
 
     /**
      * Returns whether this field is required to be filled out when bound.
-     *
+     * 
      * @return Boolean Whether this field is required
      */
     public function getRequired()
@@ -220,9 +220,9 @@ class FormBuilder
 
     /**
      * Sets whether errors bubble up to the parent.
-     *
+     * 
      * @param type $errorBubbling
-     *
+     * 
      * @return FormBuilder The current builder
      */
     public function setErrorBubbling($errorBubbling)
@@ -234,7 +234,7 @@ class FormBuilder
 
     /**
      * Returns whether errors bubble up to the parent.
-     *
+     * 
      * @return Boolean
      */
     public function getErrorBubbling()
@@ -244,9 +244,9 @@ class FormBuilder
 
     /**
      * Adds a validator to the form.
-     *
+     * 
      * @param FormValidatorInterface $validator The validator
-     *
+     * 
      * @return FormBuilder The current builder
      */
     public function addValidator(FormValidatorInterface $validator)
@@ -258,7 +258,7 @@ class FormBuilder
 
     /**
      * Returns the validators used by the form.
-     *
+     * 
      * @return array An array of FormValidatorInterface
      */
     public function getValidators()
@@ -268,9 +268,9 @@ class FormBuilder
 
     /**
      * Adds an event listener for events on this field
-     *
+     * 
      * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addListener
-     *
+     * 
      * @return FormBuilder The current builder
      */
     public function addEventListener($eventName, $listener, $priority = 0)
@@ -282,9 +282,9 @@ class FormBuilder
 
     /**
      * Adds an event subscriber for events on this field
-     *
+     * 
      * @see Symfony\Component\EventDispatcher\EventDispatcherInterface::addSubscriber
-     *
+     * 
      * @return FormBuilder The current builder
      */
     public function addEventSubscriber(EventSubscriberInterface $subscriber, $priority = 0)
@@ -296,9 +296,9 @@ class FormBuilder
 
     /**
      * Appends a transformer to the normalization transformer chain
-     *
+     * 
      * @param DataTransformerInterface $clientTransformer
-     *
+     * 
      * @return FormBuilder The current builder
      */
     public function appendNormTransformer(DataTransformerInterface $normTransformer)
@@ -310,9 +310,9 @@ class FormBuilder
 
     /**
      * Prepends a transformer to the client transformer chain
-     *
+     * 
      * @param DataTransformerInterface $normTransformer
-     *
+     * 
      * @return FormBuilder The current builder
      */
     public function prependNormTransformer(DataTransformerInterface $normTransformer)
@@ -324,7 +324,7 @@ class FormBuilder
 
     /**
      * Clears the normalization transformers.
-     *
+     * 
      * @return FormBuilder The current builder
      */
     public function resetNormTransformers()
@@ -336,7 +336,7 @@ class FormBuilder
 
     /**
      * Returns all the normalization transformers.
-     *
+     * 
      * @return array An array of DataTransformerInterface
      */
     public function getNormTransformers()
@@ -346,9 +346,9 @@ class FormBuilder
 
     /**
      * Appends a transformer to the client transformer chain
-     *
+     * 
      * @param DataTransformerInterface $clientTransformer
-     *
+     * 
      * @return FormBuilder The current builder
      */
     public function appendClientTransformer(DataTransformerInterface $clientTransformer)
@@ -360,9 +360,9 @@ class FormBuilder
 
     /**
      * Prepends a transformer to the client transformer chain
-     *
+     * 
      * @param DataTransformerInterface $clientTransformer
-     *
+     * 
      * @return FormBuilder The current builder
      */
     public function prependClientTransformer(DataTransformerInterface $clientTransformer)
@@ -374,7 +374,7 @@ class FormBuilder
 
     /**
      * Clears the client transformers.
-     *
+     * 
      * @return FormBuilder The current builder
      */
     public function resetClientTransformers()
@@ -386,7 +386,7 @@ class FormBuilder
 
     /**
      * Returns all the client transformers.
-     *
+     * 
      * @return array An array of DataTransformerInterface
      */
     public function getClientTransformers()
@@ -396,10 +396,10 @@ class FormBuilder
 
     /**
      * Sets the value for an attribute.
-     *
+     * 
      * @param string $name  The name of the attribute
      * @param string $value The value of the attribute
-     *
+     * 
      * @return FormBuilder The current builder
      */
     public function setAttribute($name, $value)
@@ -411,7 +411,7 @@ class FormBuilder
 
     /**
      * Returns the value of the attributes with the given name.
-     *
+     * 
      * @param string $name The name of the attribute
      */
     public function getAttribute($name)
@@ -421,7 +421,7 @@ class FormBuilder
 
     /**
      * Returns whether the form has an attribute with the given name.
-     *
+     * 
      * @param string $name The name of the attribute
      */
     public function hasAttribute($name)
@@ -431,7 +431,7 @@ class FormBuilder
 
     /**
      * Returns all the attributes.
-     *
+     * 
      * @return array An array of attributes
      */
     public function getAttributes()
@@ -441,9 +441,9 @@ class FormBuilder
 
     /**
      * Sets the data mapper used by the form.
-     *
+     * 
      * @param DataMapperInterface $dataMapper
-     *
+     * 
      * @return FormBuilder The current builder
      */
     public function setDataMapper(DataMapperInterface $dataMapper)
@@ -455,7 +455,7 @@ class FormBuilder
 
     /**
      * Returns the data mapper used by the form.
-     *
+     * 
      * @return array An array of DataMapperInterface
      */
     public function getDataMapper()
@@ -465,9 +465,9 @@ class FormBuilder
 
     /**
      * Set the types.
-     *
+     * 
      * @param array $types An array FormTypeInterface
-     *
+     * 
      * @return FormBuilder The current builder
      */
     public function setTypes(array $types)
@@ -479,7 +479,7 @@ class FormBuilder
 
     /**
      * Return the types.
-     *
+     * 
      * @return array An array of FormTypeInterface
      */
     public function getTypes()
@@ -489,7 +489,7 @@ class FormBuilder
 
     /**
      * Sets the data used for the client data when no value is bound.
-     *
+     * 
      * @param mixed $emptyData
      */
     public function setEmptyData($emptyData)
@@ -501,7 +501,7 @@ class FormBuilder
 
     /**
      * Returns the data used for the client data when no value is bound.
-     *
+     * 
      * @return mixed
      */
     public function getEmptyData()
@@ -512,14 +512,14 @@ class FormBuilder
     /**
      * Adds a new field to this group. A field must have a unique name within
      * the group. Otherwise the existing field is overwritten.
-     *
+     * 
      * If you add a nested group, this group should also be represented in the
      * object hierarchy.
-     *
+     * 
      * @param string|FormBuilder       $child
      * @param string|FormTypeInterface $type
      * @param array                    $options
-     *
+     * 
      * @return FormBuilder The current builder
      */
     public function add($child, $type = null, array $options = array())
@@ -548,13 +548,13 @@ class FormBuilder
 
     /**
      * Creates a form builder.
-     *
+     * 
      * @param string                    $name    The name of the form or the name of the property
      * @param string|FormTypeInterface  $type    The type of the form or null if name is a property
      * @param array                     $options The options
-     *
+     * 
      * @return FormBuilder The builder
-     *
+     * 
      * @throws FormException if the data class is not set when creating a property builder
      */
     public function create($name, $type = null, array $options = array())
@@ -584,11 +584,11 @@ class FormBuilder
 
     /**
      * Returns a child by name.
-     *
+     * 
      * @param string $name The name of the child
-     *
+     * 
      * @return FormBuilder The builder for the child
-     *
+     * 
      * @throws FormException if the given child does not exist
      */
     public function get($name)
@@ -610,9 +610,9 @@ class FormBuilder
 
     /**
      * Removes the field with the given name.
-     *
+     * 
      * @param string $name
-     *
+     * 
      * @return FormBuilder The current builder
      */
     public function remove($name)
@@ -626,9 +626,9 @@ class FormBuilder
 
     /**
      * Returns whether a field with the given name exists.
-     *
+     * 
      * @param  string $name
-     *
+     * 
      * @return Boolean
      */
     public function has($name)
@@ -638,7 +638,7 @@ class FormBuilder
 
     /**
      * Creates the form.
-     *
+     * 
      * @return Form The form
      */
     public function getForm()
@@ -671,7 +671,7 @@ class FormBuilder
 
     /**
      * Returns the event dispatcher.
-     *
+     * 
      * @return type
      */
     protected function buildDispatcher()
@@ -681,7 +681,7 @@ class FormBuilder
 
     /**
      * Creates the children.
-     *
+     * 
      * @return array An array of Form
      */
     protected function buildChildren()

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,14 +16,14 @@ use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 
 /**
  * Guesses the mime type with the binary "file" (only available on *nix)
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
 class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
 {
     /**
      * Returns whether this guesser is supported on the current OS
-     *
+     * 
      * @return Boolean
      */
     static public function isSupported()
@@ -32,7 +32,7 @@ class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
     }
     /**
      * Guesses the mime type of the file with the given path
-     *
+     * 
      * @see MimeTypeGuesserInterface::guess()
      */
     public function guess($path)

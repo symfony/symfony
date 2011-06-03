@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,14 +17,14 @@ use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 
 /**
  * A file in the file system.
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
 class File
 {
     /**
      * A map of mime types and their default extensions.
-     *
+     * 
      * @var array
      */
     static protected $defaultExtensions = array(
@@ -442,16 +442,16 @@ class File
 
     /**
      * The absolute path to the file without dots.
-     *
+     * 
      * @var string
      */
     protected $path;
 
     /**
      * Constructs a new file from the given path.
-     *
+     * 
      * @param string $path The path to the file
-     *
+     * 
      * @throws FileNotFoundException If the given path is not a file
      */
     public function __construct($path)
@@ -465,7 +465,7 @@ class File
 
     /**
      * Alias for getPath().
-     *
+     * 
      * @return string
      */
     public function __toString()
@@ -475,7 +475,7 @@ class File
 
     /**
      * Returns the file name.
-     *
+     * 
      * @return string
      */
     public function getName()
@@ -485,7 +485,7 @@ class File
 
     /**
      * Returns the file extension (with dot).
-     *
+     * 
      * @return string
      */
     public function getExtension()
@@ -499,9 +499,9 @@ class File
 
     /**
      * Returns the extension based on the mime type (with dot).
-     *
+     * 
      * If the mime type is unknown, returns null.
-     *
+     * 
      * @return string|null The guessed extension or null if it cannot be guessed
      */
     public function guessExtension()
@@ -517,7 +517,7 @@ class File
 
     /**
      * Returns the directory of the file.
-     *
+     * 
      * @return string
      */
     public function getDirectory()
@@ -527,7 +527,7 @@ class File
 
     /**
      * Returns the absolute file path, without dots.
-     *
+     * 
      * @return string
      */
     public function getPath()
@@ -537,11 +537,11 @@ class File
 
     /**
      * Returns the mime type of the file.
-     *
+     * 
      * The mime type is guessed using the functions finfo(), mime_content_type()
      * and the system binary "file" (in this order), depending on which of those
      * is available on the current operating system.
-     *
+     * 
      * @return string The guessed mime type (i.e. "application/pdf")
      */
     public function getMimeType()
@@ -553,7 +553,7 @@ class File
 
     /**
      * Returns the size of this file.
-     *
+     * 
      * @return integer The file size in bytes
      */
     public function getSize()
@@ -568,7 +568,7 @@ class File
 
     /**
      * Moves the file to a new location.
-     *
+     * 
      * @param string $directory The destination folder
      * @param string $name      The new file name
      */

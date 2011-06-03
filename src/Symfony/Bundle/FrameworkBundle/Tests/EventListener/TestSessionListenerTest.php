@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,9 +19,9 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
 /**
  * SessionListenerTest.
- *
+ * 
  * Tests SessionListener.
- *
+ * 
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  */
 class TestSessionListenerTest extends \PHPUnit_Framework_TestCase

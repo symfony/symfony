@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -56,15 +56,15 @@ class PrototypedArrayNodeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Tests that when a key attribute is mapped, that key is removed from the array:
-     *
+     * 
      *     <things>
      *         <option id="option1" value="foo">
      *         <option id="option2" value="bar">
      *     </things>
-     *
+     * 
      * The above should finally be mapped to an array that looks like this
      * (because "id" is the key attribute).
-     *
+     * 
      *     array(
      *         'things' => array(
      *             'option1' => 'foo',

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage;
 
 /**
  * Request represents an HTTP request.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Request
@@ -71,7 +71,7 @@ class Request
 
     /**
      * Constructor.
-     *
+     * 
      * @param array  $query      The GET parameters
      * @param array  $request    The POST parameters
      * @param array  $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
@@ -87,9 +87,9 @@ class Request
 
     /**
      * Sets the parameters for this request.
-     *
+     * 
      * This method also re-initializes all properties.
-     *
+     * 
      * @param array  $query      The GET parameters
      * @param array  $request    The POST parameters
      * @param array  $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
@@ -122,7 +122,7 @@ class Request
 
     /**
      * Creates a new request with values from PHP's super globals.
-     *
+     * 
      * @return Request A new request
      */
     static public function createFromGlobals()
@@ -141,7 +141,7 @@ class Request
 
     /**
      * Creates a Request based on a given URI and configuration.
-     *
+     * 
      * @param string $uri        The URI
      * @param string $method     The HTTP method
      * @param array  $parameters The request (GET) or query (POST) parameters
@@ -149,7 +149,7 @@ class Request
      * @param array  $files      The request files ($_FILES)
      * @param array  $server     The server parameters ($_SERVER)
      * @param string $content    The raw body data
-     *
+     * 
      * @return Request A Request instance
      */
     static public function create($uri, $method = 'GET', $parameters = array(), $cookies = array(), $files = array(), $server = array(), $content = null)
@@ -221,7 +221,7 @@ class Request
 
     /**
      * Clones a request and overrides some of its parameters.
-     *
+     * 
      * @param array $query      The GET parameters
      * @param array $request    The POST parameters
      * @param array $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
@@ -266,7 +266,7 @@ class Request
 
     /**
      * Clones the current request.
-     *
+     * 
      * Note that the session is not cloned as duplicated requests
      * are most of the time sub-requests of the main one.
      */
@@ -283,7 +283,7 @@ class Request
 
     /**
      * Returns the request as a string.
-     *
+     * 
      * @return string The request
      */
     public function __toString()
@@ -296,7 +296,7 @@ class Request
 
     /**
      * Overrides the PHP global variables according to this request instance.
-     *
+     * 
      * It overrides $_GET, $_POST, $_REQUEST, $_SERVER, $_COOKIE, and $_FILES.
      */
     public function overrideGlobals()
@@ -339,7 +339,7 @@ class Request
     /**
      * Whether the request contains a Session which was started in one of the
      * previous requests.
-     *
+     * 
      * @return boolean
      */
     public function hasPreviousSession()
@@ -350,7 +350,7 @@ class Request
 
     /**
      * Whether the request contains a Session object.
-     *
+     * 
      * @return boolean
      */
     public function hasSession()
@@ -370,9 +370,9 @@ class Request
 
     /**
      * Returns the client IP address.
-     *
+     * 
      * @param  Boolean $proxy Whether the current request has been made behind a proxy or not
-     *
+     * 
      * @return string The client IP address
      */
     public function getClientIp($proxy = false)
@@ -390,7 +390,7 @@ class Request
 
     /**
      * Returns current script name.
-     *
+     * 
      * @return string
      */
     public function getScriptName()
@@ -400,15 +400,15 @@ class Request
 
     /**
      * Returns the path being requested relative to the executed script.
-     *
+     * 
      * The path info always starts with a /.
-     *
+     * 
      * Suppose this request is instantiated from /mysite on localhost:
-     *
+     * 
      *  * http://localhost/mysite              returns an empty string
      *  * http://localhost/mysite/about        returns '/about'
      *  * http://localhost/mysite/about?var=1  returns '/about'
-     *
+     * 
      * @return string
      */
     public function getPathInfo()
@@ -422,13 +422,13 @@ class Request
 
     /**
      * Returns the root path from which this request is executed.
-     *
+     * 
      * Suppose that an index.php file instantiates this request object:
-     *
+     * 
      *  * http://localhost/index.php        returns an empty string
      *  * http://localhost/index.php/page   returns an empty string
      *  * http://localhost/web/index.php    return '/web'
-     *
+     * 
      * @return string
      */
     public function getBasePath()
@@ -442,12 +442,12 @@ class Request
 
     /**
      * Returns the root url from which this request is executed.
-     *
+     * 
      * The base URL never ends with a /.
-     *
+     * 
      * This is similar to getBasePath(), except that it also includes the
      * script filename (e.g. index.php) if one exists.
-     *
+     * 
      * @return string
      */
     public function getBaseUrl()
@@ -481,9 +481,9 @@ class Request
 
     /**
      * Returns the HTTP host being requested.
-     *
+     * 
      * The port name will be appended to the host if it's non-standard.
-     *
+     * 
      * @return string
      */
     public function getHttpHost()
@@ -514,9 +514,9 @@ class Request
 
     /**
      * Generates a normalized URI for the Request.
-     *
+     * 
      * @return string A normalized URI for the Request
-     *
+     * 
      * @see getQueryString()
      */
     public function getUri()
@@ -531,9 +531,9 @@ class Request
 
     /**
      * Generates a normalized URI for the given path.
-     *
+     * 
      * @param string $path A path to use instead of the current one
-     *
+     * 
      * @return string The normalized URI for the path
      */
     public function getUriForPath($path)
@@ -543,10 +543,10 @@ class Request
 
     /**
      * Generates the normalized query string for the Request.
-     *
+     * 
      * It builds a normalized query string, where keys/value pairs are alphabetized
      * and have consistent escaping.
-     *
+     * 
      * @return string A normalized query string for the Request
      */
     public function getQueryString()
@@ -591,7 +591,7 @@ class Request
 
     /**
      * Returns the host name.
-     *
+     * 
      * @return string
      */
     public function getHost()
@@ -627,7 +627,7 @@ class Request
 
     /**
      * Gets the request method.
-     *
+     * 
      * @return string The request method
      */
     public function getMethod()
@@ -644,9 +644,9 @@ class Request
 
     /**
      * Gets the mime type associated with the format.
-     *
+     * 
      * @param  string $format  The format
-     *
+     * 
      * @return string The associated mime type (null if not found)
      */
     public function getMimeType($format)
@@ -660,9 +660,9 @@ class Request
 
     /**
      * Gets the format associated with the mime type.
-     *
+     * 
      * @param  string $mimeType  The associated mime type
-     *
+     * 
      * @return string The format (null if not found)
      */
     public function getFormat($mimeType)
@@ -682,7 +682,7 @@ class Request
 
     /**
      * Associates a format with mime types.
-     *
+     * 
      * @param string       $format     The format
      * @param string|array $mimeTypes  The associated mime types (the preferred one must be the first as it will be used as the content type)
      */
@@ -697,15 +697,15 @@ class Request
 
     /**
      * Gets the request format.
-     *
+     * 
      * Here is the process to determine the format:
-     *
+     * 
      *  * format defined by the user (with setRequestFormat())
      *  * _format request parameter
      *  * $default
-     *
+     * 
      * @param string  $default     The default format
-     *
+     * 
      * @return string The request format
      */
     public function getRequestFormat($default = 'html')
@@ -734,9 +734,9 @@ class Request
 
     /**
      * Returns the request body content.
-     *
+     * 
      * @param  Boolean $asResource If true, a resource will be returned
-     *
+     * 
      * @return string|resource The request body content or a resource to read the body stream.
      */
     public function getContent($asResource = false)
@@ -775,9 +775,9 @@ class Request
 
     /**
      * Returns the preferred language.
-     *
+     * 
      * @param  array  $locales  An array of ordered available locales
-     *
+     * 
      * @return string The preferred locale
      */
     public function getPreferredLanguage(array $locales = null)
@@ -799,7 +799,7 @@ class Request
 
     /**
      * Gets a list of languages acceptable by the client browser.
-     *
+     * 
      * @return array Languages ordered in the user browser preferences
      */
     public function getLanguages()
@@ -839,7 +839,7 @@ class Request
 
     /**
      * Gets a list of charsets acceptable by the client browser.
-     *
+     * 
      * @return array List of charsets in preferable order
      */
     public function getCharsets()
@@ -853,7 +853,7 @@ class Request
 
     /**
      * Gets a list of content types acceptable by the client browser
-     *
+     * 
      * @return array Languages ordered in the user browser preferences
      */
     public function getAcceptableContentTypes()
@@ -867,10 +867,10 @@ class Request
 
     /**
      * Returns true if the request is a XMLHttpRequest.
-     *
+     * 
      * It works if your JavaScript library set an X-Requested-With HTTP header.
      * It is known to work with Prototype, Mootools, jQuery.
-     *
+     * 
      * @return Boolean true if the request is an XMLHttpRequest, false otherwise
      */
     public function isXmlHttpRequest()
@@ -880,7 +880,7 @@ class Request
 
     /**
      * Splits an Accept-* HTTP header.
-     *
+     * 
      * @param string $header  Header to split
      */
     public function splitHttpAcceptHeader($header)
@@ -912,9 +912,9 @@ class Request
 
     /*
      * The following methods are derived from code of the Zend Framework (1.10dev - 2010-01-24)
-     *
+     * 
      * Code subject to the new BSD license (http://framework.zend.com/license/new-bsd).
-     *
+     * 
      * Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
      */
 

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -26,11 +26,11 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Is the form attached to this renderer rendered?
-     *
+     * 
      * Rendering happens when either the widget or the row method was called.
      * Row implicitly includes widget, however certain rendering mechanisms
      * have to skip widget rendering when a row is rendered.
-     *
+     * 
      * @var Boolean
      */
     private $rendered = false;
@@ -38,7 +38,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * @param string $name
      * @param mixed $value
-     *
+     * 
      * @return FormView The current view
      */
     public function set($name, $value)
@@ -60,7 +60,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * @param $name
      * @param $default
-     *
+     * 
      * @return mixed
      */
     public function get($name, $default = null)
@@ -82,7 +82,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Alias of all so it is possible to do `form.vars.foo`
-     *
+     * 
      * @return array
      */
     public function getVars()
@@ -92,10 +92,10 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Sets the value for an attribute.
-     *
+     * 
      * @param string $name  The name of the attribute
      * @param string $value The value
-     *
+     * 
      * @return FormView The current view
      */
     public function setAttribute($name, $value)
@@ -107,7 +107,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Returns whether the attached form is rendered.
-     *
+     * 
      * @return Boolean Whether the form is rendered
      */
     public function isRendered()
@@ -117,7 +117,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Marks the attached form as rendered
-     *
+     * 
      * @return FormView The current view
      */
     public function setRendered()
@@ -129,9 +129,9 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Sets the parent view.
-     *
+     * 
      * @param FormView $parent The parent view
-     *
+     * 
      * @return FormView The current view
      */
     public function setParent(FormView $parent = null)
@@ -143,7 +143,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Returns the parent view.
-     *
+     * 
      * @return FormView The parent view
      */
     public function getParent()
@@ -153,7 +153,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Returns whether this view has a parent.
-     *
+     * 
      * @return Boolean Whether this view has a parent
      */
     public function hasParent()
@@ -163,9 +163,9 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Sets the children view.
-     *
+     * 
      * @param array $children The children as instances of FormView
-     *
+     * 
      * @return FormView The current view
      */
     public function setChildren(array $children)
@@ -177,7 +177,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Returns the children.
-     *
+     * 
      * @return array The children as instances of FormView
      */
     public function getChildren()
@@ -187,9 +187,9 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Returns a given child.
-     *
+     * 
      * @param string name The name of the child
-     *
+     * 
      * @return FormView The child view
      */
     public function getChild($name)
@@ -199,7 +199,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Returns whether this view has children.
-     *
+     * 
      * @return Boolean Whether this view has children
      */
     public function hasChildren()
@@ -209,9 +209,9 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Returns a child by name (implements \ArrayAccess).
-     *
+     * 
      * @param string $name The child name
-     *
+     * 
      * @return FormView The child view
      */
     public function offsetGet($name)
@@ -221,9 +221,9 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Returns whether the given child exists (implements \ArrayAccess).
-     *
+     * 
      * @param string $name The child name
-     *
+     * 
      * @return Boolean Whether the child view exists
      */
     public function offsetExists($name)
@@ -233,7 +233,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Implements \ArrayAccess.
-     *
+     * 
      * @throws \BadMethodCallException always as setting a child by name is not allowed
      */
     public function offsetSet($name, $value)
@@ -243,7 +243,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Removes a child (implements \ArrayAccess).
-     *
+     * 
      * @param string $name The child name
      */
     public function offsetUnset($name)
@@ -253,7 +253,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Returns an iterator to iterate over children (implements \IteratorAggregate)
-     *
+     * 
      * @return \ArrayIterator The iterator
      */
     public function getIterator()
@@ -267,9 +267,9 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Returns whether the given choice is a group.
-     *
+     * 
      * @param mixed $choice A choice
-     *
+     * 
      * @return Boolean Whether the choice is a group
      */
     public function isChoiceGroup($choice)
@@ -279,9 +279,9 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Returns whether the given choice is selected.
-     *
+     * 
      * @param mixed $choice The choice
-     *
+     * 
      * @return Boolean Whether the choice is selected
      */
     public function isChoiceSelected($choice)
@@ -299,7 +299,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Implements \Countable.
-     *
+     * 
      * @return integer The number of children views
      */
     public function count()

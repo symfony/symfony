@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,17 +13,17 @@ namespace Symfony\Component\Security\Acl\Model;
 
 /**
  * This interface adds mutators for the AclInterface.
- *
+ * 
  * All changes to Access Control Entries must go through this interface. Access
  * Control Entries must never be modified directly.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 interface MutableAclInterface extends AclInterface
 {
     /**
      * Deletes a class-based ACE
-     *
+     * 
      * @param integer $index
      * @return void
      */
@@ -31,7 +31,7 @@ interface MutableAclInterface extends AclInterface
 
     /**
      * Deletes a class-field-based ACE
-     *
+     * 
      * @param integer $index
      * @param string $field
      * @return void
@@ -40,7 +40,7 @@ interface MutableAclInterface extends AclInterface
 
     /**
      * Deletes an object-based ACE
-     *
+     * 
      * @param integer $index
      * @return void
      */
@@ -48,7 +48,7 @@ interface MutableAclInterface extends AclInterface
 
     /**
      * Deletes an object-field-based ACE
-     *
+     * 
      * @param integer $index
      * @param string $field
      * @return void
@@ -57,14 +57,14 @@ interface MutableAclInterface extends AclInterface
 
     /**
      * Returns the primary key of this ACL
-     *
+     * 
      * @return integer
      */
     function getId();
 
     /**
      * Inserts a class-based ACE
-     *
+     * 
      * @param SecurityIdentityInterface $sid
      * @param integer                   $mask
      * @param integer                   $index
@@ -76,7 +76,7 @@ interface MutableAclInterface extends AclInterface
 
     /**
      * Inserts a class-field-based ACE
-     *
+     * 
      * @param string                    $field
      * @param SecurityIdentityInterface $sid
      * @param integer                   $mask
@@ -89,7 +89,7 @@ interface MutableAclInterface extends AclInterface
 
     /**
      * Inserts an object-based ACE
-     *
+     * 
      * @param SecurityIdentityInterface $sid
      * @param integer                   $mask
      * @param integer                   $index
@@ -101,7 +101,7 @@ interface MutableAclInterface extends AclInterface
 
     /**
      * Inserts an object-field-based ACE
-     *
+     * 
      * @param string                    $field
      * @param SecurityIdentityInterface $sid
      * @param integer                   $mask
@@ -114,7 +114,7 @@ interface MutableAclInterface extends AclInterface
 
     /**
      * Sets whether entries are inherited
-     *
+     * 
      * @param Boolean $boolean
      * @return void
      */
@@ -122,7 +122,7 @@ interface MutableAclInterface extends AclInterface
 
     /**
      * Sets the parent ACL
-     *
+     * 
      * @param AclInterface $acl
      * @return void
      */
@@ -130,7 +130,7 @@ interface MutableAclInterface extends AclInterface
 
     /**
      * Updates a class-based ACE
-     *
+     * 
      * @param integer $index
      * @param integer $mask
      * @param string $strategy if null the strategy should not be changed
@@ -140,7 +140,7 @@ interface MutableAclInterface extends AclInterface
 
     /**
      * Updates a class-field-based ACE
-     *
+     * 
      * @param integer $index
      * @param string $field
      * @param integer $mask
@@ -151,7 +151,7 @@ interface MutableAclInterface extends AclInterface
 
     /**
      * Updates an object-based ACE
-     *
+     * 
      * @param integer $index
      * @param integer $mask
      * @param string $strategy if null the strategy should not be changed
@@ -161,7 +161,7 @@ interface MutableAclInterface extends AclInterface
 
     /**
      * Updates an object-field-based ACE
-     *
+     * 
      * @param integer $index
      * @param string $field
      * @param integer $mask

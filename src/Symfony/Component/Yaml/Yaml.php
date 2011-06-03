@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,9 +13,9 @@ namespace Symfony\Component\Yaml;
 
 /**
  * Yaml offers convenience methods to load and dump YAML.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * @api
  */
 class Yaml
@@ -24,9 +24,9 @@ class Yaml
 
     /**
      * Sets the YAML specification version to use.
-     *
+     * 
      * @param string $version The YAML specification version
-     *
+     * 
      * @throws \InvalidArgumentException When version of YAML specs is not supported
      */
     static public function setSpecVersion($version)
@@ -40,7 +40,7 @@ class Yaml
 
     /**
      * Gets the YAML specification version to use.
-     *
+     * 
      * @return string The YAML specification version
      */
     static public function getSpecVersion()
@@ -50,22 +50,22 @@ class Yaml
 
     /**
      * Loads YAML into a PHP array.
-     *
+     * 
      * The load method, when supplied with a YAML stream (string or file),
      * will do its best to convert YAML in a file into a PHP array.
-     *
+     * 
      *  Usage:
      *  <code>
      *   $array = Yaml::load('config.yml');
      *   print_r($array);
      *  </code>
-     *
+     * 
      * @param string $input Path to a YAML file or a string containing YAML
-     *
+     * 
      * @return array The YAML converted to a PHP array
-     *
+     * 
      * @throws \InvalidArgumentException If the YAML is not valid
-     *
+     * 
      * @api
      */
     public static function load($input)
@@ -102,15 +102,15 @@ class Yaml
 
     /**
      * Dumps a PHP array to a YAML string.
-     *
+     * 
      * The dump method, when supplied with an array, will do its best
      * to convert the array into friendly YAML.
-     *
+     * 
      * @param array   $array PHP array
      * @param integer $inline The level where you switch to inline YAML
-     *
+     * 
      * @return string A YAML string representing the original PHP array
-     *
+     * 
      * @api
      */
     public static function dump($array, $inline = 2)

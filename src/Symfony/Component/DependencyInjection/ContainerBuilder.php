@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -21,7 +21,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 
 /**
  * ContainerBuilder is a DI container that provides an API to easily describe services.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ContainerBuilder extends Container implements TaggedContainerInterface
@@ -37,7 +37,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Registers an extension.
-     *
+     * 
      * @param ExtensionInterface $extension An extension instance
      */
     public function registerExtension(ExtensionInterface $extension)
@@ -51,9 +51,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns an extension by alias or namespace.
-     *
+     * 
      * @param string $name An alias or a namespace
-     *
+     * 
      * @return ExtensionInterface An extension instance
      */
     public function getExtension($name)
@@ -71,7 +71,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns all registered extensions.
-     *
+     * 
      * @return array An array of ExtensionInterface
      */
     public function getExtensions()
@@ -81,7 +81,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Checks if we have an extension.
-     *
+     * 
      * @param string $name The name of the extension
      * @return Boolean If the extension exists
      */
@@ -92,7 +92,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns an array of resources loaded to build this configuration.
-     *
+     * 
      * @return ResourceInterface[] An array of resources
      */
     public function getResources()
@@ -102,9 +102,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Adds a resource for this configuration.
-     *
+     * 
      * @param ResourceInterface $resource A resource instance
-     *
+     * 
      * @return ContainerBuilder The current instance
      */
     public function addResource(ResourceInterface $resource)
@@ -116,7 +116,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Adds the object class hierarchy as resources.
-     *
+     * 
      * @param object $object An object instance
      */
     public function addObjectResource($object)
@@ -129,10 +129,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Loads the configuration for an extension.
-     *
+     * 
      * @param string $extension The extension alias or namespace
      * @param array  $values    An array of values that customizes the extension
-     *
+     * 
      * @return ContainerBuilder The current instance
      */
     public function loadFromExtension($extension, array $values = array())
@@ -154,7 +154,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Adds a compiler pass.
-     *
+     * 
      * @param CompilerPassInterface $pass A compiler pass
      * @param string                $type The type of compiler pass
      */
@@ -171,7 +171,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns the compiler pass config which can then be modified.
-     *
+     * 
      * @return PassConfig The compiler pass config
      */
     public function getCompilerPassConfig()
@@ -185,7 +185,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns the compiler.
-     *
+     * 
      * @return Compiler The compiler
      */
     public function getCompiler()
@@ -199,7 +199,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns all Scopes.
-     *
+     * 
      * @return array An array of scopes
      */
     public function getScopes()
@@ -209,7 +209,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns all Scope children.
-     *
+     * 
      * @return array An array of scope children.
      */
     public function getScopeChildren()
@@ -219,11 +219,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Sets a service.
-     *
+     * 
      * @param string $id      The service identifier
      * @param object $service The service instance
      * @param string $scope   The scope
-     *
+     * 
      * @throws BadMethodCallException
      */
     public function set($id, $service, $scope = self::SCOPE_CONTAINER)
@@ -241,7 +241,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Removes a service definition.
-     *
+     * 
      * @param string $id The service identifier
      */
     public function removeDefinition($id)
@@ -251,9 +251,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns true if the given service is defined.
-     *
+     * 
      * @param  string  $id      The service identifier
-     *
+     * 
      * @return Boolean true if the service is defined, false otherwise
      */
     public function has($id)
@@ -265,15 +265,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Gets a service.
-     *
+     * 
      * @param  string  $id              The service identifier
      * @param  integer $invalidBehavior The behavior when the service does not exist
-     *
+     * 
      * @return object The associated service
-     *
+     * 
      * @throws \InvalidArgumentException if the service is not defined
      * @throws \LogicException if the service has a circular reference to itself
-     *
+     * 
      * @see Reference
      */
     public function get($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
@@ -313,22 +313,22 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Merges a ContainerBuilder with the current ContainerBuilder configuration.
-     *
+     * 
      * Service definitions overrides the current defined ones.
-     *
+     * 
      * But for parameters, they are overridden by the current ones. It allows
      * the parameters passed to the container constructor to have precedence
      * over the loaded ones.
-     *
+     * 
      * $container = new ContainerBuilder(array('foo' => 'bar'));
      * $loader = new LoaderXXX($container);
      * $loader->load('resource_name');
      * $container->register('foo', new stdClass());
-     *
+     * 
      * In the above example, even if the loaded resource defines a foo
      * parameter, the value will still be 'bar' as defined in the ContainerBuilder
      * constructor.
-     *
+     * 
      * @param ContainerBuilder $container The ContainerBuilder instance to merge.
      * @throws \LogicException when this ContainerBuilder is frozen
      */
@@ -357,9 +357,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns the configuration array for the given extension.
-     *
+     * 
      * @param string $name The name of the extension
-     *
+     * 
      * @return array An array of configuration
      */
     public function getExtensionConfig($name)
@@ -373,13 +373,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Compiles the container.
-     *
+     * 
      * This method passes the container to compiler
      * passes whose job is to manipulate and optimize
      * the container.
-     *
+     * 
      * The main compiler passes roughly do four things:
-     *
+     * 
      *  * The extension configurations are merged;
      *  * Parameter values are resolved;
      *  * The parameter bag is frozen;
@@ -404,7 +404,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Gets all service ids.
-     *
+     * 
      * @return array An array of all defined service ids
      */
     public function getServiceIds()
@@ -414,7 +414,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Adds the service aliases.
-     *
+     * 
      * @param array $aliases An array of aliases
      */
     public function addAliases(array $aliases)
@@ -426,7 +426,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Sets the service aliases.
-     *
+     * 
      * @param array $aliases An array of service definitions
      */
     public function setAliases(array $aliases)
@@ -437,7 +437,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Sets an alias for an existing service.
-     *
+     * 
      * @param string $alias The alias to create
      * @param mixed  $id    The service to alias
      */
@@ -462,7 +462,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Removes an alias.
-     *
+     * 
      * @param string $alias The alias to remove
      */
     public function removeAlias($alias)
@@ -472,9 +472,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns true if an alias exists under the given identifier.
-     *
+     * 
      * @param  string  $id The service identifier
-     *
+     * 
      * @return Boolean true if the alias exists, false otherwise
      */
     public function hasAlias($id)
@@ -484,7 +484,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Gets all defined aliases.
-     *
+     * 
      * @return array An array of aliases
      */
     public function getAliases()
@@ -494,11 +494,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Gets an alias.
-     *
+     * 
      * @param  string  $id The service identifier
-     *
+     * 
      * @return string The aliased service identifier
-     *
+     * 
      * @throws \InvalidArgumentException if the alias does not exist
      */
     public function getAlias($id)
@@ -514,13 +514,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Registers a service definition.
-     *
+     * 
      * This methods allows for simple registration of service definition
      * with a fluid interface.
-     *
+     * 
      * @param  string $id    The service identifier
      * @param  string $class The service class
-     *
+     * 
      * @return Definition A Definition instance
      */
     public function register($id, $class = null)
@@ -530,7 +530,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Adds the service definitions.
-     *
+     * 
      * @param Definition[] $definitions An array of service definitions
      */
     public function addDefinitions(array $definitions)
@@ -542,7 +542,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Sets the service definitions.
-     *
+     * 
      * @param array $definitions An array of service definitions
      */
     public function setDefinitions(array $definitions)
@@ -553,7 +553,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Gets all service definitions.
-     *
+     * 
      * @return array An array of Definition instances
      */
     public function getDefinitions()
@@ -563,10 +563,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Sets a service definition.
-     *
+     * 
      * @param  string     $id         The service identifier
      * @param  Definition $definition A Definition instance
-     *
+     * 
      * @throws BadMethodCallException
      */
     public function setDefinition($id, Definition $definition)
@@ -584,9 +584,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns true if a service definition exists under the given identifier.
-     *
+     * 
      * @param  string  $id The service identifier
-     *
+     * 
      * @return Boolean true if the service definition exists, false otherwise
      */
     public function hasDefinition($id)
@@ -596,11 +596,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Gets a service definition.
-     *
+     * 
      * @param  string  $id The service identifier
-     *
+     * 
      * @return Definition A Definition instance
-     *
+     * 
      * @throws \InvalidArgumentException if the service definition does not exist
      */
     public function getDefinition($id)
@@ -616,13 +616,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Gets a service definition by id or alias.
-     *
+     * 
      * The method "unaliases" recursively to return a Definition instance.
-     *
+     * 
      * @param  string  $id The service identifier or alias
-     *
+     * 
      * @return Definition A Definition instance
-     *
+     * 
      * @throws \InvalidArgumentException if the service definition does not exist
      */
     public function findDefinition($id)
@@ -638,12 +638,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Creates a service for a service definition.
-     *
+     * 
      * @param  Definition $definition A service definition instance
      * @param  string     $id         The service identifier
-     *
+     * 
      * @return object              The service described by the service definition
-     *
+     * 
      * @throws \InvalidArgumentException When configure callable is not callable
      */
     private function createService(Definition $definition, $id)
@@ -731,9 +731,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Replaces service references by the real service instance.
-     *
+     * 
      * @param  mixed $value A value
-     *
+     * 
      * @return mixed The same value with all service references replaced by the real service instances
      */
     public function resolveServices($value)
@@ -753,9 +753,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns service ids for a given tag.
-     *
+     * 
      * @param string $name The tag name
-     *
+     * 
      * @return array An array of tags
      */
     public function findTaggedServiceIds($name)
@@ -772,7 +772,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns the Service Conditionals.
-     *
+     * 
      * @param mixed $value An array of conditionals to return.
      * @return array An array of Service conditionals
      */

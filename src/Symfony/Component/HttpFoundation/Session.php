@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface;
 
 /**
  * Session.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Session implements \Serializable
@@ -28,7 +28,7 @@ class Session implements \Serializable
 
     /**
      * Constructor.
-     *
+     * 
      * @param SessionStorageInterface $storage       A SessionStorageInterface instance
      * @param string                  $defaultLocale The default locale
      */
@@ -69,9 +69,9 @@ class Session implements \Serializable
 
     /**
      * Checks if an attribute is defined.
-     *
+     * 
      * @param string $name The attribute name
-     *
+     * 
      * @return Boolean true if the attribute is defined, false otherwise
      */
     public function has($name)
@@ -81,10 +81,10 @@ class Session implements \Serializable
 
     /**
      * Returns an attribute.
-     *
+     * 
      * @param string $name    The attribute name
      * @param mixed  $default The default value
-     *
+     * 
      * @return mixed
      */
     public function get($name, $default = null)
@@ -94,7 +94,7 @@ class Session implements \Serializable
 
     /**
      * Sets an attribute.
-     *
+     * 
      * @param string $name
      * @param mixed  $value
      */
@@ -109,7 +109,7 @@ class Session implements \Serializable
 
     /**
      * Returns attributes.
-     *
+     * 
      * @return array Attributes
      */
     public function getAttributes()
@@ -119,7 +119,7 @@ class Session implements \Serializable
 
     /**
      * Sets attributes.
-     *
+     * 
      * @param array $attributes Attributes
      */
     public function setAttributes(array $attributes)
@@ -133,7 +133,7 @@ class Session implements \Serializable
 
     /**
      * Removes an attribute.
-     *
+     * 
      * @param string $name
      */
     public function remove($name)
@@ -179,7 +179,7 @@ class Session implements \Serializable
 
     /**
      * Returns the session ID
-     *
+     * 
      * @return mixed  The session ID
      */
     public function getId()
@@ -189,7 +189,7 @@ class Session implements \Serializable
 
     /**
      * Returns the locale
-     *
+     * 
      * @return string
      */
     public function getLocale()
@@ -203,7 +203,7 @@ class Session implements \Serializable
 
     /**
      * Sets the locale.
-     *
+     * 
      * @param string $locale
      */
     public function setLocale($locale)

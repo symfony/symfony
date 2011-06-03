@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,9 +13,9 @@ namespace Symfony\Component\Security\Core\User;
 
 /**
  * User is the user implementation used by the in-memory user provider.
- *
+ * 
  * This should not be used for anything else.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class User implements AdvancedUserInterface

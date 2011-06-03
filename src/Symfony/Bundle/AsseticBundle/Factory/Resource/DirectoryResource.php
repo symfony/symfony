@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -16,7 +16,7 @@ use Symfony\Component\Templating\Loader\LoaderInterface;
 
 /**
  * A directory resource that creates Symfony2 templating resources.
- *
+ * 
  * @author Kris Wallsmith <kris@symfony.com>
  */
 class DirectoryResource extends BaseDirectoryResource
@@ -27,7 +27,7 @@ class DirectoryResource extends BaseDirectoryResource
 
     /**
      * Constructor.
-     *
+     * 
      * @param LoaderInterface $loader  The templating loader
      * @param string          $bundle  The current bundle name
      * @param string          $path    The directory path

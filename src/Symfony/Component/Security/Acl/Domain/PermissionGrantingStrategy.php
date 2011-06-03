@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -21,7 +21,7 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 /**
  * The permission granting strategy to apply to the access control list.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
@@ -34,7 +34,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
     /**
      * Sets the audit logger
-     *
+     * 
      * @param AuditLoggerInterface $auditLogger
      * @return void
      */
@@ -107,27 +107,27 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
     /**
      * Makes an authorization decision.
-     *
+     * 
      * The order of ACEs, and SIDs is significant; the order of permission masks
      * not so much. It is important to note that the more specific security
      * identities should be at the beginning of the SIDs array in order for this
      * strategy to produce intuitive authorization decisions.
-     *
+     * 
      * First, we will iterate over permissions, then over security identities.
      * For each combination of permission, and identity we will test the
      * available ACEs until we find one which is applicable.
-     *
+     * 
      * The first applicable ACE will make the ultimate decision for the
      * permission/identity combination. If it is granting, this method will return
      * true, if it is denying, the method will continue to check the next
      * permission/identity combination.
-     *
+     * 
      * This process is repeated until either a granting ACE is found, or no
      * permission/identity combinations are left. In the latter case, we will
      * call this method on the parent ACL if it exists, and isEntriesInheriting
      * is true. Otherwise, we will either throw an NoAceFoundException, or deny
      * access finally.
-     *
+     * 
      * @param AclInterface $acl
      * @param array        $aces               An array of ACE to check against
      * @param array        $masks              An array of permission masks
@@ -175,20 +175,20 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     /**
      * Determines whether the ACE is applicable to the given permission/security
      * identity combination.
-     *
+     * 
      * Per default, we support three different comparison strategies.
-     *
+     * 
      * Strategy ALL:
      * The ACE will be considered applicable when all the turned-on bits in the
      * required mask are also turned-on in the ACE mask.
-     *
+     * 
      * Strategy ANY:
      * The ACE will be considered applicable when any of the turned-on bits in
      * the required mask is also turned-on the in the ACE mask.
-     *
+     * 
      * Strategy EQUAL:
      * The ACE will be considered applicable when the bitmasks are equal.
-     *
+     * 
      * @param integer        $requiredMask
      * @param EntryInterface $ace
      * @return Boolean

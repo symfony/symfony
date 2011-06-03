@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,10 +13,10 @@ namespace Symfony\Component\CssSelector;
 
 /**
  * Tokenizer lexes a CSS Selector to tokens.
- *
+ * 
  * This component is a port of the Python lxml library,
  * which is copyright Infrae and distributed under the BSD license.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Tokenizer
@@ -24,9 +24,9 @@ class Tokenizer
     /**
      * Takes a CSS selector and returns an array holding the Tokens
      * it contains.
-     *
+     * 
      * @param  string $s The selector to lex.
-     *
+     * 
      * @return array Token[]
      */
     public function tokenize($s)
@@ -106,12 +106,12 @@ class Tokenizer
      * Tokenizes a quoted string (i.e. 'A string quoted with \' characters'),
      * and returns an array holding the unquoted string contained by $s and
      * the new position from which tokenizing should take over.
-     *
+     * 
      * @throws SyntaxError When expected closing is not found
-     *
+     * 
      * @param  string  $s   The selector string containing the quoted string.
      * @param  integer $pos The starting position for the quoted string.
-     *
+     * 
      * @return array
      */
     private function tokenizeEscapedString($s, $pos)
@@ -143,11 +143,11 @@ class Tokenizer
 
     /**
      * Unescapes a string literal and returns the unescaped string.
-     *
+     * 
      * @throws SyntaxError When invalid escape sequence is found
-     *
+     * 
      * @param  string $literal The string literal to unescape.
-     *
+     * 
      * @return string
      */
     private function unescapeStringLiteral($literal)
@@ -169,12 +169,12 @@ class Tokenizer
      * Lexes selector $s and returns an array holding the name of the symbol
      * contained in it and the new position from which tokenizing should take
      * over.
-     *
+     * 
      * @throws SyntaxError When Unexpected symbol is found
-     *
+     * 
      * @param  string  $s   The selector string.
      * @param  integer $pos The position in $s at which the symbol starts.
-     *
+     * 
      * @return array
      */
     private function tokenizeSymbol($s, $pos)

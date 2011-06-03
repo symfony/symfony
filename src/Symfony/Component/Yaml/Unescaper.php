@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\Yaml;
 /**
  * Unescaper encapsulates unescaping rules for single and double-quoted
  * YAML strings.
- *
+ * 
  * @author Matthew Lewinski <matthew@lewinski.org>
  */
 class Unescaper
@@ -28,9 +28,9 @@ class Unescaper
 
     /**
      * Unescapes a single quoted string.
-     *
+     * 
      * @param string $value A single quoted string.
-     *
+     * 
      * @return string The unescaped string.
      */
     public function unescapeSingleQuotedString($value)
@@ -40,9 +40,9 @@ class Unescaper
 
     /**
      * Unescapes a double quoted string.
-     *
+     * 
      * @param string $value A double quoted string.
-     *
+     * 
      * @return string The unescaped string.
      */
     public function unescapeDoubleQuotedString($value)
@@ -58,9 +58,9 @@ class Unescaper
 
     /**
      * Unescapes a character that was found in a double-quoted string
-     *
+     * 
      * @param string $value An escaped character
-     *
+     * 
      * @return string The unescaped character
      */
     public function unescapeCharacter($value)
@@ -120,13 +120,13 @@ class Unescaper
 
     /**
      * Convert a string from one encoding to another.
-     *
+     * 
      * @param string $value The string to convert
      * @param string $to    The input encoding
      * @param string $from  The output encoding
-     *
+     * 
      * @return string The string with the new encoding
-     *
+     * 
      * @throws \RuntimeException if no suitable encoding function is found (iconv or mbstring)
      */
     private function convertEncoding($value, $to, $from)

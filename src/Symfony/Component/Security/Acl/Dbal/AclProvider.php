@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -29,9 +29,9 @@ use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 
 /**
  * An ACL provider implementation.
- *
+ * 
  * This provider assumes that all ACLs share the same PermissionGrantingStrategy.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class AclProvider implements AclProviderInterface
@@ -47,7 +47,7 @@ class AclProvider implements AclProviderInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param Connection                          $connection
      * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
      * @param array                               $options
@@ -203,7 +203,7 @@ class AclProvider implements AclProviderInterface
     /**
      * Constructs the query used for looking up object identities and associated
      * ACEs, and security identities.
-     *
+     * 
      * @param array $ancestorIds
      * @return string
      */
@@ -279,7 +279,7 @@ SELECTCLAUSE;
     /**
      * Constructs the SQL for retrieving child object identities for the given
      * object identities.
-     *
+     * 
      * @param ObjectIdentityInterface $oid
      * @param Boolean                 $directChildrenOnly
      * @return string
@@ -311,7 +311,7 @@ FINDCHILDREN;
     /**
      * Constructs the SQL for retrieving the primary key of the given object
      * identity.
-     *
+     * 
      * @param ObjectIdentityInterface $oid
      * @return string
      */
@@ -335,7 +335,7 @@ QUERY;
 
     /**
      * Returns the primary key of the passed object identity.
-     *
+     * 
      * @param ObjectIdentityInterface $oid
      * @return integer
      */
@@ -346,7 +346,7 @@ QUERY;
 
     /**
      * This method is called when an ACL instance is retrieved from the cache.
-     *
+     * 
      * @param AclInterface $acl
      * @return void
      */
@@ -373,7 +373,7 @@ QUERY;
     /**
      * Retrieves all the ids which need to be queried from the database
      * including the ids of parent ACLs.
-     *
+     * 
      * @param array $batch
      * @return array
      */
@@ -394,7 +394,7 @@ QUERY;
     /**
      * Does either overwrite the passed ACE, or saves it in the global identity
      * map to ensure every ACE only gets instantiated once.
-     *
+     * 
      * @param array $aces
      * @return void
      */
@@ -412,11 +412,11 @@ QUERY;
     /**
      * This method is called for object identities which could not be retrieved
      * from the cache, and for which thus a database query is required.
-     *
+     * 
      * @param array $batch
      * @param array $sids
      * @param array $oidLookup
-     *
+     * 
      * @return \SplObjectStorage mapping object identities to ACL instances
      */
     private function lookupObjectIdentities(array $batch, array $sids, array $oidLookup)
@@ -434,13 +434,13 @@ QUERY;
 
     /**
      * This method is called to hydrate ACLs and ACEs.
-     *
+     * 
      * This method was designed for performance; thus, a lot of code has been
      * inlined at the cost of readability, and maintainability.
-     *
+     * 
      * Keep in mind that changes to this method might severely reduce the
      * performance of the entire ACL system.
-     *
+     * 
      * @param Statement $stmt
      * @param array     $oidLookup
      * @param array     $sids

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,14 +15,14 @@ use Symfony\Component\Locale\Exception\NotImplementedException;
 
 /**
  * Parser and formatter for time zone format
- *
+ * 
  * @author Igor Wiedler <igor@wiedler.ch>
  */
 class TimeZoneTransformer extends Transformer
 {
     /**
      * {@inheritDoc}
-     *
+     * 
      * @throws NotImplementedException  When time zone is different than UTC or GMT (Etc/GMT)
      */
     public function format(\DateTime $dateTime, $length)
@@ -56,14 +56,14 @@ class TimeZoneTransformer extends Transformer
 
     /**
      * Get an Etc/GMT timezone identifier for the specified timezone
-     *
+     * 
      * The PHP documentation for timezones states to not use the 'Other' time zones because them exists
      * "for backwards compatibility". However all Etc/GMT time zones are in the tz database 'etcetera' file,
      * which indicates they are not deprecated (neither are old names).
-     *
+     * 
      * Only GMT, Etc/Universal, Etc/Zulu, Etc/Greenwich, Etc/GMT-0, Etc/GMT+0 and Etc/GMT0 are old names and
      * are linked to Etc/GMT or Etc/UTC.
-     *
+     * 
      * @param  string  $timezone         A GMT timezone string (GMT-03:00, e.g.)
      * @return string                    A timezone identifier
      * @see    http://php.net/manual/en/timezones.others.php

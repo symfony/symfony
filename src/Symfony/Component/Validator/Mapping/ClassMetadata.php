@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Exception\GroupDefinitionException;
 
 /**
  * Represents all the configured constraints on a given class.
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -34,7 +34,7 @@ class ClassMetadata extends ElementMetadata
 
     /**
      * Constructs a metadata for the given class
-     *
+     * 
      * @param string $class
      */
     public function __construct($class)
@@ -50,7 +50,7 @@ class ClassMetadata extends ElementMetadata
 
     /**
      * Returns the properties to be serialized
-     *
+     * 
      * @return array
      */
     public function __sleep()
@@ -67,7 +67,7 @@ class ClassMetadata extends ElementMetadata
 
     /**
      * Returns the fully qualified name of the class
-     *
+     * 
      * @return string  The fully qualified class name
      */
     public function getClassName()
@@ -77,17 +77,17 @@ class ClassMetadata extends ElementMetadata
 
     /**
      * Returns the name of the default group for this class
-     *
+     * 
      * For each class, the group "Default" is an alias for the group
      * "<ClassName>", where <ClassName> is the non-namespaced name of the
      * class. All constraints implicitly or explicitly assigned to group
      * "Default" belong to both of these groups, unless the class defines
      * a group sequence.
-     *
+     * 
      * If a class defines a group sequence, validating the class in "Default"
      * will validate the group sequence. The constraints assigned to "Default"
      * can still be validated by validating the class in "<ClassName>".
-     *
+     * 
      * @return string  The name of the default group
      */
     public function getDefaultGroup()
@@ -114,10 +114,10 @@ class ClassMetadata extends ElementMetadata
 
     /**
      * Adds a constraint to the given property.
-     *
+     * 
      * @param string     $property   The name of the property
      * @param Constraint $constraint The constraint
-     *
+     * 
      * @return ClassMetadata           This object
      */
     public function addPropertyConstraint($property, Constraint $constraint)
@@ -137,13 +137,13 @@ class ClassMetadata extends ElementMetadata
 
     /**
      * Adds a constraint to the getter of the given property.
-     *
+     * 
      * The name of the getter is assumed to be the name of the property with an
      * uppercased first letter and either the prefix "get" or "is".
-     *
+     * 
      * @param string     $property   The name of the property
      * @param Constraint $constraint The constraint
-     *
+     * 
      * @return ClassMetadata This object
      */
     public function addGetterConstraint($property, Constraint $constraint)
@@ -163,7 +163,7 @@ class ClassMetadata extends ElementMetadata
 
     /**
      * Merges the constraints of the given metadata into this object.
-     *
+     * 
      * @param ClassMetadata $source The source metadata
      */
     public function mergeConstraints(ClassMetadata $source)
@@ -197,7 +197,7 @@ class ClassMetadata extends ElementMetadata
 
     /**
      * Adds a member metadata
-     *
+     * 
      * @param MemberMetadata $metadata
      */
     protected function addMemberMetadata(MemberMetadata $metadata)
@@ -213,9 +213,9 @@ class ClassMetadata extends ElementMetadata
 
     /**
      * Returns true if metadatas of members is present for the given property.
-     *
+     * 
      * @param string $property The name of the property
-     *
+     * 
      * @return Boolean
      */
     public function hasMemberMetadatas($property)
@@ -225,7 +225,7 @@ class ClassMetadata extends ElementMetadata
 
     /**
      * Returns all metadatas of members describing the given property
-     *
+     * 
      * @param string $property The name of the property
      * @array of MemberMetadata
      */
@@ -236,7 +236,7 @@ class ClassMetadata extends ElementMetadata
 
     /**
      * Returns all properties for which constraints are defined.
-     *
+     * 
      * @return array An array of property names
      */
     public function getConstrainedProperties()
@@ -246,7 +246,7 @@ class ClassMetadata extends ElementMetadata
 
     /**
      * Sets the default group sequence for this class.
-     *
+     * 
      * @param array $groups An array of group names
      */
     public function setGroupSequence(array $groups)
@@ -266,7 +266,7 @@ class ClassMetadata extends ElementMetadata
 
     /**
      * Returns whether this class has an overridden default group sequence.
-     *
+     * 
      * @return Boolean
      */
     public function hasGroupSequence()
@@ -276,7 +276,7 @@ class ClassMetadata extends ElementMetadata
 
     /**
      * Returns the default group sequence for this class.
-     *
+     * 
      * @return array An array of group names
      */
     public function getGroupSequence()
@@ -286,7 +286,7 @@ class ClassMetadata extends ElementMetadata
 
     /**
      * Returns a ReflectionClass instance for this class.
-     *
+     * 
      * @return ReflectionClass
      */
     public function getReflectionClass()

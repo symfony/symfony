@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 /**
  * Logger.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
@@ -44,7 +44,7 @@ class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
 
     /**
      * Returns a DebugLoggerInterface instance if one is registered with this logger.
-     *
+     * 
      * @return DebugLoggerInterface A DebugLoggerInterface instance or null if none is registered
      */
     private function getDebugLogger()

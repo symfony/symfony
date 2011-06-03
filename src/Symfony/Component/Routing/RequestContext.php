@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\Routing;
 
 /**
  * Holds information about the current request.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RequestContext
@@ -28,7 +28,7 @@ class RequestContext
 
     /**
      * Constructor.
-     *
+     * 
      * @param string  $baseUrl   The base URL
      * @param string  $method    The HTTP method
      * @param string  $host      The HTTP host name
@@ -49,7 +49,7 @@ class RequestContext
 
     /**
      * Gets the base URL.
-     *
+     * 
      * @return string The base URL
      */
     public function getBaseUrl()
@@ -59,7 +59,7 @@ class RequestContext
 
     /**
      * Sets the base URL.
-     *
+     * 
      * @param string $baseUrl The base URL
      */
     public function setBaseUrl($baseUrl)
@@ -69,7 +69,7 @@ class RequestContext
 
     /**
      * Gets the HTTP method.
-     *
+     * 
      * @return string The HTTP method
      */
     public function getMethod()
@@ -79,7 +79,7 @@ class RequestContext
 
     /**
      * Sets the HTTP method.
-     *
+     * 
      * @param string $method The HTTP method
      */
     public function setMethod($method)
@@ -89,7 +89,7 @@ class RequestContext
 
     /**
      * Gets the HTTP host.
-     *
+     * 
      * @return string The HTTP host
      */
     public function getHost()
@@ -99,7 +99,7 @@ class RequestContext
 
     /**
      * Sets the HTTP host.
-     *
+     * 
      * @param string $host The HTTP host
      */
     public function setHost($host)
@@ -109,7 +109,7 @@ class RequestContext
 
     /**
      * Gets the HTTP scheme.
-     *
+     * 
      * @return string The HTTP scheme
      */
     public function getScheme()
@@ -119,7 +119,7 @@ class RequestContext
 
     /**
      * Sets the HTTP scheme.
-     *
+     * 
      * @param string $scheme The HTTP scheme
      */
     public function setScheme($scheme)
@@ -129,7 +129,7 @@ class RequestContext
 
     /**
      * Gets the HTTP port.
-     *
+     * 
      * @return string The HTTP port
      */
     public function getHttpPort()
@@ -139,7 +139,7 @@ class RequestContext
 
     /**
      * Sets the HTTP port.
-     *
+     * 
      * @param string $httpPort The HTTP port
      */
     public function setHttpPort($httpPort)
@@ -149,7 +149,7 @@ class RequestContext
 
     /**
      * Gets the HTTPS port.
-     *
+     * 
      * @return string The HTTPS port
      */
     public function getHttpsPort()
@@ -159,7 +159,7 @@ class RequestContext
 
     /**
      * Sets the HTTPS port.
-     *
+     * 
      * @param string $httpsPort The HTTPS port
      */
     public function setHttpsPort($httpsPort)
@@ -169,7 +169,7 @@ class RequestContext
 
     /**
      * Returns the parameters.
-     *
+     * 
      * @return array The parameters
      */
     public function getParameters()
@@ -179,11 +179,11 @@ class RequestContext
 
     /**
      * Sets the parameters.
-     *
+     * 
      * This method implements a fluent interface.
-     *
+     * 
      * @param array $parameters The parameters
-     *
+     * 
      * @return Route The current Route instance
      */
     public function setParameters(array $parameters)
@@ -195,9 +195,9 @@ class RequestContext
 
     /**
      * Gets a parameter value.
-     *
+     * 
      * @param string $name A parameter name
-     *
+     * 
      * @return mixed The parameter value
      */
     public function getParameter($name)
@@ -207,9 +207,9 @@ class RequestContext
 
     /**
      * Checks if a parameter value is set for the given parameter.
-     *
+     * 
      * @param string $name A parameter name
-     *
+     * 
      * @return Boolean true if the parameter value is set, false otherwise
      */
     public function hasParameter($name)
@@ -219,7 +219,7 @@ class RequestContext
 
     /**
      * Sets a parameter value.
-     *
+     * 
      * @param string $name    A parameter name
      * @param mixed  $parameter The parameter value
      */

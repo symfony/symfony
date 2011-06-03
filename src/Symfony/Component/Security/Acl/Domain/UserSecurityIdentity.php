@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 /**
  * A SecurityIdentity implementation used for actual users
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 final class UserSecurityIdentity implements SecurityIdentityInterface
@@ -27,7 +27,7 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
 
     /**
      * Constructor
-     *
+     * 
      * @param string $username the username representation
      * @param string $class the user's fully qualified class name
      */
@@ -46,7 +46,7 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
 
     /**
      * Creates a user security identity from an UserInterface
-     *
+     * 
      * @param UserInterface $user
      * @return UserSecurityIdentity
      */
@@ -57,7 +57,7 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
 
     /**
      * Creates a user security identity from a TokenInterface
-     *
+     * 
      * @param TokenInterface $token
      * @return UserSecurityIdentity
      */
@@ -74,7 +74,7 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
 
     /**
      * Returns the username
-     *
+     * 
      * @return string
      */
     public function getUsername()
@@ -84,7 +84,7 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
 
     /**
      * Returns the user's class name
-     *
+     * 
      * @return string
      */
     public function getClass()
@@ -107,9 +107,9 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
 
     /**
      * A textual representation of this security identity.
-     *
+     * 
      * This is not used for equality comparison, but only for debugging.
-     *
+     * 
      * @return string
      */
     public function __toString()

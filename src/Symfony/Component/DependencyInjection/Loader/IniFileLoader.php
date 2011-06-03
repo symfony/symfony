@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,17 +16,17 @@ use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * IniFileLoader loads parameters from INI files.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class IniFileLoader extends FileLoader
 {
     /**
      * Loads a resource.
-     *
+     * 
      * @param mixed  $file     The resource
      * @param string $type     The resource type
-     *
+     * 
      * @throws \InvalidArgumentException When ini file is not valid
      */
     public function load($file, $type = null)
@@ -49,10 +49,10 @@ class IniFileLoader extends FileLoader
 
     /**
      * Returns true if this class supports the given resource.
-     *
+     * 
      * @param mixed  $resource A resource
      * @param string $type     The resource type
-     *
+     * 
      * @return Boolean true if this class supports the given resource, false otherwise
      */
     public function supports($resource, $type = null)

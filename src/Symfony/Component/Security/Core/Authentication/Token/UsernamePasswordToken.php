@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Core\Authentication\Token;
 
 /**
  * UsernamePasswordToken implements a username and password token.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class UsernamePasswordToken extends AbstractToken
@@ -23,12 +23,12 @@ class UsernamePasswordToken extends AbstractToken
 
     /**
      * Constructor.
-     *
+     * 
      * @param string $user        The username (like a nickname, email address, etc.)
      * @param string $credentials This usually is the password of the user
      * @param string $providerKey The provider key
      * @param array  $roles       An array of roles
-     *
+     * 
      * @throws \InvalidArgumentException
      */
     public function __construct($user, $credentials, $providerKey, array $roles = array())

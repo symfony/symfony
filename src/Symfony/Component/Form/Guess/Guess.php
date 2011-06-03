@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,11 +13,11 @@ namespace Symfony\Component\Form\Guess;
 
 /**
  * Base class for guesses made by TypeGuesserInterface implementation
- *
+ * 
  * Each instance contains a confidence value about the correctness of the guess.
  * Thus an instance with confidence HIGH_CONFIDENCE is more likely to be
  * correct than an instance with confidence LOW_CONFIDENCE.
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
 abstract class Guess
@@ -52,19 +52,19 @@ abstract class Guess
 
     /**
      * The confidence about the correctness of the value
-     *
+     * 
      * One of HIGH_CONFIDENCE, MEDIUM_CONFIDENCE and LOW_CONFIDENCE.
-     *
+     * 
      * @var integer
      */
     private $confidence;
 
     /**
      * Returns the guess most likely to be correct from a list of guesses
-     *
+     * 
      * If there are multiple guesses with the same, highest confidence, the
      * returned guess is any of them.
-     *
+     * 
      * @param  array $guesses     A list of guesses
      * @return Guess  The guess with the highest confidence
      */
@@ -79,7 +79,7 @@ abstract class Guess
 
     /**
      * Constructor
-     *
+     * 
      * @param integer $confidence   The confidence
      */
     public function __construct($confidence)
@@ -93,7 +93,7 @@ abstract class Guess
 
     /**
      * Returns the confidence that the guessed value is correct
-     *
+     * 
      * @return integer  One of the constants HIGH_CONFIDENCE, MEDIUM_CONFIDENCE
      *                  and LOW_CONFIDENCE
      */

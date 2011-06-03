@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -44,7 +44,7 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
     /**
      * Tests that no exception is thrown for an unrecognized child if the
      * ignoreExtraKeys option is set to true.
-     *
+     * 
      * Related to testExceptionThrownOnUnrecognizedChild
      */
     public function testIgnoreExtraKeysNoException()

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\Config\Loader;
 
 /**
  * Loader is the abstract class used by all built-in loaders.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class Loader implements LoaderInterface
@@ -22,7 +22,7 @@ abstract class Loader implements LoaderInterface
 
     /**
      * Gets the loader resolver.
-     *
+     * 
      * @return LoaderResolver A LoaderResolver instance
      */
     public function getResolver()
@@ -32,7 +32,7 @@ abstract class Loader implements LoaderInterface
 
     /**
      * Sets the loader resolver.
-     *
+     * 
      * @param LoaderResolver $resolver A LoaderResolver instance
      */
     public function setResolver(LoaderResolver $resolver)
@@ -42,7 +42,7 @@ abstract class Loader implements LoaderInterface
 
     /**
      * Adds definitions and parameters from a resource.
-     *
+     * 
      * @param mixed  $resource A Resource
      * @param string $type     The resource type
      */
@@ -53,12 +53,12 @@ abstract class Loader implements LoaderInterface
 
     /**
      * Finds a loader able to load an imported resource.
-     *
+     * 
      * @param mixed  $resource A Resource
      * @param string $type     The resource type
-     *
+     * 
      * @return LoaderInterface A LoaderInterface instance
-     *
+     * 
      * @throws \InvalidArgumentException if no loader is found
      */
     public function resolve($resource, $type = null)

@@ -6,22 +6,22 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
 
 /**
  * Converts between objects with getter and setter methods and arrays.
- *
+ * 
  * The normalization process looks at all public methods and calls the ones
  * which have a name starting with get and take no parameters. The result is a
  * map from property names (method name stripped of the get prefix and converted
  * to lower case) to property values. Property values are normalized through the
  * serializer.
- *
+ * 
  * The denormalization first looks at the constructor of the given class to see
  * if any of the parameters have the same name as one of the properties. The
  * constructor is then called with all parameters or an exception is thrown if
@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  * setter method exists for any of the properties. If a setter exists it is
  * called with the property value. No automatic denormalization of the value
  * takes place.
- *
+ * 
  * @author Nils Adermann <naderman@naderman.de>
  */
 class GetSetMethodNormalizer extends SerializerAwareNormalizer
@@ -121,7 +121,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
 
     /**
      * Checks if the given class has any get{Property} method.
-     *
+     * 
      * @param string $class
      * @return Boolean
      */
@@ -139,7 +139,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
 
     /**
      * Checks if a method's name is get.* and can be called without parameters.
-     *
+     * 
      * @param ReflectionMethod $method the method to check
      * @return Boolean whether the method is a getter.
      */

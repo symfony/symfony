@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 
 /**
  * LazyLoader facilitate lazy loading of loader services.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class LazyLoader implements LoaderInterface
@@ -27,7 +27,7 @@ class LazyLoader implements LoaderInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param ContainerInterface $container The container
      * @param string             $service   The loader service
      */
@@ -39,10 +39,10 @@ class LazyLoader implements LoaderInterface
 
     /**
      * Loads a resource.
-     *
+     * 
      * @param mixed  $resource A resource
      * @param string $type     The resource type
-     *
+     * 
      * @return RouteCollection A RouteCollection instance
      */
     public function load($resource, $type = null)
@@ -52,10 +52,10 @@ class LazyLoader implements LoaderInterface
 
     /**
      * Returns true if this class supports the given resource.
-     *
+     * 
      * @param mixed  $resource A resource
      * @param string $type     The resource type
-     *
+     * 
      * @return Boolean True if this class supports the given resource, false otherwise
      */
     public function supports($resource, $type = null)
@@ -65,7 +65,7 @@ class LazyLoader implements LoaderInterface
 
     /**
      * Gets the loader resolver.
-     *
+     * 
      * @return LoaderResolver A LoaderResolver instance
      */
     public function getResolver()
@@ -75,7 +75,7 @@ class LazyLoader implements LoaderInterface
 
     /**
      * Sets the loader resolver.
-     *
+     * 
      * @param LoaderResolver $resolver A LoaderResolver instance
      */
     public function setResolver(LoaderResolver $resolver)

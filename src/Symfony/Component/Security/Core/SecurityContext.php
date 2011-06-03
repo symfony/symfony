@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,9 +20,9 @@ use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 /**
  * SecurityContext is the main entry point of the Security component.
- *
+ * 
  * It gives access to the token representing the current user authentication.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -35,7 +35,7 @@ class SecurityContext implements SecurityContextInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param AuthenticationManagerInterface      $authenticationManager An AuthenticationManager instance
      * @param AccessDecisionManagerInterface|null $accessDecisionManager An AccessDecisionManager instance
      * @param Boolean                             $alwaysAuthenticate
@@ -49,7 +49,7 @@ class SecurityContext implements SecurityContextInterface
 
     /**
      * Checks if the attributes are granted against the current token.
-     *
+     * 
      * @throws AuthenticationCredentialsNotFoundException when the security context has no authentication token.
      * @param mixed $attributes
      * @param mixed|null $object
@@ -70,7 +70,7 @@ class SecurityContext implements SecurityContextInterface
 
     /**
      * Gets the currently authenticated token.
-     *
+     * 
      * @return TokenInterface|null A TokenInterface instance or null if no authentication information is available
      */
     public function getToken()
@@ -80,7 +80,7 @@ class SecurityContext implements SecurityContextInterface
 
     /**
      * Sets the currently authenticated token.
-     *
+     * 
      * @param TokenInterface $token A TokenInterface token, or null if no further authentication information should be stored
      */
     public function setToken(TokenInterface $token = null)

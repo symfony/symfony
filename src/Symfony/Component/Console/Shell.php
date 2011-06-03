@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,10 +17,10 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 
 /**
  * A Shell wraps an Application to add shell capabilities to it.
- *
+ * 
  * This class only works with a PHP compiled with readline support
  * (either --with-readline or --with-libedit)
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Shell
@@ -31,12 +31,12 @@ class Shell
 
     /**
      * Constructor.
-     *
+     * 
      * If there is no readline support for the current PHP executable
      * a \RuntimeException exception is thrown.
-     *
+     * 
      * @param Application $application An application instance
-     *
+     * 
      * @throws \RuntimeException When Readline extension is not enabled
      */
     public function __construct(Application $application)
@@ -82,7 +82,7 @@ class Shell
 
     /**
      * Tries to return autocompletion for the current entered text.
-     *
+     * 
      * @param string  $text     The last segment of the entered text
      * @param integer $position The current position
      */
@@ -117,7 +117,7 @@ class Shell
 
     /**
      * Returns the shell header.
-     *
+     * 
      * @return string The header string
      */
     protected function getHeader()

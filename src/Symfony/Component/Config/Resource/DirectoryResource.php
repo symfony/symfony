@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\Config\Resource;
 
 /**
  * DirectoryResource represents a resources stored in a subdirectory tree.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class DirectoryResource implements ResourceInterface
@@ -23,7 +23,7 @@ class DirectoryResource implements ResourceInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param string $resource The file path to the resource
      * @param string $pattern  A pattern to restrict monitored files
      */
@@ -35,7 +35,7 @@ class DirectoryResource implements ResourceInterface
 
     /**
      * Returns a string representation of the Resource.
-     *
+     * 
      * @return string A string representation of the Resource
      */
     public function __toString()
@@ -45,7 +45,7 @@ class DirectoryResource implements ResourceInterface
 
     /**
      * Returns the resource tied to this Resource.
-     *
+     * 
      * @return mixed The resource
      */
     public function getResource()
@@ -55,9 +55,9 @@ class DirectoryResource implements ResourceInterface
 
     /**
      * Returns true if the resource has not been updated since the given timestamp.
-     *
+     * 
      * @param integer $timestamp The last time the resource was loaded
-     *
+     * 
      * @return Boolean true if the resource has not been updated, false otherwise
      */
     public function isFresh($timestamp)

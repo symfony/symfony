@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -35,9 +35,9 @@ use Symfony\Component\ClassLoader\ClassCollectionLoader;
 
 /**
  * The Kernel is the heart of the Symfony system.
- *
+ * 
  * It manages an environment made of bundles.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class Kernel implements KernelInterface
@@ -57,7 +57,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param string  $environment The environment
      * @param Boolean $debug       Whether to enable debugging or not
      */
@@ -116,7 +116,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Shutdowns the kernel.
-     *
+     * 
      * This method is mainly useful when doing functional testing.
      */
     public function shutdown()
@@ -149,7 +149,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Gets a http kernel from the container
-     *
+     * 
      * @return HttpKernel
      */
     protected function getHttpKernel()
@@ -159,7 +159,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Gets the registered bundle instances.
-     *
+     * 
      * @return array An array of registered bundle instances
      */
     public function getBundles()
@@ -169,9 +169,9 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Checks if a given class name belongs to an active bundle.
-     *
+     * 
      * @param string $class A class name
-     *
+     * 
      * @return Boolean true if the class belongs to an active bundle, false otherwise
      */
     public function isClassInActiveBundle($class)
@@ -187,12 +187,12 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Returns a bundle and optionally its descendants by its name.
-     *
+     * 
      * @param string  $name  Bundle name
      * @param Boolean $first Whether to return the first bundle only or together with its descendants
-     *
+     * 
      * @return BundleInterface|Array A BundleInterface instance or an array of BundleInterface instances if $first is false
-     *
+     * 
      * @throws \InvalidArgumentException when the bundle is not enabled
      */
     public function getBundle($name, $first = true)
@@ -210,29 +210,29 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Returns the file path for a given resource.
-     *
+     * 
      * A Resource can be a file or a directory.
-     *
+     * 
      * The resource name must follow the following pattern:
-     *
+     * 
      *     @<BundleName>/path/to/a/file.something
-     *
+     * 
      * where BundleName is the name of the bundle
      * and the remaining part is the relative path in the bundle.
-     *
+     * 
      * If $dir is passed, and the first segment of the path is "Resources",
      * this method will look for a file named:
-     *
+     * 
      *     $dir/<BundleName>/path/without/Resources
-     *
+     * 
      * before looking in the bundle resource folder.
-     *
+     * 
      * @param string  $name  A resource name to locate
      * @param string  $dir   A directory where to look for the resource first
      * @param Boolean $first Whether to return the first path or paths for all matching bundles
-     *
+     * 
      * @return string|array The absolute path of the resource or an array if $first is false
-     *
+     * 
      * @throws \InvalidArgumentException if the file cannot be found or the name is not valid
      * @throws \RuntimeException         if the name contains invalid/unsafe
      * @throws \RuntimeException         if a custom resource is hidden by a resource in a derived bundle
@@ -293,7 +293,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Gets the name of the kernel
-     *
+     * 
      * @return string The kernel name
      */
     public function getName()
@@ -303,7 +303,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Gets the environment.
-     *
+     * 
      * @return string The current environment
      */
     public function getEnvironment()
@@ -313,7 +313,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Checks if debug mode is enabled.
-     *
+     * 
      * @return Boolean true if debug mode is enabled, false otherwise
      */
     public function isDebug()
@@ -323,7 +323,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Gets the application root dir.
-     *
+     * 
      * @return string The application root dir
      */
     public function getRootDir()
@@ -338,7 +338,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Gets the current container.
-     *
+     * 
      * @return ContainerInterface A ContainerInterface instance
      */
     public function getContainer()
@@ -348,7 +348,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Loads the PHP class cache.
-     *
+     * 
      * @param string  $name      The cache name prefix
      * @param string  $extension File extension of the resulting file
      */
@@ -370,7 +370,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Gets the request start time (not available if debug is disabled).
-     *
+     * 
      * @return integer The request start timestamp
      */
     public function getStartTime()
@@ -380,7 +380,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Gets the cache directory.
-     *
+     * 
      * @return string The cache directory
      */
     public function getCacheDir()
@@ -390,7 +390,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Gets the log directory.
-     *
+     * 
      * @return string The log directory
      */
     public function getLogDir()
@@ -400,10 +400,10 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Initializes the data structures related to the bundle management.
-     *
+     * 
      *  - the bundles property maps a bundle name to the bundle instance,
      *  - the bundleMap property maps a bundle name to the bundle inheritance hierarchy (most derived bundle first).
-     *
+     * 
      * @throws \LogicException if two bundles share a common name
      * @throws \LogicException if a bundle tries to extend a non-registered bundle
      * @throws \LogicException if a bundle tries to extend itself
@@ -463,7 +463,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Gets the container class.
-     *
+     * 
      * @return string The container class
      */
     protected function getContainerClass()
@@ -473,9 +473,9 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Gets the container's base class.
-     *
+     * 
      * All names except Container must be fully qualified.
-     *
+     * 
      * @return string
      */
     protected function getContainerBaseClass()
@@ -485,7 +485,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Initializes the service container.
-     *
+     * 
      * The cached version of the service container is used when fresh, otherwise the
      * container is built.
      */
@@ -513,7 +513,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Returns the kernel parameters.
-     *
+     * 
      * @return array An array of kernel parameters
      */
     protected function getKernelParameters()
@@ -541,9 +541,9 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Gets the environment parameters.
-     *
+     * 
      * Only the parameters starting with "SYMFONY__" are considered.
-     *
+     * 
      * @return array An array of parameters
      */
     protected function getEnvParameters()
@@ -560,7 +560,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Builds the service container.
-     *
+     * 
      * @return ContainerBuilder The compiled service container
      */
     protected function buildContainer()
@@ -608,7 +608,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Dumps the service container to PHP code in the cache.
-     *
+     * 
      * @param ConfigCache      $cache     The config cache
      * @param ContainerBuilder $container The service container
      * @param string           $class     The name of the class to generate
@@ -628,9 +628,9 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Returns a loader for the container.
-     *
+     * 
      * @param ContainerInterface $container The service container
-     *
+     * 
      * @return DelegatingLoader The loader
      */
     protected function getContainerLoader(ContainerInterface $container)
@@ -649,12 +649,12 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Removes comments from a PHP source string.
-     *
+     * 
      * We don't use the PHP php_strip_whitespace() function
      * as we want the content to be readable and well-formatted.
-     *
+     * 
      * @param string $source A PHP string
-     *
+     * 
      * @return string The PHP string with the comments removed
      */
     static public function stripComments($source)

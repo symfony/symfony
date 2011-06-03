@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 /**
  * Finds all the templates.
- *
+ * 
  * @author Victor Berchet <victor@suumit.com>
  */
 class TemplateFinder implements TemplateFinderInterface
@@ -30,7 +30,7 @@ class TemplateFinder implements TemplateFinderInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param KernelInterface      $kernel  A KernelInterface instance
      * @param TemplateNameParser   $parser  A TemplateNameParser instance
      * @param string               $rootDir The directory where global templates can be stored
@@ -44,7 +44,7 @@ class TemplateFinder implements TemplateFinderInterface
 
     /**
      * Find all the templates in the bundle and in the kernel Resources folder.
-     *
+     * 
      * @return array An array of templates of type TemplateReferenceInterface
      */
     public function findAllTemplates()
@@ -66,9 +66,9 @@ class TemplateFinder implements TemplateFinderInterface
 
     /**
      * Find templates in the given directory.
-     *
+     * 
      * @param string $dir The folder where to look for templates
-     *
+     * 
      * @return array An array of templates of type TemplateReferenceInterface
      */
     private function findTemplatesInFolder($dir)
@@ -90,9 +90,9 @@ class TemplateFinder implements TemplateFinderInterface
 
     /**
      * Find templates in the given bundle.
-     *
+     * 
      * @param BundleInterface $bundle The bundle where to look for templates
-     *
+     * 
      * @return array An array of templates of type TemplateReferenceInterface
      */
     private function findTemplatesInBundle(BundleInterface $bundle)

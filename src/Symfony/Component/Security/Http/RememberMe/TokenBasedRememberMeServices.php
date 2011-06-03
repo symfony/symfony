@@ -12,9 +12,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * Concrete implementation of the RememberMeServicesInterface providing
  * remember-me capabilities without requiring a TokenProvider.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class TokenBasedRememberMeServices extends AbstractRememberMeServices
@@ -68,12 +68,12 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
     /**
      * Compares two hashes using a constant-time algorithm to avoid (remote)
      * timing attacks.
-     *
+     * 
      * This is the same implementation as used in the BasePasswordEncoder.
-     *
+     * 
      * @param string $hash1 The first hash
      * @param string $hash2 The second hash
-     *
+     * 
      * @return Boolean true if the two hashes are the same, false otherwise
      */
     private function compareHashes($hash1, $hash2)
@@ -114,14 +114,14 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
 
     /**
      * Generates the cookie value.
-     *
+     * 
      * @param string  $class
      * @param string  $username The username
      * @param integer $expires  The unixtime when the cookie expires
      * @param string  $password The encoded password
-     *
+     * 
      * @throws \RuntimeException if username contains invalid chars
-     *
+     * 
      * @return string
      */
     protected function generateCookieValue($class, $username, $expires, $password)
@@ -136,7 +136,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
 
     /**
      * Generates a hash for the cookie to ensure it is not being tempered with
-     *
+     * 
      * @param string $class
      * @param string $username The username
      * @param integer $expires The unixtime when the cookie expires

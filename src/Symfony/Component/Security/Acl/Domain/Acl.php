@@ -1,9 +1,9 @@
 <?php
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -23,15 +23,15 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 /**
  * An ACL implementation.
- *
+ * 
  * Each object identity has exactly one associated ACL. Each ACL can have four
  * different types of ACEs (class ACEs, object ACEs, class field ACEs, object field
  * ACEs).
- *
+ * 
  * You should not iterate over the ACEs yourself, but instead use isGranted(),
  * or isFieldGranted(). These will utilize an implementation of PermissionGrantingStrategy
  * internally.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class Acl implements AuditableAclInterface, NotifyPropertyChanged
@@ -50,7 +50,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
 
     /**
      * Constructor
-     *
+     * 
      * @param integer                             $id
      * @param ObjectIdentityInterface             $objectIdentity
      * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
@@ -75,7 +75,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
 
     /**
      * Adds a property changed listener
-     *
+     * 
      * @param PropertyChangedListener $listener
      * @return void
      */
@@ -261,7 +261,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
 
     /**
      * Implementation for the \Serializable interface
-     *
+     * 
      * @return string
      */
     public function serialize()
@@ -281,7 +281,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
 
     /**
      * Implementation for the \Serializable interface
-     *
+     * 
      * @param string $serialized
      * @return void
      */
@@ -401,7 +401,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
 
     /**
      * Deletes an ACE
-     *
+     * 
      * @param string $property
      * @param integer $index
      * @throws \OutOfBoundsException
@@ -426,7 +426,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
 
     /**
      * Deletes a field-based ACE
-     *
+     * 
      * @param string $property
      * @param integer $index
      * @param string $field
@@ -452,7 +452,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
 
     /**
      * Inserts an ACE
-     *
+     * 
      * @param string                    $property
      * @param integer                   $index
      * @param integer                   $mask
@@ -501,7 +501,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
 
     /**
      * Inserts a field-based ACE
-     *
+     * 
      * @param string                    $property
      * @param integer                   $index
      * @param string                    $field
@@ -559,7 +559,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
 
     /**
      * Updates an ACE
-     *
+     * 
      * @param string $property
      * @param integer $index
      * @param integer $mask
@@ -587,7 +587,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
 
     /**
      * Updates auditing for an ACE
-     *
+     * 
      * @param array $aces
      * @param integer $index
      * @param Boolean $auditSuccess
@@ -614,7 +614,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
 
     /**
      * Updates a field-based ACE
-     *
+     * 
      * @param string $property
      * @param integer $index
      * @param string $field
@@ -648,7 +648,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
 
     /**
      * Called when a property of the ACL changes
-     *
+     * 
      * @param string $name
      * @param mixed $oldValue
      * @param mixed $newValue
@@ -663,7 +663,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
 
     /**
      * Called when a property of an ACE associated with this ACL changes
-     *
+     * 
      * @param EntryInterface $entry
      * @param string         $name
      * @param mixed          $oldValue

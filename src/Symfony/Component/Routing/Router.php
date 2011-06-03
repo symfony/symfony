@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Component\Config\ConfigCache;
 /**
  * The Router class is an example of the integration of all pieces of the
  * routing system for easier use.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Router implements RouterInterface
@@ -34,19 +34,19 @@ class Router implements RouterInterface
 
     /**
      * Constructor.
-     *
+     * 
      * Available options:
-     *
+     * 
      *   * cache_dir:     The cache directory (or null to disable caching)
      *   * debug:         Whether to enable debugging or not (false by default)
      *   * resource_type: Type hint for the main resource (optional)
-     *
+     * 
      * @param LoaderInterface $loader   A LoaderInterface instance
      * @param mixed           $resource The main resource to load
      * @param array           $options  An array of options
      * @param RequestContext  $context  The context
      * @param array           $defaults The default values
-     *
+     * 
      * @throws \InvalidArgumentException When unsupported option is provided
      */
     public function __construct(LoaderInterface $loader, $resource, array $options = array(), RequestContext $context = null, array $defaults = array())
@@ -88,7 +88,7 @@ class Router implements RouterInterface
 
     /**
      * Gets the RouteCollection instance associated with this Router.
-     *
+     * 
      * @return RouteCollection A RouteCollection instance
      */
     public function getRouteCollection()
@@ -102,7 +102,7 @@ class Router implements RouterInterface
 
     /**
      * Sets the request context.
-     *
+     * 
      * @param RequestContext $context The context
      */
     public function setContext(RequestContext $context)
@@ -115,7 +115,7 @@ class Router implements RouterInterface
 
     /**
      * Gets the request context.
-     *
+     * 
      * @return RequestContext The context
      */
     public function getContext()
@@ -125,11 +125,11 @@ class Router implements RouterInterface
 
     /**
      * Generates a URL from the given parameters.
-     *
+     * 
      * @param  string  $name       The name of the route
      * @param  array   $parameters An array of parameters
      * @param  Boolean $absolute   Whether to generate an absolute URL
-     *
+     * 
      * @return string The generated URL
      */
     public function generate($name, array $parameters = array(), $absolute = false)
@@ -139,11 +139,11 @@ class Router implements RouterInterface
 
     /**
      * Tries to match a URL with a set of routes.
-     *
+     * 
      * Returns false if no route matches the URL.
-     *
+     * 
      * @param  string $url URL to be parsed
-     *
+     * 
      * @return array|false An array of parameters or false if no route matches
      */
     public function match($url)
@@ -153,7 +153,7 @@ class Router implements RouterInterface
 
     /**
      * Gets the UrlMatcher instance associated with this Router.
-     *
+     * 
      * @return UrlMatcherInterface A UrlMatcherInterface instance
      */
     public function getMatcher()
@@ -186,7 +186,7 @@ class Router implements RouterInterface
 
     /**
      * Gets the UrlGenerator instance associated with this Router.
-     *
+     * 
      * @return UrlGeneratorInterface A UrlGeneratorInterface instance
      */
     public function getGenerator()

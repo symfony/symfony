@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * RouterHelper manages links between pages in a template context.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RouterHelper extends Helper
@@ -25,7 +25,7 @@ class RouterHelper extends Helper
 
     /**
      * Constructor.
-     *
+     * 
      * @param UrlGeneratorInterface $router A Router instance
      */
     public function __construct(UrlGeneratorInterface $router)
@@ -35,11 +35,11 @@ class RouterHelper extends Helper
 
     /**
      * Generates a URL from the given parameters.
-     *
+     * 
      * @param string  $name       The name of the route
      * @param array   $parameters An array of parameters
      * @param Boolean $absolute   Whether to generate an absolute URL
-     *
+     * 
      * @return string The generated URL
      */
     public function generate($name, array $parameters = array(), $absolute = false)
@@ -49,7 +49,7 @@ class RouterHelper extends Helper
 
     /**
      * Returns the canonical name of this helper.
-     *
+     * 
      * @return string The canonical name
      */
     public function getName()

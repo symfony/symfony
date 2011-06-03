@@ -90,16 +90,16 @@ beta2 to beta3
 * The settings under "framework.annotations" have changed slightly:
 
   Before:
-  
+
     framework:
         annotations:
             cache: file
             file_cache:
                 debug: true
                 dir: /foo
-                
+
   After:
-     
+
     framework:
         annotations:
             cache: file
@@ -210,7 +210,7 @@ class AcmeEntity
 }
 ```
 
-* The config under `framework.validation.annotations` has been removed and was 
+* The config under `framework.validation.annotations` has been removed and was
   replaced with a boolean flag `framework.validation.enable_annotations` which
   defaults to false.
 
@@ -357,7 +357,7 @@ class AcmeEntity
             'allow_add' => true,
             'allow_delete' => true,
         ));
-      
+
 * `Request::hasSession()` has been renamed to `Request::hasPreviousSession()`. The
   method `hasSession()` still exists, but only checks if the request contains a
   session object, not if the session was started in a previous request.
@@ -373,10 +373,10 @@ class AcmeEntity
 
 * Serializer: The `$properties` argument has been dropped from all interfaces.
 
-* Form: Renamed option value `text` of `widget` option of the `date` type was 
+* Form: Renamed option value `text` of `widget` option of the `date` type was
   renamed to `single-text`. `text` indicates to use separate text boxes now
   (like for the `time` type).
-  
+
 * Form: Renamed view variable `name` to `full_name`. The variable `name` now
   contains the local, short name (equivalent to `$form->getName()`).
 

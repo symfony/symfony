@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -27,7 +27,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * AbstractPreAuthenticatedListener is the base class for all listener that
  * authenticates users based on a pre-authenticated request (like a certificate
  * for instance).
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class AbstractPreAuthenticatedListener implements ListenerInterface
@@ -49,7 +49,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
 
     /**
      * Handles X509 authentication.
-     *
+     * 
      * @param GetResponseEvent $event A GetResponseEvent instance
      */
     public final function handle(GetResponseEvent $event)
@@ -95,9 +95,9 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
 
     /**
      * Gets the user and credentials from the Request.
-     *
+     * 
      * @param Request $request A Request instance
-     *
+     * 
      * @return array An array composed of the user and the credentials
      */
     abstract protected function getPreAuthenticatedData(Request $request);

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * ConfigDataCollector.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ConfigDataCollector extends DataCollector
@@ -28,7 +28,7 @@ class ConfigDataCollector extends DataCollector
 
     /**
      * Constructor.
-     *
+     * 
      * @param KernelInterface $kernel A KernelInterface instance
      */
     public function __construct(KernelInterface $kernel)
@@ -62,7 +62,7 @@ class ConfigDataCollector extends DataCollector
 
     /**
      * Gets the token.
-     *
+     * 
      * @return string The token
      */
     public function getToken()
@@ -72,7 +72,7 @@ class ConfigDataCollector extends DataCollector
 
     /**
      * Gets the Symfony version.
-     *
+     * 
      * @return string The Symfony version
      */
     public function getSymfonyVersion()
@@ -82,7 +82,7 @@ class ConfigDataCollector extends DataCollector
 
     /**
      * Gets the PHP version.
-     *
+     * 
      * @return string The PHP version
      */
     public function getPhpVersion()
@@ -92,7 +92,7 @@ class ConfigDataCollector extends DataCollector
 
     /**
      * Gets the application name.
-     *
+     * 
      * @return string The application name
      */
     public function getAppName()
@@ -102,7 +102,7 @@ class ConfigDataCollector extends DataCollector
 
     /**
      * Gets the environment.
-     *
+     * 
      * @return string The environment
      */
     public function getEnv()
@@ -112,7 +112,7 @@ class ConfigDataCollector extends DataCollector
 
     /**
      * Returns true if the debug is enabled.
-     *
+     * 
      * @return Boolean true if debug is enabled, false otherwise
      */
     public function isDebug()
@@ -122,7 +122,7 @@ class ConfigDataCollector extends DataCollector
 
     /**
      * Returns true if the XDebug is enabled.
-     *
+     * 
      * @return Boolean true if XDebug is enabled, false otherwise
      */
     public function hasXDebug()
@@ -132,7 +132,7 @@ class ConfigDataCollector extends DataCollector
 
     /**
      * Returns true if EAccelerator is enabled.
-     *
+     * 
      * @return Boolean true if EAccelerator is enabled, false otherwise
      */
     public function hasEAccelerator()
@@ -142,7 +142,7 @@ class ConfigDataCollector extends DataCollector
 
     /**
      * Returns true if APC is enabled.
-     *
+     * 
      * @return Boolean true if APC is enabled, false otherwise
      */
     public function hasApc()
@@ -152,7 +152,7 @@ class ConfigDataCollector extends DataCollector
 
     /**
      * Returns true if XCache is enabled.
-     *
+     * 
      * @return Boolean true if XCache is enabled, false otherwise
      */
     public function hasXCache()
@@ -162,7 +162,7 @@ class ConfigDataCollector extends DataCollector
 
     /**
      * Returns true if any accelerator is enabled.
-     *
+     * 
      * @return Boolean true if any accelerator is enabled, false otherwise
      */
     public function hasAccelerator()

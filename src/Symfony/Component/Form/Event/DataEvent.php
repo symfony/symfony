@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -30,7 +30,7 @@ class DataEvent extends Event
         $this->form = $form;
         $this->data = $data;
     }
-    
+
     /**
      * Returns the form at the source of the event.
      * 
@@ -40,11 +40,11 @@ class DataEvent extends Event
     {
         return $this->form;
     }
-    
+
     /**
      * Returns the data associated with this event.
      * 
-     * @return type 
+     * @return type
      */
     public function getData()
     {

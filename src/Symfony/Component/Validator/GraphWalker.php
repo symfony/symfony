@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Mapping\MemberMetadata;
 /**
  * Responsible for walking over and initializing validation on different
  * types of items.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
@@ -52,7 +52,7 @@ class GraphWalker
     /**
      * Initialize validation on the given object using the given metadata
      * instance and validation group.
-     *
+     * 
      * @param ClassMetadata $metadata
      * @param object        $object       The object to validate
      * @param string        $group        The validator group to use for validation

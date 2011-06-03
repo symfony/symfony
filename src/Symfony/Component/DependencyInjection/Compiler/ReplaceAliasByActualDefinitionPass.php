@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Replaces aliases with actual service definitions, effectively removing these
  * aliases.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
@@ -28,7 +28,7 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
 
     /**
      * Process the Container to replace aliases with service definitions.
-     *
+     * 
      * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
@@ -61,7 +61,7 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
 
     /**
      * Updates references to remove aliases.
-     *
+     * 
      * @param ContainerBuilder $container The container
      * @param string $currentId The alias identifier being replaced
      * @param string $newId The id of the service the alias points to
@@ -93,7 +93,7 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
 
     /**
      * Updates argument references.
-     *
+     * 
      * @param array $arguments An array of Arguments
      * @param string $currentId The alias identifier
      * @param string $newId The identifier the alias points to

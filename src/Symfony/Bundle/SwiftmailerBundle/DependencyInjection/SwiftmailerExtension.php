@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,22 +20,22 @@ use Symfony\Component\Config\Definition\Processor;
 
 /**
  * SwiftmailerExtension is an extension for the SwiftMailer library.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SwiftmailerExtension extends Extension
 {
     /**
      * Loads the Swift Mailer configuration.
-     *
+     * 
      * Usage example:
-     *
+     * 
      *      <swiftmailer:config transport="gmail">
      *        <swiftmailer:username>fabien</swift:username>
      *        <swiftmailer:password>xxxxx</swift:password>
      *        <swiftmailer:spool path="/path/to/spool/" />
      *      </swiftmailer:config>
-     *
+     * 
      * @param array            $configs   An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
@@ -110,7 +110,7 @@ class SwiftmailerExtension extends Extension
 
     /**
      * Returns the base path for the XSD files.
-     *
+     * 
      * @return string The XSD base path
      */
     public function getXsdValidationBasePath()
@@ -120,7 +120,7 @@ class SwiftmailerExtension extends Extension
 
     /**
      * Returns the namespace to be used for this extension (XML namespace).
-     *
+     * 
      * @return string The XML namespace
      */
     public function getNamespace()

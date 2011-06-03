@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -33,13 +33,13 @@ class EntityChoiceList extends ArrayChoiceList
 
     /**
      * The entities from which the user can choose
-     *
+     * 
      * This array is either indexed by ID (if the ID is a single field)
      * or by key in the choices array (if the ID consists of multiple fields)
-     *
+     * 
      * This property is initialized by initializeChoices(). It should only
      * be accessed through getEntity() and getEntities().
-     *
+     * 
      * @var Collection
      */
     private $entities = array();
@@ -47,34 +47,34 @@ class EntityChoiceList extends ArrayChoiceList
     /**
      * Contains the query builder that builds the query for fetching the
      * entities
-     *
+     * 
      * This property should only be accessed through queryBuilder.
-     *
+     * 
      * @var Doctrine\ORM\QueryBuilder
      */
     private $queryBuilder;
 
     /**
      * The fields of which the identifier of the underlying class consists
-     *
+     * 
      * This property should only be accessed through identifier.
-     *
+     * 
      * @var array
      */
     private $identifier = array();
 
     /**
      * A cache for \ReflectionProperty instances for the underlying class
-     *
+     * 
      * This property should only be accessed through getReflProperty().
-     *
+     * 
      * @var array
      */
     private $reflProperties = array();
 
     /**
      * A cache for the UnitOfWork instance of Doctrine
-     *
+     * 
      * @var Doctrine\ORM\UnitOfWork
      */
     private $unitOfWork;
@@ -114,13 +114,13 @@ class EntityChoiceList extends ArrayChoiceList
 
     /**
      * Initializes the choices and returns them
-     *
+     * 
      * If the entities were passed in the "choices" option, this method
      * does not have any significant overhead. Otherwise, if a query builder
      * was passed in the "query_builder" option, this builder is now used
      * to construct a query which is executed. In the last case, all entities
      * for the underlying class are fetched from the repository.
-     *
+     * 
      * @return array  An array of choices
      */
     protected function load()
@@ -145,15 +145,15 @@ class EntityChoiceList extends ArrayChoiceList
 
     /**
      * Convert entities into choices with support for groups
-     *
+     * 
      * The choices are generated from the entities. If the entities have a
      * composite identifier, the choices are indexed using ascending integers.
      * Otherwise the identifiers are used as indices.
-     *
+     * 
      * If the option "property" was passed, the property path in that option
      * is used as option values. Otherwise this method tries to convert
      * objects to strings using __toString().
-     *
+     * 
      */
     private function loadEntities($entities, $group = null)
     {
@@ -181,7 +181,7 @@ class EntityChoiceList extends ArrayChoiceList
                 // entity ID for performance reasons
                 $id = current($this->getIdentifierValues($entity));
             }
-            
+
             if (null === $group) {
                 // Flat list of choices
                 $this->choices[$id] = $value;
@@ -189,7 +189,7 @@ class EntityChoiceList extends ArrayChoiceList
                 // Nested choices
                 $this->choices[$group][$id] = $value;
             }
-            
+
             $this->entities[$id] = $entity;
         }
     }
@@ -201,11 +201,11 @@ class EntityChoiceList extends ArrayChoiceList
 
     /**
      * Returns the according entities for the choices
-     *
+     * 
      * If the choices were not initialized, they are initialized now. This
      * is an expensive operation, except if the entities were passed in the
      * "choices" option.
-     *
+     * 
      * @return array  An array of entities
      */
     public function getEntities()
@@ -219,14 +219,14 @@ class EntityChoiceList extends ArrayChoiceList
 
     /**
      * Returns the entity for the given key
-     *
+     * 
      * If the underlying entities have composite identifiers, the choices
      * are intialized. The key is expected to be the index in the choices
      * array in this case.
-     *
+     * 
      * If they have single identifiers, they are either fetched from the
      * internal entity cache (if filled) or loaded from the database.
-     *
+     * 
      * @param  string $key  The choice key (for entities with composite
      *                      identifiers) or entity ID (for entities with single
      *                      identifiers)
@@ -262,7 +262,7 @@ class EntityChoiceList extends ArrayChoiceList
     /**
      * Returns the \ReflectionProperty instance for a property of the
      * underlying class
-     *
+     * 
      * @param  string $property     The name of the property
      * @return \ReflectionProperty  The reflection instance
      */
@@ -278,11 +278,11 @@ class EntityChoiceList extends ArrayChoiceList
 
     /**
      * Returns the values of the identifier fields of an entity
-     *
+     * 
      * Doctrine must know about this entity, that is, the entity must already
      * be persisted or added to the identity map before. Otherwise an
      * exception is thrown.
-     *
+     * 
      * @param  object $entity  The entity for which to get the identifier
      * @throws FormException   If the entity does not exist in Doctrine's
      *                         identity map

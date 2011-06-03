@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /**
  * Binds the Symfony templating loader debugger to the Symfony logger.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Debugger implements DebuggerInterface
@@ -25,7 +25,7 @@ class Debugger implements DebuggerInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param LoggerInterface $logger A LoggerInterface instance
      */
     public function __construct(LoggerInterface $logger = null)
@@ -35,7 +35,7 @@ class Debugger implements DebuggerInterface
 
     /**
      * Logs a message.
-     *
+     * 
      * @param string $message A message to log
      */
     public function log($message)

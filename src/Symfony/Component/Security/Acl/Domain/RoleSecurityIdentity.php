@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Role\Role;
 
 /**
  * A SecurityIdentity implementation for roles
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 final class RoleSecurityIdentity implements SecurityIdentityInterface
@@ -25,7 +25,7 @@ final class RoleSecurityIdentity implements SecurityIdentityInterface
 
     /**
      * Constructor
-     *
+     * 
      * @param mixed $role a Role instance, or its string representation
      * @return void
      */
@@ -40,7 +40,7 @@ final class RoleSecurityIdentity implements SecurityIdentityInterface
 
     /**
      * Returns the role name
-     *
+     * 
      * @return string
      */
     public function getRole()
@@ -62,9 +62,9 @@ final class RoleSecurityIdentity implements SecurityIdentityInterface
 
     /**
      * Returns a textual representation of this security identity.
-     *
+     * 
      * This is solely used for debugging purposes, not to make an equality decision.
-     *
+     * 
      * @return string
      */
     public function __toString()

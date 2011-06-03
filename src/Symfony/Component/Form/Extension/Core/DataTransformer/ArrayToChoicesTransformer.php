@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,9 +19,9 @@ class ArrayToChoicesTransformer implements DataTransformerInterface
 {
     /**
      * @param array $array
-     *
+     * 
      * @return array
-     *
+     * 
      * @throws UnexpectedTypeException if the given value is not an array
      */
     public function transform($array)
@@ -39,9 +39,9 @@ class ArrayToChoicesTransformer implements DataTransformerInterface
 
     /**
      * @param array $array
-     *
+     * 
      * @return array
-     *
+     * 
      * @throws UnexpectedTypeException if the given value is not an array
      */
     public function reverseTransform($array)

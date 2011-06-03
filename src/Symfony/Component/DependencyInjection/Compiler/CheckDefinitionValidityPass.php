@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -17,21 +17,21 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * This pass validates each definition individually only taking the information
  * into account which is contained in the definition itself.
- *
+ * 
  * Later passes can rely on the following, and specifically do not need to
  * perform these checks themselves:
- *
+ * 
  * - non synthetic, non abstract services always have a class set
  * - synthetic services are always public
  * - synthetic services are always of non-prototype scope
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class CheckDefinitionValidityPass implements CompilerPassInterface
 {
     /**
      * Processes the ContainerBuilder to validate the Definition.
-     *
+     * 
      * @param ContainerBuilder $container
      * @throws \RuntimeException When the Definition is invalid
      */

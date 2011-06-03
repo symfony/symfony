@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -30,7 +30,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * ExceptionListener catches authentication exception and converts them to
  * Response instances.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ExceptionListener
@@ -54,7 +54,7 @@ class ExceptionListener
 
     /**
      * Registers a onCoreException listener to take care of security exceptions.
-     *
+     * 
      * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
      */
     public function register(EventDispatcherInterface $dispatcher)
@@ -64,7 +64,7 @@ class ExceptionListener
 
     /**
      * Handles security related exceptions.
-     *
+     * 
      * @param GetResponseForExceptionEvent $event An GetResponseForExceptionEvent instance
      */
     public function onCoreException(GetResponseForExceptionEvent $event)

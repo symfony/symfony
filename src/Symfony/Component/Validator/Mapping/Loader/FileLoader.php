@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -39,12 +39,12 @@ abstract class FileLoader implements LoaderInterface
 
     /**
      * Creates a new constraint instance for the given constraint name.
-     *
+     * 
      * @param string $name    The constraint name. Either a constraint relative
      *                        to the default constraint namespace, or a fully
      *                        qualified class name
      * @param array  $options The constraint options
-     *
+     * 
      * @return Constraint
      */
     protected function newConstraint($name, $options)

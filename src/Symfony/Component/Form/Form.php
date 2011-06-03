@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -21,28 +21,28 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Form represents a form.
- *
+ * 
  * A form is composed of a validator schema and a widget form schema.
- *
+ * 
  * To implement your own form fields, you need to have a thorough understanding
  * of the data flow within a form field. A form field stores its data in three
  * different representations:
- *
+ * 
  *   (1) the format required by the form's object
  *   (2) a normalized format for internal processing
  *   (3) the format used for display
- *
+ * 
  * A date field, for example, may store a date as "Y-m-d" string (1) in the
  * object. To facilitate processing in the field, this value is normalized
  * to a DateTime object (2). In the HTML representation of your form, a
  * localized string (3) is presented to and modified by the user.
- *
+ * 
  * In most cases, format (1) and format (2) will be the same. For example,
  * a checkbox field uses a Boolean value both for internal processing as for
  * storage in the object. In these cases you simply need to set a value
  * transformer to convert between formats (2) and (3). You can do this by
  * calling appendClientTransformer() in the configure() method.
- *
+ * 
  * In some cases though it makes sense to make format (1) configurable. To
  * demonstrate this, let's extend our above date field to store the value
  * either as "Y-m-d" string or as timestamp. Internally we still want to
@@ -50,7 +50,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * to DateTime you can set a normalization transformer by calling
  * appendNormTransformer() in configure(). The normalized data is then
  * converted to the displayed data as described before.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
@@ -236,7 +236,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns the name by which the form is identified in forms.
-     *
+     * 
      * @return string  The name of the form.
      */
     public function getName()
@@ -246,7 +246,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns the types used by this form.
-     *
+     * 
      * @return array An array of FormTypeInterface
      */
     public function getTypes()
@@ -256,11 +256,11 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns whether the form is required to be filled out.
-     *
+     * 
      * If the form has a parent and the parent is not required, this method
      * will always return false. Otherwise the value set with setRequired()
      * is returned.
-     *
+     * 
      * @return Boolean
      */
     public function isRequired()
@@ -275,13 +275,13 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns whether this form is read only.
-     *
+     * 
      * The content of a read-only form is displayed, but not allowed to be
      * modified. The validation of modified read-only forms should fail.
-     *
+     * 
      * Fields whose parents are read-only are considered read-only regardless of
      * their own state.
-     *
+     * 
      * @return Boolean
      */
     public function isReadOnly()
@@ -296,9 +296,9 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Sets the parent form.
-     *
+     * 
      * @param FormInterface $parent The parent form
-     *
+     * 
      * @return Form The current form
      */
     public function setParent(FormInterface $parent = null)
@@ -310,7 +310,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns the parent field.
-     *
+     * 
      * @return FormInterface The parent field
      */
     public function getParent()
@@ -320,7 +320,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns whether the form has a parent.
-     *
+     * 
      * @return Boolean
      */
     public function hasParent()
@@ -330,7 +330,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns the root of the form tree.
-     *
+     * 
      * @return FormInterface  The root of the tree
      */
     public function getRoot()
@@ -340,7 +340,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns whether the field is the root of the form tree.
-     *
+     * 
      * @return Boolean
      */
     public function isRoot()
@@ -350,7 +350,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns whether the form has an attribute with the given name.
-     *
+     * 
      * @param string $name The name of the attribute
      */
     public function hasAttribute($name)
@@ -360,7 +360,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns the value of the attributes with the given name.
-     *
+     * 
      * @param string $name The name of the attribute
      */
     public function getAttribute($name)
@@ -370,9 +370,9 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Updates the field with default data.
-     *
+     * 
      * @param array $appData The data formatted as expected for the underlying object
-     *
+     * 
      * @return Form The current form
      */
     public function setData($appData)
@@ -412,7 +412,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns the data in the format needed for the underlying object.
-     *
+     * 
      * @return mixed
      */
     public function getData()
@@ -422,7 +422,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns the data transformed by the value transformer.
-     *
+     * 
      * @return string
      */
     public function getClientData()
@@ -432,7 +432,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns the extra data.
-     *
+     * 
      * @return array The bound data which do not belong to a child
      */
     public function getExtraData()
@@ -442,11 +442,11 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Binds data to the field, transforms and validates it.
-     *
+     * 
      * @param string|array $clientData The data
-     *
+     * 
      * @return Form The current form
-     *
+     * 
      * @throws UnexpectedTypeException
      */
     public function bind($clientData)
@@ -559,14 +559,14 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Binds a request to the form.
-     *
+     * 
      * If the request method is POST, PUT or GET, the data is bound to the form,
      * transformed and written into the form data (an object or an array).
-     *
+     * 
      * @param Request $request    The request to bind to the form
-     *
+     * 
      * @return Form This form
-     *
+     * 
      * @throws FormException if the method of the request is not one of GET, POST or PUT
      */
     public function bindRequest(Request $request)
@@ -592,7 +592,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns the normalized data of the field.
-     *
+     * 
      * @return mixed  When the field is not bound, the default data is returned.
      *                When the field is bound, the normalized bound data is
      *                returned if the field is valid, null otherwise.
@@ -604,9 +604,9 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Adds an error to this form.
-     *
+     * 
      * @param FormError $error
-     *
+     * 
      * @return Form The current form
      */
     public function addError(FormError $error)
@@ -622,7 +622,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns whether errors bubble up to the parent.
-     *
+     * 
      * @return Boolean
      */
     public function getErrorBubbling()
@@ -632,7 +632,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns whether the field is bound.
-     *
+     * 
      * @return Boolean true if the form is bound to input values, false otherwise
      */
     public function isBound()
@@ -642,7 +642,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns whether the data in the different formats is synchronized.
-     *
+     * 
      * @return Boolean
      */
     public function isSynchronized()
@@ -652,7 +652,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns whether the form is empty.
-     *
+     * 
      * @return Boolean
      */
     public function isEmpty()
@@ -669,7 +669,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns whether the field is valid.
-     *
+     * 
      * @return Boolean
      */
     public function isValid()
@@ -691,7 +691,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns whether or not there are errors.
-     *
+     * 
      * @return Boolean  true if form is bound and not valid
      */
     public function hasErrors()
@@ -705,7 +705,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns all errors.
-     *
+     * 
      * @return array  An array of FormError instances that occurred during binding
      */
     public function getErrors()
@@ -715,7 +715,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns the DataTransformers.
-     *
+     * 
      * @return array An array of DataTransformerInterface
      */
     public function getNormTransformers()
@@ -725,7 +725,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns the DataTransformers.
-     *
+     * 
      * @return array An array of DataTransformerInterface
      */
     public function getClientTransformers()
@@ -735,7 +735,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns all children in this group.
-     *
+     * 
      * @return array
      */
     public function getChildren()
@@ -745,7 +745,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Return whether the form has children.
-     *
+     * 
      * @return Boolean
      */
     public function hasChildren()
@@ -755,9 +755,9 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Adds a child to the form.
-     *
+     * 
      * @param FormInterface $child The FormInterface to add as a child
-     *
+     * 
      * @return Form the current form
      */
     public function add(FormInterface $child)
@@ -775,9 +775,9 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Removes a child from the form.
-     *
+     * 
      * @param string $name The name of the child to remove
-     *
+     * 
      * @return Form the current form
      */
     public function remove($name)
@@ -793,9 +793,9 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns whether a child with the given name exists.
-     *
+     * 
      * @param  string $name
-     *
+     * 
      * @return Boolean
      */
     public function has($name)
@@ -805,11 +805,11 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns the child with the given name.
-     *
+     * 
      * @param  string $name
-     *
+     * 
      * @return FormInterface
-     *
+     * 
      * @throws \InvalidArgumentException if the child does not exist
      */
     public function get($name)
@@ -824,9 +824,9 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns true if the child exists (implements the \ArrayAccess interface).
-     *
+     * 
      * @param string $name The name of the child
-     *
+     * 
      * @return Boolean true if the widget exists, false otherwise
      */
     public function offsetExists($name)
@@ -836,9 +836,9 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns the form child associated with the name (implements the \ArrayAccess interface).
-     *
+     * 
      * @param string $name The offset of the value to get
-     *
+     * 
      * @return FormInterface  A form instance
      */
     public function offsetGet($name)
@@ -848,7 +848,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Adds a child to the form (implements the \ArrayAccess interface).
-     *
+     * 
      * @param string $name Ignored. The name of the child is used.
      * @param FormInterface $child  The child to be added
      */
@@ -859,7 +859,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Removes the child with the given name from the form (implements the \ArrayAccess interface).
-     *
+     * 
      * @param string $name  The name of the child to be removed
      */
     public function offsetUnset($name)
@@ -869,7 +869,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns the iterator for this group.
-     *
+     * 
      * @return \ArrayIterator
      */
     public function getIterator()
@@ -879,7 +879,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Returns the number of form children (implements the \Countable interface).
-     *
+     * 
      * @return integer The number of embedded form children
      */
     public function count()
@@ -889,9 +889,9 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Creates a view.
-     *
+     * 
      * @param FormView $parent The parent view
-     *
+     * 
      * @return FormView The view
      */
     public function createView(FormView $parent = null)
@@ -934,9 +934,9 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Normalizes the value if a normalization transformer is set.
-     *
+     * 
      * @param  mixed $value  The value to transform
-     *
+     * 
      * @return string
      */
     private function appToNorm($value)
@@ -950,9 +950,9 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Reverse transforms a value if a normalization transformer is set.
-     *
+     * 
      * @param  string $value  The value to reverse transform
-     *
+     * 
      * @return mixed
      */
     private function normToApp($value)
@@ -966,9 +966,9 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Transforms the value if a value transformer is set.
-     *
+     * 
      * @param  mixed $value  The value to transform
-     *
+     * 
      * @return string
      */
     private function normToClient($value)
@@ -988,9 +988,9 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Reverse transforms a value if a value transformer is set.
-     *
+     * 
      * @param  string $value  The value to reverse transform
-     *
+     * 
      * @return mixed
      */
     private function clientToNorm($value)

@@ -4,16 +4,16 @@ namespace Symfony\Component\Security\Core\Authentication\RememberMe;
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
 /**
  * This class is only used by PersistentTokenRememberMeServices internally.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 final class PersistentToken implements PersistentTokenInterface
@@ -26,7 +26,7 @@ final class PersistentToken implements PersistentTokenInterface
 
     /**
      * Constructor
-     *
+     * 
      * @param string   $class
      * @param string   $username
      * @param string   $series
@@ -57,7 +57,7 @@ final class PersistentToken implements PersistentTokenInterface
 
     /**
      * Returns the class of the user
-     *
+     * 
      * @return string
      */
     public function getClass()
@@ -67,7 +67,7 @@ final class PersistentToken implements PersistentTokenInterface
 
     /**
      * Returns the username
-     *
+     * 
      * @return string
      */
     public function getUsername()
@@ -77,7 +77,7 @@ final class PersistentToken implements PersistentTokenInterface
 
     /**
      * Returns the series
-     *
+     * 
      * @return string
      */
     public function getSeries()
@@ -87,7 +87,7 @@ final class PersistentToken implements PersistentTokenInterface
 
     /**
      * Returns the token value
-     *
+     * 
      * @return string
      */
     public function getTokenValue()
@@ -97,7 +97,7 @@ final class PersistentToken implements PersistentTokenInterface
 
     /**
      * Returns the time the token was last used
-     *
+     * 
      * @return DateTime
      */
     public function getLastUsed()

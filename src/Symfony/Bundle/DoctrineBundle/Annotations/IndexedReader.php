@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -15,9 +15,9 @@ use Doctrine\Common\Annotations\Reader;
 
 /**
  * Allows the reader to be used in-place of Doctrine's reader.
- *
+ * 
  * This can be removed once the BC layer is in place.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class IndexedReader implements Reader

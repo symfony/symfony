@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,9 +20,9 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param array $guessers Guessers as instances of FormTypeGuesserInterface
-     *
+     * 
      * @throws UnexpectedTypeException if any guesser does not implement FormTypeGuesserInterface
      */
     public function __construct(array $guessers)
@@ -71,7 +71,7 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
     /**
      * Executes a closure for each guesser and returns the best guess from the
      * return values
-     *
+     * 
      * @param  \Closure $closure  The closure to execute. Accepts a guesser
      *                            as argument and should return a Guess instance
      * 

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Inline service definitions where this is possible.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class InlineServiceDefinitionsPass implements RepeatablePassInterface
@@ -39,7 +39,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
 
     /**
      * Processes the ContainerBuilder for inline service definitions.
-     *
+     * 
      * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
@@ -67,7 +67,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
 
     /**
      * Processes inline arguments.
-     *
+     * 
      * @param ContainerBuilder $container The ContainerBuilder
      * @param array            $arguments An array of arguments
      */
@@ -102,7 +102,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
 
     /**
      * Checks if the definition is inlineable.
-     *
+     * 
      * @param ContainerBuilder $container
      * @param string           $id
      * @param Definition       $definition

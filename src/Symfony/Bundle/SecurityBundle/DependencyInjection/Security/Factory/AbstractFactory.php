@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * AbstractFactory is the base class for all classes inheriting from
  * AbstractAuthenticationListener
- *
+ * 
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -88,29 +88,29 @@ abstract class AbstractFactory implements SecurityFactoryInterface
     /**
      * Subclasses must return the id of a service which implements the
      * AuthenticationProviderInterface.
-     *
+     * 
      * @param ContainerBuilder $container
      * @param string           $id             The unique id of the firewall
      * @param array            $config         The options array for this listener
      * @param string           $userProviderId The id of the user provider
-     *
+     * 
      * @return string never null, the id of the authentication provider
      */
     abstract protected function createAuthProvider(ContainerBuilder $container, $id, $config, $userProviderId);
 
     /**
      * Subclasses must return the id of the abstract listener template.
-     *
+     * 
      * Listener definitions should inherit from the AbstractAuthenticationListener
      * like this:
-     *
+     * 
      *    <service id="my.listener.id"
      *             class="My\Concrete\Classname"
      *             parent="security.authentication.listener.abstract"
      *             abstract="true" />
-     *
+     * 
      * In the above case, this method would return "my.listener.id".
-     *
+     * 
      * @return string
      */
     abstract protected function getListenerId();
@@ -118,12 +118,12 @@ abstract class AbstractFactory implements SecurityFactoryInterface
     /**
      * Subclasses may create an entry point of their as they see fit. The
      * default implementation does not change the default entry point.
-     *
+     * 
      * @param ContainerBuilder $container
      * @param string $id
      * @param array $config
      * @param string $defaultEntryPointId
-     *
+     * 
      * @return string the entry point id
      */
     protected function createEntryPoint($container, $id, $config, $defaultEntryPointId)
@@ -134,9 +134,9 @@ abstract class AbstractFactory implements SecurityFactoryInterface
     /**
      * Subclasses may disable remember-me features for the listener, by
      * always returning false from this method.
-     *
+     * 
      * @param array $config
-     *
+     * 
      * @return Boolean Whether a possibly configured RememberMeServices should be set for this listener
      */
     protected function isRememberMeAware($config)

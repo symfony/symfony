@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,16 +18,16 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * ProfilerController.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ProfilerController extends ContainerAware
 {
     /**
      * Renders a profiler panel for the given token.
-     *
+     * 
      * @param string $token The profiler token
-     *
+     * 
      * @return Response A Response instance
      */
     public function panelAction($token)
@@ -56,9 +56,9 @@ class ProfilerController extends ContainerAware
 
     /**
      * Exports data for a given token.
-     *
+     * 
      * @param string $token    The profiler token
-     *
+     * 
      * @return Response A Response instance
      */
     public function exportAction($token)
@@ -78,7 +78,7 @@ class ProfilerController extends ContainerAware
 
     /**
      * Purges all tokens.
-     *
+     * 
      * @return Response A Response instance
      */
     public function purgeAction()
@@ -92,7 +92,7 @@ class ProfilerController extends ContainerAware
 
     /**
      * Imports token data.
-     *
+     * 
      * @return Response A Response instance
      */
     public function importAction()
@@ -114,10 +114,10 @@ class ProfilerController extends ContainerAware
 
     /**
      * Renders the Web Debug Toolbar.
-     *
+     * 
      * @param string $token    The profiler token
      * @param string $position The toolbar position (bottom, normal, or null -- automatically guessed)
-     *
+     * 
      * @return Response A Response instance
      */
     public function toolbarAction($token, $position = null)
@@ -162,7 +162,7 @@ class ProfilerController extends ContainerAware
 
     /**
      * Renders the profiler search bar.
-     *
+     * 
      * @return Response A Response instance
      */
     public function searchBarAction()
@@ -192,7 +192,7 @@ class ProfilerController extends ContainerAware
 
     /**
      * Search results.
-     *
+     * 
      * @param string $token The token
      * @return Response A Response instance
      */
@@ -220,7 +220,7 @@ class ProfilerController extends ContainerAware
 
     /**
      * Narrow the search bar.
-     *
+     * 
      * @return Response A Response instance
      */
     public function searchAction()

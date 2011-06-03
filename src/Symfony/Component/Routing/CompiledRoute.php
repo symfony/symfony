@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\Routing;
 
 /**
  * CompiledRoutes are returned by the RouteCompiler class.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class CompiledRoute
@@ -26,7 +26,7 @@ class CompiledRoute
 
     /**
      * Constructor.
-     *
+     * 
      * @param Route  $route        A original Route instance
      * @param string $staticPrefix The static prefix of the compiled route
      * @param string $regex        The regular expression to use to match this route
@@ -44,7 +44,7 @@ class CompiledRoute
 
     /**
      * Returns the Route instance.
-     *
+     * 
      * @return Route A Route instance
      */
     public function getRoute()
@@ -54,7 +54,7 @@ class CompiledRoute
 
     /**
      * Returns the static prefix.
-     *
+     * 
      * @return string The static prefix
      */
     public function getStaticPrefix()
@@ -64,7 +64,7 @@ class CompiledRoute
 
     /**
      * Returns the regex.
-     *
+     * 
      * @return string The regex
      */
     public function getRegex()
@@ -74,7 +74,7 @@ class CompiledRoute
 
     /**
      * Returns the tokens.
-     *
+     * 
      * @return array The tokens
      */
     public function getTokens()
@@ -84,7 +84,7 @@ class CompiledRoute
 
     /**
      * Returns the variables.
-     *
+     * 
      * @return array The variables
      */
     public function getVariables()
@@ -94,7 +94,7 @@ class CompiledRoute
 
     /**
      * Returns the pattern.
-     *
+     * 
      * @return string The pattern
      */
     public function getPattern()
@@ -104,7 +104,7 @@ class CompiledRoute
 
     /**
      * Returns the options.
-     *
+     * 
      * @return array The options
      */
     public function getOptions()
@@ -114,7 +114,7 @@ class CompiledRoute
 
     /**
      * Returns the defaults.
-     *
+     * 
      * @return array The defaults
      */
     public function getDefaults()
@@ -124,7 +124,7 @@ class CompiledRoute
 
     /**
      * Returns the requirements.
-     *
+     * 
      * @return array The requirements
      */
     public function getRequirements()

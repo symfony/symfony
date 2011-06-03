@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -30,7 +30,7 @@ class DelegatingValidator implements FormValidatorInterface
 
     /**
      * Validates the form and its domain object.
-     *
+     * 
      * @param FormInterface $form A FormInterface instance
      */
     public function validate(FormInterface $form)
@@ -79,9 +79,9 @@ class DelegatingValidator implements FormValidatorInterface
 
     /**
      * Validates the data of a form
-     *
+     * 
      * This method is called automatically during the validation process.
-     *
+     * 
      * @param FormInterface    $form    The validated form
      * @param ExecutionContext $context The current validation context
      */

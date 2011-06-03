@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -27,7 +27,7 @@ abstract class MemberMetadata extends ElementMetadata
 
     /**
      * Constructor.
-     *
+     * 
      * @param string $class    The name of the class this member is defined on
      * @param string $name     The name of the member
      * @param string $property The property the member belongs to
@@ -63,7 +63,7 @@ abstract class MemberMetadata extends ElementMetadata
 
     /**
      * Returns the names of the properties that should be serialized
-     *
+     * 
      * @return array
      */
     public function __sleep()
@@ -78,7 +78,7 @@ abstract class MemberMetadata extends ElementMetadata
 
     /**
      * Returns the name of the member
-     *
+     * 
      * @return string
      */
     public function getName()
@@ -88,7 +88,7 @@ abstract class MemberMetadata extends ElementMetadata
 
     /**
      * Returns the class this member is defined on
-     *
+     * 
      * @return string
      */
     public function getClassName()
@@ -98,7 +98,7 @@ abstract class MemberMetadata extends ElementMetadata
 
     /**
      * Returns the name of the property this member belongs to
-     *
+     * 
      * @return string The property name
      */
     public function getPropertyName()
@@ -108,7 +108,7 @@ abstract class MemberMetadata extends ElementMetadata
 
     /**
      * Returns whether this member is public
-     *
+     * 
      * @return Boolean
      */
     public function isPublic()
@@ -118,7 +118,7 @@ abstract class MemberMetadata extends ElementMetadata
 
     /**
      * Returns whether this member is protected
-     *
+     * 
      * @return Boolean
      */
     public function isProtected()
@@ -128,7 +128,7 @@ abstract class MemberMetadata extends ElementMetadata
 
     /**
      * Returns whether this member is private
-     *
+     * 
      * @return Boolean
      */
     public function isPrivate()
@@ -138,7 +138,7 @@ abstract class MemberMetadata extends ElementMetadata
 
     /**
      * Returns whether objects stored in this member should be validated
-     *
+     * 
      * @return Boolean
      */
     public function isCascaded()
@@ -149,7 +149,7 @@ abstract class MemberMetadata extends ElementMetadata
     /**
      * Returns whether arrays or traversable objects stored in this member
      * should be traversed and validated in each entry
-     *
+     * 
      * @return Boolean
      */
     public function isCollectionCascaded()
@@ -159,16 +159,16 @@ abstract class MemberMetadata extends ElementMetadata
 
     /**
      * Returns the value of this property in the given object
-     *
+     * 
      * @param object $object The object
-     *
+     * 
      * @return mixed The property value
      */
     abstract public function getValue($object);
 
     /**
      * Returns the Reflection instance of the member
-     *
+     * 
      * @return object
      */
     public function getReflectionMember()
@@ -182,7 +182,7 @@ abstract class MemberMetadata extends ElementMetadata
 
     /**
      * Creates a new Reflection instance for the member
-     *
+     * 
      * @return object
      */
     abstract protected function newReflectionMember();

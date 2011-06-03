@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -19,13 +19,13 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * This class contains the configuration information for the following tags:
- *
+ * 
  *   * security.config
  *   * security.acl
- *
+ * 
  * This information is solely responsible for how the different configuration
  * sections are normalized, and merged.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class MainConfiguration implements ConfigurationInterface
@@ -34,7 +34,7 @@ class MainConfiguration implements ConfigurationInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param array $factories
      */
     public function __construct(array $factories)
@@ -44,7 +44,7 @@ class MainConfiguration implements ConfigurationInterface
 
     /**
      * Generates the configuration tree builder.
-     *
+     * 
      * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
      */
     public function getConfigTreeBuilder()

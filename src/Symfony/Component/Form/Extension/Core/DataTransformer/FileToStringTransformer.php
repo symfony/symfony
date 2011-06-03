@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -24,11 +24,11 @@ class FileToStringTransformer implements DataTransformerInterface
 {
     /**
      * Transforms a File instance to a path
-     *
+     * 
      * @param File $file The file
-     *
+     * 
      * @return string The path to the file
-     *
+     * 
      * @throws UnexpectedTypeException if the given file is not an instance of File
      */
     public function transform($file)
@@ -47,11 +47,11 @@ class FileToStringTransformer implements DataTransformerInterface
 
     /**
      * Transforms a path to a File instance
-     *
+     * 
      * @param string $path The path to the file
-     *
+     * 
      * @return File The File
-     *
+     * 
      * @throws UnexpectedTypeException if the given path is not a string
      * @throws TransformationFailedException if the File instance could not be created
      */

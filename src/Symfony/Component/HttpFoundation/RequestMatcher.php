@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpFoundation;
 
 /**
  * RequestMatcher compares a pre-defined set of checks against a Request instance.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RequestMatcher implements RequestMatcherInterface
@@ -35,7 +35,7 @@ class RequestMatcher implements RequestMatcherInterface
 
     /**
      * Adds a check for the URL host name.
-     *
+     * 
      * @param string $regexp A Regexp
      */
     public function matchHost($regexp)
@@ -45,7 +45,7 @@ class RequestMatcher implements RequestMatcherInterface
 
     /**
      * Adds a check for the URL path info.
-     *
+     * 
      * @param string $regexp A Regexp
      */
     public function matchPath($regexp)
@@ -55,7 +55,7 @@ class RequestMatcher implements RequestMatcherInterface
 
     /**
      * Adds a check for the client IP.
-     *
+     * 
      * @param string $ip A specific IP address or a range specified using IP/netmask like 192.168.1.0/24
      */
     public function matchIp($ip)
@@ -65,7 +65,7 @@ class RequestMatcher implements RequestMatcherInterface
 
     /**
      * Adds a check for the HTTP method.
-     *
+     * 
      * @param string|array $method An HTTP method or an array of HTTP methods
      */
     public function matchMethod($method)
@@ -81,7 +81,7 @@ class RequestMatcher implements RequestMatcherInterface
 
     /**
      * Adds a check for request attribute.
-     *
+     * 
      * @param string $key    The request attribute name
      * @param string $regexp A Regexp
      */

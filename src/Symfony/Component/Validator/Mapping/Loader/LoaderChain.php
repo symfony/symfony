@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,12 +16,12 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Calls multiple LoaderInterface instances in a chain
- *
+ * 
  * This class accepts multiple instances of LoaderInterface to be passed to the
  * constructor. When loadClassMetadata() is called, the same method is called
  * in <em>all</em> of these loaders, regardless of whether any of them was
  * successful or not.
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
 class LoaderChain implements LoaderInterface
@@ -30,9 +30,9 @@ class LoaderChain implements LoaderInterface
 
     /**
      * Accepts a list of LoaderInterface instances
-     *
+     * 
      * @param array $loaders An array of LoaderInterface instances
-     *
+     * 
      * @throws MappingException If any of the loaders does not implement LoaderInterface
      */
     public function __construct(array $loaders)

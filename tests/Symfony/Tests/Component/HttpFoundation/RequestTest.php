@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -453,11 +453,11 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->setMethod('POST');
         $request->request->set('_method', 'purge');
         $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method from _method if defined and POST');
-        
+
         $request->setMethod('POST');
         $request->server->set('X-HTTP-METHOD-OVERRIDE', 'delete');
         $this->assertEquals('DELETE', $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override even though _method is set if defined and POST');
-        
+
         $request = new Request();
         $request->setMethod('POST');
         $request->server->set('X-HTTP-METHOD-OVERRIDE', 'delete');

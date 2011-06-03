@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * DelegatingEngine selects an engine for a given template.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
@@ -27,7 +27,7 @@ class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param ContainerInterface $container The DI container
      * @param array              $engineIds An array of engine Ids
      */
@@ -75,11 +75,11 @@ class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
 
     /**
      * Renders a view and returns a Response.
-     *
+     * 
      * @param string   $view       The view name
      * @param array    $parameters An array of parameters to pass to the view
      * @param Response $response   A Response instance
-     *
+     * 
      * @return Response A Response instance
      */
     public function renderResponse($view, array $parameters = array(), Response $response = null)

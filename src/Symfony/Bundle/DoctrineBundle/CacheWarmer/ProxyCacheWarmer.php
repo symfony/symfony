@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,10 +16,10 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 /**
  * The proxy generator cache warmer generates all entity proxies.
- *
+ * 
  * In the process of generating proxies the cache for all the metadata is primed also,
  * since this information is necessary to build the proxies in the first place.
- *
+ * 
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
 class ProxyCacheWarmer implements CacheWarmerInterface
@@ -39,7 +39,7 @@ class ProxyCacheWarmer implements CacheWarmerInterface
 
     /**
      * This cache warmer is not optional, without proxies fatal error occurs!
-     *
+     * 
      * @return false
      */
     public function isOptional()

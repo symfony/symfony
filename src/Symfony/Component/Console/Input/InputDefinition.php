@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,16 +13,16 @@ namespace Symfony\Component\Console\Input;
 
 /**
  * A InputDefinition represents a set of valid command line arguments and options.
- *
+ * 
  * Usage:
- *
+ * 
  *     $definition = new InputDefinition(array(
  *       new InputArgument('name', InputArgument::REQUIRED),
  *       new InputOption('foo', 'f', InputOption::VALUE_REQUIRED),
  *     ));
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * @api
  */
 class InputDefinition
@@ -36,9 +36,9 @@ class InputDefinition
 
     /**
      * Constructor.
-     *
+     * 
      * @param array $definition An array of InputArgument and InputOption instance
-     *
+     * 
      * @api
      */
     public function __construct(array $definition = array())
@@ -48,9 +48,9 @@ class InputDefinition
 
     /**
      * Sets the definition of the input.
-     *
+     * 
      * @param array $definition The definition array
-     *
+     * 
      * @api
      */
     public function setDefinition(array $definition)
@@ -71,9 +71,9 @@ class InputDefinition
 
     /**
      * Sets the InputArgument objects.
-     *
+     * 
      * @param array $arguments An array of InputArgument objects
-     *
+     * 
      * @api
      */
     public function setArguments($arguments = array())
@@ -87,9 +87,9 @@ class InputDefinition
 
     /**
      * Add an array of InputArgument objects.
-     *
+     * 
      * @param InputArgument[] $arguments An array of InputArgument objects
-     *
+     * 
      * @api
      */
     public function addArguments($arguments = array())
@@ -103,11 +103,11 @@ class InputDefinition
 
     /**
      * Add an InputArgument object.
-     *
+     * 
      * @param InputArgument $argument An InputArgument object
-     *
+     * 
      * @throws \LogicException When incorrect argument is given
-     *
+     * 
      * @api
      */
     public function addArgument(InputArgument $argument)
@@ -139,13 +139,13 @@ class InputDefinition
 
     /**
      * Returns an InputArgument by name or by position.
-     *
+     * 
      * @param string|integer $name The InputArgument name or position
-     *
+     * 
      * @return InputArgument An InputArgument object
-     *
+     * 
      * @throws \InvalidArgumentException When argument given doesn't exist
-     *
+     * 
      * @api
      */
     public function getArgument($name)
@@ -161,11 +161,11 @@ class InputDefinition
 
     /**
      * Returns true if an InputArgument object exists by name or position.
-     *
+     * 
      * @param string|integer $name The InputArgument name or position
-     *
+     * 
      * @return Boolean true if the InputArgument object exists, false otherwise
-     *
+     * 
      * @api
      */
     public function hasArgument($name)
@@ -177,9 +177,9 @@ class InputDefinition
 
     /**
      * Gets the array of InputArgument objects.
-     *
+     * 
      * @return array An array of InputArgument objects
-     *
+     * 
      * @api
      */
     public function getArguments()
@@ -189,7 +189,7 @@ class InputDefinition
 
     /**
      * Returns the number of InputArguments.
-     *
+     * 
      * @return integer The number of InputArguments
      */
     public function getArgumentCount()
@@ -199,7 +199,7 @@ class InputDefinition
 
     /**
      * Returns the number of required InputArguments.
-     *
+     * 
      * @return integer The number of required InputArguments
      */
     public function getArgumentRequiredCount()
@@ -209,7 +209,7 @@ class InputDefinition
 
     /**
      * Gets the default values.
-     *
+     * 
      * @return array An array of default values
      */
     public function getArgumentDefaults()
@@ -224,9 +224,9 @@ class InputDefinition
 
     /**
      * Sets the InputOption objects.
-     *
+     * 
      * @param array $options An array of InputOption objects
-     *
+     * 
      * @api
      */
     public function setOptions($options = array())
@@ -238,9 +238,9 @@ class InputDefinition
 
     /**
      * Add an array of InputOption objects.
-     *
+     * 
      * @param InputOption[] $options An array of InputOption objects
-     *
+     * 
      * @api
      */
     public function addOptions($options = array())
@@ -252,11 +252,11 @@ class InputDefinition
 
     /**
      * Add an InputOption object.
-     *
+     * 
      * @param InputOption $option An InputOption object
-     *
+     * 
      * @throws \LogicException When option given already exist
-     *
+     * 
      * @api
      */
     public function addOption(InputOption $option)
@@ -275,11 +275,11 @@ class InputDefinition
 
     /**
      * Returns an InputOption by name.
-     *
+     * 
      * @param string $name The InputOption name
-     *
+     * 
      * @return InputOption A InputOption object
-     *
+     * 
      * @api
      */
     public function getOption($name)
@@ -293,11 +293,11 @@ class InputDefinition
 
     /**
      * Returns true if an InputOption object exists by name.
-     *
+     * 
      * @param string $name The InputOption name
-     *
+     * 
      * @return Boolean true if the InputOption object exists, false otherwise
-     *
+     * 
      * @api
      */
     public function hasOption($name)
@@ -307,9 +307,9 @@ class InputDefinition
 
     /**
      * Gets the array of InputOption objects.
-     *
+     * 
      * @return array An array of InputOption objects
-     *
+     * 
      * @api
      */
     public function getOptions()
@@ -319,9 +319,9 @@ class InputDefinition
 
     /**
      * Returns true if an InputOption object exists by shortcut.
-     *
+     * 
      * @param string $name The InputOption shortcut
-     *
+     * 
      * @return Boolean true if the InputOption object exists, false otherwise
      */
     public function hasShortcut($name)
@@ -331,9 +331,9 @@ class InputDefinition
 
     /**
      * Gets an InputOption by shortcut.
-     *
+     * 
      * @param string $shortcut the Shortcut name
-     *
+     * 
      * @return InputOption An InputOption object
      */
     public function getOptionForShortcut($shortcut)
@@ -343,7 +343,7 @@ class InputDefinition
 
     /**
      * Gets an array of default values.
-     *
+     * 
      * @return array An array of all default values
      */
     public function getOptionDefaults()
@@ -358,11 +358,11 @@ class InputDefinition
 
     /**
      * Returns the InputOption name given a shortcut.
-     *
+     * 
      * @param string $shortcut The shortcut
-     *
+     * 
      * @return string The InputOption name
-     *
+     * 
      * @throws \InvalidArgumentException When option given does not exist
      */
     private function shortcutToName($shortcut)
@@ -376,7 +376,7 @@ class InputDefinition
 
     /**
      * Gets the synopsis.
-     *
+     * 
      * @return string The synopsis
      */
     public function getSynopsis()
@@ -400,7 +400,7 @@ class InputDefinition
 
     /**
      * Returns a textual representation of the InputDefinition.
-     *
+     * 
      * @return string A string representing the InputDefinition
      */
     public function asText()
@@ -454,9 +454,9 @@ class InputDefinition
 
     /**
      * Returns an XML representation of the InputDefinition.
-     *
+     * 
      * @param Boolean $asDom Whether to return a DOM or an XML string
-     *
+     * 
      * @return string|DOMDocument An XML string representing the InputDefinition
      */
     public function asXml($asDom = false)

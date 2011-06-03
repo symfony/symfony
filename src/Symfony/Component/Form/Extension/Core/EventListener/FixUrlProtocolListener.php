@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Adds a protocol to a URL if it doesn't already have one.
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
 class FixUrlProtocolListener implements EventSubscriberInterface

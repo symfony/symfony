@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -45,11 +45,11 @@ abstract class AbstractExtension implements FormExtensionInterface
 
     /**
      * Returns a type by name.
-     *
+     * 
      * @param string $name The name of the type
-     *
+     * 
      * @return FormTypeInterface The type
-     *
+     * 
      * @throws FormException if the given type is not supported by this extension
      */
     public function getType($name)
@@ -67,9 +67,9 @@ abstract class AbstractExtension implements FormExtensionInterface
 
     /**
      * Returns whether the given type is supported.
-     *
+     * 
      * @param string $name The name of the type
-     *
+     * 
      * @return Boolean Whether the type is supported by this extension
      */
     public function hasType($name)
@@ -83,9 +83,9 @@ abstract class AbstractExtension implements FormExtensionInterface
 
     /**
      * Returns the extensions for the given type.
-     *
+     * 
      * @param string $name The name of the type
-     *
+     * 
      * @return array An array of extensions as FormTypeExtensionInterface instances
      */
     public function getTypeExtensions($name)
@@ -101,9 +101,9 @@ abstract class AbstractExtension implements FormExtensionInterface
 
     /**
      * Returns whether this extension provides type extensions for the given type.
-     *
+     * 
      * @param string $name The name of the type
-     *
+     * 
      * @return Boolean Whether the given type has extensions
      */
     public function hasTypeExtensions($name)
@@ -117,7 +117,7 @@ abstract class AbstractExtension implements FormExtensionInterface
 
     /**
      * Returns the type guesser provided by this extension.
-     *
+     * 
      * @return FormTypeGuesserInterface|null The type guesser
      */
     public function getTypeGuesser()
@@ -131,7 +131,7 @@ abstract class AbstractExtension implements FormExtensionInterface
 
     /**
      * Registers the types.
-     *
+     * 
      * @return array An array of FormTypeInterface instances
      */
     protected function loadTypes()
@@ -141,7 +141,7 @@ abstract class AbstractExtension implements FormExtensionInterface
 
     /**
      * Registers the type extensions.
-     *
+     * 
      * @return array An array of FormTypeExtensionInterface instances
      */
     protected function loadTypeExtensions()
@@ -151,7 +151,7 @@ abstract class AbstractExtension implements FormExtensionInterface
 
     /**
      * Registers the type guesser.
-     *
+     * 
      * @return FormTypeGuesserInterface|null A type guesser
      */
     protected function loadTypeGuesser()
@@ -161,7 +161,7 @@ abstract class AbstractExtension implements FormExtensionInterface
 
     /**
      * Initializes the types.
-     *
+     * 
      * @throws UnexpectedTypeException if any registered type is not an instance of FormTypeInterface
      */
     private function initTypes()
@@ -179,7 +179,7 @@ abstract class AbstractExtension implements FormExtensionInterface
 
     /**
      * Initializes the type extensions.
-     *
+     * 
      * @throws UnexpectedTypeException if any registered type extension is not
      *                                 an instance of FormTypeExtensionInterface
      */
@@ -204,7 +204,7 @@ abstract class AbstractExtension implements FormExtensionInterface
 
     /**
      * Initializes the type guesser.
-     *
+     * 
      * @throws UnexpectedTypeException if the type guesser is not an instance of FormTypeGuesserInterface
      */
     private function initTypeGuesser()

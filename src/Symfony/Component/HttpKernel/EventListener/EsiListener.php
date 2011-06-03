@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\HttpCache\Esi;
 
 /**
  * EsiListener adds a Surrogate-Control HTTP header when the Response needs to be parsed for ESI.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class EsiListener
@@ -28,7 +28,7 @@ class EsiListener
 
     /**
      * Constructor.
-     *
+     * 
      * @param Esi $esi An ESI instance
      */
     public function __construct(Esi $esi = null)
@@ -38,7 +38,7 @@ class EsiListener
 
     /**
      * Filters the Response.
-     *
+     * 
      * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
     public function onCoreResponse(FilterResponseEvent $event)

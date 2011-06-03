@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 
 /**
  * ObjectIdentity implementation
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 final class ObjectIdentity implements ObjectIdentityInterface
@@ -27,7 +27,7 @@ final class ObjectIdentity implements ObjectIdentityInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param string $identifier
      * @param string $type
      * @return void
@@ -47,7 +47,7 @@ final class ObjectIdentity implements ObjectIdentityInterface
 
     /**
      * Constructs an ObjectIdentity for the given domain object
-     *
+     * 
      * @param object $domainObject
      * @throws \InvalidArgumentException
      * @return ObjectIdentity
@@ -100,7 +100,7 @@ final class ObjectIdentity implements ObjectIdentityInterface
 
     /**
      * Returns a textual representation of this object identity
-     *
+     * 
      * @return string
      */
     public function __toString()

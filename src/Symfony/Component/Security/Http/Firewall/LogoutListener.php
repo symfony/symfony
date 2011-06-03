@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
  * LogoutListener logout users.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class LogoutListener implements ListenerInterface
@@ -34,7 +34,7 @@ class LogoutListener implements ListenerInterface
 
     /**
      * Constructor
-     *
+     * 
      * @param SecurityContextInterface      $securityContext
      * @param string                        $logoutPath      The path that starts the logout process
      * @param string                        $targetUrl       The URL to redirect to after logout
@@ -51,7 +51,7 @@ class LogoutListener implements ListenerInterface
 
     /**
      * Adds a logout handler
-     *
+     * 
      * @param LogoutHandlerInterface $handler
      * @return void
      */
@@ -62,7 +62,7 @@ class LogoutListener implements ListenerInterface
 
     /**
      * Performs the logout if requested
-     *
+     * 
      * @param GetResponseEvent $event A GetResponseEvent instance
      */
     public function handle(GetResponseEvent $event)

@@ -20,7 +20,7 @@
         <service id="security.authentication.factory.digest" class="Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\HttpDigestFactory">
             <tag name="security.listener.factory" />
         </service>
-        
+
         <service id="security.authentication.factory.remember_me" class="Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory">
             <tag name="security.listener.factory" />
         </service>

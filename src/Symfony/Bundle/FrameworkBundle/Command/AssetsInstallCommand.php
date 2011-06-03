@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\Output;
 
 /**
  * Command that places bundle web assets into a given directory.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class AssetsInstallCommand extends Command
@@ -54,7 +54,7 @@ EOT
 
     /**
      * @see Command
-     *
+     * 
      * @throws \InvalidArgumentException When the target directory does not exist
      */
     protected function execute(InputInterface $input, OutputInterface $output)

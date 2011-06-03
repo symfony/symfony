@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,29 +13,29 @@ namespace Symfony\Component\Console\Input;
 
 /**
  * ArgvInput represents an input coming from the CLI arguments.
- *
+ * 
  * Usage:
- *
+ * 
  *     $input = new ArgvInput();
- *
+ * 
  * By default, the `$_SERVER['argv']` array is used for the input values.
- *
+ * 
  * This can be overridden by explicitly passing the input values in the constructor:
- *
+ * 
  *     $input = new ArgvInput($_SERVER['argv']);
- *
+ * 
  * If you pass it yourself, don't forget that the first element of the array
  * is the name of the running program.
- *
+ * 
  * When passing an argument to the constructor, be sure that it respects
  * the same rules as the argv one. It's almost always better to use the
  * `StringInput` when you want to provide your own input.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * @see http://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html
  * @see http://www.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap12.html#tag_12_02
- *
+ * 
  * @api
  */
 class ArgvInput extends Input
@@ -45,10 +45,10 @@ class ArgvInput extends Input
 
     /**
      * Constructor.
-     *
+     * 
      * @param array           $argv An array of parameters from the CLI (in the argv format)
      * @param InputDefinition $definition A InputDefinition instance
-     *
+     * 
      * @api
      */
     public function __construct(array $argv = null, InputDefinition $definition = null)
@@ -89,7 +89,7 @@ class ArgvInput extends Input
 
     /**
      * Parses a short option.
-     *
+     * 
      * @param string $token The current token.
      */
     private function parseShortOption($token)
@@ -110,9 +110,9 @@ class ArgvInput extends Input
 
     /**
      * Parses a short option set.
-     *
+     * 
      * @param string $name The current token
-     *
+     * 
      * @throws \RuntimeException When option given doesn't exist
      */
     private function parseShortOptionSet($name)
@@ -136,7 +136,7 @@ class ArgvInput extends Input
 
     /**
      * Parses a long option.
-     *
+     * 
      * @param string $token The current token
      */
     private function parseLongOption($token)
@@ -152,9 +152,9 @@ class ArgvInput extends Input
 
     /**
      * Parses an argument.
-     *
+     * 
      * @param string $token The current token
-     *
+     * 
      * @throws \RuntimeException When too many arguments are given
      */
     private function parseArgument($token)
@@ -179,10 +179,10 @@ class ArgvInput extends Input
 
     /**
      * Adds a short option value.
-     *
+     * 
      * @param string $shortcut The short option key
      * @param mixed  $value    The value for the option
-     *
+     * 
      * @throws \RuntimeException When option given doesn't exist
      */
     private function addShortOption($shortcut, $value)
@@ -196,10 +196,10 @@ class ArgvInput extends Input
 
     /**
      * Adds a long option value.
-     *
+     * 
      * @param string $name  The long option key
      * @param mixed  $value The value for the option
-     *
+     * 
      * @throws \RuntimeException When option given doesn't exist
      */
     private function addLongOption($name, $value)
@@ -234,7 +234,7 @@ class ArgvInput extends Input
 
     /**
      * Returns the first argument from the raw parameters (not parsed).
-     *
+     * 
      * @return string The value of the first argument or null otherwise
      */
     public function getFirstArgument()
@@ -250,12 +250,12 @@ class ArgvInput extends Input
 
     /**
      * Returns true if the raw parameters (not parsed) contains a value.
-     *
+     * 
      * This method is to be used to introspect the input parameters
      * before it has been validated. It must be used carefully.
-     *
+     * 
      * @param string|array $values The value(s) to look for in the raw parameters (can be an array)
-     *
+     * 
      * @return Boolean true if the value is contained in the raw parameters
      */
     public function hasParameterOption($values)
@@ -273,10 +273,10 @@ class ArgvInput extends Input
 
     /**
      * Returns the value of a raw option (not parsed).
-     *
+     * 
      * This method is to be used to introspect the input parameters
      * before it has been validated. It must be used carefully.
-     *
+     * 
      * @param string|array $values The value(s) to look for in the raw parameters (can be an array)
      * @param mixed $default The default value to return if no result is found
      * @return mixed The option value

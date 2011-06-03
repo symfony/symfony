@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,7 +15,7 @@ use Symfony\Component\Templating\Helper\Helper;
 
 /**
  * CodeHelper.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class CodeHelper extends Helper
@@ -25,7 +25,7 @@ class CodeHelper extends Helper
 
     /**
      * Constructor.
-     *
+     * 
      * @param string $fileLinkFormat The format for links to source files
      * @param string $rootDir        The project root directory
      */
@@ -37,9 +37,9 @@ class CodeHelper extends Helper
 
     /**
      * Formats an array as a string.
-     *
+     * 
      * @param array $args The argument array
-     *
+     * 
      * @return string
      */
     public function formatArgsAsText($args)
@@ -92,9 +92,9 @@ class CodeHelper extends Helper
 
     /**
      * Formats an array as a string.
-     *
+     * 
      * @param array $args The argument array
-     *
+     * 
      * @return string
      */
     public function formatArgs($args)
@@ -127,10 +127,10 @@ class CodeHelper extends Helper
 
     /**
      * Returns an excerpt of a code file around the given line number.
-     *
+     * 
      * @param string $file  A file path
      * @param int    $line  The selected line number
-     *
+     * 
      * @return string An HTML string
      */
     public function fileExcerpt($file, $line)
@@ -152,11 +152,11 @@ class CodeHelper extends Helper
 
     /**
      * Formats a file path.
-     *
+     * 
      * @param  string  $file An absolute file path
      * @param  integer $line The line number
      * @param  string  $text Use this text for the link rather than the file path
-     *
+     * 
      * @return string
      */
     public function formatFile($file, $line, $text = null)
@@ -181,10 +181,10 @@ class CodeHelper extends Helper
 
     /**
      * Returns the link for a given file/line pair.
-     *
+     * 
      * @param  string  $file An absolute file path
      * @param  integer $line The line number
-     *
+     * 
      * @return string A link of false
      */
     public function getFileLink($file, $line)
@@ -207,7 +207,7 @@ class CodeHelper extends Helper
 
     /**
      * Returns the canonical name of this helper.
-     *
+     * 
      * @return string The canonical name
      */
     public function getName()

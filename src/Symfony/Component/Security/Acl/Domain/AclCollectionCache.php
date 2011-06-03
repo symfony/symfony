@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterf
 
 /**
  * This service caches ACLs for an entire collection of objects.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class AclCollectionCache
@@ -28,7 +28,7 @@ class AclCollectionCache
 
     /**
      * Constructor.
-     *
+     * 
      * @param AclProviderInterface              $aclProvider
      * @param ObjectIdentityRetrievalStrategy   $oidRetrievalStrategy
      * @param SecurityIdentityRetrievalStrategy $sidRetrievalStrategy
@@ -44,7 +44,7 @@ class AclCollectionCache
     /**
      * Batch loads ACLs for an entire collection; thus, it reduces the number
      * of required queries considerably.
-     *
+     * 
      * @param mixed $collection anything that can be passed to foreach()
      * @param array $tokens an array of TokenInterface implementations
      * @return void

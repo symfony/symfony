@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Route;
 
 /**
  * Dumps a set of Apache mod_rewrite rules.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Kris Wallsmith <kris@symfony.com>
  */
@@ -23,14 +23,14 @@ class ApacheMatcherDumper extends MatcherDumper
 {
     /**
      * Dumps a set of Apache mod_rewrite rules.
-     *
+     * 
      * Available options:
-     *
+     * 
      *  * script_name: The script name (app.php by default)
      *  * base_uri:    The base URI ("" by default)
-     *
+     * 
      * @param array $options An array of options
-     *
+     * 
      * @return string A string to be used as Apache rewrite rules
      */
     public function dump(array $options = array())

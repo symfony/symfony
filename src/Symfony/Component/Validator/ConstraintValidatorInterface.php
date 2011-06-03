@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,7 +15,7 @@ interface ConstraintValidatorInterface
 {
     /**
      * Initialize the constraint validator.
-     *
+     * 
      * @param ExecutionContext $context The current validation context
      */
     function initialize(ExecutionContext $context);

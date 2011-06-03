@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -55,9 +55,9 @@ class EmailValidator extends ConstraintValidator
 
     /**
      * Check DNS Records for MX type.
-     *
+     * 
      * @param string $host Host name
-     *
+     * 
      * @return Boolean
      */
     private function checkMX($host)

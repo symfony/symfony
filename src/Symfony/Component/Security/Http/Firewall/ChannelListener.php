@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 /**
  * ChannelListener switches the HTTP protocol based on the access control
  * configuration.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ChannelListener implements ListenerInterface
@@ -37,7 +37,7 @@ class ChannelListener implements ListenerInterface
 
     /**
      * Handles channel management.
-     *
+     * 
      * @param GetResponseEvent $event A GetResponseEvent instance
      */
     public function handle(GetResponseEvent $event)

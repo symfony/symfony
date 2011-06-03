@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpFoundation;
 
 /**
  * HeaderBag is a container for HTTP headers.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class HeaderBag
@@ -24,7 +24,7 @@ class HeaderBag
 
     /**
      * Constructor.
-     *
+     * 
      * @param array $headers An array of HTTP headers
      */
     public function __construct(array $headers = array())
@@ -39,7 +39,7 @@ class HeaderBag
 
     /**
      * Returns the headers as a string.
-     *
+     * 
      * @return string The headers
      */
     public function __toString()
@@ -66,7 +66,7 @@ class HeaderBag
 
     /**
      * Returns the headers.
-     *
+     * 
      * @return array An array of headers
      */
     public function all()
@@ -76,7 +76,7 @@ class HeaderBag
 
     /**
      * Returns the parameter keys.
-     *
+     * 
      * @return array An array of parameter keys
      */
     public function keys()
@@ -86,7 +86,7 @@ class HeaderBag
 
     /**
      * Replaces the current HTTP headers by a new set.
-     *
+     * 
      * @param array  $headers An array of HTTP headers
      */
     public function replace(array $headers = array())
@@ -97,7 +97,7 @@ class HeaderBag
 
     /**
      * Adds new headers the current HTTP headers set.
-     *
+     * 
      * @param array  $headers An array of HTTP headers
      */
     public function add(array $headers)
@@ -109,11 +109,11 @@ class HeaderBag
 
     /**
      * Returns a header value by name.
-     *
+     * 
      * @param string  $key     The header name
      * @param mixed   $default The default value
      * @param Boolean $first   Whether to return the first value or all header values
-     *
+     * 
      * @return string|array The first header value if $first is true, an array of values otherwise
      */
     public function get($key, $default = null, $first = true)
@@ -137,7 +137,7 @@ class HeaderBag
 
     /**
      * Sets a header by name.
-     *
+     * 
      * @param string       $key     The key
      * @param string|array $values  The value or an array of values
      * @param Boolean      $replace Whether to replace the actual value of not (true by default)
@@ -161,9 +161,9 @@ class HeaderBag
 
     /**
      * Returns true if the HTTP header is defined.
-     *
+     * 
      * @param string $key The HTTP header
-     *
+     * 
      * @return Boolean true if the parameter exists, false otherwise
      */
     public function has($key)
@@ -173,10 +173,10 @@ class HeaderBag
 
     /**
      * Returns true if the given HTTP header contains the given value.
-     *
+     * 
      * @param string $key   The HTTP header name
      * @param string $value The HTTP value
-     *
+     * 
      * @return Boolean true if the value is contained in the header, false otherwise
      */
     public function contains($key, $value)
@@ -186,7 +186,7 @@ class HeaderBag
 
     /**
      * Removes a header.
-     *
+     * 
      * @param string $key The HTTP header name
      */
     public function remove($key)
@@ -202,7 +202,7 @@ class HeaderBag
 
     /**
      * Sets a cookie.
-     *
+     * 
      * @param Cookie $cookie
      * @return void
      */
@@ -213,7 +213,7 @@ class HeaderBag
 
     /**
      * Removes a cookie from the array, but does not unset it in the browser
-     *
+     * 
      * @param string $name
      * @return void
      */
@@ -224,7 +224,7 @@ class HeaderBag
 
     /**
      * Whether the array contains any cookie with this name
-     *
+     * 
      * @param string $name
      * @return Boolean
      */
@@ -235,11 +235,11 @@ class HeaderBag
 
     /**
      * Returns a cookie
-     *
+     * 
      * @param string $name
-     *
+     * 
      * @throws \InvalidArgumentException When the cookie does not exist
-     *
+     * 
      * @return Cookie
      */
     public function getCookie($name)
@@ -253,7 +253,7 @@ class HeaderBag
 
     /**
      * Returns an array with all cookies
-     *
+     * 
      * @return array
      */
     public function getCookies()
@@ -263,10 +263,10 @@ class HeaderBag
 
     /**
      * Returns the HTTP header value converted to a date.
-     *
+     * 
      * @param string    $key     The parameter key
      * @param \DateTime $default The default value
-     *
+     * 
      * @return \DateTime The filtered value
      */
     public function getDate($key, \DateTime $default = null)
@@ -327,9 +327,9 @@ class HeaderBag
 
     /**
      * Parses a Cache-Control HTTP header.
-     *
+     * 
      * @param string $header The value of the Cache-Control HTTP header
-     *
+     * 
      * @return array An array representing the attribute values
      */
     protected function parseCacheControl($header)

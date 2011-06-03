@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Replaces all references to aliases with references to the actual service.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class ResolveReferencesToAliasesPass implements CompilerPassInterface
@@ -26,7 +26,7 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
 
     /**
      * Processes the ContainerBuilder to replace references to aliases with actual service references.
-     *
+     * 
      * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
@@ -53,7 +53,7 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
 
     /**
      * Processes the arguments to replace aliases
-     *
+     * 
      * @param array $arguments An array of References
      * @return array An array of References
      */
@@ -76,7 +76,7 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
 
     /**
      * Resolve an alias into a definition id
-     *
+     * 
      * @param string $id The definition or alias id to resolve
      * @return string The definition id with aliases resolved
      */

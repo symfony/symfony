@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,7 +15,7 @@ use Symfony\Component\Templating\TemplateReference as BaseTemplateReference;
 
 /**
  * Internal representation of a template.
- *
+ * 
  * @author Victor Berchet <victor@suumit.com>
  */
 class TemplateReference extends BaseTemplateReference
@@ -35,7 +35,7 @@ class TemplateReference extends BaseTemplateReference
      * Returns the path to the template
      *  - as a path when the template is not part of a bundle
      *  - as a resource when the template is part of a bundle
-     *
+     * 
      * @return string A path to the template or a resource
      */
     public function getPath()

@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 /**
  * ProjectServiceContainer
- *
+ * 
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  */
@@ -25,10 +25,10 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the 'bar' service.
-     *
+     * 
      * This service is shared.
      * This method always returns the same instance of the service.
-     *
+     * 
      * @return FooClass A FooClass instance.
      */
     protected function getBarService()
@@ -42,10 +42,10 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the 'factory_service' service.
-     *
+     * 
      * This service is shared.
      * This method always returns the same instance of the service.
-     *
+     * 
      * @return Object An instance returned by foo.baz::getInstance().
      */
     protected function getFactoryServiceService()
@@ -55,7 +55,7 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the 'foo' service.
-     *
+     * 
      * @return FooClass A FooClass instance.
      */
     protected function getFooService()
@@ -79,10 +79,10 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the 'foo.baz' service.
-     *
+     * 
      * This service is shared.
      * This method always returns the same instance of the service.
-     *
+     * 
      * @return Object A %baz_class% instance.
      */
     protected function getFoo_BazService()
@@ -96,10 +96,10 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the 'foo_bar' service.
-     *
+     * 
      * This service is shared.
      * This method always returns the same instance of the service.
-     *
+     * 
      * @return Object A %foo_class% instance.
      */
     protected function getFooBarService()
@@ -110,10 +110,10 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the 'method_call1' service.
-     *
+     * 
      * This service is shared.
      * This method always returns the same instance of the service.
-     *
+     * 
      * @return FooClass A FooClass instance.
      */
     protected function getMethodCall1Service()
@@ -136,7 +136,7 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the alias_for_foo service alias.
-     *
+     * 
      * @return FooClass An instance of the foo service
      */
     protected function getAliasForFooService()
@@ -146,7 +146,7 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the default parameters.
-     *
+     * 
      * @return array An array of the default parameters
      */
     protected function getDefaultParameters()

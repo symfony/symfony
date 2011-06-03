@@ -4,9 +4,9 @@ namespace Symfony\Component\Validator;
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 
 /**
  * Default implementation of ValidatorContextInterface
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
 class ValidatorContext implements ValidatorContextInterface
@@ -65,7 +65,7 @@ class ValidatorContext implements ValidatorContextInterface
 
     /**
      * Returns the class metadata factory used in the new validator
-     *
+     * 
      * @return ClassMetadataFactoryInterface  The factory instance
      */
     public function getClassMetadataFactory()
@@ -75,7 +75,7 @@ class ValidatorContext implements ValidatorContextInterface
 
     /**
      * Returns the constraint validator factory used in the new validator
-     *
+     * 
      * @return ConstraintValidatorFactoryInterface  The factory instance
      */
     public function getConstraintValidatorFactory()

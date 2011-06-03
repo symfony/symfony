@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,18 +13,18 @@ namespace Symfony\Component\HttpKernel\Util;
 
 /**
  * Provides basic utility to manipulate the file system.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Filesystem
 {
     /**
      * Copies a file.
-     *
+     * 
      * This method only copies the file if the origin file is newer than the target file.
-     *
+     * 
      * By default, if the target already exists, it is not overridden.
-     *
+     * 
      * @param string $originFile The original filename
      * @param string $targetFile The target filename
      * @param array  $override   Whether to override an existing file or not
@@ -47,10 +47,10 @@ class Filesystem
 
     /**
      * Creates a directory recursively.
-     *
+     * 
      * @param  string|array|\Traversable $dirs The directory path
      * @param  int                       $mode The directory mode
-     *
+     * 
      * @return Boolean true if the directory has been created, false otherwise
      */
     public function mkdir($dirs, $mode = 0777)
@@ -69,7 +69,7 @@ class Filesystem
 
     /**
      * Creates empty files.
-     *
+     * 
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to remove
      */
     public function touch($files)
@@ -81,7 +81,7 @@ class Filesystem
 
     /**
      * Removes files or directories.
-     *
+     * 
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to remove
      */
     public function remove($files)
@@ -105,7 +105,7 @@ class Filesystem
 
     /**
      * Change mode for an array of files or directories.
-     *
+     * 
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to remove
      * @param integer                   $mode  The new mode
      * @param integer                   $umask The mode mask (octal)
@@ -124,10 +124,10 @@ class Filesystem
 
     /**
      * Renames a file.
-     *
+     * 
      * @param string $origin  The origin filename
      * @param string $target  The new filename
-     *
+     * 
      * @throws \RuntimeException When target file already exists
      */
     public function rename($origin, $target)
@@ -142,7 +142,7 @@ class Filesystem
 
     /**
      * Creates a symbolic link or copy a directory.
-     *
+     * 
      * @param string  $originDir     The origin directory path
      * @param string  $targetDir     The symbolic link name
      * @param Boolean $copyOnWindows Whether to copy files if on windows
@@ -171,12 +171,12 @@ class Filesystem
 
     /**
      * Mirrors a directory to another.
-     *
+     * 
      * @param string $originDir      The origin directory
      * @param string $targetDir      The target directory
      * @param \Traversable $iterator A Traversable instance
      * @param array  $options        An array of options (see copy())
-     *
+     * 
      * @throws \RuntimeException When file type is unknown
      */
     public function mirror($originDir, $targetDir, \Traversable $iterator = null, $options = array())
@@ -210,9 +210,9 @@ class Filesystem
 
     /**
      * Returns whether the file path is an absolute path.
-     *
+     * 
      * @param string $file A file path
-     *
+     * 
      * @return Boolean
      */
     public function isAbsolutePath($file)

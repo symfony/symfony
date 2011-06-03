@@ -6,16 +6,16 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
 
 /**
  * Encodes XML data
- *
+ * 
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author John Wards <jwards@whiteoctober.co.uk>
  * @author Fabian Vogler <fabian@equivalence.ch>
@@ -158,7 +158,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
 
     /**
      * Parse the input SimpleXmlElement into an array
-     *
+     * 
      * @param SimpleXmlElement $node xml to parse
      * @return array
      */
@@ -206,7 +206,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
 
     /**
      * Parse the data and convert it to DOMElements
-     *
+     * 
      * @param DOMNode $parentNode
      * @param array|object $data data
      * @return Boolean
@@ -264,7 +264,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
 
     /**
      * Selects the type of node to create and appends it to the parent.
-     *
+     * 
      * @param DOMNode      $parentNode
      * @param array|object $data
      * @param string       $nodename
@@ -287,7 +287,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
 
     /**
      * Tests the value being passed and decide what sort of element to create
-     *
+     * 
      * @param DOMNode $node
      * @param mixed $val
      * @return Boolean

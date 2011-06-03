@@ -28,7 +28,7 @@ security:
             id: user.manager
         chain:
             providers: [service, doctrine, basic]
-            
+
 
     firewalls:
         simple: { pattern: /login, security: false }

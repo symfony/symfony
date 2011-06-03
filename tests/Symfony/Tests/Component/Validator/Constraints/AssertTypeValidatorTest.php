@@ -84,12 +84,12 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->validator->isValid($value, $constraint));
     }
-    
+
     public function testConstraintViolationCanHandleArrayValue()
     {
         $constraint = new Type(array('type' => 'string'));
         $this->validator->isValid(array(0 => "Test"), $constraint);
-        
+
         $violation = new ConstraintViolation(
             '{{ value }}',
             $this->validator->getMessageParameters(),
@@ -97,7 +97,7 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
             '',
             ''
         );
-        
+
         $this->assertEquals('Array', $violation->getMessage());
     }
 

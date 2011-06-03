@@ -483,6 +483,7 @@ class Parser
     {
         //checking explicitly the first char of the trim is faster than loops or strpos
         $ltrimmedLine = ltrim($this->currentLine, ' ');
+
         return $ltrimmedLine[0] === '#';
     }
 

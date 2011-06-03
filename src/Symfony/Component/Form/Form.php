@@ -700,6 +700,7 @@ class Form implements \IteratorAggregate, FormInterface
         // Field groups are not valid if their children are invalid, but
         // hasErrors() returns only true if a field/field group itself has
         // errors
+
         return count($this->errors) > 0;
     }
 

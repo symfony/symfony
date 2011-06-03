@@ -474,10 +474,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $request->getClientIp(true));
 
         $server = array('REMOTE_ADDR' => $remoteAddr);
-        if (!is_null($httpClientIp)) {
+        if (null !== $httpClientIp) {
             $server['HTTP_CLIENT_IP'] = $httpClientIp;
         }
-        if (!is_null($httpForwardedFor)) {
+        if (null !== $httpForwardedFor) {
             $server['HTTP_X_FORWARDED_FOR'] = $httpForwardedFor;
         }
 

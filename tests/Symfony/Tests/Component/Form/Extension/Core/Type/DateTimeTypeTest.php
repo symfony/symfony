@@ -171,9 +171,9 @@ class DateTimeTypeTest extends LocalizedTestCase
         ));
 
         $dateTime = new \DateTime('2010-06-02 03:04');
-        
+
         $form->bind(array(
-        	'date' => '06*2010*02',
+            'date' => '06*2010*02',
             'time' => array(
                 'hour' => '03',
                 'minute' => '04',

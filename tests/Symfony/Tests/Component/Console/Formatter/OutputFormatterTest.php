@@ -39,6 +39,15 @@ class FormatterStyleTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testNestedStyles()
+    {
+        $formatter = new OutputFormatter(true);
+
+        $this->assertEquals(
+            "\033[37;41msome \033[32msome info\033[0m error\033[0m", $formatter->format('<error>some <info>some info</info> error</error>')
+        );
+    }
+
     public function testNewStyle()
     {
         $formatter = new OutputFormatter(true);

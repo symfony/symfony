@@ -151,7 +151,7 @@ class OutputFormatter implements OutputFormatterInterface
             }
         }
 
-        return $style->apply($match[2]);
+        return $style->apply($this->format($match[2]));
     }
 
     /**

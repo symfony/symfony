@@ -74,6 +74,7 @@ class SecurityExtension extends Extension
             ->addArgument($config['access_decision_manager']['allow_if_equal_granted_denied'])
         ;
         $container->setParameter('security.access.always_authenticate_before_granting', $config['always_authenticate_before_granting']);
+        $container->setParameter('security.authentication.hide_user_not_found', $config['hide_user_not_found']);
 
         $this->createFirewalls($config, $container);
         $this->createAuthorization($config, $container);

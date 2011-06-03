@@ -180,6 +180,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     protected function getAcl($strategy)
     {
         static $id = 1;
+
         return new Acl($id++, new ObjectIdentity(1, 'Foo'), $strategy, array(), true);
     }
 

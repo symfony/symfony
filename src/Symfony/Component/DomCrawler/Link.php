@@ -97,6 +97,7 @@ class Link
         }
 
         // relative path
+
         return substr($this->currentUri, 0, strrpos($this->currentUri, '/') + 1).$uri;
     }
 

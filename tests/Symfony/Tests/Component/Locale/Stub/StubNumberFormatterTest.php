@@ -981,6 +981,7 @@ class StubNumberFormatterTest extends LocaleTestCase
 
         $formatter = new \NumberFormatter('en', \NumberFormatter::CURRENCY);
         $formatter->setSymbol(\NumberFormatter::CURRENCY_SYMBOL, 'SFD');
+
         return $formatter;
     }
 }

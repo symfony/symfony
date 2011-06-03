@@ -95,15 +95,15 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                     $matches['_route'] = 'foo';
                     return $matches;
                 }
-        
+
                 // bar
                 if (0 === strpos($pathinfo, '/a/b') && preg_match('#^/a/b/(?P<bar>[^/]+?)$#x', $pathinfo, $matches)) {
                     $matches['_route'] = 'bar';
                     return $matches;
                 }
-        
+
             }
-    
+
         }
 
         throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();

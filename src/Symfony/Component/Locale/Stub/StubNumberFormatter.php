@@ -284,6 +284,7 @@ class StubNumberFormatter
         $value = $this->formatNumber($value, $fractionDigits);
 
         $ret = $symbol.$value;
+
         return $negative ? '('.$ret.')' : $ret;
     }
 
@@ -320,6 +321,7 @@ class StubNumberFormatter
         $fractionDigits = $this->getAttribute(self::FRACTION_DIGITS);
 
         $value = $this->round($value, $fractionDigits);
+
         return $this->formatNumber($value, $fractionDigits);
     }
 
@@ -503,6 +505,7 @@ class StubNumberFormatter
 
         $this->attributes[$attr] = $value;
         $this->initializedAttributes[$attr] = true;
+
         return true;
     }
 
@@ -590,6 +593,7 @@ class StubNumberFormatter
     private function getCurrencySymbol($currency)
     {
         $currencies = StubLocale::getCurrenciesData($this->locale);
+
         return $currencies[$currency]['symbol'];
     }
 
@@ -602,6 +606,7 @@ class StubNumberFormatter
     private function getCurrencyFractionDigits($currency)
     {
         $currencies = StubLocale::getCurrenciesData($this->locale);
+
         return $currencies[$currency]['fractionDigits'];
     }
 
@@ -614,6 +619,7 @@ class StubNumberFormatter
     private function getCurrencyRoundingIncrement($currency)
     {
         $currencies = StubLocale::getCurrenciesData($this->locale);
+
         return $currencies[$currency]['roundingIncrement'];
     }
 
@@ -644,6 +650,7 @@ class StubNumberFormatter
     private function formatNumber($value, $precision)
     {
         $precision = $this->getUnitializedPrecision($value, $precision);
+
         return number_format($value, $precision, '.', $this->getAttribute(self::GROUPING_USED) ? ',' : '');
     }
 
@@ -751,6 +758,7 @@ class StubNumberFormatter
     private function normalizeFractionDigitsValue($value)
     {
         $value = (int) $value;
+
         return (0 > $value) ? 0 : $value;
     }
 }

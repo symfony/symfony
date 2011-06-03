@@ -190,6 +190,7 @@ abstract class BaseNode implements NodeInterface
         $this->validateType($value);
 
         // normalize value
+
         return $this->normalizeValue($value);
     }
 

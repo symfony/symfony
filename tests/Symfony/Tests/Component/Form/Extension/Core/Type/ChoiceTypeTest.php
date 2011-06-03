@@ -164,9 +164,9 @@ class ChoiceTypeTest extends TypeTestCase
             'expanded' => true,
             'choices' => $this->choices,
         ));
-        
+
         $form->bind(false);
-        
+
         $this->assertEmpty($form->getExtraData());
         $this->assertNull($form->getData());
     }

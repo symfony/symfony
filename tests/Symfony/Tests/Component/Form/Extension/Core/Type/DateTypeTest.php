@@ -184,7 +184,7 @@ class DateTypeTest extends LocalizedTestCase
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'format' => 'MM*yyyy*dd',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
             'input' => 'datetime',
         ));
 
@@ -200,7 +200,7 @@ class DateTypeTest extends LocalizedTestCase
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'format' => 'MM*yyyy*dd',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
             'input' => 'string',
         ));
 
@@ -216,7 +216,7 @@ class DateTypeTest extends LocalizedTestCase
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'format' => 'MM*yyyy*dd',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
             'input' => 'timestamp',
         ));
 
@@ -234,7 +234,7 @@ class DateTypeTest extends LocalizedTestCase
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'format' => 'MM*yyyy*dd',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
             'input' => 'array',
         ));
 
@@ -258,7 +258,7 @@ class DateTypeTest extends LocalizedTestCase
     {
         $form = $this->factory->create('date', null, array(
             'format' => '0',
-            'widget' => 'single-text',
+            'widget' => 'single_text',
             'input' => 'string',
         ));
 

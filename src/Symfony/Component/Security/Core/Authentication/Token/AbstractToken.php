@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Base class for Token instances.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -30,7 +30,7 @@ abstract class AbstractToken implements TokenInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param Role[] $roles An array of roles
      */
     public function __construct(array $roles = array())
@@ -146,7 +146,7 @@ abstract class AbstractToken implements TokenInterface
 
     /**
      * Returns the token attributes.
-     *
+     * 
      * @return array The token attributes
      */
     public function getAttributes()
@@ -156,7 +156,7 @@ abstract class AbstractToken implements TokenInterface
 
     /**
      * Sets the token attributes.
-     *
+     * 
      * @param array $attributes The token attributes
      */
     public function setAttributes(array $attributes)
@@ -166,9 +166,9 @@ abstract class AbstractToken implements TokenInterface
 
     /**
      * Returns true if the attribute exists.
-     *
+     * 
      * @param  string  $name  The attribute name
-     *
+     * 
      * @return Boolean true if the attribute exists, false otherwise
      */
     public function hasAttribute($name)
@@ -178,11 +178,11 @@ abstract class AbstractToken implements TokenInterface
 
     /**
      * Returns a attribute value.
-     *
+     * 
      * @param string $name The attribute name
-     *
+     * 
      * @return mixed The attribute value
-     *
+     * 
      * @throws \InvalidArgumentException When attribute doesn't exist for this token
      */
     public function getAttribute($name)
@@ -196,7 +196,7 @@ abstract class AbstractToken implements TokenInterface
 
     /**
      * Sets a attribute.
-     *
+     * 
      * @param string $name  The attribute name
      * @param mixed  $value The attribute value
      */

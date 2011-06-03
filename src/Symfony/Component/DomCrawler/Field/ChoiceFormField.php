@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,11 +13,11 @@ namespace Symfony\Component\DomCrawler\Field;
 
 /**
  * ChoiceFormField represents a choice form field.
- *
+ * 
  * It is constructed from a HTML select tag, or a HTML checkbox, or radio inputs.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * @api
  */
 class ChoiceFormField extends FormField
@@ -28,7 +28,7 @@ class ChoiceFormField extends FormField
 
     /**
      * Returns true if the field should be included in the submitted values.
-     *
+     * 
      * @return Boolean true if the field should be included in the submitted values, false otherwise
      */
     public function hasValue()
@@ -43,9 +43,9 @@ class ChoiceFormField extends FormField
 
     /**
      * Sets the value of the field.
-     *
+     * 
      * @param string $value The value of the field
-     *
+     * 
      * @throws \InvalidArgumentException When value type provided is not correct
      */
     public function select($value)
@@ -55,9 +55,9 @@ class ChoiceFormField extends FormField
 
     /**
      * Ticks a checkbox.
-     *
+     * 
      * @throws \InvalidArgumentException When value type provided is not correct
-     *
+     * 
      * @api
      */
     public function tick()
@@ -71,9 +71,9 @@ class ChoiceFormField extends FormField
 
     /**
      * Ticks a checkbox.
-     *
+     * 
      * @throws \InvalidArgumentException When value type provided is not correct
-     *
+     * 
      * @api
      */
     public function untick()
@@ -87,9 +87,9 @@ class ChoiceFormField extends FormField
 
     /**
      * Sets the value of the field.
-     *
+     * 
      * @param string $value The value of the field
-     *
+     * 
      * @throws \InvalidArgumentException When value type provided is not correct
      */
     public function setValue($value)
@@ -129,11 +129,11 @@ class ChoiceFormField extends FormField
 
     /**
      * Adds a choice to the current ones.
-     *
+     * 
      * This method should only be used internally.
-     *
+     * 
      * @param \DOMNode $node A \DOMNode
-     *
+     * 
      * @throws \LogicException When choice provided is not multiple nor radio
      */
     public function addChoice(\DOMNode $node)
@@ -151,7 +151,7 @@ class ChoiceFormField extends FormField
 
     /**
      * Returns the type of the choice field (radio, select, or checkbox).
-     *
+     * 
      * @return string The type
      */
     public function getType()
@@ -161,7 +161,7 @@ class ChoiceFormField extends FormField
 
     /**
      * Returns true if the field accepts multiple values.
-     *
+     * 
      * @return Boolean true if the field accepts multiple values, false otherwise
      */
     public function isMultiple()
@@ -171,7 +171,7 @@ class ChoiceFormField extends FormField
 
     /**
      * Initializes the form field.
-     *
+     * 
      * @throws \LogicException When node type is incorrect
      */
     protected function initialize()

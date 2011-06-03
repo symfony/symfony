@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,17 +16,17 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * InternalController.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class InternalController extends ContainerAware
 {
     /**
      * Forwards to the given controller with the given path.
-     *
+     * 
      * @param string $path       The path
      * @param string $controller The controller name
-     *
+     * 
      * @return Response A Response instance
      */
     public function indexAction($path, $controller)

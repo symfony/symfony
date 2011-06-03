@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,10 +18,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Run this pass before passes that need to know more about the relation of
  * your services.
- *
+ * 
  * This class will populate the ServiceReferenceGraph with information. You can
  * retrieve the graph in other passes from the compiler.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class AnalyzeServiceReferencesPass implements RepeatablePassInterface
@@ -35,7 +35,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param Boolean $onlyConstructorArguments Sets this Service Reference pass to ignore method calls
      */
     public function __construct($onlyConstructorArguments = false)
@@ -52,7 +52,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
 
     /**
      * Processes a ContainerBuilder object to populate the service reference graph.
-     *
+     * 
      * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
@@ -83,7 +83,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
 
     /**
      * Processes service definitions for arguments to find relationships for the service graph.
-     *
+     * 
      * @param array $arguments An array of Reference or Definition objects relating to service definitions
      */
     private function processArguments(array $arguments)
@@ -109,7 +109,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
 
     /**
      * Returns a service definition given the full name or an alias.
-     *
+     * 
      * @param string $id A full id or alias for a service definition.
      * @return Definition The definition related to the supplied id
      */

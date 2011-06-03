@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\DomCrawler\Field;
 
 /**
  * FormField is the abstract class for all form fields.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class FormField
@@ -26,7 +26,7 @@ abstract class FormField
 
     /**
      * Constructor.
-     *
+     * 
      * @param \DOMNode $node The node associated with this field
      */
     public function __construct(\DOMNode $node)
@@ -46,7 +46,7 @@ abstract class FormField
 
     /**
      * Returns the name of the field.
-     *
+     * 
      * @return string The name of the field
      */
     public function getName()
@@ -56,7 +56,7 @@ abstract class FormField
 
     /**
      * Gets the value of the field.
-     *
+     * 
      * @return string|array The value of the field
      */
     public function getValue()
@@ -66,7 +66,7 @@ abstract class FormField
 
     /**
      * Sets the value of the field.
-     *
+     * 
      * @param string $value The value of the field
      */
     public function setValue($value)
@@ -76,7 +76,7 @@ abstract class FormField
 
     /**
      * Returns true if the field should be included in the submitted values.
-     *
+     * 
      * @return Boolean true if the field should be included in the submitted values, false otherwise
      */
     public function hasValue()

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * FormAuthenticationEntryPoint starts an authentication via a login form.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
@@ -31,7 +31,7 @@ class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 
     /**
      * Constructor
-     *
+     * 
      * @param HttpKernelInterface $kernel
      * @param string              $loginPath  The path to the login form
      * @param Boolean             $useForward Whether to forward or redirect to the login form

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,10 +18,10 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
 /**
  * CacheLoader is a loader that caches other loaders responses
  * on the filesystem.
- *
+ * 
  * This cache only caches on disk to allow PHP accelerators to cache the opcodes.
  * All other mechanism would imply the use of `eval()`.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class CacheLoader extends Loader
@@ -31,7 +31,7 @@ class CacheLoader extends Loader
 
     /**
      * Constructor.
-     *
+     * 
      * @param LoaderInterface $loader A Loader instance
      * @param string          $dir    The directory where to store the cache files
      */
@@ -43,9 +43,9 @@ class CacheLoader extends Loader
 
     /**
      * Loads a template.
-     *
+     * 
      * @param TemplateReferenceInterface $template A template
-     *
+     * 
      * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
      */
     public function load(TemplateReferenceInterface $template)
@@ -84,7 +84,7 @@ class CacheLoader extends Loader
 
     /**
      * Returns true if the template is still fresh.
-     *
+     * 
      * @param TemplateReferenceInterface $template A template
      * @param integer                    $time     The last modification time of the cached template (timestamp)
      */

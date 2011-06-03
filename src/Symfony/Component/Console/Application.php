@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -29,19 +29,19 @@ use Symfony\Component\Console\Helper\DialogHelper;
 
 /**
  * An Application is the container for a collection of commands.
- *
+ * 
  * It is the main entry point of a Console application.
- *
+ * 
  * This class is optimized for a standard CLI environment.
- *
+ * 
  * Usage:
- *
+ * 
  *     $app = new Application('myapp', '1.0 (stable)');
  *     $app->add(new SimpleCommand());
  *     $app->run();
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * @api
  */
 class Application
@@ -59,10 +59,10 @@ class Application
 
     /**
      * Constructor.
-     *
+     * 
      * @param string  $name    The name of the application
      * @param string  $version The version of the application
-     *
+     * 
      * @api
      */
     public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN')
@@ -95,14 +95,14 @@ class Application
 
     /**
      * Runs the current application.
-     *
+     * 
      * @param InputInterface  $input  An Input instance
      * @param OutputInterface $output An Output instance
-     *
+     * 
      * @return integer 0 if everything went fine, or an error code
-     *
+     * 
      * @throws \Exception When doRun returns Exception
-     *
+     * 
      * @api
      */
     public function run(InputInterface $input = null, OutputInterface $output = null)
@@ -142,10 +142,10 @@ class Application
 
     /**
      * Runs the current application.
-     *
+     * 
      * @param InputInterface  $input  An Input instance
      * @param OutputInterface $output An Output instance
-     *
+     * 
      * @return integer 0 if everything went fine, or an error code
      */
     public function doRun(InputInterface $input, OutputInterface $output)
@@ -198,9 +198,9 @@ class Application
 
     /**
      * Set a helper set to be used with the command.
-     *
+     * 
      * @param HelperSet $helperSet The helper set
-     *
+     * 
      * @api
      */
     public function setHelperSet(HelperSet $helperSet)
@@ -210,9 +210,9 @@ class Application
 
     /**
      * Get the helper set associated with the command.
-     *
+     * 
      * @return HelperSet The HelperSet instance associated with this command
-     *
+     * 
      * @api
      */
     public function getHelperSet()
@@ -222,7 +222,7 @@ class Application
 
     /**
      * Gets the InputDefinition related to this Application.
-     *
+     * 
      * @return InputDefinition The InputDefinition instance
      */
     public function getDefinition()
@@ -232,7 +232,7 @@ class Application
 
     /**
      * Gets the help message.
-     *
+     * 
      * @return string A help message.
      */
     public function getHelp()
@@ -258,9 +258,9 @@ class Application
 
     /**
      * Sets whether to catch exceptions or not during commands execution.
-     *
+     * 
      * @param Boolean $boolean Whether to catch exceptions or not during commands execution
-     *
+     * 
      * @api
      */
     public function setCatchExceptions($boolean)
@@ -270,9 +270,9 @@ class Application
 
     /**
      * Sets whether to automatically exit after a command execution or not.
-     *
+     * 
      * @param Boolean $boolean Whether to automatically exit after a command execution or not
-     *
+     * 
      * @api
      */
     public function setAutoExit($boolean)
@@ -282,9 +282,9 @@ class Application
 
     /**
      * Gets the name of the application.
-     *
+     * 
      * @return string The application name
-     *
+     * 
      * @api
      */
     public function getName()
@@ -294,9 +294,9 @@ class Application
 
     /**
      * Sets the application name.
-     *
+     * 
      * @param string $name The application name
-     *
+     * 
      * @api
      */
     public function setName($name)
@@ -306,9 +306,9 @@ class Application
 
     /**
      * Gets the application version.
-     *
+     * 
      * @return string The application version
-     *
+     * 
      * @api
      */
     public function getVersion()
@@ -318,9 +318,9 @@ class Application
 
     /**
      * Sets the application version.
-     *
+     * 
      * @param string $version The application version
-     *
+     * 
      * @api
      */
     public function setVersion($version)
@@ -330,9 +330,9 @@ class Application
 
     /**
      * Returns the long version of the application.
-     *
+     * 
      * @return string The long application version
-     *
+     * 
      * @api
      */
     public function getLongVersion()
@@ -346,11 +346,11 @@ class Application
 
     /**
      * Registers a new command.
-     *
+     * 
      * @param string $name The command name
-     *
+     * 
      * @return Command The newly created command
-     *
+     * 
      * @api
      */
     public function register($name)
@@ -360,9 +360,9 @@ class Application
 
     /**
      * Adds an array of command objects.
-     *
+     * 
      * @param Command[] $commands An array of commands
-     *
+     * 
      * @api
      */
     public function addCommands(array $commands)
@@ -374,13 +374,13 @@ class Application
 
     /**
      * Adds a command object.
-     *
+     * 
      * If a command with the same name already exists, it will be overridden.
-     *
+     * 
      * @param Command $command A Command object
-     *
+     * 
      * @return Command The registered command
-     *
+     * 
      * @api
      */
     public function add(Command $command)
@@ -398,13 +398,13 @@ class Application
 
     /**
      * Returns a registered command by name or alias.
-     *
+     * 
      * @param string $name The command name or alias
-     *
+     * 
      * @return Command A Command object
-     *
+     * 
      * @throws \InvalidArgumentException When command name given does not exist
-     *
+     * 
      * @api
      */
     public function get($name)
@@ -429,11 +429,11 @@ class Application
 
     /**
      * Returns true if the command exists, false otherwise.
-     *
+     * 
      * @param string $name The command name or alias
-     *
+     * 
      * @return Boolean true if the command exists, false otherwise
-     *
+     * 
      * @api
      */
     public function has($name)
@@ -443,9 +443,9 @@ class Application
 
     /**
      * Returns an array of all unique namespaces used by currently registered commands.
-     *
+     * 
      * It does not returns the global namespace which always exists.
-     *
+     * 
      * @return array An array of namespaces
      */
     public function getNamespaces()
@@ -462,11 +462,11 @@ class Application
 
     /**
      * Finds a registered namespace by a name or an abbreviation.
-     *
+     * 
      * @param string $namespace A namespace or abbreviation to search for
-     *
+     * 
      * @return string A registered namespace
-     *
+     * 
      * @throws \InvalidArgumentException When namespace is incorrect or ambiguous
      */
     public function findNamespace($namespace)
@@ -486,16 +486,16 @@ class Application
 
     /**
      * Finds a command by name or alias.
-     *
+     * 
      * Contrary to get, this command tries to find the best
      * match if you give it an abbreviation of a name or alias.
-     *
+     * 
      * @param  string $name A command name or a command alias
-     *
+     * 
      * @return Command A Command instance
-     *
+     * 
      * @throws \InvalidArgumentException When command name is incorrect or ambiguous
-     *
+     * 
      * @api
      */
     public function find($name)
@@ -543,13 +543,13 @@ class Application
 
     /**
      * Gets the commands (registered in the given namespace if provided).
-     *
+     * 
      * The array keys are the full names and the values the command instances.
-     *
+     * 
      * @param  string  $namespace A namespace name
-     *
+     * 
      * @return array An array of Command instances
-     *
+     * 
      * @api
      */
     public function all($namespace = null)
@@ -570,9 +570,9 @@ class Application
 
     /**
      * Returns an array of possible abbreviations given a set of names.
-     *
+     * 
      * @param array $names An array of names
-     *
+     * 
      * @return array An array of abbreviations
      */
     static public function getAbbreviations($names)
@@ -599,9 +599,9 @@ class Application
 
     /**
      * Returns a text representation of the Application.
-     *
+     * 
      * @param string $namespace An optional namespace name
-     *
+     * 
      * @return string A string representing the Application
      */
     public function asText($namespace = null)
@@ -639,10 +639,10 @@ class Application
 
     /**
      * Returns an XML representation of the Application.
-     *
+     * 
      * @param string  $namespace An optional namespace name
      * @param Boolean $asDom     Whether to return a DOM or an XML string
-     *
+     * 
      * @return string|DOMDocument An XML string representing the Application
      */
     public function asXml($namespace = null, $asDom = false)
@@ -689,7 +689,7 @@ class Application
 
     /**
      * Renders a catched exception.
-     *
+     * 
      * @param Exception       $e      An exception instance
      * @param OutputInterface $output An OutputInterface instance
      */
@@ -757,9 +757,9 @@ class Application
 
     /**
      * Gets the name of the command based on input.
-     *
+     * 
      * @param InputInterface $input The input interface
-     *
+     * 
      * @return string The command name
      */
     protected function getCommandName(InputInterface $input)
@@ -769,9 +769,9 @@ class Application
 
     /**
      * Sorts commands in alphabetical order.
-     *
+     * 
      * @param array $commands An associative array of commands to sort
-     *
+     * 
      * @return array A sorted array of commands
      */
     private function sortCommands($commands)
@@ -797,9 +797,9 @@ class Application
 
     /**
      * Returns abbreviated suggestions in string format.
-     *
+     * 
      * @param array $abbrevs Abbreviated suggestions to convert
-     *
+     * 
      * @return string A formatted string of abbreviated suggestions
      */
     private function getAbbreviationSuggestions($abbrevs)

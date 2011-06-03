@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\Event;
 
 /**
  * MessageLogger.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Clément JOBEILI <clement.jobeili@gmail.com>
  */
@@ -33,7 +33,7 @@ class MessageLogger implements \Swift_Events_SendListener
 
     /**
      * Get the message list
-     *
+     * 
      * @return array
      */
     public function getMessages()
@@ -43,7 +43,7 @@ class MessageLogger implements \Swift_Events_SendListener
 
     /**
      * Get the message count
-     *
+     * 
      * @return int count
      */
     public function countMessages()
@@ -53,7 +53,7 @@ class MessageLogger implements \Swift_Events_SendListener
 
     /**
      * Empty the message list
-     *
+     * 
      */
     public function clear()
     {
@@ -62,7 +62,7 @@ class MessageLogger implements \Swift_Events_SendListener
 
     /**
      * Invoked immediately before the Message is sent.
-     *
+     * 
      * @param \Swift_Events_SendEvent $evt
      */
     public function beforeSendPerformed(\Swift_Events_SendEvent $evt)
@@ -72,7 +72,7 @@ class MessageLogger implements \Swift_Events_SendListener
 
     /**
      * Invoked immediately after the Message is sent.
-     *
+     * 
      * @param \Swift_Events_SendEvent $evt
      */
     public function sendPerformed(\Swift_Events_SendEvent $evt)

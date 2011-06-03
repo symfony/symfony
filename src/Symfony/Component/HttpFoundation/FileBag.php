@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * FileBag is a container for HTTP headers.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  */
@@ -25,7 +25,7 @@ class FileBag extends ParameterBag
 
     /**
      * Constructor.
-     *
+     * 
      * @param array $parameters An array of HTTP files
      */
     public function __construct(array $parameters = array())
@@ -67,9 +67,9 @@ class FileBag extends ParameterBag
 
     /**
      * Converts uploaded files to UploadedFile instances.
-     *
+     * 
      * @param  array|UploadedFile $file A (multi-dimensional) array of uploaded file information
-     *
+     * 
      * @return array A (multi-dimensional) array of UploadedFile instances
      */
     protected function convertFileInformation($file)
@@ -99,16 +99,16 @@ class FileBag extends ParameterBag
 
     /**
      * Fixes a malformed PHP $_FILES array.
-     *
+     * 
      * PHP has a bug that the format of the $_FILES array differs, depending on
      * whether the uploaded file fields had normal field names or array-like
      * field names ("normal" vs. "parent[child]").
-     *
+     * 
      * This method fixes the array to look like the "normal" $_FILES array.
-     *
+     * 
      * It's safe to pass an already converted array, in which case this method
      * just returns the original array unmodified.
-     *
+     * 
      * @param  array $data
      * @return array
      */

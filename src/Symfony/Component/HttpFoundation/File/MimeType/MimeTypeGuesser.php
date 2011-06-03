@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,18 +16,18 @@ use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 
 /**
  * A singleton mime type guesser.
- *
+ * 
  * By default, all mime type guessers provided by the framework are installed
  * (if available on the current OS/PHP setup). You can register custom
  * guessers by calling the register() method on the singleton instance.
- *
+ * 
  * <code>
  * $guesser = MimeTypeGuesser::getInstance();
  * $guesser->register(new MyCustomMimeTypeGuesser());
  * </code>
- *
+ * 
  * The last registered guesser is preferred over previously registered ones.
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
 class MimeTypeGuesser implements MimeTypeGuesserInterface
@@ -46,7 +46,7 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
 
     /**
      * Returns the singleton instance
-     *
+     * 
      * @return MimeTypeGuesser
      */
     static public function getInstance()
@@ -78,9 +78,9 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
 
     /**
      * Registers a new mime type guesser
-     *
+     * 
      * When guessing, this guesser is preferred over previously registered ones.
-     *
+     * 
      * @param MimeTypeGuesserInterface $guesser
      */
     public function register(MimeTypeGuesserInterface $guesser)
@@ -90,12 +90,12 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
 
     /**
      * Tries to guess the mime type of the given file
-     *
+     * 
      * The file is passed to each registered mime type guesser in reverse order
      * of their registration (last registered is queried first). Once a guesser
      * returns a value that is not NULL, this method terminates and returns the
      * value.
-     *
+     * 
      * @param  string $path   The path to the file
      * @return string         The mime type or NULL, if none could be guessed
      * @throws FileException  If the file does not exist

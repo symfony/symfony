@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\Config;
 
 /**
  * FileLocator uses an array of pre-defined paths to find files.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class FileLocator implements FileLocatorInterface
@@ -22,7 +22,7 @@ class FileLocator implements FileLocatorInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param string|array $paths A path or an array of paths where to look for resources
      */
     public function __construct($paths = array())
@@ -32,13 +32,13 @@ class FileLocator implements FileLocatorInterface
 
     /**
      * Returns a full path for a given file name.
-     *
+     * 
      * @param mixed   $name        The file name to locate
      * @param string  $currentPath The current path
      * @param Boolean $first       Whether to return the first occurrence or an array of filenames
-     *
+     * 
      * @return string|array The full path to the file|An array of file paths
-     *
+     * 
      * @throws \InvalidArgumentException When file is not found
      */
     public function locate($name, $currentPath = null, $first = true)
@@ -77,9 +77,9 @@ class FileLocator implements FileLocatorInterface
 
     /**
      * Returns whether the file path is an absolute path.
-     *
+     * 
      * @param string $file A file path
-     *
+     * 
      * @return Boolean
      */
     private function isAbsolutePath($file)

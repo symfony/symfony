@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * Application.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Application extends BaseApplication
@@ -29,7 +29,7 @@ class Application extends BaseApplication
 
     /**
      * Constructor.
-     *
+     * 
      * @param KernelInterface $kernel A KernelInterface instance
      */
     public function __construct(KernelInterface $kernel)
@@ -45,7 +45,7 @@ class Application extends BaseApplication
 
     /**
      * Gets the Kernel associated with this Console.
-     *
+     * 
      * @return KernelInterface A KernelInterface instance
      */
     public function getKernel()
@@ -55,10 +55,10 @@ class Application extends BaseApplication
 
     /**
      * Runs the current application.
-     *
+     * 
      * @param InputInterface  $input  An Input instance
      * @param OutputInterface $output An Output instance
-     *
+     * 
      * @return integer 0 if everything went fine, or an error code
      */
     public function doRun(InputInterface $input, OutputInterface $output)

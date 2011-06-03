@@ -2,12 +2,12 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This code is partially based on the Rack-Cache library by Ryan Tomayko,
  * which is released under the MIT license.
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 
 /**
  * Store implements all the logic for storing cache metadata (Request and Response headers).
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Store implements StoreInterface
@@ -31,7 +31,7 @@ class Store implements StoreInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param string $root The path to the cache directory
      */
     public function __construct($root)
@@ -65,9 +65,9 @@ class Store implements StoreInterface
 
     /**
      * Locks the cache for a given Request.
-     *
+     * 
      * @param Request $request A Request instance
-     *
+     * 
      * @return Boolean|string true if the lock is acquired, the path to the current lock otherwise
      */
     public function lock(Request $request)
@@ -85,7 +85,7 @@ class Store implements StoreInterface
 
     /**
      * Releases the lock for the given Request.
-     *
+     * 
      * @param Request $request A Request instance
      */
     public function unlock(Request $request)
@@ -95,9 +95,9 @@ class Store implements StoreInterface
 
     /**
      * Locates a cached Response for the Request provided.
-     *
+     * 
      * @param Request $request A Request instance
-     *
+     * 
      * @return Response|null A Response instance, or null if no cache entry was found
      */
     public function lookup(Request $request)
@@ -135,13 +135,13 @@ class Store implements StoreInterface
 
     /**
      * Writes a cache entry to the store for the given Request and Response.
-     *
+     * 
      * Existing entries are read and any that match the response are removed. This
      * method calls write with the new list of cache entries.
-     *
+     * 
      * @param Request  $request  A Request instance
      * @param Response $response A Response instance
-     *
+     * 
      * @return string The key under which the response is stored
      */
     public function write(Request $request, Response $response)
@@ -191,7 +191,7 @@ class Store implements StoreInterface
 
     /**
      * Invalidates all cache entries that match the request.
-     *
+     * 
      * @param Request $request A Request instance
      */
     public function invalidate(Request $request)
@@ -230,11 +230,11 @@ class Store implements StoreInterface
     /**
      * Determines whether two Request HTTP header sets are non-varying based on
      * the vary response header value provided.
-     *
+     * 
      * @param string $vary A Response vary header
      * @param array  $env1 A Request HTTP header array
      * @param array  $env2 A Request HTTP header array
-     *
+     * 
      * @return Boolean true if the the two environments match, false otherwise
      */
     private function requestsMatch($vary, $env1, $env2)
@@ -257,11 +257,11 @@ class Store implements StoreInterface
 
     /**
      * Gets all data associated with the given key.
-     *
+     * 
      * Use this method only if you know what you are doing.
-     *
+     * 
      * @param string $key The store key
-     *
+     * 
      * @return array An array of data associated with the key
      */
     private function getMetadata($key)
@@ -275,9 +275,9 @@ class Store implements StoreInterface
 
     /**
      * Purges data for the given URL.
-     *
+     * 
      * @param string $url A URL
-     *
+     * 
      * @return Boolean true if the URL exists and has been purged, false otherwise
      */
     public function purge($url)
@@ -293,9 +293,9 @@ class Store implements StoreInterface
 
     /**
      * Loads data for the given key.
-     *
+     * 
      * @param string $key  The store key
-     *
+     * 
      * @return string The data associated with the key
      */
     private function load($key)
@@ -307,7 +307,7 @@ class Store implements StoreInterface
 
     /**
      * Save data for the given key.
-     *
+     * 
      * @param string $key  The store key
      * @param string $data The data to store
      */
@@ -343,9 +343,9 @@ class Store implements StoreInterface
 
     /**
      * Returns a cache key for the given Request.
-     *
+     * 
      * @param Request $request A Request instance
-     *
+     * 
      * @return string A key for the given Request
      */
     private function getCacheKey(Request $request)
@@ -359,9 +359,9 @@ class Store implements StoreInterface
 
     /**
      * Persists the Request HTTP headers.
-     *
+     * 
      * @param Request $request A Request instance
-     *
+     * 
      * @return array An array of HTTP headers
      */
     private function persistRequest(Request $request)
@@ -371,9 +371,9 @@ class Store implements StoreInterface
 
     /**
      * Persists the Response HTTP headers.
-     *
+     * 
      * @param Response $response A Response instance
-     *
+     * 
      * @return array An array of HTTP headers
      */
     private function persistResponse(Response $response)
@@ -386,7 +386,7 @@ class Store implements StoreInterface
 
     /**
      * Restores a Response from the HTTP headers and body.
-     *
+     * 
      * @param array  $headers An array of HTTP headers for the Response
      * @param string $body    The Response body
      */

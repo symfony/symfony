@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * EventDataCollector.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class EventDataCollector extends DataCollector
@@ -45,9 +45,9 @@ class EventDataCollector extends DataCollector
 
     /**
      * Gets the called listeners.
-     *
+     * 
      * @return array An array of called listeners
-     *
+     * 
      * @see TraceableEventDispatcherInterface
      */
     public function getCalledListeners()
@@ -57,9 +57,9 @@ class EventDataCollector extends DataCollector
 
     /**
      * Gets the not called listeners.
-     *
+     * 
      * @return array An array of not called listeners
-     *
+     * 
      * @see TraceableEventDispatcherInterface
      */
     public function getNotCalledListeners()

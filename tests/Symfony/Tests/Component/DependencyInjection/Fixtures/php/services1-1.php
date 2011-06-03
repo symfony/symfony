@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 /**
  * Container
- *
+ * 
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  */

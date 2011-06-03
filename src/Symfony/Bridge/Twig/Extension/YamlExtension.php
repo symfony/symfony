@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,7 +15,7 @@ use Symfony\Component\Yaml\Dumper as YamlDumper;
 
 /**
  * Provides integration of the Yaml component with Twig.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class YamlExtension extends \Twig_Extension
@@ -57,7 +57,7 @@ class YamlExtension extends \Twig_Extension
 
     /**
      * Returns the name of the extension.
-     *
+     * 
      * @return string The extension name
      */
     public function getName()

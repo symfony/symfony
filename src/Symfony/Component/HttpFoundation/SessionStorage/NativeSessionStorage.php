@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
 
 /**
  * NativeSessionStorage.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class NativeSessionStorage implements SessionStorageInterface
@@ -25,7 +25,7 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * Available options:
-     *
+     * 
      *  * name:     The cookie name (_SESS by default)
      *  * id:       The session id (null by default)
      *  * lifetime: Cookie lifetime
@@ -33,9 +33,9 @@ class NativeSessionStorage implements SessionStorageInterface
      *  * domain:   Cookie domain
      *  * secure:   Cookie secure
      *  * httponly: Cookie http only
-     *
+     * 
      * The default values for most options are those returned by the session_get_cookie_params() function
-     *
+     * 
      * @param array $options  An associative array of session options
      */
     public function __construct(array $options = array())
@@ -97,12 +97,12 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * Reads data from this storage.
-     *
+     * 
      * The preferred format for a key is directory style so naming conflicts can be avoided.
-     *
+     * 
      * @param string $key     A unique key identifying your data
      * @param string $default Default value
-     *
+     * 
      * @return mixed Data associated with the key
      */
     public function read($key, $default = null)
@@ -112,11 +112,11 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * Removes data from this storage.
-     *
+     * 
      * The preferred format for a key is directory style so naming conflicts can be avoided.
-     *
+     * 
      * @param  string $key  A unique key identifying your data
-     *
+     * 
      * @return mixed Data associated with the key
      */
     public function remove($key)
@@ -133,12 +133,12 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * Writes data to this storage.
-     *
+     * 
      * The preferred format for a key is directory style so naming conflicts can be avoided.
-     *
+     * 
      * @param string $key   A unique key identifying your data
      * @param mixed  $data  Data associated with your key
-     *
+     * 
      */
     public function write($key, $data)
     {
@@ -147,11 +147,11 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * Regenerates id that represents this storage.
-     *
+     * 
      * @param  Boolean $destroy Destroy session when regenerating?
-     *
+     * 
      * @return Boolean True if session regenerated, false if error
-     *
+     * 
      */
     public function regenerate($destroy = false)
     {

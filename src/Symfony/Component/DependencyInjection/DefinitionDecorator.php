@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\DependencyInjection;
 
 /**
  * This definition decorates another definition.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class DefinitionDecorator extends Definition
@@ -23,7 +23,7 @@ class DefinitionDecorator extends Definition
 
     /**
      * Constructor.
-     *
+     * 
      * @param Definition $parent The Definition instance to decorate.
      */
     public function __construct($parent)
@@ -36,7 +36,7 @@ class DefinitionDecorator extends Definition
 
     /**
      * Returns the Definition being decorated.
-     *
+     * 
      * @return Definition
      */
     public function getParent()
@@ -46,7 +46,7 @@ class DefinitionDecorator extends Definition
 
     /**
      * Returns all changes tracked for the Definition object.
-     *
+     * 
      * @return array An array of changes for this Definition
      */
     public function getChanges()
@@ -127,14 +127,14 @@ class DefinitionDecorator extends Definition
     /**
      * You should always use this method when overwriting existing arguments
      * of the parent definition.
-     *
+     * 
      * If you directly call setArguments() keep in mind that you must follow
      * certain conventions when you want to overwrite the arguments of the
      * parent definition, otherwise your arguments will only be appended.
-     *
+     * 
      * @param integer $index
      * @param mixed $value
-     *
+     * 
      * @return DefinitionDecorator the current instance
      * @throws \InvalidArgumentException when $index isn't an integer
      */

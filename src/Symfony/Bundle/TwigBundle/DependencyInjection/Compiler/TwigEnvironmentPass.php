@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
  * Adds tagged twig.extension services to twig service
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class TwigEnvironmentPass implements CompilerPassInterface

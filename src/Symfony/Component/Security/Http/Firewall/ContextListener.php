@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -27,7 +27,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * ContextListener manages the SecurityContext persistence through a session.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -56,7 +56,7 @@ class ContextListener implements ListenerInterface
 
     /**
      * Reads the SecurityContext from the session.
-     *
+     * 
      * @param GetResponseEvent $event A GetResponseEvent instance
      */
     public function handle(GetResponseEvent $event)
@@ -84,7 +84,7 @@ class ContextListener implements ListenerInterface
 
     /**
      * Writes the SecurityContext to the session.
-     *
+     * 
      * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
     public function onCoreResponse(FilterResponseEvent $event)
@@ -110,9 +110,9 @@ class ContextListener implements ListenerInterface
 
     /**
      * Refreshes the user by reloading it from the user provider
-     *
+     * 
      * @param TokenInterface $token
-     *
+     * 
      * @return TokenInterface|null
      */
     private function refreshUser(TokenInterface $token)

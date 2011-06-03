@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 /**
  * LogDataCollector.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class LoggerDataCollector extends DataCollector
@@ -46,9 +46,9 @@ class LoggerDataCollector extends DataCollector
 
     /**
      * Gets the called events.
-     *
+     * 
      * @return array An array of called events
-     *
+     * 
      * @see TraceableEventDispatcherInterface
      */
     public function countErrors()
@@ -58,7 +58,7 @@ class LoggerDataCollector extends DataCollector
 
     /**
      * Gets the logs.
-     *
+     * 
      * @return array An array of logs
      */
     public function getLogs()

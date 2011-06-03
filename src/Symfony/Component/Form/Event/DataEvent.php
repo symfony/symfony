@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -21,7 +21,7 @@ class DataEvent extends Event
 
     /**
      * Constructs an event.
-     *
+     * 
      * @param FormInterface $form The associated form
      * @param mixed         $data The data
      */
@@ -33,7 +33,7 @@ class DataEvent extends Event
 
     /**
      * Returns the form at the source of the event.
-     *
+     * 
      * @return FormInterface
      */
     public function getForm()
@@ -43,7 +43,7 @@ class DataEvent extends Event
 
     /**
      * Returns the data associated with this event.
-     *
+     * 
      * @return type
      */
     public function getData()

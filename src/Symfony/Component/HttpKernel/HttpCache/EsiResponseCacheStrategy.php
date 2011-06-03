@@ -2,13 +2,13 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This code is partially based on the Rack-Cache library by Ryan Tomayko,
  * which is released under the MIT license.
  * (based on commit 02d2b48d75bcb63cf1c0c7149c077ad256542801)
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,10 +20,10 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * EsiResponseCacheStrategy knows how to compute the Response cache HTTP header
  * based on the different ESI response cache headers.
- *
+ * 
  * This implementation changes the master response TTL to the smallest TTL received
  * or force validation if one of the ESI has validation cache strategy.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class EsiResponseCacheStrategy implements EsiResponseCacheStrategyInterface
@@ -34,7 +34,7 @@ class EsiResponseCacheStrategy implements EsiResponseCacheStrategyInterface
 
     /**
      * Adds a Response.
-     *
+     * 
      * @param Response $response
      */
     public function add(Response $response)
@@ -49,7 +49,7 @@ class EsiResponseCacheStrategy implements EsiResponseCacheStrategyInterface
 
     /**
      * Updates the Response HTTP headers based on the embedded Responses.
-     *
+     * 
      * @param Response $response
      */
     public function update(Response $response)

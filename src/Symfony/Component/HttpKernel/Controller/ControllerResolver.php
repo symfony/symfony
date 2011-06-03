@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,11 +16,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * ControllerResolver.
- *
+ * 
  * This implementation uses the '_controller' request attribute to determine
  * the controller to execute and uses the request attributes to determine
  * the controller method arguments.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ControllerResolver implements ControllerResolverInterface
@@ -29,7 +29,7 @@ class ControllerResolver implements ControllerResolverInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param LoggerInterface $logger A LoggerInterface instance
      */
     public function __construct(LoggerInterface $logger = null)
@@ -39,15 +39,15 @@ class ControllerResolver implements ControllerResolverInterface
 
     /**
      * Returns the Controller instance associated with a Request.
-     *
+     * 
      * This method looks for a '_controller' request attribute that represents
      * the controller name (a string like ClassName::MethodName).
-     *
+     * 
      * @param Request $request A Request instance
-     *
+     * 
      * @return mixed|Boolean A PHP callable representing the Controller,
      *                       or false if this resolver is not able to determine the controller
-     *
+     * 
      * @throws \InvalidArgumentException|\LogicException If the controller can't be found
      */
     public function getController(Request $request)
@@ -79,10 +79,10 @@ class ControllerResolver implements ControllerResolverInterface
 
     /**
      * Returns the arguments to pass to the controller.
-     *
+     * 
      * @param Request $request    A Request instance
      * @param mixed   $controller A PHP callable
-     *
+     * 
      * @throws \RuntimeException When value for argument given is not provided
      */
     public function getArguments(Request $request, $controller)
@@ -119,9 +119,9 @@ class ControllerResolver implements ControllerResolverInterface
 
     /**
      * Returns a callable for the given controller.
-     *
+     * 
      * @param string $controller A Controller string
-     *
+     * 
      * @return mixed A PHP callable
      */
     protected function createController($controller)

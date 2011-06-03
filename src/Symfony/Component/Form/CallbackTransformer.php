@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -27,7 +27,7 @@ class CallbackTransformer implements DataTransformerInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param \Closure $transform           The forward transform callback
      * @param \Closure $reverseTransform    The reverse transform callback
      */
@@ -39,11 +39,11 @@ class CallbackTransformer implements DataTransformerInterface
 
     /**
      * Transforms a value from the original representation to a transformed representation.
-     *
+     * 
      * @param  mixed $data               The value in the original representation
-     *
+     * 
      * @return mixed                     The value in the transformed representation
-     *
+     * 
      * @throws UnexpectedTypeException   when the argument is not a string
      * @throws DataTransformerException  when the transformation fails
      */
@@ -55,11 +55,11 @@ class CallbackTransformer implements DataTransformerInterface
     /**
      * Transforms a value from the transformed representation to its original
      * representation.
-     *
+     * 
      * @param  mixed $data               The value in the transformed representation
-     *
+     * 
      * @return mixed                     The value in the original representation
-     *
+     * 
      * @throws UnexpectedTypeException   when the argument is not of the expected type
      * @throws DataTransformerException  when the transformation fails
      */

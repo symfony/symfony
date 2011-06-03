@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
  * FilesystemLoader is a loader that read templates from the filesystem.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class FilesystemLoader extends Loader
@@ -26,7 +26,7 @@ class FilesystemLoader extends Loader
 
     /**
      * Constructor.
-     *
+     * 
      * @param array $templatePathPatterns An array of path patterns to look for templates
      */
     public function __construct($templatePathPatterns)
@@ -36,9 +36,9 @@ class FilesystemLoader extends Loader
 
     /**
      * Loads a template.
-     *
+     * 
      * @param TemplateReferenceInterface $template A template
-     *
+     * 
      * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
      */
     public function load(TemplateReferenceInterface $template)
@@ -80,7 +80,7 @@ class FilesystemLoader extends Loader
 
     /**
      * Returns true if the template is still fresh.
-     *
+     * 
      * @param TemplateReferenceInterface $template A template
      * @param integer                    $time     The last modification time of the cached template (timestamp)
      */
@@ -95,9 +95,9 @@ class FilesystemLoader extends Loader
 
     /**
      * Returns true if the file is an existing absolute path.
-     *
+     * 
      * @param string $file A path
-     *
+     * 
      * @return true if the path exists and is absolute, false otherwise
      */
     static protected function isAbsolutePath($file)

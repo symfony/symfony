@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,19 +18,19 @@ use Symfony\Component\Config\Loader\FileLoader;
 
 /**
  * XmlFileLoader loads XML routing files.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class XmlFileLoader extends FileLoader
 {
     /**
      * Loads an XML file.
-     *
+     * 
      * @param string $file An XML file path
      * @param string $type The resource type
-     *
+     * 
      * @return RouteCollection A RouteCollection instance
-     *
+     * 
      * @throws \InvalidArgumentException When a tag can't be parsed
      */
     public function load($file, $type = null)
@@ -56,7 +56,7 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Parses a node from a loaded XML file.
-     *
+     * 
      * @param RouteCollection $collection the collection to associate with the node
      * @param DOMElement      $node the node to parse
      * @param string          $path the path of the XML file being processed
@@ -82,10 +82,10 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Returns true if this class supports the given resource.
-     *
+     * 
      * @param mixed  $resource A resource
      * @param string $type     The resource type
-     *
+     * 
      * @return Boolean True if this class supports the given resource, false otherwise
      */
     public function supports($resource, $type = null)
@@ -95,11 +95,11 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Parses a route and adds it to the RouteCollection.
-     *
+     * 
      * @param RouteCollection $collection A RouteCollection instance
      * @param \DOMElement     $definition Route definition
      * @param string          $file       An XML file path
-     *
+     * 
      * @throws \InvalidArgumentException When the definition cannot be parsed
      */
     protected function parseRoute(RouteCollection $collection, \DOMElement $definition, $file)
@@ -135,11 +135,11 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Loads an XML file.
-     *
+     * 
      * @param string $file An XML file path
-     *
+     * 
      * @return \DOMDocument
-     *
+     * 
      * @throws \InvalidArgumentException When loading of XML file returns error
      */
     protected function loadFile($file)
@@ -159,9 +159,9 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Validates a loaded XML file.
-     *
+     * 
      * @param \DOMDocument $dom A loaded XML file
-     *
+     * 
      * @throws \InvalidArgumentException When XML doesn't validate its XSD schema
      */
     protected function validate(\DOMDocument $dom)
@@ -177,7 +177,7 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Retrieves libxml errors and clears them.
-     *
+     * 
      * @return array An array of libxml error strings
      */
     private function getXmlErrors()

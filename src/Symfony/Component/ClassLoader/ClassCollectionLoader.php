@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\ClassLoader;
 
 /**
  * ClassCollectionLoader.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ClassCollectionLoader
@@ -22,14 +22,14 @@ class ClassCollectionLoader
 
     /**
      * Loads a list of classes and caches them in one big file.
-     *
+     * 
      * @param array   $classes    An array of classes to load
      * @param string  $cacheDir   A cache directory
      * @param string  $name       The cache name prefix
      * @param Boolean $autoReload Whether to flush the cache when the cache is stale or not
      * @param Boolean $adaptive   Whether to remove already declared classes or not
      * @param string  $extension  File extension of the resulting file
-     *
+     * 
      * @throws \InvalidArgumentException When class can't be loaded
      */
     static public function load($classes, $cacheDir, $name, $autoReload, $adaptive = false, $extension = '.php')
@@ -120,9 +120,9 @@ class ClassCollectionLoader
 
     /**
      * Adds brackets around each namespace if it's not already the case.
-     *
+     * 
      * @param string $source Namespace string
-     *
+     * 
      * @return string Namespaces with brackets
      */
     static public function fixNamespaceDeclarations($source)
@@ -169,10 +169,10 @@ class ClassCollectionLoader
 
     /**
      * Writes a cache file.
-     *
+     * 
      * @param string $file Filename
      * @param string $content Temporary file content
-     *
+     * 
      * @throws \RuntimeException when a cache file cannot be written
      */
     static private function writeCacheFile($file, $content)
@@ -189,12 +189,12 @@ class ClassCollectionLoader
 
     /**
      * Removes comments from a PHP source string.
-     *
+     * 
      * We don't use the PHP php_strip_whitespace() function
      * as we want the content to be readable and well-formatted.
-     *
+     * 
      * @param string $source A PHP string
-     *
+     * 
      * @return string The PHP string with the comments removed
      */
     static private function stripComments($source)

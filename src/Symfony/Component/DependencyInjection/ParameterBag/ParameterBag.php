@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceEx
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ParameterBag implements ParameterBagInterface
@@ -26,7 +26,7 @@ class ParameterBag implements ParameterBagInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param array $parameters An array of parameters
      */
     public function __construct(array $parameters = array())
@@ -46,7 +46,7 @@ class ParameterBag implements ParameterBagInterface
 
     /**
      * Adds parameters to the service container parameters.
-     *
+     * 
      * @param array $parameters An array of parameters
      */
     public function add(array $parameters)
@@ -58,7 +58,7 @@ class ParameterBag implements ParameterBagInterface
 
     /**
      * Gets the service container parameters.
-     *
+     * 
      * @return array An array of parameters
      */
     public function all()
@@ -68,11 +68,11 @@ class ParameterBag implements ParameterBagInterface
 
     /**
      * Gets a service container parameter.
-     *
+     * 
      * @param string $name The parameter name
-     *
+     * 
      * @return mixed  The parameter value
-     *
+     * 
      * @throws  ParameterNotFoundException if the parameter is not defined
      */
     public function get($name)
@@ -88,7 +88,7 @@ class ParameterBag implements ParameterBagInterface
 
     /**
      * Sets a service container parameter.
-     *
+     * 
      * @param string $name  The parameter name
      * @param mixed  $value The parameter value
      */
@@ -99,9 +99,9 @@ class ParameterBag implements ParameterBagInterface
 
     /**
      * Returns true if a parameter name is defined.
-     *
+     * 
      * @param  string  $name       The parameter name
-     *
+     * 
      * @return Boolean true if the parameter name is defined, false otherwise
      */
     public function has($name)
@@ -136,12 +136,12 @@ class ParameterBag implements ParameterBagInterface
 
     /**
      * Replaces parameter placeholders (%name%) by their values.
-     *
+     * 
      * @param mixed $value A value
      * @param array $resolving An array of keys that are being resolved (used internally to detect circular references)
-     *
+     * 
      * @return mixed The resolved value
-     *
+     * 
      * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
      * @throws ParameterCircularReferenceException if a circular reference if detected
      * @throws RuntimeException when a given parameter has a type problem.
@@ -166,12 +166,12 @@ class ParameterBag implements ParameterBagInterface
 
     /**
      * Resolves parameters inside a string
-     *
+     * 
      * @param string $value     The string to resolve
      * @param array  $resolving An array of keys that are being resolved (used internally to detect circular references)
-     *
+     * 
      * @return string The resolved string
-     *
+     * 
      * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
      * @throws ParameterCircularReferenceException if a circular reference if detected
      * @throws RuntimeException when a given parameter has a type problem.

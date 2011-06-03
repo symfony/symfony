@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -35,7 +35,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * Changing the name is not allowed, otherwise the name and property path
      * are not synchronized anymore
-     *
+     * 
      * @see FieldType::buildForm
      */
     public function testNoSetName()

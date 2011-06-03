@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
  * FilesystemLoader is a loader that read templates from the filesystem.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class FilesystemLoader implements LoaderInterface
@@ -27,7 +27,7 @@ class FilesystemLoader implements LoaderInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param FileLocatorInterface $locator A FileLocatorInterface instance
      */
     public function __construct(FileLocatorInterface $locator)
@@ -37,9 +37,9 @@ class FilesystemLoader implements LoaderInterface
 
     /**
      * Loads a template.
-     *
+     * 
      * @param TemplateReferenceInterface $template A template
-     *
+     * 
      * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
      */
     public function load(TemplateReferenceInterface $template)
@@ -55,7 +55,7 @@ class FilesystemLoader implements LoaderInterface
 
     /**
      * Returns true if the template is still fresh.
-     *
+     * 
      * @param TemplateReferenceInterface $template The template name as an array
      * @param integer                    $time     The last modification time of the cached template (timestamp)
      */

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,7 +20,7 @@ use Symfony\Component\Config\ConfigCache;
 
 /**
  * Translator.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Translator extends BaseTranslator
@@ -32,12 +32,12 @@ class Translator extends BaseTranslator
 
     /**
      * Constructor.
-     *
+     * 
      * Available options:
-     *
+     * 
      *   * cache_dir: The cache directory (or null to disable caching)
      *   * debug:     Whether to enable debugging or not (false by default)
-     *
+     * 
      * @param ContainerInterface $container A ContainerInterface instance
      * @param MessageSelector    $selector  The message selector for pluralization
      * @param array              $loaderIds An array of loader Ids

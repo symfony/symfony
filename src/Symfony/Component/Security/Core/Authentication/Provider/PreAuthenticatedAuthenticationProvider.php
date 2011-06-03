@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,12 +20,12 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * Processes a pre-authenticated authentication request.
- *
+ * 
  * This authentication provider will not perform any checks on authentication
  * requests, as they should already be pre-authenticated. However, the
  * UserProviderInterface implementation may still throw a
  * UsernameNotFoundException, for example.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderInterface
@@ -36,7 +36,7 @@ class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderIn
 
     /**
      * Constructor.
-     *
+     * 
      * @param UserProviderInterface $userProvider An UserProviderInterface instance
      * @param UserCheckerInterface  $userChecker  An UserCheckerInterface instance
      * @param string                $providerKey  The provider key

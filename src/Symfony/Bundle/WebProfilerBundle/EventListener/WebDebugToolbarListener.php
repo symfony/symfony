@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,12 +19,12 @@ use Symfony\Bundle\TwigBundle\TwigEngine;
 
 /**
  * WebDebugToolbarListener injects the Web Debug Toolbar.
- *
+ * 
  * The handle method must be connected to the onCoreResponse event.
- *
+ * 
  * The WDT is only injected on well-formed HTML (with a proper </body> tag).
  * This means that the WDT is never included in sub-requests or ESI requests.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class WebDebugToolbarListener
@@ -83,7 +83,7 @@ class WebDebugToolbarListener
 
     /**
      * Injects the web debug toolbar into the given Response.
-     *
+     * 
      * @param Response $response A Response instance
      */
     protected function injectToolbar(Response $response)

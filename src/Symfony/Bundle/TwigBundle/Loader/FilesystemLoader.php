@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
 /**
  * FilesystemLoader extends the default Twig filesystem loader
  * to work with the Symfony2 paths.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class FilesystemLoader implements \Twig_LoaderInterface
@@ -29,7 +29,7 @@ class FilesystemLoader implements \Twig_LoaderInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param FileLocatorInterface        $locator A FileLocatorInterface instance
      * @param TemplateNameParserInterface $parser  A TemplateNameParserInterface instance
      */
@@ -42,9 +42,9 @@ class FilesystemLoader implements \Twig_LoaderInterface
 
     /**
      * Gets the source code of a template, given its name.
-     *
+     * 
      * @param  mixed $name The template name or a TemplateReferenceInterface instance
-     *
+     * 
      * @return string The template source code
      */
     public function getSource($name)
@@ -54,9 +54,9 @@ class FilesystemLoader implements \Twig_LoaderInterface
 
     /**
      * Gets the cache key to use for the cache for a given template name.
-     *
+     * 
      * @param  mixed $name The template name or a TemplateReferenceInterface instance
-     *
+     * 
      * @return string The cache key
      */
     public function getCacheKey($name)
@@ -66,10 +66,10 @@ class FilesystemLoader implements \Twig_LoaderInterface
 
     /**
      * Returns true if the template is still fresh.
-     *
+     * 
      * @param mixed     $name The template name or a TemplateReferenceInterface instance
      * @param timestamp $time The last modification time of the cached template
-     *
+     * 
      * @throws \Twig_Error_Loader if the template does not exist
      */
     public function isFresh($name, $time)
@@ -79,9 +79,9 @@ class FilesystemLoader implements \Twig_LoaderInterface
 
     /**
      * Returns the path to the template file
-     *
+     * 
      * @param $name The template logical name
-     *
+     * 
      * @return string The path to the template file
      */
     protected function findTemplate($name)

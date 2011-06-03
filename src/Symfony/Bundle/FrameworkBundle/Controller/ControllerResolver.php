@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 /**
  * ControllerResolver.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ControllerResolver extends BaseControllerResolver
@@ -29,7 +29,7 @@ class ControllerResolver extends BaseControllerResolver
 
     /**
      * Constructor.
-     *
+     * 
      * @param ContainerInterface   $container A ContainerInterface instance
      * @param ControllerNameParser $parser    A ControllerNameParser instance
      * @param LoggerInterface      $logger    A LoggerInterface instance
@@ -44,9 +44,9 @@ class ControllerResolver extends BaseControllerResolver
 
     /**
      * Returns a callable for the given controller.
-     *
+     * 
      * @param string $controller A Controller string
-     *
+     * 
      * @return mixed A PHP callable
      */
     protected function createController($controller)

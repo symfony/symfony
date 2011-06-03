@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Core\Role;
 
 /**
  * RoleHierarchy defines a role hierarchy.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RoleHierarchy implements RoleHierarchyInterface
@@ -23,7 +23,7 @@ class RoleHierarchy implements RoleHierarchyInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param array $hierarchy An array defining the hierarchy
      */
     public function __construct(array $hierarchy)
@@ -35,9 +35,9 @@ class RoleHierarchy implements RoleHierarchyInterface
 
     /**
      * Returns an array of all roles reachable by the given ones.
-     *
+     * 
      * @param RoleInterface[] $roles An array of RoleInterface instances
-     *
+     * 
      * @return RoleInterface[] An array of RoleInterface instances
      */
     public function getReachableRoles(array $roles)

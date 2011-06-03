@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,14 +13,14 @@ namespace Symfony\Component\Console\Helper;
 
 /**
  * The Formatter class provides helpers to format messages.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class FormatterHelper extends Helper
 {
     /**
      * Formats a message within a section.
-     *
+     * 
      * @param string  $section The section name
      * @param string  $message The message
      * @param string  $style   The style to apply to the section
@@ -32,11 +32,11 @@ class FormatterHelper extends Helper
 
     /**
      * Formats a message as a block of text.
-     *
+     * 
      * @param string|array $messages The message to write in the block
      * @param string       $style    The style to apply to the whole block
      * @param Boolean      $large    Whether to return a large block
-     *
+     * 
      * @return string The formatter message
      */
     public function formatBlock($messages, $style, $large = false)
@@ -67,9 +67,9 @@ class FormatterHelper extends Helper
 
     /**
      * Returns the length of a string, uses mb_strlen if it is available.
-     *
+     * 
      * @param string $string The string to check its length
-     *
+     * 
      * @return integer The length of the string
      */
     private function strlen($string)
@@ -79,7 +79,7 @@ class FormatterHelper extends Helper
 
     /**
      * Returns the helper's canonical name
-     *
+     * 
      * @return string The canonical name of the helper
      */
     public function getName()

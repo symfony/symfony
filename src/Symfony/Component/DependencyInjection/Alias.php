@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ class Alias
 
     /**
      * Constructor.
-     *
+     * 
      * @param string $id Alias identifier
      * @param Boolean $public If this alias is public
      */
@@ -30,7 +30,7 @@ class Alias
 
     /**
      * Checks if this DI Alias should be public or not.
-     *
+     * 
      * @return Boolean
      */
     public function isPublic()
@@ -40,7 +40,7 @@ class Alias
 
     /**
      * Sets if this Alias is public.
-     *
+     * 
      * @param Boolean $boolean If this Alias should be public
      */
     public function setPublic($boolean)
@@ -50,7 +50,7 @@ class Alias
 
     /**
      * Returns the Id of this alias.
-     *
+     * 
      * @return string The alias id
      */
     public function __toString()

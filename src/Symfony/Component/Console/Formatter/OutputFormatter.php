@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,9 +13,9 @@ namespace Symfony\Component\Console\Formatter;
 
 /**
  * Formatter class for console output.
- *
+ * 
  * @author Konstantin Kudryashov <ever.zet@gmail.com>
- *
+ * 
  * @api
  */
 class OutputFormatter implements OutputFormatterInterface
@@ -25,10 +25,10 @@ class OutputFormatter implements OutputFormatterInterface
 
     /**
      * Initializes console output formatter.
-     *
+     * 
      * @param   Boolean $decorated  Whether this formatter should actually decorate strings
      * @param   array   $styles     Array of "name => FormatterStyle" instance
-     *
+     * 
      * @api
      */
     public function __construct($decorated = null, array $styles = array())
@@ -47,9 +47,9 @@ class OutputFormatter implements OutputFormatterInterface
 
     /**
      * Sets the decorated flag.
-     *
+     * 
      * @param Boolean $decorated Whether to decorated the messages or not
-     *
+     * 
      * @api
      */
     public function setDecorated($decorated)
@@ -59,9 +59,9 @@ class OutputFormatter implements OutputFormatterInterface
 
     /**
      * Gets the decorated flag.
-     *
+     * 
      * @return Boolean true if the output will decorate messages, false otherwise
-     *
+     * 
      * @api
      */
     public function isDecorated()
@@ -71,10 +71,10 @@ class OutputFormatter implements OutputFormatterInterface
 
     /**
      * Sets a new style.
-     *
+     * 
      * @param string                        $name  The style name
      * @param OutputFormatterStyleInterface $style The style instance
-     *
+     * 
      * @api
      */
     public function setStyle($name, OutputFormatterStyleInterface $style)
@@ -84,11 +84,11 @@ class OutputFormatter implements OutputFormatterInterface
 
     /**
      * Checks if output formatter has style with specified name.
-     *
+     * 
      * @param   string  $name
-     *
+     * 
      * @return  Boolean
-     *
+     * 
      * @api
      */
     public function hasStyle($name)
@@ -98,11 +98,11 @@ class OutputFormatter implements OutputFormatterInterface
 
     /**
      * Gets style options from style with specified name.
-     *
+     * 
      * @param   string  $name
-     *
+     * 
      * @return  OutputFormatterStyleInterface
-     *
+     * 
      * @api
      */
     public function getStyle($name)
@@ -116,11 +116,11 @@ class OutputFormatter implements OutputFormatterInterface
 
     /**
      * Formats a message according to the given styles.
-     *
+     * 
      * @param  string $message The message to style
-     *
+     * 
      * @return string The styled message
-     *
+     * 
      * @api
      */
     public function format($message)
@@ -130,9 +130,9 @@ class OutputFormatter implements OutputFormatterInterface
 
     /**
      * Replaces style of the output.
-     *
+     * 
      * @param array $match
-     *
+     * 
      * @return string The replaced style
      */
     private function replaceStyle($match)
@@ -156,9 +156,9 @@ class OutputFormatter implements OutputFormatterInterface
 
     /**
      * Tries to create new style instance from string.
-     *
+     * 
      * @param   string  $string
-     *
+     * 
      * @return  Symfony\Component\Console\Format\FormatterStyle|Boolean false if string is not format string
      */
     private function createStyleFromString($string)

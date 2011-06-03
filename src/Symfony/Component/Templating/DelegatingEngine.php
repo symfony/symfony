@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\Templating;
 
 /**
  * DelegatingEngine selects an engine for a given template.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class DelegatingEngine implements EngineInterface
@@ -22,7 +22,7 @@ class DelegatingEngine implements EngineInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param array $engines An array of EngineInterface instances to add
      */
     public function __construct(array $engines = array())
@@ -35,12 +35,12 @@ class DelegatingEngine implements EngineInterface
 
     /**
      * Renders a template.
-     *
+     * 
      * @param mixed $name       A template name or a TemplateReferenceInterface instance
      * @param array $parameters An array of parameters to pass to the template
-     *
+     * 
      * @return string The evaluated template as a string
-     *
+     * 
      * @throws \InvalidArgumentException if the template does not exist
      * @throws \RuntimeException         if the template cannot be rendered
      */
@@ -51,9 +51,9 @@ class DelegatingEngine implements EngineInterface
 
     /**
      * Returns true if the template exists.
-     *
+     * 
      * @param mixed $name A template name or a TemplateReferenceInterface instance
-     *
+     * 
      * @return Boolean true if the template exists, false otherwise
      */
     public function exists($name)
@@ -63,7 +63,7 @@ class DelegatingEngine implements EngineInterface
 
     /**
      * Adds an engine.
-     *
+     * 
      * @param EngineInterface $engine An EngineInterface instance
      */
     public function addEngine(EngineInterface $engine)
@@ -73,9 +73,9 @@ class DelegatingEngine implements EngineInterface
 
     /**
      * Returns true if this class is able to render the given template.
-     *
+     * 
      * @param mixed $name A template name or a TemplateReferenceInterface instance
-     *
+     * 
      * @return Boolean true if this class supports the given template, false otherwise
      */
     public function supports($name)
@@ -91,11 +91,11 @@ class DelegatingEngine implements EngineInterface
 
     /**
      * Get an engine able to render the given template.
-     *
+     * 
      * @param mixed $name A template name or a TemplateReferenceInterface instance
-     *
+     * 
      * @return EngineInterface The engine
-     *
+     * 
      * @throws \RuntimeException if no engine able to work with the template is found
      */
     protected function getEngine($name)

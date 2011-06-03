@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,7 +20,7 @@ class ProxyCacheWarmerTest extends \Symfony\Bundle\DoctrineBundle\Tests\TestCase
      * because there are none in the AnnotationsBundle. However that is
      * rather a task of doctrine to test. We touch the lines here and
      * verify that the container is called correctly for the relevant information.
-     *
+     * 
      * @group DoctrineORMProxy
      */
     public function testWarmCache()

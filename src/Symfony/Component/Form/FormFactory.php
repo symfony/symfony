@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -44,9 +44,9 @@ class FormFactory implements FormFactoryInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param array $extensions An array of FormExtensionInterface
-     *
+     * 
      * @throws UnexpectedTypeException if any extension does not implement FormExtensionInterface
      */
     public function __construct(array $extensions)
@@ -62,9 +62,9 @@ class FormFactory implements FormFactoryInterface
 
     /**
      * Returns whether the given type is supported.
-     *
+     * 
      * @param string $name The name of the type
-     *
+     * 
      * @return Boolean Whether the type is supported
      */
     public function hasType($name)
@@ -84,7 +84,7 @@ class FormFactory implements FormFactoryInterface
 
     /**
      * Add a type.
-     *
+     * 
      * @param FormTypeInterface $type The type
      */
     public function addType(FormTypeInterface $type)
@@ -96,13 +96,13 @@ class FormFactory implements FormFactoryInterface
 
     /**
      * Returns a type by name.
-     *
+     * 
      * This methods registers the type extensions from the form extensions.
-     *
+     * 
      * @param string|FormTypeInterface $name The name of the type or a type instance
-     *
+     * 
      * @return FormTypeInterface The type
-     *
+     * 
      * @throws FormException if the type can not be retrieved from any extension
      */
     public function getType($name)
@@ -120,15 +120,15 @@ class FormFactory implements FormFactoryInterface
 
     /**
      * Returns a form.
-     *
+     * 
      * @see createBuilder()
-     *
+     * 
      * @param string|FormTypeInterface  $type       The type of the form
      * @param mixed                     $data       The initial data
      * @param array                     $options    The options
-     *
+     * 
      * @return Form The form named after the type
-     *
+     * 
      * @throws FormException if any given option is not applicable to the given type
      */
     public function create($type, $data = null, array $options = array())
@@ -138,16 +138,16 @@ class FormFactory implements FormFactoryInterface
 
     /**
      * Returns a form.
-     *
+     * 
      * @see createNamedBuilder()
-     *
+     * 
      * @param string|FormTypeInterface  $type       The type of the form
      * @param string                    $name       The name of the form
      * @param mixed                     $data       The initial data
      * @param array                     $options    The options
-     *
+     * 
      * @return Form The form
-     *
+     * 
      * @throws FormException if any given option is not applicable to the given type
      */
     public function createNamed($type, $name, $data = null, array $options = array())
@@ -157,16 +157,16 @@ class FormFactory implements FormFactoryInterface
 
     /**
      * Returns a form for a property of a class.
-     *
+     * 
      * @see createBuilderForProperty()
-     *
+     * 
      * @param string $class     The fully qualified class name
      * @param string $property  The name of the property to guess for
      * @param mixed  $data      The initial data
      * @param array  $options   The options for the builder
-     *
+     * 
      * @return Form The form named after the property
-     *
+     * 
      * @throws FormException if any given option is not applicable to the form type
      */
     public function createForProperty($class, $property, $data = null, array $options = array())
@@ -176,13 +176,13 @@ class FormFactory implements FormFactoryInterface
 
     /**
      * Returns a form builder
-     *
+     * 
      * @param string|FormTypeInterface  $type       The type of the form
      * @param mixed                     $data       The initial data
      * @param array                     $options    The options
-     *
+     * 
      * @return FormBuilder The form builder
-     *
+     * 
      * @throws FormException if any given option is not applicable to the given type
      */
     public function createBuilder($type, $data = null, array $options = array())
@@ -194,14 +194,14 @@ class FormFactory implements FormFactoryInterface
 
     /**
      * Returns a form builder.
-     *
+     * 
      * @param string|FormTypeInterface  $type       The type of the form
      * @param string                    $name       The name of the form
      * @param mixed                     $data       The initial data
      * @param array                     $options    The options
-     *
+     * 
      * @return FormBuilder The form builder
-     *
+     * 
      * @throws FormException if any given option is not applicable to the given type
      */
     public function createNamedBuilder($type, $name, $data = null, array $options = array())
@@ -283,17 +283,17 @@ class FormFactory implements FormFactoryInterface
 
     /**
      * Returns a form builder for a property of a class.
-     *
+     * 
      * If any of the 'max_length', 'required' and type options can be guessed,
      * and are not provided in the options argument, the guessed value is used.
-     *
+     * 
      * @param string $class     The fully qualified class name
      * @param string $property  The name of the property to guess for
      * @param mixed  $data      The initial data
      * @param array  $options   The options for the builder
-     *
+     * 
      * @return FormBuilder The form builder named after the property
-     *
+     * 
      * @throws FormException if any given option is not applicable to the form type
      */
     public function createBuilderForProperty($class, $property, $data = null, array $options = array())
@@ -353,9 +353,9 @@ class FormFactory implements FormFactoryInterface
 
     /**
      * Loads a type.
-     *
+     * 
      * @param string $name The type name
-     *
+     * 
      * @throws FormException if the type is not provided by any registered extension
      */
     private function loadType($name)
@@ -380,7 +380,7 @@ class FormFactory implements FormFactoryInterface
 
     /**
      * Loads the extensions for a given type.
-     *
+     * 
      * @param FormTypeInterface $type The type
      */
     private function loadTypeExtensions(FormTypeInterface $type)

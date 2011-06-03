@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,9 +15,9 @@ use Symfony\Component\DomCrawler\Field\FormField;
 
 /**
  * Form represents an HTML form.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * @api
  */
 class Form extends Link implements \ArrayAccess
@@ -28,13 +28,13 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Constructor.
-     *
+     * 
      * @param \DOMNode $node       A \DOMNode instance
      * @param string   $currentUri The URI of the page where the form is embedded
      * @param string   $method     The method to use for the link (if null, it defaults to the method defined by the form)
-     *
+     * 
      * @throws \LogicException if the node is not a button inside a form tag
-     *
+     * 
      * @api
      */
     public function __construct(\DOMNode $node, $currentUri, $method = null)
@@ -63,7 +63,7 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Gets the form node associated with this form.
-     *
+     * 
      * @return \DOMNode A \DOMNode instance
      */
     public function getFormNode()
@@ -73,9 +73,9 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Sets the value of the fields.
-     *
+     * 
      * @param array $values An array of field values
-     *
+     * 
      * @api
      */
     public function setValues(array $values)
@@ -89,11 +89,11 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Gets the field values.
-     *
+     * 
      * The returned array does not include file fields (@see getFiles).
-     *
+     * 
      * @return array An array of field values.
-     *
+     * 
      * @api
      */
     public function getValues()
@@ -110,9 +110,9 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Gets the file field values.
-     *
+     * 
      * @return array An array of file field values.
-     *
+     * 
      * @api
      */
     public function getFiles()
@@ -133,12 +133,12 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Gets the field values as PHP.
-     *
+     * 
      * This method converts fields with th array notation
      * (like foo[bar] to arrays) like PHP does.
-     *
+     * 
      * @return array An array of field values.
-     *
+     * 
      * @api
      */
     public function getPhpValues()
@@ -151,12 +151,12 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Gets the file field values as PHP.
-     *
+     * 
      * This method converts fields with th array notation
      * (like foo[bar] to arrays) like PHP does.
-     *
+     * 
      * @return array An array of field values.
-     *
+     * 
      * @api
      */
     public function getPhpFiles()
@@ -169,13 +169,13 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Gets the URI of the form.
-     *
+     * 
      * The returned URI is not the same as the form "action" attribute.
      * This method merges the value if the method is GET to mimics
      * browser behavior.
-     *
+     * 
      * @return string The URI
-     *
+     * 
      * @api
      */
     public function getUri()
@@ -197,11 +197,11 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Gets the form method.
-     *
+     * 
      * If no method is defined in the form, GET is returned.
-     *
+     * 
      * @return string The method
-     *
+     * 
      * @api
      */
     public function getMethod()
@@ -215,11 +215,11 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Returns true if the named field exists.
-     *
+     * 
      * @param string $name The field name
-     *
+     * 
      * @return Boolean true if the field exists, false otherwise
-     *
+     * 
      * @api
      */
     public function has($name)
@@ -229,9 +229,9 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Removes a field from the form.
-     *
+     * 
      * @param string $name The field name
-     *
+     * 
      * @api
      */
     public function remove($name)
@@ -241,13 +241,13 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Gets a named field.
-     *
+     * 
      * @param string $name The field name
-     *
+     * 
      * @return FormField The field instance
-     *
+     * 
      * @throws \InvalidArgumentException When field is not present in this form
-     *
+     * 
      * @api
      */
     public function get($name)
@@ -261,11 +261,11 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Sets a named field.
-     *
+     * 
      * @param Field\FormField $field The field
-     *
+     * 
      * @return FormField The field instance
-     *
+     * 
      * @api
      */
     public function set(Field\FormField $field)
@@ -275,9 +275,9 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Gets all fields.
-     *
+     * 
      * @return array An array of fields
-     *
+     * 
      * @api
      */
     public function all()
@@ -326,9 +326,9 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Returns true if the named field exists.
-     *
+     * 
      * @param string $name The field name
-     *
+     * 
      * @return Boolean true if the field exists, false otherwise
      */
     public function offsetExists($name)
@@ -338,11 +338,11 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Gets the value of a field.
-     *
+     * 
      * @param string $name The field name
-     *
+     * 
      * @return FormField The associated Field instance
-     *
+     * 
      * @throws \InvalidArgumentException if the field does not exist
      */
     public function offsetGet($name)
@@ -356,10 +356,10 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Sets the value of a field.
-     *
+     * 
      * @param string       $name  The field name
      * @param string|array $value The value of the field
-     *
+     * 
      * @throws \InvalidArgumentException if the field does not exist
      */
     public function offsetSet($name, $value)
@@ -373,7 +373,7 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Removes a field from the form.
-     *
+     * 
      * @param string $name The field name
      */
     public function offsetUnset($name)

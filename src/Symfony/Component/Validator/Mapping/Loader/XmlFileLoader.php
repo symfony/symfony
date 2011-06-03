@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -67,9 +67,9 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Parses a collection of "constraint" XML nodes.
-     *
+     * 
      * @param SimpleXMLElement $nodes The XML nodes
-     *
+     * 
      * @return array The Constraint instances
      */
     protected function parseConstraints(\SimpleXMLElement $nodes)
@@ -101,9 +101,9 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Parses a collection of "value" XML nodes.
-     *
+     * 
      * @param SimpleXMLElement $nodes The XML nodes
-     *
+     * 
      * @return array The values
      */
     protected function parseValues(\SimpleXMLElement $nodes)
@@ -135,9 +135,9 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Parses a collection of "option" XML nodes.
-     *
+     * 
      * @param SimpleXMLElement $nodes The XML nodes
-     *
+     * 
      * @return array The options
      */
     protected function parseOptions(\SimpleXMLElement $nodes)
@@ -165,11 +165,11 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Parse a XML File.
-     *
+     * 
      * @param string $file Path of file
-     *
+     * 
      * @return SimpleXMLElement
-     *
+     * 
      * @throws MappingException
      */
     protected function parseFile($file)

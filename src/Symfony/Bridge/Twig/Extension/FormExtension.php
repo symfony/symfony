@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Component\Form\Exception\FormException;
 
 /**
  * FormExtension extends Twig with form capabilities.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
@@ -48,7 +48,7 @@ class FormExtension extends \Twig_Extension
 
     /**
      * Sets a theme for a given view.
-     *
+     * 
      * @param FormView $view      A FormView instance
      * @param array    $resources An array of resources
      */
@@ -60,7 +60,7 @@ class FormExtension extends \Twig_Extension
 
     /**
      * Returns the token parser instance to add to the existing list.
-     *
+     * 
      * @return array An array of Twig_TokenParser instances
      */
     public function getTokenParsers()
@@ -85,13 +85,13 @@ class FormExtension extends \Twig_Extension
 
     /**
      * Renders the HTML enctype in the form tag, if necessary
-     *
+     * 
      * Example usage in Twig templates:
-     *
+     * 
      *     <form action="..." method="post" {{ form_enctype(form) }}>
-     *
+     * 
      * @param FormView $view  The view for which to render the encoding type
-     *
+     * 
      * @return string The html markup
      */
     public function renderEnctype(FormView $view)
@@ -101,10 +101,10 @@ class FormExtension extends \Twig_Extension
 
     /**
      * Renders a row for the view.
-     *
+     * 
      * @param FormView $view      The view to render as a row
      * @param array    $variables An array of variables
-     *
+     * 
      * @return string The html markup
      */
     public function renderRow(FormView $view, array $variables = array())
@@ -114,10 +114,10 @@ class FormExtension extends \Twig_Extension
 
     /**
      * Renders views which have not already been rendered.
-     *
+     * 
      * @param FormView $view      The parent view
      * @param array    $variables An array of variables
-     *
+     * 
      * @return string The html markup
      */
     public function renderRest(FormView $view, array $variables = array())
@@ -127,20 +127,20 @@ class FormExtension extends \Twig_Extension
 
     /**
      * Renders the HTML for a given view
-     *
+     * 
      * Example usage in Twig:
-     *
+     * 
      *     {{ form_widget(view) }}
-     *
+     * 
      * You can pass options during the call:
-     *
+     * 
      *     {{ form_widget(view, {'attr': {'class': 'foo'}}) }}
-     *
+     * 
      *     {{ form_widget(view, {'separator': '+++++'}) }}
-     *
+     * 
      * @param FormView        $view      The view to render
      * @param array           $variables Additional variables passed to the template
-     *
+     * 
      * @return string The html markup
      */
     public function renderWidget(FormView $view, array $variables = array())
@@ -150,9 +150,9 @@ class FormExtension extends \Twig_Extension
 
     /**
      * Renders the errors of the given view
-     *
+     * 
      * @param FormView $view The view to render the errors for
-     *
+     * 
      * @return string The html markup
      */
     public function renderErrors(FormView $view)
@@ -162,11 +162,11 @@ class FormExtension extends \Twig_Extension
 
     /**
      * Renders the label of the given view
-     *
+     * 
      * @param FormView $view  The view to render the label for
      * @param string   $label Label name
      * @param array    $variables Additional variables passed to the template
-     *
+     * 
      * @return string The html markup
      */
     public function renderLabel(FormView $view, $label = null, array $variables = array())
@@ -180,19 +180,19 @@ class FormExtension extends \Twig_Extension
 
     /**
      * Renders a template.
-     *
+     * 
      * 1. This function first looks for a block named "_<view id>_<section>",
      * 2. if such a block is not found the function will look for a block named
      *    "<type name>_<section>",
      * 3. the type name is recusrively replaced by the parent type name until a
      *    corresponding block is found
-     *
+     * 
      * @param FormView  $view       The form view
      * @param string    $section    The section to render (i.e. 'row', 'widget', 'label', ...)
      * @param array     $variables  Additional variables
-     *
+     * 
      * @return string The html markup
-     *
+     * 
      * @throws FormException if no template block exists to render the given section of the view
      */
     protected function render(FormView $view, $section, array $variables = array())
@@ -228,13 +228,13 @@ class FormExtension extends \Twig_Extension
 
     /**
      * Returns the templates used by the view.
-     *
+     * 
      * templates are looked for in the following resources:
      *   * resources from the themes (and its parents)
      *   * default resources
-     *
+     * 
      * @param FormView $view The view
-     *
+     * 
      * @return array An array of Twig_TemplateInterface instances
      */
     protected function getTemplates(FormView $view)
@@ -275,9 +275,9 @@ class FormExtension extends \Twig_Extension
 
     /**
      * Returns all the block defined in the template hierarchy.
-     *
+     * 
      * @param \Twig_Template $template
-     *
+     * 
      * @return array A list of block names
      */
     protected function getBlockNames(\Twig_Template $template)
@@ -292,7 +292,7 @@ class FormExtension extends \Twig_Extension
 
     /**
      * Returns the name of the extension.
-     *
+     * 
      * @return string The extension name
      */
     public function getName()

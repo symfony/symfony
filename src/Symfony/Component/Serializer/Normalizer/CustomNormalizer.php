@@ -6,9 +6,9 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -38,7 +38,7 @@ class CustomNormalizer extends SerializerAwareNormalizer
 
     /**
      * Checks if the given class implements the NormalizableInterface.
-     *
+     * 
      * @param mixed   $data   Data to normalize.
      * @param string  $format The format being (de-)serialized from or into.
      * @return Boolean
@@ -50,7 +50,7 @@ class CustomNormalizer extends SerializerAwareNormalizer
 
     /**
      * Checks if the given class implements the NormalizableInterface.
-     *
+     * 
      * @param mixed   $data   Data to denormalize from.
      * @param string  $type   The class to which the data should be denormalized.
      * @param string  $format The format being deserialized from.

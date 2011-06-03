@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 /**
  * SwitchUserRole is used when the current user temporarily impersonates
  * another one.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SwitchUserRole extends Role
@@ -25,7 +25,7 @@ class SwitchUserRole extends Role
 
     /**
      * Constructor.
-     *
+     * 
      * @param string         $role   The role as a string
      * @param TokenInterface $source The original token
      */
@@ -38,7 +38,7 @@ class SwitchUserRole extends Role
 
     /**
      * Returns the original Token.
-     *
+     * 
      * @return TokenInterface The original TokenInterface instance
      */
     public function getSource()

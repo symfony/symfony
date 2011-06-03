@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,7 +16,7 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
  * TemplateLocator locates templates in bundles.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class TemplateLocator implements FileLocatorInterface
@@ -27,7 +27,7 @@ class TemplateLocator implements FileLocatorInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param FileLocatorInterface $locator A FileLocatorInterface instance
      */
     public function __construct(FileLocatorInterface $locator)
@@ -38,13 +38,13 @@ class TemplateLocator implements FileLocatorInterface
 
     /**
      * Returns a full path for a given file.
-     *
+     * 
      * @param TemplateReferenceInterface $template     A template
      * @param string                     $currentPath  Unused
      * @param Boolean                    $first        Unused
-     *
+     * 
      * @return string The full path for the file
-     *
+     * 
      * @throws \InvalidArgumentException When the template is not an instance of TemplateReferenceInterface
      * @throws \InvalidArgumentException When the template file can not be found
      */

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,9 +20,9 @@ use Symfony\Component\Console\Application;
 
 /**
  * Base class for all commands.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * @api
  */
 class Command
@@ -41,11 +41,11 @@ class Command
 
     /**
      * Constructor.
-     *
+     * 
      * @param string $name The name of the command
-     *
+     * 
      * @throws \LogicException When the command name is empty
-     *
+     * 
      * @api
      */
     public function __construct($name = null)
@@ -68,9 +68,9 @@ class Command
 
     /**
      * Sets the application instance for this command.
-     *
+     * 
      * @param Application $application An Application instance
-     *
+     * 
      * @api
      */
     public function setApplication(Application $application = null)
@@ -80,9 +80,9 @@ class Command
 
     /**
      * Gets the application instance for this command.
-     *
+     * 
      * @return Application An Application instance
-     *
+     * 
      * @api
      */
     public function getApplication()
@@ -99,17 +99,17 @@ class Command
 
     /**
      * Executes the current command.
-     *
+     * 
      * This method is not abstract because you can use this class
      * as a concrete class. In this case, instead of defining the
      * execute() method, you set the code to execute by passing
      * a Closure to the setCode() method.
-     *
+     * 
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
-     *
+     * 
      * @return integer 0 if everything went fine, or an error code
-     *
+     * 
      * @throws \LogicException When this abstract method is not implemented
      * @see    setCode()
      */
@@ -120,7 +120,7 @@ class Command
 
     /**
      * Interacts with the user.
-     *
+     * 
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      */
@@ -130,10 +130,10 @@ class Command
 
     /**
      * Initializes the command just after the input has been validated.
-     *
+     * 
      * This is mainly useful when a lot of commands extends one main command
      * where some things need to be initialized based on the input arguments and options.
-     *
+     * 
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      */
@@ -143,17 +143,17 @@ class Command
 
     /**
      * Runs the command.
-     *
+     * 
      * The code to execute is either defined directly with the
      * setCode() method or by overriding the execute() method
      * in a sub-class.
-     *
+     * 
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
-     *
+     * 
      * @see setCode()
      * @see execute()
-     *
+     * 
      * @api
      */
     public function run(InputInterface $input, OutputInterface $output)
@@ -190,16 +190,16 @@ class Command
 
     /**
      * Sets the code to execute when running this command.
-     *
+     * 
      * If this method is used, it overrides the code defined
      * in the execute() method.
-     *
+     * 
      * @param \Closure $code A \Closure
-     *
+     * 
      * @return Command The current instance
-     *
+     * 
      * @see execute()
-     *
+     * 
      * @api
      */
     public function setCode(\Closure $code)
@@ -230,11 +230,11 @@ class Command
 
     /**
      * Sets an array of argument and option instances.
-     *
+     * 
      * @param array|Definition $definition An array of argument and option instances or a definition instance
-     *
+     * 
      * @return Command The current instance
-     *
+     * 
      * @api
      */
     public function setDefinition($definition)
@@ -252,9 +252,9 @@ class Command
 
     /**
      * Gets the InputDefinition attached to this Command.
-     *
+     * 
      * @return InputDefinition An InputDefinition instance
-     *
+     * 
      * @api
      */
     public function getDefinition()
@@ -264,14 +264,14 @@ class Command
 
     /**
      * Adds an argument.
-     *
+     * 
      * @param string  $name        The argument name
      * @param integer $mode        The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
      * @param string  $description A description text
      * @param mixed   $default     The default value (for InputArgument::OPTIONAL mode only)
-     *
+     * 
      * @return Command The current instance
-     *
+     * 
      * @api
      */
     public function addArgument($name, $mode = null, $description = '', $default = null)
@@ -283,15 +283,15 @@ class Command
 
     /**
      * Adds an option.
-     *
+     * 
      * @param string  $name        The option name
      * @param string  $shortcut    The shortcut (can be null)
      * @param integer $mode        The option mode: One of the InputOption::VALUE_* constants
      * @param string  $description A description text
      * @param mixed   $default     The default value (must be null for InputOption::VALUE_REQUIRED or self::VALUE_NONE)
-     *
+     * 
      * @return Command The current instance
-     *
+     * 
      * @api
      */
     public function addOption($name, $shortcut = null, $mode = null, $description = '', $default = null)
@@ -303,18 +303,18 @@ class Command
 
     /**
      * Sets the name of the command.
-     *
+     * 
      * This method can set both the namespace and the name if
      * you separate them by a colon (:)
-     *
+     * 
      *     $command->setName('foo:bar');
-     *
+     * 
      * @param string $name The command name
-     *
+     * 
      * @return Command The current instance
-     *
+     * 
      * @throws \InvalidArgumentException When command name given is empty
-     *
+     * 
      * @api
      */
     public function setName($name)
@@ -338,9 +338,9 @@ class Command
 
     /**
      * Returns the command namespace.
-     *
+     * 
      * @return string The command namespace
-     *
+     * 
      * @api
      */
     public function getNamespace()
@@ -350,9 +350,9 @@ class Command
 
     /**
      * Returns the command name.
-     *
+     * 
      * @return string The command name
-     *
+     * 
      * @api
      */
     public function getName()
@@ -362,9 +362,9 @@ class Command
 
     /**
      * Returns the fully qualified command name.
-     *
+     * 
      * @return string The fully qualified command name
-     *
+     * 
      * @api
      */
     public function getFullName()
@@ -374,11 +374,11 @@ class Command
 
     /**
      * Sets the description for the command.
-     *
+     * 
      * @param string $description The description for the command
-     *
+     * 
      * @return Command The current instance
-     *
+     * 
      * @api
      */
     public function setDescription($description)
@@ -390,9 +390,9 @@ class Command
 
     /**
      * Returns the description for the command.
-     *
+     * 
      * @return string The description for the command
-     *
+     * 
      * @api
      */
     public function getDescription()
@@ -402,11 +402,11 @@ class Command
 
     /**
      * Sets the help for the command.
-     *
+     * 
      * @param string $help The help for the command
-     *
+     * 
      * @return Command The current instance
-     *
+     * 
      * @api
      */
     public function setHelp($help)
@@ -418,9 +418,9 @@ class Command
 
     /**
      * Returns the help for the command.
-     *
+     * 
      * @return string The help for the command
-     *
+     * 
      * @api
      */
     public function getHelp()
@@ -431,7 +431,7 @@ class Command
     /**
      * Returns the processed help for the command replacing the %command.name% and
      * %command.full_name% patterns with the real values dynamically.
-     *
+     * 
      * @return string  The processed help for the command
      */
     public function getProcessedHelp()
@@ -452,11 +452,11 @@ class Command
 
     /**
      * Sets the aliases for the command.
-     *
+     * 
      * @param array $aliases An array of aliases for the command
-     *
+     * 
      * @return Command The current instance
-     *
+     * 
      * @api
      */
     public function setAliases($aliases)
@@ -468,9 +468,9 @@ class Command
 
     /**
      * Returns the aliases for the command.
-     *
+     * 
      * @return array An array of aliases for the command
-     *
+     * 
      * @api
      */
     public function getAliases()
@@ -480,7 +480,7 @@ class Command
 
     /**
      * Returns the synopsis for the command.
-     *
+     * 
      * @return string The synopsis
      */
     public function getSynopsis()
@@ -494,13 +494,13 @@ class Command
 
     /**
      * Gets a helper instance by name.
-     *
+     * 
      * @param string $name The helper name
-     *
+     * 
      * @return mixed The helper value
-     *
+     * 
      * @throws \InvalidArgumentException if the helper is not defined
-     *
+     * 
      * @api
      */
     public function getHelper($name)
@@ -510,7 +510,7 @@ class Command
 
     /**
      * Returns a text representation of the command.
-     *
+     * 
      * @return string A string representing the command
      */
     public function asText()
@@ -537,9 +537,9 @@ class Command
 
     /**
      * Returns an XML representation of the command.
-     *
+     * 
      * @param Boolean $asDom Whether to return a DOM or an XML string
-     *
+     * 
      * @return string|DOMDocument An XML string representing the command
      */
     public function asXml($asDom = false)

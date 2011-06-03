@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  * ControllerNameParser converts controller from the short notation a:b:c
  * (BlogBundle:Post:index) to a fully-qualified class::method string
  * (Bundle\BlogBundle\Controller\PostController::indexAction).
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ControllerNameParser
@@ -28,7 +28,7 @@ class ControllerNameParser
 
     /**
      * Constructor.
-     *
+     * 
      * @param KernelInterface $kernel A KernelInterface instance
      * @param LoggerInterface $logger A LoggerInterface instance
      */
@@ -40,9 +40,9 @@ class ControllerNameParser
 
     /**
      * Converts a short notation a:b:c to a class::method.
-     *
+     * 
      * @param string $controller A short notation controller (a:b:c)
-     *
+     * 
      * @param string A controller (class::method)
      */
     public function parse($controller)

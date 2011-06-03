@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpFoundation;
 
 /**
  * Response represents an HTTP response.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Response
@@ -75,7 +75,7 @@ class Response
 
     /**
      * Constructor.
-     *
+     * 
      * @param string  $content The response content
      * @param integer $status  The response status code
      * @param array   $headers An array of response headers
@@ -94,7 +94,7 @@ class Response
 
     /**
      * Returns the response content as it will be sent (with the headers).
-     *
+     * 
      * @return string The response content
      */
     public function __toString()
@@ -157,7 +157,7 @@ class Response
 
     /**
      * Sets the response content
-     *
+     * 
      * @param string $content
      */
     public function setContent($content)
@@ -167,7 +167,7 @@ class Response
 
     /**
      * Gets the current response content
-     *
+     * 
      * @return string Content
      */
     public function getContent()
@@ -177,7 +177,7 @@ class Response
 
     /**
      * Sets the HTTP protocol version (1.0 or 1.1).
-     *
+     * 
      * @param string $version The HTTP protocol version
      */
     public function setProtocolVersion($version)
@@ -187,7 +187,7 @@ class Response
 
     /**
      * Gets the HTTP protocol version.
-     *
+     * 
      * @return string The HTTP protocol version
      */
     public function getProtocolVersion()
@@ -197,10 +197,10 @@ class Response
 
     /**
      * Sets response status code.
-     *
+     * 
      * @param integer $code HTTP status code
      * @param string  $text HTTP status text
-     *
+     * 
      * @throws \InvalidArgumentException When the HTTP status code is not valid
      */
     public function setStatusCode($code, $text = null)
@@ -215,7 +215,7 @@ class Response
 
     /**
      * Retrieves status code for the current web response.
-     *
+     * 
      * @return string Status code
      */
     public function getStatusCode()
@@ -225,7 +225,7 @@ class Response
 
     /**
      * Sets response charset.
-     *
+     * 
      * @param string $charset Character set
      */
     public function setCharset($charset)
@@ -235,7 +235,7 @@ class Response
 
     /**
      * Retrieves the response charset.
-     *
+     * 
      * @return string Character set
      */
     public function getCharset()
@@ -245,13 +245,13 @@ class Response
 
     /**
      * Returns true if the response is worth caching under any circumstance.
-     *
+     * 
      * Responses marked "private" with an explicit Cache-Control directive are
      * considered uncacheable.
-     *
+     * 
      * Responses with neither a freshness lifetime (Expires, max-age) nor cache
      * validator (Last-Modified, ETag) are considered uncacheable.
-     *
+     * 
      * @return Boolean true if the response is worth caching, false otherwise
      */
     public function isCacheable()
@@ -269,11 +269,11 @@ class Response
 
     /**
      * Returns true if the response is "fresh".
-     *
+     * 
      * Fresh responses may be served from cache without any interaction with the
      * origin. A response is considered fresh when it includes a Cache-Control/max-age
      * indicator or Expiration header and the calculated age is less than the freshness lifetime.
-     *
+     * 
      * @return Boolean true if the response is fresh, false otherwise
      */
     public function isFresh()
@@ -284,7 +284,7 @@ class Response
     /**
      * Returns true if the response includes headers that can be used to validate
      * the response with the origin server using a conditional GET request.
-     *
+     * 
      * @return Boolean true if the response is validateable, false otherwise
      */
     public function isValidateable()
@@ -294,7 +294,7 @@ class Response
 
     /**
      * Marks the response as "private".
-     *
+     * 
      * It makes the response ineligible for serving other clients.
      */
     public function setPrivate()
@@ -305,7 +305,7 @@ class Response
 
     /**
      * Marks the response as "public".
-     *
+     * 
      * It makes the response eligible for serving other clients.
      */
     public function setPublic()
@@ -316,12 +316,12 @@ class Response
 
     /**
      * Returns true if the response must be revalidated by caches.
-     *
+     * 
      * This method indicates that the response must not be served stale by a
      * cache in any circumstance without first revalidating with the origin.
      * When present, the TTL of the response should not be overridden to be
      * greater than the value provided by the origin.
-     *
+     * 
      * @return Boolean true if the response must be revalidated by a cache, false otherwise
      */
     public function mustRevalidate()
@@ -331,9 +331,9 @@ class Response
 
     /**
      * Returns the Date header as a DateTime instance.
-     *
+     * 
      * @return \DateTime A \DateTime instance
-     *
+     * 
      * @throws \RuntimeException when the header is not parseable
      */
     public function getDate()
@@ -343,7 +343,7 @@ class Response
 
     /**
      * Sets the Date header.
-     *
+     * 
      * @param \DateTime $date A \DateTime instance
      */
     public function setDate(\DateTime $date)
@@ -354,7 +354,7 @@ class Response
 
     /**
      * Returns the age of the response.
-     *
+     * 
      * @return integer The age of the response in seconds
      */
     public function getAge()
@@ -378,7 +378,7 @@ class Response
 
     /**
      * Returns the value of the Expires header as a DateTime instance.
-     *
+     * 
      * @return \DateTime A DateTime instance
      */
     public function getExpires()
@@ -388,9 +388,9 @@ class Response
 
     /**
      * Sets the Expires HTTP header with a \DateTime instance.
-     *
+     * 
      * If passed a null value, it removes the header.
-     *
+     * 
      * @param \DateTime $date A \DateTime instance
      */
     public function setExpires(\DateTime $date = null)
@@ -407,10 +407,10 @@ class Response
     /**
      * Sets the number of seconds after the time specified in the response's Date
      * header when the the response should no longer be considered fresh.
-     *
+     * 
      * First, it checks for a s-maxage directive, then a max-age directive, and then it falls
      * back on an expires header. It returns null when no maximum age can be established.
-     *
+     * 
      * @return integer|null Number of seconds
      */
     public function getMaxAge()
@@ -432,9 +432,9 @@ class Response
 
     /**
      * Sets the number of seconds after which the response should no longer be considered fresh.
-     *
+     * 
      * This methods sets the Cache-Control max-age directive.
-     *
+     * 
      * @param integer $value A number of seconds
      */
     public function setMaxAge($value)
@@ -444,9 +444,9 @@ class Response
 
     /**
      * Sets the number of seconds after which the response should no longer be considered fresh by shared caches.
-     *
+     * 
      * This methods sets the Cache-Control s-maxage directive.
-     *
+     * 
      * @param integer $value A number of seconds
      */
     public function setSharedMaxAge($value)
@@ -457,12 +457,12 @@ class Response
 
     /**
      * Returns the response's time-to-live in seconds.
-     *
+     * 
      * It returns null when no freshness information is present in the response.
-     *
+     * 
      * When the responses TTL is <= 0, the response may not be served from cache without first
      * revalidating with the origin.
-     *
+     * 
      * @return integer The TTL in seconds
      */
     public function getTtl()
@@ -476,9 +476,9 @@ class Response
 
     /**
      * Sets the response's time-to-live for shared caches.
-     *
+     * 
      * This method adjusts the Cache-Control/s-maxage directive.
-     *
+     * 
      * @param integer $seconds The number of seconds
      */
     public function setTtl($seconds)
@@ -488,9 +488,9 @@ class Response
 
     /**
      * Sets the response's time-to-live for private/client caches.
-     *
+     * 
      * This method adjusts the Cache-Control/max-age directive.
-     *
+     * 
      * @param integer $seconds The number of seconds
      */
     public function setClientTtl($seconds)
@@ -500,7 +500,7 @@ class Response
 
     /**
      * Returns the Last-Modified HTTP header as a DateTime instance.
-     *
+     * 
      * @return \DateTime A DateTime instance
      */
     public function getLastModified()
@@ -510,9 +510,9 @@ class Response
 
     /**
      * Sets the Last-Modified HTTP header with a \DateTime instance.
-     *
+     * 
      * If passed a null value, it removes the header.
-     *
+     * 
      * @param \DateTime $date A \DateTime instance
      */
     public function setLastModified(\DateTime $date = null)
@@ -528,7 +528,7 @@ class Response
 
     /**
      * Returns the literal value of ETag HTTP header.
-     *
+     * 
      * @return string The ETag HTTP header
      */
     public function getEtag()
@@ -538,7 +538,7 @@ class Response
 
     /**
      * Sets the ETag value.
-     *
+     * 
      * @param string  $etag The ETag unique identifier
      * @param Boolean $weak Whether you want a weak ETag or not
      */
@@ -557,9 +557,9 @@ class Response
 
     /**
      * Sets Response cache headers (validation and/or expiration).
-     *
+     * 
      * Available options are: etag, last_modified, max_age, s_maxage, private, and public.
-     *
+     * 
      * @param array $options An array of cache options
      */
     public function setCache(array $options)
@@ -603,10 +603,10 @@ class Response
 
     /**
      * Modifies the response so that it conforms to the rules defined for a 304 status code.
-     *
+     * 
      * This sets the status, removes the body, and discards any headers
      * that MUST NOT be included in 304 responses.
-     *
+     * 
      * @see http://tools.ietf.org/html/rfc2616#section-10.3.5
      */
     public function setNotModified()
@@ -622,7 +622,7 @@ class Response
 
     /**
      * Returns true if the response includes a Vary header.
-     *
+     * 
      * @return true if the response includes a Vary header, false otherwise
      */
     public function hasVary()
@@ -632,7 +632,7 @@ class Response
 
     /**
      * Returns an array of header names given in the Vary header.
-     *
+     * 
      * @return array An array of Vary names
      */
     public function getVary()
@@ -646,7 +646,7 @@ class Response
 
     /**
      * Sets the Vary header.
-     *
+     * 
      * @param string|array $headers
      * @param Boolean      $replace Whether to replace the actual value of not (true by default)
      */
@@ -658,12 +658,12 @@ class Response
     /**
      * Determines if the Response validators (ETag, Last-Modified) matches
      * a conditional value specified in the Request.
-     *
+     * 
      * If the Response is not modified, it sets the status code to 304 and
      * remove the actual content by calling the setNotModified() method.
-     *
+     * 
      * @param Request $request A Request instance
-     *
+     * 
      * @return Boolean true if the Response validators matches the Request, false otherwise
      */
     public function isNotModified(Request $request)

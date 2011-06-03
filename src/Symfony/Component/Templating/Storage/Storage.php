@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\Templating\Storage;
 
 /**
  * Storage is the base class for all storage classes.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class Storage
@@ -22,7 +22,7 @@ abstract class Storage
 
     /**
      * Constructor.
-     *
+     * 
      * @param string $template The template name
      */
     public function __construct($template)
@@ -32,7 +32,7 @@ abstract class Storage
 
     /**
      * Returns the object string representation.
-     *
+     * 
      * @return string The template name
      */
     public function __toString()
@@ -42,7 +42,7 @@ abstract class Storage
 
     /**
      * Returns the content of the template.
-     *
+     * 
      * @return string The template content
      */
     abstract public function getContent();

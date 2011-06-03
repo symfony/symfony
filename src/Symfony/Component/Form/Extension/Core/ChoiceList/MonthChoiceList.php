@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ class MonthChoiceList extends PaddedChoiceList
 
     /**
      * Generates an array of localized month choices.
-     *
+     * 
      * @param IntlDateFormatter $formatter An IntlDateFormatter instance
      * @param array             $months    The month numbers to generate
      */
@@ -29,7 +29,7 @@ class MonthChoiceList extends PaddedChoiceList
 
     /**
      * Initializes the list of months.
-     *
+     * 
      * @throws UnexpectedTypeException if the function does not return an array
      */
     protected function load()

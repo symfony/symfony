@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,21 +13,21 @@ namespace Symfony\Component\Finder;
 
 /**
  * Glob matches globbing patterns against text.
- *
+ * 
  *   if match_glob("foo.*", "foo.bar") echo "matched\n";
- *
+ * 
  * // prints foo.bar and foo.baz
  * $regex = glob_to_regex("foo.*");
  * for (array('foo.bar', 'foo.baz', 'foo', 'bar') as $t)
  * {
  *   if (/$regex/) echo "matched: $car\n";
  * }
- *
+ * 
  * Glob implements glob(3) style matching that can be used to match
  * against text, rather than fetching names from a filesystem.
- *
+ * 
  * Based on the Perl Text::Glob module.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com> PHP port
  * @author     Richard Clamp <richardc@unixbeard.net> Perl version
  * @copyright  2004-2005 Fabien Potencier <fabien@symfony.com>
@@ -37,11 +37,11 @@ class Glob
 {
     /**
      * Returns a regexp which is the equivalent of the glob pattern.
-     *
+     * 
      * @param string  $glob                The glob pattern
      * @param Boolean $strictLeadingDot
      * @param Boolean $strictWildcardSlash
-     *
+     * 
      * @return string regex The regexp
      */
     static public function toRegex($glob, $strictLeadingDot = true, $strictWildcardSlash = true)

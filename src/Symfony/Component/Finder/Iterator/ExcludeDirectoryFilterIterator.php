@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\Finder\Iterator;
 
 /**
  * ExcludeDirectoryFilterIterator filters out directories.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ExcludeDirectoryFilterIterator extends \FilterIterator
@@ -22,7 +22,7 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator
 
     /**
      * Constructor.
-     *
+     * 
      * @param \Iterator $iterator    The Iterator to filter
      * @param array     $directories An array of directories to exclude
      */
@@ -38,7 +38,7 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator
 
     /**
      * Filters the iterator values.
-     *
+     * 
      * @return Boolean true if the value should be kept, false otherwise
      */
     public function accept()

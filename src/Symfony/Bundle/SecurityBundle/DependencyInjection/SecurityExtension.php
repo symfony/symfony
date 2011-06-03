@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -27,7 +27,7 @@ use Symfony\Component\Config\Definition\Processor;
 
 /**
  * SecurityExtension.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -146,7 +146,7 @@ class SecurityExtension extends Extension
 
     /**
      * Loads the web configuration.
-     *
+     * 
      * @param array            $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
@@ -604,7 +604,7 @@ class SecurityExtension extends Extension
 
     /**
      * Returns the base path for the XSD files.
-     *
+     * 
      * @return string The XSD base path
      */
     public function getXsdValidationBasePath()

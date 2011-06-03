@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * RequestDataCollector.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RequestDataCollector extends BaseRequestDataCollector
@@ -66,7 +66,7 @@ class RequestDataCollector extends BaseRequestDataCollector
 
     /**
      * Gets the route.
-     *
+     * 
      * @return string The route
      */
     public function getRoute()
@@ -76,7 +76,7 @@ class RequestDataCollector extends BaseRequestDataCollector
 
     /**
      * Gets the controller.
-     *
+     * 
      * @return string The controller as a string
      */
     public function getController()

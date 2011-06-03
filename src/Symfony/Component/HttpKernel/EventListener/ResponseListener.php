@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * ResponseListener fixes the Response Content-Type.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ResponseListener
@@ -31,7 +31,7 @@ class ResponseListener
 
     /**
      * Filters the Response.
-     *
+     * 
      * @param FilterResponseEvent $event    A FilterResponseEvent instance
      */
     public function onCoreResponse(FilterResponseEvent $event)

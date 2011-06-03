@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 /**
  * The base node class
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 abstract class BaseNode implements NodeInterface
@@ -33,7 +33,7 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param string $name The name of the node
      * @param NodeInterface $parent The parent of this node
      * @throws \InvalidArgumentException if the name contains a period.
@@ -55,7 +55,7 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Adds an equivalent value.
-     *
+     * 
      * @param mixed $originalValue
      * @param mixed $equivalentValue
      */
@@ -66,7 +66,7 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Set this node as required.
-     *
+     * 
      * @param Boolean $boolean Required node
      */
     public function setRequired($boolean)
@@ -76,7 +76,7 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Sets if this node can be overridden.
-     *
+     * 
      * @param Boolean $allow
      */
     public function setAllowOverwrite($allow)
@@ -86,7 +86,7 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Sets the closures used for normalization.
-     *
+     * 
      * @param array $closures An array of Closures used for normalization
      */
     public function setNormalizationClosures(array $closures)
@@ -96,7 +96,7 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Sets the closures used for final validation.
-     *
+     * 
      * @param array $closures An array of Closures used for final validation
      */
     public function setFinalValidationClosures(array $closures)
@@ -106,7 +106,7 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Checks if this node is required.
-     *
+     * 
      * @return Boolean
      */
     public function isRequired()
@@ -116,7 +116,7 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Returns the name of this node
-     *
+     * 
      * @return string The Node's name.
      */
     public function getName()
@@ -126,7 +126,7 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Retrieves the path of this node.
-     *
+     * 
      * @return string The Node's path
      */
     public function getPath()
@@ -142,7 +142,7 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Merges two values together.
-     *
+     * 
      * @param mixed $leftSide
      * @param mixed $rightSide
      * @return mixed The merged value
@@ -167,9 +167,9 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Normalizes a value, applying all normalization closures.
-     *
+     * 
      * @param mixed $value Value to normalize.
-     *
+     * 
      * @return mixed The normalized value.
      */
     public final function normalize($value)
@@ -195,7 +195,7 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Finalizes a value, applying all finalization closures.
-     *
+     * 
      * @param mixed $value The value to finalize
      * @return mixed The finalized value
      */
@@ -226,7 +226,7 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Validates the type of a Node.
-     *
+     * 
      * @param mixed $value The value to validate
      * @throws InvalidTypeException when the value is invalid
      */
@@ -234,7 +234,7 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Normalizes the value.
-     *
+     * 
      * @param mixed $value The value to normalize.
      * @return mixed The normalized value
      */
@@ -242,7 +242,7 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Merges two values together
-     *
+     * 
      * @param mixed $leftSide
      * @param mixed $rightSide
      * @return mixed The merged value
@@ -251,7 +251,7 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Finalizes a value
-     *
+     * 
      * @param mixed $value The value to finalize
      * @return mixed The finalized value
      */

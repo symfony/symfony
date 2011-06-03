@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,9 +17,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Merge changes from the request to a Doctrine\Common\Collections\Collection instance.
- *
+ * 
  * This works with ORM, MongoDB and CouchDB instances of the collection interface.
- *
+ * 
  * @see Doctrine\Common\Collections\Collection
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */

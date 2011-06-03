@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * GlobalVariables is the entry point for Symfony global variables in Twig templates.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class GlobalVariables
@@ -29,7 +29,7 @@ class GlobalVariables
 
     /**
      * Returns the security context service.
-     *
+     * 
      * @return Symfony\Component\Security\Core\SecurityContext|void The security context
      */
     public function getSecurity()
@@ -41,9 +41,9 @@ class GlobalVariables
 
     /**
      * Returns the current user.
-     *
+     * 
      * @return mixed|void
-     *
+     * 
      * @see Symfony\Component\Security\Core\Authentication\Token\TokenInterface::getUser()
      */
     public function getUser()
@@ -66,7 +66,7 @@ class GlobalVariables
 
     /**
      * Returns the current request.
-     *
+     * 
      * @return Symfony\Component\HttpFoundation\Request|void The http request object
      */
     public function getRequest()
@@ -78,7 +78,7 @@ class GlobalVariables
 
     /**
      * Returns the current session.
-     *
+     * 
      * @return Symfony\Component\HttpFoundation\Session|void The session
      */
     public function getSession()
@@ -90,7 +90,7 @@ class GlobalVariables
 
     /**
      * Returns the current app environment.
-     *
+     * 
      * @return string The current environment string (e.g 'dev')
      */
     public function getEnvironment()
@@ -100,7 +100,7 @@ class GlobalVariables
 
     /**
      * Returns the current app debug mode.
-     *
+     * 
      * @return Boolean The current debug mode
      */
     public function getDebug()

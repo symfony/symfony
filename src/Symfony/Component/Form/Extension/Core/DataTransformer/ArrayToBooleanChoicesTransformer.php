@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -27,15 +27,15 @@ class ArrayToBooleanChoicesTransformer implements DataTransformerInterface
     /**
      * Transforms an array of choices to a format appropriate for the nested
      * checkboxes/radio buttons.
-     *
+     * 
      * The result is an array with the options as keys and true/false as values,
      * depending on whether a given option is selected. If this field is rendered
      * as select tag, the value is not modified.
-     *
+     * 
      * @param  mixed $array  An array
-     *
+     * 
      * @return mixed         An array
-     *
+     * 
      * @throws UnexpectedTypeException if the given value is not an array
      * @throws TransformationFailedException if the choices can not be retrieved
      */
@@ -64,15 +64,15 @@ class ArrayToBooleanChoicesTransformer implements DataTransformerInterface
 
     /**
      * Transforms a checkbox/radio button array to an array of choices.
-     *
+     * 
      * The input value is an array with the choices as keys and true/false as
      * values, depending on whether a given choice is selected. The output
      * is an array with the selected choices.
-     *
+     * 
      * @param  mixed $value  An array
-     *
+     * 
      * @return mixed $value  An array
-     *
+     * 
      * @throws UnexpectedTypeException if the given value is not an array
      */
     public function reverseTransform($value)

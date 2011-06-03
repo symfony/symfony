@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -21,18 +21,18 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 
 /**
  * AnnotationClassLoader loads routing information from a PHP class and its methods.
- *
+ * 
  * You need to define an implementation for the getRouteDefaults() method. Most of the
  * time, this method should define some PHP callable to be called for the route
  * (a controller in MVC speak).
- *
+ * 
  * The @Route annotation can be set on the class (for global parameters),
  * and on each method.
- *
+ * 
  * The @Route annotation main value is the route pattern. The annotation also
  * recognizes three parameters: requirements, options, and name. The name parameter
  * is mandatory. Here is an example of how you should be able to use it:
- *
+ * 
  *     /**
  *      * @Route("/Blog")
  *      * /
@@ -44,7 +44,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
  *         public function index()
  *         {
  *         }
- *
+ * 
  *         /**
  *          * @Route("/{id}", name="blog_post", requirements = {"id" = "\d+"})
  *          * /
@@ -52,7 +52,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
  *         {
  *         }
  *     }
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class AnnotationClassLoader implements LoaderInterface
@@ -62,7 +62,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param Reader $reader
      */
     public function __construct(Reader $reader)
@@ -72,7 +72,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     /**
      * Sets the annotation class to read route properties from.
-     *
+     * 
      * @param string $class A fully-qualified class name
      */
     public function setRouteAnnotationClass($class)
@@ -82,12 +82,12 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     /**
      * Loads from annotations from a class.
-     *
+     * 
      * @param string $class A class name
      * @param string $type  The resource type
-     *
+     * 
      * @return RouteCollection A RouteCollection instance
-     *
+     * 
      * @throws \InvalidArgumentException When route can't be parsed
      */
     public function load($class, $type = null)
@@ -155,10 +155,10 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     /**
      * Returns true if this class supports the given resource.
-     *
+     * 
      * @param mixed  $resource A resource
      * @param string $type     The resource type
-     *
+     * 
      * @return Boolean True if this class supports the given resource, false otherwise
      */
     public function supports($resource, $type = null)
@@ -168,7 +168,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     /**
      * Sets the loader resolver.
-     *
+     * 
      * @param LoaderResolver $resolver A LoaderResolver instance
      */
     public function setResolver(LoaderResolver $resolver)
@@ -177,7 +177,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     /**
      * Gets the loader resolver.
-     *
+     * 
      * @return LoaderResolver A LoaderResolver instance
      */
     public function getResolver()
@@ -186,10 +186,10 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     /**
      * Gets the default route name for a class method.
-     *
+     * 
      * @param \ReflectionClass $class
      * @param \ReflectionMethod $method
-     *
+     * 
      * @return string
      */
     protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)

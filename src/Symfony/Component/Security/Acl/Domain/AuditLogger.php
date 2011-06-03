@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,14 +17,14 @@ use Symfony\Component\Security\Acl\Model\AuditLoggerInterface;
 
 /**
  * Base audit logger implementation
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 abstract class AuditLogger implements AuditLoggerInterface
 {
     /**
      * Performs some checks if logging was requested
-     *
+     * 
      * @param Boolean        $granted
      * @param EntryInterface $ace
      * @return void
@@ -44,7 +44,7 @@ abstract class AuditLogger implements AuditLoggerInterface
 
     /**
      * This method is only called when logging is needed
-     *
+     * 
      * @param Boolean        $granted
      * @param EntryInterface $ace
      * @return void

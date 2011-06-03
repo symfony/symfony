@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * Allows easy traversing of a property path
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
 class PropertyPath implements \IteratorAggregate
@@ -50,7 +50,7 @@ class PropertyPath implements \IteratorAggregate
 
     /**
      * Parses the given property path
-     *
+     * 
      * @param string $propertyPath
      */
     public function __construct($propertyPath)
@@ -94,7 +94,7 @@ class PropertyPath implements \IteratorAggregate
 
     /**
      * Returns the string representation of the property path
-     *
+     * 
      * @return string
      */
     public function __toString()
@@ -104,7 +104,7 @@ class PropertyPath implements \IteratorAggregate
 
     /**
      * Returns a new iterator for this path
-     *
+     * 
      * @return PropertyPathIterator
      */
     public function getIterator()
@@ -114,7 +114,7 @@ class PropertyPath implements \IteratorAggregate
 
     /**
      * Returns the elements of the property path as array
-     *
+     * 
      * @return array   An array of property/index names
      */
     public function getElements()
@@ -124,9 +124,9 @@ class PropertyPath implements \IteratorAggregate
 
     /**
      * Returns the element at the given index in the property path
-     *
+     * 
      * @param integer $index The index key
-     *
+     * 
      * @return string  A property or index name
      */
     public function getElement($index)
@@ -136,7 +136,7 @@ class PropertyPath implements \IteratorAggregate
 
     /**
      * Returns whether the element at the given index is a property
-     *
+     * 
      * @param  integer $index  The index in the property path
      * @return Boolean         Whether the element at this index is a property
      */
@@ -147,7 +147,7 @@ class PropertyPath implements \IteratorAggregate
 
     /**
      * Returns whether the element at the given index is an array index
-     *
+     * 
      * @param  integer $index  The index in the property path
      * @return Boolean         Whether the element at this index is an array index
      */
@@ -158,24 +158,24 @@ class PropertyPath implements \IteratorAggregate
 
     /**
      * Returns the value at the end of the property path of the object
-     *
+     * 
      * Example:
      * <code>
      * $path = new PropertyPath('child.name');
-     *
+     * 
      * echo $path->getValue($object);
      * // equals echo $object->getChild()->getName();
      * </code>
-     *
+     * 
      * This method first tries to find a public getter for each property in the
      * path. The name of the getter must be the camel-cased property name
      * prefixed with "get" or "is".
-     *
+     * 
      * If the getter does not exist, this method tries to find a public
      * property. The value of the property is then returned.
-     *
+     * 
      * If neither is found, an exception is thrown.
-     *
+     * 
      * @param  object|array $objectOrArray    The object or array to traverse
      * @return mixed                          The value at the end of the
      *                                        property path
@@ -209,24 +209,24 @@ class PropertyPath implements \IteratorAggregate
 
     /**
      * Sets the value at the end of the property path of the object
-     *
+     * 
      * Example:
      * <code>
      * $path = new PropertyPath('child.name');
-     *
+     * 
      * echo $path->setValue($object, 'Fabien');
      * // equals echo $object->getChild()->setName('Fabien');
      * </code>
-     *
+     * 
      * This method first tries to find a public setter for each property in the
      * path. The name of the setter must be the camel-cased property name
      * prefixed with "set".
-     *
+     * 
      * If the setter does not exist, this method tries to find a public
      * property. The value of the property is then changed.
-     *
+     * 
      * If neither is found, an exception is thrown.
-     *
+     * 
      * @param  object|array $objectOrArray    The object or array to traverse
      * @param  mixed        $value            The value at the end of the
      *                                        property path
@@ -265,7 +265,7 @@ class PropertyPath implements \IteratorAggregate
 
     /**
      * Reads the value of the property at the given index in the path
-     *
+     * 
      * @param  object $object         The object to read from
      * @param  integer $currentIndex  The index of the read property in the path
      * @return mixed                  The value of the property
@@ -318,7 +318,7 @@ class PropertyPath implements \IteratorAggregate
 
     /**
      * Sets the value of the property at the given index in the path
-     *
+     * 
      * @param object  $objectOrArray The object or array to traverse
      * @param integer $currentIndex  The index of the modified property in the
      *                               path

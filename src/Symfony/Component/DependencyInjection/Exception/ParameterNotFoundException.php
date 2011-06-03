@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\DependencyInjection\Exception;
 
 /**
  * This exception is thrown when a non-existent parameter is used.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ParameterNotFoundException extends InvalidArgumentException
@@ -24,7 +24,7 @@ class ParameterNotFoundException extends InvalidArgumentException
 
     /**
      * Constructor.
-     *
+     * 
      * @param string $key       The requested parameter key
      * @param string $sourceId  The service id that references the non-existent parameter
      * @param string $sourceKey The parameter key that references the non-existent parameter

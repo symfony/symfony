@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,10 +15,10 @@ use Symfony\Component\CssSelector\SyntaxError;
 
 /**
  * CombinedSelectorNode represents a combinator node.
- *
+ * 
  * This component is a port of the Python lxml library,
  * which is copyright Infrae and distributed under the BSD license.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class CombinedSelectorNode implements NodeInterface
@@ -36,7 +36,7 @@ class CombinedSelectorNode implements NodeInterface
 
     /**
      * The constructor.
-     *
+     * 
      * @param NodeInterface $selector The XPath selector
      * @param string $combinator The combinator
      * @param NodeInterface $subselector The sub XPath selector
@@ -76,7 +76,7 @@ class CombinedSelectorNode implements NodeInterface
 
     /**
      * Joins a NodeInterface into the XPath of this object.
-     *
+     * 
      * @param XPathExpr $xpath The XPath expression for this object
      * @param NodeInterface $sub The NodeInterface object to add
      */
@@ -90,7 +90,7 @@ class CombinedSelectorNode implements NodeInterface
 
     /**
      * Joins a NodeInterface as a child of this object.
-     *
+     * 
      * @param XPathExpr $xpath The parent XPath expression
      * @param NodeInterface $sub The NodeInterface object to add
      */
@@ -104,7 +104,7 @@ class CombinedSelectorNode implements NodeInterface
 
     /**
      * Joins an XPath expression as an adjacent of another.
-     *
+     * 
      * @param XPathExpr $xpath The parent XPath expression
      * @param NodeInterface $sub The adjacent XPath expression
      */
@@ -120,7 +120,7 @@ class CombinedSelectorNode implements NodeInterface
 
     /**
      * Joins an XPath expression as an indirect adjacent of another.
-     *
+     * 
      * @param XPathExpr $xpath The parent XPath expression
      * @param NodeInterface $sub The indirect adjacent NodeInterface object
      */

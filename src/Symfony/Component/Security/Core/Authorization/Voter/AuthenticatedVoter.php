@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,9 +17,9 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 /**
  * AuthenticatedVoter votes if an attribute like IS_AUTHENTICATED_FULLY,
  * IS_AUTHENTICATED_REMEMBERED, or IS_AUTHENTICATED_ANONYMOUSLY is present.
- *
+ * 
  * This list is most restrictive to least restrictive checking.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -33,9 +33,9 @@ class AuthenticatedVoter implements VoterInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param AuthenticationTrustResolverInterface $authenticationTrustResolver
-     *
+     * 
      * @return void
      */
     public function __construct(AuthenticationTrustResolverInterface $authenticationTrustResolver)

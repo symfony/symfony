@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -15,7 +15,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * The SecurityContextInterface.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 interface SecurityContextInterface
@@ -26,14 +26,14 @@ interface SecurityContextInterface
 
     /**
      * Returns the current security token.
-     *
+     * 
      * @return TokenInterface|null A TokenInterface instance or null if no authentication information is available
      */
     function getToken();
 
     /**
      * Sets the authentication token.
-     *
+     * 
      * @param TokenInterface $token
      * @return void
      */
@@ -41,7 +41,7 @@ interface SecurityContextInterface
 
     /**
      * Checks if the attributes are granted against the current authentication token and optionally supplied object.
-     *
+     * 
      * @param array $attributes
      * @param mixed $object
      * @return Boolean

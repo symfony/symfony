@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -21,9 +21,9 @@ class ArrayChoiceList implements ChoiceListInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param array|\Closure $choices An array of choices or a function returning an array
-     *
+     * 
      * @throws UnexpectedTypeException if the type of the choices parameter is not supported
      */
     public function __construct($choices)
@@ -37,7 +37,7 @@ class ArrayChoiceList implements ChoiceListInterface
 
     /**
      * Returns a list of choices
-     *
+     * 
      * @return array
      */
     public function getChoices()
@@ -51,7 +51,7 @@ class ArrayChoiceList implements ChoiceListInterface
 
     /**
      * Initializes the list of choices.
-     *
+     * 
      * @throws UnexpectedTypeException if the function does not return an array
      */
     protected function load()

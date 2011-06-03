@@ -2,13 +2,13 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This code is partially based on the Rack-Cache library by Ryan Tomayko,
  * which is released under the MIT license.
  * (based on commit 02d2b48d75bcb63cf1c0c7149c077ad256542801)
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Cache provides HTTP caching.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class HttpCache implements HttpKernelInterface
@@ -35,39 +35,39 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * Constructor.
-     *
+     * 
      * The available options are:
-     *
+     * 
      *   * debug:                 If true, the traces are added as a HTTP header to ease debugging
-     *
+     * 
      *   * default_ttl            The number of seconds that a cache entry should be considered
      *                            fresh when no explicit freshness information is provided in
      *                            a response. Explicit Cache-Control or Expires headers
      *                            override this value. (default: 0)
-     *
+     * 
      *   * private_headers        Set of request headers that trigger "private" cache-control behavior
      *                            on responses that don't explicitly state whether the response is
      *                            public or private via a Cache-Control directive. (default: Authorization and Cookie)
-     *
+     * 
      *   * allow_reload           Specifies whether the client can force a cache reload by including a
      *                            Cache-Control "no-cache" directive in the request. Set it to ``true``
      *                            for compliance with RFC 2616. (default: false)
-     *
+     * 
      *   * allow_revalidate       Specifies whether the client can force a cache revalidate by including
      *                            a Cache-Control "max-age=0" directive in the request. Set it to ``true``
       *                            for compliance with RFC 2616. (default: false)
-     *
+     * 
      *   * stale_while_revalidate Specifies the default number of seconds (the granularity is the second as the
      *                            Response TTL precision is a second) during which the cache can immediately return
      *                            a stale response while it revalidates it in the background (default: 2).
      *                            This setting is overridden by the stale-while-revalidate HTTP Cache-Control
      *                            extension (see RFC 5861).
-     *
+     * 
      *   * stale_if_error         Specifies the default number of seconds (the granularity is the second) during which
      *                            the cache can serve a stale response when an error is encountered (default: 60).
      *                            This setting is overridden by the stale-if-error HTTP Cache-Control extension
      *                            (see RFC 5861).
-     *
+     * 
      * @param HttpKernelInterface $kernel  An HttpKernelInterface instance
      * @param StoreInterface      $store   A Store instance
      * @param Esi                 $esi     An Esi instance
@@ -96,7 +96,7 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * Returns an array of events that took place during processing of the last request.
-     *
+     * 
      * @return array An array of events
      */
     public function getTraces()
@@ -106,7 +106,7 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * Returns a log message for the events of the last request processing.
-     *
+     * 
      * @return string A log message
      */
     public function getLog()
@@ -121,7 +121,7 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * Gets the Request instance associated with the master request.
-     *
+     * 
      * @return Symfony\Component\HttpFoundation\Request A Request instance
      */
     public function getRequest()
@@ -131,7 +131,7 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * Gets the Kernel instance
-     *
+     * 
      * @return Symfony\Component\HttpKernel\HttpKernelInterface An HttpKernelInterface instance
      */
     public function getKernel()
@@ -142,7 +142,7 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * Gets the Esi instance
-     *
+     * 
      * @return Symfony\Component\HttpKernel\HttpCache\Esi An Esi instance
      */
     public function getEsi()
@@ -201,10 +201,10 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * Forwards the Request to the backend without storing the Response in the cache.
-     *
+     * 
      * @param Request $request A Request instance
      * @param Boolean $catch   Whether to process exceptions
-     *
+     * 
      * @return Response A Response instance
      */
     protected function pass(Request $request, $catch = false)
@@ -216,12 +216,12 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * Invalidates non-safe methods (like POST, PUT, and DELETE).
-     *
+     * 
      * @param Request $request A Request instance
      * @param Boolean $catch   Whether to process exceptions
-     *
+     * 
      * @return Response A Response instance
-     *
+     * 
      * @see RFC2616 13.10
      */
     protected function invalidate(Request $request, $catch = false)
@@ -248,16 +248,16 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * Lookups a Response from the cache for the given Request.
-     *
+     * 
      * When a matching cache entry is found and is fresh, it uses it as the
      * response without forwarding any request to the backend. When a matching
      * cache entry is found but is stale, it attempts to "validate" the entry with
      * the backend using conditional GET. When no matching cache entry is found,
      * it triggers "miss" processing.
-     *
+     * 
      * @param Request $request A Request instance
      * @param Boolean $catch   whether to process exceptions
-     *
+     * 
      * @return Response A Response instance
      */
     protected function lookup(Request $request, $catch = false)
@@ -302,14 +302,14 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * Validates that a cache entry is fresh.
-     *
+     * 
      * The original request is used as a template for a conditional
      * GET request with the backend.
-     *
+     * 
      * @param Request  $request A Request instance
      * @param Response $entry   A Response instance to validate
      * @param Boolean  $catch   Whether to process exceptions
-     *
+     * 
      * @return Response A Response instance
      */
     protected function validate(Request $request, Response $entry, $catch = false)
@@ -365,12 +365,12 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * Forwards the Request to the backend and determines whether the response should be stored.
-     *
+     * 
      * This methods is triggered when the cache missed or a reload is required.
-     *
+     * 
      * @param Request $request A Request instance
      * @param Boolean $catch   whether to process exceptions
-     *
+     * 
      * @return Response A Response instance
      */
     protected function fetch(Request $request, $catch = false)
@@ -401,11 +401,11 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * Forwards the Request to the backend and returns the Response.
-     *
+     * 
      * @param Request  $request A Request instance
      * @param Boolean  $catch   Whether to catch exceptions or not
      * @param Response $entry   A Response instance (the stale entry if present, null otherwise)
-     *
+     * 
      * @return Response A Response instance
      */
     protected function forward(Request $request, $catch = false, Response $entry = null)
@@ -438,10 +438,10 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * Checks whether the cache entry is "fresh enough" to satisfy the Request.
-     *
+     * 
      * @param Request  $request A Request instance
      * @param Response $entry   A Response instance
-     *
+     * 
      * @return Boolean true if the cache entry if fresh enough, false otherwise
      */
     protected function isFreshEnough(Request $request, Response $entry)
@@ -459,10 +459,10 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * Locks a Request during the call to the backend.
-     *
+     * 
      * @param Request  $request A Request instance
      * @param Response $entry   A Response instance
-     *
+     * 
      * @return Boolean true if the cache entry can be returned even if it is staled, false otherwise
      */
     protected function lock(Request $request, Response $entry)
@@ -516,7 +516,7 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * Writes the Response to the cache.
-     *
+     * 
      * @param Request  $request  A Request instance
      * @param Response $response A Response instance
      */
@@ -542,10 +542,10 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * Restores the Response body.
-     *
+     * 
      * @param Request  $request  A Request instance
      * @param Response $response A Response instance
-     *
+     * 
      * @return Response A Response instance
      */
     private function restoreResponseBody(Request $request, Response $response)
@@ -592,9 +592,9 @@ class HttpCache implements HttpKernelInterface
     /**
      * Checks if the Request includes authorization or other sensitive information
      * that should cause the Response to be considered private by default.
-     *
+     * 
      * @param Request $request A Request instance
-     *
+     * 
      * @return Boolean true if the Request is private, false otherwise
      */
     private function isPrivateRequest(Request $request)
@@ -616,7 +616,7 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * Records that an event took place.
-     *
+     * 
      * @param Request $request A Request instance
      * @param string  $event The event name
      */

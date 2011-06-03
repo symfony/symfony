@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,7 +19,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 /**
  * Unique Entity Validator checks if one or a set of fields contain unique values.
- *
+ * 
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
 class UniqueEntityValidator extends ConstraintValidator

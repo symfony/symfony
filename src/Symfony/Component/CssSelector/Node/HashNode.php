@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,10 +15,10 @@ use Symfony\Component\CssSelector\XPathExpr;
 
 /**
  * HashNode represents a "selector#id" node.
- *
+ * 
  * This component is a port of the Python lxml library,
  * which is copyright Infrae and distributed under the BSD license.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class HashNode implements NodeInterface
@@ -28,7 +28,7 @@ class HashNode implements NodeInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param NodeInterface $selector The NodeInterface object
      * @param string $id The ID
      */

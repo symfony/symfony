@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * XmlDumper dumps a service container as an XML string.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Martin Hasoň <martin.hason@gmail.com>
  */
@@ -31,9 +31,9 @@ class XmlDumper extends Dumper
 
     /**
      * Dumps the service container as an XML string.
-     *
+     * 
      * @param  array  $options An array of options
-     *
+     * 
      * @return string An xml string representing of the service container
      */
     public function dump(array $options = array())
@@ -57,7 +57,7 @@ class XmlDumper extends Dumper
 
     /**
      * Adds parameters.
-     *
+     * 
      * @param DOMElement $parent
      * @return void
      */
@@ -79,7 +79,7 @@ class XmlDumper extends Dumper
 
     /**
      * Adds method calls.
-     *
+     * 
      * @param array $methodcalls
      * @param DOMElement $parent
      * @return void
@@ -98,7 +98,7 @@ class XmlDumper extends Dumper
 
     /**
      * Adds a service.
-     *
+     * 
      * @param Definition $definition
      * @param string $id
      * @param DOMElement $parent
@@ -168,7 +168,7 @@ class XmlDumper extends Dumper
 
     /**
      * Adds a service alias.
-     *
+     * 
      * @param string $alias
      * @param string $id
      * @param DOMElement $parent
@@ -187,7 +187,7 @@ class XmlDumper extends Dumper
 
     /**
      * Adds services.
-     *
+     * 
      * @param DOMElement $parent
      * @return void
      */
@@ -211,7 +211,7 @@ class XmlDumper extends Dumper
 
     /**
      * Converts parameters.
-     *
+     * 
      * @param array      $parameters
      * @param string     $type
      * @param DOMElement $parent
@@ -255,7 +255,7 @@ class XmlDumper extends Dumper
 
     /**
      * Escapes arguments
-     *
+     * 
      * @param array $arguments
      * @return array
      */
@@ -277,7 +277,7 @@ class XmlDumper extends Dumper
 
     /**
      * Converts php types to xml types.
-     *
+     * 
      * @param mixed $value Value to convert
      * @throws \RuntimeException When trying to dump object or resource
      */

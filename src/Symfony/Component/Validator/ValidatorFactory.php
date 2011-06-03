@@ -4,9 +4,9 @@ namespace Symfony\Component\Validator;
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -23,55 +23,55 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 
 /**
  * Creates and configures new validator objects
- *
+ * 
  * Usually you will use the static method buildDefault() to initialize a
  * factory with default configuration. To this method you can pass various
  * parameters that configure where the validator mapping is found. If you
  * don't pass a parameter, the mapping will be read from annotations.
- *
+ * 
  * <code>
  * // read from annotations only
  * $factory = ValidatorFactory::buildDefault();
- *
+ * 
  * // read from XML and YAML, suppress annotations
  * $factory = ValidatorFactory::buildDefault(array(
  *   '/path/to/mapping.xml',
  *   '/path/to/other/mapping.yml',
  * ), false);
  * </code>
- *
+ * 
  * You then have to call getValidator() to create new validators.
- *
+ * 
  * <code>
  * $validator = $factory->getValidator();
  * </code>
- *
+ * 
  * When manually constructing a factory, the default configuration of the
  * validators can be passed to the constructor as a ValidatorContextInterface
  * object.
- *
+ * 
  * <code>
  * $defaultContext = new ValidatorContext();
  * $defaultContext->setClassMetadataFactory($metadataFactory);
  * $defaultContext->setConstraintValidatorFactory($validatorFactory);
  * $factory = new ValidatorFactory($defaultContext);
- *
+ * 
  * $form = $factory->getValidator();
  * </code>
- *
+ * 
  * You can also override the default configuration by calling any of the
  * methods in this class. These methods return a ValidatorContextInterface object
  * on which you can override further settings or call getValidator() to create
  * a form.
- *
+ * 
  * <code>
  * $form = $factory
  *     ->setClassMetadataFactory($customFactory);
  *     ->getValidator();
  * </code>
- *
+ * 
  * ValidatorFactory instances should be cached and reused in your application.
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
 class ValidatorFactory implements ValidatorContextInterface
@@ -84,7 +84,7 @@ class ValidatorFactory implements ValidatorContextInterface
 
     /**
      * Builds a validator factory with the default mapping loaders
-     *
+     * 
      * @param  array $mappingFiles          A list of XML or YAML file names
      *                                      where mapping information can be
      *                                      found. Can be empty.
@@ -148,7 +148,7 @@ class ValidatorFactory implements ValidatorContextInterface
 
     /**
      * Sets the given context as default context
-     *
+     * 
      * @param ValidatorContextInterface $defaultContext  A preconfigured context
      */
     public function __construct(ValidatorContextInterface $defaultContext = null)
@@ -159,7 +159,7 @@ class ValidatorFactory implements ValidatorContextInterface
     /**
      * Overrides the class metadata factory of the default context and returns
      * the new context
-     *
+     * 
      * @param  ClassMetadataFactoryInterface $metadataFactory  The new factory instance
      * @return ValidatorContextInterface                       The preconfigured form context
      */
@@ -173,7 +173,7 @@ class ValidatorFactory implements ValidatorContextInterface
     /**
      * Overrides the constraint validator factory of the default context and
      * returns the new context
-     *
+     * 
      * @param  ClassMetadataFactoryInterface $validatorFactory  The new factory instance
      * @return ValidatorContextInterface                        The preconfigured form context
      */
@@ -186,7 +186,7 @@ class ValidatorFactory implements ValidatorContextInterface
 
     /**
      * Creates a new validator with the settings stored in the default context
-     *
+     * 
      * @return ValidatorInterface  The new validator
      */
     public function getValidator()

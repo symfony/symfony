@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,7 +15,7 @@ use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * Extends the \RecursiveDirectoryIterator to support relative paths
- *
+ * 
  * @author Victor Berchet <victor@suumit.com>
  */
 class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
@@ -31,7 +31,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
 
     /**
      * Return an instance of SplFileInfo with support for relative paths
-     *
+     * 
      * @return SplFileInfo File information
      */
     public function current()

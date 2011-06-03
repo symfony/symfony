@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -85,9 +85,9 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Parses a collection of YAML nodes
-     *
+     * 
      * @param array $nodes The YAML nodes
-     *
+     * 
      * @return array An array of values or Constraint instances
      */
     protected function parseNodes(array $nodes)

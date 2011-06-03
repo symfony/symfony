@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -29,7 +29,7 @@ class EntitiesToArrayTransformer implements DataTransformerInterface
 
     /**
      * Transforms entities into choice keys
-     *
+     * 
      * @param Collection|object $collection A collection of entities, a single entity or
      *                                      NULL
      * @return mixed An array of choice keys, a single key or NULL
@@ -66,7 +66,7 @@ class EntitiesToArrayTransformer implements DataTransformerInterface
 
     /**
      * Transforms choice keys into entities
-     *
+     * 
      * @param  mixed $keys   An array of keys, a single key or NULL
      * @return Collection|object  A collection of entities, a single entity
      *                            or NULL

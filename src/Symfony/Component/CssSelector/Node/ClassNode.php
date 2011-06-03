@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,10 +15,10 @@ use Symfony\Component\CssSelector\XPathExpr;
 
 /**
  * ClassNode represents a "selector.className" node.
- *
+ * 
  * This component is a port of the Python lxml library,
  * which is copyright Infrae and distributed under the BSD license.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ClassNode implements NodeInterface
@@ -28,7 +28,7 @@ class ClassNode implements NodeInterface
 
     /**
      * The constructor.
-     *
+     * 
      * @param NodeInterface $selector The XPath Selector
      * @param string $className The class name
      */

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,21 +19,21 @@ use Symfony\Component\Config\Definition\Processor;
 
 /**
  * WebProfilerExtension.
- *
+ * 
  * Usage:
- *
+ * 
  *     <webprofiler:config
  *        toolbar="true"
  *        intercept-redirects="true"
  *    />
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class WebProfilerExtension extends Extension
 {
     /**
      * Loads the web profiler configuration.
-     *
+     * 
      * @param array            $configs   An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
@@ -54,7 +54,7 @@ class WebProfilerExtension extends Extension
 
     /**
      * Returns the base path for the XSD files.
-     *
+     * 
      * @return string The XSD base path
      */
     public function getXsdValidationBasePath()

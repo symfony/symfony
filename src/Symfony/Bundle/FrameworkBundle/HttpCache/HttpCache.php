@@ -12,22 +12,22 @@ use Symfony\Component\HttpFoundation\Response;
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
 /**
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class HttpCache extends BaseHttpCache
 {
     /**
      * Constructor.
-     *
+     * 
      * @param HttpKernelInterface $kernel An HttpKernelInterface instance
      */
     public function __construct(HttpKernelInterface $kernel)
@@ -40,11 +40,11 @@ abstract class HttpCache extends BaseHttpCache
 
     /**
      * Forwards the Request to the backend and returns the Response.
-     *
+     * 
      * @param Request  $request A Request instance
      * @param Boolean  $raw     Whether to catch exceptions or not
      * @param Response $entry   A Response instance (the stale entry if present, null otherwise)
-     *
+     * 
      * @return Response A Response instance
      */
     protected function forward(Request $request, $raw = false, Response $entry = null)
@@ -58,7 +58,7 @@ abstract class HttpCache extends BaseHttpCache
 
     /**
      * Returns an array of options to customize the Cache configuration.
-     *
+     * 
      * @return array An array of options
      */
     protected function getOptions()

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,13 +16,13 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Allows to filter a controller callable
- *
+ * 
  * You can call getController() to retrieve the current controller. With
  * setController() you can set a new controller that is used in for processing
  * a request.
- *
+ * 
  * Controllers should be callables.
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
 class FilterControllerEvent extends KernelEvent
@@ -42,7 +42,7 @@ class FilterControllerEvent extends KernelEvent
 
     /**
      * Returns the current controller
-     *
+     * 
      * @return callable
      */
     public function getController()
@@ -52,7 +52,7 @@ class FilterControllerEvent extends KernelEvent
 
     /**
      * Sets a new controller
-     *
+     * 
      * @param callable $controller
      */
     public function setController($controller)

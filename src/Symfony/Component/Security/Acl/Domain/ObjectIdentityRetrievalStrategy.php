@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,7 +16,7 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityRetrievalStrategyInterfac
 
 /**
  * Strategy to be used for retrieving object identities from domain objects
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class ObjectIdentityRetrievalStrategy implements ObjectIdentityRetrievalStrategyInterface

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,7 +16,7 @@ use Symfony\Component\Config\Exception\FileLoaderImportException;
 
 /**
  * FileLoader is the abstract class used by all built-in loaders that are file based.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class FileLoader extends Loader
@@ -27,7 +27,7 @@ abstract class FileLoader extends Loader
 
     /**
      * Constructor.
-     *
+     * 
      * @param FileLocatorInterface $locator A FileLocatorInterface instance
      */
     public function __construct(FileLocatorInterface $locator)
@@ -47,12 +47,12 @@ abstract class FileLoader extends Loader
 
     /**
      * Adds definitions and parameters from a resource.
-     *
+     * 
      * @param mixed   $resource       A Resource
      * @param string  $type           The resource type
      * @param Boolean $ignoreErrors   Whether to ignore import errors or not
      * @param string  $sourceResource The original resource importing the new resource
-     *
+     * 
      * @return mixed
      */
     public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null)

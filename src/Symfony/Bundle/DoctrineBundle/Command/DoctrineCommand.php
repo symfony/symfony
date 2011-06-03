@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,7 +16,7 @@ use Doctrine\ORM\Tools\EntityGenerator;
 
 /**
  * Base class for Doctrine console commands to extend from.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class DoctrineCommand extends Command
@@ -40,7 +40,7 @@ abstract class DoctrineCommand extends Command
 
     /**
      * Get a doctrine dbal connection by symfony name.
-     *
+     * 
      * @param string $name
      * @return Doctrine\DBAL\Connection
      */

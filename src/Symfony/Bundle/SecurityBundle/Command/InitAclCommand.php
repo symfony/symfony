@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,7 +19,7 @@ use Doctrine\DBAL\DriverManager;
 
 /**
  * Installs the tables required by the ACL system
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class InitAclCommand extends Command

@@ -14,9 +14,9 @@ use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -25,7 +25,7 @@ use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
  * Concrete implementation of the RememberMeServicesInterface which needs
  * an implementation of TokenProviderInterface for providing remember-me
  * capabilities.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
@@ -34,7 +34,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
 
     /**
      * Sets the token provider
-     *
+     * 
      * @param TokenProviderInterface $tokenProvider
      * @return void
      */
@@ -131,7 +131,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
 
     /**
      * Generates a cryptographically strong random value
-     *
+     * 
      * @return string
      */
     protected function generateRandomValue()

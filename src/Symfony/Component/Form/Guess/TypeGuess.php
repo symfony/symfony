@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Guess;
 /**
  * Contains a guessed class name and a list of options for creating an instance
  * of that class
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
 class TypeGuess extends Guess
@@ -33,7 +33,7 @@ class TypeGuess extends Guess
 
     /**
      * Constructor
-     *
+     * 
      * @param string $type          The guessed field type
      * @param array  $options       The options for creating instances of the
      *                              guessed class
@@ -50,7 +50,7 @@ class TypeGuess extends Guess
 
     /**
      * Returns the guessed field type
-     *
+     * 
      * @return string
      */
     public function getType()
@@ -60,7 +60,7 @@ class TypeGuess extends Guess
 
     /**
      * Returns the guessed options for creating instances of the guessed type
-     *
+     * 
      * @return array
      */
     public function getOptions()

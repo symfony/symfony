@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,10 +16,10 @@ use Symfony\Component\CssSelector\SyntaxError;
 
 /**
  * AttribNode represents a "selector[namespace|attrib operator value]" node.
- *
+ * 
  * This component is a port of the Python lxml library,
  * which is copyright Infrae and distributed under the BSD license.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class AttribNode implements NodeInterface
@@ -32,7 +32,7 @@ class AttribNode implements NodeInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param NodeInterface $selector The XPath selector
      * @param string $namespace The namespace
      * @param string $attrib The attribute
@@ -102,7 +102,7 @@ class AttribNode implements NodeInterface
 
     /**
      * Returns the XPath Attribute
-     *
+     * 
      * @return string The XPath attribute
      */
     protected function xpathAttrib()
@@ -117,7 +117,7 @@ class AttribNode implements NodeInterface
 
     /**
      * Returns a formatted attribute
-     *
+     * 
      * @return string The formatted attribute
      */
     protected function formatAttrib()

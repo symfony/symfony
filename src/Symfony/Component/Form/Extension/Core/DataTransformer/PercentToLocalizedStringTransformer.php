@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * Transforms between a normalized format (integer or float) and a percentage value.
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
@@ -37,9 +37,9 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @see self::$types for a list of supported types
-     *
+     * 
      * @param integer $precision The precision
      * @param string  $type      One of the supported types
      */
@@ -63,11 +63,11 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
 
     /**
      * Transforms between a normalized format (integer or float) into a percentage value.
-     *
+     * 
      * @param  number $value  Normalized value
-     *
+     * 
      * @return number         Percentage value
-     *
+     * 
      * @throws UnexpectedTypeException if the given value is not numeric
      * @throws TransformationFailedException if the value could not be transformed
      */
@@ -98,11 +98,11 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
 
     /**
      * Transforms between a percentage value into a normalized format (integer or float).
-     *
+     * 
      * @param  number $value  Percentage value.
-     *
+     * 
      * @return number         Normalized value.
-     *
+     * 
      * @throws UnexpectedTypeException if the given value is not a string
      * @throws TransformationFailedException if the value could not be transformed
      */
@@ -133,7 +133,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
 
     /**
      * Returns a preconfigured \NumberFormatter instance
-     *
+     * 
      * @return \NumberFormatter
      */
     protected function getNumberFormatter()

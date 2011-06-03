@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,9 +13,9 @@ namespace Symfony\Component\DomCrawler;
 
 /**
  * Link represents an HTML link (an HTML a tag).
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * @api
  */
 class Link
@@ -26,13 +26,13 @@ class Link
 
     /**
      * Constructor.
-     *
+     * 
      * @param \DOMNode $node       A \DOMNode instance
      * @param string   $currentUri The URI of the page where the link is embedded (or the base href)
      * @param string   $method     The method to use for the link (get by default)
-     *
+     * 
      * @throws \LogicException if the node is not a link
-     *
+     * 
      * @api
      */
     public function __construct(\DOMNode $node, $currentUri, $method = 'GET')
@@ -57,7 +57,7 @@ class Link
 
     /**
      * Gets the node associated with this link.
-     *
+     * 
      * @return \DOMNode A \DOMNode instance
      */
     public function getNode()
@@ -67,9 +67,9 @@ class Link
 
     /**
      * Gets the URI associated with this link.
-     *
+     * 
      * @return string The URI
-     *
+     * 
      * @api
      */
     public function getUri()
@@ -107,9 +107,9 @@ class Link
 
     /**
      * Gets the method associated with this link.
-     *
+     * 
      * @return string The method
-     *
+     * 
      * @api
      */
     public function getMethod()

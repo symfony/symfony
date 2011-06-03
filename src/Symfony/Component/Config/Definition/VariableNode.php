@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,10 +16,10 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 /**
  * This node represents a variable value in the config tree.
- *
+ * 
  * This node is intended for arbitrary variables.
  * Any PHP type is accepted as a value.
- *
+ * 
  * @author Jeremy Mikola <jmikola@gmail.com>
  */
 class VariableNode extends BaseNode implements PrototypeNodeInterface
@@ -55,7 +55,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * Sets if this node is allowed to have an empty value.
-     *
+     * 
      * @param Boolean $boolean True if this entity will accept empty values.
      */
     public function setAllowEmptyValue($boolean)

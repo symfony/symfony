@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,39 +19,39 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
  * Container is a dependency injection container.
- *
+ * 
  * It gives access to object instances (services).
- *
+ * 
  * Services and parameters are simple key/pair stores.
- *
+ * 
  * Parameter and service keys are case insensitive.
- *
+ * 
  * A service id can contain lowercased letters, digits, underscores, and dots.
  * Underscores are used to separate words, and dots to group services
  * under namespaces:
- *
+ * 
  * <ul>
  *   <li>request</li>
  *   <li>mysql_session_storage</li>
  *   <li>symfony.mysql_session_storage</li>
  * </ul>
- *
+ * 
  * A service can also be defined by creating a method named
  * getXXXService(), where XXX is the camelized version of the id:
- *
+ * 
  * <ul>
  *   <li>request -> getRequestService()</li>
  *   <li>mysql_session_storage -> getMysqlSessionStorageService()</li>
  *   <li>symfony.mysql_session_storage -> getSymfony_MysqlSessionStorageService()</li>
  * </ul>
- *
+ * 
  * The container can have three possible behaviors when a service does not exist:
- *
+ * 
  *  * EXCEPTION_ON_INVALID_REFERENCE: Throws an exception (the default)
  *  * NULL_ON_INVALID_REFERENCE:      Returns null
  *  * IGNORE_ON_INVALID_REFERENCE:    Ignores the wrapping command asking for the reference
  *                                    (for instance, ignore a setter if the service does not exist)
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -67,7 +67,7 @@ class Container implements ContainerInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param ParameterBagInterface $parameterBag A ParameterBagInterface instance
      */
     public function __construct(ParameterBagInterface $parameterBag = null)
@@ -85,9 +85,9 @@ class Container implements ContainerInterface
 
     /**
      * Compiles the container.
-     *
+     * 
      * This method does two things:
-     *
+     * 
      *  * Parameter values are resolved;
      *  * The parameter bag is frozen.
      */
@@ -100,7 +100,7 @@ class Container implements ContainerInterface
 
     /**
      * Returns true if the container parameter bag are frozen.
-     *
+     * 
      * @return Boolean true if the container parameter bag are frozen, false otherwise
      */
     public function isFrozen()
@@ -110,7 +110,7 @@ class Container implements ContainerInterface
 
     /**
      * Gets the service container parameter bag.
-     *
+     * 
      * @return ParameterBagInterface A ParameterBagInterface instance
      */
     public function getParameterBag()
@@ -120,11 +120,11 @@ class Container implements ContainerInterface
 
     /**
      * Gets a parameter.
-     *
+     * 
      * @param  string $name The parameter name
-     *
+     * 
      * @return mixed  The parameter value
-     *
+     * 
      * @throws  \InvalidArgumentException if the parameter is not defined
      */
     public function getParameter($name)
@@ -134,9 +134,9 @@ class Container implements ContainerInterface
 
     /**
      * Checks if a parameter exists.
-     *
+     * 
      * @param  string $name The parameter name
-     *
+     * 
      * @return Boolean The presence of parameter in container
      */
     public function hasParameter($name)
@@ -146,7 +146,7 @@ class Container implements ContainerInterface
 
     /**
      * Sets a parameter.
-     *
+     * 
      * @param string $name  The parameter name
      * @param mixed  $value The parameter value
      */
@@ -157,7 +157,7 @@ class Container implements ContainerInterface
 
     /**
      * Sets a service.
-     *
+     * 
      * @param string $id      The service identifier
      * @param object $service The service instance
      * @param string $scope   The scope of the service
@@ -183,9 +183,9 @@ class Container implements ContainerInterface
 
     /**
      * Returns true if the given service is defined.
-     *
+     * 
      * @param  string  $id      The service identifier
-     *
+     * 
      * @return Boolean true if the service is defined, false otherwise
      */
     public function has($id)
@@ -197,17 +197,17 @@ class Container implements ContainerInterface
 
     /**
      * Gets a service.
-     *
+     * 
      * If a service is both defined through a set() method and
      * with a set*Service() method, the former has always precedence.
-     *
+     * 
      * @param  string  $id              The service identifier
      * @param  integer $invalidBehavior The behavior when the service does not exist
-     *
+     * 
      * @return object The associated service
-     *
+     * 
      * @throws \InvalidArgumentException if the service is not defined
-     *
+     * 
      * @see Reference
      */
     public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
@@ -244,7 +244,7 @@ class Container implements ContainerInterface
 
     /**
      * Gets all service ids.
-     *
+     * 
      * @return array An array of all defined service ids
      */
     public function getServiceIds()
@@ -262,7 +262,7 @@ class Container implements ContainerInterface
 
     /**
      * This is called when you enter a scope
-     *
+     * 
      * @param string $name
      * @return void
      */
@@ -305,7 +305,7 @@ class Container implements ContainerInterface
     /**
      * This is called to leave the current scope, and move back to the parent
      * scope.
-     *
+     * 
      * @param string $name The name of the scope to leave
      * @return void
      * @throws \InvalidArgumentException if the scope is not active
@@ -342,7 +342,7 @@ class Container implements ContainerInterface
 
     /**
      * Adds a scope to the container.
-     *
+     * 
      * @param ScopeInterface $scope
      * @return void
      */
@@ -373,7 +373,7 @@ class Container implements ContainerInterface
 
     /**
      * Returns whether this container has a certain scope
-     *
+     * 
      * @param string $name The name of the scope
      * @return Boolean
      */
@@ -384,9 +384,9 @@ class Container implements ContainerInterface
 
     /**
      * Returns whether this scope is currently active
-     *
+     * 
      * This does not actually check if the passed scope actually exists.
-     *
+     * 
      * @param string $name
      * @return Boolean
      */
@@ -397,7 +397,7 @@ class Container implements ContainerInterface
 
     /**
      * Camelizes a string.
-     *
+     * 
      * @param string $id A string to camelize
      * @return string The camelized string
      */
@@ -408,7 +408,7 @@ class Container implements ContainerInterface
 
     /**
      * A string to underscore.
-     *
+     * 
      * @param string $id The string to underscore
      * @return string The underscored string
      */

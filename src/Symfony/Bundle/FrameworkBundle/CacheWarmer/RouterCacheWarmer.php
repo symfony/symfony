@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Router;
 
 /**
  * Generates the router matcher and generator classes.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RouterCacheWarmer implements CacheWarmerInterface
@@ -25,7 +25,7 @@ class RouterCacheWarmer implements CacheWarmerInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param Router $router A Router instance
      */
     public function __construct(Router $router)
@@ -35,7 +35,7 @@ class RouterCacheWarmer implements CacheWarmerInterface
 
     /**
      * Warms up the cache.
-     *
+     * 
      * @param string $cacheDir The cache directory
      */
     public function warmUp($cacheDir)
@@ -47,7 +47,7 @@ class RouterCacheWarmer implements CacheWarmerInterface
 
     /**
      * Checks whether this warmer is optional or not.
-     *
+     * 
      * @return Boolean always false
      */
     public function isOptional()

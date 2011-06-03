@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,13 +17,13 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * Contains the properties of a constraint definition.
- *
+ * 
  * A constraint can be defined on a class, an option or a getter method.
  * The Constraint class encapsulates all the configuration required for
  * validating this class, option or getter result successfully.
- *
+ * 
  * Constraint instances are immutable and serializable.
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
 abstract class Constraint
@@ -53,23 +53,23 @@ abstract class Constraint
 
     /**
      * Initializes the constraint with options.
-     *
+     * 
      * You should pass an associative array. The keys should be the names of
      * existing properties in this class. The values should be the value for these
      * properties.
-     *
+     * 
      * Alternatively you can override the method getDefaultOption() to return the
      * name of an existing property. If no associative array is passed, this
      * property is set instead.
-     *
+     * 
      * You can force that certain options are set by overriding
      * getRequiredOptions() to return the names of these options. If any
      * option is not set here, an exception is thrown.
-     *
+     * 
      * @param mixed $options The options (as associative array)
      *                       or the value for the default
      *                       option (any other type)
-     *
+     * 
      * @throws InvalidOptionsException       When you pass the names of non-existing
      *                                       options
      * @throws MissingOptionsException       When you don't pass any of the options
@@ -140,7 +140,7 @@ abstract class Constraint
 
     /**
      * Adds the given group if this constraint is in the Default group
-     *
+     * 
      * @param string $group
      */
     public function addImplicitGroupName($group)
@@ -152,9 +152,9 @@ abstract class Constraint
 
     /**
      * Returns the name of the default option
-     *
+     * 
      * Override this method to define a default option.
-     *
+     * 
      * @return string
      * @see __construct()
      */
@@ -165,9 +165,9 @@ abstract class Constraint
 
     /**
      * Returns the name of the required options
-     *
+     * 
      * Override this method if you want to define required options.
-     *
+     * 
      * @return array
      * @see __construct()
      */
@@ -178,11 +178,11 @@ abstract class Constraint
 
     /**
      * Returns the name of the class that validates this constraint
-     *
+     * 
      * By default, this is the fully qualified name of the constraint class
      * suffixed with "Validator". You can override this method to change that
      * behaviour.
-     *
+     * 
      * @return string
      */
     public function validatedBy()
@@ -193,10 +193,10 @@ abstract class Constraint
     /**
      * Returns whether the constraint can be put onto classes, properties or
      * both
-     *
+     * 
      * This method should return one or more of the constants
      * Constraint::CLASS_CONSTRAINT and Constraint::PROPERTY_CONSTRAINT.
-     *
+     * 
      * @return string|array  One or more constant values
      */
     public function getTargets()

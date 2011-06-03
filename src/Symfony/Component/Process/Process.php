@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -14,9 +14,9 @@ namespace Symfony\Component\Process;
 /**
  * Process is a thin wrapper around proc_* functions to ease
  * start independent PHP processes.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * @api
  */
 class Process
@@ -34,16 +34,16 @@ class Process
 
     /**
      * Constructor.
-     *
+     * 
      * @param string  $commandline The command line to run
      * @param string  $cwd         The working directory
      * @param array   $env         The environment variables
      * @param string  $stdin       The STDIN content
      * @param integer $timeout     The timeout in seconds
      * @param array   $options     An array of options for proc_open
-     *
+     * 
      * @throws \RuntimeException When proc_open is not installed
-     *
+     * 
      * @api
      */
     public function __construct($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array())
@@ -69,21 +69,21 @@ class Process
 
     /**
      * Runs the process.
-     *
+     * 
      * The callback receives the type of output (out or err) and
      * some bytes from the output in real-time. It allows to have feedback
      * from the independent process during execution.
-     *
+     * 
      * The STDOUT and STDERR are also available after the process is finished
      * via the getOutput() and getErrorOutput() methods.
-     *
+     * 
      * @param Closure|string|array $callback A PHP callback to run whenever there is some
      *                                       output available on STDOUT or STDERR
-     *
+     * 
      * @return integer The exit status code
-     *
+     * 
      * @throws \RuntimeException When process can't be launch or is stopped
-     *
+     * 
      * @api
      */
     public function run($callback = null)
@@ -179,12 +179,12 @@ class Process
 
     /**
      * Returns the output of the process (STDOUT).
-     *
+     * 
      * This only returns the output if you have not supplied a callback
      * to the run() method.
-     *
+     * 
      * @return string The process output
-     *
+     * 
      * @api
      */
     public function getOutput()
@@ -194,12 +194,12 @@ class Process
 
     /**
      * Returns the error output of the process (STDERR).
-     *
+     * 
      * This only returns the error output if you have not supplied a callback
      * to the run() method.
-     *
+     * 
      * @return string The process error output
-     *
+     * 
      * @api
      */
     public function getErrorOutput()
@@ -209,9 +209,9 @@ class Process
 
     /**
      * Returns the exit code returned by the process.
-     *
+     * 
      * @return integer The exit status code
-     *
+     * 
      * @api
      */
     public function getExitCode()
@@ -221,9 +221,9 @@ class Process
 
     /**
      * Checks if the process ended successfully.
-     *
+     * 
      * @return Boolean true if the process ended successfully, false otherwise
-     *
+     * 
      * @api
      */
     public function isSuccessful()
@@ -233,11 +233,11 @@ class Process
 
     /**
      * Returns true if the child process has been terminated by an uncaught signal.
-     *
+     * 
      * It always returns false on Windows.
-     *
+     * 
      * @return Boolean
-     *
+     * 
      * @api
      */
     public function hasBeenSignaled()
@@ -247,11 +247,11 @@ class Process
 
     /**
      * Returns the number of the signal that caused the child process to terminate its execution.
-     *
+     * 
      * It is only meaningful if hasBeenSignaled() returns true.
-     *
+     * 
      * @return integer
-     *
+     * 
      * @api
      */
     public function getTermSignal()
@@ -261,11 +261,11 @@ class Process
 
     /**
      * Returns true if the child process has been stopped by a signal.
-     *
+     * 
      * It always returns false on Windows.
-     *
+     * 
      * @return Boolean
-     *
+     * 
      * @api
      */
     public function hasBeenStopped()
@@ -275,11 +275,11 @@ class Process
 
     /**
      * Returns the number of the signal that caused the child process to stop its execution
-     *
+     * 
      * It is only meaningful if hasBeenStopped() returns true.
-     *
+     * 
      * @return integer
-     *
+     * 
      * @api
      */
     public function getStopSignal()

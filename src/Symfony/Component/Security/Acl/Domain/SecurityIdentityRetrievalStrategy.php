@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 
 /**
  * Strategy for retrieving security identities
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class SecurityIdentityRetrievalStrategy implements SecurityIdentityRetrievalStrategyInterface
@@ -32,10 +32,10 @@ class SecurityIdentityRetrievalStrategy implements SecurityIdentityRetrievalStra
 
     /**
      * Constructor
-     *
+     * 
      * @param RoleHierarchyInterface      $roleHierarchy
      * @param AuthenticationTrustResolver $authenticationTrustResolver
-     *
+     * 
      * @return void
      */
     public function __construct(RoleHierarchyInterface $roleHierarchy, AuthenticationTrustResolver $authenticationTrustResolver)

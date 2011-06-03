@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,7 +20,7 @@ class MethodArgumentValueNotImplementedException extends NotImplementedException
 {
     /**
      * Constructor
-     *
+     * 
      * @param  string  $methodName         The method name that raised the exception
      * @param  string  $argName            The argument name
      * @param  string  $argValue           The argument value that is not implemented

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,9 +13,9 @@ namespace Symfony\Component\Console\Input;
 
 /**
  * Represents a command line argument.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * @api
  */
 class InputArgument
@@ -31,14 +31,14 @@ class InputArgument
 
     /**
      * Constructor.
-     *
+     * 
      * @param string  $name        The argument name
      * @param integer $mode        The argument mode: self::REQUIRED or self::OPTIONAL
      * @param string  $description A description text
      * @param mixed   $default     The default value (for self::OPTIONAL mode only)
-     *
+     * 
      * @throws \InvalidArgumentException When argument mode is not valid
-     *
+     * 
      * @api
      */
     public function __construct($name, $mode = null, $description = '', $default = null)
@@ -58,7 +58,7 @@ class InputArgument
 
     /**
      * Returns the argument name.
-     *
+     * 
      * @return string The argument name
      */
     public function getName()
@@ -68,7 +68,7 @@ class InputArgument
 
     /**
      * Returns true if the argument is required.
-     *
+     * 
      * @return Boolean true if parameter mode is self::REQUIRED, false otherwise
      */
     public function isRequired()
@@ -78,7 +78,7 @@ class InputArgument
 
     /**
      * Returns true if the argument can take multiple values.
-     *
+     * 
      * @return Boolean true if mode is self::IS_ARRAY, false otherwise
      */
     public function isArray()
@@ -88,9 +88,9 @@ class InputArgument
 
     /**
      * Sets the default value.
-     *
+     * 
      * @param mixed $default The default value
-     *
+     * 
      * @throws \LogicException When incorrect default value is given
      */
     public function setDefault($default = null)
@@ -112,7 +112,7 @@ class InputArgument
 
     /**
      * Returns the default value.
-     *
+     * 
      * @return mixed The default value
      */
     public function getDefault()
@@ -122,7 +122,7 @@ class InputArgument
 
     /**
      * Returns the description text.
-     *
+     * 
      * @return string The description text
      */
     public function getDescription()

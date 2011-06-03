@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 /**
  * ExceptionDataCollector.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ExceptionDataCollector extends DataCollector
@@ -42,7 +42,7 @@ class ExceptionDataCollector extends DataCollector
 
     /**
      * Checks if the exception is not null.
-     *
+     * 
      * @return Boolean true if the exception is not null, false otherwise
      */
     public function hasException()
@@ -52,7 +52,7 @@ class ExceptionDataCollector extends DataCollector
 
     /**
      * Gets the exception.
-     *
+     * 
      * @return \Exception The exception
      */
     public function getException()
@@ -62,7 +62,7 @@ class ExceptionDataCollector extends DataCollector
 
     /**
      * Gets the exception message.
-     *
+     * 
      * @return string The exception message
      */
     public function getMessage()
@@ -72,7 +72,7 @@ class ExceptionDataCollector extends DataCollector
 
     /**
      * Gets the exception code.
-     *
+     * 
      * @return integer The exception code
      */
     public function getCode()
@@ -82,7 +82,7 @@ class ExceptionDataCollector extends DataCollector
 
     /**
      * Gets the status code.
-     *
+     * 
      * @return integer The status code
      */
     public function getStatusCode()
@@ -92,7 +92,7 @@ class ExceptionDataCollector extends DataCollector
 
     /**
      * Gets the exception trace.
-     *
+     * 
      * @return array The exception trace
      */
     public function getTrace()

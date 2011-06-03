@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,13 +13,13 @@ namespace Symfony\Component\Console\Input;
 
 /**
  * ArrayInput represents an input provided as an array.
- *
+ * 
  * Usage:
- *
+ * 
  *     $input = new ArrayInput(array('name' => 'foo', '--bar' => 'foobar'));
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * @api
  */
 class ArrayInput extends Input
@@ -28,10 +28,10 @@ class ArrayInput extends Input
 
     /**
      * Constructor.
-     *
+     * 
      * @param array           $parameters An array of parameters
      * @param InputDefinition $definition A InputDefinition instance
-     *
+     * 
      * @api
      */
     public function __construct(array $parameters, InputDefinition $definition = null)
@@ -43,7 +43,7 @@ class ArrayInput extends Input
 
     /**
      * Returns the first argument from the raw parameters (not parsed).
-     *
+     * 
      * @return string The value of the first argument or null otherwise
      */
     public function getFirstArgument()
@@ -59,12 +59,12 @@ class ArrayInput extends Input
 
     /**
      * Returns true if the raw parameters (not parsed) contains a value.
-     *
+     * 
      * This method is to be used to introspect the input parameters
      * before it has been validated. It must be used carefully.
-     *
+     * 
      * @param string|array $values The values to look for in the raw parameters (can be an array)
-     *
+     * 
      * @return Boolean true if the value is contained in the raw parameters
      */
     public function hasParameterOption($values)
@@ -86,13 +86,13 @@ class ArrayInput extends Input
 
     /**
      * Returns the value of a raw option (not parsed).
-     *
+     * 
      * This method is to be used to introspect the input parameters
      * before it has been validated. It must be used carefully.
-     *
+     * 
      * @param string|array $values The value(s) to look for in the raw parameters (can be an array)
      * @param mixed $default The default value to return if no result is found
-     *
+     * 
      * @return mixed The option value
      */
     public function getParameterOption($values, $default = false)
@@ -128,10 +128,10 @@ class ArrayInput extends Input
 
     /**
      * Adds a short option value.
-     *
+     * 
      * @param string $shortcut The short option key
      * @param mixed  $value    The value for the option
-     *
+     * 
      * @throws \RuntimeException When option given doesn't exist
      */
     private function addShortOption($shortcut, $value)
@@ -145,10 +145,10 @@ class ArrayInput extends Input
 
     /**
      * Adds a long option value.
-     *
+     * 
      * @param string $name  The long option key
      * @param mixed  $value The value for the option
-     *
+     * 
      * @throws \InvalidArgumentException When option given doesn't exist
      * @throws \InvalidArgumentException When a required value is missing
      */
@@ -173,10 +173,10 @@ class ArrayInput extends Input
 
     /**
      * Adds an argument value.
-     *
+     * 
      * @param string $name  The argument name
      * @param mixed  $value The value for the argument
-     *
+     * 
      * @throws \InvalidArgumentException When argument given doesn't exist
      */
     private function addArgument($name, $value)

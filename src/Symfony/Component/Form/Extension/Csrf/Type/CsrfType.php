@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -24,7 +24,7 @@ class CsrfType extends AbstractType
 
     /**
      * Constructor.
-     *
+     * 
      * @param CsrfProviderInterface $csrfProvider The provider to use to generate the token
      */
     public function __construct(CsrfProviderInterface $csrfProvider)
@@ -34,10 +34,10 @@ class CsrfType extends AbstractType
 
     /**
      * Builds the CSRF field.
-     *
+     * 
      * A validator is added to check the token value when the CSRF field is added to
      * a root form
-     *
+     * 
      * @param FormBuilder $builder The form builder
      * @param array       $options The options
      */
@@ -83,7 +83,7 @@ class CsrfType extends AbstractType
 
     /**
      * Returns the name of this form.
-     *
+     * 
      * @return string 'csrf'
      */
     public function getName()

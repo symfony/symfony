@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Parameter;
 
 /**
  * MonologExtension is an extension for the Monolog library.
- *
+ * 
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author Christophe Coevoet <stof@notk.org>
  */
@@ -32,7 +32,7 @@ class MonologExtension extends Extension
 
     /**
      * Loads the Monolog configuration.
-     *
+     * 
      * @param array            $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
@@ -88,7 +88,7 @@ class MonologExtension extends Extension
 
     /**
      * Returns the base path for the XSD files.
-     *
+     * 
      * @return string The XSD base path
      */
     public function getXsdValidationBasePath()

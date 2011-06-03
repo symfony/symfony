@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\Templating\Helper;
 
 /**
  * SlotsHelper manages template slots.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SlotsHelper extends Helper
@@ -23,12 +23,12 @@ class SlotsHelper extends Helper
 
     /**
      * Starts a new slot.
-     *
+     * 
      * This method starts an output buffer that will be
      * closed when the stop() method is called.
-     *
+     * 
      * @param string $name  The slot name
-     *
+     * 
      * @throws \InvalidArgumentException if a slot with the same name is already started
      */
     public function start($name)
@@ -46,7 +46,7 @@ class SlotsHelper extends Helper
 
     /**
      * Stops a slot.
-     *
+     * 
      * @throws \LogicException if no slot has been started
      */
     public function stop()
@@ -62,7 +62,7 @@ class SlotsHelper extends Helper
 
     /**
      * Returns true if the slot exists.
-     *
+     * 
      * @param string $name The slot name
      */
     public function has($name)
@@ -72,10 +72,10 @@ class SlotsHelper extends Helper
 
     /**
      * Gets the slot value.
-     *
+     * 
      * @param string $name    The slot name
      * @param string $default The default slot content
-     *
+     * 
      * @return string The slot content
      */
     public function get($name, $default = false)
@@ -85,7 +85,7 @@ class SlotsHelper extends Helper
 
     /**
      * Sets a slot value.
-     *
+     * 
      * @param string $name    The slot name
      * @param string $content The slot content
      */
@@ -96,10 +96,10 @@ class SlotsHelper extends Helper
 
     /**
      * Outputs a slot.
-     *
+     * 
      * @param string $name    The slot name
      * @param string $default The default slot content
-     *
+     * 
      * @return Boolean true if the slot is defined or if a default content has been provided, false otherwise
      */
     public function output($name, $default = false)
@@ -121,7 +121,7 @@ class SlotsHelper extends Helper
 
     /**
      * Returns the canonical name of this helper.
-     *
+     * 
      * @return string The canonical name
      */
     public function getName()

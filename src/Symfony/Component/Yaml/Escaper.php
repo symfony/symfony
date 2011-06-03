@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\Yaml;
 /**
  * Escaper encapsulates escaping rules for single and double-quoted
  * YAML strings.
- *
+ * 
  * @author Matthew Lewinski <matthew@lewinski.org>
  */
 class Escaper
@@ -40,9 +40,9 @@ class Escaper
 
     /**
      * Determines if a PHP value would require double quoting in YAML.
-     *
+     * 
      * @param string $value A PHP value
-     *
+     * 
      * @return Boolean True if the value would require double quotes.
      */
     static public function requiresDoubleQuoting($value)
@@ -52,9 +52,9 @@ class Escaper
 
     /**
      * Escapes and surrounds a PHP value with double quotes.
-     *
+     * 
      * @param string $value A PHP value
-     *
+     * 
      * @return string The quoted, escaped string
      */
     static public function escapeWithDoubleQuotes($value)
@@ -64,9 +64,9 @@ class Escaper
 
     /**
      * Determines if a PHP value would require single quoting in YAML.
-     *
+     * 
      * @param string $value A PHP value
-     *
+     * 
      * @return Boolean True if the value would require single quotes.
      */
     static public function requiresSingleQuoting($value)
@@ -76,9 +76,9 @@ class Escaper
 
     /**
      * Escapes and surrounds a PHP value with single quotes.
-     *
+     * 
      * @param string $value A PHP value
-     *
+     * 
      * @return string The quoted, escaped string
      */
     static public function escapeWithSingleQuotes($value)

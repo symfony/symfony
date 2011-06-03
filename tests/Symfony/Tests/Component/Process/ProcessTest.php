@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,7 +20,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * tests getter/setter
-     *
+     * 
      * @dataProvider methodProvider
      */
     public function testDefaultGetterSetter($fn)
@@ -37,7 +37,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     /**
      * tests results from sub processes
-     *
+     * 
      * @dataProvider codeProvider
      */
     public function testProcessResponses($expected, $getter, $code)

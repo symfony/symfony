@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -20,12 +20,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Checks the validity of references
- *
+ * 
  * The following checks are performed by this pass:
  * - target definitions are not abstract
  * - target definitions are of equal or wider scope
  * - target definitions are in the same scope hierarchy
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class CheckReferenceValidityPass implements CompilerPassInterface
@@ -39,7 +39,7 @@ class CheckReferenceValidityPass implements CompilerPassInterface
 
     /**
      * Processes the ContainerBuilder to validate References.
-     *
+     * 
      * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
@@ -83,7 +83,7 @@ class CheckReferenceValidityPass implements CompilerPassInterface
 
     /**
      * Validates an array of References.
-     *
+     * 
      * @param array $arguments An array of Reference objects
      * @throws \RuntimeException when there is a reference to an abstract definition.
      */
@@ -111,7 +111,7 @@ class CheckReferenceValidityPass implements CompilerPassInterface
 
     /**
      * Validates the scope of a single Reference.
-     *
+     * 
      * @param Reference  $reference
      * @param Definition $definition
      * @throws \RuntimeException when there is an issue with the Reference scope
@@ -147,7 +147,7 @@ class CheckReferenceValidityPass implements CompilerPassInterface
 
     /**
      * Returns the Definition given an id.
-     *
+     * 
      * @param string $id Definition identifier
      * @return Definition
      */

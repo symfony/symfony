@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -695,10 +695,10 @@ class StubIntlDateFormatterTest extends LocaleTestCase
      * any of the tested formats alone. The stub does not implement them as it would be needed to add more
      * abstraction, passing more context to the transformers objects. Any of the formats are ignored alone
      * or with date/time data (years, months, days, hours, minutes and seconds).
-     *
+     * 
      * Also in intl, format like 'ss E' for '10 2' (2nd day of year + 10 seconds) are added, then we have
      * 86,400 seconds (24h * 60min * 60s) + 10 seconds
-     *
+     * 
      * @dataProvider parseDifferences()
      */
     public function testParseDifferencesStub($pattern, $value, $stubExpected, $intlExpected)

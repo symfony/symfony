@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\Debug;
 
 /**
  * ErrorHandler.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ErrorHandler
@@ -32,9 +32,9 @@ class ErrorHandler
 
     /**
      * Register the error handler.
-     *
+     * 
      * @param integer $level The level at which the conversion to Exception is done (null to use the error_reporting() value and 0 to disable)
-     *
+     * 
      * @return The registered error handler
      */
     static public function register($level = null)

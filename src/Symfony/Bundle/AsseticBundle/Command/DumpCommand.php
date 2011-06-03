@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Dumps assets to the filesystem.
- *
+ * 
  * @author Kris Wallsmith <kris@symfony.com>
  */
 class DumpCommand extends Command
@@ -72,10 +72,10 @@ class DumpCommand extends Command
 
     /**
      * Watches a asset manager for changes.
-     *
+     * 
      * This method includes an infinite loop the continuously polls the asset
      * manager for changes.
-     *
+     * 
      * @param InputInterface  $input  The command input
      * @param OutputInterface $output The command output
      */
@@ -120,10 +120,10 @@ class DumpCommand extends Command
 
     /**
      * Checks if an asset should be dumped.
-     *
+     * 
      * @param string $name        The asset name
      * @param array  &$previously An array of previous visits
-     *
+     * 
      * @return Boolean Whether the asset should be dumped
      */
     private function checkAsset($name, array &$previously)
@@ -145,10 +145,10 @@ class DumpCommand extends Command
 
     /**
      * Writes an asset.
-     *
+     * 
      * If the application or asset is in debug mode, each leaf asset will be
      * dumped as well.
-     *
+     * 
      * @param string          $name   An asset name
      * @param OutputInterface $output The command output
      */
@@ -170,10 +170,10 @@ class DumpCommand extends Command
 
     /**
      * Performs the asset dump.
-     *
+     * 
      * @param AssetInterface  $asset  An asset
      * @param OutputInterface $output The command output
-     *
+     * 
      * @throws RuntimeException If there is a problem writing the asset
      */
     private function doDump(AssetInterface $asset, OutputInterface $output)

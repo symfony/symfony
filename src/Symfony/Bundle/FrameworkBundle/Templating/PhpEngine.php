@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * This engine knows how to render Symfony templates.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class PhpEngine extends BasePhpEngine implements EngineInterface
@@ -28,7 +28,7 @@ class PhpEngine extends BasePhpEngine implements EngineInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param TemplateNameParserInterface $parser    A TemplateNameParserInterface instance
      * @param ContainerInterface          $container The DI container
      * @param LoaderInterface             $loader    A loader instance
@@ -72,11 +72,11 @@ class PhpEngine extends BasePhpEngine implements EngineInterface
 
     /**
      * Renders a view and returns a Response.
-     *
+     * 
      * @param string   $view       The view name
      * @param array    $parameters An array of parameters to pass to the view
      * @param Response $response   A Response instance
-     *
+     * 
      * @return Response A Response instance
      */
     public function renderResponse($view, array $parameters = array(), Response $response = null)

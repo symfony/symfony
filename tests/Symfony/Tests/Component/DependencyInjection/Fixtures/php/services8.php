@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 /**
  * ProjectServiceContainer
- *
+ * 
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  */
@@ -25,7 +25,7 @@ class ProjectServiceContainer extends Container
 
     /**
      * Gets the default parameters.
-     *
+     * 
      * @return array An array of the default parameters
      */
     protected function getDefaultParameters()

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -29,7 +29,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
 
     /**
      * Adds a CSRF field to the form when the CSRF protection is enabled.
-     *
+     * 
      * @param FormBuilder   $builder The form builder
      * @param array         $options The options
      */
@@ -51,7 +51,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
 
     /**
      * Removes CSRF fields from all the form views except the root one.
-     *
+     * 
      * @param FormView      $view The form view
      * @param FormInterface $form The form
      */

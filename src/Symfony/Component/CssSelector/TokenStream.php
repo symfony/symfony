@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,10 +13,10 @@ namespace Symfony\Component\CssSelector;
 
 /**
  * TokenStream represents a stream of CSS Selector tokens.
- *
+ * 
  * This component is a port of the Python lxml library,
  * which is copyright Infrae and distributed under the BSD license.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class TokenStream
@@ -29,7 +29,7 @@ class TokenStream
 
     /**
      * Constructor.
-     *
+     * 
      * @param array $tokens The tokens that make the stream.
      * @param mixed $source The source of the stream.
      */
@@ -44,7 +44,7 @@ class TokenStream
 
     /**
      * Gets the tokens that have already been visited in this stream.
-     *
+     * 
      * @return array
      */
     public function getUsed()
@@ -56,7 +56,7 @@ class TokenStream
      * Gets the next token in the stream or null if there is none.
      * Note that if this stream was set to be peeking its behavior
      * will be restored to not peeking after this operation.
-     *
+     * 
      * @return mixed
      */
     public function next()
@@ -83,9 +83,9 @@ class TokenStream
      * will be returned but it won't be considered as used (visited) until the
      * next() method is invoked.
      * If there are no remaining tokens null will be returned.
-     *
+     * 
      * @see next()
-     *
+     * 
      * @return mixed
      */
     public function peek()

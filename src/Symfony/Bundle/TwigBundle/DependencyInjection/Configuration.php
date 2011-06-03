@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -17,14 +17,14 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * TwigExtension configuration structure.
- *
+ * 
  * @author Jeremy Mikola <jmikola@gmail.com>
  */
 class Configuration implements ConfigurationInterface
 {
     /**
      * Generates the configuration tree builder.
-     *
+     * 
      * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
      */
     public function getConfigTreeBuilder()

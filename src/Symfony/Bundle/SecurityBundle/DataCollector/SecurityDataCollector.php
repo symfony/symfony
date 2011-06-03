@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
 /**
  * SecurityDataCollector.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SecurityDataCollector extends DataCollector
@@ -61,7 +61,7 @@ class SecurityDataCollector extends DataCollector
 
     /**
      * Checks if security is enabled.
-     *
+     * 
      * @return Boolean true if security is enabled, false otherwise
      */
     public function isEnabled()
@@ -71,7 +71,7 @@ class SecurityDataCollector extends DataCollector
 
     /**
      * Gets the user.
-     *
+     * 
      * @return string The user
      */
     public function getUser()
@@ -81,7 +81,7 @@ class SecurityDataCollector extends DataCollector
 
     /**
      * Gets the roles of the user.
-     *
+     * 
      * @return array The roles
      */
     public function getRoles()
@@ -91,7 +91,7 @@ class SecurityDataCollector extends DataCollector
 
     /**
      * Checks if the user is authenticated or not.
-     *
+     * 
      * @return Boolean true if the user is authenticated, false otherwise
      */
     public function isAuthenticated()

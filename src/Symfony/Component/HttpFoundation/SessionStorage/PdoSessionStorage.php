@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
 
 /**
  * PdoSessionStorage.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Michael Williams <michael.williams@funsational.com>
  */
@@ -24,13 +24,13 @@ class PdoSessionStorage extends NativeSessionStorage
 
     /**
      * Constructor.
-     *
+     * 
      * @param \PDO  $db        A PDO instance
      * @param array $options   An associative array of session options
      * @param array $dbOptions An associative array of DB options
-     *
+     * 
      * @throws \InvalidArgumentException When "db_table" option is not provided
-     *
+     * 
      * @see NativeSessionStorage::__construct()
      */
     public function __construct(\PDO $db, array $options = array(), array $dbOptions = array())
@@ -73,10 +73,10 @@ class PdoSessionStorage extends NativeSessionStorage
 
     /**
      * Opens a session.
-     *
+     * 
      * @param  string $path  (ignored)
      * @param  string $name  (ignored)
-     *
+     * 
      * @return Boolean true, if the session was opened, otherwise an exception is thrown
      */
     public function sessionOpen($path = null, $name = null)
@@ -86,7 +86,7 @@ class PdoSessionStorage extends NativeSessionStorage
 
     /**
      * Closes a session.
-     *
+     * 
      * @return Boolean true, if the session was closed, otherwise false
      */
     public function sessionClose()
@@ -97,11 +97,11 @@ class PdoSessionStorage extends NativeSessionStorage
 
     /**
      * Destroys a session.
-     *
+     * 
      * @param  string $id  A session ID
-     *
+     * 
      * @return Boolean   true, if the session was destroyed, otherwise an exception is thrown
-     *
+     * 
      * @throws \RuntimeException If the session cannot be destroyed
      */
     public function sessionDestroy($id)
@@ -126,11 +126,11 @@ class PdoSessionStorage extends NativeSessionStorage
 
     /**
      * Cleans up old sessions.
-     *
+     * 
      * @param  int $lifetime  The lifetime of a session
-     *
+     * 
      * @return Boolean true, if old sessions have been cleaned, otherwise an exception is thrown
-     *
+     * 
      * @throws \RuntimeException If any old sessions cannot be cleaned
      */
     public function sessionGC($lifetime)
@@ -156,11 +156,11 @@ class PdoSessionStorage extends NativeSessionStorage
 
     /**
      * Reads a session.
-     *
+     * 
      * @param  string $id  A session ID
-     *
+     * 
      * @return string      The session data if the session was read or created, otherwise an exception is thrown
-     *
+     * 
      * @throws \RuntimeException If the session cannot be read
      */
     public function sessionRead($id)
@@ -196,12 +196,12 @@ class PdoSessionStorage extends NativeSessionStorage
 
     /**
      * Writes session data.
-     *
+     * 
      * @param  string $id    A session ID
      * @param  string $data  A serialized chunk of session data
-     *
+     * 
      * @return Boolean true, if the session was written, otherwise an exception is thrown
-     *
+     * 
      * @throws \RuntimeException If the session data cannot be written
      */
     public function sessionWrite($id, $data)
@@ -238,7 +238,7 @@ class PdoSessionStorage extends NativeSessionStorage
 
     /**
      * Creates a new session with the given $id and $data
-     *
+     * 
      * @param string $id
      * @param string $data
      */

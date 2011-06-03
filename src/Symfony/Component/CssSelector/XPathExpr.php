@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,10 +13,10 @@ namespace Symfony\Component\CssSelector;
 
 /**
  * XPathExpr represents an XPath expression.
- *
+ * 
  * This component is a port of the Python lxml library,
  * which is copyright Infrae and distributed under the BSD license.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class XPathExpr
@@ -29,7 +29,7 @@ class XPathExpr
 
     /**
      * Constructor.
-     *
+     * 
      * @param string  $prefix     Prefix for the XPath expression.
      * @param string  $path       Actual path of the expression.
      * @param string  $element    The element in the expression.
@@ -47,7 +47,7 @@ class XPathExpr
 
     /**
      * Gets the prefix of this XPath expression.
-     *
+     * 
      * @return string
      */
     public function getPrefix()
@@ -57,7 +57,7 @@ class XPathExpr
 
     /**
      * Gets the path of this XPath expression.
-     *
+     * 
      * @return string
      */
     public function getPath()
@@ -67,7 +67,7 @@ class XPathExpr
 
     /**
      * Answers whether this XPath expression has a star prefix.
-     *
+     * 
      * @return Boolean
      */
     public function hasStarPrefix()
@@ -77,7 +77,7 @@ class XPathExpr
 
     /**
      * Gets the element of this XPath expression.
-     *
+     * 
      * @return string
      */
     public function getElement()
@@ -87,7 +87,7 @@ class XPathExpr
 
     /**
      * Gets the condition of this XPath expression.
-     *
+     * 
      * @return string
      */
     public function getCondition()
@@ -97,7 +97,7 @@ class XPathExpr
 
     /**
      * Gets a string representation for this XPath expression.
-     *
+     * 
      * @return string
      */
     public function __toString()
@@ -123,7 +123,7 @@ class XPathExpr
     /**
      * Adds a condition to this XPath expression.
      * Any pre-existent condition will be ANDed to it.
-     *
+     * 
      * @param string $condition The condition to add.
      */
     public function addCondition($condition)
@@ -138,7 +138,7 @@ class XPathExpr
     /**
      * Adds a prefix to this XPath expression.
      * It will be prepended to any pre-existent prefixes.
-     *
+     * 
      * @param string $prefix  The prefix to add.
      */
     public function addPrefix($prefix)
@@ -189,7 +189,7 @@ class XPathExpr
     /**
      * Joins this XPath expression with $other (another XPath expression) using
      * $combiner to join them.
-     *
+     * 
      * @param string    $combiner The combiner string.
      * @param XPathExpr $other    The other XPath expression to combine with
      *                            this one.
@@ -214,9 +214,9 @@ class XPathExpr
 
     /**
      * Gets an XPath literal for $s.
-     *
+     * 
      * @param  mixed $s Can either be a Node\ElementNode or a string.
-     *
+     * 
      * @return string
      */
     static public function xpathLiteral($s)

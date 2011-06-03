@@ -8,16 +8,16 @@ use Symfony\Component\DependencyInjection\Container;
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
 
 /**
  * Provides useful features shared by many extensions.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class Extension implements ExtensionInterface
@@ -26,7 +26,7 @@ abstract class Extension implements ExtensionInterface
 
     /**
      * Gets the classes to cache.
-     *
+     * 
      * @return array An array of classes
      */
     public function getClassesToCompile()
@@ -36,7 +36,7 @@ abstract class Extension implements ExtensionInterface
 
     /**
      * Adds classes to the class cache.
-     *
+     * 
      * @param array $classes An array of classes
      */
     public function addClassesToCompile(array $classes)
@@ -46,7 +46,7 @@ abstract class Extension implements ExtensionInterface
 
     /**
      * Returns the base path for the XSD files.
-     *
+     * 
      * @return string The XSD base path
      */
     public function getXsdValidationBasePath()
@@ -56,7 +56,7 @@ abstract class Extension implements ExtensionInterface
 
     /**
      * Returns the namespace to be used for this extension (XML namespace).
-     *
+     * 
      * @return string The XML namespace
      */
     public function getNamespace()
@@ -66,9 +66,9 @@ abstract class Extension implements ExtensionInterface
 
     /**
      * Returns the recommended alias to use in XML.
-     *
+     * 
      * This alias is also the mandatory prefix to use when using YAML.
-     *
+     * 
      * @return string The alias
      */
     public function getAlias()

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Loads asset formulae from the filesystem.
- *
+ * 
  * @author Kris Wallsmith <kris@symfony.com>
  */
 class AssetFactory extends BaseAssetFactory
@@ -29,7 +29,7 @@ class AssetFactory extends BaseAssetFactory
 
     /**
      * Constructor.
-     *
+     * 
      * @param KernelInterface       $kernel       The kernel is used to parse bundle notation
      * @param ContainerInterface    $container    The container is used to load the managers lazily, thus avoiding a circular dependency
      * @param ParameterBagInterface $parameterBag The container parameter bag
@@ -47,7 +47,7 @@ class AssetFactory extends BaseAssetFactory
 
     /**
      * Adds support for bundle notation file and glob assets and parameter placeholders.
-     *
+     * 
      * FIXME: This is a naive implementation of globs in that it doesn't
      * attempt to support bundle inheritance within the glob pattern itself.
      */

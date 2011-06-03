@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,7 +20,7 @@ abstract class ElementMetadata
 
     /**
      * Returns the names of the properties that should be serialized.
-     *
+     * 
      * @return array
      */
     public function __sleep()
@@ -48,7 +48,7 @@ abstract class ElementMetadata
 
     /**
      * Adds a constraint to this element.
-     *
+     * 
      * @param Constraint $constraint
      */
     public function addConstraint(Constraint $constraint)
@@ -68,7 +68,7 @@ abstract class ElementMetadata
 
     /**
      * Returns all constraints of this element.
-     *
+     * 
      * @return array  An array of Constraint instances
      */
     public function getConstraints()
@@ -78,7 +78,7 @@ abstract class ElementMetadata
 
     /**
      * Returns whether this element has any constraints.
-     *
+     * 
      * @return Boolean
      */
     public function hasConstraints()
@@ -88,9 +88,9 @@ abstract class ElementMetadata
 
     /**
      * Returns the constraints of the given group and global ones (* group).
-     *
+     * 
      * @param string $group The group name
-     *
+     * 
      * @return array An array with all Constraint instances belonging to the group
      */
     public function findConstraints($group)

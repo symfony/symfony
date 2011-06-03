@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Removes unused service definitions from the container.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
@@ -35,7 +35,7 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
 
     /**
      * Processes the ContainerBuilder to remove unused definitions.
-     *
+     * 
      * @param ContainerBuilder $container
      * @return void
      */

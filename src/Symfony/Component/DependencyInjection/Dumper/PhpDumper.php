@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Parameter;
 
 /**
  * PhpDumper dumps a service container as a PHP class.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -58,14 +58,14 @@ class PhpDumper extends Dumper
 
     /**
      * Dumps the service container as a PHP class.
-     *
+     * 
      * Available options:
-     *
+     * 
      *  * class:      The class name
      *  * base_class: The base class name
-     *
+     * 
      * @param  array  $options An array of options
-     *
+     * 
      * @return string A PHP class representing of the service container
      */
     public function dump(array $options = array())
@@ -94,7 +94,7 @@ class PhpDumper extends Dumper
 
     /**
      * Generates Service local temp variables.
-     *
+     * 
      * @param string $cId
      * @param string $definition
      * @return string
@@ -142,7 +142,7 @@ class PhpDumper extends Dumper
 
     /**
      * Generates the require_once statement for service includes.
-     *
+     * 
      * @param string $id The service id
      * @param Definition $definition
      * @return string
@@ -171,7 +171,7 @@ class PhpDumper extends Dumper
 
     /**
      * Generates the inline definition of a service.
-     *
+     * 
      * @param string $id
      * @param Definition $definition
      * @return string
@@ -249,7 +249,7 @@ class PhpDumper extends Dumper
 
     /**
      * Adds the service return statement.
-     *
+     * 
      * @param string $id Service id
      * @param Definition $definition
      * @return string
@@ -265,11 +265,11 @@ class PhpDumper extends Dumper
 
     /**
      * Generates the service instance.
-     *
+     * 
      * @param string $id
      * @param Definition $definition
      * @return string
-     *
+     * 
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
@@ -327,7 +327,7 @@ class PhpDumper extends Dumper
 
     /**
      * Checks if the definition is a simple instance.
-     *
+     * 
      * @param string $id
      * @param Definition $definition
      * @return Boolean
@@ -349,7 +349,7 @@ class PhpDumper extends Dumper
 
     /**
      * Adds method calls to a service definition.
-     *
+     * 
      * @param string $id
      * @param Definition $definition
      * @param string $variableName
@@ -384,7 +384,7 @@ class PhpDumper extends Dumper
 
     /**
      * Generates the inline definition setup.
-     *
+     * 
      * @param string $id
      * @param Definition $definition
      * @return string
@@ -422,7 +422,7 @@ class PhpDumper extends Dumper
 
     /**
      * Adds configurator definition
-     *
+     * 
      * @param string $id
      * @param Definition $definition
      * @param string $variableName
@@ -447,7 +447,7 @@ class PhpDumper extends Dumper
 
     /**
      * Adds a service
-     *
+     * 
      * @param string $id
      * @param Definition $definition
      * @return string
@@ -474,7 +474,7 @@ class PhpDumper extends Dumper
         if (ContainerInterface::SCOPE_PROTOTYPE !== $definition->getScope()) {
             $doc .= <<<EOF
 
-     *
+     * 
      * This service is shared.
      * This method always returns the same instance of the service.
 EOF;
@@ -483,7 +483,7 @@ EOF;
         if (!$definition->isPublic()) {
             $doc .= <<<EOF
 
-     *
+     * 
      * This service is private.
      * If you want to be able to request this service from the container directly,
      * make it public, otherwise you might end up with broken code.
@@ -494,7 +494,7 @@ EOF;
 
     /**
      * Gets the '$id' service.$doc
-     *
+     * 
      * $return
      */
     protected function get{$name}Service()
@@ -537,7 +537,7 @@ EOF;
 
     /**
      * Adds a service alias.
-     *
+     * 
      * @param string $alias
      * @param string $id
      * @return string
@@ -556,7 +556,7 @@ EOF;
 
     /**
      * Gets the $alias service alias.
-     *
+     * 
      * @return $type An instance of the $id service
      */
     protected function get{$name}Service()
@@ -569,7 +569,7 @@ EOF;
 
     /**
      * Adds multiple services
-     *
+     * 
      * @return string
      */
     private function addServices()
@@ -596,7 +596,7 @@ EOF;
 
     /**
      * Adds the class headers.
-     *
+     * 
      * @param string $class Class name
      * @param string $baseClass The name of the base class
      * @return string
@@ -617,7 +617,7 @@ $bagClass
 
 /**
  * $class
- *
+ * 
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  */
@@ -628,7 +628,7 @@ EOF;
 
     /**
      * Adds the constructor.
-     *
+     * 
      * @return string
      */
     private function addConstructor()
@@ -660,7 +660,7 @@ EOF;
 
     /**
      * Adds the constructor for a frozen container.
-     *
+     * 
      * @return string
      */
     private function addFrozenConstructor()
@@ -701,7 +701,7 @@ EOF;
 
     /**
      * Adds default parameters method.
-     *
+     * 
      * @return string
      */
     private function addDefaultParametersMethod()
@@ -752,7 +752,7 @@ EOF;
 
     /**
      * Gets the default parameters.
-     *
+     * 
      * @return array An array of the default parameters
      */
     protected function getDefaultParameters()
@@ -767,7 +767,7 @@ EOF;
 
     /**
      * Exports parameters.
-     *
+     * 
      * @param array $parameters
      * @param string $path
      * @param integer $indent
@@ -797,7 +797,7 @@ EOF;
 
     /**
      * Ends the class definition.
-     *
+     * 
      * @return void
      */
     private function endClass()
@@ -810,7 +810,7 @@ EOF;
 
     /**
      * Wraps the service conditionals.
-     *
+     * 
      * @param string $value
      * @param string $code
      * @return string
@@ -834,7 +834,7 @@ EOF;
 
     /**
      * Builds service calls from arguments
-     *
+     * 
      * @param array  $arguments
      * @param string $calls    By reference
      * @param string $behavior By reference
@@ -864,7 +864,7 @@ EOF;
 
     /**
      * Returns the inline definition
-     *
+     * 
      * @param Definition $definition
      * @return array
      */
@@ -887,7 +887,7 @@ EOF;
 
     /**
      * Gets the definition from arguments
-     *
+     * 
      * @param array $arguments
      * @return array
      */
@@ -911,7 +911,7 @@ EOF;
 
     /**
      * Checks if a service id has a reference
-     *
+     * 
      * @param string $id
      * @param array $arguments
      * @return Boolean
@@ -935,7 +935,7 @@ EOF;
 
     /**
      * Dumps values.
-     *
+     * 
      * @param array $value
      * @param Boolean $interpolate
      * @return string
@@ -1019,7 +1019,7 @@ EOF;
 
     /**
      * Dumps a parameter
-     *
+     * 
      * @param string $name
      * @return string
      */
@@ -1034,7 +1034,7 @@ EOF;
 
     /**
      * Gets a service call
-     *
+     * 
      * @param string    $id
      * @param Reference $reference
      * @return string
@@ -1058,7 +1058,7 @@ EOF;
 
     /**
      * Returns the next name to use
-     *
+     * 
      * @return string
      */
     private function getNextVariableName()

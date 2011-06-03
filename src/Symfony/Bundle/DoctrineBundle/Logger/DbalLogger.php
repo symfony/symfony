@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,7 +16,7 @@ use Doctrine\DBAL\Logging\DebugStack;
 
 /**
  * DbalLogger.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class DbalLogger extends DebugStack
@@ -25,7 +25,7 @@ class DbalLogger extends DebugStack
 
     /**
      * Constructor.
-     *
+     * 
      * @param LoggerInterface $logger A LoggerInterface instance
      */
     public function __construct(LoggerInterface $logger = null)
@@ -47,7 +47,7 @@ class DbalLogger extends DebugStack
 
     /**
      * Logs a message.
-     *
+     * 
      * @param string $message A message to log
      */
     public function log($message)

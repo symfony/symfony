@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,20 +16,20 @@ use Symfony\Component\HttpKernel\Exception\FlattenException;
 
 /**
  * ExceptionHandler converts an exception to a Response object.
- *
+ * 
  * It is mostly useful in debug mode to replace the default PHP/XDebug
  * output with something prettier and more useful.
- *
+ * 
  * As this class is mainly used during Kernel boot, where nothing is yet
  * available, the Response content is always HTML.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ExceptionHandler
 {
     /**
      * Register the exception handler.
-     *
+     * 
      * @return The registered exception handler
      */
     static public function register()
@@ -43,9 +43,9 @@ class ExceptionHandler
 
     /**
      * Returns a Response for the given Exception.
-     *
+     * 
      * @param \Exception $exception An \Exception instance
-     *
+     * 
      * @return Response A Response instance
      */
     public function handle(\Exception $exception)

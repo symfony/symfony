@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,7 +16,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * TranslatorHelper.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class TranslatorHelper extends Helper
@@ -25,7 +25,7 @@ class TranslatorHelper extends Helper
 
     /**
      * Constructor.
-     *
+     * 
      * @param TranslatorInterface $translator A TranslatorInterface instance
      */
     public function __construct(TranslatorInterface $translator)
@@ -51,7 +51,7 @@ class TranslatorHelper extends Helper
 
     /**
      * Returns the canonical name of this helper.
-     *
+     * 
      * @return string The canonical name
      */
     public function getName()

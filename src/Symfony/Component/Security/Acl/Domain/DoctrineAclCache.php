@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,7 +19,7 @@ use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 
 /**
  * This class is a wrapper around the actual cache implementation.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class DoctrineAclCache implements AclCacheInterface
@@ -32,11 +32,11 @@ class DoctrineAclCache implements AclCacheInterface
 
     /**
      * Constructor
-     *
+     * 
      * @param Cache                               $cache
      * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
      * @param string                              $prefix
-     *
+     * 
      * @return void
      */
     public function __construct(Cache $cache, PermissionGrantingStrategyInterface $permissionGrantingStrategy, $prefix = self::PREFIX)
@@ -142,7 +142,7 @@ class DoctrineAclCache implements AclCacheInterface
 
     /**
      * Unserializes the ACL.
-     *
+     * 
      * @param string $serialized
      * @return AclInterface
      */
@@ -200,7 +200,7 @@ class DoctrineAclCache implements AclCacheInterface
 
     /**
      * Returns the key for the object identity
-     *
+     * 
      * @param ObjectIdentityInterface $oid
      * @return string
      */
@@ -212,7 +212,7 @@ class DoctrineAclCache implements AclCacheInterface
 
     /**
      * Returns the alias key for the object identity key
-     *
+     * 
      * @param string $aclId
      * @return string
      */

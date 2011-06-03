@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * TemplateNameParser converts template names from the short notation
  * "bundle:section:template.format.engine" to TemplateReferenceInterface
  * instances.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class TemplateNameParser extends BaseTemplateNameParser
@@ -29,7 +29,7 @@ class TemplateNameParser extends BaseTemplateNameParser
 
     /**
      * Constructor.
-     *
+     * 
      * @param KernelInterface $kernel A KernelInterface instance
      */
     public function __construct(KernelInterface $kernel)
@@ -81,9 +81,9 @@ class TemplateNameParser extends BaseTemplateNameParser
 
     /**
      * Convert a filename to a template.
-     *
+     * 
      * @param string $file The filename
-     *
+     * 
      * @return TemplateReferenceInterface A template
      */
     public function parseFromFilename($file)

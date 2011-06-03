@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
  * TwigExtension.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jeremy Mikola <jmikola@gmail.com>
  */
@@ -28,7 +28,7 @@ class TwigExtension extends Extension
 {
     /**
      * Responds to the twig configuration parameter.
-     *
+     * 
      * @param array            $configs
      * @param ContainerBuilder $container
      */
@@ -89,7 +89,7 @@ class TwigExtension extends Extension
 
     /**
      * Returns the base path for the XSD files.
-     *
+     * 
      * @return string The XSD base path
      */
     public function getXsdValidationBasePath()

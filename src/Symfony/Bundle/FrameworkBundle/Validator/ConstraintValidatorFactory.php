@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,22 +18,22 @@ use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 
 /**
  * Uses a service container to create constraint validators.
- *
+ * 
  * A constraint validator should be tagged as "validator.constraint_validator"
  * in the service container and include an "alias" attribute:
- *
+ * 
  *     <service id="some_doctrine_validator">
  *         <argument type="service" id="doctrine.orm.some_entity_manager" />
  *         <tag name="validator.constraint_validator" alias="some_alias" />
  *     </service>
- *
+ * 
  * A constraint may then return this alias in its validatedBy() method:
- *
+ * 
  *     public function validatedBy()
  *     {
  *         return 'some_alias';
  *     }
- *
+ * 
  * @author Kris Wallsmith <kris@symfony.com>
  */
 class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
@@ -43,7 +43,7 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param ContainerInterface $container  The service container
      * @param array              $validators An array of validators
      */
@@ -55,9 +55,9 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 
     /**
      * Returns the validator for the supplied constraint.
-     *
+     * 
      * @param Constraint $constraint A constraint
-     *
+     * 
      * @return Symfony\Component\Validator\ConstraintValidator A validator for the supplied constraint
      */
     public function getInstance(Constraint $constraint)

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,13 +13,13 @@ namespace Symfony\Component\Console\Input;
 
 /**
  * StringInput represents an input provided as a string.
- *
+ * 
  * Usage:
- *
+ * 
  *     $input = new StringInput('foo --bar="foobar"');
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * @api
  */
 class StringInput extends ArgvInput
@@ -29,10 +29,10 @@ class StringInput extends ArgvInput
 
     /**
      * Constructor.
-     *
+     * 
      * @param string     $input An array of parameters from the CLI (in the argv format)
      * @param InputDefinition $definition A InputDefinition instance
-     *
+     * 
      * @api
      */
     public function __construct($input, InputDefinition $definition = null)
@@ -44,7 +44,7 @@ class StringInput extends ArgvInput
 
     /**
      * Tokenizes a string.
-     *
+     * 
      * @param string $input The input to tokenize
      * @throws \InvalidArgumentException When unable to parse input (should never happen)
      */

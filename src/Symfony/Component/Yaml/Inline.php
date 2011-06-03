@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -12,7 +12,7 @@ namespace Symfony\Component\Yaml;
 
 /**
  * Inline implements a YAML parser/dumper for the YAML inline syntax.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Inline
@@ -21,9 +21,9 @@ class Inline
 
     /**
      * Converts a YAML string to a PHP array.
-     *
+     * 
      * @param string $value A YAML string
-     *
+     * 
      * @return array A PHP array representing the YAML string
      */
     static public function load($value)
@@ -59,11 +59,11 @@ class Inline
 
     /**
      * Dumps a given PHP variable to a YAML string.
-     *
+     * 
      * @param mixed $value The PHP variable to convert
-     *
+     * 
      * @return string The YAML string representing the PHP array
-     *
+     * 
      * @throws Exception When trying to dump PHP resource
      */
     static public function dump($value)
@@ -109,9 +109,9 @@ class Inline
 
     /**
      * Dumps a PHP array to a YAML string.
-     *
+     * 
      * @param array $value The PHP array to dump
-     *
+     * 
      * @return string The YAML string representing the PHP array
      */
     static private function dumpArray($value)
@@ -140,15 +140,15 @@ class Inline
 
     /**
      * Parses a scalar to a YAML string.
-     *
+     * 
      * @param scalar  $scalar
      * @param string  $delimiters
      * @param array   $stringDelimiters
      * @param integer &$i
      * @param Boolean $evaluate
-     *
+     * 
      * @return string A YAML string
-     *
+     * 
      * @throws ParserException When malformed inline YAML string is parsed
      */
     static public function parseScalar($scalar, $delimiters = null, $stringDelimiters = array('"', "'"), &$i = 0, $evaluate = true)
@@ -181,12 +181,12 @@ class Inline
 
     /**
      * Parses a quoted scalar to YAML.
-     *
+     * 
      * @param string  $scalar
      * @param integer $i
-     *
+     * 
      * @return string A YAML string
-     *
+     * 
      * @throws ParserException When malformed inline YAML string is parsed
      */
     static private function parseQuotedScalar($scalar, &$i)
@@ -211,12 +211,12 @@ class Inline
 
     /**
      * Parses a sequence to a YAML string.
-     *
+     * 
      * @param string  $sequence
      * @param integer $i
-     *
+     * 
      * @return string A YAML string
-     *
+     * 
      * @throws ParserException When malformed inline YAML string is parsed
      */
     static private function parseSequence($sequence, &$i = 0)
@@ -267,12 +267,12 @@ class Inline
 
     /**
      * Parses a mapping to a YAML string.
-     *
+     * 
      * @param string  $mapping
      * @param integer $i
-     *
+     * 
      * @return string A YAML string
-     *
+     * 
      * @throws ParserException When malformed inline YAML string is parsed
      */
     static private function parseMapping($mapping, &$i = 0)
@@ -331,9 +331,9 @@ class Inline
 
     /**
      * Evaluates scalars and replaces magic values.
-     *
+     * 
      * @param string $scalar
-     *
+     * 
      * @return string A YAML string
      */
     static private function evaluateScalar($scalar)
@@ -380,7 +380,7 @@ class Inline
 
     /**
      * Gets a regex that matches an unix timestamp
-     *
+     * 
      * @return string The regular expression
      */
     static private function getTimestampRegex()

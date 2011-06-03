@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpFoundation;
 
 /**
  * ResponseHeaderBag is a container for Response HTTP headers.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ResponseHeaderBag extends HeaderBag
@@ -22,7 +22,7 @@ class ResponseHeaderBag extends HeaderBag
 
     /**
      * Constructor.
-     *
+     * 
      * @param array $headers An array of HTTP headers
      */
     public function __construct(array $headers = array())
@@ -104,7 +104,7 @@ class ResponseHeaderBag extends HeaderBag
 
     /**
      * Clears a cookie in the browser
-     *
+     * 
      * @param string $name
      * @param string $path
      * @param string $domain
@@ -117,10 +117,10 @@ class ResponseHeaderBag extends HeaderBag
 
     /**
      * Returns the calculated value of the cache-control header.
-     *
+     * 
      * This considers several other headers and calculates or modifies the
      * cache-control header to a sensible, conservative value.
-     *
+     * 
      * @return string
      */
     protected function computeCacheControlValue()

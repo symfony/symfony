@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,19 +17,19 @@ use Symfony\Component\Config\Resource\DirectoryResource;
 /**
  * AnnotationDirectoryLoader loads routing information from annotations set
  * on PHP classes and methods.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class AnnotationDirectoryLoader extends AnnotationFileLoader
 {
     /**
      * Loads from annotations from a directory.
-     *
+     * 
      * @param string $path A directory path
      * @param string $type The resource type
-     *
+     * 
      * @return RouteCollection A RouteCollection instance
-     *
+     * 
      * @throws \InvalidArgumentException When the directory does not exist or its routes cannot be parsed
      */
     public function load($path, $type = null)
@@ -53,10 +53,10 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
 
     /**
      * Returns true if this class supports the given resource.
-     *
+     * 
      * @param mixed  $resource A resource
      * @param string $type     The resource type
-     *
+     * 
      * @return Boolean True if this class supports the given resource, false otherwise
      */
     public function supports($resource, $type = null)

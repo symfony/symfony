@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,9 +15,9 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
 
 /**
  * Translator.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * @api
  */
 class Translator implements TranslatorInterface
@@ -31,10 +31,10 @@ class Translator implements TranslatorInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param string          $locale   The locale
      * @param MessageSelector $selector The message selector for pluralization
-     *
+     * 
      * @api
      */
     public function __construct($locale, MessageSelector $selector)
@@ -48,10 +48,10 @@ class Translator implements TranslatorInterface
 
     /**
      * Adds a Loader.
-     *
+     * 
      * @param string          $format The name of the loader (@see addResource())
      * @param LoaderInterface $loader A LoaderInterface instance
-     *
+     * 
      * @api
      */
     public function addLoader($format, LoaderInterface $loader)
@@ -61,12 +61,12 @@ class Translator implements TranslatorInterface
 
     /**
      * Adds a Resource.
-     *
+     * 
      * @param string $format   The name of the loader (@see addLoader())
      * @param mixed  $resource The resource name
      * @param string $locale   The locale
      * @param string $domain   The domain
-     *
+     * 
      * @api
      */
     public function addResource($format, $resource, $locale, $domain = 'messages')
@@ -80,7 +80,7 @@ class Translator implements TranslatorInterface
 
     /**
      * {@inheritdoc}
-     *
+     * 
      * @api
      */
     public function setLocale($locale)
@@ -90,7 +90,7 @@ class Translator implements TranslatorInterface
 
     /**
      * {@inheritdoc}
-     *
+     * 
      * @api
      */
     public function getLocale()
@@ -100,9 +100,9 @@ class Translator implements TranslatorInterface
 
     /**
      * Sets the fallback locale.
-     *
+     * 
      * @param string $locale The fallback locale
-     *
+     * 
      * @api
      */
     public function setFallbackLocale($locale)
@@ -115,7 +115,7 @@ class Translator implements TranslatorInterface
 
     /**
      * {@inheritdoc}
-     *
+     * 
      * @api
      */
     public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
@@ -133,7 +133,7 @@ class Translator implements TranslatorInterface
 
     /**
      * {@inheritdoc}
-     *
+     * 
      * @api
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)

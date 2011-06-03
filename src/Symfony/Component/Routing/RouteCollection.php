@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,7 +15,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 
 /**
  * A RouteCollection represents a set of Route instances.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RouteCollection implements \IteratorAggregate
@@ -41,10 +41,10 @@ class RouteCollection implements \IteratorAggregate
 
     /**
      * Adds a route.
-     *
+     * 
      * @param string $name  The route name
      * @param Route  $route A Route instance
-     *
+     * 
      * @throws \InvalidArgumentException When route name contains non valid characters
      */
     public function add($name, Route $route)
@@ -58,7 +58,7 @@ class RouteCollection implements \IteratorAggregate
 
     /**
      * Returns the array of routes.
-     *
+     * 
      * @return array An array of routes
      */
     public function all()
@@ -77,9 +77,9 @@ class RouteCollection implements \IteratorAggregate
 
     /**
      * Gets a route by name.
-     *
+     * 
      * @param  string $name  The route name
-     *
+     * 
      * @return Route  $route A Route instance
      */
     public function get($name)
@@ -102,7 +102,7 @@ class RouteCollection implements \IteratorAggregate
 
     /**
      * Adds a route collection to the current set of routes (at the end of the current set).
-     *
+     * 
      * @param RouteCollection $collection A RouteCollection instance
      * @param string          $prefix     An optional prefix to add before each pattern of the route collection
      */
@@ -115,7 +115,7 @@ class RouteCollection implements \IteratorAggregate
 
     /**
      * Adds a prefix to all routes in the current set.
-     *
+     * 
      * @param string          $prefix     An optional prefix to add before each pattern of the route collection
      */
     public function addPrefix($prefix)
@@ -150,7 +150,7 @@ class RouteCollection implements \IteratorAggregate
 
     /**
      * Returns an array of resources loaded to build this collection.
-     *
+     * 
      * @return ResourceInterface[] An array of resources
      */
     public function getResources()
@@ -167,7 +167,7 @@ class RouteCollection implements \IteratorAggregate
 
     /**
      * Adds a resource for this collection.
-     *
+     * 
      * @param ResourceInterface $resource A resource instance
      */
     public function addResource(ResourceInterface $resource)

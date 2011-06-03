@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -14,7 +14,7 @@ use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
 
 /**
  * This class builds an if expression.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Christophe Coevoet <stof@notk.org>
  */
@@ -26,7 +26,7 @@ class ExprBuilder
 
     /**
      * Constructor
-     *
+     * 
      * @param NodeDefinition $node The related node
      */
     public function __construct(NodeDefinition $node)
@@ -36,7 +36,7 @@ class ExprBuilder
 
     /**
      * Mark the expression as being always used.
-     *
+     * 
      * @return ExprBuilder
      */
     public function always(\Closure $then = null)
@@ -52,9 +52,9 @@ class ExprBuilder
 
     /**
      * Sets a closure to use as tests.
-     *
+     * 
      * The default one tests if the value is true.
-     *
+     * 
      * @param \Closure $closure
      * @return ExprBuilder
      */
@@ -71,7 +71,7 @@ class ExprBuilder
 
     /**
      * Tests if the value is a string.
-     *
+     * 
      * @return ExprBuilder
      */
     public function ifString()
@@ -83,7 +83,7 @@ class ExprBuilder
 
     /**
      * Tests if the value is null.
-     *
+     * 
      * @return ExprBuilder
      */
     public function ifNull()
@@ -95,7 +95,7 @@ class ExprBuilder
 
     /**
      * Tests if the value is an array.
-     *
+     * 
      * @return ExprBuilder
      */
     public function ifArray()
@@ -107,9 +107,9 @@ class ExprBuilder
 
     /**
      * Tests if the value is in an array.
-     *
+     * 
      * @param array $array
-     *
+     * 
      * @return ExprBuilder
      */
     public function ifInArray(array $array)
@@ -121,9 +121,9 @@ class ExprBuilder
 
     /**
      * Tests if the value is not in an array.
-     *
+     * 
      * @param array $array
-     *
+     * 
      * @return ExprBuilder
      */
     public function ifNotInArray(array $array)
@@ -135,9 +135,9 @@ class ExprBuilder
 
     /**
      * Sets the closure to run if the test pass.
-     *
+     * 
      * @param \Closure $closure
-     *
+     * 
      * @return ExprBuilder
      */
     public function then(\Closure $closure)
@@ -149,7 +149,7 @@ class ExprBuilder
 
     /**
      * Sets a closure returning an empty array.
-     *
+     * 
      * @return ExprBuilder
      */
     public function thenEmptyArray()
@@ -161,11 +161,11 @@ class ExprBuilder
 
     /**
      * Sets a closure marking the value as invalid at validation time.
-     *
+     * 
      * if you want to add the value of the node in your message just use a %s placeholder.
-     *
+     * 
      * @param string $message
-     *
+     * 
      * @return ExprBuilder
      */
     public function thenInvalid($message)
@@ -177,7 +177,7 @@ class ExprBuilder
 
     /**
      * Sets a closure unsetting this key of the array at validation time.
-     *
+     * 
      * @return ExprBuilder
      */
     public function thenUnset()
@@ -189,7 +189,7 @@ class ExprBuilder
 
     /**
      * Returns the related node
-     *
+     * 
      * @return NodeDefinition
      */
     public function end()
@@ -206,9 +206,9 @@ class ExprBuilder
 
     /**
      * Builds the expressions.
-     *
+     * 
      * @param array $expressions An array of ExprBuilder instances to build
-     *
+     * 
      * @return array
      */
     public static function buildExpressions(array $expressions)

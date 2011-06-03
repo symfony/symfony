@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -22,16 +22,16 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * YamlFileLoader loads YAML files service definitions.
- *
+ * 
  * The YAML format does not support anonymous services (cf. the XML loader).
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class YamlFileLoader extends FileLoader
 {
     /**
      * Loads a Yaml file.
-     *
+     * 
      * @param mixed  $file The resource
      * @param string $type The resource type
      */
@@ -67,10 +67,10 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Returns true if this class supports the given resource.
-     *
+     * 
      * @param mixed  $resource A resource
      * @param string $type     The resource type
-     *
+     * 
      * @return Boolean true if this class supports the given resource, false otherwise
      */
     public function supports($resource, $type = null)
@@ -80,7 +80,7 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Parses all imports
-     *
+     * 
      * @param array $content
      * @param string $file
      * @return void
@@ -99,7 +99,7 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Parses definitions
-     *
+     * 
      * @param array $content
      * @param string $file
      * @return void
@@ -117,7 +117,7 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Parses a definition.
-     *
+     * 
      * @param string $id
      * @param array $service
      * @param string $file
@@ -222,7 +222,7 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Loads a YAML file.
-     *
+     * 
      * @param string $file
      * @return array The file content
      */
@@ -233,11 +233,11 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Validates a YAML file.
-     *
+     * 
      * @param mixed $content
      * @param string $file
      * @return array
-     *
+     * 
      * @throws \InvalidArgumentException When service file is not valid
      */
     private function validate($content, $file)
@@ -265,7 +265,7 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Resolves services.
-     *
+     * 
      * @param string $value
      * @return void
      */
@@ -297,7 +297,7 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Loads from Extensions
-     *
+     * 
      * @param array $content
      * @return void
      */

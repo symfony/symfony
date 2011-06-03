@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,16 +15,16 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * ArrayLoader loads translations from a PHP array.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * @api
  */
 class ArrayLoader implements LoaderInterface
 {
     /**
      * {@inheritdoc}
-     *
+     * 
      * @api
      */
     public function load($resource, $locale, $domain = 'messages')
@@ -38,14 +38,14 @@ class ArrayLoader implements LoaderInterface
 
     /**
      * Flattens an nested array of translations
-     *
+     * 
      * The scheme used is:
      *   'key' => array('key2' => array('key3' => 'value'))
      * Becomes:
      *   'key.key2.key3' => 'value'
-     *
+     * 
      * This function takes an array by reference and will modify it
-     *
+     * 
      * @param array $messages the array that will be flattened
      * @param array $subnode current subnode being parsed, used internally for recursive calls
      * @param string $path current path being parsed, used internally for recursive calls

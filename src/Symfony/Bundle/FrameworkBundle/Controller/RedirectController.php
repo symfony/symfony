@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,24 +16,24 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
- *
- *
+ * 
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RedirectController extends ContainerAware
 {
     /**
      * Redirects to another route.
-     *
+     * 
      * It expects a route path parameter.
      * By default, the response status code is 301.
-     *
+     * 
      * If the route empty, the status code will be 410.
      * If the permanent path parameter is set, the status code will be 302.
-     *
+     * 
      * @param string  $route     The route pattern to redirect to
      * @param Boolean $permanent Whether the redirect is permanent or not
-     *
+     * 
      * @return Response A Response instance
      */
     public function redirectAction($route, $permanent = false)
@@ -50,18 +50,18 @@ class RedirectController extends ContainerAware
 
     /**
      * Redirects to a URL.
-     *
+     * 
      * By default, the response status code is 301.
-     *
+     * 
      * If the path is empty, the status code will be 410.
      * If the permanent flag is set, the status code will be 302.
-     *
+     * 
      * @param string  $path      The path to redirect to
      * @param Boolean $permanent Whether the redirect is permanent or not
      * @param Boolean $scheme    The URL scheme (null to keep the current one)
      * @param integer $httpPort  The HTTP port
      * @param integer $httpsPort The HTTPS port
-     *
+     * 
      * @return Response A Response instance
      */
     public function urlRedirectAction($path, $permanent = false, $scheme = null, $httpPort = 80, $httpsPort = 443)

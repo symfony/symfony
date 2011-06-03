@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,7 +15,7 @@ use Symfony\Component\Finder\Glob;
 
 /**
  * FilenameFilterIterator filters files by patterns (a regexp, a glob, or a string).
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class FilenameFilterIterator extends \FilterIterator
@@ -25,7 +25,7 @@ class FilenameFilterIterator extends \FilterIterator
 
     /**
      * Constructor.
-     *
+     * 
      * @param \Iterator $iterator        The Iterator to filter
      * @param array     $matchPatterns   An array of patterns that need to match
      * @param array     $noMatchPatterns An array of patterns that need to not match
@@ -47,7 +47,7 @@ class FilenameFilterIterator extends \FilterIterator
 
     /**
      * Filters the iterator values.
-     *
+     * 
      * @return Boolean true if the value should be kept, false otherwise
      */
     public function accept()

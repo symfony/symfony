@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,7 +15,7 @@ use Doctrine\DBAL\Schema\Schema as BaseSchema;
 
 /**
  * The schema used for the ACL system.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 final class Schema extends BaseSchema
@@ -24,7 +24,7 @@ final class Schema extends BaseSchema
 
     /**
      * Constructor
-     *
+     * 
      * @param array $options the names for tables
      * @return void
      */
@@ -43,7 +43,7 @@ final class Schema extends BaseSchema
 
     /**
      * Adds the class table to the schema
-     *
+     * 
      * @return void
      */
     protected function addClassTable()
@@ -57,7 +57,7 @@ final class Schema extends BaseSchema
 
     /**
      * Adds the entry table to the schema
-     *
+     * 
      * @return void
      */
     protected function addEntryTable()
@@ -87,7 +87,7 @@ final class Schema extends BaseSchema
 
     /**
      * Adds the object identity table to the schema
-     *
+     * 
      * @return void
      */
     protected function addObjectIdentitiesTable()
@@ -109,7 +109,7 @@ final class Schema extends BaseSchema
 
     /**
      * Adds the object identity relation table to the schema
-     *
+     * 
      * @return void
      */
     protected function addObjectIdentityAncestorsTable()
@@ -128,7 +128,7 @@ final class Schema extends BaseSchema
 
     /**
      * Adds the security identity table to the schema
-     *
+     * 
      * @return void
      */
     protected function addSecurityIdentitiesTable()

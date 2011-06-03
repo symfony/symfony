@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -22,14 +22,14 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
  * Semantic asset configuration.
- *
+ * 
  * @author Kris Wallsmith <kris@symfony.com>
  */
 class AsseticExtension extends Extension
 {
     /**
      * Loads the configuration.
-     *
+     * 
      * @param array            $configs   An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
@@ -122,11 +122,11 @@ class AsseticExtension extends Extension
 
     /**
      * Merges the user's config arrays.
-     *
+     * 
      * @param array   $configs An array of config arrays
      * @param Boolean $debug   The debug mode
      * @param array   $bundles An array of all bundle names
-     *
+     * 
      * @return array The merged config
      */
     static protected function processConfigs(array $configs, $debug, array $bundles)
@@ -138,10 +138,10 @@ class AsseticExtension extends Extension
 
     /**
      * Registers factory resources for certain bundles.
-     *
+     * 
      * @param ContainerBuilder $container The container
      * @param array            $bundles   An array of select bundle names
-     *
+     * 
      * @throws InvalidArgumentException If registering resources from a bundle that doesn't exist
      */
     static protected function registerFormulaResources(ContainerBuilder $container, array $bundles)
@@ -176,14 +176,14 @@ class AsseticExtension extends Extension
 
     /**
      * Creates a directory resource definition.
-     *
+     * 
      * If more than one directory is provided a coalescing definition will be
      * returned.
-     *
+     * 
      * @param string $bundle A bundle name or empty string
      * @param string $engine The templating engine
      * @param array  $dirs   An array of directories to merge
-     *
+     * 
      * @return Definition A resource definition
      */
     static protected function createDirectoryResourceDefinition($bundle, $engine, array $dirs)
@@ -216,7 +216,7 @@ class AsseticExtension extends Extension
 
     /**
      * Returns the base path for the XSD files.
-     *
+     * 
      * @return string The XSD base path
      */
     public function getXsdValidationBasePath()

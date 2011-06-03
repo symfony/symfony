@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Resize a collection form element based on the data sent from the client.
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
 class ResizeFormListener implements EventSubscriberInterface

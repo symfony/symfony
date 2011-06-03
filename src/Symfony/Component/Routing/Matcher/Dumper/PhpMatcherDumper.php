@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,21 +16,21 @@ use Symfony\Component\Routing\RouteCollection;
 
 /**
  * PhpMatcherDumper creates a PHP class able to match URLs for a given set of routes.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class PhpMatcherDumper extends MatcherDumper
 {
     /**
      * Dumps a set of routes to a PHP class.
-     *
+     * 
      * Available options:
-     *
+     * 
      *  * class:      The class name
      *  * base_class: The base class name
-     *
+     * 
      * @param  array  $options An array of options
-     *
+     * 
      * @return string A PHP class representing the matcher class
      */
     public function dump(array $options = array())
@@ -212,7 +212,7 @@ use Symfony\Component\Routing\RequestContext;
 
 /**
  * $class
- *
+ * 
  * This class has been auto-generated
  * by the Symfony Routing Component.
  */

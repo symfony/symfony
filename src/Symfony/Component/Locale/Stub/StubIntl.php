@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@ namespace Symfony\Component\Locale\Stub;
 
 /**
  * Provides fake static versions of the global functions in the intl extension
- *
+ * 
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
 abstract class StubIntl
@@ -64,7 +64,7 @@ abstract class StubIntl
 
     /**
      * Returns whether the error code indicates a failure
-     *
+     * 
      * @param  integer $errorCode The error code returned by StubIntl::getErrorCode()
      * @return Boolean
      */
@@ -75,9 +75,9 @@ abstract class StubIntl
 
     /**
      * Returns the error code of the last operation
-     *
+     * 
      * Returns StubIntl::U_ZERO_ERROR if no error occurred.
-     *
+     * 
      * @return integer
      */
     public static function getErrorCode() {
@@ -86,9 +86,9 @@ abstract class StubIntl
 
     /**
      * Returns the error message of the last operation
-     *
+     * 
      * Returns "U_ZERO_ERROR" if no error occurred.
-     *
+     * 
      * @return string
      */
     public static function getErrorMessage() {
@@ -97,7 +97,7 @@ abstract class StubIntl
 
     /**
      * Sets the current error code
-     *
+     * 
      * @param  integer $code  One of the error constants in this class
      * @throws \InvalidArgumentException  If the code is not one of the error
      *                                    constants in this class

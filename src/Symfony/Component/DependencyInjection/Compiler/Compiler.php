@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 
 /**
  * This class is used to remove circular dependencies between individual passes.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class Compiler
@@ -39,7 +39,7 @@ class Compiler
 
     /**
      * Returns the PassConfig.
-     *
+     * 
      * @return PassConfig The PassConfig instance
      */
     public function getPassConfig()
@@ -49,7 +49,7 @@ class Compiler
 
     /**
      * Returns the ServiceReferenceGraph.
-     *
+     * 
      * @return ServiceReferenceGraph The ServiceReferenceGraph instance
      */
     public function getServiceReferenceGraph()
@@ -59,7 +59,7 @@ class Compiler
 
     /**
      * Returns the logging formatter which can be used by compilation passes.
-     *
+     * 
      * @return LoggingFormatter
      */
     public function getLoggingFormatter()
@@ -69,7 +69,7 @@ class Compiler
 
     /**
      * Adds a pass to the PassConfig.
-     *
+     * 
      * @param CompilerPassInterface $pass A compiler pass
      * @param string                $type The type of the pass
      */
@@ -80,7 +80,7 @@ class Compiler
 
     /**
      * Adds a log message.
-     *
+     * 
      * @param string $string The log message
      */
     public function addLogMessage($string)
@@ -90,7 +90,7 @@ class Compiler
 
     /**
      * Returns the log.
-     *
+     * 
      * @return array Log array
      */
     public function getLog()
@@ -100,7 +100,7 @@ class Compiler
 
     /**
      * Run the Compiler and process all Passes.
-     *
+     * 
      * @param ContainerBuilder $container
      */
     public function compile(ContainerBuilder $container)

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,11 +19,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * GraphvizDumper dumps a service container as a graphviz file.
- *
+ * 
  * You can convert the generated dot file with the dot utility (http://www.graphviz.org/):
- *
+ * 
  *   dot -Tpng container.dot > foo.png
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class GraphvizDumper extends Dumper
@@ -41,18 +41,18 @@ class GraphvizDumper extends Dumper
 
     /**
      * Dumps the service container as a graphviz graph.
-     *
+     * 
      * Available options:
-     *
+     * 
      *  * graph: The default options for the whole graph
      *  * node: The default options for nodes
      *  * edge: The default options for edges
      *  * node.instance: The default options for services that are defined directly by object instances
      *  * node.definition: The default options for services that are defined via service definition instances
      *  * node.missing: The default options for missing services
-     *
+     * 
      * @param  array  $options An array of options
-     *
+     * 
      * @return string The dot representation of the service container
      */
     public function dump(array $options = array())
@@ -85,7 +85,7 @@ class GraphvizDumper extends Dumper
 
     /**
      * Returns all nodes.
-     *
+     * 
      * @return string A string representation of all nodes
      */
     private function addNodes()
@@ -102,7 +102,7 @@ class GraphvizDumper extends Dumper
 
     /**
      * Returns all edges.
-     *
+     * 
      * @return string A string representation of all edges
      */
     private function addEdges()
@@ -119,7 +119,7 @@ class GraphvizDumper extends Dumper
 
     /**
      * Finds all edges belonging to a specific service id.
-     *
+     * 
      * @param string $id The service id used to find edges
      * @param array $arguments An array of arguments
      * @param Boolean $required
@@ -152,7 +152,7 @@ class GraphvizDumper extends Dumper
 
     /**
      * Finds all nodes.
-     *
+     * 
      * @return array An array of all nodes
      */
     private function findNodes()
@@ -184,7 +184,7 @@ class GraphvizDumper extends Dumper
 
     /**
      * Returns the start dot.
-     *
+     * 
      * @return string The string representation of a start dot
      */
     private function startDot()
@@ -198,7 +198,7 @@ class GraphvizDumper extends Dumper
 
     /**
      * Returns the end dot.
-     *
+     * 
      * @return void
      */
     private function endDot()
@@ -208,7 +208,7 @@ class GraphvizDumper extends Dumper
 
     /**
      * Adds attributes
-     *
+     * 
      * @param array $attributes An array of attributes
      * @return string A comma separated list of attributes
      */
@@ -224,9 +224,9 @@ class GraphvizDumper extends Dumper
 
     /**
      * Adds options
-     *
+     * 
      * @param array $options An array of options
-     *
+     * 
      * @return string A space separated list of options
      */
     private function addOptions($options)
@@ -241,7 +241,7 @@ class GraphvizDumper extends Dumper
 
     /**
      * Dotizes an identifier.
-     *
+     * 
      * @param string $id The identifier to dotize
      * @return string A dotized string
      */
@@ -252,7 +252,7 @@ class GraphvizDumper extends Dumper
 
     /**
      * Compiles an array of aliases for a specified service id.
-     *
+     * 
      * @param string $id A service id
      * @return array An array of aliases
      */

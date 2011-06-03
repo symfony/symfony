@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * AccessListener enforces access control rules.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class AccessListener implements ListenerInterface
@@ -44,7 +44,7 @@ class AccessListener implements ListenerInterface
 
     /**
      * Handles access authorization.
-     *
+     * 
      * @param GetResponseEvent $event A GetResponseEvent instance
      */
     public function handle(GetResponseEvent $event)

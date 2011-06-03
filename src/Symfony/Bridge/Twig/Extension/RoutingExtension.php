@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Provides integration of the Routing component with Twig.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RoutingExtension extends \Twig_Extension
@@ -29,7 +29,7 @@ class RoutingExtension extends \Twig_Extension
 
     /**
      * Returns a list of functions to add to the existing list.
-     *
+     * 
      * @return array An array of functions
      */
     public function getFunctions()
@@ -52,7 +52,7 @@ class RoutingExtension extends \Twig_Extension
 
     /**
      * Returns the name of the extension.
-     *
+     * 
      * @return string The extension name
      */
     public function getName()

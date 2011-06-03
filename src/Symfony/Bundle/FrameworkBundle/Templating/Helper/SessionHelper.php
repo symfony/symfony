@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * SessionHelper provides read-only access to the session attributes.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SessionHelper extends Helper
@@ -25,7 +25,7 @@ class SessionHelper extends Helper
 
     /**
      * Constructor.
-     *
+     * 
      * @param Request $request A Request instance
      */
     public function __construct(Request $request)
@@ -35,10 +35,10 @@ class SessionHelper extends Helper
 
     /**
      * Returns an attribute
-     *
+     * 
      * @param string $name    The attribute name
      * @param mixed  $default The default value
-     *
+     * 
      * @return mixed
      */
     public function get($name, $default = null)
@@ -48,7 +48,7 @@ class SessionHelper extends Helper
 
     /**
      * Returns the locale
-     *
+     * 
      * @return string
      */
     public function getLocale()
@@ -73,7 +73,7 @@ class SessionHelper extends Helper
 
     /**
      * Returns the canonical name of this helper.
-     *
+     * 
      * @return string The canonical name
      */
     public function getName()

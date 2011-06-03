@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * Default implementation of the ConstraintValidatorFactoryInterface.
- *
+ * 
  * This enforces the convention that the validatedBy() method on any
  * Constrain will return the class name of the ConstraintValidator that
  * should validate the Constraint.

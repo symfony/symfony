@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -26,7 +26,7 @@ class CommandTester
 
     /**
      * Constructor.
-     *
+     * 
      * @param Command $command A Command instance to test.
      */
     public function __construct(Command $command)
@@ -36,16 +36,16 @@ class CommandTester
 
     /**
      * Executes the command.
-     *
+     * 
      * Available options:
-     *
+     * 
      *  * interactive: Sets the input interactive flag
      *  * decorated:   Sets the output decorated flag
      *  * verbosity:   Sets the output verbosity flag
-     *
+     * 
      * @param array $input   An array of arguments and options
      * @param array $options An array of options
-     *
+     * 
      * @return integer The command exit code
      */
     public function execute(array $input, array $options = array())
@@ -68,7 +68,7 @@ class CommandTester
 
     /**
      * Gets the display returned by the last execution of the command.
-     *
+     * 
      * @return string The display
      */
     public function getDisplay()
@@ -80,7 +80,7 @@ class CommandTester
 
     /**
      * Gets the input instance used by the last execution of the command.
-     *
+     * 
      * @return InputInterface The current input instance
      */
     public function getInput()
@@ -90,7 +90,7 @@ class CommandTester
 
     /**
      * Gets the output instance used by the last execution of the command.
-     *
+     * 
      * @return OutputInterface The current output instance
      */
     public function getOutput()

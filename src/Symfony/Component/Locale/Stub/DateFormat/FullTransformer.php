@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Component\Locale\Stub\DateFormat\MonthTransformer;
 
 /**
  * Parser and formatter for date formats
- *
+ * 
  * @author Igor Wiedler <igor@wiedler.ch>
  */
 class FullTransformer
@@ -33,7 +33,7 @@ class FullTransformer
 
     /**
      * Constructor
-     *
+     * 
      * @param  string  $pattern   The pattern to be used to format and/or parse values
      * @param  string  $timezone  The timezone to perform the date/time calculations
      */
@@ -68,7 +68,7 @@ class FullTransformer
 
     /**
      * Return the array of Transformer objects
-     *
+     * 
      * @return  array  Associative array of Transformer objects (format char => Transformer)
      */
     public function getTransformers()
@@ -78,7 +78,7 @@ class FullTransformer
 
     /**
      * Format a DateTime using ICU dateformat pattern
-     *
+     * 
      * @param  DateTime  $dateTime  A DateTime object to be used to generate the formatted value
      * @return string               The formatted value
      */
@@ -95,7 +95,7 @@ class FullTransformer
 
     /**
      * Return the formatted ICU value for the matched date characters
-     *
+     * 
      * @param  string    $dateChars     The date characters to be replaced with a formatted ICU value
      * @param  DateTime  $dateTime      A DateTime object to be used to generate the formatted value
      * @return string                   The formatted value
@@ -122,7 +122,7 @@ class FullTransformer
 
     /**
      * Parse a pattern based string to a timestamp value
-     *
+     * 
      * @param  DateTime  $dateTime       A configured DateTime object to use to perform the date calculation
      * @param  string    $value          String to convert to a time value
      * @return int                       The corresponding Unix timestamp
@@ -153,7 +153,7 @@ class FullTransformer
 
     /**
      * Retrieve a regular expression to match with a formatted value.
-     *
+     * 
      * @param  string  $pattern  The pattern to create the reverse matching regular expression
      * @return string            The reverse matching regular expression with named captures being formed by the
      *                           transformer index in the $transformer array
@@ -187,7 +187,7 @@ class FullTransformer
 
     /**
      * Check if the first char of a string is a single quote
-     *
+     * 
      * @param  string  $quoteMatch  The string to check
      * @return Boolean              true if matches, false otherwise
      */
@@ -198,7 +198,7 @@ class FullTransformer
 
     /**
      * Replaces single quotes at the start or end of a string with two single quotes
-     *
+     * 
      * @param  string  $quoteMatch  The string to replace the quotes
      * @return string               A string with the single quotes replaced
      */
@@ -212,7 +212,7 @@ class FullTransformer
 
     /**
      * Builds a chars match regular expression
-     *
+     * 
      * @param  string  $specialChars  A string of chars to build the regular expression
      * @return string                 The chars match regular expression
      */
@@ -230,7 +230,7 @@ class FullTransformer
     /**
      * Normalize a preg_replace match array, removing the numeric keys and returning an associative array
      * with the value and pattern values for the matched Transformer
-     *
+     * 
      * @param  array  $data
      * @return array
      */
@@ -255,7 +255,7 @@ class FullTransformer
     /**
      * Calculates the Unix timestamp based on the matched values by the reverse matching regular
      * expression of parse()
-     *
+     * 
      * @param  DateTime $dateTime The DateTime object to be used to calculate the timestamp
      * @param  array    $options  An array with the matched values to be used to calculate the timestamp
      * @return Boolean|int        The calculated timestamp or false if matched date is invalid
@@ -300,7 +300,7 @@ class FullTransformer
     /**
      * Add sensible default values for missing items in the extracted date/time options array. The values
      * are base in the beginning of the Unix era
-     *
+     * 
      * @param  array  $options
      * @return array
      */

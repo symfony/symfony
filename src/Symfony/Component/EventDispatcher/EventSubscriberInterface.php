@@ -12,7 +12,7 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * 
  * This software consists of voluntary contributions made by many individuals
  * and is licensed under the LGPL. For more information, see
  * <http://www.doctrine-project.org>.
@@ -25,7 +25,7 @@ namespace Symfony\Component\EventDispatcher;
  * If an EventSubscriber is added to an EventDispatcherInterface, the manager invokes
  * {@link getSubscribedEvents} and registers the subscriber as a listener for all
  * returned events.
- *
+ * 
  * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link    www.doctrine-project.org
  * @since   2.0
@@ -38,7 +38,7 @@ interface EventSubscriberInterface
 {
     /**
      * Returns an array of event names this subscriber wants to listen to.
-     *
+     * 
      * @return array The event names to listen to
      */
     static function getSubscribedEvents();

@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * UserProviderInterface retrieves users for UsernamePasswordToken tokens.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class UserAuthenticationProvider implements AuthenticationProviderInterface
@@ -33,7 +33,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
 
     /**
      * Constructor.
-     *
+     * 
      * @param UserCheckerInterface $userChecker                An UserCheckerInterface interface
      * @param string               $providerKey                A provider key
      * @param Boolean              $hideUserNotFoundExceptions Whether to hide user not found exception or not
@@ -97,12 +97,12 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
 
     /**
      * Retrieves the user from an implementation-specific location.
-     *
+     * 
      * @param string                $username The username to retrieve
      * @param UsernamePasswordToken $token    The Token
-     *
+     * 
      * @return array The user
-     *
+     * 
      * @throws AuthenticationException if the credentials could not be validated
      */
     abstract protected function retrieveUser($username, UsernamePasswordToken $token);
@@ -110,10 +110,10 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     /**
      * Does additional checks on the user and token (like validating the
      * credentials).
-     *
+     * 
      * @param UserInterface         $user  The retrieved UserInterface instance
      * @param UsernamePasswordToken $token The UsernamePasswordToken token to be authenticated
-     *
+     * 
      * @throws AuthenticationException if the credentials could not be validated
      */
     abstract protected function checkAuthentication(UserInterface $user, UsernamePasswordToken $token);

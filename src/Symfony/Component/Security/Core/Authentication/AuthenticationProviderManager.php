@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 /**
  * AuthenticationProviderManager uses a list of AuthenticationProviderInterface
  * instances to authenticate a Token.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class AuthenticationProviderManager implements AuthenticationManagerInterface
@@ -30,7 +30,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param AuthenticationProviderInterface[] $providers        An array of AuthenticationProviderInterface instances
      * @param Boolean                           $eraseCredentials Whether to erase credentials after authentication or not
      */

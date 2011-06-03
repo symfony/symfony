@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Client simulates a browser and makes requests to a Kernel object.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Client extends BaseClient
@@ -30,7 +30,7 @@ class Client extends BaseClient
 
     /**
      * Returns the container.
-     *
+     * 
      * @return ContainerInterface
      */
     public function getContainer()
@@ -40,7 +40,7 @@ class Client extends BaseClient
 
     /**
      * Returns the kernel.
-     *
+     * 
      * @return HttpKernelInterface
      */
     public function getKernel()
@@ -50,7 +50,7 @@ class Client extends BaseClient
 
     /**
      * Gets the profile associated with the current Response.
-     *
+     * 
      * @return HttpProfile A Profile instance
      */
     public function getProfile()
@@ -64,9 +64,9 @@ class Client extends BaseClient
 
     /**
      * Makes a request.
-     *
+     * 
      * @param Request $request A Request instance
-     *
+     * 
      * @return Response A Response instance
      */
     protected function doRequest($request)
@@ -84,9 +84,9 @@ class Client extends BaseClient
 
     /**
      * Returns the script to execute when the request must be insulated.
-     *
+     * 
      * @param Request $request A Request instance
-     *
+     * 
      * @return string The script content
      */
     protected function getScript($request)

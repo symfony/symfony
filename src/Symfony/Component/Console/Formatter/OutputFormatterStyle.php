@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,9 +13,9 @@ namespace Symfony\Component\Console\Formatter;
 
 /**
  * Formatter style class for defining styles.
- *
+ * 
  * @author Konstantin Kudryashov <ever.zet@gmail.com>
- *
+ * 
  * @api
  */
 class OutputFormatterStyle implements OutputFormatterStyleInterface
@@ -54,11 +54,11 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
 
     /**
      * Initializes output formatter style.
-     *
+     * 
      * @param   string  $foreground     style foreground color name
      * @param   string  $background     style background color name
      * @param   array   $options        style options
-     *
+     * 
      * @api
      */
     public function __construct($foreground = null, $background = null, array $options = array())
@@ -76,9 +76,9 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
 
     /**
      * Sets style foreground color.
-     *
+     * 
      * @param   string  $color  color name
-     *
+     * 
      * @api
      */
     public function setForeground($color = null)
@@ -102,9 +102,9 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
 
     /**
      * Sets style background color.
-     *
+     * 
      * @param   string  $color  color name
-     *
+     * 
      * @api
      */
     public function setBackground($color = null)
@@ -128,9 +128,9 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
 
     /**
      * Sets some specific style option.
-     *
+     * 
      * @param   string  $option     option name
-     *
+     * 
      * @api
      */
     public function setOption($option)
@@ -150,7 +150,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
 
     /**
      * Unsets some specific style option.
-     *
+     * 
      * @param   string  $option     option name
      */
     public function unsetOption($option)
@@ -171,7 +171,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
 
     /**
      * Set multiple style options at once.
-     *
+     * 
      * @param   array   $options
      */
     public function setOptions(array $options)
@@ -185,9 +185,9 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
 
     /**
      * Applies the style to a given text.
-     *
+     * 
      * @param string $text The text to style
-     *
+     * 
      * @return string
      */
     public function apply($text)

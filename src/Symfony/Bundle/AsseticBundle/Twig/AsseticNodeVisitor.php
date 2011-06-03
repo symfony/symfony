@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -15,7 +15,7 @@ use Assetic\Extension\Twig\AsseticFilterFunction;
 
 /**
  * Assetic node visitor.
- *
+ * 
  * @author Kris Wallsmith <kris@symfony.com>
  */
 class AsseticNodeVisitor implements \Twig_NodeVisitorInterface
@@ -61,7 +61,7 @@ class AsseticNodeVisitor implements \Twig_NodeVisitorInterface
 
     /**
      * Extracts formulae from filter function nodes.
-     *
+     * 
      * @return array|null The formula
      */
     private function checkNode(\Twig_NodeInterface $node, \Twig_Environment $env)

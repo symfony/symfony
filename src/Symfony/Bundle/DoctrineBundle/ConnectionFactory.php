@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -27,7 +27,7 @@ class ConnectionFactory
 
     /**
      * Construct.
-     *
+     * 
      * @param array $typesConfig
      */
     public function __construct(array $typesConfig)
@@ -37,11 +37,11 @@ class ConnectionFactory
 
     /**
      * Create a connection by name.
-     *
+     * 
      * @param array         $params
      * @param Configuration $config
      * @param EventManager  $eventManager
-     *
+     * 
      * @return Doctrine\DBAL\Connection
      */
     public function createConnection(array $params, Configuration $config = null, EventManager $eventManager = null)

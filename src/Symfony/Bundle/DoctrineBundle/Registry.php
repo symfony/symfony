@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -18,7 +18,7 @@ use Doctrine\ORM\ORMException;
 
 /**
  * References all Doctrine connections and entity managers in a given Container.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Registry
@@ -40,7 +40,7 @@ class Registry
 
     /**
      * Gets the default connection name.
-     *
+     * 
      * @return string The default connection name
      */
     public function getDefaultConnectionName()
@@ -50,9 +50,9 @@ class Registry
 
     /**
      * Gets the named connection.
-     *
+     * 
      * @param string $name The connection name (null for the default one)
-     *
+     * 
      * @return Connection
      */
     public function getConnection($name = null)
@@ -70,7 +70,7 @@ class Registry
 
     /**
      * Gets all connection names.
-     *
+     * 
      * @return array An array of connection names
      */
     public function getConnectionNames()
@@ -80,7 +80,7 @@ class Registry
 
     /**
      * Gets the default entity manager name.
-     *
+     * 
      * @return string The default entity manager name
      */
     public function getDefaultEntityManagerName()
@@ -90,9 +90,9 @@ class Registry
 
     /**
      * Gets a named entity manager.
-     *
+     * 
      * @param string $name The entity manager name (null for the default one)
-     *
+     * 
      * @return EntityManager
      */
     public function getEntityManager($name = null)
@@ -110,19 +110,19 @@ class Registry
 
     /**
      * Resets a named entity manager.
-     *
+     * 
      * This method is useful when an entity manager has been closed
      * because of a rollbacked transaction AND when you think that
      * it makes sense to get a new one to replace the closed one.
-     *
+     * 
      * Be warned that you will get a brand new entity manager as
      * the existing one is not useable anymore. This means that any
      * other object with a dependency on this entity manager will
      * hold an obsolete reference. You can inject the registry instead
      * to avoid this problem.
-     *
+     * 
      * @param string $name The entity manager name (null for the default one)
-     *
+     * 
      * @return EntityManager
      */
     public function resetEntityManager($name = null)
@@ -142,13 +142,13 @@ class Registry
 
     /**
      * Resolves a registered namespace alias to the full namespace.
-     *
+     * 
      * This method looks for the alias in all registered entity managers.
-     *
+     * 
      * @param string $alias The alias
-     *
+     * 
      * @return string The full namespace
-     *
+     * 
      * @see Configuration::getEntityNamespace
      */
     public function getEntityNamespace($alias)
@@ -165,7 +165,7 @@ class Registry
 
     /**
      * Gets all connection names.
-     *
+     * 
      * @return array An array of connection names
      */
     public function getEntityManagerNames()

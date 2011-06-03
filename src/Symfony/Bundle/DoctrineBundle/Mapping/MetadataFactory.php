@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,8 +20,8 @@ use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Tools\DisconnectedClassMetadataFactory;
 
 /**
- *
- *
+ * 
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class MetadataFactory
@@ -30,7 +30,7 @@ class MetadataFactory
 
     /**
      * Constructor.
-     *
+     * 
      * @param Registry $registry A Registry instance
      */
     public function __construct(Registry $registry)
@@ -40,9 +40,9 @@ class MetadataFactory
 
     /**
      * Gets the metadata of all classes of a bundle.
-     *
+     * 
      * @param BundleInterface $bundle A BundleInterface instance
-     *
+     * 
      * @return ClassMetadataCollection A ClassMetadataCollection instance
      */
     public function getBundleMetadata(BundleInterface $bundle)
@@ -62,10 +62,10 @@ class MetadataFactory
 
     /**
      * Gets the metadata of a class.
-     *
+     * 
      * @param string $class A class name
      * @param string $path  The path where the class is stored (if known)
-     *
+     * 
      * @return ClassMetadataCollection A ClassMetadataCollection instance
      */
     public function getClassMetadata($class, $path = null)
@@ -90,10 +90,10 @@ class MetadataFactory
 
     /**
      * Gets the metadata of all classes of a namespace.
-     *
+     * 
      * @param string $namespace A namespace name
      * @param string $path      The path where the class is stored (if known)
-     *
+     * 
      * @return ClassMetadataCollection A ClassMetadataCollection instance
      */
     public function getNamespaceMetadata($namespace, $path = null)

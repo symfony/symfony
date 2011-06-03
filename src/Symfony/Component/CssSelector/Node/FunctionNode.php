@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -16,10 +16,10 @@ use Symfony\Component\CssSelector\XPathExpr;
 
 /**
  * FunctionNode represents a "selector:name(expr)" node.
- *
+ * 
  * This component is a port of the Python lxml library,
  * which is copyright Infrae and distributed under the BSD license.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class FunctionNode implements NodeInterface
@@ -33,7 +33,7 @@ class FunctionNode implements NodeInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param NodeInterface $selector The XPath expression
      * @param string $type
      * @param string $name
@@ -75,7 +75,7 @@ class FunctionNode implements NodeInterface
 
     /**
      * undocumented function
-     *
+     * 
      * @param XPathExpr $xpath
      * @param mixed     $expr
      * @param Boolean   $last
@@ -147,7 +147,7 @@ class FunctionNode implements NodeInterface
 
     /**
      * undocumented function
-     *
+     * 
      * @param XPathExpr $xpath
      * @param XPathExpr $expr
      * @return XPathExpr
@@ -159,7 +159,7 @@ class FunctionNode implements NodeInterface
 
     /**
      * undocumented function
-     *
+     * 
      * @param XPathExpr $xpath
      * @param XPathExpr $expr
      * @return XPathExpr
@@ -175,7 +175,7 @@ class FunctionNode implements NodeInterface
 
     /**
      * undocumented function
-     *
+     * 
      * @param XPathExpr $xpath
      * @param XPathExpr $expr
      * @return XPathExpr
@@ -187,7 +187,7 @@ class FunctionNode implements NodeInterface
 
     /**
      * undocumented function
-     *
+     * 
      * @param XPathExpr $xpath
      * @param XPathExpr $expr
      * @return XPathExpr
@@ -210,7 +210,7 @@ class FunctionNode implements NodeInterface
 
     /**
      * undocumented function
-     *
+     * 
      * @param XPathExpr $xpath
      * @param XPathExpr $expr
      * @return XPathExpr
@@ -228,7 +228,7 @@ class FunctionNode implements NodeInterface
 
     /**
      * Parses things like '1n+2', or 'an+b' generally, returning (a, b)
-     *
+     * 
      * @param mixed $s
      * @return array
      */

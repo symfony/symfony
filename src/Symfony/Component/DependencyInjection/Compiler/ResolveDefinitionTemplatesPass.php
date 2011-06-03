@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony framework.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * This replaces all DefinitionDecorator instances with their equivalent fully
  * merged Definition instance.
- *
+ * 
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class ResolveDefinitionTemplatesPass implements CompilerPassInterface
@@ -29,7 +29,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
 
     /**
      * Process the ContainerBuilder to replace DefinitionDecorator instances with their real Definition instances.
-     *
+     * 
      * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
@@ -52,7 +52,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
 
     /**
      * Resolves the definition
-     *
+     * 
      * @param string              $id         The definition identifier
      * @param DefinitionDecorator $definition
      * @return Definition

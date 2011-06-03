@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -24,7 +24,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 /**
  * DaoAuthenticationProvider uses a UserProviderInterface to retrieve the user
  * for a UsernamePasswordToken.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class DaoAuthenticationProvider extends UserAuthenticationProvider
@@ -34,7 +34,7 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
 
     /**
      * Constructor.
-     *
+     * 
      * @param UserProviderInterface   $userProvider               An UserProviderInterface instance
      * @param UserCheckerInterface    $userChecker                An UserCheckerInterface instance
      * @param string                  $providerKey                The provider key

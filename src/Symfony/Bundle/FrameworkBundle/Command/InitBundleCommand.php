@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -20,7 +20,7 @@ use Symfony\Bundle\FrameworkBundle\Generator\Generator;
 
 /**
  * Initializes a new bundle.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class InitBundleCommand extends Command
@@ -55,7 +55,7 @@ EOT
 
     /**
      * @see Command
-     *
+     * 
      * @throws \InvalidArgumentException When namespace doesn't end with Bundle
      * @throws \RuntimeException         When bundle can't be executed
      */

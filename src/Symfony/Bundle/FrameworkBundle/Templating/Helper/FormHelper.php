@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,8 +17,8 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Exception\FormException;
 
 /**
- *
- *
+ * 
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
@@ -75,10 +75,10 @@ class FormHelper extends Helper
 
     /**
      * Renders the entire form field "row".
-     *
+     * 
      * @param FormView $view
      * @param array    $variables
-     *
+     * 
      * @return string
      */
     public function row(FormView $view, array $variables = array())

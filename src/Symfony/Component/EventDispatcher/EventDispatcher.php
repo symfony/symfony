@@ -12,7 +12,7 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * 
  * This software consists of voluntary contributions made by many individuals
  * and is licensed under the LGPL. For more information, see
  * <http://www.doctrine-project.org>.
@@ -22,10 +22,10 @@ namespace Symfony\Component\EventDispatcher;
 
 /**
  * The EventDispatcherInterface is the central point of Symfony's event listener system.
- *
+ * 
  * Listeners are registered on the manager and events are dispatched through the
  * manager.
- *
+ * 
  * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
  * @author  Jonathan Wage <jonwage@gmail.com>
@@ -33,7 +33,7 @@ namespace Symfony\Component\EventDispatcher;
  * @author  Bernhard Schussek <bschussek@gmail.com>
  * @author  Fabien Potencier <fabien@symfony.com>
  * @author  Jordi Boggiano <j.boggiano@seld.be>
- *
+ * 
  * @api
  */
 class EventDispatcher implements EventDispatcherInterface
@@ -43,7 +43,7 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * @see EventDispatcherInterface::dispatch
-     *
+     * 
      * @api
      */
     public function dispatch($eventName, Event $event = null)
@@ -61,7 +61,7 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * @see EventDispatcherInterface::getListeners
-     *
+     * 
      * @api
      */
     public function getListeners($eventName = null)
@@ -89,7 +89,7 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * @see EventDispatcherInterface::hasListeners
-     *
+     * 
      * @api
      */
     public function hasListeners($eventName = null)
@@ -99,7 +99,7 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * @see EventDispatcherInterface::addListener
-     *
+     * 
      * @api
      */
     public function addListener($eventName, $listener, $priority = 0)
@@ -146,10 +146,10 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * Triggers the listeners of an event.
-     *
+     * 
      * This method can be overridden to add functionality that is executed
      * for each listener.
-     *
+     * 
      * @param array[callback] $listeners The event listeners.
      * @param string $eventName The name of the event to dispatch.
      * @param Event $event The event object to pass to the event handlers/listeners.
@@ -166,7 +166,7 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * Sorts the internal list of listeners for the given event by priority.
-     *
+     * 
      * @param string $eventName The name of the event.
      */
     private function sortListeners($eventName)

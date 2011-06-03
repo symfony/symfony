@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 /**
  * AccessDecisionManager is the base class for all access decision managers
  * that use decision voters.
- *
+ * 
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class AccessDecisionManager implements AccessDecisionManagerInterface
@@ -29,7 +29,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
 
     /**
      * Constructor.
-     *
+     * 
      * @param VoterInterface[] $voters                             An array of VoterInterface instances
      * @param string           $strategy                           The vote strategy
      * @param Boolean          $allowIfAllAbstainDecisions         Whether to grant access if all voters abstained or not
@@ -85,7 +85,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
 
     /**
      * Grants access if any voter returns an affirmative response.
-     *
+     * 
      * If all voters abstained from voting, the decision will be based on the
      * allowIfAllAbstainDecisions property value (defaults to false).
      */
@@ -117,15 +117,15 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
 
     /**
      * Grants access if there is consensus of granted against denied responses.
-     *
+     * 
      * Consensus means majority-rule (ignoring abstains) rather than unanimous
      * agreement (ignoring abstains). If you require unanimity, see
      * UnanimousBased.
-     *
+     * 
      * If there were an equal number of grant and deny votes, the decision will
      * be based on the allowIfEqualGrantedDeniedDecisions property value
      * (defaults to true).
-     *
+     * 
      * If all voters abstained from voting, the decision will be based on the
      * allowIfAllAbstainDecisions property value (defaults to false).
      */
@@ -172,7 +172,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
 
     /**
      * Grants access if only grant (or abstain) votes were received.
-     *
+     * 
      * If all voters abstained from voting, the decision will be based on the
      * allowIfAllAbstainDecisions property value (defaults to false).
      */

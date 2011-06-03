@@ -2,9 +2,9 @@
 
 /*
  * This file is part of the Symfony package.
- *
+ * 
  * (c) Fabien Potencier <fabien@symfony.com>
- *
+ * 
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -33,7 +33,7 @@ class Locale extends \Locale
 
     /**
      * Returns the country names for a locale
-     *
+     * 
      * @param  string $locale     The locale to use for the country names
      * @return array              The country names with their codes as keys
      * @throws RuntimeException   When the resource bundles cannot be loaded
@@ -69,7 +69,7 @@ class Locale extends \Locale
 
     /**
      * Returns all available country codes
-     *
+     * 
      * @return array              The country codes
      * @throws RuntimeException   When the resource bundles cannot be loaded
      */
@@ -80,7 +80,7 @@ class Locale extends \Locale
 
     /**
      * Returns the language names for a locale
-     *
+     * 
      * @param  string $locale     The locale to use for the language names
      * @return array              The language names with their codes as keys
      * @throws RuntimeException   When the resource bundles cannot be loaded
@@ -114,7 +114,7 @@ class Locale extends \Locale
 
     /**
      * Returns all available language codes
-     *
+     * 
      * @return array              The language codes
      * @throws RuntimeException   When the resource bundles cannot be loaded
      */
@@ -125,7 +125,7 @@ class Locale extends \Locale
 
     /**
      * Returns the locale names for a locale
-     *
+     * 
      * @param  string $locale     The locale to use for the locale names
      * @return array              The locale names with their codes as keys
      * @throws RuntimeException   When the resource bundles cannot be loaded
@@ -156,7 +156,7 @@ class Locale extends \Locale
 
     /**
      * Returns all available locale codes
-     *
+     * 
      * @return array              The locale codes
      * @throws RuntimeException   When the resource bundles cannot be loaded
      */

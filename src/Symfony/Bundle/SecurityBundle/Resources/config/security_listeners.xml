@@ -141,6 +141,7 @@
             <argument type="service" id="security.user_checker" />
             <argument /> <!-- Provider-shared Key -->
             <argument type="service" id="security.encoder_factory" />
+            <argument>%security.authentication.hide_user_not_found%</argument>
         </service>
 
         <service id="security.authentication.provider.pre_authenticated" class="%security.authentication.provider.pre_authenticated.class%" abstract="true" public="false">

@@ -60,7 +60,7 @@ class DateType extends AbstractType
             $pattern
         );
 
-        if ($options['widget'] === 'single-text') {
+        if ($options['widget'] === 'single_text') {
             $builder->appendClientTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $format, \IntlDateFormatter::NONE, \IntlDateFormatter::GREGORIAN, $pattern));
         } else {
             $yearOptions = $monthOptions = $dayOptions = array();

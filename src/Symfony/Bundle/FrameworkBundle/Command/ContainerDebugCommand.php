@@ -27,7 +27,7 @@ use Symfony\Component\Config\FileLocator;
  *
  * @author Ryan Weaver <ryan@thatsquality.com>
  */
-class ContainerDebugCommand extends ContainerAwareCommand
+class ContainerDebugCommand extends DebugCommand
 {
     /**
      * @var ContainerBuilder

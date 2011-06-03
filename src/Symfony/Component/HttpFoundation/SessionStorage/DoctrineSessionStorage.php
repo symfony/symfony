@@ -172,7 +172,7 @@ class DoctrineSessionStorage extends NativeSessionStorage
             $this->updateEntity($entity, array(
                 'id'    => $sessionId,
                 'data'  => $data,
-                'time'  => $time,
+                'time'  => time(),
             ));
         } else {
             $this->createNewSession($sessionId, $data);

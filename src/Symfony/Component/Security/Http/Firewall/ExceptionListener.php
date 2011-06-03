@@ -140,8 +140,6 @@ class ExceptionListener
 
     private function startAuthentication(Request $request, AuthenticationException $authException)
     {
-        $this->context->setToken(null);
-
         if (null === $this->authenticationEntryPoint) {
             throw $authException;
         }

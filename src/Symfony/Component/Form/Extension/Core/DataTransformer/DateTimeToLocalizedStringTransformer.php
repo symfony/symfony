@@ -43,11 +43,11 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     {
         parent::__construct($inputTimezone, $outputTimezone);
 
-        if (is_null($dateFormat)) {
+        if (null === $dateFormat) {
             $dateFormat = \IntlDateFormatter::MEDIUM;
         }
 
-        if (is_null($timeFormat)) {
+        if (null === $timeFormat) {
             $timeFormat = \IntlDateFormatter::SHORT;
         }
 

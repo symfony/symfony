@@ -184,6 +184,13 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://localhost/app.php/', $this->getGenerator($routes, array('scheme' => 'https'))->generate('test'));
     }
 
+    public function testNoTrailingSlashForMultipleOptionalParameters()
+    {
+        $routes = $this->getRoutes('test', new Route('/category/{slug1}/{slug2}/{slug3}', array('slug2' => null, 'slug3' => null)));
+
+        $this->assertEquals('/app.php/category/foo', $this->getGenerator($routes)->generate('test', array('slug1' => 'foo')));
+    }
+
     protected function getGenerator(RouteCollection $routes, array $parameters = array())
     {
         $context = new RequestContext('/app.php');

@@ -61,10 +61,6 @@ class RouterListener
             $request->isSecure() ? $request->getPort() : $this->httpsPort
         );
 
-        if ($session = $request->getSession()) {
-            $context->setParameter('_locale', $session->getLocale());
-        }
-
         $this->router->setContext($context);
     }
 
@@ -100,9 +96,17 @@ class RouterListener
             throw new MethodNotAllowedHttpException($e->getAllowedMethods(), $message, $e);
         }
 
-        if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType() && $locale = $request->attributes->get('_locale')) {
-            $request->getSession()->setLocale($locale);
-            $this->router->getContext()->setParameter('_locale', $locale);
+        if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
+            $context = $this->router->getContext();
+            $session = $request->getSession();
+            if ($locale = $request->attributes->get('_locale')) {
+                if ($session) {
+                    $session->setLocale($locale);
+                }
+                $context->setParameter('_locale', $locale);
+            } elseif ($session) {
+                $context->setParameter('_locale', $session->getLocale());
+            }
         }
     }
 

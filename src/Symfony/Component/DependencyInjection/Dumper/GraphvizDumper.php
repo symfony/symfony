@@ -199,7 +199,7 @@ class GraphvizDumper extends Dumper
     /**
      * Returns the end dot.
      *
-     * @return void
+     * @return string
      */
     private function endDot()
     {

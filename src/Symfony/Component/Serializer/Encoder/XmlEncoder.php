@@ -269,7 +269,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
      * @param array|object $data
      * @param string       $nodename
      * @param string       $key
-     * @return void
+     * @return Boolean
      */
     private function appendNode($parentNode, $data, $nodeName, $key = null)
     {

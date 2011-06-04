@@ -207,6 +207,7 @@ class FullTransformer
         if (preg_match("/^'+$/", $quoteMatch)) {
             return str_replace("''", "'", $quoteMatch);
         }
+
         return str_replace("''", "'", substr($quoteMatch, 1, -1));
     }
 

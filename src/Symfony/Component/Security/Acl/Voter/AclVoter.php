@@ -124,6 +124,7 @@ class AclVoter implements VoterInterface
         }
 
         // no attribute was supported
+
         return self::ACCESS_ABSTAIN;
     }
 

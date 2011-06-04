@@ -511,6 +511,7 @@ class HttpCache implements HttpKernelInterface
         }
 
         // we have the lock, call the backend
+
         return false;
     }
 

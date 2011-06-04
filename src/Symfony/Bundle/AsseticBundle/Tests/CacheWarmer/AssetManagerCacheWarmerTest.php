@@ -31,13 +31,13 @@ class AssetManagerCacheWarmerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $am->expects($this->once())->method('load');
-        
+
         $container = $this
             ->getMockBuilder('Symfony\\Component\\DependencyInjection\\Container')
             ->setConstructorArgs(array())
             ->getMock()
         ;
-        
+
         $container
             ->expects($this->once())
             ->method('get')

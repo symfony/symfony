@@ -53,6 +53,7 @@ class Unescaper
         };
 
         // evaluate the string
+
         return preg_replace_callback('/'.self::REGEX_ESCAPED_CHARACTER.'/u', $callback, $value);
     }
 

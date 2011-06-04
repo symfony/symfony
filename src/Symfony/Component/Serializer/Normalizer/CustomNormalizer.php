@@ -33,6 +33,7 @@ class CustomNormalizer extends SerializerAwareNormalizer
     {
         $object = new $class;
         $object->denormalize($this->serializer, $data, $format);
+
         return $object;
     }
 

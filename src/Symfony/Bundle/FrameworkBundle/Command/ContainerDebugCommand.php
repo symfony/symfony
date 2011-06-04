@@ -214,6 +214,7 @@ EOF
         }
 
         // the service has been injected in some special way, just return the service
+
         return $this->containerBuilder->get($serviceId);
     }
 }

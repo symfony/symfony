@@ -80,6 +80,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('path')->defaultValue('%kernel.cache_dir%/swiftmailer/spool')->end()
                     ->end()
                 ->end()
+                ->scalarNode('sender_address')->end()
                 ->scalarNode('delivery_address')->end()
                 ->booleanNode('disable_delivery')->end()
                 ->booleanNode('logging')->defaultValue($this->debug)->end()

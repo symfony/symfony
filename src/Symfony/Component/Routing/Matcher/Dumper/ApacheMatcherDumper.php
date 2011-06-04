@@ -72,8 +72,8 @@ class ApacheMatcherDumper extends MatcherDumper
             if ($req = strtolower($route->getRequirement('_method'))) {
                 $allow = array();
                 foreach (explode('|', $req) as $method) {
-                    $methodVars[] = $var = '_ROUTING__allow_'.$method;
-                    $allow[] = 'E='.$var.':1';
+                    $methodVars[] = $method;
+                    $allow[] = 'E=_ROUTING__allow_'.$method.':1';
                 }
 
                 $rule[] = "RewriteCond %{REQUEST_URI} $regex";
@@ -96,8 +96,9 @@ class ApacheMatcherDumper extends MatcherDumper
 
         if (0 < count($methodVars)) {
             $rule = array('# 405 Method Not Allowed');
+            $methodVars = array_values(array_unique($methodVars));
             foreach ($methodVars as $i => $methodVar) {
-                $rule[] = sprintf('RewriteCond %%{%s} !-z%s', $methodVar, isset($methodVars[$i + 1]) ? ' [OR]' : '');
+                $rule[] = sprintf('RewriteCond %%{_ROUTING__allow_%s} !-z%s', $methodVar, isset($methodVars[$i + 1]) ? ' [OR]' : '');
             }
             $rule[] = sprintf('RewriteRule .* %s [QSA,L]', $options['script_name']);
 

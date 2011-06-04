@@ -40,6 +40,12 @@ class ApacheMatcherDumperTest extends \PHPUnit_Framework_TestCase
             array(),
             array('_method' => 'GET|head')
         ));
+        // method requirement (again)
+        $collection->add('baragain', new Route(
+            '/baragain/{foo}',
+            array(),
+            array('_method' => 'get|post')
+        ));
         // simple
         $collection->add('baz', new Route(
             '/test/baz'

@@ -267,7 +267,7 @@ class YamlFileLoader extends FileLoader
      * Resolves services.
      *
      * @param string $value
-     * @return void
+     * @return Reference
      */
     private function resolveServices($value)
     {

@@ -68,7 +68,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
             throw new \InvalidArgumentException('Expected an array("service", "method") argument');
         }
 
-        $this->listenerIds[$eventName][$callback[0].'::'.$callback[1]] = array($callback[0], $callback[1], $priority);
+        $this->listenerIds[$eventName][] = array($callback[0], $callback[1], $priority);
     }
 
     /**
@@ -86,14 +86,15 @@ class ContainerAwareEventDispatcher extends EventDispatcher
                 list($serviceId, $method, $priority) = $args;
                 $listener = $this->container->get($serviceId);
 
-                if (!isset($this->listeners[$eventName][$serviceId])) {
+                $key = $serviceId.$method;
+                if (!isset($this->listeners[$eventName][$key])) {
                     $this->addListener($eventName, array($listener, $method), $priority);
-                } elseif ($listener !== $this->listeners[$eventName][$serviceId]) {
-                    $this->removeListener($eventName, array($this->listeners[$eventName][$serviceId], $method));
+                } elseif ($listener !== $this->listeners[$eventName][$key]) {
+                    $this->removeListener($eventName, array($this->listeners[$eventName][$key], $method));
                     $this->addListener($eventName, array($listener, $method), $priority);
                 }
 
-                $this->listeners[$eventName][$serviceId] = $listener;
+                $this->listeners[$eventName][$key] = $listener;
             }
         }
 

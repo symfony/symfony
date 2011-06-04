@@ -31,8 +31,8 @@ class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\Redirec
 
         // bar
         if (0 === strpos($pathinfo, '/bar') && preg_match('#^/bar/(?P<foo>[^/]+?)$#x', $pathinfo, $matches)) {
-            if (!in_array($this->context->getMethod(), array('get', 'head'))) {
-                $allow = array_merge($allow, array('get', 'head'));
+            if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
+                $allow = array_merge($allow, array('GET', 'HEAD'));
                 goto not_bar;
             }
             $matches['_route'] = 'bar';
@@ -42,8 +42,8 @@ class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\Redirec
 
         // barhead
         if (0 === strpos($pathinfo, '/barhead') && preg_match('#^/barhead/(?P<foo>[^/]+?)$#x', $pathinfo, $matches)) {
-            if (!in_array($this->context->getMethod(), array('get', 'head'))) {
-                $allow = array_merge($allow, array('get', 'head'));
+            if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
+                $allow = array_merge($allow, array('GET', 'HEAD'));
                 goto not_barhead;
             }
             $matches['_route'] = 'barhead';
@@ -80,8 +80,8 @@ class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\Redirec
 
         // baz5
         if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/]+?)/?$#x', $pathinfo, $matches)) {
-            if ($this->context->getMethod() != 'post') {
-                $allow[] = 'post';
+            if ($this->context->getMethod() != 'POST') {
+                $allow[] = 'POST';
                 goto not_baz5;
             }
             if (substr($pathinfo, -1) !== '/') {
@@ -94,8 +94,8 @@ class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\Redirec
 
         // baz.baz6
         if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/]+?)/?$#x', $pathinfo, $matches)) {
-            if ($this->context->getMethod() != 'put') {
-                $allow[] = 'put';
+            if ($this->context->getMethod() != 'PUT') {
+                $allow[] = 'PUT';
                 goto not_bazbaz6;
             }
             if (substr($pathinfo, -1) !== '/') {

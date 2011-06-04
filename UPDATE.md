@@ -21,90 +21,114 @@ beta3 to beta4
   valid PHP callable.
 
     * `EventDispatcher::addListener($eventName, $listener, $priority = 0)`:
-      `$eventName` is the event name (cannot be an array anymore) and
-      `$listener` is a PHP callable.
+        * `$eventName` is the event name (cannot be an array anymore),
+        * `$listener` is a PHP callable.
 
     * The events classes and constants have been renamed:
 
-        * `Symfony\Component\Form\Events` to `Symfony\Component\Form\FormEvents`
+        * Old class name `Symfony\Component\Form\Events` and constants:
 
-            -Events::preBind = 'preBind'
-            -Events::postBind = 'postBind'
-            -Events::preSetData = 'preSetData'
-            -Events::postSetData = 'postSetData'
-            -Events::onBindClientData = 'onBindClientData'
-            -Events::onBindNormData = 'onBindNormData'
-            -Events::onSetData = 'onSetData'
+                Events::preBind = 'preBind'
+                Events::postBind = 'postBind'
+                Events::preSetData = 'preSetData'
+                Events::postSetData = 'postSetData'
+                Events::onBindClientData = 'onBindClientData'
+                Events::onBindNormData = 'onBindNormData'
+                Events::onSetData = 'onSetData'
 
-            +FormEvents::PRE_BIND = 'form.pre_bind'
-            +FormEvents::POST_BIND = 'form.post_bind'
-            +FormEvents::PRE_SET_DATA = 'form.pre_set_data'
-            +FormEvents::POST_SET_DATA = 'form.post_set_data'
-            +FormEvents::BIND_CLIENT_DATA = 'form.bind_client_data'
-            +FormEvents::BIND_NORM_DATA = 'form.bind_norm_data'
-            +FormEvents::SET_DATA = 'form.set_data'
+        * New class name `Symfony\Component\Form\FormEvents` and constants:
 
-        * `Symfony\Component\HttpKernel\Events` to `Symfony\Component\HttpKernel\CoreEvents`
+                FormEvents::PRE_BIND = 'form.pre_bind'
+                FormEvents::POST_BIND = 'form.post_bind'
+                FormEvents::PRE_SET_DATA = 'form.pre_set_data'
+                FormEvents::POST_SET_DATA = 'form.post_set_data'
+                FormEvents::BIND_CLIENT_DATA = 'form.bind_client_data'
+                FormEvents::BIND_NORM_DATA = 'form.bind_norm_data'
+                FormEvents::SET_DATA = 'form.set_data'
 
-            -Events::onCoreRequest = 'onCoreRequest'
-            -Events::onCoreException = 'onCoreException'
-            -Events::onCoreView = 'onCoreView'
-            -Events::onCoreController = 'onCoreController'
-            -Events::onCoreResponse = 'onCoreResponse'
+        * Old class name `Symfony\Component\HttpKernel\Events` and constants:
 
-            +CoreEvents::REQUEST = 'core.request'
-            +CoreEvents::EXCEPTION = 'core.exception'
-            +CoreEvents::VIEW = 'core.view'
-            +CoreEvents::CONTROLLER = 'core.controller'
-            +CoreEvents::RESPONSE = 'core.response'
+                Events::onCoreRequest = 'onCoreRequest'
+                Events::onCoreException = 'onCoreException'
+                Events::onCoreView = 'onCoreView'
+                Events::onCoreController = 'onCoreController'
+                Events::onCoreResponse = 'onCoreResponse'
 
-        * `Symfony\Component\Security\Http\Events` to `Symfony\Component\Security\Http\SecurityEvents`
+        * New class name `Symfony\Component\HttpKernel\CoreEvents` and constants:
 
-            -Events::onSecurityInteractiveLogin = 'onSecurityInteractiveLogin'
-            -Events::onSecuritySwitchUser = 'onSecuritySwitchUser'
+                CoreEvents::REQUEST = 'core.request'
+                CoreEvents::EXCEPTION = 'core.exception'
+                CoreEvents::VIEW = 'core.view'
+                CoreEvents::CONTROLLER = 'core.controller'
+                CoreEvents::RESPONSE = 'core.response'
 
-            +SecurityEvents::INTERACTIVE_LOGIN = 'security.interactive_login'
-            +SecurityEvents::SWITCH_USER = 'security.switch_user'
+        * Old class name `Symfony\Component\Security\Http\Events` and constants:
+
+                Events::onSecurityInteractiveLogin = 'onSecurityInteractiveLogin'
+                Events::onSecuritySwitchUser = 'onSecuritySwitchUser'
+
+        * New class name `Symfony\Component\Security\Http\SecurityEvents` and constants:
+
+                SecurityEvents::INTERACTIVE_LOGIN = 'security.interactive_login'
+                SecurityEvents::SWITCH_USER = 'security.switch_user'
 
     * `addListenerService` now only takes a single event name as its first
-      argument.
+      argument,
 
     * Tags in configuration must now set the method to call:
 
-        -<tag name="kernel.listener" event="onCoreRequest" />
-        +<tag name="kernel.listener" event="core.request" method="onCoreRequest" />
+        * Before:
+
+                <tag name="kernel.listener" event="onCoreRequest" />
+
+        * After:
+
+                <tag name="kernel.listener" event="core.request" method="onCoreRequest" />
 
     * Subscribers must now always return a hash:
 
-         public static function getSubscribedEvents()
-         {
-        -    return Events::onBindNormData;
-        +    return array(FormEvents::BIND_NORM_DATA => 'onBindNormData');
-         }
+        * Before:
 
-* Form DateType parameter single-text changed to single_text
+                public static function getSubscribedEvents()
+                {
+                    return Events::onBindNormData;
+                }
+
+        * After:
+
+                public static function getSubscribedEvents()
+                {
+                    return array(FormEvents::BIND_NORM_DATA => 'onBindNormData');
+                }
+
+* Form `DateType` parameter `single-text` changed to `single_text`
+* Form field label helpers now accepts setting attributes, i.e.:
+
+```html+jinja
+{{ form_label(form.name, 'Custom label', { 'attr': {'class': 'name_field'} }) }}
+```
 
 beta2 to beta3
 --------------
 
-* The settings under "framework.annotations" have changed slightly:
+* The settings under `framework.annotations` have changed slightly:
 
-  Before:
+    Before:
   
-    framework:
-        annotations:
-            cache: file
-            file_cache:
-                debug: true
-                dir: /foo
+        framework:
+            annotations:
+                cache: file
+                file_cache:
+                    debug: true
+                    dir: /foo
                 
-  After:
+    After:
      
-    framework:
-        annotations:
-            cache: file
-            debug: true
-            file_cache_dir: /foo
+        framework:
+            annotations:
+                cache: file
+                debug: true
+                file_cache_dir: /foo
 
 beta1 to beta2
 --------------

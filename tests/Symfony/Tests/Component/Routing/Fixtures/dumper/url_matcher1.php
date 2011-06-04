@@ -117,6 +117,18 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
     
         }
 
+        // foo
+        if (preg_match('#^/(?P<_locale>[^/]+?)/b/(?P<foo>[^/]+?)$#x', $pathinfo, $matches)) {
+            $matches['_route'] = 'foo';
+            return $matches;
+        }
+
+        // bar
+        if (preg_match('#^/(?P<_locale>[^/]+?)/b/(?P<bar>[^/]+?)$#x', $pathinfo, $matches)) {
+            $matches['_route'] = 'bar';
+            return $matches;
+        }
+
         throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();
     }
 }

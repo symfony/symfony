@@ -129,6 +129,18 @@ class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\Redirec
     
         }
 
+        // foo
+        if (preg_match('#^/(?P<_locale>[^/]+?)/b/(?P<foo>[^/]+?)$#x', $pathinfo, $matches)) {
+            $matches['_route'] = 'foo';
+            return $matches;
+        }
+
+        // bar
+        if (preg_match('#^/(?P<_locale>[^/]+?)/b/(?P<bar>[^/]+?)$#x', $pathinfo, $matches)) {
+            $matches['_route'] = 'bar';
+            return $matches;
+        }
+
         // secure
         if ($pathinfo === '/secure') {
             if ($this->context->getScheme() !== 'https') {

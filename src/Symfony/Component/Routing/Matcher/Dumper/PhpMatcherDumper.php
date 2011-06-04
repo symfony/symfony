@@ -74,8 +74,10 @@ EOF;
         $code = array();
         foreach ($routes as $name => $route) {
             if ($route instanceof RouteCollection) {
+                $prefix = $route->getPrefix();
+                $optimizable = $prefix && count($route->all()) > 1 && false === strpos($route->getPrefix(), '{');
                 $indent = '';
-                if (count($route->all()) > 1 && $prefix = $route->getPrefix()) {
+                if ($optimizable) {
                     $code[] = sprintf("        if (0 === strpos(\$pathinfo, '%s')) {", $prefix);
                     $indent = '    ';
                 }
@@ -86,7 +88,7 @@ EOF;
                     }
                 }
 
-                if ($indent) {
+                if ($optimizable) {
                     $code[] = "        }\n";
                 }
             } else {

@@ -102,7 +102,7 @@ class RouterListener
 
         if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType() && $locale = $request->attributes->get('_locale')) {
             $request->getSession()->setLocale($locale);
-            $context->setParameter('_locale', $locale);
+            $this->router->getContext()->setParameter('_locale', $locale);
         }
     }
 

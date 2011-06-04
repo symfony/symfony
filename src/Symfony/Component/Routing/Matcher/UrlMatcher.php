@@ -79,7 +79,7 @@ class UrlMatcher implements UrlMatcherInterface
         }
 
         throw 0 < count($this->allow)
-            ? new MethodNotAllowedException(array_unique(array_map('strtolower', $this->allow)))
+            ? new MethodNotAllowedException(array_unique(array_map('strtoupper', $this->allow)))
             : new ResourceNotFoundException();
     }
 
@@ -112,11 +112,11 @@ class UrlMatcher implements UrlMatcherInterface
             // check HTTP method requirement
             if ($req = $route->getRequirement('_method')) {
                 // HEAD and GET are equivalent as per RFC
-                if ('head' === $method = $this->context->getMethod()) {
-                    $method = 'get';
+                if ('HEAD' === $method = $this->context->getMethod()) {
+                    $method = 'GET';
                 }
 
-                if (!in_array($method, $req = explode('|', strtolower($req)))) {
+                if (!in_array($method, $req = explode('|', strtoupper($req)))) {
                     $this->allow = array_merge($this->allow, $req);
 
                     continue;

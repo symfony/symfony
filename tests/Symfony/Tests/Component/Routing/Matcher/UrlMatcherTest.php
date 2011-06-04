@@ -40,7 +40,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
             $matcher->match('/foo');
             $this->fail();
         } catch (MethodNotAllowedException $e) {
-            $this->assertEquals(array('post'), $e->getAllowedMethods());
+            $this->assertEquals(array('POST'), $e->getAllowedMethods());
         }
     }
 
@@ -65,7 +65,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
             $matcher->match('/foo');
             $this->fail();
         } catch (MethodNotAllowedException $e) {
-            $this->assertEquals(array('post', 'put', 'delete'), $e->getAllowedMethods());
+            $this->assertEquals(array('POST', 'PUT', 'DELETE'), $e->getAllowedMethods());
         }
     }
 

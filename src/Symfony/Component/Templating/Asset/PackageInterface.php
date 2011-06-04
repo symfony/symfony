@@ -16,7 +16,7 @@ namespace Symfony\Component\Templating\Asset;
  *
  * @author Kris Wallsmith <kris@symfony.com>
  */
-interface AssetPackageInterface
+interface PackageInterface
 {
     /**
      * Returns the asset package version.
@@ -26,11 +26,11 @@ interface AssetPackageInterface
     function getVersion();
 
     /**
-     * Returns a base URL for the supplied path.
+     * Returns an absolute or root-relative public path.
      *
-     * @param string $path An asset path
+     * @param string $path A path
      *
-     * @return string A base URL
+     * @return string The public path
      */
-    function getBaseUrl($path);
+    function getUrl($path);
 }

@@ -40,6 +40,17 @@ class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\Redirec
         }
         not_bar:
 
+        // barhead
+        if (0 === strpos($pathinfo, '/barhead') && preg_match('#^/barhead/(?P<foo>[^/]+?)$#x', $pathinfo, $matches)) {
+            if (!in_array($this->context->getMethod(), array('get', 'head'))) {
+                $allow = array_merge($allow, array('get', 'head'));
+                goto not_barhead;
+            }
+            $matches['_route'] = 'barhead';
+            return $matches;
+        }
+        not_barhead:
+
         // baz
         if ($pathinfo === '/test/baz') {
             return array('_route' => 'baz');

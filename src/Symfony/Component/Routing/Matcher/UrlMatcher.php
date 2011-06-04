@@ -110,10 +110,17 @@ class UrlMatcher implements UrlMatcherInterface
             }
 
             // check HTTP method requirement
-            if ($route->getRequirement('_method') && ($req = explode('|', $route->getRequirement('_method'))) && !in_array($this->context->getMethod(), array_map('strtolower', $req))) {
-                $this->allow = array_merge($this->allow, $req);
+            if ($req = $route->getRequirement('_method')) {
+                // HEAD and GET are equivalent as per RFC
+                if ('head' === $method = $this->context->getMethod()) {
+                    $method = 'get';
+                }
 
-                continue;
+                if (!in_array($method, $req = explode('|', strtolower($req)))) {
+                    $this->allow = array_merge($this->allow, $req);
+
+                    continue;
+                }
             }
 
             return array_merge($this->mergeDefaults($matches, $route->getDefaults()), array('_route' => $name));

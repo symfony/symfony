@@ -34,6 +34,12 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
             array(),
             array('_method' => 'GET|head')
         ));
+        // GET method requirement automatically adds HEAD as valid
+        $collection->add('barhead', new Route(
+            '/barhead/{foo}',
+            array(),
+            array('_method' => 'GET')
+        ));
         // simple
         $collection->add('baz', new Route(
             '/test/baz'

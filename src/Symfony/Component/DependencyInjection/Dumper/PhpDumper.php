@@ -798,7 +798,7 @@ EOF;
     /**
      * Ends the class definition.
      *
-     * @return void
+     * @return string
      */
     private function endClass()
     {

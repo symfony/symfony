@@ -47,7 +47,7 @@ class ScalarToBooleanChoicesTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        if (!is_scalar($value) && !is_null($value)) {
+        if (!is_scalar($value) && null !== $value) {
             throw new UnexpectedTypeException($value, 'scalar');
         }
 

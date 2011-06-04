@@ -69,15 +69,20 @@ class ApacheMatcherDumper extends MatcherDumper
             $rule = array("# $name");
 
             // method mismatch
-            if ($req = strtolower($route->getRequirement('_method'))) {
+            if ($req = $route->getRequirement('_method')) {
+                $methods = explode('|', strtolower($req));
+                // GET and HEAD are equivalent
+                if (in_array('get', $methods) && !in_array('head', $methods)) {
+                    $methods[] = 'head';
+                }
                 $allow = array();
-                foreach (explode('|', $req) as $method) {
+                foreach ($methods as $method) {
                     $methodVars[] = $method;
                     $allow[] = 'E=_ROUTING__allow_'.$method.':1';
                 }
 
                 $rule[] = "RewriteCond %{REQUEST_URI} $regex";
-                $rule[] = "RewriteCond %{REQUEST_METHOD} !^($req)$ [NC]";
+                $rule[] = sprintf("RewriteCond %%{REQUEST_METHOD} !^(%s)$ [NC]", implode('|', $methods));
                 $rule[] = sprintf('RewriteRule .* - [S=%d,%s]', $hasTrailingSlash ? 2 : 1, implode(',', $allow));
             }
 

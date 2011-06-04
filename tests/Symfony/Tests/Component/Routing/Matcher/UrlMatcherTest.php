@@ -44,6 +44,15 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testHeadAllowedWhenRequirementContainsGet()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', array(), array('_method' => 'get')));
+
+        $matcher = new UrlMatcher($coll, new RequestContext('', 'head'));
+        $matcher->match('/foo');
+    }
+
     public function testMethodNotAllowedAggregatesAllowedMethods()
     {
         $coll = new RouteCollection();

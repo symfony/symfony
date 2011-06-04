@@ -137,7 +137,11 @@ EOF;
 EOF;
 
         if ($req = $route->getRequirement('_method')) {
-            $methods = array_map('strtolower', explode('|', $req));
+            $methods = explode('|', strtolower($req));
+            // GET and HEAD are equivalent
+            if (in_array('get', $methods) && !in_array('head', $methods)) {
+                $methods[] = 'head';
+            }
             if (1 === count($methods)) {
                 $code[] = <<<EOF
             if (\$this->context->getMethod() != '$methods[0]') {

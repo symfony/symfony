@@ -56,6 +56,7 @@ class MainConfiguration implements ConfigurationInterface
             ->children()
                 ->scalarNode('access_denied_url')->defaultNull()->end()
                 ->scalarNode('session_fixation_strategy')->cannotBeEmpty()->defaultValue('migrate')->end()
+                ->booleanNode('hide_user_not_found')->defaultTrue()->end()
                 ->booleanNode('always_authenticate_before_granting')->defaultFalse()->end()
                 ->arrayNode('access_decision_manager')
                     ->addDefaultsIfNotSet()

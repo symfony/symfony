@@ -87,7 +87,7 @@ class UrlMatcher implements UrlMatcherInterface
     {
         foreach ($routes as $name => $route) {
             if ($route instanceof RouteCollection) {
-                if ($route->getPrefix() !== substr($pathinfo, 0, strlen($route->getPrefix()))) {
+                if (false === strpos($route->getPrefix(), '{') && $route->getPrefix() !== substr($pathinfo, 0, strlen($route->getPrefix()))) {
                     continue;
                 }
 

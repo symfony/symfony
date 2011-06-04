@@ -135,6 +135,21 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('_route' => 'foo', 'foo' => 'foo'), $matcher->match('/a/b/foo'));
     }
 
+    public function testMatchWithDynamicPrefix()
+    {
+        $collection1 = new RouteCollection();
+        $collection1->add('foo', new Route('/{foo}'));
+
+        $collection2 = new RouteCollection();
+        $collection2->addCollection($collection1, '/b');
+
+        $collection = new RouteCollection();
+        $collection->addCollection($collection2, '/{_locale}');
+
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        $this->assertEquals(array('_locale' => 'fr', '_route' => 'foo', 'foo' => 'foo'), $matcher->match('/fr/b/foo'));
+    }
+
     public function testMatchRegression()
     {
         $coll = new RouteCollection();

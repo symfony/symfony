@@ -25,7 +25,7 @@ class AssetWriterCacheWarmerTest extends \PHPUnit_Framework_TestCase
     public function testWarmUp()
     {
         $am = $this->getMock('Assetic\\AssetManager');
-        
+
         $writer = $this
             ->getMockBuilder('Assetic\\AssetWriter')
             ->disableOriginalConstructor()
@@ -37,19 +37,19 @@ class AssetWriterCacheWarmerTest extends \PHPUnit_Framework_TestCase
             ->method('writeManagerAssets')
             ->with($am)
         ;
-        
+
         $container = $this
             ->getMockBuilder('Symfony\\Component\\DependencyInjection\\Container')
             ->setConstructorArgs(array())
             ->getMock()
         ;
-        
+
         $container
             ->expects($this->once())
             ->method('get')
             ->with('assetic.asset_manager')
             ->will($this->returnValue($am))
-        ;        
+        ;
 
         $warmer = new AssetWriterCacheWarmer($container, $writer);
         $warmer->warmUp('/path/to/cache');

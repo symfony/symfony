@@ -70,6 +70,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         }
 
         // re-read the ACL from the database to ensure proper caching, etc.
+
         return $this->findAcl($oid);
     }
 

@@ -32,6 +32,7 @@ class ArraySessionStorage implements SessionStorageInterface
         if ($destroy) {
             $this->data = array();
         }
+
         return true;
     }
 

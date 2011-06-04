@@ -93,6 +93,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
         }
 
         // replace the UTF-8 non break spaces
+
         return $value;
     }
 

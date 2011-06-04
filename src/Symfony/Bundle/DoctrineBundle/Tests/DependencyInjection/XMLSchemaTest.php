@@ -22,6 +22,7 @@ class XMLSchemaTest extends \PHPUnit_Framework_TestCase
                 $schemaFiles[] = array($element->getPathname());
             }
         }
+
         return $schemaFiles;
     }
 

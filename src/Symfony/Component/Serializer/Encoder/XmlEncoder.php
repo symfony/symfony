@@ -45,6 +45,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
         } else {
             $this->appendNode($this->dom, $data, $this->rootNodeName);
         }
+
         return $this->dom->saveXML();
     }
 
@@ -65,6 +66,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
             $data['#'] = (string) $xml;
             return $data;
         }
+
         return $this->parseXml($xml);
     }
 
@@ -201,6 +203,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
                 $data[$key] = $value;
             }
         }
+
         return $data;
     }
 
@@ -282,6 +285,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
         if ($appendNode) {
             $parentNode->appendChild($node);
         }
+
         return $appendNode;
     }
 

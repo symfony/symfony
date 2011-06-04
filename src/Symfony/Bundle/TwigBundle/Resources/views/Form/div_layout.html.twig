@@ -50,11 +50,11 @@
 
 {% block container_attributes %}
 {% spaceless %}
-    id="{{ id }}" 
+    id="{{ id }}"
     {% for attrname,attrvalue in attr %}{{attrname}}="{{attrvalue}}" {% endfor %}
 {% endspaceless %}
 {% endblock container_attributes %}
-    
+
 {% block field_widget %}
 {% spaceless %}
     {% set type = type|default('text') %}

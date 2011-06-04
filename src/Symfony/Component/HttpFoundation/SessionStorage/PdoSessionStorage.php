@@ -92,6 +92,7 @@ class PdoSessionStorage extends NativeSessionStorage
     public function sessionClose()
     {
         // do nothing
+
         return true;
     }
 

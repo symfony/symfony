@@ -42,29 +42,35 @@ class RouterListener
         $this->logger = $logger;
     }
 
+    public function onEarlyCoreRequest(GetResponseEvent $event)
+    {
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+            return;
+        }
+
+        $request = $event->getRequest();
+
+        // set the context even if the parsing does not need to be done
+        // to have correct link generation
+        $context = new RequestContext(
+            $request->getBaseUrl(),
+            $request->getMethod(),
+            $request->getHost(),
+            $request->getScheme(),
+            $request->isSecure() ? $this->httpPort : $request->getPort(),
+            $request->isSecure() ? $request->getPort() : $this->httpsPort
+        );
+
+        if ($session = $request->getSession()) {
+            $context->setParameter('_locale', $session->getLocale());
+        }
+
+        $this->router->setContext($context);
+    }
+
     public function onCoreRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        $master = HttpKernelInterface::MASTER_REQUEST === $event->getRequestType();
-
-        if ($master) {
-            // set the context even if the parsing does not need to be done
-            // to have correct link generation
-            $context = new RequestContext(
-                $request->getBaseUrl(),
-                $request->getMethod(),
-                $request->getHost(),
-                $request->getScheme(),
-                $request->isSecure() ? $this->httpPort : $request->getPort(),
-                $request->isSecure() ? $request->getPort() : $this->httpsPort
-            );
-
-            if ($session = $request->getSession()) {
-                $context->setParameter('_locale', $session->getLocale());
-            }
-
-            $this->router->setContext($context);
-        }
 
         if ($request->attributes->has('_controller')) {
             // routing is already done
@@ -94,7 +100,7 @@ class RouterListener
             throw new MethodNotAllowedHttpException($e->getAllowedMethods(), $message, $e);
         }
 
-        if ($master && $locale = $request->attributes->get('_locale')) {
+        if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType() && $locale = $request->attributes->get('_locale')) {
             $request->getSession()->setLocale($locale);
             $context->setParameter('_locale', $locale);
         }

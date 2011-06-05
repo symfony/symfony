@@ -21,9 +21,30 @@ use Doctrine\ORM\Mapping\Driver\YamlDriver as BaseYamlDriver;
  */
 class YamlDriver extends BaseYamlDriver
 {
-    protected $_globalFile = 'mapping';
+    protected $_prefixes = array();
+    protected $_globalBasename;
     protected $_classCache;
     protected $_fileExtension = '.orm.yml';
+
+    public function setGlobalBasename($file)
+    {
+        $this->_globalBasename = $file;
+    }
+
+    public function getGlobalBasename()
+    {
+        return $this->_globalBasename;
+    }
+
+    public function setNamespacePrefixes($prefixes)
+    {
+        $this->_prefixes = $prefixes;
+    }
+
+    public function getNamespacePrefixes()
+    {
+        return $this->_prefixes;
+    }
 
     public function isTransient($className)
     {
@@ -39,7 +60,7 @@ class YamlDriver extends BaseYamlDriver
         $classes = array();
 
         if ($this->_paths) {
-            foreach ((array) $this->_paths as $prefix => $path) {
+            foreach ((array) $this->_paths as $path) {
                 if (!is_dir($path)) {
                     throw MappingException::fileMappingDriversRequireConfiguredDirectoryPath($path);
                 }
@@ -52,12 +73,16 @@ class YamlDriver extends BaseYamlDriver
                 foreach ($iterator as $file) {
                     $fileName = $file->getBasename($this->_fileExtension);
 
-                    if ($fileName == $file->getBasename() || $fileName == $this->_globalFile) {
+                    if ($fileName == $file->getBasename() || $fileName == $this->_globalBasename) {
                         continue;
                     }
 
                     // NOTE: All files found here means classes are not transient!
-                    $classes[] = $prefix.'\\'.str_replace('.', '\\', $fileName);
+                    if (isset($this->_prefixes[$path])) {
+                        $classes[] = $this->_prefixes[$path].'\\'.str_replace('.', '\\', $fileName);
+                    } else {
+                        $classes[] = str_replace('.', '\\', $fileName);
+                    }
                 }
             }
         }
@@ -81,16 +106,29 @@ class YamlDriver extends BaseYamlDriver
     protected function initialize()
     {
         $this->_classCache = array();
-        foreach ($this->_paths as $path) {
-            if (file_exists($file = $path.'/'.$this->_globalFile.$this->_fileExtension)) {
-                $this->_classCache = array_merge($this->_classCache, $this->_loadMappingFile($file));
+        if (null !== $this->_globalBasename) {
+            foreach ($this->_paths as $path) {
+                if (file_exists($file = $path.'/'.$this->_globalBasename.$this->_fileExtension)) {
+                    $this->_classCache = array_merge($this->_classCache, $this->_loadMappingFile($file));
+                }
             }
         }
     }
 
     protected function _findMappingFile($className)
     {
-        foreach ($this->_paths as $prefix => $path) {
+        $defaultFileName = str_replace('\\', '.', $className) . $this->_fileExtension;
+        foreach ($this->_paths as $path) {
+            if (!isset($this->_prefixes[$path])) {
+                if (file_exists($path . DIRECTORY_SEPARATOR . $defaultFileName)) {
+                    return $path . DIRECTORY_SEPARATOR . $defaultFileName;
+                }
+
+                continue;
+            }
+
+            $prefix = $this->_prefixes[$path];
+
             if (0 !== strpos($className, $prefix.'\\')) {
                 continue;
             }

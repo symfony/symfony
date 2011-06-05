@@ -22,6 +22,9 @@ class XmlDriverTest extends AbstractDriverTest
 
     protected function getDriver(array $paths = array())
     {
-        return new XmlDriver($paths);
+        $driver = new XmlDriver(array_values($paths));
+        $driver->setNamespacePrefixes(array_flip($paths));
+
+        return $driver;
     }
 }

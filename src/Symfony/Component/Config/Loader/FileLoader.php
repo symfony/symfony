@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Loader;
 
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Exception\FileLoaderImportException;
+use Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceException;
 
 /**
  * FileLoader is the abstract class used by all built-in loaders that are file based.
@@ -21,6 +22,8 @@ use Symfony\Component\Config\Exception\FileLoaderImportException;
  */
 abstract class FileLoader extends Loader
 {
+    static protected $loading = array();
+
     protected $locator;
 
     private $currentDir;
@@ -46,7 +49,7 @@ abstract class FileLoader extends Loader
     }
 
     /**
-     * Adds definitions and parameters from a resource.
+     * Imports a resource.
      *
      * @param mixed   $resource       A Resource
      * @param string  $type           The resource type
@@ -64,7 +67,18 @@ abstract class FileLoader extends Loader
                 $resource = $this->locator->locate($resource, $this->currentDir);
             }
 
-            return $loader->load($resource);
+            if (isset(self::$loading[$resource])) {
+                throw new FileLoaderImportCircularReferenceException(array_keys(self::$loading));
+            }
+            self::$loading[$resource] = true;
+
+            $ret = $loader->load($resource);
+
+            unset(self::$loading[$resource]);
+
+            return $ret;
+        } catch (FileLoaderImportCircularReferenceException $e) {
+            throw $e;
         } catch (\Exception $e) {
             if (!$ignoreErrors) {
                 // prevent embedded imports from nesting multiple exceptions

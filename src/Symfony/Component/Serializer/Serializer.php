@@ -65,7 +65,7 @@ class Serializer implements SerializerInterface
         if (null === $data || is_scalar($data)) {
             return $data;
         }
-        if ($data instanceof Traversable) {
+        if ($data instanceof \Traversable) {
             $normalized = array();
             foreach ($data as $key => $val) {
                 $normalized[$key] = $this->normalize($val, $format);

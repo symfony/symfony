@@ -10,6 +10,12 @@
 {% endspaceless %}
 {% endblock field_label %}
 
+{% block collection_label %}
+{% spaceless %}
+    <label {% for attrname,attrvalue in attr %} {{attrname}}="{{attrvalue}}"{% endfor %}>{{ label|trans }}</label>
+{% endspaceless %}
+{% endblock collection_label %}
+
 {% block field_errors %}
 {% spaceless %}
     {% if errors|length > 0 %}

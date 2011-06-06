@@ -109,7 +109,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
      */
     public function supportsNormalization($data, $format = null)
     {
-        return $this->supports(get_class($data));
+        return is_object($data) && $this->supports(get_class($data));
     }
 
     /**

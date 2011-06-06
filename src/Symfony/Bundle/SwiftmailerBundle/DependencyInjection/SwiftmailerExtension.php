@@ -91,11 +91,19 @@ class SwiftmailerExtension extends Extension
         }
         $container->setParameter('swiftmailer.spool.enabled', isset($config['spool']));
 
+        // antiflood?
+        if (isset($config['antiflood'])) {
+            $container->setParameter('swiftmailer.plugin.antiflood.threshold', $config['antiflood']['threshold']);
+            $container->setParameter('swiftmailer.plugin.antiflood.sleep', $config['antiflood']['sleep']);
+
+            $container->findDefinition('swiftmailer.transport')->addMethodCall('registerPlugin', array(new Reference('swiftmailer.plugin.antiflood')));
+        }
+
         if ($config['logging']) {
             $container->findDefinition('swiftmailer.transport')->addMethodCall('registerPlugin', array(new Reference('swiftmailer.plugin.messagelogger')));
             $container->findDefinition('swiftmailer.data_collector')->addTag('data_collector', array('template' => 'SwiftmailerBundle:Collector:swiftmailer', 'id' => 'swiftmailer'));
         }
-        
+
         if (isset($config['sender_address']) && $config['sender_address']) {
             $container->setParameter('swiftmailer.sender_address', $config['sender_address']);
             $container->findDefinition('swiftmailer.transport')->addMethodCall('registerPlugin', array(new Reference('swiftmailer.plugin.impersonate')));

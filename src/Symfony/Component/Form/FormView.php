@@ -15,13 +15,26 @@ use Symfony\Component\Form\Util\FormUtil;
 
 class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 {
+    /**
+     * @var array
+     */
     private $vars = array(
         'value' => null,
         'attr'  => array(),
     );
 
+    /**
+     * Hold the parent view.
+     *
+     * @var FormView
+     */
     private $parent;
 
+    /**
+     * Array of children views.
+     *
+     * @var array
+     */
     private $children = array();
 
     /**
@@ -34,6 +47,14 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * @var Boolean
      */
     private $rendered = false;
+
+    /**
+     * Array of block name that were already rendered. Every manual call of
+     * widget or row marks block name as rendered and skips it in auto rendering.
+     *
+     * @var array
+     */
+    private $renderedBlocks = array();
 
     /**
      * @param string $name
@@ -123,6 +144,32 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     public function setRendered()
     {
         $this->rendered = true;
+
+        return $this;
+    }
+
+    /**
+     * Returns whether the block with given name was already rendered.
+     *
+     * @param string $block An block name
+     *
+     * @return Boolean Whether the block was already rendered
+     */
+    public function isBlockRendered($block)
+    {
+        return isset($this->renderedBlocks[$block]);
+    }
+
+    /**
+     * Marks given block name as rendered.
+     *
+     * @param string $block An block name
+     *
+     * @return FormView The current view
+     */
+    public function setBlockAsRendered($block)
+    {
+        $this->renderedBlocks[$block] = true;
 
         return $this;
     }

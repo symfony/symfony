@@ -23,12 +23,36 @@ use Symfony\Component\Form\Exception\FormException;
  */
 class FormExtension extends \Twig_Extension
 {
+    /**
+     * @var array
+     */
     protected $resources;
+
+    /**
+     * @var \SplObjectStorage
+     */
     protected $templates;
+
+    /**
+     * @var \Twig_Environment
+     */
     protected $environment;
+
+    /**
+     * @var \SplObjectStorage
+     */
     protected $themes;
+
+    /**
+     * @var \SplObjectStorage
+     */
     protected $varStack;
 
+    /**
+     * Constructor
+     *
+     * @param array
+     */
     public function __construct(array $resources = array())
     {
         $this->themes = new \SplObjectStorage();
@@ -90,7 +114,7 @@ class FormExtension extends \Twig_Extension
      *
      *     <form action="..." method="post" {{ form_enctype(form) }}>
      *
-     * @param FormView $view  The view for which to render the encoding type
+     * @param FormView $view The view for which to render the encoding type
      *
      * @return string The html markup
      */
@@ -138,8 +162,8 @@ class FormExtension extends \Twig_Extension
      *
      *     {{ form_widget(view, {'separator': '+++++'}) }}
      *
-     * @param FormView        $view      The view to render
-     * @param array           $variables Additional variables passed to the template
+     * @param FormView $view      The view to render
+     * @param array    $variables Additional variables passed to the template
      *
      * @return string The html markup
      */
@@ -163,8 +187,8 @@ class FormExtension extends \Twig_Extension
     /**
      * Renders the label of the given view
      *
-     * @param FormView $view  The view to render the label for
-     * @param string   $label Label name
+     * @param FormView $view      The view to render the label for
+     * @param string   $label     Label name
      * @param array    $variables Additional variables passed to the template
      *
      * @return string The html markup
@@ -187,9 +211,9 @@ class FormExtension extends \Twig_Extension
      * 3. the type name is recursively replaced by the parent type name until a
      *    corresponding block is found
      *
-     * @param FormView  $view       The form view
-     * @param string    $section    The section to render (i.e. 'row', 'widget', 'label', ...)
-     * @param array     $variables  Additional variables
+     * @param FormView $view      The form view
+     * @param string   $section   The section to render (i.e. 'row', 'widget', 'label', ...)
+     * @param array    $variables Additional variables
      *
      * @return string The html markup
      *
@@ -202,11 +226,15 @@ class FormExtension extends \Twig_Extension
         array_unshift($blocks, '_'.$view->get('id'));
 
         foreach ($blocks as &$block) {
-            $block = $block.'_'.$section;
+            $block .= '_'.$section;
+            if ($view->isBlockRendered($block)) {
+                return;
+            }
 
             if (isset($templates[$block])) {
                 if ('widget' === $section || 'row' === $section) {
                     $view->setRendered();
+                    $view->setBlockAsRendered($block);
                 }
 
                 $this->varStack[$view] = array_replace(

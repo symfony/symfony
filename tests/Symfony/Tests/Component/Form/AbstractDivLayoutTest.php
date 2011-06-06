@@ -282,6 +282,46 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         );
     }
 
+    public function testCollectionRow()
+    {
+        $collection = $this->factory->createNamedBuilder(
+            'collection',
+            'collection',
+            array('a', 'b'),
+            array('type' => 'text')
+        );
+
+        $form = $this->factory->createNamedBuilder('form', 'form')
+          ->add($collection)
+          ->getForm();
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./input[@type="hidden"][@id="form__token"]
+        /following-sibling::div
+            [
+                ./label[not(@for)]
+                /following-sibling::div
+                    [
+                        ./div
+                            [
+                                ./label[@for="form_collection_0"]
+                                /following-sibling::input[@type="text"][@value="a"]
+                            ]
+                        /following-sibling::div
+                            [
+                                ./label[@for="form_collection_1"]
+                                /following-sibling::input[@type="text"][@value="b"]
+                            ]
+                    ]
+            ]
+    ]
+    [count(.//input)=3]
+'
+        );
+    }
+
     public function testForm()
     {
         $form = $this->factory->createNamedBuilder('form', 'name')

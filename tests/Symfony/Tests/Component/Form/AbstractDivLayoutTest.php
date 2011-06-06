@@ -404,4 +404,23 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 '
         );
     }
+
+    public function testFileLabelAccessibility()
+    {
+        $form = $this->factory->createNamed('file', 'name');
+        $html = $this->renderRow($form->createView());
+
+        $this->assertMatchesXpath($html,
+'/div
+    [
+        ./label[@for="name_file"]
+        /following-sibling::div[@id="name"]
+            [
+                ./input[@id="name_file"][@type="file"]
+            ]
+    ]
+'
+        );
+    }
+
 }

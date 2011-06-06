@@ -56,6 +56,7 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('resources')
                             ->addDefaultsIfNotSet()
                             ->defaultValue(array('form_div_layout.html.twig'))
+                            ->setExample(array('MyBundle::form.html.twig'))
                             ->validate()
                                 ->ifTrue(function($v) { return !in_array('form_div_layout.html.twig', $v); })
                                 ->then(function($v){
@@ -77,6 +78,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('globals')
                     ->useAttributeAsKey('key')
+                    ->setExample(array('foo' => '"@bar"', 'pi' => 3.14))
                     ->prototype('array')
                         ->beforeNormalization()
                             ->ifTrue(function($v){ return is_string($v) && 0 === strpos($v, '@'); })
@@ -116,7 +118,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('autoescape')->end()
-                ->scalarNode('base_template_class')->end()
+                ->scalarNode('base_template_class')->setExample('Twig_Template')->end()
                 ->scalarNode('cache')->defaultValue('%kernel.cache_dir%/twig')->end()
                 ->scalarNode('charset')->defaultValue('%kernel.charset%')->end()
                 ->scalarNode('debug')->defaultValue('%kernel.debug%')->end()

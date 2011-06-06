@@ -368,4 +368,25 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 '
         );
     }
+
+    public function testSearchInputName()
+    {
+        $form = $this->factory->createNamedBuilder('form', 'full')
+            ->add('name', 'search')
+            ->getForm();
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./input[@type="hidden"][@id="full__token"]
+        /following-sibling::div
+            [
+                ./label[@for="full_name"]
+                /following-sibling::input[@type="search"][@id="full_name"][@name="full[name]"]
+            ]
+    ]
+    [count(//input)=2]
+'
+        );
+    }
 }

@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  * @author John Wards <jwards@whiteoctober.co.uk>
  * @author Fabian Vogler <fabian@equivalence.ch>
  */
-class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, NormalizationAwareInterface
+class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, DecoderInterface, NormalizationAwareInterface
 {
     private $dom;
     private $format;

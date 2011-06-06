@@ -1,17 +1,20 @@
-{% block field_rows %}
-{% spaceless %}
-    {{ form_errors(form) }}
-    {% for child in form %}
-        {{ form_row(child) }}
-    {% endfor %}
-{% endspaceless %}
-{% endblock field_rows %}
-
 {% block field_enctype %}
 {% spaceless %}
     {% if multipart %}enctype="multipart/form-data"{% endif %}
 {% endspaceless %}
 {% endblock field_enctype %}
+
+{% block field_label %}
+{% spaceless %}
+    <label for="{{ id }}"{% for attrname,attrvalue in attr %} {{attrname}}="{{attrvalue}}"{% endfor %}>{{ label|trans }}</label>
+{% endspaceless %}
+{% endblock field_label %}
+
+{% block collection_label %}
+{% spaceless %}
+    <label {% for attrname,attrvalue in attr %} {{attrname}}="{{attrvalue}}"{% endfor %}>{{ label|trans }}</label>
+{% endspaceless %}
+{% endblock collection_label %}
 
 {% block field_errors %}
 {% spaceless %}
@@ -25,6 +28,15 @@
 {% endspaceless %}
 {% endblock field_errors %}
 
+{% block field_rows %}
+{% spaceless %}
+    {{ form_errors(form) }}
+    {% for child in form %}
+        {{ form_row(child) }}
+    {% endfor %}
+{% endspaceless %}
+{% endblock field_rows %}
+
 {% block field_rest %}
 {% spaceless %}
     {% for child in form %}
@@ -34,18 +46,6 @@
     {% endfor %}
 {% endspaceless %}
 {% endblock field_rest %}
-
-{% block field_label %}
-{% spaceless %}
-    <label for="{{ id }}"{% for attrname,attrvalue in attr %} {{attrname}}="{{attrvalue}}"{% endfor %}>{{ label|trans }}</label>
-{% endspaceless %}
-{% endblock field_label %}
-
-{% block collection_label %}
-{% spaceless %}
-    <label {% for attrname,attrvalue in attr %} {{attrname}}="{{attrvalue}}"{% endfor %}>{{ label|trans }}</label>
-{% endspaceless %}
-{% endblock collection_label %}
 
 {% block attributes %}
 {% spaceless %}
@@ -60,6 +60,15 @@
     {% for attrname,attrvalue in attr %}{{attrname}}="{{attrvalue}}" {% endfor %}
 {% endspaceless %}
 {% endblock container_attributes %}
+
+{% block form_widget %}
+{% spaceless %}
+    <div {{ block('container_attributes') }}>
+        {{ block('field_rows') }}
+        {{ form_rest(form) }}
+    </div>
+{% endspaceless %}
+{% endblock form_widget %}
 
 {% block field_widget %}
 {% spaceless %}
@@ -239,18 +248,11 @@
 {% endspaceless %}
 {% endblock file_widget %}
 
-{% block collection_widget %}
-{% spaceless %}
-    {{ block('form_widget') }}
-{% endspaceless %}
-{% endblock collection_widget %}
-
 {% block repeated_row %}
 {% spaceless %}
     {{ block('field_rows') }}
 {% endspaceless %}
 {% endblock repeated_row %}
-
 
 {% block field_row %}
 {% spaceless %}
@@ -261,15 +263,6 @@
     </div>
 {% endspaceless %}
 {% endblock field_row %}
-
-{% block form_widget %}
-{% spaceless %}
-    <div {{ block('container_attributes') }}>
-        {{ block('field_rows') }}
-        {{ form_rest(form) }}
-    </div>
-{% endspaceless %}
-{% endblock form_widget %}
 
 {% block email_widget %}
 {% spaceless %}

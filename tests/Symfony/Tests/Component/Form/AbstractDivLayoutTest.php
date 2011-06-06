@@ -116,6 +116,155 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         );
     }
 
+    public function testRestWithChildrenForms()
+    {
+        $child1 = $this->factory->createNamedBuilder('form', 'child1')
+            ->add('field1', 'text')
+            ->add('field2', 'text')
+            ->getForm();
+
+        $child2 = $this->factory->createNamedBuilder('form', 'child2')
+            ->add('field1', 'text')
+            ->add('field2', 'text')
+            ->getForm();
+
+        $view = $this->factory->createNamedBuilder('form', 'parent')
+            ->getForm()
+            ->add($child1)
+            ->add($child2)
+            ->createView();
+
+        // Render child1.field1 row
+        $this->renderRow($view['child1']['field1']);
+
+        // Render child2.field2 widget (remember that widget don't render label)
+        $this->renderWidget($view['child2']['field2']);
+
+        // Rest should only contain child1.field2 and child2.field1
+        $html = $this->renderRest($view);
+
+        $this->assertMatchesXpath($html,
+'/input
+    [@type="hidden"]
+    [@id="parent__token"]
+/following-sibling::div
+    [
+        ./label[@for="parent_child1"]
+        /following-sibling::div
+            [@id="parent_child1"]
+            [
+                ./div
+                    [
+                        ./label[@for="parent_child1_field2"]
+                        /following-sibling::input[@id="parent_child1_field2"]
+                    ]
+            ]
+    ]
+/following-sibling::div
+    [
+        ./label[@for="parent_child2"]
+        /following-sibling::div
+            [@id="parent_child2"]
+            [
+                ./div
+                    [
+                        ./label[@for="parent_child2_field1"]
+                        /following-sibling::input[@id="parent_child2_field1"]
+                    ]
+                /following-sibling::div
+                    [
+                        ./label[@for="parent_child2_field2"]
+                    ]
+            ]
+    ]
+'
+        );
+    }
+
+    public function testRestAndRepeatedWithRow()
+    {
+        $view = $this->factory->createNamedBuilder('form', 'name')
+            ->add('first', 'text')
+            ->add('password', 'repeated')
+            ->getForm()
+            ->createView();
+
+        $this->renderRow($view['password']);
+
+        $html = $this->renderRest($view);
+
+        $this->assertMatchesXpath($html,
+'/input
+    [@type="hidden"]
+    [@id="name__token"]
+/following-sibling::div
+    [
+        ./label[@for="name_first"]
+        /following-sibling::input[@type="text"][@id="name_first"]
+    ]
+    [count(.//input)=1]
+'
+        );
+    }
+
+    public function testRestAndRepeatedWithRowPerField()
+    {
+        $view = $this->factory->createNamedBuilder('form', 'name')
+            ->add('first', 'text')
+            ->add('password', 'repeated')
+            ->getForm()
+            ->createView();
+
+        $this->renderRow($view['password']['first']);
+        $this->renderRow($view['password']['second']);
+
+        $html = $this->renderRest($view);
+
+        $this->assertMatchesXpath($html,
+'/input
+    [@type="hidden"]
+    [@id="name__token"]
+/following-sibling::div
+    [
+        ./label[@for="name_first"]
+        /following-sibling::input[@type="text"][@id="name_first"]
+    ]
+    [count(.//input)=1]
+    [count(.//label)=1]
+'
+        );
+    }
+
+    public function testRestAndRepeatedWithWidgetPerField()
+    {
+        $view = $this->factory->createNamedBuilder('form', 'name')
+            ->add('first', 'text')
+            ->add('password', 'repeated')
+            ->getForm()
+            ->createView();
+
+        // The password form is considered as rendered as all its childrend
+        // are rendered
+        $this->renderWidget($view['password']['first']);
+        $this->renderWidget($view['password']['second']);
+
+        $html = $this->renderRest($view);
+
+        $this->assertMatchesXpath($html,
+'/input
+    [@type="hidden"]
+    [@id="name__token"]
+/following-sibling::div
+    [
+        ./label[@for="name_first"]
+        /following-sibling::input[@type="text"][@id="name_first"]
+    ]
+    [count(//input)=2]
+    [count(//label)=1]
+'
+        );
+    }
+
     public function testCollection()
     {
         $form = $this->factory->createNamed('collection', 'name', array('a', 'b'), array(

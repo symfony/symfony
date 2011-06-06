@@ -83,7 +83,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('sender_address')->end()
                 ->arrayNode('antiflood')
                     ->children()
-                        ->scalarNode('treshold')->defaultValue(99)->end()
+                        ->scalarNode('threshold')->defaultValue(99)->end()
                         ->scalarNode('sleep')->defaultValue(0)->end()
                     ->end()
                 ->end()

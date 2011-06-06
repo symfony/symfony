@@ -48,7 +48,8 @@ class MetadataFactory
     public function getBundleMetadata(BundleInterface $bundle)
     {
         $namespace = $bundle->getNamespace();
-        if (!$metadata = $this->getMetadataForNamespace($namespace)) {
+        $metadata = $this->getMetadataForNamespace($namespace);
+        if (!$metadata->getMetadata()) {
             throw new \RuntimeException(sprintf('Bundle "%s" does not contain any mapped entities.', $bundle->getName()));
         }
 
@@ -70,7 +71,8 @@ class MetadataFactory
      */
     public function getClassMetadata($class, $path = null)
     {
-        if (!$metadata = $this->getMetadataForClass($class)) {
+        $metadata = $this->getMetadataForClass($class);
+        if (!$metadata->getMetadata()) {
             throw new \RuntimeException(sprintf('Entity "%s" is not a mapped entity.', $class));
         }
 
@@ -98,7 +100,8 @@ class MetadataFactory
      */
     public function getNamespaceMetadata($namespace, $path = null)
     {
-        if (!$metadata = $this->getMetadataForNamespace($namespace)) {
+        $metadata = $this->getMetadataForNamespace($namespace);
+        if (!$metadata->getMetadata()) {
             throw new \RuntimeException(sprintf('Namespace "%s" does not contain any mapped entities.', $namespace));
         }
 

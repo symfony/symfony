@@ -74,6 +74,7 @@ class SecurityExtension extends Extension
             ->addArgument($config['access_decision_manager']['allow_if_equal_granted_denied'])
         ;
         $container->setParameter('security.access.always_authenticate_before_granting', $config['always_authenticate_before_granting']);
+        $container->setParameter('security.authentication.hide_user_not_found', $config['hide_user_not_found']);
 
         $this->createFirewalls($config, $container);
         $this->createAuthorization($config, $container);
@@ -387,7 +388,7 @@ class SecurityExtension extends Extension
         }
 
         if (false === $hasListeners) {
-            throw new \LogicException(sprintf('No authentication listener registered for pattern "%s".', isset($firewall['pattern']) ? $firewall['pattern'] : ''));
+            throw new \LogicException(sprintf('No authentication listener registered for firewall "%s".', $id));
         }
 
         return array($listeners, $defaultEntryPoint);

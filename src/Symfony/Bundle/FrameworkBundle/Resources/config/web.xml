@@ -28,6 +28,7 @@
         </service>
 
         <service id="router_listener" class="%router_listener.class%">
+            <tag name="kernel.listener" event="core.request" method="onEarlyCoreRequest" priority="255" />
             <tag name="kernel.listener" event="core.request" method="onCoreRequest" />
             <tag name="monolog.logger" channel="request" />
             <argument type="service" id="router" />

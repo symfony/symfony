@@ -36,10 +36,10 @@ class RequestContext
      * @param integer $httpPort  The HTTP port
      * @param integer $httpsPort The HTTPS port
      */
-    public function __construct($baseUrl = '', $method = 'get', $host = 'localhost', $scheme = 'http', $httpPort = 80, $httpsPort = 443)
+    public function __construct($baseUrl = '', $method = 'GET', $host = 'localhost', $scheme = 'http', $httpPort = 80, $httpsPort = 443)
     {
         $this->baseUrl = $baseUrl;
-        $this->method = strtolower($method);
+        $this->method = strtoupper($method);
         $this->host = $host;
         $this->scheme = strtolower($scheme);
         $this->httpPort = $httpPort;
@@ -70,6 +70,8 @@ class RequestContext
     /**
      * Gets the HTTP method.
      *
+     * The method is always an uppercased string.
+     *
      * @return string The HTTP method
      */
     public function getMethod()
@@ -84,7 +86,7 @@ class RequestContext
      */
     public function setMethod($method)
     {
-        $this->method = strtolower($method);
+        $this->method = strtoupper($method);
     }
 
     /**

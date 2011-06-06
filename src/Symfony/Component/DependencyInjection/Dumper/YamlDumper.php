@@ -113,7 +113,7 @@ class YamlDumper extends Dumper
      *
      * @param string $alias
      * @param string $id
-     * @return void
+     * @return string
      */
     private function addServiceAlias($alias, $id)
     {

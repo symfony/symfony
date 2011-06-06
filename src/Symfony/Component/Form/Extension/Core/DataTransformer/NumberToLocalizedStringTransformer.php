@@ -40,11 +40,11 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
 
     public function __construct($precision = null, $grouping = null, $roundingMode = null)
     {
-        if (is_null($grouping)) {
+        if (null === $grouping) {
             $grouping = false;
         }
 
-        if (is_null($roundingMode)) {
+        if (null === $roundingMode) {
             $roundingMode = self::ROUND_HALFUP;
         }
 

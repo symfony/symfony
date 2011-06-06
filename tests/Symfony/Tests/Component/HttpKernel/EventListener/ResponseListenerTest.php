@@ -76,4 +76,15 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('application/json', $event->getResponse()->headers->get('content-type'));
     }
+
+    public function testFilterRemovesContentForHeadRequests()
+    {
+        $response = new Response('foo');
+        $request = Request::create('/', 'HEAD');
+
+        $event = new FilterResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $this->dispatcher->dispatch(CoreEvents::RESPONSE, $event);
+
+        $this->assertEquals('', $response->getContent());
+    }
 }

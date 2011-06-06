@@ -628,6 +628,8 @@ class Request
     /**
      * Gets the request method.
      *
+     * The method is always an uppercased string.
+     *
      * @return string The request method
      */
     public function getMethod()

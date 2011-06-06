@@ -184,7 +184,7 @@ class FormExtension extends \Twig_Extension
      * 1. This function first looks for a block named "_<view id>_<section>",
      * 2. if such a block is not found the function will look for a block named
      *    "<type name>_<section>",
-     * 3. the type name is recusrively replaced by the parent type name until a
+     * 3. the type name is recursively replaced by the parent type name until a
      *    corresponding block is found
      *
      * @param FormView  $view       The form view

@@ -147,7 +147,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 '/input[@type="hidden"][@id="parent__token"]
 /following-sibling::div
     [
-        ./label[@for="parent_child1"]
+        ./label[not(@for)]
         /following-sibling::div[@id="parent_child1"]
             [
                 ./div
@@ -160,7 +160,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
 /following-sibling::div
     [
-        ./label[@for="parent_child2"]
+        ./label[not(@for)]
         /following-sibling::div[@id="parent_child2"]
             [
                 ./div

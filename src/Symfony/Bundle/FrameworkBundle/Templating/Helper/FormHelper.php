@@ -73,7 +73,7 @@ class FormHelper extends Helper
     /**
      * Renders the HTML enctype in the form tag, if necessary.
      *
-     * Example usage in Twig templates:
+     * Example usage templates:
      *
      *     <form action="..." method="post" <?php echo $view['form']->enctype() ?>>
      *
@@ -89,15 +89,15 @@ class FormHelper extends Helper
     /**
      * Renders the HTML for a given view.
      *
-     * Example usage in Twig:
+     * Example usage:
      *
-     *     <?php view['form']->widget() ?>
+     *     <?php echo view['form']->widget() ?>
      *
      * You can pass options during the call:
      *
-     *     <?php view['form']->widget(array('attr' => array('class' => 'foo'))) ?>
+     *     <?php echo view['form']->widget(array('attr' => array('class' => 'foo'))) ?>
      *
-     *     <?php view['form']->widget(array('separator' => '+++++)) ?>
+     *     <?php echo view['form']->widget(array('separator' => '+++++)) ?>
      *
      * @param FormView $view      The view for which to render the widget
      * @param array    $variables Additional variables passed to the template

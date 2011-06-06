@@ -36,12 +36,6 @@
 {% endspaceless %}
 {% endblock hidden_row %}
 
-{% block repeated_errors %}
-{% spaceless %}
-    {{ block('form_errors') }}
-{% endspaceless %}
-{% endblock repeated_errors %}
-
 {% block form_widget %}
 {% spaceless %}
     <table {{ block('container_attributes') }}>

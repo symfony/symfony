@@ -60,6 +60,7 @@ class FixFileUploadListener implements EventSubscriberInterface
         // Newly uploaded file
         if ($data['file'] instanceof UploadedFile && $data['file']->isValid()) {
             $data['token'] = (string)rand(100000, 999999);
+            $this->storage->removeExpiredFiles();
             $directory = $this->storage->getTempDir($data['token']);
             $data['file']->move($directory);
             $data['name'] = $data['file']->getName();

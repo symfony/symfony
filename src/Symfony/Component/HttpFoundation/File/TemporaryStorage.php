@@ -49,8 +49,6 @@ class TemporaryStorage
         $this->secret = $secret;
         $this->size = max((int) $size, 0);
         $this->ttlSec = max((int) $ttlSec, 0);
-
-        $this->removeExpiredFiles();
     }
 
     protected function generateHashInfo($token)

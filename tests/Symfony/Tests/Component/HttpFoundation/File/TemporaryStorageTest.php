@@ -32,12 +32,14 @@ class TemporaryStorageTest extends \PHPUnit_Framework_TestCase
         $storage->getTempDir(array());
     }
 
-    public function testDoNotTruncateWhenSizeIsZero()
+    public function testDoNotTruncateWhenSizeParameterIsZero()
     {
         $path = __DIR__.'/Fixtures/storage';
         $storage = new TemporaryStorage('secret', $path);
         $file = new \SplFileObject($path.'/foo', 'w');
         $file->fwrite("foobar");
+
+        $storage->removeExpiredFiles();
 
         $this->assertTrue(file_exists($path.'/foo'));
 
@@ -64,6 +66,8 @@ class TemporaryStorageTest extends \PHPUnit_Framework_TestCase
         }
 
         $storage = new TemporaryStorage('secret', $path, 2 * $size);
+
+        $storage->removeExpiredFiles();
 
         foreach ($files as $i => $file) {
             if ($i % 2) {
@@ -93,6 +97,8 @@ class TemporaryStorageTest extends \PHPUnit_Framework_TestCase
 
         $storage = new TemporaryStorage('secret', $path, 4 * $size);
 
+        $storage->removeExpiredFiles();
+
         foreach ($files as $i => $file) {
             $this->assertTrue(file_exists($file));
             unlink($file);
@@ -119,6 +125,8 @@ class TemporaryStorageTest extends \PHPUnit_Framework_TestCase
         }
 
         $storage = new TemporaryStorage('secret', $path, 0, 30 * 60);
+
+        $storage->removeExpiredFiles();
 
         foreach ($files as $i => $file) {
             if ($i % 2) {

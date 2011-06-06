@@ -122,41 +122,22 @@ beta2 to beta3
 
 * The settings under `framework.annotations` have changed slightly:
 
-<<<<<<< HEAD
-  Before:
-
-    framework:
-        annotations:
-            cache: file
-            file_cache:
-                debug: true
-                dir: /foo
-
-  After:
-
-    framework:
-        annotations:
-            cache: file
-            debug: true
-            file_cache_dir: /foo
-=======
     Before:
-  
+
         framework:
             annotations:
                 cache: file
                 file_cache:
                     debug: true
                     dir: /foo
-                
+
     After:
-     
+
         framework:
             annotations:
                 cache: file
                 debug: true
                 file_cache_dir: /foo
->>>>>>> master
 
 beta1 to beta2
 --------------

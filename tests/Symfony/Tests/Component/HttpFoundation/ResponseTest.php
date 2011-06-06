@@ -340,6 +340,10 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response = new Response('', 404);
         $this->assertFalse($response->isRedirection());
         $this->assertFalse($response->isRedirect());
+
+        $response = new Response('', 301, array('Location' => '/good-uri'));
+        $this->assertFalse($response->isRedirect('/bad-uri'));
+        $this->assertTrue($response->isRedirect('/good-uri'));
     }
 
     public function testIsNotFound()

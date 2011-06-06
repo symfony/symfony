@@ -197,6 +197,12 @@ class FormExtension extends \Twig_Extension
      */
     protected function render(FormView $view, $section, array $variables = array())
     {
+        $mainTemplate = in_array($section, array('widget', 'row'));
+        if ($mainTemplate && $view->isRendered()) {
+
+                return '';
+        }
+
         $templates = $this->getTemplates($view);
         $blocks = $view->get('types');
         array_unshift($blocks, '_'.$view->get('id'));
@@ -205,9 +211,6 @@ class FormExtension extends \Twig_Extension
             $block = $block.'_'.$section;
 
             if (isset($templates[$block])) {
-                if ('widget' === $section || 'row' === $section) {
-                    $view->setRendered();
-                }
 
                 $this->varStack[$view] = array_replace(
                     $view->all(),
@@ -216,6 +219,10 @@ class FormExtension extends \Twig_Extension
                 );
 
                 $html = $templates[$block]->renderBlock($block, $this->varStack[$view]);
+
+                if ($mainTemplate) {
+                    $view->setRendered();
+                }
 
                 unset($this->varStack[$view]);
 

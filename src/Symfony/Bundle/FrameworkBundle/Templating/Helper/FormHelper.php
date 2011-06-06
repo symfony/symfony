@@ -107,6 +107,12 @@ class FormHelper extends Helper
 
     protected function renderSection(FormView $view, $section, array $variables = array())
     {
+        $mainTemplate = in_array($section, array('row', 'widget'));
+        if ($mainTemplate && $view->isRendered()) {
+
+                return '';
+        }
+
         $template = null;
         $blocks = $view->get('types');
         array_unshift($blocks, '_'.$view->get('id'));
@@ -124,11 +130,13 @@ class FormHelper extends Helper
             throw new FormException(sprintf('Unable to render form as none of the following blocks exist: "%s".', implode('", "', $blocks)));
         }
 
-        if ('widget' === $section || 'row' === $section) {
+        $html = $this->render($view, $template, $variables);
+
+        if ($mainTemplate) {
             $view->setRendered();
         }
 
-        return $this->render($view, $template, $variables);
+        return $html;
     }
 
     public function render(FormView $view, $template, array $variables = array())

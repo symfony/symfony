@@ -48,10 +48,11 @@ class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
      */
     public function start(Request $request, AuthenticationException $authException = null)
     {
+        $path = str_replace('{_locale}', $request->getSession()->getLocale(), $this->loginPath);
         if ($this->useForward) {
-            return $this->httpKernel->handle(Request::create($this->loginPath), HttpKernelInterface::SUB_REQUEST);
+            return $this->httpKernel->handle(Request::create($path), HttpKernelInterface::SUB_REQUEST);
         }
 
-        return new RedirectResponse(0 !== strpos($this->loginPath, 'http') ? $request->getUriForPath($this->loginPath) : $this->loginPath, 302);
+        return new RedirectResponse(0 !== strpos($path, 'http') ? $request->getUriForPath($path) : $path, 302);
     }
 }

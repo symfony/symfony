@@ -41,6 +41,12 @@
 {% endspaceless %}
 {% endblock field_label %}
 
+{% block collection_label %}
+{% spaceless %}
+    <label {% for attrname,attrvalue in attr %} {{attrname}}="{{attrvalue}}"{% endfor %}>{{ label|trans }}</label>
+{% endspaceless %}
+{% endblock collection_label %}
+
 {% block attributes %}
 {% spaceless %}
     id="{{ id }}" name="{{ full_name }}"{% if read_only %} disabled="disabled"{% endif %}{% if required %} required="required"{% endif %}{% if max_length %} maxlength="{{ max_length }}"{% endif %}{% if pattern %} pattern="{{ pattern }}"{% endif %}
@@ -50,11 +56,11 @@
 
 {% block container_attributes %}
 {% spaceless %}
-    id="{{ id }}" 
+    id="{{ id }}"
     {% for attrname,attrvalue in attr %}{{attrname}}="{{attrvalue}}" {% endfor %}
 {% endspaceless %}
 {% endblock container_attributes %}
-    
+
 {% block field_widget %}
 {% spaceless %}
     {% set type = type|default('text') %}

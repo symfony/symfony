@@ -144,14 +144,11 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $html = $this->renderRest($view);
 
         $this->assertMatchesXpath($html,
-'/input
-    [@type="hidden"]
-    [@id="parent__token"]
+'/input[@type="hidden"][@id="parent__token"]
 /following-sibling::div
     [
         ./label[@for="parent_child1"]
-        /following-sibling::div
-            [@id="parent_child1"]
+        /following-sibling::div[@id="parent_child1"]
             [
                 ./div
                     [
@@ -160,23 +157,21 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
                     ]
             ]
     ]
+
 /following-sibling::div
     [
         ./label[@for="parent_child2"]
-        /following-sibling::div
-            [@id="parent_child2"]
+        /following-sibling::div[@id="parent_child2"]
             [
                 ./div
                     [
                         ./label[@for="parent_child2_field1"]
                         /following-sibling::input[@id="parent_child2_field1"]
                     ]
-                /following-sibling::div
-                    [
-                        ./label[@for="parent_child2_field2"]
-                    ]
             ]
     ]
+    [count(//label)=4]
+    [count(//input[@type="text"])=2]
 '
         );
     }

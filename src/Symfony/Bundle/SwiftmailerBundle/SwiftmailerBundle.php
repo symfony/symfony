@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\SwiftmailerBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Bundle\SwiftmailerBundle\DependencyInjection\Compiler\RegisterPluginsPass;
 
 /**
  * Bundle.
@@ -20,4 +22,10 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class SwiftmailerBundle extends Bundle
 {
+    public function build(ContainerBuilder $container)
+    {
+        parent::build($container);
+
+        $container->addCompilerPass(new RegisterPluginsPass());
+    }
 }

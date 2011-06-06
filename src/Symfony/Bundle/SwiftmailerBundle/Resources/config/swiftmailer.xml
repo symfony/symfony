@@ -67,7 +67,7 @@
         </service>
 
         <service id="swiftmailer.plugin.blackhole" class="%swiftmailer.plugin.blackhole.class%" public="false" />
-        
+
         <service id="swiftmailer.plugin.antiflood" class="%swiftmailer.plugin.antiflood.class%" public="false">
             <argument>%swiftmailer.plugin.antiflood.threshold%</argument>
             <argument>%swiftmailer.plugin.antiflood.sleep%</argument>
@@ -76,7 +76,7 @@
         <service id="swiftmailer.plugin.impersonate" class="%swiftmailer.plugin.impersonate.class%" public="false">
             <argument>%swiftmailer.sender_address%</argument>
         </service>
-             
+
         <service id="swiftmailer.plugin.messagelogger" class="%swiftmailer.plugin.messagelogger.class%" />
 
         <service id="swiftmailer.data_collector" class="%swiftmailer.data_collector.class%" public="false">

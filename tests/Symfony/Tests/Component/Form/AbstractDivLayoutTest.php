@@ -389,4 +389,19 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 '
         );
     }
+
+    public function testLabelHasNoId()
+    {
+        $form = $this->factory->createNamed('text', 'name');
+        $html = $this->renderRow($form->createView());
+
+        $this->assertMatchesXpath($html,
+'/div
+    [
+        ./label[@for="name"][not(@id)]
+        /following-sibling::input[@id="name"]
+    ]
+'
+        );
+    }
 }

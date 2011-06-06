@@ -38,7 +38,14 @@ class FormHelper extends Helper
         $this->varStack = new \SplObjectStorage();
     }
 
-    public function attributes()
+    /**
+     * Renders the attributes for the current view.
+     *
+     * @param Boolean $includeId Whether to render the id attribute
+     *
+     * @return string The HTML markup
+     */
+    public function attributes($includeId = true)
     {
         $html = '';
         $attr = array();
@@ -51,7 +58,7 @@ class FormHelper extends Helper
                 $attr = $vars['attr'];
             }
 
-            if (isset($vars['id'])) {
+            if (true === $includeId && isset($vars['id'])) {
                 $attr['id'] = $vars['id'];
             }
         }

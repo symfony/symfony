@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\DoctrineBundle;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;

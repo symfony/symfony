@@ -55,10 +55,10 @@ class TemplatePathsCacheWarmer extends CacheWarmer
     /**
      * Checks whether this warmer is optional or not.
      *
-     * @return Boolean always false
+     * @return Boolean always true
      */
     public function isOptional()
     {
-        return false;
+        return true;
     }
 }

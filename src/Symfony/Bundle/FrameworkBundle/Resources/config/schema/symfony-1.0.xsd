@@ -21,21 +21,12 @@
             <xsd:element name="annotations" type="annotations" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
-        <xsd:attribute name="cache-warmer" type="cache_warmer" />
         <xsd:attribute name="charset" type="xsd:string" />
         <xsd:attribute name="error-handler" type="xsd:string" />
         <xsd:attribute name="exception-controller" type="xsd:string" />
         <xsd:attribute name="ide" type="xsd:string" />
         <xsd:attribute name="secret" type="xsd:string" />
     </xsd:complexType>
-
-    <xsd:simpleType name="cache_warmer">
-        <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="false" />
-            <xsd:enumeration value="full" />
-            <xsd:enumeration value="true" />
-        </xsd:restriction>
-    </xsd:simpleType>
 
     <xsd:complexType name="form">
         <xsd:attribute name="enabled" type="xsd:boolean" />
@@ -74,7 +65,6 @@
     </xsd:complexType>
 
     <xsd:complexType name="router">
-        <xsd:attribute name="cache-warmer" type="cache_warmer" />
         <xsd:attribute name="resource" type="xsd:string" />
         <xsd:attribute name="type" type="xsd:string" />
         <xsd:attribute name="http-port" type="xsd:string" />
@@ -105,7 +95,6 @@
         <xsd:attribute name="assets-version" type="xsd:string" />
         <xsd:attribute name="assets-version-format" type="xsd:string" />
         <xsd:attribute name="cache" type="xsd:string" />
-        <xsd:attribute name="cache-warmer" type="cache_warmer" />
     </xsd:complexType>
 
     <xsd:complexType name="package">

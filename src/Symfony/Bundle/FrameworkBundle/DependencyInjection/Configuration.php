@@ -46,7 +46,6 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('cache_warmer')->defaultValue(!$this->debug)->end()
                 ->scalarNode('charset')->end()
                 ->scalarNode('secret')->isRequired()->end()
                 ->scalarNode('exception_controller')->defaultValue('Symfony\\Bundle\\FrameworkBundle\\Controller\\ExceptionController::showAction')->end()
@@ -144,7 +143,6 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('router')
                     ->canBeUnset()
                     ->children()
-                        ->scalarNode('cache_warmer')->defaultFalse()->end()
                         ->scalarNode('resource')->isRequired()->end()
                         ->scalarNode('type')->end()
                         ->scalarNode('http_port')->defaultValue(80)->end()
@@ -231,7 +229,6 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->scalarNode('cache')->end()
-                        ->scalarNode('cache_warmer')->defaultFalse()->end()
                     ->end()
                     ->fixXmlConfig('engine')
                     ->children()

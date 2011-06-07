@@ -138,6 +138,16 @@ class Controller extends ContainerAware
     }
 
     /**
+     * Shortcut to return the request service.
+     *
+     * @return Symfony\Component\HttpFoundation\Request
+     */
+    public function getRequest()
+    {
+        return $this->get('request');
+    }
+
+    /**
      * Shortcut to return the Doctrine Registry class
      *
      * @return Symfony\Bundle\DoctrineBundle\Registry

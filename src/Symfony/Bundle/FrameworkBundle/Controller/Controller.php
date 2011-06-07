@@ -140,7 +140,7 @@ class Controller extends ContainerAware
     /**
      * Shortcut to return the Doctrine Registry class
      *
-     * @return Symfony\Bundle\DoctrineBundle\Registry
+     * @return \Symfony\Bundle\DoctrineBundle\Registry
      */
     public function getDoctrine()
     {

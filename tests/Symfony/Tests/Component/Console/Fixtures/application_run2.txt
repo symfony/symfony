@@ -1,7 +1,6 @@
 Usage:
  help [--xml] [command_name]
 
-Aliases: ?
 Arguments:
  command           The command to execute
  command_name      The command name (default: help)

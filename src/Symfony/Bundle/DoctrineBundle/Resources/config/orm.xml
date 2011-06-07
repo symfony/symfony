@@ -44,7 +44,7 @@
 
         <service id="doctrine.orm.proxy_cache_warmer" class="%doctrine.orm.proxy_cache_warmer.class%" public="false">
             <tag name="kernel.cache_warmer" />
-            <argument type="service" id="service_container" />
+            <argument type="service" id="doctrine" />
         </service>
 
         <service id="form.type_guesser.doctrine" class="%form.type_guesser.doctrine.class%">

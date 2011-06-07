@@ -9,6 +9,8 @@ timeline closely anyway.
 beta4 to beta5
 --------------
 
+* All settings regarding the cache warmers have been removed.
+
 * `Response::isRedirected()` has been merged with `Response::isRedirect()`
 
 beta3 to beta4

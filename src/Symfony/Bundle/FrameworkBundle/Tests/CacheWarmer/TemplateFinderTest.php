@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Loader;
+namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
-use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateFinder;
+use Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplateFinder;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BaseBundle\BaseBundle;
 
 
@@ -40,7 +40,7 @@ class TemplateFinderTest extends TestCase
 
         $parser = new TemplateNameParser($kernel);
 
-        $finder = new TemplateFinder($kernel, $parser, __DIR__.'/../../Fixtures/Resources');
+        $finder = new TemplateFinder($kernel, $parser, __DIR__.'/../Fixtures/Resources');
 
         $templates = array_map(
             function ($template) { return $template->getLogicalName(); },

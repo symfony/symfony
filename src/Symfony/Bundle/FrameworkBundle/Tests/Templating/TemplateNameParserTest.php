@@ -49,7 +49,6 @@ class TemplateNameParserTest extends TestCase
         $template = $this->parser->parse($name);
 
         $this->assertEquals($template->getLogicalName(), $ref->getLogicalName());
-        $this->assertEquals($template->getLogicalName(), $ref->getLogicalName());
         $this->assertEquals($template->getLogicalName(), $name);
     }
 

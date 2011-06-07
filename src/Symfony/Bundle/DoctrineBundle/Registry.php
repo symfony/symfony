@@ -124,6 +124,21 @@ class Registry
     }
 
     /**
+     * Gets an array of all registered entity managers
+     *
+     * @return array An array of EntityManager instances
+     */
+    public function getEntityManagers()
+    {
+        $ems = array();
+        foreach ($this->entityManagers as $name => $id) {
+            $ems[$name] = $this->container->get($id);
+        }
+
+        return $ems;
+    }
+
+    /**
      * Resets a named entity manager.
      *
      * This method is useful when an entity manager has been closed

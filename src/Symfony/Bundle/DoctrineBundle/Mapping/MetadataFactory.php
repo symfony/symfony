@@ -156,9 +156,9 @@ class MetadataFactory
     private function getAllMetadata()
     {
         $metadata = array();
-        foreach ($this->registry->getEntityManagerNames() as $name => $id) {
+        foreach ($this->registry->getEntityManagers() as $em) {
             $cmf = new DisconnectedClassMetadataFactory();
-            $cmf->setEntityManager($this->registry->getEntityManager($name));
+            $cmf->setEntityManager($em);
             foreach ($cmf->getAllMetadata() as $m) {
                 $metadata[] = $m;
             }

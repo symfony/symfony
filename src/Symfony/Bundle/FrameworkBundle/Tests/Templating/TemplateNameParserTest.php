@@ -48,7 +48,7 @@ class TemplateNameParserTest extends TestCase
     {
         $template = $this->parser->parse($name);
 
-        $this->assertEquals($template->getSignature(), $ref->getSignature());
+        $this->assertEquals($template->getLogicalName(), $ref->getLogicalName());
         $this->assertEquals($template->getLogicalName(), $ref->getLogicalName());
         $this->assertEquals($template->getLogicalName(), $name);
     }
@@ -96,7 +96,7 @@ class TemplateNameParserTest extends TestCase
         if ($ref === false) {
             $this->assertFalse($template);
         } else {
-            $this->assertEquals($template->getSignature(), $ref->getSignature());
+            $this->assertEquals($template->getLogicalName(), $ref->getLogicalName());
         }
     }
 

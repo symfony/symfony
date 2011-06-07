@@ -23,11 +23,11 @@ class TemplateReference extends BaseTemplateReference
     public function __construct($bundle = null, $controller = null, $name = null, $format = null, $engine = null)
     {
         $this->parameters = array(
-            'bundle'        => $bundle,
-            'controller'    => $controller,
-            'name'          => $name,
-            'format'        => $format,
-            'engine'        => $engine,
+            'bundle'     => $bundle,
+            'controller' => $controller,
+            'name'       => $name,
+            'format'     => $format,
+            'engine'     => $engine,
         );
     }
 
@@ -51,10 +51,6 @@ class TemplateReference extends BaseTemplateReference
      */
     public function getLogicalName()
     {
-        $parts = sprintf('%s:%s:', $this->get('bundle'), $this->get('controller'));
-        $elements = sprintf('%s.%s.%s', $this->get('name'), $this->get('format'), $this->get('engine'));
-
-        return $parts . $elements;
+        return sprintf('%s:%s:%s.%s.%s', $this->get('bundle'), $this->get('controller'), $this->get('name'), $this->get('format'), $this->get('engine'));
     }
-
 }

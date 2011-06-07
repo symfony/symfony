@@ -20,27 +20,17 @@ class TemplateReference implements TemplateReferenceInterface
 {
     protected $parameters;
 
-    public function  __construct($name = null, $engine = null)
+    public function __construct($name = null, $engine = null)
     {
         $this->parameters = array(
-            'name'      => $name,
-            'engine'    => $engine,
+            'name'   => $name,
+            'engine' => $engine,
         );
     }
 
     public function __toString()
     {
         return $this->getLogicalName();
-    }
-
-    /**
-     * Returns the template signature
-     *
-     * @return string A UID for the template
-     */
-    public function getSignature()
-    {
-        return md5(serialize($this->parameters));
     }
 
     /**
@@ -105,7 +95,9 @@ class TemplateReference implements TemplateReferenceInterface
     }
 
     /**
-     * Returns the template name
+     * Returns the "logical" template name.
+     *
+     * The template name acts as a unique identifier for the template.
      *
      * @return string The template name
      */

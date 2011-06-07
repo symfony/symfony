@@ -88,7 +88,7 @@ class FilesystemLoader implements \Twig_LoaderInterface
     {
         $tpl = $this->parser->parse($name);
 
-        if (isset($this->cache[$key = $tpl->getSignature()])) {
+        if (isset($this->cache[$key = $tpl->getLogicalName()])) {
             return $this->cache[$key];
         }
 

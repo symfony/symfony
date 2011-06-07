@@ -9,6 +9,17 @@ timeline closely anyway.
 beta4 to beta5
 --------------
 
+* Default Twig form templates have been moved to the Twig bridge. Here is how
+  you can reference them now from a template or in a configuration setting:
+
+    Before:
+
+        `TwigBundle:Form:div_layout.html.twig`
+
+    After:
+
+        `div_layout.html.twig`
+
 * All settings regarding the cache warmers have been removed.
 
 * `Response::isRedirected()` has been merged with `Response::isRedirect()`

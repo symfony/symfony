@@ -21,7 +21,7 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FilesystemLoader implements \Twig_LoaderInterface
+class FilesystemLoader extends \Twig_Loader_Filesystem
 {
     protected $locator;
     protected $parser;
@@ -41,43 +41,6 @@ class FilesystemLoader implements \Twig_LoaderInterface
     }
 
     /**
-     * Gets the source code of a template, given its name.
-     *
-     * @param  mixed $name The template name or a TemplateReferenceInterface instance
-     *
-     * @return string The template source code
-     */
-    public function getSource($name)
-    {
-        return file_get_contents($this->findTemplate($name));
-    }
-
-    /**
-     * Gets the cache key to use for the cache for a given template name.
-     *
-     * @param  mixed $name The template name or a TemplateReferenceInterface instance
-     *
-     * @return string The cache key
-     */
-    public function getCacheKey($name)
-    {
-        return $this->findTemplate($name);
-    }
-
-    /**
-     * Returns true if the template is still fresh.
-     *
-     * @param mixed     $name The template name or a TemplateReferenceInterface instance
-     * @param timestamp $time The last modification time of the cached template
-     *
-     * @throws \Twig_Error_Loader if the template does not exist
-     */
-    public function isFresh($name, $time)
-    {
-        return filemtime($this->findTemplate($name)) < $time;
-    }
-
-    /**
      * Returns the path to the template file
      *
      * @param $name The template logical name
@@ -86,7 +49,11 @@ class FilesystemLoader implements \Twig_LoaderInterface
      */
     protected function findTemplate($name)
     {
-        $tpl = $this->parser->parse($name);
+        try {
+            $tpl = $this->parser->parse($name);
+        } catch (\Exception $e) {
+            return parent::findTemplate($name);
+        }
 
         if (isset($this->cache[$key = $tpl->getLogicalName()])) {
             return $this->cache[$key];

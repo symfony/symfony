@@ -32,7 +32,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
         parent::setUp();
 
         $loader = new StubFilesystemLoader(array(
-            __DIR__.'/../../../../../../src/Symfony/Bundle/TwigBundle/Resources/views/Form',
+            __DIR__.'/../../../../../../src/Symfony/Bridge/Twig/Resources/views/Form',
             __DIR__,
         ));
 

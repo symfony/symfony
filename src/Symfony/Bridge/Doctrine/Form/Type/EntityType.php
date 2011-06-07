@@ -22,7 +22,7 @@ use Doctrine\ORM\EntityManager;
 
 class EntityType extends AbstractType
 {
-    private $em;
+    protected $em;
 
     public function __construct(EntityManager $em)
     {

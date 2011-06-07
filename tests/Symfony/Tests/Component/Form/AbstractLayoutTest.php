@@ -479,6 +479,28 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testSingleChoiceExpandedWithBooleanValue()
+    {
+        $form = $this->factory->createNamed('choice', 'na&me', true, array(
+            'property_path' => 'name',
+            'choices' => array('1' => 'Choice&A', '0' => 'Choice&B'),
+            'multiple' => false,
+            'expanded' => true,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./input[@type="radio"][@name="na&me"][@id="na&me_1"][@checked]
+        /following-sibling::label[@for="na&me_1"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::input[@type="radio"][@name="na&me"][@id="na&me_0"][not(@checked)]
+        /following-sibling::label[@for="na&me_0"][.="[trans]Choice&B[/trans]"]
+    ]
+    [count(./input)=2]
+'
+        );
+    }
+
     public function testMultipleChoiceExpanded()
     {
         $form = $this->factory->createNamed('choice', 'na&me', array('&a', '&c'), array(

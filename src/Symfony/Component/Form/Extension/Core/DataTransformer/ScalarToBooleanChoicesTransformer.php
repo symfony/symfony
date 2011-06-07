@@ -51,6 +51,10 @@ class ScalarToBooleanChoicesTransformer implements DataTransformerInterface
             throw new UnexpectedTypeException($value, 'scalar');
         }
 
+        if (is_bool($value) || null === $value) {
+            $value = (int)$value;
+        }
+
         try {
             $choices = $this->choiceList->getChoices();
         } catch (\Exception $e) {
@@ -58,7 +62,7 @@ class ScalarToBooleanChoicesTransformer implements DataTransformerInterface
         }
 
         foreach (array_keys($choices) as $key) {
-            $choices[$key] = $key === $value;
+            $choices[$key] = (string)$key === (string)$value;
         }
 
         return $choices;

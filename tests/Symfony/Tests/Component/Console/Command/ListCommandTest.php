@@ -21,10 +21,10 @@ class ListCommandTest extends \PHPUnit_Framework_TestCase
         $application = new Application();
 
         $commandTester = new CommandTester($command = $application->get('list'));
-        $commandTester->execute(array('command' => $command->getFullName()));
+        $commandTester->execute(array('command' => $command->getName()));
         $this->assertRegExp('/help   Displays help for a command/', $commandTester->getDisplay(), '->execute() returns a list of available commands');
 
-        $commandTester->execute(array('command' => $command->getFullName(), '--xml' => true));
-        $this->assertRegExp('/<command id="list" namespace="_global" name="list">/', $commandTester->getDisplay(), '->execute() returns a list of available commands in XML if --xml is passed');
+        $commandTester->execute(array('command' => $command->getName(), '--xml' => true));
+        $this->assertRegExp('/<command id="list" name="list">/', $commandTester->getDisplay(), '->execute() returns a list of available commands in XML if --xml is passed');
     }
 }

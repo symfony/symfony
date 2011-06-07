@@ -9,6 +9,10 @@ timeline closely anyway.
 beta4 to beta5
 --------------
 
+* In the Console component: `Command::getFullname()` and
+  `Command::getNamespace()` have been removed (`Command::getName()` behavior
+  is now the same as the old `Command::getFullname()`).
+
 * Default Twig form templates have been moved to the Twig bridge. Here is how
   you can reference them now from a template or in a configuration setting:
 

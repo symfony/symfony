@@ -9,7 +9,6 @@ framework:
     profiler:
         only_exceptions: true
     router:
-        cache_warmer: true
         resource:     %kernel.root_dir%/config/routing.xml
         type:         xml
     session:
@@ -25,7 +24,6 @@ framework:
     templating:
         assets_version:   SomeVersionScheme
         assets_base_urls: http://cdn.example.com
-        cache_warmer:     true
         engines:          [php, twig]
         loader:           [loader.foo, loader.bar]
         cache:            /path/to/cache

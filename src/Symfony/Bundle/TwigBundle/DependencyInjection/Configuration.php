@@ -32,12 +32,6 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('twig');
 
-        $rootNode
-            ->children()
-                ->scalarNode('cache_warmer')->defaultFalse()->end()
-            ->end();
-        ;
-
         $this->addExtensionsSection($rootNode);
         $this->addFormSection($rootNode);
         $this->addGlobalsSection($rootNode);

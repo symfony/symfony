@@ -22,32 +22,23 @@ use Symfony\Component\Config\ConfigCache;
  */
 class Router implements RouterInterface
 {
-    private $matcher;
-    private $generator;
-    private $defaults;
-    private $context;
-    private $loader;
-    private $collection;
-    private $resource;
-
+    protected $matcher;
+    protected $generator;
+    protected $defaults;
+    protected $context;
+    protected $loader;
+    protected $collection;
+    protected $resource;
     protected $options;
 
     /**
      * Constructor.
-     *
-     * Available options:
-     *
-     *   * cache_dir:     The cache directory (or null to disable caching)
-     *   * debug:         Whether to enable debugging or not (false by default)
-     *   * resource_type: Type hint for the main resource (optional)
      *
      * @param LoaderInterface $loader   A LoaderInterface instance
      * @param mixed           $resource The main resource to load
      * @param array           $options  An array of options
      * @param RequestContext  $context  The context
      * @param array           $defaults The default values
-     *
-     * @throws \InvalidArgumentException When unsupported option is provided
      */
     public function __construct(LoaderInterface $loader, $resource, array $options = array(), RequestContext $context = null, array $defaults = array())
     {
@@ -55,6 +46,24 @@ class Router implements RouterInterface
         $this->resource = $resource;
         $this->context = null === $context ? new RequestContext() : $context;
         $this->defaults = $defaults;
+        $this->setOptions($options);
+    }
+
+    /**
+     * Sets options.
+     *
+     * Available options:
+     *
+     *   * cache_dir:     The cache directory (or null to disable caching)
+     *   * debug:         Whether to enable debugging or not (false by default)
+     *   * resource_type: Type hint for the main resource (optional)
+     *
+     * @param array $options An array of options
+     *
+     * @throws \InvalidArgumentException When unsupported option is provided
+     */
+    public function setOptions(array $options)
+    {
         $this->options = array(
             'cache_dir'              => null,
             'debug'                  => false,
@@ -92,7 +101,7 @@ class Router implements RouterInterface
      * @param string $key   The key
      * @param mixed  $value The value
      *
-     * @throw \InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function setOption($key, $value)
     {
@@ -110,7 +119,7 @@ class Router implements RouterInterface
      *
      * @return mixed The value
      *
-     * @throw \InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function getOption($key)
     {

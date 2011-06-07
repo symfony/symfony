@@ -19,6 +19,7 @@ use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Bundle\DoctrineBundle\Registry;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Controller is a simple implementation of a Controller.
@@ -141,7 +142,7 @@ class Controller extends ContainerAware
     /**
      * Shortcut to return the request service.
      *
-     * @return Symfony\Component\HttpFoundation\Request
+     * @return Request
      */
     public function getRequest()
     {

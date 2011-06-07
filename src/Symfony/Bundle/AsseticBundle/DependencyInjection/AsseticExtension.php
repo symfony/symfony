@@ -186,7 +186,7 @@ class AsseticExtension extends Extension
      *
      * @return Definition A resource definition
      */
-    static protected function createDirectoryResourceDefinition($bundle, $engine, array $dirs)
+    static public function createDirectoryResourceDefinition($bundle, $engine, array $dirs)
     {
         $dirResources = array();
         foreach ($dirs as $dir) {

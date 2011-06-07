@@ -40,7 +40,6 @@ class HelpCommand extends Command
                 new InputOption('xml', null, InputOption::VALUE_NONE, 'To output help as XML'),
             ))
             ->setName('help')
-            ->setAliases(array('?'))
             ->setDescription('Displays help for a command')
             ->setHelp(<<<EOF
 The <info>help</info> command displays help for a given command:

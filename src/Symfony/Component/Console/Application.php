@@ -457,7 +457,7 @@ class Application
             }
         }
 
-        return array_unique(array_filter($namespaces));
+        return array_values(array_unique(array_filter($namespaces)));
     }
 
     /**
@@ -578,7 +578,7 @@ class Application
 
         $commands = array();
         foreach ($this->commands as $name => $command) {
-            if ($namespace === $this->extractNamespace($command->getName())) {
+            if ($namespace === $this->extractNamespace($name)) {
                 $commands[$name] = $command;
             }
         }
@@ -687,6 +687,10 @@ class Application
             }
 
             foreach ($commands as $name => $command) {
+                if ($name !== $command->getName()) {
+                    continue;
+                }
+
                 if (!$namespace) {
                     $commandXML = $dom->createElement('command');
                     $namespaceArrayXML->appendChild($commandXML);

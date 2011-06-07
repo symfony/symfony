@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Bundle\DoctrineBundle\Registry;
 
 /**
  * Controller is a simple implementation of a Controller.
@@ -140,7 +141,7 @@ class Controller extends ContainerAware
     /**
      * Shortcut to return the Doctrine Registry class
      *
-     * @return Symfony\Bundle\DoctrineBundle\Registry
+     * @return Registry
      */
     public function getDoctrine()
     {

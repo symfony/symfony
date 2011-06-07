@@ -69,6 +69,21 @@ class Registry
     }
 
     /**
+     * Gets an array of all registered connections
+     *
+     * @return array An array of Connection instances
+     */
+    public function getConnections()
+    {
+        $connections = array();
+        foreach ($this->connections as $name => $id) {
+            $connections[$name] = $this->container->get($id);
+        }
+
+        return $connections;
+    }
+
+    /**
      * Gets all connection names.
      *
      * @return array An array of connection names

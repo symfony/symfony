@@ -47,7 +47,6 @@ use Symfony\Component\Console\Helper\DialogHelper;
 class Application
 {
     private $commands;
-    private $aliases;
     private $wantHelps = false;
     private $runningCommand;
     private $name;
@@ -72,7 +71,6 @@ class Application
         $this->catchExceptions = true;
         $this->autoExit = true;
         $this->commands = array();
-        $this->aliases = array();
         $this->helperSet = new HelperSet(array(
             new FormatterHelper(),
             new DialogHelper(),
@@ -390,7 +388,7 @@ class Application
         $this->commands[$command->getName()] = $command;
 
         foreach ($command->getAliases() as $alias) {
-            $this->aliases[$alias] = $command;
+            $this->commands[$alias] = $command;
         }
 
         return $command;
@@ -409,11 +407,11 @@ class Application
      */
     public function get($name)
     {
-        if (!isset($this->commands[$name]) && !isset($this->aliases[$name])) {
+        if (!isset($this->commands[$name])) {
             throw new \InvalidArgumentException(sprintf('The command "%s" does not exist.', $name));
         }
 
-        $command = isset($this->commands[$name]) ? $this->commands[$name] : $this->aliases[$name];
+        $command = $this->commands[$name];
 
         if ($this->wantHelps) {
             $this->wantHelps = false;
@@ -438,7 +436,7 @@ class Application
      */
     public function has($name)
     {
-        return isset($this->commands[$name]) || isset($this->aliases[$name]);
+        return isset($this->commands[$name]);
     }
 
     /**
@@ -452,18 +450,14 @@ class Application
     {
         $namespaces = array();
         foreach ($this->commands as $command) {
-            if ($namespace = $this->extractNamespace($command->getName())) {
-                $namespaces[] = $namespace;
-            }
+            $namespaces[] = $this->extractNamespace($command->getName());
 
             foreach ($command->getAliases() as $alias) {
-                if ($namespace = $this->extractNamespace($alias)) {
-                    $namespaces[] = $namespace;
-                }
+                $namespaces[] = $this->extractNamespace($alias);
             }
         }
 
-        return array_unique($namespaces);
+        return array_unique(array_filter($namespaces));
     }
 
     /**
@@ -532,7 +526,7 @@ class Application
             }
         }
 
-        $abbrevs = static::getAbbreviations($commands);
+        $abbrevs = static::getAbbreviations(array_unique($commands));
         if (isset($abbrevs[$searchName]) && 1 == count($abbrevs[$searchName])) {
             return $this->get($abbrevs[$searchName][0]);
         }
@@ -544,7 +538,16 @@ class Application
         }
 
         // aliases
-        $abbrevs = static::getAbbreviations(array_keys($this->aliases));
+        $aliases = array();
+        foreach ($this->commands as $command) {
+            foreach ($command->getAliases() as $alias) {
+                if ($this->extractNamespace($alias) == $namespace) {
+                    $aliases[] = $alias;
+                }
+            }
+        }
+
+        $abbrevs = static::getAbbreviations(array_unique($aliases));
         if (!isset($abbrevs[$searchName])) {
             throw new \InvalidArgumentException(sprintf('Command "%s" is not defined.', $name));
         }
@@ -642,10 +645,8 @@ class Application
                 $messages[] = '<comment>'.$space.'</comment>';
             }
 
-            foreach ($commands as $command) {
-                $aliases = $command->getAliases() ? '<comment> ('.implode(', ', $command->getAliases()).')</comment>' : '';
-
-                $messages[] = sprintf("  <info>%-${width}s</info> %s%s", $command->getName(), $command->getDescription(), $aliases);
+            foreach ($commands as $name => $command) {
+                $messages[] = sprintf("  <info>%-${width}s</info> %s", $name, $command->getDescription());
             }
         }
 
@@ -685,11 +686,11 @@ class Application
                 $namespaceArrayXML->setAttribute('id', $space);
             }
 
-            foreach ($commands as $command) {
+            foreach ($commands as $name => $command) {
                 if (!$namespace) {
                     $commandXML = $dom->createElement('command');
                     $namespaceArrayXML->appendChild($commandXML);
-                    $commandXML->appendChild($dom->createTextNode($command->getName()));
+                    $commandXML->appendChild($dom->createTextNode($name));
                 }
 
                 $node = $command->asXml(true)->getElementsByTagName('command')->item(0);
@@ -793,13 +794,9 @@ class Application
     {
         $namespacedCommands = array();
         foreach ($commands as $name => $command) {
-            $key = $this->extractNamespace($command->getName());
+            $key = $this->extractNamespace($name, 1);
             if (!$key) {
                 $key = '_global';
-            }
-
-            if (!isset($namespacedCommands[$key])) {
-                $namespacedCommands[$key] = array();
             }
 
             $namespacedCommands[$key][$name] = $command;
@@ -825,12 +822,11 @@ class Application
         return sprintf('%s, %s%s', $abbrevs[0], $abbrevs[1], count($abbrevs) > 2 ? sprintf(' and %d more', count($abbrevs) - 2) : '');
     }
 
-    private function extractNamespace($name)
+    private function extractNamespace($name, $limit = null)
     {
-        if (false !== $pos = strrpos($name, ':')) {
-            return substr($name, 0, $pos);
-        }
+        $parts = explode(':', $name);
+        array_pop($parts);
 
-        return '';
+        return implode(':', null === $limit ? $parts : array_slice($parts, 0, $limit));
     }
 }

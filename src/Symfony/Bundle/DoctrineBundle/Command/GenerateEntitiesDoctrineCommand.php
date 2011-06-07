@@ -30,6 +30,7 @@ class GenerateEntitiesDoctrineCommand extends DoctrineCommand
     {
         $this
             ->setName('doctrine:generate:entities')
+            ->setAliases(array('generate:doctrine:entities'))
             ->setDescription('Generate entity classes and method stubs from your mapping information')
             ->addArgument('name', InputArgument::REQUIRED, 'A bundle name, a namespace, or a class name')
             ->addOption('path', null, InputOption::VALUE_REQUIRED, 'The path where to generate entities when it cannot be guessed')

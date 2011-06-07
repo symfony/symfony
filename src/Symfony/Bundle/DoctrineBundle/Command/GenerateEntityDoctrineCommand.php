@@ -30,6 +30,7 @@ class GenerateEntityDoctrineCommand extends DoctrineCommand
     {
         $this
             ->setName('doctrine:generate:entity')
+            ->setAliases(array('generate:doctrine:entity'))
             ->setDescription('Generate a new Doctrine entity inside a bundle')
             ->addArgument('entity', InputArgument::REQUIRED, 'The entity class name to initialize (shortcut notation)')
             ->addArgument('fields', InputArgument::OPTIONAL, 'The fields to create with the new entity')

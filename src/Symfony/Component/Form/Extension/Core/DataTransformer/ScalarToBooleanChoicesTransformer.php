@@ -87,7 +87,7 @@ class ScalarToBooleanChoicesTransformer implements DataTransformerInterface
 
         foreach ($value as $choice => $selected) {
             if ($selected) {
-                return $choice;
+                return (string) $choice;
             }
         }
 

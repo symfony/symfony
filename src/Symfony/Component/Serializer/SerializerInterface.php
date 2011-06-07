@@ -103,25 +103,4 @@ interface SerializerInterface
      * @return EncoderInterface
      */
     function getEncoder($format);
-
-    /**
-     * @param string           $format  format name
-     * @param EncoderInterface $encoder
-     */
-    function setEncoder($format, EncoderInterface $encoder);
-
-    /**
-     * @param string $format format name
-     */
-    function removeEncoder($format);
-
-    /**
-     * @param NormalizerInterface $normalizer
-     */
-    function addNormalizer(NormalizerInterface $normalizer);
-
-    /**
-     * @param NormalizerInterface $normalizer
-     */
-    function removeNormalizer(NormalizerInterface $normalizer);
 }

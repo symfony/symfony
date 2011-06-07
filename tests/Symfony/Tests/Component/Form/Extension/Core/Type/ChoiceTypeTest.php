@@ -32,6 +32,14 @@ class ChoiceTypeTest extends TypeTestCase
         4 => 'Roman',
     );
 
+    private $stringButNumericChoices = array(
+        '0' => 'Bernhard',
+        '1' => 'Fabien',
+        '2' => 'Kris',
+        '3' => 'Jon',
+        '4' => 'Roman',
+    );
+
     protected $groupedChoices = array(
         'Symfony' => array(
             'a' => 'Bernhard',
@@ -181,7 +189,30 @@ class ChoiceTypeTest extends TypeTestCase
 
         $form->bind('1');
 
-        $this->assertSame(1, $form->getData());
+        $this->assertSame('1', $form->getData());
+        $this->assertSame(false, $form[0]->getData());
+        $this->assertSame(true, $form[1]->getData());
+        $this->assertSame(false, $form[2]->getData());
+        $this->assertSame(false, $form[3]->getData());
+        $this->assertSame(false, $form[4]->getData());
+        $this->assertSame('', $form[0]->getClientData());
+        $this->assertSame('1', $form[1]->getClientData());
+        $this->assertSame('', $form[2]->getClientData());
+        $this->assertSame('', $form[3]->getClientData());
+        $this->assertSame('', $form[4]->getClientData());
+    }
+
+    public function testBindSingleExpandedStringsButNumericChoices()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'expanded' => true,
+            'choices' => $this->stringButNumericChoices,
+        ));
+
+        $form->bind('1');
+
+        $this->assertSame('1', $form->getData());
         $this->assertSame(false, $form[0]->getData());
         $this->assertSame(true, $form[1]->getData());
         $this->assertSame(false, $form[2]->getData());

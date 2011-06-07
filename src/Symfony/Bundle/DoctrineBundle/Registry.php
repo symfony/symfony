@@ -109,19 +109,6 @@ class Registry
     }
 
     /**
-     * Shortcut method to return the EntityRepository for an entity.
-     *
-     * @param string $entityName The name of the entity.
-     * @param string $entityManagerNAme The entity manager name (null for the default one)
-     *
-     * @return Doctrine\ORM\EntityRepository
-     */
-    public function getRepository($entityName, $entityManagerName = null)
-    {
-        return $this->getEntityManager($entityManagerName)->getRepository($entityName);
-    }
-
-    /**
      * Resets a named entity manager.
      *
      * This method is useful when an entity manager has been closed
@@ -184,5 +171,19 @@ class Registry
     public function getEntityManagerNames()
     {
         return $this->entityManagers;
+    }
+
+
+    /**
+     * Gets the EntityRepository for an entity.
+     *
+     * @param string $entityName        The name of the entity.
+     * @param string $entityManagerNAme The entity manager name (null for the default one)
+     *
+     * @return Doctrine\ORM\EntityRepository
+     */
+    public function getRepository($entityName, $entityManagerName = null)
+    {
+        return $this->getEntityManager($entityManagerName)->getRepository($entityName);
     }
 }

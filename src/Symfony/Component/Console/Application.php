@@ -387,7 +387,7 @@ class Application
     {
         $command->setApplication($this);
 
-        $this->commands[$command->getFullName()] = $command;
+        $this->commands[$command->getName()] = $command;
 
         foreach ($command->getAliases() as $alias) {
             $this->aliases[$alias] = $command;
@@ -452,12 +452,18 @@ class Application
     {
         $namespaces = array();
         foreach ($this->commands as $command) {
-            if ($command->getNamespace()) {
-                $namespaces[$command->getNamespace()] = true;
+            if ($namespace = $this->extractNamespace($command->getName())) {
+                $namespaces[] = $namespace;
+            }
+
+            foreach ($command->getAliases() as $alias) {
+                if ($namespace = $this->extractNamespace($alias)) {
+                    $namespaces[] = $namespace;
+                }
             }
         }
 
-        return array_keys($namespaces);
+        return array_unique($namespaces);
     }
 
     /**
@@ -471,17 +477,27 @@ class Application
      */
     public function findNamespace($namespace)
     {
-        $abbrevs = static::getAbbreviations($this->getNamespaces());
-
-        if (!isset($abbrevs[$namespace])) {
-            throw new \InvalidArgumentException(sprintf('There are no commands defined in the "%s" namespace.', $namespace));
+        $allNamespaces = array();
+        foreach ($this->getNamespaces() as $n) {
+            $allNamespaces[$n] = explode(':', $n);
         }
 
-        if (count($abbrevs[$namespace]) > 1) {
-            throw new \InvalidArgumentException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions($abbrevs[$namespace])));
+        $found = array();
+        foreach (explode(':', $namespace) as $i => $part) {
+            $abbrevs = static::getAbbreviations(array_unique(array_values(array_filter(array_map(function ($p) use ($i) { return isset($p[$i]) ? $p[$i] : ''; }, $allNamespaces)))));
+
+            if (!isset($abbrevs[$part])) {
+                throw new \InvalidArgumentException(sprintf('There are no commands defined in the "%s" namespace.', $namespace));
+            }
+
+            if (count($abbrevs[$part]) > 1) {
+                throw new \InvalidArgumentException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions($abbrevs[$namespace])));
+            }
+
+            $found[] = $abbrevs[$part][0];
         }
 
-        return $abbrevs[$namespace][0];
+        return implode(':', $found);
     }
 
     /**
@@ -502,43 +518,42 @@ class Application
     {
         // namespace
         $namespace = '';
+        $searchName = $name;
         if (false !== $pos = strrpos($name, ':')) {
             $namespace = $this->findNamespace(substr($name, 0, $pos));
-            $name = substr($name, $pos + 1);
+            $searchName = $namespace.substr($name, $pos);
         }
-
-        $fullName = $namespace ? $namespace.':'.$name : $name;
 
         // name
         $commands = array();
         foreach ($this->commands as $command) {
-            if ($command->getNamespace() == $namespace) {
+            if ($this->extractNamespace($command->getName()) == $namespace) {
                 $commands[] = $command->getName();
             }
         }
 
         $abbrevs = static::getAbbreviations($commands);
-        if (isset($abbrevs[$name]) && 1 == count($abbrevs[$name])) {
-            return $this->get($namespace ? $namespace.':'.$abbrevs[$name][0] : $abbrevs[$name][0]);
+        if (isset($abbrevs[$searchName]) && 1 == count($abbrevs[$searchName])) {
+            return $this->get($abbrevs[$searchName][0]);
         }
 
-        if (isset($abbrevs[$name]) && count($abbrevs[$name]) > 1) {
-            $suggestions = $this->getAbbreviationSuggestions(array_map(function ($command) use ($namespace) { return $namespace.':'.$command; }, $abbrevs[$name]));
+        if (isset($abbrevs[$searchName]) && count($abbrevs[$searchName]) > 1) {
+            $suggestions = $this->getAbbreviationSuggestions($abbrevs[$searchName]);
 
-            throw new \InvalidArgumentException(sprintf('Command "%s" is ambiguous (%s).', $fullName, $suggestions));
+            throw new \InvalidArgumentException(sprintf('Command "%s" is ambiguous (%s).', $name, $suggestions));
         }
 
         // aliases
         $abbrevs = static::getAbbreviations(array_keys($this->aliases));
-        if (!isset($abbrevs[$fullName])) {
-            throw new \InvalidArgumentException(sprintf('Command "%s" is not defined.', $fullName));
+        if (!isset($abbrevs[$searchName])) {
+            throw new \InvalidArgumentException(sprintf('Command "%s" is not defined.', $name));
         }
 
-        if (count($abbrevs[$fullName]) > 1) {
-            throw new \InvalidArgumentException(sprintf('Command "%s" is ambiguous (%s).', $fullName, $this->getAbbreviationSuggestions($abbrevs[$fullName])));
+        if (count($abbrevs[$searchName]) > 1) {
+            throw new \InvalidArgumentException(sprintf('Command "%s" is ambiguous (%s).', $name, $this->getAbbreviationSuggestions($abbrevs[$searchName])));
         }
 
-        return $this->get($abbrevs[$fullName][0]);
+        return $this->get($abbrevs[$searchName][0]);
     }
 
     /**
@@ -560,7 +575,7 @@ class Application
 
         $commands = array();
         foreach ($this->commands as $name => $command) {
-            if ($namespace === $command->getNamespace()) {
+            if ($namespace === $this->extractNamespace($command->getName())) {
                 $commands[$name] = $command;
             }
         }
@@ -630,7 +645,7 @@ class Application
             foreach ($commands as $command) {
                 $aliases = $command->getAliases() ? '<comment> ('.implode(', ', $command->getAliases()).')</comment>' : '';
 
-                $messages[] = sprintf("  <info>%-${width}s</info> %s%s", ($command->getNamespace() ? ':' : '').$command->getName(), $command->getDescription(), $aliases);
+                $messages[] = sprintf("  <info>%-${width}s</info> %s%s", $command->getName(), $command->getDescription(), $aliases);
             }
         }
 
@@ -778,7 +793,10 @@ class Application
     {
         $namespacedCommands = array();
         foreach ($commands as $name => $command) {
-            $key = $command->getNamespace() ? $command->getNamespace() : '_global';
+            $key = $this->extractNamespace($command->getName());
+            if (!$key) {
+                $key = '_global';
+            }
 
             if (!isset($namespacedCommands[$key])) {
                 $namespacedCommands[$key] = array();
@@ -805,5 +823,14 @@ class Application
     private function getAbbreviationSuggestions($abbrevs)
     {
         return sprintf('%s, %s%s', $abbrevs[0], $abbrevs[1], count($abbrevs) > 2 ? sprintf(' and %d more', count($abbrevs) - 2) : '');
+    }
+
+    private function extractNamespace($name)
+    {
+        if (false !== $pos = strrpos($name, ':')) {
+            return substr($name, 0, $pos);
+        }
+
+        return '';
     }
 }

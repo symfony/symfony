@@ -49,13 +49,6 @@ interface TemplateReferenceInterface
     function get($name);
 
     /**
-     * Returns the template signature
-     *
-     * @return string A UID for the template
-     */
-    function getSignature();
-
-    /**
      * Returns the path to the template.
      *
      * By default, it just returns the template name.
@@ -65,7 +58,9 @@ interface TemplateReferenceInterface
     function getPath();
 
     /**
-     * Returns the template name
+     * Returns the "logical" template name.
+     *
+     * The template name acts as a unique identifier for the template.
      *
      * @return string The template name
      */

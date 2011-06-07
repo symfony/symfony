@@ -72,7 +72,8 @@ class CachedTemplateLocator extends TemplateLocator
      */
     protected function getCachedTemplatePath(TemplateReferenceInterface $template)
     {
-        $key = $template->getSignature();
+        $key = $template->getLogicalName();
+
         return isset($this->templates[$key]) ? $this->templates[$key] : null;
     }
 }

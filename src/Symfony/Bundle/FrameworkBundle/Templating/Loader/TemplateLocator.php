@@ -54,7 +54,7 @@ class TemplateLocator implements FileLocatorInterface
             throw new \InvalidArgumentException("The template must be an instance of TemplateReferenceInterface.");
         }
 
-        $key = $template->getSignature();
+        $key = $template->getLogicalName();
 
         if (isset($this->cache[$key])) {
             return $this->cache[$key];

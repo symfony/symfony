@@ -111,7 +111,7 @@ class Controller extends ContainerAware
     }
 
     /**
-     * Creates and returns a Form instance from the type of the form
+     * Creates and returns a Form instance from the type of the form.
      *
      * @param string|FormTypeInterface $type    The built type of the form
      * @param mixed $data                       The initial data for the form
@@ -138,7 +138,7 @@ class Controller extends ContainerAware
     }
 
     /**
-     * Shortcut to return the Doctrine Registry class
+     * Shortcut to return the Doctrine Registry service.
      *
      * @return Symfony\Bundle\DoctrineBundle\Registry
      */

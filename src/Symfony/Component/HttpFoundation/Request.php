@@ -233,23 +233,23 @@ class Request
     {
         $dup = clone $this;
         if ($query !== null) {
-          $dup->query = new ParameterBag($query);
+            $dup->query = new ParameterBag($query);
         }
         if ($request !== null) {
-          $dup->request = new ParameterBag($request);
+            $dup->request = new ParameterBag($request);
         }
         if ($attributes !== null) {
-          $dup->attributes = new ParameterBag($attributes);
+            $dup->attributes = new ParameterBag($attributes);
         }
         if ($cookies !== null) {
-          $dup->cookies = new ParameterBag($cookies);
+            $dup->cookies = new ParameterBag($cookies);
         }
         if ($files !== null) {
-          $dup->files = new FileBag($files);
+            $dup->files = new FileBag($files);
         }
         if ($server !== null) {
-          $dup->server = new ServerBag($server);
-          $dup->headers = new HeaderBag($dup->server->getHeaders());
+            $dup->server = new ServerBag($server);
+            $dup->headers = new HeaderBag($dup->server->getHeaders());
         }
         $this->languages = null;
         $this->charsets = null;

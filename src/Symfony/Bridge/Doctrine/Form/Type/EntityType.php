@@ -44,14 +44,11 @@ class EntityType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         $defaultOptions = array(
-            'multiple'          => false,
-            'expanded'          => false,
             'em'                => null,
             'class'             => null,
             'property'          => null,
             'query_builder'     => null,
             'choices'           => array(),
-            'preferred_choices' => array(),
         );
 
         $options = array_replace($defaultOptions, $options);

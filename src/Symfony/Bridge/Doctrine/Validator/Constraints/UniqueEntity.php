@@ -25,6 +25,7 @@ class UniqueEntity extends Constraint
     public $message = 'This value is already used.';
     public $em = null;
     public $fields = array();
+    public $entity = null;
 
     public function getRequiredOptions()
     {
@@ -54,3 +55,4 @@ class UniqueEntity extends Constraint
         return 'fields';
     }
 }
+

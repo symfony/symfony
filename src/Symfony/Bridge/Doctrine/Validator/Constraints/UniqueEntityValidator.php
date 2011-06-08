@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Form\Util\PropertyPath;
 
 /**
  * Unique Entity Validator checks if one or a set of fields contain unique values.
@@ -38,11 +39,11 @@ class UniqueEntityValidator extends ConstraintValidator
     }
 
     /**
-     * @param object $entity
+     * @param object $object
      * @param Constraint $constraint
      * @return bool
      */
-    public function isValid($entity, Constraint $constraint)
+    public function isValid($object, Constraint $constraint)
     {
         if (!is_array($constraint->fields) && !is_string($constraint->fields)) {
             throw new UnexpectedTypeException($constraint->fields, 'array');
@@ -56,7 +57,7 @@ class UniqueEntityValidator extends ConstraintValidator
 
         $em = $this->registry->getEntityManager($constraint->em);
 
-        $className = $this->context->getCurrentClass();
+        $className = $constraint->entity ?: $this->context->getCurrentClass();
         $class = $em->getClassMetadata($className);
 
         $criteria = array();
@@ -65,13 +66,18 @@ class UniqueEntityValidator extends ConstraintValidator
                 throw new ConstraintDefinitionException("Only field names mapped by Doctrine can be validated for uniqueness.");
             }
 
-            $criteria[$fieldName] = $class->reflFields[$fieldName]->getValue($entity);
+            if (null === $constraint->entity) {
+                $criteria[$fieldName] = $class->reflFields[$fieldName]->getValue($object);
+            } else {
+                $propertyPath = new PropertyPath($fieldName);
+                $criteria[$fieldName] = $propertyPath->getValue($object);
+            }
         }
 
         $repository = $em->getRepository($className);
         $result = $repository->findBy($criteria);
 
-        if (count($result) > 0 && $result[0] !== $entity) {
+        if (count($result) > 0 && $result[0] !== $object) {
             $oldPath = $this->context->getPropertyPath();
             $this->context->setPropertyPath( empty($oldPath) ? $fields[0] : $oldPath . "." . $fields[0]);
             $this->context->addViolation($constraint->message, array(), $criteria[$constraint->fields[0]]);
@@ -81,3 +87,4 @@ class UniqueEntityValidator extends ConstraintValidator
         return true; // all true, we added the violation already!
     }
 }
+

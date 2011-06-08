@@ -86,7 +86,8 @@ class Application
             new InputOption('--quiet',          '-q', InputOption::VALUE_NONE, 'Do not output any message.'),
             new InputOption('--verbose',        '-v', InputOption::VALUE_NONE, 'Increase verbosity of messages.'),
             new InputOption('--version',        '-V', InputOption::VALUE_NONE, 'Display this program version.'),
-            new InputOption('--ansi',           '-a', InputOption::VALUE_NONE, 'Force ANSI output.'),
+            new InputOption('--ansi',           '',   InputOption::VALUE_NONE, 'Force ANSI output.'),
+            new InputOption('--no-ansi',        '',   InputOption::VALUE_NONE, 'Disable ANSI output.'),
             new InputOption('--no-interaction', '-n', InputOption::VALUE_NONE, 'Do not ask any interactive question.'),
         ));
     }
@@ -150,8 +151,10 @@ class Application
     {
         $name = $this->getCommandName($input);
 
-        if (true === $input->hasParameterOption(array('--ansi', '-a'))) {
+        if (true === $input->hasParameterOption(array('--ansi'))) {
             $output->setDecorated(true);
+        } elseif (true === $input->hasParameterOption(array('--no-ansi'))) {
+            $output->setDecorated(false);
         }
 
         if (true === $input->hasParameterOption(array('--help', '-h'))) {

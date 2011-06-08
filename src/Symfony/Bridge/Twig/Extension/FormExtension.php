@@ -248,15 +248,17 @@ class FormExtension extends \Twig_Extension
     {
         if (!$this->templates->contains($view)) {
             // defaults
-            $all = $this->resources;
+            $all = array();
 
             // themes
             $parent = $view;
             do {
                 if (isset($this->themes[$parent])) {
-                    $all = array_merge($all, $this->themes[$parent]);
+                    $all = array_merge($this->themes[$parent], $all);
                 }
             } while ($parent = $parent->getParent());
+
+            $all = array_merge($this->resources, $all);
 
             $templates = array();
             foreach ($all as $resource) {

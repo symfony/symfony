@@ -32,7 +32,7 @@ abstract class DoctrineOrmTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @return EntityManager
      */
-    public static function createTestEntityManager($paths = array())
+    static public function createTestEntityManager($paths = array())
     {
         $config = new \Doctrine\ORM\Configuration();
         $config->setAutoGenerateProxyClasses(true);

@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\DoctrineBundle\CacheWarmer;
 
-use Symfony\Bundle\DoctrineBundle\Registry;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 /**
@@ -29,9 +29,9 @@ class ProxyCacheWarmer implements CacheWarmerInterface
     /**
      * Constructor.
      *
-     * @param Registry $registry The Doctrine registry
+     * @param RegistryInterface $registry A RegistryInterface instance
      */
-    public function __construct(Registry $registry)
+    public function __construct(RegistryInterface $registry)
     {
         $this->registry = $registry;
     }

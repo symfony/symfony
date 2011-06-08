@@ -15,27 +15,27 @@
         <?php if (!$multiple && !$required): ?><option value=""><?php echo $empty_value; ?></option><?php endif; ?>
         <?php if (count($preferred_choices) > 0): ?>
             <?php foreach ($preferred_choices as $choice => $label): ?>
-                <?php if ($form->isChoiceGroup($label)): ?>
+                <?php if ($view['form']->isChoiceGroup($label)): ?>
                     <optgroup label="<?php echo $view->escape($choice) ?>">
                         <?php foreach ($label as $nestedChoice => $nestedLabel): ?>
-                            <option value="<?php echo $view->escape($nestedChoice) ?>"<?php if ($form->isChoiceSelected($nestedChoice)): ?> selected="selected"<?php endif?>><?php echo $view->escape($nestedLabel) ?></option>
+                            <option value="<?php echo $view->escape($nestedChoice) ?>"<?php if ($view['form']->isChoiceSelected($form, $nestedChoice)): ?> selected="selected"<?php endif?>><?php echo $view->escape($nestedLabel) ?></option>
                         <?php endforeach ?>
                     </optgroup>
                 <?php else: ?>
-                    <option value="<?php echo $view->escape($choice) ?>"<?php if ($form->isChoiceSelected($choice)): ?> selected="selected"<?php endif?>><?php echo $view->escape($label) ?></option>
+                    <option value="<?php echo $view->escape($choice) ?>"<?php if ($view['form']->isChoiceSelected($form, $choice)): ?> selected="selected"<?php endif?>><?php echo $view->escape($label) ?></option>
                 <?php endif ?>
             <?php endforeach ?>
             <option disabled="disabled"><?php echo $separator ?></option>
         <?php endif ?>
         <?php foreach ($choices as $choice => $label): ?>
-            <?php if ($form->isChoiceGroup($label)): ?>
+            <?php if ($view['form']->isChoiceGroup($label)): ?>
                 <optgroup label="<?php echo $view->escape($choice) ?>">
                     <?php foreach ($label as $nestedChoice => $nestedLabel): ?>
-                        <option value="<?php echo $view->escape($nestedChoice) ?>"<?php if ($form->isChoiceSelected($nestedChoice)): ?> selected="selected"<?php endif?>><?php echo $view->escape($nestedLabel) ?></option>
+                        <option value="<?php echo $view->escape($nestedChoice) ?>"<?php if ($view['form']->isChoiceSelected($form, $nestedChoice)): ?> selected="selected"<?php endif?>><?php echo $view->escape($nestedLabel) ?></option>
                     <?php endforeach ?>
                 </optgroup>
             <?php else: ?>
-                <option value="<?php echo $view->escape($choice) ?>"<?php if ($form->isChoiceSelected($choice)): ?> selected="selected"<?php endif?>><?php echo $view->escape($label) ?></option>
+                <option value="<?php echo $view->escape($choice) ?>"<?php if ($view['form']->isChoiceSelected($form, $choice)): ?> selected="selected"<?php endif?>><?php echo $view->escape($label) ?></option>
             <?php endif ?>
         <?php endforeach ?>
     </select>

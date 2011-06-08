@@ -26,19 +26,20 @@ $finder
     ->name('*.xml')
     ->name('*.xml.dist')
     ->name('*.yml')
-    ->in(__DIR__)
+    ->in(array(__DIR__.'/src', __DIR__.'/tests'))
     ->notName(basename(__FILE__))
     ->exclude('.git')
     ->exclude('vendor')
 ;
 
-$exit = 0;
+$count = 0;
+
 foreach ($finder as $file) {
 
     /* @var $file Symfony\Component\Finder\SplFileInfo */
 
     // These files are skipped because tests would break
-    if (in_array($file->getRelativePathname(), array(
+    foreach(array(
         'tests/Symfony/Tests/Component/ClassLoader/ClassCollectionLoaderTest.php',
         'tests/Symfony/Tests/Component/DependencyInjection/Fixtures/containers/container9.php',
         'tests/Symfony/Tests/Component/DependencyInjection/Fixtures/includes/foo.php',
@@ -47,8 +48,11 @@ foreach ($finder as $file) {
         'tests/Symfony/Tests/Component/Routing/Fixtures/dumper/url_matcher1.php',
         'tests/Symfony/Tests/Component/Routing/Fixtures/dumper/url_matcher2.php',
         'tests/Symfony/Tests/Component/Yaml/Fixtures/sfTests.yml',
-    ))) {
-        continue;
+    ) as $skippedFile) {
+
+        if ($skippedFile === substr($file->getRealPath(), strlen($skippedFile) * -1)) {
+            continue(2);
+        }
     }
 
     $old = file_get_contents($file->getRealpath());
@@ -90,13 +94,13 @@ foreach ($finder as $file) {
     }
 
     if ($new != $old) {
-        $exit = 1;
+        $count++;
+
         if ($fix) {
             file_put_contents($file->getRealpath(), $new);
         }
-
-        echo $file->getRelativePathname().PHP_EOL;
+        printf('%4d) %s'.PHP_EOL, $count, $file->getRelativePathname());
     }
 }
 
-exit($exit);
+exit($count ? 1 : 0);

@@ -14,6 +14,8 @@ require_once __DIR__.'/autoload.php.dist';
 
 use Symfony\Component\Finder\Finder;
 
+$fix = isset($argv[1]) && 'fix' == $argv[1];
+
 $finder = new Finder();
 $finder
     ->files()
@@ -24,14 +26,14 @@ $finder
     ->name('*.xml')
     ->name('*.xml.dist')
     ->name('*.yml')
-    ->in(__DIR__)
+    ->in(__DIR__.'/src', __DIR__.'/tests')
     ->notName(basename(__FILE__))
     ->exclude('.git')
     ->exclude('vendor')
 ;
 
-foreach ($finder as $file) { /* @var $file Symfony\Component\Finder\SplFileInfo */
-
+$exit = 0;
+foreach ($finder as $file) {
     // These files are skipped because tests would break
     if (in_array($file->getRelativePathname(), array(
         'tests/Symfony/Tests/Component/ClassLoader/ClassCollectionLoaderTest.php',
@@ -55,7 +57,7 @@ foreach ($finder as $file) { /* @var $file Symfony\Component\Finder\SplFileInfo 
 
     // [Structure] Indentation is done by steps of four spaces (tabs are never allowed);
     $new = preg_replace_callback('/^( *)(\t+)/m', function ($matches) use ($new) {
-        return $matches[1] . str_repeat('    ', strlen($matches[2]));
+        return $matches[1].str_repeat('    ', strlen($matches[2]));
     }, $new);
 
     // [Structure] Use the linefeed character (0x0A) to end lines;
@@ -68,7 +70,13 @@ foreach ($finder as $file) { /* @var $file Symfony\Component\Finder\SplFileInfo 
     $new = preg_replace('/([^    {|\n]$)(\n        return .+?$\n    \}$)/m', '$1'."\n".'$2', $new);
 
     if ($new != $old) {
-        file_put_contents($file->getRealpath(), $new);
-        echo $file->getRelativePathname() . PHP_EOL;
+        $exit = 1;
+        if ($fix) {
+            file_put_contents($file->getRealpath(), $new);
+        }
+
+        echo $file->getRelativePathname().PHP_EOL;
     }
 }
+
+exit($exit);

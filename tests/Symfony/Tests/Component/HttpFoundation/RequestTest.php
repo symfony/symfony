@@ -147,6 +147,15 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\HttpFoundation\Request::getFormat
+     */
+    public function testGetFormatFromMimeTypeWithParameters()
+    {
+        $request = new Request();
+        $this->assertEquals('json', $request->getFormat('application/json; charset=utf-8'));
+    }
+
+    /**
      * @covers Symfony\Component\HttpFoundation\Request::getMimeType
      * @dataProvider getFormatToMimeTypeMapProvider
      */

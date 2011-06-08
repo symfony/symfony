@@ -15,6 +15,7 @@ use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Util\FormUtil;
 
 /**
  *
@@ -36,6 +37,16 @@ class FormHelper extends Helper
     {
         $this->engine = $engine;
         $this->varStack = new \SplObjectStorage();
+    }
+
+    public function isChoiceGroup($label)
+    {
+        return FormUtil::isChoiceGroup($label);
+    }
+
+    public function isChoiceSelected(FormView $view, $choice)
+    {
+        return FormUtil::isChoiceSelected($choice, $view->get('value'));
     }
 
     /**

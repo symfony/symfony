@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Util\FormUtil;
-
 class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 {
     private $vars = array(
@@ -273,38 +271,6 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     public function getIterator()
     {
         return new \ArrayIterator($this->children);
-    }
-
-    /**
-     * Returns whether the given choice is a group.
-     *
-     * @param mixed $choice A choice
-     *
-     * @return Boolean Whether the choice is a group
-     */
-    public function isChoiceGroup($choice)
-    {
-        return is_array($choice) || $choice instanceof \Traversable;
-    }
-
-    /**
-     * Returns whether the given choice is selected.
-     *
-     * @param mixed $choice The choice
-     *
-     * @return Boolean Whether the choice is selected
-     */
-    public function isChoiceSelected($choice)
-    {
-        $choice = FormUtil::toArrayKey($choice);
-
-        // The value should already have been converted by value transformers,
-        // otherwise we had to do the conversion on every call of this method
-        if (is_array($this->vars['value'])) {
-            return false !== array_search($choice, $this->vars['value'], true);
-        }
-
-        return $choice === $this->vars['value'];
     }
 
     /**

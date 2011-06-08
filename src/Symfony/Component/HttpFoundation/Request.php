@@ -674,6 +674,10 @@ class Request
      */
     public function getFormat($mimeType)
     {
+        if (false !== $pos = strpos($mimeType, ';')) {
+            $mimeType = substr($mimeType, 0, $pos);
+        }
+
         if (null === static::$formats) {
             static::initializeFormats();
         }

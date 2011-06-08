@@ -138,6 +138,6 @@ EOF;
 
         $class = "$namespace\\$class";
 
-        return new $class($parent->getEnvironment(), $parent->getDebug());
+        return new $class($parent->getEnvironment(), $parent->isDebug());
     }
 }

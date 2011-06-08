@@ -436,6 +436,9 @@ class AcmeEntity
 * Form: Renamed view variable `name` to `full_name`. The variable `name` now
   contains the local, short name (equivalent to `$form->getName()`).
 
+* In cache:clear command, the --without-debug option became --with-debug.
+  Now you have to force the debug kernel if you really need it.
+
 PR12 to beta1
 -------------
 

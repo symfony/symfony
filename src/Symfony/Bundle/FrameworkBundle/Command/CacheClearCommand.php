@@ -34,7 +34,7 @@ class CacheClearCommand extends Command
             ->setName('cache:clear')
             ->setDefinition(array(
                 new InputOption('no-warmup', '', InputOption::VALUE_NONE, 'Do not warm up the cache'),
-                new InputOption('without-debug', '', InputOption::VALUE_NONE, 'If the cache is warmed up, whether to disable debugging or not'),
+                new InputOption('with-debug', '', InputOption::VALUE_NONE, 'If the cache is warmed up, whether to force debugging or not'),
             ))
             ->setDescription('Clear the cache')
             ->setHelp(<<<EOF
@@ -42,7 +42,7 @@ The <info>cache:clear</info> command clears the application cache for a given en
 and debug mode:
 
 <info>./app/console cache:clear --env=dev</info>
-<info>./app/console cache:clear --env=prod --without-debug</info>
+<info>./app/console cache:clear --env=prod --with-debug</info>
 EOF
             )
         ;
@@ -65,7 +65,7 @@ EOF
         } else {
             $warmupDir = $realCacheDir.'_new';
 
-            $this->warmup(!$input->getOption('without-debug'), $warmupDir);
+            $this->warmup($input->getOption('with-debug'), $warmupDir);
 
             rename($realCacheDir, $oldCacheDir);
             rename($warmupDir, $realCacheDir);
@@ -139,6 +139,6 @@ EOF;
 
         $class = "$namespace\\$class";
 
-        return new $class($parent->getEnvironment(), $debug);
+        return new $class($parent->getEnvironment(), $debug ? $debug : $parent->isDebug());
     }
 }

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineBundle\Logger;
+namespace Symfony\Bridge\Doctrine\Logger;
 
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Doctrine\DBAL\Logging\DebugStack;

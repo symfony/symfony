@@ -11,14 +11,10 @@
 
 namespace Symfony\Tests\Bridge\Doctrine\Form;
 
-use Symfony\Bundle\DoctrineBundle\Annotations\IndexedReader;
-
+use Symfony\Bridge\Doctrine\Annotations\IndexedReader;
 use Doctrine\Common\Annotations\AnnotationReader;
-
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-
 use Doctrine\ORM\EntityManager;
-use Symfony\Tests\Component\Form\Extension\Core\Type\TestCase;
 
 abstract class DoctrineOrmTestCase extends \PHPUnit_Framework_TestCase
 {

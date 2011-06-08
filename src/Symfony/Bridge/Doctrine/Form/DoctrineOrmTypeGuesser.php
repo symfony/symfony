@@ -34,15 +34,17 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
      */
     public function guessType($class, $property)
     {
-        if (!$metadata = $this->getMetadata($class)) {
+        if (!$ret = $this->getMetadata($class)) {
             return new TypeGuess('text', array(), Guess::LOW_CONFIDENCE);
         }
+
+        list($metadata, $name) = $ret;
 
         if ($metadata->hasAssociation($property)) {
             $multiple = $metadata->isCollectionValuedAssociation($property);
             $mapping = $metadata->getAssociationMapping($property);
 
-            return new TypeGuess('entity', array('em' => $this->em, 'class' => $mapping['targetEntity'], 'multiple' => $multiple), Guess::HIGH_CONFIDENCE);
+            return new TypeGuess('entity', array('em' => $name, 'class' => $mapping['targetEntity'], 'multiple' => $multiple), Guess::HIGH_CONFIDENCE);
         }
 
         switch ($metadata->getTypeOfField($property))
@@ -80,8 +82,9 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
      */
     public function guessRequired($class, $property)
     {
-        if ($metadata = $this->getMetadata($class) && $metadata->hasField($property)) {
-            if (!$metadata->isNullable($property)) {
+        $ret = $this->getMetadata($class);
+        if ($ret && $ret[0]->hasField($property)) {
+            if (!$ret[0]->isNullable($property)) {
                 return new ValueGuess(true, Guess::HIGH_CONFIDENCE);
             }
 
@@ -94,8 +97,9 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
      */
     public function guessMaxLength($class, $property)
     {
-        if ($metadata = $this->getMetadata($class) && !$metadata->hasAssociation($property)) {
-            $mapping = $metadata->getFieldMapping($property);
+        $ret = $this->getMetadata($class);
+        if ($ret && !$ret[0]->hasAssociation($property)) {
+            $mapping = $ret[0]->getFieldMapping($property);
 
             if (isset($mapping['length'])) {
                 return new ValueGuess($mapping['length'], Guess::HIGH_CONFIDENCE);
@@ -110,11 +114,6 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     {
     }
 
-    /**
-     * Returns whether Doctrine 2 metadata exists for that class
-     *
-     * @return Boolean
-     */
     protected function getMetadata($class)
     {
         if (array_key_exists($class, $this->cache)) {
@@ -122,9 +121,9 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
         }
 
         $this->cache[$class] = null;
-        foreach ($this->registry->getEntityManagers() as $em) {
+        foreach ($this->registry->getEntityManagers() as $name => $em) {
             if ($em->getConfiguration()->getMetadataDriverImpl()->isTransient($class)) {
-                return $this->cache[$class] = $em->getClassMetadata($class);
+                return $this->cache[$class] = array($em->getClassMetadata($class), $name);
             }
         }
     }

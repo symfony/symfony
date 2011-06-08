@@ -11,6 +11,7 @@ class ConstraintAValidator extends ConstraintValidator
     {
         if ('VALID' != $value) {
             $this->setMessage('message', array('param' => 'value'));
+
             return false;
         }
 

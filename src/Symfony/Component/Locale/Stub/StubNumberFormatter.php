@@ -303,6 +303,7 @@ class StubNumberFormatter
         // The original NumberFormatter does not support this format type
         if ($type == self::TYPE_CURRENCY) {
             trigger_error(__METHOD__ . '(): Unsupported format type ' . $type, \E_USER_WARNING);
+
             return false;
         }
 
@@ -439,6 +440,7 @@ class StubNumberFormatter
     {
         if ($type == self::TYPE_DEFAULT || $type == self::TYPE_CURRENCY) {
             trigger_error(__METHOD__ . '(): Unsupported format type ' . $type, \E_USER_WARNING);
+
             return false;
         }
 
@@ -593,6 +595,7 @@ class StubNumberFormatter
     private function getCurrencySymbol($currency)
     {
         $currencies = StubLocale::getCurrenciesData($this->locale);
+
         return $currencies[$currency]['symbol'];
     }
 
@@ -605,6 +608,7 @@ class StubNumberFormatter
     private function getCurrencyFractionDigits($currency)
     {
         $currencies = StubLocale::getCurrenciesData($this->locale);
+
         return $currencies[$currency]['fractionDigits'];
     }
 
@@ -617,6 +621,7 @@ class StubNumberFormatter
     private function getCurrencyRoundingIncrement($currency)
     {
         $currencies = StubLocale::getCurrenciesData($this->locale);
+
         return $currencies[$currency]['roundingIncrement'];
     }
 

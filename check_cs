@@ -26,16 +26,20 @@ $finder
     ->name('*.xml')
     ->name('*.xml.dist')
     ->name('*.yml')
-    ->in(__DIR__.'/src', __DIR__.'/tests')
+    ->in(array(__DIR__.'/src', __DIR__.'/tests'))
     ->notName(basename(__FILE__))
     ->exclude('.git')
     ->exclude('vendor')
 ;
 
-$exit = 0;
+$count = 0;
+
 foreach ($finder as $file) {
+
+    /* @var $file Symfony\Component\Finder\SplFileInfo */
+
     // These files are skipped because tests would break
-    if (in_array($file->getRelativePathname(), array(
+    foreach(array(
         'tests/Symfony/Tests/Component/ClassLoader/ClassCollectionLoaderTest.php',
         'tests/Symfony/Tests/Component/DependencyInjection/Fixtures/containers/container9.php',
         'tests/Symfony/Tests/Component/DependencyInjection/Fixtures/includes/foo.php',
@@ -44,8 +48,11 @@ foreach ($finder as $file) {
         'tests/Symfony/Tests/Component/Routing/Fixtures/dumper/url_matcher1.php',
         'tests/Symfony/Tests/Component/Routing/Fixtures/dumper/url_matcher2.php',
         'tests/Symfony/Tests/Component/Yaml/Fixtures/sfTests.yml',
-    ))) {
-        continue;
+    ) as $skippedFile) {
+
+        if ($skippedFile === substr($file->getRealPath(), strlen($skippedFile) * -1)) {
+            continue(2);
+        }
     }
 
     $old = file_get_contents($file->getRealpath());
@@ -68,11 +75,13 @@ foreach ($finder as $file) {
 
     // [Structure] Add a blank line before return statements
     $new = preg_replace_callback('/(^.*$)\n(^ +return)/m', function ($match) {
-        // don't add it if the previous line is
-        //  * {
-        //  * :
-        //  * already blank line
-        if (preg_match('#(\{ *$|^$|^ *//|\:)#', $match[1])) {
+        // don't add it if the previous line is ...
+        if (
+            preg_match('/\{$/m',   $match[1]) || // ... ending with an opening brace
+            preg_match('/\:$/m',   $match[1]) || // ... ending with a colon (e.g. a case statement)
+            preg_match('%^ *//%m', $match[1]) || // ... an inline comment
+            preg_match('/^$/m',    $match[1])    // ... already blank
+        ) {
             return $match[1]."\n".$match[2];
         }
 
@@ -80,18 +89,18 @@ foreach ($finder as $file) {
     }, $new);
 
     // [Structure] A file must always ends with a linefeed character
-    if (strlen($new) && "\n" != $new[strlen($new) - 1]) {
+    if (strlen($new) && "\n" != substr($new, -1)) {
         $new .= "\n";
     }
 
     if ($new != $old) {
-        $exit = 1;
+        $count++;
+
         if ($fix) {
             file_put_contents($file->getRealpath(), $new);
         }
-
-        echo $file->getRelativePathname().PHP_EOL;
+        printf('%4d) %s'.PHP_EOL, $count, $file->getRelativePathname());
     }
 }
 
-exit($exit);
+exit($count ? 1 : 0);

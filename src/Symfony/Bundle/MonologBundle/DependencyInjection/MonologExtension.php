@@ -63,6 +63,7 @@ class MonologExtension extends Extension
                 if ($a['priority'] == $b['priority']) {
                     return 0;
                 }
+
                 return $a['priority'] < $b['priority'] ? -1 : 1;
             });
             foreach ($handlers as $handler) {
@@ -110,6 +111,7 @@ class MonologExtension extends Extension
         switch ($handler['type']) {
         case 'service':
             $container->setAlias($handlerId, $handler['id']);
+
             return $handlerId;
 
         case 'stream':

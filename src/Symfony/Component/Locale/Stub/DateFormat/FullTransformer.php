@@ -111,6 +111,7 @@ class FullTransformer
 
         if (isset($this->transformers[$dateChars[0]])) {
             $transformer = $this->transformers[$dateChars[0]];
+
             return $transformer->format($dateTime, $length);
         } else {
             // handle unimplemented characters
@@ -178,6 +179,7 @@ class FullTransformer
             if (isset($transformers[$transformerIndex])) {
                 $transformer = $transformers[$transformerIndex];
                 $captureName = str_repeat($transformerIndex, $length);
+
                 return "(?P<$captureName>" . $transformer->getReverseMatchingRegExp($length) . ')';
             }
         }, $escapedPattern);
@@ -207,6 +209,7 @@ class FullTransformer
         if (preg_match("/^'+$/", $quoteMatch)) {
             return str_replace("''", "'", $quoteMatch);
         }
+
         return str_replace("''", "'", substr($quoteMatch, 1, -1));
     }
 

@@ -194,6 +194,7 @@ class ParameterBag implements ParameterBagInterface
         }
 
         $self = $this;
+
         return preg_replace_callback('/(?<!%)%([^%]+)%/', function ($match) use ($self, $resolving) {
             $key = strtolower($match[1]);
             if (isset($resolving[$key])) {

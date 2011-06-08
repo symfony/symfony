@@ -134,6 +134,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
                 return true;
             }
         }
+
         return false;
     }
 

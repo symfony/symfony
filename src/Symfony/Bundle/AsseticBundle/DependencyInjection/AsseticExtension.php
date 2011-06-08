@@ -133,6 +133,7 @@ class AsseticExtension extends Extension
     {
         $processor = new Processor();
         $configuration = new Configuration($debug, $bundles);
+
         return $processor->processConfiguration($configuration, $configs);
     }
 

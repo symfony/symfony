@@ -333,7 +333,7 @@ class Request
 
     /**
      * Gets the Session.
-     * 
+     *
      * @return Session|null The session
      */
     public function getSession()
@@ -365,7 +365,7 @@ class Request
 
     /**
      * Sets the Session.
-     * 
+     *
      * @param Session $session The Session
      */
     public function setSession(Session $session)
@@ -466,7 +466,7 @@ class Request
 
     /**
      * Gets the request's scheme.
-     * 
+     *
      * @return string
      */
     public function getScheme()
@@ -476,7 +476,7 @@ class Request
 
     /**
      * Returns the port on which the request is made.
-     * 
+     *
      * @return string
      */
     public function getPort()
@@ -505,7 +505,7 @@ class Request
 
     /**
      * Returns the requested URI.
-     * 
+     *
      * @return string
      */
     public function getRequestUri()
@@ -580,7 +580,7 @@ class Request
 
     /**
      * Checks whether the request is secure or not.
-     * 
+     *
      * @return Boolean
      */
     public function isSecure()
@@ -621,7 +621,7 @@ class Request
 
     /**
      * Sets the request method.
-     * 
+     *
      * @param string $method
      */
     public function setMethod($method)
@@ -735,7 +735,7 @@ class Request
 
     /**
      * Checks whether the method is safe or not.
-     * 
+     *
      * @return Boolean
      */
     public function isMethodSafe()
@@ -771,7 +771,7 @@ class Request
 
     /**
      * Gets the Etags.
-     * 
+     *
      * @return array The entity tags
      */
     public function getETags()

@@ -53,6 +53,7 @@ class InitAclCommand extends Command
         foreach ($tables as $table) {
             if (in_array($table, $tableNames, true)) {
                 $output->writeln(sprintf('The table "%s" already exists. Aborting.', $table));
+
                 return;
             }
         }

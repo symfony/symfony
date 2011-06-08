@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Csrf\Type;
 
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
@@ -35,18 +36,35 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilder $builder, array $options)
     {
-        if ($options['csrf_protection']) {
+        if (!$options['csrf_protection']) {
+            return;
+        }
+
+        $listener = function(DataEvent $event) use ($options, $builder)
+        {
+            $form = $event->getForm();
+
+            if (!$form->isRoot()) {
+                return;
+            }
+
             $csrfOptions = array('intention' => $options['intention']);
 
             if ($options['csrf_provider']) {
                 $csrfOptions['csrf_provider'] = $options['csrf_provider'];
             }
 
-            $builder
-                ->add($options['csrf_field_name'], 'csrf', $csrfOptions)
-                ->setAttribute('csrf_field_name', $options['csrf_field_name'])
-            ;
-        }
+            $form->add(
+                $builder
+                    ->create($options['csrf_field_name'], 'csrf', $csrfOptions)
+                    ->getForm()
+            );
+        };
+
+        $builder
+            ->addEventListener('form.pre_set_data', $listener, -10)
+            ->addEventListener('form.pre_bind', $listener, -10)
+        ;
     }
 
     /**

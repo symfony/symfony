@@ -80,7 +80,9 @@ foreach ($finder as $file) {
     }, $new);
 
     // [Structure] A file must always ends with a linefeed character
-// FIXME
+    if (strlen($new) && "\n" != $new[strlen($new) - 1]) {
+        $new .= "\n";
+    }
 
     if ($new != $old) {
         $exit = 1;

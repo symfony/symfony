@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\DoctrineBundle;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\ORMException;
@@ -21,7 +22,7 @@ use Doctrine\ORM\ORMException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Registry
+class Registry implements RegistryInterface
 {
     private $container;
     private $connections;
@@ -202,7 +203,6 @@ class Registry
     {
         return $this->entityManagers;
     }
-
 
     /**
      * Gets the EntityRepository for an entity.

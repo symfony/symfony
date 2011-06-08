@@ -49,12 +49,12 @@
 
         <service id="form.type_guesser.doctrine" class="%form.type_guesser.doctrine.class%">
             <tag name="form.type_guesser" />
-            <argument type="service" id="doctrine.orm.entity_manager" />
+            <argument type="service" id="doctrine" />
         </service>
 
         <service id="form.type.entity" class="Symfony\Bridge\Doctrine\Form\Type\EntityType">
             <tag name="form.type" alias="entity" />
-            <argument type="service" id="doctrine.orm.entity_manager" />
+            <argument type="service" id="doctrine" />
         </service>
 
         <service id="doctrine.orm.configuration" class="%doctrine.orm.configuration.class%" abstract="true" public="false" />

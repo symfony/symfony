@@ -9,6 +9,10 @@ timeline closely anyway.
 beta4 to beta5
 --------------
 
+* The `em` option of the Doctrine `EntityType` class now takes the entity
+  manager name instead of the EntityManager instance. If you don't pass this
+  option, the default Entity Manager will be used as before.
+
 * In the Console component: `Command::getFullname()` and
   `Command::getNamespace()` have been removed (`Command::getName()` behavior
   is now the same as the old `Command::getFullname()`).

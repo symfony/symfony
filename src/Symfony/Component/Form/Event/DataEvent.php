@@ -21,7 +21,7 @@ class DataEvent extends Event
 
     /**
      * Constructs an event.
-     * 
+     *
      * @param FormInterface $form The associated form
      * @param mixed         $data The data
      */
@@ -30,21 +30,21 @@ class DataEvent extends Event
         $this->form = $form;
         $this->data = $data;
     }
-    
+
     /**
      * Returns the form at the source of the event.
-     * 
+     *
      * @return FormInterface
      */
     public function getForm()
     {
         return $this->form;
     }
-    
+
     /**
      * Returns the data associated with this event.
-     * 
-     * @return type 
+     *
+     * @return type
      */
     public function getData()
     {

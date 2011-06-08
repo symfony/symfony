@@ -45,6 +45,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
         } else {
             $this->appendNode($this->dom, $data, $this->rootNodeName);
         }
+
         return $this->dom->saveXML();
     }
 
@@ -63,8 +64,10 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
                 $data['@'.$attrkey] = (string) $attr;
             }
             $data['#'] = (string) $xml;
+
             return $data;
         }
+
         return $this->parseXml($xml);
     }
 
@@ -97,6 +100,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
             $frag = $this->dom->createDocumentFragment();
             $frag->appendXML($val);
             $node->appendChild($frag);
+
             return true;
         }
 
@@ -138,6 +142,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
     {
         if ($fragment instanceof \DOMDocumentFragment) {
             $node->appendChild($fragment);
+
             return true;
         }
 
@@ -201,6 +206,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
                 $data[$key] = $value;
             }
         }
+
         return $data;
     }
 
@@ -244,6 +250,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
                     $append = $this->appendNode($parentNode, $data, $key);
                 }
             }
+
             return $append;
         }
         if (is_object($data)) {
@@ -255,8 +262,10 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
             if (!$parentNode->parentNode->parentNode) {
                 $root = $parentNode->parentNode;
                 $root->removeChild($parentNode);
+
                 return $this->appendNode($root, $data, $this->rootNodeName);
             }
+
             return $this->appendNode($parentNode, $data, 'data');
         }
         throw new \UnexpectedValueException('An unexpected value could not be serialized: '.var_export($data, true));
@@ -282,6 +291,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
         if ($appendNode) {
             $parentNode->appendChild($node);
         }
+
         return $appendNode;
     }
 

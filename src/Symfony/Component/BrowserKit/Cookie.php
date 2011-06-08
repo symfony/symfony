@@ -132,7 +132,7 @@ class Cookie
                 throw new \InvalidArgumentException(sprintf('The URL "%s" is not valid.', $url));
             }
             $parts = array_merge($urlParts, $parts);
-            
+
             $values['domain'] = $parts['host'];
             $values['path'] = substr($parts['path'], 0, strrpos($parts['path'], '/'));
         }

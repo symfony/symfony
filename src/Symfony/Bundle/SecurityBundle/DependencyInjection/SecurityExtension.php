@@ -123,6 +123,7 @@ class SecurityExtension extends Extension
         // custom ACL provider
         if (isset($config['provider'])) {
             $container->setAlias('security.acl.provider', $config['provider']);
+
             return;
         }
 

@@ -47,6 +47,7 @@ class Serializer implements SerializerInterface
         if (!$this->encoders[$format] instanceof NormalizationAwareInterface) {
             $data = $this->normalize($data);
         }
+
         return $this->encode($data, $format);
     }
 
@@ -70,6 +71,7 @@ class Serializer implements SerializerInterface
             foreach ($data as $key => $val) {
                 $normalized[$key] = $this->normalize($val, $format);
             }
+
             return $normalized;
         }
         if (is_object($data)) {
@@ -79,6 +81,7 @@ class Serializer implements SerializerInterface
             foreach ($data as $key => $val) {
                 $data[$key] = $this->normalize($val, $format);
             }
+
             return $data;
         }
         throw new \UnexpectedValueException('An unexpected value could not be normalized: '.var_export($data, true));
@@ -100,6 +103,7 @@ class Serializer implements SerializerInterface
         if (!isset($this->encoders[$format])) {
             throw new \UnexpectedValueException('No encoder registered for the '.$format.' format');
         }
+
         return $this->encoders[$format]->encode($data, $format);
     }
 
@@ -111,6 +115,7 @@ class Serializer implements SerializerInterface
         if (!isset($this->decoders[$format])) {
             throw new \UnexpectedValueException('No decoder registered for the '.$format.' format');
         }
+
         return $this->decoders[$format]->decode($data, $format);
     }
 
@@ -133,6 +138,7 @@ class Serializer implements SerializerInterface
         foreach ($this->normalizers as $normalizer) {
             if ($normalizer->supportsNormalization($object, $class, $format)) {
                 $this->normalizerCache[$class][$format] = $normalizer;
+
                 return $normalizer->normalize($object, $format);
             }
         }
@@ -158,6 +164,7 @@ class Serializer implements SerializerInterface
         foreach ($this->normalizers as $normalizer) {
             if ($normalizer->supportsDenormalization($data, $class, $format)) {
                 $this->denormalizerCache[$class][$format] = $normalizer;
+
                 return $normalizer->denormalize($data, $class, $format);
             }
         }

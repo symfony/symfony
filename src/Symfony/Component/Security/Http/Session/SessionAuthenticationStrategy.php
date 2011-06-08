@@ -48,10 +48,12 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
 
             case self::MIGRATE:
                 $request->getSession()->migrate();
+
                 return;
 
             case self::INVALIDATE:
                 $request->getSession()->invalidate();
+
                 return;
 
             default:

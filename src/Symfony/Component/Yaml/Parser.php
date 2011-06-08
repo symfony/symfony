@@ -340,6 +340,7 @@ class Parser
             if (!array_key_exists($value, $this->refs)) {
                 throw new ParserException(sprintf('Reference "%s" does not exist (%s).', $value, $this->currentLine));
             }
+
             return $this->refs[$value];
         }
 
@@ -483,6 +484,7 @@ class Parser
     {
         //checking explicitly the first char of the trim is faster than loops or strpos
         $ltrimmedLine = ltrim($this->currentLine, ' ');
+
         return $ltrimmedLine[0] === '#';
     }
 

@@ -168,6 +168,7 @@ abstract class AbstractDoctrineExtension extends Extension
         if (!$bundleConfig['prefix']) {
             $bundleConfig['prefix'] = $bundle->getNamespaceName().'\\'.$this->getMappingObjectDefaultName();
         }
+
         return $bundleConfig;
     }
 

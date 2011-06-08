@@ -203,7 +203,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
                 $this->logger->debug(sprintf('Forwarding to %s', $path));
             }
 
-            $subRequest = Request::create($path);
+            $subRequest = Request::create($path, 'get', array(), $request->cookies->all(), array(), $request->server->all());
             $subRequest->attributes->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed);
 
             return $event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST);

@@ -121,8 +121,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('Doctrine\Common\Cache\XcacheCache', $container->getParameter('doctrine.orm.cache.xcache.class'));
         $this->assertEquals('Doctrine\ORM\Mapping\Driver\DriverChain', $container->getParameter('doctrine.orm.metadata.driver_chain.class'));
         $this->assertEquals('Doctrine\ORM\Mapping\Driver\AnnotationDriver', $container->getParameter('doctrine.orm.metadata.annotation.class'));
-        $this->assertEquals('Symfony\Bundle\DoctrineBundle\Mapping\Driver\XmlDriver', $container->getParameter('doctrine.orm.metadata.xml.class'));
-        $this->assertEquals('Symfony\Bundle\DoctrineBundle\Mapping\Driver\YamlDriver', $container->getParameter('doctrine.orm.metadata.yml.class'));
+        $this->assertEquals('Symfony\Bridge\Doctrine\Mapping\Driver\XmlDriver', $container->getParameter('doctrine.orm.metadata.xml.class'));
+        $this->assertEquals('Symfony\Bridge\Doctrine\Mapping\Driver\YamlDriver', $container->getParameter('doctrine.orm.metadata.yml.class'));
 
         $config = array(
             'proxy_namespace' => 'MyProxies',

@@ -9,20 +9,20 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfony\Bundle\DoctrineBundle\Tests\Mapping\Driver;
+namespace Symfony\Tests\Bridge\Doctrine\Mapping\Driver;
 
-use Symfony\Bundle\DoctrineBundle\Mapping\Driver\XmlDriver;
+use Symfony\Bridge\Doctrine\Mapping\Driver\YamlDriver;
 
-class XmlDriverTest extends AbstractDriverTest
+class YamlDriverTest extends AbstractDriverTest
 {
     protected function getFileExtension()
     {
-        return '.orm.xml';
+        return '.orm.yml';
     }
 
     protected function getDriver(array $paths = array())
     {
-        $driver = new XmlDriver(array_values($paths));
+        $driver = new YamlDriver(array_values($paths));
         $driver->setNamespacePrefixes(array_flip($paths));
 
         return $driver;

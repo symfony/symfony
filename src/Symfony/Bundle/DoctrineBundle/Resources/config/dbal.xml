@@ -7,9 +7,9 @@
     <parameters>
         <parameter key="doctrine.dbal.connection.class">Doctrine\DBAL\Connection</parameter>
         <parameter key="doctrine.dbal.logger.debug.class">Doctrine\DBAL\Logging\DebugStack</parameter>
-        <parameter key="doctrine.dbal.logger.class">Symfony\Bundle\DoctrineBundle\Logger\DbalLogger</parameter>
+        <parameter key="doctrine.dbal.logger.class">Symfony\Bridge\Doctrine\Logger\DbalLogger</parameter>
         <parameter key="doctrine.dbal.configuration.class">Doctrine\DBAL\Configuration</parameter>
-        <parameter key="doctrine.data_collector.class">Symfony\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector</parameter>
+        <parameter key="doctrine.data_collector.class">Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector</parameter>
         <parameter key="doctrine.dbal.connection.event_manager.class">Doctrine\Common\EventManager</parameter>
         <parameter key="doctrine.dbal.connection_factory.class">Symfony\Bundle\DoctrineBundle\ConnectionFactory</parameter>
         <parameter key="doctrine.dbal.events.mysql_session_init.class">Doctrine\DBAL\Event\Listeners\MysqlSessionInit</parameter>

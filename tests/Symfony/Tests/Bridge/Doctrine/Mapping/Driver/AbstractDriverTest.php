@@ -9,57 +9,57 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfony\Bundle\DoctrineBundle\Tests\Mapping\Driver;
+namespace Symfony\Tests\Bridge\Doctrine\Mapping\Driver;
 
 abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
 {
     public function testFindMappingFile()
     {
         $driver = $this->getDriver(array(
-            'MyNamespace\MyBundle\EntityFoo' => 'foo',
-            'MyNamespace\MyBundle\Entity' => $this->dir,
+            'MyNamespace\MySubnamespace\EntityFoo' => 'foo',
+            'MyNamespace\MySubnamespace\Entity' => $this->dir,
         ));
 
         touch($filename = $this->dir.'/Foo'.$this->getFileExtension());
-        $this->assertEquals($filename, $this->invoke($driver, '_findMappingFile', array('MyNamespace\MyBundle\Entity\Foo')));
+        $this->assertEquals($filename, $this->invoke($driver, '_findMappingFile', array('MyNamespace\MySubnamespace\Entity\Foo')));
     }
 
     public function testFindMappingFileInSubnamespace()
     {
         $driver = $this->getDriver(array(
-            'MyNamespace\MyBundle\Entity' => $this->dir,
+            'MyNamespace\MySubnamespace\Entity' => $this->dir,
         ));
 
         touch($filename = $this->dir.'/Foo.Bar'.$this->getFileExtension());
-        $this->assertEquals($filename, $this->invoke($driver, '_findMappingFile', array('MyNamespace\MyBundle\Entity\Foo\Bar')));
+        $this->assertEquals($filename, $this->invoke($driver, '_findMappingFile', array('MyNamespace\MySubnamespace\Entity\Foo\Bar')));
     }
 
     public function testFindMappingFileNamespacedFoundFileNotFound()
     {
         $this->setExpectedException(
             'Doctrine\ORM\Mapping\MappingException',
-            "No mapping file found named '".$this->dir."/Foo".$this->getFileExtension()."' for class 'MyNamespace\MyBundle\Entity\Foo'."
+            "No mapping file found named '".$this->dir."/Foo".$this->getFileExtension()."' for class 'MyNamespace\MySubnamespace\Entity\Foo'."
         );
 
         $driver = $this->getDriver(array(
-            'MyNamespace\MyBundle\Entity' => $this->dir,
+            'MyNamespace\MySubnamespace\Entity' => $this->dir,
         ));
 
-        $this->invoke($driver, '_findMappingFile', array('MyNamespace\MyBundle\Entity\Foo'));
+        $this->invoke($driver, '_findMappingFile', array('MyNamespace\MySubnamespace\Entity\Foo'));
     }
 
     public function testFindMappingNamespaceNotFound()
     {
         $this->setExpectedException(
             'Doctrine\ORM\Mapping\MappingException',
-            "No mapping file found named 'Foo".$this->getFileExtension()."' for class 'MyOtherNamespace\MyBundle\Entity\Foo'."
+            "No mapping file found named 'Foo".$this->getFileExtension()."' for class 'MyOtherNamespace\MySubnamespace\Entity\Foo'."
         );
 
         $driver = $this->getDriver(array(
-            'MyNamespace\MyBundle\Entity' => $this->dir,
+            'MyNamespace\MySubnamespace\Entity' => $this->dir,
         ));
 
-        $this->invoke($driver, '_findMappingFile', array('MyOtherNamespace\MyBundle\Entity\Foo'));
+        $this->invoke($driver, '_findMappingFile', array('MyOtherNamespace\MySubnamespace\Entity\Foo'));
     }
 
     protected function setUp()

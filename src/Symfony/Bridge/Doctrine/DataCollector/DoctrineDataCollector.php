@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineBundle\DataCollector;
+namespace Symfony\Bridge\Doctrine\DataCollector;
 
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\DoctrineBundle\Logger\DbalLogger;
+use Symfony\Bridge\Doctrine\Logger\DbalLogger;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineBundle\CacheWarmer;
+namespace Symfony\Bridge\Doctrine\CacheWarmer;
 
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;

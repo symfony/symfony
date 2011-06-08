@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfony\Bundle\DoctrineBundle\Annotations;
+namespace Symfony\Bridge\Doctrine\Annotations;
 
 use Doctrine\Common\Annotations\Reader;
 

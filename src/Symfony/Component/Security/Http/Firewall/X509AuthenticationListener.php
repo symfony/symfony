@@ -28,7 +28,7 @@ class X509AuthenticationListener extends AbstractPreAuthenticatedListener
     private $userKey;
     private $credentialKey;
 
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, $userKey = 'SSL_CLIENT_S_DN_Email', $credentialKey = 'SSL_CLIENT_S_DN', LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, $userKey = 'HTTP_SSL_CLIENT_S_DN_EMAIL', $credentialKey = 'HTTP_SSL_CLIENT_S_DN', LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         parent::__construct($securityContext, $authenticationManager, $providerKey, $logger, $dispatcher);
 

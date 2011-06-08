@@ -59,8 +59,8 @@ class X509Factory implements SecurityFactoryInterface
         $node
             ->children()
                 ->scalarNode('provider')->end()
-                ->scalarNode('user')->defaultValue('SSL_CLIENT_S_DN_Email')->end()
-                ->scalarNode('credentials')->defaultValue('SSL_CLIENT_S_DN')->end()
+                ->scalarNode('user')->defaultValue('HTTP_SSL_CLIENT_S_DN_EMAIL')->end()
+                ->scalarNode('credentials')->defaultValue('HTTP_SSL_CLIENT_S_DN')->end()
             ->end()
         ;
     }

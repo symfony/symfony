@@ -122,7 +122,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 
         $this->cache[$class] = null;
         foreach ($this->registry->getEntityManagers() as $name => $em) {
-            if ($em->getConfiguration()->getMetadataDriverImpl()->isTransient($class)) {
+            if (!$em->getConfiguration()->getMetadataDriverImpl()->isTransient($class)) {
                 return $this->cache[$class] = array($em->getClassMetadata($class), $name);
             }
         }

@@ -28,6 +28,13 @@ class ServerBag extends ParameterBag
             }
         }
 
+        // CONTENT_TYPE and CONTENT_LENGTH are not prefixed with HTTP_
+        foreach (array('CONTENT_TYPE', 'CONTENT_LENGTH') as $key) {
+            if (isset($this->parameters[$key])) {
+                $headers[$key] = $this->parameters[$key];
+            }
+        }
+
         return $headers;
     }
 }

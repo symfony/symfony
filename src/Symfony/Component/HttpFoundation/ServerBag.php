@@ -23,15 +23,13 @@ class ServerBag extends ParameterBag
     {
         $headers = array();
         foreach ($this->parameters as $key => $value) {
-            if ('HTTP_' === substr($key, 0, 5)) {
+            if (0 === strpos($key, 'HTTP_')) {
                 $headers[substr($key, 5)] = $value;
             }
-        }
 
-        // CONTENT_TYPE and CONTENT_LENGTH are not prefixed with HTTP_
-        foreach (array('CONTENT_TYPE', 'CONTENT_LENGTH') as $key) {
-            if (isset($this->parameters[$key])) {
-                $headers[$key] = $this->parameters[$key];
+            // CONTENT_* are not prefixed with HTTP_
+            if (in_array($key, array('CONTENT_TYPE', 'CONTENT_LENGTH', 'CONTENT_MD5'))) {
+                $headers[$key] = $value;
             }
         }
 

@@ -52,22 +52,35 @@ foreach ($finder as $file) {
 
     $new = $old;
 
-    // [Structure] Never use short tags (<?);
+    // [Structure] Never use short tags (<?)
     $new = str_replace('<? ', '<?php ', $new);
 
-    // [Structure] Indentation is done by steps of four spaces (tabs are never allowed);
+    // [Structure] Indentation is done by steps of four spaces (tabs are never allowed)
     $new = preg_replace_callback('/^( *)(\t+)/m', function ($matches) use ($new) {
         return $matches[1].str_repeat('    ', strlen($matches[2]));
     }, $new);
 
-    // [Structure] Use the linefeed character (0x0A) to end lines;
+    // [Structure] Use the linefeed character (0x0A) to end lines
     $new = str_replace("\r\n", "\n", $new);
 
-    // [Structure] Don't add trailing spaces at the end of lines;
+    // [Structure] Don't add trailing spaces at the end of lines
     $new = preg_replace('/[ \t]*$/m', '', $new);
 
-    // [Structure] Add a blank line before return statements;
-    $new = preg_replace('/([^    {|\n]$)(\n        return .+?$\n    \}$)/m', '$1'."\n".'$2', $new);
+    // [Structure] Add a blank line before return statements
+    $new = preg_replace_callback('/(^.*$)\n(^ +return)/m', function ($match) {
+        // don't add it if the previous line is
+        //  * {
+        //  * :
+        //  * already blank line
+        if (preg_match('#(\{ *$|^$|^ *//|\:)#', $match[1])) {
+            return $match[1]."\n".$match[2];
+        }
+
+        return $match[1]."\n\n".$match[2];
+    }, $new);
+
+    // [Structure] A file must always ends with a linefeed character
+// FIXME
 
     if ($new != $old) {
         $exit = 1;

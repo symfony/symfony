@@ -115,7 +115,7 @@ class ExceptionListener
                             return;
                         }
 
-                        $subRequest = Request::create($this->errorPage);
+                        $subRequest = Request::create($this->errorPage, 'get', array(), $request->cookies->all(), array(), $request->server->all());
                         $subRequest->attributes->set(SecurityContextInterface::ACCESS_DENIED_ERROR, $exception);
 
                         $response = $event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);

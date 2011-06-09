@@ -151,6 +151,8 @@ class MetadataFactory
                 return new ClassMetadataCollection(array($metadata));
             }
         }
+
+        return new ClassMetadataCollection(array());
     }
 
     private function getAllMetadata()

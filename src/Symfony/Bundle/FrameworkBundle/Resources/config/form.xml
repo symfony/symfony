@@ -8,8 +8,6 @@
         <parameter key="form.extension.class">Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension</parameter>
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
         <parameter key="form.type_guesser.validator.class">Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser</parameter>
-        <parameter key="file.temporary_storage.class">Symfony\Component\HttpFoundation\File\TemporaryStorage</parameter>
-        <parameter key="file.temporary_storage.session.class">Symfony\Component\HttpFoundation\File\SessionBasedTemporaryStorage</parameter>
     </parameters>
 
     <services>
@@ -51,18 +49,6 @@
             <argument type="service" id="validator.mapping.class_metadata_factory" />
         </service>
 
-        <!-- TemporaryStorage - where should we put this? -->
-        <service id="file.temporary_storage.session" class="%file.temporary_storage.session.class%">
-            <argument type="service" id="session" />
-            <argument>%kernel.secret%</argument>
-            <argument>%kernel.cache_dir%/upload</argument>
-        </service>
-
-        <service id="file.temporary_storage" class="%file.temporary_storage.class%">
-            <argument>%kernel.secret%</argument>
-            <argument>%kernel.cache_dir%/upload</argument>
-        </service>
-
         <!-- CoreExtension -->
         <service id="form.type.field" class="Symfony\Component\Form\Extension\Core\Type\FieldType">
             <tag name="form.type" alias="field" />
@@ -97,7 +83,6 @@
         </service>
         <service id="form.type.file" class="Symfony\Component\Form\Extension\Core\Type\FileType">
             <tag name="form.type" alias="file" />
-            <argument type="service" id="file.temporary_storage" />
         </service>
         <service id="form.type.hidden" class="Symfony\Component\Form\Extension\Core\Type\HiddenType">
             <tag name="form.type" alias="hidden" />

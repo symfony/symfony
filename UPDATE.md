@@ -9,6 +9,8 @@ timeline closely anyway.
 beta4 to beta5
 --------------
 
+* The temporary storage for file uploads has been removed
+
 * The `Symfony\Component\HttpFoundation\File\File::getExtension()` and
   `guessExtension()` methods do not return the extension with a `.` anymore.
 

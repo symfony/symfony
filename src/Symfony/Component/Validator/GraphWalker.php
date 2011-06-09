@@ -144,7 +144,7 @@ class GraphWalker
                 foreach ($value as $key => $element) {
                     // Ignore any scalar values in the collection
                     if (is_object($element) || is_array($element)) {
-                        $this->walkReference($element, $group, $propertyPath.'['.$key.']', $traverse);
+                        $this->walkReference($element, $group, $propertyPath.'.'.$key.'', $traverse);
                     }
                 }
             }

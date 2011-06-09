@@ -62,10 +62,12 @@ class Serializer implements SerializerInterface
      */
     public final function serialize($data, $format)
     {
-        $encoder = $this->getEncoder($format);
-        if (!isset($encoder)) {
-            throw new UnexpectedValueException('No encoder registered for the '.$format.' format');
+        if (!$this->supportsSerialization($format)) {
+            throw new UnexpectedValueException('Serialization for the format '.$format.' is not supported');
         }
+
+        $encoder = $this->getEncoder($format);
+
         if (!$encoder instanceof NormalizationAwareInterface) {
             $data = $this->normalize($data);
         }
@@ -78,6 +80,10 @@ class Serializer implements SerializerInterface
      */
     public final function deserialize($data, $type, $format)
     {
+        if (!$this->supportsDeserialization($format)) {
+            throw new UnexpectedValueException('Deserialization for the format '.$format.' is not supported');
+        }
+
         $data = $this->decode($data, $format);
 
         return $this->denormalize($data, $type, $format);
@@ -193,7 +199,7 @@ class Serializer implements SerializerInterface
      */
     public function supportsSerialization($format)
     {
-        return isset($this->encoders[$format]);
+        return $this->supportsEncoding($format);
     }
 
     /**
@@ -201,7 +207,35 @@ class Serializer implements SerializerInterface
      */
     public function supportsDeserialization($format)
     {
-        return isset($this->encoders[$format]) && $this->encoders[$format] instanceof DecoderInterface;
+        return $this->supportsDecoding($format);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsEncoding($format)
+    {
+        try {
+            $encoder = $this->getEncoder($format);
+        } catch (\RuntimeException $e) {
+            return false;
+        }
+
+        return $encoder instanceof EncoderInterface;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsDecoding($format)
+    {
+        try {
+            $encoder = $this->getEncoder($format);
+        } catch (\RuntimeException $e) {
+            return false;
+        }
+
+        return $encoder instanceof DecoderInterface;
     }
 
     /**

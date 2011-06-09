@@ -62,10 +62,11 @@ class Serializer implements SerializerInterface
      */
     public final function serialize($data, $format)
     {
-        if (!isset($this->encoders[$format])) {
+        $encoder = $this->getEncoder($format);
+        if (!isset($encoder)) {
             throw new UnexpectedValueException('No encoder registered for the '.$format.' format');
         }
-        if (!$this->encoders[$format] instanceof NormalizationAwareInterface) {
+        if (!$encoder instanceof NormalizationAwareInterface) {
             $data = $this->normalize($data);
         }
 

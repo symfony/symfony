@@ -249,8 +249,9 @@ class FormExtension extends \Twig_Extension
     /**
      * Returns the templates used by the view.
      *
-     * templates are looked for in the following resources:
+     * Templates are looked for in the resources in the following order:
      *   * resources from the themes (and its parents)
+     *   * resources from the themes of parent views (up to the root view)
      *   * default resources
      *
      * @param FormView $view The view
@@ -260,29 +261,25 @@ class FormExtension extends \Twig_Extension
     protected function getTemplates(FormView $view)
     {
         if (!$this->templates->contains($view)) {
-            // defaults
-            $all = $this->resources;
-
-            // themes
+            $resources = array();
             $parent = $view;
             do {
                 if (isset($this->themes[$parent])) {
-                    $all = array_merge($all, $this->themes[$parent]);
+                    $resources = array_merge($this->themes[$parent], $resources);
                 }
             } while ($parent = $parent->getParent());
 
+            $resources = array_merge($this->resources, $resources);
+
             $templates = array();
-            foreach ($all as $resource) {
+            foreach ($resources as $resource) {
                 if (!$resource instanceof \Twig_Template) {
                     $resource = $this->environment->loadTemplate($resource);
                 }
 
-                $blocks = array();
                 foreach ($this->getBlockNames($resource) as $name) {
-                    $blocks[$name] = $resource;
+                    $templates[$name] = $resource;
                 }
-
-                $templates = array_replace($templates, $blocks);
             }
 
             $this->templates->attach($view, $templates);

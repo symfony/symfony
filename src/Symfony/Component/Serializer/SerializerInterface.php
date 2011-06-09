@@ -39,6 +39,7 @@ interface SerializerInterface
      * @param mixed $data
      * @param string $type
      * @param string $format
+     * @api
      */
     function deserialize($data, $type, $format);
 
@@ -58,8 +59,8 @@ interface SerializerInterface
      * @param mixed $data
      * @param string $type
      * @param string $format
-     *
      * @return mixed
+     * @api
      */
     function denormalize($data, $type, $format = null);
 
@@ -88,6 +89,7 @@ interface SerializerInterface
      *
      * @param string $format format name
      * @return Boolean
+     * @api
      */
     function supportsSerialization($format);
 
@@ -96,6 +98,7 @@ interface SerializerInterface
      *
      * @param string $format format name
      * @return Boolean
+     * @api
      */
     function supportsDeserialization($format);
 
@@ -104,6 +107,7 @@ interface SerializerInterface
      *
      * @param string $format format name
      * @return Boolean
+     * @api
      */
     function supportsEncoding($format);
 
@@ -112,11 +116,15 @@ interface SerializerInterface
      *
      * @param string $format format name
      * @return Boolean
+     * @api
      */
     function supportsDecoding($format);
 
     /**
+     * Get the encoder for the given format
+     * 
      * @return EncoderInterface
+     * @api
      */
     function getEncoder($format);
 }

@@ -110,11 +110,13 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function isRendered()
     {
-        if (true === $this->rendered || 0 == count($this->children)) {
+        $hasChildren = 0 < count($this->children);
+
+        if (true === $this->rendered || !$hasChildren) {
             return $this->rendered;
         }
 
-        if (count($this->children) > 0) {
+        if ($hasChildren) {
             foreach ($this->children as $child) {
                 if (!$child->isRendered()) {
                     return false;
@@ -122,9 +124,9 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
             }
 
             return $this->rendered = true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**

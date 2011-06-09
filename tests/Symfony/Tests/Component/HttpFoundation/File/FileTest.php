@@ -47,7 +47,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
     public function testGetExtensionReturnsExtensionWithDot()
     {
-        $this->assertEquals('.gif', $this->file->getExtension());
+        $this->assertEquals('gif', $this->file->getExtension());
     }
 
     public function testGetDirectoryReturnsDirectoryName()
@@ -78,7 +78,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
         MimeTypeGuesser::getInstance()->register($guesser);
 
-        $this->assertEquals('.gif', $file->guessExtension());
+        $this->assertEquals('gif', $file->guessExtension());
     }
 
     public function testConstructWhenFileNotExists()

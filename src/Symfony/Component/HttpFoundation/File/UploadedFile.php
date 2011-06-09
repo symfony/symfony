@@ -116,7 +116,7 @@ class UploadedFile extends File
         }
 
         if ($ext = pathinfo($this->getOriginalName(), PATHINFO_EXTENSION)) {
-            return '.'.$ext;
+            return $ext;
         }
 
         return '';

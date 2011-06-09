@@ -9,6 +9,9 @@ timeline closely anyway.
 beta4 to beta5
 --------------
 
+* The `Symfony\Component\HttpFoundation\File\File::getExtension()` and
+  `guessExtension()` methods do not return the extension with a `.` anymore.
+
 * The `em` option of the Doctrine `EntityType` class now takes the entity
   manager name instead of the EntityManager instance. If you don't pass this
   option, the default Entity Manager will be used as before.

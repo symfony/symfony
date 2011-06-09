@@ -484,21 +484,21 @@ class File
     }
 
     /**
-     * Returns the file extension (with dot).
+     * Returns the file extension.
      *
      * @return string
      */
     public function getExtension()
     {
         if ($ext = pathinfo($this->getName(), PATHINFO_EXTENSION)) {
-            return '.'.$ext;
+            return $ext;
         }
 
         return '';
     }
 
     /**
-     * Returns the extension based on the mime type (with dot).
+     * Returns the extension based on the mime type.
      *
      * If the mime type is unknown, returns null.
      *
@@ -509,7 +509,7 @@ class File
         $type = $this->getMimeType();
 
         if (isset(self::$defaultExtensions[$type])) {
-            return '.'.self::$defaultExtensions[$type];
+            return self::$defaultExtensions[$type];
         }
 
         return null;

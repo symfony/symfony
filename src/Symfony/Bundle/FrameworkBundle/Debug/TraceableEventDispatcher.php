@@ -26,7 +26,6 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
 {
     private $logger;
     private $called;
-    private $container;
 
     /**
      * Constructor.
@@ -38,7 +37,6 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     {
         parent::__construct($container);
 
-        $this->container = $container;
         $this->logger = $logger;
         $this->called = array();
     }

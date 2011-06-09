@@ -41,7 +41,7 @@ abstract class Loader implements LoaderInterface
     }
 
     /**
-     * Adds definitions and parameters from a resource.
+     * Imports a resource.
      *
      * @param mixed  $resource A Resource
      * @param string $type     The resource type

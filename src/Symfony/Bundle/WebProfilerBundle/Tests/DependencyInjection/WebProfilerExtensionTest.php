@@ -31,7 +31,7 @@ class WebProfilerExtensionTest extends TestCase
 {
     private $kernel;
     /**
-     * @var Symfony\Component\DependencyInjection\Container $container 
+     * @var Symfony\Component\DependencyInjection\Container $container
      */
     private $container;
 

@@ -115,19 +115,11 @@ class EntityChoiceList extends ArrayChoiceList
     /**
      * Initializes the choices and returns them
      *
-     * The choices are generated from the entities. If the entities have a
-     * composite identifier, the choices are indexed using ascending integers.
-     * Otherwise the identifiers are used as indices.
-     *
      * If the entities were passed in the "choices" option, this method
      * does not have any significant overhead. Otherwise, if a query builder
      * was passed in the "query_builder" option, this builder is now used
      * to construct a query which is executed. In the last case, all entities
      * for the underlying class are fetched from the repository.
-     *
-     * If the option "property" was passed, the property path in that option
-     * is used as option values. Otherwise this method tries to convert
-     * objects to strings using __toString().
      *
      * @return array  An array of choices
      */
@@ -146,7 +138,32 @@ class EntityChoiceList extends ArrayChoiceList
         $this->choices = array();
         $this->entities = array();
 
+        $this->loadEntities($entities);
+
+        return $this->choices;
+    }
+
+    /**
+     * Convert entities into choices with support for groups
+     *
+     * The choices are generated from the entities. If the entities have a
+     * composite identifier, the choices are indexed using ascending integers.
+     * Otherwise the identifiers are used as indices.
+     *
+     * If the option "property" was passed, the property path in that option
+     * is used as option values. Otherwise this method tries to convert
+     * objects to strings using __toString().
+     *
+     */
+    private function loadEntities($entities, $group = null)
+    {
         foreach ($entities as $key => $entity) {
+            if (is_array($entity)) {
+                // Entities are in named groups
+                $this->loadEntities($entity, $key);
+                continue;
+            }
+
             if ($this->propertyPath) {
                 // If the property option was given, use it
                 $value = $this->propertyPath->getValue($entity);
@@ -158,15 +175,22 @@ class EntityChoiceList extends ArrayChoiceList
             if (count($this->identifier) > 1) {
                 // When the identifier consists of multiple field, use
                 // naturally ordered keys to refer to the choices
-                $this->choices[$key] = $value;
-                $this->entities[$key] = $entity;
+                $id = $key;
             } else {
                 // When the identifier is a single field, index choices by
                 // entity ID for performance reasons
                 $id = current($this->getIdentifierValues($entity));
-                $this->choices[$id] = $value;
-                $this->entities[$id] = $entity;
             }
+
+            if (null === $group) {
+                // Flat list of choices
+                $this->choices[$id] = $value;
+            } else {
+                // Nested choices
+                $this->choices[$group][$id] = $value;
+            }
+
+            $this->entities[$id] = $entity;
         }
     }
 
@@ -197,7 +221,7 @@ class EntityChoiceList extends ArrayChoiceList
      * Returns the entity for the given key
      *
      * If the underlying entities have composite identifiers, the choices
-     * are intialized. The key is expected to be the index in the choices
+     * are initialized. The key is expected to be the index in the choices
      * array in this case.
      *
      * If they have single identifiers, they are either fetched from the
@@ -218,6 +242,7 @@ class EntityChoiceList extends ArrayChoiceList
             if (count($this->identifier) > 1) {
                 // $key is a collection index
                 $entities = $this->getEntities();
+
                 return isset($entities[$key]) ? $entities[$key] : null;
             } else if ($this->entities) {
                 return isset($this->entities[$key]) ? $this->entities[$key] : null;
@@ -240,7 +265,7 @@ class EntityChoiceList extends ArrayChoiceList
      * underlying class
      *
      * @param  string $property     The name of the property
-     * @return \ReflectionProperty  The reflection instsance
+     * @return \ReflectionProperty  The reflection instance
      */
     private function getReflProperty($property)
     {

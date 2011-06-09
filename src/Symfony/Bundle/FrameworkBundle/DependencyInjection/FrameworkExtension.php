@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -59,7 +60,6 @@ class FrameworkExtension extends Extension
         $configuration = new Configuration($container->getParameter('kernel.debug'));
         $config = $processor->processConfiguration($configuration, $configs);
 
-        $container->setParameter('kernel.cache_warmup', $config['cache_warmer']);
         if (isset($config['charset'])) {
             $container->setParameter('kernel.charset', $config['charset']);
         }
@@ -118,7 +118,7 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\EventDispatcher\\EventSubscriberInterface',
 
             'Symfony\\Component\\HttpKernel\\HttpKernel',
-            'Symfony\\Component\\HttpKernel\\ResponseListener',
+            'Symfony\\Component\\HttpKernel\\EventListener\\ResponseListener',
             'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver',
             'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface',
             'Symfony\\Component\\HttpKernel\\Event\\KernelEvent',
@@ -127,9 +127,9 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseEvent',
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseForControllerResultEvent',
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseForExceptionEvent',
-            'Symfony\\Component\\HttpKernel\\Events',
+            'Symfony\\Component\\HttpKernel\\CoreEvents',
 
-            'Symfony\\Bundle\\FrameworkBundle\\RequestListener',
+            'Symfony\\Bundle\\FrameworkBundle\\EventListener\\RouterListener',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameParser',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
@@ -241,17 +241,12 @@ class FrameworkExtension extends Extension
         $loader->load('routing.xml');
 
         $container->setParameter('router.resource', $config['resource']);
-        $router = $container->findDefinition('router.real');
+        $router = $container->findDefinition('router');
 
         if (isset($config['type'])) {
             $argument = $router->getArgument(2);
             $argument['resource_type'] = $config['type'];
             $router->replaceArgument(2, $argument);
-        }
-
-        if ($config['cache_warmer']) {
-            $container->getDefinition('router.cache_warmer')->addTag('kernel.cache_warmer');
-            $container->setAlias('router', 'router.cached');
         }
 
         $container->setParameter('request_listener.http_port', $config['http_port']);
@@ -296,6 +291,7 @@ class FrameworkExtension extends Extension
         $container->setParameter('session.storage.options', $options);
 
         $this->addClassesToCompile(array(
+            'Symfony\\Bundle\\FrameworkBundle\\EventListener\\SessionListener',
             'Symfony\\Component\\HttpFoundation\\SessionStorage\\SessionStorageInterface',
             $container->getDefinition('session')->getClass(),
         ));
@@ -331,17 +327,19 @@ class FrameworkExtension extends Extension
             $loader->load('templating_debug.xml');
         }
 
-        $packages = array();
+        // create package definitions and add them to the assets helper
+        $defaultPackage = $this->createPackageDefinition($container, $config['assets_base_urls']['http'], $config['assets_base_urls']['ssl'], $config['assets_version'], $config['assets_version_format']);
+        $container->setDefinition('templating.asset.default_package', $defaultPackage);
+        $namedPackages = array();
         foreach ($config['packages'] as $name => $package) {
-            $packages[$name] = new Definition('%templating.asset_package.class%', array(
-                $package['base_urls'],
-                $package['version'],
-            ));
+            $namedPackage = $this->createPackageDefinition($container, $package['base_urls']['http'], $package['base_urls']['ssl'], $package['version'], $package['version_format'], $name);
+            $container->setDefinition('templating.asset.package.'.$name, $namedPackage);
+            $namedPackages[$name] = new Reference('templating.asset.package.'.$name);
         }
-
-        $container->setParameter('templating.helper.assets.assets_base_urls', isset($config['assets_base_urls']) ? $config['assets_base_urls'] : array());
-        $container->setParameter('templating.helper.assets.assets_version', $config['assets_version']);
-        $container->getDefinition('templating.helper.assets')->replaceArgument(3, $packages);
+        $container->getDefinition('templating.helper.assets')->setArguments(array(
+            new Reference('templating.asset.default_package'),
+            $namedPackages,
+        ));
 
         if (!empty($config['loaders'])) {
             $loaders = array_map(function($loader) { return new Reference($loader); }, $config['loaders']);
@@ -363,16 +361,6 @@ class FrameworkExtension extends Extension
             $container->setParameter('templating.loader.cache.path', $config['cache']);
 
             $container->setDefinition('templating.loader', $loaderCache);
-        }
-
-        if ($config['cache_warmer']) {
-            $container
-                ->getDefinition('templating.cache_warmer.template_paths')
-                ->addTag('kernel.cache_warmer', array('priority' => 20))
-            ;
-            $container->setAlias('templating.locator', 'templating.locator.cached');
-        } else {
-            $container->setAlias('templating.locator', 'templating.locator.uncached');
         }
 
         $this->addClassesToCompile(array(
@@ -412,6 +400,73 @@ class FrameworkExtension extends Extension
     }
 
     /**
+     * Returns a definition for an asset package.
+     */
+    private function createPackageDefinition(ContainerBuilder $container, array $httpUrls, array $sslUrls, $version, $format, $name = null)
+    {
+        if (!$httpUrls) {
+            $package = new DefinitionDecorator('templating.asset.path_package');
+            $package
+                ->setPublic(false)
+                ->setScope('request')
+                ->replaceArgument(1, $version)
+                ->replaceArgument(2, $format)
+            ;
+
+            return $package;
+        }
+
+        if ($httpUrls == $sslUrls) {
+            $package = new DefinitionDecorator('templating.asset.url_package');
+            $package
+                ->setPublic(false)
+                ->replaceArgument(0, $sslUrls)
+                ->replaceArgument(1, $version)
+                ->replaceArgument(2, $format)
+            ;
+
+            return $package;
+        }
+
+        $prefix = $name ? 'templating.asset.package.'.$name : 'templating.asset.default_package';
+
+        $httpPackage = new DefinitionDecorator('templating.asset.url_package');
+        $httpPackage
+            ->replaceArgument(0, $httpUrls)
+            ->replaceArgument(1, $version)
+            ->replaceArgument(2, $format)
+        ;
+        $container->setDefinition($prefix.'.http', $httpPackage);
+
+        if ($sslUrls) {
+            $sslPackage = new DefinitionDecorator('templating.asset.url_package');
+            $sslPackage
+                ->replaceArgument(0, $sslUrls)
+                ->replaceArgument(1, $version)
+                ->replaceArgument(2, $format)
+            ;
+        } else {
+            $sslPackage = new DefinitionDecorator('templating.asset.path_package');
+            $sslPackage
+                ->setScope('request')
+                ->replaceArgument(1, $version)
+                ->replaceArgument(2, $format)
+            ;
+        }
+        $container->setDefinition($prefix.'.ssl', $sslPackage);
+
+        $package = new DefinitionDecorator('templating.asset.request_aware_package');
+        $package
+            ->setPublic(false)
+            ->setScope('request')
+            ->replaceArgument(1, $prefix.'.http')
+            ->replaceArgument(2, $prefix.'.ssl')
+        ;
+
+        return $package;
+    }
+
+    /**
      * Loads the translator configuration.
      *
      * @param array            $config    A translator configuration array
@@ -421,7 +476,8 @@ class FrameworkExtension extends Extension
     {
         if (!empty($config['enabled'])) {
             // Use the "real" translator instead of the identity default
-            $container->setDefinition('translator', $translator = $container->findDefinition('translator.real'));
+            $container->setAlias('translator', 'translator.real');
+            $translator = $container->findDefinition('translator.real');
             $translator->addMethodCall('setFallbackLocale', array($config['fallback']));
 
             // Discover translation directories

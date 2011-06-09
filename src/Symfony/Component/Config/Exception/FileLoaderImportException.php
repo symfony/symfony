@@ -35,7 +35,7 @@ class FileLoaderImportException extends \Exception
         parent::__construct($message, $code, $previous);
     }
 
-    private function varToString($var)
+    protected function varToString($var)
     {
         if (is_object($var)) {
             return sprintf('[object](%s)', get_class($var));
@@ -58,6 +58,6 @@ class FileLoaderImportException extends \Exception
             return 'null';
         }
 
-        return str_replace("\n", '', var_export((string) $var, true));
+        return (string) $var;
     }
 }

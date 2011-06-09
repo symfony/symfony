@@ -729,19 +729,14 @@ class Response
         return 404 === $this->statusCode;
     }
 
-    public function isRedirect()
+    public function isRedirect($location = null)
     {
-        return in_array($this->statusCode, array(201, 301, 302, 303, 307));
+        return in_array($this->statusCode, array(201, 301, 302, 303, 307)) && (null === $location ?: $location == $this->headers->get('Location'));
     }
 
     public function isEmpty()
     {
         return in_array($this->statusCode, array(201, 204, 304));
-    }
-
-    public function isRedirected($location)
-    {
-        return $this->isRedirect() && $location == $this->headers->get('Location');
     }
 
     protected function fixContentType()

@@ -488,7 +488,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     {
         $template = $this->parser->parse($name);
 
-        $key = $template->getSignature();
+        $key = $template->getLogicalName();
         if (isset($this->cache[$key])) {
             return $this->cache[$key];
         }

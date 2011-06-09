@@ -33,7 +33,7 @@ class ResponseHeaderBag extends HeaderBag
             $this->set('cache-control', '');
         }
     }
-    
+
     /**
      * {@inheritdoc}
      */

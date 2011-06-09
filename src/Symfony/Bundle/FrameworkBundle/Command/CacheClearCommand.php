@@ -34,7 +34,6 @@ class CacheClearCommand extends Command
             ->setName('cache:clear')
             ->setDefinition(array(
                 new InputOption('no-warmup', '', InputOption::VALUE_NONE, 'Do not warm up the cache'),
-                new InputOption('without-debug', '', InputOption::VALUE_NONE, 'If the cache is warmed up, whether to disable debugging or not'),
             ))
             ->setDescription('Clear the cache')
             ->setHelp(<<<EOF
@@ -42,7 +41,7 @@ The <info>cache:clear</info> command clears the application cache for a given en
 and debug mode:
 
 <info>./app/console cache:clear --env=dev</info>
-<info>./app/console cache:clear --env=prod --without-debug</info>
+<info>./app/console cache:clear --env=prod --no-debug</info>
 EOF
             )
         ;
@@ -65,7 +64,7 @@ EOF
         } else {
             $warmupDir = $realCacheDir.'_new';
 
-            $this->warmup(!$input->getOption('without-debug'), $warmupDir);
+            $this->warmup($warmupDir);
 
             rename($realCacheDir, $oldCacheDir);
             rename($warmupDir, $realCacheDir);
@@ -74,11 +73,11 @@ EOF
         $this->container->get('filesystem')->remove($oldCacheDir);
     }
 
-    protected function warmup($debug, $warmupDir)
+    protected function warmup($warmupDir)
     {
         $this->container->get('filesystem')->remove($warmupDir);
 
-        $kernel = $this->getTempKernel($this->container->get('kernel'), $debug, $warmupDir);
+        $kernel = $this->getTempKernel($this->container->get('kernel'), $warmupDir);
         $kernel->boot();
 
         $warmer = $kernel->getContainer()->get('cache_warmer');
@@ -95,7 +94,7 @@ EOF
         }
     }
 
-    protected function getTempKernel(KernelInterface $parent, $debug, $warmupDir)
+    protected function getTempKernel(KernelInterface $parent, $warmupDir)
     {
         $parentClass = get_class($parent);
 
@@ -139,6 +138,6 @@ EOF;
 
         $class = "$namespace\\$class";
 
-        return new $class($parent->getEnvironment(), $debug);
+        return new $class($parent->getEnvironment(), $parent->isDebug());
     }
 }

@@ -20,7 +20,7 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class UserSecurityIdentity implements SecurityIdentityInterface
+final class UserSecurityIdentity implements SecurityIdentityInterface
 {
     private $username;
     private $class;
@@ -40,7 +40,7 @@ class UserSecurityIdentity implements SecurityIdentityInterface
             throw new \InvalidArgumentException('$class must not be empty.');
         }
 
-        $this->username = $username;
+        $this->username = (string) $username;
         $this->class = $class;
     }
 

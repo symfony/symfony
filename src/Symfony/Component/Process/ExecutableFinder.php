@@ -41,7 +41,7 @@ class ExecutableFinder
      */
     public function find($name, $default = null)
     {
-        $dirs = explode(PATH_SEPARATOR, getenv('PATH') ? getenv('PATH') : getenv('Path'));
+        $dirs = explode(PATH_SEPARATOR, ini_get('open_basedir') ? ini_get('open_basedir') : (getenv('PATH') ? getenv('PATH') : getenv('Path')));
         $suffixes = DIRECTORY_SEPARATOR == '\\' ? (getenv('PATHEXT') ? explode(PATH_SEPARATOR, getenv('PATHEXT')) : $this->suffixes) : array('');
         foreach ($suffixes as $suffix) {
             foreach ($dirs as $dir) {

@@ -39,9 +39,13 @@ class ExprBuilder
      *
      * @return ExprBuilder
      */
-    public function always()
+    public function always(\Closure $then = null)
     {
         $this->ifPart = function($v) { return true; };
+
+        if (null !== $then) {
+            $this->thenPart = $then;
+        }
 
         return $this;
     }

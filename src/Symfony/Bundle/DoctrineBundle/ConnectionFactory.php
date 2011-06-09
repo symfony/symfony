@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\DoctrineBundle;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
@@ -38,7 +37,7 @@ class ConnectionFactory
     /**
      * Create a connection by name.
      *
-     * @param string        $connectionName
+     * @param array         $params
      * @param Configuration $config
      * @param EventManager  $eventManager
      *

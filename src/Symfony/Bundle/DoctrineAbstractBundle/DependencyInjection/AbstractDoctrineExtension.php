@@ -168,6 +168,7 @@ abstract class AbstractDoctrineExtension extends Extension
         if (!$bundleConfig['prefix']) {
             $bundleConfig['prefix'] = $bundle->getNamespaceName().'\\'.$this->getMappingObjectDefaultName();
         }
+
         return $bundleConfig;
     }
 
@@ -193,9 +194,9 @@ abstract class AbstractDoctrineExtension extends Extension
                 $mappingDriverDef = $container->getDefinition($mappingService);
                 $args = $mappingDriverDef->getArguments();
                 if ($driverType == 'annotation') {
-                    $args[1] = array_merge($driverPaths, $args[1]);
+                    $args[1] = array_merge(array_values($driverPaths), $args[1]);
                 } else {
-                    $args[0] = array_merge($driverPaths, $args[0]);
+                    $args[0] = array_merge(array_values($driverPaths), $args[0]);
                 }
                 $mappingDriverDef->setArguments($args);
             } else if ($driverType == 'annotation') {
@@ -205,10 +206,14 @@ abstract class AbstractDoctrineExtension extends Extension
                 ));
             } else {
                 $mappingDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.'.$driverType.'.class%'), array(
-                    $driverPaths
+                    array_values($driverPaths)
                 ));
             }
             $mappingDriverDef->setPublic(false);
+            if (false !== strpos($mappingDriverDef->getClass(), 'yml') || false !== strpos($mappingDriverDef->getClass(), 'xml')) {
+                $mappingDriverDef->addMethodCall('setNamespacePrefixes', array(array_flip($driverPaths)));
+                $mappingDriverDef->addMethodCall('setGlobalBasename', array('mapping'));
+            }
 
             $container->setDefinition($mappingService, $mappingDriverDef);
 

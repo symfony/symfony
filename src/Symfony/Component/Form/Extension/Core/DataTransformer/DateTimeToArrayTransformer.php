@@ -32,7 +32,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      * @param string  $inputTimezone    The input timezone
      * @param string  $outputTimezone   The output timezone
      * @param array   $fields           The date fields
-     * @param Boolean $pad              Wether to use padding
+     * @param Boolean $pad              Whether to use padding
      *
      * @throws UnexpectedTypeException if a timezone is not a string
      */
@@ -40,7 +40,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
     {
         parent::__construct($inputTimezone, $outputTimezone);
 
-        if (is_null($fields)) {
+        if (null === $fields) {
             $fields = array('year', 'month', 'day', 'hour', 'minute', 'second');
         }
 
@@ -74,7 +74,6 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         if (!$dateTime instanceof \DateTime) {
             throw new UnexpectedTypeException($dateTime, '\DateTime');
         }
-
 
         if ($this->inputTimezone !== $this->outputTimezone) {
             try {

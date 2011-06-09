@@ -29,7 +29,6 @@ class Command
 {
     private $application;
     private $name;
-    private $namespace;
     private $aliases;
     private $definition;
     private $help;
@@ -319,33 +318,11 @@ class Command
      */
     public function setName($name)
     {
-        if (false !== $pos = strrpos($name, ':')) {
-            $namespace = substr($name, 0, $pos);
-            $name = substr($name, $pos + 1);
-        } else {
-            $namespace = $this->namespace;
-        }
+        $this->validateName($name);
 
-        if (!$name) {
-            throw new \InvalidArgumentException('A command name cannot be empty.');
-        }
-
-        $this->namespace = $namespace;
         $this->name = $name;
 
         return $this;
-    }
-
-    /**
-     * Returns the command namespace.
-     *
-     * @return string The command namespace
-     *
-     * @api
-     */
-    public function getNamespace()
-    {
-        return $this->namespace;
     }
 
     /**
@@ -358,18 +335,6 @@ class Command
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * Returns the fully qualified command name.
-     *
-     * @return string The fully qualified command name
-     *
-     * @api
-     */
-    public function getFullName()
-    {
-        return $this->getNamespace() ? $this->getNamespace().':'.$this->getName() : $this->getName();
     }
 
     /**
@@ -436,7 +401,7 @@ class Command
      */
     public function getProcessedHelp()
     {
-        $name = $this->namespace.':'.$this->name;
+        $name = $this->name;
 
         $placeholders = array(
             '%command.name%',
@@ -461,6 +426,10 @@ class Command
      */
     public function setAliases($aliases)
     {
+        foreach ($aliases as $alias) {
+            $this->validateName($alias);
+        }
+
         $this->aliases = $aliases;
 
         return $this;
@@ -486,7 +455,7 @@ class Command
     public function getSynopsis()
     {
         if (null === $this->synopsis) {
-            $this->synopsis = trim(sprintf('%s %s', $this->getFullName(), $this->definition->getSynopsis()));
+            $this->synopsis = trim(sprintf('%s %s', $this->name, $this->definition->getSynopsis()));
         }
 
         return $this->synopsis;
@@ -547,9 +516,8 @@ class Command
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->formatOutput = true;
         $dom->appendChild($commandXML = $dom->createElement('command'));
-        $commandXML->setAttribute('id', $this->getFullName());
-        $commandXML->setAttribute('namespace', $this->getNamespace() ? $this->getNamespace() : '_global');
-        $commandXML->setAttribute('name', $this->getName());
+        $commandXML->setAttribute('id', $this->name);
+        $commandXML->setAttribute('name', $this->name);
 
         $commandXML->appendChild($usageXML = $dom->createElement('usage'));
         $usageXML->appendChild($dom->createTextNode(sprintf($this->getSynopsis(), '')));
@@ -572,5 +540,12 @@ class Command
         $commandXML->appendChild($dom->importNode($definition->getElementsByTagName('options')->item(0), true));
 
         return $asDom ? $dom : $dom->saveXml();
+    }
+
+    private function validateName($name)
+    {
+        if (!preg_match('/^[^\:]+(\:[^\:]+)*$/', $name)) {
+            throw new \InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));
+        }
     }
 }

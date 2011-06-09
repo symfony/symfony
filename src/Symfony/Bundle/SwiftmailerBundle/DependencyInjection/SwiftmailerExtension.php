@@ -45,9 +45,6 @@ class SwiftmailerExtension extends Extension
         $loader->load('swiftmailer.xml');
         $container->setAlias('mailer', 'swiftmailer.mailer');
 
-        $r = new \ReflectionClass('Swift_Message');
-        $container->getDefinition('swiftmailer.mailer')->setFile(dirname(dirname(dirname($r->getFilename()))).'/swift_init.php');
-
         $processor = new Processor();
         $configuration = new Configuration($container->getParameter('kernel.debug'));
         $config = $processor->processConfiguration($configuration, $configs);
@@ -92,21 +89,37 @@ class SwiftmailerExtension extends Extension
                 $container->setParameter('swiftmailer.spool.'.$type.'.'.$key, $config['spool'][$key]);
             }
         }
+        $container->setParameter('swiftmailer.spool.enabled', isset($config['spool']));
+
+        // antiflood?
+        if (isset($config['antiflood'])) {
+            $container->setParameter('swiftmailer.plugin.antiflood.threshold', $config['antiflood']['threshold']);
+            $container->setParameter('swiftmailer.plugin.antiflood.sleep', $config['antiflood']['sleep']);
+
+            $container->getDefinition('swiftmailer.plugin.antiflood')->addTag('swiftmailer.plugin');
+        }
 
         if ($config['logging']) {
-            $container->findDefinition('swiftmailer.transport')->addMethodCall('registerPlugin', array(new Reference('swiftmailer.plugin.messagelogger')));
+            $container->getDefinition('swiftmailer.plugin.messagelogger')->addTag('swiftmailer.plugin');
             $container->findDefinition('swiftmailer.data_collector')->addTag('data_collector', array('template' => 'SwiftmailerBundle:Collector:swiftmailer', 'id' => 'swiftmailer'));
+        }
+
+        if (isset($config['sender_address']) && $config['sender_address']) {
+            $container->setParameter('swiftmailer.sender_address', $config['sender_address']);
+            $container->getDefinition('swiftmailer.plugin.impersonate')->addTag('swiftmailer.plugin');
+        } else {
+            $container->setParameter('swiftmailer.sender_address', null);
         }
 
         if (isset($config['delivery_address']) && $config['delivery_address']) {
             $container->setParameter('swiftmailer.single_address', $config['delivery_address']);
-            $container->findDefinition('swiftmailer.transport')->addMethodCall('registerPlugin', array(new Reference('swiftmailer.plugin.redirecting')));
+            $container->getDefinition('swiftmailer.plugin.redirecting')->addTag('swiftmailer.plugin');
         } else {
             $container->setParameter('swiftmailer.single_address', null);
         }
 
         if (isset($config['disable_delivery']) && $config['disable_delivery']) {
-            $container->findDefinition('swiftmailer.transport')->addMethodCall('registerPlugin', array(new Reference('swiftmailer.plugin.blackhole')));
+            $container->getDefinition('swiftmailer.plugin.blackhole')->addTag('swiftmailer.plugin');
         }
     }
 

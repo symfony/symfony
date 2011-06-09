@@ -44,7 +44,7 @@ class FileToArrayTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transfom a file internal representation to a File instance
+     * Transform a file internal representation to a File instance
      *
      * @param File $array the file representation
      *
@@ -64,11 +64,11 @@ class FileToArrayTransformer implements DataTransformerInterface
         }
 
         if (!array_key_exists('file', $array)) {
-            throw new TransformationFailedException('The key "file" is missing');
+            throw new TransformationFailedException('The key "file" is missing.');
         }
 
         if (!empty($array['file']) && !$array['file'] instanceof File) {
-            throw new TransformationFailedException('The key "file" should be empty or instance of File');
+            throw new TransformationFailedException('The key "file" should be empty or instance of File (Have you set the "enctype" attribute of the form tag to "multipart/form-data"?).');
         }
 
         return $array['file'];

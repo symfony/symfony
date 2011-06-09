@@ -40,18 +40,23 @@ class RouterCacheWarmer implements CacheWarmerInterface
      */
     public function warmUp($cacheDir)
     {
+        $currentDir = $this->router->getOption('cache_dir');
+
         // force cache generation
+        $this->router->setOption('cache_dir', $cacheDir);
         $this->router->getMatcher();
         $this->router->getGenerator();
+
+        $this->router->setOption('cache_dir', $currentDir);
     }
 
     /**
      * Checks whether this warmer is optional or not.
      *
-     * @return Boolean always false
+     * @return Boolean always true
      */
     public function isOptional()
     {
-        return false;
+        return true;
     }
 }

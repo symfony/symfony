@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <symfony>
   <commands>
-    <command id="help" namespace="_global" name="help">
+    <command id="help" name="help">
   <usage>help [--xml] [command_name]</usage>
   <description>Displays help for a command</description>
   <help>The &lt;info&gt;help&lt;/info&gt; command displays help for a given command:
@@ -11,9 +11,7 @@
  You can also output the help as XML by using the &lt;comment&gt;--xml&lt;/comment&gt; option:
  
    &lt;info&gt;./symfony help --xml list&lt;/info&gt;</help>
-  <aliases>
-    <alias>?</alias>
-  </aliases>
+  <aliases />
   <arguments>
     <argument name="command_name" is_required="0" is_array="0">
       <description>The command name</description>
@@ -28,7 +26,7 @@
     </option>
   </options>
 </command>
-    <command id="list" namespace="_global" name="list">
+    <command id="list" name="list">
   <usage>list [--xml] [namespace]</usage>
   <description>Lists commands</description>
   <help>The &lt;info&gt;list&lt;/info&gt; command lists all commands:
@@ -55,7 +53,7 @@
     </option>
   </options>
 </command>
-    <command id="foo:bar" namespace="foo" name="bar">
+    <command id="foo:bar" name="foo:bar">
   <usage>foo:bar</usage>
   <description>The foo:bar command</description>
   <help/>
@@ -72,7 +70,7 @@
       <command>list</command>
     </namespace>
     <namespace id="foo">
-      <command>bar</command>
+      <command>foo:bar</command>
     </namespace>
   </namespaces>
 </symfony>

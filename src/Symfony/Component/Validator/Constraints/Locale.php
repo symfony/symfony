@@ -14,12 +14,4 @@ namespace Symfony\Component\Validator\Constraints;
 class Locale extends \Symfony\Component\Validator\Constraint
 {
     public $message = 'This value is not a valid locale';
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTargets()
-    {
-        return self::PROPERTY_CONSTRAINT;
-    }
 }

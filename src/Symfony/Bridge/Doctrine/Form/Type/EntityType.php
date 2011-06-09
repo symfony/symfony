@@ -13,20 +13,20 @@ namespace Symfony\Bridge\Doctrine\Form\Type;
 
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeCollectionListener;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\EntitiesToArrayTransformer;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\EntityToIdTransformer;
 use Symfony\Component\Form\AbstractType;
-use Doctrine\ORM\EntityManager;
 
 class EntityType extends AbstractType
 {
-    private $em;
+    protected $registry;
 
-    public function __construct(EntityManager $em)
+    public function __construct(RegistryInterface $registry)
     {
-        $this->em = $em;
+        $this->registry = $registry;
     }
 
     public function buildForm(FormBuilder $builder, array $options)
@@ -44,23 +44,18 @@ class EntityType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         $defaultOptions = array(
-            'multiple'          => false,
-            'expanded'          => false,
-            'em'                => $this->em,
+            'em'                => null,
             'class'             => null,
             'property'          => null,
             'query_builder'     => null,
             'choices'           => array(),
-            'preferred_choices' => array(),
-            'multiple'          => false,
-            'expanded'          => false,
         );
 
         $options = array_replace($defaultOptions, $options);
 
         if (!isset($options['choice_list'])) {
             $defaultOptions['choice_list'] = new EntityChoiceList(
-                $options['em'],
+                $this->registry->getEntityManager($options['em']),
                 $options['class'],
                 $options['property'],
                 $options['query_builder'],

@@ -20,18 +20,18 @@
         <!-- metadata -->
         <parameter key="doctrine.orm.metadata.driver_chain.class">Doctrine\ORM\Mapping\Driver\DriverChain</parameter>
         <parameter key="doctrine.orm.metadata.annotation.class">Doctrine\ORM\Mapping\Driver\AnnotationDriver</parameter>
-        <parameter key="doctrine.orm.metadata.annotation_reader.class">Symfony\Bundle\DoctrineBundle\Annotations\IndexedReader</parameter>
-        <parameter key="doctrine.orm.metadata.xml.class">Symfony\Bundle\DoctrineBundle\Mapping\Driver\XmlDriver</parameter>
-        <parameter key="doctrine.orm.metadata.yml.class">Symfony\Bundle\DoctrineBundle\Mapping\Driver\YamlDriver</parameter>
+        <parameter key="doctrine.orm.metadata.annotation_reader.class">Symfony\Bridge\Doctrine\Annotations\IndexedReader</parameter>
+        <parameter key="doctrine.orm.metadata.xml.class">Symfony\Bridge\Doctrine\Mapping\Driver\XmlDriver</parameter>
+        <parameter key="doctrine.orm.metadata.yml.class">Symfony\Bridge\Doctrine\Mapping\Driver\YamlDriver</parameter>
         <parameter key="doctrine.orm.metadata.php.class">Doctrine\ORM\Mapping\Driver\PHPDriver</parameter>
         <parameter key="doctrine.orm.metadata.staticphp.class">Doctrine\ORM\Mapping\Driver\StaticPHPDriver</parameter>
 
         <!-- cache warmer -->
-        <parameter key="doctrine.orm.proxy_cache_warmer.class">Symfony\Bundle\DoctrineBundle\CacheWarmer\ProxyCacheWarmer</parameter>
+        <parameter key="doctrine.orm.proxy_cache_warmer.class">Symfony\Bridge\Doctrine\CacheWarmer\ProxyCacheWarmer</parameter>
 
         <!-- form field factory guesser -->
         <parameter key="form.type_guesser.doctrine.class">Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser</parameter>
-        
+
         <!-- validator -->
         <parameter key="doctrine.orm.validator.unique.class">Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator</parameter>
     </parameters>
@@ -44,23 +44,23 @@
 
         <service id="doctrine.orm.proxy_cache_warmer" class="%doctrine.orm.proxy_cache_warmer.class%" public="false">
             <tag name="kernel.cache_warmer" />
-            <argument type="service" id="service_container" />
+            <argument type="service" id="doctrine" />
         </service>
 
         <service id="form.type_guesser.doctrine" class="%form.type_guesser.doctrine.class%">
             <tag name="form.type_guesser" />
-            <argument type="service" id="doctrine.orm.entity_manager" />
+            <argument type="service" id="doctrine" />
         </service>
 
         <service id="form.type.entity" class="Symfony\Bridge\Doctrine\Form\Type\EntityType">
             <tag name="form.type" alias="entity" />
-            <argument type="service" id="doctrine.orm.entity_manager" />
+            <argument type="service" id="doctrine" />
         </service>
 
         <service id="doctrine.orm.configuration" class="%doctrine.orm.configuration.class%" abstract="true" public="false" />
 
         <service id="doctrine.orm.entity_manager.abstract" class="%doctrine.orm.entity_manager.class%" factory-class="%doctrine.orm.entity_manager.class%" factory-method="create" abstract="true" />
-        
+
         <!-- validator -->
         <service id="doctrine.orm.validator.unique" class="%doctrine.orm.validator.unique.class%">
             <tag name="validator.constraint_validator" alias="doctrine.orm.validator.unique" />

@@ -1,9 +1,9 @@
 {% if trace.function %}
-    at 
+    at
     <strong>
         <abbr title="{{ trace.class }}">{{ trace.short_class }}</abbr>
         {{ trace.type ~ trace.function }}
-    </strong> 
+    </strong>
     ({{ trace.args|format_args }})
     <br />
 {% endif %}

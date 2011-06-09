@@ -22,7 +22,7 @@ if (!class_exists('Twig_Environment')) {
         {
             // strip away bundle name
             $parts = explode(':', $name);
- 
+
             return parent::findTemplate(end($parts));
         }
     }

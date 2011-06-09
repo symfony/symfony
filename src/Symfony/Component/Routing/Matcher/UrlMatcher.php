@@ -79,7 +79,7 @@ class UrlMatcher implements UrlMatcherInterface
         }
 
         throw 0 < count($this->allow)
-            ? new MethodNotAllowedException(array_unique(array_map('strtolower', $this->allow)))
+            ? new MethodNotAllowedException(array_unique(array_map('strtoupper', $this->allow)))
             : new ResourceNotFoundException();
     }
 
@@ -87,7 +87,7 @@ class UrlMatcher implements UrlMatcherInterface
     {
         foreach ($routes as $name => $route) {
             if ($route instanceof RouteCollection) {
-                if ($route->getPrefix() !== substr($pathinfo, 0, strlen($route->getPrefix()))) {
+                if (false === strpos($route->getPrefix(), '{') && $route->getPrefix() !== substr($pathinfo, 0, strlen($route->getPrefix()))) {
                     continue;
                 }
 
@@ -110,10 +110,17 @@ class UrlMatcher implements UrlMatcherInterface
             }
 
             // check HTTP method requirement
-            if ($route->getRequirement('_method') && ($req = explode('|', $route->getRequirement('_method'))) && !in_array($this->context->getMethod(), array_map('strtolower', $req))) {
-                $this->allow = array_merge($this->allow, $req);
+            if ($req = $route->getRequirement('_method')) {
+                // HEAD and GET are equivalent as per RFC
+                if ('HEAD' === $method = $this->context->getMethod()) {
+                    $method = 'GET';
+                }
 
-                continue;
+                if (!in_array($method, $req = explode('|', strtoupper($req)))) {
+                    $this->allow = array_merge($this->allow, $req);
+
+                    continue;
+                }
             }
 
             return array_merge($this->mergeDefaults($matches, $route->getDefaults()), array('_route' => $name));

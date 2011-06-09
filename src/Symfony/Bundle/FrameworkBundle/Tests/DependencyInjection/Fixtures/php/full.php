@@ -14,7 +14,6 @@ $container->loadFromExtension('framework', array(
         'only_exceptions' => true,
     ),
     'router' => array(
-        'cache_warmer' => true,
         'resource'     => '%kernel.root_dir%/config/routing.xml',
         'type'         => 'xml',
     ),
@@ -33,7 +32,6 @@ $container->loadFromExtension('framework', array(
         'assets_version'   => 'SomeVersionScheme',
         'assets_base_urls' => 'http://cdn.example.com',
         'cache'            => '/path/to/cache',
-        'cache_warmer'     => true,
         'engines'          => array('php', 'twig'),
         'loader'           => array('loader.foo', 'loader.bar'),
         'packages'         => array(

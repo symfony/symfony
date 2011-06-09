@@ -11,10 +11,12 @@
 
 namespace Symfony\Tests\Component\Validator;
 
+require_once __DIR__.'/Fixtures/ClassConstraint.php';
 require_once __DIR__.'/Fixtures/ConstraintA.php';
 require_once __DIR__.'/Fixtures/ConstraintB.php';
 require_once __DIR__.'/Fixtures/ConstraintC.php';
 
+use Symfony\Tests\Component\Validator\Fixtures\ClassConstraint;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintA;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintB;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintC;
@@ -106,5 +108,19 @@ class ConstraintTest extends \PHPUnit_Framework_TestCase
     public function testCanCreateConstraintWithNoDefaultOptionAndEmptyArray()
     {
         new ConstraintB(array());
+    }
+
+    public function testGetTargetsCanBeString()
+    {
+        $constraint = new ClassConstraint;
+
+        $this->assertEquals('class', $constraint->getTargets());
+    }
+
+    public function testGetTargetsCanBeArray()
+    {
+        $constraint = new ConstraintA;
+
+        $this->assertEquals(array('property', 'class'), $constraint->getTargets());
     }
 }

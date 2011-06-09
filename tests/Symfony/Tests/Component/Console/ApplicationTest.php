@@ -304,8 +304,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester->run(array('--ansi' => true));
         $this->assertTrue($tester->getOutput()->isDecorated(), '->run() forces color output if --ansi is passed');
 
-        $tester->run(array('-a' => true));
-        $this->assertTrue($tester->getOutput()->isDecorated(), '->run() forces color output if -a is passed');
+        $tester->run(array('--no-ansi' => true));
+        $this->assertFalse($tester->getOutput()->isDecorated(), '->run() forces color output to be disabled if --no-ansi is passed');
 
         $application = new Application();
         $application->setAutoExit(false);

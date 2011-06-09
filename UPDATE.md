@@ -6,27 +6,161 @@ one. It only discusses changes that need to be done when using the "public"
 API of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.
 
+beta4 to beta5
+--------------
+
+* The `em` option of the Doctrine `EntityType` class now takes the entity
+  manager name instead of the EntityManager instance. If you don't pass this
+  option, the default Entity Manager will be used as before.
+
+* In the Console component: `Command::getFullname()` and
+  `Command::getNamespace()` have been removed (`Command::getName()` behavior
+  is now the same as the old `Command::getFullname()`).
+
+* Default Twig form templates have been moved to the Twig bridge. Here is how
+  you can reference them now from a template or in a configuration setting:
+
+    Before:
+
+        `TwigBundle:Form:div_layout.html.twig`
+
+    After:
+
+        `div_layout.html.twig`
+
+* All settings regarding the cache warmers have been removed.
+
+* `Response::isRedirected()` has been merged with `Response::isRedirect()`
+
+beta3 to beta4
+--------------
+
+* `Client::getProfiler` has been removed in favor of `Client::getProfile`,
+  which returns an instance of `Profile`.
+
+* Some `UniversalClassLoader` methods have been renamed:
+
+    * `registerPrefixFallback` to `registerPrefixFallbacks`
+    * `registerNamespaceFallback` to `registerNamespaceFallbacks`
+
+* The event system has been made more flexible. A listener can now be any
+  valid PHP callable.
+
+    * `EventDispatcher::addListener($eventName, $listener, $priority = 0)`:
+        * `$eventName` is the event name (cannot be an array anymore),
+        * `$listener` is a PHP callable.
+
+    * The events classes and constants have been renamed:
+
+        * Old class name `Symfony\Component\Form\Events` and constants:
+
+                Events::preBind = 'preBind'
+                Events::postBind = 'postBind'
+                Events::preSetData = 'preSetData'
+                Events::postSetData = 'postSetData'
+                Events::onBindClientData = 'onBindClientData'
+                Events::onBindNormData = 'onBindNormData'
+                Events::onSetData = 'onSetData'
+
+        * New class name `Symfony\Component\Form\FormEvents` and constants:
+
+                FormEvents::PRE_BIND = 'form.pre_bind'
+                FormEvents::POST_BIND = 'form.post_bind'
+                FormEvents::PRE_SET_DATA = 'form.pre_set_data'
+                FormEvents::POST_SET_DATA = 'form.post_set_data'
+                FormEvents::BIND_CLIENT_DATA = 'form.bind_client_data'
+                FormEvents::BIND_NORM_DATA = 'form.bind_norm_data'
+                FormEvents::SET_DATA = 'form.set_data'
+
+        * Old class name `Symfony\Component\HttpKernel\Events` and constants:
+
+                Events::onCoreRequest = 'onCoreRequest'
+                Events::onCoreException = 'onCoreException'
+                Events::onCoreView = 'onCoreView'
+                Events::onCoreController = 'onCoreController'
+                Events::onCoreResponse = 'onCoreResponse'
+
+        * New class name `Symfony\Component\HttpKernel\CoreEvents` and constants:
+
+                CoreEvents::REQUEST = 'core.request'
+                CoreEvents::EXCEPTION = 'core.exception'
+                CoreEvents::VIEW = 'core.view'
+                CoreEvents::CONTROLLER = 'core.controller'
+                CoreEvents::RESPONSE = 'core.response'
+
+        * Old class name `Symfony\Component\Security\Http\Events` and constants:
+
+                Events::onSecurityInteractiveLogin = 'onSecurityInteractiveLogin'
+                Events::onSecuritySwitchUser = 'onSecuritySwitchUser'
+
+        * New class name `Symfony\Component\Security\Http\SecurityEvents` and constants:
+
+                SecurityEvents::INTERACTIVE_LOGIN = 'security.interactive_login'
+                SecurityEvents::SWITCH_USER = 'security.switch_user'
+
+    * `addListenerService` now only takes a single event name as its first
+      argument,
+
+    * Tags in configuration must now set the method to call:
+
+        * Before:
+
+                <tag name="kernel.listener" event="onCoreRequest" />
+
+        * After:
+
+                <tag name="kernel.listener" event="core.request" method="onCoreRequest" />
+
+    * Subscribers must now always return a hash:
+
+        * Before:
+
+                public static function getSubscribedEvents()
+                {
+                    return Events::onBindNormData;
+                }
+
+        * After:
+
+                public static function getSubscribedEvents()
+                {
+                    return array(FormEvents::BIND_NORM_DATA => 'onBindNormData');
+                }
+
+* Form `DateType` parameter `single-text` changed to `single_text`
+* Form field label helpers now accepts setting attributes, i.e.:
+
+```html+jinja
+{{ form_label(form.name, 'Custom label', { 'attr': {'class': 'name_field'} }) }}
+```
+
+* In order to use Swiftmailer, you should now register its "init.php" file via
+  the autoloader ("app/autoloader.php") and remove the `Swift_` prefix from
+  the autoloader. For an example on how this should be done, see the Standard
+  Distribution
+  [autoload.php](https://github.com/symfony/symfony-standard/blob/v2.0.0BETA4/app/autoload.php#L29).
+
 beta2 to beta3
 --------------
 
-* The settings under "framework.annotations" have changed slightly:
+* The settings under `framework.annotations` have changed slightly:
 
-  Before:
+    Before:
   
-    framework:
-        annotations:
-            cache: file
-            file_cache:
-                debug: true
-                dir: /foo
+        framework:
+            annotations:
+                cache: file
+                file_cache:
+                    debug: true
+                    dir: /foo
                 
-  After:
+    After:
      
-    framework:
-        annotations:
-            cache: file
-            debug: true
-            file_cache_dir: /foo
+        framework:
+            annotations:
+                cache: file
+                debug: true
+                file_cache_dir: /foo
 
 beta1 to beta2
 --------------

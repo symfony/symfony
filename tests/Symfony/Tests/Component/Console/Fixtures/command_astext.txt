@@ -10,7 +10,8 @@
  <info>--quiet</info> (-q) Do not output any message.
  <info>--verbose</info> (-v) Increase verbosity of messages.
  <info>--version</info> (-V) Display this program version.
- <info>--ansi</info> (-a) Force ANSI output.
+ <info>--ansi</info> Force ANSI output.
+ <info>--no-ansi</info> Disable ANSI output.
  <info>--no-interaction</info> (-n) Do not ask any interactive question.
 
 <comment>Help:</comment>

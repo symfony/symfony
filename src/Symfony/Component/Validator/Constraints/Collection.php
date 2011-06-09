@@ -37,12 +37,4 @@ class Collection extends \Symfony\Component\Validator\Constraint
     {
         return array('fields');
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTargets()
-    {
-        return self::PROPERTY_CONSTRAINT;
-    }
 }

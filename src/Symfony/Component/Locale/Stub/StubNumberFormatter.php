@@ -284,6 +284,7 @@ class StubNumberFormatter
         $value = $this->formatNumber($value, $fractionDigits);
 
         $ret = $symbol.$value;
+
         return $negative ? '('.$ret.')' : $ret;
     }
 
@@ -302,6 +303,7 @@ class StubNumberFormatter
         // The original NumberFormatter does not support this format type
         if ($type == self::TYPE_CURRENCY) {
             trigger_error(__METHOD__ . '(): Unsupported format type ' . $type, \E_USER_WARNING);
+
             return false;
         }
 
@@ -320,6 +322,7 @@ class StubNumberFormatter
         $fractionDigits = $this->getAttribute(self::FRACTION_DIGITS);
 
         $value = $this->round($value, $fractionDigits);
+
         return $this->formatNumber($value, $fractionDigits);
     }
 
@@ -437,6 +440,7 @@ class StubNumberFormatter
     {
         if ($type == self::TYPE_DEFAULT || $type == self::TYPE_CURRENCY) {
             trigger_error(__METHOD__ . '(): Unsupported format type ' . $type, \E_USER_WARNING);
+
             return false;
         }
 
@@ -503,6 +507,7 @@ class StubNumberFormatter
 
         $this->attributes[$attr] = $value;
         $this->initializedAttributes[$attr] = true;
+
         return true;
     }
 
@@ -590,6 +595,7 @@ class StubNumberFormatter
     private function getCurrencySymbol($currency)
     {
         $currencies = StubLocale::getCurrenciesData($this->locale);
+
         return $currencies[$currency]['symbol'];
     }
 
@@ -602,6 +608,7 @@ class StubNumberFormatter
     private function getCurrencyFractionDigits($currency)
     {
         $currencies = StubLocale::getCurrenciesData($this->locale);
+
         return $currencies[$currency]['fractionDigits'];
     }
 
@@ -614,6 +621,7 @@ class StubNumberFormatter
     private function getCurrencyRoundingIncrement($currency)
     {
         $currencies = StubLocale::getCurrenciesData($this->locale);
+
         return $currencies[$currency]['roundingIncrement'];
     }
 
@@ -644,6 +652,7 @@ class StubNumberFormatter
     private function formatNumber($value, $precision)
     {
         $precision = $this->getUnitializedPrecision($value, $precision);
+
         return number_format($value, $precision, '.', $this->getAttribute(self::GROUPING_USED) ? ',' : '');
     }
 
@@ -674,7 +683,7 @@ class StubNumberFormatter
      * Check if the attribute is initialized (value set by client code).
      *
      * @param  string  $attr   The attribute name
-     * @return Boolean         true if the value was set by cliente, false otherwise
+     * @return Boolean         true if the value was set by client, false otherwise
      */
     private function isInitializedAttribute($attr)
     {
@@ -751,6 +760,7 @@ class StubNumberFormatter
     private function normalizeFractionDigitsValue($value)
     {
         $value = (int) $value;
+
         return (0 > $value) ? 0 : $value;
     }
 }

@@ -14,7 +14,6 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\PaddedChoiceList;
 use Symfony\Component\Form\Extension\Core\ChoiceList\MonthChoiceList;
 use Symfony\Component\Form\FormView;
@@ -35,7 +34,7 @@ class DateType extends AbstractType
             \DateTimeZone::UTC
         );
 
-        if ($options['widget'] === 'single-text') {
+        if ($options['widget'] === 'single_text') {
             $builder->appendClientTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $options['format'], \IntlDateFormatter::NONE));
         } else {
             $yearOptions = $monthOptions = $dayOptions = array();
@@ -80,8 +79,6 @@ class DateType extends AbstractType
             $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], array('year', 'month', 'day'))
             ));
-        } else if ($options['input'] !== 'datetime') {
-            throw new FormException('The "input" option must be "datetime", "string", "timestamp" or "array".');
         }
 
         $builder
@@ -138,7 +135,7 @@ class DateType extends AbstractType
                 'array',
             ),
             'widget'    => array(
-                'single-text',
+                'single_text',
                 'text',
                 'choice',
             ),
@@ -153,7 +150,7 @@ class DateType extends AbstractType
 
     public function getParent(array $options)
     {
-        return $options['widget'] === 'single-text' ? 'field' : 'form';
+        return $options['widget'] === 'single_text' ? 'field' : 'form';
     }
 
     public function getName()

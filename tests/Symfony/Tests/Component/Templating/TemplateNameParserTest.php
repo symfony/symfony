@@ -35,7 +35,7 @@ class TemplateNameParserTest extends \PHPUnit_Framework_TestCase
     {
         $template = $this->parser->parse($name);
 
-        $this->assertEquals($template->getSignature(), $ref->getSignature());
+        $this->assertEquals($template->getLogicalName(), $ref->getLogicalName());
         $this->assertEquals($template->getLogicalName(), $name);
     }
 

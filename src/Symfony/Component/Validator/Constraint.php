@@ -199,5 +199,8 @@ abstract class Constraint
      *
      * @return string|array  One or more constant values
      */
-    abstract public function getTargets();
+    public function getTargets()
+    {
+        return self::PROPERTY_CONSTRAINT;
+    }
 }

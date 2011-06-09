@@ -20,7 +20,7 @@ class DefaultValidator implements FormValidatorInterface
     public function validate(FormInterface $form)
     {
         if (!$form->isSynchronized()) {
-            $form->addError(new FormError('The value is invalid'));
+            $form->addError(new FormError(sprintf('The value for "%s" is invalid', $form->getName())));
         }
 
         if (count($form->getExtraData()) > 0) {

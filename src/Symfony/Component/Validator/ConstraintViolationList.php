@@ -111,5 +111,5 @@ EOF;
     {
         unset($this->violations[$offset]);
     }
-    
+
 }

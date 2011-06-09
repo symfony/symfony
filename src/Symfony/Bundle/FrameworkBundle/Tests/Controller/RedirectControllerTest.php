@@ -79,8 +79,7 @@ class RedirectControllerTest extends TestCase
 
         $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $returnResponse);
 
-        $this->assertTrue($returnResponse->isRedirect());
-        $this->assertTrue($returnResponse->isRedirected($url));
+        $this->assertTrue($returnResponse->isRedirect($url));
         $this->assertEquals($expectedCode, $returnResponse->getStatusCode());
     }
 

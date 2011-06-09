@@ -151,11 +151,11 @@ class OutputFormatter implements OutputFormatterInterface
             }
         }
 
-        return $style->apply($match[2]);
+        return $style->apply($this->format($match[2]));
     }
 
     /**
-     * Tryes to create new style instance from string.
+     * Tries to create new style instance from string.
      *
      * @param   string  $string
      *

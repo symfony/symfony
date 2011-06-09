@@ -26,17 +26,17 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
 
     public function __construct($precision = null, $grouping = null, $roundingMode = null, $divisor = null)
     {
-        if (is_null($grouping)) {
+        if (null === $grouping) {
             $grouping = true;
         }
 
-        if (is_null($precision)) {
+        if (null === $precision) {
             $precision = 2;
         }
 
         parent::__construct($precision, $grouping, $roundingMode);
 
-        if (is_null($divisor)) {
+        if (null === $divisor) {
             $divisor = 1;
         }
 

@@ -83,6 +83,10 @@ class FrameworkExtension extends Extension
             $this->registerValidationConfiguration($config['validation'], $container, $loader);
         }
 
+        if (isset($config['file_upload'])) {
+            $this->registerFileUploadConfiguration($config['file_upload'], $container);
+        }
+
         if (isset($config['esi'])) {
             $this->registerEsiConfiguration($config['esi'], $loader);
         }
@@ -158,12 +162,25 @@ class FrameworkExtension extends Extension
         }
 
         if ($container->hasDefinition('session')) {
-            $container->removeDefinition('file.temporary_storage');
-            $container->setDefinition('file.temporary_storage', $container->getDefinition('file.temporary_storage.session'));
-            $container->removeDefinition('file.temporary_storage.session');
+            $container->removeDefinition('form.temporary_storage');
+            $container->setDefinition('form.temporary_storage', $container->getDefinition('form.temporary_storage.session'));
+            $container->removeDefinition('form.temporary_storage.session');
         } else {
-            $container->removeDefinition('file.temporary_storage.session');
+            $container->removeDefinition('form.temporary_storage.session');
         }
+    }
+
+    /**
+     * Loads the file upload configuration.
+     *
+     * @param array            $config    A file upload configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     */
+    private function registerFileUploadConfiguration(array $config, ContainerBuilder $container)
+    {
+        $container->setParameter('form.temporary_storage.folder', $config['path']);
+        $container->setParameter('form.temporary_storage.size', $config['size']);
+        $container->setParameter('form.temporary_storage.ttl', $config['max_age_sec']);
     }
 
     /**

@@ -55,6 +55,7 @@ class Configuration implements ConfigurationInterface
         ;
 
         $this->addFormSection($rootNode);
+        $this->addFileUploadSection($rootNode);
         $this->addEsiSection($rootNode);
         $this->addProfilerSection($rootNode);
         $this->addRouterSection($rootNode);
@@ -86,6 +87,34 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->booleanNode('enabled')->defaultTrue()->end()
                         ->scalarNode('field_name')->defaultValue('_token')->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addFileUploadSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('file_upload')
+                ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('path')->defaultValue('%kernel.cache_dir%/upload')->end()
+                        ->scalarNode('size')
+                            ->defaultValue(500 * 1024 * 1024)
+                            ->validate()
+                                ->ifTrue(function ($v) { return !(is_integer($v) && $v >= 0); })
+                                ->thenInvalid('The temporary folder size must be an integer greater or equal to 0.')
+                            ->end()
+                        ->end()
+                        ->scalarNode('max_age_sec')
+                            ->defaultValue(60 * 60)
+                            ->validate()
+                                ->ifTrue(function ($v) { return !(is_integer($v) && $v >= 0); })
+                                ->thenInvalid('The max age must be an integer greater or equal to 0.')
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()

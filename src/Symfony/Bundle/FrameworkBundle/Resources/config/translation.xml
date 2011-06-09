@@ -60,7 +60,7 @@
         </service>
         
         <service id="translation.formatter.yml" class="%translation.formatter.yml.class%">
-        	<tag name="tranlsation.formatter" alias="yml" />
+        	<tag name="translation.formatter" alias="yml" />
         </service>
     </services>
 </container>

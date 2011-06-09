@@ -12,8 +12,7 @@
 namespace Symfony\Bundle\AsseticBundle\Factory;
 
 use Assetic\Factory\AssetFactory as BaseAssetFactory;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -25,22 +24,19 @@ class AssetFactory extends BaseAssetFactory
 {
     private $kernel;
     private $container;
-    private $parameterBag;
 
     /**
      * Constructor.
      *
-     * @param KernelInterface       $kernel       The kernel is used to parse bundle notation
-     * @param ContainerInterface    $container    The container is used to load the managers lazily, thus avoiding a circular dependency
-     * @param ParameterBagInterface $parameterBag The container parameter bag
-     * @param string                $baseDir      The base directory for relative inputs
-     * @param Boolean               $debug        The current debug mode
+     * @param KernelInterface $kernel    The kernel is used to parse bundle notation
+     * @param Container       $container The container is used to load the managers lazily, thus avoiding a circular dependency
+     * @param string          $baseDir   The base directory for relative inputs
+     * @param Boolean         $debug     The current debug mode
      */
-    public function __construct(KernelInterface $kernel, ContainerInterface $container, ParameterBagInterface $parameterBag, $baseDir, $debug = false)
+    public function __construct(KernelInterface $kernel, Container $container, $baseDir, $debug = false)
     {
         $this->kernel = $kernel;
         $this->container = $container;
-        $this->parameterBag = $parameterBag;
 
         parent::__construct($baseDir, $debug);
     }
@@ -53,7 +49,7 @@ class AssetFactory extends BaseAssetFactory
      */
     protected function parseInput($input, array $options = array())
     {
-        $input = $this->parameterBag->resolveValue($input);
+        $input = $this->container->getParameterBag()->resolveValue($input);
 
         // expand bundle notation
         if ('@' == $input[0] && false !== strpos($input, '/')) {

@@ -603,7 +603,9 @@ EOF;
      */
     private function startClass($class, $baseClass)
     {
-        $bagClass = $this->container->isFrozen() ? '' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
+        $bagClass = $this->container->isFrozen()
+            ? 'Symfony\\Component\\DependencyInjection\\ParameterBag\\FrozenParameterBag'
+            : 'Symfony\\Component\\DependencyInjection\\ParameterBag\\ParameterBag';
 
         return <<<EOF
 <?php
@@ -613,7 +615,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
-$bagClass
+use $bagClass;
 
 /**
  * $class
@@ -715,6 +717,18 @@ EOF;
         $code = '';
         if ($this->container->isFrozen()) {
             $code .= <<<EOF
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParameterBag()
+    {
+        if (null === \$this->parameterBag) {
+            \$this->parameterBag = new FrozenParameterBag(\$this->getDefaultParameters());
+        }
+
+        return \$this->parameterBag;
+    }
 
     /**
      * {@inheritdoc}

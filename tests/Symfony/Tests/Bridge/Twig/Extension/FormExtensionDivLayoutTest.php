@@ -48,6 +48,48 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $this->extension->initRuntime($environment);
     }
 
+    public function testThemeInheritance()
+    {
+        $child = $this->factory->createNamedBuilder('form', 'child')
+            ->add('field', 'text')
+            ->getForm();
+
+        $view = $this->factory->createNamedBuilder('form', 'parent')
+            ->add('field', 'text')
+            ->getForm()
+            ->add($child)
+            ->createView()
+        ;
+
+        $this->extension->setTheme($view, array('parent_label.html.twig'));
+        $this->extension->setTheme($view['child'], array('child_label.html.twig'));
+
+        $this->assertWidgetMatchesXpath($view, array(),
+'/div
+    [
+        ./input[@type="hidden"]
+        /following-sibling::div
+            [
+                ./label[.="parent"]
+                /following-sibling::input[@type="text"]
+            ]
+        /following-sibling::div
+            [
+                ./label
+                /following-sibling::div
+                    [
+                        ./div
+                            [
+                                ./label[.="child"]
+                                /following-sibling::input[@type="text"]
+                            ]
+                    ]
+            ]
+    ]
+'
+        );
+    }
+
     protected function renderEnctype(FormView $view)
     {
         return (string)$this->extension->renderEnctype($view);

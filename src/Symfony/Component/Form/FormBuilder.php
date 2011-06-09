@@ -562,22 +562,10 @@ class FormBuilder
         }
 
         if (null !== $type) {
-            $builder = $this->getFormFactory()->createNamedBuilder(
-                $type,
-                $name,
-                null,
-                $options
-            );
-        } else {
-            $builder = $this->getFormFactory()->createBuilderForProperty(
-                $this->dataClass,
-                $name,
-                null,
-                $options
-            );
+            return $this->getFormFactory()->createNamedBuilder($type, $name, null, $options);
         }
 
-        return $builder;
+        return $this->getFormFactory()->createBuilderForProperty($this->dataClass, $name, null, $options);
     }
 
     /**

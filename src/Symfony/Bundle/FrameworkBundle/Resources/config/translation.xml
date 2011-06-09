@@ -11,6 +11,7 @@
         <parameter key="translation.loader.php.class">Symfony\Component\Translation\Loader\PhpFileLoader</parameter>
         <parameter key="translation.loader.yml.class">Symfony\Component\Translation\Loader\YamlFileLoader</parameter>
         <parameter key="translation.loader.xliff.class">Symfony\Component\Translation\Loader\XliffFileLoader</parameter>
+    	<parameter key="translation.formatter.php.class">Symfony\Component\Translation\Formatter\PhpFormatter</parameter>
     </parameters>
 
     <services>

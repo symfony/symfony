@@ -554,32 +554,18 @@ class FormBuilder
      * @param array                     $options The options
      *
      * @return FormBuilder The builder
-     *
-     * @throws FormException if the data class is not set when creating a property builder
      */
     public function create($name, $type = null, array $options = array())
     {
-        if (null !== $type) {
-            $builder = $this->getFormFactory()->createNamedBuilder(
-                $type,
-                $name,
-                null,
-                $options
-            );
-        } else {
-            if (!$this->dataClass) {
-                throw new FormException(sprintf('The "%s" type cannot be guessed as the data class is not set. Provide the type manually (\'text\', \'password\', ...) or set the data class.', $name));
-            }
-
-            $builder = $this->getFormFactory()->createBuilderForProperty(
-                $this->dataClass,
-                $name,
-                null,
-                $options
-            );
+        if (null === $type && !$this->dataClass) {
+            $type = 'text';
         }
 
-        return $builder;
+        if (null !== $type) {
+            return $this->getFormFactory()->createNamedBuilder($type, $name, null, $options);
+        }
+
+        return $this->getFormFactory()->createBuilderForProperty($this->dataClass, $name, null, $options);
     }
 
     /**

@@ -75,8 +75,11 @@ class Serializer implements SerializerInterface
     /**
      * {@inheritdoc}
      */
-    public final function deserialize($data, $type, $format) {
-        return $this->denormalize($this->decode($data, $format), $type, $format);
+    public final function deserialize($data, $type, $format)
+    {
+        $data = $this->decode($data, $format);
+
+        return $this->denormalize($data, $type, $format);
     }
 
     /**

@@ -568,7 +568,7 @@ class FormBuilder
             );
         } else {
             if (!$this->dataClass) {
-                throw new FormException(sprintf('The "%s" form children type cannot be guessed as the data class is not set. Provide the type manually (\'text\', \'password\', ...) or set the data class.', $name));
+                throw new FormException(sprintf('The "%s" type cannot be guessed as the data class is not set. Provide the type manually (\'text\', \'password\', ...) or set the data class.', $name));
             }
 
             $builder = $this->getFormFactory()->createBuilderForProperty(

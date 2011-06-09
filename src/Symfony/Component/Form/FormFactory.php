@@ -269,6 +269,7 @@ class FormFactory implements FormFactoryInterface
         }
 
         $builder->setTypes($types);
+        $builder->setCurrentLoadingType($type->getName());
 
         foreach ($types as $type) {
             $type->buildForm($builder, $options);
@@ -277,6 +278,7 @@ class FormFactory implements FormFactoryInterface
                 $typeExtension->buildForm($builder, $options);
             }
         }
+        $builder->setCurrentLoadingType(null);
 
         return $builder;
     }

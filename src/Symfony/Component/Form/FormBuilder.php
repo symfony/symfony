@@ -13,6 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Exception\CircularReferenceException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -109,6 +110,8 @@ class FormBuilder
      * @var mixed
      */
     private $emptyData = '';
+
+    private $currentLoadingType;
 
     /**
      * Constructor.
@@ -538,6 +541,10 @@ class FormBuilder
             throw new UnexpectedTypeException($type, 'string or Symfony\Component\Form\FormTypeInterface');
         }
 
+        if ($this->currentLoadingType && ($type instanceof FormTypeInterface ? $type->getName() : $type) == $this->currentLoadingType) {
+            throw new CircularReferenceException(is_string($type) ? $this->getFormFactory()->getType($type) : $type);
+        }
+
         $this->children[$child] = array(
             'type'      => $type,
             'options'   => $options,
@@ -653,6 +660,11 @@ class FormBuilder
         }
 
         return $instance;
+    }
+
+    public function setCurrentLoadingType($type)
+    {
+        $this->currentLoadingType = $type;
     }
 
     /**

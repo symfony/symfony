@@ -52,13 +52,6 @@ class UploadedFile extends File
     protected $error;
 
     /**
-     * Whether the uploaded file has already been moved.
-     *
-     * @var Boolean
-     */
-    protected $moved;
-
-    /**
      * Accepts the information of the uploaded file as provided by the PHP global $_FILES.
      *
      * @param string  $path         The full temporary path to the file
@@ -66,13 +59,11 @@ class UploadedFile extends File
      * @param string  $mimeType     The type of the file as provided by PHP
      * @param integer $size         The file size
      * @param integer $error        The error constant of the upload (one of PHP's UPLOAD_ERR_XXX constants)
-     * @param Boolean $moved        Whether the file has been moved from its original location
      *
      * @throws FileException         If file_uploads is disabled
      * @throws FileNotFoundException If the file does not exist
      */
-    public function __construct($path, $originalName, $mimeType = null,
-            $size = null, $error = null, $moved = false)
+    public function __construct($path, $originalName, $mimeType = null, $size = null, $error = null)
     {
         if (!ini_get('file_uploads')) {
             throw new FileException(sprintf('Unable to create UploadedFile because "file_uploads" is disabled in your php.ini file (%s)', get_cfg_var('cfg_file_path')));
@@ -87,7 +78,6 @@ class UploadedFile extends File
         $this->mimeType = $mimeType ?: 'application/octet-stream';
         $this->size = $size;
         $this->error = $error ?: UPLOAD_ERR_OK;
-        $this->moved = (Boolean) $moved;
     }
 
     /**
@@ -111,10 +101,6 @@ class UploadedFile extends File
      */
     public function getExtension()
     {
-        if ($this->moved) {
-            return parent::getExtension();
-        }
-
         if ($ext = pathinfo($this->getOriginalName(), PATHINFO_EXTENSION)) {
             return $ext;
         }
@@ -164,10 +150,6 @@ class UploadedFile extends File
      */
     public function move($directory, $name = null)
     {
-        if ($this->moved) {
-            return parent::move($directory, $name);
-        }
-
         $newPath = $directory.DIRECTORY_SEPARATOR.(null === $name ? $this->getName() : $name);
 
         if (!@move_uploaded_file($this->getPath(), $newPath)) {
@@ -175,7 +157,6 @@ class UploadedFile extends File
             throw new FileException(sprintf('Could not move file %s to %s (%s)', $this->getPath(), $newPath, strip_tags($error['message'])));
         }
 
-        $this->moved = true;
         $this->path = realpath($newPath);
     }
 }

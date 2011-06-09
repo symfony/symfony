@@ -30,10 +30,9 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher = new EventDispatcher();
         $this->csrfProvider = $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface');
-        $storage = new \Symfony\Component\HttpFoundation\File\TemporaryStorage('foo', \sys_get_temp_dir());
 
         $this->factory = new FormFactory(array(
-            new CoreExtension($storage),
+            new CoreExtension(),
             new CsrfExtension($this->csrfProvider),
         ));
     }
@@ -757,11 +756,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '/div
     [
         ./input[@type="file"][@id="na&me_file"]
-        /following-sibling::input[@type="hidden"][@id="na&me_token"]
-        /following-sibling::input[@type="hidden"][@id="na&me_name"]
-        /following-sibling::input[@type="hidden"][@id="na&me_originalName"]
     ]
-    [count(./input)=4]
+    [count(./input)=1]
 '
         );
     }

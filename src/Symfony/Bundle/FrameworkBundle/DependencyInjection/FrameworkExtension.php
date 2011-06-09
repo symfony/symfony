@@ -156,14 +156,6 @@ class FrameworkExtension extends Extension
             $container->setParameter('form.type_extension.csrf.enabled', $config['csrf_protection']['enabled']);
             $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
         }
-
-        if ($container->hasDefinition('session')) {
-            $container->removeDefinition('file.temporary_storage');
-            $container->setDefinition('file.temporary_storage', $container->getDefinition('file.temporary_storage.session'));
-            $container->removeDefinition('file.temporary_storage.session');
-        } else {
-            $container->removeDefinition('file.temporary_storage.session');
-        }
     }
 
     /**

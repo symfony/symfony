@@ -5,27 +5,160 @@
 このドキュメントでは、フレームワークの "パブリックな" APIを使っている場合に必要な変更点についてのみ説明しています。
 フレームワークのコアコードを "ハック" している場合は、変更履歴を注意深く追跡する必要があるでしょう。
 
+beta4 から beta5
+----------------
+
+* ファイルアップロードのための一時的なストレージは削除されました
+
+* `Symfony\Component\HttpFoundation\File\File::getExtension()` メソッドと `guessExtension()` メソッドは拡張子を
+  返すときにもう `.` を付けません。
+
+* Doctrine の `EntityType` クラスの `em` オプションは EntityManager インスタンスの代わりにエンティティ名を取ります。
+  このオプションをを渡さない場合、以前と同じようにデフォルトのエンティティマネージャーが使われます。
+
+* Console コンポーネントの中の: `Command::getFullname()` メソッドと `Command::getNamespace()` メソッドは削除されました
+  (`Command::getName()` メソッドの振る舞いは以前の `Command::getFullname()` メソッドと同じになりました)。
+
+* デフォルトの Twig フォームテンプレートは Twig bridge に移動されました。以下のようにすればテンプレートや
+  コンフィギュレーション設定中で現在Twig フォームテンプレートを参照できます:
+
+    変更前:
+
+        `TwigBundle:Form:div_layout.html.twig`
+
+    変更後:
+
+        `div_layout.html.twig`
+
+* キャッシュされているかを考慮する全ての設定は削除されました。
+
+* `Response::isRedirected()` メソッドは `Response::isRedirect()` メソッドに統合されました。
+
+beta3 から beta4
+----------------
+
+* `Profile` のインスタンスを返す `Client::getProfiler` は、 `Client::getProfile` が選ばれたため削除されました。
+
+* いくつかの `UniversalClassLoader` のメソッド名は変更されました:
+
+    * `registerPrefixFallback` から `registerPrefixFallbacks`
+    * `registerNamespaceFallback` から `registerNamespaceFallbacks`
+
+* イベントシステムはさらに柔軟になりました。リスナーは任意の有効でコール可能な PHP 関数であれば可能になりました。
+
+    * `EventDispatcher::addListener($eventName, $listener, $priority = 0)`:
+        * `$eventName` がイベント名で (もう配列ではいけません)、
+        * `$listener` が コール可能な PHP 関数です。
+
+    * イベントクラス名と定数が変更されました:
+
+        * 以前の `Symfony\Component\Form\Events` のクラス名と定数:
+
+                Events::preBind = 'preBind'
+                Events::postBind = 'postBind'
+                Events::preSetData = 'preSetData'
+                Events::postSetData = 'postSetData'
+                Events::onBindClientData = 'onBindClientData'
+                Events::onBindNormData = 'onBindNormData'
+                Events::onSetData = 'onSetData'
+
+        * 新しい `Symfony\Component\Form\FormEvents` クラス名と定数:
+
+                FormEvents::PRE_BIND = 'form.pre_bind'
+                FormEvents::POST_BIND = 'form.post_bind'
+                FormEvents::PRE_SET_DATA = 'form.pre_set_data'
+                FormEvents::POST_SET_DATA = 'form.post_set_data'
+                FormEvents::BIND_CLIENT_DATA = 'form.bind_client_data'
+                FormEvents::BIND_NORM_DATA = 'form.bind_norm_data'
+                FormEvents::SET_DATA = 'form.set_data'
+
+        * 以前の `Symfony\Component\HttpKernel\Events` のクラス名と定数:
+
+                Events::onCoreRequest = 'onCoreRequest'
+                Events::onCoreException = 'onCoreException'
+                Events::onCoreView = 'onCoreView'
+                Events::onCoreController = 'onCoreController'
+                Events::onCoreResponse = 'onCoreResponse'
+
+        * 新しい `Symfony\Component\HttpKernel\CoreEvents` のクラス名と定数:
+
+                CoreEvents::REQUEST = 'core.request'
+                CoreEvents::EXCEPTION = 'core.exception'
+                CoreEvents::VIEW = 'core.view'
+                CoreEvents::CONTROLLER = 'core.controller'
+                CoreEvents::RESPONSE = 'core.response'
+
+        * 以前の `Symfony\Component\Security\Http\Events` のクラス名と定数:
+
+                Events::onSecurityInteractiveLogin = 'onSecurityInteractiveLogin'
+                Events::onSecuritySwitchUser = 'onSecuritySwitchUser'
+
+        * 新しい `Symfony\Component\Security\Http\SecurityEvents` のクラス名と定数:
+
+                SecurityEvents::INTERACTIVE_LOGIN = 'security.interactive_login'
+                SecurityEvents::SWITCH_USER = 'security.switch_user'
+
+    * `addListenerService` は第 1 引数として単一のイベント名だけを取るようになりました。
+
+    * タグの中のコンフィギュレーションは呼び出すメソッドを設定が必須になりました:
+
+        * 変更前:
+
+                <tag name="kernel.listener" event="onCoreRequest" />
+
+        * 変更後:
+
+                <tag name="kernel.listener" event="core.request" method="onCoreRequest" />
+
+    * Subscriber は常に連想配列を返すようになりました:
+
+        * 変更前:
+
+                public static function getSubscribedEvents()
+                {
+                    return Events::onBindNormData;
+                }
+
+        * 変更後:
+
+                public static function getSubscribedEvents()
+                {
+                    return array(FormEvents::BIND_NORM_DATA => 'onBindNormData');
+                }
+
+* フォーム `DateType` パラメーターの `single-text` は `single_text` へ変更されました
+* フォームフィールドラベルヘルパーは属性の設定も受け入れるようになりました。例 :
+
+```html+jinja
+{{ form_label(form.name, 'Custom label', { 'attr': {'class': 'name_field'} }) }}
+```
+
+* Swiftmailer を使うためには、autoloader ("app/autoloader.php") を通して "init.php" を登録し、
+  `Swift_` prefix の登録を autoloader から削除しなければなりません。これをどのように行うべきかの例は、
+  Standard Distribution をご覧ください。
+  [autoload.php](https://github.com/symfony/symfony-standard/blob/v2.0.0BETA4/app/autoload.php#L29).
+
 beta2 から beta3
 ----------------
 
 * `framework.annotations` に属する設定が少し変更されました。
 
-  変更前:
+    変更前:
 
-    framework:
-        annotations:
-            cache: file
-            file_cache:
+        framework:
+            annotations:
+                cache: file
+                file_cache:
+                    debug: true
+                    dir: /foo
+
+    変更後:
+
+        framework:
+            annotations:
+                cache: file
                 debug: true
-                dir: /foo
-
-  変更後:
-
-    framework:
-        annotations:
-            cache: file
-            debug: true
-            file_cache_dir: /foo
+                file_cache_dir: /foo
 
 beta1 から beta2
 ----------------

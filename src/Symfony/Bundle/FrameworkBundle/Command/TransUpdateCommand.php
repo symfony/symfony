@@ -37,7 +37,7 @@ class UpdateTransCommand extends Command {
     protected function configure()
     {
         $this
-            ->setName('bcc:trans:update')
+            ->setName('trans:update')
             ->setDescription('Update the translation file')
             ->setDefinition(array(
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
@@ -94,34 +94,16 @@ class UpdateTransCommand extends Command {
                 $this->_crawlNode($tree);
             }
 
-            // load any existing yml translation files
-            $finder = new Finder();
-            $files = $finder->files()->name('*.' . $input->getArgument('locale') . '.yml')->in($bundleTransPath);
-            foreach ($files as $file) {
-                $output->writeln(sprintf(' > parsing translation <comment>%s</comment>', $file->getPathname()));
-                $domain = substr($file->getFileName(), 0, strrpos($file->getFileName(), $input->getArgument('locale') . '.yml') - 1);
-                $yml_loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
-                $this->messages->addCatalogue($yml_loader->load($file->getPathname(), $input->getArgument('locale'), $domain));
-            }
-
-            // load any existing xliff translation files
-            $finder = new Finder();
-            $files = $finder->files()->name('*.' . $input->getArgument('locale') . '.xliff')->in($bundleTransPath);
-            foreach ($files as $file) {
-                $output->writeln(sprintf(' > parsing translation <comment>%s</comment>', $file->getPathname()));
-                $domain = substr($file->getFileName(), 0, strrpos($file->getFileName(), $input->getArgument('locale') . '.xliff') - 1);
-                $loader = new \Symfony\Component\Translation\Loader\XliffFileLoader();
-                $this->messages->addCatalogue($loader->load($file->getPathname(), $input->getArgument('locale'), $domain));
-            }
-
-            // load any existing php translation files
-            $finder = new Finder();
-            $files = $finder->files()->name('*.' . $input->getArgument('locale') . '.php')->in($bundleTransPath);
-            foreach ($files as $file) {
-                $output->writeln(sprintf(' > parsing translation <comment>%s</comment>', $file->getPathname()));
-                $domain = substr($file->getFileName(), 0, strrpos($file->getFileName(), $input->getArgument('locale') . '.php') - 1);
-                $loader = new \Symfony\Component\Translation\Loader\PhpFileLoader();
-                $this->messages->addCatalogue($loader->load($file->getPathname(), $input->getArgument('locale'), $domain));
+            foreach($this->container->findTaggedServiceIds('translation.loader') as $id => $attributes) {
+                // load any existing translation files
+                $finder = new Finder();
+                $files = $finder->files()->name('*.' . $input->getArgument('locale') . $attributes[0]['alias'])->in($bundleTransPath);
+                foreach ($files as $file) {
+                    $output->writeln(sprintf(' > parsing translation <comment>%s</comment>', $file->getPathname()));
+                    $domain = substr($file->getFileName(), 0, strrpos($file->getFileName(), $input->getArgument('locale') . $attributes[0]['alias']) - 1);
+                    $loader = $this->container->get($id);
+                    $this->messages->addCatalogue($loader->load($file->getPathname(), $input->getArgument('locale'), $domain));
+                }
             }
 
             // show compiled list of messages
@@ -136,14 +118,11 @@ class UpdateTransCommand extends Command {
             if($input->getOption('force') === true) {
                 $output->writeln("\nWriting files.\n");
                 $path = $foundBundle->getPath() . '/Resources/translations/';
-                if ($input->getOption('output-format') == 'yml') {
-                    $formatter = new \BCC\ExtraToolsBundle\Translation\Formatter\YmlFormatter();
-                } elseif ($input->getOption('output-format') == 'php') {
-                    $formatter = new \BCC\ExtraToolsBundle\Translation\Formatter\PhpFormatter();
-                } elseif ($input->getOption('output-format') == 'pot') {
-                    $formatter = new \BCC\ExtraToolsBundle\Translation\Formatter\PotFormatter();
-                } else {
-                    $formatter = new \BCC\ExtraToolsBundle\Translation\Formatter\XliffFormatter($input->getOption('source-lang'));
+                foreach($this->container->findTaggedServiceIds('translation.formatter') as $id => $attributes) {
+                    if ($input->getOption('output-format') == $attributes[0]['alias']) {
+                        $formatter = $this->container->get($id);
+                        break;
+                    }
                 }
                 foreach ($this->messages->getDomains() as $domain) {
                     $file = $domain . '.' . $input->getArgument('locale') . '.' . $input->getOption('output-format');

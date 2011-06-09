@@ -97,8 +97,12 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateNoTypeNoDataClass()
     {
-        $this->setExpectedException('Symfony\Component\Form\Exception\FormException', 'The "foo" type cannot be guessed as the data class is not set. Provide the type manually (\'text\', \'password\', ...) or set the data class.');
-        $this->builder->create('foo');
+        $this->factory->expects($this->once())
+                ->method('createNamedBuilder')
+                ->with('text', 'foo', null, array())
+        ;
+
+        $builder = $this->builder->create('foo');
     }
 
     public function testGetUnknown()

@@ -306,6 +306,22 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($form->isValid());
     }
 
+    public function testValidIfBoundAndReadOnlyWithChildren()
+    {
+        $this->factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('text', 'name', null, array())
+            ->will($this->returnValue($this->getBuilder('name')));
+
+        $form = $this->getBuilder('person')
+            ->setReadOnly(true)
+            ->add('name', 'text')
+            ->getForm();
+        $form->bind(array('name' => 'Jacques Doe'));
+
+        $this->assertTrue($form->isValid());
+    }
+
     public function testNotValidIfNotBound()
     {
         $this->assertFalse($this->form->isValid());

@@ -128,7 +128,7 @@ class Response
         // headers
         foreach ($this->headers->all() as $name => $values) {
             foreach ($values as $value) {
-                header($name.': '.$value);
+                header($name.': '.$value, false);
             }
         }
 

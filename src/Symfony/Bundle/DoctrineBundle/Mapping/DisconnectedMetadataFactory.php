@@ -20,6 +20,6 @@ class DisconnectedMetadataFactory extends MetadataFactory
 {
     protected function getClassMetadataFactoryClass()
     {
-        return 'Doctrine\\ORM\Tools\\DisconnectedClassMetadataFactory';
+        return 'Doctrine\\ORM\\Tools\\DisconnectedClassMetadataFactory';
     }
 }

@@ -57,6 +57,10 @@ class TwigExtension extends Extension
 
         if (!empty($config['extensions'])) {
             foreach ($config['extensions'] as $id) {
+                if (!$container->hasDefinition($id)) {
+                    throw new \InvalidArgumentException(sprintf('You specified "%s" as a Twig extension, but that service name does not exist.', $id));
+                }
+
                 $container->getDefinition($id)->addTag('twig.extension');
             }
         }

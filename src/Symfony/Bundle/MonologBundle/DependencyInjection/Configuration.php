@@ -57,7 +57,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('id')->end()
                             ->scalarNode('priority')->defaultValue(0)->end()
                             ->scalarNode('level')->defaultValue('DEBUG')->end()
-                            ->booleanNode('bubble')->defaultFalse()->end()
+                            ->booleanNode('bubble')->defaultTrue()->end()
                             ->scalarNode('path')->defaultValue('%kernel.logs_dir%/%kernel.environment%.log')->end() // stream and rotating
                             ->scalarNode('ident')->defaultFalse()->end() // syslog
                             ->scalarNode('facility')->defaultValue('user')->end() // syslog

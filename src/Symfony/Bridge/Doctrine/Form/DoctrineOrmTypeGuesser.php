@@ -98,7 +98,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     public function guessMaxLength($class, $property)
     {
         $ret = $this->getMetadata($class);
-        if ($ret && !$ret[0]->hasAssociation($property)) {
+        if ($ret && $ret[0]->hasField($property) && !$ret[0]->hasAssociation($property)) {
             $mapping = $ret[0]->getFieldMapping($property);
 
             if (isset($mapping['length'])) {

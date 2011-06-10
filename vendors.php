@@ -43,5 +43,5 @@ foreach ($deps as $dep) {
         system(sprintf('git clone %s "%s"', $url, $installDir));
     }
 
-    system(sprintf('cd %s && git fetch origin && git reset --hard %s', $installDir, $rev));
+    system(sprintf('cd "%s" && git fetch origin && git reset --hard %s', $installDir, $rev));
 }

@@ -32,17 +32,6 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder = new FormBuilder('name', $this->factory, $this->dispatcher);
     }
 
-    /**
-     * Changing the name is not allowed, otherwise the name and property path
-     * are not synchronized anymore
-     *
-     * @see FieldType::buildForm
-     */
-    public function testNoSetName()
-    {
-        $this->assertFalse(method_exists($this->builder, 'setName'));
-    }
-
     public function testAddNameNoString()
     {
         $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');

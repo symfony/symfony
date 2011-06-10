@@ -679,10 +679,12 @@ class Form implements \IteratorAggregate, FormInterface
             return false;
         }
 
-        foreach ($this->children as $child) {
-            if (!$child->isValid()) {
+        if (!$this->readOnly) {
+            foreach ($this->children as $child) {
+                if (!$child->isValid()) {
 
-                return false;
+                    return false;
+                }
             }
         }
 

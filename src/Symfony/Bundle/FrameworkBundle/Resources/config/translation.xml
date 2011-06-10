@@ -11,6 +11,10 @@
         <parameter key="translation.loader.php.class">Symfony\Component\Translation\Loader\PhpFileLoader</parameter>
         <parameter key="translation.loader.yml.class">Symfony\Component\Translation\Loader\YamlFileLoader</parameter>
         <parameter key="translation.loader.xliff.class">Symfony\Component\Translation\Loader\XliffFileLoader</parameter>
+        <parameter key="translation.formatter.php.class">Symfony\Component\Translation\Formatter\PhpFormatter</parameter>
+        <parameter key="translation.formatter.pot.class">Symfony\Component\Translation\Formatter\PotFormatter</parameter>
+        <parameter key="translation.formatter.xliff.class">Symfony\Component\Translation\Formatter\XliffFormatter</parameter>
+        <parameter key="translation.formatter.yml.class">Symfony\Component\Translation\Formatter\YamlFormatter</parameter>
     </parameters>
 
     <services>
@@ -41,6 +45,22 @@
 
         <service id="translation.loader.xliff" class="%translation.loader.xliff.class%">
             <tag name="translation.loader" alias="xliff" />
+        </service>
+        
+        <service id="translation.formatter.php" class="%translation.formatter.php.class%">
+            <tag name="translation.formatter" alias="php" />
+        </service>
+        
+        <service id="translation.formatter.pot" class="%translation.formatter.pot.class%">
+            <tag name="translation.formatter" alias="pot" />
+        </service>
+        
+        <service id="tranlsation.formatter.xliff" class="%translation.formatter.xliff.class%">
+            <tag name="translation.formatter" alias="xliff" />
+        </service>
+        
+        <service id="translation.formatter.yml" class="%translation.formatter.yml.class%">
+            <tag name="translation.formatter" alias="yml" />
         </service>
     </services>
 </container>

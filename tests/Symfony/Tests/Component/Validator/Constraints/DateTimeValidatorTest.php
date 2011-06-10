@@ -33,6 +33,11 @@ class DateTimeValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->validator->isValid('', new DateTime()));
     }
 
+    public function testDateTimeClassIsValid()
+    {
+        $this->assertTrue($this->validator->isValid(new \DateTime(), new DateTime()));
+    }
+
     public function testExpectsStringCompatibleType()
     {
         $this->setExpectedException('Symfony\Component\Validator\Exception\UnexpectedTypeException');

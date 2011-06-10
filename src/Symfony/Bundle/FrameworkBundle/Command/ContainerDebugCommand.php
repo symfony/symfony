@@ -47,7 +47,7 @@ class ContainerDebugCommand extends Command
             ->setName('container:debug')
             ->setDescription('Displays current services for an application')
             ->setHelp(<<<EOF
-The <info>container:debug</info> displays all configured <comment>public</comment> services:
+The <info>container:debug</info> command displays all configured <comment>public</comment> services:
 
   <info>container:debug</info>
 

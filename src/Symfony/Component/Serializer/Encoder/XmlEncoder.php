@@ -3,6 +3,7 @@
 namespace Symfony\Component\Serializer\Encoder;
 
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /*
  * This file is part of the Symfony framework.
@@ -20,7 +21,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  * @author John Wards <jwards@whiteoctober.co.uk>
  * @author Fabian Vogler <fabian@equivalence.ch>
  */
-class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, NormalizationAwareInterface
+class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, DecoderInterface, NormalizationAwareInterface
 {
     private $dom;
     private $format;
@@ -254,7 +255,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
             return $append;
         }
         if (is_object($data)) {
-            $data = $this->serializer->normalizeObject($data, $this->format);
+            $data = $this->serializer->normalize($data, $this->format);
             if (null !== $data && !is_scalar($data)) {
                 return $this->buildXml($parentNode, $data);
             }
@@ -268,7 +269,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
 
             return $this->appendNode($parentNode, $data, 'data');
         }
-        throw new \UnexpectedValueException('An unexpected value could not be serialized: '.var_export($data, true));
+        throw new UnexpectedValueException('An unexpected value could not be serialized: '.var_export($data, true));
     }
 
     /**
@@ -312,7 +313,7 @@ class XmlEncoder extends SerializerAwareEncoder implements DecoderInterface, Nor
         } elseif ($val instanceof \Traversable) {
             $this->buildXml($node, $val);
         } elseif (is_object($val)) {
-            return $this->buildXml($node, $this->serializer->normalizeObject($val, $this->format));
+            return $this->buildXml($node, $this->serializer->normalize($val, $this->format));
         } elseif (is_numeric($val)) {
             return $this->appendText($node, (string) $val);
         } elseif (is_string($val)) {

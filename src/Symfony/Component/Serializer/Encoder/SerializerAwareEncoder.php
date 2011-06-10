@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\SerializerAwareInterface;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-abstract class SerializerAwareEncoder implements SerializerAwareInterface, EncoderInterface
+abstract class SerializerAwareEncoder implements SerializerAwareInterface
 {
     protected $serializer;
 

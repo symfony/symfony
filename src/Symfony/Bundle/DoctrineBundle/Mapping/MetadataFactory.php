@@ -17,10 +17,10 @@ use Doctrine\ORM\Tools\EntityRepositoryGenerator;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\ORMException;
-use Doctrine\ORM\Tools\DisconnectedClassMetadataFactory;
 
 /**
- *
+ * This class provides methods to access Doctrine entity class metadata for a
+ * given bundle, namespace or entity class.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -159,7 +159,8 @@ class MetadataFactory
     {
         $metadata = array();
         foreach ($this->registry->getEntityManagers() as $em) {
-            $cmf = new DisconnectedClassMetadataFactory();
+            $class = $this->getClassMetadataFactoryClass();
+            $cmf = new $class();
             $cmf->setEntityManager($em);
             foreach ($cmf->getAllMetadata() as $m) {
                 $metadata[] = $m;
@@ -167,5 +168,10 @@ class MetadataFactory
         }
 
         return $metadata;
+    }
+
+    protected function getClassMetadataFactoryClass()
+    {
+        return '\\Doctrine\\ORM\\Mapping\\ClassMetadataFactory';
     }
 }

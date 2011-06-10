@@ -183,9 +183,12 @@ class DelegatingValidator implements FormValidatorInterface
             $nestedNamePath = $namePath . '.' . $child->getName();
 
             if (strpos($path, '[') === 0) {
-                $nestedDataPath = $dataPath . $path;
+                $nestedDataPaths = array($dataPath . $path);
             } else {
-                $nestedDataPath = $dataPath . '.' . $path;
+                $nestedDataPaths = array($dataPath . '.' . $path);
+                if ($child->hasChildren()) {
+                    $nestedDataPaths[] = $dataPath . '[' . $path . ']';
+                }
             }
 
             if ($child->hasChildren()) {
@@ -195,10 +198,14 @@ class DelegatingValidator implements FormValidatorInterface
                     $this->buildDataPathMapping($child, $mapping, $dataPath, $nestedNamePath);
                 }
 
-                $this->buildDataPathMapping($child, $mapping, $nestedDataPath, $nestedNamePath);
+                foreach ($nestedDataPaths as $nestedDataPath) {
+                    $this->buildDataPathMapping($child, $mapping, $nestedDataPath, $nestedNamePath);
+                }
             }
 
-            $mapping['/^'.preg_quote($nestedDataPath, '/').'(?!\w)/'] = $child;
+            foreach ($nestedDataPaths as $nestedDataPath) {
+                $mapping['/^'.preg_quote($nestedDataPath, '/').'(?!\w)/'] = $child;
+            }
         }
     }
 

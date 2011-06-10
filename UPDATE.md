@@ -10,8 +10,8 @@ beta4 to beta5
 --------------
 
 * Expanded the SerializerInterface, while reducing the number of public
-  methods in the Serializer class itself and adding component specific
-  Exception classes.
+  methods in the Serializer class itself breaking BC and adding component
+  specific Exception classes.
 
 * The temporary storage for file uploads has been removed
 

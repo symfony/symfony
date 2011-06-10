@@ -172,6 +172,6 @@ class MetadataFactory
 
     protected function getClassMetadataFactoryClass()
     {
-        return '\\Doctrine\\ORM\\Mapping\\ClassMetadataFactory';
+        return 'Doctrine\\ORM\\Mapping\\ClassMetadataFactory';
     }
 }

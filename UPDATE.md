@@ -9,6 +9,9 @@ timeline closely anyway.
 beta4 to beta5
 --------------
 
+* The `extensions` setting for Twig has been removed. There is now only one
+  way to register Twig extensions, via the `twig.extension` tag.
+
 * The stack of Monolog handlers now bubbles the records by default. To stop
   the propagation you need to configure the bubbling explicitly.
 

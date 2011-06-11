@@ -18,6 +18,10 @@
         <parameter key="twig.extension.form.class">Symfony\Bridge\Twig\Extension\FormExtension</parameter>
         <parameter key="twig.extension.text.class">Twig_Extensions_Extension_Text</parameter>
         <parameter key="twig.extension.debug.class">Twig_Extensions_Extension_Debug</parameter>
+        <parameter key="twig.translation.formatter.php.class">Symfony\Component\Translation\Formatter\PhpFormatter</parameter>
+        <parameter key="twig.translation.formatter.pot.class">Symfony\Component\Translation\Formatter\PotFormatter</parameter>
+        <parameter key="twig.translation.formatter.xliff.class">Symfony\Component\Translation\Formatter\XliffFormatter</parameter>
+        <parameter key="twig.translation.formatter.yml.class">Symfony\Component\Translation\Formatter\YamlFormatter</parameter>
     </parameters>
 
     <services>
@@ -80,5 +84,13 @@
         <service id="twig.extension.text" class="%twig.extension.text.class%" public="false" />
 
         <service id="twig.extension.debug" class="%twig.extension.debug.class%" public="false" />
+        
+        <service id="twig.translation.formatter.php" class="%twig.translation.formatter.php.class%"/>
+
+        <service id="twig.translation.formatter.pot" class="%twig.translation.formatter.pot.class%"/>
+
+        <service id="twig.tranlsation.formatter.xliff" class="%twig.translation.formatter.xliff.class%"/>
+
+        <service id="twig.translation.formatter.yml" class="%twig.translation.formatter.yml.class%"/>
     </services>
 </container>

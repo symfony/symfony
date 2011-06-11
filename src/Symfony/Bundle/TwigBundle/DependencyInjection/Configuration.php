@@ -32,24 +32,11 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('twig');
 
-        $this->addExtensionsSection($rootNode);
         $this->addFormSection($rootNode);
         $this->addGlobalsSection($rootNode);
         $this->addTwigOptions($rootNode);
 
         return $treeBuilder;
-    }
-
-    private function addExtensionsSection(ArrayNodeDefinition $rootNode)
-    {
-        $rootNode
-            ->fixXmlConfig('extension')
-            ->children()
-                ->arrayNode('extensions')
-                    ->prototype('scalar')->end()
-                ->end()
-            ->end()
-        ;
     }
 
     private function addFormSection(ArrayNodeDefinition $rootNode)

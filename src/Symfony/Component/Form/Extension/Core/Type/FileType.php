@@ -48,7 +48,7 @@ class FileType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'type' => 'file',
+            'type' => 'string',
         );
     }
 

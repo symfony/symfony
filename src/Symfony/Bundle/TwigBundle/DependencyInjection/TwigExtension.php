@@ -55,12 +55,6 @@ class TwigExtension extends Extension
             }
         }
 
-        if (!empty($config['extensions'])) {
-            foreach ($config['extensions'] as $id) {
-                $container->getDefinition($id)->addTag('twig.extension');
-            }
-        }
-
         unset(
             $config['form'],
             $config['globals'],

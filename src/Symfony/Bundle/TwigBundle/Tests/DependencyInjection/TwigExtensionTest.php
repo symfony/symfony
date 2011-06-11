@@ -52,12 +52,6 @@ class TwigExtensionTest extends TestCase
 
         $this->assertEquals('Twig_Environment', $container->getParameter('twig.class'), '->load() loads the twig.xml file');
 
-        // Extensions
-        foreach (array('twig.extension.debug', 'twig.extension.text') as $id) {
-            $config = $container->getDefinition($id);
-            $this->assertEquals(array('twig.extension'), array_keys($config->getTags()), '->load() adds tags to extension definitions');
-        }
-
         // Form resources
         $resources = $container->getParameter('twig.form.resources');
         $this->assertContains('div_layout.html.twig', $resources, '->load() includes default template for form resources');

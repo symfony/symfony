@@ -75,6 +75,7 @@ EOF;
         
         $routeIterator = $routes->getIterator();
         $keys = array_keys($routeIterator->getArrayCopy());
+        $keysCount = count($keys);
         
         $i = 0;
         
@@ -86,8 +87,10 @@ EOF;
                 $optimizable = $prefix && count($route->all()) > 1 && false === strpos($route->getPrefix(), '{');
                 $indent = '';
                 if ($optimizable) {
-                    for ($j = $i; $j < count($keys); $j++) {
-                        if ($keys[$j] === null) continue;
+                    for ($j = $i; $j < $keysCount; $j++) {
+                        if ($keys[$j] === null) {
+                          continue;
+                        }
                       
                         $testRoute = $routeIterator->offsetGet($keys[$j]);
                         $isCollection = ($testRoute instanceof RouteCollection);

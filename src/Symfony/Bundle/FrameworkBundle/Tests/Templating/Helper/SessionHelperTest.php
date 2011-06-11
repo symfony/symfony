@@ -22,17 +22,17 @@ class SessionHelperTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-		$this->request = new Request();
-		
-		$session = new Session(new ArraySessionStorage());
-		$session->set('foobar', 'bar');
-		$session->setFlash('foo', 'bar');
+        $this->request = new Request();
+
+        $session = new Session(new ArraySessionStorage());
+        $session->set('foobar', 'bar');
+        $session->setFlash('foo', 'bar');
 
         $this->request->setSession($session);
     }
 
-	public function testFlash()
-	{
+    public function testFlash()
+    {
         $helper = new SessionHelper($this->request);
 
         $this->assertTrue($helper->hasFlash('foo'));
@@ -41,22 +41,22 @@ class SessionHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $helper->getFlash('bar', 'foo'));
 
         $this->assertNull($helper->getFlash('foobar'));
-	}
+    }
 
-	public function testGet()
-	{
+    public function testGet()
+    {
         $helper = new SessionHelper($this->request);
 
         $this->assertEquals('bar', $helper->get('foobar'));
         $this->assertEquals('foo', $helper->get('bar', 'foo'));
 
         $this->assertNull($helper->get('foo'));
-	}
+    }
 
-	public function testGetName()
-	{
+    public function testGetName()
+    {
         $helper = new SessionHelper($this->request);
 
         $this->assertEquals('session', $helper->getName());
-	}
+    }
 }

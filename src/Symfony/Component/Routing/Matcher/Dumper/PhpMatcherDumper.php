@@ -101,6 +101,7 @@ EOF;
 
     private function compileRoute(Route $route, $name, $supportsRedirections, $parentPrefix = null)
     {
+        $code = array();
         $compiledRoute = $route->compile();
         $conditions = array();
         $hasTrailingSlash = false;

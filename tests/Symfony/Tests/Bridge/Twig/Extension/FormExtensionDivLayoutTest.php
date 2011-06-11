@@ -48,6 +48,51 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $this->extension->initRuntime($environment);
     }
 
+    public function testThemeBlockInheritance()
+    {
+        $view = $this->factory
+            ->createNamed('email', 'name')
+            ->createView()
+        ;
+
+        $this->extension->setTheme($view, array('theme.html.twig'));
+
+        $this->assertMatchesXpath(
+            $this->renderWidget($view),
+            '/input[@type="email"][@rel="theme"]'
+        );
+    }
+
+    public function testThemeBlockInheritanceUsingUse()
+    {
+        $view = $this->factory
+            ->createNamed('email', 'name')
+            ->createView()
+        ;
+
+        $this->extension->setTheme($view, array('theme_use.html.twig'));
+
+        $this->assertMatchesXpath(
+            $this->renderWidget($view),
+            '/input[@type="email"][@rel="theme"]'
+        );
+    }
+
+    public function testThemeBlockInheritanceUsingExtend()
+    {
+        $view = $this->factory
+            ->createNamed('email', 'name')
+            ->createView()
+        ;
+
+        $this->extension->setTheme($view, array('theme_extends.html.twig'));
+
+        $this->assertMatchesXpath(
+            $this->renderWidget($view),
+            '/input[@type="email"][@rel="theme"]'
+        );
+    }
+
     public function testThemeInheritance()
     {
         $child = $this->factory->createNamedBuilder('form', 'child')

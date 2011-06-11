@@ -24,17 +24,16 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class UrlValidator extends ConstraintValidator
 {
-    // Pattern based on ICAN data
     const PATTERN = '~^
-            (\S+)://                                 # protocol
-            (
-                ([a-z0-9-]+\.)+(aero|arpa|asia|biz|cat|com|coop|edu|gov|info|int|jobs|mil|mobi|museum|name|net|org|pro|tel|travel|xxx|[a-z]{2})  # a domain name
+            (?:\S+)://                               # protocol
+            (?:
+                ([[:alpha:]-]{1,64}\.)+([:alpha:]{2,9})  # a domain name
                     |                                #  or
-                \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}   # a IP address
+                \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}       # a IP address
             )
             (:[0-9]{0,5})?                          # a port (optional)
             (/?|/\S+)?                              # a /, nothing or a / with something (optional)
-        $~ix';
+        $~ixu';
 
     public function isValid($value, Constraint $constraint)
     {
@@ -50,7 +49,8 @@ class UrlValidator extends ConstraintValidator
         $valid = false;
         $ip    = null;
 
-        if (strlen($value) > 8 && strlen($value) < 256 && (false !== $protocolPos = strpos($value, '://'))) {
+        // URL can must have at least 8 and valid protocol
+        if (strlen($value) > 8 && (false !== $protocolPos = strpos($value, '://'))) {
             $valid = in_array(strtolower(substr($value, 0, $protocolPos)), $constraint->protocols);
 
             if ($valid) {

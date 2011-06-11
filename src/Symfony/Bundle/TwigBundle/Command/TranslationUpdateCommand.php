@@ -12,13 +12,6 @@ use Symfony\Component\Console\Input\InputOption;
 class TranslationUpdateCommand extends Command
 {
     /**
-     * Default domain for found trans blocks/filters
-     *
-     * @var string
-     */
-    private $defaultDomain = 'messages';
-    
-    /**
      * Supported formats for output
      * 
      * @var array
@@ -26,24 +19,10 @@ class TranslationUpdateCommand extends Command
     private $supportedFormats = array('yml', 'xliff', 'php', 'pot');
     
     /**
-     * Supported formats for import
-     * 
-     * @var array
-     */
-    private $supportedLoaders = array('yml', 'xliff', 'php');
-    
-    /**
-     * Prefix for newly found message ids
-     *
-     * @var string
-     */
-    protected $prefix;
-
-    /**
      * Compiled catalogue of messages
      * @var  \Symfony\Component\Translation\MessageCatalogue
      */
-    protected $messages;
+    protected $catalogue;
 
     /**
      * {@inheritDoc}
@@ -51,7 +30,7 @@ class TranslationUpdateCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('translation:update')
+            ->setName('twig:translation:update')
             ->setDescription('Update the translation file')
             ->setDefinition(array(
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
@@ -84,9 +63,6 @@ class TranslationUpdateCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $twig = $this->container->get('twig');
-        $this->prefix = $input->getOption('prefix');
-
         if ($input->getOption('force') !== true && $input->getOption('dump-messages') !== true) {
             $output->writeln('<info>You must choose one of --force or --dump-messages</info>');
             return;
@@ -102,126 +78,33 @@ class TranslationUpdateCommand extends Command
         $bundleTransPath = $foundBundle->getPath() . '/Resources/translations';
         $output->writeln(sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $input->getArgument('locale'), $foundBundle->getName()));
 
-        $output->writeln('Parsing files.');
-
+        // create catalogue
+        $catalogue = new \Symfony\Component\Translation\MessageCatalogue($input->getArgument('locale'));
+        
         // load any messages from templates
-        $this->messages = new \Symfony\Component\Translation\MessageCatalogue($input->getArgument('locale'));
-        $finder = new Finder();
-        $files = $finder->files()->name('*.html.twig')->in($foundBundle->getPath() . '/Resources/views/');
-        foreach ($files as $file) {
-            $output->writeln(sprintf(' > parsing template <comment>%s</comment>', $file->getPathname()));
-            $tree = $twig->parse($twig->tokenize(file_get_contents($file->getPathname())));
-            $this->crawlNode($tree);
-        }
-
-        foreach($this->supportedLoaders as $format) {
-            // load any existing translation files
-            $finder = new Finder();
-            $files = $finder->files()->name('*.' . $input->getArgument('locale') . $format)->in($bundleTransPath);
-            foreach ($files as $file) {
-                $output->writeln(sprintf(' > parsing translation <comment>%s</comment>', $file->getPathname()));
-                $domain = substr($file->getFileName(), 0, strrpos($file->getFileName(), $input->getArgument('locale') . $attributes[0]['alias']) - 1);
-                $loader = $this->container->get('translation.loader.' . $format);
-                $this->messages->addCatalogue($loader->load($file->getPathname(), $input->getArgument('locale'), $domain));
-            }
-        }
-
+        $output->writeln('Parsing templates');
+        $twigExtractor = $this->container->get('twig.translation.extractor.twig');
+        $twigExtractor->setPrefix($input->getOption('prefix'));
+        $twigExtractor->extractMessages($foundBundle->getPath() . '/Resources/views/', $catalogue);
+        
+        // load any existing messages from the translation files
+        $output->writeln('Parsing translation files');
+        $fileExtractor = $this->container->get('twig.translation.extractor.file');
+        $fileExtractor->extractMessages($bundleTransPath, $catalogue);
+        
         // show compiled list of messages
         if($input->getOption('dump-messages') === true){
-            foreach ($this->messages->getDomains() as $domain) {
+            foreach ($catalogue->getDomains() as $domain) {
                 $output->writeln(sprintf("\nDisplaying messages for domain <info>%s</info>:\n", $domain));
-                $output->writeln(\Symfony\Component\Yaml\Yaml::dump($this->messages->all($domain),10));
+                $output->writeln(\Symfony\Component\Yaml\Yaml::dump($catalogue->all($domain),10));
             }
         }
 
         // save the files
         if($input->getOption('force') === true) {
-            $output->writeln("\nWriting files.\n");
-            $path = $foundBundle->getPath() . '/Resources/translations/';
-            
-            // get the right formatter
-            $formatter = $this->container->get('twig.translation.formatter.' . $input->getOption('output-format'));
-            
-            foreach ($this->messages->getDomains() as $domain) {
-                $file = $domain . '.' . $input->getArgument('locale') . '.' . $input->getOption('output-format');
-                if (file_exists($path . $file)) {
-                    copy($path . $file, $path . '~' . $file . '.bak');
-                }
-                $output->writeln(sprintf(' > generating <comment>%s</comment>', $path . $file));
-                file_put_contents($path . $file, $formatter->format($this->messages->all($domain)));
-            }
+            $output->writeln("Writing files");
+            $fileWriter = $this->container->get('twig.translation.writer');
+            $fileWriter->writeTranslations($catalogue, $bundleTransPath, $input->getOption('output-format'));
         }
     }
-
-    /**
-     * Recursive function that extract trans message from a twig tree
-     *
-     * @param \Twig_Node The twig tree root
-     */
-    private function crawlNode(\Twig_Node $node)
-    {
-        if ($node instanceof \Symfony\Bridge\Twig\Node\TransNode && !$node->getNode('body') instanceof \Twig_Node_Expression_GetAttr) {
-            // trans block
-            $domain = $node->getNode('domain')->getAttribute('value');
-            $message = $node->getNode('body')->getAttribute('data');
-            $this->messages->set($message, $this->prefix.$message, $domain);
-        } else if ($node instanceof \Twig_Node_Print) {
-            // trans filter (be carefull of how you chain your filters)
-            $message = $this->extractMessage($node->getNode('expr'));
-            $domain = $this->extractDomain($node->getNode('expr'));
-            if($message !== null && $domain!== null) {
-                 $this->messages->set($message, $this->prefix.$message, $domain);
-            }
-        } else {
-            // continue crawling
-            foreach ($node as $child) {
-                if ($child != null) {
-                    $this->crawlNode($child);
-                }
-            }
-        }
-    }
-
-    /**
-     * Extract a message from a \Twig_Node_Print
-     * Return null if not a constant message
-     *
-     * @param \Twig_Node $node
-     */
-    private function extractMessage(\Twig_Node $node)
-    {
-        if($node->hasNode('node')) {
-            return $this->extractMessage($node->getNode ('node'));
-        }
-        if($node instanceof \Twig_Node_Expression_Constant) {
-            return $node->getAttribute('value');
-        }
-
-        return null;
-    }
-
-    /**
-     * Extract a domain from a \Twig_Node_Print
-     * Return null if no trans filter
-     *
-     * @param \Twig_Node $node
-     */
-    private function extractDomain(\Twig_Node $node)
-    {
-        // must be a filter node
-        if(!$node instanceof \Twig_Node_Expression_Filter) {
-            return null;
-        }
-        // is a trans filter
-        if($node->getNode('filter')->getAttribute('value') == 'trans') {
-            if($node->getNode('arguments')->hasNode(1)) {
-                return $node->getNode('arguments')->getNode(1)->getAttribute('value');
-            } else {
-                return $this->defaultDomain;
-            }
-        }
-
-        return $this->extractDomain($node->getNode('node'));
-    }
-
 }

@@ -22,6 +22,10 @@
         <parameter key="twig.translation.formatter.pot.class">Symfony\Component\Translation\Formatter\PotFormatter</parameter>
         <parameter key="twig.translation.formatter.xliff.class">Symfony\Component\Translation\Formatter\XliffFormatter</parameter>
         <parameter key="twig.translation.formatter.yml.class">Symfony\Component\Translation\Formatter\YamlFormatter</parameter>
+        <parameter key="twig.translation.extractor.twig.class">Symfony\Component\Translation\Formatter\YamlFormatter</parameter>
+        <parameter key="twig.translation.extractor.twig.class">Symfony\Bundle\TwigBundle\Translation\TwigTranslationExtractor</parameter>
+        <parameter key="twig.translation.extractor.file.class">Symfony\Bundle\TwigBundle\Translation\FileTranslationExtractor</parameter>
+        <parameter key="twig.translation.writer.class">Symfony\Bundle\TwigBundle\Translation\FileTranslationWriter</parameter>
     </parameters>
 
     <services>
@@ -92,5 +96,17 @@
         <service id="twig.tranlsation.formatter.xliff" class="%twig.translation.formatter.xliff.class%"/>
 
         <service id="twig.translation.formatter.yml" class="%twig.translation.formatter.yml.class%"/>
+
+        <service id="twig.translation.extractor.twig" class="%twig.translation.extractor.twig.class%">
+            <argument type="service" id="twig" />
+        </service>
+
+        <service id="twig.translation.extractor.file" class="%twig.translation.extractor.file.class%">
+            <argument type="service" id="service_container" />
+        </service>
+
+        <service id="twig.translation.writer" class="%twig.translation.writer.class%">
+            <argument type="service" id="service_container" />
+        </service>
     </services>
 </container>

@@ -69,7 +69,7 @@ $code
 EOF;
     }
 
-    private function compileRoutes(RouteCollection $routes, $supportsRedirections)
+    private function compileRoutes(RouteCollection $routes, $supportsRedirections, $parentPrefix = null)
     {
         $code = array();
         foreach ($routes as $name => $route) {
@@ -82,7 +82,7 @@ EOF;
                     $indent = '    ';
                 }
 
-                foreach ($this->compileRoutes($route, $supportsRedirections) as $line) {
+                foreach ($this->compileRoutes($route, $supportsRedirections, $prefix) as $line) {
                     foreach (explode("\n", $line) as $l) {
                         $code[] = $indent.$l;
                     }
@@ -92,7 +92,7 @@ EOF;
                     $code[] = "        }\n";
                 }
             } else {
-                foreach ($this->compileRoute($route, $name, $supportsRedirections) as $line) {
+                foreach ($this->compileRoute($route, $name, $supportsRedirections, $parentPrefix) as $line) {
                     $code[] = $line;
                 }
             }
@@ -101,8 +101,9 @@ EOF;
         return $code;
     }
 
-    private function compileRoute(Route $route, $name, $supportsRedirections)
+    private function compileRoute(Route $route, $name, $supportsRedirections, $parentPrefix = null)
     {
+        $code = array();
         $compiledRoute = $route->compile();
         $conditions = array();
         $hasTrailingSlash = false;
@@ -115,7 +116,7 @@ EOF;
                 $conditions[] = sprintf("\$pathinfo === '%s'", str_replace('\\', '', $m['url']));
             }
         } else {
-            if ($compiledRoute->getStaticPrefix()) {
+            if ($compiledRoute->getStaticPrefix() && $compiledRoute->getStaticPrefix() != $parentPrefix) {
                 $conditions[] = sprintf("0 === strpos(\$pathinfo, '%s')", $compiledRoute->getStaticPrefix());
             }
 

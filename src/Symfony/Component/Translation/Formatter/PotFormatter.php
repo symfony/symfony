@@ -34,10 +34,16 @@ class PotFormatter implements FormatterInterface
         return implode("\n", $output) . "\n";
     }
 
-    protected function clean($message)
+    /**
+     * Clean the given message to to make it pot compliant
+     * @param type $message
+     * @return string the cleaned message
+     */
+    private function clean($message)
     {
         $message = strtr($message, array("\\'" => "'", "\\\\" => "\\", "\r\n" => "\n"));
         $message = addcslashes($message, "\0..\37\\\"");
+        
         return $message;
     }
 }

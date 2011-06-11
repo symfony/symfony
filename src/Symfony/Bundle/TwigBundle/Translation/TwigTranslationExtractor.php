@@ -4,6 +4,7 @@ namespace Symfony\Bundle\TwigBundle\Translation;
 
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Finder\Finder;
+use Symfony\Bridge\Twig\Node\TransNode;
 use Twig_Environment;
 
 /**
@@ -31,7 +32,7 @@ class TwigTranslationExtractor implements TranslationExtractorInterface
      */
     private $twig;
     
-    function __construct(Twig_Environment $twig) {
+    public function __construct(Twig_Environment $twig) {
         $this->twig = $twig;
     }
     
@@ -48,22 +49,30 @@ class TwigTranslationExtractor implements TranslationExtractorInterface
     }
     
     /**
+     * Set the prefix that should be used for new found messages
+     * @param type $prefix The prefix
+     */
+    public function setPrefix($prefix) {
+        $this->prefix = $prefix;
+    }
+    
+    /**
      * Recursive function that extract trans message from a twig tree
      *
      * @param \Twig_Node The twig tree root
      */
     private function crawlNode(\Twig_Node $node, $catalogue)
     {
-        if ($node instanceof \Symfony\Bridge\Twig\Node\TransNode && !$node->getNode('body') instanceof \Twig_Node_Expression_GetAttr) {
+        if ($node instanceof TransNode && !$node->getNode('body') instanceof \Twig_Node_Expression_GetAttr) {
             // trans block
             $domain = $node->getNode('domain')->getAttribute('value');
             $message = $node->getNode('body')->getAttribute('data');
             $catalogue->set($message, $this->prefix.$message, $domain);
-        } else if ($node instanceof \Twig_Node_Print) {
+        } elseif ($node instanceof \Twig_Node_Print) {
             // trans filter (be carefull of how you chain your filters)
             $message = $this->extractMessage($node->getNode('expr'));
             $domain = $this->extractDomain($node->getNode('expr'));
-            if($message !== null && $domain!== null) {
+            if ($message !== null && $domain !== null) {
                  $catalogue->set($message, $this->prefix.$message, $domain);
             }
         } else {
@@ -84,10 +93,10 @@ class TwigTranslationExtractor implements TranslationExtractorInterface
      */
     private function extractMessage(\Twig_Node $node)
     {
-        if($node->hasNode('node')) {
+        if ($node->hasNode('node')) {
             return $this->extractMessage($node->getNode ('node'));
         }
-        if($node instanceof \Twig_Node_Expression_Constant) {
+        if ($node instanceof \Twig_Node_Expression_Constant) {
             return $node->getAttribute('value');
         }
 
@@ -103,22 +112,17 @@ class TwigTranslationExtractor implements TranslationExtractorInterface
     private function extractDomain(\Twig_Node $node)
     {
         // must be a filter node
-        if(!$node instanceof \Twig_Node_Expression_Filter) {
+        if (!$node instanceof \Twig_Node_Expression_Filter) {
             return null;
         }
         // is a trans filter
         if($node->getNode('filter')->getAttribute('value') == 'trans') {
-            if($node->getNode('arguments')->hasNode(1)) {
+            if ($node->getNode('arguments')->hasNode(1)) {
                 return $node->getNode('arguments')->getNode(1)->getAttribute('value');
-            } else {
-                return $this->defaultDomain;
             }
+            return $this->defaultDomain;
         }
 
         return $this->extractDomain($node->getNode('node'));
-    }
-    
-    public function setPrefix($prefix) {
-        $this->prefix = $prefix;
     }
 }

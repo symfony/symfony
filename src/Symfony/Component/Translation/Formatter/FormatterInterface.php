@@ -10,8 +10,8 @@ interface FormatterInterface
     /**
      * Generates a string representation of the message format.
      *
-     * @param $messages array
+     * @param array $messages
      * @return string
      */
-    public function format(array $messages);
+    function format(array $messages);
 }

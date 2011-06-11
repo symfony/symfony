@@ -24,7 +24,7 @@ class FileTranslationExtractor implements TranslationExtractorInterface
      */
     private $container;
     
-    function __construct($container) {
+    public function __construct(ContainerInterface $container) {
         $this->container = $container;
     }
     

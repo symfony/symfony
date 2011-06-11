@@ -8,6 +8,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Yaml\Yaml;
 
 class TranslationUpdateCommand extends Command
 {
@@ -79,7 +81,7 @@ class TranslationUpdateCommand extends Command
         $output->writeln(sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $input->getArgument('locale'), $foundBundle->getName()));
 
         // create catalogue
-        $catalogue = new \Symfony\Component\Translation\MessageCatalogue($input->getArgument('locale'));
+        $catalogue = new MessageCatalogue($input->getArgument('locale'));
         
         // load any messages from templates
         $output->writeln('Parsing templates');
@@ -96,8 +98,10 @@ class TranslationUpdateCommand extends Command
         if($input->getOption('dump-messages') === true){
             foreach ($catalogue->getDomains() as $domain) {
                 $output->writeln(sprintf("\nDisplaying messages for domain <info>%s</info>:\n", $domain));
-                $output->writeln(\Symfony\Component\Yaml\Yaml::dump($catalogue->all($domain),10));
+                $output->writeln(Yaml::dump($catalogue->all($domain),10));
             }
+            if($input->getOption('output-format') == 'xliff')
+                $output->writeln('Xliff output version is <info>1.2/info>');
         }
 
         // save the files

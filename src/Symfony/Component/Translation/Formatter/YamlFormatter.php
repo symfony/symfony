@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\Translation\Formatter;
 
-use \Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Yaml\Yaml;
 
 class YamlFormatter implements FormatterInterface
 {

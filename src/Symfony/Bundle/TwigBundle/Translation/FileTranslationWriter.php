@@ -15,11 +15,13 @@ class FileTranslationWriter
      */
     private $container;
     
-    function __construct($container) {
+    public function __construct(ContainerInterface $container)
+    {
         $this->container = $container;
     }
     
-    public function writeTranslations(MessageCatalogue $catalogue, $path, $format){
+    public function writeTranslations(MessageCatalogue $catalogue, $path, $format)
+    {
         // get the right formatter
         $formatter = $this->container->get('twig.translation.formatter.' . $format);
 

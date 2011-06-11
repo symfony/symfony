@@ -744,7 +744,7 @@ class Response
 
     protected function fixContentType()
     {
-	$charset = $this->charset ?: 'UTF-8';
+        $charset = $this->charset ?: 'UTF-8';
         if (!$this->headers->has('Content-Type')) {
             $this->headers->set('Content-Type', 'text/html; charset='.$charset);
         } elseif ('text/' === substr($this->headers->get('Content-Type'), 0, 5) && false === strpos($this->headers->get('Content-Type'), 'charset')) {

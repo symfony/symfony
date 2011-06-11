@@ -23,6 +23,9 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class FieldType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilder $builder, array $options)
     {
         if (null === $options['property_path']) {
@@ -55,6 +58,9 @@ class FieldType extends AbstractType
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildView(FormView $view, FormInterface $form)
     {
         $name = $form->getName();
@@ -93,6 +99,9 @@ class FieldType extends AbstractType
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         $defaultOptions = array(
@@ -129,16 +138,25 @@ class FieldType extends AbstractType
         return $defaultOptions;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function createBuilder($name, FormFactoryInterface $factory, array $options)
     {
         return new FormBuilder($name, $factory, new EventDispatcher(), $options['data_class']);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent(array $options)
     {
         return null;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'field';

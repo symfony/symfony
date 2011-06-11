@@ -19,6 +19,9 @@ use Symfony\Component\Form\FormView;
 
 class RadioType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilder $builder, array $options)
     {
         $builder
@@ -27,6 +30,9 @@ class RadioType extends AbstractType
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildView(FormView $view, FormInterface $form)
     {
         $view
@@ -39,6 +45,9 @@ class RadioType extends AbstractType
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         return array(
@@ -46,11 +55,17 @@ class RadioType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent(array $options)
     {
         return 'field';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'radio';

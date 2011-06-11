@@ -26,6 +26,9 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToBooleanChoicesT
 
 class ChoiceType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilder $builder, array $options)
     {
         if (!$options['choices'] && !$options['choice_list']) {
@@ -88,6 +91,9 @@ class ChoiceType extends AbstractType
 
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildView(FormView $view, FormInterface $form)
     {
         $choices = $form->getAttribute('choice_list')->getChoices();
@@ -110,6 +116,9 @@ class ChoiceType extends AbstractType
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         $multiple = isset($options['multiple']) && $options['multiple'];
@@ -126,11 +135,17 @@ class ChoiceType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent(array $options)
     {
         return $options['expanded'] ? 'form' : 'field';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'choice';

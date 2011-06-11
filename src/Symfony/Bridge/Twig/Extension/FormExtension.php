@@ -217,13 +217,15 @@ class FormExtension extends \Twig_Extension
         }
 
         $templates = $this->getTemplates($view);
-        $blocks = $view->get('types');
-        array_unshift($blocks, '_'.$view->get('id'));
+        $template = end($templates);
+        $blocks = $this->getBlocks($templates);
+        $types = $view->get('types');
+        array_unshift($types, '_'.$view->get('id'));
 
-        foreach ($blocks as &$block) {
-            $block = $block.'_'.$section;
+        foreach ($types as $type) {
+            $block = $type.'_'.$section;
 
-            if (isset($templates[$block])) {
+            if (isset($blocks[$block])) {
 
                 $this->varStack[$view] = array_replace(
                     $view->all(),
@@ -231,7 +233,7 @@ class FormExtension extends \Twig_Extension
                     $variables
                 );
 
-                $html = $templates[$block]->renderBlock($block, $this->varStack[$view]);
+                $html = $template->renderBlock($block, $this->varStack[$view], $blocks);
 
                 if ($mainTemplate) {
                     $view->setRendered();
@@ -261,25 +263,21 @@ class FormExtension extends \Twig_Extension
     protected function getTemplates(FormView $view)
     {
         if (!$this->templates->contains($view)) {
-            $resources = array();
+            $templates = array();
             $parent = $view;
             do {
                 if (isset($this->themes[$parent])) {
-                    $resources = array_merge($this->themes[$parent], $resources);
+                    $templates = array_merge($this->themes[$parent], $templates);
                 }
             } while ($parent = $parent->getParent());
 
-            $resources = array_merge($this->resources, $resources);
+            $templates = array_merge($this->resources, $templates);
 
-            $templates = array();
-            foreach ($resources as $resource) {
-                if (!$resource instanceof \Twig_Template) {
-                    $resource = $this->environment->loadTemplate($resource);
+            foreach ($templates as $i => $template) {
+                if (!$template instanceof \Twig_Template) {
+                    $template = $this->environment->loadTemplate($template);
                 }
-
-                foreach ($this->getBlockNames($resource) as $name) {
-                    $templates[$name] = $resource;
-                }
+                $templates[$i] = $template;
             }
 
             $this->templates->attach($view, $templates);
@@ -291,20 +289,28 @@ class FormExtension extends \Twig_Extension
     }
 
     /**
-     * Returns all the block defined in the template hierarchy.
+     * Returns the blocks to be used to render the template stack.
      *
-     * @param \Twig_Template $template
+     * @param \ArrayObject $templates The template stack
      *
-     * @return array A list of block names
+     * @return array A list of block to be used to render the view
      */
-    protected function getBlockNames(\Twig_Template $template)
+    protected function getBlocks(array $templates)
     {
-        $names = array();
-        do {
-            $names = array_merge($names, $template->getBlockNames());
-        } while (false !== $template = $template->getParent(array()));
+        $blocks = array();
 
-        return array_unique($names);
+        foreach ($templates as $template) {
+
+            $templateBlocks = array();
+
+            do {
+                $templateBlocks = array_merge($template->getBlocks(), $templateBlocks);
+            } while (false !== $template = $template->getParent(array()));
+
+            $blocks = array_merge($blocks, $templateBlocks);
+        }
+
+        return $blocks;
     }
 
     /**

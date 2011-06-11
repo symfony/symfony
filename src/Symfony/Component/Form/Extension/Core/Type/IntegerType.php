@@ -17,6 +17,9 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\IntegerToLocalizedStri
 
 class IntegerType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilder $builder, array $options)
     {
         $builder->appendClientTransformer(
@@ -27,6 +30,9 @@ class IntegerType extends AbstractType
         ));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         return array(
@@ -38,6 +44,9 @@ class IntegerType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getAllowedOptionValues(array $options)
     {
         return array(
@@ -53,11 +62,17 @@ class IntegerType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent(array $options)
     {
         return 'field';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'integer';

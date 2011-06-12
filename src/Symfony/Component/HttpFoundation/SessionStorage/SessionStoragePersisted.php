@@ -1,41 +1,58 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
 use Symfony\Component\HttpFoundation\SessionStorage\Persistence\SessionStoragePersistenceInterface;
 
+/**
+ * SessionStoragePersisted is used to implement SessionStorage and bind
+ * a concrete instance of SessionStoragePersistenceInterface to php's
+ * session_set_save_handler
+ *
+ * @author Mark de Jong <mail@markdejong.org>
+ */
 class SessionStoragePersisted implements SessionStorageInterface
 {
     static protected $sessionIdRegenerated = false;
-    static protected $sessionStarted       = false;
+    static protected $sessionStarted = false;
 
-	/**
-	 * \Symfony\Component\HttpFoundation\SessionStorage\Persistence\SessionStoragePersistenceInterface
-	 */
-	protected  $persister;
+    /**
+     * \Symfony\Component\HttpFoundation\SessionStorage\Persistence\SessionStoragePersistenceInterface
+     */
+    protected $persister;
 
-	/**
-	 * @var array
-	 */
-	protected $options;
+    /**
+     * @var array
+     */
+    protected $options;
 
-	public function __construct(SessionStoragePersistenceInterface $persister, array $options)
-	{
-		$this->persister = $persister;
+    public function __construct(SessionStoragePersistenceInterface $persister, array $options)
+    {
+        $this->persister = $persister;
+        $this->options = $options;
 
-		$cookieDefaults = session_get_cookie_params();
+        $cookieDefaults = session_get_cookie_params();
 
         $this->options = array_merge(array(
-            'name'          => '_SESS',
-            'lifetime'      => $cookieDefaults['lifetime'],
-            'path'          => $cookieDefaults['path'],
-            'domain'        => $cookieDefaults['domain'],
-            'secure'        => $cookieDefaults['secure'],
-            'httponly'      => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
-        ), $options);
+            'name' => '_SESS',
+            'lifetime' => $cookieDefaults['lifetime'],
+            'path' => $cookieDefaults['path'],
+            'domain' => $cookieDefaults['domain'],
+            'secure' => $cookieDefaults['secure'],
+            'httponly' => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
+         ), $options);
 
         session_name($this->options['name']);
-	}
+    }
 
     /**
      * Starts the session.
@@ -56,7 +73,7 @@ class SessionStoragePersisted implements SessionStorageInterface
             array($this->persister, 'gc')
         );
 
-		// disable native cache limiter as this is managed by HeaderBag directly
+        // disable native cache limiter as this is managed by HeaderBag directly
         session_cache_limiter(false);
 
         if (!ini_get('session.use_cookies') && isset($this->options['id']) && $this->options['id'] && $this->options['id'] != session_id()) {

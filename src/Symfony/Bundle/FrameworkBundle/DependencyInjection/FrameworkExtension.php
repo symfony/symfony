@@ -286,13 +286,13 @@ class FrameworkExtension extends Extension
         $this->addClassesToCompile(array(
             'Symfony\\Bundle\\FrameworkBundle\\EventListener\\SessionListener',
             'Symfony\\Component\\HttpFoundation\\SessionStorage\\SessionStorageInterface',
+            'Symfony\\Component\\HttpFoundation\\SessionStorage\\SessionStorageBridge',
             $container->getDefinition('session')->getClass(),
         ));
 
         if ($container->hasDefinition($config['storage_id'])) {
             $this->addClassesToCompile(array(
-                $container->findDefinition('session.storage')->getClass(),
-                $container->findDefinition('session.persistence')->getClass()
+                $container->findDefinition('session.storage')->getClass()
             ));
         }
     }

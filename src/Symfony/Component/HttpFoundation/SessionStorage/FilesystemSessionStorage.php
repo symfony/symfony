@@ -26,7 +26,7 @@ class FilesystemSessionStorage implements SessionStorageInterface
     private $path;
     private $data;
     private $started;
-	private $options;
+    private $options;
 
     public function __construct($path, array $options = array())
     {
@@ -36,13 +36,13 @@ class FilesystemSessionStorage implements SessionStorageInterface
         $cookieDefaults = session_get_cookie_params();
 
         $this->options = array_merge(array(
-            'name'          => '_SESS',
-            'lifetime'      => $cookieDefaults['lifetime'],
-            'path'          => $cookieDefaults['path'],
-            'domain'        => $cookieDefaults['domain'],
-            'secure'        => $cookieDefaults['secure'],
-            'httponly'      => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
-        ), $options);
+            'name' => '_SESS',
+            'lifetime' => $cookieDefaults['lifetime'],
+            'path' => $cookieDefaults['path'],
+            'domain' => $cookieDefaults['domain'],
+            'secure' => $cookieDefaults['secure'],
+            'httponly' => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly']  : false,
+         ), $options);
 
         session_name($this->options['name']);
     }
@@ -69,7 +69,7 @@ class FilesystemSessionStorage implements SessionStorageInterface
             session_id(hash('md5', uniqid(mt_rand(), true)));
         }
 
-        $file = $this->path.'/'.session_id().'.session';
+        $file = $this->path . '/' . session_id() . '.session';
 
         $this->data = file_exists($file) ? unserialize(file_get_contents($file)) : array();
         $this->started = true;
@@ -106,7 +106,7 @@ class FilesystemSessionStorage implements SessionStorageInterface
             mkdir($this->path, 0777, true);
         }
 
-        file_put_contents($this->path.'/'.session_id().'.session', serialize($this->data));
+        file_put_contents($this->path . '/' . session_id() . '.session', serialize($this->data));
     }
 
     public function regenerate($destroy = false)

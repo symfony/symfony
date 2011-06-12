@@ -1,50 +1,93 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\HttpFoundation\SessionStorage\Persistence;
 
 use Symfony\Component\HttpFoundation\SessionStorage\Persistence\AbstractSessionStoragePersistence;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * PdoSessionStorage.
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ * @author Michael Williams <michael.williams@funsational.com>
+ */
 class PdoSessionStoragePersistence extends AbstractSessionStoragePersistence
 {
-	public function __construct(\PDO $db, array $dbOptions = array(), EventDispatcherInterface $dispatcher)
-	{
+    /**
+     * Constructor.
+     *
+     * @param \PDO  $db        A PDO instance
+     * @param array $dbOptions An associative array of DB options
+     *
+     * @throws \InvalidArgumentException When "db_table" option is not provided
+     *
+     */
+    public function __construct(\PDO $db, array $dbOptions = array(), EventDispatcherInterface $dispatcher)
+    {
         if (!array_key_exists('db_table', $dbOptions)) {
             throw new \InvalidArgumentException('You must provide the "db_table" option for a PdoSessionStorage.');
         }
 
         $this->db = $db;
         $this->dbOptions = array_merge(array(
-            'db_id_col'   => 'sess_id',
-            'db_data_col' => 'sess_data',
-            'db_time_col' => 'sess_time',
+            'db_id_col'     => 'sess_id',
+            'db_data_col'   => 'sess_data',
+            'db_time_col'   => 'sess_time',
         ), $dbOptions);
 
-		parent::__construct($dispatcher);
-	}
+        parent::__construct($dispatcher);
+    }
 
-	public function open($savePath, $sessionName)
-	{
-		return true;
-	}
+    /**
+     * Called upon opening a new session from (set by session_set_save_handler)
+     *
+     * @param string $savePath The path to save to
+     * @param string $sessionName The name of the session
+     * @return void
+     */
+    public function open($savePath, $sessionName)
+    {
+        return true;
+    }
 
-	public function close()
-	{
-		return true;
-	}
+    /**
+     * Called upon closing a session from (set by session_set_save_handler)
+     *
+     * @return void
+     */
+    public function close()
+    {
+        return true;
+    }
 
-	public function write($id, $data)
-	{
-		// get table/column
-        $dbTable   = $this->dbOptions['db_table'];
+    /**
+     * Called upon writing a session from (set by session_set_save_handler)
+     *
+     * @param string $id
+     * @param string $data
+     * @return void
+     */
+    public function write($id, $data)
+    {
+        // get table/column
+        $dbTable = $this->dbOptions['db_table'];
         $dbDataCol = $this->dbOptions['db_data_col'];
-        $dbIdCol   = $this->dbOptions['db_id_col'];
+        $dbIdCol = $this->dbOptions['db_id_col'];
         $dbTimeCol = $this->dbOptions['db_time_col'];
 
         $sql = ('mysql' === $this->db->getAttribute(\PDO::ATTR_DRIVER_NAME))
-            ? "INSERT INTO $dbTable ($dbIdCol, $dbDataCol, $dbTimeCol) VALUES (:id, :data, :time) "
-              ."ON DUPLICATE KEY UPDATE $dbDataCol = VALUES($dbDataCol), $dbTimeCol = CASE WHEN $dbTimeCol = :time THEN (VALUES($dbTimeCol) + 1) ELSE VALUES($dbTimeCol) END"
-            : "UPDATE $dbTable SET $dbDataCol = :data, $dbTimeCol = :time WHERE $dbIdCol = :id";
+                ? "INSERT INTO $dbTable ($dbIdCol, $dbDataCol, $dbTimeCol) VALUES (:id, :data, :time) "
+                  . "ON DUPLICATE KEY UPDATE $dbDataCol = VALUES($dbDataCol), $dbTimeCol = CASE WHEN $dbTimeCol = :time THEN (VALUES($dbTimeCol) + 1) ELSE VALUES($dbTimeCol) END"
+                : "UPDATE $dbTable SET $dbDataCol = :data, $dbTimeCol = :time WHERE $dbIdCol = :id";
 
         try {
             $stmt = $this->db->prepare($sql);
@@ -59,18 +102,24 @@ class PdoSessionStoragePersistence extends AbstractSessionStoragePersistence
                 $this->createNewSession($id, $data);
             }
 
-	        parent::write($id, $data);
+            parent::write($id, $data);
 
         } catch (\PDOException $e) {
             throw new \RuntimeException(sprintf('PDOException was thrown when trying to manipulate session data: %s', $e->getMessage()), 0, $e);
         }
 
         return true;
-	}
+    }
 
-	public function destroy($id)
-	{
-		// get table/column
+    /**
+     * Called upon destroying a session from (set by session_set_save_handler)
+     *
+     * @param  string $id
+     * @return void
+     */
+    public function destroy($id)
+    {
+        // get table/column
         $dbTable  = $this->dbOptions['db_table'];
         $dbIdCol = $this->dbOptions['db_id_col'];
 
@@ -81,24 +130,31 @@ class PdoSessionStoragePersistence extends AbstractSessionStoragePersistence
             $stmt = $this->db->prepare($sql);
             $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
             $stmt->execute();
-
-	        parent::destroy($id);
-
         } catch (\PDOException $e) {
             throw new \RuntimeException(sprintf('PDOException was thrown when trying to manipulate session data: %s', $e->getMessage()), 0, $e);
         }
 
         return true;
-	}
+    }
 
-	public function gc($maxlifetime)
-	{
+    /**
+     * Called upon garbage collection (set by session_set_save_handler)
+     *
+     * @param int $maxlifetime
+     * @return void
+     */
+    public function gc($maxlifetime)
+    {
         // get table/column
-        $dbTable    = $this->dbOptions['db_table'];
+        $dbTable = $this->dbOptions['db_table'];
         $dbTimeCol = $this->dbOptions['db_time_col'];
+        $dbIdCol = $this->dbOptions['db_id_col'];
+        $eventQueue = array();
 
         // delete the record associated with this id
-        $sql = "DELETE FROM $dbTable WHERE $dbTimeCol < (:time - $lifetime)";
+        $sql = "SELECT * FROM $dbTable WHERE $dbTimeCol < (:time - $maxlifetime)";
+
+        parent::gc($maxlifetime);
 
         try {
             $this->db->query($sql);
@@ -106,23 +162,48 @@ class PdoSessionStoragePersistence extends AbstractSessionStoragePersistence
             $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
             $stmt->execute();
 
-	        parent::gc($maxlifetime);
+            $sessionRows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
+            if($this->db->beginTransaction())
+            {
+                foreach($sessionRows as $row)
+                {
+                    $this->db->exec(sprintf("DELETE FROM `%s` WHERE `%s` = '%s'", $dbTable, $dbIdCol, $row[$dbIdCol]));
+                    $eventQueue[] = $row[$dbIdCol];
+                }
+
+                $this->db->commit();
+
+                foreach($eventQueue as $id)
+                {
+                    parent::destroy($id);
+                }
+            }
+            else
+            {
+                throw new \RuntimeException('Could not start destroy transaction');
+            }
         } catch (\PDOException $e) {
+            $this->db->rollBack();
             throw new \RuntimeException(sprintf('PDOException was thrown when trying to manipulate session data: %s', $e->getMessage()), 0, $e);
         }
 
 
-
         return true;
-	}
+    }
 
-	public function read($id)
-	{
-		// get table/columns
-        $dbTable    = $this->dbOptions['db_table'];
+    /**
+     * Called upon reading a session from (set by session_set_save_handler)
+     *
+     * @param string $id
+     * @return void
+     */
+    public function read($id)
+    {
+        // get table/columns
+        $dbTable = $this->dbOptions['db_table'];
         $dbDataCol = $this->dbOptions['db_data_col'];
-        $dbIdCol   = $this->dbOptions['db_id_col'];
+        $dbIdCol = $this->dbOptions['db_id_col'];
 
         try {
             $sql = "SELECT $dbDataCol FROM $dbTable WHERE $dbIdCol = :id";
@@ -142,13 +223,13 @@ class PdoSessionStoragePersistence extends AbstractSessionStoragePersistence
             // session does not exist, create it
             $this->createNewSession($id);
 
-	        parent::read($id);
+            parent::read($id);
 
             return '';
         } catch (\PDOException $e) {
             throw new \RuntimeException(sprintf('PDOException was thrown when trying to manipulate session data: %s', $e->getMessage()), 0, $e);
         }
-	}
+    }
 
     /**
      * Creates a new session with the given $id and $data
@@ -159,9 +240,9 @@ class PdoSessionStoragePersistence extends AbstractSessionStoragePersistence
     private function createNewSession($id, $data = '')
     {
         // get table/column
-        $dbTable    = $this->dbOptions['db_table'];
+        $dbTable = $this->dbOptions['db_table'];
         $dbDataCol = $this->dbOptions['db_data_col'];
-        $dbIdCol   = $this->dbOptions['db_id_col'];
+        $dbIdCol = $this->dbOptions['db_id_col'];
         $dbTimeCol = $this->dbOptions['db_time_col'];
 
         $sql = "INSERT INTO $dbTable ($dbIdCol, $dbDataCol, $dbTimeCol) VALUES (:id, :data, :time)";

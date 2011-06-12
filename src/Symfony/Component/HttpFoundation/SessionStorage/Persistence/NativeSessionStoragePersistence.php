@@ -1,101 +1,161 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+
 namespace Symfony\Component\HttpFoundation\SessionStorage\Persistence;
 
 use Symfony\Component\HttpFoundation\SessionStorage\Persistence\AbstractSessionStoragePersistence;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * NativeSessionStoragePersistence
+ *
+ * @author Mark de Jong <mail@markdejong.org>
+ */
 class NativeSessionStoragePersistence extends AbstractSessionStoragePersistence
 {
-	/**
-	 * @var string
-	 */
-	private $path;
+    /**
+     * @var string
+     */
+    private $path;
 
-	public function __construct(EventDispatcherInterface $dispatcher)
-	{
-		$this->path = "D:/www/hosts/rectus/app/tmp/sessions";
-		parent::__construct($dispatcher);
-	}
+    /**
+     * Constructor.
+     *
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher A concrete instance of EventDispatcherInterface
+     * @param string $path Path to the directory which will hold the sessions
+     *
+     */
+    public function __construct(EventDispatcherInterface $dispatcher, $path)
+    {
+        $this->path = $path;
 
-	private function getFilename($id)
-	{
-		return sprintf("%s/%s", $this->path, $id);
-	}
+        if (!is_dir($this->path)) {
+            mkdir($this->path, 0777, true);
+        }
 
-	public function open($savePath, $sessionName)
-	{
-//		$this->path = $savePath;
-		return true;
-	}
+        parent::__construct($dispatcher);
+    }
 
-	public function close()
-	{
-		parent::close();
-		return true;
-	}
+    private function getFilename($id)
+    {
+        return sprintf("%s/%s", $this->path, $id);
+    }
 
-	public function write($id, $data)
-	{
-		$filename = $this->getFilename($id);
+    /**
+     * Called upon opening a new session from (set by session_set_save_handler)
+     *
+     * @param string $savePath (ignored)
+     * @param string $sessionName (ignored)
+     * @return void
+     */
+    public function open($savePath, $sessionName)
+    {
+        return true;
+    }
 
-		if(false !== ($fp = @fopen($filename, "w")))
-		{
-			$success = fwrite($fp, $data);
-			fclose($fp);
+    /**
+     * Called upon closing a session from (set by session_set_save_handler)
+     *
+     * @return void
+     */
+    public function close()
+    {
+        parent::close();
+        return true;
+    }
 
-			parent::write($id, $data);
+    /**
+     * Called upon writing a session from (set by session_set_save_handler)
+     *
+     * @param string $id
+     * @param string $data
+     * @return void
+     */
+    public function write($id, $data)
+    {
+        $filename = $this->getFilename($id);
 
-			return $success;
-		}
+        if (false !== ($fp = @fopen($filename, "w"))) {
+            $success = fwrite($fp, $data);
+            fclose($fp);
 
-		return false;
-	}
+            parent::write($id, $data);
 
-	public function destroy($id)
-	{
-		parent::destroy($id);
+            return $success;
+        }
 
-		return @unlink($this->getFilename($id));
-	}
+        return false;
+    }
 
-	public function gc($maxlifetime)
-	{
-		foreach(new \DirectoryIterator($this->path) as $entry)
-		{
-			if($entry->isFile())
-			{
-				if($entry->getMTime() + $maxlifetime < time())
-				{
-					$this->destroy($entry->getBasename());
-				}
-			}
-		}
+    /**
+     * Called upon destroying a session from (set by session_set_save_handler)
+     *
+     * @param  string $id
+     * @return void
+     */
+    public function destroy($id)
+    {
+        parent::destroy($id);
 
-		parent::gc($maxlifetime);
+        return @unlink($this->getFilename($id));
+    }
 
-		return true;
-	}
+    /**
+     * Called upon garbage collection (set by session_set_save_handler)
+     *
+     * @param int $maxlifetime
+     * @return void
+     */
+    public function gc($maxlifetime)
+    {
+        parent::gc($maxlifetime);
+        
+        foreach (new \DirectoryIterator($this->path) as $entry)
+        {
+            if ($entry->isFile()) {
+                if ($entry->getMTime() + $maxlifetime < time()) {
+                    $this->destroy($entry->getBasename());
+                }
+            }
+        }
 
-	public function read($id)
-	{
-		$filename = $this->getFilename($id);
-		$contents = false;
 
-		if(file_exists($filename) && false !== ($fp = @fread($filename, "r")))
-		{
-			while (!feof($fp))
-			{
-				$contents .= fread($fp, 8192);
-			}
+        return true;
+    }
 
-			fclose($fp);
+    /**
+     * Called upon reading a session from (set by session_set_save_handler)
+     *
+     * @param string $id
+     * @return void
+     */
+    public function read($id)
+    {
+        $filename = $this->getFilename($id);
+        $contents = false;
 
-			parent::read($id);
+        if (file_exists($filename) && false !== ($fp = @fread($filename, "r"))) {
+            while (!feof($fp))
+            {
+                $contents .= fread($fp, 8192);
+            }
 
-			return $contents;
-		}
+            fclose($fp);
 
-		return $contents;
-	}
+            parent::read($id);
+
+            return $contents;
+        }
+
+        return $contents;
+    }
 }

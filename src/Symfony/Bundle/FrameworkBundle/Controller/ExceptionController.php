@@ -90,6 +90,6 @@ class ExceptionController extends ContainerAware
         // default to a generic HTML exception
         $this->container->get('request')->setRequestFormat('html');
 
-        return sprintf('FrameworkBundle:Exception:%s.html.twig');
+        return sprintf('FrameworkBundle:Exception:%s.html.twig', $name);
     }
 }

@@ -18,6 +18,6 @@ class BasicPermissionMapTest extends \PHPUnit_Framework_TestCase
     public function testGetMasksReturnsNullWhenNotSupportedMask()
     {
         $map = new BasicPermissionMap();
-        $this->assertNull($map->getMasks('IS_AUTHENTICATED_REMEBERED', null));
+        $this->assertNull($map->getMasks('IS_AUTHENTICATED_REMEMBERED', null));
     }
 }

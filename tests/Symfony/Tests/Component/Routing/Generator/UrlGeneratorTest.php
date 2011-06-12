@@ -142,7 +142,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException Symfony\Component\Routing\Exception\MissingMandatoryParametersException
      */
-    public function testGenerateForRouteWithoutManditoryParameter()
+    public function testGenerateForRouteWithoutMandatoryParameter()
     {
         $routes = $this->getRoutes('test', new Route('/testing/{foo}'));
         $this->getGenerator($routes)->generate('test', array(), true);

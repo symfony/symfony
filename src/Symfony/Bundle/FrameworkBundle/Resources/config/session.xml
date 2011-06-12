@@ -6,13 +6,20 @@
 
     <parameters>
         <parameter key="session.class">Symfony\Component\HttpFoundation\Session</parameter>
+        <parameter key="session.bridge">Symfony\Component\HttpFoundation\SessionBridge</parameter>
         <parameter key="session.storage.native.class">Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage</parameter>
         <parameter key="session.storage.filesystem.class">Symfony\Component\HttpFoundation\SessionStorage\FilesystemSessionStorage</parameter>
     </parameters>
 
     <services>
+
+	    <service id="session.bridge" class="%session.bridge%">
+		    <argument type="service" id="event_dispatcher" />
+		    <argument type="service" id="session.storage" />
+	    </service>
+
         <service id="session" class="%session.class%">
-            <argument type="service" id="session.storage" />
+            <argument type="service" id="session.bridge" />
             <argument>%session.default_locale%</argument>
         </service>
 

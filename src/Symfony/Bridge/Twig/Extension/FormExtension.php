@@ -56,7 +56,7 @@ class FormExtension extends \Twig_Extension
     public function setTheme(FormView $view, array $resources)
     {
         $this->themes->attach($view, $resources);
-        $this->templates->detach($view);
+        $this->templates = new \SplObjectStorage();
     }
 
     /**
@@ -263,21 +263,24 @@ class FormExtension extends \Twig_Extension
     protected function getTemplates(FormView $view)
     {
         if (!$this->templates->contains($view)) {
-            $templates = array();
-            $parent = $view;
-            do {
-                if (isset($this->themes[$parent])) {
-                    $templates = array_merge($this->themes[$parent], $templates);
-                }
-            } while ($parent = $parent->getParent());
 
-            $templates = array_merge($this->resources, $templates);
+            $rootView = !$view->hasParent();
+
+            $templates = $rootView ? $this->resources : array();
+
+            if (isset($this->themes[$view])) {
+                $templates = array_merge($templates, $this->themes[$view]);
+            }
 
             foreach ($templates as $i => $template) {
                 if (!$template instanceof \Twig_Template) {
                     $template = $this->environment->loadTemplate($template);
                 }
                 $templates[$i] = $template;
+            }
+
+            if (!$rootView) {
+                $templates = array_merge($this->getTemplates($view->getParent()), $templates);
             }
 
             $this->templates->attach($view, $templates);

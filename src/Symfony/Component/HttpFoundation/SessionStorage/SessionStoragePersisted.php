@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\SessionStorage\Persistence\SessionStoragePe
  * a concrete instance of SessionStoragePersistenceInterface to php's
  * session_set_save_handler
  *
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Mark de Jong <mail@markdejong.org>
  */
 class SessionStoragePersisted implements SessionStorageInterface

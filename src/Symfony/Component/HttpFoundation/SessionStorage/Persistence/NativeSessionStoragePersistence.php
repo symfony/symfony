@@ -143,7 +143,8 @@ class NativeSessionStoragePersistence extends AbstractSessionStoragePersistence
         $filename = $this->getFilename($id);
         $contents = false;
 
-        if (file_exists($filename) && false !== ($fp = @fread($filename, "r"))) {
+        if (file_exists($filename) && ($fp = @fopen($filename, "r")) !== false) {
+
             while (!feof($fp))
             {
                 $contents .= fread($fp, 8192);

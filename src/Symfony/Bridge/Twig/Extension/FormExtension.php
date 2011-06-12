@@ -25,16 +25,17 @@ use Symfony\Component\Form\Util\FormUtil;
 class FormExtension extends \Twig_Extension
 {
     protected $resources;
-    protected $templates;
+    protected $blocks;
     protected $environment;
     protected $themes;
     protected $varStack;
+    protected $template;
 
     public function __construct(array $resources = array())
     {
         $this->themes = new \SplObjectStorage();
         $this->varStack = new \SplObjectStorage();
-        $this->templates = new \SplObjectStorage();
+        $this->blocks = new \SplObjectStorage();
 
         $this->resources = $resources;
     }
@@ -56,7 +57,7 @@ class FormExtension extends \Twig_Extension
     public function setTheme(FormView $view, array $resources)
     {
         $this->themes->attach($view, $resources);
-        $this->templates = new \SplObjectStorage();
+        $this->blocks = new \SplObjectStorage();
     }
 
     /**
@@ -216,9 +217,14 @@ class FormExtension extends \Twig_Extension
                 return '';
         }
 
-        $templates = $this->getTemplates($view);
-        $template = end($templates);
-        $blocks = $this->getBlocks($templates);
+        if (null === $this->template) {
+            $this->template = reset($this->resources);
+            if (!$this->template instanceof \Twig_Template) {
+                $this->template = $this->environment->loadTemplate($this->template);
+            }
+        }
+
+        $blocks = $this->getBlocks($view);
         $types = $view->get('types');
         array_unshift($types, '_'.$view->get('id'));
 
@@ -233,7 +239,7 @@ class FormExtension extends \Twig_Extension
                     $variables
                 );
 
-                $html = $template->renderBlock($block, $this->varStack[$view], $blocks);
+                $html = $this->template->renderBlock($block, $this->varStack[$view], $blocks);
 
                 if ($mainTemplate) {
                     $view->setRendered();
@@ -249,7 +255,7 @@ class FormExtension extends \Twig_Extension
     }
 
     /**
-     * Returns the templates used by the view.
+     * Returns the blocks used to render the view.
      *
      * Templates are looked for in the resources in the following order:
      *   * resources from the themes (and its parents)
@@ -260,9 +266,9 @@ class FormExtension extends \Twig_Extension
      *
      * @return array An array of Twig_TemplateInterface instances
      */
-    protected function getTemplates(FormView $view)
+    protected function getBlocks(FormView $view)
     {
-        if (!$this->templates->contains($view)) {
+        if (!$this->blocks->contains($view)) {
 
             $rootView = !$view->hasParent();
 
@@ -272,45 +278,26 @@ class FormExtension extends \Twig_Extension
                 $templates = array_merge($templates, $this->themes[$view]);
             }
 
-            foreach ($templates as $i => $template) {
+            $blocks = array();
+
+            foreach ($templates as $template) {
                 if (!$template instanceof \Twig_Template) {
                     $template = $this->environment->loadTemplate($template);
                 }
-                $templates[$i] = $template;
+                $templateBlocks = array();
+                do {
+                    $templateBlocks = array_merge($template->getBlocks(), $templateBlocks);
+                } while (false !== $template = $template->getParent(array()));
+                $blocks = array_merge($blocks, $templateBlocks);
             }
 
             if (!$rootView) {
-                $templates = array_merge($this->getTemplates($view->getParent()), $templates);
+                $blocks = array_merge($this->getBlocks($view->getParent()), $blocks);
             }
 
-            $this->templates->attach($view, $templates);
+            $this->blocks->attach($view, $blocks);
         } else {
-            $templates = $this->templates[$view];
-        }
-
-        return $templates;
-    }
-
-    /**
-     * Returns the blocks to be used to render the template stack.
-     *
-     * @param \ArrayObject $templates The template stack
-     *
-     * @return array A list of block to be used to render the view
-     */
-    protected function getBlocks(array $templates)
-    {
-        $blocks = array();
-
-        foreach ($templates as $template) {
-
-            $templateBlocks = array();
-
-            do {
-                $templateBlocks = array_merge($template->getBlocks(), $templateBlocks);
-            } while (false !== $template = $template->getParent(array()));
-
-            $blocks = array_merge($blocks, $templateBlocks);
+            $blocks = $this->blocks[$view];
         }
 
         return $blocks;

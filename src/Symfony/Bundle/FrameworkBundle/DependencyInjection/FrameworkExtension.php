@@ -274,6 +274,7 @@ class FrameworkExtension extends Extension
 
         // session storage
         $container->setAlias('session.storage', $config['storage_id']);
+        $container->setAlias('session.persistence', $config['persistence_id']);
         $options = array();
         foreach (array('name', 'lifetime', 'path', 'domain', 'secure', 'httponly') as $key) {
             if (isset($config[$key])) {
@@ -291,6 +292,7 @@ class FrameworkExtension extends Extension
         if ($container->hasDefinition($config['storage_id'])) {
             $this->addClassesToCompile(array(
                 $container->findDefinition('session.storage')->getClass(),
+                $container->findDefinition('session.persistence')->getClass()
             ));
         }
     }

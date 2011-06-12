@@ -11,7 +11,7 @@ class SessionEvent extends Event
 	 */
 	private $sessionId;
 
-	public function __construct($sessionId)
+	public function __construct($sessionId = null)
 	{
 		$this->sessionId = $sessionId;
 	}

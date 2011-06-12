@@ -1,46 +1,29 @@
 <?php
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
-/**
- * NativeSessionStorage.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- */
-class NativeSessionStorage implements SessionStorageInterface
+use Symfony\Component\HttpFoundation\SessionStorage\Persistence\SessionStoragePersistenceInterface;
+
+class SessionStoragePersisted implements SessionStorageInterface
 {
     static protected $sessionIdRegenerated = false;
     static protected $sessionStarted       = false;
 
-    protected $options;
+	/**
+	 * \Symfony\Component\HttpFoundation\SessionStorage\Persistence\SessionStoragePersistenceInterface
+	 */
+	protected  $persister;
 
-    /**
-     * Available options:
-     *
-     *  * name:     The cookie name (_SESS by default)
-     *  * id:       The session id (null by default)
-     *  * lifetime: Cookie lifetime
-     *  * path:     Cookie path
-     *  * domain:   Cookie domain
-     *  * secure:   Cookie secure
-     *  * httponly: Cookie http only
-     *
-     * The default values for most options are those returned by the session_get_cookie_params() function
-     *
-     * @param array $options  An associative array of session options
-     */
-    public function __construct(array $options = array())
-    {
-        $cookieDefaults = session_get_cookie_params();
+	/**
+	 * @var array
+	 */
+	protected $options;
+
+	public function __construct(SessionStoragePersistenceInterface $persister, array $options)
+	{
+		$this->persister = $persister;
+
+		$cookieDefaults = session_get_cookie_params();
 
         $this->options = array_merge(array(
             'name'          => '_SESS',
@@ -52,7 +35,7 @@ class NativeSessionStorage implements SessionStorageInterface
         ), $options);
 
         session_name($this->options['name']);
-    }
+	}
 
     /**
      * Starts the session.
@@ -63,15 +46,17 @@ class NativeSessionStorage implements SessionStorageInterface
             return;
         }
 
-        session_set_cookie_params(
-            $this->options['lifetime'],
-            $this->options['path'],
-            $this->options['domain'],
-            $this->options['secure'],
-            $this->options['httponly']
+        // use this object as the session handler
+        session_set_save_handler(
+            array($this->persister, 'open'),
+            array($this->persister, 'close'),
+            array($this->persister, 'read'),
+            array($this->persister, 'write'),
+            array($this->persister, 'destroy'),
+            array($this->persister, 'gc')
         );
 
-        // disable native cache limiter as this is managed by HeaderBag directly
+		// disable native cache limiter as this is managed by HeaderBag directly
         session_cache_limiter(false);
 
         if (!ini_get('session.use_cookies') && isset($this->options['id']) && $this->options['id'] && $this->options['id'] != session_id()) {

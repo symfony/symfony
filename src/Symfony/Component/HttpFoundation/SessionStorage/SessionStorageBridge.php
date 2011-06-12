@@ -1,13 +1,13 @@
 <?php
 
-namespace Symfony\Component\HttpFoundation;
+namespace Symfony\Component\HttpFoundation\SessionStorage;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface;
 use Symfony\Component\HttpFoundation\Event\SessionEvent;
 use Symfony\Component\HttpFoundation\SessionEvents;
 
-class SessionBridge implements SessionStorageInterface
+class SessionStorageBridge implements SessionStorageInterface
 {
 	/**
 	 * @var \Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface
@@ -15,14 +15,12 @@ class SessionBridge implements SessionStorageInterface
 	private $session;
 
 	/**
-	 * @var \Symfony\Component\EventDispatcher\EventDispatcher
+	 * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
 	 */
 	private $dispatcher;
 
-	function __construct($dispatcher, SessionStorageInterface $session)
+	function __construct(EventDispatcherInterface $dispatcher, SessionStorageInterface $session)
 	{
-		//print_r(func_get_args());
-
 		$this->dispatcher = $dispatcher;
 		$this->session = $session;
 	}

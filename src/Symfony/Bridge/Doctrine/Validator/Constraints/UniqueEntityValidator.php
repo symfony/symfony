@@ -51,7 +51,7 @@ class UniqueEntityValidator extends ConstraintValidator
         $fields = (array)$constraint->fields;
 
         if (count($constraint->fields) == 0) {
-            throw new ConstraintDefinitionException("At least one field has to specified.");
+            throw new ConstraintDefinitionException("At least one field has to be specified.");
         }
 
         $em = $this->registry->getEntityManager($constraint->em);

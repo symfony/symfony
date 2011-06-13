@@ -85,7 +85,7 @@ class TranslationUpdateCommand extends Command
         
         // load any messages from templates
         $output->writeln('Parsing templates');
-        $twigExtractor = $this->container->get('twig.translation.extractor.twig');
+        $twigExtractor = $this->container->get('twig.translation.extractor');
         $twigExtractor->setPrefix($input->getOption('prefix'));
         $twigExtractor->extractMessages($foundBundle->getPath() . '/Resources/views/', $catalogue);
         

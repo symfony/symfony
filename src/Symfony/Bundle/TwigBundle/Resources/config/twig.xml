@@ -88,24 +88,28 @@
 
         <service id="twig.extension.debug" class="%twig.extension.debug.class%" public="false" />
         
-        <service id="twig.translation.formatter.php" class="%twig.translation.formatter.php.class%"/>
+        <service id="twig.translation.formatter.php" class="%twig.translation.formatter.php.class%">
+            <tag name="translation.formatter" alias="php" />
+        </service>
 
-        <service id="twig.translation.formatter.pot" class="%twig.translation.formatter.pot.class%"/>
+        <service id="twig.translation.formatter.pot" class="%twig.translation.formatter.pot.class%">
+            <tag name="translation.formatter" alias="pot" />
+        </service>
 
-        <service id="twig.tranlsation.formatter.xliff" class="%twig.translation.formatter.xliff.class%"/>
+        <service id="twig.tranlsation.formatter.xliff" class="%twig.translation.formatter.xliff.class%">
+            <tag name="translation.formatter" alias="xliff" />
+        </service>
 
-        <service id="twig.translation.formatter.yml" class="%twig.translation.formatter.yml.class%"/>
+        <service id="twig.translation.formatter.yml" class="%twig.translation.formatter.yml.class%">
+            <tag name="translation.formatter" alias="yml" />
+        </service>
 
         <service id="twig.translation.extractor" class="%twig.translation.extractor.class%">
             <argument type="service" id="twig" />
         </service>
 
-        <service id="twig.translation.extractor.file" class="%twig.translation.extractor.file.class%">
-            <argument type="service" id="service_container" />
-        </service>
+        <service id="twig.translation.extractor.file" class="%twig.translation.extractor.file.class%"/>
 
-        <service id="twig.translation.writer" class="%twig.translation.writer.class%">
-            <argument type="service" id="service_container" />
-        </service>
+        <service id="twig.translation.writer" class="%twig.translation.writer.class%"/>
     </services>
 </container>

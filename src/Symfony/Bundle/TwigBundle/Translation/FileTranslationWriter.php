@@ -3,6 +3,7 @@
 namespace Symfony\Bundle\TwigBundle\Translation;
 
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\Formatter\FormatterInterface;
 
 /**
  * Write translation messages to translation files
@@ -10,20 +11,25 @@ use Symfony\Component\Translation\MessageCatalogue;
 class FileTranslationWriter
 {    
     /**
-     * The container
-     * @var \Symfony\Component\DependencyInjection\ContainerInterface
+     * Supported formats for import
+     * 
+     * @var array
      */
-    private $container;
-    
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    private $formatters;
+        
+    /**
+     * Add a formatter to the translation extractor
+     * @param string $format The format of the loader
+     * @param FormatterInterface $formatter 
+     */
+    public function addLoader($format, FormatterInterface $formatter){
+        $this->formatters[$format] = $formatters;
     }
     
     public function writeTranslations(MessageCatalogue $catalogue, $path, $format)
     {
         // get the right formatter
-        $formatter = $this->container->get('twig.translation.formatter.' . $format);
+        $formatter = $this->formatters[$format];
 
         // save
         foreach ($catalogue->getDomains() as $domain) {

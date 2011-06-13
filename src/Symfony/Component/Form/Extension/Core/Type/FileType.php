@@ -21,6 +21,9 @@ use Symfony\Component\Form\FormView;
 
 class FileType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilder $builder, array $options)
     {
         if ($options['type'] === 'string') {
@@ -35,6 +38,9 @@ class FileType extends AbstractType
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildViewBottomUp(FormView $view, FormInterface $form)
     {
         $view
@@ -45,6 +51,9 @@ class FileType extends AbstractType
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         return array(
@@ -52,6 +61,9 @@ class FileType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getAllowedOptionValues(array $options)
     {
         return array(
@@ -62,6 +74,9 @@ class FileType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'file';

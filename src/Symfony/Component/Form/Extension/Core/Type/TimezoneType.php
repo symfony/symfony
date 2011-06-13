@@ -16,6 +16,9 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\TimezoneChoiceList;
 
 class TimezoneType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         return array(
@@ -23,11 +26,17 @@ class TimezoneType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent(array $options)
     {
         return 'choice';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'timezone';

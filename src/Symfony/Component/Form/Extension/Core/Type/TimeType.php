@@ -23,6 +23,9 @@ use Symfony\Component\Form\FormView;
 
 class TimeType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilder $builder, array $options)
     {
         $hourOptions = $minuteOptions = $secondOptions = array();
@@ -77,6 +80,9 @@ class TimeType extends AbstractType
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildView(FormView $view, FormInterface $form)
     {
         $view
@@ -85,6 +91,9 @@ class TimeType extends AbstractType
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         return array(
@@ -102,6 +111,9 @@ class TimeType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getAllowedOptionValues(array $options)
     {
         return array(
@@ -118,6 +130,9 @@ class TimeType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'time';

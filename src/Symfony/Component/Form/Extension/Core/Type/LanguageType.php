@@ -16,6 +16,9 @@ use Symfony\Component\Locale\Locale;
 
 class LanguageType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         return array(
@@ -23,11 +26,17 @@ class LanguageType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent(array $options)
     {
         return 'choice';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'language';

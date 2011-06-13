@@ -75,14 +75,14 @@ class ExceptionController extends ContainerAware
 
         // when not in debug, try to find a template for the specific HTTP status code and format
         if (!$debug) {
-            $template = sprintf('FrameworkBundle:Exception:%s%s.%s.twig', $name, $code, $format);
+            $template = new TemplateReference('FrameworkBundle', 'Exception', $name.$code, $format, 'twig');
             if ($templating->exists($template)) {
                 return $template;
             }
         }
 
         // try to find a template for the given format
-        $template = sprintf('FrameworkBundle:Exception:%s.%s.twig', $name, $format);
+        $template = new TemplateReference('FrameworkBundle', 'Exception', $name, $format, 'twig');
         if ($templating->exists($template)) {
             return $template;
         }
@@ -90,6 +90,6 @@ class ExceptionController extends ContainerAware
         // default to a generic HTML exception
         $this->container->get('request')->setRequestFormat('html');
 
-        return sprintf('FrameworkBundle:Exception:%s.html.twig', $name);
+        return new TemplateReference('FrameworkBundle', 'Exception', $name, 'html', 'twig');
     }
 }

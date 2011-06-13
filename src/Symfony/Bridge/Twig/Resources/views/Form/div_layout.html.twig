@@ -273,3 +273,12 @@
     {{ block('field_widget') }}
 {% endspaceless %}
 {% endblock email_widget %}
+
+{% block collection_widget %}
+{% spaceless %}
+    {{ block('form_widget') }}
+    {% if prototype %}
+    <script type="text/html" id="{{ id }}_prototype">{{ form_row(prototype) }}</script>
+    {% endif %}
+{% endspaceless %}
+{% endblock collection_widget %}

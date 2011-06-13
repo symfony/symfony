@@ -87,4 +87,46 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('', $response->getContent());
     }
+
+    public function testFilterSetsNonDefaultCharsetIfNotOverridden()
+    {
+        $listener = new ResponseListener('ISO-8859-15');
+        $this->dispatcher->addListener(CoreEvents::RESPONSE, array($listener, 'onCoreResponse'), 1);
+
+        $response = new Response('foo');
+
+        $event = new FilterResponseEvent($this->kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $response);
+        $this->dispatcher->dispatch(CoreEvents::RESPONSE, $event);
+
+        $this->assertEquals('ISO-8859-15', $response->getCharset());
+    }
+
+    public function testFilterDoesNothingIfCharsetIsOverridden()
+    {
+        $listener = new ResponseListener('ISO-8859-15');
+        $this->dispatcher->addListener(CoreEvents::RESPONSE, array($listener, 'onCoreResponse'), 1);
+
+        $response = new Response('foo');
+        $response->setCharset('ISO-8859-1');
+
+        $event = new FilterResponseEvent($this->kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $response);
+        $this->dispatcher->dispatch(CoreEvents::RESPONSE, $event);
+
+        $this->assertEquals('ISO-8859-1', $response->getCharset());
+    }
+
+    public function testFiltersSetsNonDefaultCharsetIfNotOverriddenOnNonTextContentType()
+    {
+        $listener = new ResponseListener('ISO-8859-15');
+        $this->dispatcher->addListener(CoreEvents::RESPONSE, array($listener, 'onCoreResponse'), 1);
+
+        $response = new Response('foo');
+        $request = Request::create('/');
+        $request->setRequestFormat('application/json');
+
+        $event = new FilterResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $this->dispatcher->dispatch(CoreEvents::RESPONSE, $event);
+
+        $this->assertEquals('ISO-8859-15', $response->getCharset());
+    }
 }

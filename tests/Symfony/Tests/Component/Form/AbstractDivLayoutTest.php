@@ -413,11 +413,8 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $this->assertMatchesXpath($html,
 '/div
     [
-        ./label[@for="name_file"]
-        /following-sibling::div[@id="name"]
-            [
-                ./input[@id="name_file"][@type="file"]
-            ]
+        ./label[@for="name"]
+        /following-sibling::input[@id="name"][@type="file"]
     ]
 '
         );

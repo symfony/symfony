@@ -56,7 +56,7 @@ class FileResource implements ResourceInterface
 
     public function __toString()
     {
-        return $this->path;
+        return (string) $this->getTemplate();
     }
 
     protected function getTemplate()

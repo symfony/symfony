@@ -33,14 +33,14 @@ class ConfigDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(Kernel::VERSION,$c->getSymfonyVersion());
         $this->assertNull($c->getToken());
 
-        // if else clause because we dont know it
+        // if else clause because we don't know it
         if (extension_loaded('xdebug')) {
             $this->assertTrue($c->hasXdebug());
         } else {
             $this->assertFalse($c->hasXdebug());
         }
 
-        // if else clause because we dont know it
+        // if else clause because we don't know it
         if (((extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'))
                 ||
                 (extension_loaded('apc') && ini_get('apc.enabled'))

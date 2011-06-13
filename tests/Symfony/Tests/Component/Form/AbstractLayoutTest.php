@@ -1118,4 +1118,21 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '
         );
     }
+
+    public function testCollectionPrototype()
+    {
+        $form = $this->factory->createNamedBuilder('form', 'na&me', array('items' => array('one', 'two', 'three')))
+            ->add('items', 'collection', array('allow_add' => true))
+            ->getForm()
+            ->createView();
+
+        $html = $this->renderWidget($form);
+
+        $this->assertMatchesXpath($html,
+'//script
+    [@id="na&me_items_prototype"]
+    [@type="text/html"]
+'
+        );
+    }
 }

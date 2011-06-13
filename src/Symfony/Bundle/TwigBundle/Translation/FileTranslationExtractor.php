@@ -13,7 +13,7 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
 class FileTranslationExtractor implements TranslationExtractorInterface
 {
     /**
-     * Supported formats for import
+     * Loaders used for import
      * 
      * @var array
      */

@@ -12,7 +12,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Yaml\Yaml;
 
 class TranslationUpdateCommand extends Command
-{    
+{
     /**
      * Compiled catalogue of messages
      * @var  \Symfony\Component\Translation\MessageCatalogue

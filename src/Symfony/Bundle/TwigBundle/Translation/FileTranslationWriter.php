@@ -11,7 +11,7 @@ use Symfony\Component\Translation\Formatter\FormatterInterface;
 class FileTranslationWriter
 {    
     /**
-     * Supported formats for export
+     * Formatters used for export
      * 
      * @var array
      */

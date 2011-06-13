@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Validator;
+namespace Symfony\Tests\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraints\Null;
 use Symfony\Component\Validator\Constraints\NullValidator;

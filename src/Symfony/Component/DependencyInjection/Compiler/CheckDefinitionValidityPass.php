@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -10,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * into account which is contained in the definition itself.
  *
  * Later passes can rely on the following, and specifically do not need to
- * perform these checks themself:
+ * perform these checks themselves:
  *
  * - non synthetic, non abstract services always have a class set
  * - synthetic services are always public

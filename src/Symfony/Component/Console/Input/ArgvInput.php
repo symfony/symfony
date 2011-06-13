@@ -229,7 +229,11 @@ class ArgvInput extends Input
             $value = $option->isValueOptional() ? $option->getDefault() : true;
         }
 
-        $this->options[$name] = $value;
+        if ($option->isArray()) {
+            $this->options[$name][] = $value;
+        } else {
+            $this->options[$name] = $value;
+        }
     }
 
     /**
@@ -260,9 +264,7 @@ class ArgvInput extends Input
      */
     public function hasParameterOption($values)
     {
-        if (!is_array($values)) {
-            $values = array($values);
-        }
+        $values = (array) $values;
 
         foreach ($this->tokens as $v) {
             if (in_array($v, $values)) {
@@ -285,9 +287,7 @@ class ArgvInput extends Input
      */
     public function getParameterOption($values, $default = false)
     {
-        if (!is_array($values)) {
-            $values = array($values);
-        }
+        $values = (array) $values;
 
         $tokens = $this->tokens;
         while ($token = array_shift($tokens)) {

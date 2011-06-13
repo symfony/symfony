@@ -5,11 +5,12 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="request_listener.class">Symfony\Bundle\FrameworkBundle\RequestListener</parameter>
+        <parameter key="router_listener.class">Symfony\Bundle\FrameworkBundle\EventListener\RouterListener</parameter>
+        <parameter key="session_listener.class">Symfony\Bundle\FrameworkBundle\EventListener\SessionListener</parameter>
         <parameter key="controller_resolver.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver</parameter>
         <parameter key="controller_name_converter.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser</parameter>
-        <parameter key="response_listener.class">Symfony\Component\HttpKernel\ResponseListener</parameter>
-        <parameter key="exception_listener.class">Symfony\Component\HttpKernel\Debug\ExceptionListener</parameter>
+        <parameter key="response_listener.class">Symfony\Component\HttpKernel\EventListener\ResponseListener</parameter>
+        <parameter key="exception_listener.class">Symfony\Component\HttpKernel\EventListener\ExceptionListener</parameter>
     </parameters>
 
     <services>
@@ -26,25 +27,30 @@
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
-        <service id="request_listener" class="%request_listener.class%">
-            <tag name="kernel.listener" event="onCoreRequest" />
+        <service id="router_listener" class="%router_listener.class%">
+            <tag name="kernel.listener" event="core.request" method="onEarlyCoreRequest" priority="255" />
+            <tag name="kernel.listener" event="core.request" method="onCoreRequest" />
             <tag name="monolog.logger" channel="request" />
-            <argument type="service" id="service_container" />
             <argument type="service" id="router" />
-            <argument /> <!-- HTTP port -->
-            <argument /> <!-- HTTPS port -->
+            <argument>%request_listener.http_port%</argument>
+            <argument>%request_listener.https_port%</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
+        <service id="session_listener" class="%session_listener.class%">
+            <tag name="kernel.listener" event="core.request" method="onCoreRequest" priority="128" />
+            <argument type="service" id="service_container" />
+        </service>
+
         <service id="response_listener" class="%response_listener.class%">
-            <tag name="kernel.listener" event="onCoreResponse" />
+            <tag name="kernel.listener" event="core.response" method="onCoreResponse" />
             <argument>%kernel.charset%</argument>
         </service>
 
         <service id="exception_listener" class="%exception_listener.class%">
-            <tag name="kernel.listener" event="onCoreException" priority="-128" />
+            <tag name="kernel.listener" event="core.exception" method="onCoreException" priority="-128" />
             <tag name="monolog.logger" channel="request" />
-            <argument /> <!-- controller name -->
+            <argument>%exception_listener.controller%</argument>
             <argument type="service" id="logger" on-invalid="null" />
         </service>
     </services>

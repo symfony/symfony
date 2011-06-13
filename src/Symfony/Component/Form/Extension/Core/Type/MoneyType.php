@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -23,8 +23,15 @@ class MoneyType extends AbstractType
 
     public function buildForm(FormBuilder $builder, array $options)
     {
-        $builder->appendClientTransformer(new MoneyToLocalizedStringTransformer($options['precision'], $options['grouping'], null, $options['divisor']))
-            ->setAttribute('currency', $options['currency']);
+        $builder
+            ->appendClientTransformer(new MoneyToLocalizedStringTransformer(
+                $options['precision'],
+                $options['grouping'],
+                null,
+                $options['divisor']
+            ))
+            ->setAttribute('currency', $options['currency'])
+        ;
     }
 
     public function buildView(FormView $view, FormInterface $form)
@@ -36,9 +43,9 @@ class MoneyType extends AbstractType
     {
         return array(
             'precision' => 2,
-            'grouping' => false,
-            'divisor' => 1,
-            'currency' => 'EUR',
+            'grouping'  => false,
+            'divisor'   => 1,
+            'currency'  => 'EUR',
         );
     }
 

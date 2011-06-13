@@ -11,8 +11,8 @@
 
 namespace Symfony\Tests\Component\Routing\Matcher;
 
-use Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException;
-use Symfony\Component\Routing\Matcher\Exception\NotFoundException;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -40,8 +40,17 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
             $matcher->match('/foo');
             $this->fail();
         } catch (MethodNotAllowedException $e) {
-            $this->assertEquals(array('post'), $e->getAllowedMethods());
+            $this->assertEquals(array('POST'), $e->getAllowedMethods());
         }
+    }
+
+    public function testHeadAllowedWhenRequirementContainsGet()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', array(), array('_method' => 'get')));
+
+        $matcher = new UrlMatcher($coll, new RequestContext('', 'head'));
+        $matcher->match('/foo');
     }
 
     public function testMethodNotAllowedAggregatesAllowedMethods()
@@ -56,7 +65,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
             $matcher->match('/foo');
             $this->fail();
         } catch (MethodNotAllowedException $e) {
-            $this->assertEquals(array('post', 'put', 'delete'), $e->getAllowedMethods());
+            $this->assertEquals(array('POST', 'PUT', 'DELETE'), $e->getAllowedMethods());
         }
     }
 
@@ -69,7 +78,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         try {
             $matcher->match('/no-match');
             $this->fail();
-        } catch (NotFoundException $e) {}
+        } catch (ResourceNotFoundException $e) {}
         $this->assertEquals(array('_route' => 'foo', 'bar' => 'baz'), $matcher->match('/foo/baz'));
 
         // test that defaults are merged
@@ -96,5 +105,67 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType('array', $matcher->match('/foo'));
         $matcher = new UrlMatcher($collection, new RequestContext('', 'head'), array());
         $this->assertInternalType('array', $matcher->match('/foo'));
+
+        // route with an optional variable as the first segment
+        $collection = new RouteCollection();
+        $collection->add('bar', new Route('/{bar}/foo', array('bar' => 'bar'), array('bar' => 'foo|bar')));
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        $this->assertEquals(array('_route' => 'bar', 'bar' => 'bar'), $matcher->match('/bar/foo'));
+        $this->assertEquals(array('_route' => 'bar', 'bar' => 'foo'), $matcher->match('/foo/foo'));
+
+        $collection = new RouteCollection();
+        $collection->add('bar', new Route('/{bar}', array('bar' => 'bar'), array('bar' => 'foo|bar')));
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        $this->assertEquals(array('_route' => 'bar', 'bar' => 'foo'), $matcher->match('/foo'));
+        $this->assertEquals(array('_route' => 'bar', 'bar' => 'bar'), $matcher->match('/'));
+    }
+
+    public function testMatchWithPrefixes()
+    {
+        $collection1 = new RouteCollection();
+        $collection1->add('foo', new Route('/{foo}'));
+
+        $collection2 = new RouteCollection();
+        $collection2->addCollection($collection1, '/b');
+
+        $collection = new RouteCollection();
+        $collection->addCollection($collection2, '/a');
+
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        $this->assertEquals(array('_route' => 'foo', 'foo' => 'foo'), $matcher->match('/a/b/foo'));
+    }
+
+    public function testMatchWithDynamicPrefix()
+    {
+        $collection1 = new RouteCollection();
+        $collection1->add('foo', new Route('/{foo}'));
+
+        $collection2 = new RouteCollection();
+        $collection2->addCollection($collection1, '/b');
+
+        $collection = new RouteCollection();
+        $collection->addCollection($collection2, '/{_locale}');
+
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        $this->assertEquals(array('_locale' => 'fr', '_route' => 'foo', 'foo' => 'foo'), $matcher->match('/fr/b/foo'));
+    }
+
+    public function testMatchRegression()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo/{foo}'));
+        $coll->add('bar', new Route('/foo/bar/{foo}'));
+
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $this->assertEquals(array('foo' => 'bar', '_route' => 'bar'), $matcher->match('/foo/bar/bar'));
+
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/{bar}'));
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        try {
+            $matcher->match('/');
+            $this->fail();
+        } catch (ResourceNotFoundException $e) {
+        }
     }
 }

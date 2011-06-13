@@ -54,15 +54,21 @@ class EsiResponseCacheStrategy implements EsiResponseCacheStrategyInterface
      */
     public function update(Response $response)
     {
+        // if we only have one Response, do nothing
+        if (1 === count($this->ttls)) {
+            return;
+        }
+
         if (!$this->cacheable) {
             $response->headers->set('Cache-Control', 'no-cache, must-revalidate');
 
             return;
         }
 
-        $maxAge = min($this->maxAges);
-        $response->setSharedMaxAge($maxAge);
+        if (null !== $maxAge = min($this->maxAges)) {
+            $response->setSharedMaxAge($maxAge);
+            $response->headers->set('Age', $maxAge - min($this->ttls));
+        }
         $response->setMaxAge(0);
-        $response->headers->set('Age', $maxAge - min($this->ttls));
     }
 }

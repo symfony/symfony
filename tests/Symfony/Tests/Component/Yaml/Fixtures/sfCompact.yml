@@ -2,17 +2,17 @@
 test: Compact notation
 brief: |
     Compact notation for sets of mappings with single element
-yaml: | 
+yaml: |
   ---
   # products purchased
   - item    : Super Hoop
   - item    : Basketball
     quantity: 1
-  - item: 
+  - item:
       name: Big Shoes
       nick: Biggies
     quantity: 1
-php: | 
+php: |
   array (
     array (
       'item' => 'Super Hoop',
@@ -55,17 +55,17 @@ php: |
 test: Compact notation
 brief: |
     Compact notation for sets of mappings with single element
-yaml: | 
+yaml: |
   ---
   # products purchased
   - item    : Super Hoop
   - item    : Basketball
     quantity: 1
-  - item: 
+  - item:
       name: Big Shoes
       nick: Biggies
     quantity: 1
-php: | 
+php: |
   array (
     array (
       'item' => 'Super Hoop',
@@ -108,17 +108,17 @@ php: |
 test: Compact notation
 brief: |
     Compact notation for sets of mappings with single element
-yaml: | 
+yaml: |
   ---
   # products purchased
   - item    : Super Hoop
   - item    : Basketball
     quantity: 1
-  - item: 
+  - item:
       name: Big Shoes
       nick: Biggies
     quantity: 1
-php: | 
+php: |
   array (
     array (
       'item' => 'Super Hoop',

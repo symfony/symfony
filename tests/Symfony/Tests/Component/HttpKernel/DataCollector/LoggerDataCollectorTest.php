@@ -39,11 +39,6 @@ class TestLogger extends Logger implements DebugLoggerInterface
         return 1337;
     }
 
-    public function getDebugLogger()
-    {
-        return new static();
-    }
-
     public function getLogs($priority = false)
     {
         return array('foo');

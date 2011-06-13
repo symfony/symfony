@@ -55,7 +55,6 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function getPhpUnitXmlDir()
     {
-        $dir = null;
         if (!isset($_SERVER['argv']) || false === strpos($_SERVER['argv'][0], 'phpunit')) {
             throw new \RuntimeException('You must override the WebTestCase::createKernel() method.');
         }
@@ -150,5 +149,15 @@ abstract class WebTestCase extends BaseWebTestCase
             isset($options['environment']) ? $options['environment'] : 'test',
             isset($options['debug']) ? $options['debug'] : true
         );
+    }
+
+    /**
+     * Shuts the kernel down if it was used in the test.
+     */
+    protected function tearDown()
+    {
+        if (null !== $this->kernel) {
+            $this->kernel->shutdown();
+        }
     }
 }

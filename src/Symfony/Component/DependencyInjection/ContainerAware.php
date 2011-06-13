@@ -18,6 +18,9 @@ namespace Symfony\Component\DependencyInjection;
  */
 class ContainerAware implements ContainerAwareInterface
 {
+    /**
+     * @var ContainerInterface
+     */
     protected $container;
 
     /**

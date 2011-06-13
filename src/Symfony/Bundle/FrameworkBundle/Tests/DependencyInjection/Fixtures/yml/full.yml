@@ -1,14 +1,14 @@
 framework:
+    secret: s3cr3t
+    form: ~
     csrf_protection:
         enabled:    true
         field_name: _csrf
-        secret:     s3cr3t
     esi:
         enabled: true
     profiler:
         only_exceptions: true
     router:
-        cache_warmer: true
         resource:     %kernel.root_dir%/config/routing.xml
         type:         xml
     session:
@@ -24,7 +24,6 @@ framework:
     templating:
         assets_version:   SomeVersionScheme
         assets_base_urls: http://cdn.example.com
-        cache_warmer:     true
         engines:          [php, twig]
         loader:           [loader.foo, loader.bar]
         cache:            /path/to/cache
@@ -42,3 +41,7 @@ framework:
     validation:
         enabled: true
         cache:   apc
+    annotations:
+        cache:   file
+        debug:   true
+        file_cache_dir: %kernel.cache_dir%/annotations

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Config\Definition;
 
+use Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException;
+
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\DuplicateKeyException;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
@@ -126,7 +128,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Checks if the node has a default value.
      *
-     * @return boolean
+     * @return Boolean
      */
     public function hasDefaultValue()
     {
@@ -193,8 +195,11 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         foreach ($this->children as $name => $child) {
             if (!array_key_exists($name, $value)) {
                 if ($child->isRequired()) {
-                    $msg = sprintf('The node at path "%s.%s" must be configured.', $this->getPath(), $name);
-                    throw new InvalidConfigurationException($msg);
+                    $msg = sprintf('The child node "%s" at path "%s" must be configured.', $name, $this->getPath());
+                    $ex = new InvalidConfigurationException($msg);
+                    $ex->setPath($this->getPath());
+
+                    throw $ex;
                 }
 
                 if ($child->hasDefaultValue()) {
@@ -223,11 +228,14 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected function validateType($value)
     {
         if (!is_array($value) && (!$this->allowFalse || false !== $value)) {
-            throw new InvalidTypeException(sprintf(
+            $ex = new InvalidTypeException(sprintf(
                 'Invalid type for path "%s". Expected array, but got %s',
                 $this->getPath(),
                 gettype($value)
             ));
+            $ex->setPath($this->getPath());
+
+            throw $ex;
         }
     }
 
@@ -256,7 +264,10 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         // if extra fields are present, throw exception
         if (count($value) && !$this->ignoreExtraKeys) {
             $msg = sprintf('Unrecognized options "%s" under "%s"', implode(', ', array_keys($value)), $this->getPath());
-            throw new InvalidConfigurationException($msg);
+            $ex = new InvalidConfigurationException($msg);
+            $ex->setPath($this->getPath().'.'.reset($value));
+
+            throw $ex;
         }
 
         return $normalized;
@@ -266,7 +277,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * Remap multiple singular values to a single plural value
      *
      * @param array $value The source values
-     * @return array The remaped values
+     * @return array The remapped values
      */
     protected function remapXml($value)
     {
@@ -309,13 +320,16 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             // no conflict
             if (!array_key_exists($k, $leftSide)) {
                 if (!$this->allowNewKeys) {
-                    throw new InvalidConfigurationException(sprintf(
+                    $ex = new InvalidConfigurationException(sprintf(
                         'You are not allowed to define new elements for path "%s". '
                        .'Please define all elements for this path in one config file. '
                        .'If you are trying to overwrite an element, make sure you redefine it '
                        .'with the same name.',
                         $this->getPath()
                     ));
+                    $ex->setPath($this->getPath());
+
+                    throw $ex;
                 }
 
                 $leftSide[$k] = $v;

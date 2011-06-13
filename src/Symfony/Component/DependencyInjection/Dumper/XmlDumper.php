@@ -122,6 +122,9 @@ class XmlDumper extends Dumper
         if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope()) {
             $service->setAttribute('scope', $scope);
         }
+        if (!$definition->isPublic()) {
+            $service->setAttribute('public', 'false');
+        }
 
         foreach ($definition->getTags() as $name => $tags) {
             foreach ($tags as $attributes) {
@@ -209,9 +212,10 @@ class XmlDumper extends Dumper
     /**
      * Converts parameters.
      *
-     * @param array $parameters
-     * @param string $type
+     * @param array      $parameters
+     * @param string     $type
      * @param DOMElement $parent
+     * @param string     $keyAttribute
      * @return void
      */
     private function convertParameters($parameters, $type, \DOMElement $parent, $keyAttribute = 'key')

@@ -40,6 +40,13 @@ interface BundleInterface
     function build(ContainerBuilder $container);
 
     /**
+     * Returns the container extension that should be implicitly loaded.
+     *
+     * @return ExtensionInterface|null The default extension or null if there is none
+     */
+    function getContainerExtension();
+
+    /**
      * Returns the bundle parent name.
      *
      * @return string The Bundle parent name it overrides or null if no parent

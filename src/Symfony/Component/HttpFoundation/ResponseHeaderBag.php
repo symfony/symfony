@@ -37,6 +37,19 @@ class ResponseHeaderBag extends HeaderBag
     /**
      * {@inheritdoc}
      */
+    public function __toString()
+    {
+        $cookies = '';
+        foreach ($this->cookies as $cookie) {
+            $cookies .= 'Set-Cookie: '.$cookie."\r\n";
+        }
+
+        return parent::__toString().$cookies;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function replace(array $headers = array())
     {
         parent::replace($headers);

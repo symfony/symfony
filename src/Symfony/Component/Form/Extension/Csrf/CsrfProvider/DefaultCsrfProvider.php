@@ -41,6 +41,22 @@ class DefaultCsrfProvider implements CsrfProviderInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function generateCsrfToken($intention)
+    {
+        return sha1($this->secret.$intention.$this->getSessionId());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isCsrfTokenValid($intention, $token)
+    {
+        return $token === $this->generateCsrfToken($intention);
+    }
+
+    /**
      * Returns the ID of the user session
      *
      * Automatically starts the session if necessary.
@@ -54,21 +70,5 @@ class DefaultCsrfProvider implements CsrfProviderInterface
         }
 
         return session_id();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function generateCsrfToken($pageId)
-    {
-        return sha1($this->secret.$pageId.$this->getSessionId());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isCsrfTokenValid($pageId, $token)
-    {
-        return $token === $this->generateCsrfToken($pageId);
     }
 }

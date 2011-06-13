@@ -74,6 +74,22 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/app.php/testing', $url);
     }
 
+    public function testRelativeUrlWithNullParameterButNotOptional()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing/{foo}/bar', array('foo' => null)));
+        $url = $this->getGenerator($routes)->generate('test', array(), false);
+
+        $this->assertEquals('/app.php/testing//bar', $url);
+    }
+
+    public function testRelativeUrlWithOptionalZeroParameter()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing/{page}'));
+        $url = $this->getGenerator($routes)->generate('test', array('page' => 0), false);
+
+        $this->assertEquals('/app.php/testing/0', $url);
+    }
+
     public function testRelativeUrlWithExtraParameters()
     {
         $routes = $this->getRoutes('test', new Route('/testing'));
@@ -115,7 +131,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Routing\Exception\RouteNotFoundException
      */
     public function testGenerateWithoutRoutes()
     {
@@ -124,7 +140,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Routing\Exception\MissingMandatoryParametersException
      */
     public function testGenerateForRouteWithoutManditoryParameter()
     {
@@ -133,7 +149,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Routing\Exception\InvalidParameterException
      */
     public function testGenerateForRouteWithInvalidOptionalParameter()
     {
@@ -142,7 +158,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Routing\Exception\InvalidParameterException
      */
     public function testGenerateForRouteWithInvalidManditoryParameter()
     {
@@ -166,6 +182,13 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
 
         $routes = $this->getRoutes('test', new Route('/', array(), array('_scheme' => 'http')));
         $this->assertEquals('http://localhost/app.php/', $this->getGenerator($routes, array('scheme' => 'https'))->generate('test'));
+    }
+
+    public function testNoTrailingSlashForMultipleOptionalParameters()
+    {
+        $routes = $this->getRoutes('test', new Route('/category/{slug1}/{slug2}/{slug3}', array('slug2' => null, 'slug3' => null)));
+
+        $this->assertEquals('/app.php/category/foo', $this->getGenerator($routes)->generate('test', array('slug1' => 'foo')));
     }
 
     protected function getGenerator(RouteCollection $routes, array $parameters = array())

@@ -42,7 +42,7 @@ class ReversedTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        return $this->reversedTransformer->reverseTransform($value, null);
+        return $this->reversedTransformer->reverseTransform($value);
     }
 
     /**

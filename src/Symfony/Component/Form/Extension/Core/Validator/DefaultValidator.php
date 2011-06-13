@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -20,7 +20,7 @@ class DefaultValidator implements FormValidatorInterface
     public function validate(FormInterface $form)
     {
         if (!$form->isSynchronized()) {
-            $form->addError(new FormError('The value is invalid'));
+            $form->addError(new FormError(sprintf('The value for "%s" is invalid', $form->getName())));
         }
 
         if (count($form->getExtraData()) > 0) {

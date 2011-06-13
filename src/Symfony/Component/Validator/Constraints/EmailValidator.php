@@ -17,33 +17,37 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class EmailValidator extends ConstraintValidator
 {
-
     public function isValid($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {
             return true;
         }
 
-        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString()'))) {
+        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
         $value = (string) $value;
+        $valid = filter_var($value, FILTER_VALIDATE_EMAIL);
 
-        if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+        if ($valid) {
+            $host = substr($value, strpos($value, '@') + 1);
+
+            if (version_compare(PHP_VERSION, '5.3.3', '<') && strpos($host, '.') === false) {
+                // Likely not a FQDN, bug in PHP FILTER_VALIDATE_EMAIL prior to PHP 5.3.3
+                $valid = false;
+            }
+
+            // Check MX records
+            if ($valid && $constraint->checkMX) {
+                $valid = $this->checkMX($host);
+            }
+        }
+
+        if (!$valid) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;
-        }
-
-        if ($constraint->checkMX) {
-            $host = substr($value, strpos($value, '@') + 1);
-
-            if (!$this->checkMX($host)) {
-                $this->setMessage($constraint->message, array('{{ value }}' => $value));
-
-                return false;
-            }
         }
 
         return true;
@@ -58,10 +62,6 @@ class EmailValidator extends ConstraintValidator
      */
     private function checkMX($host)
     {
-        if (function_exists('checkdnsrr')) {
-            return checkdnsrr($host, 'MX');
-        }
-
-        throw new \LogicException('Could not retrieve DNS record information. Remove check_mx = true to prevent this warning');
+        return checkdnsrr($host, 'MX');
     }
 }

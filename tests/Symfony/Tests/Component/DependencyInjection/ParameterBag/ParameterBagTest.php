@@ -12,6 +12,9 @@
 namespace Symfony\Tests\Component\DependencyInjection\ParameterBag;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
+use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 class ParameterBagTest extends \PHPUnit_Framework_TestCase
 {
@@ -62,7 +65,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
             $this->fail('->get() throws an \InvalidArgumentException if the key does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws an \InvalidArgumentException if the key does not exist');
-            $this->assertEquals('The parameter "baba" must be defined.', $e->getMessage(), '->get() throws an \InvalidArgumentException if the key does not exist');
+            $this->assertEquals('You have requested a non-existent parameter "baba".', $e->getMessage(), '->get() throws an \InvalidArgumentException if the key does not exist');
         }
     }
 
@@ -89,27 +92,73 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('I\'m a bar', $bag->resolveValue('I\'m a %foo%'), '->resolveValue() replaces placeholders by their values');
         $this->assertEquals(array('bar' => 'bar'), $bag->resolveValue(array('%foo%' => '%foo%')), '->resolveValue() replaces placeholders in keys and values of arrays');
         $this->assertEquals(array('bar' => array('bar' => array('bar' => 'bar'))), $bag->resolveValue(array('%foo%' => array('%foo%' => array('%foo%' => '%foo%')))), '->resolveValue() replaces placeholders in nested arrays');
-        $this->assertEquals('I\'m a %foo%', $bag->resolveValue('I\'m a %%foo%%'), '->resolveValue() supports % escaping by doubling it');
-        $this->assertEquals('I\'m a bar %foo bar', $bag->resolveValue('I\'m a %foo% %%foo %foo%'), '->resolveValue() supports % escaping by doubling it');
+        $this->assertEquals('I\'m a %%foo%%', $bag->resolveValue('I\'m a %%foo%%'), '->resolveValue() supports % escaping by doubling it');
+        $this->assertEquals('I\'m a bar %%foo bar', $bag->resolveValue('I\'m a %foo% %%foo %foo%'), '->resolveValue() supports % escaping by doubling it');
 
         $bag = new ParameterBag(array('foo' => true));
-        $this->assertTrue($bag->resolveValue('%foo%') === true, '->resolveValue() replaces arguments that are just a placeholder by their value without casting them to strings');
+        $this->assertSame(true, $bag->resolveValue('%foo%'), '->resolveValue() replaces arguments that are just a placeholder by their value without casting them to strings');
+        $bag = new ParameterBag(array('foo' => null));
+        $this->assertSame(null, $bag->resolveValue('%foo%'), '->resolveValue() replaces arguments that are just a placeholder by their value without casting them to strings');
 
         $bag = new ParameterBag(array());
         try {
-            $bag->resolveValue('%foobar%', array());
+            $bag->resolveValue('%foobar%');
             $this->fail('->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent parameter');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent parameter');
-            $this->assertEquals('The parameter "foobar" must be defined.', $e->getMessage(), '->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent parameter');
+        } catch (ParameterNotFoundException $e) {
+            $this->assertEquals('You have requested a non-existent parameter "foobar".', $e->getMessage(), '->resolveValue() throws a ParameterNotFoundException if a placeholder references a non-existent parameter');
         }
 
         try {
-            $bag->resolveValue('foo %foobar% bar', array());
-            $this->fail('->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent parameter');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent parameter');
-            $this->assertEquals('The parameter "foobar" must be defined.', $e->getMessage(), '->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent parameter');
+            $bag->resolveValue('foo %foobar% bar');
+            $this->fail('->resolveValue() throws a ParameterNotFoundException if a placeholder references a non-existent parameter');
+        } catch (ParameterNotFoundException $e) {
+            $this->assertEquals('You have requested a non-existent parameter "foobar".', $e->getMessage(), '->resolveValue() throws a ParameterNotFoundException if a placeholder references a non-existent parameter');
+        }
+
+        $bag = new ParameterBag(array('foo' => 'a %bar%', 'bar' => array()));
+        try {
+            $bag->resolveValue('%foo%');
+            $this->fail('->resolveValue() throws a RuntimeException when a parameter embeds another non-string parameter');
+        } catch (RuntimeException $e) {
+            $this->assertEquals('A parameter cannot contain a non-string parameter.', $e->getMessage(), '->resolveValue() throws a RuntimeException when a parameter embeds another non-string parameter');
+        }
+
+        $bag = new ParameterBag(array('foo' => '%bar%', 'bar' => '%foobar%', 'foobar' => '%foo%'));
+        try {
+            $bag->resolveValue('%foo%');
+            $this->fail('->resolveValue() throws a ParameterCircularReferenceException when a parameter has a circular reference');
+        } catch (ParameterCircularReferenceException $e) {
+            $this->assertEquals('Circular reference detected for parameter "foo" ("foo" > "bar" > "foobar" > "foo").', $e->getMessage(), '->resolveValue() throws a ParameterCircularReferenceException when a parameter has a circular reference');
+        }
+
+        $bag = new ParameterBag(array('foo' => 'a %bar%', 'bar' => 'a %foobar%', 'foobar' => 'a %foo%'));
+        try {
+            $bag->resolveValue('%foo%');
+            $this->fail('->resolveValue() throws a ParameterCircularReferenceException when a parameter has a circular reference');
+        } catch (ParameterCircularReferenceException $e) {
+            $this->assertEquals('Circular reference detected for parameter "foo" ("foo" > "bar" > "foobar" > "foo").', $e->getMessage(), '->resolveValue() throws a ParameterCircularReferenceException when a parameter has a circular reference');
+        }
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::resolve
+     */
+    public function testResolveIndicatesWhyAParameterIsNeeded()
+    {
+        $bag = new ParameterBag(array('foo' => '%bar%'));
+
+        try {
+            $bag->resolve();
+        } catch (ParameterNotFoundException $e) {
+            $this->assertEquals('The parameter "foo" has a dependency on a non-existent parameter "bar".', $e->getMessage());
+        }
+
+        $bag = new ParameterBag(array('foo' => '%bar%'));
+
+        try {
+            $bag->resolve();
+        } catch (ParameterNotFoundException $e) {
+            $this->assertEquals('The parameter "foo" has a dependency on a non-existent parameter "bar".', $e->getMessage());
         }
     }
 }

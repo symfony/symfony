@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -21,27 +21,38 @@ use Symfony\Component\HttpFoundation\File\File;
  */
 class FileToArrayTransformer implements DataTransformerInterface
 {
+    /**
+     * Convert a File instance to a file representation
+     *
+     * @param File $file The file
+     *
+     * @return array The file representation
+     *
+     * @throws UnexpectedTypeException if the file is not an instance of File
+     */
     public function transform($file)
     {
         if (null === $file || '' === $file) {
-            return array(
-                'file' => '',
-                'token' => '',
-                'name' => '',
-            );
+            return array('file' => '');
         }
 
         if (!$file instanceof File) {
             throw new UnexpectedTypeException($file, 'Symfony\Component\HttpFoundation\File\File');
         }
 
-        return array(
-            'file' => $file,
-            'token' => '',
-            'name' => '',
-        );
+        return array('file' => $file);
     }
 
+    /**
+     * Transform a file internal representation to a File instance
+     *
+     * @param File $array the file representation
+     *
+     * @return File The file
+     *
+     * @throws UnexpectedTypeException if the file representation is not an array
+     * @throws TransformationFailedException if the file representation is invalid
+     */
     public function reverseTransform($array)
     {
         if (null === $array || '' === $array || array() === $array) {
@@ -53,11 +64,11 @@ class FileToArrayTransformer implements DataTransformerInterface
         }
 
         if (!array_key_exists('file', $array)) {
-            throw new TransformationFailedException('The key "file" is missing');
+            throw new TransformationFailedException('The key "file" is missing.');
         }
 
         if (!empty($array['file']) && !$array['file'] instanceof File) {
-            throw new TransformationFailedException('The key "file" should be empty or instance of File');
+            throw new TransformationFailedException('The key "file" should be empty or instance of File (Have you set the "enctype" attribute of the form tag to "multipart/form-data"?).');
         }
 
         return $array['file'];

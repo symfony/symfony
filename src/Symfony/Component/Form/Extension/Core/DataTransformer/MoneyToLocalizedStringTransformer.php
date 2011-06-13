@@ -26,17 +26,17 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
 
     public function __construct($precision = null, $grouping = null, $roundingMode = null, $divisor = null)
     {
-        if (is_null($grouping)) {
+        if (null === $grouping) {
             $grouping = true;
         }
 
-        if (is_null($precision)) {
+        if (null === $precision) {
             $precision = 2;
         }
 
         parent::__construct($precision, $grouping, $roundingMode);
 
-        if (is_null($divisor)) {
+        if (null === $divisor) {
             $divisor = 1;
         }
 
@@ -47,7 +47,11 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      * Transforms a normalized format into a localized money string.
      *
      * @param  number $value  Normalized number
+     *
      * @return string         Localized money string.
+     *
+     * @throws UnexpectedTypeException if the given value is not numeric
+     * @throws TransformationFailedException if the value can not be transformed
      */
     public function transform($value)
     {
@@ -66,7 +70,11 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      * Transforms a localized money string into a normalized format.
      *
      * @param string $value Localized money string
+     *
      * @return number Normalized number
+     *
+     * @throws UnexpectedTypeException if the given value is not a string
+     * @throws TransformationFailedException if the value can not be transformed
      */
     public function reverseTransform($value)
     {

@@ -18,8 +18,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class TypeTestCase extends \PHPUnit_Framework_TestCase
 {
-    protected $storage;
-
     protected $factory;
 
     protected $builder;
@@ -31,9 +29,6 @@ abstract class TypeTestCase extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->storage = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\TemporaryStorage')
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->factory = new FormFactory($this->getExtensions());
         $this->builder = new FormBuilder(null, $this->factory, $this->dispatcher);
     }
@@ -41,7 +36,7 @@ abstract class TypeTestCase extends \PHPUnit_Framework_TestCase
     protected function getExtensions()
     {
         return array(
-            new CoreExtension($this->storage),
+            new CoreExtension(),
         );
     }
 

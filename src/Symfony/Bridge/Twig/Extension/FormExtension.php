@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Twig\Extension;
 use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Util\FormUtil;
 
 /**
  * FormExtension extends Twig with form capabilities.
@@ -27,10 +28,14 @@ class FormExtension extends \Twig_Extension
     protected $templates;
     protected $environment;
     protected $themes;
+    protected $varStack;
 
     public function __construct(array $resources = array())
     {
         $this->themes = new \SplObjectStorage();
+        $this->varStack = new \SplObjectStorage();
+        $this->templates = new \SplObjectStorage();
+
         $this->resources = $resources;
     }
 
@@ -51,6 +56,7 @@ class FormExtension extends \Twig_Extension
     public function setTheme(FormView $view, array $resources)
     {
         $this->themes->attach($view, $resources);
+        $this->templates->detach($view);
     }
 
     /**
@@ -69,13 +75,25 @@ class FormExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'form_enctype' => new \Twig_Function_Method($this, 'renderEnctype', array('is_safe' => array('html'))),
-            'form_widget'  => new \Twig_Function_Method($this, 'renderWidget', array('is_safe' => array('html'))),
-            'form_errors'  => new \Twig_Function_Method($this, 'renderErrors', array('is_safe' => array('html'))),
-            'form_label'   => new \Twig_Function_Method($this, 'renderLabel', array('is_safe' => array('html'))),
-            'form_row'     => new \Twig_Function_Method($this, 'renderRow', array('is_safe' => array('html'))),
-            'form_rest'    => new \Twig_Function_Method($this, 'renderRest', array('is_safe' => array('html'))),
+            'form_enctype'             => new \Twig_Function_Method($this, 'renderEnctype', array('is_safe' => array('html'))),
+            'form_widget'              => new \Twig_Function_Method($this, 'renderWidget', array('is_safe' => array('html'))),
+            'form_errors'              => new \Twig_Function_Method($this, 'renderErrors', array('is_safe' => array('html'))),
+            'form_label'               => new \Twig_Function_Method($this, 'renderLabel', array('is_safe' => array('html'))),
+            'form_row'                 => new \Twig_Function_Method($this, 'renderRow', array('is_safe' => array('html'))),
+            'form_rest'                => new \Twig_Function_Method($this, 'renderRest', array('is_safe' => array('html'))),
+            '_form_is_choice_group'    => new \Twig_Function_Method($this, 'isChoiceGroup', array('is_safe' => array('html'))),
+            '_form_is_choice_selected' => new \Twig_Function_Method($this, 'isChoiceSelected', array('is_safe' => array('html'))),
         );
+    }
+
+    public function isChoiceGroup($label)
+    {
+        return FormUtil::isChoiceGroup($label);
+    }
+
+    public function isChoiceSelected(FormView $view, $choice)
+    {
+        return FormUtil::isChoiceSelected($choice, $view->get('value'));
     }
 
     /**
@@ -86,6 +104,8 @@ class FormExtension extends \Twig_Extension
      *     <form action="..." method="post" {{ form_enctype(form) }}>
      *
      * @param FormView $view  The view for which to render the encoding type
+     *
+     * @return string The html markup
      */
     public function renderEnctype(FormView $view)
     {
@@ -97,12 +117,22 @@ class FormExtension extends \Twig_Extension
      *
      * @param FormView $view      The view to render as a row
      * @param array    $variables An array of variables
+     *
+     * @return string The html markup
      */
     public function renderRow(FormView $view, array $variables = array())
     {
         return $this->render($view, 'row', $variables);
     }
 
+    /**
+     * Renders views which have not already been rendered.
+     *
+     * @param FormView $view      The parent view
+     * @param array    $variables An array of variables
+     *
+     * @return string The html markup
+     */
     public function renderRest(FormView $view, array $variables = array())
     {
         return $this->render($view, 'rest', $variables);
@@ -115,31 +145,28 @@ class FormExtension extends \Twig_Extension
      *
      *     {{ form_widget(view) }}
      *
-     * You can pass attributes element during the call:
+     * You can pass options during the call:
      *
-     *     {{ form_widget(view, {'class': 'foo'}) }}
+     *     {{ form_widget(view, {'attr': {'class': 'foo'}}) }}
      *
-     * Some fields also accept additional variables as parameters:
+     *     {{ form_widget(view, {'separator': '+++++'}) }}
      *
-     *     {{ form_widget(view, {}, {'separator': '+++++'}) }}
-     *
-     * @param FormView        $view       The view to render
+     * @param FormView        $view      The view to render
      * @param array           $variables Additional variables passed to the template
-     * @param array|string    $resources  A resource or array of resources
+     *
+     * @return string The html markup
      */
-    public function renderWidget(FormView $view, array $variables = array(), $resources = null)
+    public function renderWidget(FormView $view, array $variables = array())
     {
-        if (null !== $resources && !is_array($resources)) {
-            $resources = array($resources);
-        }
-
-        return $this->render($view, 'widget', $variables, $resources);
+        return $this->render($view, 'widget', $variables);
     }
 
     /**
      * Renders the errors of the given view
      *
      * @param FormView $view The view to render the errors for
+     *
+     * @return string The html markup
      */
     public function renderErrors(FormView $view)
     {
@@ -151,83 +178,131 @@ class FormExtension extends \Twig_Extension
      *
      * @param FormView $view  The view to render the label for
      * @param string   $label Label name
+     * @param array    $variables Additional variables passed to the template
+     *
+     * @return string The html markup
      */
-    public function renderLabel(FormView $view, $label = null)
+    public function renderLabel(FormView $view, $label = null, array $variables = array())
     {
-        return $this->render($view, 'label', null === $label ? array() : array('label' => $label));
+        if ($label !== null) {
+            $variables += array('label' => $label);
+        }
+
+        return $this->render($view, 'label', $variables);
     }
 
-    protected function render(FormView $view, $section, array $variables = array(), array $resources = null)
+    /**
+     * Renders a template.
+     *
+     * 1. This function first looks for a block named "_<view id>_<section>",
+     * 2. if such a block is not found the function will look for a block named
+     *    "<type name>_<section>",
+     * 3. the type name is recursively replaced by the parent type name until a
+     *    corresponding block is found
+     *
+     * @param FormView  $view       The form view
+     * @param string    $section    The section to render (i.e. 'row', 'widget', 'label', ...)
+     * @param array     $variables  Additional variables
+     *
+     * @return string The html markup
+     *
+     * @throws FormException if no template block exists to render the given section of the view
+     */
+    protected function render(FormView $view, $section, array $variables = array())
     {
-        $templates = $this->getTemplates($view, $resources);
+        $mainTemplate = in_array($section, array('widget', 'row'));
+        if ($mainTemplate && $view->isRendered()) {
+
+                return '';
+        }
+
+        $templates = $this->getTemplates($view);
         $blocks = $view->get('types');
+        array_unshift($blocks, '_'.$view->get('id'));
+
         foreach ($blocks as &$block) {
             $block = $block.'_'.$section;
 
             if (isset($templates[$block])) {
-                if ('widget' === $section || 'row' === $section) {
-                    $view->setRendered(true);
+
+                $this->varStack[$view] = array_replace(
+                    $view->all(),
+                    isset($this->varStack[$view]) ? $this->varStack[$view] : array(),
+                    $variables
+                );
+
+                $html = $templates[$block]->renderBlock($block, $this->varStack[$view]);
+
+                if ($mainTemplate) {
+                    $view->setRendered();
                 }
 
-                return $templates[$block]->renderBlock($block, array_merge($view->all(), $variables));
+                unset($this->varStack[$view]);
+
+                return $html;
             }
         }
 
         throw new FormException(sprintf('Unable to render form as none of the following blocks exist: "%s".', implode('", "', $blocks)));
     }
 
-    protected function getTemplate(FormView $view, $name, array $resources = null)
+    /**
+     * Returns the templates used by the view.
+     *
+     * Templates are looked for in the resources in the following order:
+     *   * resources from the themes (and its parents)
+     *   * resources from the themes of parent views (up to the root view)
+     *   * default resources
+     *
+     * @param FormView $view The view
+     *
+     * @return array An array of Twig_TemplateInterface instances
+     */
+    protected function getTemplates(FormView $view)
     {
-        $templates = $this->getTemplates($view, $resources);
+        if (!$this->templates->contains($view)) {
+            $resources = array();
+            $parent = $view;
+            do {
+                if (isset($this->themes[$parent])) {
+                    $resources = array_merge($this->themes[$parent], $resources);
+                }
+            } while ($parent = $parent->getParent());
 
-        return $templates[$name];
-    }
+            $resources = array_merge($this->resources, $resources);
 
-    protected function getTemplates(FormView $view, array $resources = null)
-    {
-        // templates are looked for in the following resources:
-        //   * resources provided directly into the function call
-        //   * resources from the themes (and its parents)
-        //   * default resources
+            $templates = array();
+            foreach ($resources as $resource) {
+                if (!$resource instanceof \Twig_Template) {
+                    $resource = $this->environment->loadTemplate($resource);
+                }
 
-        // defaults
-        $all = $this->resources;
-
-        // themes
-        $parent = $view;
-        do {
-            if (isset($this->themes[$parent])) {
-                $all = array_merge($all, $this->themes[$parent]);
-            }
-        } while ($parent = $parent->getParent());
-
-        // local
-        $all = array_merge($all, null !== $resources ? (array) $resources : array());
-
-        $templates = array();
-        foreach ($all as $resource) {
-            if (!$resource instanceof \Twig_Template) {
-                $resource = $this->environment->loadTemplate($resource);
+                foreach ($this->getBlockNames($resource) as $name) {
+                    $templates[$name] = $resource;
+                }
             }
 
-            $blocks = array();
-            foreach ($this->getBlockNames($resource) as $name) {
-                $blocks[$name] = $resource;
-            }
-
-            $templates = array_replace($templates, $blocks);
+            $this->templates->attach($view, $templates);
+        } else {
+            $templates = $this->templates[$view];
         }
 
         return $templates;
     }
 
-    protected function getBlockNames($resource)
+    /**
+     * Returns all the block defined in the template hierarchy.
+     *
+     * @param \Twig_Template $template
+     *
+     * @return array A list of block names
+     */
+    protected function getBlockNames(\Twig_Template $template)
     {
-        $names = $resource->getBlockNames();
-        $parent = $resource;
-        while (false !== $parent = $parent->getParent(array())) {
-            $names = array_merge($names, $parent->getBlockNames());
-        }
+        $names = array();
+        do {
+            $names = array_merge($names, $template->getBlockNames());
+        } while (false !== $template = $template->getParent(array()));
 
         return array_unique($names);
     }

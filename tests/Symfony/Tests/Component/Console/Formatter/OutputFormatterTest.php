@@ -39,12 +39,20 @@ class FormatterStyleTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testNestedStyles()
+    {
+        $formatter = new OutputFormatter(true);
+
+        $this->assertEquals(
+            "\033[37;41msome \033[32msome info\033[0m error\033[0m", $formatter->format('<error>some <info>some info</info> error</error>')
+        );
+    }
+
     public function testNewStyle()
     {
         $formatter = new OutputFormatter(true);
 
-        $style = $this->getMockBuilder('Symfony\Component\Console\Formatter\OutputFormatterStyleInterface')
-            ->getMock();
+        $style = $this->getMockBuilder('Symfony\Component\Console\Formatter\OutputFormatterStyleInterface')->getMock();
         $formatter->setStyle('test', $style);
 
         $this->assertEquals($style, $formatter->getStyle('test'));
@@ -52,17 +60,10 @@ class FormatterStyleTest extends \PHPUnit_Framework_TestCase
 
         $style
             ->expects($this->once())
-            ->method('getBeginStyle')
-            ->will($this->returnValue('[STYLE_BEG]'));
+            ->method('apply')
+            ->will($this->returnValue('[STYLE_BEG]some custom msg[STYLE_END]'));
 
-        $style
-            ->expects($this->once())
-            ->method('getEndStyle')
-            ->will($this->returnValue('[STYLE_END]'));
-
-        $this->assertEquals(
-            "[STYLE_BEG]some custom msg[STYLE_END]", $formatter->format('<test>some custom msg</test>')
-        );
+        $this->assertEquals("[STYLE_BEG]some custom msg[STYLE_END]", $formatter->format('<test>some custom msg</test>'));
     }
 
     public function testRedefineStyle()
@@ -75,13 +76,8 @@ class FormatterStyleTest extends \PHPUnit_Framework_TestCase
 
         $style
             ->expects($this->once())
-            ->method('getBeginStyle')
-            ->will($this->returnValue('[STYLE_BEG]'));
-
-        $style
-            ->expects($this->once())
-            ->method('getEndStyle')
-            ->will($this->returnValue('[STYLE_END]'));
+            ->method('apply')
+            ->will($this->returnValue('[STYLE_BEG]some custom msg[STYLE_END]'));
 
         $this->assertEquals(
             "[STYLE_BEG]some custom msg[STYLE_END]", $formatter->format('<info>some custom msg</info>')
@@ -92,9 +88,8 @@ class FormatterStyleTest extends \PHPUnit_Framework_TestCase
     {
         $formatter = new OutputFormatter(true);
 
-        $this->assertEquals(
-            "\033[34;41msome text\033[0m", $formatter->format('<fg=blue;bg=red>some text</>')
-        );
+        $this->assertEquals("\033[34;41msome text\033[0m", $formatter->format('<fg=blue;bg=red>some text</>'));
+        $this->assertEquals("\033[34;41msome text\033[0m", $formatter->format('<fg=blue;bg=red>some text</fg=blue;bg=red>'));
     }
 
     public function testNotDecoratedFormatter()

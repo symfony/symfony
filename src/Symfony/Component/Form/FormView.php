@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,13 +11,11 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Util\FormUtil;
-
 class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 {
     private $vars = array(
         'value' => null,
-        'attr' => array(),
+        'attr'  => array(),
     );
 
     private $parent;
@@ -38,10 +36,14 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * @param string $name
      * @param mixed $value
+     *
+     * @return FormView The current view
      */
     public function set($name, $value)
     {
         $this->vars[$name] = $value;
+
+        return $this;
     }
 
     /**
@@ -56,6 +58,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * @param $name
      * @param $default
+     *
      * @return mixed
      */
     public function get($name, $default = null)
@@ -85,103 +88,197 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
         return $this->all();
     }
 
+    /**
+     * Sets the value for an attribute.
+     *
+     * @param string $name  The name of the attribute
+     * @param string $value The value
+     *
+     * @return FormView The current view
+     */
     public function setAttribute($name, $value)
     {
         $this->vars['attr'][$name] = $value;
+
+        return $this;
     }
 
+    /**
+     * Returns whether the attached form is rendered.
+     *
+     * @return Boolean Whether the form is rendered
+     */
     public function isRendered()
     {
-        return $this->rendered;
+        $hasChildren = 0 < count($this->children);
+
+        if (true === $this->rendered || !$hasChildren) {
+            return $this->rendered;
+        }
+
+        if ($hasChildren) {
+            foreach ($this->children as $child) {
+                if (!$child->isRendered()) {
+                    return false;
+                }
+            }
+
+            return $this->rendered = true;
+        }
+
+        return false;
     }
 
+    /**
+     * Marks the attached form as rendered
+     *
+     * @return FormView The current view
+     */
     public function setRendered()
     {
         $this->rendered = true;
+
+        return $this;
     }
 
-    public function setParent(self $parent)
+    /**
+     * Sets the parent view.
+     *
+     * @param FormView $parent The parent view
+     *
+     * @return FormView The current view
+     */
+    public function setParent(FormView $parent = null)
     {
         $this->parent = $parent;
+
+        return $this;
     }
 
+    /**
+     * Returns the parent view.
+     *
+     * @return FormView The parent view
+     */
     public function getParent()
     {
         return $this->parent;
     }
 
+    /**
+     * Returns whether this view has a parent.
+     *
+     * @return Boolean Whether this view has a parent
+     */
     public function hasParent()
     {
         return null !== $this->parent;
     }
 
+    /**
+     * Sets the children view.
+     *
+     * @param array $children The children as instances of FormView
+     *
+     * @return FormView The current view
+     */
     public function setChildren(array $children)
     {
         $this->children = $children;
+
+        return $this;
     }
 
+    /**
+     * Returns the children.
+     *
+     * @return array The children as instances of FormView
+     */
     public function getChildren()
     {
         return $this->children;
     }
 
+    /**
+     * Returns a given child.
+     *
+     * @param string name The name of the child
+     *
+     * @return FormView The child view
+     */
+    public function getChild($name)
+    {
+        return $this->children[$name];
+    }
+
+    /**
+     * Returns whether this view has children.
+     *
+     * @return Boolean Whether this view has children
+     */
     public function hasChildren()
     {
         return count($this->children) > 0;
     }
 
+    /**
+     * Returns a child by name (implements \ArrayAccess).
+     *
+     * @param string $name The child name
+     *
+     * @return FormView The child view
+     */
     public function offsetGet($name)
     {
-        return $this->children[$name];
+        return $this->getChild($name);
     }
 
+    /**
+     * Returns whether the given child exists (implements \ArrayAccess).
+     *
+     * @param string $name The child name
+     *
+     * @return Boolean Whether the child view exists
+     */
     public function offsetExists($name)
     {
         return isset($this->children[$name]);
     }
 
+    /**
+     * Implements \ArrayAccess.
+     *
+     * @throws \BadMethodCallException always as setting a child by name is not allowed
+     */
     public function offsetSet($name, $value)
     {
         throw new \BadMethodCallException('Not supported');
     }
 
+    /**
+     * Removes a child (implements \ArrayAccess).
+     *
+     * @param string $name The child name
+     */
     public function offsetUnset($name)
     {
-        throw new \BadMethodCallException('Not supported');
-    }
-
-    public function getIterator()
-    {
-        if (isset($this->children)) {
-            $this->rendered = true;
-
-            return new \ArrayIterator($this->children);
-        }
-
-        return new \ArrayIterator(array());
-    }
-
-    public function isChoiceGroup($choice)
-    {
-        return is_array($choice) || $choice instanceof \Traversable;
-    }
-
-    public function isChoiceSelected($choice)
-    {
-        $choice = FormUtil::toArrayKey($choice);
-
-        // The value should already have been converted by value transformers,
-        // otherwise we had to do the conversion on every call of this method
-        if (is_array($this->vars['value'])) {
-            return false !== array_search($choice, $this->vars['value'], true);
-        }
-
-        return $choice === $this->vars['value'];
+        unset($this->children[$name]);
     }
 
     /**
-     * @see Countable
-     * @return integer
+     * Returns an iterator to iterate over children (implements \IteratorAggregate)
+     *
+     * @return \ArrayIterator The iterator
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->children);
+    }
+
+    /**
+     * Implements \Countable.
+     *
+     * @return integer The number of children views
      */
     public function count()
     {

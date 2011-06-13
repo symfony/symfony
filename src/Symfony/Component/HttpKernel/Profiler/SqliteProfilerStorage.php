@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 class SqliteProfilerStorage extends PdoProfilerStorage
 {
     /**
-     * @throws \RuntimeException When neither of SQLite or PDO_SQLite extension is enabled
+     * @throws \RuntimeException When neither of SQLite3 or PDO_SQLite extension is enabled
      */
     protected function initDb()
     {
@@ -31,10 +31,14 @@ class SqliteProfilerStorage extends PdoProfilerStorage
             }
             if (class_exists('SQLite3')) {
                 $db = new \SQLite3(substr($this->dsn, 7, strlen($this->dsn)), \SQLITE3_OPEN_READWRITE | \SQLITE3_OPEN_CREATE);
+                if (method_exists($db, 'busyTimeout')) {
+                    // busyTimeout only exists for PHP >= 5.3.3
+                    $db->busyTimeout(1000);
+                }
             } elseif (class_exists('PDO') && in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
                 $db = new \PDO($this->dsn);
             } else {
-                throw new \RuntimeException('You need to enable either the SQLite or PDO_SQLite extension for the profiler to run properly.');
+                throw new \RuntimeException('You need to enable either the SQLite3 or PDO_SQLite extension for the profiler to run properly.');
             }
 
             $db->exec('CREATE TABLE IF NOT EXISTS sf_profiler_data (token STRING, data STRING, ip STRING, url STRING, time INTEGER, parent STRING, created_at INTEGER)');

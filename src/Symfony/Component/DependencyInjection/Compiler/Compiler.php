@@ -105,7 +105,6 @@ class Compiler
      */
     public function compile(ContainerBuilder $container)
     {
-        $start = microtime(true);
         foreach ($this->passConfig->getPasses() as $pass) {
             $pass->process($container);
         }

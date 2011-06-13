@@ -17,12 +17,6 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 /**
  * Transforms between a normalized time and a localized time string
  *
- * Options:
- *
- *  * "input": The type of the normalized format ("time" or "timestamp"). Default: "datetime"
- *  * "output": The type of the transformed format ("string" or "array"). Default: "string"
- *  * "format": The format of the time string ("short", "medium", "long" or "full"). Default: "short"
- *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
@@ -32,24 +26,37 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 
     private $timeFormat;
 
+    /**
+     * Constructor.
+     *
+     * @see BaseDateTimeTransformer::formats for available format options
+     *
+     * @param string  $inputTimezone   The name of the input timezone
+     * @param string  $outputTimezone  The name of the output timezone
+     * @param integer $dateFormat      The date format
+     * @param integer $timeFormat      The time format
+     *
+     * @throws UnexpectedTypeException If a format is not supported
+     * @throws UnexpectedTypeException if a timezone is not a string
+     */
     public function __construct($inputTimezone = null, $outputTimezone = null, $dateFormat = null, $timeFormat = null)
     {
         parent::__construct($inputTimezone, $outputTimezone);
 
-        if (is_null($dateFormat)) {
+        if (null === $dateFormat) {
             $dateFormat = \IntlDateFormatter::MEDIUM;
         }
 
-        if (is_null($timeFormat)) {
+        if (null === $timeFormat) {
             $timeFormat = \IntlDateFormatter::SHORT;
         }
 
         if (!in_array($dateFormat, self::$formats, true)) {
-            throw new \InvalidArgumentException(sprintf('The value $dateFormat is expected to be one of "%s". Is "%s"', implode('", "', self::$formats), $dateFormat));
+            throw new UnexpectedTypeException($dateFormat, implode('", "', self::$formats));
         }
 
         if (!in_array($timeFormat, self::$formats, true)) {
-            throw new \InvalidArgumentException(sprintf('The value $timeFormat is expected to be one of "%s". Is "%s"', implode('", "', self::$formats), $timeFormat));
+            throw new UnexpectedTypeException($timeFormat, implode('", "', self::$formats));
         }
 
         $this->dateFormat = $dateFormat;
@@ -60,7 +67,11 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * Transforms a normalized date into a localized date string/array.
      *
      * @param  DateTime $dateTime  Normalized date.
+     *
      * @return string|array        Localized date string/array.
+     *
+     * @throws UnexpectedTypeException if the given value is not an instance of \DateTime
+     * @throws TransformationFailedException if the date could not be transformed
      */
     public function transform($dateTime)
     {
@@ -72,14 +83,12 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
             throw new UnexpectedTypeException($dateTime, '\DateTime');
         }
 
-        $inputTimezone = $this->inputTimezone;
-
         // convert time to UTC before passing it to the formatter
-        if ('UTC' != $inputTimezone) {
+        if ('UTC' !== $this->inputTimezone) {
             $dateTime->setTimezone(new \DateTimeZone('UTC'));
         }
 
-        $value = $this->getIntlDateFormatter()->format((int)$dateTime->format('U'));
+        $value = $this->getIntlDateFormatter()->format((int) $dateTime->format('U'));
 
         if (intl_get_error_code() != 0) {
             throw new TransformationFailedException(intl_get_error_message());
@@ -92,12 +101,15 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * Transforms a localized date string/array into a normalized date.
      *
      * @param  string|array $value Localized date string/array
+     *
      * @return DateTime Normalized date
+     *
+     * @throws UnexpectedTypeException if the given value is not a string
+     * @throws TransformationFailedException if the date could not be parsed
+     * @throws TransformationFailedException if the input timezone is not supported
      */
     public function reverseTransform($value)
     {
-        $inputTimezone = $this->inputTimezone;
-
         if (!is_string($value)) {
             throw new UnexpectedTypeException($value, 'string');
         }
@@ -115,8 +127,12 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         // read timestamp into DateTime object - the formatter delivers in UTC
         $dateTime = new \DateTime(sprintf('@%s UTC', $timestamp));
 
-        if ('UTC' != $inputTimezone) {
-            $dateTime->setTimezone(new \DateTimeZone($inputTimezone));
+        if ('UTC' !== $this->inputTimezone) {
+            try {
+                $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
+            } catch (\Exception $e) {
+                throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
+            }
         }
 
         return $dateTime;
@@ -129,10 +145,11 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      */
     protected function getIntlDateFormatter()
     {
-        $dateFormat = $this->dateFormat;
-        $timeFormat = $this->timeFormat;
-        $timezone = $this->outputTimezone;
-
-        return new \IntlDateFormatter(\Locale::getDefault(), $dateFormat, $timeFormat, $timezone);
+        return new \IntlDateFormatter(
+             \Locale::getDefault(),
+             $this->dateFormat,
+             $this->timeFormat,
+             $this->outputTimezone
+        );
     }
 }

@@ -13,6 +13,7 @@ namespace Symfony\Tests\Component\HttpFoundation\File;
 
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class FileTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,34 +26,12 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPathReturnsAbsolutePath()
     {
-        $this->assertEquals(__DIR__.'/Fixtures/test.gif', $this->file->getPath());
+        $this->assertEquals(__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.gif', $this->file->getPath());
     }
 
     public function test__toString()
     {
-        $this->assertEquals(__DIR__.'/Fixtures/test.gif', (string) $this->file);
-    }
-
-    public function testGetWebPathReturnsPathRelativeToDocumentRoot()
-    {
-        File::setDocumentRoot(__DIR__);
-
-        $this->assertEquals(__DIR__, File::getDocumentRoot());
-        $this->assertEquals('/Fixtures/test.gif', $this->file->getWebPath());
-    }
-
-    public function testGetWebPathReturnsEmptyPathIfOutsideDocumentRoot()
-    {
-        File::setDocumentRoot(__DIR__.'/Fixtures/directory');
-
-        $this->assertEquals('', $this->file->getWebPath());
-    }
-
-    public function testSetDocumentRootThrowsLogicExceptionWhenNotExists()
-    {
-        $this->setExpectedException('LogicException');
-
-        File::setDocumentRoot(__DIR__.'/Fixtures/not_here');
+        $this->assertEquals(__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.gif', (string) $this->file);
     }
 
     public function testGetNameReturnsNameWithExtension()
@@ -68,12 +47,12 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
     public function testGetExtensionReturnsExtensionWithDot()
     {
-        $this->assertEquals('.gif', $this->file->getExtension());
+        $this->assertEquals('gif', $this->file->getExtension());
     }
 
     public function testGetDirectoryReturnsDirectoryName()
     {
-        $this->assertEquals(__DIR__.'/Fixtures', $this->file->getDirectory());
+        $this->assertEquals(__DIR__.DIRECTORY_SEPARATOR.'Fixtures', $this->file->getDirectory());
     }
 
     public function testGetMimeTypeUsesMimeTypeGuessers()
@@ -85,21 +64,21 @@ class FileTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('image/gif', $this->file->getMimeType());
     }
 
-    public function testGetDefaultExtensionWithoutGuesser()
+    public function testGuessExtensionWithoutGuesser()
     {
         $file = new File(__DIR__.'/Fixtures/directory/.empty');
 
-        $this->assertEquals('.empty', $file->getDefaultExtension());
+        $this->assertEquals(null, $file->guessExtension());
     }
 
-    public function testGetDefaultExtensionIsBasedOnMimeType()
+    public function testGuessExtensionIsBasedOnMimeType()
     {
         $file = new File(__DIR__.'/Fixtures/test');
         $guesser = $this->createMockGuesser($file->getPath(), 'image/gif');
 
         MimeTypeGuesser::getInstance()->register($guesser);
 
-        $this->assertEquals('.gif', $file->getDefaultExtension());
+        $this->assertEquals('gif', $file->guessExtension());
     }
 
     public function testConstructWhenFileNotExists()
@@ -116,8 +95,6 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
     public function testSizeFailing()
     {
-        $this->setExpectedException('Symfony\Component\HttpFoundation\File\Exception\FileException');
-
         $dir = __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'directory';
         $path = $dir.DIRECTORY_SEPARATOR.'test.copy.gif';
         @unlink($path);
@@ -125,7 +102,12 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
         $file = new File($path);
         @unlink($path);
-        $file->getSize();
+
+        try {
+            $file->getSize();
+            $this->fail('File::getSize should throw an exception.');
+        } catch (FileException $e) {
+        }
     }
 
     public function testMove()
@@ -170,7 +152,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
     public function testMoveFailing()
     {
-        $path = __DIR__.'/Fixtures/test.copy.gif';
+        $path = __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.copy.gif';
         $targetPath = '/thisfolderwontexist';
         @unlink($path);
         @unlink($targetPath);
@@ -178,31 +160,15 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
         $file = new File($path);
 
-        $this->setExpectedException('Symfony\Component\HttpFoundation\File\Exception\FileException');
-        $file->move($targetPath);
+        try {
+            $file->move($targetPath);
+            $this->fail('File::move should throw an exception.');
+        } catch (FileException $e) {
+        }
 
         $this->assertFileExists($path);
         $this->assertFileNotExists($path.$targetPath.'test.gif');
         $this->assertEquals($path, $file->getPath());
-
-        @unlink($path);
-        @unlink($targetPath);
-    }
-
-    public function testRename()
-    {
-        $path = __DIR__.'/Fixtures/test.copy.gif';
-        $targetPath = realpath(__DIR__.'/Fixtures').DIRECTORY_SEPARATOR.'test.target.gif';
-        @unlink($path);
-        @unlink($targetPath);
-        copy(realpath(__DIR__.'/Fixtures/test.gif'), $path);
-
-        $file = new File($path);
-        $file->rename('test.target.gif');
-
-        $this->assertTrue(file_exists($targetPath));
-        $this->assertFalse(file_exists($path));
-        $this->assertEquals($targetPath, $file->getPath());
 
         @unlink($path);
         @unlink($targetPath);

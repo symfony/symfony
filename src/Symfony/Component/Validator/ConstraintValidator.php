@@ -13,8 +13,17 @@ namespace Symfony\Component\Validator;
 
 abstract class ConstraintValidator implements ConstraintValidatorInterface
 {
+    /**
+     * @var ExecutionContext
+     */
     protected $context;
+    /**
+     * @var string
+     */
     private $messageTemplate;
+    /**
+     * @var array
+     */
     private $messageParameters;
 
     /**

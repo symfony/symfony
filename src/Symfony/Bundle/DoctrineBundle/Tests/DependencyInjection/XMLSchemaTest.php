@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection;
 
 class XMLSchemaTest extends \PHPUnit_Framework_TestCase
@@ -13,6 +22,7 @@ class XMLSchemaTest extends \PHPUnit_Framework_TestCase
                 $schemaFiles[] = array($element->getPathname());
             }
         }
+
         return $schemaFiles;
     }
 

@@ -1,4 +1,5 @@
 security:
+    acl: ~
     encoders:
         JMS\FooBundle\Entity\User1: plaintext
         JMS\FooBundle\Entity\User2:
@@ -27,7 +28,7 @@ security:
             id: user.manager
         chain:
             providers: [service, doctrine, basic]
-            
+
 
     firewalls:
         simple: { pattern: /login, security: false }

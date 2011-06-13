@@ -144,7 +144,7 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsHourWithinRange_returnsTrueIfWithin()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('time', null, array(
             'hours' => array(6, 7),
@@ -157,7 +157,7 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsHourWithinRange_returnsTrueIfEmpty()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('time', null, array(
             'hours' => array(6, 7),
@@ -170,7 +170,7 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsHourWithinRange_returnsFalseIfNotContained()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('time', null, array(
             'hours' => array(6, 7),
@@ -183,7 +183,7 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsMinuteWithinRange_returnsTrueIfWithin()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('time', null, array(
             'minutes' => array(6, 7),
@@ -196,7 +196,7 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsMinuteWithinRange_returnsTrueIfEmpty()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('time', null, array(
             'minutes' => array(6, 7),
@@ -209,7 +209,7 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsMinuteWithinRange_returnsFalseIfNotContained()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('time', null, array(
             'minutes' => array(6, 7),
@@ -222,7 +222,7 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsSecondWithinRange_returnsTrueIfWithin()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('time', null, array(
             'seconds' => array(6, 7),
@@ -236,7 +236,7 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsSecondWithinRange_returnsTrueIfEmpty()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('time', null, array(
             'seconds' => array(6, 7),
@@ -250,7 +250,7 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsSecondWithinRange_returnsTrueIfNotWithSeconds()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('time', null, array(
             'seconds' => array(6, 7),
@@ -263,7 +263,7 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsSecondWithinRange_returnsFalseIfNotContained()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('time', null, array(
             'seconds' => array(6, 7),
@@ -277,7 +277,7 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilled_returnsFalseIfCompletelyEmpty()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('time', null, array(
             'widget' => 'choice',
@@ -293,7 +293,7 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilled_returnsFalseIfCompletelyEmpty_withSeconds()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('time', null, array(
             'widget' => 'choice',
@@ -311,7 +311,7 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilled_returnsFalseIfCompletelyFilled()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('time', null, array(
             'widget' => 'choice',
@@ -327,7 +327,7 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilled_returnsFalseIfCompletelyFilled_withSeconds()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('time', null, array(
             'widget' => 'choice',
@@ -345,7 +345,7 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilled_returnsTrueIfChoiceAndHourEmpty()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('time', null, array(
             'widget' => 'choice',
@@ -363,7 +363,7 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilled_returnsTrueIfChoiceAndMinuteEmpty()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('time', null, array(
             'widget' => 'choice',
@@ -381,7 +381,7 @@ class TimeTypeTest extends LocalizedTestCase
 
     public function testIsPartiallyFilled_returnsTrueIfChoiceAndSecondsEmpty()
     {
-        $this->markTestSkipped('Needs to be reimplemented using validators');
+        $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('time', null, array(
             'widget' => 'choice',

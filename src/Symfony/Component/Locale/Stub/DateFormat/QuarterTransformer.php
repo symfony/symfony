@@ -33,6 +33,7 @@ class QuarterTransformer extends Transformer
                 return 'Q' . $quarter;
             default:
                 $map = array(1 => '1st quarter', 2 => '2nd quarter', 3 => '3rd quarter', 4 => '4th quarter');
+
                 return $map[$quarter];
         }
     }

@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\Routing\Router;
 
 /**
@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Router;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RouterCacheWarmer extends CacheWarmer
+class RouterCacheWarmer implements CacheWarmerInterface
 {
     protected $router;
 
@@ -40,18 +40,23 @@ class RouterCacheWarmer extends CacheWarmer
      */
     public function warmUp($cacheDir)
     {
+        $currentDir = $this->router->getOption('cache_dir');
+
         // force cache generation
+        $this->router->setOption('cache_dir', $cacheDir);
         $this->router->getMatcher();
         $this->router->getGenerator();
+
+        $this->router->setOption('cache_dir', $currentDir);
     }
 
     /**
      * Checks whether this warmer is optional or not.
      *
-     * @return Boolean always false
+     * @return Boolean always true
      */
     public function isOptional()
     {
-        return false;
+        return true;
     }
 }

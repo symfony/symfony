@@ -17,53 +17,29 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Tests\Component\Form\Fixtures\FooType;
 
 class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
 {
     public function testHasType()
     {
-        $loader = new TestExtension();
+        $loader = new ConcreteExtension();
         $this->assertTrue($loader->hasType('foo'));
         $this->assertFalse($loader->hasType('bar'));
     }
 
     public function testGetType()
     {
-        $loader = new TestExtension(array($type));
-        $this->assertInstanceOf(__NAMESPACE__.'\TestType', $loader->getType('foo'));
-        $this->assertSame($loader->getType('foo'), $loader->getType('foo'));
+        $loader = new ConcreteExtension();
+        $this->assertTrue($loader->getType('foo') instanceof FooType);
     }
 }
 
-class TestType implements FormTypeInterface
-{
-    public function getName()
-    {
-        return 'foo';
-    }
-
-    function buildForm(FormBuilder $builder, array $options) {}
-
-    function buildView(FormView $view, FormInterface $form) {}
-
-    function buildViewBottomUp(FormView $view, FormInterface $form) {}
-
-    function createBuilder($name, FormFactoryInterface $factory, array $options) {}
-
-    function getDefaultOptions(array $options) {}
-
-    function getParent(array $options) {}
-
-    function setExtensions(array $extensions) {}
-
-    function getExtensions() {}
-}
-
-class TestExtension extends AbstractExtension
+class ConcreteExtension extends AbstractExtension
 {
     protected function loadTypes()
     {
-        return array(new TestType());
+        return array(new FooType());
     }
 
     protected function loadTypeGuesser()

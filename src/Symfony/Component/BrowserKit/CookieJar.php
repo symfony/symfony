@@ -81,7 +81,7 @@ class CookieJar
     public function updateFromResponse(Response $response, $uri = null)
     {
         foreach ($response->getHeader('Set-Cookie', false) as $cookie) {
-            $this->set(Cookie::fromString($cookie), $uri);
+            $this->set(Cookie::fromString($cookie, $uri));
         }
     }
 
@@ -100,20 +100,24 @@ class CookieJar
     /**
      * Returns not yet expired cookie values for the given URI.
      *
-     * @param string $uri A URI
+     * @param string  $uri A URI
+     * @param Boolean $returnsRawValue Returns raw value or urldecoded value
      *
      * @return array An array of cookie values
      */
-    public function allValues($uri)
+    public function allValues($uri, $returnsRawValue = false)
     {
         $this->flushExpiredCookies();
 
-        $parts = parse_url($uri);
+        $parts = array_replace(array('path' => '/'), parse_url($uri));
 
         $cookies = array();
         foreach ($this->cookieJar as $cookie) {
-            if ($cookie->getDomain() && $cookie->getDomain() != substr($parts['host'], -strlen($cookie->getDomain()))) {
-                continue;
+            if ($cookie->getDomain()) {
+                $domain = ltrim($cookie->getDomain(), '.');
+                if ($domain != substr($parts['host'], -strlen($domain))) {
+                    continue;
+                }
             }
 
             if ($cookie->getPath() != substr($parts['path'], 0, strlen($cookie->getPath()))) {
@@ -124,10 +128,22 @@ class CookieJar
                 continue;
             }
 
-            $cookies[$cookie->getName()] = $cookie->getValue();
+            $cookies[$cookie->getName()] = $returnsRawValue ? $cookie->getRawValue() : $cookie->getValue();
         }
 
         return $cookies;
+    }
+
+    /**
+     * Returns not yet expired raw cookie values for the given URI.
+     *
+     * @param string $uri A URI
+     *
+     * @return array An array of cookie values
+     */
+    public function allRawValues($uri)
+    {
+        return $this->allValues($uri, true);
     }
 
     /**

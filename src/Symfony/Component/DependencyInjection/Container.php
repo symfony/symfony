@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Exception\NonExistentServiceException;
-use Symfony\Component\DependencyInjection\Exception\CircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
@@ -219,7 +219,7 @@ class Container implements ContainerInterface
         }
 
         if (isset($this->loading[$id])) {
-            throw new CircularReferenceException($id, array_keys($this->loading));
+            throw new ServiceCircularReferenceException($id, array_keys($this->loading));
         }
 
         if (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service')) {
@@ -238,7 +238,7 @@ class Container implements ContainerInterface
         }
 
         if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
-            throw new NonExistentServiceException($id);
+            throw new ServiceNotFoundException($id);
         }
     }
 
@@ -300,22 +300,6 @@ class Container implements ContainerInterface
         }
 
         $this->scopedServices[$name] = array();
-    }
-
-
-    /**
-     * Returns the current stacked service scope for the given name
-     *
-     * @param string $name The service name
-     * @return array The service scope
-     */
-    public function getCurrentScopedStack($name)
-    {
-        if (!isset($this->scopeStacks[$name]) || 0 === $this->scopeStacks[$name]->count()) {
-            return null;
-        }
-
-        return $this->scopeStacks[$name]->top();
     }
 
     /**

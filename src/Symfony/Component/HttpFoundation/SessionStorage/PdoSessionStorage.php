@@ -111,11 +111,11 @@ class PdoSessionStorage extends NativeSessionStorage
         $dbIdCol = $this->dbOptions['db_id_col'];
 
         // delete the record associated with this id
-        $sql = 'DELETE FROM '.$dbTable.' WHERE '.$dbIdCol.'= ?';
+        $sql = "DELETE FROM $dbTable WHERE $dbIdCol = :id";
 
         try {
             $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(1, $id, \PDO::PARAM_STR);
+            $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
             $stmt->execute();
         } catch (\PDOException $e) {
             throw new \RuntimeException(sprintf('PDOException was thrown when trying to manipulate session data: %s', $e->getMessage()), 0, $e);
@@ -140,10 +140,13 @@ class PdoSessionStorage extends NativeSessionStorage
         $dbTimeCol = $this->dbOptions['db_time_col'];
 
         // delete the record associated with this id
-        $sql = 'DELETE FROM '.$dbTable.' WHERE '.$dbTimeCol.' < '.(time() - $lifetime);
+        $sql = "DELETE FROM $dbTable WHERE $dbTimeCol < (:time - $lifetime)";
 
         try {
             $this->db->query($sql);
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
+            $stmt->execute();
         } catch (\PDOException $e) {
             throw new \RuntimeException(sprintf('PDOException was thrown when trying to manipulate session data: %s', $e->getMessage()), 0, $e);
         }
@@ -166,13 +169,12 @@ class PdoSessionStorage extends NativeSessionStorage
         $dbTable    = $this->dbOptions['db_table'];
         $dbDataCol = $this->dbOptions['db_data_col'];
         $dbIdCol   = $this->dbOptions['db_id_col'];
-        $dbTimeCol = $this->dbOptions['db_time_col'];
 
         try {
-            $sql = 'SELECT '.$dbDataCol.' FROM '.$dbTable.' WHERE '.$dbIdCol.'=?';
+            $sql = "SELECT $dbDataCol FROM $dbTable WHERE $dbIdCol = :id";
 
             $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(1, $id, \PDO::PARAM_STR, 255);
+            $stmt->bindParam(':id', $id, \PDO::PARAM_STR, 255);
 
             $stmt->execute();
             // it is recommended to use fetchAll so that PDO can close the DB cursor
@@ -205,17 +207,21 @@ class PdoSessionStorage extends NativeSessionStorage
     public function sessionWrite($id, $data)
     {
         // get table/column
-        $dbTable    = $this->dbOptions['db_table'];
+        $dbTable   = $this->dbOptions['db_table'];
         $dbDataCol = $this->dbOptions['db_data_col'];
         $dbIdCol   = $this->dbOptions['db_id_col'];
         $dbTimeCol = $this->dbOptions['db_time_col'];
 
-        $sql = 'UPDATE '.$dbTable.' SET '.$dbDataCol.' = ?, '.$dbTimeCol.' = '.time().' WHERE '.$dbIdCol.'= ?';
+        $sql = ('mysql' === $this->db->getAttribute(\PDO::ATTR_DRIVER_NAME))
+            ? "INSERT INTO $dbTable ($dbIdCol, $dbDataCol, $dbTimeCol) VALUES (:id, :data, :time) "
+              ."ON DUPLICATE KEY UPDATE $dbDataCol = VALUES($dbDataCol), $dbTimeCol = CASE WHEN $dbTimeCol = :time THEN (VALUES($dbTimeCol) + 1) ELSE VALUES($dbTimeCol) END"
+            : "UPDATE $dbTable SET $dbDataCol = :data, $dbTimeCol = :time WHERE $dbIdCol = :id";
 
         try {
             $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(1, $data, \PDO::PARAM_STR);
-            $stmt->bindParam(2, $id, \PDO::PARAM_STR);
+            $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
+            $stmt->bindParam(':data', $data, \PDO::PARAM_STR);
+            $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
             $stmt->execute();
 
             if (!$stmt->rowCount()) {
@@ -244,12 +250,12 @@ class PdoSessionStorage extends NativeSessionStorage
         $dbIdCol   = $this->dbOptions['db_id_col'];
         $dbTimeCol = $this->dbOptions['db_time_col'];
 
-        $sql = 'INSERT INTO '.$dbTable.'('.$dbIdCol.', '.$dbDataCol.', '.$dbTimeCol.') VALUES (?, ?, ?)';
+        $sql = "INSERT INTO $dbTable ($dbIdCol, $dbDataCol, $dbTimeCol) VALUES (:id, :data, :time)";
 
         $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(1, $id, \PDO::PARAM_STR);
-        $stmt->bindValue(2, $data, \PDO::PARAM_STR);
-        $stmt->bindValue(3, time(), \PDO::PARAM_INT);
+        $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
+        $stmt->bindParam(':data', $data, \PDO::PARAM_STR);
+        $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
         $stmt->execute();
 
         return true;

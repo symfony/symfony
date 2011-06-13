@@ -25,13 +25,17 @@ class DateValidator extends ConstraintValidator
             return true;
         }
 
-        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString()'))) {
+        if ($value instanceof \DateTime) {
+            return true;
+        }
+
+        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
         $value = (string) $value;
 
-        if (!preg_match(self::PATTERN, $value, $matches)) {
+        if (!preg_match(static::PATTERN, $value, $matches)) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;

@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -24,15 +24,15 @@ class ValidatorExtension extends AbstractExtension
         $this->validator = $validator;
     }
 
+    public function loadTypeGuesser()
+    {
+        return new ValidatorTypeGuesser($this->validator->getMetadataFactory());
+    }
+
     protected function loadTypeExtensions()
     {
         return array(
             new Type\FieldTypeValidatorExtension($this->validator),
         );
-    }
-
-    public function loadTypeGuesser()
-    {
-        return new ValidatorTypeGuesser($this->validator->getMetadataFactory());
     }
 }

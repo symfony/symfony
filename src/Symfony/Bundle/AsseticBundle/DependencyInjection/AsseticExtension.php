@@ -15,6 +15,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -22,7 +23,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 /**
  * Semantic asset configuration.
  *
- * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ * @author Kris Wallsmith <kris@symfony.com>
  */
 class AsseticExtension extends Extension
 {
@@ -52,6 +53,19 @@ class AsseticExtension extends Extension
         $container->setParameter('assetic.node.bin', $config['node']);
         $container->setParameter('assetic.sass.bin', $config['sass']);
 
+        // register formulae
+        $formulae = array();
+        foreach ($config['assets'] as $name => $formula) {
+            $formulae[$name] = array($formula['inputs'], $formula['filters'], $formula['options']);
+        }
+
+        if ($formulae) {
+            $container->getDefinition('assetic.config_resource')->replaceArgument(0, $formulae);
+        } else {
+            $container->removeDefinition('assetic.config_loader');
+            $container->removeDefinition('assetic.config_resource');
+        }
+
         // register filters
         foreach ($config['filters'] as $name => $filter) {
             if (isset($filter['resource'])) {
@@ -66,10 +80,30 @@ class AsseticExtension extends Extension
                 unset($filter['file']);
             }
 
+            if (isset($filter['apply_to'])) {
+                if (!is_array($filter['apply_to'])) {
+                    $filter['apply_to'] = array($filter['apply_to']);
+                }
+
+                foreach ($filter['apply_to'] as $i => $pattern) {
+                    $worker = new DefinitionDecorator('assetic.worker.ensure_filter');
+                    $worker->replaceArgument(0, '/'.$pattern.'/');
+                    $worker->replaceArgument(1, new Reference('assetic.filter.'.$name));
+                    $worker->addTag('assetic.factory_worker');
+
+                    $container->setDefinition('assetic.filter.'.$name.'.worker'.$i, $worker);
+                }
+
+                unset($filter['apply_to']);
+            }
+
             foreach ($filter as $key => $value) {
                 $container->setParameter('assetic.filter.'.$name.'.'.$key, $value);
             }
         }
+
+        // twig functions
+        $container->setParameter('assetic.twig_extension.functions', $config['twig']['functions']);
 
         // choose dynamic or static
         if ($parameterBag->resolveValue($parameterBag->get('assetic.use_controller'))) {
@@ -99,6 +133,7 @@ class AsseticExtension extends Extension
     {
         $processor = new Processor();
         $configuration = new Configuration($debug, $bundles);
+
         return $processor->processConfiguration($configuration, $configs);
     }
 
@@ -152,7 +187,7 @@ class AsseticExtension extends Extension
      *
      * @return Definition A resource definition
      */
-    static protected function createDirectoryResourceDefinition($bundle, $engine, array $dirs)
+    static public function createDirectoryResourceDefinition($bundle, $engine, array $dirs)
     {
         $dirResources = array();
         foreach ($dirs as $dir) {

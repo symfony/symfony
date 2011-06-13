@@ -369,7 +369,7 @@ class StubLocale
      *
      * @param  array   $langtag       A list of the language tags to compare to locale
      * @param  string  $locale        The locale to use as the language range when matching
-     * @param  bool    $canonicalize  If true, the arguments will be converted to canonical form before matching
+     * @param  Boolean $canonicalize  If true, the arguments will be converted to canonical form before matching
      * @param  string  $default       The locale to use if no match is found
      * @see    http://www.php.net/manual/en/locale.lookup.php
      * @throws RuntimeException       When the intl extension is not loaded
@@ -396,7 +396,7 @@ class StubLocale
      * Sets the default runtime locale
      *
      * @param  string  $locale    The locale code
-     * @return bool               true on success or false on failure
+     * @return Boolean            true on success or false on failure
      * @see    http://www.php.net/manual/en/locale.parselocale.php
      * @throws MethodNotImplementedException
      */

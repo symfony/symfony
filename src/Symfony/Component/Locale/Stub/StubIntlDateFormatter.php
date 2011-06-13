@@ -90,7 +90,7 @@ class StubIntlDateFormatter
     private $dateTimeZone;
 
     /**
-     * @var bool
+     * @var Boolean
      */
     private $unitializedTimeZoneId = false;
 
@@ -160,8 +160,16 @@ class StubIntlDateFormatter
      */
     public function format($timestamp)
     {
-        if (!is_int($timestamp)) {
+        // intl allows timestamps to be passed as arrays - we don't
+        if (is_array($timestamp)) {
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'timestamp', $timestamp, 'Only integer unix timestamps are supported');
+        }
+
+        if (!is_int($timestamp)) {
+            // behave like the intl extension
+            StubIntl::setErrorCode(StubIntl::U_ILLEGAL_ARGUMENT_ERROR);
+
+            return false;
         }
 
         $transformer = new FullTransformer($this->getPattern(), $this->getTimeZoneId());
@@ -311,8 +319,11 @@ class StubIntlDateFormatter
             throw new MethodArgumentNotImplementedException(__METHOD__, 'position');
         }
 
+        StubIntl::setErrorCode(StubIntl::U_ZERO_ERROR);
+
         $dateTime = $this->createDateTime(0);
         $transformer = new FullTransformer($this->getPattern(), $this->getTimeZoneId());
+
         return $transformer->parse($dateTime, $value);
     }
 
@@ -320,7 +331,7 @@ class StubIntlDateFormatter
      * Set the formatter's calendar
      *
      * @param  string  $calendar  The calendar to use. Default is IntlDateFormatter::GREGORIAN.
-     * @return bool               true on success or false on failure
+     * @return Boolean            true on success or false on failure
      * @see    http://www.php.net/manual/en/intldateformatter.setcalendar.php
      * @throws MethodNotImplementedException
      */
@@ -337,8 +348,8 @@ class StubIntlDateFormatter
      * patterns, parsing as much as possible to obtain a value. Extra space, unrecognized tokens, or
      * invalid values ("February 30th") are not accepted.
      *
-     * @param  bool  $lenient     Sets whether the parser is lenient or not, default is false (strict)
-     * @return bool               true on success or false on failure
+     * @param  Boolean $lenient   Sets whether the parser is lenient or not, default is false (strict)
+     * @return Boolean            true on success or false on failure
      * @see    http://www.php.net/manual/en/intldateformatter.setlenient.php
      * @throws MethodNotImplementedException
      */
@@ -351,7 +362,7 @@ class StubIntlDateFormatter
      * Set the formatter's pattern
      *
      * @param  string  $pattern   A pattern string in conformance with the ICU IntlDateFormatter documentation
-     * @return bool               true on success or false on failure
+     * @return Boolean            true on success or false on failure
      * @see    http://www.php.net/manual/en/intldateformatter.setpattern.php
      * @see    http://userguide.icu-project.org/formatparse/datetime
      */
@@ -370,7 +381,7 @@ class StubIntlDateFormatter
      * @param  string  $timeZoneId   The time zone ID string of the time zone to use.
      *                               If NULL or the empty string, the default time zone for the
      *                               runtime is used.
-     * @return bool                  true on success or false on failure
+     * @return Boolean               true on success or false on failure
      * @see    http://www.php.net/manual/en/intldateformatter.settimezoneid.php
      */
     public function setTimeZoneId($timeZoneId)
@@ -399,6 +410,7 @@ class StubIntlDateFormatter
         }
 
         $this->timeZoneId = $timeZone;
+
         return true;
     }
 

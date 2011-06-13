@@ -34,6 +34,12 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
             array(),
             array('_method' => 'GET|head')
         ));
+        // GET method requirement automatically adds HEAD as valid
+        $collection->add('barhead', new Route(
+            '/barhead/{foo}',
+            array(),
+            array('_method' => 'GET')
+        ));
         // simple
         $collection->add('baz', new Route(
             '/test/baz'
@@ -67,6 +73,22 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
             '/foofoo',
             array('def' => 'test')
         ));
+
+        // prefixes
+        $collection1 = new RouteCollection();
+        $collection1->add('foo', new Route('/{foo}'));
+        $collection1->add('bar', new Route('/{bar}'));
+        $collection2 = new RouteCollection();
+        $collection2->addCollection($collection1, '/b');
+        $collection->addCollection($collection2, '/a');
+
+        // "dynamic" prefix
+        $collection1 = new RouteCollection();
+        $collection1->add('foo', new Route('/{foo}'));
+        $collection1->add('bar', new Route('/{bar}'));
+        $collection2 = new RouteCollection();
+        $collection2->addCollection($collection1, '/b');
+        $collection->addCollection($collection2, '/{_locale}');
 
         $dumper = new PhpMatcherDumper($collection, new RequestContext());
         $this->assertStringEqualsFile(__DIR__.'/../../Fixtures/dumper/url_matcher1.php', $dumper->dump(), '->dump() dumps basic routes to the correct PHP file.');

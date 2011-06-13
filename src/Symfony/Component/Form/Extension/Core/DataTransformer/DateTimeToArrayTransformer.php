@@ -17,12 +17,6 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 /**
  * Transforms between a normalized time and a localized time string/array.
  *
- * Options:
- *
- *  * "input": The type of the normalized format ("time" or "timestamp"). Default: "datetime"
- *  * "output": The type of the transformed format ("string" or "array"). Default: "string"
- *  * "format": The format of the time string ("short", "medium", "long" or "full"). Default: "short"
- *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
@@ -32,23 +26,37 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
 
     private $fields;
 
-    public function __construct($inputTimezone = null, $outputTimezone = null, $fields = null, $pad = false)
+    /**
+     * Constructor.
+     *
+     * @param string  $inputTimezone    The input timezone
+     * @param string  $outputTimezone   The output timezone
+     * @param array   $fields           The date fields
+     * @param Boolean $pad              Whether to use padding
+     *
+     * @throws UnexpectedTypeException if a timezone is not a string
+     */
+    public function __construct($inputTimezone = null, $outputTimezone = null, array $fields = null, $pad = false)
     {
         parent::__construct($inputTimezone, $outputTimezone);
 
-        if (is_null($fields)) {
+        if (null === $fields) {
             $fields = array('year', 'month', 'day', 'hour', 'minute', 'second');
         }
 
         $this->fields = $fields;
-        $this->pad =$pad;
+        $this->pad = (Boolean) $pad;
     }
 
     /**
-     * Transforms a normalized date into a localized date string/array.
+     * Transforms a normalized date into a localized date.
      *
      * @param  DateTime $dateTime  Normalized date.
-     * @return string|array        Localized date array.
+     *
+     * @return array               Localized date.
+     *
+     * @throws UnexpectedTypeException if the given value is not an instance of \DateTime
+     * @throws TransformationFailedException if the output timezone is not supported
      */
     public function transform($dateTime)
     {
@@ -67,11 +75,12 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             throw new UnexpectedTypeException($dateTime, '\DateTime');
         }
 
-        $inputTimezone = $this->inputTimezone;
-        $outputTimezone = $this->outputTimezone;
-
-        if ($inputTimezone != $outputTimezone) {
-            $dateTime->setTimezone(new \DateTimeZone($outputTimezone));
+        if ($this->inputTimezone !== $this->outputTimezone) {
+            try {
+                $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
+            } catch (\Exception $e) {
+                throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
+            }
         }
 
         $result = array_intersect_key(array(
@@ -86,7 +95,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         if (!$this->pad) {
             foreach ($result as &$entry) {
                 // remove leading zeros
-                $entry = (string)(int)$entry;
+                $entry = (string) (int) $entry;
             }
         }
 
@@ -94,19 +103,21 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
     }
 
     /**
-     * Transforms a localized date string/array into a normalized date.
+     * Transforms a localized date into a normalized date.
      *
-     * @param  array $value  Localized date string/array
+     * @param  array $value  Localized date
+     *
      * @return DateTime      Normalized date
+     *
+     * @throws UnexpectedTypeException if the given value is not an array
+     * @throws TransformationFailedException if the value could not bet transformed
+     * @throws TransformationFailedException if the input timezone is not supported
      */
     public function reverseTransform($value)
     {
         if (null === $value) {
             return null;
         }
-
-        $inputTimezone = $this->inputTimezone;
-        $outputTimezone = $this->outputTimezone;
 
         if (!is_array($value)) {
             throw new UnexpectedTypeException($value, 'array');
@@ -125,8 +136,9 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         }
 
         if (count($emptyFields) > 0) {
-            throw new TransformationFailedException(sprintf(
-                    'The fields "%s" should not be empty', implode('", "', $emptyFields)));
+            throw new TransformationFailedException(
+                sprintf('The fields "%s" should not be empty', implode('", "', $emptyFields)
+            ));
         }
 
         try {
@@ -138,14 +150,14 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
                 empty($value['hour']) ? '0' : $value['hour'],
                 empty($value['minute']) ? '0' : $value['minute'],
                 empty($value['second']) ? '0' : $value['second'],
-                $outputTimezone
+                $this->outputTimezone
             ));
-        } catch (\Exception $e) {
-            throw new TransformationFailedException($e->getMessage(), null, $e);
-        }
 
-        if ($inputTimezone != $outputTimezone) {
-            $dateTime->setTimezone(new \DateTimeZone($inputTimezone));
+            if ($this->inputTimezone !== $this->outputTimezone) {
+                $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
+            }
+        } catch (\Exception $e) {
+            throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
         }
 
         return $dateTime;

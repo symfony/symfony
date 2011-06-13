@@ -20,7 +20,7 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class ObjectIdentity implements ObjectIdentityInterface
+final class ObjectIdentity implements ObjectIdentityInterface
 {
     private $identifier;
     private $type;

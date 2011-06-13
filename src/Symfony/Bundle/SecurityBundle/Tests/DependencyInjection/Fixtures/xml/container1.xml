@@ -6,6 +6,8 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <config>
+        <acl />
+
         <encoder class="JMS\FooBundle\Entity\User1" algorithm="plaintext" />
 
         <encoder class="JMS\FooBundle\Entity\User2" algorithm="sha1" encode-as-base64="false" iterations="5" />
@@ -17,7 +19,7 @@
         <provider name="default">
             <user name="foo" password="foo" roles="ROLE_USER" />
         </provider>
-        
+
         <provider name="digest">
             <user name="foo" password="foo" roles="ROLE_USER, ROLE_ADMIN" />
         </provider>
@@ -32,7 +34,7 @@
         </provider>
 
         <provider name="service" id="user.manager" />
-        
+
         <provider name="chain" providers="service, doctrine, basic" />
 
         <firewall name="simple" pattern="/login" security="false" />

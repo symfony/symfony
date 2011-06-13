@@ -3,7 +3,7 @@
 <constraint-mapping xmlns="http://symfony.com/schema/dic/constraint-mapping"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping http://symfony.com/schema/dic/services/constraint-mapping-1.0.xsd">
-    
+
   <namespace prefix="custom">Symfony\Tests\Component\Validator\Fixtures\</namespace>
 
   <class name="Symfony\Tests\Component\Validator\Fixtures\Entity">
@@ -19,25 +19,25 @@
     <!-- PROPERTY CONSTRAINTS -->
 
     <property name="firstName">
-  
+
       <!-- Constraint without value -->
       <constraint name="NotNull" />
-      
+
       <!-- Constraint with single value -->
       <constraint name="Min">3</constraint>
-      
+
       <!-- Constraint with multiple values -->
       <constraint name="Choice">
         <value>A</value>
         <value>B</value>
       </constraint>
-      
+
       <!-- Constraint with child constraints -->
       <constraint name="All">
         <constraint name="NotNull" />
         <constraint name="Min">3</constraint>
       </constraint>
-      
+
       <!-- Option with child constraints -->
       <constraint name="All">
         <option name="constraints">
@@ -45,7 +45,7 @@
           <constraint name="Min">3</constraint>
         </option>
       </constraint>
-      
+
       <!-- Value with child constraints -->
       <constraint name="Collection">
         <option name="fields">
@@ -58,7 +58,7 @@
           </value>
         </option>
       </constraint>
-      
+
       <!-- Constraint with options -->
       <constraint name="Choice">
         <!-- Option with single value -->

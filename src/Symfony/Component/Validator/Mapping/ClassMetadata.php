@@ -41,7 +41,11 @@ class ClassMetadata extends ElementMetadata
     {
         $this->name = $class;
         // class name without namespace
-        $this->defaultGroup = substr($class, strrpos($class, '\\') + 1);
+        if (false !== $nsSep = strrpos($class, '\\')) {
+            $this->defaultGroup = substr($class, $nsSep + 1);
+        } else {
+            $this->defaultGroup = $class;
+        }
     }
 
     /**

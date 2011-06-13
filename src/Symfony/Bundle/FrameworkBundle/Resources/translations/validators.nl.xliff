@@ -4,23 +4,23 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false</source>
-                <target>Deze waarde zou niet waar moeten zijn</target>
+                <target>Deze waarde mag niet waar zijn</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true</source>
-                <target>Deze waarde zou waar moeten zijn</target>
+                <target>Deze waarde moet waar zijn</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}</source>
-                <target>Deze waarde zou van het type {{ type }} moeten zijn</target>
+                <target>Deze waarde moet van het type {{ type }} zijn</target>
             </trans-unit>
             <trans-unit id="4">
                 <source>This value should be blank</source>
-                <target>Deze waarde zou leeg moeten zijn</target>
+                <target>Deze waarde moet leeg zijn</target>
             </trans-unit>
             <trans-unit id="5">
                 <source>This value should be one of the given choices</source>
-                <target>Deze waarde zou een van de gegeven opties moeten zijn</target>
+                <target>Deze waarde moet een van de gegeven opties zijn</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You should select at least {{ limit }} choices</source>
@@ -56,11 +56,11 @@
             </trans-unit>
             <trans-unit id="14">
                 <source>The file is not readable</source>
-                <target>Het bestand niet leesbaar</target>
+                <target>Het bestand is niet leesbaar</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>The file is too large ({{ size }}). Allowed maximum size is {{ limit }}</source>
-                <target>Het bestand is te groot({{ size }}). Toegestane maximum grootte is {{ limit }}</target>
+                <target>Het bestand is te groot ({{ size }}). Toegestane maximum grootte is {{ limit }}</target>
             </trans-unit>
             <trans-unit id="16">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}</source>
@@ -68,19 +68,19 @@
             </trans-unit>
             <trans-unit id="17">
                 <source>This value should be {{ limit }} or less</source>
-                <target>Deze waarde zou {{ limit }} of minder moeten zijn</target>
+                <target>Deze waarde moet {{ limit }} of minder zijn</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value is too long. It should have {{ limit }} characters or less</source>
-                <target>Deze waarde is te lang. Het zou {{ limit }} karakters of minder moeten hebben</target>
+                <target>Deze waarde is te lang. Hij mag maximaal {{ limit }} tekens bevatten</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>This value should be {{ limit }} or more</source>
-                <target>Deze waarde zou {{ limit }} of meer moeten zijn</target>
+                <target>Deze waarde moet {{ limit }} of meer zijn</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>This value is too short. It should have {{ limit }} characters or more</source>
-                <target>Deze waarde is te kort. Het zou {{ limit }} karakters of meer moeten hebben</target>
+                <target>Deze waarde is te kort. Hij moet tenminste {{ limit }} tekens bevatten</target>
             </trans-unit>
             <trans-unit id="21">
                 <source>This value should not be blank</source>
@@ -112,7 +112,7 @@
             </trans-unit>
             <trans-unit id="28">
                 <source>This field group should not contain extra fields</source>
-                <target>Deze veld groep mag geen extra velden bevatten</target>
+                <target>Deze veldgroep mag geen extra velden bevatten</target>
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file</source>
@@ -120,7 +120,7 @@
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid</source>
-                <target>Het CSRF token is ongeldig</target>
+                <target>De CSRF-token is ongeldig</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal</source>

@@ -16,27 +16,30 @@ namespace Symfony\Component\Finder\Iterator;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class SortableIterator extends \ArrayIterator
+class SortableIterator implements \IteratorAggregate
 {
     const SORT_BY_NAME = 1;
     const SORT_BY_TYPE = 2;
 
+    private $iterator;
+    private $sort;
+
     /**
      * Constructor.
      *
-     * @param \Iterator        $iterator The Iterator to filter
-     * @param integer|\Closure $sort     The sort type (SORT_BY_NAME, SORT_BY_TYPE, or a \Closure instance)
+     * @param \Traversable     $iterator The Iterator to filter
+     * @param integer|callback $sort     The sort type (SORT_BY_NAME, SORT_BY_TYPE, or a PHP callback)
      */
-    public function __construct(\Iterator $iterator, $sort)
+    public function __construct(\Traversable $iterator, $sort)
     {
+        $this->iterator = $iterator;
+
         if (self::SORT_BY_NAME === $sort) {
-            $sort = function ($a, $b)
-            {
+            $this->sort = function ($a, $b) {
                 return strcmp($a->getRealpath(), $b->getRealpath());
             };
         } elseif (self::SORT_BY_TYPE === $sort) {
-            $sort = function ($a, $b)
-            {
+            $this->sort = function ($a, $b) {
                 if ($a->isDir() && $b->isFile()) {
                     return -1;
                 } elseif ($a->isFile() && $b->isDir()) {
@@ -45,13 +48,18 @@ class SortableIterator extends \ArrayIterator
 
                 return strcmp($a->getRealpath(), $b->getRealpath());
             };
-        } elseif (!$sort instanceof \Closure) {
-            throw new \InvalidArgumentException(sprintf('The SortableIterator takes a \Closure or a valid built-in sort algorithm as an argument (%s given).', $sort));
+        } elseif (is_callable($sort)) {
+            $this->sort = $sort;
+        } else {
+            throw new \InvalidArgumentException('The SortableIterator takes a PHP callback or a valid built-in sort algorithm as an argument.');
         }
+    }
 
-        $array = new \ArrayObject(iterator_to_array($iterator));
-        $array->uasort($sort);
+    public function getIterator()
+    {
+        $array = iterator_to_array($this->iterator, true);
+        uasort($array, $this->sort);
 
-        parent::__construct($array);
+        return new \ArrayIterator($array);
     }
 }

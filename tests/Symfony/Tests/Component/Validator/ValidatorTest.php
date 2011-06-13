@@ -146,4 +146,12 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($result));
     }
+
+    public function testGetMetadataFactory()
+    {
+        $this->assertInstanceOf(
+            'Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface',
+            $this->validator->getMetadataFactory()
+        );
+    }
 }

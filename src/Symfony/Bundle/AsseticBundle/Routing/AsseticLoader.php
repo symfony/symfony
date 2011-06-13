@@ -33,7 +33,7 @@ use Symfony\Component\Routing\RouteCollection;
  * In a production environment you should use the `assetic:dump` command to
  * create static asset files.
  *
- * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ * @author Kris Wallsmith <kris@symfony.com>
  */
 class AsseticLoader extends Loader
 {
@@ -67,8 +67,11 @@ class AsseticLoader extends Loader
 
             $this->loadRouteForAsset($routes, $asset, $name);
 
+            $debug = isset($formula[2]['debug']) ? $formula[2]['debug'] : $this->am->isDebug();
+            $combine = isset($formula[2]['combine']) ? $formula[2]['combine'] : !$debug;
+
             // add a route for each "leaf" in debug mode
-            if (isset($formula[2]['debug']) ? $formula[2]['debug'] : $this->am->isDebug()) {
+            if (!$combine) {
                 $i = 0;
                 foreach ($asset as $leaf) {
                     $this->loadRouteForAsset($routes, $leaf, $name, $i++);
@@ -99,7 +102,7 @@ class AsseticLoader extends Loader
         );
 
         // remove the fake front controller
-        $pattern = str_replace('_controller/', '', $asset->getTargetUrl());
+        $pattern = str_replace('_controller/', '', $asset->getTargetPath());
 
         if ($format = pathinfo($pattern, PATHINFO_EXTENSION)) {
             $defaults['_format'] = $format;

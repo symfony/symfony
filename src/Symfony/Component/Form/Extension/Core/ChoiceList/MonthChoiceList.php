@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,19 +16,22 @@ class MonthChoiceList extends PaddedChoiceList
     private $formatter;
 
     /**
-     * Generates an array of localized month choices
+     * Generates an array of localized month choices.
      *
-     * @param  array $months  The month numbers to generate
-     * @return array          The localized months respecting the configured
-     *                        locale and date format
+     * @param IntlDateFormatter $formatter An IntlDateFormatter instance
+     * @param array             $months    The month numbers to generate
      */
     public function __construct(\IntlDateFormatter $formatter, array $months)
     {
-        parent::__construct($months, 2, '0', STR_PAD_LEFT);
-
+        parent::__construct(array_combine($months, $months), 2, '0', STR_PAD_LEFT);
         $this->formatter = $formatter;
     }
 
+    /**
+     * Initializes the list of months.
+     *
+     * @throws UnexpectedTypeException if the function does not return an array
+     */
     protected function load()
     {
         parent::load();
@@ -42,8 +45,7 @@ class MonthChoiceList extends PaddedChoiceList
             $this->formatter->setPattern($matches[0]);
 
             foreach ($this->choices as $choice => $value) {
-                // It's important to specify the first day of the month here!
-                $this->choices[$choice] = $this->formatter->format(gmmktime(0, 0, 0, $choice, 1));
+                $this->choices[$choice] = $this->formatter->format(gmmktime(0, 0, 0, $value, 15));
             }
 
             // I'd like to clone the formatter above, but then we get a

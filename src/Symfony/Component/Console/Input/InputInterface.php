@@ -31,7 +31,7 @@ interface InputInterface
      * This method is to be used to introspect the input parameters
      * before it has been validated. It must be used carefully.
      *
-     * @param string|array $value The values to look for in the raw parameters (can be an array)
+     * @param string|array $values The values to look for in the raw parameters (can be an array)
      *
      * @return Boolean true if the value is contained in the raw parameters
      */
@@ -97,7 +97,7 @@ interface InputInterface
     /**
      * Is this input means interactive?
      *
-     * @return bool
+     * @return Boolean
      */
     function isInteractive();
 }

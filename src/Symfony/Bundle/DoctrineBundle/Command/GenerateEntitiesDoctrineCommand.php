@@ -15,7 +15,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\Output;
+use Doctrine\ORM\Tools\EntityRepositoryGenerator;
+use Symfony\Bundle\DoctrineBundle\Mapping\DisconnectedMetadataFactory;
 
 /**
  * Generate entity classes from mapping information
@@ -29,52 +30,80 @@ class GenerateEntitiesDoctrineCommand extends DoctrineCommand
     {
         $this
             ->setName('doctrine:generate:entities')
-            ->setDescription('Generate entity classes and method stubs from your mapping information.')
-            ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to initialize the entity or entities in.')
-            ->addOption('entity', null, InputOption::VALUE_OPTIONAL, 'The entity class to initialize (shortname without namespace).')
+            ->setAliases(array('generate:doctrine:entities'))
+            ->setDescription('Generate entity classes and method stubs from your mapping information')
+            ->addArgument('name', InputArgument::REQUIRED, 'A bundle name, a namespace, or a class name')
+            ->addOption('path', null, InputOption::VALUE_REQUIRED, 'The path where to generate entities when it cannot be guessed')
+            ->addOption('no-backup', null, InputOption::VALUE_NONE, 'Do not backup existing entities files.')
             ->setHelp(<<<EOT
-The <info>doctrine:generate:entities</info> command generates entity classes and method stubs from your mapping information:
+The <info>doctrine:generate:entities</info> command generates entity classes
+and method stubs from your mapping information:
 
-You have to limit generation of entities to an individual bundle:
+You have to limit generation of entities:
+
+* To a bundle:
 
   <info>./app/console doctrine:generate:entities MyCustomBundle</info>
 
-Alternatively, you can limit generation to a single entity within a bundle:
+* To a single entity:
 
-  <info>./app/console doctrine:generate:entities "MyCustomBundle" --entity="User"</info>
+  <info>./app/console doctrine:generate:entities MyCustomBundle:User</info>
+  <info>./app/console doctrine:generate:entities MyCustomBundle/Entity/User</info>
 
-You have to specify the shortname (without namespace) of the entity you want to filter for.
+* To a namespace
+
+  <info>./app/console doctrine:generate:entities MyCustomBundle/Entity</info>
+
+If the entities are not stored in a bundle, and if the classes do not exist,
+the command has no way to guess where they should be generated. In this case,
+you must provide the <comment>--path</comment> option:
+
+  <info>./app/console doctrine:generate:entities Blog/Entity --path=src/</info>
+
+You should provide the <comment>--no-backup</comment> option if you don't mind to back up files
+before to generate entities:
+
+  <info>./app/console doctrine:generate:entities Blog/Entity --no-backup</info>
+
 EOT
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $bundleName = $input->getArgument('bundle');
-        $filterEntity = $input->getOption('entity');
+        $manager = new DisconnectedMetadataFactory($this->container->get('doctrine'));
 
-        $foundBundle = $this->findBundle($bundleName);
+        try {
+            $bundle = $this->getApplication()->getKernel()->getBundle($input->getArgument('name'));
 
-        if ($metadatas = $this->getBundleMetadatas($foundBundle)) {
-            $output->writeln(sprintf('Generating entities for "<info>%s</info>"', $foundBundle->getName()));
-            $entityGenerator = $this->getEntityGenerator();
+            $output->writeln(sprintf('Generating entities for bundle "<info>%s</info>"', $bundle->getName()));
+            $metadata = $manager->getBundleMetadata($bundle);
+        } catch (\InvalidArgumentException $e) {
+            $name = strtr($input->getArgument('name'), '/', '\\');
 
-            foreach ($metadatas as $metadata) {
-                if ($filterEntity && $metadata->getReflClass()->getShortName() !== $filterEntity) {
-                    continue;
-                }
-
-                if (strpos($metadata->name, $foundBundle->getNamespace()) === false) {
-                    throw new \RuntimeException(
-                        "Entity " . $metadata->name . " and bundle don't have a common namespace, ".
-                        "generation failed because the target directory cannot be detected.");
-                }
-
-                $output->writeln(sprintf('  > generating <comment>%s</comment>', $metadata->name));
-                $entityGenerator->generate(array($metadata), $this->findBasePathForBundle($foundBundle));
+            if (false !== $pos = strpos($name, ':')) {
+                $name = $this->container->get('doctrine')->getEntityNamespace(substr($name, 0, $pos)).'\\'.substr($name, $pos + 1);
             }
-        } else {
-            throw new \RuntimeException("Bundle " . $bundleName . " does not contain any mapped entities.");
+
+            if (class_exists($name)) {
+                $output->writeln(sprintf('Generating entity "<info>%s</info>"', $name));
+                $metadata = $manager->getClassMetadata($name, $input->getOption('path'));
+            } else {
+                $output->writeln(sprintf('Generating entities for namespace "<info>%s</info>"', $name));
+                $metadata = $manager->getNamespaceMetadata($name, $input->getOption('path'));
+            }
+        }
+
+        $generator = $this->getEntityGenerator();
+        $generator->setBackupExisting(!$input->getOption('no-backup'));
+        $repoGenerator = new EntityRepositoryGenerator();
+        foreach ($metadata->getMetadata() as $m) {
+            $output->writeln(sprintf('  > generating <comment>%s</comment>', $m->name));
+            $generator->generate(array($m), $metadata->getPath());
+
+            if ($m->customRepositoryClassName && false !== strpos($m->customRepositoryClassName, $metadata->getNamespace())) {
+                $repoGenerator->writeEntityRepositoryClass($m->customRepositoryClassName, $metadata->getPath());
+            }
         }
     }
 }

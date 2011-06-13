@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,27 +13,29 @@ namespace Symfony\Bridge\Doctrine\Form\Type;
 
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeCollectionListener;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\EntitiesToArrayTransformer;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\EntityToIdTransformer;
 use Symfony\Component\Form\AbstractType;
-use Doctrine\ORM\EntityManager;
 
 class EntityType extends AbstractType
 {
-    private $em;
+    protected $registry;
 
-    public function __construct(EntityManager $em)
+    public function __construct(RegistryInterface $registry)
     {
-        $this->em = $em;
+        $this->registry = $registry;
     }
 
     public function buildForm(FormBuilder $builder, array $options)
     {
         if ($options['multiple']) {
-            $builder->addEventSubscriber(new MergeCollectionListener())
-                ->prependClientTransformer(new EntitiesToArrayTransformer($options['choice_list']));
+            $builder
+                ->addEventSubscriber(new MergeCollectionListener())
+                ->prependClientTransformer(new EntitiesToArrayTransformer($options['choice_list']))
+            ;
         } else {
             $builder->prependClientTransformer(new EntityToIdTransformer($options['choice_list']));
         }
@@ -42,24 +44,18 @@ class EntityType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         $defaultOptions = array(
-            'template' => 'choice',
-            'multiple' => false,
-            'expanded' => false,
-            'em' => $this->em,
-            'class' => null,
-            'property' => null,
-            'query_builder' => null,
-            'choices' => array(),
-            'preferred_choices' => array(),
-            'multiple' => false,
-            'expanded' => false,
+            'em'                => null,
+            'class'             => null,
+            'property'          => null,
+            'query_builder'     => null,
+            'choices'           => array(),
         );
 
         $options = array_replace($defaultOptions, $options);
 
         if (!isset($options['choice_list'])) {
             $defaultOptions['choice_list'] = new EntityChoiceList(
-                $options['em'],
+                $this->registry->getEntityManager($options['em']),
                 $options['class'],
                 $options['property'],
                 $options['query_builder'],

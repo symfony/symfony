@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -21,14 +21,18 @@ class CheckboxType extends AbstractType
 {
     public function buildForm(FormBuilder $builder, array $options)
     {
-        $builder->appendClientTransformer(new BooleanToStringTransformer())
-            ->setAttribute('value', $options['value']);
+        $builder
+            ->appendClientTransformer(new BooleanToStringTransformer())
+            ->setAttribute('value', $options['value'])
+        ;
     }
 
     public function buildView(FormView $view, FormInterface $form)
     {
-        $view->set('value', $form->getAttribute('value'));
-        $view->set('checked', (bool)$form->getData());
+        $view
+            ->set('value', $form->getAttribute('value'))
+            ->set('checked', (Boolean) $form->getData())
+        ;
     }
 
     public function getDefaultOptions(array $options)

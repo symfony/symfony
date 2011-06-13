@@ -12,6 +12,7 @@
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
 use Symfony\Component\Locale\Exception\NotImplementedException;
+use Symfony\Component\Locale\Stub\StubIntl;
 use Symfony\Component\Locale\Stub\DateFormat\MonthTransformer;
 
 /**
@@ -110,6 +111,7 @@ class FullTransformer
 
         if (isset($this->transformers[$dateChars[0]])) {
             $transformer = $this->transformers[$dateChars[0]];
+
             return $transformer->format($dateTime, $length);
         } else {
             // handle unimplemented characters
@@ -177,6 +179,7 @@ class FullTransformer
             if (isset($transformers[$transformerIndex])) {
                 $transformer = $transformers[$transformerIndex];
                 $captureName = str_repeat($transformerIndex, $length);
+
                 return "(?P<$captureName>" . $transformer->getReverseMatchingRegExp($length) . ')';
             }
         }, $escapedPattern);
@@ -188,7 +191,7 @@ class FullTransformer
      * Check if the first char of a string is a single quote
      *
      * @param  string  $quoteMatch  The string to check
-     * @return bool                 true if matches, false otherwise
+     * @return Boolean              true if matches, false otherwise
      */
     public function isQuoteMatch($quoteMatch)
     {
@@ -206,6 +209,7 @@ class FullTransformer
         if (preg_match("/^'+$/", $quoteMatch)) {
             return str_replace("''", "'", $quoteMatch);
         }
+
         return str_replace("''", "'", substr($quoteMatch, 1, -1));
     }
 
@@ -257,7 +261,7 @@ class FullTransformer
      *
      * @param  DateTime $dateTime The DateTime object to be used to calculate the timestamp
      * @param  array    $options  An array with the matched values to be used to calculate the timestamp
-     * @return bool|int           The calculated timestamp or false if matched date is invalid
+     * @return Boolean|int        The calculated timestamp or false if matched date is invalid
      */
     protected function calculateUnixTimestamp(\DateTime $dateTime, array $options)
     {
@@ -275,6 +279,8 @@ class FullTransformer
 
         // If month is false, return immediately (intl behavior)
         if (false === $month) {
+            StubIntl::setErrorCode(StubIntl::U_PARSE_ERROR);
+
             return false;
         }
 

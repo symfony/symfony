@@ -27,10 +27,15 @@ class CustomFilterIterator extends \FilterIterator
      * Constructor.
      *
      * @param \Iterator $iterator The Iterator to filter
-     * @param array     $filters  An array of \Closure
+     * @param array     $filters  An array of PHP callbacks
      */
     public function __construct(\Iterator $iterator, array $filters)
     {
+        foreach ($filters as $filter) {
+            if (!is_callable($filter)) {
+                throw new \InvalidArgumentException('Invalid PHP callback.');
+            }
+        }
         $this->filters = $filters;
 
         parent::__construct($iterator);
@@ -46,7 +51,7 @@ class CustomFilterIterator extends \FilterIterator
         $fileinfo = $this->current();
 
         foreach ($this->filters as $filter) {
-            if (false === $filter($fileinfo)) {
+            if (false === call_user_func($filter, $fileinfo)) {
                 return false;
             }
         }

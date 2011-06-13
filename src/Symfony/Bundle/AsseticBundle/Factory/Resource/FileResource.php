@@ -18,16 +18,14 @@ use Symfony\Component\Templating\Loader\LoaderInterface;
 /**
  * A file resource.
  *
- * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ * @author Kris Wallsmith <kris@symfony.com>
  */
 class FileResource implements ResourceInterface
 {
     protected $loader;
-    protected $parser;
     protected $bundle;
     protected $baseDir;
     protected $path;
-
     protected $template;
 
     /**

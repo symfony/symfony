@@ -357,6 +357,7 @@ class Inline
             case ctype_digit($scalar):
                 $raw = $scalar;
                 $cast = intval($scalar);
+
                 return '0' == $scalar[0] ? octdec($scalar) : (((string) $raw == (string) $cast) ? $cast : $raw);
             case in_array(strtolower($scalar), $trueValues):
                 return true;

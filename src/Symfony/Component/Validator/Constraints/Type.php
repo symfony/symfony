@@ -31,12 +31,4 @@ class Type extends \Symfony\Component\Validator\Constraint
     {
         return array('type');
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTargets()
-    {
-        return self::PROPERTY_CONSTRAINT;
-    }
 }

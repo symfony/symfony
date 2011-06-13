@@ -40,11 +40,11 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
 
     public function __construct($precision = null, $grouping = null, $roundingMode = null)
     {
-        if (is_null($grouping)) {
+        if (null === $grouping) {
             $grouping = false;
         }
 
-        if (is_null($roundingMode)) {
+        if (null === $roundingMode) {
             $roundingMode = self::ROUND_HALFUP;
         }
 
@@ -56,8 +56,12 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * Transforms a number type into localized number.
      *
-     * @param  number $value  Number value.
-     * @return string         Localized value.
+     * @param  integer|float $value  Number value.
+     *
+     * @return string Localized value.
+     *
+     * @throws UnexpectedTypeException if the given value is not numeric
+     * @throws TransformationFailedException if the value can not be transformed
      */
     public function transform($value)
     {
@@ -82,7 +86,12 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * Transforms a localized number into an integer or float
      *
-     * @param string $value
+     * @param string $value The localized value
+     *
+     * @return integer|float The numeric value
+     *
+     * @throws UnexpectedTypeException if the given value is not a string
+     * @throws TransformationFailedException if the value can not be transformed
      */
     public function reverseTransform($value)
     {

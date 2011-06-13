@@ -1,7 +1,7 @@
 <?php
 
-use Symfony\Component\Routing\Matcher\Exception\MethodNotAllowedException;
-use Symfony\Component\Routing\Matcher\Exception\NotFoundException;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RequestContext;
 
 /**
@@ -30,15 +30,26 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         }
 
         // bar
-        if (0 === strpos($pathinfo, '/bar') && preg_match('#^/bar/(?P<foo>[^/\.]+?)$#x', $pathinfo, $matches)) {
-            if (!in_array($this->context->getMethod(), array('get', 'head'))) {
-                $allow = array_merge($allow, array('get', 'head'));
+        if (0 === strpos($pathinfo, '/bar') && preg_match('#^/bar/(?P<foo>[^/]+?)$#x', $pathinfo, $matches)) {
+            if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
+                $allow = array_merge($allow, array('GET', 'HEAD'));
                 goto not_bar;
             }
             $matches['_route'] = 'bar';
             return $matches;
         }
         not_bar:
+
+        // barhead
+        if (0 === strpos($pathinfo, '/barhead') && preg_match('#^/barhead/(?P<foo>[^/]+?)$#x', $pathinfo, $matches)) {
+            if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
+                $allow = array_merge($allow, array('GET', 'HEAD'));
+                goto not_barhead;
+            }
+            $matches['_route'] = 'barhead';
+            return $matches;
+        }
+        not_barhead:
 
         // baz
         if ($pathinfo === '/test/baz') {
@@ -56,15 +67,15 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         }
 
         // baz4
-        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/$#x', $pathinfo, $matches)) {
+        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/]+?)/$#x', $pathinfo, $matches)) {
             $matches['_route'] = 'baz4';
             return $matches;
         }
 
         // baz5
-        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/$#x', $pathinfo, $matches)) {
-            if ($this->context->getMethod() != 'post') {
-                $allow[] = 'post';
+        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/]+?)/$#x', $pathinfo, $matches)) {
+            if ($this->context->getMethod() != 'POST') {
+                $allow[] = 'POST';
                 goto not_baz5;
             }
             $matches['_route'] = 'baz5';
@@ -73,9 +84,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         not_baz5:
 
         // baz.baz6
-        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/$#x', $pathinfo, $matches)) {
-            if ($this->context->getMethod() != 'put') {
-                $allow[] = 'put';
+        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?P<foo>[^/]+?)/$#x', $pathinfo, $matches)) {
+            if ($this->context->getMethod() != 'PUT') {
+                $allow[] = 'PUT';
                 goto not_bazbaz6;
             }
             $matches['_route'] = 'baz.baz6';
@@ -88,6 +99,36 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             return array (  'def' => 'test',  '_route' => 'foofoo',);
         }
 
-        throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new NotFoundException();
+        if (0 === strpos($pathinfo, '/a')) {
+            if (0 === strpos($pathinfo, '/a/b')) {
+                // foo
+                if (preg_match('#^/a/b/(?P<foo>[^/]+?)$#x', $pathinfo, $matches)) {
+                    $matches['_route'] = 'foo';
+                    return $matches;
+                }
+        
+                // bar
+                if (preg_match('#^/a/b/(?P<bar>[^/]+?)$#x', $pathinfo, $matches)) {
+                    $matches['_route'] = 'bar';
+                    return $matches;
+                }
+        
+            }
+    
+        }
+
+        // foo
+        if (preg_match('#^/(?P<_locale>[^/]+?)/b/(?P<foo>[^/]+?)$#x', $pathinfo, $matches)) {
+            $matches['_route'] = 'foo';
+            return $matches;
+        }
+
+        // bar
+        if (preg_match('#^/(?P<_locale>[^/]+?)/b/(?P<bar>[^/]+?)$#x', $pathinfo, $matches)) {
+            $matches['_route'] = 'bar';
+            return $matches;
+        }
+
+        throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();
     }
 }

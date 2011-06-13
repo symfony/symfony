@@ -19,28 +19,28 @@ class AbstractTypeTest extends \PHPUnit_Framework_TestCase
     {
         $type = new MyTest();
 
-        $this->assertEquals('mytest', $type->getName());
+        $this->assertEquals('symfony_tests_component_form_mytest', $type->getName());
     }
 
     public function testGetNameWithTypeSuffix()
     {
         $type = new MyTestType();
 
-        $this->assertEquals('mytest', $type->getName());
+        $this->assertEquals('symfony_tests_component_form_mytesttype', $type->getName());
     }
 
     public function testGetNameWithFormSuffix()
     {
         $type = new MyTestForm();
 
-        $this->assertEquals('mytest', $type->getName());
+        $this->assertEquals('symfony_tests_component_form_mytestform', $type->getName());
     }
 
     public function testGetNameWithFormTypeSuffix()
     {
         $type = new MyTestFormType();
 
-        $this->assertEquals('mytest', $type->getName());
+        $this->assertEquals('symfony_tests_component_form_mytestformtype', $type->getName());
     }
 }
 

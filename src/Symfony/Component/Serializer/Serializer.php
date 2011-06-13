@@ -4,6 +4,11 @@ namespace Symfony\Component\Serializer;
 
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
+use Symfony\Component\Serializer\Encoder\DecoderInterface;
+use Symfony\Component\Serializer\Encoder\NormalizationAwareInterface;
+use Symfony\Component\Serializer\Exception\RuntimeException;
+use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /*
  * This file is part of the Symfony framework.
@@ -22,155 +27,215 @@ use Symfony\Component\Serializer\Encoder\EncoderInterface;
  *
  * $serializer->serialize($obj, 'xml')
  * $serializer->decode($data, 'xml')
- * $serializer->denormalizeObject($data, 'Class', 'xml')
+ * $serializer->denormalize($data, 'Class', 'xml')
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * @author Lukas Kahwe Smith <smith@pooteeweet.org>
  */
 class Serializer implements SerializerInterface
 {
-    private $normalizers = array();
-    private $encoders = array();
-    private $normalizerCache = array();
+    protected $normalizers = array();
+    protected $encoders = array();
+    protected $normalizerCache = array();
+    protected $denormalizerCache = array();
 
-    /**
-     * @param mixed $value value to test
-     * @return Boolean whether the type is a structured type (array + objects)
-     */
-    public function isStructuredType($value)
+    public function __construct(array $normalizers = array(), array $encoders = array())
     {
-        return null !== $value && !is_scalar($value);
+        foreach ($normalizers as $normalizer) {
+            if ($normalizer instanceof SerializerAwareInterface) {
+                $normalizer->setSerializer($this);
+            }
+        }
+        $this->normalizers = $normalizers;
+
+        foreach ($encoders as $encoder) {
+            if ($encoder instanceof SerializerAwareInterface) {
+                $encoder->setSerializer($this);
+            }
+        }
+        $this->encoders = $encoders;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function serialize($data, $format)
+    public final function serialize($data, $format)
     {
+        if (!$this->supportsSerialization($format)) {
+            throw new UnexpectedValueException('Serialization for the format '.$format.' is not supported');
+        }
+
+        $encoder = $this->getEncoder($format);
+
+        if (!$encoder instanceof NormalizationAwareInterface) {
+            $data = $this->normalize($data);
+        }
+
         return $this->encode($data, $format);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function normalizeObject($object, $format, $properties = null)
+    public final function deserialize($data, $type, $format)
     {
-        if (!$this->normalizers) {
-            throw new \LogicException('You must register at least one normalizer to be able to normalize objects.');
+        if (!$this->supportsDeserialization($format)) {
+            throw new UnexpectedValueException('Deserialization for the format '.$format.' is not supported');
         }
-        $class = get_class($object);
-        if (isset($this->normalizerCache[$class][$format])) {
-            return $this->normalizerCache[$class][$format]->normalize($object, $format, $properties);
-        }
-        $reflClass = new \ReflectionClass($class);
-        foreach ($this->normalizers as $normalizer) {
-            if ($normalizer->supports($reflClass, $format)) {
-                $this->normalizerCache[$class][$format] = $normalizer;
-                return $normalizer->normalize($object, $format, $properties);
-            }
-        }
-        throw new \UnexpectedValueException('Could not normalize object of type '.$class.', no supporting normalizer found.');
+
+        $data = $this->decode($data, $format);
+
+        return $this->denormalize($data, $type, $format);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function denormalizeObject($data, $class, $format = null)
+    public function normalize($data, $format = null)
     {
-        if (!$this->normalizers) {
-            throw new \LogicException('You must register at least one normalizer to be able to denormalize objects.');
-        }
-        if (isset($this->normalizerCache[$class][$format])) {
-            return $this->normalizerCache[$class][$format]->denormalize($data, $format);
-        }
-        $reflClass = new \ReflectionClass($class);
-        foreach ($this->normalizers as $normalizer) {
-            if ($normalizer->supports($reflClass, $format)) {
-                $this->normalizerCache[$class][$format] = $normalizer;
-                return $normalizer->denormalize($data, $class, $format);
-            }
-        }
-        throw new \UnexpectedValueException('Could not denormalize object of type '.$class.', no supporting normalizer found.');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function normalize($data, $format)
-    {
-        if (is_array($data)) {
-            foreach ($data as $key => $val) {
-                $data[$key] = $this->isStructuredType($val) ? $this->normalize($val, $format) : $val;
-            }
+        if (null === $data || is_scalar($data)) {
             return $data;
+        }
+        if ($data instanceof \Traversable) {
+            $normalized = array();
+            foreach ($data as $key => $val) {
+                $normalized[$key] = $this->normalize($val, $format);
+            }
+
+            return $normalized;
         }
         if (is_object($data)) {
             return $this->normalizeObject($data, $format);
         }
-        throw new \UnexpectedValueException('An unexpected value could not be normalized: '.var_export($data, true));
-    }
+        if (is_array($data)) {
+            foreach ($data as $key => $val) {
+                $data[$key] = $this->normalize($val, $format);
+            }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function encode($data, $format)
-    {
-        if (!$this->hasEncoder($format)) {
-            throw new \UnexpectedValueException('No encoder registered for the '.$format.' format');
+            return $data;
         }
-        return $this->encoders[$format]->encode($data, $format);
+        throw new UnexpectedValueException('An unexpected value could not be normalized: '.var_export($data, true));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function decode($data, $format)
+    public function denormalize($data, $type, $format = null)
     {
-        if (!$this->hasEncoder($format)) {
-            throw new \UnexpectedValueException('No encoder registered to decode the '.$format.' format');
+        return $this->denormalizeObject($data, $type, $format);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public final function encode($data, $format)
+    {
+        return $this->getEncoder($format)->encode($data, $format);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public final function decode($data, $format)
+    {
+        return $this->getEncoder($format)->decode($data, $format);
+    }
+
+    /**
+     * Normalizes an object into a set of arrays/scalars
+     *
+     * @param object $object object to normalize
+     * @param string $format format name, present to give the option to normalizers to act differently based on formats
+     * @return array|scalar
+     */
+    private function normalizeObject($object, $format = null)
+    {
+        if (!$this->normalizers) {
+            throw new LogicException('You must register at least one normalizer to be able to normalize objects.');
         }
-        return $this->encoders[$format]->decode($data, $format);
+        $class = get_class($object);
+        if (isset($this->normalizerCache[$class][$format])) {
+            return $this->normalizerCache[$class][$format]->normalize($object, $format);
+        }
+        foreach ($this->normalizers as $normalizer) {
+            if ($normalizer->supportsNormalization($object, $class, $format)) {
+                $this->normalizerCache[$class][$format] = $normalizer;
+
+                return $normalizer->normalize($object, $format);
+            }
+        }
+        throw new UnexpectedValueException('Could not normalize object of type '.$class.', no supporting normalizer found.');
+    }
+
+    /**
+     * Denormalizes data back into an object of the given class
+     *
+     * @param mixed $data data to restore
+     * @param string $class the expected class to instantiate
+     * @param string $format format name, present to give the option to normalizers to act differently based on formats
+     * @return object
+     */
+    private function denormalizeObject($data, $class, $format = null)
+    {
+        if (!$this->normalizers) {
+            throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
+        }
+        if (isset($this->denormalizerCache[$class][$format])) {
+            return $this->denormalizerCache[$class][$format]->denormalize($data, $class, $format);
+        }
+        foreach ($this->normalizers as $normalizer) {
+            if ($normalizer->supportsDenormalization($data, $class, $format)) {
+                $this->denormalizerCache[$class][$format] = $normalizer;
+
+                return $normalizer->denormalize($data, $class, $format);
+            }
+        }
+        throw new UnexpectedValueException('Could not denormalize object of type '.$class.', no supporting normalizer found.');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function addNormalizer(NormalizerInterface $normalizer)
+    public function supportsSerialization($format)
     {
-        $this->normalizers[] = $normalizer;
-        $normalizer->setSerializer($this);
+        return $this->supportsEncoding($format);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getNormalizers()
+    public function supportsDeserialization($format)
     {
-        return $this->normalizers;
+        return $this->supportsDecoding($format);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function removeNormalizer(NormalizerInterface $normalizer)
+    public function supportsEncoding($format)
     {
-        unset($this->normalizers[array_search($normalizer, $this->normalizers, true)]);
+        try {
+            $encoder = $this->getEncoder($format);
+        } catch (\RuntimeException $e) {
+            return false;
+        }
+
+        return $encoder instanceof EncoderInterface;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setEncoder($format, EncoderInterface $encoder)
+    public function supportsDecoding($format)
     {
-        $this->encoders[$format] = $encoder;
-        $encoder->setSerializer($this);
-    }
+        try {
+            $encoder = $this->getEncoder($format);
+        } catch (\RuntimeException $e) {
+            return false;
+        }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getEncoders()
-    {
-        return $this->encoders;
+        return $encoder instanceof DecoderInterface;
     }
 
     /**
@@ -178,22 +243,10 @@ class Serializer implements SerializerInterface
      */
     public function getEncoder($format)
     {
+        if (!isset($this->encoders[$format])) {
+            throw new RuntimeException(sprintf('No encoder found for format "%s".', $format));
+        }
+
         return $this->encoders[$format];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasEncoder($format)
-    {
-        return isset($this->encoders[$format]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function removeEncoder($format)
-    {
-        unset($this->encoders[$format]);
     }
 }

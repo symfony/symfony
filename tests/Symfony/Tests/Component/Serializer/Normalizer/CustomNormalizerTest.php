@@ -6,6 +6,7 @@ require_once __DIR__.'/../Fixtures/ScalarDummy.php';
 
 use Symfony\Tests\Component\Serializer\Fixtures\ScalarDummy;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 /*
  * This file is part of the Symfony framework.
@@ -21,7 +22,7 @@ class CustomNormalizerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->normalizer = new CustomNormalizer;
-        $this->normalizer->setSerializer($this->getMock('Symfony\Component\Serializer\Serializer'));
+        $this->normalizer->setSerializer(new Serializer);
     }
 
     public function testSerialize()
@@ -44,9 +45,15 @@ class CustomNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($obj->xmlFoo);
     }
 
-    public function testSupports()
+    public function testSupportsNormalization()
     {
-        $this->assertTrue($this->normalizer->supports(new \ReflectionClass(get_class(new ScalarDummy))));
-        $this->assertFalse($this->normalizer->supports(new \ReflectionClass('stdClass')));
+        $this->assertTrue($this->normalizer->supportsNormalization(new ScalarDummy));
+        $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass));
+    }
+
+    public function testSupportsDenormalization()
+    {
+        $this->assertTrue($this->normalizer->supportsDenormalization(array(), 'Symfony\Tests\Component\Serializer\Fixtures\ScalarDummy'));
+        $this->assertFalse($this->normalizer->supportsDenormalization(array(), 'stdClass'));
     }
 }

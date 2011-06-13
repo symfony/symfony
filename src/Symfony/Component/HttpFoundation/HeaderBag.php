@@ -38,6 +38,33 @@ class HeaderBag
     }
 
     /**
+     * Returns the headers as a string.
+     *
+     * @return string The headers
+     */
+    public function __toString()
+    {
+        if (!$this->headers) {
+            return '';
+        }
+
+        $beautifier = function ($name) {
+            return preg_replace('/\-(.)/e', "'-'.strtoupper('\\1')", ucfirst($name));
+        };
+
+        $max = max(array_map('strlen', array_keys($this->headers))) + 1;
+        $content = '';
+        ksort($this->headers);
+        foreach ($this->headers as $name => $values) {
+            foreach ($values as $value) {
+                $content .= sprintf("%-{$max}s %s\r\n", $beautifier($name).':', $value);
+            }
+        }
+
+        return $content;
+    }
+
+    /**
      * Returns the headers.
      *
      * @return array An array of headers
@@ -119,9 +146,7 @@ class HeaderBag
     {
         $key = strtr(strtolower($key), '_', '-');
 
-        if (!is_array($values)) {
-            $values = array($values);
-        }
+        $values = (array) $values;
 
         if (true === $replace || !isset($this->headers[$key])) {
             $this->headers[$key] = $values;

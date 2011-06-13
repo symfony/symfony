@@ -47,13 +47,13 @@ class ApacheMatcherDumper extends MatcherDumper
             $compiledRoute = $route->compile();
 
             // prepare the apache regex
-            $regex = preg_replace('/\?P<.+?>/', '', substr($compiledRoute->getRegex(), 1, -2));
+            $regex = preg_replace('/\?P<.+?>/', '', substr(str_replace(array("\n", ' '), '', $compiledRoute->getRegex()), 1, -2));
             $regex = '^'.preg_quote($options['base_uri']).substr($regex, 1);
 
             $hasTrailingSlash = '/$' == substr($regex, -2) && '^/$' != $regex;
 
             $variables = array('E=_ROUTING__route:'.$name);
-            foreach (array_keys($compiledRoute->getVariables()) as $i => $variable) {
+            foreach ($compiledRoute->getVariables() as $i => $variable) {
                 $variables[] = 'E=_ROUTING_'.$variable.':%'.($i + 1);
             }
             foreach ($route->getDefaults() as $key => $value) {
@@ -69,15 +69,20 @@ class ApacheMatcherDumper extends MatcherDumper
             $rule = array("# $name");
 
             // method mismatch
-            if ($req = strtolower($route->getRequirement('_method'))) {
+            if ($req = $route->getRequirement('_method')) {
+                $methods = explode('|', strtoupper($req));
+                // GET and HEAD are equivalent
+                if (in_array('GET', $methods) && !in_array('HEAD', $methods)) {
+                    $methods[] = 'HEAD';
+                }
                 $allow = array();
-                foreach (explode('|', $req) as $method) {
-                    $methodVars[] = $var = '_ROUTING__allow_'.$method;
-                    $allow[] = 'E='.$var.':1';
+                foreach ($methods as $method) {
+                    $methodVars[] = $method;
+                    $allow[] = 'E=_ROUTING__allow_'.$method.':1';
                 }
 
                 $rule[] = "RewriteCond %{REQUEST_URI} $regex";
-                $rule[] = "RewriteCond %{REQUEST_METHOD} !^($req)$ [NC]";
+                $rule[] = sprintf("RewriteCond %%{REQUEST_METHOD} !^(%s)$ [NC]", implode('|', $methods));
                 $rule[] = sprintf('RewriteRule .* - [S=%d,%s]', $hasTrailingSlash ? 2 : 1, implode(',', $allow));
             }
 
@@ -96,8 +101,9 @@ class ApacheMatcherDumper extends MatcherDumper
 
         if (0 < count($methodVars)) {
             $rule = array('# 405 Method Not Allowed');
+            $methodVars = array_values(array_unique($methodVars));
             foreach ($methodVars as $i => $methodVar) {
-                $rule[] = sprintf('RewriteCond %%{%s} !-z%s', $methodVar, isset($methodVars[$i + 1]) ? ' [OR]' : '');
+                $rule[] = sprintf('RewriteCond %%{_ROUTING__allow_%s} !-z%s', $methodVar, isset($methodVars[$i + 1]) ? ' [OR]' : '');
             }
             $rule[] = sprintf('RewriteRule .* %s [QSA,L]', $options['script_name']);
 

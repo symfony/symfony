@@ -153,13 +153,13 @@ class ProjectTemplateLoader extends Loader
     public function setTemplate($name, $content)
     {
         $template = new TemplateReference($name, 'php');
-        $this->templates[$template->getSignature()] = $content;
+        $this->templates[$template->getLogicalName()] = $content;
     }
 
     public function load(TemplateReferenceInterface $template)
     {
-        if (isset($this->templates[$template->getSignature()])) {
-            return new StringStorage($this->templates[$template->getSignature()]);
+        if (isset($this->templates[$template->getLogicalName()])) {
+            return new StringStorage($this->templates[$template->getLogicalName()]);
         }
 
         return false;

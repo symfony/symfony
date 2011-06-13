@@ -80,7 +80,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $translator = new Translator('en', new MessageSelector());
         $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', array($id => $translation), $locale, $domain);
+        $translator->addResource('array', array((string) $id => $translation), $locale, $domain);
 
         $this->assertEquals($expected, $translator->trans($id, $parameters, $domain, $locale));
     }
@@ -104,7 +104,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $translator = new Translator('en', new MessageSelector());
         $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', array($id => $translation), $locale, $domain);
+        $translator->addResource('array', array((string) $id => $translation), $locale, $domain);
 
         $this->assertEquals($expected, $translator->transChoice($id, $number, $parameters, $domain, $locale));
     }
@@ -114,6 +114,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         return array(
             array('Symfony2 est super !', 'Symfony2 is great!', 'Symfony2 est super !', array(), 'fr', ''),
             array('Symfony2 est awesome !', 'Symfony2 is %what%!', 'Symfony2 est %what% !', array('%what%' => 'awesome'), 'fr', ''),
+            array('Symfony2 est super !', new String('Symfony2 is great!'), 'Symfony2 est super !', array(), 'fr', ''),
         );
     }
 
@@ -158,6 +159,23 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             array('Il n\'y a aucune pomme', '{0} There is no apple|one: There is one apple|more: There is %count% apples', '{0} Il n\'y a aucune pomme|one: Il y a %count% pomme|more: Il y a %count% pommes', 0, array('%count%' => 0), 'fr', ''),
             array('Il y a 1 pomme', '{0} There is no apple|one: There is one apple|more: There is %count% apples', '{0} Il n\'y a aucune pomme|one: Il y a %count% pomme|more: Il y a %count% pommes', 1, array('%count%' => 1), 'fr', ''),
             array('Il y a 10 pommes', '{0} There is no apple|one: There is one apple|more: There is %count% apples', '{0} Il n\'y a aucune pomme|one: Il y a %count% pomme|more: Il y a %count% pommes', 10, array('%count%' => 10), 'fr', ''),
+
+            array('Il y a 0 pomme', new String('{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples'), '[0,1] Il y a %count% pomme|]1,Inf] Il y a %count% pommes', 0, array('%count%' => 0), 'fr', ''),
         );
+    }
+}
+
+class String
+{
+    protected $str;
+
+    public function __construct($str)
+    {
+        $this->str = $str;
+    }
+
+    public function __toString()
+    {
+        return $this->str;
     }
 }

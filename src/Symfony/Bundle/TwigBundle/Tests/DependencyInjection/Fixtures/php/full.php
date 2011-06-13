@@ -6,10 +6,6 @@ $container->loadFromExtension('twig', array(
             'MyBundle::form.html.twig',
         )
      ),
-     'extensions' => array(
-         'twig.extension.debug',
-         'twig.extension.text',
-     ),
      'globals' => array(
          'foo' => '@bar',
          'pi'  => 3.14,
@@ -18,7 +14,6 @@ $container->loadFromExtension('twig', array(
      'autoescape'          => true,
      'base_template_class' => 'stdClass',
      'cache'               => '/tmp',
-     'cache_warmer'        => true,
      'charset'             => 'ISO-8859-1',
      'debug'               => true,
      'strict_variables'    => true,

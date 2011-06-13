@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,17 +19,37 @@ class IntegerType extends AbstractType
 {
     public function buildForm(FormBuilder $builder, array $options)
     {
-        $builder->appendClientTransformer(new IntegerToLocalizedStringTransformer($options['precision'], $options['grouping'], $options['rounding_mode']));
+        $builder->appendClientTransformer(
+            new IntegerToLocalizedStringTransformer(
+                $options['precision'],
+                $options['grouping'],
+                $options['rounding_mode']
+        ));
     }
 
     public function getDefaultOptions(array $options)
     {
         return array(
             // default precision is locale specific (usually around 3)
-            'precision' => null,
-            'grouping' => false,
+            'precision'     => null,
+            'grouping'      => false,
             // Integer cast rounds towards 0, so do the same when displaying fractions
-            'rounding_mode' => IntegerToLocalizedStringTransformer::ROUND_DOWN,
+            'rounding_mode' => \NumberFormatter::ROUND_DOWN,
+        );
+    }
+
+    public function getAllowedOptionValues(array $options)
+    {
+        return array(
+            'rounding_mode' => array(
+                \NumberFormatter::ROUND_FLOOR,
+                \NumberFormatter::ROUND_DOWN,
+                \NumberFormatter::ROUND_HALFDOWN,
+                \NumberFormatter::ROUND_HALFEVEN,
+                \NumberFormatter::ROUND_HALFUP,
+                \NumberFormatter::ROUND_UP,
+                \NumberFormatter::ROUND_CEILING,
+            ),
         );
     }
 

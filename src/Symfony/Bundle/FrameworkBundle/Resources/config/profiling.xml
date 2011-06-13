@@ -6,31 +6,30 @@
 
     <parameters>
         <parameter key="profiler.class">Symfony\Component\HttpKernel\Profiler\Profiler</parameter>
-        <parameter key="profiler_listener.class">Symfony\Bundle\FrameworkBundle\Profiler\ProfilerListener</parameter>
+        <parameter key="profiler_listener.class">Symfony\Component\HttpKernel\EventListener\ProfilerListener</parameter>
     </parameters>
 
     <services>
-        <service id="profiler" class="%profiler.class%" scope="request">
+        <service id="profiler" class="%profiler.class%">
             <tag name="monolog.logger" channel="profiler" />
             <argument type="service" id="profiler.storage" />
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
         <service id="profiler.storage" class="" public="false">
-            <argument /> <!-- DSN -->
-            <argument /> <!-- Username -->
-            <argument /> <!-- Password -->
-            <argument /> <!-- Lifetime -->
+            <argument>%profiler.storage.dsn%</argument>
+            <argument>%profiler.storage.username%</argument>
+            <argument>%profiler.storage.password%</argument>
+            <argument>%profiler.storage.lifetime%</argument>
         </service>
 
         <service id="profiler_listener" class="%profiler_listener.class%">
-            <tag name="kernel.listener" event="onCoreResponse" />
-            <tag name="kernel.listener" event="onCoreException" />
-            <tag name="kernel.listener" event="onCoreRequest" />
-            <argument type="service" id="service_container" />
+            <tag name="kernel.listener" event="core.response" method="onCoreResponse" priority="-100" />
+            <tag name="kernel.listener" event="core.exception" method="onCoreException" />
+            <argument type="service" id="profiler" />
             <argument type="service" id="profiler.request_matcher" on-invalid="null" />
-            <argument /> <!-- Only exceptions? -->
-            <argument /> <!-- Only master requests? -->
+            <argument>%profiler_listener.only_exceptions%</argument>
+            <argument>%profiler_listener.only_master_requests%</argument>
         </service>
     </services>
 </container>

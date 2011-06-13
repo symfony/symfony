@@ -18,11 +18,11 @@ namespace Symfony\Component\HttpFoundation;
  */
 class RequestMatcher implements RequestMatcherInterface
 {
-    protected $path;
-    protected $host;
-    protected $methods;
-    protected $ip;
-    protected $attributes;
+    private $path;
+    private $host;
+    private $methods;
+    private $ip;
+    private $attributes;
 
     public function __construct($path = null, $host = null, $methods = null, $ip = null, array $attributes = array())
     {
@@ -105,8 +105,16 @@ class RequestMatcher implements RequestMatcherInterface
             }
         }
 
-        if (null !== $this->path && !preg_match('#'.str_replace('#', '\\#', $this->path).'#', $request->getPathInfo())) {
-            return false;
+        if (null !== $this->path) {
+            if (null !== $session = $request->getSession()) {
+                $path = strtr($this->path, array('{_locale}' => $session->getLocale(), '#' => '\\#'));
+            } else {
+                $path = str_replace('#', '\\#', $this->path);
+            }
+
+            if (!preg_match('#'.$path.'#', $request->getPathInfo())) {
+                return false;
+            }
         }
 
         if (null !== $this->host && !preg_match('#'.str_replace('#', '\\#', $this->host).'#', $request->getHost())) {
@@ -122,6 +130,16 @@ class RequestMatcher implements RequestMatcherInterface
 
     protected function checkIp($ip)
     {
+        // IPv6 address
+        if (false !== strpos($ip, ':')) {
+            return $this->checkIp6($ip);
+        } else {
+            return $this->checkIp4($ip);
+        }
+    }
+
+    protected function checkIp4($ip)
+    {
         if (false !== strpos($this->ip, '/')) {
             list($address, $netmask) = explode('/', $this->ip);
 
@@ -134,5 +152,28 @@ class RequestMatcher implements RequestMatcherInterface
         }
 
         return 0 === substr_compare(sprintf('%032b', ip2long($ip)), sprintf('%032b', ip2long($address)), 0, $netmask);
+    }
+
+    /**
+     * @author David Soria Parra <dsp at php dot net>
+     * @see https://github.com/dsp/v6tools
+     */
+    protected function checkIp6($ip)
+    {
+        list($address, $netmask) = explode('/', $this->ip);
+
+        $bytes_addr = unpack("n*", inet_pton($address));
+        $bytes_test = unpack("n*", inet_pton($ip));
+
+        for ($i = 1, $ceil = ceil($netmask / 16); $i <= $ceil; $i++) {
+            $left = $netmask - 16 * ($i-1);
+            $left = ($left <= 16) ?: 16;
+            $mask = ~(0xffff >> $left) & 0xffff;
+            if (($bytes_addr[$i] & $mask) != ($bytes_test[$i] & $mask)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

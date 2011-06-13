@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper;
 /**
  * The dynamic "assetic" templating helper.
  *
- * @author Kris Wallsmith <kris.wallsmith@symfony.com>
+ * @author Kris Wallsmith <kris@symfony.com>
  */
 class DynamicAsseticHelper extends AsseticHelper
 {
@@ -29,13 +29,12 @@ class DynamicAsseticHelper extends AsseticHelper
      *
      * @param RouterHelper $routerHelper The router helper
      * @param AssetFactory $factory      The asset factory
-     * @param Boolean      $debug        The debug mode
      */
-    public function __construct(RouterHelper $routerHelper, AssetFactory $factory, $debug = false)
+    public function __construct(RouterHelper $routerHelper, AssetFactory $factory)
     {
         $this->routerHelper = $routerHelper;
 
-        parent::__construct($factory, $debug);
+        parent::__construct($factory);
     }
 
     protected function getAssetUrl(AssetInterface $asset, $options = array())

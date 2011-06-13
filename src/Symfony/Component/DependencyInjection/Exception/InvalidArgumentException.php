@@ -18,6 +18,6 @@ use \InvalidArgumentException as BaseInvalidArgumentException;
  *
  * @author Bulat Shakirzyanov <bulat@theopenskyproject.com>
  */
-class InvalidArgumentException extends BaseInvalidArgumentException implements Exception
+class InvalidArgumentException extends BaseInvalidArgumentException implements ExceptionInterface
 {
 }

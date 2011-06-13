@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,30 +12,26 @@
 namespace Symfony\Bridge\Doctrine\Form;
 
 use Symfony\Component\Form\AbstractExtension;
-use Doctrine\ORM\EntityManager;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class DoctrineOrmExtension extends AbstractExtension
 {
-    /**
-     * The Doctrine 2 entity manager
-     * @var Doctrine\ORM\EntityManager
-     */
-    protected $em = null;
+    protected $registry;
 
-    public function __construct(EntityManager $em)
+    public function __construct(RegistryInterface $registry)
     {
-        $this->em = $em;
+        $this->registry = $registry;
     }
 
     protected function loadTypes()
     {
         return array(
-            new Type\EntityType($this->em),
+            new Type\EntityType($this->registry),
         );
     }
 
     protected function loadTypeGuesser()
     {
-        return new DoctrineOrmTypeGuesser($this->em);
+        return new DoctrineOrmTypeGuesser($this->registry);
     }
 }

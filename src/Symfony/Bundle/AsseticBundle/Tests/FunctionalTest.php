@@ -43,35 +43,6 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $filesystem->remove($this->cacheDir);
     }
 
-    /**
-     * @dataProvider provideAmDebugAndAssetCount
-     */
-    public function testKernel($debug, $count)
-    {
-        $kernel = new TestKernel('test', $debug);
-        $kernel->boot();
-
-        $this->assertEquals($count, count($kernel->getContainer()->get('assetic.asset_manager')->getNames()));
-    }
-
-    /**
-     * @dataProvider provideRouterDebugAndAssetCount
-     */
-    public function testRoutes($debug, $count)
-    {
-        $kernel = new TestKernel('test', $debug);
-        $kernel->boot();
-
-        $matches = 0;
-        foreach (array_keys($kernel->getContainer()->get('router')->getRouteCollection()->all()) as $name) {
-            if (0 === strpos($name, '_assetic_')) {
-                ++$matches;
-            }
-        }
-
-        $this->assertEquals($count, $matches);
-    }
-
     public function testTwigRenderDebug()
     {
         $kernel = new TestKernel('test', true);
@@ -100,21 +71,5 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(3, count($crawler->filter('link[href$=".css"]')));
         $this->assertEquals(2, count($crawler->filter('script[src$=".js"]')));
-    }
-
-    public function provideAmDebugAndAssetCount()
-    {
-        return array(
-            array(true, 3),
-            array(false, 3),
-        );
-    }
-
-    public function provideRouterDebugAndAssetCount()
-    {
-        return array(
-            array(true, 9),
-            array(false, 3),
-        );
     }
 }

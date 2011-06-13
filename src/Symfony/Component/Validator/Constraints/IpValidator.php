@@ -19,11 +19,12 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * Validates whether a value is a valid IP address
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Joseph Bielawski <stloyd@gmail.com>
  */
 class IpValidator extends ConstraintValidator
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function isValid($value, Constraint $constraint)
     {
@@ -31,71 +32,66 @@ class IpValidator extends ConstraintValidator
             return true;
         }
 
-        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString()'))) {
+        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
         $value = (string) $value;
-        $valid = false;
 
-        if ($constraint->version == Ip::V4 || $constraint->version == Ip::ALL) {
-            $valid = $this->isValidV4($value);
+        switch ($constraint->version) {
+            case Ip::V4:
+               $flag = FILTER_FLAG_IPV4;
+               break;
+
+            case Ip::V6:
+               $flag = FILTER_FLAG_IPV6;
+               break;
+
+            case Ip::V4_NO_PRIV:
+               $flag = FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE;
+               break;
+
+            case Ip::V6_NO_PRIV:
+               $flag = FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE;
+               break;
+
+            case Ip::ALL_NO_PRIV:
+               $flag = FILTER_FLAG_NO_PRIV_RANGE;
+               break;
+
+            case Ip::V4_NO_RES:
+               $flag = FILTER_FLAG_IPV4 | FILTER_FLAG_NO_RES_RANGE;
+               break;
+
+            case Ip::V6_NO_RES:
+               $flag = FILTER_FLAG_IPV6 | FILTER_FLAG_NO_RES_RANGE;
+               break;
+
+            case Ip::ALL_NO_RES:
+               $flag = FILTER_FLAG_NO_RES_RANGE;
+               break;
+
+            case Ip::V4_ONLY_PUBLIC:
+               $flag = FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE;
+               break;
+
+            case Ip::V6_ONLY_PUBLIC:
+               $flag = FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE;
+               break;
+
+            case Ip::ALL_ONLY_PUBLIC:
+               $flag = FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE;
+               break;
+
+            default:
+                $flag = null;
+                break;
         }
 
-        if ($constraint->version == Ip::V6 || $constraint->version == Ip::ALL) {
-            $valid = $valid || $this->isValidV6($value);
-        }
-
-        if (!$valid) {
+        if (!filter_var($value, FILTER_VALIDATE_IP, $flag)) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Validates that a value is a valid IPv4 address
-     *
-     * @param string $value
-     */
-    protected function isValidV4($value)
-    {
-        if (!preg_match('/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/', $value, $matches)) {
-            return false;
-        }
-
-        for ($i = 1; $i <= 4; ++$i) {
-            if ($matches[$i] > 255) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Validates that a value is a valid IPv6 address
-     *
-     * @param string $value
-     */
-    protected function isValidV6($value)
-    {
-        if (!preg_match('/^[0-9a-fA-F]{0,4}(:[0-9a-fA-F]{0,4}){1,5}((:[0-9a-fA-F]{0,4}){1,2}|:([\d\.]+))$/', $value, $matches)) {
-            return false;
-        }
-
-        // allow V4 addresses mapped to V6
-        if (isset($matches[4]) && !$this->isValidV4($matches[4])) {
-            return false;
-        }
-
-        // "::" is only allowed once per address
-        if (($offset = strpos($value, '::')) !== false) {
-            if (strpos($value, '::', $offset + 1) !== false) {
-                return false;
-            }
         }
 
         return true;

@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -37,17 +46,15 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('cache_warmer')->defaultValue(!$this->debug)->end()
                 ->scalarNode('charset')->end()
-                ->scalarNode('document_root')->end()
-                ->scalarNode('error_handler')->end()
+                ->scalarNode('secret')->isRequired()->end()
                 ->scalarNode('exception_controller')->defaultValue('Symfony\\Bundle\\FrameworkBundle\\Controller\\ExceptionController::showAction')->end()
                 ->scalarNode('ide')->defaultNull()->end()
                 ->booleanNode('test')->end()
             ->end()
         ;
 
-        $this->addCsrfProtectionSection($rootNode);
+        $this->addFormSection($rootNode);
         $this->addEsiSection($rootNode);
         $this->addProfilerSection($rootNode);
         $this->addRouterSection($rootNode);
@@ -55,14 +62,23 @@ class Configuration implements ConfigurationInterface
         $this->addTemplatingSection($rootNode);
         $this->addTranslatorSection($rootNode);
         $this->addValidationSection($rootNode);
+        $this->addAnnotationsSection($rootNode);
 
         return $treeBuilder;
     }
 
-    private function addCsrfProtectionSection(ArrayNodeDefinition $rootNode)
+    private function addFormSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
             ->children()
+                ->arrayNode('form')
+                    ->canBeUnset()
+                    ->treatNullLike(array('enabled' => true))
+                    ->treatTrueLike(array('enabled' => true))
+                    ->children()
+                        ->booleanNode('enabled')->defaultTrue()->end()
+                    ->end()
+                ->end()
                 ->arrayNode('csrf_protection')
                     ->canBeUnset()
                     ->treatNullLike(array('enabled' => true))
@@ -70,7 +86,6 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->booleanNode('enabled')->defaultTrue()->end()
                         ->scalarNode('field_name')->defaultValue('_token')->end()
-                        ->scalarNode('secret')->defaultValue('secret')->end()
                     ->end()
                 ->end()
             ->end()
@@ -86,7 +101,7 @@ class Configuration implements ConfigurationInterface
                     ->treatNullLike(array('enabled' => true))
                     ->treatTrueLike(array('enabled' => true))
                     ->children()
-                        ->booleanNode('enabled')->end()
+                        ->booleanNode('enabled')->defaultTrue()->end()
                     ->end()
                 ->end()
             ->end()
@@ -100,8 +115,8 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('profiler')
                     ->canBeUnset()
                     ->children()
-                        ->booleanNode('only_exceptions')->defaultValue(false)->end()
-                        ->booleanNode('only_master_requests')->defaultValue(false)->end()
+                        ->booleanNode('only_exceptions')->defaultFalse()->end()
+                        ->booleanNode('only_master_requests')->defaultFalse()->end()
                         ->scalarNode('dsn')->defaultValue('sqlite:%kernel.cache_dir%/profiler.db')->end()
                         ->scalarNode('username')->defaultValue('')->end()
                         ->scalarNode('password')->defaultValue('')->end()
@@ -128,7 +143,6 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('router')
                     ->canBeUnset()
                     ->children()
-                        ->scalarNode('cache_warmer')->defaultFalse()->end()
                         ->scalarNode('resource')->isRequired()->end()
                         ->scalarNode('type')->end()
                         ->scalarNode('http_port')->defaultValue(80)->end()
@@ -163,24 +177,58 @@ class Configuration implements ConfigurationInterface
 
     private function addTemplatingSection(ArrayNodeDefinition $rootNode)
     {
+        $organizeUrls = function($urls)
+        {
+            $urls += array(
+                'http' => array(),
+                'ssl'  => array(),
+            );
+
+            foreach ($urls as $i => $url) {
+                if (is_integer($i)) {
+                    if (0 === strpos($url, 'https://') || 0 === strpos($url, '//')) {
+                        $urls['http'][] = $urls['ssl'][] = $url;
+                    } else {
+                        $urls['http'][] = $url;
+                    }
+                    unset($urls[$i]);
+                }
+            }
+
+            return $urls;
+        };
+
         $rootNode
             ->children()
                 ->arrayNode('templating')
                     ->canBeUnset()
                     ->children()
                         ->scalarNode('assets_version')->defaultValue(null)->end()
+                        ->scalarNode('assets_version_format')->defaultValue(null)->end()
                     ->end()
                     ->fixXmlConfig('assets_base_url')
                     ->children()
                         ->arrayNode('assets_base_urls')
+                            ->addDefaultsIfNotSet()
+                            ->defaultValue(array('http' => array(), 'ssl' => array()))
                             ->beforeNormalization()
-                                ->ifTrue(function($v){ return !is_array($v); })
-                                ->then(function($v){ return array($v); })
+                                ->ifTrue(function($v) { return !is_array($v); })
+                                ->then(function($v) { return array($v); })
                             ->end()
-                            ->prototype('scalar')->end()
+                            ->beforeNormalization()
+                                ->always()
+                                ->then($organizeUrls)
+                            ->end()
+                            ->children()
+                                ->arrayNode('http')
+                                    ->prototype('scalar')->end()
+                                ->end()
+                                ->arrayNode('ssl')
+                                    ->prototype('scalar')->end()
+                                ->end()
+                            ->end()
                         ->end()
                         ->scalarNode('cache')->end()
-                        ->scalarNode('cache_warmer')->defaultFalse()->end()
                     ->end()
                     ->fixXmlConfig('engine')
                     ->children()
@@ -212,8 +260,26 @@ class Configuration implements ConfigurationInterface
                                 ->fixXmlConfig('base_url')
                                 ->children()
                                     ->scalarNode('version')->defaultNull()->end()
+                                    ->scalarNode('version_format')->defaultNull()->end()
                                     ->arrayNode('base_urls')
-                                        ->prototype('scalar')->end()
+                                        ->addDefaultsIfNotSet()
+                                        ->defaultValue(array('http' => array(), 'ssl' => array()))
+                                        ->beforeNormalization()
+                                            ->ifTrue(function($v) { return !is_array($v); })
+                                            ->then(function($v) { return array($v); })
+                                        ->end()
+                                        ->beforeNormalization()
+                                            ->always()
+                                            ->then($organizeUrls)
+                                        ->end()
+                                        ->children()
+                                            ->arrayNode('http')
+                                                ->prototype('scalar')->end()
+                                            ->end()
+                                            ->arrayNode('ssl')
+                                                ->prototype('scalar')->end()
+                                            ->end()
+                                        ->end()
                                     ->end()
                                 ->end()
                             ->end()
@@ -230,6 +296,8 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('translator')
                     ->canBeUnset()
+                    ->treatNullLike(array('enabled' => true))
+                    ->treatTrueLike(array('enabled' => true))
                     ->children()
                         ->booleanNode('enabled')->defaultTrue()->end()
                         ->scalarNode('fallback')->defaultValue('en')->end()
@@ -245,30 +313,28 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('validation')
                     ->canBeUnset()
-                    // For XML, namespace is a child of validation, so it must be moved under annotations
-                    ->beforeNormalization()
-                        ->ifTrue(function($v) { return is_array($v) && !empty($v['annotations']) && !empty($v['namespace']); })
-                        ->then(function($v){
-                            $v['annotations'] = array('namespace' => $v['namespace']);
-                            unset($v['namespace']);
-                            return $v;
-                        })
-                    ->end()
+                    ->treatNullLike(array('enabled' => true))
+                    ->treatTrueLike(array('enabled' => true))
                     ->children()
-                        ->booleanNode('enabled')->end()
+                    ->booleanNode('enabled')->defaultTrue()->end()
                         ->scalarNode('cache')->end()
-                        ->arrayNode('annotations')
-                            ->canBeUnset()
-                            ->treatNullLike(array())
-                            ->treatTrueLike(array())
-                            ->fixXmlConfig('namespace')
-                            ->children()
-                                ->arrayNode('namespaces')
-                                    ->useAttributeAsKey('prefix')
-                                    ->prototype('scalar')->end()
-                                ->end()
-                            ->end()
-                        ->end()
+                        ->booleanNode('enable_annotations')->defaultFalse()->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addAnnotationsSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('annotations')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('cache')->defaultValue('file')->end()
+                        ->scalarNode('file_cache_dir')->defaultValue('%kernel.cache_dir%/annotations')->end()
+                        ->booleanNode('debug')->defaultValue($this->debug)->end()
                     ->end()
                 ->end()
             ->end()

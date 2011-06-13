@@ -48,6 +48,10 @@ class Parser
         $this->currentLine = '';
         $this->lines = explode("\n", $this->cleanup($value));
 
+        if (function_exists('mb_detect_encoding') && false === mb_detect_encoding($value, 'UTF-8', true)) {
+            throw new ParserException('The YAML value does not appear to be valid UTF-8.');
+        }
+
         if (function_exists('mb_internal_encoding') && ((int) ini_get('mbstring.func_overload')) & 2) {
             $mbEncoding = mb_internal_encoding();
             mb_internal_encoding('UTF-8');
@@ -336,6 +340,7 @@ class Parser
             if (!array_key_exists($value, $this->refs)) {
                 throw new ParserException(sprintf('Reference "%s" does not exist (%s).', $value, $this->currentLine));
             }
+
             return $this->refs[$value];
         }
 
@@ -479,6 +484,7 @@ class Parser
     {
         //checking explicitly the first char of the trim is faster than loops or strpos
         $ltrimmedLine = ltrim($this->currentLine, ' ');
+
         return $ltrimmedLine[0] === '#';
     }
 

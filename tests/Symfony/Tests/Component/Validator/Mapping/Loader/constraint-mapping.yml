@@ -7,7 +7,7 @@ Symfony\Tests\Component\Validator\Fixtures\Entity:
     - Symfony\Tests\Component\Validator\Fixtures\ConstraintA: ~
     # Custom constraint with namespaces prefix
     - "custom:ConstraintB": ~
-      
+
   properties:
     firstName:
       # Constraint without value
@@ -35,8 +35,7 @@ Symfony\Tests\Component\Validator\Fixtures\Entity:
               - Min: 5
       # Constraint with options
       - Choice: { choices: [A, B], message: Must be one of %choices% }
-        
+
   getters:
     lastName:
       - NotNull: ~
-        

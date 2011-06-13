@@ -128,13 +128,15 @@ abstract class AbstractType implements FormTypeInterface
     /**
      * Returns the name of this type.
      *
-     * The default name type is the class name, where \ are replaced by _.
+     * The default name type is the class name without the Form nor Type suffix
      *
      * @return string The name of this type
      */
     public function getName()
     {
-        return strtolower(str_replace('\\', '_', get_class($this)));
+        preg_match('/\\\\(\w+?)(Form)?(Type)?$/i', get_class($this), $matches);
+
+        return strtolower($matches[1]);
     }
 
     /**

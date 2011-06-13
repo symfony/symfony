@@ -68,10 +68,17 @@ EOT
             throw new \InvalidArgumentException(sprintf('The entity name must contain a : ("%s" given, expecting something like AcmeBlogBundle:Blog/Post)', $entity));
         }
 
-        $bundle = substr($entity, 0, $pos);
+        $bundleName = substr($entity, 0, $pos);
+        $bundle = $this->getApplication()->getKernel()->getBundle($bundleName);
+
+        // we need to create the directory so that the command works even
+        // for the very first entity created in the bundle
+        if (!is_dir($bundle->getPath().'/Entity')) {
+            @mkdir($bundle->getPath().'/Entity', 0777, true);
+        }
+
         $entity = substr($entity, $pos + 1);
-        $fullEntityClassName = $this->container->get('doctrine')->getEntityNamespace($bundle).'\\'.$entity;
-        $bundle = $this->getApplication()->getKernel()->getBundle($bundle);
+        $fullEntityClassName = $this->container->get('doctrine')->getEntityNamespace($bundleName).'\\'.$entity;
         $mappingType = $input->getOption('mapping-type');
 
         $class = new ClassMetadataInfo($fullEntityClassName);

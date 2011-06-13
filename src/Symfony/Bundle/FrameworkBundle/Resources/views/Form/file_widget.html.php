@@ -1,8 +1,7 @@
-<div<?php echo $view['form']->attributes() ?>>
-    <input type="file"
-        id="<?php echo $view->escape($form['file']->get('id')) ?>"
-        name="<?php echo $view->escape($form['file']->get('name')) ?>"
-        <?php if ($form['file']->get('disabled')): ?>disabled="disabled"<?php endif ?>
-        <?php if ($form['file']->get('required')): ?>required="required"<?php endif ?>
-    />
-</div>
+<input type="file"
+    <?php echo $view['form']->attributes() ?>
+    name="<?php echo $view->escape($full_name) ?>"
+    value="<?php echo $view->escape($value) ?>"
+    <?php if ($read_only): ?>disabled="disabled"<?php endif ?>
+    <?php if ($required): ?>required="required"<?php endif ?>
+/>

@@ -753,11 +753,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
-'/div
-    [
-        ./input[@type="file"][@id="na&me_file"]
-    ]
-    [count(./input)=1]
+'/input
+    [@type="file"]
 '
         );
     }

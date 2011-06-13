@@ -19,7 +19,14 @@ beta4 to beta5
   methods in the Serializer class itself breaking BC and adding component
   specific Exception classes.
 
-* The temporary storage for file uploads has been removed
+* The FileType Form class has been heavily changed:
+
+    * The temporary storage has been removed.
+
+    * The file type `type` option has also been removed (the new behavior is
+      the same as when the `type` was set to `file` before).
+
+    * The file input is now rendered as any other input field.
 
 * The `Symfony\Component\HttpFoundation\File\File::getExtension()` and
   `guessExtension()` methods do not return the extension with a `.` anymore.

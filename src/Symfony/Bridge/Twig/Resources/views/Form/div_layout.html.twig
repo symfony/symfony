@@ -16,12 +16,6 @@
 {% endspaceless %}
 {% endblock form_label %}
 
-{% block file_label %}
-{% spaceless %}
-    {{ form_label(form.file) }}
-{% endspaceless %}
-{% endblock file_label %}
-
 {% block field_errors %}
 {% spaceless %}
     {% if errors|length > 0 %}
@@ -242,14 +236,6 @@
     {{ block('field_widget') }} %
 {% endspaceless %}
 {% endblock percent_widget %}
-
-{% block file_widget %}
-{% spaceless %}
-    <div {{ block('container_attributes') }}>
-        {{ form_widget(form.file) }}
-    </div>
-{% endspaceless %}
-{% endblock file_widget %}
 
 {% block repeated_row %}
 {% spaceless %}

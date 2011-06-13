@@ -18,11 +18,11 @@ class FileTranslationWriter
     private $formatters;
         
     /**
-     * Add a formatter to the translation extractor
+     * Add a formatter to the writer
      * @param string $format The format of the loader
      * @param FormatterInterface $formatter 
      */
-    public function addLoader($format, FormatterInterface $formatter){
+    public function addFormatter($format, FormatterInterface $formatter){
         $this->formatters[$format] = $formatters;
     }
     
@@ -33,11 +33,11 @@ class FileTranslationWriter
 
         // save
         foreach ($catalogue->getDomains() as $domain) {
-            $file = $domain . '.' . $catalogue->getLocale() . '.' . $format;
+            $file = $domain.'.'.$catalogue->getLocale().'.'.$format;
             if (file_exists($path . $file)) {
-                copy($path . $file, $path . '~' . $file . '.bak');
+                copy($path.$file, $path.'~'.$file.'.bak');
             }
-            file_put_contents($path . '/' . $file, $formatter->format($catalogue->all($domain)));
+            file_put_contents($path.'/'.$file, $formatter->format($catalogue->all($domain)));
         }
     }
 }

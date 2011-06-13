@@ -120,6 +120,7 @@ class TwigTranslationExtractor implements TranslationExtractorInterface
             if ($node->getNode('arguments')->hasNode(1)) {
                 return $node->getNode('arguments')->getNode(1)->getAttribute('value');
             }
+            
             return $this->defaultDomain;
         }
 

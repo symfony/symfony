@@ -215,11 +215,21 @@ class Session implements \Serializable
         $this->attributes['_locale'] = $locale;
     }
 
+    /**
+     * Gets the flash messages.
+     *
+     * @return array
+     */
     public function getFlashes()
     {
         return isset($this->attributes['_flash']) ? $this->attributes['_flash'] : array();
     }
 
+    /**
+     * Sets the flash messages.
+     *
+     * @param array $values
+     */
     public function setFlashes($values)
     {
         if (false === $this->started) {
@@ -230,11 +240,25 @@ class Session implements \Serializable
         $this->oldFlashes = array();
     }
 
+    /**
+     * Gets a flash message.
+     *
+     * @param string      $name
+     * @param string|null $default
+     *
+     * @return string
+     */
     public function getFlash($name, $default = null)
     {
         return array_key_exists($name, $this->getFlashes()) ? $this->attributes['_flash'][$name] : $default;
     }
 
+    /**
+     * Sets a flash message.
+     *
+     * @param string $name
+     * @param string $value
+     */
     public function setFlash($name, $value)
     {
         if (false === $this->started) {
@@ -245,6 +269,13 @@ class Session implements \Serializable
         unset($this->oldFlashes[$name]);
     }
 
+    /**
+     * Checks whether a flash message exists.
+     *
+     * @param string $name
+     *
+     * @return Boolean
+     */
     public function hasFlash($name)
     {
         if (false === $this->started) {
@@ -254,6 +285,11 @@ class Session implements \Serializable
         return array_key_exists($name, $this->attributes['_flash']);
     }
 
+    /**
+     * Removes a flash message.
+     *
+     * @param string $name
+     */
     public function removeFlash($name)
     {
         if (false === $this->started) {
@@ -263,6 +299,9 @@ class Session implements \Serializable
         unset($this->attributes['_flash'][$name]);
     }
 
+    /**
+     * Removes the flash messages.
+     */
     public function clearFlashes()
     {
         if (false === $this->started) {

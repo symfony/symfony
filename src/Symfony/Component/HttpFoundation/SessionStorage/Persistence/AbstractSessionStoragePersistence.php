@@ -30,7 +30,7 @@ abstract class AbstractSessionStoragePersistence implements SessionStoragePersis
     private $dispatcher;
 
     /**
-     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher A concrete instance of a event dispatcher     *
+     * @param EventDispatcherInterface $dispatcher A concrete instance of a event dispatcher     *
      */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
@@ -38,73 +38,54 @@ abstract class AbstractSessionStoragePersistence implements SessionStoragePersis
     }
 
     /**
-     * Called upon opening a new session from (set by session_set_save_handler)
-     *
-     * @param string $savePath The path to save to
-     * @param string $sessionName The name of the session
-     * @return void
+     * {@inheritDoc}
      */
-    function open($savePath, $sessionName)
+    public function open($savePath, $sessionName)
     {
         $event = new SessionEvent();
         $this->dispatcher->dispatch(SessionPersistenceEvents::OPEN, $event);
     }
 
     /**
-     * Called upon closing a session from (set by session_set_save_handler)
-     *
-     * @return void
+     * {@inheritDoc}
      */
-    function close()
+    public function close()
     {
         $event = new SessionEvent();
         $this->dispatcher->dispatch(SessionPersistenceEvents::CLOSE, $event);
     }
 
     /**
-     * Called upon writing a session from (set by session_set_save_handler)
-     *
-     * @param string $id
-     * @param string $data
-     * @return void
+     * {@inheritDoc}
      */
-    function write($id, $data)
+    public function write($id, $data)
     {
         $event = new SessionEvent($id);
         $this->dispatcher->dispatch(SessionPersistenceEvents::WRITE, $event);
     }
 
     /**
-     * Called upon destroying a session from (set by session_set_save_handler)
-     *
-     * @param  string $id
-     * @return void
+     * {@inheritDoc}
      */
-    function destroy($id)
+    public function destroy($id)
     {
         $event = new SessionEvent($id);
         $this->dispatcher->dispatch(SessionPersistenceEvents::DESTROY, $event);
     }
 
     /**
-     * Called upon garbage collection (set by session_set_save_handler)
-     *
-     * @param int $maxlifetime
-     * @return void
+     * {@inheritDoc}
      */
-    function gc($maxlifetime)
+    public function gc($maxlifetime)
     {
         $event = new SessionEvent();
         $this->dispatcher->dispatch(SessionPersistenceEvents::GC, $event);
     }
 
     /**
-     * Called upon reading a session from (set by session_set_save_handler)
-     *
-     * @param string $id
-     * @return void
+     * {@inheritDoc}
      */
-    function read($id)
+    public function read($id)
     {
         $event = new SessionEvent($id);
         $this->dispatcher->dispatch(SessionPersistenceEvents::READ, $event);

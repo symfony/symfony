@@ -19,7 +19,7 @@ namespace Symfony\Component\HttpFoundation\SessionStorage\Persistence;
 interface SessionStoragePersistenceInterface
 {
     /**
-     * Called upon opening a new session from (set by session_set_save_handler)
+     * Called upon opening a new session (callback set by session_set_save_handler)
      *
      * @param string $savePath The path to save to
      * @param string $sessionName The name of the session
@@ -28,14 +28,14 @@ interface SessionStoragePersistenceInterface
     function open($savePath, $sessionName);
 
     /**
-     * Called upon closing a session from (set by session_set_save_handler)
+     * Called upon closing a session (callback set by session_set_save_handler)
      *
      * @return void
      */
     function close();
 
     /**
-     * Called upon reading a session from (set by session_set_save_handler)
+     * Called upon reading a session (callback set by session_set_save_handler)
      *
      * @param string $id
      * @return void
@@ -43,7 +43,7 @@ interface SessionStoragePersistenceInterface
     function read($id);
 
     /**
-     * Called upon writing a session from (set by session_set_save_handler)
+     * Called upon writing a session (callback set by session_set_save_handler)
      *
      * @param string $id
      * @param string $data
@@ -52,7 +52,7 @@ interface SessionStoragePersistenceInterface
     function write($id, $data);
 
     /**
-     * Called upon destroying a session from (set by session_set_save_handler)
+     * Called upon destroying a session (callback set by session_set_save_handler)
      *
      * @param  string $id
      * @return void
@@ -60,7 +60,7 @@ interface SessionStoragePersistenceInterface
     function destroy($id);
 
     /**
-     * Called upon garbage collection (set by session_set_save_handler)
+     * Called upon garbage collection (callback set by session_set_save_handler)
      *
      * @param int $maxlifetime
      * @return void

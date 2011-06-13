@@ -23,6 +23,16 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class PdoSessionStoragePersistence extends AbstractSessionStoragePersistence
 {
     /**
+     * @var \PDO
+     */
+    private $db;
+
+    /**
+     * @var array
+     */
+    private $dbOptions;
+
+    /**
      * Constructor.
      *
      * @param \PDO  $db        A PDO instance
@@ -48,11 +58,7 @@ class PdoSessionStoragePersistence extends AbstractSessionStoragePersistence
     }
 
     /**
-     * Called upon opening a new session from (set by session_set_save_handler)
-     *
-     * @param string $savePath The path to save to
-     * @param string $sessionName The name of the session
-     * @return void
+     * {@inheritDoc}
      */
     public function open($savePath, $sessionName)
     {
@@ -60,9 +66,7 @@ class PdoSessionStoragePersistence extends AbstractSessionStoragePersistence
     }
 
     /**
-     * Called upon closing a session from (set by session_set_save_handler)
-     *
-     * @return void
+     * {@inheritDoc}
      */
     public function close()
     {
@@ -70,11 +74,7 @@ class PdoSessionStoragePersistence extends AbstractSessionStoragePersistence
     }
 
     /**
-     * Called upon writing a session from (set by session_set_save_handler)
-     *
-     * @param string $id
-     * @param string $data
-     * @return void
+     * {@inheritDoc}
      */
     public function write($id, $data)
     {
@@ -112,10 +112,7 @@ class PdoSessionStoragePersistence extends AbstractSessionStoragePersistence
     }
 
     /**
-     * Called upon destroying a session from (set by session_set_save_handler)
-     *
-     * @param  string $id
-     * @return void
+     * {@inheritDoc}
      */
     public function destroy($id)
     {
@@ -138,10 +135,7 @@ class PdoSessionStoragePersistence extends AbstractSessionStoragePersistence
     }
 
     /**
-     * Called upon garbage collection (set by session_set_save_handler)
-     *
-     * @param int $maxlifetime
-     * @return void
+     * {@inheritDoc}
      */
     public function gc($maxlifetime)
     {
@@ -193,10 +187,7 @@ class PdoSessionStoragePersistence extends AbstractSessionStoragePersistence
     }
 
     /**
-     * Called upon reading a session from (set by session_set_save_handler)
-     *
-     * @param string $id
-     * @return void
+     * {@inheritDoc}
      */
     public function read($id)
     {

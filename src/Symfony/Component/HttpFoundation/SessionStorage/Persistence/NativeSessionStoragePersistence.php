@@ -30,7 +30,7 @@ class NativeSessionStoragePersistence extends AbstractSessionStoragePersistence
     /**
      * Constructor.
      *
-     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher A concrete instance of EventDispatcherInterface
+     * @param EventDispatcherInterface $dispatcher A concrete instance of EventDispatcherInterface
      * @param string $path Path to the directory which will hold the sessions
      *
      */
@@ -51,11 +51,7 @@ class NativeSessionStoragePersistence extends AbstractSessionStoragePersistence
     }
 
     /**
-     * Called upon opening a new session from (set by session_set_save_handler)
-     *
-     * @param string $savePath (ignored)
-     * @param string $sessionName (ignored)
-     * @return void
+     * {@inheritDoc}
      */
     public function open($savePath, $sessionName)
     {
@@ -63,9 +59,7 @@ class NativeSessionStoragePersistence extends AbstractSessionStoragePersistence
     }
 
     /**
-     * Called upon closing a session from (set by session_set_save_handler)
-     *
-     * @return void
+     * {@inheritDoc}
      */
     public function close()
     {
@@ -74,11 +68,7 @@ class NativeSessionStoragePersistence extends AbstractSessionStoragePersistence
     }
 
     /**
-     * Called upon writing a session from (set by session_set_save_handler)
-     *
-     * @param string $id
-     * @param string $data
-     * @return void
+     * {@inheritDoc}
      */
     public function write($id, $data)
     {
@@ -97,10 +87,7 @@ class NativeSessionStoragePersistence extends AbstractSessionStoragePersistence
     }
 
     /**
-     * Called upon destroying a session from (set by session_set_save_handler)
-     *
-     * @param  string $id
-     * @return void
+     * {@inheritDoc}
      */
     public function destroy($id)
     {
@@ -110,17 +97,13 @@ class NativeSessionStoragePersistence extends AbstractSessionStoragePersistence
     }
 
     /**
-     * Called upon garbage collection (set by session_set_save_handler)
-     *
-     * @param int $maxlifetime
-     * @return void
+     * {@inheritDoc}
      */
     public function gc($maxlifetime)
     {
         parent::gc($maxlifetime);
         
-        foreach (new \DirectoryIterator($this->path) as $entry)
-        {
+        foreach (new \DirectoryIterator($this->path) as $entry) {
             if ($entry->isFile()) {
                 if ($entry->getMTime() + $maxlifetime < time()) {
                     $this->destroy($entry->getBasename());
@@ -128,15 +111,11 @@ class NativeSessionStoragePersistence extends AbstractSessionStoragePersistence
             }
         }
 
-
         return true;
     }
 
     /**
-     * Called upon reading a session from (set by session_set_save_handler)
-     *
-     * @param string $id
-     * @return void
+     * {@inheritDoc}
      */
     public function read($id)
     {
@@ -144,9 +123,7 @@ class NativeSessionStoragePersistence extends AbstractSessionStoragePersistence
         $contents = false;
 
         if (file_exists($filename) && ($fp = @fopen($filename, "r")) !== false) {
-
-            while (!feof($fp))
-            {
+            while (!feof($fp)) {
                 $contents .= fread($fp, 8192);
             }
 

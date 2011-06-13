@@ -27,7 +27,7 @@ class SessionStoragePersisted implements SessionStorageInterface
     static protected $sessionStarted = false;
 
     /**
-     * \Symfony\Component\HttpFoundation\SessionStorage\Persistence\SessionStoragePersistenceInterface
+     * @var \Symfony\Component\HttpFoundation\SessionStorage\Persistence\SessionStoragePersistenceInterface
      */
     protected $persister;
 
@@ -36,6 +36,23 @@ class SessionStoragePersisted implements SessionStorageInterface
      */
     protected $options;
 
+
+    /**
+     * Available options:
+     *
+     *  * name:     The cookie name (_SESS by default)
+     *  * id:       The session id (null by default)
+     *  * lifetime: Cookie lifetime
+     *  * path:     Cookie path
+     *  * domain:   Cookie domain
+     *  * secure:   Cookie secure
+     *  * httponly: Cookie http only
+     *
+     * The default values for most options are those returned by the session_get_cookie_params() function
+     *
+     * @param SessionStoragePersistenceInterface An concrete implementation of SessionStoragePersistenceInterface
+     * @param array $options  An associative array of session options
+     */
     public function __construct(SessionStoragePersistenceInterface $persister, array $options)
     {
         $this->persister = $persister;
@@ -56,7 +73,7 @@ class SessionStoragePersisted implements SessionStorageInterface
     }
 
     /**
-     * Starts the session.
+     * {@inheritDoc}
      */
     public function start()
     {
@@ -99,14 +116,7 @@ class SessionStoragePersisted implements SessionStorageInterface
     }
 
     /**
-     * Reads data from this storage.
-     *
-     * The preferred format for a key is directory style so naming conflicts can be avoided.
-     *
-     * @param string $key     A unique key identifying your data
-     * @param string $default Default value
-     *
-     * @return mixed Data associated with the key
+     * {@inheritDoc}
      */
     public function read($key, $default = null)
     {
@@ -114,13 +124,7 @@ class SessionStoragePersisted implements SessionStorageInterface
     }
 
     /**
-     * Removes data from this storage.
-     *
-     * The preferred format for a key is directory style so naming conflicts can be avoided.
-     *
-     * @param  string $key  A unique key identifying your data
-     *
-     * @return mixed Data associated with the key
+     * {@inheritDoc}
      */
     public function remove($key)
     {
@@ -135,13 +139,7 @@ class SessionStoragePersisted implements SessionStorageInterface
     }
 
     /**
-     * Writes data to this storage.
-     *
-     * The preferred format for a key is directory style so naming conflicts can be avoided.
-     *
-     * @param string $key   A unique key identifying your data
-     * @param mixed  $data  Data associated with your key
-     *
+     * {@inheritDoc}
      */
     public function write($key, $data)
     {
@@ -149,12 +147,7 @@ class SessionStoragePersisted implements SessionStorageInterface
     }
 
     /**
-     * Regenerates id that represents this storage.
-     *
-     * @param  Boolean $destroy Destroy session when regenerating?
-     *
-     * @return Boolean True if session regenerated, false if error
-     *
+     * {@inheritDoc}
      */
     public function regenerate($destroy = false)
     {

@@ -292,7 +292,7 @@ class FrameworkExtension extends Extension
 
         if ($container->hasDefinition($config['storage_id'])) {
             $this->addClassesToCompile(array(
-                $container->findDefinition('session.storage')->getClass()
+                $container->findDefinition('session.storage')->getClass(),
             ));
         }
     }

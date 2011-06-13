@@ -122,7 +122,7 @@ interface SerializerInterface
 
     /**
      * Get the encoder for the given format
-     * 
+     *
      * @return EncoderInterface
      * @api
      */

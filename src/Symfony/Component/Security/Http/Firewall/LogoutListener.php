@@ -71,7 +71,7 @@ class LogoutListener implements ListenerInterface
 
         $logoutPath = str_replace('{_locale}', $request->getSession()->getLocale(), $this->logoutPath);
         $targetUrl = str_replace('{_locale}', $request->getSession()->getLocale(), $this->targetUrl);
-        
+
         if ($logoutPath !== $request->getPathInfo()) {
             return;
         }

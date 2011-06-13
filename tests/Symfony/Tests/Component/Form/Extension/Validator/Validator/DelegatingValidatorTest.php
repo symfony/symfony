@@ -432,7 +432,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
             )));
 
         $child->setData(array());
-        
+
         $this->validator->validate($parent);
 
         $this->assertFalse($parent->hasErrors(), '->hasErrors() returns false for parent form');

@@ -86,7 +86,7 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
         $entity1 = new SingleIdentEntity(1, 'Foo');
         $entity2 = new SingleIdentEntity(2, 'Bar');
 
-        // Oh yea, we're persistin' with fire now!
+        // Oh yeah, we're persisting with fire now!
         $this->em->persist($entity1);
         $this->em->persist($entity2);
 

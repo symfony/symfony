@@ -382,7 +382,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceNotContains('store');
     }
 
-    public function testCachesResponesWithExplicitNoCacheDirective()
+    public function testCachesResponsesWithExplicitNoCacheDirective()
     {
         $time = \DateTime::createFromFormat('U', time() + 5);
         $this->setNextResponse(200, array('Expires' => $time->format(DATE_RFC2822), 'Cache-Control' => 'public, no-cache'));

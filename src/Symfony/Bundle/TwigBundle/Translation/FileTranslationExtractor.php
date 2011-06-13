@@ -17,27 +17,29 @@ class FileTranslationExtractor implements TranslationExtractorInterface
      * 
      * @var array
      */
-    private $loaders;
+    private $loaders = array();
         
     /**
      * Add a loader to the translation extractor
      * @param string $format The format of the loader
      * @param LoaderInterface $loader 
      */
-    public function addLoader($format, LoaderInterface $loader){
+    public function addLoader($format, LoaderInterface $loader)
+    {
         $this->loaders[$format] = $loader;
     }
     
     /**
      * {@inheritDoc}
      */
-    public function extractMessages($directory, MessageCatalogue $catalogue) {
+    public function extractMessages($directory, MessageCatalogue $catalogue)
+    {
         foreach($this->loaders as $format => $loader) {
             // load any existing translation files
             $finder = new Finder();
-            $files = $finder->files()->name('*.' . $catalogue->getLocale() . $format)->in($directory);
+            $files = $finder->files()->name('*.'.$catalogue->getLocale().$format)->in($directory);
             foreach ($files as $file) {
-                $domain = substr($file->getFileName(), 0, strrpos($file->getFileName(), $input->getArgument('locale') . $format) - 1);
+                $domain = substr($file->getFileName(), 0, strrpos($file->getFileName(), $input->getArgument('locale').$format) - 1);
                 $catalogue->addCatalogue($loader->load($file->getPathname(), $input->getArgument('locale'), $domain));
             }
         }

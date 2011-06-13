@@ -12,14 +12,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Yaml\Yaml;
 
 class TranslationUpdateCommand extends Command
-{
-    /**
-     * Supported formats for output
-     * 
-     * @var array
-     */
-    private $supportedFormats = array('yml', 'xliff', 'php', 'pot');
-    
+{    
     /**
      * Compiled catalogue of messages
      * @var  \Symfony\Component\Translation\MessageCatalogue
@@ -43,7 +36,7 @@ class TranslationUpdateCommand extends Command
                 ),
                 new InputOption(
                     'output-format', null, InputOption::VALUE_OPTIONAL,
-                    'Override the default output format (' . implode(', ', $this->supportedFormats) . ')', 'yml'
+                    'Override the default output format', 'yml'
                 ),
                 new InputOption(
                     'source-lang', null, InputOption::VALUE_OPTIONAL,
@@ -65,13 +58,18 @@ class TranslationUpdateCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // check presence of force or dump-message
         if ($input->getOption('force') !== true && $input->getOption('dump-messages') !== true) {
             $output->writeln('<info>You must choose one of --force or --dump-messages</info>');
             return;
         }
         
-        if (!in_array($input->getOption('output-format'), $this->supportedFormats)) {
+        // check format
+        $fileWriter = $this->container->get('twig.translation.writer');
+        $supportedFormats = $fileWriter->getFormats();
+        if (!in_array($input->getOption('output-format'), $supportedFormats)) {
             $output->writeln('<error>Wrong output format</error>');
+            $output->writeln('Supported formats are '.implode(', ', $supportedFormats).'.');
             return;
         }
 
@@ -107,7 +105,6 @@ class TranslationUpdateCommand extends Command
         // save the files
         if($input->getOption('force') === true) {
             $output->writeln("Writing files");
-            $fileWriter = $this->container->get('twig.translation.writer');
             $fileWriter->writeTranslations($catalogue, $bundleTransPath, $input->getOption('output-format'));
         }
     }

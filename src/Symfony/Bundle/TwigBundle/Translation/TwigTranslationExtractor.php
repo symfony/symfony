@@ -32,14 +32,16 @@ class TwigTranslationExtractor implements TranslationExtractorInterface
      */
     private $twig;
     
-    public function __construct(Twig_Environment $twig) {
+    public function __construct(Twig_Environment $twig)
+    {
         $this->twig = $twig;
     }
     
     /**
      * {@inheritDoc}
      */
-    public function extractMessages($directory, MessageCatalogue $catalogue) {
+    public function extractMessages($directory, MessageCatalogue $catalogue)
+    {
         $finder = new Finder();
         $files = $finder->files()->name('*.html.twig')->in($directory);
         foreach ($files as $file) {
@@ -52,7 +54,8 @@ class TwigTranslationExtractor implements TranslationExtractorInterface
      * Set the prefix that should be used for new found messages
      * @param type $prefix The prefix
      */
-    public function setPrefix($prefix) {
+    public function setPrefix($prefix)
+    {
         $this->prefix = $prefix;
     }
     

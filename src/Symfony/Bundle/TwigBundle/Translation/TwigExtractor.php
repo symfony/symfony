@@ -2,22 +2,22 @@
 
 namespace Symfony\Bundle\TwigBundle\Translation;
 
+use Symfony\Bundle\FrameworkBundle\Translation\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Finder\Finder;
 use Symfony\Bridge\Twig\Node\TransNode;
 use Twig_Environment;
 
 /**
- * Extract translation messages from twig templates
+ * Extract translation messages from a twig template
  */
-class TwigTranslationExtractor implements TranslationExtractorInterface
+class TwigExtractor implements ExtractorInterface
 {
     /**
-     * Default domain for found trans blocks/filters
+     * Default domain for found messages
      *
      * @var string
      */
-    private $defaultDomain = 'messages';
+    private $defaultDomain = '';
     
     /**
      * Prefix for found message
@@ -40,19 +40,14 @@ class TwigTranslationExtractor implements TranslationExtractorInterface
     /**
      * {@inheritDoc}
      */
-    public function extractMessages($directory, MessageCatalogue $catalogue)
+    public function load($file, MessageCatalogue $catalogue)
     {
-        $finder = new Finder();
-        $files = $finder->files()->name('*.html.twig')->in($directory);
-        foreach ($files as $file) {
-            $tree = $this->twig->parse($this->twig->tokenize(file_get_contents($file->getPathname())));
-            $this->crawlNode($tree, $catalogue);
-        }
+        $tree = $this->twig->parse($this->twig->tokenize(file_get_contents($file->getPathname())));
+        $this->crawlNode($tree, $catalogue);
     }
-    
+
     /**
-     * Set the prefix that should be used for new found messages
-     * @param type $prefix The prefix
+     * {@inheritDoc}
      */
     public function setPrefix($prefix)
     {
@@ -62,9 +57,10 @@ class TwigTranslationExtractor implements TranslationExtractorInterface
     /**
      * Recursive function that extract trans message from a twig tree
      *
-     * @param \Twig_Node The twig tree root
+     * @param \Twig_Node $node The twig tree root
+     * @param MessageCatalogue $catalogue
      */
-    private function crawlNode(\Twig_Node $node, $catalogue)
+    private function crawlNode(\Twig_Node $node, MessageCatalogue $catalogue)
     {
         if ($node instanceof TransNode && !$node->getNode('body') instanceof \Twig_Node_Expression_GetAttr) {
             // trans block
@@ -130,3 +126,4 @@ class TwigTranslationExtractor implements TranslationExtractorInterface
         return $this->extractDomain($node->getNode('node'));
     }
 }
+

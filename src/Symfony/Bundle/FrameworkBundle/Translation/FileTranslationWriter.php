@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Bundle\TwigBundle\Translation;
+namespace Symfony\Bundle\FrameworkBundle\Translation;
 
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Formatter\FormatterInterface;

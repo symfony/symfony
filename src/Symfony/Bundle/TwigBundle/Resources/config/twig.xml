@@ -18,13 +18,7 @@
         <parameter key="twig.extension.form.class">Symfony\Bridge\Twig\Extension\FormExtension</parameter>
         <parameter key="twig.extension.text.class">Twig_Extensions_Extension_Text</parameter>
         <parameter key="twig.extension.debug.class">Twig_Extensions_Extension_Debug</parameter>
-        <parameter key="twig.translation.formatter.php.class">Symfony\Component\Translation\Formatter\PhpFormatter</parameter>
-        <parameter key="twig.translation.formatter.pot.class">Symfony\Component\Translation\Formatter\PotFormatter</parameter>
-        <parameter key="twig.translation.formatter.xliff.class">Symfony\Component\Translation\Formatter\XliffFormatter</parameter>
-        <parameter key="twig.translation.formatter.yml.class">Symfony\Component\Translation\Formatter\YamlFormatter</parameter>
-        <parameter key="twig.translation.extractor.class">Symfony\Bundle\TwigBundle\Translation\TwigTranslationExtractor</parameter>
-        <parameter key="twig.translation.extractor.file.class">Symfony\Bundle\TwigBundle\Translation\FileTranslationExtractor</parameter>
-        <parameter key="twig.translation.writer.class">Symfony\Bundle\TwigBundle\Translation\FileTranslationWriter</parameter>
+        <parameter key="twig.translation.extractor.class">Symfony\Bundle\TwigBundle\Translation\TwigExtractor</parameter>
     </parameters>
 
     <services>
@@ -88,28 +82,9 @@
 
         <service id="twig.extension.debug" class="%twig.extension.debug.class%" public="false" />
         
-        <service id="twig.translation.formatter.php" class="%twig.translation.formatter.php.class%">
-            <tag name="translation.formatter" alias="php" />
-        </service>
-
-        <service id="twig.translation.formatter.pot" class="%twig.translation.formatter.pot.class%">
-            <tag name="translation.formatter" alias="pot" />
-        </service>
-
-        <service id="twig.tranlsation.formatter.xliff" class="%twig.translation.formatter.xliff.class%">
-            <tag name="translation.formatter" alias="xliff" />
-        </service>
-
-        <service id="twig.translation.formatter.yml" class="%twig.translation.formatter.yml.class%">
-            <tag name="translation.formatter" alias="yml" />
-        </service>
-
         <service id="twig.translation.extractor" class="%twig.translation.extractor.class%">
             <argument type="service" id="twig" />
+            <tag name="translation.extractor" alias="twig" />
         </service>
-
-        <service id="twig.translation.extractor.file" class="%twig.translation.extractor.file.class%"/>
-
-        <service id="twig.translation.writer" class="%twig.translation.writer.class%"/>
     </services>
 </container>

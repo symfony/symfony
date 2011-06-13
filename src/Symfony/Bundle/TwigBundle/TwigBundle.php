@@ -29,7 +29,5 @@ class TwigBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new TwigEnvironmentPass());
-        $container->addCompilerPass(new TranslationExtractorPass());
-        $container->addCompilerPass(new TranslationWriterPass());
     }
 }

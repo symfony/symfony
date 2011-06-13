@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
+namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -13,11 +13,11 @@ class TranslationWriterPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('twig.translation.writer')) {
+        if (!$container->hasDefinition('translation.writer')) {
             return;
         }
 
-        $definition = $container->getDefinition('twig.translation.writer');
+        $definition = $container->getDefinition('translation.writer');
 
         foreach ($container->findTaggedServiceIds('translation.formatter') as $id => $attributes) {
             $definition->addMethodCall('addFormatter', array($attributes[0]['alias'], new Reference($id)));

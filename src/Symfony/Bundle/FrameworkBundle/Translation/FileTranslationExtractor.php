@@ -1,8 +1,7 @@
 <?php
 
-namespace Symfony\Bundle\TwigBundle\Translation;
+namespace Symfony\Bundle\FrameworkBundle\Translation;
 
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Loader\LoaderInterface;
@@ -10,7 +9,7 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
 /**
  * Extract translation messages from translation files
  */
-class FileTranslationExtractor implements TranslationExtractorInterface
+class FileTranslationExtractor
 {
     /**
      * Loaders used for import
@@ -30,7 +29,10 @@ class FileTranslationExtractor implements TranslationExtractorInterface
     }
     
     /**
-     * {@inheritDoc}
+     * Extract translation messages from a directory to the catalogue
+     * 
+     * @param string $directory the directory to look into
+     * @param MessageCatalogue $catalogue the catalogue
      */
     public function extractMessages($directory, MessageCatalogue $catalogue)
     {

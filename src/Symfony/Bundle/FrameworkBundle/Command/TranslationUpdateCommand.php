@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Bundle\TwigBundle\Command;
+namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,7 +15,7 @@ class TranslationUpdateCommand extends Command
 {
     /**
      * Compiled catalogue of messages
-     * @var  \Symfony\Component\Translation\MessageCatalogue
+     * @var MessageCatalogue
      */
     protected $catalogue;
 
@@ -25,7 +25,7 @@ class TranslationUpdateCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('twig:translation:update')
+            ->setName('translation:update')
             ->setDescription('Update the translation file')
             ->setDefinition(array(
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
@@ -65,7 +65,7 @@ class TranslationUpdateCommand extends Command
         }
         
         // check format
-        $fileWriter = $this->container->get('twig.translation.writer');
+        $fileWriter = $this->container->get('translation.writer');
         $supportedFormats = $fileWriter->getFormats();
         if (!in_array($input->getOption('output-format'), $supportedFormats)) {
             $output->writeln('<error>Wrong output format</error>');
@@ -83,13 +83,13 @@ class TranslationUpdateCommand extends Command
         
         // load any messages from templates
         $output->writeln('Parsing templates');
-        $twigExtractor = $this->container->get('twig.translation.extractor');
-        $twigExtractor->setPrefix($input->getOption('prefix'));
-        $twigExtractor->extractMessages($foundBundle->getPath() . '/Resources/views/', $catalogue);
+        $templateExtractor = $this->container->get('translation.extractor.template');
+        $templateExtractor->setPrefix($input->getOption('prefix'));
+        $templateExtractor->extractMessages($foundBundle->getPath() . '/Resources/views/', $catalogue);
         
         // load any existing messages from the translation files
         $output->writeln('Parsing translation files');
-        $fileExtractor = $this->container->get('twig.translation.extractor.file');
+        $fileExtractor = $this->container->get('translation.extractor.file');
         $fileExtractor->extractMessages($bundleTransPath, $catalogue);
         
         // show compiled list of messages
@@ -104,7 +104,7 @@ class TranslationUpdateCommand extends Command
 
         // save the files
         if($input->getOption('force') === true) {
-            $output->writeln("Writing files");
+            $output->writeln('Writing files');
             $fileWriter->writeTranslations($catalogue, $bundleTransPath, $input->getOption('output-format'));
         }
     }

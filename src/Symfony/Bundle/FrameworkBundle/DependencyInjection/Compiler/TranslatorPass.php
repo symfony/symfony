@@ -19,18 +19,19 @@ class TranslatorPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
+        $loaders = array();
+        foreach ($container->findTaggedServiceIds('translation.loader') as $id => $attributes) {
+            $loaders[$id] = $attributes[0]['alias'];
+        }
+        
         if ($container->hasDefinition('translator.real')) {
-            $loaders = array();
-            foreach ($container->findTaggedServiceIds('translation.loader') as $id => $attributes) {
-                $loaders[$id] = $attributes[0]['alias'];
-            }
             $container->findDefinition('translator.real')->replaceArgument(2, $loaders);
         }
 
         if ($container->hasDefinition('translation.loader')) {
             $definition = $container->getDefinition('translation.loader');
-            foreach ($container->findTaggedServiceIds('translation.loader') as $id => $attributes) {
-                $definition->addMethodCall('addLoader', array($attributes[0]['alias'], new Reference($id)));
+            foreach ($loaders as $id => $format) {
+                $definition->addMethodCall('addLoader', array($format, new Reference($id)));
             }
         }
     }

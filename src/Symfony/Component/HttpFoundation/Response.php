@@ -89,7 +89,6 @@ class Response
         if (!$this->headers->has('Date')) {
             $this->setDate(new \DateTime(null, new \DateTimeZone('UTC')));
         }
-        $this->charset = 'UTF-8';
     }
 
     /**
@@ -745,11 +744,12 @@ class Response
 
     protected function fixContentType()
     {
+        $charset = $this->charset ?: 'UTF-8';
         if (!$this->headers->has('Content-Type')) {
-            $this->headers->set('Content-Type', 'text/html; charset='.$this->charset);
+            $this->headers->set('Content-Type', 'text/html; charset='.$charset);
         } elseif ('text/' === substr($this->headers->get('Content-Type'), 0, 5) && false === strpos($this->headers->get('Content-Type'), 'charset')) {
             // add the charset
-            $this->headers->set('Content-Type', $this->headers->get('Content-Type').'; charset='.$this->charset);
+            $this->headers->set('Content-Type', $this->headers->get('Content-Type').'; charset='.$charset);
         }
     }
 }

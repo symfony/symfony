@@ -50,6 +50,8 @@ be the concatenation of the namespace segments (e.g. <comment>VendorHelloBundle<
 EOT
             )
             ->setName('init:bundle')
+            ->setAliases(array('bundle:init'))
+            ->setDescription('Create a new bundle')
         ;
     }
 

@@ -49,6 +49,8 @@ To create a symlink to each bundle instead of copying its assets, use the
 EOT
             )
             ->setName('assets:install')
+            ->setAliases(array('install:assets'))
+            ->setDescription('Install the bundles assets')
         ;
     }
 

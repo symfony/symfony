@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Http\Event;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class FailedLoginEvent extends Event
 {

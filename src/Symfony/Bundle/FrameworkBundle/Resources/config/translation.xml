@@ -16,9 +16,9 @@
         <parameter key="translation.formatter.xliff.class">Symfony\Component\Translation\Formatter\XliffFormatter</parameter>
         <parameter key="translation.formatter.yml.class">Symfony\Component\Translation\Formatter\YamlFormatter</parameter>
         <parameter key="translation.extractor.php.class">Symfony\Bundle\FrameworkBundle\Translation\PhpExtractor</parameter>
-        <parameter key="translation.extractor.template.class">Symfony\Bundle\FrameworkBundle\Translation\TemplateTranslationExtractor</parameter>
-        <parameter key="translation.extractor.file.class">Symfony\Bundle\FrameworkBundle\Translation\FileTranslationExtractor</parameter>
-        <parameter key="translation.writer.class">Symfony\Bundle\FrameworkBundle\Translation\FileTranslationWriter</parameter>
+        <parameter key="translation.loader.class">Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader</parameter>
+        <parameter key="translation.extractor.class">Symfony\Component\Translation\Extractor\TranslationExtractor</parameter>
+        <parameter key="translation.writer.class">Symfony\Component\Translation\Writer\TranslationWriter</parameter>
     </parameters>
 
     <services>
@@ -71,9 +71,9 @@
             <tag name="translation.extractor" alias="php" />
         </service>
         
-        <service id="translation.extractor.template" class="%translation.extractor.template.class%"/>
+        <service id="translation.loader" class="%translation.loader.class%"/>
         
-        <service id="translation.extractor.file" class="%translation.extractor.file.class%"/>
+        <service id="translation.extractor" class="%translation.extractor.class%"/>
 
         <service id="translation.writer" class="%translation.writer.class%"/>
     </services>

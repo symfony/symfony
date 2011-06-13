@@ -2,7 +2,8 @@
 
 namespace Symfony\Bundle\TwigBundle\Translation;
 
-use Symfony\Bundle\FrameworkBundle\Translation\ExtractorInterface;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Bridge\Twig\Node\TransNode;
 use Twig_Environment;
@@ -40,10 +41,15 @@ class TwigExtractor implements ExtractorInterface
     /**
      * {@inheritDoc}
      */
-    public function load($file, MessageCatalogue $catalogue)
+    public function load($directory, MessageCatalogue $catalogue)
     {
-        $tree = $this->twig->parse($this->twig->tokenize(file_get_contents($file->getPathname())));
-        $this->crawlNode($tree, $catalogue);
+        // load any existing translation files
+        $finder = new Finder();
+        $files = $finder->files()->name('*.twig')->in($directory);
+        foreach ($files as $file) {
+            $tree = $this->twig->parse($this->twig->tokenize(file_get_contents($file->getPathname())));
+            $this->crawlNode($tree, $catalogue);
+        }
     }
 
     /**

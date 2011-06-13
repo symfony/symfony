@@ -83,14 +83,14 @@ class TranslationUpdateCommand extends Command
         
         // load any messages from templates
         $output->writeln('Parsing templates');
-        $templateExtractor = $this->container->get('translation.extractor.template');
-        $templateExtractor->setPrefix($input->getOption('prefix'));
-        $templateExtractor->extractMessages($foundBundle->getPath() . '/Resources/views/', $catalogue);
+        $extractor = $this->container->get('translation.extractor');
+        $extractor->setPrefix($input->getOption('prefix'));
+        $extractor->extractMessages($foundBundle->getPath() . '/Resources/views/', $catalogue);
         
         // load any existing messages from the translation files
-        $output->writeln('Parsing translation files');
-        $fileExtractor = $this->container->get('translation.extractor.file');
-        $fileExtractor->extractMessages($bundleTransPath, $catalogue);
+        $output->writeln('Loading translation files');
+        $loader = $this->container->get('translation.loader');
+        $loader->loadMessages($bundleTransPath, $catalogue);
         
         // show compiled list of messages
         if($input->getOption('dump-messages') === true){

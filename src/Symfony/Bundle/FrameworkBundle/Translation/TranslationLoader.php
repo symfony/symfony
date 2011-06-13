@@ -7,9 +7,9 @@ use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 
 /**
- * Extract translation messages from translation files
+ * Load translation messages from translation files
  */
-class FileTranslationExtractor
+class TranslationLoader
 {
     /**
      * Loaders used for import
@@ -29,12 +29,12 @@ class FileTranslationExtractor
     }
     
     /**
-     * Extract translation messages from a directory to the catalogue
+     * Load translation messages from a directory to the catalogue
      * 
      * @param string $directory the directory to look into
      * @param MessageCatalogue $catalogue the catalogue
      */
-    public function extractMessages($directory, MessageCatalogue $catalogue)
+    public function loadMessages($directory, MessageCatalogue $catalogue)
     {
         foreach($this->loaders as $format => $loader) {
             // load any existing translation files

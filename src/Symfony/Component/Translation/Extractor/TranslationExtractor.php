@@ -1,14 +1,13 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\Translation;
+namespace Symfony\Component\Translation\Extractor;
 
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\MessageCatalogue;
 
 /**
- * Extract translation messages from translation files
+ * Extract translation messages from template files
  */
-class TemplateTranslationExtractor
+class TranslationExtractor
 {
     /**
      * Extractors
@@ -20,11 +19,11 @@ class TemplateTranslationExtractor
     /**
      * Add a loader to the translation extractor
      * @param string $format The format of the loader
-     * @param ExtractorInterface $extactor 
+     * @param ExtractorInterface $extractor 
      */
-    public function addExtractor($format, ExtractorInterface $extactor)
+    public function addExtractor($format, ExtractorInterface $extractor)
     {
-        $this->extractors[$format] = $extactor;
+        $this->extractors[$format] = $extractor;
     }
 
     /**
@@ -45,13 +44,8 @@ class TemplateTranslationExtractor
      */
     public function extractMessages($directory, MessageCatalogue $catalogue)
     {
-        foreach($this->extractors as $format => $extactor) {
-            // load any existing translation files
-            $finder = new Finder();
-            $files = $finder->files()->name('*.'.$format)->in($directory);
-            foreach ($files as $file) {
-                $extactor->load($file, $catalogue);
-            }
+        foreach ($this->extractors as $extractor) {
+            $extractor->load($directory, $catalogue);
         }
     }
 }

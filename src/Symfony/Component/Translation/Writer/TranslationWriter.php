@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\Translation;
+namespace Symfony\Component\Translation\Writer;
 
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Formatter\FormatterInterface;
@@ -8,8 +8,8 @@ use Symfony\Component\Translation\Formatter\FormatterInterface;
 /**
  * Write translation messages to translation files
  */
-class FileTranslationWriter
-{    
+class TranslationWriter
+{
     /**
      * Formatters used for export
      * 

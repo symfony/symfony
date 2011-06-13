@@ -1,20 +1,21 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\Translation;
+namespace Symfony\Component\Translation\Extractor;
 
 use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * Interface implemented by all extractors
  */
-interface ExtractorInterface {
+interface ExtractorInterface
+{
     /**
-     * Extract translation messages from a template file to the catalogue
+     * Extract translation messages from a template directory to the catalogue
      * 
-     * @param string $file the path to the template file to look into
+     * @param string $directory the path to look into
      * @param MessageCatalogue $catalogue the catalogue
      */
-    function load($file, MessageCatalogue $catalogue);
+    function load($directory, MessageCatalogue $catalogue);
     
     /**
      * Set the prefix that should be used for new found messages

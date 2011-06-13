@@ -21,8 +21,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CompilerDebugDumpPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationTemplateExtractorPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationFileExtractorPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationExtractorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationWriterPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -51,8 +50,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new FormPass());
         $container->addCompilerPass(new TranslatorPass());
         $container->addCompilerPass(new AddCacheWarmerPass());
-        $container->addCompilerPass(new TranslationTemplateExtractorPass());
-        $container->addCompilerPass(new TranslationFileExtractorPass());
+        $container->addCompilerPass(new TranslationExtractorPass());
         $container->addCompilerPass(new TranslationWriterPass());
 
         if ($container->getParameter('kernel.debug')) {

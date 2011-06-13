@@ -2,7 +2,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Translation;
 
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\Extractor\ExtractorInterface;
 
 /**
  * Extract translation messages from a php template
@@ -41,9 +43,14 @@ class PhpExtractor implements ExtractorInterface
     /**
      * {@inheritDoc}
      */
-    public function load($file, MessageCatalogue $catalog)
+    public function load($directory, MessageCatalogue $catalog)
     {
-        $this->parseTokens(token_get_all(file_get_contents($file)), $catalog);
+        // load any existing translation files
+        $finder = new Finder();
+        $files = $finder->files()->name('*.php')->in($directory);
+        foreach ($files as $file) {
+            $this->parseTokens(token_get_all(file_get_contents($file)), $catalog);
+        }
     }
     
     /**
@@ -62,8 +69,9 @@ class PhpExtractor implements ExtractorInterface
      */
     protected function normalizeToken($token)
     {
-        if(is_array($token))
+        if (is_array($token)) {
             return $token[1];
+        }
         
         return $token;
     }
@@ -83,14 +91,11 @@ class PhpExtractor implements ExtractorInterface
                 foreach ($sequence as $id => $item) {
                     if($this->normalizeToken($tokens[$key + $id]) == $item) {
                         continue;
-                    }
-                    elseif (self::MESSAGE_TOKEN == $item) {
+                    } elseif (self::MESSAGE_TOKEN == $item) {
                         $message = $this->normalizeToken($tokens[$key + $id]);
-                    }
-                    elseif (self::IGNORE_TOKEN == $item) {
+                    } elseif (self::IGNORE_TOKEN == $item) {
                         continue;
-                    }
-                    else {
+                    } else {
                         break;
                     }
                 }

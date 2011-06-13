@@ -72,16 +72,16 @@ EOF;
     private function compileRoutes(RouteCollection $routes, $supportsRedirections, $parentPrefix = null)
     {
         $code = array();
-        
+
         $routeIterator = $routes->getIterator();
         $keys = array_keys($routeIterator->getArrayCopy());
         $keysCount = count($keys);
-        
+
         $i = 0;
-        
+
         foreach ($routeIterator as $name => $route) {
             $i++;
-            
+
             if ($route instanceof RouteCollection) {
                 $prefix = $route->getPrefix();
                 $optimizable = $prefix && count($route->all()) > 1 && false === strpos($route->getPrefix(), '{');
@@ -91,7 +91,7 @@ EOF;
                         if ($keys[$j] === null) {
                           continue;
                         }
-                      
+
                         $testRoute = $routeIterator->offsetGet($keys[$j]);
                         $isCollection = ($testRoute instanceof RouteCollection);
 
@@ -99,23 +99,22 @@ EOF;
 
                         if (0 === strpos($testPrefix, $prefix)) {
                             $routeIterator->offsetUnset($keys[$j]);
-                        
+
                             if ($isCollection) {
                                 $route->addCollection($testRoute);
-                            }
-                            else {
+                            } else {
                                 $route->add($keys[$j], $testRoute);
                             }
-                        
+
                             $i++;
                             $keys[$j] = null;
                         }
                     }
-                    
+
                     $code[] = sprintf("        if (0 === strpos(\$pathinfo, '%s')) {", $prefix);
                     $indent = '    ';
                 }
-                
+
                 foreach ($this->compileRoutes($route, $supportsRedirections, $prefix) as $line) {
                     foreach (explode("\n", $line) as $l) {
                         $code[] = $indent.$l;

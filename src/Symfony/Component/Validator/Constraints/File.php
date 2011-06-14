@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-class File extends \Symfony\Component\Validator\Constraint
+use Symfony\Component\Validator\Constraint;
+
+class File extends Constraint
 {
     public $maxSize = null;
     public $mimeTypes = array();

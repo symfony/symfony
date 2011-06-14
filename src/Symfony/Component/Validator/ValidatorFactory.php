@@ -93,7 +93,7 @@ class ValidatorFactory implements ValidatorContextInterface
      * @param  string $staticMethod         The name of the static method to
      *                                      use, if static method loading should
      *                                      be enabled
-     * @throws \InvalidArgumentException    If any of the files in $mappingFiles
+     * @throws MappingException             If any of the files in $mappingFiles
      *                                      has neither the extension ".xml" nor
      *                                      ".yml" nor ".yaml"
      */

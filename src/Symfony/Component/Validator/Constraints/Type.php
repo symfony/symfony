@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-class Type extends \Symfony\Component\Validator\Constraint
+use Symfony\Component\Validator\Constraint;
+
+class Type extends Constraint
 {
     public $message = 'This value should be of type {{ type }}';
     public $type;

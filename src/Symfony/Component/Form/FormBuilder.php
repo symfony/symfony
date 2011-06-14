@@ -290,9 +290,9 @@ class FormBuilder
      *
      * @return FormBuilder The current builder
      */
-    public function addEventSubscriber(EventSubscriberInterface $subscriber, $priority = 0)
+    public function addEventSubscriber(EventSubscriberInterface $subscriber)
     {
-        $this->dispatcher->addSubscriber($subscriber, $priority);
+        $this->dispatcher->addSubscriber($subscriber);
 
         return $this;
     }

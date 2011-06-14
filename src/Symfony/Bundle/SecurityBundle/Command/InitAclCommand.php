@@ -31,6 +31,8 @@ class InitAclCommand extends Command
     {
         $this
             ->setName('init:acl')
+            ->setDescription('Initialize ACL component')
+            ->setAliases(array('acl:init'))
         ;
     }
 

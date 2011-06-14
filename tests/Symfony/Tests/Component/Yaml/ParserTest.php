@@ -20,11 +20,6 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     protected $parser;
     protected $path;
 
-    static public function setUpBeforeClass()
-    {
-        Yaml::setSpecVersion('1.1');
-    }
-
     protected function setUp()
     {
         $this->parser = new Parser();

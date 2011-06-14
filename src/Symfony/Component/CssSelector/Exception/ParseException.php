@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\CssSelector;
+namespace Symfony\Component\CssSelector\Exception;
 
 /**
  * ParseException is thrown when a CSS selector syntax is not valid.
@@ -19,6 +19,6 @@ namespace Symfony\Component\CssSelector;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ParseException extends \LogicException
+class ParseException extends \Exception
 {
 }

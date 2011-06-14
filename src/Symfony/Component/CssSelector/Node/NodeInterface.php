@@ -31,7 +31,7 @@ interface NodeInterface
     /**
      * @return XPathExpr The XPath expression
      *
-     * @throws SyntaxError When unknown operator is found
+     * @throws ParseException When unknown operator is found
      */
     function toXpath();
 }

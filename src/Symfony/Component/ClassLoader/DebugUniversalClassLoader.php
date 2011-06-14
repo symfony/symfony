@@ -55,7 +55,7 @@ class DebugUniversalClassLoader extends UniversalClassLoader
             require $file;
 
             if (!class_exists($class, false) && !interface_exists($class, false)) {
-                throw new \Exception(sprintf('The autoloader expected class "%s" to be defined in file "%s". You probably have a typo in the namespace or the class name.', $class, $file));
+                throw new \RuntimeException(sprintf('The autoloader expected class "%s" to be defined in file "%s". You probably have a typo in the namespace or the class name.', $class, $file));
             }
         }
     }

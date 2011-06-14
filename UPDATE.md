@@ -9,6 +9,36 @@ timeline closely anyway.
 beta4 to beta5
 --------------
 
+* The File classes from `HttpFoundation` have been refactored:
+
+    * `Symfony\Component\HttpFoundation\File\File` has a new API:
+
+       * It now extends `\splFileInfo`:
+
+           * former `getName()` equivalent is `getBasename()`,
+           * former `getDirectory()` equivalent is `getPath()`,
+           * former `getPath()` equivalent is `getRealPath()`.
+
+       * the `move()` method now creates the target directory when it does not exist,
+
+       * `getExtension()` and `guessExtension()` do not return the extension
+          with a leading `.` anymore
+
+    * `Symfony\Component\HttpFoundation\File\UploadedFile` has a new API:
+
+        * The constructor has a new Boolean parameter that must be set to true
+          in test mode only in order to be able to move the file. This parameter
+          is not intended to be set to true from outside of the core files.
+
+        * `getMimeType()` now always returns the mime type of the underlying file.
+           Use `getClientMimeType()` to get the mime type from the request.
+
+        * `getSize()` now always returns the size of the underlying file.
+           Use `getClientSize()` to get the file size from the request.
+
+        * Use `getClientOriginalName()` to retrieve the original name from the
+          request.
+
 * The `extensions` setting for Twig has been removed. There is now only one
   way to register Twig extensions, via the `twig.extension` tag.
 
@@ -27,9 +57,6 @@ beta4 to beta5
       the same as when the `type` was set to `file` before).
 
     * The file input is now rendered as any other input field.
-
-* The `Symfony\Component\HttpFoundation\File\File::getExtension()` and
-  `guessExtension()` methods do not return the extension with a `.` anymore.
 
 * The `em` option of the Doctrine `EntityType` class now takes the entity
   manager name instead of the EntityManager instance. If you don't pass this

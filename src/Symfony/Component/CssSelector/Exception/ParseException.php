@@ -12,13 +12,13 @@
 namespace Symfony\Component\CssSelector;
 
 /**
- * SyntaxError is thrown when a CSS selector syntax is not valid.
+ * ParseException is thrown when a CSS selector syntax is not valid.
  *
  * This component is a port of the Python lxml library,
  * which is copyright Infrae and distributed under the BSD license.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class SyntaxError extends \LogicException
+class ParseException extends \LogicException
 {
 }

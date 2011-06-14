@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Yaml;
 
+use Symfony\Component\Yaml\Exception\ParseException;
+
 /**
  * Yaml offers convenience methods to load and dump YAML.
  *
@@ -64,12 +66,14 @@ class Yaml
         $yaml = new Parser();
 
         try {
-            $ret = $yaml->parse($input);
-        } catch (\Exception $e) {
-            throw new \InvalidArgumentException(sprintf('Unable to parse %s: %s', $file ? sprintf('file "%s"', $file) : 'string', $e->getMessage()), 0, $e);
-        }
+            return $yaml->parse($input);
+        } catch (ParseException $e) {
+            if ($file) {
+                $e->setParsedFile($file);
+            }
 
-        return $ret;
+            throw $e;
+        }
     }
 
     /**

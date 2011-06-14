@@ -85,7 +85,7 @@ class DelegatingValidator implements FormValidatorInterface
      * @param FormInterface    $form    The validated form
      * @param ExecutionContext $context The current validation context
      */
-    public static function validateFormData(FormInterface $form, ExecutionContext $context)
+    static public function validateFormData(FormInterface $form, ExecutionContext $context)
     {
         if (is_object($form->getData()) || is_array($form->getData())) {
             $propertyPath = $context->getPropertyPath();

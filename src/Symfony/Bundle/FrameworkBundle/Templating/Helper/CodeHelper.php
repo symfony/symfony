@@ -215,7 +215,7 @@ class CodeHelper extends Helper
         return 'code';
     }
 
-    protected static function fixCodeMarkup($line)
+    static protected function fixCodeMarkup($line)
     {
         // </span> ending tag from previous line
         $opening = strpos($line, '<span');

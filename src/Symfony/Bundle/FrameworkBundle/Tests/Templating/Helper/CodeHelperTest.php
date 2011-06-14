@@ -17,7 +17,7 @@ class CodeHelperTest extends \PHPUnit_Framework_TestCase
 {
     protected static $helper;
 
-    public static function setUpBeforeClass()
+    static public function setUpBeforeClass()
     {
         self::$helper = new CodeHelper('format', '/root');
     }

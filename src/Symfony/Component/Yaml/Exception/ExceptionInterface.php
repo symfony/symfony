@@ -9,13 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Yaml;
+namespace Symfony\Component\Yaml\Exception;
 
 /**
- * Exception class used by all exceptions thrown by the component.
+ * Exception interface for all exceptions thrown by the component.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
-class ParserException extends Exception
+interface ExceptionInterface
 {
 }

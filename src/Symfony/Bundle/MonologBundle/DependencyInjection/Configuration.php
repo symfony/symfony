@@ -107,6 +107,26 @@ class Configuration implements ConfigurationInterface
                         ->ifTrue(function($v) { return isset($v['debug']); })
                         ->thenInvalid('The "debug" name cannot be used as it is reserved for the handler of the profiler')
                     ->end()
+                    ->setExample(array(
+                        'syslog' => array(
+                            'type' => 'stream',
+                            'path' => '/var/log/symfony.log',
+                            'level' => 'ERROR',
+                            'bubble' => 'false',
+                            'formatter' => 'my_formatter',
+                            'processors' => array('some_callable')
+                            ),
+                        'main' => array(
+                            'type' => 'fingerscrossed',
+                            'action_level' => 'WARNING',
+                            'buffer_size' => 30,
+                            'handler' => 'custom',
+                            ),
+                        'custom' => array(
+                            'type' => 'service',
+                            'id' => 'my_handler'
+                            )
+                        ))
                 ->end()
             ->end()
         ;

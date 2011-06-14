@@ -228,8 +228,8 @@ class FormExtension extends \Twig_Extension
         $types = $view->get('types');
         array_unshift($types, '_'.$view->get('proto_id', $view->get('id')));
 
-        foreach ($types as $type) {
-            $block = $type.'_'.$section;
+        foreach ($types as &$block) {
+            $block = $block.'_'.$section;
 
             if (isset($blocks[$block])) {
 
@@ -251,7 +251,7 @@ class FormExtension extends \Twig_Extension
             }
         }
 
-        throw new FormException(sprintf('Unable to render form as none of the following blocks exist: "%s".', implode('", "', $blocks)));
+        throw new FormException(sprintf('Unable to render form as none of the following blocks exist: "%s".', implode('", "', $types)));
     }
 
     /**

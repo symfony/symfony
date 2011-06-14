@@ -17,6 +17,8 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  * A RouteCollection represents a set of Route instances.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class RouteCollection implements \IteratorAggregate
 {
@@ -26,6 +28,8 @@ class RouteCollection implements \IteratorAggregate
 
     /**
      * Constructor.
+     *
+     * @api
      */
     public function __construct()
     {
@@ -46,6 +50,8 @@ class RouteCollection implements \IteratorAggregate
      * @param Route  $route A Route instance
      *
      * @throws \InvalidArgumentException When route name contains non valid characters
+     *
+     * @api
      */
     public function add($name, Route $route)
     {
@@ -105,6 +111,8 @@ class RouteCollection implements \IteratorAggregate
      *
      * @param RouteCollection $collection A RouteCollection instance
      * @param string          $prefix     An optional prefix to add before each pattern of the route collection
+     *
+     * @api
      */
     public function addCollection(RouteCollection $collection, $prefix = '')
     {
@@ -117,6 +125,8 @@ class RouteCollection implements \IteratorAggregate
      * Adds a prefix to all routes in the current set.
      *
      * @param string          $prefix     An optional prefix to add before each pattern of the route collection
+     *
+     * @api
      */
     public function addPrefix($prefix)
     {

@@ -15,6 +15,8 @@ namespace Symfony\Component\Routing;
  * Holds information about the current request.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class RequestContext
 {
@@ -35,6 +37,8 @@ class RequestContext
      * @param string  $scheme    The HTTP scheme
      * @param integer $httpPort  The HTTP port
      * @param integer $httpsPort The HTTPS port
+     *
+     * @api
      */
     public function __construct($baseUrl = '', $method = 'GET', $host = 'localhost', $scheme = 'http', $httpPort = 80, $httpsPort = 443)
     {
@@ -61,6 +65,8 @@ class RequestContext
      * Sets the base URL.
      *
      * @param string $baseUrl The base URL
+     *
+     * @api
      */
     public function setBaseUrl($baseUrl)
     {
@@ -83,6 +89,8 @@ class RequestContext
      * Sets the HTTP method.
      *
      * @param string $method The HTTP method
+     *
+     * @api
      */
     public function setMethod($method)
     {
@@ -103,6 +111,8 @@ class RequestContext
      * Sets the HTTP host.
      *
      * @param string $host The HTTP host
+     *
+     * @api
      */
     public function setHost($host)
     {
@@ -123,6 +133,8 @@ class RequestContext
      * Sets the HTTP scheme.
      *
      * @param string $scheme The HTTP scheme
+     *
+     * @api
      */
     public function setScheme($scheme)
     {
@@ -143,6 +155,8 @@ class RequestContext
      * Sets the HTTP port.
      *
      * @param string $httpPort The HTTP port
+     *
+     * @api
      */
     public function setHttpPort($httpPort)
     {
@@ -163,6 +177,8 @@ class RequestContext
      * Sets the HTTPS port.
      *
      * @param string $httpsPort The HTTPS port
+     *
+     * @api
      */
     public function setHttpsPort($httpsPort)
     {
@@ -224,6 +240,8 @@ class RequestContext
      *
      * @param string $name    A parameter name
      * @param mixed  $parameter The parameter value
+     *
+     * @api
      */
     public function setParameter($name, $parameter)
     {

@@ -15,6 +15,8 @@ namespace Symfony\Component\Routing\Matcher;
  * RedirectableUrlMatcherInterface knows how to redirect the user.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 interface RedirectableUrlMatcherInterface
 {
@@ -26,6 +28,8 @@ interface RedirectableUrlMatcherInterface
      * @param string  $scheme The URL scheme (null to keep the current one)
      *
      * @return array An array of parameters
+     *
+     * @api
      */
     function redirect($path, $route, $scheme = null);
 }

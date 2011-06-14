@@ -28,7 +28,14 @@ class TimeType extends AbstractType
      */
     public function buildForm(FormBuilder $builder, array $options)
     {
-        if ($options['widget'] === 'choice') {
+        $parts = array('hour', 'minute');
+        if ($options['with_seconds']) {
+            $parts[] = 'second';
+        }
+
+        if ($options['widget'] === 'single_text') {
+            $builder->appendClientTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], 'H:i:s'));
+        } else {
             if (is_array($options['empty_value'])) {
                 $options['empty_value'] = array_merge(array('hour' => null, 'minute' => null, 'second' => null), $options['empty_value']);
             } else {
@@ -61,11 +68,13 @@ class TimeType extends AbstractType
                     'required' => $options['required'],
                 ));
             }
-        }
 
-        $parts = array('hour', 'minute');
-        if ($options['with_seconds']) {
-            $parts[] = 'second';
+            $builder->appendClientTransformer(new DateTimeToArrayTransformer(
+                $options['data_timezone'],
+                $options['user_timezone'],
+                $parts,
+                $options['widget'] === 'text'
+            ));
         }
 
         if ($options['input'] === 'string') {
@@ -83,12 +92,6 @@ class TimeType extends AbstractType
         }
 
         $builder
-            ->appendClientTransformer(new DateTimeToArrayTransformer(
-                $options['data_timezone'],
-                $options['user_timezone'],
-                $parts,
-                $options['widget'] === 'text'
-            ))
             ->setAttribute('widget', $options['widget'])
             ->setAttribute('with_seconds', $options['with_seconds'])
         ;
@@ -139,10 +142,19 @@ class TimeType extends AbstractType
                 'array',
             ),
             'widget' => array(
+                'single_text',
                 'text',
                 'choice',
             ),
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParent(array $options)
+    {
+        return $options['widget'] === 'single_text' ? 'field' : 'form';
     }
 
     /**

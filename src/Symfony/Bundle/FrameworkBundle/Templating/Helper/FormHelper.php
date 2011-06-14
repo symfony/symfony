@@ -202,29 +202,25 @@ class FormHelper extends Helper
         }
 
         $template = null;
-        $blocks = $view->get('types');
-        array_unshift($blocks, '_'.$view->get('proto_id', $view->get('id')));
+        $types = $view->get('types');
+        $types[] = '_'.$view->get('proto_id', $view->get('id'));
 
-        foreach ($blocks as &$block) {
-            $block = $block.'_'.$section;
-            $template = $this->lookupTemplate($block);
+        for ($i = count($types) - 1; $i >= 0; $i--) {
+            $types[$i] .= '_'.$section;
+            $template = $this->lookupTemplate($types[$i]);
 
             if ($template) {
-                break;
+                $html = $this->render($view, $template, $variables);
+
+                if ($mainTemplate) {
+                    $view->setRendered();
+                }
+
+                return $html;
             }
         }
 
-        if (!$template) {
-            throw new FormException(sprintf('Unable to render form as none of the following blocks exist: "%s".', implode('", "', $blocks)));
-        }
-
-        $html = $this->render($view, $template, $variables);
-
-        if ($mainTemplate) {
-            $view->setRendered();
-        }
-
-        return $html;
+        throw new FormException(sprintf('Unable to render form as none of the following blocks exist: "%s".', implode('", "', $types)));
     }
 
     public function render(FormView $view, $template, array $variables = array())

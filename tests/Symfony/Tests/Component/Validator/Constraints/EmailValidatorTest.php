@@ -23,6 +23,11 @@ class EmailValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator = new EmailValidator();
     }
 
+    protected function tearDown()
+    {
+        $this->validator = null;
+    }
+
     public function testNullIsValid()
     {
         $this->assertTrue($this->validator->isValid(null, new Email()));
@@ -48,15 +53,9 @@ class EmailValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->validator->isValid($email, new Email()));
     }
 
-    /**
-     * @dataProvider getValidEmails
-     */
-    public function testValidEmailsAndCheckMX($email)
+    public function testValidEmailsAndCheckMX()
     {
-        $validator = new EmailValidator();
-        $validator->checkMX = true;
-
-        $this->assertTrue($validator->isValid($email, new Email()));
+        $this->assertTrue($this->validator->isValid('fabien@symfony.com', new Email(array('checkMX' => true))));
     }
 
     public function getValidEmails()

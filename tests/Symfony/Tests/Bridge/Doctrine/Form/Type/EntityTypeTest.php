@@ -67,6 +67,13 @@ class EntityTypeTest extends TypeTestCase
         }
     }
 
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->em = null;
+    }
+
     protected function getExtensions()
     {
         return array_merge(parent::getExtensions(), array(
@@ -85,23 +92,25 @@ class EntityTypeTest extends TypeTestCase
         // be managed!
     }
 
-//    public function testSetDataToUninitializedEntityWithNonRequired()
-//    {
-//        $entity1 = new SingleIdentEntity(1, 'Foo');
-//        $entity2 = new SingleIdentEntity(2, 'Bar');
-//
-//        $this->persist(array($entity1, $entity2));
-//
-//        $field = $this->factory->createNamed('entity', 'name', null, array(
-//            'em' => 'default',
-//            'class' => self::SINGLE_IDENT_CLASS,
-//            'required' => false,
-//            'property' => 'name'
-//        ));
-//
-//        $this->assertEquals(array('' => '', 1 => 'Foo', 2 => 'Bar'), $field->getRenderer()->getVar('choices'));
-//
-//    }
+    public function testSetDataToUninitializedEntityWithNonRequired()
+    {
+        $this->markTestIncomplete('Needs to be implemented');
+
+        $entity1 = new SingleIdentEntity(1, 'Foo');
+        $entity2 = new SingleIdentEntity(2, 'Bar');
+
+        $this->persist(array($entity1, $entity2));
+
+        $field = $this->factory->createNamed('entity', 'name', null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'required' => false,
+            'property' => 'name'
+        ));
+
+        $this->assertEquals(array('' => '', 1 => 'Foo', 2 => 'Bar'), $field->getRenderer()->getVar('choices'));
+
+    }
 
     /**
      * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException

@@ -23,6 +23,11 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator = new UrlValidator();
     }
 
+    protected function tearDown()
+    {
+        $this->validator = null;
+    }
+
     public function testNullIsValid()
     {
         $this->assertTrue($this->validator->isValid(null, new Url()));
@@ -54,13 +59,8 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
             array('http://a.pl'),
             array('http://www.google.com'),
             array('http://www.google.museum'),
-            array('http://google.বাংলা/'),
-            array('http://google.ąęź/'),
             array('https://google.com/'),
             array('https://google.com:80/'),
-            array('http://א-ת.com/'),
-            array('http://żółw.żółw/'),
-            array('http://àlàl.com:80/'),
             array('http://www.example.coop/'),
             array('http://www.test-example.com/'),
             array('http://www.symfony.com/'),
@@ -94,11 +94,9 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
             array('http://goog_le.com'),
             array('http://google.com::aa'),
             array('http://google.com:aa'),
-            array('http://google.foobar'),
             array('ftp://google.fr'),
             array('faked://google.fr'),
             array('http://127.0.0.1:aa/'),
-            array('http://127.0.0.1:123456/'),
             array('ftp://[::1]/'),
             array('http://[::1'),
         );

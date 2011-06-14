@@ -31,6 +31,11 @@ class SessionHelperTest extends \PHPUnit_Framework_TestCase
         $this->request->setSession($session);
     }
 
+    protected function tearDown()
+    {
+        $this->request = null;
+    }
+
     public function testFlash()
     {
         $helper = new SessionHelper($this->request);
@@ -41,6 +46,8 @@ class SessionHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $helper->getFlash('bar', 'foo'));
 
         $this->assertNull($helper->getFlash('foobar'));
+
+        $this->assertEquals(array('foo' => 'bar'), $helper->getFlashes());
     }
 
     public function testGet()
@@ -51,6 +58,13 @@ class SessionHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $helper->get('bar', 'foo'));
 
         $this->assertNull($helper->get('foo'));
+    }
+
+    public function testGetLocale()
+    {
+        $helper = new SessionHelper($this->request);
+
+        $this->assertEquals('en', $helper->getLocale());
     }
 
     public function testGetName()

@@ -22,6 +22,17 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testConstructWhenFileNotExists()
+    {
+        $this->setExpectedException('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
+
+        new UploadedFile(
+            __DIR__.'/Fixtures/not_here',
+            'original.gif',
+            null
+        );
+    }
+
     public function testFileUploadsWithNoMimeType()
     {
         $file = new UploadedFile(
@@ -133,5 +144,50 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals('original.gif', $file->getClientOriginalName());
+    }
+
+    public function testGetSize()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'original.gif',
+            'image/gif',
+            filesize(__DIR__.'/Fixtures/test.gif'),
+            null
+        );
+
+        $this->assertEquals(filesize(__DIR__.'/Fixtures/test.gif'), $file->getSize());
+
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test',
+            'original.gif',
+            'image/gif'
+        );
+
+        $this->assertEquals(filesize(__DIR__.'/Fixtures/test'), $file->getSize());
+    }
+
+    public function testGetExtension()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'original.gif',
+            null
+        );
+
+        $this->assertEquals('gif', $file->getExtension());
+    }
+
+    public function testIsValid()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'original.gif',
+            null,
+            filesize(__DIR__.'/Fixtures/test.gif'),
+            UPLOAD_ERR_OK
+        );
+
+        $this->assertTrue($file->isValid());
     }
 }

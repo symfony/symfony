@@ -12,7 +12,7 @@
 namespace Symfony\Component\CssSelector\Node;
 
 use Symfony\Component\CssSelector\XPathExpr;
-use Symfony\Component\CssSelector\SyntaxError;
+use Symfony\Component\CssSelector\Exception\ParseException;
 
 /**
  * AttribNode represents a "selector[namespace|attrib operator value]" node.
@@ -94,7 +94,7 @@ class AttribNode implements NodeInterface
             // FIXME: case sensitive?
             $path->addCondition(sprintf('contains(%s, %s)', $attrib, XPathExpr::xpathLiteral($value)));
         } else {
-            throw new SyntaxError(sprintf('Unknown operator: %s', $this->operator));
+            throw new ParseException(sprintf('Unknown operator: %s', $this->operator));
         }
 
         return $path;

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\CssSelector;
 
+use Symfony\Component\CssSelector\Exception\ParseException;
+
 /**
  * Parser is the main entry point of the component and can convert CSS
  * selectors to XPath expressions.
@@ -36,7 +38,7 @@ class Parser
      *
      * @return string
      *
-     * @throws SyntaxError When got None for xpath expression
+     * @throws ParseException When got None for xpath expression
      *
      * @api
      */
@@ -63,7 +65,7 @@ class Parser
 
         // @codeCoverageIgnoreStart
         if (!$expr) {
-            throw new SyntaxError(sprintf('Got None for xpath expression from %s.', $cssExpr));
+            throw new ParseException(sprintf('Got None for xpath expression from %s.', $cssExpr));
         }
         // @codeCoverageIgnoreEnd
 
@@ -130,7 +132,7 @@ class Parser
      * Parses a selector contained in $stream and returns the Node
      * object that represents it.
      *
-     * @throws SyntaxError When expected selector but got something else
+     * @throws ParseException When expected selector but got something else
      *
      * @param  TokenStream $stream The stream containing the selector.
      *
@@ -153,7 +155,7 @@ class Parser
             $consumed = count($stream->getUsed());
             $nextSelector = $this->parseSimpleSelector($stream);
             if ($consumed == count($stream->getUsed())) {
-                throw new SyntaxError(sprintf("Expected selector, got '%s'", $stream->peek()));
+                throw new ParseException(sprintf("Expected selector, got '%s'", $stream->peek()));
             }
 
             $result = new Node\CombinedSelectorNode($result, $combinator, $nextSelector);
@@ -166,7 +168,7 @@ class Parser
      * Parses a simple selector (the current token) from $stream and returns
      * the resulting Node object.
      *
-     * @throws SyntaxError When expected symbol but got something else
+     * @throws ParseException When expected symbol but got something else
      *
      * @param  TokenStream $stream The stream containing the selector.
      *
@@ -180,7 +182,7 @@ class Parser
         } else {
             $next = $stream->next();
             if ('*' != $next && !$next->isType('Symbol')) {
-                throw new SyntaxError(sprintf("Expected symbol, got '%s'", $next));
+                throw new ParseException(sprintf("Expected symbol, got '%s'", $next));
             }
 
             if ($stream->peek() == '|') {
@@ -188,7 +190,7 @@ class Parser
                 $stream->next();
                 $element = $stream->next();
                 if ('*' != $element && !$next->isType('Symbol')) {
-                    throw new SyntaxError(sprintf("Expected symbol, got '%s'", $next));
+                    throw new ParseException(sprintf("Expected symbol, got '%s'", $next));
                 }
             } else {
                 $namespace = '*';
@@ -223,7 +225,7 @@ class Parser
                 $result = $this->parseAttrib($result, $stream);
                 $next = $stream->next();
                 if (']' != $next) {
-                    throw new SyntaxError(sprintf("] expected, got '%s'", $next));
+                    throw new ParseException(sprintf("] expected, got '%s'", $next));
                 }
 
                 continue;
@@ -231,7 +233,7 @@ class Parser
                 $type = $stream->next();
                 $ident = $stream->next();
                 if (!$ident || !$ident->isType('Symbol')) {
-                    throw new SyntaxError(sprintf("Expected symbol, got '%s'", $ident));
+                    throw new ParseException(sprintf("Expected symbol, got '%s'", $ident));
                 }
 
                 if ($stream->peek() == '(') {
@@ -247,7 +249,7 @@ class Parser
                     }
                     $next = $stream->next();
                     if (')' != $next) {
-                        throw new SyntaxError(sprintf("Expected ')', got '%s' and '%s'", $next, $selector));
+                        throw new ParseException(sprintf("Expected ')', got '%s' and '%s'", $next, $selector));
                     }
 
                     $result = new Node\FunctionNode($result, $type, $ident, $selector);
@@ -273,7 +275,7 @@ class Parser
      * Parses an attribute from a selector contained in $stream and returns
      * the resulting AttribNode object.
      *
-     * @throws SyntaxError When encountered unexpected selector
+     * @throws ParseException When encountered unexpected selector
      *
      * @param  Node\NodeInterface $selector The selector object whose attribute
      *                                      is to be parsed.
@@ -298,12 +300,12 @@ class Parser
 
         $op = $stream->next();
         if (!in_array($op, array('^=', '$=', '*=', '=', '~=', '|=', '!='))) {
-            throw new SyntaxError(sprintf("Operator expected, got '%s'", $op));
+            throw new ParseException(sprintf("Operator expected, got '%s'", $op));
         }
 
         $value = $stream->next();
         if (!$value->isType('Symbol') && !$value->isType('String')) {
-            throw new SyntaxError(sprintf("Expected string or symbol, got '%s'", $value));
+            throw new ParseException(sprintf("Expected string or symbol, got '%s'", $value));
         }
 
         return new Node\AttribNode($selector, $namespace, $attrib, $op, $value);

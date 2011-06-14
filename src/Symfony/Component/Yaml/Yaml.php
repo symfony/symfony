@@ -68,7 +68,7 @@ class Yaml
      *
      * @api
      */
-    public static function load($input)
+    static public function load($input)
     {
         $file = '';
 
@@ -113,7 +113,7 @@ class Yaml
      *
      * @api
      */
-    public static function dump($array, $inline = 2)
+    static public function dump($array, $inline = 2)
     {
         $yaml = new Dumper();
 

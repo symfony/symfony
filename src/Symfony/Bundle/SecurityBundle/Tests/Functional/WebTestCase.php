@@ -16,7 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 
 class WebTestCase extends BaseWebTestCase
 {
-    public static function assertRedirect($response, $location)
+    static public function assertRedirect($response, $location)
     {
         self::assertTrue($response->isRedirect());
         self::assertEquals('http://localhost'.$location, $response->headers->get('Location'));

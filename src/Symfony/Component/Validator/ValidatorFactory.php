@@ -97,7 +97,7 @@ class ValidatorFactory implements ValidatorContextInterface
      *                                      has neither the extension ".xml" nor
      *                                      ".yml" nor ".yaml"
      */
-    public static function buildDefault(array $mappingFiles = array(), $annotations = true, $staticMethod = null)
+    static public function buildDefault(array $mappingFiles = array(), $annotations = true, $staticMethod = null)
     {
         $xmlMappingFiles = array();
         $yamlMappingFiles = array();

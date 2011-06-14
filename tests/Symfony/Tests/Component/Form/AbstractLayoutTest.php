@@ -371,7 +371,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '/select
     [@name="na&me"]
     [
-        ./option[@value=""][.=""]
+        ./option[@value=""][.="[trans][/trans]"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="Choice&A"]
         /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
     ]
@@ -394,7 +394,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '/select
     [@name="na&me"]
     [
-        ./option[@value=""][.=""]
+        ./option[@value=""][.="[trans][/trans]"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="Choice&A"]
         /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
     ]

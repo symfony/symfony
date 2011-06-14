@@ -134,7 +134,7 @@
     {% else %}
     <select {{ block('attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
         {% if not multiple and empty_value is not none %}
-            <option value="">{{ empty_value }}</option>
+            <option value="">{{ empty_value|trans }}</option>
         {% endif %}
         {% if preferred_choices|length > 0 %}
             {% set options = preferred_choices %}

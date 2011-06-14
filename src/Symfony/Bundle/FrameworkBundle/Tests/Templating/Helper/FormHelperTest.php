@@ -46,6 +46,11 @@ class FormHelperTest extends AbstractDivLayoutTest
         ));
     }
 
+    protected function tearDown()
+    {
+        $this->helper = null;
+    }
+
     protected function renderEnctype(FormView $view)
     {
         return (string)$this->helper->enctype($view);

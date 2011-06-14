@@ -33,6 +33,12 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->listener = new TestEventListener();
     }
 
+    protected function tearDown()
+    {
+        $this->dispatcher = null;
+        $this->listener = null;
+    }
+
     public function testInitialState()
     {
         $this->assertEquals(array(), $this->dispatcher->getListeners());

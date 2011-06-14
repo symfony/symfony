@@ -36,6 +36,12 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator = new Validator($this->factory, new ConstraintValidatorFactory());
     }
 
+    protected function tearDown()
+    {
+        $this->factory = null;
+        $this->validator = null;
+    }
+
     public function testValidate_defaultGroup()
     {
         $entity = new Entity();

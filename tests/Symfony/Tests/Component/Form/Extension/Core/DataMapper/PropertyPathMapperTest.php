@@ -29,6 +29,12 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
             ->getMock();
     }
 
+    protected function tearDown()
+    {
+        $this->mapper = null;
+        $this->propertyPath = null;
+    }
+
     private function getForm(PropertyPath $propertyPath = null)
     {
         $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');

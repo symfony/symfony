@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormBuilder;
 
 class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 {
+    private $dispatcher;
     private $factory;
     private $form;
 
@@ -26,6 +27,13 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
         $this->form = $this->getForm();
+    }
+
+    protected function tearDown()
+    {
+        $this->dispatcher = null;
+        $this->factory = null;
+        $this->form = null;
     }
 
     protected function getBuilder($name = 'name')

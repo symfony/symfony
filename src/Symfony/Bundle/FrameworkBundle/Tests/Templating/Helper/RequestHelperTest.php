@@ -24,6 +24,11 @@ class RequestHelperTest extends \PHPUnit_Framework_TestCase
         $this->request->initialize(array('foobar' => 'bar'));
     }
 
+    protected function tearDown()
+    {
+        $this->request = null;
+    }
+
     public function testGetParameter()
     {
         $helper = new RequestHelper($this->request);

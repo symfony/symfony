@@ -32,6 +32,8 @@ class GeneratorTest extends TestCase
     {
         $filesystem = new Filesystem();
         $filesystem->remove($this->dir);
+
+        $this->dir = null;
     }
 
     public function testRenderString()

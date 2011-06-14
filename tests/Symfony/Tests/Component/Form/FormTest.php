@@ -43,6 +43,13 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->form = $this->getBuilder()->getForm();
     }
 
+    protected function tearDown()
+    {
+        $this->dispatcher = null;
+        $this->factory = null;
+        $this->form = null;
+    }
+
     /**
      * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
      */

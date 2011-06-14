@@ -39,6 +39,11 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->initialize($context);
     }
 
+    protected function tearDown()
+    {
+        $this->validator = null;
+    }
+
     public function testExpectArrayIfMultipleIsTrue()
     {
         $constraint = new Choice(array(

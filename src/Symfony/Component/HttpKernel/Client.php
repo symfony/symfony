@@ -121,7 +121,14 @@ EOF;
                 $filtered[$key] = $this->filterFiles($value);
             } elseif ($value instanceof UploadedFile) {
                 // Create a test mode UploadedFile
-                $filtered[$key] = new UploadedFile($value->getPath(), $value->getName(), $value->getMimeType(), $value->getSize(), $value->getError(), true);
+                $filtered[$key] = new UploadedFile(
+                    $value->getPathname(),
+                    $value->getClientOriginalName(),
+                    $value->getClientMimeType(),
+                    $value->getClientSize(),
+                    $value->getError(),
+                    true
+                );
             } else {
                 $filtered[$key] = $value;
             }

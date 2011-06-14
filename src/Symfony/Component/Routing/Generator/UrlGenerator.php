@@ -22,6 +22,8 @@ use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
  * UrlGenerator generates URL based on a set of routes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class UrlGenerator implements UrlGeneratorInterface
 {
@@ -35,6 +37,8 @@ class UrlGenerator implements UrlGeneratorInterface
      *
      * @param RouteCollection $routes  A RouteCollection instance
      * @param RequestContext  $context The context
+     *
+     * @api
      */
     public function __construct(RouteCollection $routes, RequestContext $context)
     {
@@ -47,6 +51,8 @@ class UrlGenerator implements UrlGeneratorInterface
      * Sets the request context.
      *
      * @param RequestContext $context The context
+     *
+     * @api
      */
     public function setContext(RequestContext $context)
     {
@@ -73,6 +79,8 @@ class UrlGenerator implements UrlGeneratorInterface
      * @return string The generated URL
      *
      * @throws Symfony\Component\Routing\Exception\RouteNotFoundException When route doesn't exist
+     *
+     * @api
      */
     public function generate($name, array $parameters = array(), $absolute = false)
     {

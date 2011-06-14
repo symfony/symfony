@@ -21,6 +21,8 @@ use Symfony\Component\Routing\RequestContext;
  * UrlMatcher matches URL based on a set of routes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class UrlMatcher implements UrlMatcherInterface
 {
@@ -33,6 +35,8 @@ class UrlMatcher implements UrlMatcherInterface
      *
      * @param RouteCollection $routes  A RouteCollection instance
      * @param RequestContext  $context The context
+     *
+     * @api
      */
     public function __construct(RouteCollection $routes, RequestContext $context)
     {
@@ -44,6 +48,8 @@ class UrlMatcher implements UrlMatcherInterface
      * Sets the request context.
      *
      * @param RequestContext $context The context
+     *
+     * @api
      */
     public function setContext(RequestContext $context)
     {
@@ -69,6 +75,8 @@ class UrlMatcher implements UrlMatcherInterface
      *
      * @throws ResourceNotFoundException If the resource could not be found
      * @throws MethodNotAllowedException If the resource was found but the request method is not allowed
+     *
+     * @api
      */
     public function match($pathinfo)
     {

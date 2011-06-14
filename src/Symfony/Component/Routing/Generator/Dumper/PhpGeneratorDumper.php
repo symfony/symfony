@@ -17,6 +17,8 @@ use Symfony\Component\Routing\Route;
  * PhpGeneratorDumper creates a PHP class able to generate URLs for a given set of routes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class PhpGeneratorDumper extends GeneratorDumper
 {
@@ -31,6 +33,8 @@ class PhpGeneratorDumper extends GeneratorDumper
      * @param  array  $options An array of options
      *
      * @return string A PHP class representing the generator class
+     *
+     * @api
      */
     public function dump(array $options = array())
     {

@@ -21,6 +21,8 @@ use Symfony\Component\Config\Loader\FileLoader;
  * YamlFileLoader loads Yaml routing files.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class YamlFileLoader extends FileLoader
 {
@@ -37,6 +39,8 @@ class YamlFileLoader extends FileLoader
      * @return RouteCollection A RouteCollection instance
      *
      * @throws \InvalidArgumentException When route can't be parsed
+     *
+     * @api
      */
     public function load($file, $type = null)
     {
@@ -80,6 +84,8 @@ class YamlFileLoader extends FileLoader
      * @param string $type     The resource type
      *
      * @return Boolean True if this class supports the given resource, false otherwise
+     *
+     * @api
      */
     public function supports($resource, $type = null)
     {

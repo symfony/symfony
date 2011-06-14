@@ -31,8 +31,18 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session = $this->getSession();
     }
 
+    protected function tearDown()
+    {
+        $this->storage = null;
+        $this->session = null;
+    }
+
     public function testFlash()
     {
+        $this->session->clearFlashes();
+
+        $this->assertSame(array(), $this->session->getFlashes());
+
         $this->assertFalse($this->session->hasFlash('foo'));
 
         $this->session->setFlash('foo', 'bar');
@@ -46,14 +56,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $flashes = array('foo' => 'bar', 'bar' => 'foo');
 
-        $this->session = $this->getSession();
         $this->session->setFlashes($flashes);
 
         $this->assertSame($flashes, $this->session->getFlashes());
-
-        $this->session->clearFlashes();
-
-        $this->assertSame(array(), $this->session->getFlashes());
     }
 
     public function testFlashesAreFlushedWhenNeeded()
@@ -194,6 +199,30 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(array(), $this->session->getFlashes());
         $this->assertSame(array(), $this->session->getAttributes());
+    }
+
+    public function testStorageRegenerate()
+    {
+        $this->storage->write('foo', 'bar');
+
+        $this->assertTrue($this->storage->regenerate());
+
+        $this->assertEquals('bar', $this->storage->read('foo'));
+
+        $this->assertTrue($this->storage->regenerate(true));
+
+        $this->assertNull($this->storage->read('foo'));
+    }
+
+    public function testStorageRemove()
+    {
+        $this->storage->write('foo', 'bar');
+
+        $this->assertEquals('bar', $this->storage->read('foo'));
+
+        $this->storage->remove('foo');
+
+        $this->assertNull($this->storage->read('foo'));
     }
 
     protected function getSession()

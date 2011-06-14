@@ -26,6 +26,13 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         $this->context = new ExecutionContext('Root', $this->walker, $this->metadataFactory);
     }
 
+    protected function tearDown()
+    {
+        $this->walker = null;
+        $this->metadataFactory = null;
+        $this->context = null;
+    }
+
     public function testClone()
     {
         $clone = clone $this->context;
@@ -45,8 +52,60 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
     {
         $this->context->addViolation('', array(), '');
 
-        $this->assertEquals(1, count($this->context->getViolations()));
-        $this->assertInstanceOf('Symfony\Component\Validator\ConstraintViolationList', $this->context->getViolations());
+        $violations = $this->context->getViolations();
+
+        $this->assertEquals(1, count($violations));
+        $this->assertInstanceOf('Symfony\Component\Validator\ConstraintViolationList', $violations);
+
+        $this->assertInstanceOf('ArrayIterator', $violations->getIterator());
+
+        $this->assertTrue(isset($violations[0]));
+        $this->assertFalse(isset($violations[1]));
+
+        $violations[] = 'fake';
+        $this->assertEquals('fake', $violations[1]);
+        $this->assertTrue(isset($violations[1]));
+
+        unset($violations[1]);
+        $this->assertFalse(isset($violations[1]));
+
+        $violations[0] = 'fake';
+        $this->assertEquals('fake', $violations[0]);
+    }
+
+    public function testViolationsMerge()
+    {
+        $this->context->addViolation('Message 1', array(), '');
+        $this->context->addViolation('Message 2', array(), '');
+
+        $violations1 = $this->context->getViolations();
+
+        $this->context->addViolation('', array(), '');
+
+        $violations2 = $this->context->getViolations();
+        unset($violations2[1]);
+
+        $violations1->addAll($violations2);
+
+        $this->assertEmpty($violations1[2]->getMessage());
+    }
+
+    public function testViolationsAsString()
+    {
+        $this->context->addViolation('Message 1', array(), '');
+        $this->context->addViolation('Message 2', array(), '');
+
+        $violations = $this->context->getViolations();
+
+        $expected = <<<EOF
+Root.:
+    Message 1
+Root.:
+    Message 2
+
+EOF;
+
+        $this->assertEquals($expected, $violations->__toString());
     }
 
     public function testGetRoot()

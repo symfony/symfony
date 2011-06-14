@@ -12,7 +12,7 @@
         <?php if ($read_only): ?> disabled="disabled"<?php endif ?>
         <?php if ($multiple): ?> multiple="multiple"<?php endif ?>
     >
-        <?php if (!$multiple && !$required): ?><option value=""><?php echo $empty_value; ?></option><?php endif; ?>
+        <?php if (!$multiple && null !== $empty_value): ?><option value=""><?php echo $empty_value; ?></option><?php endif; ?>
         <?php if (count($preferred_choices) > 0): ?>
             <?php foreach ($preferred_choices as $choice => $label): ?>
                 <?php if ($view['form']->isChoiceGroup($label)): ?>

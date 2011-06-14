@@ -133,7 +133,7 @@
         </div>
     {% else %}
     <select {{ block('attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
-        {% if not multiple and not required %}
+        {% if not multiple and empty_value is not none %}
             <option value="">{{ empty_value }}</option>
         {% endif %}
         {% if preferred_choices|length > 0 %}

@@ -29,5 +29,5 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      *
      * @return Client A Client instance
      */
-    abstract public function createClient(array $options = array(), array $server = array());
+    abstract static protected function createClient(array $options = array(), array $server = array());
 }

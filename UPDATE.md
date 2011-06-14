@@ -9,6 +9,9 @@ timeline closely anyway.
 beta4 to beta5
 --------------
 
+* The `$kernel` property on `WebTestCase` is now static. Change any instances
+  of `$this->kernel` in your functional tests to `self::$kernel`.
+
 * The `extensions` setting for Twig has been removed. There is now only one
   way to register Twig extensions, via the `twig.extension` tag.
 

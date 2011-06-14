@@ -380,6 +380,29 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testSingleChoiceRequiredWithEmptyValue()
+    {
+        $form = $this->factory->createNamed('choice', 'na&me', '&a', array(
+            'property_path' => 'name',
+            'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
+            'required' => true,
+            'multiple' => false,
+            'expanded' => false,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array('empty_value' => ''),
+'/select
+    [@name="na&me"]
+    [
+        ./option[@value=""][.=""]
+        /following-sibling::option[@value="&a"][@selected="selected"][.="Choice&A"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
+    ]
+    [count(./option)=3]
+'
+        );
+    }
+
     public function testSingleChoiceGrouped()
     {
         $form = $this->factory->createNamed('choice', 'na&me', '&a', array(

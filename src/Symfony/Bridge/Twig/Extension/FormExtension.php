@@ -226,7 +226,7 @@ class FormExtension extends \Twig_Extension
 
         $blocks = $this->getBlocks($view);
         $types = $view->get('types');
-        array_unshift($types, '_'.$view->get('id'));
+        array_unshift($types, '_'.$view->get('proto_id', $view->get('id')));
 
         foreach ($types as $type) {
             $block = $type.'_'.$section;

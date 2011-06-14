@@ -26,7 +26,7 @@ class Inline
      *
      * @return array A PHP array representing the YAML string
      */
-    static public function load($value)
+    static public function parse($value)
     {
         $value = trim($value);
 

@@ -228,7 +228,7 @@ class YamlFileLoader extends FileLoader
      */
     private function loadFile($file)
     {
-        return $this->validate(Yaml::load($file), $file);
+        return $this->validate(Yaml::parse($file), $file);
     }
 
     /**

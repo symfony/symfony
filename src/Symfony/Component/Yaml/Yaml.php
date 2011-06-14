@@ -49,14 +49,14 @@ class Yaml
     }
 
     /**
-     * Loads YAML into a PHP array.
+     * Parses YAML into a PHP array.
      *
-     * The load method, when supplied with a YAML stream (string or file),
+     * The parse method, when supplied with a YAML stream (string or file),
      * will do its best to convert YAML in a file into a PHP array.
      *
      *  Usage:
      *  <code>
-     *   $array = Yaml::load('config.yml');
+     *   $array = Yaml::parse('config.yml');
      *   print_r($array);
      *  </code>
      *
@@ -68,7 +68,7 @@ class Yaml
      *
      * @api
      */
-    static public function load($input)
+    static public function parse($input)
     {
         $file = '';
 

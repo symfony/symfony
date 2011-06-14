@@ -46,7 +46,7 @@ class YamlFileLoader extends FileLoader
     {
         $path = $this->locator->locate($file);
 
-        $config = Yaml::load($path);
+        $config = Yaml::parse($path);
 
         $collection = new RouteCollection();
         $collection->addResource(new FileResource($path));

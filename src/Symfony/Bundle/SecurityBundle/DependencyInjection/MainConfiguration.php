@@ -57,8 +57,8 @@ class MainConfiguration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('access_denied_url')->defaultNull()->end()
-                ->scalarNode('session_fixation_strategy')->cannotBeEmpty()->defaultValue('migrate')->end()
+                ->scalarNode('access_denied_url')->defaultNull()->setExample('/foo/error403')->end()
+                ->scalarNode('session_fixation_strategy')->cannotBeEmpty()->setInfo('strategy can be: none, migrate, invalidate')->defaultValue('migrate')->end()
                 ->booleanNode('hide_user_not_found')->defaultTrue()->end()
                 ->booleanNode('always_authenticate_before_granting')->defaultFalse()->end()
                 ->booleanNode('erase_credentials')->defaultTrue()->end()
@@ -72,7 +72,7 @@ class MainConfiguration implements ConfigurationInterface
                 ->end()
             ->end()
         ;
-
+        
         $this->addAclSection($rootNode);
         $this->addEncodersSection($rootNode);
         $this->addProvidersSection($rootNode);
@@ -89,7 +89,7 @@ class MainConfiguration implements ConfigurationInterface
             ->children()
                 ->arrayNode('acl')
                     ->children()
-                        ->scalarNode('connection')->end()
+                        ->scalarNode('connection')->setInfo('any name configured in doctrine.dbal section')->end()
                         ->arrayNode('cache')
                             ->addDefaultsIfNotSet()
                             ->children()
@@ -290,6 +290,16 @@ class MainConfiguration implements ConfigurationInterface
             ->fixXmlConfig('provider')
             ->children()
                 ->arrayNode('providers')
+                    ->setExample(array(
+                        'memory' => array(
+                            'name' => 'memory',
+                            'users' => array(
+                                'foo' => array('password' => 'foo', 'roles' => 'ROLE_USER'),
+                                'bar' => array('password' => 'bar', 'roles' => '[ROLE_USER, ROLE_ADMIN]')
+                            )
+                        ),
+                        'entity' => array('entity' => array('class' => 'SecurityBundle:User', 'property' => 'username'))
+                    ))
                     ->disallowNewKeysInSubsequentConfigs()
                     ->isRequired()
                     ->requiresAtLeastOneElement()
@@ -340,6 +350,14 @@ class MainConfiguration implements ConfigurationInterface
             ->fixXmlConfig('encoder')
             ->children()
                 ->arrayNode('encoders')
+                    ->setExample(array(
+                        'Acme\DemoBundle\Entity\User1' => 'sha512',
+                        'Acme\DemoBundle\Entity\User2' => array(
+                            'algorithm' => 'sha512',
+                            'encode_as_base64' => 'true',
+                            'iterations'=> 5000
+                        )
+                    ))
                     ->requiresAtLeastOneElement()
                     ->useAttributeAsKey('class')
                     ->prototype('array')

@@ -18,7 +18,6 @@ use Symfony\Component\Yaml\Exception\ParseException;
 class ParserTest extends \PHPUnit_Framework_TestCase
 {
     protected $parser;
-    protected $path;
 
     protected function setUp()
     {
@@ -66,20 +65,6 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         }
 
         return $tests;
-    }
-
-    public function testValidSpecification()
-    {
-        Yaml::setSpecVersion('1.1');
-
-        $this->assertEquals('1.1', Yaml::getSpecVersion());
-    }
-
-    public function testInvalidSpecification()
-    {
-        $this->setExpectedException('\InvalidArgumentException');
-
-        Yaml::setSpecVersion('0.1');
     }
 
     public function testTabsInYaml()

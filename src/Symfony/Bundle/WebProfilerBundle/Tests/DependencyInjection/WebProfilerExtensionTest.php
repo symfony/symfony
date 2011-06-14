@@ -73,6 +73,14 @@ class WebProfilerExtensionTest extends TestCase
         $this->container->set('kernel', $this->kernel);
     }
 
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->container = null;
+        $this->kernel = null;
+    }
+
     /**
      * @dataProvider getDebugModes
      */

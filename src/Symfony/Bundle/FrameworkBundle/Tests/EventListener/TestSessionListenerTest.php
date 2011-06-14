@@ -35,6 +35,12 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
         $this->session  = $this->getSession();
     }
 
+    protected function tearDown()
+    {
+        $this->listener = null;
+        $this->session = null;
+    }
+
     public function testShouldSaveMasterRequestSession()
     {
         $this->sessionMustBeSaved();

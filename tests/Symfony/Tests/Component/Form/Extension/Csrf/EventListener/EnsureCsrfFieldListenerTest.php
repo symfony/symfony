@@ -18,6 +18,8 @@ class EnsureCsrfFieldListenerTest extends \PHPUnit_Framework_TestCase
 {
     private $form;
     private $formFactory;
+    private $field;
+    private $event;
 
     protected function setUp()
     {
@@ -25,6 +27,14 @@ class EnsureCsrfFieldListenerTest extends \PHPUnit_Framework_TestCase
         $this->form = $this->getMock('Symfony\\Tests\\Component\\Form\\FormInterface');
         $this->field = $this->getMock('Symfony\\Tests\\Component\\Form\\FormInterface');
         $this->event = new DataEvent($this->form, array());
+    }
+
+    protected function tearDown()
+    {
+        $this->form = null;
+        $this->formFactory = null;
+        $this->field = null;
+        $this->event = null;
     }
 
     public function testAddField()

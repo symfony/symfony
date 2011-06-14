@@ -33,6 +33,14 @@ abstract class TypeTestCase extends \PHPUnit_Framework_TestCase
         $this->builder = new FormBuilder(null, $this->factory, $this->dispatcher);
     }
 
+    protected function tearDown()
+    {
+        $this->builder = null;
+        $this->dispatcher = null;
+        $this->factory = null;
+        $this->typeLoader = null;
+    }
+
     protected function getExtensions()
     {
         return array(

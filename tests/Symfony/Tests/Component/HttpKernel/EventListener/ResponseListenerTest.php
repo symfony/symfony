@@ -34,6 +34,13 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
         $this->kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
 
     }
+
+    protected function tearDown()
+    {
+        $this->dispatcher = null;
+        $this->kernel = null;
+    }
+
     public function testFilterDoesNothingForSubRequests()
     {
         $response = new Response('foo');

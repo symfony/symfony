@@ -31,6 +31,12 @@ class CommandTesterTest extends \PHPUnit_Framework_TestCase
         $this->tester->execute(array('foo' => 'bar'), array('interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE));
     }
 
+    protected function tearDown()
+    {
+        $this->command = null;
+        $this->tester = null;
+    }
+
     public function testExecute()
     {
         $this->assertFalse($this->tester->getInput()->isInteractive(), '->execute() takes an interactive option');

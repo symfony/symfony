@@ -23,6 +23,11 @@ class DateValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator = new DateValidator();
     }
 
+    protected function tearDown()
+    {
+        $this->validator = null;
+    }
+
     public function testNullIsValid()
     {
         $this->assertTrue($this->validator->isValid(null, new Date()));

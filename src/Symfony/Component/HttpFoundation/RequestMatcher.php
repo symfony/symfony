@@ -70,13 +70,7 @@ class RequestMatcher implements RequestMatcherInterface
      */
     public function matchMethod($method)
     {
-        $this->methods = array_map(
-            function ($m)
-            {
-                return strtolower($m);
-            },
-            is_array($method) ? $method : array($method)
-        );
+        $this->methods = array_map('strtolower', is_array($method) ? $method : array($method));
     }
 
     /**

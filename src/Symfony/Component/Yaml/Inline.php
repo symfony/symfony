@@ -68,9 +68,6 @@ class Inline
      */
     static public function dump($value)
     {
-        $trueValues = '1.1' == Yaml::getSpecVersion() ? array('true', 'on', '+', 'yes', 'y') : array('true');
-        $falseValues = '1.1' == Yaml::getSpecVersion() ? array('false', 'off', '-', 'no', 'n') : array('false');
-
         switch (true) {
             case is_resource($value):
                 throw new Exception('Unable to dump PHP resources in a YAML file.');
@@ -95,12 +92,7 @@ class Inline
             case '' == $value:
                 return "''";
             case preg_match(self::getTimestampRegex(), $value):
-                return "'$value'";
-            case in_array(strtolower($value), $trueValues):
-                return "'$value'";
-            case in_array(strtolower($value), $falseValues):
-                return "'$value'";
-            case in_array(strtolower($value), array('null', '~')):
+            case in_array(strtolower($value), array('null', '~', 'true', 'false')):
                 return "'$value'";
             default:
                 return $value;
@@ -340,9 +332,6 @@ class Inline
     {
         $scalar = trim($scalar);
 
-        $trueValues = '1.1' == Yaml::getSpecVersion() ? array('true', 'on', '+', 'yes', 'y') : array('true');
-        $falseValues = '1.1' == Yaml::getSpecVersion() ? array('false', 'off', '-', 'no', 'n') : array('false');
-
         switch (true) {
             case 'null' == strtolower($scalar):
             case '' == $scalar:
@@ -359,9 +348,9 @@ class Inline
                 $cast = intval($scalar);
 
                 return '0' == $scalar[0] ? octdec($scalar) : (((string) $raw == (string) $cast) ? $cast : $raw);
-            case in_array(strtolower($scalar), $trueValues):
+            case 'true' === strtolower($scalar):
                 return true;
-            case in_array(strtolower($scalar), $falseValues):
+            case 'false' === strtolower($scalar):
                 return false;
             case is_numeric($scalar):
                 return '0x' == $scalar[0].$scalar[1] ? hexdec($scalar) : floatval($scalar);

@@ -16,11 +16,6 @@ use Symfony\Component\Yaml\Inline;
 
 class InlineTest extends \PHPUnit_Framework_TestCase
 {
-    static public function setUpBeforeClass()
-    {
-        Yaml::setSpecVersion('1.1');
-    }
-
     public function testParse()
     {
         foreach ($this->getTestsForParse() as $yaml => $value) {

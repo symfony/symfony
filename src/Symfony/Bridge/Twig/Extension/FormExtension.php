@@ -226,12 +226,12 @@ class FormExtension extends \Twig_Extension
 
         $blocks = $this->getBlocks($view);
         $types = $view->get('types');
-        array_unshift($types, '_'.$view->get('proto_id', $view->get('id')));
+        $types[] = '_'.$view->get('proto_id', $view->get('id'));
 
-        foreach ($types as &$block) {
-            $block = $block.'_'.$section;
+        for ($i = count($types) - 1; $i >= 0; $i--) {
+            $types[$i] .= '_'.$section;
 
-            if (isset($blocks[$block])) {
+            if (isset($blocks[$types[$i]])) {
 
                 $this->varStack[$view] = array_replace(
                     $view->all(),
@@ -239,7 +239,7 @@ class FormExtension extends \Twig_Extension
                     $variables
                 );
 
-                $html = $this->template->renderBlock($block, $this->varStack[$view], $blocks);
+                $html = $this->template->renderBlock($types[$i], $this->varStack[$view], $blocks);
 
                 if ($mainTemplate) {
                     $view->setRendered();

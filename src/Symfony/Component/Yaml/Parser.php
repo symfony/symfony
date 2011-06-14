@@ -168,7 +168,7 @@ class Parser
             } else {
                 // 1-liner followed by newline
                 if (2 == count($this->lines) && empty($this->lines[1])) {
-                    $value = Inline::load($this->lines[0]);
+                    $value = Inline::parse($this->lines[0]);
                     if (is_array($value)) {
                         $first = reset($value);
                         if (is_string($first) && '*' === substr($first, 0, 1)) {
@@ -350,7 +350,7 @@ class Parser
             return $this->parseFoldedScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), intval(abs($modifiers)));
         }
 
-        return Inline::load($value);
+        return Inline::parse($value);
     }
 
     /**

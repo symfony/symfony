@@ -21,10 +21,10 @@ class InlineTest extends \PHPUnit_Framework_TestCase
         Yaml::setSpecVersion('1.1');
     }
 
-    public function testLoad()
+    public function testParse()
     {
-        foreach ($this->getTestsForLoad() as $yaml => $value) {
-            $this->assertEquals($value, Inline::load($yaml), sprintf('::load() converts an inline YAML to a PHP structure (%s)', $yaml));
+        foreach ($this->getTestsForParse() as $yaml => $value) {
+            $this->assertEquals($value, Inline::parse($yaml), sprintf('::parse() converts an inline YAML to a PHP structure (%s)', $yaml));
         }
     }
 
@@ -36,12 +36,12 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($yaml, Inline::dump($value), sprintf('::dump() converts a PHP structure to an inline YAML (%s)', $yaml));
         }
 
-        foreach ($this->getTestsForLoad() as $yaml => $value) {
+        foreach ($this->getTestsForParse() as $yaml => $value) {
             if ($value == 1230) {
                 continue;
             }
 
-            $this->assertEquals($value, Inline::load(Inline::dump($value)), 'check consistency');
+            $this->assertEquals($value, Inline::parse(Inline::dump($value)), 'check consistency');
         }
 
         foreach ($testsForDump as $yaml => $value) {
@@ -49,11 +49,11 @@ class InlineTest extends \PHPUnit_Framework_TestCase
                 continue;
             }
 
-            $this->assertEquals($value, Inline::load(Inline::dump($value)), 'check consistency');
+            $this->assertEquals($value, Inline::parse(Inline::dump($value)), 'check consistency');
         }
     }
 
-    protected function getTestsForLoad()
+    protected function getTestsForParse()
     {
         return array(
             '' => '',

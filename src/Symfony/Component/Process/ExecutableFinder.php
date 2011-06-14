@@ -44,12 +44,12 @@ class ExecutableFinder
         if (ini_get('open_basedir')) {
             $searchPath = explode(PATH_SEPARATOR, getenv('open_basedir'));
             $dirs = array();
-            foreach($searchPath as $path) {
+            foreach ($searchPath as $path) {
                 if (is_dir($path)) {
                     $dirs[] = $path;
                 } else {
                     $file = str_replace(dirname($path), '', $path);
-                    if($path == $name && is_executable($path)) {
+                    if ($file == $name && is_executable($path)) {
                         return $path;
                     }
                 }

@@ -79,8 +79,6 @@ interface EventDispatcherInterface
      *
      * @return array The event listeners for the specified event, or all event
      *               listeners by event name.
-     *
-     * @api
      */
     function getListeners($eventName = null);
 
@@ -91,8 +89,6 @@ interface EventDispatcherInterface
      *
      * @return Boolean TRUE if the specified event has any listeners, FALSE
      *                 otherwise.
-     *
-     * @api
      */
     function hasListeners($eventName = null);
 }

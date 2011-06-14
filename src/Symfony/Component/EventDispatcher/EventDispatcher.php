@@ -61,8 +61,6 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * @see EventDispatcherInterface::getListeners
-     *
-     * @api
      */
     public function getListeners($eventName = null)
     {
@@ -89,8 +87,6 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * @see EventDispatcherInterface::hasListeners
-     *
-     * @api
      */
     public function hasListeners($eventName = null)
     {
@@ -126,6 +122,8 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * @see EventDispatcherInterface::addSubscriber
+     *
+     * @api
      */
     public function addSubscriber(EventSubscriberInterface $subscriber)
     {

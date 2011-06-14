@@ -70,7 +70,7 @@ class RequestMatcher implements RequestMatcherInterface
      */
     public function matchMethod($method)
     {
-        $this->methods = array_map('strtolower', is_array($method) ? $method : array($method));
+        $this->methods = array_map('strtoupper', is_array($method) ? $method : array($method));
     }
 
     /**
@@ -89,7 +89,7 @@ class RequestMatcher implements RequestMatcherInterface
      */
     public function matches(Request $request)
     {
-        if (null !== $this->methods && !in_array(strtolower($request->getMethod()), $this->methods)) {
+        if (null !== $this->methods && !in_array($request->getMethod(), $this->methods)) {
             return false;
         }
 

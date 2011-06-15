@@ -73,6 +73,7 @@ EOF;
     {
         $code = array();
 
+        $routes = clone $routes;
         $routeIterator = $routes->getIterator();
         $keys = array_keys($routeIterator->getArrayCopy());
         $keysCount = count($keys);
@@ -82,6 +83,7 @@ EOF;
         foreach ($routeIterator as $name => $route) {
             $i++;
 
+            $route = clone $route;
             if ($route instanceof RouteCollection) {
                 $prefix = $route->getPrefix();
                 $optimizable = $prefix && count($route->all()) > 1 && false === strpos($route->getPrefix(), '{');

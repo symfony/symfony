@@ -17,7 +17,6 @@
         <service id="controller_name_converter" class="%controller_name_converter.class%" public="false">
             <tag name="monolog.logger" channel="request" />
             <argument type="service" id="kernel" />
-            <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
         <service id="controller_resolver" class="%controller_resolver.class%" public="false">

@@ -71,12 +71,16 @@
 
 {% block datetime_widget %}
 {% spaceless %}
-    <div {{ block('widget_container_attributes') }}>
-        {{ form_errors(form.date) }}
-        {{ form_errors(form.time) }}
-        {{ form_widget(form.date) }}
-        {{ form_widget(form.time) }}
-    </div>
+    {% if widget == 'single_text' %}
+        {{ block('field_widget') }}
+    {% else %}
+        <div {{ block('widget_container_attributes') }}>
+            {{ form_errors(form.date) }}
+            {{ form_errors(form.time) }}
+            {{ form_widget(form.date) }}
+            {{ form_widget(form.time) }}
+        </div>
+    {% endif %}
 {% endspaceless %}
 {% endblock datetime_widget %}
 
@@ -99,7 +103,7 @@
 {% block time_widget %}
 {% spaceless %}
     {% if widget == 'single_text' %}
-        {{ block('text_widget') }}
+        {{ block('field_widget') }}
     {% else %}
         <div {{ block('widget_container_attributes') }}>
             {{ form_widget(form.hour, { 'attr': { 'size': '1' } }) }}:{{ form_widget(form.minute, { 'attr': { 'size': '1' } }) }}{% if with_seconds %}:{{ form_widget(form.second, { 'attr': { 'size': '1' } }) }}{% endif %}

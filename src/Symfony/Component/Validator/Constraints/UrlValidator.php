@@ -15,22 +15,25 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * Validates whether a value is a valid URL
+ *
+ * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Igor Wiedler
+ * @author Joseph Bielawski <stloyd@gmail.com>
+ */
 class UrlValidator extends ConstraintValidator
 {
     const PATTERN = '~^
-            (%s)://                                 # protocol
-            (
-                ([a-z0-9-]+\.)+[a-z]{2,6}               # a domain name
-                    |                                     #  or
-                \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}      # a IP address
-                    |                                     #  or
-                \[
-                    (?:(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){6})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:::(?:(?:(?:[0-9a-f]{1,4})):){5})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:[0-9a-f]{1,4})))?::(?:(?:(?:[0-9a-f]{1,4})):){4})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,1}(?:(?:[0-9a-f]{1,4})))?::(?:(?:(?:[0-9a-f]{1,4})):){3})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,2}(?:(?:[0-9a-f]{1,4})))?::(?:(?:(?:[0-9a-f]{1,4})):){2})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,3}(?:(?:[0-9a-f]{1,4})))?::(?:(?:[0-9a-f]{1,4})):)(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,4}(?:(?:[0-9a-f]{1,4})))?::)(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,5}(?:(?:[0-9a-f]{1,4})))?::)(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,6}(?:(?:[0-9a-f]{1,4})))?::))))
-                \]  # a IPv6 address
+            (?:\S+)://                               # protocol
+            (?:
+                ([[:alpha:]-]{1,64}\.)+([:alpha:]{2,9})  # a domain name
+                    |                                #  or
+                \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}       # a IP address
             )
-            (:[0-9]+)?                              # a port (optional)
-            (/?|/\S+)                               # a /, nothing or a / with something
-        $~ix';
+            (:[0-9]{0,5})?                          # a port (optional)
+            (/?|/\S+)?                              # a /, nothing or a / with something (optional)
+        $~ixu';
 
     public function isValid($value, Constraint $constraint)
     {
@@ -43,10 +46,26 @@ class UrlValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
+        $valid = false;
+        $ip    = null;
 
-        $pattern = sprintf(self::PATTERN, implode('|', $constraint->protocols));
+        // URL can must have at least 8 and valid protocol
+        if (strlen($value) > 8 && (false !== $protocolPos = strpos($value, '://'))) {
+            $valid = in_array(strtolower(substr($value, 0, $protocolPos)), $constraint->protocols);
 
-        if (!preg_match($pattern, $value)) {
+            if ($valid) {
+                // Check for an IPv6 address in URL
+                if ((false !== $firstBracert = strpos($value, '://[')) && (false !== $secondBracert = strpos($value, ']'))) {
+                    $ip = substr($value, $firstBracert += 4, $secondBracert - $firstBracert);
+                    $valid = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6);
+                }
+
+                // If IPv6 exists valid, lets replace it and check the rest of value
+                $valid = preg_match(self::PATTERN, ($ip === null ? $value : str_replace('['.$ip.']', 'example.com', $value)));
+            }
+        }
+
+        if (!$valid) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;

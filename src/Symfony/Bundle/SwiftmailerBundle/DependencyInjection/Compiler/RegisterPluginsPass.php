@@ -35,10 +35,12 @@ class RegisterPluginsPass implements CompilerPassInterface
             $plugins[$priority][] = new Reference($id);
         }
 
-        krsort($plugins);
-        $plugins = call_user_func_array('array_merge', $plugins);
-        foreach ($plugins as $plugin) {
-            $definition->addMethodCall('registerPlugin', array($plugin));
+        if ($plugins) {
+            krsort($plugins);
+            $plugins = call_user_func_array('array_merge', $plugins);
+            foreach ($plugins as $plugin) {
+                $definition->addMethodCall('registerPlugin', array($plugin));
+            }
         }
     }
 }

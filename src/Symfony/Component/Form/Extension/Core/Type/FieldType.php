@@ -75,6 +75,11 @@ class FieldType extends AbstractType
             $fullName = $name;
         }
 
+        $types = array();
+        foreach ($form->getTypes() as $type) {
+            $types[] = $type->getName();
+        }
+
         $view
             ->set('form', $view)
             ->set('id', $id)
@@ -90,7 +95,7 @@ class FieldType extends AbstractType
             ->set('label', $form->getAttribute('label'))
             ->set('multipart', false)
             ->set('attr', array())
-            ->set('types', array_map(function ($type) { return $type->getName(); }, $form->getTypes()))
+            ->set('types', $types)
         ;
     }
 

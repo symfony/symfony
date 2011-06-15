@@ -125,6 +125,18 @@ class ProjectUrlMatcher extends Symfony\Tests\Component\Routing\Fixtures\Redirec
                     return $matches;
                 }
         
+                // foo1
+                if (preg_match('#^/a/b/(?P<foo1>[^/]+?)$#x', $pathinfo, $matches)) {
+                    $matches['_route'] = 'foo1';
+                    return $matches;
+                }
+        
+                // bar1
+                if (preg_match('#^/a/b/(?P<bar1>[^/]+?)$#x', $pathinfo, $matches)) {
+                    $matches['_route'] = 'bar1';
+                    return $matches;
+                }
+        
                 throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();
             }
     

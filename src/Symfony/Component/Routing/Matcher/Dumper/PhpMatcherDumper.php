@@ -79,7 +79,6 @@ EOF;
         $keysCount = count($keys);
 
         $i = 0;
-
         foreach ($routeIterator as $name => $route) {
             $i++;
 
@@ -113,8 +112,10 @@ EOF;
                         }
                     }
 
-                    $code[] = sprintf("        if (0 === strpos(\$pathinfo, '%s')) {", $prefix);
-                    $indent = '    ';
+                    if ($prefix !== $parentPrefix) {
+                        $code[] = sprintf("        if (0 === strpos(\$pathinfo, '%s')) {", $prefix);
+                        $indent = '    ';
+                    }
                 }
 
                 foreach ($this->compileRoutes($route, $supportsRedirections, $prefix) as $line) {
@@ -123,7 +124,7 @@ EOF;
                     }
                 }
 
-                if ($optimizable) {
+                if ($optimizable && $prefix !== $parentPrefix) {
                     $code[] = "            throw 0 < count(\$allow) ? new MethodNotAllowedException(array_unique(\$allow)) : new ResourceNotFoundException();";
                     $code[] = "        }\n";
                 }

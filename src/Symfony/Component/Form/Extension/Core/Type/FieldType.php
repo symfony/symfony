@@ -41,7 +41,7 @@ class FieldType extends AbstractType
         if (!is_array($options['attr'])) {
             throw new FormException('The "attr" option must be "array".');
         }
-        
+
         $builder
             ->setRequired($options['required'])
             ->setReadOnly($options['read_only'])

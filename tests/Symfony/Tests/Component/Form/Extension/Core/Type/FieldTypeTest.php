@@ -195,7 +195,7 @@ class FieldTypeTest extends TypeTestCase
         $this->assertSame($author, $form->getData());
         $this->assertEquals('Bernhard', $author->firstName);
     }
-    
+
     public function testGetAttributesIsEmpty()
     {
         $form = $this->factory->create('field', null, array('attr' => array()));

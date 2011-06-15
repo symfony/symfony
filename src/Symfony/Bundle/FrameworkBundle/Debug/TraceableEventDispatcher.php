@@ -58,11 +58,8 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
             } else {
                 $typeDefinition = '[?] '.var_export($listener, true);
             }
-            $msg = sprintf('The given callback (%s) for event "%s" is not callable.', $typeDefinition, $eventName);
-            if (null !== $this->logger) {
-                $this->logger->err($msg);
-            }
-            throw new \RuntimeException($msg);
+
+            throw new \RuntimeException(sprintf('The given callback (%s) for event "%s" is not callable.', $typeDefinition, $eventName));
         }
 
         parent::addListener($eventName, $listener, $priority);

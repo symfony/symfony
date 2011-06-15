@@ -24,18 +24,15 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
 class ControllerNameParser
 {
     protected $kernel;
-    protected $logger;
 
     /**
      * Constructor.
      *
      * @param KernelInterface $kernel A KernelInterface instance
-     * @param LoggerInterface $logger A LoggerInterface instance
      */
-    public function __construct(KernelInterface $kernel, LoggerInterface $logger = null)
+    public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
-        $this->logger = $logger;
     }
 
     /**
@@ -57,9 +54,7 @@ class ControllerNameParser
         foreach ($this->kernel->getBundle($bundle, false) as $b) {
             $try = $b->getNamespace().'\\Controller\\'.$controller.'Controller';
             if (!class_exists($try)) {
-                if (null !== $this->logger) {
-                    $logs[] = sprintf('Unable to find controller "%s:%s" - class "%s" does not exist.', $bundle, $controller, $try);
-                }
+                $logs[] = sprintf('Unable to find controller "%s:%s" - class "%s" does not exist.', $bundle, $controller, $try);
             } else {
                 $class = $try;
 

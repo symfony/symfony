@@ -40,12 +40,7 @@ class TemplateReference extends BaseTemplateReference
      */
     public function getPath()
     {
-        $controller = $this->get('controller');
-
-        // Fix for namespaced controllers
-        if (!empty($controller) && false !== strpos($controller, '\\')) {
-            $controller = str_replace('\\', '/', $controller);
-        }
+        $controller = str_replace('\\', '/', $this->get('controller'));
 
         $path = (empty($controller) ? '' : $controller.'/').$this->get('name').'.'.$this->get('format').'.'.$this->get('engine');
 

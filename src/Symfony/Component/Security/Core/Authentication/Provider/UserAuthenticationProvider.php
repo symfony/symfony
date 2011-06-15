@@ -80,7 +80,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
             return $authenticatedToken;
         } catch (UsernameNotFoundException $notFound) {
             if ($this->hideUserNotFoundExceptions) {
-                throw new BadCredentialsException(sprintf('Bad credentials for user "%s"', $username), 0, $notFound);
+                throw new BadCredentialsException('Bad credentials', 0, $notFound);
             }
 
             throw $notFound;

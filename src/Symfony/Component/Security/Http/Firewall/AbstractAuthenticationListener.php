@@ -221,10 +221,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     private function onSuccess(GetResponseEvent $event, Request $request, TokenInterface $token)
     {
         if (null !== $this->logger) {
-            $this->logger->info(sprintf(
-                'User "%s" has been authenticated successfully',
-                $token->getUsername()
-            ));
+            $this->logger->info(sprintf('User "%s" has been authenticated successfully', $token->getUsername()));
         }
 
         $this->securityContext->setToken($token);

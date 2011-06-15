@@ -80,7 +80,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException LogicException
      */
-    public function testHandleWhenNoControllerIsNotACallable()
+    public function testHandleWhenTheControllerIsNotACallable()
     {
         $dispatcher = new EventDispatcher();
         $kernel = new HttpKernel($dispatcher, $this->getResolver('foobar'));
@@ -88,7 +88,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $kernel->handle(new Request());
     }
 
-    public function testHandleWhenNoControllerIsAClosure()
+    public function testHandleWhenTheControllerIsAClosure()
     {
         $response = new Response('foo');
         $dispatcher = new EventDispatcher();
@@ -97,42 +97,42 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($response, $kernel->handle(new Request()));
     }
 
-    public function testHandleWhenNoControllerIsAnObjectWithInvoke()
+    public function testHandleWhenTheControllerIsAnObjectWithInvoke()
     {
         $dispatcher = new EventDispatcher();
         $kernel = new HttpKernel($dispatcher, $this->getResolver(new Controller()));
 
-        $this->assertEquals(new Response('foo'), $kernel->handle(new Request()));
+        $this->assertResponseEquals(new Response('foo'), $kernel->handle(new Request()));
     }
 
-    public function testHandleWhenNoControllerIsAFunction()
+    public function testHandleWhenTheControllerIsAFunction()
     {
         $dispatcher = new EventDispatcher();
         $kernel = new HttpKernel($dispatcher, $this->getResolver('Symfony\Tests\Component\HttpKernel\controller_func'));
 
-        $this->assertEquals(new Response('foo'), $kernel->handle(new Request()));
+        $this->assertResponseEquals(new Response('foo'), $kernel->handle(new Request()));
     }
 
-    public function testHandleWhenNoControllerIsAnArray()
+    public function testHandleWhenTheControllerIsAnArray()
     {
         $dispatcher = new EventDispatcher();
         $kernel = new HttpKernel($dispatcher, $this->getResolver(array(new Controller(), 'controller')));
 
-        $this->assertEquals(new Response('foo'), $kernel->handle(new Request()));
+        $this->assertResponseEquals(new Response('foo'), $kernel->handle(new Request()));
     }
 
-    public function testHandleWhenNoControllerIsAStaticArray()
+    public function testHandleWhenTheControllerIsAStaticArray()
     {
         $dispatcher = new EventDispatcher();
         $kernel = new HttpKernel($dispatcher, $this->getResolver(array('Symfony\Tests\Component\HttpKernel\Controller', 'staticcontroller')));
 
-        $this->assertEquals(new Response('foo'), $kernel->handle(new Request()));
+        $this->assertResponseEquals(new Response('foo'), $kernel->handle(new Request()));
     }
 
     /**
      * @expectedException LogicException
      */
-    public function testHandleWhenControllerDoesNotReturnAResponse()
+    public function testHandleWhenTheControllerDoesNotReturnAResponse()
     {
         $dispatcher = new EventDispatcher();
         $kernel = new HttpKernel($dispatcher, $this->getResolver(function () { return 'foo'; }));
@@ -140,7 +140,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $kernel->handle(new Request());
     }
 
-    public function testHandleWhenControllerDoesNotReturnAResponseButAViewIsRegistered()
+    public function testHandleWhenTheControllerDoesNotReturnAResponseButAViewIsRegistered()
     {
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener(CoreEvents::VIEW, function ($event)
@@ -179,6 +179,12 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(array()));
 
         return $resolver;
+    }
+
+    protected function assertResponseEquals(Response $expected, Response $actual)
+    {
+        $expected->setDate($actual->getDate());
+        $this->assertEquals($expected, $actual);
     }
 }
 

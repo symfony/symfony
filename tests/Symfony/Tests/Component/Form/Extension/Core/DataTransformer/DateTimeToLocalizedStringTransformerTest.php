@@ -122,6 +122,17 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
 
         $this->assertEquals($dateTime->format('d.m.Y H:i'), $transformer->transform($input));
     }
+    
+    public function testTransform_dontChangeReference()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer('Europe/Paris');
+        
+        $input = new \DateTime('2010-02-03 00:00:00 Europe/Paris');
+        
+        $transformer->transform($input);
+        
+        $this->assertEquals(new \DateTime('2010-02-03 00:00:00 Europe/Paris'), $input);
+    }
 
     /**
      * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException

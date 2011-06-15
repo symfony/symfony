@@ -11,17 +11,17 @@
 
 namespace Symfony\Tests\Component\CssSelector;
 
-use Symfony\Component\CssSelector\Parser;
+use Symfony\Component\CssSelector\CssSelector;
 
-class ParserTest extends \PHPUnit_Framework_TestCase
+class CssSelectorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCssToXpath()
+    public function testCsstoXPath()
     {
-        $this->assertEquals('descendant-or-self::h1', Parser::cssToXpath('h1'));
-        $this->assertEquals("descendant-or-self::h1[@id = 'foo']", Parser::cssToXpath('h1#foo'));
-        $this->assertEquals("descendant-or-self::h1[contains(concat(' ', normalize-space(@class), ' '), ' foo ')]", Parser::cssToXpath('h1.foo'));
+        $this->assertEquals('descendant-or-self::h1', CssSelector::toXPath('h1'));
+        $this->assertEquals("descendant-or-self::h1[@id = 'foo']", CssSelector::toXPath('h1#foo'));
+        $this->assertEquals("descendant-or-self::h1[contains(concat(' ', normalize-space(@class), ' '), ' foo ')]", CssSelector::toXPath('h1.foo'));
 
-        $this->assertEquals('descendant-or-self::foo:h1', Parser::cssToXpath('foo|h1'));
+        $this->assertEquals('descendant-or-self::foo:h1', CssSelector::toXPath('foo|h1'));
     }
 
     /**
@@ -29,14 +29,14 @@ class ParserTest extends \PHPUnit_Framework_TestCase
      */
     public function testParse($css, $xpath)
     {
-        $parser = new Parser();
+        $parser = new CssSelector();
 
-        $this->assertEquals($xpath, (string) $parser->parse($css)->toXpath(), '->parse() parses an input string and returns a node');
+        $this->assertEquals($xpath, (string) $parser->parse($css)->toXPath(), '->parse() parses an input string and returns a node');
     }
 
     public function testParseExceptions()
     {
-        $parser = new Parser();
+        $parser = new CssSelector();
 
         try {
             $parser->parse('h1:');

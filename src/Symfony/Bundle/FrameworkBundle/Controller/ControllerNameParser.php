@@ -76,12 +76,6 @@ class ControllerNameParser
 
     private function handleControllerNotFoundException($bundle, $controller, array $logs)
     {
-        if (null !== $this->logger) {
-            foreach ($logs as $log) {
-                $this->logger->info($log);
-            }
-        }
-
         // just one log, return it as the exception
         if (1 == count($logs)) {
             throw new \InvalidArgumentException($logs[0]);

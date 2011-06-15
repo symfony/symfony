@@ -32,9 +32,6 @@ class SessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
     public function testGenerateCsrfToken()
     {
         $this->session->expects($this->once())
-                ->method('start');
-
-        $this->session->expects($this->once())
                 ->method('getId')
                 ->will($this->returnValue('ABCDEF'));
 
@@ -46,9 +43,6 @@ class SessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
     public function testIsCsrfTokenValidSucceeds()
     {
         $this->session->expects($this->once())
-                ->method('start');
-
-        $this->session->expects($this->once())
                 ->method('getId')
                 ->will($this->returnValue('ABCDEF'));
 
@@ -59,9 +53,6 @@ class SessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testIsCsrfTokenValidFails()
     {
-        $this->session->expects($this->once())
-                ->method('start');
-
         $this->session->expects($this->once())
                 ->method('getId')
                 ->will($this->returnValue('ABCDEF'));

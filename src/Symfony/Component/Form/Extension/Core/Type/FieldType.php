@@ -76,7 +76,7 @@ class FieldType extends AbstractType
         }
 
         $types = array();
-        foreach (array_reverse((array) $form->getTypes()) as $type) {
+        foreach ($form->getTypes() as $type) {
             $types[] = $type->getName();
         }
 

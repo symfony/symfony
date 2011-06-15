@@ -260,11 +260,8 @@
 {% endspaceless %}
 {% endblock email_widget %}
 
-{% block collection_widget %}
+{% block prototype_row %}
 {% spaceless %}
-    {{ block('form_widget') }}
-    {% if prototype is defined %}
-    <script type="text/html" id="{{ id }}_prototype">{{ form_row(prototype) }}</script>
-    {% endif %}
+    <script type="text/html" id="{{ proto_id }}">{{ block('field_row') }}</script>
 {% endspaceless %}
-{% endblock collection_widget %}
+{% endblock prototype_row %}

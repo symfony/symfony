@@ -31,7 +31,8 @@ class TimeType extends AbstractType
         if ($options['widget'] === 'single_text') {
             $builder->appendClientTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], 'H:i:s'));
         } else if ($options['widget'] === 'choice') {
-            if (is_array($options['empty_value'])) {                $options['empty_value'] = array_merge(array('hour' => null, 'minute' => null, 'second' => null), $options['empty_value']);
+            if (is_array($options['empty_value'])) {
+                $options['empty_value'] = array_merge(array('hour' => null, 'minute' => null, 'second' => null), $options['empty_value']);
             } else {
                 $options['empty_value'] = array('hour' => $options['empty_value'], 'minute' => $options['empty_value'], 'second' => $options['empty_value']);
             }
@@ -65,9 +66,10 @@ class TimeType extends AbstractType
         }
 
         $parts = array('hour', 'minute');
-        if ($options['with_seconds']) {        if ($options['with_seconds']) {
+        if ($options['with_seconds']) {
             $parts[] = 'second';
         }
+
         if ($options['input'] === 'string') {
             $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], 'H:i:s')

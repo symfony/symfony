@@ -14,10 +14,10 @@ namespace Symfony\Component\CssSelector;
 use Symfony\Component\CssSelector\Exception\ParseException;
 
 /**
- * Parser is the main entry point of the component and can convert CSS
+ * CssSelector is the main entry point of the component and can convert CSS
  * selectors to XPath expressions.
  *
- * $xpath = Parser::cssToXpath('h1.foo');
+ * $xpath = CssSelector::toXpath('h1.foo');
  *
  * This component is a port of the Python lxml library,
  * which is copyright Infrae and distributed under the BSD license.
@@ -26,7 +26,7 @@ use Symfony\Component\CssSelector\Exception\ParseException;
  *
  * @api
  */
-class Parser
+class CssSelector
 {
     /**
      * Translates a CSS expression to its XPath equivalent.
@@ -42,7 +42,7 @@ class Parser
      *
      * @api
      */
-    static public function cssToXpath($cssExpr, $prefix = 'descendant-or-self::')
+    static public function toXPath($cssExpr, $prefix = 'descendant-or-self::')
     {
         if (is_string($cssExpr)) {
             if (preg_match('#^\w+\s*$#u', $cssExpr, $match)) {

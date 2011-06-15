@@ -60,7 +60,7 @@ class ControllerResolver implements ControllerResolverInterface
             return false;
         }
 
-        if (is_array($controller) || method_exists($controller, '__invoke')) {
+        if (is_array($controller) || ((is_object($controller) || false === strpos($controller, ':')) && method_exists($controller, '__invoke'))) {
             return $controller;
         }
 

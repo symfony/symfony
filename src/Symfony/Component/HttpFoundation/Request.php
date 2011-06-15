@@ -322,26 +322,24 @@ class Request
     }
 
     /**
+     * Gets a "parameter" value.
+     *
      * This method is mainly useful for libraries that want to provide some flexibility.
-     * 
+     *
      * Order of precedence: GET, PATH, POST, COOKIE
      * Avoid using this method in controllers:
      *  * slow
      *  * prefer to get from a "named" source
-     * 
+     *
      * @param string    $key        the key
      * @param mixed     $default    the default value
      * @param type      $deep       is parameter deep in multidimensional array
-     * 
+     *
      * @return mixed
      */
     public function get($key, $default = null, $deep = false)
     {
-        return $this->query->get(
-            $key, 
-            $this->attributes->get($key, $this->request->get($key, $default, $deep), $deep), 
-            $deep
-        );
+        return $this->query->get($key, $this->attributes->get($key, $this->request->get($key, $default, $deep), $deep), $deep);
     }
 
     /**
@@ -1031,9 +1029,9 @@ class Request
         return rtrim($baseUrl, '/');
     }
 
-    /*
-     * Prepare base path.
-     * 
+    /**
+     * Prepares base path.
+     *
      * @return string base path
      */
     protected function prepareBasePath()
@@ -1058,7 +1056,7 @@ class Request
     }
 
     /**
-     * Prepare path info.
+     * Prepares path info.
      *
      * @return string path info
      */
@@ -1088,7 +1086,7 @@ class Request
     }
 
     /**
-     * Initialize HTTP request formats.
+     * Initializes HTTP request formats.
      */
     static protected function initializeFormats()
     {

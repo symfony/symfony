@@ -121,11 +121,24 @@ class CollectionFormTest extends TypeTestCase
     public function testAllowAddButNoPrototype()
     {
         $form = $this->factory->create('collection', null, array(
-            'type' => 'field',
+            'type'      => 'field',
             'allow_add' => true,
             'prototype' => false,
         ));
 
         $this->assertFalse($form->has('$$name$$'));
+    }
+
+    public function testPrototypeMultipartPropagation()
+    {
+        $form = $this->factory
+            ->create('collection', null, array(
+                'type'      => 'file',
+                'allow_add' => true,
+                'prototype' => true,
+            ))
+        ;
+
+        $this->assertTrue($form->createView()->get('multipart'));
     }
 }

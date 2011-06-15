@@ -60,6 +60,10 @@ class SwiftmailerExtension extends Extension
             $transport = $config['transport'];
         }
 
+        if (isset($config['disable_delivery']) && $config['disable_delivery']) {
+            $transport = 'null';
+        }
+
         if ('smtp' === $transport) {
             $loader->load('smtp.xml');
         }
@@ -116,10 +120,6 @@ class SwiftmailerExtension extends Extension
             $container->getDefinition('swiftmailer.plugin.redirecting')->addTag('swiftmailer.plugin');
         } else {
             $container->setParameter('swiftmailer.single_address', null);
-        }
-
-        if (isset($config['disable_delivery']) && $config['disable_delivery']) {
-            $container->getDefinition('swiftmailer.plugin.blackhole')->addTag('swiftmailer.plugin');
         }
     }
 

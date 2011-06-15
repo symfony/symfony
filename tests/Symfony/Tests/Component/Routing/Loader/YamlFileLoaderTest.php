@@ -90,6 +90,19 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
     }
 
+    public function testLoadWithResourceArray()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $routeCollection = $loader->load('validresources.yml');
+        $routes = $routeCollection->all();
+
+        $this->assertEquals(2, count($routes));
+        $this->assertArrayHasKey('blog_show', $routes);
+        $this->assertArrayHasKey('blog_delete', $routes);
+        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+    }
+
+
     /**
      * @expectedException \InvalidArgumentException
      */

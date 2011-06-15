@@ -53,6 +53,19 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
     }
 
+    public function testLoadWithExtraResource()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $routeCollection = $loader->load('validresources.xml');
+        $routes = $routeCollection->all();
+
+        $this->assertEquals(2, count($routes));
+        $this->assertArrayHasKey('blog_show', $routes);
+        $this->assertArrayHasKey('blog_delete', $routes);
+        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+    }
+
+
     /**
      * @expectedException \InvalidArgumentException
      * @dataProvider getPathsToInvalidFiles

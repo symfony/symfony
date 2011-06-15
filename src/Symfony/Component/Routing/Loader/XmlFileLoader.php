@@ -75,9 +75,27 @@ class XmlFileLoader extends FileLoader
             case 'import':
                 $resource = (string) $node->getAttribute('resource');
                 $type = (string) $node->getAttribute('type');
+                $type = empty($type) ? null : $type;
                 $prefix = (string) $node->getAttribute('prefix');
                 $this->setCurrentDir(dirname($path));
-                $collection->addCollection($this->import($resource, ('' !== $type ? $type : null), false, $file), $prefix);
+
+                $collection->addCollection($this->import($resource, $type, false, $file), $prefix);
+
+                foreach ($node->childNodes as $extraResource) {
+                    if (!$extraResource instanceof \DOMElement) {
+                        continue;
+                    }
+
+                    switch ($extraResource->tagName) {
+                        case 'extra-resource':
+                            $resource = trim((string) $extraResource->nodeValue);
+                            $collection->addCollection($this->import($resource, $type, false, $file), $prefix);
+                            break;
+                        default:
+                            throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $extraResource->tagName));
+                    }
+                }
+
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));

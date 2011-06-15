@@ -113,8 +113,21 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                     return $matches;
                 }
         
+                throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();
             }
     
+            // ababa
+            if ($pathinfo === '/ababa') {
+                return array('_route' => 'ababa');
+            }
+    
+            // foo
+            if (preg_match('#^/aba/(?P<foo>[^/]+?)$#x', $pathinfo, $matches)) {
+                $matches['_route'] = 'foo';
+                return $matches;
+            }
+    
+            throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();
         }
 
         // foo

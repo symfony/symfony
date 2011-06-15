@@ -100,7 +100,7 @@ class SwiftmailerExtension extends Extension
         }
 
         if ($config['logging']) {
-            $container->getDefinition('swiftmailer.plugin.messagelogger')->addTag('swiftmailer.plugin');
+            $container->getDefinition('swiftmailer.plugin.messagelogger')->addTag('swiftmailer.plugin', array('priority' => 5));
             $container->findDefinition('swiftmailer.data_collector')->addTag('data_collector', array('template' => 'SwiftmailerBundle:Collector:swiftmailer', 'id' => 'swiftmailer'));
         }
 

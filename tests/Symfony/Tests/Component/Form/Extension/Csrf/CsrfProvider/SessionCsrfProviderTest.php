@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
 class SessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
 {
     protected $provider;
+    protected $session;
 
     protected function setUp()
     {
@@ -27,6 +28,12 @@ class SessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
             false // don't call constructor
         );
         $this->provider = new SessionCsrfProvider($this->session, 'SECRET');
+    }
+
+    protected function tearDown()
+    {
+        $this->provider = null;
+        $this->session = null;
     }
 
     public function testGenerateCsrfToken()

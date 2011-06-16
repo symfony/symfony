@@ -33,6 +33,13 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
         $this->em = $this->createTestEntityManager();
     }
 
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->em = null;
+    }
+
     /**
      * @expectedException Symfony\Component\Form\Exception\FormException
      */

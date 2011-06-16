@@ -19,7 +19,6 @@ class FileTest extends \PHPUnit_Framework_TestCase
 {
     protected $file;
 
-
     public function testGetMimeTypeUsesMimeTypeGuessers()
     {
         $file = new File(__DIR__.'/Fixtures/test.gif');

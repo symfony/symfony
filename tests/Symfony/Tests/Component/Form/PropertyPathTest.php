@@ -20,7 +20,6 @@ use Symfony\Tests\Component\Form\Fixtures\Magician;
 
 class PropertyPathTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testGetValueReadsArray()
     {
         $array = array('firstName' => 'Bernhard');

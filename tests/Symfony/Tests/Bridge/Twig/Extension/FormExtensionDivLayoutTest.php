@@ -48,6 +48,13 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $this->extension->initRuntime($environment);
     }
 
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->extension = null;
+    }
+
     public function testThemeBlockInheritance()
     {
         $view = $this->factory

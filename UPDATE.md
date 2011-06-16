@@ -9,6 +9,10 @@ timeline closely anyway.
 beta4 to beta5
 --------------
 
+* `UserProviderInterface::loadUser()` has been renamed to
+  `UserProviderInterface::refreshUser()` to make the goal of the method
+  clearer.
+
 * The `$kernel` property on `WebTestCase` is now static. Change any instances
   of `$this->kernel` in your functional tests to `self::$kernel`.
 

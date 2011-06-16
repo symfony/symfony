@@ -50,11 +50,11 @@ class ChainUserProvider implements UserProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function loadUser(UserInterface $user)
+    public function refreshUser(UserInterface $user)
     {
         foreach ($this->providers as $provider) {
             try {
-                return $provider->loadUser($user);
+                return $provider->refreshUser($user);
             } catch (UnsupportedUserException $unsupported) {
                 // try next one
             }

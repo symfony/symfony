@@ -73,27 +73,33 @@ class XmlFileLoader extends FileLoader
                 $this->parseRoute($collection, $node, $path);
                 break;
             case 'import':
-                $resource = (string) $node->getAttribute('resource');
                 $type = (string) $node->getAttribute('type');
                 $type = empty($type) ? null : $type;
                 $prefix = (string) $node->getAttribute('prefix');
                 $this->setCurrentDir(dirname($path));
 
-                $collection->addCollection($this->import($resource, $type, false, $file), $prefix);
+                $resources = array();
 
-                foreach ($node->childNodes as $extraResource) {
-                    if (!$extraResource instanceof \DOMElement) {
+                if ($node->hasAttribute('resource')) {
+                    $resources[] = (string) $node->getAttribute('resource');
+                }
+
+                foreach ($node->childNodes as $node) {
+                    if (!$node instanceof \DOMElement) {
                         continue;
                     }
 
-                    switch ($extraResource->tagName) {
-                        case 'extra-resource':
-                            $resource = trim((string) $extraResource->nodeValue);
-                            $collection->addCollection($this->import($resource, $type, false, $file), $prefix);
+                    switch ($node->tagName) {
+                        case 'resource':
+                            $resources[] = trim((string) $node->nodeValue);
                             break;
                         default:
-                            throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $extraResource->tagName));
+                            throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));
                     }
+                }
+
+                foreach ($resources as $resource) {
+                    $collection->addCollection($this->import($resource, $type, false, $file), $prefix);
                 }
 
                 break;

@@ -1,2 +1,2 @@
 blog_show:
-    resource: [validpattern.yml, validpattern.2.yml]
+    resources: [validpattern.yml, validpattern.2.yml]

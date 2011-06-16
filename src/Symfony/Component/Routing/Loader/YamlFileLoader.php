@@ -27,7 +27,7 @@ use Symfony\Component\Config\Loader\FileLoader;
 class YamlFileLoader extends FileLoader
 {
     private static $availableKeys = array(
-        'type', 'resource', 'prefix', 'pattern', 'options', 'defaults', 'requirements'
+        'type', 'resource', 'resources', 'prefix', 'pattern', 'options', 'defaults', 'requirements'
     );
 
     /**
@@ -64,11 +64,11 @@ class YamlFileLoader extends FileLoader
         foreach ($config as $name => $config) {
             $config = $this->normalizeRouteConfig($config);
 
-            if (isset($config['resource'])) {
+            if (isset($config['resources'])) {
                 $type = isset($config['type']) ? $config['type'] : null;
                 $prefix = isset($config['prefix']) ? $config['prefix'] : null;
                 $this->setCurrentDir(dirname($path));
-                foreach ((array) $config['resource'] as $resource) {
+                foreach ($config['resources'] as $resource) {
                     $collection->addCollection($this->import($resource, $type, false, $file), $prefix);
                 }
             } else {
@@ -137,6 +137,14 @@ class YamlFileLoader extends FileLoader
                     $key, implode(', ', self::$availableKeys)
                 ));
             }
+        }
+
+        if (!isset($config['resources']) && isset($config['resource'])) {
+            $config['resources'] = $config['resource'];
+        }
+
+        if (isset($config['resources'])) {
+            $config['resources'] = (array) $config['resources'];
         }
 
         return $config;

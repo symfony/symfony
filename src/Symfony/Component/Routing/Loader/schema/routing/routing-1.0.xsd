@@ -27,7 +27,7 @@
 
   <xsd:complexType name="import">
     <xsd:sequence>
-      <xsd:element name="extra-resource" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="resource" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
     </xsd:sequence>
 
     <xsd:attribute name="resource" type="xsd:string" />

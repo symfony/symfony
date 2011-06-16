@@ -53,7 +53,7 @@ abstract class Kernel implements KernelInterface
     protected $startTime;
     protected $classes;
 
-    const VERSION = '2.0.0-RC1-DEV';
+    const VERSION = '2.0.0-BETA5';
 
     /**
      * Constructor.

@@ -30,12 +30,14 @@ class FormExtension extends \Twig_Extension
     protected $themes;
     protected $varStack;
     protected $template;
+    protected $rendering;
 
     public function __construct(array $resources = array())
     {
         $this->themes = new \SplObjectStorage();
         $this->varStack = new \SplObjectStorage();
         $this->blocks = new \SplObjectStorage();
+        $this->rendering = array();
 
         $this->resources = $resources;
     }
@@ -225,35 +227,50 @@ class FormExtension extends \Twig_Extension
         }
 
         $blocks = $this->getBlocks($view);
+        $custom = '_'.$view->get('proto_id', $view->get('id'));
         $types = $view->get('types');
-        $types[] = '_'.$view->get('proto_id', $view->get('id'));
+        $types[] = $custom;
+        $rendering = $custom.$section;
 
-        for ($i = count($types) - 1; $i >= 0; $i--) {
-            $types[$i] .= '_'.$section;
+        $i = isset($this->rendering[$rendering]) ? $this->rendering[$rendering] - 1 : count ($types) - 1;
 
-            if (isset($blocks[$types[$i]])) {
+        do {
+            $block = $types[$i].'_'.$section;
+
+            if (isset($blocks[$block])) {
+
+                $this->rendering[$rendering] = $i;
 
                 $this->varStack[$view] = array_replace(
-                    $view->all(),
-                    isset($this->varStack[$view]) ? $this->varStack[$view] : array(),
+                    isset($this->varStack[$view]) ? $this->varStack[$view] : $view->all(),
                     $variables
                 );
 
-                $html = $this->template->renderBlock($types[$i], $this->varStack[$view], $blocks);
+                $html = $this->template->renderBlock($block, $this->varStack[$view], $blocks);
 
                 if ($mainTemplate) {
                     $view->setRendered();
                 }
 
-                unset($this->varStack[$view]);
+                unset($this->varStack[$view], $this->rendering[$rendering]);
 
                 return $html;
             }
-        }
+        } while (--$i >= 0);
 
         throw new FormException(sprintf('Unable to render form as none of the following blocks exist: "%s".', implode('", "', $types)));
     }
 
+    /**
+     * Returns the name of the extension.
+     *
+     * @return string The extension name
+     */
+    public function getName()
+    {
+        return 'form';
+    }
+    
     /**
      * Returns the blocks used to render the view.
      *
@@ -301,15 +318,5 @@ class FormExtension extends \Twig_Extension
         }
 
         return $blocks;
-    }
-
-    /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
-     */
-    public function getName()
-    {
-        return 'form';
     }
 }

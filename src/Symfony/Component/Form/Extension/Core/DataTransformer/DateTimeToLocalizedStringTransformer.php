@@ -84,6 +84,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         }
 
         // convert time to UTC before passing it to the formatter
+        $dateTime = clone $dateTime;
         if ('UTC' !== $this->inputTimezone) {
             $dateTime->setTimezone(new \DateTimeZone('UTC'));
         }

@@ -85,4 +85,13 @@ class MinValidatorTest extends \PHPUnit_Framework_TestCase
             '{{ limit }}' => 10,
         ));
     }
+
+    public function testConstraintGetDefaultOption()
+    {
+        $constraint = new Min(array(
+            'limit' => 10,
+        ));
+
+        $this->assertEquals('limit', $constraint->getDefaultOption());
+    }
 }

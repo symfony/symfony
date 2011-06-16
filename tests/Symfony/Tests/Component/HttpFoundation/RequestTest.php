@@ -765,4 +765,13 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->setSession(new Session(new ArraySessionStorage()));
         $this->assertTrue($request->hasPreviousSession());
     }
+
+    public function testToString()
+    {
+        $request = new Request();
+
+        $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
+
+        $this->assertContains('Accept-Language: zh, en-us; q=0.8, en; q=0.6', $request->__toString());
+    }
 }

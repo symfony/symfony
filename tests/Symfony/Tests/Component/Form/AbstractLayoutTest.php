@@ -28,13 +28,18 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     {
         \Locale::setDefault('en');
 
-        $dispatcher = new EventDispatcher();
         $this->csrfProvider = $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface');
 
         $this->factory = new FormFactory(array(
             new CoreExtension(),
             new CsrfExtension($this->csrfProvider),
         ));
+    }
+
+    protected function tearDown()
+    {
+        $this->csrfProvider = null;
+        $this->factory = null;
     }
 
     protected function assertXpathNodeValue(\DomElement $element, $expression, $nodeValue)

@@ -48,6 +48,13 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
         $this->extension->initRuntime($environment);
     }
 
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->extension = null;
+    }
+
     protected function renderEnctype(FormView $view)
     {
         return (string)$this->extension->renderEnctype($view);

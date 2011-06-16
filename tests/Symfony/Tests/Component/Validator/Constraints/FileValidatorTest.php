@@ -31,6 +31,10 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         fclose($this->file);
+
+        $this->validator = null;
+        $this->path = null;
+        $this->file = null;
     }
 
     public function testNullIsValid()

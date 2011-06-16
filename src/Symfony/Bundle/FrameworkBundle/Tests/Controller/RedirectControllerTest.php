@@ -90,4 +90,18 @@ class RedirectControllerTest extends TestCase
             array(false, 302),
         );
     }
+
+    public function testEmptyPath()
+    {
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+
+        $controller = new RedirectController();
+        $controller->setContainer($container);
+
+        $returnResponse = $controller->urlRedirectAction('');
+
+        $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $returnResponse);
+
+        $this->assertEquals(410, $returnResponse->getStatusCode());
+    }
 }

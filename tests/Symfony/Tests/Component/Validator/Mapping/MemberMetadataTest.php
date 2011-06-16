@@ -34,6 +34,11 @@ class MemberMetadataTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    protected function tearDown()
+    {
+        $this->metadata = null;
+    }
+
     public function testAddValidSetsMemberToCascaded()
     {
         $result = $this->metadata->addConstraint(new Valid());

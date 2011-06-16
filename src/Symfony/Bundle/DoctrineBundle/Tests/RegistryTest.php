@@ -13,15 +13,8 @@ namespace Symfony\Bundle\DoctrineBundle\Tests;
 
 use Symfony\Bundle\DoctrineBundle\Registry;
 
-class RegistryTest extends \PHPUnit_Framework_TestCase
+class RegistryTest extends TestCase
 {
-    public function setUp()
-    {
-        if (!class_exists('Doctrine\ORM\Version')) {
-            $this->markTestSkipped('Doctrine is required for this test to run.');
-        }
-    }
-
     public function testGetDefaultConnectionName()
     {
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');

@@ -135,6 +135,17 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($response->getMaxAge(), $response->getAge() + 10);
     }
 
+    public function testGetSetProtocolVersion()
+    {
+        $response = new Response();
+
+        $this->assertEquals('1.0', $response->getProtocolVersion());
+
+        $response->setProtocolVersion('1.1');
+
+        $this->assertEquals('1.1', $response->getProtocolVersion());
+    }
+
     public function testGetVary()
     {
         $response = new Response();

@@ -31,6 +31,17 @@ class MimeTypeTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testGuessImageWithDirectory()
+    {
+        if (extension_loaded('fileinfo')) {
+            $this->setExpectedException('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
+
+            $this->assertEquals('image/gif', MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/directory'));
+        } else {
+            $this->assertNull(MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/directory'));
+        }
+    }
+
     public function testGuessImageWithContentTypeMimeTypeGuesser()
     {
         $guesser = MimeTypeGuesser::getInstance();

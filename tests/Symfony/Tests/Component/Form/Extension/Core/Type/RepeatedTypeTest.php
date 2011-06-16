@@ -17,7 +17,6 @@ use Symfony\Component\Form\Field;
 class RepeatedTypeTest extends TypeTestCase
 {
     protected $form;
-    protected $optionsForm;
 
     protected function setUp()
     {
@@ -27,13 +26,6 @@ class RepeatedTypeTest extends TypeTestCase
             'type' => 'field',
         ));
         $this->form->setData(null);
-
-        $this->optionsForm = $this->factory->create('repeated', null, array(
-            'type'           => 'field',
-            'options'        => array('label'    => 'Test'),
-            'first_options'  => array('required' => false),
-            'second_options' => array('label'    => 'Test2'),
-        ));
     }
 
     public function testSetData()
@@ -46,13 +38,17 @@ class RepeatedTypeTest extends TypeTestCase
 
     public function testSetOptions()
     {
-        $first  = $this->optionsForm['first'];
-        $second = $this->optionsForm['second'];
+        $form = $this->factory->create('repeated', null, array(
+            'type'           => 'field',
+            'options'        => array('label'    => 'Test'),
+            'first_options'  => array('required' => false),
+            'second_options' => array('label'    => 'Test2'),
+        ));
 
-        $this->assertEquals('Test', $first->getAttribute('label'));
-        $this->assertEquals('Test2', $second->getAttribute('label'));
-        $this->assertFalse($first->isRequired());
-        $this->assertTrue($second->isRequired());
+        $this->assertEquals('Test', $form['first']->getAttribute('label'));
+        $this->assertEquals('Test2', $form['second']->getAttribute('label'));
+        $this->assertFalse($form['first']->isRequired());
+        $this->assertTrue($form['second']->isRequired());
     }
 
     public function testSubmitUnequal()

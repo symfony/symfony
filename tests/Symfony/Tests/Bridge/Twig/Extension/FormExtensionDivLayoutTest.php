@@ -37,7 +37,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         ));
 
         $this->extension = new FormExtension(array(
-            'div_layout.html.twig',
+            'form_div_layout.html.twig',
             'custom_widgets.html.twig',
         ));
 

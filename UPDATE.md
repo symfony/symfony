@@ -83,7 +83,7 @@ beta4 to beta5
 
     After:
 
-        `div_layout.html.twig`
+        `form_div_layout.html.twig`
 
 * All settings regarding the cache warmers have been removed.
 

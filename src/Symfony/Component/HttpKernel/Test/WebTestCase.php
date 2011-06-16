@@ -24,10 +24,20 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Creates a Client.
      *
+     * The method can't be declared abstract and static at the same time because
+     * it produces a Strict Standards notice since PHP 5.3 and Late Static Binding
+     * implementation. That's why, it throws a \LogicException and must be
+     * overriden by a more specific class.
+     *
      * @param array $options An array of options to pass to the createKernel class
      * @param array $server  An array of server parameters
      *
      * @return Client A Client instance
+     *
+     * @throws \LogicException
      */
-    abstract static protected function createClient(array $options = array(), array $server = array());
+    static protected function createClient(array $options = array(), array $server = array())
+    {
+        throw new \LogicException('WebTestCase::createClient() must be overriden in a more specific class.');
+    }
 }

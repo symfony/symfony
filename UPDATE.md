@@ -9,6 +9,9 @@ timeline closely anyway.
 beta4 to beta5
 --------------
 
+* The AsseticBundle has been moved to its own repository (it still bundled
+  with Symfony SE).
+
 * Yaml Component:
 
     * Exception classes have been moved to their own namespace

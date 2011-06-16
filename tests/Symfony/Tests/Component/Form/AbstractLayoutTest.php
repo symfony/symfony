@@ -385,7 +385,54 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSingleChoiceRequiredWithEmptyValue()
+    public function testSingleChoiceNonRequiredNoneSelected()
+    {
+        $form = $this->factory->createNamed('choice', 'na&me', null, array(
+            'property_path' => 'name',
+            'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
+            'required' => false,
+            'multiple' => false,
+            'expanded' => false,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/select
+    [@name="na&me"]
+    [
+        ./option[@value=""][not(@selected)][.="[trans][/trans]"]
+        /following-sibling::option[@value="&a"][not(@selected)][.="Choice&A"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
+    ]
+    [count(./option)=3]
+'
+        );
+    }
+
+    public function testSingleChoiceWithNonRequiredEmptyValue()
+    {
+        $form = $this->factory->createNamed('choice', 'na&me', '&a', array(
+            'property_path' => 'name',
+            'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
+            'multiple' => false,
+            'expanded' => false,
+            'required' => false,
+            'empty_value' => 'Select&Anything&Not&Me',
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/select
+    [@name="na&me"]
+    [
+        ./option[@value=""][not(@selected)][.="[trans]Select&Anything&Not&Me[/trans]"]
+        /following-sibling::option[@value="&a"][@selected="selected"][.="Choice&A"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
+    ]
+    [count(./option)=3]
+'
+        );
+    }
+
+    public function testSingleChoiceRequiredWithEmptyValueViaView()
     {
         $form = $this->factory->createNamed('choice', 'na&me', '&a', array(
             'property_path' => 'name',

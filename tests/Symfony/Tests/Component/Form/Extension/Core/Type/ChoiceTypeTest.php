@@ -311,6 +311,16 @@ class ChoiceTypeTest extends TypeTestCase
         $this->factory->create('choice', 'name');
     }
 
+    public function testPassRequiredToView()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'choices' => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertTrue($view->get('required'));
+    }
+
     public function testPassMultipleToView()
     {
         $form = $this->factory->create('choice', null, array(
@@ -331,6 +341,42 @@ class ChoiceTypeTest extends TypeTestCase
         $view = $form->createView();
 
         $this->assertTrue($view->get('expanded'));
+    }
+
+    public function testPassEmptyValueToViewIsNull()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'choices' => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertNull($view->get('empty_value'));
+    }
+
+    public function testPassEmptyValueToViewIsEmpty()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'required' => false,
+            'choices' => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertEmpty($view->get('empty_value'));
+    }
+
+    public function testPassEmptyValueToView()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'required' => false,
+            'empty_value' => 'foobar',
+            'choices' => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertEquals('foobar', $view->get('empty_value'));
     }
 
     public function testPassChoicesToView()

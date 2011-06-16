@@ -186,6 +186,10 @@ class YamlFileLoader extends FileLoader
             $definition->setProperties($this->resolveServices($service['properties']));
         }
 
+        if (isset($service['lookup_methods'])) {
+            $definition->setLookupMethods($this->resolveServices($service['lookup_methods']));
+        }
+
         if (isset($service['configurator'])) {
             if (is_string($service['configurator'])) {
                 $definition->setConfigurator($service['configurator']);

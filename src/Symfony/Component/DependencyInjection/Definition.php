@@ -15,6 +15,7 @@ namespace Symfony\Component\DependencyInjection;
  * Definition represents a service definition.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class Definition
 {
@@ -31,6 +32,7 @@ class Definition
     private $public;
     private $synthetic;
     private $abstract;
+    private $lookupMethods;
 
     protected $arguments;
 
@@ -51,6 +53,7 @@ class Definition
         $this->synthetic = false;
         $this->abstract = false;
         $this->properties = array();
+        $this->lookupMethods = array();
     }
 
     /**
@@ -545,5 +548,24 @@ class Definition
     public function getConfigurator()
     {
         return $this->configurator;
+    }
+
+    public function setLookupMethod($name, $value)
+    {
+        $this->lookupMethods[$name] = $value;
+
+        return $this;
+    }
+
+    public function getLookupMethods()
+    {
+        return $this->lookupMethods;
+    }
+
+    public function setLookupMethods(array $methods)
+    {
+        $this->lookupMethods = $methods;
+
+        return $this;
     }
 }

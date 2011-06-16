@@ -85,6 +85,10 @@ class YamlDumper extends Dumper
             $code .= sprintf("    properties: %s\n", Yaml::dump($this->dumpValue($definition->getProperties()), 0));
         }
 
+        if ($definition->getLookupMethods()) {
+            $code .= sprintf("    lookup_methods: %s\n", Yaml::dump($this->dumpValue($definition->getLookupMethods()), 0));
+        }
+
         if ($definition->getMethodCalls()) {
             $code .= sprintf("    calls:\n      %s\n", str_replace("\n", "\n      ", Yaml::dump($this->dumpValue($definition->getMethodCalls()), 1)));
         }

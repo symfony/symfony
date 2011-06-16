@@ -41,6 +41,9 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
             $definition->setArguments(
                 $this->processArguments($definition->getArguments())
             );
+            $definition->setLookupMethods(
+                $this->processArguments($definition->getLookupMethods())
+            );
 
             $calls = array();
             foreach ($definition->getMethodCalls() as $call) {

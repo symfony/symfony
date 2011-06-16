@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
-
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
@@ -164,6 +163,7 @@ class XmlFileLoader extends FileLoader
 
         $definition->setArguments($service->getArgumentsAsPhp('argument'));
         $definition->setProperties($service->getArgumentsAsPhp('property'));
+        $definition->setLookupMethods($service->getArgumentsAsPhp('lookup-method'));
 
         if (isset($service->configurator)) {
             if (isset($service->configurator['function'])) {

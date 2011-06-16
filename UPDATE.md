@@ -9,6 +9,9 @@ timeline closely anyway.
 beta4 to beta5
 --------------
 
+* The `$kernel` property on `WebTestCase` is now static. Change any instances
+  of `$this->kernel` in your functional tests to `self::$kernel`.
+
 * The AsseticBundle has been moved to its own repository (it still bundled
   with Symfony SE).
 

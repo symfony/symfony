@@ -27,9 +27,8 @@ class RepeatedType extends AbstractType
                 $options['first_name'],
                 $options['second_name'],
             )))
-            ->add($options['first_name'],  $options['type'], 0 < count($options['first_options'])  ? $options['first_options']  : $options['options'])
-            ->add($options['second_name'], $options['type'], 0 < count($options['second_options']) ? $options['second_options'] : $options['options'])
-
+            ->add($options['first_name'], $options['type'], array_merge($options['options'], $options['first_options']))
+            ->add($options['second_name'], $options['type'], array_merge($options['options'], $options['second_options']))
         ;
     }
 

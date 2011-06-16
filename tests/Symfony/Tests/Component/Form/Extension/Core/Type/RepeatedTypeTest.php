@@ -17,6 +17,7 @@ use Symfony\Component\Form\Field;
 class RepeatedTypeTest extends TypeTestCase
 {
     protected $form;
+    protected $optionsForm;
 
     protected function setUp()
     {
@@ -26,6 +27,13 @@ class RepeatedTypeTest extends TypeTestCase
             'type' => 'field',
         ));
         $this->form->setData(null);
+
+        $this->optionsForm = $this->factory->create('repeated', null, array(
+            'type'           => 'field',
+            'options'        => array('label'    => 'Test'),
+            'first_options'  => array('required' => false),
+            'second_options' => array('label'    => 'Test2'),
+        ));
     }
 
     public function testSetData()
@@ -34,6 +42,17 @@ class RepeatedTypeTest extends TypeTestCase
 
         $this->assertEquals('foobar', $this->form['first']->getData());
         $this->assertEquals('foobar', $this->form['second']->getData());
+    }
+
+    public function testSetOptions()
+    {
+        $first  = $this->optionsForm['first'];
+        $second = $this->optionsForm['second'];
+
+        $this->assertEquals('Test', $first->getAttribute('label'));
+        $this->assertEquals('Test2', $second->getAttribute('label'));
+        $this->assertFalse($first->isRequired());
+        $this->assertTrue($second->isRequired());
     }
 
     public function testSubmitUnequal()

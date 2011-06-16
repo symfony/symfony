@@ -75,7 +75,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             throw new \RuntimeException('The intl extension is not available');
         }
 
-        if (defined(INTL_ICU_VERSION)) {
+        if (defined('INTL_ICU_VERSION')) {
             return INTL_ICU_VERSION;
         }
 

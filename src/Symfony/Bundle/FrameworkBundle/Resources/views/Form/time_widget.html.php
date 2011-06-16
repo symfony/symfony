@@ -1,4 +1,4 @@
-<div<?php echo $view['form']->attributes() ?>>
+<div <?php echo $view['form']->renderBlock('container_attributes') ?>>
     <?php
         // There should be no spaces between the colons and the widgets, that's why
         // this block is written in a single PHP tag

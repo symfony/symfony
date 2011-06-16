@@ -30,6 +30,12 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         $this->dateTimeWithoutSeconds = new \DateTime('2010-02-03 04:05:00 UTC');
     }
 
+    protected function tearDown()
+    {
+        $this->dateTime = null;
+        $this->dateTimeWithoutSeconds = null;
+    }
+
     public static function assertEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = FALSE, $ignoreCase = FALSE)
     {
         if ($expected instanceof \DateTime && $actual instanceof \DateTime) {

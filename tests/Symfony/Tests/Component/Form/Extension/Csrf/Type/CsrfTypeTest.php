@@ -22,6 +22,13 @@ class CsrfTypeTest extends TypeTestCase
         $this->provider = $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface');
     }
 
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->provider = null;
+    }
+
     protected function getNonRootForm()
     {
         $form = $this->getMock('Symfony\Tests\Component\Form\FormInterface');

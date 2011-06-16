@@ -19,7 +19,6 @@ use Symfony\Component\Routing\RequestContext;
 
 class RouterListenerTest extends \PHPUnit_Framework_TestCase
 {
-    private $container;
     private $router;
 
     protected function setUp()
@@ -27,6 +26,11 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
         $this->router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')
                              ->disableOriginalConstructor()
                              ->getMock();
+    }
+
+    protected function tearDown()
+    {
+        $this->router = null;
     }
 
     /**

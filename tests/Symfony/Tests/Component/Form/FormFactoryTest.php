@@ -42,6 +42,15 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->factory = new FormFactory(array($this->extension1, $this->extension2));
     }
 
+    protected function tearDown()
+    {
+        $this->extension1 = null;
+        $this->extension2 = null;
+        $this->guesser1 = null;
+        $this->guesser2 = null;
+        $this->factory = null;
+    }
+
     public function testAddType()
     {
         $this->assertFalse($this->factory->hasType('foo'));

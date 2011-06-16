@@ -42,6 +42,15 @@ class FilesystemLoaderTest extends TestCase
         ;
     }
 
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->locator = null;
+        $this->parser = null;
+        $this->loader = null;
+    }
+
     public function testTwigErrorIfLocatorThrowsInvalid()
     {
         $this->setExpectedException('Twig_Error_Loader');

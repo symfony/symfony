@@ -182,7 +182,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->fail('->load() should throw an exception when a tag is missing the name key');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if a tag is missing the name key');
-            $this->assertStringStartsWith('A "tags" entry is missing a "name" key must be an array for service ', $e->getMessage(), '->load() throws an InvalidArgumentException if a tag is missing the name key');
+            $this->assertStringStartsWith('A "tags" entry is missing a "name" key for service ', $e->getMessage(), '->load() throws an InvalidArgumentException if a tag is missing the name key');
         }
     }
 }

@@ -97,7 +97,7 @@ class ClassCollectionLoader
 
             // add namespace declaration for global code
             if (!$r->inNamespace()) {
-                $c = "\nnamespace\n{\n$c\n}\n";
+                $c = "\nnamespace\n{\n".self::stripComments($c)."\n}\n";
             } else {
                 $c = self::fixNamespaceDeclarations('<?php '.$c);
                 $c = preg_replace('/^\s*<\?php/', '', $c);
@@ -110,7 +110,7 @@ class ClassCollectionLoader
         if (!is_dir(dirname($cache))) {
             mkdir(dirname($cache), 0777, true);
         }
-        self::writeCacheFile($cache, self::stripComments('<?php '.$content));
+        self::writeCacheFile($cache, '<?php '.$content);
 
         if ($autoReload) {
             // save the resources
@@ -139,6 +139,9 @@ class ClassCollectionLoader
             $token = $tokens[$i];
             if (is_string($token)) {
                 $output .= $token;
+            } elseif (in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
+                // strip comments
+                continue;
             } elseif (T_NAMESPACE === $token[0]) {
                 if ($inNamespace) {
                     $output .= "}\n";

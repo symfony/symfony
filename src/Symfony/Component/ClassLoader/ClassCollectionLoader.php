@@ -135,7 +135,8 @@ class ClassCollectionLoader
         $inNamespace = false;
         $tokens = token_get_all($source);
 
-        while ($token = array_shift($tokens)) {
+        for ($i = 0, $max = count($tokens); $i < $max; $i++) {
+            $token = $tokens[$i];
             if (is_string($token)) {
                 $output .= $token;
             } elseif (T_NAMESPACE === $token[0]) {
@@ -145,12 +146,12 @@ class ClassCollectionLoader
                 $output .= $token[1];
 
                 // namespace name and whitespaces
-                while (($t = array_shift($tokens)) && is_array($t) && in_array($t[0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
+                while (($t = $tokens[++$i]) && is_array($t) && in_array($t[0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
                     $output .= $t[1];
                 }
                 if (is_string($t) && '{' === $t) {
                     $inNamespace = false;
-                    array_unshift($tokens, $t);
+                    --$i;
                 } else {
                     $output .= "\n{";
                     $inNamespace = true;

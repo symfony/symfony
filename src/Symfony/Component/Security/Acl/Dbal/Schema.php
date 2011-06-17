@@ -20,7 +20,7 @@ use Doctrine\DBAL\Schema\Schema as BaseSchema;
  */
 final class Schema extends BaseSchema
 {
-    protected $options;
+    private $options;
 
     /**
      * Constructor
@@ -41,12 +41,23 @@ final class Schema extends BaseSchema
         $this->addEntryTable();
     }
 
+    public function addToSchema(BaseSchema $schema)
+    {
+        foreach ($this->getTables() as $table) {
+            $schema->_addTable($table);
+        }
+
+        foreach ($this->getSequences() as $sequence) {
+            $schema->_addSequence($sequence);
+        }
+    }
+
     /**
      * Adds the class table to the schema
      *
      * @return void
      */
-    protected function addClassTable()
+    private function addClassTable()
     {
         $table = $this->createTable($this->options['class_table_name']);
         $table->addColumn('id', 'integer', array('unsigned' => true, 'autoincrement' => 'auto'));
@@ -60,7 +71,7 @@ final class Schema extends BaseSchema
      *
      * @return void
      */
-    protected function addEntryTable()
+    private function addEntryTable()
     {
         $table = $this->createTable($this->options['entry_table_name']);
 
@@ -90,7 +101,7 @@ final class Schema extends BaseSchema
      *
      * @return void
      */
-    protected function addObjectIdentitiesTable()
+    private function addObjectIdentitiesTable()
     {
         $table = $this->createTable($this->options['oid_table_name']);
 
@@ -112,7 +123,7 @@ final class Schema extends BaseSchema
      *
      * @return void
      */
-    protected function addObjectIdentityAncestorsTable()
+    private function addObjectIdentityAncestorsTable()
     {
         $table = $this->createTable($this->options['oid_ancestors_table_name']);
 
@@ -131,7 +142,7 @@ final class Schema extends BaseSchema
      *
      * @return void
      */
-    protected function addSecurityIdentitiesTable()
+    private function addSecurityIdentitiesTable()
     {
         $table = $this->createTable($this->options['sid_table_name']);
 

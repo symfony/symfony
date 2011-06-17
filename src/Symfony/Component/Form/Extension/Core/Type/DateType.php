@@ -44,21 +44,27 @@ class DateType extends AbstractType
             $widget = $options['widget'];
 
             if ($widget === 'choice') {
+                $emptyValue = $options['empty_value'];
+                $specificEmptyValue = is_array($emptyValue);
+
                 // Only pass a subset of the options to children
                 $yearOptions = array(
                     'choice_list' => new PaddedChoiceList(
                         array_combine($options['years'], $options['years']), 4, '0', STR_PAD_LEFT
                     ),
+                    'empty_value' => $specificEmptyValue ? $emptyValue['year'] : $emptyValue,
                 );
                 $monthOptions = array(
                     'choice_list' => new MonthChoiceList(
                         $formatter, $options['months']
                     ),
+                    'empty_value' => $specificEmptyValue ? $emptyValue['month'] : $emptyValue,
                 );
                 $dayOptions = array(
                     'choice_list' => new PaddedChoiceList(
                         array_combine($options['days'], $options['days']), 2, '0', STR_PAD_LEFT
                     ),
+                    'empty_value' => $specificEmptyValue ? $emptyValue['day'] : $emptyValue,
                 );
             }
 
@@ -119,18 +125,20 @@ class DateType extends AbstractType
      */
     public function getDefaultOptions(array $options)
     {
+        $required = isset($options['required']) ? (Boolean) $options['required'] : true;
+
         return array(
-            'years'             => range(date('Y') - 5, date('Y') + 5),
-            'months'            => range(1, 12),
-            'days'              => range(1, 31),
-            'widget'            => 'choice',
-            'input'             => 'datetime',
-            'format'            => \IntlDateFormatter::MEDIUM,
-            'data_timezone'     => null,
-            'user_timezone'     => null,
-            // Don't modify \DateTime classes by reference, we treat
-            // them like immutable value objects
-            'by_reference'      => false,
+            'years'         => range(date('Y') - 5, date('Y') + 5),
+            'months'        => range(1, 12),
+            'days'          => range(1, 31),
+            'empty_value'   => $required ? null : '',
+            'widget'        => 'choice',
+            'input'         => 'datetime',
+            'format'        => \IntlDateFormatter::MEDIUM,
+            'data_timezone' => null,
+            'user_timezone' => null,
+            /* Don't modify \DateTime classes by reference, we treat them like immutable value objects */
+            'by_reference'  => false,
         );
     }
 

@@ -125,7 +125,7 @@ class ChoiceType extends AbstractType
     {
         $multiple = isset($options['multiple']) && $options['multiple'];
         $expanded = isset($options['expanded']) && $options['expanded'];
-        $required = (Boolean) (isset($options['required']) ? $options['required'] : true);
+        $required = isset($options['required']) ? (Boolean) $options['required'] : true;
 
         return array(
             'multiple'          => false,

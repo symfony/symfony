@@ -32,24 +32,26 @@ class DateTimeType extends AbstractType
             'years',
             'months',
             'days',
+            'empty_value',
         )));
         $timeOptions = array_intersect_key($options, array_flip(array(
             'hours',
             'minutes',
             'seconds',
             'with_seconds',
+            'empty_value',
         )));
 
-        if (isset($options['date_widget'])) {
+        if (null !== $options['date_widget']) {
             $dateOptions['widget'] = $options['date_widget'];
         }
-        if (isset($options['date_format'])) {
+        if (null !== $options['date_format']) {
             $dateOptions['format'] = $options['date_format'];
         }
 
         $dateOptions['input'] = 'array';
 
-        if (isset($options['time_widget'])) {
+        if (null !== $options['time_widget']) {
             $timeOptions['widget'] = $options['time_widget'];
         }
 
@@ -95,13 +97,14 @@ class DateTimeType extends AbstractType
      */
     public function getDefaultOptions(array $options)
     {
+        $required = isset($options['required']) ? (Boolean) $options['required'] : true;
+
         return array(
             'input'         => 'datetime',
-            'with_seconds'  => false,
             'data_timezone' => null,
             'user_timezone' => null,
-            // Don't modify \DateTime classes by reference, we treat
-            // them like immutable value objects
+            'empty_value'   => $required ? null : '',
+            /* Don't modify \DateTime classes by reference, we treat them like immutable value objects */
             'by_reference'  => false,
             'date_widget'   => null,
             'date_format'   => null,

@@ -32,21 +32,29 @@ class TimeType extends AbstractType
         $parts = array('hour', 'minute');
 
         if ($options['widget'] === 'choice') {
-            $hourOptions['choice_list'] =  new PaddedChoiceList(
+            $emptyValue = $options['empty_value'];
+            $specificEmptyValue = is_array($emptyValue);
+
+            $hourOptions['choice_list'] = new PaddedChoiceList(
                 array_combine($options['hours'], $options['hours']), 2, '0', STR_PAD_LEFT
             );
+            $hourOptions['empty_value'] = $specificEmptyValue ? $emptyValue['hour'] : $emptyValue;
+
             $minuteOptions['choice_list'] = new PaddedChoiceList(
                 array_combine($options['minutes'], $options['minutes']), 2, '0', STR_PAD_LEFT
             );
+            $minuteOptions['empty_value'] = $specificEmptyValue ? $emptyValue['minute'] : $emptyValue;
 
             if ($options['with_seconds']) {
                 $secondOptions['choice_list'] = new PaddedChoiceList(
                     array_combine($options['seconds'], $options['seconds']), 2, '0', STR_PAD_LEFT
                 );
+                $secondOptions['empty_value'] = $specificEmptyValue ? $emptyValue['second'] : $emptyValue;
             }
         }
 
-        $builder->add('hour', $options['widget'], $hourOptions)
+        $builder
+            ->add('hour', $options['widget'], $hourOptions)
             ->add('minute', $options['widget'], $minuteOptions);
 
         if ($options['with_seconds']) {
@@ -96,18 +104,20 @@ class TimeType extends AbstractType
      */
     public function getDefaultOptions(array $options)
     {
+        $required = isset($options['required']) ? (Boolean) $options['required'] : true;
+
         return array(
-            'hours'             => range(0, 23),
-            'minutes'           => range(0, 59),
-            'seconds'           => range(0, 59),
-            'widget'            => 'choice',
-            'input'             => 'datetime',
-            'with_seconds'      => false,
-            'data_timezone'     => null,
-            'user_timezone'     => null,
-            // Don't modify \DateTime classes by reference, we treat
-            // them like immutable value objects
-            'by_reference'      => false,
+            'hours'         => range(0, 23),
+            'minutes'       => range(0, 59),
+            'seconds'       => range(0, 59),
+            'empty_value'   => $required ? null : '',
+            'widget'        => 'choice',
+            'input'         => 'datetime',
+            'with_seconds'  => false,
+            'data_timezone' => null,
+            'user_timezone' => null,
+            /* Don't modify \DateTime classes by reference, we treat them like immutable value objects */
+            'by_reference'  => false,
         );
     }
 

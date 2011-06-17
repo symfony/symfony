@@ -23,14 +23,11 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->validator = new ImageValidator();
-        $this->path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ImageValidatorTest';
-        $this->image = imagecreatetruecolor(2, 2);
-        imagejpeg($this->image, $this->path);
+        $this->image = __DIR__.'/Fixtures/test.gif';
     }
 
     protected function tearDown()
     {
-        imagedestroy($this->image);
     }
 
     public function testNullIsValid()
@@ -45,7 +42,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidImage()
     {
-        $this->assertTrue($this->validator->isValid($this->path, new Image()));
+        $this->assertTrue($this->validator->isValid($this->image, new Image()));
     }
 
     public function testValidSize()
@@ -57,7 +54,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
             'maxHeight' => 2,
         ));
 
-        $this->assertTrue($this->validator->isValid($this->path, $constraint));
+        $this->assertTrue($this->validator->isValid($this->image, $constraint));
     }
 
     public function testWidthTooSmall()
@@ -67,7 +64,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
             'minWidthMessage' => 'myMessage',
         ));
 
-        $this->assertFalse($this->validator->isValid($this->path, $constraint));
+        $this->assertFalse($this->validator->isValid($this->image, $constraint));
         $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
         $this->assertEquals($this->validator->getMessageParameters(), array(
             '{{ width }}' => '2',
@@ -82,7 +79,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
             'maxWidthMessage' => 'myMessage',
         ));
 
-        $this->assertFalse($this->validator->isValid($this->path, $constraint));
+        $this->assertFalse($this->validator->isValid($this->image, $constraint));
         $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
         $this->assertEquals($this->validator->getMessageParameters(), array(
             '{{ width }}' => '2',
@@ -97,7 +94,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
             'minHeightMessage' => 'myMessage',
         ));
 
-        $this->assertFalse($this->validator->isValid($this->path, $constraint));
+        $this->assertFalse($this->validator->isValid($this->image, $constraint));
         $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
         $this->assertEquals($this->validator->getMessageParameters(), array(
             '{{ height }}' => '2',
@@ -112,7 +109,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
             'maxHeightMessage' => 'myMessage',
         ));
 
-        $this->assertFalse($this->validator->isValid($this->path, $constraint));
+        $this->assertFalse($this->validator->isValid($this->image, $constraint));
         $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
         $this->assertEquals($this->validator->getMessageParameters(), array(
             '{{ height }}' => '2',
@@ -128,7 +125,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
 
-        $this->validator->isValid($this->path, $constraint);
+        $this->validator->isValid($this->image, $constraint);
     }
 
     public function testInvalidMaxWidth()
@@ -139,7 +136,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
 
-        $this->validator->isValid($this->path, $constraint);
+        $this->validator->isValid($this->image, $constraint);
     }
 
     public function testInvalidMinHeight()
@@ -150,7 +147,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
 
-        $this->validator->isValid($this->path, $constraint);
+        $this->validator->isValid($this->image, $constraint);
     }
 
     public function testInvalidMaxHeight()
@@ -161,6 +158,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
 
-        $this->validator->isValid($this->path, $constraint);
+        $this->validator->isValid($this->image, $constraint);
     }
 }

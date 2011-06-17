@@ -9,6 +9,7 @@
     <select
         <?php echo $view['form']->attributes() ?>
         name="<?php echo $view->escape($full_name) ?>"
+        <?php if ($required): ?> required="required"<?php endif ?>
         <?php if ($read_only): ?> disabled="disabled"<?php endif ?>
         <?php if ($multiple): ?> multiple="multiple"<?php endif ?>
     >

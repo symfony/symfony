@@ -321,6 +321,17 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertTrue($view->get('required'));
     }
 
+    public function testPassNonRequiredToView()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'required' => false,
+            'choices' => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertFalse($view->get('required'));
+    }
+
     public function testPassMultipleToView()
     {
         $form = $this->factory->create('choice', null, array(
@@ -343,7 +354,7 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertTrue($view->get('expanded'));
     }
 
-    public function testPassEmptyValueToViewIsNull()
+    public function testNotPassedEmptyValueToViewIsNull()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
@@ -366,17 +377,36 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertEmpty($view->get('empty_value'));
     }
 
-    public function testPassEmptyValueToView()
+    /**
+     * @dataProvider getOptionsWithEmptyValue
+     */
+    public function testPassEmptyValueToView($multiple, $expanded, $required, $emptyValue, $viewValue)
     {
         $form = $this->factory->create('choice', null, array(
-            'multiple' => false,
-            'required' => false,
-            'empty_value' => 'foobar',
+            'multiple' => $multiple,
+            'expanded' => $expanded,
+            'required' => $required,
+            'empty_value' => $emptyValue,
             'choices' => $this->choices,
         ));
         $view = $form->createView();
 
-        $this->assertEquals('foobar', $view->get('empty_value'));
+        $this->assertEquals($viewValue, $view->get('empty_value'));
+    }
+
+    public function getOptionsWithEmptyValue()
+    {
+        return array(
+            array(false, false, false, 'foobar', 'foobar'),
+            array(true, false, false, 'foobar', null),
+            array(false, true, false, 'foobar', null),
+            array(false, false, true, 'foobar', 'foobar'),
+            array(false, false, true, '', ''),
+            array(false, false, true, null, null),
+            array(false, true, true, 'foobar', null),
+            array(true, true, false, 'foobar', null),
+            array(true, true, true, 'foobar', null),
+        );
     }
 
     public function testPassChoicesToView()

@@ -125,7 +125,7 @@ class OutputFormatter implements OutputFormatterInterface
      */
     public function format($message)
     {
-        return preg_replace_callback('#<([a-z][a-z0-9_=;-]+)>(.*?)</\\1?>#i', array($this, 'replaceStyle'), $message);
+        return preg_replace_callback('#<([a-z][a-z0-9_=;-]+)>(.*?)</\\1?>#is', array($this, 'replaceStyle'), $message);
     }
 
     /**

@@ -47,23 +47,23 @@
 {% endspaceless %}
 {% endblock field_rest %}
 
-{% block attributes %}
+{% block widget_attributes %}
 {% spaceless %}
     id="{{ id }}" name="{{ full_name }}"{% if read_only %} disabled="disabled"{% endif %}{% if required %} required="required"{% endif %}{% if max_length %} maxlength="{{ max_length }}"{% endif %}{% if pattern %} pattern="{{ pattern }}"{% endif %}
     {% for attrname,attrvalue in attr %}{{attrname}}="{{attrvalue}}" {% endfor %}
 {% endspaceless %}
-{% endblock attributes %}
+{% endblock widget_attributes %}
 
-{% block container_attributes %}
+{% block widget_container_attributes %}
 {% spaceless %}
     id="{{ id }}"
     {% for attrname,attrvalue in attr %}{{attrname}}="{{attrvalue}}" {% endfor %}
 {% endspaceless %}
-{% endblock container_attributes %}
+{% endblock widget_container_attributes %}
 
 {% block form_widget %}
 {% spaceless %}
-    <div {{ block('container_attributes') }}>
+    <div {{ block('widget_container_attributes') }}>
         {{ block('field_rows') }}
         {{ form_rest(form) }}
     </div>
@@ -73,7 +73,7 @@
 {% block field_widget %}
 {% spaceless %}
     {% set type = type|default('text') %}
-    <input type="{{ type }}" {{ block('attributes') }} value="{{ value }}" />
+    <input type="{{ type }}" {{ block('widget_attributes') }} value="{{ value }}" />
 {% endspaceless %}
 {% endblock field_widget %}
 
@@ -102,11 +102,11 @@
 
 {% block textarea_widget %}
 {% spaceless %}
-    <textarea {{ block('attributes') }}>{{ value }}</textarea>
+    <textarea {{ block('widget_attributes') }}>{{ value }}</textarea>
 {% endspaceless %}
 {% endblock textarea_widget %}
 
-{% block options %}
+{% block widget_choice_options %}
 {% spaceless %}
     {% for choice, label in options %}
         {% if _form_is_choice_group(label) %}
@@ -120,29 +120,29 @@
         {% endif %}
     {% endfor %}
 {% endspaceless %}
-{% endblock options %}
+{% endblock widget_choice_options %}
 
 {% block choice_widget %}
 {% spaceless %}
     {% if expanded %}
-        <div {{ block('container_attributes') }}>
+        <div {{ block('widget_container_attributes') }}>
         {% for choice, child in form %}
             {{ form_widget(child) }}
             {{ form_label(child) }}
         {% endfor %}
         </div>
     {% else %}
-    <select {{ block('attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
+    <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
         {% if empty_value is not none %}
             <option value="">{{ empty_value|trans }}</option>
         {% endif %}
         {% if preferred_choices|length > 0 %}
             {% set options = preferred_choices %}
-            {{ block('options') }}
+            {{ block('widget_choice_options') }}
             <option disabled="disabled">{{ separator }}</option>
         {% endif %}
         {% set options = choices %}
-        {{ block('options') }}
+        {{ block('widget_choice_options') }}
     </select>
     {% endif %}
 {% endspaceless %}
@@ -150,19 +150,19 @@
 
 {% block checkbox_widget %}
 {% spaceless %}
-    <input type="checkbox" {{ block('attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+    <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
 {% endspaceless %}
 {% endblock checkbox_widget %}
 
 {% block radio_widget %}
 {% spaceless %}
-    <input type="radio" {{ block('attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+    <input type="radio" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
 {% endspaceless %}
 {% endblock radio_widget %}
 
 {% block datetime_widget %}
 {% spaceless %}
-    <div {{ block('container_attributes') }}>
+    <div {{ block('widget_container_attributes') }}>
         {{ form_errors(form.date) }}
         {{ form_errors(form.time) }}
         {{ form_widget(form.date) }}
@@ -176,7 +176,7 @@
     {% if widget == 'single_text' %}
         {{ block('text_widget') }}
     {% else %}
-        <div {{ block('container_attributes') }}>
+        <div {{ block('widget_container_attributes') }}>
             {{ date_pattern|replace({
                 '{{ year }}': form_widget(form.year),
                 '{{ month }}': form_widget(form.month),
@@ -189,7 +189,7 @@
 
 {% block time_widget %}
 {% spaceless %}
-    <div {{ block('container_attributes') }}>
+    <div {{ block('widget_container_attributes') }}>
         {{ form_widget(form.hour, { 'attr': { 'size': '1' } }) }}:{{ form_widget(form.minute, { 'attr': { 'size': '1' } }) }}{% if with_seconds %}:{{ form_widget(form.second, { 'attr': { 'size': '1' } }) }}{% endif %}
     </div>
 {% endspaceless %}

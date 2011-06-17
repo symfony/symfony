@@ -6,6 +6,16 @@ one. It only discusses changes that need to be done when using the "public"
 API of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.
 
+beta5 to RC1
+------------
+
+* Some blocks in the Twig Form templates have been renamed to avoid
+  collisions:
+
+    * `container_attributes` to `widget_container_attributes`
+    * `attributes` to `widget_attributes`
+    * `options` to `widget_choice_options`
+
 beta4 to beta5
 --------------
 

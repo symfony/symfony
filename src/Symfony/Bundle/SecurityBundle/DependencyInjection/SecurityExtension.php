@@ -623,11 +623,14 @@ class SecurityExtension extends Extension
                 ->getDefinition('security.util.secure_random')
                 ->addMethodCall('setSeedProvider', array(new Reference($config['seed_provider'])))
             ;
+            $container->setAlias('security.util.secure_random_seed_provider', $config['seed_provider']);
         } else if (isset($config['connection'])) {
             $container
                 ->getDefinition('security.util.secure_random')
                 ->addMethodCall('setConnection', array(new Reference($this->getDoctrineConnectionId($config['connection'])), $config['table_name']))
             ;
+            $container->setAlias('security.util.secure_random_connection', $this->getDoctrineConnectionId($config['connection']));
+            $container->setParameter('security.util.secure_random_table', $config['table_name']);
             $container
                 ->getDefinition('security.util.secure_random_schema_listener')
                 ->addTag('doctrine.event_listener', array('connection' => $config['connection'], 'event' => 'postGenerateSchema', 'lazy' => true))

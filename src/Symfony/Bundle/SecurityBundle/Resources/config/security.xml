@@ -133,7 +133,7 @@
             <tag name="monolog.logger" channel="security" />
             <argument type="service" id="logger" />
         </service>
-        <service id="security.util.secure_random_schema" class="%security.util.secure_random_schema.class%" public="false">
+        <service id="security.util.secure_random_schema" class="%security.util.secure_random_schema.class%">
             <argument></argument><!-- Table Name -->
         </service>
         <service id="security.util.secure_random_schema_listener" class="%security.util.secure_random_schema_listener.class%" public="false">

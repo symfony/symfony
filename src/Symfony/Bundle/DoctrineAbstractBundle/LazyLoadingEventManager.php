@@ -120,15 +120,4 @@ class LazyLoadingEventManager extends EventManager
             }
         }
     }
-
-    /**
-     * Adds an EventSubscriber. The subscriber is asked for all the events he is
-     * interested in and added as a listener for these events.
-     *
-     * @param Doctrine\Common\EventSubscriber $subscriber The subscriber.
-     */
-    public function addEventSubscriber(EventSubscriber $subscriber)
-    {
-        $this->addEventListener($subscriber->getSubscribedEvents(), $subscriber);
-    }
 }

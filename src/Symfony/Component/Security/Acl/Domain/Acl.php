@@ -234,7 +234,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     public function isSidLoaded($sids)
     {
         if (!$this->loadedSids) {
-            return true;
+            return false;
         }
 
         if (!is_array($sids)) {

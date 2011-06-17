@@ -11,8 +11,13 @@
 
 namespace Symfony\Tests\Component\Security\Http\RememberMe;
 
-use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
+use Symfony\Component\Security\Core\Util\NullSeedProvider;
 
+use Symfony\Component\HttpKernel\Log\NullLogger;
+
+use Symfony\Component\Security\Core\Util\SecureRandom;
+
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -308,8 +313,17 @@ class PersistentTokenBasedRememberMeServicesTest extends \PHPUnit_Framework_Test
         if (null === $userProvider) {
             $userProvider = $this->getProvider();
         }
+        if (null === $logger) {
+            $logger = new NullLogger();
+        }
 
-        return new PersistentTokenBasedRememberMeServices(array($userProvider), 'fookey', 'fookey', $options, $logger);
+        $services = new PersistentTokenBasedRememberMeServices(array($userProvider), 'fookey', 'fookey', $options, $logger);
+
+        $secureRandom = new SecureRandom($logger);
+        $secureRandom->setSeedProvider(new NullSeedProvider());
+        $services->setSecureRandom($secureRandom);
+
+        return $services;
     }
 
     protected function getProvider()

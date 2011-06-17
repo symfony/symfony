@@ -124,5 +124,11 @@
         <service id="security.user.provider.in_memory.user" class="%security.user.provider.in_memory.user.class%" abstract="true" public="false" />
 
         <service id="security.user.provider.chain" class="%security.user.provider.chain.class%" abstract="true" public="false" />
+        
+        <!-- Utilities -->
+        <service id="security.util.secure_random" class="Symfony\Component\Security\Core\Util\SecureRandom">
+            <tag name="monolog.logger" channel="security" />
+            <argument type="service" id="logger" />
+        </service>
     </services>
 </container>

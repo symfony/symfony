@@ -64,7 +64,7 @@ abstract class FileLoader extends Loader
             $loader = $this->resolve($resource, $type);
 
             if ($loader instanceof FileLoader && null !== $this->currentDir) {
-                $resource = $this->locator->locate($resource, $this->currentDir);
+                $resource = $loader->locator->locate($resource, $this->currentDir);
             }
 
             if (isset(self::$loading[$resource])) {

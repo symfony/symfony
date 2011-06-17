@@ -352,6 +352,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array('separator' => '-- sep --'),
 '/select
     [@name="na&me"]
+    [@required="required"]
     [
         ./option[@value="&b"][not(@selected)][.="Choice&B"]
         /following-sibling::option[@disabled="disabled"][not(@selected)][.="-- sep --"]
@@ -375,12 +376,12 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
     [@name="na&me"]
+    [not(@required)]
     [
-        ./option[@value=""][.="[trans][/trans]"]
-        /following-sibling::option[@value="&a"][@selected="selected"][.="Choice&A"]
+        ./option[@value="&a"][@selected="selected"][.="Choice&A"]
         /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
     ]
-    [count(./option)=3]
+    [count(./option)=2]
 '
         );
     }
@@ -398,12 +399,12 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
     [@name="na&me"]
+    [not(@required)]
     [
-        ./option[@value=""][not(@selected)][.="[trans][/trans]"]
-        /following-sibling::option[@value="&a"][not(@selected)][.="Choice&A"]
+        ./option[@value="&a"][not(@selected)][.="Choice&A"]
         /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
     ]
-    [count(./option)=3]
+    [count(./option)=2]
 '
         );
     }
@@ -422,8 +423,34 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
     [@name="na&me"]
+    [not(@required)]
     [
         ./option[@value=""][not(@selected)][.="[trans]Select&Anything&Not&Me[/trans]"]
+        /following-sibling::option[@value="&a"][@selected="selected"][.="Choice&A"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
+    ]
+    [count(./option)=3]
+'
+        );
+    }
+
+    public function testSingleChoiceRequiredWithEmptyValue()
+    {
+        $form = $this->factory->createNamed('choice', 'na&me', '&a', array(
+            'property_path' => 'name',
+            'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
+            'required' => true,
+            'multiple' => false,
+            'expanded' => false,
+            'empty_value' => 'Test&Me'
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/select
+    [@name="na&me"]
+    [@required="required"]
+    [
+        ./option[@value=""][.="[trans]Test&Me[/trans]"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="Choice&A"]
         /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
     ]
@@ -445,6 +472,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array('empty_value' => ''),
 '/select
     [@name="na&me"]
+    [@required="required"]
     [
         ./option[@value=""][.="[trans][/trans]"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="Choice&A"]
@@ -508,6 +536,29 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testMultipleChoiceSkipEmptyValue()
+    {
+        $form = $this->factory->createNamed('choice', 'na&me', array('&a'), array(
+            'property_path' => 'name',
+            'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
+            'multiple' => true,
+            'expanded' => false,
+            'empty_value' => 'Test&Me'
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/select
+    [@name="na&me[]"]
+    [@multiple="multiple"]
+    [
+        ./option[@value="&a"][@selected="selected"][.="Choice&A"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
+    ]
+    [count(./option)=2]
+'
+        );
+    }
+
     public function testMultipleChoiceNonRequired()
     {
         $form = $this->factory->createNamed('choice', 'na&me', array('&a'), array(
@@ -538,6 +589,29 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'multiple' => false,
             'expanded' => true,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./input[@type="radio"][@name="na&me"][@id="na&me_&a"][@checked]
+        /following-sibling::label[@for="na&me_&a"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::input[@type="radio"][@name="na&me"][@id="na&me_&b"][not(@checked)]
+        /following-sibling::label[@for="na&me_&b"][.="[trans]Choice&B[/trans]"]
+    ]
+    [count(./input)=2]
+'
+        );
+    }
+
+    public function testSingleChoiceExpandedSkipEmptyValue()
+    {
+        $form = $this->factory->createNamed('choice', 'na&me', '&a', array(
+            'property_path' => 'name',
+            'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
+            'multiple' => false,
+            'expanded' => true,
+            'empty_value' => 'Test&Me'
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),

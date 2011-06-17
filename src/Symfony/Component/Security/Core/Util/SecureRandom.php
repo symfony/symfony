@@ -128,7 +128,7 @@ final class SecureRandom
         $stmt = $this->con->executeQuery("SELECT seed, updated_at FROM {$this->seedTableName}");
 
         if (false === $this->seed = $stmt->fetchColumn(0)) {
-            throw new \RuntimeException('The seeding table for the SPRNG was not initialized.');
+            throw new \RuntimeException('You need to initialize the generator by running the console command "init:secure-random".');
         }
 
         $this->seedLastUpdatedAt = new \DateTime($stmt->fetchColumn(1));

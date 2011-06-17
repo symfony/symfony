@@ -22,7 +22,6 @@
         <xsd:attribute name="password" type="xsd:string" />
         <xsd:attribute name="driver" type="xsd:string" />
         <xsd:attribute name="driver-class" type="xsd:string" />
-        <xsd:attribute name="options" type="xsd:string" />
         <xsd:attribute name="path" type="xsd:string" />
         <xsd:attribute name="unix-socket" type="xsd:string" />
         <xsd:attribute name="memory" type="xsd:boolean" />
@@ -36,10 +35,28 @@
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="connection" type="connection" />
             <xsd:element name="type" type="type" />
+            <xsd:element name="option" type="option" />
+            <xsd:element name="mapping-type" type="mapping-type" />
         </xsd:choice>
 
         <xsd:attribute name="default-connection" type="xsd:string" />
         <xsd:attributeGroup ref="connection-config" />
+    </xsd:complexType>
+
+    <xsd:complexType name="option">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="key" type="xsd:string" use="required" />
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="mapping-type">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:extension>
+        </xsd:simpleContent>
     </xsd:complexType>
 
     <xsd:complexType name="type">
@@ -51,6 +68,10 @@
     </xsd:complexType>
 
     <xsd:complexType name="connection">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="option" type="option" />
+            <xsd:element name="mapping-type" type="mapping-type" />
+        </xsd:choice>
         <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attributeGroup ref="connection-config" />
     </xsd:complexType>

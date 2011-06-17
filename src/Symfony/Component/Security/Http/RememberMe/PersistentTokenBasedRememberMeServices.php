@@ -136,7 +136,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
      */
     protected function generateRandomValue()
     {
-        if (function_exists('openssl_random_pseudo_bytes')) {
+        if (0 !== stripos(PHP_OS, 'win') && function_exists('openssl_random_pseudo_bytes')) {
             $bytes = openssl_random_pseudo_bytes(64, $strong);
 
             if (true === $strong && false !== $bytes) {
@@ -145,7 +145,19 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
         }
 
         if (null !== $this->logger) {
-            $this->logger->warn('Could not produce a cryptographically strong random value. Please install/update the OpenSSL extension.');
+            $msg = 'Could not produce a cryptographically strong random value';
+
+            if (0 === stripos(PHP_OS, 'win')) {
+                $msg .= ' because you are on a Windows plattform. If you intend to deploy to a Windows server,'
+                       .' you need to make your own implementation of a pseudo random number generator and'
+                       .' override PersistentTokenBasedRememberMeServices::generateRandomValue()';
+            } else if (!extension_loaded('openssl')) {
+                $msg .= ' because the "openssl" extension is not loaded. Please enable it in your php.ini';
+            }
+
+            $msg .= '.';
+
+            $this->logger->warn($msg);
         }
 
         return base64_encode(hash('sha512', uniqid(mt_rand(), true), true));

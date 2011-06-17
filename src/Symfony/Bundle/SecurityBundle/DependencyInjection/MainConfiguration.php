@@ -90,7 +90,7 @@ class MainConfiguration implements ConfigurationInterface
             ->children()
                 ->arrayNode('acl')
                     ->children()
-                        ->scalarNode('connection')->end()
+                        ->scalarNode('connection')->defaultValue('default')->cannotBeEmpty()->end()
                         ->arrayNode('cache')
                             ->addDefaultsIfNotSet()
                             ->children()

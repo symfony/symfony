@@ -125,7 +125,6 @@ EOF;
                 }
 
                 if ($optimizable && $prefix !== $parentPrefix) {
-                    $code[] = "            throw 0 < count(\$allow) ? new MethodNotAllowedException(array_unique(\$allow)) : new ResourceNotFoundException();";
                     $code[] = "        }\n";
                 }
             } else {

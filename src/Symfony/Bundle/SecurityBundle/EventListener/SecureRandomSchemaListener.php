@@ -2,15 +2,14 @@
 
 namespace Symfony\Bundle\SecurityBundle\EventListener;
 
-use Symfony\Component\Security\Acl\Dbal\Schema;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
+use Symfony\Component\Security\Core\Util\SecureRandomSchema;
 
-class AclSchemaListener
+class SecureRandomSchemaListener
 {
     private $schema;
 
-    public function __construct(Schema $schema)
+    public function __construct(SecureRandomSchema $schema)
     {
         $this->schema = $schema;
     }

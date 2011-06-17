@@ -59,7 +59,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 
     protected function registerListener($listenerId, $instances)
     {
-        $connections = array();
+        $connections = $lazy = array();
         foreach ($instances as $attributes) {
             if (!isset($attributes['event'])) {
                 throw new \InvalidArgumentException(sprintf('Doctrine event listener "%s" must specify the "event" attribute.', $listenerId));
@@ -75,14 +75,19 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
                 if (!isset($connections[$connection]) || !is_array($connections[$connection])) {
                     $connections[$connection] = array();
                 }
+                $lazy[$connection] = isset($attributes['lazy']) ? $attributes['lazy'] : false;
                 $connections[$connection][] = $attributes['event'];
             }
         }
 
         foreach ($connections as $name => $events) {
+            if ($lazy[$name]) {
+                $this->container->getDefinition($listenerId)->setPublic(true);
+            }
+
             $this->getEventManager($name, $listenerId)->addMethodCall('addEventListener', array(
                 array_unique($events),
-                new Reference($listenerId),
+                $lazy[$name] ? $listenerId : new Reference($listenerId),
             ));
         }
     }

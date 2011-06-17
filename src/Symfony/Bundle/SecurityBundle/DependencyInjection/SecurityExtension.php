@@ -81,7 +81,7 @@ class SecurityExtension extends Extension
         $this->createRoleHierarchy($config, $container);
 
         if (isset($config['util']['secure_random'])) {
-            $this->createSecureRandom($config['util']['secure_random'], $container);
+            $this->configureSecureRandom($config['util']['secure_random'], $container);
         }
 
         if ($config['encoders']) {
@@ -142,9 +142,8 @@ class SecurityExtension extends Extension
 
         $container
             ->getDefinition('security.acl.dbal.schema_listener')
-            ->addTag('doctrine.event_listener', array('connection' => $config['connection'], 'event' => 'postGenerateSchema'))
+            ->addTag('doctrine.event_listener', array('connection' => $config['connection'], 'event' => 'postGenerateSchema', 'lazy' => true))
         ;
-        $this->addClassesToCompile(array('Symfony\Bundle\SecurityBundle\EventListener\AclSchemaListener'));
 
         $container->getDefinition('security.acl.cache.doctrine')->addArgument($config['cache']['prefix']);
 
@@ -617,7 +616,7 @@ class SecurityExtension extends Extension
         return $this->factories = $factories;
     }
 
-    private function createSecureRandom(array $config, ContainerBuilder $container)
+    private function configureSecureRandom(array $config, ContainerBuilder $container)
     {
         if (isset($config['seed_provider'])) {
             $container
@@ -627,11 +626,18 @@ class SecurityExtension extends Extension
         } else if (isset($config['connection'])) {
             $container
                 ->getDefinition('security.util.secure_random')
-                ->addMethodCall('setConnection', array($this->getDoctrineConnectionId($config['connection']), $config['table_name']))
+                ->addMethodCall('setConnection', array(new Reference($this->getDoctrineConnectionId($config['connection'])), $config['table_name']))
+            ;
+            $container
+                ->getDefinition('security.util.secure_random_schema_listener')
+                ->addTag('doctrine.event_listener', array('connection' => $config['connection'], 'event' => 'postGenerateSchema', 'lazy' => true))
+            ;
+            $container
+                ->getDefinition('security.util.secure_random_schema')
+                ->replaceArgument(0, $config['table_name'])
             ;
         }
     }
-
 
     /**
      * Returns the base path for the XSD files.

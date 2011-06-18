@@ -103,7 +103,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($request->isSecure());
 
         $json = '{"jsonrpc":"2.0","method":"echo","id":7,"params":["Hello World"]}';
-        $request = Request::create('http://example.com/jsonrpc', 'POST', array(), array(), array(), array(), $json);
+        $request = Request::create('http://example.com/jsonrpc', Request::METHOD_POST, array(), array(), array(), array(), $json);
         $this->assertEquals($json, $request->getContent());
         $this->assertFalse($request->isSecure());
     }
@@ -448,29 +448,58 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
 
-        $this->assertEquals('GET', $request->getMethod(), '->getMethod() returns GET if no method is defined');
+        $this->assertEquals(Request::METHOD_GET, $request->getMethod(), '->getMethod() returns GET if no method is defined');
 
         $request->setMethod('get');
-        $this->assertEquals('GET', $request->getMethod(), '->getMethod() returns an uppercased string');
+        $this->assertEquals(Request::METHOD_GET, $request->getMethod(), '->getMethod() returns an uppercased string');
 
         $request->setMethod('PURGE');
         $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method even if it is not a standard one');
 
-        $request->setMethod('POST');
-        $this->assertEquals('POST', $request->getMethod(), '->getMethod() returns the method POST if no _method is defined');
+        $request->setMethod(Request::METHOD_POST);
+        $this->assertEquals(Request::METHOD_POST, $request->getMethod(), '->getMethod() returns the method POST if no _method is defined');
 
-        $request->setMethod('POST');
+        $request->setMethod(Request::METHOD_POST);
         $request->request->set('_method', 'purge');
         $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method from _method if defined and POST');
 
-        $request->setMethod('POST');
+        $request->setMethod(Request::METHOD_POST);
         $request->server->set('X-HTTP-METHOD-OVERRIDE', 'delete');
-        $this->assertEquals('DELETE', $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override even though _method is set if defined and POST');
+        $this->assertEquals(Request::METHOD_DELETE, $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override even though _method is set if defined and POST');
 
         $request = new Request();
-        $request->setMethod('POST');
+        $request->setMethod(Request::METHOD_POST);
         $request->server->set('X-HTTP-METHOD-OVERRIDE', 'delete');
-        $this->assertEquals('DELETE', $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override if defined and POST');
+        $this->assertEquals(Request::METHOD_DELETE, $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override if defined and POST');
+    }
+    
+    /**
+     * @covers Symfony\Component\HttpFoundation\Request::isMethodGet
+     * @covers Symfony\Component\HttpFoundation\Request::isMethodPost
+     * @covers Symfony\Component\HttpFoundation\Request::isMethodPut
+     * @covers Symfony\Component\HttpFoundation\Request::isMethodDelete
+     * @covers Symfony\Component\HttpFoundation\Request::isMethodHead
+     */
+    public function testIsMethodType()
+    {
+        $request = new Request();
+
+        $this->assertTrue($request->isMethodGet(), '->isMethodGet() returns true if no method is defined');
+
+        $request->setMethod(Request::METHOD_POST);
+        $this->assertTrue($request->isMethodPost(), '->isMethodPost() returns true if method is POST');
+        
+        $request->setMethod(Request::METHOD_GET);
+        $this->assertTrue($request->isMethodGet(), '->isMethodGet() returns true if method is GET');
+        
+        $request->setMethod(Request::METHOD_PUT);
+        $this->assertTrue($request->isMethodPut(), '->isMethodPut() returns true if method is PUT');
+        
+        $request->setMethod(Request::METHOD_DELETE);
+        $this->assertTrue($request->isMethodDelete(), '->isMethodDelete() returns true if method is DELETE');
+        
+        $request->setMethod(Request::METHOD_HEAD);
+        $this->assertTrue($request->isMethodHead(), '->isMethodHead() returns true if method is HEAD');        
     }
 
     /**

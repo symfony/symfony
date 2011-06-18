@@ -20,6 +20,12 @@ use Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage;
  */
 class Request
 {
+    const METHOD_GET = 'GET';
+    const METHOD_POST = 'POST';
+    const METHOD_PUT = 'PUT';
+    const METHOD_DELETE = 'DELETE';
+    const METHOD_HEAD = 'HEAD';
+    
     /**
      * @var \Symfony\Component\HttpFoundation\ParameterBag
      */
@@ -130,7 +136,7 @@ class Request
         $request = new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
 
         if (0 === strpos($request->server->get('CONTENT_TYPE'), 'application/x-www-form-urlencoded')
-            && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), array('PUT', 'DELETE'))
+            && in_array(strtoupper($request->server->get('REQUEST_METHOD', self::METHOD_GET)), array(self::METHOD_PUT, self::METHOD_DELETE))
         ) {
             parse_str($request->getContent(), $data);
             $request->request = new ParameterBag($data);
@@ -152,7 +158,7 @@ class Request
      *
      * @return Request A Request instance
      */
-    static public function create($uri, $method = 'GET', $parameters = array(), $cookies = array(), $files = array(), $server = array(), $content = null)
+    static public function create($uri, $method = self::METHOD_GET, $parameters = array(), $cookies = array(), $files = array(), $server = array(), $content = null)
     {
         $defaults = array(
             'SERVER_NAME'          => 'localhost',
@@ -186,7 +192,7 @@ class Request
             $defaults['HTTP_HOST'] = $defaults['HTTP_HOST'].':'.$components['port'];
         }
 
-        if (in_array(strtoupper($method), array('POST', 'PUT', 'DELETE'))) {
+        if (in_array(strtoupper($method), array(self::METHOD_POST, self::METHOD_PUT, self::METHOD_DELETE))) {
             $request = $parameters;
             $query = array();
             $defaults['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
@@ -620,7 +626,7 @@ class Request
     }
 
     /**
-     * Sets the request method.
+     * Sets the request method. 
      *
      * @param string $method
      */
@@ -640,13 +646,63 @@ class Request
     public function getMethod()
     {
         if (null === $this->method) {
-            $this->method = strtoupper($this->server->get('REQUEST_METHOD', 'GET'));
-            if ('POST' === $this->method) {
-                $this->method = strtoupper($this->server->get('X-HTTP-METHOD-OVERRIDE', $this->request->get('_method', 'POST')));
+            $this->method = strtoupper($this->server->get('REQUEST_METHOD', self::METHOD_GET));
+            if (self::METHOD_POST === $this->method) {
+                $this->method = strtoupper($this->server->get('X-HTTP-METHOD-OVERRIDE', $this->request->get('_method', self::METHOD_POST)));
             }
         }
 
         return $this->method;
+    }
+    
+    /**
+     * Checks if method is GET.
+     *
+     * @return boolean
+     */
+    public function isMethodGet()
+    {
+        return self::METHOD_GET === $this->getMethod();
+    }
+    
+    /**
+     * Checks if method is POST.
+     *
+     * @return boolean
+     */
+    public function isMethodPost()
+    {
+        return self::METHOD_POST === $this->getMethod();
+    }
+    
+    /**
+     * Checks if method is PUT.
+     *
+     * @return boolean
+     */
+    public function isMethodPut()
+    {
+        return self::METHOD_PUT === $this->getMethod();
+    }
+    
+    /**
+     * Checks if method is DELETE.
+     *
+     * @return boolean
+     */
+    public function isMethodDelete()
+    {
+        return self::METHOD_DELETE === $this->getMethod();
+    }
+    
+    /**
+     * Checks if method is HEAD.
+     *
+     * @return boolean
+     */
+    public function isMethodHead()
+    {
+        return self::METHOD_HEAD === $this->getMethod();
     }
 
     /**
@@ -740,7 +796,7 @@ class Request
      */
     public function isMethodSafe()
     {
-        return in_array($this->getMethod(), array('GET', 'HEAD'));
+        return in_array($this->getMethod(), array(self::METHOD_GET, self::METHOD_HEAD));
     }
 
     /**

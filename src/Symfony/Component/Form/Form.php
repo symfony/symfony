@@ -573,14 +573,14 @@ class Form implements \IteratorAggregate, FormInterface
     {
         // Store the bound data in case of a post request
         switch ($request->getMethod()) {
-            case 'POST':
-            case 'PUT':
+            case Request::METHOD_POST:
+            case Request::METHOD_PUT:
                 $data = array_replace_recursive(
                     $request->request->get($this->getName(), array()),
                     $request->files->get($this->getName(), array())
                 );
                 break;
-            case 'GET':
+            case Request::METHOD_GET:
                 $data = $request->query->get($this->getName(), array());
                 break;
             default:

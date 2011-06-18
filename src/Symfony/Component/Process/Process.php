@@ -105,13 +105,9 @@ class Process
         };
 
         // Workaround for http://bugs.php.net/bug.php?id=51800
-        if (strstr(PHP_OS, 'WIN')) {
-            $stderrPipeMode = 'a';
-        } else {
-            $stderrPipeMode = 'w';
-        }
-
-        $descriptors = array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', $stderrPipeMode));
+        // Set stderr in append mode.
+        // This bug causes freezing in Windows machines and empty files in GNU/Linux
+        $descriptors = array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', 'a'));
 
         $process = proc_open($this->commandline, $descriptors, $pipes, $this->cwd, $this->env, $this->options);
 

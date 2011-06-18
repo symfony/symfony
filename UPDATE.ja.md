@@ -5,18 +5,82 @@
 このドキュメントでは、フレームワークの "パブリックな" APIを使っている場合に必要な変更点についてのみ説明しています。
 フレームワークのコアコードを "ハック" している場合は、変更履歴を注意深く追跡する必要があるでしょう。
 
+beta5 から RC1
+--------------
+
+* ルーティングの `AnnotGlobLoader` クラスが削除されました。
+
+* Twig フォームテンプレートのいくつかのブロックの名前は、衝突を避けるために変更されました。
+
+    * `container_attributes` から `widget_container_attributes`
+    * `attributes` から `widget_attributes`
+    * `options` から `widget_choice_options`
+
 beta4 から beta5
 ----------------
 
-* ファイルアップロードのための一時的なストレージは削除されました
+* `UserProviderInterface::loadUser()` メソッドの名前は、メソッドの目的がより明確になるよう、`UserProviderInterface::refreshUser()` に変更されました。
 
-* `Symfony\Component\HttpFoundation\File\File::getExtension()` メソッドと `guessExtension()` メソッドは拡張子を
-  返すときにもう `.` を付けません。
+* `WebTestCase` クラスの `$kernel` プロパティは static に変更されました。
+  ファンクショナルテスト内で `$this->kernel` を使っている箇所は、`self::$kernel` に変更してください。
 
-* Doctrine の `EntityType` クラスの `em` オプションは EntityManager インスタンスの代わりにエンティティ名を取ります。
+* AsseticBundle は独立したリポジトリで管理されるようになりました（Symfony2 Standard Edition にはバンドルされています）。
+
+* Yaml コンポーネントの変更:
+
+    * Exception クラスは独自の名前空間へ移動されました。
+    * `Yaml::load()` メソッドの名前は `Yaml::parse()` に変更されました。
+
+* `HttpFoundation` コンポーネントの `File` クラスのリファクタリング:
+
+    * `Symfony\Component\HttpFoundation\File\File` の API が新しくなりました。
+
+       * `\SplFileInfo` を継承するようになりました
+
+           * `getName()` は `getBasename()` に変更
+           * `getDirectory()` は `getPath()` に変更
+           * `getPath()` は `getRealPath()` に変更
+
+       * `move()` メソッドを呼び出した時に、対象ディレクトリがまだ存在していない場合は作成されるようになりました。
+
+       * `getExtension()` と `guessExtension()` の戻り値の拡張子から、先頭の `.` が除去されるように変更されました。
+
+    * `Symfony\Component\HttpFoundation\File\UploadedFile` の API が新しくなりました。
+
+        * コンストラクタに真偽値の引数が追加されました。
+          この引数に true を指定すると、ファイルを移動できるようになりますが、テストモード以外では true に設定しないでください。
+          コアファイル以外の外部から true に設定することは想定していません。
+
+        * `getMimeType()` は、対象ファイルの MIME タイプを必ず返すように変更されました。
+           リクエストから MIME タイプを取得する場合は、`getClientMimeType()` メソッドを使ってください。
+
+        * `getSize()` は、対象ファイルのサイズを必ず返すように変更されました。
+           リクエストからファイルサイズを取得する場合は、`getClientSize()` メソッドを使ってください。
+
+        * リクエストからオリジナルのファイル名を取得する場合は、`getClientOriginalName()` メソッドを使ってください。
+
+* Twig の `extensions` 設定は削除されました。
+  Twig エクステンションを登録する場合は、`twig.extension` タグを使ってください。
+
+* Monolog ハンドラのスタックで、デフォルトで記録が伝播されるようになりました。
+  伝播されないようにするには、bubble を明示的に false に設定してください。
+
+* SerializerInterface が拡張されました。
+  Serializer クラスのパブリックメソッドの数は減りましたが、後方互換性が損なわれ、コンポーネント独自の Exception クラスが追加されました。
+
+* FileType フォームクラスが大きく変更されました。
+
+    * テンポラリストレージが削除されました。
+
+    * FileType の `type` オプションが削除されました。
+      新しい動作は、以前の `type` に `file` を設定した場合の動作と同じです。
+
+    * ファイルウィジェットは、他の INPUT フィールドと同じようにレンダリングされるように変更されました。
+
+* Doctrine の `EntityType` クラスコンストラクタの `em` 引数には、EntityManager インスタンスの代わりにエンティティマネージャー名を指定するよう変更されました。
   このオプションをを渡さない場合、以前と同じようにデフォルトのエンティティマネージャーが使われます。
 
-* Console コンポーネントの中の: `Command::getFullname()` メソッドと `Command::getNamespace()` メソッドは削除されました
+* Console コンポーネントの中の `Command::getFullname()` メソッドと `Command::getNamespace()` メソッドは削除されました
   (`Command::getName()` メソッドの振る舞いは以前の `Command::getFullname()` メソッドと同じになりました)。
 
 * デフォルトの Twig フォームテンプレートは Twig bridge に移動されました。以下のようにすればテンプレートや
@@ -28,16 +92,16 @@ beta4 から beta5
 
     変更後:
 
-        `div_layout.html.twig`
+        `form_div_layout.html.twig`
 
-* キャッシュされているかを考慮する全ての設定は削除されました。
+* キャッシュウォーマーに関連する設定は、すべて削除されました。
 
 * `Response::isRedirected()` メソッドは `Response::isRedirect()` メソッドに統合されました。
 
 beta3 から beta4
 ----------------
 
-* `Profile` のインスタンスを返す `Client::getProfiler` は、 `Client::getProfile` が選ばれたため削除されました。
+* `Profile` のインスタンスを返す `Client::getProfile()` メソッドへの変更に従い、`Client::getProfiler()` メソッドは削除されました。
 
 * いくつかの `UniversalClassLoader` のメソッド名は変更されました:
 
@@ -100,7 +164,7 @@ beta3 から beta4
 
     * `addListenerService` は第 1 引数として単一のイベント名だけを取るようになりました。
 
-    * タグの中のコンフィギュレーションは呼び出すメソッドを設定が必須になりました:
+    * コンフィギュレーションのタグでは、呼び出すメソッドを指定する必要があります。
 
         * 変更前:
 

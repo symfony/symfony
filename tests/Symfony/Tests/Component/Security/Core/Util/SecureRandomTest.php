@@ -2,6 +2,10 @@
 
 namespace Symfony\Tests\Component\Security\Core\Util;
 
+use Symfony\Component\Security\Core\Util\NullSeedProvider;
+
+use Symfony\Component\HttpKernel\Log\NullLogger;
+
 use Symfony\Component\Security\Core\Util\SecureRandomSchema;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Connection;
@@ -93,7 +97,7 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($runs[3] > 502 && $runs[3] < 748, 'Runs of length 3 outside of defined interval: '.$runs[3]);
         $this->assertTrue($runs[4] > 233 && $runs[4] < 402, 'Runs of length 4 outside of defined interval: '.$runs[4]);
         $this->assertTrue($runs[5] > 90 && $runs[5] < 223, 'Runs of length 5 outside of defined interval: '.$runs[5]);
-        $this->assertTrue($runs[6] > 90 && $runs[5] < 233, 'Runs of length 6 outside of defined interval: '.$runs[6]);
+        $this->assertTrue($runs[6] > 90 && $runs[6] < 233, 'Runs of length 6 outside of defined interval: '.$runs[6]);
     }
 
     /**
@@ -145,15 +149,51 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
 
     public function getPrngs()
     {
-        $prngs = array(array($this->getSecureRandom()));
+        $prngs = array();
+        $logger = new NullLogger();
 
-        $prng = $this->getSecureRandom();
-        $ref = new \ReflectionProperty($prng, 'useOpenSsl');
-        $ref->setAccessible(true);
-        $ref->setValue($prng, false);
+        // openssl with fallback
+        $prng = new SecureRandom($logger);
+        $prng->setSeedProvider(new NullSeedProvider());
+        $prngs[] = array($prng);
+
+        // no-openssl with database seed provider
+        if (class_exists('Doctrine\DBAL\DriverManager')) {
+            $prng = new SecureRandom($logger);
+            $con = DriverManager::getConnection(array(
+                'driver' => 'pdo_sqlite',
+                'memory' => true
+            ));
+
+            $schema = new SecureRandomSchema('seed_table');
+            foreach ($schema->toSql($con->getDatabasePlatform()) as $sql) {
+                $con->executeQuery($sql);
+            }
+            $con->executeQuery("INSERT INTO seed_table VALUES (:seed, :updatedAt)", array(
+                ':seed' => base64_encode(hash('sha512', uniqid(mt_rand(), true), true)),
+                ':updatedAt' => date('Y-m-d H:i:s'),
+            ));
+
+            $prng->setConnection($con, 'seed_table');
+            $this->disableOpenSsl($prng);
+
+            $prngs[] = array($prng);
+        }
+
+        // no-openssl with custom seed provider
+        $prng = new SecureRandom($logger);
+        $prng->setSeedProvider(new NullSeedProvider());
+        $this->disableOpenSsl($prng);
         $prngs[] = array($prng);
 
         return $prngs;
+    }
+
+    private function disableOpenSsl($prng)
+    {
+        $ref = new \ReflectionProperty($prng, 'useOpenSsl');
+        $ref->setAccessible(true);
+        $ref->setValue($prng, false);
     }
 
     private function getBitSequence($prng, $length)
@@ -166,29 +206,5 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
         }
 
         return substr($bitSequence, 0, $length);
-    }
-
-    private function getSecureRandom()
-    {
-        $logger = $this->getMock('Symfony\Component\HttpKernel\Log\LoggerInterface');
-        $prng = new SecureRandom($logger);
-
-        $con = DriverManager::getConnection(array(
-            'driver' => 'pdo_sqlite',
-            'memory' => true
-        ));
-
-        $schema = new SecureRandomSchema('seed_table');
-        foreach ($schema->toSql($con->getDatabasePlatform()) as $sql) {
-            $con->executeQuery($sql);
-        }
-        $con->executeQuery("INSERT INTO seed_table VALUES (:seed, :updatedAt)", array(
-            ':seed' => base64_encode(hash('sha512', uniqid(mt_rand(), true), true)),
-            ':updatedAt' => date('Y-m-d H:i:s'),
-        ));
-
-        $prng->setConnection($con, 'seed_table');
-
-        return $prng;
     }
 }

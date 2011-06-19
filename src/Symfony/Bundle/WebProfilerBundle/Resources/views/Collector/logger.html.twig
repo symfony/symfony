@@ -32,6 +32,12 @@
             {% for log in collector.logs %}
                 <li class="{{ cycle(['odd', 'even'], loop.index) }}{% if 'ERR' == log.priorityName or 'ERROR' == log.priorityName %} error{% endif %}">
                     {{ log.message }}
+                    {% if log.context is defined and log.context is not empty %}
+                        <br />
+                        <small>
+                            <strong>Context</strong>: {{ log.context|yaml_encode }}
+                        </small>
+                    {% endif %}
                 </li>
             {% endfor %}
         </ul>

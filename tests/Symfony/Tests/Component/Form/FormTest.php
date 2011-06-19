@@ -817,8 +817,8 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function requestMethodProvider()
     {
         return array(
-            array('POST'),
-            array('PUT'),
+            array(Request::METHOD_POST),
+            array(Request::METHOD_PUT),
         );
     }
 

@@ -46,42 +46,42 @@ class Logger implements LoggerInterface
         $this->logs[$priority][] = $message;
     }
 
-    public function emerg($message)
+    public function emerg($message, array $context = array())
     {
         $this->log($message, 'emerg');
     }
 
-    public function alert($message)
+    public function alert($message, array $context = array())
     {
         $this->log($message, 'alert');
     }
 
-    public function crit($message)
+    public function crit($message, array $context = array())
     {
         $this->log($message, 'crit');
     }
 
-    public function err($message)
+    public function err($message, array $context = array())
     {
         $this->log($message, 'err');
     }
 
-    public function warn($message)
+    public function warn($message, array $context = array())
     {
         $this->log($message, 'warn');
     }
 
-    public function notice($message)
+    public function notice($message, array $context = array())
     {
         $this->log($message, 'notice');
     }
 
-    public function info($message)
+    public function info($message, array $context = array())
     {
         $this->log($message, 'info');
     }
 
-    public function debug($message)
+    public function debug($message, array $context = array())
     {
         $this->log($message, 'debug');
     }

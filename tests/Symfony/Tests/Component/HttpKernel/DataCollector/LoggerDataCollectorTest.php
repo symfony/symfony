@@ -46,7 +46,7 @@ class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
             array(
                 1,
                 array(array('message' => 'foo', 'context' => array('foo' => fopen(__FILE__, 'r')))),
-                array(array('message' => 'foo', 'context' => array('foo' => 'Resource'))),
+                array(array('message' => 'foo', 'context' => array('foo' => 'Resource(stream)'))),
             ),
             array(
                 1,

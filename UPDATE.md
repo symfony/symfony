@@ -21,6 +21,17 @@ beta5 to RC1
     * `attributes` to `widget_attributes`
     * `options` to `widget_choice_options`
 
+* Kernel listeners must now be tagged with kernel.event_listener:
+
+    * Before:
+
+            <tag name="kernel.listener" event="core.request" method="onCoreRequest" />
+
+    * After:
+
+            <tag name="kernel.event_listener" event="core.request" method="onCoreRequest" />
+
+
 beta4 to beta5
 --------------
 

@@ -190,7 +190,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 
         if (null !== $this->failureHandler) {
             $response = $this->failureHandler->onAuthenticationFailure($request, $failed);
-            if ($response !== null) {
+            if (null !== $response) {
                 return $response;
             }
         }

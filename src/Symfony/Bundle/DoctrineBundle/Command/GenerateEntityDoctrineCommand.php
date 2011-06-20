@@ -71,11 +71,12 @@ EOT
         $bundleName = substr($entity, 0, $pos);
         $bundle = $this->getApplication()->getKernel()->getBundle($bundleName);
 
-        // we need to create the directory so that the command works even
-        // for the very first entity created in the bundle
-        if (!is_dir($bundle->getPath().'/Entity')) {
-            @mkdir($bundle->getPath().'/Entity', 0777, true);
-        }
+        // configure the bundle (needed if the bundle does not contain any Entities yet)
+        $config = $this->getEntityManager(null)->getConfiguration();
+        $config->setEntityNamespaces(array_merge(
+            array($bundle->getName() => $bundle->getNamespace().'\\Entity'),
+            $config->getEntityNamespaces()
+        ));
 
         $entity = substr($entity, $pos + 1);
         $fullEntityClassName = $this->container->get('doctrine')->getEntityNamespace($bundleName).'\\'.$entity;

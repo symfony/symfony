@@ -97,7 +97,6 @@ class DateType extends AbstractType
         $builder
             ->setAttribute('formatter', $formatter)
             ->setAttribute('widget', $options['widget'])
-            ->setAttribute('empty_value', $options['empty_value'])
         ;
     }
 
@@ -107,7 +106,6 @@ class DateType extends AbstractType
     public function buildViewBottomUp(FormView $view, FormInterface $form)
     {
         $view->set('widget', $form->getAttribute('widget'));
-        $view->set('empty_value', $form->getAttribute('empty_value'));
 
         if ($view->hasChildren()) {
             $pattern = $form->getAttribute('formatter')->getPattern();

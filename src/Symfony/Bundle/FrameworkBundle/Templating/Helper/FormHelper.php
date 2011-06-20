@@ -199,8 +199,8 @@ class FormHelper extends Helper
         }
 
         do {
-            $block = $types[$typeIndex].'_'.$section;
-            $template = $this->lookupTemplate($block);
+            $types[$typeIndex] .= '_'.$section;
+            $template = $this->lookupTemplate($types[$typeIndex]);
 
             if ($template) {
 
@@ -221,7 +221,10 @@ class FormHelper extends Helper
             }
         }  while (--$typeIndex >= 0);
 
-        throw new FormException(sprintf('Unable to render the form as none of the following blocks exist: "%s".', implode('", "', $types)));
+        throw new FormException(sprintf(
+            'Unable to render the form as none of the following blocks exist: "%s".',
+            implode('", "', array_reverse($types))
+        ));
     }
 
     /**

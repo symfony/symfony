@@ -12,11 +12,11 @@
 namespace Symfony\Component\Config\Exception;
 
 /**
- * Exception class for when a resource cannot be imported.
+ * Exception class for when a resource cannot be loaded or imported.
  *
  * @author Ryan Weaver <ryan@thatsquality.com>
  */
-class FileLoaderImportException extends \Exception
+class FileLoaderLoadException extends \Exception
 {
     /**
      * @param  string    $resource The resource that could not be imported
@@ -24,10 +24,10 @@ class FileLoaderImportException extends \Exception
      * @param  integer   $code     The error code
      * @param  Exception $previous A previous exception
      */
-    public function __construct($resource, $sourceResource, $code = null, $previous = null)
+    public function __construct($resource, $sourceResource = null, $code = null, $previous = null)
     {
         if (null === $sourceResource) {
-            $message = sprintf('Cannot import resource "%s".', $this->varToString($resource));
+            $message = sprintf('Cannot load resource "%s".', $this->varToString($resource));
         } else {
             $message = sprintf('Cannot import resource "%s" from "%s".', $this->varToString($resource), $this->varToString($sourceResource));
         }
@@ -38,7 +38,7 @@ class FileLoaderImportException extends \Exception
     protected function varToString($var)
     {
         if (is_object($var)) {
-            return sprintf('[object](%s)', get_class($var));
+            return sprintf('Object(%s)', get_class($var));
         }
 
         if (is_array($var)) {
@@ -47,15 +47,23 @@ class FileLoaderImportException extends \Exception
                 $a[] = sprintf('%s => %s', $k, $this->varToString($v));
             }
 
-            return sprintf("[array](%s)", implode(', ', $a));
+            return sprintf("Array(%s)", implode(', ', $a));
         }
 
         if (is_resource($var)) {
-            return '[resource]';
+            return sprintf('Resource(%s)', get_resource_type($var));
         }
 
         if (null === $var) {
             return 'null';
+        }
+
+        if (false === $var) {
+            return 'false';
+        }
+
+        if (true === $var) {
+            return 'true';
         }
 
         return (string) $var;

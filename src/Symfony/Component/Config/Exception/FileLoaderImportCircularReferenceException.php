@@ -16,7 +16,7 @@ namespace Symfony\Component\Config\Exception;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FileLoaderImportCircularReferenceException extends FileLoaderImportException
+class FileLoaderImportCircularReferenceException extends FileLoaderLoadException
 {
     public function __construct(array $resources, $code = null, $previous = null)
     {

@@ -94,7 +94,7 @@ class LoggerDataCollector extends DataCollector
         }
 
         if (is_resource($context)) {
-            return 'Resource';
+            return sprintf('Resource(%s)', get_resource_type($context));
         }
 
         if (is_object($context)) {

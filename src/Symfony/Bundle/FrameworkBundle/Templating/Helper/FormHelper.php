@@ -31,15 +31,12 @@ class FormHelper extends Helper
 
     protected $varStack;
 
-    protected $rendering;
-
     protected $context;
 
     public function __construct(EngineInterface $engine)
     {
         $this->engine = $engine;
         $this->varStack = array();
-        $this->rendering = array();
         $this->context = array();
     }
 
@@ -110,7 +107,7 @@ class FormHelper extends Helper
             ),
             $variables
         );
-        
+
         return $this->renderSection($view, 'row', $variables);
     }
 
@@ -185,31 +182,36 @@ class FormHelper extends Helper
         $template = null;
 
         $custom = '_'.$view->get('proto_id', $view->get('id'));
-        $types = $view->get('types');
-        $types[] = $custom;
         $rendering = $custom.$section;
 
-        $i = isset($this->rendering[$rendering]) ? $this->rendering[$rendering] - 1 : count ($types) - 1;
+        if (isset($this->varStack[$rendering])) {
+            $typeIndex = $this->varStack[$rendering]['typeIndex'] - 1;
+            $types = $this->varStack[$rendering]['types'];
+            $this->varStack[$rendering]['variables'] = array_replace_recursive($this->varStack[$rendering]['variables'], $variables);
+        } else {
+            $types = $view->get('types');
+            $types[] = $custom;
+            $typeIndex = count($types) - 1;
+            $this->varStack[$rendering] = array (
+                'variables' => array_replace_recursive($view->all(), $variables),
+                'types'     => $types,
+            );
+        }
 
         do {
-            $block = $types[$i].'_'.$section;
+            $block = $types[$typeIndex].'_'.$section;
             $template = $this->lookupTemplate($block);
 
             if ($template) {
 
-                $this->rendering[$rendering] = $i;
+                $this->varStack[$rendering]['typeIndex'] = $typeIndex;
 
-                $this->varStack[$rendering] = array_replace_recursive(
-                    isset($this->varStack[$rendering]) ? $this->varStack[$rendering] : $view->all(),
-                    $variables
-                );
+                $this->context[] = $this->varStack[$rendering]['variables'];
 
-                $this->context[] = $this->varStack[$rendering];
-
-                $html = $this->engine->render($template, $this->varStack[$rendering]);
+                $html = $this->engine->render($template, $this->varStack[$rendering]['variables']);
 
                 array_pop($this->context);
-                unset($this->varStack[$rendering], $this->rendering[$rendering]);
+                unset($this->varStack[$rendering]);
 
                 if ($mainTemplate) {
                     $view->setRendered();
@@ -217,7 +219,7 @@ class FormHelper extends Helper
 
                 return $html;
             }
-        }  while (--$i >= 0);
+        }  while (--$typeIndex >= 0);
 
         throw new FormException(sprintf('Unable to render the form as none of the following blocks exist: "%s".', implode('", "', $types)));
     }

@@ -16,12 +16,13 @@ use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
+use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
@@ -41,11 +42,13 @@ class ExceptionListener
     private $authenticationTrustResolver;
     private $errorPage;
     private $logger;
+    private $httpUtils;
 
-    public function __construct(SecurityContextInterface $context, AuthenticationTrustResolverInterface $trustResolver, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $context, AuthenticationTrustResolverInterface $trustResolver, HttpUtils $httpUtils, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null, LoggerInterface $logger = null)
     {
         $this->context = $context;
         $this->accessDeniedHandler = $accessDeniedHandler;
+        $this->httpUtils = $httpUtils;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
         $this->authenticationTrustResolver = $trustResolver;
         $this->errorPage = $errorPage;
@@ -115,7 +118,7 @@ class ExceptionListener
                             return;
                         }
 
-                        $subRequest = Request::create($this->errorPage, 'get', array(), $request->cookies->all(), array(), $request->server->all());
+                        $subRequest = $this->httpUtils->createRequest($request, $this->errorPage);
                         $subRequest->attributes->set(SecurityContextInterface::ACCESS_DENIED_ERROR, $exception);
 
                         $response = $event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);

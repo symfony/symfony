@@ -30,15 +30,12 @@ class FormExtension extends \Twig_Extension
     protected $themes;
     protected $varStack;
     protected $template;
-    protected $rendering;
 
     public function __construct(array $resources = array())
     {
         $this->themes = new \SplObjectStorage();
         $this->varStack = array();
         $this->blocks = new \SplObjectStorage();
-        $this->rendering = array();
-
         $this->resources = $resources;
     }
 
@@ -133,7 +130,7 @@ class FormExtension extends \Twig_Extension
             ),
             $variables
         );
-        
+
         return $this->render($view, 'row', $variables);
     }
 
@@ -235,37 +232,42 @@ class FormExtension extends \Twig_Extension
             }
         }
 
-        $blocks = $this->getBlocks($view);
         $custom = '_'.$view->get('proto_id', $view->get('id'));
-        $types = $view->get('types');
-        $types[] = $custom;
         $rendering = $custom.$section;
+        $blocks = $this->getBlocks($view);
 
-        $i = isset($this->rendering[$rendering]) ? $this->rendering[$rendering] - 1 : count ($types) - 1;
+        if (isset($this->varStack[$rendering])) {
+            $typeIndex = $this->varStack[$rendering]['typeIndex'] - 1;
+            $types = $this->varStack[$rendering]['types'];
+            $this->varStack[$rendering]['variables'] = array_replace_recursive($this->varStack[$rendering]['variables'], $variables);
+        } else {
+            $types = $view->get('types');
+            $types[] = $custom;
+            $typeIndex = count($types) - 1;
+            $this->varStack[$rendering] = array (
+                'variables' => array_replace_recursive($view->all(), $variables),
+                'types'     => $types,
+            );
+        }
 
         do {
-            $block = $types[$i].'_'.$section;
+            $block = $types[$typeIndex].'_'.$section;
 
             if (isset($blocks[$block])) {
 
-                $this->rendering[$rendering] = $i;
+                $this->varStack[$rendering]['typeIndex'] = $typeIndex;
 
-                $this->varStack[$rendering] = array_replace_recursive(
-                    isset($this->varStack[$rendering]) ? $this->varStack[$rendering] : $view->all(),
-                    $variables
-                );
-
-                $html = $this->template->renderBlock($block, $this->varStack[$rendering], $blocks);
+                $html = $this->template->renderBlock($block, $this->varStack[$rendering]['variables'], $blocks);
 
                 if ($mainTemplate) {
                     $view->setRendered();
                 }
 
-                unset($this->varStack[$rendering], $this->rendering[$rendering]);
+                unset($this->varStack[$rendering]);
 
                 return $html;
             }
-        } while (--$i >= 0);
+        } while (--$typeIndex >= 0);
 
         throw new FormException(sprintf('Unable to render form as none of the following blocks exist: "%s".', implode('", "', $types)));
     }

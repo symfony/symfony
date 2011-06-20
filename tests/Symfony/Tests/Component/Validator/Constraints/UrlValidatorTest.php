@@ -83,6 +83,7 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
             array('http://مثال.آزمایشی/'),
             array('http://실례.테스트/'),
             array('http://العربية.idn.icann.org/'),
+            array('http://☎.com/'),
         );
     }
 

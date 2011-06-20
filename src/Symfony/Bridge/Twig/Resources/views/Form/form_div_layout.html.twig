@@ -188,10 +188,10 @@
 
 {% block field_row %}
 {% spaceless %}
-    <div>
-        {{ form_label(form) }}
+    <div {% for attrname,attrvalue in attr %}{{attrname}}="{{attrvalue}}" {% endfor %}>
+        {{ form_label(form, null, label) }}
         {{ form_errors(form) }}
-        {{ form_widget(form) }}
+        {{ form_widget(form, widget) }}
     </div>
 {% endspaceless %}
 {% endblock field_row %}

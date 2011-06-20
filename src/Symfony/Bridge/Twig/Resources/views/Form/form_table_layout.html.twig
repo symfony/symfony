@@ -2,13 +2,13 @@
 
 {% block field_row %}
 {% spaceless %}
-    <tr>
+    <tr {% for attrname,attrvalue in attr %}{{attrname}}="{{attrvalue}}" {% endfor %}>
         <td>
-            {{ form_label(form) }}
+            {{ form_label(form, null, label) }}
         </td>
         <td>
             {{ form_errors(form) }}
-            {{ form_widget(form) }}
+            {{ form_widget(form, widget) }}
         </td>
     </tr>
 {% endspaceless %}

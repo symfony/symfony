@@ -35,16 +35,21 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         );
     }
 
-    public function testRowForwardsVariables()
+    public function testRowOverrideVariables()
     {
         $view = $this->factory->createNamed('text', 'name')->createView();
-        $html = $this->renderRow($view, array('label' => 'foo&bar'));
+        $html = $this->renderRow($view, array(
+            'label'  => array('label' => 'foo&bar', 'attr' => array('class ' => 'label&class')),
+            'widget' => array('attr' => array('class' => 'widget&class')),
+            'attr'   => array('class' => 'row&class')
+
+        ));
 
         $this->assertMatchesXpath($html,
-'/div
+'/div[@class="row&class"]
     [
-        ./label[@for="name"][.="[trans]foo&bar[/trans]"]
-        /following-sibling::input[@id="name"]
+        ./label[@for="name"][.="[trans]foo&bar[/trans]"][@class="label&class"]
+        /following-sibling::input[@id="name"][@class="widget&class"]
     ]
 '
         );

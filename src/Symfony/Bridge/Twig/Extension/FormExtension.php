@@ -35,7 +35,7 @@ class FormExtension extends \Twig_Extension
     public function __construct(array $resources = array())
     {
         $this->themes = new \SplObjectStorage();
-        $this->varStack = new \SplObjectStorage();
+        $this->varStack = array();
         $this->blocks = new \SplObjectStorage();
         $this->rendering = array();
 
@@ -125,6 +125,15 @@ class FormExtension extends \Twig_Extension
      */
     public function renderRow(FormView $view, array $variables = array())
     {
+        $variables = array_replace_recursive(
+            array(
+                'label'     => array(),
+                'widget'    => array(),
+                'attr'      => array(),
+            ),
+            $variables
+        );
+        
         return $this->render($view, 'row', $variables);
     }
 
@@ -241,18 +250,18 @@ class FormExtension extends \Twig_Extension
 
                 $this->rendering[$rendering] = $i;
 
-                $this->varStack[$view] = array_replace(
-                    isset($this->varStack[$view]) ? $this->varStack[$view] : $view->all(),
+                $this->varStack[$rendering] = array_replace_recursive(
+                    isset($this->varStack[$rendering]) ? $this->varStack[$rendering] : $view->all(),
                     $variables
                 );
 
-                $html = $this->template->renderBlock($block, $this->varStack[$view], $blocks);
+                $html = $this->template->renderBlock($block, $this->varStack[$rendering], $blocks);
 
                 if ($mainTemplate) {
                     $view->setRendered();
                 }
 
-                unset($this->varStack[$view], $this->rendering[$rendering]);
+                unset($this->varStack[$rendering], $this->rendering[$rendering]);
 
                 return $html;
             }
@@ -270,7 +279,7 @@ class FormExtension extends \Twig_Extension
     {
         return 'form';
     }
-    
+
     /**
      * Returns the blocks used to render the view.
      *

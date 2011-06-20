@@ -112,10 +112,6 @@ class YamlFileLoader extends FileLoader
             throw new \InvalidArgumentException(sprintf('You must define a "pattern" for the "%s" route.', $name));
         }
 
-        if (isset($options['enabled']) && true !== $options['enabled']) {
-            return;
-        }
-
         $route = new Route($config['pattern'], $defaults, $requirements, $options);
 
         $collection->add($name, $route);

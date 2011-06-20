@@ -134,7 +134,7 @@ class XmlFileLoader extends FileLoader
             }
         }
 
-        if(isset($options['enabled']) && 'true' !== $options['enabled']) {
+        if (isset($options['enabled']) && 'true' !== $options['enabled']) {
             return;
         }
 

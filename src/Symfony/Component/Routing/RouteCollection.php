@@ -55,7 +55,7 @@ class RouteCollection implements \IteratorAggregate
      */
     public function add($name, Route $route)
     {
-        if(false === $route->getOption('enabled')) {
+        if (false === $route->getOption('enabled')) {
             return;
         }
 

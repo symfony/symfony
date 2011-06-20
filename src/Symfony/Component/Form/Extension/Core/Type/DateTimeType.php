@@ -32,12 +32,14 @@ class DateTimeType extends AbstractType
             'years',
             'months',
             'days',
+            'empty_value',
         )));
         $timeOptions = array_intersect_key($options, array_flip(array(
             'hours',
             'minutes',
             'seconds',
             'with_seconds',
+            'empty_value',
         )));
 
         if (isset($options['date_widget'])) {
@@ -97,9 +99,9 @@ class DateTimeType extends AbstractType
     {
         return array(
             'input'         => 'datetime',
-            'with_seconds'  => false,
             'data_timezone' => null,
             'user_timezone' => null,
+            'empty_value'   => null,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference'  => false,

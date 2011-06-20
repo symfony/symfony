@@ -280,13 +280,13 @@ class SecurityExtension extends Extension
         if (isset($firewall['logout'])) {
             $listenerId = 'security.logout_listener.'.$id;
             $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.logout_listener'));
-            $listener->replaceArgument(1, $firewall['logout']['path']);
-            $listener->replaceArgument(2, $firewall['logout']['target']);
+            $listener->replaceArgument(2, $firewall['logout']['path']);
+            $listener->replaceArgument(3, $firewall['logout']['target']);
             $listeners[] = new Reference($listenerId);
 
             // add logout success handler
             if (isset($firewall['logout']['success_handler'])) {
-                $listener->replaceArgument(3, new Reference($firewall['logout']['success_handler']));
+                $listener->replaceArgument(4, new Reference($firewall['logout']['success_handler']));
             }
 
             // add session logout handler
@@ -513,13 +513,13 @@ class SecurityExtension extends Extension
     {
         $exceptionListenerId = 'security.exception_listener.'.$id;
         $listener = $container->setDefinition($exceptionListenerId, new DefinitionDecorator('security.exception_listener'));
-        $listener->replaceArgument(2, null === $defaultEntryPoint ? null : new Reference($defaultEntryPoint));
+        $listener->replaceArgument(3, null === $defaultEntryPoint ? null : new Reference($defaultEntryPoint));
 
         // access denied handler setup
         if (isset($config['access_denied_handler'])) {
-            $listener->replaceArgument(4, new Reference($config['access_denied_handler']));
+            $listener->replaceArgument(5, new Reference($config['access_denied_handler']));
         } else if (isset($config['access_denied_url'])) {
-            $listener->replaceArgument(3, $config['access_denied_url']);
+            $listener->replaceArgument(4, $config['access_denied_url']);
         }
 
         return $exceptionListenerId;

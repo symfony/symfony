@@ -9,6 +9,9 @@ timeline closely anyway.
 beta5 to RC1
 ------------
 
+* renamed `Symfony\Bundle\FrameworkBundle\Command\Command` to
+  `Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand`
+
 * removed the routing `AnnotGlobLoader` class
 
 * Some blocks in the Twig Form templates have been renamed to avoid

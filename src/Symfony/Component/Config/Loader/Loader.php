@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Config\Loader;
 
+use Symfony\Component\Config\Exception\FileLoaderLoadException;
+
 /**
  * Loader is the abstract class used by all built-in loaders.
  *
@@ -63,7 +65,6 @@ abstract class Loader implements LoaderInterface
      */
     public function resolve($resource, $type = null)
     {
-
         if ($this->supports($resource, $type)) {
             return $this;
         }
@@ -71,10 +72,9 @@ abstract class Loader implements LoaderInterface
         $loader = null === $this->resolver ? false : $this->resolver->resolve($resource, $type);
 
         if (false === $loader) {
-            throw new \InvalidArgumentException(sprintf('Unable to load the "%s" resource.', is_string($resource) ? $resource : (is_object($resource) ? get_class($resource) : 'RESOURCE')));
+            throw new FileLoaderLoadException($resource);
         }
 
         return $loader;
     }
-
 }

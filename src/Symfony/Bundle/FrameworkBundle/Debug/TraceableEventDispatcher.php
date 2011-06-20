@@ -52,7 +52,7 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
             if (is_string($listener)) {
                 $typeDefinition = '[string] '.$listener;
             } elseif (is_array($listener)) {
-                $typeDefinition = '[array] '.$listener[0].', '.$listener[1];
+                $typeDefinition = '[array] '.(is_object($listener[0]) ? get_class($listener[0]) : $listener[0]).'::'.$listener[1];
             } elseif (is_object($listener)) {
                 $typeDefinition = '[object] '.get_class($listener);
             } else {

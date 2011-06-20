@@ -23,7 +23,7 @@ use Symfony\Component\Finder\Finder;
  * @author Francis Besset <francis.besset@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class CacheClearCommand extends Command
+class CacheClearCommand extends ContainerAwareCommand
 {
     /**
      * @see Command
@@ -52,7 +52,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $realCacheDir = $this->container->getParameter('kernel.cache_dir');
+        $realCacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
         $oldCacheDir  = $realCacheDir.'_old';
 
         if (!is_writable($realCacheDir)) {
@@ -70,14 +70,14 @@ EOF
             rename($warmupDir, $realCacheDir);
         }
 
-        $this->container->get('filesystem')->remove($oldCacheDir);
+        $this->getContainer()->get('filesystem')->remove($oldCacheDir);
     }
 
     protected function warmup($warmupDir)
     {
-        $this->container->get('filesystem')->remove($warmupDir);
+        $this->getContainer()->get('filesystem')->remove($warmupDir);
 
-        $kernel = $this->getTempKernel($this->container->get('kernel'), $warmupDir);
+        $kernel = $this->getTempKernel($this->getContainer()->get('kernel'), $warmupDir);
         $kernel->boot();
 
         $warmer = $kernel->getContainer()->get('cache_warmer');
@@ -131,7 +131,7 @@ namespace $namespace
     }
 }
 EOF;
-        $this->container->get('filesystem')->mkdir($warmupDir);
+        $this->getContainer()->get('filesystem')->mkdir($warmupDir);
         file_put_contents($file = $warmupDir.'/kernel.tmp', $code);
         require_once $file;
         @unlink($file);

@@ -79,7 +79,7 @@ EOT
         ));
 
         $entity = substr($entity, $pos + 1);
-        $fullEntityClassName = $this->container->get('doctrine')->getEntityNamespace($bundleName).'\\'.$entity;
+        $fullEntityClassName = $this->getContainer()->get('doctrine')->getEntityNamespace($bundleName).'\\'.$entity;
         $mappingType = $input->getOption('mapping-type');
 
         $class = new ClassMetadataInfo($fullEntityClassName);

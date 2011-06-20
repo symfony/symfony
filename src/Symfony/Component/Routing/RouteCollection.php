@@ -55,6 +55,10 @@ class RouteCollection implements \IteratorAggregate
      */
     public function add($name, Route $route)
     {
+        if(false === $route->getOption('enabled')) {
+            return;
+        }
+
         if (!preg_match('/^[a-z0-9A-Z_.]+$/', $name)) {
             throw new \InvalidArgumentException(sprintf('Name "%s" contains non valid characters for a route name.', $name));
         }

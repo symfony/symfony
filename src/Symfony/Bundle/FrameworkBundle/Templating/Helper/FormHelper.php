@@ -38,8 +38,7 @@ class FormHelper extends Helper
     public function __construct(EngineInterface $engine)
     {
         $this->engine = $engine;
-        $this->varStack = new \SplObjectStorage();
-        $this->viewStack = array();
+        $this->varStack = array();
         $this->rendering = array();
         $this->context = array();
     }
@@ -103,6 +102,15 @@ class FormHelper extends Helper
      */
     public function row(FormView $view, array $variables = array())
     {
+        $variables = array_replace_recursive(
+            array(
+                'label'     => array(),
+                'widget'    => array(),
+                'attr'      => array()
+            ),
+            $variables
+        );
+        
         return $this->renderSection($view, 'row', $variables);
     }
 
@@ -191,18 +199,17 @@ class FormHelper extends Helper
 
                 $this->rendering[$rendering] = $i;
 
-                $this->varStack[$view] = array_replace(
-                    $view->all(),
-                    isset($this->varStack[$view]) ? $this->varStack[$view] : array(),
+                $this->varStack[$rendering] = array_replace_recursive(
+                    isset($this->varStack[$rendering]) ? $this->varStack[$rendering] : $view->all(),
                     $variables
                 );
 
-                $this->context[] = $this->varStack[$view];
+                $this->context[] = $this->varStack[$rendering];
 
-                $html = $this->engine->render($template, $this->varStack[$view]);
+                $html = $this->engine->render($template, $this->varStack[$rendering]);
 
                 array_pop($this->context);
-                unset($this->varStack[$view], $this->rendering[$rendering]);
+                unset($this->varStack[$rendering], $this->rendering[$rendering]);
 
                 if ($mainTemplate) {
                     $view->setRendered();

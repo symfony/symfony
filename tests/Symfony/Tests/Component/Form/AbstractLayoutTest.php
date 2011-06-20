@@ -747,6 +747,87 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testDateTimeWithEmptyValueGlobal()
+    {
+        $form = $this->factory->createNamed('datetime', 'na&me', null, array(
+            'property_path' => 'name',
+            'input' => 'string',
+            'empty_value' => 'Change&Me',
+            'required' => false,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./div
+            [@id="na&me_date"]
+            [
+                ./select
+                    [@id="na&me_date_month"]
+                    [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+                /following-sibling::select
+                    [@id="na&me_date_day"]
+                    [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+                /following-sibling::select
+                    [@id="na&me_date_year"]
+                    [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+            ]
+        /following-sibling::div
+            [@id="na&me_time"]
+            [
+                ./select
+                    [@id="na&me_time_hour"]
+                    [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+                /following-sibling::select
+                    [@id="na&me_time_minute"]
+                    [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+            ]
+    ]
+    [count(.//select)=5]
+'
+        );
+    }
+    public function testDateTimeWithEmptyValueOnTime()
+    {
+        $form = $this->factory->createNamed('datetime', 'na&me', '2011-02-03', array(
+            'property_path' => 'name',
+            'input' => 'string',
+            'empty_value' => array('hour' => 'Change&Me', 'minute' => 'Change&Me'),
+            'required' => false,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./div
+            [@id="na&me_date"]
+            [
+                ./select
+                    [@id="na&me_date_month"]
+                    [./option[@value="2"][@selected="selected"]]
+                /following-sibling::select
+                    [@id="na&me_date_day"]
+                    [./option[@value="3"][@selected="selected"]]
+                /following-sibling::select
+                    [@id="na&me_date_year"]
+                    [./option[@value="2011"][@selected="selected"]]
+            ]
+        /following-sibling::div
+            [@id="na&me_time"]
+            [
+                ./select
+                    [@id="na&me_time_hour"]
+                    [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+                /following-sibling::select
+                    [@id="na&me_time_minute"]
+                    [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+            ]
+    ]
+    [count(.//select)=5]
+'
+        );
+    }
+
     public function testDateTimeWithSeconds()
     {
         $form = $this->factory->createNamed('datetime', 'na&me', '2011-02-03 04:05:06', array(
@@ -810,6 +891,62 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         /following-sibling::select
             [@id="na&me_year"]
             [./option[@value="2011"][@selected="selected"]]
+    ]
+    [count(./select)=3]
+'
+        );
+    }
+
+    public function testDateChoiceWithEmptyValueGlobal()
+    {
+        $form = $this->factory->createNamed('date', 'na&me', null, array(
+            'property_path' => 'name',
+            'input' => 'string',
+            'widget' => 'choice',
+            'empty_value' => 'Change&Me',
+            'required' => false,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./select
+            [@id="na&me_month"]
+            [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+        /following-sibling::select
+            [@id="na&me_day"]
+            [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+        /following-sibling::select
+            [@id="na&me_year"]
+            [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+    ]
+    [count(./select)=3]
+'
+        );
+    }
+
+    public function testDateChoiceWithEmptyValueOnYear()
+    {
+        $form = $this->factory->createNamed('date', 'na&me', null, array(
+            'property_path' => 'name',
+            'input' => 'string',
+            'widget' => 'choice',
+            'required' => false,
+            'empty_value' => array('year' => 'Change&Me'),
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./select
+            [@id="na&me_month"]
+            [./option[@value="1"]]
+        /following-sibling::select
+            [@id="na&me_day"]
+            [./option[@value="1"]]
+        /following-sibling::select
+            [@id="na&me_year"]
+            [./option[@value=""][.="[trans]Change&Me[/trans]"]]
     ]
     [count(./select)=3]
 '
@@ -1226,6 +1363,54 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             [./option[@value="6"][@selected="selected"]]
     ]
     [count(./select)=3]
+'
+        );
+    }
+
+    public function testTimeWithEmptyValueGlobal()
+    {
+        $form = $this->factory->createNamed('time', 'na&me', null, array(
+            'property_path' => 'name',
+            'input' => 'string',
+            'empty_value' => 'Change&Me',
+            'required' => false,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./select
+            [@id="na&me_hour"]
+            [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+        /following-sibling::select
+            [@id="na&me_minute"]
+            [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+    ]
+    [count(./select)=2]
+'
+        );
+    }
+
+    public function testTimeWithEmptyValueOnYear()
+    {
+        $form = $this->factory->createNamed('time', 'na&me', null, array(
+            'property_path' => 'name',
+            'input' => 'string',
+            'required' => false,
+            'empty_value' => array('hour' => 'Change&Me'),
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./select
+            [@id="na&me_hour"]
+            [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+        /following-sibling::select
+            [@id="na&me_minute"]
+            [./option[@value="1"]]
+    ]
+    [count(./select)=2]
 '
         );
     }

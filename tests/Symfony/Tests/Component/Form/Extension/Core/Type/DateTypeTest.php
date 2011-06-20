@@ -174,7 +174,7 @@ class DateTypeTest extends LocalizedTestCase
 
         $form->bind($text);
 
-        $this->assertSame(null, $form->getData());
+        $this->assertNull($form->getData());
         $this->assertEquals($text, $form->getClientData());
     }
 

@@ -66,7 +66,7 @@ class Session implements \Serializable
             $this->setPhpDefaultLocale($this->locale);
 
             // flag current flash messages to be removed at shutdown
-            $this->oldFlashes = array_flip(array_keys($this->flashes));
+            $this->oldFlashes = $this->flashes;
         }
 
         $this->started = true;

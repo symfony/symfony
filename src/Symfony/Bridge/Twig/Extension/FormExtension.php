@@ -251,13 +251,13 @@ class FormExtension extends \Twig_Extension
         }
 
         do {
-            $block = $types[$typeIndex].'_'.$section;
+            $types[$typeIndex] .= '_'.$section;
 
-            if (isset($blocks[$block])) {
+            if (isset($blocks[$types[$typeIndex]])) {
 
                 $this->varStack[$rendering]['typeIndex'] = $typeIndex;
 
-                $html = $this->template->renderBlock($block, $this->varStack[$rendering]['variables'], $blocks);
+                $html = $this->template->renderBlock($types[$typeIndex], $this->varStack[$rendering]['variables'], $blocks);
 
                 if ($mainTemplate) {
                     $view->setRendered();
@@ -269,7 +269,10 @@ class FormExtension extends \Twig_Extension
             }
         } while (--$typeIndex >= 0);
 
-        throw new FormException(sprintf('Unable to render form as none of the following blocks exist: "%s".', implode('", "', $types)));
+        throw new FormException(sprintf(
+            'Unable to render the form as none of the following blocks exist: "%s".',
+            implode('", "', array_reverse($types))
+        ));
     }
 
     /**

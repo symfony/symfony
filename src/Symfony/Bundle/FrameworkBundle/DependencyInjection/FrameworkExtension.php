@@ -274,6 +274,7 @@ class FrameworkExtension extends Extension
 
         // session storage
         $container->setAlias('session.storage', $config['storage_id']);
+        $container->setAlias('session.persistence', $config['persistence_id']);
         $options = array();
         foreach (array('name', 'lifetime', 'path', 'domain', 'secure', 'httponly') as $key) {
             if (isset($config[$key])) {
@@ -285,6 +286,7 @@ class FrameworkExtension extends Extension
         $this->addClassesToCompile(array(
             'Symfony\\Bundle\\FrameworkBundle\\EventListener\\SessionListener',
             'Symfony\\Component\\HttpFoundation\\SessionStorage\\SessionStorageInterface',
+            'Symfony\\Component\\HttpFoundation\\SessionStorage\\SessionStorageBridge',
             $container->getDefinition('session')->getClass(),
         ));
 

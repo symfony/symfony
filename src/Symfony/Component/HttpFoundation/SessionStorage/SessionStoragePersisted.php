@@ -11,17 +11,31 @@
 
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
+use Symfony\Component\HttpFoundation\SessionStorage\Persistence\SessionStoragePersistenceInterface;
+
 /**
- * NativeSessionStorage.
+ * SessionStoragePersisted is used to implement SessionStorage and bind
+ * a concrete instance of SessionStoragePersistenceInterface to php's
+ * session_set_save_handler
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Mark de Jong <mail@markdejong.org>
  */
-class NativeSessionStorage implements SessionStorageInterface
+class SessionStoragePersisted implements SessionStorageInterface
 {
     static protected $sessionIdRegenerated = false;
-    static protected $sessionStarted       = false;
+    static protected $sessionStarted = false;
 
+    /**
+     * @var \Symfony\Component\HttpFoundation\SessionStorage\Persistence\SessionStoragePersistenceInterface
+     */
+    protected $persister;
+
+    /**
+     * @var array
+     */
     protected $options;
+
 
     /**
      * Available options:
@@ -36,26 +50,30 @@ class NativeSessionStorage implements SessionStorageInterface
      *
      * The default values for most options are those returned by the session_get_cookie_params() function
      *
+     * @param SessionStoragePersistenceInterface An concrete implementation of SessionStoragePersistenceInterface
      * @param array $options  An associative array of session options
      */
-    public function __construct(array $options = array())
+    public function __construct(SessionStoragePersistenceInterface $persister, array $options)
     {
+        $this->persister = $persister;
+        $this->options = $options;
+
         $cookieDefaults = session_get_cookie_params();
 
         $this->options = array_merge(array(
-            'name'          => '_SESS',
-            'lifetime'      => $cookieDefaults['lifetime'],
-            'path'          => $cookieDefaults['path'],
-            'domain'        => $cookieDefaults['domain'],
-            'secure'        => $cookieDefaults['secure'],
-            'httponly'      => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
-        ), $options);
+            'name' => '_SESS',
+            'lifetime' => $cookieDefaults['lifetime'],
+            'path' => $cookieDefaults['path'],
+            'domain' => $cookieDefaults['domain'],
+            'secure' => $cookieDefaults['secure'],
+            'httponly' => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
+         ), $options);
 
         session_name($this->options['name']);
     }
 
     /**
-     * Starts the session.
+     * {@inheritDoc}
      */
     public function start()
     {
@@ -63,12 +81,14 @@ class NativeSessionStorage implements SessionStorageInterface
             return;
         }
 
-        session_set_cookie_params(
-            $this->options['lifetime'],
-            $this->options['path'],
-            $this->options['domain'],
-            $this->options['secure'],
-            $this->options['httponly']
+        // use this object as the session handler
+        session_set_save_handler(
+            array($this->persister, 'open'),
+            array($this->persister, 'close'),
+            array($this->persister, 'read'),
+            array($this->persister, 'write'),
+            array($this->persister, 'destroy'),
+            array($this->persister, 'gc')
         );
 
         // disable native cache limiter as this is managed by HeaderBag directly
@@ -96,14 +116,7 @@ class NativeSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * Reads data from this storage.
-     *
-     * The preferred format for a key is directory style so naming conflicts can be avoided.
-     *
-     * @param string $key     A unique key identifying your data
-     * @param string $default Default value
-     *
-     * @return mixed Data associated with the key
+     * {@inheritDoc}
      */
     public function read($key, $default = null)
     {
@@ -111,13 +124,7 @@ class NativeSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * Removes data from this storage.
-     *
-     * The preferred format for a key is directory style so naming conflicts can be avoided.
-     *
-     * @param  string $key  A unique key identifying your data
-     *
-     * @return mixed Data associated with the key
+     * {@inheritDoc}
      */
     public function remove($key)
     {
@@ -132,13 +139,7 @@ class NativeSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * Writes data to this storage.
-     *
-     * The preferred format for a key is directory style so naming conflicts can be avoided.
-     *
-     * @param string $key   A unique key identifying your data
-     * @param mixed  $data  Data associated with your key
-     *
+     * {@inheritDoc}
      */
     public function write($key, $data)
     {
@@ -146,12 +147,7 @@ class NativeSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * Regenerates id that represents this storage.
-     *
-     * @param  Boolean $destroy Destroy session when regenerating?
-     *
-     * @return Boolean True if session regenerated, false if error
-     *
+     * {@inheritDoc}
      */
     public function regenerate($destroy = false)
     {

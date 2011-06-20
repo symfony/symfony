@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation\SessionStorage;
 
+use Symfony\Component\HttpFoundation\SessionStorage\Persistence\FilesystemSessionStoragePersistence;
+
 /**
  * FilesystemSessionStorage simulates sessions for functional tests.
  *
@@ -19,18 +21,30 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FilesystemSessionStorage extends NativeSessionStorage
+class FilesystemSessionStorage implements SessionStorageInterface
 {
     private $path;
     private $data;
     private $started;
+    private $options;
 
     public function __construct($path, array $options = array())
     {
         $this->path = $path;
         $this->started = false;
 
-        parent::__construct($options);
+        $cookieDefaults = session_get_cookie_params();
+
+        $this->options = array_merge(array(
+            'name' => '_SESS',
+            'lifetime' => $cookieDefaults['lifetime'],
+            'path' => $cookieDefaults['path'],
+            'domain' => $cookieDefaults['domain'],
+            'secure' => $cookieDefaults['secure'],
+            'httponly' => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly']  : false,
+         ), $options);
+
+        session_name($this->options['name']);
     }
 
     public function start()

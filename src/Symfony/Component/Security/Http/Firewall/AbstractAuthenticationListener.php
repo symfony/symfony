@@ -189,7 +189,10 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         $this->securityContext->setToken(null);
 
         if (null !== $this->failureHandler) {
-            return $this->failureHandler->onAuthenticationFailure($request, $failed);
+            $response = $this->failureHandler->onAuthenticationFailure($request, $failed);
+            if ($response !== null) {
+                return $response;
+            }
         }
 
         if (null === $this->options['failure_path']) {

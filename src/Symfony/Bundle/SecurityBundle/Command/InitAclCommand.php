@@ -22,7 +22,7 @@ use Doctrine\DBAL\DriverManager;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class InitAclCommand extends Command
+class InitAclCommand extends ContainerAwareCommand
 {
     /**
      * @see Command

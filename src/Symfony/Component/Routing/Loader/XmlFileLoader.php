@@ -134,10 +134,6 @@ class XmlFileLoader extends FileLoader
             }
         }
 
-        if (isset($options['enabled']) && 'true' !== $options['enabled']) {
-            return;
-        }
-
         $route = new Route((string) $definition->getAttribute('pattern'), $defaults, $requirements, $options);
 
         $collection->add((string) $definition->getAttribute('id'), $route);

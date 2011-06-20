@@ -41,32 +41,42 @@ class DateType extends AbstractType
             $builder->appendClientTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $options['format'], \IntlDateFormatter::NONE));
         } else {
             $yearOptions = $monthOptions = $dayOptions = array();
-            $widget = $options['widget'];
 
-            if ($widget === 'choice') {
+            if ($options['widget'] === 'choice') {
+                if (is_array($options['empty_value'])) {
+                    $options['empty_value'] = array_merge(array('year' => null, 'month' => null, 'day' => null), $options['empty_value']);
+                } else {
+                    $options['empty_value'] = array('year' => $options['empty_value'], 'month' => $options['empty_value'], 'day' => $options['empty_value']);
+                }
+
                 // Only pass a subset of the options to children
                 $yearOptions = array(
                     'choice_list' => new PaddedChoiceList(
                         array_combine($options['years'], $options['years']), 4, '0', STR_PAD_LEFT
                     ),
+                    'empty_value' => $options['empty_value']['year'],
                 );
                 $monthOptions = array(
                     'choice_list' => new MonthChoiceList(
                         $formatter, $options['months']
                     ),
+                    'empty_value' => $options['empty_value']['month'],
                 );
                 $dayOptions = array(
                     'choice_list' => new PaddedChoiceList(
                         array_combine($options['days'], $options['days']), 2, '0', STR_PAD_LEFT
                     ),
+                    'empty_value' => $options['empty_value']['day'],
                 );
             }
 
             $builder
-                ->add('year', $widget, $yearOptions)
-                ->add('month', $widget, $monthOptions)
-                ->add('day', $widget, $dayOptions)
-                ->appendClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], array('year', 'month', 'day')))
+                ->add('year', $options['widget'], $yearOptions)
+                ->add('month', $options['widget'], $monthOptions)
+                ->add('day', $options['widget'], $dayOptions)
+                ->appendClientTransformer(new DateTimeToArrayTransformer(
+                    $options['data_timezone'], $options['user_timezone'], array('year', 'month', 'day')
+                ))
             ;
         }
 
@@ -87,6 +97,7 @@ class DateType extends AbstractType
         $builder
             ->setAttribute('formatter', $formatter)
             ->setAttribute('widget', $options['widget'])
+            ->setAttribute('empty_value', $options['empty_value'])
         ;
     }
 
@@ -96,9 +107,9 @@ class DateType extends AbstractType
     public function buildViewBottomUp(FormView $view, FormInterface $form)
     {
         $view->set('widget', $form->getAttribute('widget'));
+        $view->set('empty_value', $form->getAttribute('empty_value'));
 
         if ($view->hasChildren()) {
-
             $pattern = $form->getAttribute('formatter')->getPattern();
 
             // set right order with respect to locale (e.g.: de_DE=dd.MM.yy; en_US=M/d/yy)
@@ -120,17 +131,18 @@ class DateType extends AbstractType
     public function getDefaultOptions(array $options)
     {
         return array(
-            'years'             => range(date('Y') - 5, date('Y') + 5),
-            'months'            => range(1, 12),
-            'days'              => range(1, 31),
-            'widget'            => 'choice',
-            'input'             => 'datetime',
-            'format'            => \IntlDateFormatter::MEDIUM,
-            'data_timezone'     => null,
-            'user_timezone'     => null,
+            'years'         => range(date('Y') - 5, date('Y') + 5),
+            'months'        => range(1, 12),
+            'days'          => range(1, 31),
+            'widget'        => 'choice',
+            'input'         => 'datetime',
+            'format'        => \IntlDateFormatter::MEDIUM,
+            'data_timezone' => null,
+            'user_timezone' => null,
+            'empty_value'   => null,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
-            'by_reference'      => false,
+            'by_reference'  => false,
         );
     }
 

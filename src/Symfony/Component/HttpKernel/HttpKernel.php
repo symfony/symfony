@@ -181,7 +181,7 @@ class HttpKernel implements HttpKernelInterface
     private function varToString($var)
     {
         if (is_object($var)) {
-            return sprintf('[object](%s)', get_class($var));
+            return sprintf('Object(%s)', get_class($var));
         }
 
         if (is_array($var)) {
@@ -190,17 +190,25 @@ class HttpKernel implements HttpKernelInterface
                 $a[] = sprintf('%s => %s', $k, $this->varToString($v));
             }
 
-            return sprintf("[array](%s)", implode(', ', $a));
+            return sprintf("Array(%s)", implode(', ', $a));
         }
 
         if (is_resource($var)) {
-            return '[resource]';
+            return sprintf('Resource(%s)', get_resource_type($var));
         }
 
         if (null === $var) {
             return 'null';
         }
 
-        return str_replace("\n", '', var_export((string) $var, true));
+        if (false === $var) {
+            return 'false';
+        }
+
+        if (true === $var) {
+            return 'true';
+        }
+
+        return (string) $var;
     }
 }

@@ -61,7 +61,7 @@ abstract class Loader implements LoaderInterface
      *
      * @return LoaderInterface A LoaderInterface instance
      *
-     * @throws \InvalidArgumentException if no loader is found
+     * @throws FileLoaderLoadException if no loader is found
      */
     public function resolve($resource, $type = null)
     {

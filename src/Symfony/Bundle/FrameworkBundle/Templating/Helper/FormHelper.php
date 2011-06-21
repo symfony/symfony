@@ -35,6 +35,8 @@ class FormHelper extends Helper
 
     protected $themes;
 
+    protected $templates;
+
     /**
      * Constructor;
      *
@@ -46,7 +48,8 @@ class FormHelper extends Helper
         $this->engine = $engine;
         $this->varStack = array();
         $this->context = array();
-        $this->themes = new \SplObjectStorage();
+        $this->templates = array();
+        $this->themes = array();
 
         $this->resources = 0 == count($resources) ? array('FrameworkBundle:Form') : $resources;
 
@@ -72,7 +75,8 @@ class FormHelper extends Helper
      */
     public function setTheme(FormView $view, $themes)
     {
-        $this->themes[$view] = (array) $themes;
+        $this->themes[$view->get('id')] = (array) $themes;
+        $this->templates = array();
     }
 
     /**
@@ -274,43 +278,47 @@ class FormHelper extends Helper
         return $this->engine->render($template, $variables);
     }
 
+    public function getName()
+    {
+        return 'form';
+    }
+
     /**
      * Returns the name of the template to use to render the block
      *
-     * @param FormView $view      The form view
-     * @param string   $blockName The name of the block
+     * @param FormView $view  The form view
+     * @param string   $block The name of the block
      *
      * @return string|Boolean The template logical name or false when no template is found
      */
     protected function lookupTemplate(FormView $view, $block)
     {
-
         $file = $block.'.html.php';
+        $id = $view->get('id');
 
-        $themes = $view->hasParent() ? array() : $this->resources;
+        if (!isset($this->templates[$id][$block])) {
+            $template = false;
 
-        if ($this->themes->contains($view)) {
-            $themes = array_merge($themes, $this->themes[$view]);
-        }
+            $themes = $view->hasParent() ? array() : $this->resources;
 
-        for ($i = count($themes) - 1; $i >= 0; --$i) {
-
-            $template = $themes[$i].':'.$file;
-
-            if ($this->engine->exists($template)) {
-                return $template;
+            if (isset($this->themes[$id])) {
+                $themes = array_merge($themes, $this->themes[$id]);
             }
+
+            for ($i = count($themes) - 1; $i >= 0; --$i) {
+                if ($this->engine->exists($templateName = $themes[$i].':'.$file)) {
+                    $template = $templateName;
+                    break;
+                }
+            }
+
+            if (false === $template && $view->hasParent()) {
+                $template = $this->lookupTemplate($view->getParent(), $block);
+            }
+
+            $this->templates[$id][$block] = $template;
         }
 
-        if ($view->hasParent()) {
-            return $this->lookupTemplate($view->getParent(), $block);
-        }
-
-        return false;
-    }
-
-    public function getName()
-    {
-        return 'form';
+        return $this->templates[$id][$block];
     }
 }

@@ -49,8 +49,9 @@ class File extends \SplFileInfo
     public function guessExtension()
     {
         $type = $this->getMimeType();
+        $guesser = ExtensionGuesser::getInstance();
 
-        return ExtensionGuesser::guessExtension($type);
+        return $guesser->guess($type);
     }
 
     /**

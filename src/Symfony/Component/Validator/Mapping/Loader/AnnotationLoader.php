@@ -61,10 +61,10 @@ class AnnotationLoader implements LoaderInterface
             if ($method->getDeclaringClass()->getName() ==  $className) {
                 foreach ($this->reader->getMethodAnnotations($method) as $constraint) {
                     if ($constraint instanceof Constraint) {
-                        if (preg_match( '/^(get|is)(.+)$/', $method->getName(), $matches)) {
+                        if (preg_match('/^(get|is)(.+)$/i', $method->getName(), $matches)) {
                             $metadata->addGetterConstraint(lcfirst($matches[2]), $constraint);
                         } else {
-                            throw new MappingException( sprintf( 'Cannot add constraint to %s::%s', $className, $method->getName() ) );
+                            throw new MappingException(sprintf('The constraint on "%s::%s" cannot be added. Constraints can only be added on methods beginning with "get" or "is".', $className, $method->getName()));
                         }
                     }
 

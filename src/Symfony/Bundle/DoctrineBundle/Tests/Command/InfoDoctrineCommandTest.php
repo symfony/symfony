@@ -22,14 +22,14 @@ class InfoDoctrineCommandTest extends TestCase
 {
     public function testAnnotationsBundle()
     {
-        $input = new StringInput("doctrine:mapping:info");
+        $input = new StringInput('doctrine:mapping:info');
         $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
         $output->expects($this->at(0))
                ->method('writeln')
-               ->with($this->equalTo("Found <info>1</info> entities mapped in entity manager <info>default</info>:"));
+               ->with($this->equalTo('Found <info>1</info> entities mapped in entity manager <info>default</info>:'));
         $output->expects($this->at(1))
                ->method('writeln')
-               ->with($this->equalTo("<info>[OK]</info>   Fixtures\Bundles\YamlBundle\Entity\Test"));
+               ->with($this->equalTo('<info>[OK]</info>   Fixtures\Bundles\YamlBundle\Entity\Test'));
 
         $testContainer = $this->createYamlBundleTestContainer();
         $kernel = $this->getMock('Symfony\Component\HttpKernel\Kernel', array(), array(), '', false);

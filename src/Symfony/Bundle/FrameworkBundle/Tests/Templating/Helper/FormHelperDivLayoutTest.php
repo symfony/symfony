@@ -22,9 +22,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Templating\PhpEngine;
 use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
-use Symfony\Tests\Component\Form\AbstractTableLayoutTest;
+use Symfony\Tests\Component\Form\AbstractDivLayoutTest;
 
-class FormHelperTableTest extends AbstractTableLayoutTest
+class FormHelperDivLayoutTest extends AbstractDivLayoutTest
 {
     protected $helper;
 
@@ -33,15 +33,12 @@ class FormHelperTableTest extends AbstractTableLayoutTest
         parent::setUp();
 
         $root = realpath(__DIR__.'/../../../Resources/views');
-        $rootCustom = realpath(__DIR__.'/Resources');
-        $templateNameParser = new StubTemplateNameParser($root, $rootCustom);
+        $rootTheme = realpath(__DIR__.'/Resources');
+        $templateNameParser = new StubTemplateNameParser($root, $rootTheme);
         $loader = new FilesystemLoader(array());
         $engine = new PhpEngine($templateNameParser, $loader);
 
-        $this->helper = new FormHelper($engine, array(
-            'FrameworkBundle:Form',
-            'FrameworkBundle:FormTable'
-        ));
+        $this->helper = new FormHelper($engine);
 
         $engine->setHelpers(array(
             $this->helper,
@@ -82,5 +79,24 @@ class FormHelperTableTest extends AbstractTableLayoutTest
     protected function renderRest(FormView $view, array $vars = array())
     {
         return (string)$this->helper->rest($view, $vars);
+    }
+
+    protected function setTheme(FormView $view, array $themes)
+    {
+        $this->helper->setTheme($view, $themes);
+    }
+
+    static public function themeBlockInheritanceProvider()
+    {
+        return array(
+            array(array('TestBundle:Parent'))
+        );
+    }
+
+    static public function themeInheritanceProvider()
+    {
+        return array(
+            array(array('TestBundle:Parent'), array('TestBundle:Child'))
+        );
     }
 }

@@ -18,23 +18,24 @@ class StubTemplateNameParser implements TemplateNameParserInterface
 {
     private $root;
 
-    private $rootCustom;
+    private $rootTheme;
 
-    public function __construct($root, $rootCustom)
+    public function __construct($root, $rootTheme)
     {
         $this->root = $root;
-        $this->rootCustom = $rootCustom;
+        $this->rootTheme = $rootTheme;
     }
 
     public function parse($name)
     {
-        $parts = explode(':', $name);
-        $name = $parts[count($parts) - 1];
+        list($bundle, $controller, $template) = explode(':', $name);
 
-        if ($name[0] == '_') {
-            $path = $this->rootCustom.'/'.$name;
+        if ($template[0] == '_') {
+            $path = $this->rootTheme.'/Custom/'.$template;
+        } elseif ($bundle === 'TestBundle') {
+            $path = $this->rootTheme.'/'.$controller.'/'.$template;
         } else {
-            $path = $this->root.'/'.$parts[count($parts) - 2].'/'.$name;
+            $path = $this->root.'/'.$controller.'/'.$template;
         }
 
         return new TemplateReference($path, 'php');

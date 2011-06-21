@@ -11,7 +11,7 @@
         xhr.open('GET', '{{ path("_wdt", { "token": token }) }}', true);
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
         xhr.onreadystatechange = function(state) {
-            if (4 === xhr.readyState && 200 === xhr.status) {
+            if (4 === xhr.readyState && 200 === xhr.status && '<!-- START' === xhr.responseText.substring(0, 10)) {
                 wdt.innerHTML = xhr.responseText;
                 wdt.style.display = 'block';
             }

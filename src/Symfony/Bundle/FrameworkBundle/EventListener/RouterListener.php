@@ -42,7 +42,7 @@ class RouterListener
         $this->logger = $logger;
     }
 
-    public function onEarlyCoreRequest(GetResponseEvent $event)
+    public function onEarlyKernelRequest(GetResponseEvent $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;
@@ -64,7 +64,7 @@ class RouterListener
         $this->router->setContext($context);
     }
 
-    public function onCoreRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
 

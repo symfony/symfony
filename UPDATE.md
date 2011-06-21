@@ -21,16 +21,23 @@ beta5 to RC1
     * `attributes` to `widget_attributes`
     * `options` to `widget_choice_options`
 
-* Kernel listeners must now be tagged with kernel.event_listener:
+* Kernel event changes:
+    * Kernel events are now properly prefixed with `kernel` instead of `core`:
+    * Kernel listeners must now be tagged with kernel.event_listener:
 
-    * Before:
+        * Before:
 
-            <tag name="kernel.listener" event="core.request" method="onCoreRequest" />
+                <tag name="kernel.listener" event="core.request" method="onCoreRequest" />
 
-    * After:
+        * After:
 
-            <tag name="kernel.event_listener" event="core.request" method="onCoreRequest" />
+                <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
 
+    Note: the method can of course remain as `onCoreRequest`, but renaming it
+    as well for consistency with future projects makes sense.
+
+    * The `Symfony\Component\HttpKernel\CoreEvents` class has been renamed to
+      `Symfony\Component\HttpKernel\KernelEvents`
 
 beta4 to beta5
 --------------

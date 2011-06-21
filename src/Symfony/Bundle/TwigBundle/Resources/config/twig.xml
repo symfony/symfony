@@ -1,0 +1,78 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="twig.class">Twig_Environment</parameter>
+        <parameter key="twig.loader.class">Symfony\Bundle\TwigBundle\Loader\FilesystemLoader</parameter>
+        <parameter key="templating.engine.twig.class">Symfony\Bundle\TwigBundle\TwigEngine</parameter>
+        <parameter key="twig.cache_warmer.class">Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheCacheWarmer</parameter>
+        <parameter key="twig.extension.trans.class">Symfony\Bridge\Twig\Extension\TranslationExtension</parameter>
+        <parameter key="twig.extension.assets.class">Symfony\Bundle\TwigBundle\Extension\AssetsExtension</parameter>
+        <parameter key="twig.extension.actions.class">Symfony\Bundle\TwigBundle\Extension\ActionsExtension</parameter>
+        <parameter key="twig.extension.code.class">Symfony\Bundle\TwigBundle\Extension\CodeExtension</parameter>
+        <parameter key="twig.extension.routing.class">Symfony\Bridge\Twig\Extension\RoutingExtension</parameter>
+        <parameter key="twig.extension.yaml.class">Symfony\Bridge\Twig\Extension\YamlExtension</parameter>
+        <parameter key="twig.extension.form.class">Symfony\Bridge\Twig\Extension\FormExtension</parameter>
+    </parameters>
+
+    <services>
+        <service id="twig" class="%twig.class%">
+            <argument type="service" id="twig.loader" />
+            <argument>%twig.options%</argument>
+        </service>
+
+        <service id="twig.cache_warmer" class="%twig.cache_warmer.class%" public="false">
+            <tag name="kernel.cache_warmer" />
+            <argument type="service" id="service_container" />
+            <argument type="service" id="templating.finder" />
+        </service>
+
+        <service id="twig.loader" class="%twig.loader.class%">
+            <argument type="service" id="templating.locator" />
+            <argument type="service" id="templating.name_parser" />
+        </service>
+
+        <service id="templating.engine.twig" class="%templating.engine.twig.class%" public="false">
+            <argument type="service" id="twig" />
+            <argument type="service" id="templating.name_parser" />
+            <argument type="service" id="templating.globals" />
+        </service>
+
+        <service id="twig.extension.trans" class="%twig.extension.trans.class%" public="false">
+            <tag name="twig.extension" />
+            <argument type="service" id="translator" />
+        </service>
+
+        <service id="twig.extension.assets" class="%twig.extension.assets.class%" public="false">
+            <tag name="twig.extension" />
+            <argument type="service" id="service_container" />
+        </service>
+
+        <service id="twig.extension.actions" class="%twig.extension.actions.class%" public="false">
+            <tag name="twig.extension" />
+            <argument type="service" id="service_container" />
+        </service>
+
+        <service id="twig.extension.code" class="%twig.extension.code.class%" public="false">
+            <tag name="twig.extension" />
+            <argument type="service" id="service_container" />
+        </service>
+
+        <service id="twig.extension.routing" class="%twig.extension.routing.class%" public="false">
+            <tag name="twig.extension" />
+            <argument type="service" id="router" />
+        </service>
+
+        <service id="twig.extension.yaml" class="%twig.extension.yaml.class%" public="false">
+            <tag name="twig.extension" />
+        </service>
+
+        <service id="twig.extension.form" class="%twig.extension.form.class%" public="false">
+            <tag name="twig.extension" />
+            <argument>%twig.form.resources%</argument>
+        </service>
+    </services>
+</container>

@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+  <services>
+    <service id="foo" class="FooClass" />
+    <service id="baz" class="BazClass" />
+    <service id="scope.container" class="FooClass" scope="container" />
+    <service id="scope.custom" class="FooClass" scope="custom" />
+    <service id="scope.prototype" class="FooClass" scope="prototype" />
+    <service id="constructor" class="FooClass" factory-method="getInstance" />
+    <service id="file" class="FooClass">
+      <file>%path%/foo.php</file>
+    </service>
+    <service id="arguments" class="FooClass">
+      <argument>foo</argument>
+      <argument type="service" id="foo" />
+      <argument type="collection">
+        <argument>true</argument>
+        <argument>false</argument>
+      </argument>
+    </service>
+    <service id="configurator1" class="FooClass">
+      <configurator function="sc_configure" />
+    </service>
+    <service id="configurator2" class="FooClass">
+      <configurator service="baz" method="configure" />
+    </service>
+    <service id="configurator3" class="FooClass">
+      <configurator class="BazClass" method="configureStatic" />
+    </service>
+    <service id="method_call1" class="FooClass">
+      <call method="setBar" />
+    </service>
+    <service id="method_call2" class="FooClass">
+      <call method="setBar">
+        <argument>foo</argument>
+        <argument type="service" id="foo" />
+        <argument type="collection">
+          <argument>true</argument>
+          <argument>false</argument>
+        </argument>
+      </call>
+    </service>
+    <service id="alias_for_foo" alias="foo" />
+    <service id="another_alias_for_foo" alias="foo" public="false" />
+    <service id="factory_service" factory-method="getInstance" factory-service="baz_factory" />
+  </services>
+</container>

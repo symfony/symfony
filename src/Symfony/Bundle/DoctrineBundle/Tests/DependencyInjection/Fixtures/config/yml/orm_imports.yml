@@ -1,0 +1,6 @@
+imports:
+  - { resource: orm_imports_import.yml }
+
+doctrine:
+    orm:
+        auto_generate_proxy_classes: true

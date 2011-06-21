@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<symfony>
+  <commands namespace="foo">
+    <command id="foo:bar" name="foo:bar">
+  <usage>foo:bar</usage>
+  <description>The foo:bar command</description>
+  <help/>
+  <aliases>
+    <alias>afoobar</alias>
+  </aliases>
+  <arguments/>
+  <options/>
+</command>
+  </commands>
+</symfony>

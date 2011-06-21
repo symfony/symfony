@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="data_collector.security.class">Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector</parameter>
+    </parameters>
+
+    <services>
+        <service id="data_collector.security" class="%data_collector.security.class%" public="false">
+            <tag name="data_collector" template="SecurityBundle:Collector:security" id="security" />
+            <argument type="service" id="security.context" on-invalid="ignore" />
+        </service>
+    </services>
+</container>

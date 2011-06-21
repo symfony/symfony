@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xsd:schema xmlns="http://symfony.com/schema/dic/webprofiler"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://symfony.com/schema/dic/webprofiler"
+    elementFormDefault="qualified">
+
+    <xsd:element name="config" type="config" />
+
+    <xsd:complexType name="config">
+        <xsd:attribute name="toolbar" type="xsd:boolean" />
+        <xsd:attribute name="intercept-redirects" type="xsd:boolean" />
+        <xsd:attribute name="verbose" type="xsd:boolean" />
+    </xsd:complexType>
+</xsd:schema>

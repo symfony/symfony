@@ -1,0 +1,47 @@
+framework:
+    secret: s3cr3t
+    form: ~
+    csrf_protection:
+        enabled:    true
+        field_name: _csrf
+    esi:
+        enabled: true
+    profiler:
+        only_exceptions: true
+    router:
+        resource:     %kernel.root_dir%/config/routing.xml
+        type:         xml
+    session:
+        auto_start:     true
+        default_locale: fr
+        storage_id:     session.storage.native
+        name:           _SYMFONY
+        lifetime:       86400
+        path:           /
+        domain:         example.com
+        secure:         true
+        httponly:       true
+    templating:
+        assets_version:   SomeVersionScheme
+        assets_base_urls: http://cdn.example.com
+        engines:          [php, twig]
+        loader:           [loader.foo, loader.bar]
+        cache:            /path/to/cache
+        packages:
+            images:
+                version: 1.0.0
+                base_urls: ["http://images1.example.com", "http://images2.example.com"]
+            foo:
+                version: 1.0.0
+            bar:
+                base_urls: ["http://images1.example.com", "http://images2.example.com"]
+    translator:
+        enabled:  true
+        fallback: fr
+    validation:
+        enabled: true
+        cache:   apc
+    annotations:
+        cache:   file
+        debug:   true
+        file_cache_dir: %kernel.cache_dir%/annotations

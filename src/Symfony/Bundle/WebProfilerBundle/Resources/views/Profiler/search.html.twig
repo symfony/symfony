@@ -1,0 +1,32 @@
+<div class="search clearfix">
+    <h3>
+        <img style="margin: 0 5px 0 0; vertical-align: middle; height: 16px" width="16" height="16" alt="Search" src="{{ asset('bundles/webprofiler/images/search.png') }}" />
+        Search
+    </h3>
+    <form action="{{ path('_profiler_search') }}" method="get">
+        <label for="ip">IP</label>
+        <input type="text" name="ip" id="ip" value="{{ ip }}" />
+        <div class="clear_fix"></div>
+        <label for="url">URL</label>
+        <input type="text" name="url" id="url" value="{{ url }}" />
+        <div class="clear_fix"></div>
+        <label for="token">Token</label>
+        <input type="text" name="token" id="token" value="{{ token }}" />
+        <div class="clear_fix"></div>
+        <label for="limit">Limit</label>
+        <select name="limit" id="limit">
+            {% for l in [10, 50, 100] %}
+                <option{{ l == limit ? ' selected="selected"' : '' }}>{{ l }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">
+            <span class="border_l">
+                <span class="border_r">
+                    <span class="btn_bg">UPDATE</span>
+                </span>
+            </span>
+        </button>
+        <div class="clear_fix"></div>
+    </form>
+</div>

@@ -1,0 +1,25 @@
+<div class="search import clearfix">
+    <h3>
+        <img style="margin: 0 5px 0 0; vertical-align: middle; height: 16px" width="16" height="16" alt="Import" src="{{ asset('bundles/webprofiler/images/import.png') }}" />
+        Admin
+    </h3>
+
+    <form action="{{ path('_profiler_import') }}" method="post" enctype="multipart/form-data">
+        <div style="margin-bottom: 10px">
+            &raquo;&nbsp;<a href="{{ path('_profiler_purge', { 'token': token }) }}">Purge</a>
+        </div>
+        <div style="margin-bottom: 10px">
+            &raquo;&nbsp;<a href="{{ path('_profiler_export', { 'token': token }) }}">Export</a>
+        </div>
+        &raquo;&nbsp;<label for="file">Import</label><br />
+        <input type="file" name="file" id="file" /><br />
+        <button type="submit">
+            <span class="border_l">
+                <span class="border_r">
+                    <span class="btn_bg">UPLOAD</span>
+                </span>
+            </span>
+        </button>
+        <div class="clear_fix"></div>
+    </form>
+</div>

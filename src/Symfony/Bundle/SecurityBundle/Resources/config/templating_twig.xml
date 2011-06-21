@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="twig.extension.security" class="Symfony\Bundle\SecurityBundle\Twig\Extension\SecurityExtension" public="false">
+            <tag name="twig.extension" />
+            <argument type="service" id="security.context" on-invalid="ignore" />
+        </service>
+    </services>
+</container>

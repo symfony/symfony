@@ -1,0 +1,88 @@
+{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+        <img width="20" height="28" alt="Database" style="border-width: 0; vertical-align: middle; margin-right: 5px;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAcCAYAAABh2p9gAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQRJREFUeNpi/P//PwM1ARMDlcGogZQDlpMnT7pxc3NbA9nhQKxOpL5rQLwJiPeBsI6Ozl+YBOOOHTv+AOllQNwtLS39F2owKYZ/gRq8G4i3ggxEToggWzvc3d2Pk+1lNL4fFAs6ODi8JzdS7mMRVyDVoAMHDsANdAPiOCC+jCQvQKqBQB/BDbwBxK5AHA3E/kB8nKJkA8TMQBwLxaBIKQbi70AvTADSBiSadwFXpCikpKQU8PDwkGTaly9fHFigkaKIJid4584dkiMFFI6jkTJII0WVmpHCAixZQEXWYhDeuXMnyLsVlEQKI45qFBQZ8eRECi4DBaAlDqle/8A48ip6gAADANdQY88Uc0oGAAAAAElFTkSuQmCC"/>
+    {% endset %}
+    {% set text %}
+        <span title="{{ '%0.2f'|format(collector.time * 1000) }} ms">{{ collector.querycount }}</span>
+    {% endset %}
+    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
+{% endblock %}
+
+{% block menu %}
+<span class="label">
+    <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/db.png') }}" alt="" /></span>
+    <strong>Doctrine</strong>
+    <span class="count">
+        <span>{{ collector.querycount }}</span>
+        <span>{{ '%0.0f'|format(collector.time * 1000) }} ms</span>
+    </span>
+</span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Queries</h2>
+
+    {% if not collector.querycount %}
+        <p>
+            <em>No queries.</em>
+        </p>
+    {% else %}
+        <ul class="alt">
+            {% for i, query in collector.queries %}
+                <li class="{{ i is odd ? 'odd' : 'even' }}">
+                    <div>
+                        <code>{{ query.sql }}</code>
+                    </div>
+                    <small>
+                        <strong>Parameters</strong>: {{ query.params|yaml_encode }}<br />
+                        <strong>Time</strong>: {{ '%0.2f'|format(query.executionMS * 1000) }} ms
+                    </small>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <h2>Database Connections</h2>
+
+    {% if collector.connections %}
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Service</th>
+            </tr>
+            {% for name, service in collector.connections %}
+                <tr>
+                    <th>{{ name }}</th>
+                    <td>{{ service }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>
+            <em>No entity managers.</em>
+        </p>
+    {% endif %}
+
+    <h2>Entity Managers</h2>
+
+    {% if collector.managers %}
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Service</th>
+            </tr>
+            {% for name, service in collector.managers %}
+                <tr>
+                    <th>{{ name }}</th>
+                    <td>{{ service }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>
+            <em>No entity managers.</em>
+        </p>
+    {% endif %}
+{% endblock %}

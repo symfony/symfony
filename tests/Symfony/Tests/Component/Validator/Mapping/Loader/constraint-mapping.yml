@@ -1,0 +1,41 @@
+namespaces:
+  custom: Symfony\Tests\Component\Validator\Fixtures\
+
+Symfony\Tests\Component\Validator\Fixtures\Entity:
+  constraints:
+    # Custom constraint
+    - Symfony\Tests\Component\Validator\Fixtures\ConstraintA: ~
+    # Custom constraint with namespaces prefix
+    - "custom:ConstraintB": ~
+
+  properties:
+    firstName:
+      # Constraint without value
+      - NotNull: ~
+      # Constraint with single value
+      - Min: 3
+      # Constraint with multiple values
+      - Choice: [A, B]
+      # Constraint with child constraints
+      - All:
+          - NotNull: ~
+          - Min: 3
+      # Option with child constraints
+      - All:
+          constraints:
+            - NotNull: ~
+            - Min: 3
+      # Value with child constraints
+      - Collection:
+          fields:
+            foo:
+              - NotNull: ~
+              - Min: 3
+            bar:
+              - Min: 5
+      # Constraint with options
+      - Choice: { choices: [A, B], message: Must be one of %choices% }
+
+  getters:
+    lastName:
+      - NotNull: ~

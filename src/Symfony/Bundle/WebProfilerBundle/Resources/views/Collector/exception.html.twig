@@ -1,0 +1,30 @@
+{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+
+{% block head %}
+    <link href="{{ asset('bundles/framework/css/exception.css') }}" rel="stylesheet" type="text/css" media="screen" />
+    {{ parent() }}
+{% endblock %}
+
+{% block menu %}
+<span class="label">
+    <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/exception.png') }}" alt="Exception" /></span>
+    <strong>Exception</strong>
+    <span class="count">
+        {% if collector.hasexception %}
+            <span>1</span>
+        {% endif %}
+    </span>
+</span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Exception</h2>
+
+    {% if not collector.hasexception %}
+        <p>
+            <em>No exception was thrown and uncaught during the request.</em>
+        </p>
+    {% else %}
+        {% render 'WebProfilerBundle:Exception:show' with { 'exception': collector.exception, 'format': 'html' } %}
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,25 @@
+<div id="header" class="clear_fix">
+    <h1>
+        <img src="{{ asset('bundles/webprofiler/images/profiler/logo_symfony_profiler.gif') }}" alt="Symfony profiler"/>
+    </h1>
+
+    <div class="search">
+        <form method="get" action="http://symfony.com/search">
+            <div class="form_row">
+                <label for="search_id">
+                    <img src="{{ asset('bundles/webprofiler/images/profiler/grey_magnifier.png') }}" alt="Search on Symfony website"/>
+                </label>
+
+                <input name="q" id="search_id" type="search" placeholder="Search on Symfony website"/>
+
+                <button type="submit">
+                    <span class="border_l">
+                        <span class="border_r">
+                            <span class="btn_bg">OK</span>
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

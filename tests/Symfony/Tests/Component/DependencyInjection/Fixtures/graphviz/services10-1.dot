@@ -1,0 +1,10 @@
+digraph sc {
+  ratio="normal"
+  node [fontsize="13" fontname="Verdana" shape="square"];
+  edge [fontsize="12" fontname="Verdana" color="white" arrowhead="closed" arrowsize="1"];
+
+  node_foo [label="foo\nFooClass\n", shape=square, fillcolor="grey", style="filled"];
+  node_service_container [label="service_container\nSymfony\\Component\\DependencyInjection\\ContainerBuilder\n", shape=square, fillcolor="green", style="empty"];
+  node_bar [label="bar\n\n", shape=square, fillcolor="red", style="empty"];
+  node_foo -> node_bar [label="" style="filled"];
+}

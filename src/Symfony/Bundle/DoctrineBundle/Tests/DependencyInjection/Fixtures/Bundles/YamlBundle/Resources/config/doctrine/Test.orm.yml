@@ -1,0 +1,5 @@
+Fixtures\Bundles\YamlBundle\Entity\Test:
+  type: entity
+  id:
+    id:
+      type: integer

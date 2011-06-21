@@ -1,27 +1,27 @@
 <?php
 
-require_once __DIR__.'/src/Symfony/Foundation/UniversalClassLoader.php';
+require_once __DIR__.'/src/Symfony/Component/ClassLoader/UniversalClassLoader.php';
 
-use Symfony\Foundation\UniversalClassLoader;
+use Symfony\Component\ClassLoader\UniversalClassLoader;
 
 $loader = new UniversalClassLoader();
 $loader->registerNamespaces(array(
-    'Doctrine\\Common'           => __DIR__.'/vendor/doctrine/lib/vendor/doctrine-common/lib',
-    'Doctrine\\DBAL\\Migrations' => __DIR__.'/vendor/doctrine-migrations/lib',
-    'Doctrine\\DBAL'             => __DIR__.'/vendor/doctrine/lib/vendor/doctrine-dbal/lib',
-    'Doctrine'                   => __DIR__.'/vendor/doctrine/lib',
-    'Zend'                       => __DIR__.'/vendor/zend/library',
+    'Symfony\\Tests'   => __DIR__.'/tests',
+    'Symfony'          => __DIR__.'/src',
+    'Doctrine\\Common' => __DIR__.'/vendor/doctrine-common/lib',
+    'Doctrine\\DBAL'   => __DIR__.'/vendor/doctrine-dbal/lib',
+    'Doctrine'         => __DIR__.'/vendor/doctrine/lib',
+    'Monolog'          => __DIR__.'/vendor/monolog/src',
 ));
 $loader->registerPrefixes(array(
-    'Swift_' => __DIR__.'/vendor/swiftmailer/lib/classes',
-    'Twig_'  => __DIR__.'/vendor/twig/lib',
+    'Twig_' => __DIR__.'/vendor/twig/lib',
+));
+$loader->registerPrefixFallbacks(array(
+    __DIR__.'/src/Symfony/Component/Locale/Resources/stubs',
 ));
 $loader->register();
 
-// needed for code coverage
-require_once __DIR__.'/vendor/propel/runtime/lib/Propel.php';
-set_include_path(
-    __DIR__.'/vendor/phing/classes'.PATH_SEPARATOR.
-    __DIR__.'/vendor/propel/runtime/lib'.PATH_SEPARATOR.
-    get_include_path()
-);
+if (is_file(__DIR__.'/vendor/swiftmailer/lib/classes/Swift.php')) {
+    require_once __DIR__.'/vendor/swiftmailer/lib/classes/Swift.php';
+    Swift::registerAutoload(__DIR__.'/vendor/swiftmailer/lib/swift_init.php');
+}

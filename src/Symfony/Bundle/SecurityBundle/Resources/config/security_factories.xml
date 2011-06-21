@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="security.authentication.factory.form" class="Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FormLoginFactory">
+            <tag name="security.listener.factory" />
+        </service>
+
+        <service id="security.authentication.factory.x509" class="Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\X509Factory">
+            <tag name="security.listener.factory" />
+        </service>
+
+        <service id="security.authentication.factory.basic" class="Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\HttpBasicFactory">
+            <tag name="security.listener.factory" />
+        </service>
+
+        <service id="security.authentication.factory.digest" class="Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\HttpDigestFactory">
+            <tag name="security.listener.factory" />
+        </service>
+
+        <service id="security.authentication.factory.remember_me" class="Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory">
+            <tag name="security.listener.factory" />
+        </service>
+    </services>
+</container>

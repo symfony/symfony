@@ -1,0 +1,57 @@
+{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+
+{% from _self import display_listener %}
+
+{% block menu %}
+<span class="label">
+    <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/events.png') }}" alt="Events" /></span>
+    <strong>Events</strong>
+</span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Called Listeners</h2>
+
+    <table>
+        <tr>
+            <th>Event name</th>
+            <th>Listener</th>
+        </tr>
+        {% for listener in collector.calledlisteners %}
+            <tr>
+                <td><code>{{ listener.event }}</code></td>
+                <td><code>{{ display_listener(listener) }}</code></td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    {% if collector.notcalledlisteners %}
+        <h2>Not Called Listeners</h2>
+
+        <table>
+            <tr>
+                <th>Event name</th>
+                <th>Listener</th>
+            </tr>
+            {% set listeners = collector.notcalledlisteners %}
+            {% for listener in listeners|keys|sort %}
+                <tr>
+                    <td><code>{{ listeners[listener].event }}</code></td>
+                    <td><code>{{ display_listener(listeners[listener]) }}</code></td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+{% endblock %}
+
+{% macro display_listener(listener) %}
+    {% if listener.type == "Closure" %}
+        Closure
+    {% elseif listener.type == "Function" %}
+        {% set link = listener.file|file_link(listener.line) %}
+        {% if link %}<a href="{{ link }}">{{ listener.function }}</a>{% else %}{{ listener.function }}{% endif %}
+    {% elseif listener.type == "Method" %}
+        {% set link = listener.file|file_link(listener.line) %}
+        {{ listener.class|abbr_class }}::{% if link %}<a href="{{ link }}">{{ listener.method }}</a>{% else %}{{ listener.method }}{% endif %}
+    {% endif %}
+{% endmacro %}

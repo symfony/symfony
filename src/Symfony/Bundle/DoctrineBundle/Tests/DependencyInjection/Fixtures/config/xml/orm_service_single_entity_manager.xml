@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+
+<srv:container xmlns="http://symfony.com/schema/dic/doctrine"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:srv="http://symfony.com/schema/dic/services"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/doctrine http://symfony.com/schema/dic/doctrine/doctrine-1.0.xsd">
+
+    <srv:parameters>
+        <srv:parameter key="doctrine.orm.proxy_namespace">Proxies</srv:parameter>
+    </srv:parameters>
+
+    <config>
+        <dbal default-connection="default">
+            <connection
+                name="default"
+                driver="pdo_sqlite"
+                dbname="sqlite_db"
+                user="sqlite_user"
+                password="sqlite_s3cr3t"
+                memory="true" />
+        </dbal>
+
+        <orm
+                default-entity-manager="default"
+                auto-generate-proxy-classes="true"
+            >
+            <entity-manager name="default" connection="default">
+                <metadata-cache-driver type="memcache">
+                    <class>Doctrine\Common\Cache\MemcacheCache</class>
+                    <host>localhost</host>
+                    <port>11211</port>
+                    <instance-class>Memcache</instance-class>
+                </metadata-cache-driver>
+                <mapping name="YamlBundle" />
+            </entity-manager>
+        </orm>
+    </config>
+</srv:container>

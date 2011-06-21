@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+
+<srv:container xmlns="http://symfony.com/schema/dic/doctrine"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:srv="http://symfony.com/schema/dic/services"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/doctrine http://symfony.com/schema/dic/doctrine/doctrine-1.0.xsd">
+
+    <srv:imports>
+        <srv:import resource="orm_imports_import.xml" />
+    </srv:imports>
+
+    <config>
+        <orm auto-generate-proxy-classes="true" />
+    </config>
+</srv:container>

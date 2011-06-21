@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="test.client.class">Symfony\Bundle\FrameworkBundle\Client</parameter>
+        <parameter key="test.client.parameters" type="collection"></parameter>
+        <parameter key="test.client.history.class">Symfony\Component\BrowserKit\History</parameter>
+        <parameter key="test.client.cookiejar.class">Symfony\Component\BrowserKit\CookieJar</parameter>
+        <parameter key="test.session.listener.class">Symfony\Bundle\FrameworkBundle\EventListener\TestSessionListener</parameter>
+    </parameters>
+
+    <services>
+        <service id="test.client" class="%test.client.class%" scope="prototype">
+            <argument type="service" id="kernel" />
+            <argument>%test.client.parameters%</argument>
+            <argument type="service" id="test.client.history" />
+            <argument type="service" id="test.client.cookiejar" />
+        </service>
+
+        <service id="test.client.history" class="%test.client.history.class%" scope="prototype" />
+
+        <service id="test.client.cookiejar" class="%test.client.cookiejar.class%" scope="prototype" />
+
+        <service id="test.session.listener" class="%test.session.listener.class%">
+            <argument type="service" id="service_container" />
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="192" />
+            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" priority="-128" />
+        </service>
+    </services>
+</container>

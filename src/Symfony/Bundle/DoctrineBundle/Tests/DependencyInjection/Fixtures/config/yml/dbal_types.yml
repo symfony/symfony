@@ -1,0 +1,7 @@
+doctrine:
+    dbal:
+        default_connection: default
+        types:
+            test: Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType
+        connections:
+            default: ~

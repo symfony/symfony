@@ -1,0 +1,14 @@
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                dbname: db
+
+    orm:
+        entity_managers:
+            default:
+                hydrators:
+                    test_hydrator: Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestHydrator
+                mappings:
+                    YamlBundle: ~

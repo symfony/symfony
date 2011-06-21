@@ -2,7 +2,7 @@
 
 <phpunit backupGlobals="false"
          backupStaticAttributes="false"
-         colors="false"
+         colors="true"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
@@ -14,17 +14,24 @@
     <testsuites>
         <testsuite name="Symfony Test Suite">
             <directory>./tests/Symfony/</directory>
-            <directory>./src/Symfony/Framework/*/Tests/</directory>
+            <directory>./src/Symfony/Bundle/*/Tests/</directory>
         </testsuite>
     </testsuites>
+
+    <groups>
+        <exclude>
+            <group>benchmark</group>
+        </exclude>
+    </groups>
 
     <filter>
         <whitelist>
             <directory>./src/Symfony/</directory>
             <exclude>
-                <directory>./src/Symfony/Framework/*/Resources</directory>
-                <file>./src/Symfony/Foundation/bootstrap.php</file>
-                <file>./src/Symfony/Foundation/packager.php</file>
+                <directory>./src/Symfony/Bundle/*/Resources</directory>
+                <directory>./src/Symfony/Bundle/*/Tests</directory>
+                <directory>./src/Symfony/Component/*/Resources</directory>
+                <directory>./src/Symfony/Component/*/*/Resources</directory>
             </exclude>
         </whitelist>
     </filter>

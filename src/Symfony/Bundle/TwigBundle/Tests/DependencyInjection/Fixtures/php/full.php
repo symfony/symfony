@@ -1,0 +1,20 @@
+<?php
+
+$container->loadFromExtension('twig', array(
+    'form' => array(
+        'resources' => array(
+            'MyBundle::form.html.twig',
+        )
+     ),
+     'globals' => array(
+         'foo' => '@bar',
+         'pi'  => 3.14,
+     ),
+     'auto_reload'         => true,
+     'autoescape'          => true,
+     'base_template_class' => 'stdClass',
+     'cache'               => '/tmp',
+     'charset'             => 'ISO-8859-1',
+     'debug'               => true,
+     'strict_variables'    => true,
+));

@@ -1,0 +1,21 @@
+<div id="sfwdt{{ token }}" style="display: none"></div>
+<script type="text/javascript">/*<![CDATA[*/
+    (function () {
+        var wdt, xhr;
+        wdt = document.getElementById('sfwdt{{ token }}');
+        if (window.XMLHttpRequest) {
+            xhr = new XMLHttpRequest();
+        } else {
+            xhr = new ActiveXObject('Microsoft.XMLHTTP');
+        }
+        xhr.open('GET', '{{ path("_wdt", { "token": token }) }}', true);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.onreadystatechange = function(state) {
+            if (4 === xhr.readyState && 200 === xhr.status && -1 !== xhr.responseText.indexOf('sf-toolbarreset')) {
+                wdt.innerHTML = xhr.responseText;
+                wdt.style.display = 'block';
+            }
+        };
+        xhr.send('');
+    })();
+/*]]>*/</script>

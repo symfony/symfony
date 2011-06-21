@@ -1,0 +1,136 @@
+{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+        <img width="28" height="28" alt="Request" style="border-width: 0; vertical-align: middle; margin-right: 5px;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAABOZJREFUeNrsVmsspFcY9jHMMsxKE9sxM1SUNHRpSNR9bbQqrrNUCG1E1z3ZyIpq+dEfIiToRtomEiFi/zQrWdlZFFstDYK632ZRu2yxFNu4GzOY6fPKN80YVu1m41dP8uac75zz3t/3OR+jVqv1LnLo613wuHCFnJcdTExM8LOzs+9vb28HaPZMTU1bSkpKohwcHDbPI3xwcPBMhUx+fv6V4eHhG0KhsMfd3V2srYwGfQ8MDPiWlZUtYHjZ2dlJYcBfOFK/qof6YHTs7OxsUigU4rW1tQNjY+NHpzGMjo6my2SyQJVKxcH6mzt37gRmZWXJcKQ6j0IGVcpUV1e/W1NT0y6Xyy1fNScwbCkmJuZaQkLCU11PTwspFc0lhPHW6yijQXzET3LOG9JLYWFhywiTan9//1jVisVilbe3946FhYVieXmZ297ezsN87I6hoaEqODj4BatQfh6FKlipCA8Pf1ZbW2urOQgICNjKzMxsNzExofxQVZrHx8c7FRQUXOvp6THW3CM+GCo/dw4lEsnP6+vrx6rRxsZGWVlZWcHhcH7a2tpaKCwsdElOTpbZ2tqKNjc3I5KSkj5fWVk51lLm5ubNUqk0CsudM3O4sbHxke6mj4/PYyirr6urm4+MjPy1u7v7bkpKyi9VVVV/8/l8qa+v71NdHsj5BJPwP0OKKj2BNmhwCuPs2NiYBOGyoL2DgwPzycnJT7G8y+Vyn2B+T5uHlUN3pzV7rq6uJz3EONG0s7OzXEyHKKZ1Ho93cGQZh6MODQ1dof3FxUXDUwSRHOPY2NjoiIiI22R3XFzcFyEhIT9ibfKvh6jCuY6Ojne0mYEmPsgV19nZ+Y/S0tIHQ0NDHo6OjqNOTk4j8JKP3Hyoq5DkUNEyDHMTwBEI427v7u6KDAwMFNgXgGY0jf/1/Py8pKGh4X00P18jwMrKqjE3N/dLKBJTh4CWR0ZGloqKir6Hhz6ae1FRUZsovMcI+RByzjQ1NcXv7e2ZaBuDtpIhNf2BgYFfkULHxsbGzwBROYeHh/o6KLKAy40I6zJwVLi6uhoKYW9r34EHqpycnO9aWlquA+pccK7n6em5nZqa+ufMzAwfcoU7OzsGkLWOar9Opf28q6tLoKuMRRHx3NxcyllVR3y9vb3CtLS0uoyMjKsU1vT09GZra+s2tJcFKjwVxliiX0ddXFz0SYkB+moQL4T8daBNIBDsARAGkC8F4TLtwYBZTA9Bj2DwUdG1tbU5jI+Pc0ihHJaMFRcXP0Tejg5R9nqJiYmnGkD7dE5DJBIdIGTEN15eXv4xQncEBhUVFbdQod9GR0f/MDU1ZUV7CDWvv7/fnmGtegvkBYbI1tZWLzc3t+dAGDXQxV9XIYS1mpmZMX19fSI/P7/fAQT3sT2pVCo94cHN+vr6D+DNZW2evLy8J7hbj+U9DvukrIE6URwv0HtNWO8iVJYeHh5XgZtXNIz4XrG3t7+H5RLu8TDPkzKQ0sjIqA+NzkxPT6dCoUdQUNAagUFzc/NlROQ33Kml1mC0/trIUyOWCIhtQDdAniAei5HdICnoGfu0KVlSsw+BAD0Yir6V+Pv7L5AcGMCBkTXkEDnCnPGbSL0kYuHKiBW8SlVNjC/hoeRas3zbhIisIcRzhFLMG/4vZVgFBqwyFRsJleb5Yv7/EX7T4x8BBgDTTU7fbnA/yAAAAABJRU5ErkJggg=="/>
+    {% endset %}
+    {% set text %}
+        {% spaceless %}
+            {% if collector.controller.class is defined %}
+                <span>{{ collector.controller.class|abbr_class }}</span>
+                <span>::</span>
+                {% set link = collector.controller.file|file_link(collector.controller.line) %}
+                <span>{% if link %}<a style="color: #2f2f2f" href="{{ link }}">{{ collector.controller.method }}</a>{% else %}{{ collector.controller.method }}{% endif %}</span>
+            {% else %}
+                <span>{{ collector.controller }}</span>
+            {% endif %}
+            <span style="margin: 0; padding: 0; color: #979696;">|</span>
+            <span{{ not collector.route ? ' style="color:#a33"' : '' }}>{{ collector.route ? collector.route : 'NONE' }}</span>
+            <span style="margin: 0; padding: 0; color: #979696;">|</span>
+            <span style="color: {{ 200 == collector.statuscode ? '#759e1a' : '#a33' }}">{{ collector.statuscode }}</span>
+        {% endspaceless %}
+    {% endset %}
+    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
+{% endblock %}
+
+{% block menu %}
+<span class="label">
+    <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/request.png') }}" alt="Request" /></span>
+    <strong>Request</strong>
+</span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Request GET Parameters</h2>
+
+    {% if collector.requestquery.all|length %}
+        {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.requestquery } only %}
+    {% else %}
+        <p>
+            <em>No GET parameters</em>
+        </p>
+    {% endif %}
+
+    <h2>Request POST Parameters</h2>
+
+    {% if collector.requestrequest.all|length %}
+        {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.requestrequest } only %}
+    {% else %}
+        <p>
+            <em>No POST parameters</em>
+        </p>
+    {% endif %}
+
+    <h2>Request Attributes</h2>
+
+    {% if collector.requestattributes.all|length %}
+        {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.requestattributes } only %}
+    {% else %}
+        <p>
+            <em>No attributes</em>
+        </p>
+    {% endif %}
+
+    <h2>Request Cookies</h2>
+
+    {% if collector.requestcookies.all|length %}
+        {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.requestcookies } only %}
+    {% else %}
+        <p>
+            <em>No cookies</em>
+        </p>
+    {% endif %}
+
+    <h2>Request Headers</h2>
+
+    {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.requestheaders } only %}
+
+    <h2>Request Content</h2>
+
+    <p>
+        {% if collector.content == false %}
+            <em>Request content not available (it was retrieved as a resource).</em>
+        {% elseif collector.content %}
+            <pre>{{ collector.content }}</pre>
+        {% else %}
+            <em>No content</em>
+        {% endif %}
+    </p>
+
+    <h2>Request Server Parameters</h2>
+
+    {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.requestserver } only %}
+
+    <h2>Response Headers</h2>
+
+    {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.responseheaders } only %}
+
+    <h2>Session Attributes</h2>
+
+    {% if collector.sessionattributes|length %}
+        <table>
+            <tr>
+                <th>Key</th>
+                <th>Value</th>
+            </tr>
+            {% set attributes = collector.sessionattributes %}
+            {% for key in attributes|keys|sort %}
+                <tr>
+                    <th>{{ key }}</th>
+                    <td>{{ attributes[key]|yaml_dump }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>
+            <em>No session attributes</em>
+        </p>
+    {% endif %}
+
+
+    {% if profile.parent %}
+        <h2><a href="{{ path('_profiler', { 'token': profile.parent.token }) }}">Parent request: {{ profile.parent.token }}</a></h2>
+
+        {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': profile.parent.getcollector('request').requestattributes } only %}
+    {% endif %}
+
+    {% if profile.children|length %}
+        <h2>Sub requests</h2>
+
+        {% for child in profile.children %}
+            <h3><a href="{{ path('_profiler', { 'token': child.token }) }}">{{ child.token }}</a></h3>
+            {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': child.getcollector('request').requestattributes } only %}
+        {% endfor %}
+    {% endif %}
+
+{% endblock %}

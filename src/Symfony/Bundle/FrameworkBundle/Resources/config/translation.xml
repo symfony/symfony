@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="translator.class">Symfony\Bundle\FrameworkBundle\Translation\Translator</parameter>
+        <parameter key="translator.identity.class">Symfony\Component\Translation\IdentityTranslator</parameter>
+        <parameter key="translator.selector.class">Symfony\Component\Translation\MessageSelector</parameter>
+        <parameter key="translation.loader.php.class">Symfony\Component\Translation\Loader\PhpFileLoader</parameter>
+        <parameter key="translation.loader.yml.class">Symfony\Component\Translation\Loader\YamlFileLoader</parameter>
+        <parameter key="translation.loader.xliff.class">Symfony\Component\Translation\Loader\XliffFileLoader</parameter>
+    </parameters>
+
+    <services>
+        <service id="translator.real" class="%translator.class%">
+            <argument type="service" id="service_container" />
+            <argument type="service" id="translator.selector" />
+            <argument type="collection" /> <!-- translation loaders -->
+            <argument type="collection">
+                <argument key="cache_dir">%kernel.cache_dir%/translations</argument>
+                <argument key="debug">%kernel.debug%</argument>
+            </argument>
+            <argument type="service" id="session" on-invalid="ignore" />
+        </service>
+
+        <service id="translator" class="%translator.identity.class%">
+            <argument type="service" id="translator.selector" />
+        </service>
+
+        <service id="translator.selector" class="%translator.selector.class%" public="false" />
+
+        <service id="translation.loader.php" class="%translation.loader.php.class%">
+            <tag name="translation.loader" alias="php" />
+        </service>
+
+        <service id="translation.loader.yml" class="%translation.loader.yml.class%">
+            <tag name="translation.loader" alias="yml" />
+        </service>
+
+        <service id="translation.loader.xliff" class="%translation.loader.xliff.class%">
+            <tag name="translation.loader" alias="xliff" />
+        </service>
+    </services>
+</container>

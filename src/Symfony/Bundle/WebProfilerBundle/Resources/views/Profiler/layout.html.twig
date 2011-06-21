@@ -1,0 +1,48 @@
+{% extends 'WebProfilerBundle:Profiler:base.html.twig' %}
+
+{% block body %}
+
+    {% render 'WebProfilerBundle:Profiler:toolbar' with { 'token': token, 'position': 'normal' } %}
+
+    <div id="content">
+        {% include 'WebProfilerBundle:Profiler:header.html.twig' only %}
+
+        {% if profile %}
+            <div id="resume">
+                <p>
+                    <strong><a href="{{ profile.url }}">{{ profile.url }}</a></strong>
+                    <span class="date">
+                        <strong>by {{ profile.ip }}</strong> at <strong>{{ profile.time|date('r') }}</strong>
+                    </span>
+                </p>
+            </div>
+        {% endif %}
+
+        <div id="main">
+
+            <div class="clear_fix">
+                <div id="collector_wrapper">
+                    <div id="collector_content">
+                        {% block panel '' %}
+                    </div>
+                </div>
+                <div id="navigation">
+                    {% if templates is defined %}
+                        <ul id="menu_profiler">
+                            {% for name, template in templates %}
+                                {% set menu %}{{ template.renderBlock('menu', { 'collector': profile.getcollector(name)}) }}{% endset %}
+                                {% if menu != '' %}
+                                    <li class="{{ name }}{% if name == panel %} selected{% endif %}">
+                                        <a href="{{ path('_profiler', { 'token': token, 'panel': name }) }}">{{ menu|raw }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    {% render 'WebProfilerBundle:Profiler:searchBar' %}
+                    {% include 'WebProfilerBundle:Profiler:admin.html.twig' with { 'token': token } only %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

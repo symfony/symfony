@@ -1,8 +1,0 @@
-<?xml version="1.0" ?>
-
-<container xmlns="http://www.symfony-project.org/schema/dic/services"
-    xmlns:foobar="http://www.example.com/schema/foobar">
-
-  <foobar:foobar />
-
-</container>

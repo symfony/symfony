@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="robots" content="noindex,nofollow" />
+        <title>{% block title 'Profiler' %}</title>
+        <link rel="shortcut icon" type="image/x-icon" href="{{ asset('bundles/webprofiler/favicon.ico') }}" />
+        {% block head %}
+            <link href="{{ asset('bundles/webprofiler/css/toolbar.css') }}" rel="stylesheet" type="text/css" media="screen" />
+            <link href="{{ asset('bundles/webprofiler/css/profiler.css') }}" rel="stylesheet" type="text/css" media="screen" />
+        {% endblock %}
+    </head>
+    <body>
+        {% block body '' %}
+    </body>
+</html>

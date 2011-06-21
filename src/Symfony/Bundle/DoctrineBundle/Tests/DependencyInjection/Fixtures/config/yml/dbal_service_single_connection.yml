@@ -1,0 +1,6 @@
+doctrine:
+    dbal:
+        dbname: mysql_db
+        user: mysql_user
+        password: mysql_s3cr3t
+        unix_socket: /path/to/mysqld.sock

@@ -1,9 +1,0 @@
-imports:
-    - { resource: config.yml }
-
-zend.logger:
-    priority: debug
-    path:     %kernel.logs_dir%/%kernel.environment%.log
-
-web.config:
-    toolbar: true

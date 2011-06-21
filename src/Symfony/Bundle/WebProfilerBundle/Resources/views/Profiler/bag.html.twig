@@ -1,0 +1,12 @@
+<table>
+    <tr>
+        <th>Key</th>
+        <th>Value</th>
+    </tr>
+    {% for key in bag.keys|sort %}
+        <tr>
+            <th>{{ key }}</th>
+            <td>{{ bag.get(key)|yaml_dump }}</td>
+        </tr>
+    {% endfor %}
+</table>

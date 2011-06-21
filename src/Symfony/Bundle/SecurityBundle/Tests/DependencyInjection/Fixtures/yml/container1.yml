@@ -1,0 +1,54 @@
+security:
+    acl: ~
+    encoders:
+        JMS\FooBundle\Entity\User1: plaintext
+        JMS\FooBundle\Entity\User2:
+            algorithm: sha1
+            encode_as_base64: false
+            iterations: 5
+        JMS\FooBundle\Entity\User3:
+            algorithm: md5
+        JMS\FooBundle\Entity\User4:
+            id: security.encoder.foo
+
+    providers:
+        default:
+            users:
+                foo: { password: foo, roles: ROLE_USER }
+        digest:
+            users:
+                foo: { password: foo, roles: 'ROLE_USER, ROLE_ADMIN' }
+        basic:
+            users:
+                foo: { password: 0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33, roles: ROLE_SUPER_ADMIN }
+                bar: { password: 0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33, roles: [ROLE_USER, ROLE_ADMIN] }
+        doctrine:
+            entity: { class: SecurityBundle:User, property: username }
+        service:
+            id: user.manager
+        chain:
+            providers: [service, doctrine, basic]
+
+
+    firewalls:
+        simple: { pattern: /login, security: false }
+        secure:
+            stateless: true
+            http_basic: true
+            http_digest: true
+            form_login: true
+            anonymous: true
+            switch_user: true
+            x509: true
+            logout: true
+
+    role_hierarchy:
+        ROLE_ADMIN:       ROLE_USER
+        ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+        ROLE_REMOTE:      ROLE_USER,ROLE_ADMIN
+
+    access_control:
+        - { path: /blog/524, role: ROLE_USER, requires_channel: https }
+        -
+            path: /blog/.*
+            role: IS_AUTHENTICATED_ANONYMOUSLY

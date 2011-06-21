@@ -1,0 +1,273 @@
+/*
+Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Code licensed under the BSD License:
+http://developer.yahoo.com/yui/license.html
+version: 3.1.2
+build: 56
+*/
+.sf-exceptionreset html{color:#000;background:#FFF;}.sf-exceptionreset body,.sf-exceptionreset div,.sf-exceptionreset dl,.sf-exceptionreset dt,.sf-exceptionreset dd,.sf-exceptionreset ul,.sf-exceptionreset ol,.sf-exceptionreset li,.sf-exceptionreset h1,.sf-exceptionreset h2,.sf-exceptionreset h3,.sf-exceptionreset h4,.sf-exceptionreset h5,.sf-exceptionreset h6,.sf-exceptionreset pre,.sf-exceptionreset code,.sf-exceptionreset form,.sf-exceptionreset fieldset,.sf-exceptionreset legend,.sf-exceptionreset input,.sf-exceptionreset textarea,.sf-exceptionreset p,.sf-exceptionreset blockquote,.sf-exceptionreset th,.sf-exceptionreset td{margin:0;padding:0;}.sf-exceptionreset table{border-collapse:collapse;border-spacing:0;}.sf-exceptionreset fieldset,.sf-exceptionreset img{border:0;}.sf-exceptionreset address,.sf-exceptionreset caption,.sf-exceptionreset cite,.sf-exceptionreset code,.sf-exceptionreset dfn,.sf-exceptionreset em,.sf-exceptionreset strong,.sf-exceptionreset th,.sf-exceptionreset var{font-style:normal;font-weight:normal;}.sf-exceptionreset li{list-style:none;}.sf-exceptionreset caption,.sf-exceptionreset th{text-align:left;}.sf-exceptionreset h1,.sf-exceptionreset h2,.sf-exceptionreset h3,.sf-exceptionreset h4,.sf-exceptionreset h5,.sf-exceptionreset h6{font-size:100%;font-weight:normal;}.sf-exceptionreset q:before,.sf-exceptionreset q:after{content:'';}.sf-exceptionreset abbr,.sf-exceptionreset acronym{border:0;font-variant:normal;}.sf-exceptionreset sup{vertical-align:text-top;}.sf-exceptionreset sub{vertical-align:text-bottom;}.sf-exceptionreset input,.sf-exceptionreset textarea,.sf-exceptionreset select{font-family:inherit;font-size:inherit;font-weight:inherit;}.sf-exceptionreset input,.sf-exceptionreset textarea,.sf-exceptionreset select{*font-size:100%;}.sf-exceptionreset legend{color:#000;}
+
+.sf-exceptionreset html,
+.sf-exceptionreset body
+{
+    width:100%;
+    min-height:100%;
+    _height:100%;
+    margin:0;
+    padding:0;
+}
+.sf-exceptionreset body
+{
+    font: 1em "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;;
+    text-align:left;
+    background-color:#efefef;
+}
+.sf-exceptionreset abbr
+{
+    border-bottom: 1px dotted #000;
+    cursor: help;
+}
+.sf-exceptionreset p
+{
+  font-size:14px;
+  line-height:20px;
+  color:#868686;
+  padding-bottom:20px
+}
+
+.sf-exceptionreset strong
+{
+  color:#313131;
+  font-weight:bold;
+}
+
+.sf-exceptionreset a
+{
+    color:#6c6159;
+}
+.sf-exceptionreset a img
+{
+    border:none;
+}
+.sf-exceptionreset a:hover
+{
+    text-decoration:underline;
+}
+
+.sf-exceptionreset em
+{
+    font-style:italic;
+}
+
+.sf-exceptionreset h2,
+.sf-exceptionreset h3
+{
+    font-weight:bold;
+}
+
+.sf-exceptionreset h1
+{
+    font-family:Georgia, "Times New Roman", Times, serif;
+    font-size: 20px;
+    color:#313131;
+}
+
+.sf-exceptionreset li
+{
+    padding-bottom:10px;
+}
+
+.sf-exceptionreset .traces
+{
+    padding-bottom:14px;
+}
+
+.sf-exceptionreset .traces li
+{
+    font-size:12px;
+    color:#868686;
+    padding: 5px 4px;
+    list-style-type:decimal;
+    margin-left:20px;
+}
+
+.sf-exceptionreset #logs .traces li.error
+{
+    font-style:normal;
+    color:#AA3333;
+    background:#f9ecec;
+}
+
+/* fix for Opera not liking empty <li> */
+.sf-exceptionreset .traces li:after {
+    content: '\00A0'
+}
+
+.sf-exceptionreset .trace
+{
+    border:1px solid #D3D3D3;
+    padding:10px;
+    overflow:auto;
+    margin:10px 0 20px;
+}
+
+.sf-exceptionreset .block,
+.sf-exceptionreset .block_exception
+{
+    -moz-border-radius:16px;
+    -webkit-border-radius:16px;
+    border-radius:16px;
+    margin-bottom:20px;
+}
+.sf-exceptionreset .block
+{
+    background-color:#FFFFFF;
+    border:1px solid #dfdfdf;
+    padding:40px 50px;
+}
+
+.sf-exceptionreset .block_exception
+{
+    background-color:#f6f6f6;
+    border:1px solid #dfdfdf;
+    padding:30px 28px;
+}
+
+.sf-exceptionreset .block_exception div
+{
+    color:#313131;
+    font-size:10px;
+}
+
+.sf-exceptionreset .block_exception_detected .illustration_exception,
+.sf-exceptionreset .block_exception_detected .text_exception
+{
+    float:left;
+}
+.sf-exceptionreset .block_exception_detected .illustration_exception
+{
+    width:152px;
+}
+.sf-exceptionreset .block_exception_detected .text_exception
+{
+    width:670px;
+    padding: 30px 44px 24px 46px;
+    position:relative;
+}
+.sf-exceptionreset .text_exception .open_quote,
+.sf-exceptionreset .text_exception .close_quote
+{
+    position:absolute;
+}
+
+.sf-exceptionreset .open_quote
+{
+    top:0;
+    left:0;
+}
+
+.sf-exceptionreset .close_quote
+{
+    bottom:0;
+    right:50px;
+}
+
+.sf-exceptionreset .block_exception p
+{
+    font-family:Arial, Helvetica, sans-serif;
+}
+.sf-exceptionreset .block_exception p a,
+.sf-exceptionreset .block_exception p a:hover
+{
+    color:#565656;
+}
+
+.sf-exceptionreset h2
+{
+    font-size:16px;
+    font-family:Arial, Helvetica, sans-serif;
+    padding-bottom:16px;
+}
+
+.sf-exceptionreset li a
+{
+    background:none;
+    color:#868686;
+    text-decoration:none;
+}
+
+.sf-exceptionreset li a:hover
+{
+    background:none;
+    color:#313131;
+    text-decoration:underline;
+}
+
+.sf-exceptionreset .logs h2
+{
+    float:left;
+    width:654px;
+}
+
+.sf-exceptionreset .error_count
+{
+    float:right;
+    width:170px;
+    text-align:right;
+}
+
+.sf-exceptionreset .error_count span
+{
+    display:inline-block;
+    background-color:#aacd4e;
+    -moz-border-radius:6px;
+    -webkit-border-radius:6px;
+    border-radius:6px;
+    padding:4px;
+    color:white;
+    margin-right:2px;
+    font-size:11px;
+    font-weight:bold;
+}
+
+.sf-exceptionreset .toggle
+{
+    vertical-align:middle;
+}
+
+.sf-exceptionreset .linked ul, 
+.sf-exceptionreset .linked li
+{
+    display: inline;
+}
+
+.sf-exceptionreset #output_content
+{
+    color: #000;
+    font-size: 12px;
+}
+
+.sf-exceptionreset ol
+{
+    padding: 10px 0
+}
+
+.sf-exceptionreset ol li {
+    list-style: decimal; 
+    margin-left: 20px; 
+    padding: 2px;
+    padding-bottom: 20px;
+}
+
+.sf-exceptionreset ol ol li
+{
+    list-style-position: inside; 
+    margin-left: 0; 
+    white-space: nowrap; 
+    font-size: 12px; 
+    padding-bottom: 0;
+}
+.sf-exceptionreset li .selected
+{
+    background-color: #ffd;
+}

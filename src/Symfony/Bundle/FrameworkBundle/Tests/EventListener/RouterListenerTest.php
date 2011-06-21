@@ -49,7 +49,7 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
                      ->with($expectedContext);
 
         $event = $this->createGetResponseEventForUri($uri);
-        $listener->onEarlyCoreRequest($event);
+        $listener->onEarlyKernelRequest($event);
     }
 
     public function getPortData()

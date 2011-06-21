@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpKernel;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
-final class CoreEvents
+final class KernelEvents
 {
     /**
      * The REQUEST event occurs at the very beginning of request
@@ -29,7 +29,7 @@ final class CoreEvents
      *
      * @var string
      */
-    const REQUEST = 'core.request';
+    const REQUEST = 'kernel.request';
 
     /**
      * The EXCEPTION event occurs when an uncaught exception appears
@@ -41,7 +41,7 @@ final class CoreEvents
      *
      * @var string
      */
-    const EXCEPTION = 'core.exception';
+    const EXCEPTION = 'kernel.exception';
 
     /**
      * The VIEW event occurs when the return value of a controller
@@ -54,7 +54,7 @@ final class CoreEvents
      *
      * @var string
      */
-    const VIEW = 'core.view';
+    const VIEW = 'kernel.view';
 
     /**
      * The CONTROLLER event occurs once a controller was found for
@@ -66,7 +66,7 @@ final class CoreEvents
      *
      * @var string
      */
-    const CONTROLLER = 'core.controller';
+    const CONTROLLER = 'kernel.controller';
 
     /**
      * The RESPONSE event occurs once a response was created for
@@ -78,5 +78,5 @@ final class CoreEvents
      *
      * @var string
      */
-    const RESPONSE = 'core.response';
+    const RESPONSE = 'kernel.response';
 }

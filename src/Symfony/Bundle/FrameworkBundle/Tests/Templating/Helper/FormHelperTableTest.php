@@ -22,9 +22,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Templating\PhpEngine;
 use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
-use Symfony\Tests\Component\Form\AbstractDivLayoutTest;
+use Symfony\Tests\Component\Form\AbstractTableLayoutTest;
 
-class FormHelperTest extends AbstractDivLayoutTest
+class FormHelperTableTest extends AbstractTableLayoutTest
 {
     protected $helper;
 
@@ -38,7 +38,10 @@ class FormHelperTest extends AbstractDivLayoutTest
         $loader = new FilesystemLoader(array());
         $engine = new PhpEngine($templateNameParser, $loader);
 
-        $this->helper = new FormHelper($engine);
+        $this->helper = new FormHelper($engine, array(
+            'FrameworkBundle:Form',
+            'FrameworkBundle:FormTable'
+        ));
 
         $engine->setHelpers(array(
             $this->helper,

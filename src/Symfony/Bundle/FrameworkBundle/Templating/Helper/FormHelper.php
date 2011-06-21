@@ -25,19 +25,31 @@ use Symfony\Component\Form\Util\FormUtil;
  */
 class FormHelper extends Helper
 {
-    static protected $cache = array();
-
     protected $engine;
 
     protected $varStack;
 
     protected $context;
 
-    public function __construct(EngineInterface $engine)
+    protected $resources;
+
+    protected $themes;
+
+    /**
+     * Constructor;
+     *
+     * @param EngineInterface $engine    The templating engine
+     * @param array           $resources An array of theme name
+     */
+    public function __construct(EngineInterface $engine, array $resources = array())
     {
         $this->engine = $engine;
         $this->varStack = array();
         $this->context = array();
+        $this->themes = new \SplObjectStorage();
+
+        $this->resources = 0 == count($resources) ? array('FrameworkBundle:Form') : $resources;
+
     }
 
     public function isChoiceGroup($label)
@@ -48,6 +60,19 @@ class FormHelper extends Helper
     public function isChoiceSelected(FormView $view, $choice)
     {
         return FormUtil::isChoiceSelected($choice, $view->get('value'));
+    }
+
+    /**
+     * Sets a theme for a given view.
+     *
+     * The theme format is "<Bundle>:<Controller>".
+     *
+     * @param FormView     $view      A FormView instance
+     * @param string|array $resources A theme or an array of theme
+     */
+    public function setTheme(FormView $view, $themes)
+    {
+        $this->themes[$view] = (array) $themes;
     }
 
     /**
@@ -178,28 +203,31 @@ class FormHelper extends Helper
         if (isset($this->varStack[$rendering])) {
             $typeIndex = $this->varStack[$rendering]['typeIndex'] - 1;
             $types = $this->varStack[$rendering]['types'];
-            $this->varStack[$rendering]['variables'] = array_replace_recursive($this->varStack[$rendering]['variables'], $variables);
+            $variables = array_replace_recursive($this->varStack[$rendering]['variables'], $variables);
         } else {
             $types = $view->get('types');
             $types[] = $custom;
             $typeIndex = count($types) - 1;
-            $this->varStack[$rendering] = array (
-                'variables' => array_replace_recursive($view->all(), $variables),
-                'types'     => $types,
-            );
+            $variables = array_replace_recursive($view->all(), $variables);
+            $this->varStack[$rendering]['types'] = $types;
         }
+
+        $this->varStack[$rendering]['variables'] = $variables;
 
         do {
             $types[$typeIndex] .= '_'.$section;
-            $template = $this->lookupTemplate($types[$typeIndex]);
+            $template = $this->lookupTemplate($view, $types[$typeIndex]);
 
             if ($template) {
 
                 $this->varStack[$rendering]['typeIndex'] = $typeIndex;
 
-                $this->context[] = $this->varStack[$rendering]['variables'];
+                $this->context[] = array(
+                    'variables' => $variables,
+                    'view'      => $view,
+                );
 
-                $html = $this->engine->render($template, $this->varStack[$rendering]['variables']);
+                $html = $this->engine->render($template, $variables);
 
                 array_pop($this->context);
                 unset($this->varStack[$rendering]);
@@ -233,13 +261,15 @@ class FormHelper extends Helper
             throw new FormException(sprintf('This method should only be called while rendering a form element.', $name));
         }
 
-        $template = $this->lookupTemplate($name);
+        $context = end($this->context);
+
+        $template = $this->lookupTemplate($context['view'], $name);
 
         if (false === $template) {
             throw new FormException(sprintf('No block "%s" found while rendering the form.', $name));
         }
 
-        $variables = array_replace_recursive(end($this->context), $variables);
+        $variables = array_replace_recursive($context['variables'], $variables);
 
         return $this->engine->render($template, $variables);
     }
@@ -247,30 +277,36 @@ class FormHelper extends Helper
     /**
      * Returns the name of the template to use to render the block
      *
-     * @param string $blockName The name of the block
+     * @param FormView $view      The form view
+     * @param string   $blockName The name of the block
      *
      * @return string|Boolean The template logical name or false when no template is found
      */
-    protected function lookupTemplate($blockName)
+    protected function lookupTemplate(FormView $view, $block)
     {
-        if (isset(self::$cache[$blockName])) {
-            return self::$cache[$blockName];
+
+        $file = $block.'.html.php';
+
+        $themes = $view->hasParent() ? array() : $this->resources;
+
+        if ($this->themes->contains($view)) {
+            $themes = array_merge($themes, $this->themes[$view]);
         }
 
-        $template = $blockName.'.html.php';
-/*
-        if ($this->templateDir) {
-            $template = $this->templateDir.':'.$template;
-        }
-*/
-        $template = 'FrameworkBundle:Form:'.$template;
-        if (!$this->engine->exists($template)) {
-            $template = false;
+        for ($i = count($themes) - 1; $i >= 0; --$i) {
+
+            $template = $themes[$i].':'.$file;
+
+            if ($this->engine->exists($template)) {
+                return $template;
+            }
         }
 
-        self::$cache[$blockName] = $template;
+        if ($view->hasParent()) {
+            return $this->lookupTemplate($view->getParent(), $block);
+        }
 
-        return $template;
+        return false;
     }
 
     public function getName()

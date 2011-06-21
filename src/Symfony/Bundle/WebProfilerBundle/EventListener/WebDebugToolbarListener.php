@@ -20,7 +20,7 @@ use Symfony\Bundle\TwigBundle\TwigEngine;
 /**
  * WebDebugToolbarListener injects the Web Debug Toolbar.
  *
- * The handle method must be connected to the onCoreResponse event.
+ * The onKernelResponse method must be connected to the kernel.response event.
  *
  * The WDT is only injected on well-formed HTML (with a proper </body> tag).
  * This means that the WDT is never included in sub-requests or ESI requests.
@@ -45,7 +45,7 @@ class WebDebugToolbarListener
         return $this->verbose;
     }
 
-    public function onCoreResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;

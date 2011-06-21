@@ -50,7 +50,7 @@ class Firewall
      *
      * @param GetResponseEvent $event An GetResponseEvent instance
      */
-    public function onCoreRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;

@@ -165,6 +165,9 @@ class Response
      */
     public function setContent($content)
     {
+        if (!is_string($content)) {
+            throw new \UnexpectedValueException('The Response content must be a string, "'.gettype($content).'" given.');
+        }
         $this->content = $content;
     }
 

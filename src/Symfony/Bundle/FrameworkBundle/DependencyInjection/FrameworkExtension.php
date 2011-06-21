@@ -127,7 +127,7 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseEvent',
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseForControllerResultEvent',
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseForExceptionEvent',
-            'Symfony\\Component\\HttpKernel\\CoreEvents',
+            'Symfony\\Component\\HttpKernel\\KernelEvents',
 
             'Symfony\\Bundle\\FrameworkBundle\\EventListener\\RouterListener',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameParser',

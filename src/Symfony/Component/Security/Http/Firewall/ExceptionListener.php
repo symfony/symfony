@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\CoreEvents;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -53,13 +53,13 @@ class ExceptionListener
     }
 
     /**
-     * Registers a onCoreException listener to take care of security exceptions.
+     * Registers a onKernelException listener to take care of security exceptions.
      *
      * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
      */
     public function register(EventDispatcherInterface $dispatcher)
     {
-        $dispatcher->addListener(CoreEvents::EXCEPTION, array($this, 'onCoreException'));
+        $dispatcher->addListener(KernelEvents::EXCEPTION, array($this, 'onKernelException'));
     }
 
     /**
@@ -67,7 +67,7 @@ class ExceptionListener
      *
      * @param GetResponseForExceptionEvent $event An GetResponseForExceptionEvent instance
      */
-    public function onCoreException(GetResponseForExceptionEvent $event)
+    public function onKernelException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();
         $request = $event->getRequest();

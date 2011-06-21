@@ -35,7 +35,7 @@ class ExceptionListener
         $this->logger = $logger;
     }
 
-    public function onCoreException(GetResponseForExceptionEvent $event)
+    public function onKernelException(GetResponseForExceptionEvent $event)
     {
         static $handling;
 

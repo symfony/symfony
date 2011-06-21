@@ -26,12 +26,6 @@ class PasswordEncoder extends BasePasswordEncoder
 
 class BasePasswordEncoderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testComparePassword()
-    {
-        $this->assertTrue($this->invokeComparePasswords('password', 'password'));
-        $this->assertFalse($this->invokeComparePasswords('password', 'foo'));
-    }
-
     public function testDemergePasswordAndSalt()
     {
         $this->assertEquals(array('password', 'salt'), $this->invokeDemergePasswordAndSalt('password{salt}'));
@@ -71,15 +65,5 @@ class BasePasswordEncoderTest extends \PHPUnit_Framework_TestCase
         $m->setAccessible(true);
 
         return $m->invoke($encoder, $password, $salt);
-    }
-
-    protected function invokeComparePasswords($p1, $p2)
-    {
-        $encoder = new PasswordEncoder();
-        $r = new \ReflectionObject($encoder);
-        $m = $r->getMethod('comparePasswords');
-        $m->setAccessible(true);
-
-        return $m->invoke($encoder, $p1, $p2);
     }
 }

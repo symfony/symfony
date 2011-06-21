@@ -23,5 +23,4 @@ interface ExtensionGuesserInterface
      * @return string             The guessed extension or NULL, if none could be guessed
      */
     function guess($mimeType);
-
 }

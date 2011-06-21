@@ -21,9 +21,10 @@ beta5 to RC1
     * `attributes` to `widget_attributes`
     * `options` to `widget_choice_options`
 
-* Kernel event changes:
+* Event changes:
+    * All listeners must now be tagged with `kernel.event_listener` instead of
+      `kernel.listener`:
     * Kernel events are now properly prefixed with `kernel` instead of `core`:
-    * Kernel listeners must now be tagged with kernel.event_listener:
 
         * Before:
 

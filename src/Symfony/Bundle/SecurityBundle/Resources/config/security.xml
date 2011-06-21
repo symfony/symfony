@@ -71,7 +71,7 @@
 
 
         <!-- Authorization related services -->
-        <service id="security.access.decision_manager" class="%security.access.decision_manager.class%" public="false">
+        <service id="security.access.decision_manager" class="%security.access.decision_manager.class%" public="true">
             <argument type="collection"></argument>
         </service>
 

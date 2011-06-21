@@ -36,5 +36,21 @@ class DoctrineBundle extends Bundle
         // force Doctrine annotations to be loaded
         // should be removed when a better solution is found in Doctrine
         class_exists('Doctrine\ORM\Mapping\Driver\AnnotationDriver');
+
+        // Register an autoloader for proxies to avoid issues when unserializing them
+        // when the ORM is used.
+        if ($this->container->hasParameter('doctrine.orm.proxy_namespace')) {
+            $namespace = $this->container->getParameter('doctrine.orm.proxy_namespace');
+            $dir = $this->container->getParameter('doctrine.orm.proxy_dir');
+            spl_autoload_register(function($class) use ($namespace, $dir) {
+                if (0 === strpos($class, $namespace)) {
+                    $className = substr($class, strlen($namespace) +1);
+                    $file = $dir.DIRECTORY_SEPARATOR.$className.'.php';
+                    if (file_exists($file)) {
+                        require $file;
+                    }
+                }
+            });
+        }
     }
 }

@@ -29,9 +29,13 @@ class StubTemplateNameParser implements TemplateNameParserInterface
     public function parse($name)
     {
         $parts = explode(':', $name);
-        $name = $parts[count($parts)-1];
+        $name = $parts[count($parts) - 1];
 
-        $path = ($name{0} === '_' ? $this->rootCustom : $this->root).'/'.$name;
+        if ($name[0] == '_') {
+            $path = $this->rootCustom.'/'.$name;
+        } else {
+            $path = $this->root.'/'.$parts[count($parts) - 2].'/'.$name;
+        }
 
         return new TemplateReference($path, 'php');
     }

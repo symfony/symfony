@@ -127,6 +127,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 $options,
                 new Reference(sprintf('doctrine.dbal.%s_connection.configuration', $name)),
                 new Reference(sprintf('doctrine.dbal.%s_connection.event_manager', $name)),
+                $connection['mapping_types'],
             ))
         ;
     }
@@ -139,6 +140,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             $options['platform'] = new Reference($options['platform_service']);
             unset($options['platform_service']);
         }
+        unset($options['mapping_types']);
 
         foreach (array(
             'options' => 'driverOptions',

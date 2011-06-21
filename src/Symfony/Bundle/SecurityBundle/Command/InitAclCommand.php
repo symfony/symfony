@@ -4,11 +4,17 @@ namespace Symfony\Bundle\SecurityBundle\Command;
 
 use Doctrine\DBAL\Schema\Comparator;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\Command;
 
-class InitAclCommand extends Command
+/**
+ * Installs the tables required by the ACL system
+ *
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ */
+class InitAclCommand extends ContainerAwareCommand
 {
     protected function configure()
     {

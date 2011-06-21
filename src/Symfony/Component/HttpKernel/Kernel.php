@@ -28,10 +28,13 @@ use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 use Symfony\Component\HttpKernel\DependencyInjection\AddClassesToCachePass;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension as DIExtension;
+use Symfony\Component\HttpKernel\Debug\ErrorHandler;
+use Symfony\Component\HttpKernel\Debug\ExceptionHandler;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
+use Symfony\Component\ClassLoader\DebugUniversalClassLoader;
 
 /**
  * The Kernel is the heart of the Symfony system.
@@ -77,6 +80,22 @@ abstract class Kernel implements KernelInterface
         $this->init();
     }
 
+    public function init()
+    {
+        if ($this->debug) {
+            ini_set('display_errors', 1);
+            error_reporting(-1);
+
+            DebugUniversalClassLoader::enable();
+            ErrorHandler::register();
+            if ('cli' !== php_sapi_name()) {
+                ExceptionHandler::register();
+            }
+        } else {
+            ini_set('display_errors', 0);
+        }
+    }
+
     public function __clone()
     {
         if ($this->debug) {
@@ -85,10 +104,6 @@ abstract class Kernel implements KernelInterface
 
         $this->booted = false;
         $this->container = null;
-    }
-
-    public function init()
-    {
     }
 
     /**

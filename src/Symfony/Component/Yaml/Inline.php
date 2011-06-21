@@ -73,7 +73,7 @@ class Inline
     {
         switch (true) {
             case is_resource($value):
-                throw new DumpException('Unable to dump PHP resources in a YAML file.');
+                throw new DumpException(sprintf('Unable to dump PHP resources in a YAML file ("%s").', get_resource_type($value)));
             case is_object($value):
                 return '!!php/object:'.serialize($value);
             case is_array($value):

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Console\Formatter;
+namespace Symfony\Tests\Component\Console\Helper;
 
 use Symfony\Component\Console\Helper\FormatterHelper;
 

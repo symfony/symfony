@@ -50,6 +50,10 @@ class AppKernel extends Kernel
         return include $filename;
     }
 
+    public function init()
+    {
+    }
+
     public function getRootDir()
     {
         return __DIR__;

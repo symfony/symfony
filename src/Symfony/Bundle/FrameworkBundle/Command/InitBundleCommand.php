@@ -23,7 +23,7 @@ use Symfony\Bundle\FrameworkBundle\Generator\Generator;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class InitBundleCommand extends Command
+class InitBundleCommand extends ContainerAwareCommand
 {
     /**
      * @see Command
@@ -101,7 +101,7 @@ EOT
             throw new \RuntimeException(sprintf('Bundle "%s" already exists.', $bundle));
         }
 
-        $filesystem = $this->container->get('filesystem');
+        $filesystem = $this->getContainer()->get('filesystem');
         $filesystem->mirror(__DIR__.'/../Resources/skeleton/bundle/generic', $targetDir);
         $filesystem->mirror(__DIR__.'/../Resources/skeleton/bundle/'.$input->getOption('format'), $targetDir);
 

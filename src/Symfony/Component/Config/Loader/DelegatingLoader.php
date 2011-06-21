@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Config\Loader;
 
+use Symfony\Component\Config\Exception\FileLoaderLoadException;
+
 /**
  * DelegatingLoader delegates loading to other loaders using a loader resolver.
  *
@@ -37,14 +39,12 @@ class DelegatingLoader extends Loader
      * @param mixed  $resource A resource
      * @param string $type     The resource type
      *
-     * @throws \InvalidArgumentException if no loader is found.
+     * @throws FileLoaderLoadException if no loader is found.
      */
     public function load($resource, $type = null)
     {
-        $loader = $this->resolver->resolve($resource, $type);
-
-        if (false === $loader) {
-            throw new \InvalidArgumentException(sprintf('Unable to load the "%s" resource.', is_string($resource) ? $resource : (is_object($resource) ? get_class($resource) : 'RESOURCE')));
+        if (false === $loader = $this->resolver->resolve($resource, $type)) {
+            throw new FileLoaderLoadException($resource);
         }
 
         return $loader->load($resource, $type);

@@ -2,23 +2,20 @@
 
 namespace Symfony\Bundle\SecurityBundle\Command;
 
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Doctrine\DBAL\Types\Type;
-
 use Symfony\Component\Console\Input\InputOption;
-
 use Doctrine\DBAL\Schema\Comparator;
-
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Bundle\FrameworkBundle\Command\Command;
 
 /**
  * Initializes the CSPRNG fallback algorithm.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class InitSecureRandomCommand extends Command
+class InitSecureRandomCommand extends ContainerAwareCommand
 {
     protected function configure()
     {

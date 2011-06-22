@@ -38,7 +38,7 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         $loader = new FilesystemLoader(array());
         $engine = new PhpEngine($templateNameParser, $loader);
 
-        $this->helper = new FormHelper($engine);
+        $this->helper = new FormHelper($engine, array('FrameworkBundle:Form'));
 
         $engine->setHelpers(array(
             $this->helper,

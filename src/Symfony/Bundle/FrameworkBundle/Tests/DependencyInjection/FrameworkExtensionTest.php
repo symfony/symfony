@@ -121,6 +121,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('/path/to/cache', $container->getParameter('templating.loader.cache.path'));
 
         $this->assertEquals(array('php', 'twig'), $container->getParameter('templating.engines'), '->registerTemplatingConfiguration() sets a templating.engines parameter');
+
+        $this->assertEquals(array('FrameworkBundle:Form', 'theme1', 'theme2'), $container->getParameter('templating.helper.form.resources'), '->registerTemplatingConfiguration() registers the theme and adds the base theme');
     }
 
     public function testTranslator()

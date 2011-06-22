@@ -43,16 +43,14 @@ class FormHelper extends Helper
      * @param EngineInterface $engine    The templating engine
      * @param array           $resources An array of theme name
      */
-    public function __construct(EngineInterface $engine, array $resources = array())
+    public function __construct(EngineInterface $engine, array $resources)
     {
         $this->engine = $engine;
+        $this->resources = $resources;
         $this->varStack = array();
         $this->context = array();
         $this->templates = array();
         $this->themes = array();
-
-        $this->resources = 0 == count($resources) ? array('FrameworkBundle:Form') : $resources;
-
     }
 
     public function isChoiceGroup($label)

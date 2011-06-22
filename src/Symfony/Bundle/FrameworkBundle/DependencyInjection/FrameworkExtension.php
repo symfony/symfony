@@ -314,6 +314,7 @@ class FrameworkExtension extends Extension
         );
 
         $container->setParameter('templating.helper.code.file_link_format', str_replace('%', '%%', isset($links[$ide]) ? $links[$ide] : $ide));
+        $container->setParameter('templating.helper.form.resources', $config['form']['resources']);
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('templating_debug.xml');

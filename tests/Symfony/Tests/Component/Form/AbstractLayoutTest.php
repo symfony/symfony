@@ -107,6 +107,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
     abstract protected function renderRest(FormView $view, array $vars = array());
 
+    abstract protected function setTheme(FormView $view, array $themes);
+
     public function testEnctype()
     {
         $form = $this->factory->createNamedBuilder('form', 'na&me', null, array(

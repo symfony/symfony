@@ -35,6 +35,8 @@ framework:
                 version: 1.0.0
             bar:
                 base_urls: ["http://images1.example.com", "http://images2.example.com"]
+        form:
+            resources:    [theme1, theme2]
     translator:
         enabled:  true
         fallback: fr

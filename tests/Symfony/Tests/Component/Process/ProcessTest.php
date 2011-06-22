@@ -38,24 +38,59 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     /**
      * tests results from sub processes
      *
-     * @dataProvider codeProvider
+     * @dataProvider responsesCodeProvider
      */
     public function testProcessResponses($expected, $getter, $code)
     {
-        $p = new Process(sprintf('php -r "%s"', $code));
+        $p = new Process(sprintf('php -r \'%s\'', $code));
         $p->run();
 
         $this->assertSame($expected, $p->$getter());
     }
 
-    public function codeProvider()
+    /**
+     * tests results from sub processes
+     *
+     * @dataProvider pipesCodeProvider
+     */
+    public function testProcessPipes($expected, $code)
+    {
+        $p = new Process(sprintf('php -r \'%s\'', $code));
+        $p->setStdin($expected);
+        $p->run();
+
+        $this->assertSame($expected, $p->getOutput());
+        $this->assertSame($expected, $p->getErrorOutput());
+        $this->assertSame(0, $p->getExitCode());
+    }
+
+    public function responsesCodeProvider()
     {
         return array(
             //expected output / getter / code to execute
             //array(1,'getExitCode','exit(1);'),
             //array(true,'isSuccessful','exit();'),
-            array('output', 'getOutput', 'echo \"output\";'),
+            array('output', 'getOutput', 'echo "output";'),
         );
+    }
+     
+    public function pipesCodeProvider()
+    {
+        $variations = array(
+            'fwrite(STDOUT, $in = file_get_contents("php://stdin")); fwrite(STDERR, $in);',
+            'include "' . __DIR__ . '/ProcessTestHelper.php";',
+        );
+        $baseData = str_repeat('*', 1024);
+
+        $codes = array();
+        foreach (array(1, 16, 64, 1024, 4096) as $size)
+        {
+            $data = str_repeat($baseData, $size) . '!';
+            foreach ($variations as $code) {
+                $codes[] = array($data, $code);
+            }
+        }
+        return $codes;
     }
 
     /**

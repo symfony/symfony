@@ -431,7 +431,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     {
         $response = new Response();
         $response->setContent($content);
-        $this->assertEquals($content, $response->getContent());
+        $this->assertEquals((string) $content, $response->getContent());
     }
 
     /**

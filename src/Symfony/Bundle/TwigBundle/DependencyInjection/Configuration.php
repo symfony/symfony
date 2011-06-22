@@ -51,7 +51,7 @@ class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->defaultValue(array('form_div_layout.html.twig'))
                             ->validate()
-                                ->always()
+                                ->ifTrue(function($v) { return !in_array('form_div_layout.html.twig', $v); })
                                 ->then(function($v){
                                     return array_merge(array('form_div_layout.html.twig'), $v);
                                 })

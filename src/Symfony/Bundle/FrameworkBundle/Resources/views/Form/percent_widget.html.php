@@ -1,1 +1,1 @@
-<?php echo $view['form']->render($form, 'FrameworkBundle:Form:number_widget.html.php') ?> %
+<?php echo $view['form']->renderBlock('field_widget',  array('type' => isset($type) ? $type : "text")) ?> %

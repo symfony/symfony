@@ -404,4 +404,67 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 '
         );
     }
+
+    /**
+     * @dataProvider themeBlockInheritanceProvider
+     */
+    public function testThemeBlockInheritance($theme)
+    {
+        $view = $this->factory
+            ->createNamed('email', 'name')
+            ->createView()
+        ;
+
+        $this->setTheme($view, $theme);
+
+        $this->assertMatchesXpath(
+            $this->renderWidget($view),
+            '/input[@type="email"][@rel="theme"]'
+        );
+    }
+
+    /**
+     * @dataProvider themeInheritanceProvider
+     */
+    public function testThemeInheritance($parentTheme, $childTheme)
+    {
+        $child = $this->factory->createNamedBuilder('form', 'child')
+            ->add('field', 'text')
+            ->getForm();
+
+        $view = $this->factory->createNamedBuilder('form', 'parent')
+            ->add('field', 'text')
+            ->getForm()
+            ->add($child)
+            ->createView()
+        ;
+
+        $this->setTheme($view, $parentTheme);
+        $this->setTheme($view['child'], $childTheme);
+
+        $this->assertWidgetMatchesXpath($view, array(),
+'/div
+    [
+        ./input[@type="hidden"]
+        /following-sibling::div
+            [
+                ./label[.="parent"]
+                /following-sibling::input[@type="text"]
+            ]
+        /following-sibling::div
+            [
+                ./label
+                /following-sibling::div
+                    [
+                        ./div
+                            [
+                                ./label[.="child"]
+                                /following-sibling::input[@type="text"]
+                            ]
+                    ]
+            ]
+    ]
+'
+        );
+    }
 }

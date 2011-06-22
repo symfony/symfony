@@ -170,7 +170,8 @@ class Response
         if (!is_string($content) && !is_numeric($content) && !is_callable(array($content, '__toString'))) {
             throw new \UnexpectedValueException('The Response content must be a string or object implementing __toString(), "'.gettype($content).'" given.');
         }
-        $this->content = $content;
+
+        $this->content = (string) $content;
     }
 
     /**

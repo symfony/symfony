@@ -1,15 +1,13 @@
 <?php if ($expanded): ?>
-    <div<?php echo $view['form']->attributes() ?>>
-    <?php foreach ($form as $choice => $child): ?>
+    <div <?php echo $view['form']->renderBlock('container_attributes') ?>>
+    <?php foreach ($form as $child): ?>
         <?php echo $view['form']->widget($child) ?>
         <?php echo $view['form']->label($child) ?>
     <?php endforeach ?>
     </div>
 <?php else: ?>
     <select
-        <?php echo $view['form']->attributes() ?>
-        name="<?php echo $view->escape($full_name) ?>"
-        <?php if ($read_only): ?> disabled="disabled"<?php endif ?>
+        <?php echo $view['form']->renderBlock('attributes') ?>
         <?php if ($multiple): ?> multiple="multiple"<?php endif ?>
     >
         <?php if (null !== $empty_value): ?><option value=""><?php echo $view->escape($view['translator']->trans($empty_value)) ?></option><?php endif; ?>

@@ -1,5 +1,5 @@
-<div <?php foreach($attr as $k => $v) { printf('%s="%s" ', $view->escape($k), $view->escape($v)); } ?>>
-    <?php echo $view['form']->label($form, null, $label) ?>
+<div>
+    <?php echo $view['form']->label($form, isset($label) ? $label : null) ?>
     <?php echo $view['form']->errors($form) ?>
-    <?php echo $view['form']->widget($form, $widget) ?>
+    <?php echo $view['form']->widget($form) ?>
 </div>

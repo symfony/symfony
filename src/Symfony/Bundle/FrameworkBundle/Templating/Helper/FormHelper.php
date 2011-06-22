@@ -99,15 +99,6 @@ class FormHelper extends Helper
      */
     public function row(FormView $view, array $variables = array())
     {
-        $variables = array_replace_recursive(
-            array(
-                'label'     => array(),
-                'widget'    => array(),
-                'attr'      => array()
-            ),
-            $variables
-        );
-
         return $this->renderSection($view, 'row', $variables);
     }
 

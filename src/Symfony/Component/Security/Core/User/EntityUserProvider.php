@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\User;
 
+use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -58,6 +59,10 @@ class EntityUserProvider implements UserProviderInterface
 
         if (null === $user) {
             throw new UsernameNotFoundException(sprintf('User "%s" not found.', $username));
+        }
+
+        if ($user instanceof Proxy) {
+            throw new \RuntimeException('The entity manager returned a proxy user. Please make sure that all users that are loaded prior to this method are not lazy-loaded.');
         }
 
         return $user;

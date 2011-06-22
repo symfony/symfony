@@ -71,6 +71,7 @@ class ChoiceType extends AbstractType
             ->setAttribute('multiple', $options['multiple'])
             ->setAttribute('expanded', $options['expanded'])
             ->setAttribute('required', $options['required'])
+            ->setAttribute('empty_value', $options['multiple'] || $options['expanded'] ? null : $options['empty_value'])
         ;
 
         if ($options['expanded']) {
@@ -106,7 +107,7 @@ class ChoiceType extends AbstractType
             ->set('preferred_choices', array_intersect_key($choices, $preferred))
             ->set('choices', array_diff_key($choices, $preferred))
             ->set('separator', '-------------------')
-            ->set('empty_value', !$form->getAttribute('multiple') && !$form->getAttribute('required') ? '' : null)
+            ->set('empty_value', $form->getAttribute('empty_value'))
         ;
 
         if ($view->get('multiple') && !$view->get('expanded')) {
@@ -132,6 +133,7 @@ class ChoiceType extends AbstractType
             'choices'           => array(),
             'preferred_choices' => array(),
             'empty_data'        => $multiple || $expanded ? array() : '',
+            'empty_value'       => ($multiple || $expanded) || !isset($options['empty_value']) ? null : '',
             'error_bubbling'    => false,
         );
     }

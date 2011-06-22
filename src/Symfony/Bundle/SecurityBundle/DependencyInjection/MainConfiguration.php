@@ -80,6 +80,7 @@ class MainConfiguration implements ConfigurationInterface
         $this->addFirewallsSection($rootNode, $this->factories);
         $this->addAccessControlSection($rootNode);
         $this->addRoleHierarchySection($rootNode);
+        $this->addUtilSection($rootNode);
 
         return $tb;
     }
@@ -90,7 +91,7 @@ class MainConfiguration implements ConfigurationInterface
             ->children()
                 ->arrayNode('acl')
                     ->children()
-                        ->scalarNode('connection')->end()
+                        ->scalarNode('connection')->defaultValue('default')->cannotBeEmpty()->end()
                         ->arrayNode('cache')
                             ->addDefaultsIfNotSet()
                             ->children()
@@ -354,6 +355,26 @@ class MainConfiguration implements ConfigurationInterface
                             ->booleanNode('encode_as_base64')->defaultTrue()->end()
                             ->scalarNode('iterations')->defaultValue(5000)->end()
                             ->scalarNode('id')->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addUtilSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('util')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('secure_random')
+                            ->children()
+                                ->scalarNode('connection')->cannotBeEmpty()->end()
+                                ->scalarNode('table_name')->defaultValue('seed_table')->cannotBeEmpty()->end()
+                                ->scalarNode('seed_provider')->cannotBeEmpty()->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()

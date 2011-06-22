@@ -1,21 +1,13 @@
 <?php
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Symfony\Bundle\SecurityBundle\Command;
 
+use Doctrine\DBAL\Schema\Comparator;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Security\Acl\Dbal\Schema;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Doctrine\DBAL\DriverManager;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Bundle\FrameworkBundle\Command\Command;
 
 /**
  * Installs the tables required by the ACL system
@@ -24,45 +16,34 @@ use Doctrine\DBAL\DriverManager;
  */
 class InitAclCommand extends ContainerAwareCommand
 {
-    /**
-     * @see Command
-     */
     protected function configure()
     {
-        $this
-            ->setName('init:acl')
-        ;
+        $this->setName('init:acl');
+        $this->addOption('dump-sql', null, InputOption::VALUE_NONE, 'Whether to dump the SQL statement');
+        $this->addOption('force', null, InputOption::VALUE_NONE, 'Whether to execute the SQL statements');
     }
 
-    /**
-     * @see Command
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $connection = $this->getContainer()->get('security.acl.dbal.connection');
-        $sm = $connection->getSchemaManager();
-        $tableNames = $sm->listTableNames();
-        $tables = array(
-            'class_table_name' => $this->getContainer()->getParameter('security.acl.dbal.class_table_name'),
-            'sid_table_name'   => $this->getContainer()->getParameter('security.acl.dbal.sid_table_name'),
-            'oid_table_name'   => $this->getContainer()->getParameter('security.acl.dbal.oid_table_name'),
-            'oid_ancestors_table_name' => $this->getContainer()->getParameter('security.acl.dbal.oid_ancestors_table_name'),
-            'entry_table_name' => $this->getContainer()->getParameter('security.acl.dbal.entry_table_name'),
-        );
+        $con = $this->container->get('security.acl.dbal.connection');
+        $schema = $this->container->get('security.acl.dbal.schema');
 
-        foreach ($tables as $table) {
-            if (in_array($table, $tableNames, true)) {
-                $output->writeln(sprintf('The table "%s" already exists. Aborting.', $table));
+        if ($input->getOption('force') === $input->getOption('dump-sql')) {
+            throw new \InvalidArgumentException('This command needs to be run with one of these options: --force, or --dump-sql');
+        }
 
-                return;
+        $execute = $input->getOption('force');
+        $comparator = new Comparator();
+        foreach ($comparator->compare($con->getSchemaManager()->createSchema(), $schema)->toSaveSql($con->getDatabasePlatform()) as $sql) {
+            if ($execute) {
+                $con->executeQuery($sql);
+            } else {
+                $output->writeln($sql);
             }
         }
 
-        $schema = new Schema($tables);
-        foreach ($schema->toSql($connection->getDatabasePlatform()) as $sql) {
-            $connection->exec($sql);
+        if ($execute) {
+            $output->writeln('The database schema was updated successfully.');
         }
-
-        $output->writeln('ACL tables have been initialized successfully.');
     }
 }

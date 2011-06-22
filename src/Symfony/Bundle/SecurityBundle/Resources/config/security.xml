@@ -38,6 +38,9 @@
         <parameter key="security.matcher.class">Symfony\Component\HttpFoundation\RequestMatcher</parameter>
 
         <parameter key="security.role_hierarchy.class">Symfony\Component\Security\Core\Role\RoleHierarchy</parameter>
+        
+        <parameter key="security.util.secure_random_schema.class">Symfony\Component\Security\Core\Util\SecureRandomSchema</parameter>
+        <parameter key="security.util.secure_random_schema_listener.class">Symfony\Bundle\SecurityBundle\EventListener\SecureRandomSchemaListener</parameter>
     </parameters>
 
     <services>
@@ -124,5 +127,17 @@
         <service id="security.user.provider.in_memory.user" class="%security.user.provider.in_memory.user.class%" abstract="true" public="false" />
 
         <service id="security.user.provider.chain" class="%security.user.provider.chain.class%" abstract="true" public="false" />
+        
+        <!-- Utilities -->
+        <service id="security.util.secure_random" class="Symfony\Component\Security\Core\Util\SecureRandom">
+            <tag name="monolog.logger" channel="security" />
+            <argument type="service" id="logger" />
+        </service>
+        <service id="security.util.secure_random_schema" class="%security.util.secure_random_schema.class%">
+            <argument></argument><!-- Table Name -->
+        </service>
+        <service id="security.util.secure_random_schema_listener" class="%security.util.secure_random_schema_listener.class%" public="false">
+            <argument type="service" id="security.util.secure_random_schema" />
+        </service>
     </services>
 </container>

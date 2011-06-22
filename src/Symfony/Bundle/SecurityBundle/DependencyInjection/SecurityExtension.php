@@ -80,6 +80,10 @@ class SecurityExtension extends Extension
         $this->createAuthorization($config, $container);
         $this->createRoleHierarchy($config, $container);
 
+        if (isset($config['util']['secure_random'])) {
+            $this->configureSecureRandom($config['util']['secure_random'], $container);
+        }
+
         if ($config['encoders']) {
             $this->createEncoders($config['encoders'], $container);
         }
@@ -134,9 +138,13 @@ class SecurityExtension extends Extension
     {
         $loader->load('security_acl_dbal.xml');
 
-        if (isset($config['connection'])) {
-            $container->setAlias('security.acl.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']));
-        }
+        $container->setAlias('security.acl.dbal.connection', $this->getDoctrineConnectionId($config['connection']));
+
+        $container
+            ->getDefinition('security.acl.dbal.schema_listener')
+            ->addTag('doctrine.event_listener', array('connection' => $config['connection'], 'event' => 'postGenerateSchema', 'lazy' => true))
+        ;
+
         $container->getDefinition('security.acl.cache.doctrine')->addArgument($config['cache']['prefix']);
 
         $container->setParameter('security.acl.dbal.class_table_name', $config['tables']['class']);
@@ -144,6 +152,11 @@ class SecurityExtension extends Extension
         $container->setParameter('security.acl.dbal.oid_table_name', $config['tables']['object_identity']);
         $container->setParameter('security.acl.dbal.oid_ancestors_table_name', $config['tables']['object_identity_ancestors']);
         $container->setParameter('security.acl.dbal.sid_table_name', $config['tables']['security_identity']);
+    }
+
+    private function getDoctrineConnectionId($name)
+    {
+        return sprintf('doctrine.dbal.%s_connection', $name);
     }
 
     /**
@@ -603,6 +616,31 @@ class SecurityExtension extends Extension
         return $this->factories = $factories;
     }
 
+    private function configureSecureRandom(array $config, ContainerBuilder $container)
+    {
+        if (isset($config['seed_provider'])) {
+            $container
+                ->getDefinition('security.util.secure_random')
+                ->addMethodCall('setSeedProvider', array(new Reference($config['seed_provider'])))
+            ;
+            $container->setAlias('security.util.secure_random_seed_provider', $config['seed_provider']);
+        } else if (isset($config['connection'])) {
+            $container
+                ->getDefinition('security.util.secure_random')
+                ->addMethodCall('setConnection', array(new Reference($this->getDoctrineConnectionId($config['connection'])), $config['table_name']))
+            ;
+            $container->setAlias('security.util.secure_random_connection', $this->getDoctrineConnectionId($config['connection']));
+            $container->setParameter('security.util.secure_random_table', $config['table_name']);
+            $container
+                ->getDefinition('security.util.secure_random_schema_listener')
+                ->addTag('doctrine.event_listener', array('connection' => $config['connection'], 'event' => 'postGenerateSchema', 'lazy' => true))
+            ;
+            $container
+                ->getDefinition('security.util.secure_random_schema')
+                ->replaceArgument(0, $config['table_name'])
+            ;
+        }
+    }
 
     /**
      * Returns the base path for the XSD files.

@@ -2,15 +2,16 @@
 
 namespace Symfony\Component\Security\Http\RememberMe;
 
-use Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\CookieTheftException;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
+use Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\CookieTheftException;
+use Symfony\Component\Security\Core\Util\SecureRandom;
 
 /*
  * This file is part of the Symfony package.
@@ -31,6 +32,7 @@ use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
 {
     private $tokenProvider;
+    private $secureRandom;
 
     /**
      * Sets the token provider
@@ -41,6 +43,11 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
     public function setTokenProvider(TokenProviderInterface $tokenProvider)
     {
         $this->tokenProvider = $tokenProvider;
+    }
+
+    public function setSecureRandom(SecureRandom $secureRandom)
+    {
+        $this->secureRandom = $secureRandom;
     }
 
     /**
@@ -81,7 +88,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
         }
 
         $series = $persistentToken->getSeries();
-        $tokenValue = $this->generateRandomValue();
+        $tokenValue = base64_encode($this->secureRandom->nextBytes(32));
         $this->tokenProvider->updateToken($series, $tokenValue, new \DateTime());
         $request->attributes->set(self::COOKIE_ATTR_NAME,
             new Cookie(
@@ -103,8 +110,8 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
      */
     protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token)
     {
-        $series = $this->generateRandomValue();
-        $tokenValue = $this->generateRandomValue();
+        $series = base64_encode($this->secureRandom->nextBytes(32));
+        $tokenValue = base64_encode($this->secureRandom->nextBytes(32));
 
         $this->tokenProvider->createNewToken(
             new PersistentToken(
@@ -127,27 +134,5 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
                 $this->options['httponly']
             )
         );
-    }
-
-    /**
-     * Generates a cryptographically strong random value
-     *
-     * @return string
-     */
-    protected function generateRandomValue()
-    {
-        if (function_exists('openssl_random_pseudo_bytes')) {
-            $bytes = openssl_random_pseudo_bytes(64, $strong);
-
-            if (true === $strong && false !== $bytes) {
-                return base64_encode($bytes);
-            }
-        }
-
-        if (null !== $this->logger) {
-            $this->logger->warn('Could not produce a cryptographically strong random value. Please install/update the OpenSSL extension.');
-        }
-
-        return base64_encode(hash('sha512', uniqid(mt_rand(), true), true));
     }
 }

@@ -122,15 +122,6 @@ class FormExtension extends \Twig_Extension
      */
     public function renderRow(FormView $view, array $variables = array())
     {
-        $variables = array_replace_recursive(
-            array(
-                'label'     => array(),
-                'widget'    => array(),
-                'attr'      => array(),
-            ),
-            $variables
-        );
-
         return $this->render($view, 'row', $variables);
     }
 

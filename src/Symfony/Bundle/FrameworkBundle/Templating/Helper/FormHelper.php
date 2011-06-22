@@ -31,12 +31,13 @@ class FormHelper extends Helper
 
     protected $varStack;
 
-    protected $viewStack = array();
+    protected $context;
 
     public function __construct(EngineInterface $engine)
     {
         $this->engine = $engine;
-        $this->varStack = new \SplObjectStorage();
+        $this->varStack = array();
+        $this->context = array();
     }
 
     public function isChoiceGroup($label)
@@ -47,38 +48,6 @@ class FormHelper extends Helper
     public function isChoiceSelected(FormView $view, $choice)
     {
         return FormUtil::isChoiceSelected($choice, $view->get('value'));
-    }
-
-    /**
-     * Renders the attributes for the current view.
-     *
-     * @param Boolean $includeId Whether to render the id attribute
-     *
-     * @return string The HTML markup
-     */
-    public function attributes($includeId = true)
-    {
-        $html = '';
-        $attr = array();
-
-        if (count($this->viewStack) > 0) {
-            $view = end($this->viewStack);
-            $vars = $this->varStack[$view];
-
-            if (isset($vars['attr'])) {
-                $attr = $vars['attr'];
-            }
-
-            if (true === $includeId && isset($vars['id'])) {
-                $attr['id'] = $vars['id'];
-            }
-        }
-
-        foreach ($attr as $k => $v) {
-            $html .= ' '.$this->engine->escape($k).'="'.$this->engine->escape($v).'"';
-        }
-
-        return $html;
     }
 
     /**
@@ -202,15 +171,38 @@ class FormHelper extends Helper
         }
 
         $template = null;
-        $types = $view->get('types');
-        $types[] = '_'.$view->get('proto_id', $view->get('id'));
 
-        for ($i = count($types) - 1; $i >= 0; $i--) {
-            $types[$i] .= '_'.$section;
-            $template = $this->lookupTemplate($types[$i]);
+        $custom = '_'.$view->get('proto_id', $view->get('id'));
+        $rendering = $custom.$section;
+
+        if (isset($this->varStack[$rendering])) {
+            $typeIndex = $this->varStack[$rendering]['typeIndex'] - 1;
+            $types = $this->varStack[$rendering]['types'];
+            $this->varStack[$rendering]['variables'] = array_replace_recursive($this->varStack[$rendering]['variables'], $variables);
+        } else {
+            $types = $view->get('types');
+            $types[] = $custom;
+            $typeIndex = count($types) - 1;
+            $this->varStack[$rendering] = array (
+                'variables' => array_replace_recursive($view->all(), $variables),
+                'types'     => $types,
+            );
+        }
+
+        do {
+            $types[$typeIndex] .= '_'.$section;
+            $template = $this->lookupTemplate($types[$typeIndex]);
 
             if ($template) {
-                $html = $this->render($view, $template, $variables);
+
+                $this->varStack[$rendering]['typeIndex'] = $typeIndex;
+
+                $this->context[] = $this->varStack[$rendering]['variables'];
+
+                $html = $this->engine->render($template, $this->varStack[$rendering]['variables']);
+
+                array_pop($this->context);
+                unset($this->varStack[$rendering]);
 
                 if ($mainTemplate) {
                     $view->setRendered();
@@ -218,27 +210,38 @@ class FormHelper extends Helper
 
                 return $html;
             }
-        }
+        }  while (--$typeIndex >= 0);
 
-        throw new FormException(sprintf('Unable to render form as none of the following blocks exist: "%s".', implode('", "', $types)));
+        throw new FormException(sprintf(
+            'Unable to render the form as none of the following blocks exist: "%s".',
+            implode('", "', array_reverse($types))
+        ));
     }
 
-    public function render(FormView $view, $template, array $variables = array())
+    /**
+     * Render a block from a form element.
+     *
+     * @param string $name
+     * @param array  $variables Additional variables (those would override the current context)
+     *
+     * @throws FormException if the block is not found
+     * @throws FormException if the method is called out of a form element (no context)
+     */
+    public function renderBlock($name, $variables = array())
     {
-        $this->varStack[$view] = array_replace(
-            $view->all(),
-            isset($this->varStack[$view]) ? $this->varStack[$view] : array(),
-            $variables
-        );
+        if (0 == count($this->context)) {
+            throw new FormException(sprintf('This method should only be called while rendering a form element.', $name));
+        }
 
-        $this->viewStack[] = $view;
+        $template = $this->lookupTemplate($name);
 
-        $html = $this->engine->render($template, $this->varStack[$view]);
+        if (false === $template) {
+            throw new FormException(sprintf('No block "%s" found while rendering the form.', $name));
+        }
 
-        array_pop($this->viewStack);
-        unset($this->varStack[$view]);
+        $variables = array_replace_recursive(end($this->context), $variables);
 
-        return $html;
+        return $this->engine->render($template, $variables);
     }
 
     /**

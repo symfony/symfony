@@ -88,6 +88,11 @@ class LinkTest extends \PHPUnit_Framework_TestCase
             array('?a=b', 'http://localhost/bar/', 'http://localhost/bar/?a=b'),
 
             array('http://login.foo.com/foo', 'http://localhost/bar/', 'http://login.foo.com/foo'),
+
+            array('?foo=2', 'http://localhost?foo=1', 'http://localhost?foo=2'),
+            array('?foo=2', 'http://localhost/?foo=1', 'http://localhost/?foo=2'),
+            array('?foo=2', 'http://localhost/bar?foo=1', 'http://localhost/bar?foo=2'),
+            array('?foo=2', 'http://localhost/bar/?foo=1', 'http://localhost/bar/?foo=2'),
         );
     }
 }

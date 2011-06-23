@@ -1,14 +1,7 @@
 <?php if ($widget == 'single_text'): ?>
-    <input type="text"
-        <?php echo $view['form']->renderBlock('attributes') ?>
-        name="<?php echo $view->escape($full_name) ?>"
-        value="<?php echo $view->escape($value) ?>"
-        <?php if ($read_only): ?>disabled="disabled"<?php endif ?>
-        <?php if ($required): ?>required="required"<?php endif ?>
-        <?php if ($max_length): ?>maxlength="<?php echo $max_length ?>"<?php endif ?>
-    />
+    <?php echo $view['form']->renderBlock('field_widget'); ?>
 <?php else: ?>
-    <div<?php echo $view['form']->renderBlock('container_attributes') ?>>
+    <div <?php echo $view['form']->renderBlock('container_attributes') ?>>
         <?php
             // There should be no spaces between the colons and the widgets, that's why
             // this block is written in a single PHP tag

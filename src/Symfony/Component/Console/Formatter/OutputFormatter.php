@@ -125,7 +125,7 @@ class OutputFormatter implements OutputFormatterInterface
      */
     public function format($message)
     {
-        return preg_replace_callback(OutputFormatterStyleInterface::FORMAT_PATTERN, array($this, 'replaceStyle'), $message);
+        return preg_replace_callback(OutputFormatterInterface::FORMAT_PATTERN, array($this, 'replaceStyle'), $message);
     }
 
     /**

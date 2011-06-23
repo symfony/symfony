@@ -136,7 +136,7 @@ class DelegatingValidator implements FormValidatorInterface
     {
         foreach ($form->getAttribute('error_mapping') as $nestedDataPath => $nestedNamePath)
         {
-            $mapping['/^'.preg_quote($formPath . '.data.' . $nestedDataPath).'(?!\w)/'] = $namePath . '.' . $nestedNamePath;
+            $mapping['/^'.preg_quote($formPath.'.data.'.$nestedDataPath).'(?!\w)/'] = $namePath.'.'.$nestedNamePath;
         }
 
         $iterator = new VirtualFormAwareIterator($form->getChildren());
@@ -146,17 +146,17 @@ class DelegatingValidator implements FormValidatorInterface
             $path = (string)$child->getAttribute('property_path');
             $parts = explode('.', $path, 2);
 
-            $nestedNamePath = $namePath . '.' . $child->getName();
+            $nestedNamePath = $namePath.'.'.$child->getName();
 
             if ($child->hasChildren() || isset($parts[1])) {
-                $nestedFormPath = $formPath . '[' . trim($parts[0], '[]') . ']';
+                $nestedFormPath = $formPath.'['.trim($parts[0], '[]').']';
             }
             else {
-                $nestedFormPath = $formPath . '.data.' . $parts[0];
+                $nestedFormPath = $formPath.'.data.'.$parts[0];
             }
 
             if (isset($parts[1])) {
-                $nestedFormPath .= '.data.' . $parts[1];
+                $nestedFormPath .= '.data.'.$parts[1];
             }
 
             if ($child->hasChildren()) {
@@ -171,7 +171,7 @@ class DelegatingValidator implements FormValidatorInterface
     {
         foreach ($form->getAttribute('error_mapping') as $nestedDataPath => $nestedNamePath)
         {
-            $mapping['/^'.preg_quote($dataPath . '.' . $nestedDataPath).'(?!\w)/'] = $namePath . '.' . $nestedNamePath;
+            $mapping['/^'.preg_quote($dataPath.'.'.$nestedDataPath).'(?!\w)/'] = $namePath.'.'.$nestedNamePath;
         }
 
         $iterator = new VirtualFormAwareIterator($form->getChildren());
@@ -180,14 +180,14 @@ class DelegatingValidator implements FormValidatorInterface
         foreach ($iterator as $child) {
             $path = (string)$child->getAttribute('property_path');
 
-            $nestedNamePath = $namePath . '.' . $child->getName();
+            $nestedNamePath = $namePath.'.'.$child->getName();
 
             if (strpos($path, '[') === 0) {
-                $nestedDataPaths = array($dataPath . $path);
+                $nestedDataPaths = array($dataPath.$path);
             } else {
-                $nestedDataPaths = array($dataPath . '.' . $path);
+                $nestedDataPaths = array($dataPath.'.'.$path);
                 if ($child->hasChildren()) {
-                    $nestedDataPaths[] = $dataPath . '[' . $path . ']';
+                    $nestedDataPaths[] = $dataPath.'['.$path.']';
                 }
             }
 
@@ -215,7 +215,7 @@ class DelegatingValidator implements FormValidatorInterface
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $child) {
-            $nestedNamePath = $namePath . '.' . $child->getName();
+            $nestedNamePath = $namePath.'.'.$child->getName();
             $forms[$nestedNamePath] = $child;
 
             if ($child->hasChildren()) {

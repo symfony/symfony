@@ -35,7 +35,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
             'kernel.debug'       => false,
             'kernel.bundles'     => array('YamlBundle' => 'Fixtures\Bundles\YamlBundle\YamlBundle'),
             'kernel.cache_dir'   => sys_get_temp_dir(),
-            'kernel.root_dir'    => __DIR__ . '/../../../../' // src dir
+            'kernel.root_dir'    => __DIR__.'/../../../../' // src dir
         )));
         $container->set('annotation_reader', new AnnotationReader());
         $loader = new DoctrineExtension();
@@ -59,7 +59,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
                     'default' => array(
                     'mappings' => array('YamlBundle' => array(
                         'type' => 'yml',
-                        'dir' => __DIR__ . '/DependencyInjection/Fixtures/Bundles/YamlBundle/Resources/config/doctrine',
+                        'dir' => __DIR__.'/DependencyInjection/Fixtures/Bundles/YamlBundle/Resources/config/doctrine',
                         'prefix' => 'Fixtures\Bundles\YamlBundle\Entity',
                     )
                 )

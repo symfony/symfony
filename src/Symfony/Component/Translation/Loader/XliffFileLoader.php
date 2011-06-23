@@ -56,7 +56,7 @@ class XliffFileLoader implements LoaderInterface
             throw new \Exception(implode("\n", $this->getXmlErrors()));
         }
 
-        $location = str_replace('\\', '/', __DIR__) . '/schema/dic/xliff-core/xml.xsd';
+        $location = str_replace('\\', '/', __DIR__).'/schema/dic/xliff-core/xml.xsd';
         $parts = explode('/', $location);
         if (preg_match('#^phar://#i', $location)) {
             $tmpfile = tempnam(sys_get_temp_dir(), 'sf2');

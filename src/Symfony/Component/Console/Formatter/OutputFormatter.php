@@ -108,7 +108,7 @@ class OutputFormatter implements OutputFormatterInterface
     public function getStyle($name)
     {
         if (!$this->hasStyle($name)) {
-            throw new \InvalidArgumentException('Undefined style: ' . $name);
+            throw new \InvalidArgumentException('Undefined style: '.$name);
         }
 
         return $this->styles[strtolower($name)];

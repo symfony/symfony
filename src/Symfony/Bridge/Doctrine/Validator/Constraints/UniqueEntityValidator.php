@@ -73,7 +73,7 @@ class UniqueEntityValidator extends ConstraintValidator
 
         if (count($result) > 0 && $result[0] !== $entity) {
             $oldPath = $this->context->getPropertyPath();
-            $this->context->setPropertyPath( empty($oldPath) ? $fields[0] : $oldPath . "." . $fields[0]);
+            $this->context->setPropertyPath( empty($oldPath) ? $fields[0] : $oldPath.".".$fields[0]);
             $this->context->addViolation($constraint->message, array(), $criteria[$fields[0]]);
             $this->context->setPropertyPath($oldPath);
         }

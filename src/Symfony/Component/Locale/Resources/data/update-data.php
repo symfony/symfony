@@ -363,7 +363,7 @@ foreach ($translatedLocales as $translatedLocale) {
         }
 
         if (count($extras) > 0) {
-            $langName .= ' (' . implode(', ', $extras) . ')';
+            $langName .= ' ('.implode(', ', $extras).')';
         }
 
         $localeNames[$supportedLocale] = $langName;

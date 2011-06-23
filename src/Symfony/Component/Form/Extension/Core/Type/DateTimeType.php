@@ -149,6 +149,7 @@ class DateTimeType extends AbstractType
              ),
             'time_widget'   => array(
                 null, // inherit default from TimeType
+                'single_text',
                 'text',
                 'choice',
             ),

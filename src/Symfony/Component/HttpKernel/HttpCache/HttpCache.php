@@ -317,7 +317,7 @@ class HttpCache implements HttpKernelInterface
         $subRequest = clone $request;
 
         // send no head requests because we want content
-        $subRequest->setMethod('get');
+        $subRequest->setMethod('GET');
 
         // add our cached last-modified validator
         $subRequest->headers->set('if_modified_since', $entry->headers->get('Last-Modified'));
@@ -378,7 +378,7 @@ class HttpCache implements HttpKernelInterface
         $subRequest = clone $request;
 
         // send no head requests because we want content
-        $subRequest->setMethod('get');
+        $subRequest->setMethod('GET');
 
         // avoid that the backend sends no content
         $subRequest->headers->remove('if_modified_since');
@@ -550,7 +550,7 @@ class HttpCache implements HttpKernelInterface
      */
     private function restoreResponseBody(Request $request, Response $response)
     {
-        if ('head' === strtolower($request->getMethod()) || 304 === $response->getStatusCode()) {
+        if ('HEAD' === strtoupper($request->getMethod()) || 304 === $response->getStatusCode()) {
             $response->setContent('');
             $response->headers->remove('X-Body-Eval');
             $response->headers->remove('X-Body-File');

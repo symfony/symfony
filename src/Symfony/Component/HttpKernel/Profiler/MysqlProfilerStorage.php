@@ -25,7 +25,7 @@ class MysqlProfilerStorage extends PdoProfilerStorage
     {
         if (null === $this->db) {
             if ('mysql' !== substr($this->dsn, 0, 5)) {
-                throw new \RuntimeException('Please check your configuration. You are trying to use Mysql with a wrong dsn. "' . $this->dsn . '"');
+                throw new \RuntimeException('Please check your configuration. You are trying to use Mysql with a wrong dsn. "'.$this->dsn.'"');
             }
 
             if (!class_exists('PDO') || !in_array('mysql', \PDO::getAvailableDrivers(), true)) {

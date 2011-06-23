@@ -62,8 +62,8 @@ class FileValidator extends ConstraintValidator
 
             if ($size > $limit) {
                 $this->setMessage($constraint->maxSizeMessage, array(
-                    '{{ size }}'    => $size . $suffix,
-                    '{{ limit }}'   => $limit . $suffix,
+                    '{{ size }}'    => $size.$suffix,
+                    '{{ limit }}'   => $limit.$suffix,
                     '{{ file }}'    => $path,
                 ));
 

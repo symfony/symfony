@@ -55,18 +55,21 @@ class DateType extends AbstractType
                         array_combine($options['years'], $options['years']), 4, '0', STR_PAD_LEFT
                     ),
                     'empty_value' => $options['empty_value']['year'],
+                    'required' => $options['required'],
                 );
                 $monthOptions = array(
                     'choice_list' => new MonthChoiceList(
                         $formatter, $options['months']
                     ),
                     'empty_value' => $options['empty_value']['month'],
+                    'required' => $options['required'],
                 );
                 $dayOptions = array(
                     'choice_list' => new PaddedChoiceList(
                         array_combine($options['days'], $options['days']), 2, '0', STR_PAD_LEFT
                     ),
                     'empty_value' => $options['empty_value']['day'],
+                    'required' => $options['required'],
                 );
             }
 

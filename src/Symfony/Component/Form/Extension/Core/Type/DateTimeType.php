@@ -33,6 +33,7 @@ class DateTimeType extends AbstractType
             'months',
             'days',
             'empty_value',
+            'required',
         )));
         $timeOptions = array_intersect_key($options, array_flip(array(
             'hours',
@@ -40,6 +41,7 @@ class DateTimeType extends AbstractType
             'seconds',
             'with_seconds',
             'empty_value',
+            'required',
         )));
 
         if (isset($options['date_widget'])) {

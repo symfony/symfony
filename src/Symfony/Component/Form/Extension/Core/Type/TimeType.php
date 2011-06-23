@@ -40,13 +40,15 @@ class TimeType extends AbstractType
                     'choice_list' => new PaddedChoiceList(
                         array_combine($options['hours'], $options['hours']), 2, '0', STR_PAD_LEFT
                     ),
-                    'empty_value' => $options['empty_value']['hour']
+                    'empty_value' => $options['empty_value']['hour'],
+                    'required' => $options['required'],
                 ))
                 ->add('minute', $options['widget'], array(
                     'choice_list' => new PaddedChoiceList(
                         array_combine($options['minutes'], $options['minutes']), 2, '0', STR_PAD_LEFT
                     ),
-                    'empty_value' => $options['empty_value']['minute']
+                    'empty_value' => $options['empty_value']['minute'],
+                    'required' => $options['required'],
                 ))
             ;
 
@@ -55,7 +57,8 @@ class TimeType extends AbstractType
                     'choice_list' => new PaddedChoiceList(
                         array_combine($options['seconds'], $options['seconds']), 2, '0', STR_PAD_LEFT
                     ),
-                    'empty_value' => $options['empty_value']['second']
+                    'empty_value' => $options['empty_value']['second'],
+                    'required' => $options['required'],
                 ));
             }
         }

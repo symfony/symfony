@@ -76,12 +76,6 @@ class DateTimeType extends AbstractType
                 }
             }
 
-            // If `empty_value` is set, overwrite widget options from `date` and `time`
-            if (isset($options['empty_value'])) {
-                $dateOptions['empty_value'] = $options['empty_value'];
-                $timeOptions['empty_value'] = $options['empty_value'];
-            }
-
             if (isset($options['date_format'])) {
                 $dateOptions['format'] = $options['date_format'];
             }

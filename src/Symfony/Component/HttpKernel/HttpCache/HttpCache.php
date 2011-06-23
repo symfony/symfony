@@ -55,7 +55,7 @@ class HttpCache implements HttpKernelInterface
      *
      *   * allow_revalidate       Specifies whether the client can force a cache revalidate by including
      *                            a Cache-Control "max-age=0" directive in the request. Set it to ``true``
-      *                            for compliance with RFC 2616. (default: false)
+     *                            for compliance with RFC 2616. (default: false)
      *
      *   * stale_while_revalidate Specifies the default number of seconds (the granularity is the second as the
      *                            Response TTL precision is a second) during which the cache can immediately return
@@ -550,7 +550,7 @@ class HttpCache implements HttpKernelInterface
      */
     private function restoreResponseBody(Request $request, Response $response)
     {
-        if ('head' === strtolower($request->getMethod())) {
+        if ('head' === strtolower($request->getMethod()) || 304 === $response->getStatusCode()) {
             $response->setContent('');
             $response->headers->remove('X-Body-Eval');
             $response->headers->remove('X-Body-File');

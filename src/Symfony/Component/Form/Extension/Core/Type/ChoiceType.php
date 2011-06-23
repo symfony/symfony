@@ -65,13 +65,28 @@ class ChoiceType extends AbstractType
             }
         }
 
+        // empty value
+        if ($options['multiple'] || $options['expanded']) {
+            // never use and empty value for these cases
+            $emptyValue = null;
+        } elseif (false === $options['empty_value']) {
+            // an empty value should be added but the user decided otherwise
+            $options['empty_value'] = null;
+        } elseif (null === $options['empty_value']) {
+            // user did not made a decision, so we put a blank empty value
+            $emptyValue = $options['required'] ? null : '';
+        } else {
+            // empty value has been set explicitely
+            $emptyValue = $options['empty_value'];
+        }
+
         $builder
             ->setAttribute('choice_list', $options['choice_list'])
             ->setAttribute('preferred_choices', $options['preferred_choices'])
             ->setAttribute('multiple', $options['multiple'])
             ->setAttribute('expanded', $options['expanded'])
             ->setAttribute('required', $options['required'])
-            ->setAttribute('empty_value', $options['multiple'] || $options['expanded'] ? null : $options['empty_value'])
+            ->setAttribute('empty_value', $emptyValue)
         ;
 
         if ($options['expanded']) {
@@ -133,7 +148,7 @@ class ChoiceType extends AbstractType
             'choices'           => array(),
             'preferred_choices' => array(),
             'empty_data'        => $multiple || $expanded ? array() : '',
-            'empty_value'       => ($multiple || $expanded) || !isset($options['empty_value']) ? null : '',
+            'empty_value'       => $multiple || $expanded || !isset($options['empty_value']) ? null : '',
             'error_bubbling'    => false,
         );
     }

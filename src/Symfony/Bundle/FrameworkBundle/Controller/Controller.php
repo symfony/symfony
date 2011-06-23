@@ -18,7 +18,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Bundle\DoctrineBundle\Registry;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -147,20 +146,6 @@ class Controller extends ContainerAware
     public function getRequest()
     {
         return $this->get('request');
-    }
-
-    /**
-     * Shortcut to return the Doctrine Registry service.
-     *
-     * @return Registry
-     */
-    public function getDoctrine()
-    {
-        if (!$this->has('doctrine')) {
-            throw new \LogicException('The DoctrineBundle is not installed in your application.');
-        }
-
-        return $this->get('doctrine');
     }
 
     /**

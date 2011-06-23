@@ -22,12 +22,12 @@ class TrueValidator extends ConstraintValidator
             return true;
         }
 
-        if (!$value) {
-            $this->setMessage($constraint->message);
-
-            return false;
+        if (true === $value || 1 === $value || '1' === $value) {
+            return true;
         }
 
-        return true;
+        $this->setMessage($constraint->message);
+
+        return false;
     }
 }

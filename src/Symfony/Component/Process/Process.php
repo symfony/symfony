@@ -122,10 +122,10 @@ class Process
         foreach ($pipes as $pipe) {
             stream_set_blocking($pipe, false);
         }
-        
+
         if (null === $this->stdin) {
             fclose($pipes[0]);
-            $writePipes = null; 
+            $writePipes = null;
         } else {
             $writePipes = array($pipes[0]);
             $stdinLen = strlen($this->stdin);

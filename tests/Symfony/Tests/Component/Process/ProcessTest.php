@@ -73,7 +73,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
             array('output', 'getOutput', 'echo "output";'),
         );
     }
-     
+
     public function pipesCodeProvider()
     {
         $variations = array(
@@ -90,6 +90,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
                 $codes[] = array($data, $code);
             }
         }
+
         return $codes;
     }
 

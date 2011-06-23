@@ -36,6 +36,21 @@ class RepeatedTypeTest extends TypeTestCase
         $this->assertEquals('foobar', $this->form['second']->getData());
     }
 
+    public function testSetOptions()
+    {
+        $form = $this->factory->create('repeated', null, array(
+            'type'           => 'field',
+            'options'        => array('label'    => 'Test'),
+            'first_options'  => array('required' => false),
+            'second_options' => array('label'    => 'Test2'),
+        ));
+
+        $this->assertEquals('Test', $form['first']->getAttribute('label'));
+        $this->assertEquals('Test2', $form['second']->getAttribute('label'));
+        $this->assertFalse($form['first']->isRequired());
+        $this->assertTrue($form['second']->isRequired());
+    }
+
     public function testSubmitUnequal()
     {
         $input = array('first' => 'foo', 'second' => 'bar');

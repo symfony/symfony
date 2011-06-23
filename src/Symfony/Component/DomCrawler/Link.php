@@ -91,16 +91,21 @@ class Link
 
         // only an anchor
         if ('#' ===  $uri[0]) {
-            return $this->currentUri.$uri;
+            $baseUri = $this->currentUri;
+            if (false !== $pos = strpos($baseUri, '#')) {
+                $baseUri = substr($baseUri, 0, $pos);
+            }
+
+            return $baseUri.$uri;
         }
 
         // only a query string
-        if ('?' === $uri[0] ) {
+        if ('?' === $uri[0]) {
             $baseUri = $this->currentUri;
 
             // remove the query string from the current uri
-            if (false !== ($pos = strpos($this->currentUri, '?'))) {
-                $baseUri = substr($this->currentUri, 0, strpos($this->currentUri, '?'));
+            if (false !== $pos = strpos($baseUri, '?')) {
+                $baseUri = substr($baseUri, 0, $pos);
             }
 
             return $baseUri.$uri;

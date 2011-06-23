@@ -37,7 +37,6 @@ class DateTimeType extends AbstractType
             $timeParts[] = 'second';
         }
 
-        // If `widget` is set to `single_text`, ignore widget options from `date` and `time`
         if ($options['widget'] === 'single_text') {
             $builder->appendClientTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], 'Y-m-d H:i:s'));
         } else {
@@ -58,19 +57,31 @@ class DateTimeType extends AbstractType
                 'required',
             )));
 
-            if (isset($options['date_widget'])) {
-                $dateOptions['widget'] = $options['date_widget'];
+            // If `widget` is set, overwrite widget options from `date` and `time`
+            if (isset($options['widget'])) {
+                $dateOptions['widget'] = $options['widget'];
+                $timeOptions['widget'] = $options['widget'];
+            } else {
+                if (isset($options['date_widget'])) {
+                    $dateOptions['widget'] = $options['date_widget'];
+                }
+
+                if (isset($options['time_widget'])) {
+                    $timeOptions['widget'] = $options['time_widget'];
+                }
             }
+
+            // If `empty_value` is set, overwrite widget options from `date` and `time`
+            if (isset($options['empty_value'])) {
+                $dateOptions['empty_value'] = $options['empty_value'];
+                $timeOptions['empty_value'] = $options['empty_value'];
+            }
+
             if (isset($options['date_format'])) {
                 $dateOptions['format'] = $options['date_format'];
             }
 
             $dateOptions['input'] = 'array';
-
-            if (isset($options['time_widget'])) {
-                $timeOptions['widget'] = $options['time_widget'];
-            }
-
             $timeOptions['input'] = 'array';
 
             $builder
@@ -118,8 +129,6 @@ class DateTimeType extends AbstractType
     {
         return array(
             'input'         => 'datetime',
-            // This will overwrite "widget" child options
-            'widget'        => null,
             'data_timezone' => null,
             'user_timezone' => null,
             'date_widget'   => null,
@@ -137,6 +146,10 @@ class DateTimeType extends AbstractType
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference'  => false,
+            // This will overwrite "widget" child options
+            'widget'        => null,
+            // This will overwrite "empty_value" child options
+            'empty_value'   => null,
         );
     }
 
@@ -173,6 +186,7 @@ class DateTimeType extends AbstractType
             ),
             // This option will overwrite "date_widget" and "time_widget" options
             'widget'     => array(
+                null, // default, don't overwrite options
                 'single_text',
                 'text',
                 'choice',

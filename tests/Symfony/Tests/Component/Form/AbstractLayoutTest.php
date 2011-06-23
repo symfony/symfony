@@ -1503,7 +1503,24 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testTimeSingleText()    {        $form = $this->factory->createNamed('time', 'na&me', '04:05:06', array(            'property_path' => 'name',            'input' => 'string',            'widget' => 'single_text',        ));        $this->assertWidgetMatchesXpath($form->createView(), array(),'/input    [@type="text"]    [@name="na&me"]    [@value="04:05:06"]    [@id="my&id"]    [@class="my&class"]'        );    }    public function testTimeWithEmptyValueGlobal()
+    public function testTimeSingleText()
+    {
+        $form = $this->factory->createNamed('time', 'na&me', '04:05:06', array(
+            'property_path' => 'name',
+            'input' => 'string',
+            'widget' => 'single_text',
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/input
+    [@type="text"]
+    [@name="na&me"]
+    [@value="04:05:06"]
+'
+        );
+    }
+
+    public function testTimeWithEmptyValueGlobal()
     {
         $form = $this->factory->createNamed('time', 'na&me', null, array(
             'property_path' => 'name',

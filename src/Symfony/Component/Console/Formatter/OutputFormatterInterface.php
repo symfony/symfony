@@ -21,6 +21,11 @@ namespace Symfony\Component\Console\Formatter;
 interface OutputFormatterInterface
 {
     /**
+     * The pattern to phrase the format.
+     */
+    const FORMAT_PATTERN = '#<([a-z][a-z0-9_=;-]+)>(.*?)</\\1?>#is';
+
+    /**
      * Sets the decorated flag.
      *
      * @param Boolean $decorated Whether to decorated the messages or not

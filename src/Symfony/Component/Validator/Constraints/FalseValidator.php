@@ -22,7 +22,7 @@ class FalseValidator extends ConstraintValidator
             return true;
         }
 
-        if ($value) {
+        if (false !== filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)) {
             $this->setMessage($constraint->message);
 
             return false;

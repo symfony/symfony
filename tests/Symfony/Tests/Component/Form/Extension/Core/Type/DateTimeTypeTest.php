@@ -170,7 +170,7 @@ class DateTimeTypeTest extends LocalizedTestCase
             'widget' => 'single_text',
         ));
 
-        $form->bind('2010-06-02 03:04:00');
+        $form->bind('2010-06-02 03:04:05');
 
         $this->assertEquals('2010-06-02 03:04:00', $form->getData());
         $this->assertEquals('2010-06-02 03:04:00', $form->getClientData());

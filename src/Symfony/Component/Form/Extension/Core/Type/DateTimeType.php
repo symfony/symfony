@@ -33,7 +33,10 @@ class DateTimeType extends AbstractType
         $parts = array('year', 'month', 'day', 'hour', 'minute');
         $timeParts = array('hour', 'minute');
 
+        $format = 'Y-m-d H:i:00';
         if ($options['with_seconds']) {
+            $format = 'Y-m-d H:i:s';
+
             $parts[] = 'second';
             $timeParts[] = 'second';
         }
@@ -43,7 +46,7 @@ class DateTimeType extends AbstractType
         }
 
         if ($options['widget'] === 'single_text') {
-            $builder->appendClientTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], 'Y-m-d H:i:s'));
+            $builder->appendClientTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], $format));
         } else {
             // Only pass a subset of the options to children
             $dateOptions = array_intersect_key($options, array_flip(array(
@@ -98,7 +101,7 @@ class DateTimeType extends AbstractType
 
         if ($options['input'] === 'string') {
             $builder->appendNormTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], 'Y-m-d H:i:s')
+                new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], $format)
             ));
         } else if ($options['input'] === 'timestamp') {
             $builder->appendNormTransformer(new ReversedTransformer(

@@ -19,7 +19,7 @@ use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DataTransformerChain;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToPartsTransformer;
 
@@ -43,7 +43,7 @@ class DateTimeType extends AbstractType
         }
 
         if ($options['widget'] === 'single_text') {
-            $builder->appendClientTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], 'Y-m-d H:i:s'));
+            $builder->appendClientTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], 'Y-m-d H:i:s'));
         } else {
             // Only pass a subset of the options to children
             $dateOptions = array_intersect_key($options, array_flip(array(

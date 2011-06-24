@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Helper;
 
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 
 /**
  * The Dialog class provides helpers to interact with the user.
@@ -29,15 +30,100 @@ class DialogHelper extends Helper
      *
      * @return string The user answer
      */
-    public function ask(OutputInterface $output, $question, $default = null)
+    public function ask(OutputInterface $output, $question, $default = null, $autocomplete = null)
     {
-        // @codeCoverageIgnoreStart
         $output->write($question);
 
-        $ret = trim(fgets(STDIN));
+        $inputStream = (null === $this->inputStream ? STDIN : $this->inputStream);
+
+        if (null === $autocomplete || !($output instanceof StreamOutput && $output->hasColorSupport())) {
+            $ret = trim(fgets($inputStream));
+        } else {
+            $i = 0;
+            $currentMatched = false;
+            $ret = '';
+
+            // Disable icanon (so we can fread each keypress) and echo (we'll do echoing here instead)
+            system("stty -icanon -echo");
+
+            while ($c = fread($inputStream, 3)) {
+                // Did we read an escape character?
+                if (strlen($c) > 1 && $c[0] == "\033") {
+                    // Escape sequences for arrow keys
+                    if ($c[2] == 'A' || $c[2] == 'B' || $c[2] == 'C' || $c[2] == 'D') {
+                        continue;
+                    }
+                }
+
+                // Backspace Character
+                if (ord($c) == 127) {
+                    if ($i == 0) {
+                        continue;
+                    }
+
+                    // Move cursor backwards
+                    $output->write("\033[1D");
+                    // Erase characters from cursor to end of line
+                    $output->write("\033[K");
+                    $ret = substr($ret, 0, --$i);
+
+                    continue;
+                }
+
+                if ($c == "\t" | $c == "\n") {
+                    if (false !== $currentMatched) {
+                        // Echo out completed match
+                        $output->write(substr($autocomplete[$currentMatched], strlen($ret)));
+                        $ret = $autocomplete[$currentMatched];
+                        $i = strlen($ret);
+                    }
+
+                    if ($c == "\n") {
+                        $output->write($c);
+                        break;
+                    }
+
+                    continue;
+                }
+
+                $output->write($c);
+                $ret .= $c;
+                $i++;
+
+                $lastMatch = $currentMatched;
+
+                // Erase characters from cursor to end of line
+                $output->write("\033[K");
+
+                for ($j = 0; $j < count($autocomplete); $j++) {
+                    $matchTest = substr($autocomplete[$j], 0, strlen($ret));
+
+                    if ($ret == $matchTest) {
+                        // Save cursor position
+                        $output->write("\0337");
+
+                        // Set fore/background colour to make text appear highlighted
+                        $output->write("\033[47;30m");
+                        $output->write(substr($autocomplete[$j], strlen($ret)));
+                        // Reset text colour
+                        $output->write("\033[0m");
+
+                        // Restore cursor position
+                        $output->write("\0338");
+
+                        $currentMatched = $j;
+                        break;
+                    }
+
+                    $currentMatched = false;
+                }
+            }
+
+            // Reset stty so it behaves normally again
+            system("stty icanon echo");
+        }
 
         return $ret ? $ret : $default;
-        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -76,15 +162,16 @@ class DialogHelper extends Helper
      *
      * @param OutputInterface $output
      * @param string|array    $question
-     * @param callback        $validator A PHP callback
-     * @param integer         $attempts Max number of times to ask before giving up (false by default, which means infinite)
-     * @param string          $default  The default answer if none is given by the user
+     * @param callback        $validator    A PHP callback
+     * @param integer         $attempts     Max number of times to ask before giving up (false by default, which means infinite)
+     * @param string          $default      The default answer if none is given by the user
+     * @param array           $autoComplete
      *
      * @return mixed
      *
      * @throws \Exception When any of the validator returns an error
      */
-    public function askAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $default = null)
+    public function askAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $default = null, $autocomplete = null)
     {
         // @codeCoverageIgnoreStart
         $error = null;
@@ -93,7 +180,7 @@ class DialogHelper extends Helper
                 $output->writeln($this->getHelperSet()->get('formatter')->formatBlock($error->getMessage(), 'error'));
             }
 
-            $value = $this->ask($output, $question, $default);
+            $value = $this->ask($output, $question, $default, $autocomplete);
 
             try {
                 return call_user_func($validator, $value);

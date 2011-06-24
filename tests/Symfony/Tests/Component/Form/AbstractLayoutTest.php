@@ -810,6 +810,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '
         );
     }
+
     public function testDateTimeWithEmptyValueOnTime()
     {
         $form = $this->factory->createNamed('datetime', 'na&me', '2011-02-03', array(
@@ -913,38 +914,46 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             [@value="Feb 3, 2011"]
         /following-sibling::input
             [@type="text"]
-            [@name="na&me[time]"]
             [@id="na&me_time"]
+            [@name="na&me[time]"]
             [@value="04:05:00"]
     ]
 '
         );
     }
 
-    public function testDateTimeWithSecondsSingleText()
+    public function testDateTimeWithWidgetSingleText()
     {
         $form = $this->factory->createNamed('datetime', 'name', '2011-02-03 04:05:06', array(
             'property_path' => 'name',
             'input' => 'string',
-            'date_widget' => 'single_text',
-            'time_widget' => 'single_text',
-            'with_seconds' => true,
+            'widget' => 'single_text',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
-'/div
-    [
-        ./input
-            [@type="text"]
-            [@id="name_date"]
-            [@name="name[date]"]
-            [@value="Feb 3, 2011"]
-        /following-sibling::input
-            [@type="text"]
-            [@name="name[time]"]
-            [@id="name_time"]
-            [@value="04:05:06"]
-    ]
+'/input
+    [@type="text"]
+    [@name="name"]
+    [@value="2011-02-03 04:05:06"]
+'
+        );
+    }
+
+    public function testDateTimeWithWidgetSingleTextIgnoreDateAndTimeWidgets()
+    {
+        $form = $this->factory->createNamed('datetime', 'na&me', '2011-02-03 04:05:06', array(
+            'property_path' => 'name',
+            'input' => 'string',
+            'date_widget' => 'choice',
+            'time_widget' => 'choice',
+            'widget' => 'single_text',
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/input
+    [@type="text"]
+    [@name="na&me"]
+    [@value="2011-02-03 04:05:06"]
 '
         );
     }

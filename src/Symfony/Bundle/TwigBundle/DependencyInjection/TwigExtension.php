@@ -42,7 +42,12 @@ class TwigExtension extends Extension
         $config = $processor->processConfiguration($configuration, $configs);
 
         $container->setParameter('twig.form.resources', $config['form']['resources']);
-        $container->getDefinition('twig.loader')->addMethodCall('addPath', array(__DIR__.'/../../../Bridge/Twig/Resources/views/Form'));
+        $container->getDefinition('twig.loader')->addMethodCall('setPaths', array(
+            array(
+                __DIR__.'/../../../Bridge/Twig/Resources/views/Form',
+                $container->getParameter('kernel.root_dir').'/Resources/views/Form'
+            )
+        ));
 
         if (!empty($config['globals'])) {
             $def = $container->getDefinition('twig');

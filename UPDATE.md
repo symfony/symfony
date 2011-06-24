@@ -9,10 +9,10 @@ timeline closely anyway.
 beta5 to RC1
 ------------
 
-* renamed `Symfony\Bundle\FrameworkBundle\Command\Command` to
+* Renamed `Symfony\Bundle\FrameworkBundle\Command\Command` to
   `Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand`
 
-* removed the routing `AnnotGlobLoader` class
+* Removed the routing `AnnotGlobLoader` class
 
 * Some blocks in the Twig Form templates have been renamed to avoid
   collisions:
@@ -22,8 +22,9 @@ beta5 to RC1
     * `options` to `widget_choice_options`
 
 * Event changes:
+
     * All listeners must now be tagged with `kernel.event_listener` instead of
-      `kernel.listener`:
+      `kernel.listener`.
     * Kernel events are now properly prefixed with `kernel` instead of `core`:
 
         * Before:
@@ -34,11 +35,21 @@ beta5 to RC1
 
                 <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
 
-    Note: the method can of course remain as `onCoreRequest`, but renaming it
-    as well for consistency with future projects makes sense.
+        Note: the method can of course remain as `onCoreRequest`, but renaming it
+        as well for consistency with future projects makes sense.
 
     * The `Symfony\Component\HttpKernel\CoreEvents` class has been renamed to
       `Symfony\Component\HttpKernel\KernelEvents`
+
+* Form component changes:
+
+    * Added theming support to PHP Form templates,
+    * Added `single_text` option to `TimeType` and `DateTimeType` to be compliant
+      with `DateType`,
+    * Added `empty_value` option to `ChoiceType`, `DateTimeType`, `DateType`
+      and `TimeType`.
+
+* `TrueValidator` and `FalseValidator` constraints validators no longer accepts any value as valid data.
 
 beta4 to beta5
 --------------
@@ -62,7 +73,7 @@ beta4 to beta5
 
     * `Symfony\Component\HttpFoundation\File\File` has a new API:
 
-       * It now extends `\splFileInfo`:
+       * It now extends `\SplFileInfo`:
 
            * former `getName()` equivalent is `getBasename()`,
            * former `getDirectory()` equivalent is `getPath()`,
@@ -94,11 +105,11 @@ beta4 to beta5
 * The stack of Monolog handlers now bubbles the records by default. To stop
   the propagation you need to configure the bubbling explicitly.
 
-* Expanded the SerializerInterface, while reducing the number of public
+* Expanded the `SerializerInterface`, while reducing the number of public
   methods in the Serializer class itself breaking BC and adding component
   specific Exception classes.
 
-* The FileType Form class has been heavily changed:
+* The `FileType` Form class has been heavily changed:
 
     * The temporary storage has been removed.
 
@@ -120,11 +131,11 @@ beta4 to beta5
 
     Before:
 
-        `TwigBundle:Form:div_layout.html.twig`
+        TwigBundle:Form:div_layout.html.twig
 
     After:
 
-        `form_div_layout.html.twig`
+        form_div_layout.html.twig
 
 * All settings regarding the cache warmers have been removed.
 

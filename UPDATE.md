@@ -41,14 +41,6 @@ beta5 to RC1
     * The `Symfony\Component\HttpKernel\CoreEvents` class has been renamed to
       `Symfony\Component\HttpKernel\KernelEvents`
 
-* Form component changes:
-
-    * Added theming support to PHP Form templates,
-    * Added `single_text` option to `TimeType` and `DateTimeType` to be compliant
-      with `DateType`,
-    * Added `empty_value` option to `ChoiceType`, `DateTimeType`, `DateType`
-      and `TimeType`.
-
 * `TrueValidator` and `FalseValidator` constraints validators no longer accepts any value as valid data.
 
 beta4 to beta5

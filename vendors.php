@@ -26,7 +26,7 @@ if (!is_dir($vendorDir = dirname(__FILE__).'/vendor')) {
 $deps = array(
     array('doctrine', 'http://github.com/doctrine/doctrine2.git', 'origin/HEAD'),
     array('doctrine-dbal', 'http://github.com/doctrine/dbal.git', 'origin/HEAD'),
-    array('doctrine-common', 'http://github.com/doctrine/common.git', 'origin/3.0.x'),
+    array('doctrine-common', 'http://github.com/doctrine/common.git', 'origin/HEAD'),
     array('monolog', 'http://github.com/Seldaek/monolog.git', 'origin/HEAD'),
     array('swiftmailer', 'http://github.com/swiftmailer/swiftmailer.git', 'origin/4.1'),
     array('twig', 'http://github.com/fabpot/Twig.git', 'origin/HEAD'),

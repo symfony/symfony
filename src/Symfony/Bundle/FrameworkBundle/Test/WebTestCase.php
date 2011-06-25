@@ -15,7 +15,6 @@ use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Test\WebTestCase as BaseWebTestCase;
 
 /**
  * WebTestCase is the base class for functional tests.

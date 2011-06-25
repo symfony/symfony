@@ -15,6 +15,21 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ResponseTest extends \PHPUnit_Framework_TestCase
 {
+    public function testSetStatusCode()
+    {
+        $response = new Response();
+        $response->setStatusCode(200);
+        $this->assertEquals('OK', $response->getStatusText(), '->setStatusCode() with no text argument sets the status text corresponding to the code');
+
+        $response = new Response();
+        $response->setStatusCode(200, false);
+        $this->assertEquals('', $response->getStatusText(), '->setStatusCode() with FALSE as text sets an empty string as status text');
+
+        $response = new Response();
+        $response->setStatusCode(200, 'The status text');
+        $this->assertEquals('The status text', $response->getStatusText(), '->setStatusCode() with a text argument overrides the default status text');
+    }
+
     public function testIsValidateable()
     {
         $response = new Response('', 200, array('Last-Modified' => $this->createDateTimeOneHourAgo()->format(DATE_RFC2822)));

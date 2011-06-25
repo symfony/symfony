@@ -166,6 +166,7 @@ class Request
             'SCRIPT_NAME'          => '',
             'SCRIPT_FILENAME'      => '',
             'SERVER_PROTOCOL'      => 'HTTP/1.1',
+            'REQUEST_TIME'         => time(),
         );
 
         $components = parse_url($uri);

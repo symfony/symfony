@@ -51,7 +51,7 @@ class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
     public function start(Request $request, AuthenticationException $authException = null)
     {
         if ($this->useForward) {
-            $path = $this->httpUtils->createRequest($request, $this->loginPath);
+            $subRequest = $this->httpUtils->createRequest($request, $this->loginPath);
 
             return $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
         }

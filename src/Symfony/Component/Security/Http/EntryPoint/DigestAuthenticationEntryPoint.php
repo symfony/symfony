@@ -57,7 +57,7 @@ class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterfac
 
         $response = new Response();
         $response->headers->set('WWW-Authenticate', $authenticateHeader);
-        $response->setStatusCode(401, $authException->getMessage());
+        $response->setStatusCode(401, $authException ? $authException->getMessage() : null);
 
         return $response;
     }

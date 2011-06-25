@@ -934,7 +934,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '/input
     [@type="text"]
     [@name="name"]
-    [@value="2011-02-03 04:05:06"]
+    [@value="2011-02-03 04:05:00"]
 '
         );
     }
@@ -953,7 +953,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '/input
     [@type="text"]
     [@name="na&me"]
-    [@value="2011-02-03 04:05:06"]
+    [@value="2011-02-03 04:05:00"]
 '
         );
     }

@@ -92,6 +92,12 @@ EOF
             file_put_contents(preg_replace('/__.*__/', '', $file), $content);
             unlink($file);
         }
+        // This fix the appdevUrlMatcher.php.meta and appdevUrlGenerator.php.meta
+        foreach ($finder->files()->name('*.php.meta')->in($warmupDir) as $file) {
+            $content = file_get_contents($file);
+            $content = preg_replace('/C:'.  strlen($kernel->getName()).':"'.$kernel->getName().'"/', 'C:9:"AppKernel"', $content);
+            file_put_contents($file, $content);
+        }
     }
 
     protected function getTempKernel(KernelInterface $parent, $warmupDir)
@@ -127,6 +133,10 @@ namespace $namespace
         protected function getContainerClass()
         {
             return parent::getContainerClass().'__{$rand}__';
+        }
+        public function getName()
+        {
+            return 'AppKernel{$rand}';
         }
     }
 }

@@ -79,7 +79,15 @@ EOF
     {
         $this->getContainer()->get('filesystem')->remove($warmupDir);
 
-        $kernel = $this->getTempKernel($this->getContainer()->get('kernel'), $warmupDir);
+        $parent = $this->getContainer()->get('kernel');
+        $class = get_class($parent);
+        $namespace = '';
+        if (false !== $pos = strrpos($class, '\\')) {
+            $namespace = substr($class, 0, $pos);
+            $class = substr($class, $pos + 1);
+        }
+
+        $kernel = $this->getTempKernel($parent, $namespace, $class, $warmupDir);
         $kernel->boot();
 
         $warmer = $kernel->getContainer()->get('cache_warmer');
@@ -99,8 +107,8 @@ EOF
         // fix meta references to the Kernel
         foreach ($finder->files()->name('*.meta')->in($warmupDir) as $file) {
             $content = preg_replace(
-                '/C\:\d+\:"AppKernel'.preg_quote($this->getTempKernelSuffix(), '"/').'"/',
-                'C:9:"AppKernel"',
+                '/C\:\d+\:"'.preg_quote($class.$this->getTempKernelSuffix(), '"/').'"/',
+                sprintf('C:%s:"%s"', strlen($class), $class),
                 file_get_contents($file)
             );
             file_put_contents($file, $content);
@@ -116,25 +124,16 @@ EOF
         return $this->name;
     }
 
-    protected function getTempKernel(KernelInterface $parent, $warmupDir)
+    protected function getTempKernel(KernelInterface $parent, $namespace, $class, $warmupDir)
     {
-        $parentClass = get_class($parent);
-
-        $namespace = '';
-        if (false !== $pos = strrpos($parentClass, '\\')) {
-            $namespace = substr($parentClass, 0, $pos);
-            $parentClass = substr($parentClass, $pos + 1);
-        }
-
         $suffix = $this->getTempKernelSuffix();
-        $class = $parentClass.$suffix;
         $rootDir = $parent->getRootDir();
         $code = <<<EOF
 <?php
 
 namespace $namespace
 {
-    class $class extends $parentClass
+    class $class$suffix extends $class
     {
         public function getCacheDir()
         {
@@ -148,7 +147,7 @@ namespace $namespace
 
         protected function getContainerClass()
         {
-            return parent::getContainerClass().'{$suffix}';
+            return parent::getContainerClass().'$suffix';
         }
     }
 }
@@ -157,8 +156,7 @@ EOF;
         file_put_contents($file = $warmupDir.'/kernel.tmp', $code);
         require_once $file;
         @unlink($file);
-
-        $class = "$namespace\\$class";
+        $class = "$namespace\\$class$suffix";
 
         return new $class($parent->getEnvironment(), $parent->isDebug());
     }

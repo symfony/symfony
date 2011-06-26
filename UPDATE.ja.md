@@ -1,12 +1,15 @@
 プロジェクトをアップデートする方法
 ==================================
 
-このドキュメントでは、Symfony2 PRの特定のバージョンから1つ次のバージョンへアップデートする方法を説明します。
+このドキュメントでは、Symfony2 の特定のバージョンから1つ次のバージョンへアップデートする方法を説明します。
 このドキュメントでは、フレームワークの "パブリックな" APIを使っている場合に必要な変更点についてのみ説明しています。
 フレームワークのコアコードを "ハック" している場合は、変更履歴を注意深く追跡する必要があるでしょう。
 
 beta5 から RC1
 --------------
+
+* `Symfony\Bundle\FrameworkBundle\Command\Command` クラスの名前が
+  `Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand` に変更されました。
 
 * ルーティングの `AnnotGlobLoader` クラスが削除されました。
 
@@ -15,6 +18,26 @@ beta5 から RC1
     * `container_attributes` から `widget_container_attributes`
     * `attributes` から `widget_attributes`
     * `options` から `widget_choice_options`
+
+* イベントの変更:
+
+    * すべてのリスナーには、`kernel.listener` タグではなく `kernel.event_listener` タグを設定する必要があります。
+    * カーネルイベントのプレフィックスが `core` から `kernel` に変更されました:
+
+        * 変更前:
+
+                <tag name="kernel.listener" event="core.request" method="onCoreRequest" />
+
+        * 変更後:
+
+                <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
+
+        Note: メソッド名 method 属性で独立して指定できるので、`onCoreRequest` のままでも動作しますが、将来的な一貫性のためにイベント名に合わせたメソッド名に変更しておく方がよいでしょう。
+
+    * `Symfony\Component\HttpKernel\CoreEvents` クラスの名前が
+      `Symfony\Component\HttpKernel\KernelEvents` に変更されました。
+
+* `TrueValidator` と `FalseValidator` の受け付ける値をより限定しました。
 
 beta4 から beta5
 ----------------
@@ -65,10 +88,10 @@ beta4 から beta5
 * Monolog ハンドラのスタックで、デフォルトで記録が伝播されるようになりました。
   伝播されないようにするには、bubble を明示的に false に設定してください。
 
-* SerializerInterface が拡張されました。
+* `SerializerInterface` が拡張されました。
   Serializer クラスのパブリックメソッドの数は減りましたが、後方互換性が損なわれ、コンポーネント独自の Exception クラスが追加されました。
 
-* FileType フォームクラスが大きく変更されました。
+* `FileType` フォームクラスが大きく変更されました。
 
     * テンポラリストレージが削除されました。
 
@@ -88,11 +111,11 @@ beta4 から beta5
 
     変更前:
 
-        `TwigBundle:Form:div_layout.html.twig`
+        TwigBundle:Form:div_layout.html.twig
 
     変更後:
 
-        `form_div_layout.html.twig`
+        form_div_layout.html.twig
 
 * キャッシュウォーマーに関連する設定は、すべて削除されました。
 

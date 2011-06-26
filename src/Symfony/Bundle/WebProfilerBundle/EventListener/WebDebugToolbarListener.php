@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Bundle\TwigBundle\TwigEngine;
+use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
 
 /**
  * WebDebugToolbarListener injects the Web Debug Toolbar.
@@ -29,20 +30,29 @@ use Symfony\Bundle\TwigBundle\TwigEngine;
  */
 class WebDebugToolbarListener
 {
+    const DISABLED        = 1;
+    const ENABLED         = 2;
+    const ENABLED_MINIMAL = 3;
+
     protected $templating;
     protected $interceptRedirects;
-    protected $verbose;
+    protected $mode;
 
-    public function __construct(TwigEngine $templating, $interceptRedirects = false, $verbose = true)
+    public function __construct(TwigEngine $templating, $interceptRedirects = false, $mode = self::ENABLED)
     {
         $this->templating = $templating;
         $this->interceptRedirects = (Boolean) $interceptRedirects;
-        $this->verbose = (Boolean) $verbose;
+        $this->mode = (integer) $mode;
     }
 
-    public function getVerbose()
+    public function isVerbose()
     {
-        return $this->verbose;
+        return self::ENABLED === $this->mode;
+    }
+
+    public function isEnabled()
+    {
+        return self::DISABLED !== $this->mode;
     }
 
     public function onKernelResponse(FilterResponseEvent $event)
@@ -70,7 +80,8 @@ class WebDebugToolbarListener
             $response->headers->remove('Location');
         }
 
-        if (!$response->headers->has('X-Debug-Token')
+        if (self::DISABLED === $this->mode
+            || !$response->headers->has('X-Debug-Token')
             || '3' === substr($response->getStatusCode(), 0, 1)
             || ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))
             || 'html' !== $request->getRequestFormat()

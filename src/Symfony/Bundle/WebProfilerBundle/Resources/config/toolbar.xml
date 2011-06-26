@@ -13,7 +13,7 @@
             <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" priority="-128" />
             <argument type="service" id="templating.engine.twig" />
             <argument>%web_profiler.debug_toolbar.intercept_redirects%</argument>
-            <argument>%web_profiler.debug_toolbar.verbose%</argument>
+            <argument>%web_profiler.debug_toolbar.mode%</argument>
         </service>
     </services>
 </container>

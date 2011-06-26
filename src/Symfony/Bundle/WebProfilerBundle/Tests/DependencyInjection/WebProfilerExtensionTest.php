@@ -91,7 +91,7 @@ class WebProfilerExtensionTest extends TestCase
         $extension = new WebProfilerExtension();
         $extension->load(array(array()), $this->container);
 
-        $this->assertFalse($this->container->has('web_profiler.debug_toolbar'));
+        $this->assertFalse($this->container->get('web_profiler.debug_toolbar')->isEnabled());
 
         $this->assertSaneContainer($this->getDumpedContainer());
     }
@@ -99,14 +99,13 @@ class WebProfilerExtensionTest extends TestCase
     /**
      * @dataProvider getDebugModes
      */
-    public function testToolbarConfig($debug)
+    public function testToolbarConfig($enabled, $verbose)
     {
-        $this->container->setParameter('kernel.debug', $debug);
-
         $extension = new WebProfilerExtension();
-        $extension->load(array(array('toolbar' => $debug)), $this->container);
+        $extension->load(array(array('toolbar' => $enabled, 'verbose' => $verbose)), $this->container);
 
-        $this->assertTrue($debug === $this->container->has('web_profiler.debug_toolbar'), '->load() registers web_profiler.debug_toolbar only when toolbar is true');
+        $this->assertSame($enabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());
+        $this->assertSame($enabled && $verbose, $this->container->get('web_profiler.debug_toolbar')->isVerbose());
 
         $this->assertSaneContainer($this->getDumpedContainer());
     }
@@ -114,8 +113,10 @@ class WebProfilerExtensionTest extends TestCase
     public function getDebugModes()
     {
         return array(
-            array(true),
-            array(false),
+            array(true, true),
+            array(true, false),
+            array(false, false),
+            array(false, true),
         );
     }
 

@@ -25,6 +25,8 @@ use Symfony\Component\Finder\Finder;
  */
 class CacheClearCommand extends ContainerAwareCommand
 {
+    protected $name;
+
     /**
      * @see Command
      */
@@ -85,13 +87,33 @@ EOF
         $warmer->warmUp($warmupDir);
 
         // fix container files and classes
+        $regex = '/'.preg_quote($this->getTempKernelSuffix(), '/').'/';
         $finder = new Finder();
         foreach ($finder->files()->name(get_class($kernel->getContainer()).'*')->in($warmupDir) as $file) {
             $content = file_get_contents($file);
-            $content = preg_replace('/__.*__/', '', $content);
-            file_put_contents(preg_replace('/__.*__/', '', $file), $content);
+            $content = preg_replace($regex, '', $content);
+            file_put_contents(preg_replace($regex, '', $file), $content);
             unlink($file);
         }
+
+        // fix meta references to the Kernel
+        foreach ($finder->files()->name('*.meta')->in($warmupDir) as $file) {
+            $content = preg_replace(
+                '/C\:\d+\:"AppKernel'.preg_quote($this->getTempKernelSuffix(), '"/').'"/',
+                'C:9:"AppKernel"',
+                file_get_contents($file)
+            );
+            file_put_contents($file, $content);
+        }
+    }
+
+    protected function getTempKernelSuffix()
+    {
+        if (null === $this->name) {
+            $this->name = '__'.uniqid().'__';
+        }
+
+        return $this->name;
     }
 
     protected function getTempKernel(KernelInterface $parent, $warmupDir)
@@ -104,8 +126,8 @@ EOF
             $parentClass = substr($parentClass, $pos + 1);
         }
 
-        $rand = uniqid();
-        $class = $parentClass.$rand;
+        $suffix = $this->getTempKernelSuffix();
+        $class = $parentClass.$suffix;
         $rootDir = $parent->getRootDir();
         $code = <<<EOF
 <?php
@@ -126,7 +148,7 @@ namespace $namespace
 
         protected function getContainerClass()
         {
-            return parent::getContainerClass().'__{$rand}__';
+            return parent::getContainerClass().'{$suffix}';
         }
     }
 }

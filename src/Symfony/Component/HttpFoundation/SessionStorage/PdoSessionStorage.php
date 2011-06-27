@@ -35,7 +35,7 @@ class PdoSessionStorage extends NativeSessionStorage
      */
     public function __construct(\PDO $db, array $options = array(), array $dbOptions = array())
     {
-        if (!array_key_exists('db_table', $dbOptions)) {
+        if (!isset($dbOptions['db_table'])) {
             throw new \InvalidArgumentException('You must provide the "db_table" option for a PdoSessionStorage.');
         }
 
@@ -107,10 +107,10 @@ class PdoSessionStorage extends NativeSessionStorage
     public function sessionDestroy($id)
     {
         // get table/column
-        $dbTable  = $this->dbOptions['db_table'];
+        $dbTable = $this->dbOptions['db_table'];
         $dbIdCol = $this->dbOptions['db_id_col'];
 
-        // delete the record associated with this id
+        // delete old records
         $sql = "DELETE FROM $dbTable WHERE $dbIdCol = :id";
 
         try {
@@ -136,7 +136,7 @@ class PdoSessionStorage extends NativeSessionStorage
     public function sessionGC($lifetime)
     {
         // get table/column
-        $dbTable    = $this->dbOptions['db_table'];
+        $dbTable   = $this->dbOptions['db_table'];
         $dbTimeCol = $this->dbOptions['db_time_col'];
 
         // delete the record associated with this id
@@ -166,7 +166,7 @@ class PdoSessionStorage extends NativeSessionStorage
     public function sessionRead($id)
     {
         // get table/columns
-        $dbTable    = $this->dbOptions['db_table'];
+        $dbTable   = $this->dbOptions['db_table'];
         $dbDataCol = $this->dbOptions['db_data_col'];
         $dbIdCol   = $this->dbOptions['db_id_col'];
 
@@ -245,7 +245,7 @@ class PdoSessionStorage extends NativeSessionStorage
     private function createNewSession($id, $data = '')
     {
         // get table/column
-        $dbTable    = $this->dbOptions['db_table'];
+        $dbTable   = $this->dbOptions['db_table'];
         $dbDataCol = $this->dbOptions['db_data_col'];
         $dbIdCol   = $this->dbOptions['db_id_col'];
         $dbTimeCol = $this->dbOptions['db_time_col'];

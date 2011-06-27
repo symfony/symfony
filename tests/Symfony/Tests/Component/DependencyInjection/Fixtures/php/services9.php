@@ -66,12 +66,8 @@ class ProjectServiceContainer extends Container
 
         $instance->setBar($this->get('bar'));
         $instance->initialize();
-        $b = new \ReflectionProperty($instance, 'foo');
-        $b->setAccessible(true);
-        $b->setValue($instance, 'bar');
-        $c = new \ReflectionProperty($instance, 'moo');
-        $c->setAccessible(true);
-        $c->setValue($instance, $a);
+        $instance->foo = 'bar';
+        $instance->moo = $a;
         sc_configure($instance);
 
         return $instance;

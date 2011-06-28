@@ -5,8 +5,6 @@ namespace Symfony\Component\HttpKernel\DependencyInjection;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 /*
  * This file is part of the Symfony framework.
@@ -49,12 +47,19 @@ class AutoloadExtension extends Extension
             }
         }
 
-        if (file_exists($this->path.'/Resources/config/services.yml')) {
-            $loader = new YamlFileLoader($container, new FileLocator($this->path.'/Resources/config'));
-            $loader->load('services.yml');
-        } elseif (file_exists($this->path.'/Resources/config/services.xml')) {
-            $loader = new XmlFileLoader($container, new FileLocator($this->path.'/Resources/config'));
-            $loader->load('services.xml');
+        $formats = array(
+            'yml' => 'Yaml',
+            'xml' => 'Xml',
+            'php' => 'Php',
+            'ini' => 'Ini',
+        );
+        foreach ($formats as $format => $class) {
+            if (file_exists($this->path.'/Resources/config/services.'.$format)) {
+                $class = 'Symfony\Component\DependencyInjection\Loader\\'.$class.'FileLoader';
+                $loader = new $class($container, new FileLocator($this->path.'/Resources/config'));
+                $loader->load('services.'.$format);
+                break;
+            }
         }
     }
 

@@ -52,6 +52,12 @@ class ResizeFormListener implements EventSubscriberInterface
      */
     private $allowDelete;
 
+    /**
+     * Whether children will receive 'data' from the parent
+     * @var Boolean
+     */
+    private $forwardData;
+
     public function __construct(FormFactoryInterface $factory, $type, array $options = array(), $allowAdd = false, $allowDelete = false)
     {
         $this->factory = $factory;
@@ -59,6 +65,7 @@ class ResizeFormListener implements EventSubscriberInterface
         $this->allowAdd = $allowAdd;
         $this->allowDelete = $allowDelete;
         $this->options = $options;
+        $this->forwardData = false;
     }
 
     static public function getSubscribedEvents()
@@ -88,8 +95,18 @@ class ResizeFormListener implements EventSubscriberInterface
             $form->remove($name);
         }
 
+        if (isset($this->options['forward_data'])) {
+            $this->forwardData = $this->options['forward_data'];
+            unset($this->options['forward_data']);
+        }
+
         // Then add all rows again in the correct order
         foreach ($data as $name => $value) {
+            if ($this->forwardData) {
+                // Forward 'data' value in each row
+                $this->options['data'] = $value;
+            }
+
             $form->add($this->factory->createNamed($this->type, $name, null, array_replace(array(
                 'property_path' => '['.$name.']',
             ), $this->options)));

@@ -126,7 +126,7 @@ class CollectionFormTest extends TypeTestCase
             'prototype' => false,
         ));
 
-        $this->assertFalse($form->has('$$name$$'));
+        $this->assertFalse($form->has('--name--'));
     }
 
     public function testPrototypeMultipartPropagation()

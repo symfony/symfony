@@ -24,16 +24,6 @@
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
-        <service id="router_listener" class="%router_listener.class%">
-            <tag name="kernel.event_listener" event="kernel.request" method="onEarlyKernelRequest" priority="255" />
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
-            <tag name="monolog.logger" channel="request" />
-            <argument type="service" id="router" />
-            <argument>%request_listener.http_port%</argument>
-            <argument>%request_listener.https_port%</argument>
-            <argument type="service" id="logger" on-invalid="ignore" />
-        </service>
-
         <service id="response_listener" class="%response_listener.class%">
             <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
             <argument>%kernel.charset%</argument>

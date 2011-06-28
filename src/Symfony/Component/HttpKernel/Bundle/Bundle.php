@@ -88,9 +88,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
             }
         }
 
-        if ($this->extension) {
-            return $this->extension;
-        }
+        return $this->extension;
     }
 
     /**

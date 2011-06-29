@@ -59,7 +59,7 @@ class RepeatedTypeTest extends TypeTestCase
 
         $this->assertEquals('Test', $form['first']->getAttribute('label'));
         $this->assertEquals('Test2', $form['second']->getAttribute('label'));
-        $this->assertFalse($form['first']->isRequired());
+        $this->assertTrue($form['first']->isRequired());
         $this->assertTrue($form['second']->isRequired());
     }
 
@@ -67,14 +67,13 @@ class RepeatedTypeTest extends TypeTestCase
     {
         $form = $this->factory->create('repeated', null, array(
             'type'           => 'field',
-            'options'        => array('label'  => 'Label'),
-            'first_options'  => array('required' => false),
+            'options'        => array('label' => 'Label'),
             'second_options' => array('label' => 'Second label')
         ));
 
         $this->assertEquals('Label', $form['first']->getAttribute('label'));
         $this->assertEquals('Second label', $form['second']->getAttribute('label'));
-        $this->assertFalse($form['first']->isRequired());
+        $this->assertTrue($form['first']->isRequired());
         $this->assertTrue($form['second']->isRequired());
     }
 

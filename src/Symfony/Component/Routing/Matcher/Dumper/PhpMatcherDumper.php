@@ -121,7 +121,11 @@ EOF;
 
                 foreach ($this->compileRoutes($route, $supportsRedirections, $prefix) as $line) {
                     foreach (explode("\n", $line) as $l) {
-                        $code[] = $indent.$l;
+                        if ($l) {
+                            $code[] = $indent.$l;
+                        } else {
+                            $code[] = $l;
+                        }
                     }
                 }
 

@@ -82,6 +82,29 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->validator->isValid('bar', $constraint));
     }
 
+    public function testValidChoiceArrayWithKeys()
+    {
+        $constraint = new Choice(array('choices' => array('key1' => 'foo', 'key2' => 'bar')));
+
+        $this->assertTrue($this->validator->isValid('key2', $constraint));
+    }
+
+    public function testValidChoiceArrayMixed()
+    {
+        $constraint = new Choice(array('choices' => array('foo', 'key2' => 'bar')));
+
+        $this->assertTrue($this->validator->isValid('foo', $constraint));
+        $this->assertTrue($this->validator->isValid('key2', $constraint));
+    }
+
+    public function testValidChoiceArrayWithEmptyLabels()
+    {
+        $constraint = new Choice(array('choices' => array('key1' => '', 'key2' => '')));
+
+        $this->assertTrue($this->validator->isValid('key1', $constraint));
+        $this->assertTrue($this->validator->isValid('key2', $constraint));
+    }
+
     public function testValidChoiceCallbackFunction()
     {
         $constraint = new Choice(array('callback' => __NAMESPACE__.'\choice_callback'));
@@ -120,6 +143,26 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertTrue($this->validator->isValid(array('baz', 'bar'), $constraint));
+    }
+
+    public function testMultipleChoicesWithKeys()
+    {
+        $constraint = new Choice(array(
+            'choices' => array('key1' => 'foo', 'key2' => 'bar', 'key3' => 'baz'),
+            'multiple' => true,
+        ));
+
+        $this->assertTrue($this->validator->isValid(array('key1', 'key3'), $constraint));
+    }
+
+    public function testMultipleChoicesMixed()
+    {
+        $constraint = new Choice(array(
+            'choices' => array('key1' => 'foo', 'bar', 'key3' => 'baz'),
+            'multiple' => true,
+        ));
+
+        $this->assertTrue($this->validator->isValid(array('key1', 'bar'), $constraint));
     }
 
     public function testInvalidChoice()

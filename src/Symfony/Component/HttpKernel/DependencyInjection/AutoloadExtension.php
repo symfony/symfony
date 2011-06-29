@@ -51,7 +51,6 @@ class AutoloadExtension extends Extension
             'yml' => 'Yaml',
             'xml' => 'Xml',
             'php' => 'Php',
-            'ini' => 'Ini',
         );
         foreach ($formats as $format => $class) {
             if (file_exists($this->path.'/Resources/config/services.'.$format)) {

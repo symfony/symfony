@@ -28,7 +28,6 @@
       <xsd:element name="imports" type="imports" minOccurs="0" maxOccurs="1" />
       <xsd:element name="parameters" type="parameters" minOccurs="0" maxOccurs="1" />
       <xsd:element name="services" type="services" minOccurs="0" maxOccurs="1" />
-      <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
     </xsd:sequence>
   </xsd:complexType>
 

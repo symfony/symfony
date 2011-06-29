@@ -189,7 +189,7 @@ class Tokenizer
         $matchStart = $match[0][1];
 
         if ($matchStart == $pos) {
-            throw new ParseException(sprintf('Unexpected symbol: %s at %s', $s[$pos], $pos));
+            throw new Exception\ParseException(sprintf('Unexpected symbol: %s at %s', $s[$pos], $pos));
         }
 
         $result = substr($s, $start, $matchStart - $start);

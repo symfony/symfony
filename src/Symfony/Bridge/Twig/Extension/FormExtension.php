@@ -192,6 +192,16 @@ class FormExtension extends \Twig_Extension
     }
 
     /**
+     * Returns the name of the extension.
+     *
+     * @return string The extension name
+     */
+    public function getName()
+    {
+        return 'form';
+    }
+
+    /**
      * Renders a template.
      *
      * 1. This function first looks for a block named "_<view id>_<section>",
@@ -264,16 +274,6 @@ class FormExtension extends \Twig_Extension
             'Unable to render the form as none of the following blocks exist: "%s".',
             implode('", "', array_reverse($types))
         ));
-    }
-
-    /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
-     */
-    public function getName()
-    {
-        return 'form';
     }
 
     /**

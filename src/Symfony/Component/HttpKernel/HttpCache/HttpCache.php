@@ -540,6 +540,13 @@ class HttpCache implements HttpKernelInterface
         $this->store->unlock($request);
     }
 
+    protected function processResponseBody(Request $request, Response $response)
+    {
+        if (null !== $this->esi && $this->esi->needsEsiParsing($response)) {
+            $this->esi->process($request, $response);
+        }
+    }
+
     /**
      * Restores the Response body.
      *
@@ -579,13 +586,6 @@ class HttpCache implements HttpKernelInterface
 
         if (!$response->headers->has('Transfer-Encoding')) {
             $response->headers->set('Content-Length', strlen($response->getContent()));
-        }
-    }
-
-    protected function processResponseBody(Request $request, Response $response)
-    {
-        if (null !== $this->esi && $this->esi->needsEsiParsing($response)) {
-            $this->esi->process($request, $response);
         }
     }
 

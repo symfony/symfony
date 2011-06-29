@@ -56,24 +56,6 @@ class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function getEngine($name)
-    {
-        foreach ($this->engines as $i => $engine) {
-            if (is_string($engine)) {
-                $engine = $this->engines[$i] = $this->container->get($engine);
-            }
-
-            if ($engine->supports($name)) {
-                return $engine;
-            }
-        }
-
-        throw new \RuntimeException(sprintf('No engine is able to work with the template "%s".', $name));
-    }
-
-    /**
      * Renders a view and returns a Response.
      *
      * @param string   $view       The view name
@@ -91,5 +73,23 @@ class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
         $response->setContent($this->render($view, $parameters));
 
         return $response;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getEngine($name)
+    {
+        foreach ($this->engines as $i => $engine) {
+            if (is_string($engine)) {
+                $engine = $this->engines[$i] = $this->container->get($engine);
+            }
+
+            if ($engine->supports($name)) {
+                return $engine;
+            }
+        }
+
+        throw new \RuntimeException(sprintf('No engine is able to work with the template "%s".', $name));
     }
 }

@@ -93,6 +93,21 @@ class PhpDumper extends Dumper
     }
 
     /**
+     * Dumps a parameter
+     *
+     * @param string $name
+     * @return string
+     */
+    public function dumpParameter($name)
+    {
+        if ($this->container->isFrozen() && $this->container->hasParameter($name)) {
+            return $this->dumpValue($this->container->getParameter($name), false);
+        }
+
+        return sprintf("\$this->getParameter('%s')", strtolower($name));
+    }
+    
+    /**
      * Generates Service local temp variables.
      *
      * @param string $cId
@@ -1013,21 +1028,6 @@ EOF;
         } else {
             return var_export($value, true);
         }
-    }
-
-    /**
-     * Dumps a parameter
-     *
-     * @param string $name
-     * @return string
-     */
-    public function dumpParameter($name)
-    {
-        if ($this->container->isFrozen() && $this->container->hasParameter($name)) {
-            return $this->dumpValue($this->container->getParameter($name), false);
-        }
-
-        return sprintf("\$this->getParameter('%s')", strtolower($name));
     }
 
     /**

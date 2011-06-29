@@ -59,24 +59,6 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
     }
 
     /**
-     * Registers all natively provided mime type guessers
-     */
-    private function __construct()
-    {
-        if (FileBinaryMimeTypeGuesser::isSupported()) {
-            $this->register(new FileBinaryMimeTypeGuesser());
-        }
-
-        if (ContentTypeMimeTypeGuesser::isSupported()) {
-            $this->register(new ContentTypeMimeTypeGuesser());
-        }
-
-        if (FileinfoMimeTypeGuesser::isSupported()) {
-            $this->register(new FileinfoMimeTypeGuesser());
-        }
-    }
-
-    /**
      * Registers a new mime type guesser
      *
      * When guessing, this guesser is preferred over previously registered ones.
@@ -121,5 +103,23 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
         }
 
         return $mimeType;
+    }
+
+    /**
+     * Registers all natively provided mime type guessers
+     */
+    private function __construct()
+    {
+        if (FileBinaryMimeTypeGuesser::isSupported()) {
+            $this->register(new FileBinaryMimeTypeGuesser());
+        }
+
+        if (ContentTypeMimeTypeGuesser::isSupported()) {
+            $this->register(new ContentTypeMimeTypeGuesser());
+        }
+
+        if (FileinfoMimeTypeGuesser::isSupported()) {
+            $this->register(new FileinfoMimeTypeGuesser());
+        }
     }
 }

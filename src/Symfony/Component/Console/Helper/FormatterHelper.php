@@ -66,6 +66,16 @@ class FormatterHelper extends Helper
     }
 
     /**
+     * Returns the helper's canonical name
+     *
+     * @return string The canonical name of the helper
+     */
+    public function getName()
+    {
+        return 'formatter';
+    }
+
+    /**
      * Returns the length of a string, uses mb_strlen if it is available.
      *
      * @param string $string The string to check its length
@@ -75,15 +85,5 @@ class FormatterHelper extends Helper
     private function strlen($string)
     {
         return function_exists('mb_strlen') ? mb_strlen($string, mb_detect_encoding($string)) : strlen($string);
-    }
-
-    /**
-     * Returns the helper's canonical name
-     *
-     * @return string The canonical name of the helper
-     */
-    public function getName()
-    {
-        return 'formatter';
     }
 }

@@ -81,6 +81,25 @@ class Shell
     }
 
     /**
+     * Returns the shell header.
+     *
+     * @return string The header string
+     */
+    protected function getHeader()
+    {
+        return <<<EOF
+
+Welcome to the <info>{$this->application->getName()}</info> shell (<comment>{$this->application->getVersion()}</comment>).
+
+At the prompt, type <comment>help</comment> for some help,
+or <comment>list</comment> to get a list available commands.
+
+To exit the shell, type <comment>^D</comment>.
+
+EOF;
+    }
+
+    /**
      * Tries to return autocompletion for the current entered text.
      *
      * @param string  $text     The last segment of the entered text
@@ -113,24 +132,5 @@ class Shell
         }
 
         return $list;
-    }
-
-    /**
-     * Returns the shell header.
-     *
-     * @return string The header string
-     */
-    protected function getHeader()
-    {
-        return <<<EOF
-
-Welcome to the <info>{$this->application->getName()}</info> shell (<comment>{$this->application->getVersion()}</comment>).
-
-At the prompt, type <comment>help</comment> for some help,
-or <comment>list</comment> to get a list available commands.
-
-To exit the shell, type <comment>^D</comment>.
-
-EOF;
     }
 }

@@ -73,6 +73,74 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
+     * Converts a \DomElement object to a PHP array.
+     *
+     * The following rules applies during the conversion:
+     *
+     *  * Each tag is converted to a key value or an array
+     *    if there is more than one "value"
+     *
+     *  * The content of a tag is set under a "value" key (<foo>bar</foo>)
+     *    if the tag also has some nested tags
+     *
+     *  * The attributes are converted to keys (<foo foo="bar"/>)
+     *
+     *  * The nested-tags are converted to keys (<foo><foo>bar</foo></foo>)
+     *
+     * @param \DomElement $element A \DomElement instance
+     *
+     * @return array A PHP array
+     */
+    static public function convertDomElementToArray(\DomElement $element)
+    {
+        $empty = true;
+        $config = array();
+        foreach ($element->attributes as $name => $node) {
+            $config[$name] = SimpleXMLElement::phpize($node->value);
+            $empty = false;
+        }
+
+        $nodeValue = false;
+        foreach ($element->childNodes as $node) {
+            if ($node instanceof \DOMText) {
+                if (trim($node->nodeValue)) {
+                    $nodeValue = trim($node->nodeValue);
+                    $empty = false;
+                }
+            } elseif (!$node instanceof \DOMComment) {
+                if ($node instanceof \DOMElement && '_services' === $node->nodeName) {
+                    $value = new Reference($node->getAttribute('id'));
+                } else {
+                    $value = static::convertDomElementToArray($node);
+                }
+
+                $key = $node->localName;
+                if (isset($config[$key])) {
+                    if (!is_array($config[$key]) || !is_int(key($config[$key]))) {
+                        $config[$key] = array($config[$key]);
+                    }
+                    $config[$key][] = $value;
+                } else {
+                    $config[$key] = $value;
+                }
+
+                $empty = false;
+            }
+        }
+
+        if (false !== $nodeValue) {
+            $value = SimpleXMLElement::phpize($nodeValue);
+            if (count($config)) {
+                $config['value'] = $value;
+            } else {
+                $config = $value;
+            }
+        }
+
+        return !$empty ? $config : null;
+    }
+
+    /**
      * Parses parameters
      *
      * @param SimpleXMLElement $xml
@@ -431,73 +499,5 @@ EOF
 
             $this->container->loadFromExtension($node->namespaceURI, $values);
         }
-    }
-
-    /**
-     * Converts a \DomElement object to a PHP array.
-     *
-     * The following rules applies during the conversion:
-     *
-     *  * Each tag is converted to a key value or an array
-     *    if there is more than one "value"
-     *
-     *  * The content of a tag is set under a "value" key (<foo>bar</foo>)
-     *    if the tag also has some nested tags
-     *
-     *  * The attributes are converted to keys (<foo foo="bar"/>)
-     *
-     *  * The nested-tags are converted to keys (<foo><foo>bar</foo></foo>)
-     *
-     * @param \DomElement $element A \DomElement instance
-     *
-     * @return array A PHP array
-     */
-    static public function convertDomElementToArray(\DomElement $element)
-    {
-        $empty = true;
-        $config = array();
-        foreach ($element->attributes as $name => $node) {
-            $config[$name] = SimpleXMLElement::phpize($node->value);
-            $empty = false;
-        }
-
-        $nodeValue = false;
-        foreach ($element->childNodes as $node) {
-            if ($node instanceof \DOMText) {
-                if (trim($node->nodeValue)) {
-                    $nodeValue = trim($node->nodeValue);
-                    $empty = false;
-                }
-            } elseif (!$node instanceof \DOMComment) {
-                if ($node instanceof \DOMElement && '_services' === $node->nodeName) {
-                    $value = new Reference($node->getAttribute('id'));
-                } else {
-                    $value = static::convertDomElementToArray($node);
-                }
-
-                $key = $node->localName;
-                if (isset($config[$key])) {
-                    if (!is_array($config[$key]) || !is_int(key($config[$key]))) {
-                        $config[$key] = array($config[$key]);
-                    }
-                    $config[$key][] = $value;
-                } else {
-                    $config[$key] = $value;
-                }
-
-                $empty = false;
-            }
-        }
-
-        if (false !== $nodeValue) {
-            $value = SimpleXMLElement::phpize($nodeValue);
-            if (count($config)) {
-                $config['value'] = $value;
-            } else {
-                $config = $value;
-            }
-        }
-
-        return !$empty ? $config : null;
     }
 }

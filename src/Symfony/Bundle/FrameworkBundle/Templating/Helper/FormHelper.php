@@ -173,6 +173,39 @@ class FormHelper extends Helper
     }
 
     /**
+     * Render a block from a form element.
+     *
+     * @param string $name
+     * @param array  $variables Additional variables (those would override the current context)
+     *
+     * @throws FormException if the block is not found
+     * @throws FormException if the method is called out of a form element (no context)
+     */
+    public function renderBlock($name, $variables = array())
+    {
+        if (0 == count($this->context)) {
+            throw new FormException(sprintf('This method should only be called while rendering a form element.', $name));
+        }
+
+        $context = end($this->context);
+
+        $template = $this->lookupTemplate($context['view'], $name);
+
+        if (false === $template) {
+            throw new FormException(sprintf('No block "%s" found while rendering the form.', $name));
+        }
+
+        $variables = array_replace_recursive($context['variables'], $variables);
+
+        return $this->engine->render($template, $variables);
+    }
+
+    public function getName()
+    {
+        return 'form';
+    }
+
+    /**
      * Renders a template.
      *
      * 1. This function first looks for a block named "_<view id>_<section>",
@@ -246,39 +279,6 @@ class FormHelper extends Helper
             'Unable to render the form as none of the following blocks exist: "%s".',
             implode('", "', array_reverse($types))
         ));
-    }
-
-    /**
-     * Render a block from a form element.
-     *
-     * @param string $name
-     * @param array  $variables Additional variables (those would override the current context)
-     *
-     * @throws FormException if the block is not found
-     * @throws FormException if the method is called out of a form element (no context)
-     */
-    public function renderBlock($name, $variables = array())
-    {
-        if (0 == count($this->context)) {
-            throw new FormException(sprintf('This method should only be called while rendering a form element.', $name));
-        }
-
-        $context = end($this->context);
-
-        $template = $this->lookupTemplate($context['view'], $name);
-
-        if (false === $template) {
-            throw new FormException(sprintf('No block "%s" found while rendering the form.', $name));
-        }
-
-        $variables = array_replace_recursive($context['variables'], $variables);
-
-        return $this->engine->render($template, $variables);
-    }
-
-    public function getName()
-    {
-        return 'form';
     }
 
     /**

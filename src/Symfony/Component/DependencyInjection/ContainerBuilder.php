@@ -637,6 +637,68 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Replaces service references by the real service instance.
+     *
+     * @param  mixed $value A value
+     *
+     * @return mixed The same value with all service references replaced by the real service instances
+     */
+    public function resolveServices($value)
+    {
+        if (is_array($value)) {
+            foreach ($value as &$v) {
+                $v = $this->resolveServices($v);
+            }
+        } elseif (is_object($value) && $value instanceof Reference) {
+            $value = $this->get((string) $value, $value->getInvalidBehavior());
+        } elseif (is_object($value) && $value instanceof Definition) {
+            $value = $this->createService($value, null);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Returns service ids for a given tag.
+     *
+     * @param string $name The tag name
+     *
+     * @return array An array of tags
+     */
+    public function findTaggedServiceIds($name)
+    {
+        $tags = array();
+        foreach ($this->getDefinitions() as $id => $definition) {
+            if ($definition->getTag($name)) {
+                $tags[$id] = $definition->getTag($name);
+            }
+        }
+
+        return $tags;
+    }
+
+    /**
+     * Returns the Service Conditionals.
+     *
+     * @param mixed $value An array of conditionals to return.
+     * @return array An array of Service conditionals
+     */
+    static public function getServiceConditionals($value)
+    {
+        $services = array();
+
+        if (is_array($value)) {
+            foreach ($value as $v) {
+                $services = array_unique(array_merge($services, self::getServiceConditionals($v)));
+            }
+        } elseif (is_object($value) && $value instanceof Reference && $value->getInvalidBehavior() === ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
+            $services[] = (string) $value;
+        }
+
+        return $services;
+    }
+
+    /**
      * Creates a service for a service definition.
      *
      * @param  Definition $definition A service definition instance
@@ -718,67 +780,5 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return $service;
-    }
-
-    /**
-     * Replaces service references by the real service instance.
-     *
-     * @param  mixed $value A value
-     *
-     * @return mixed The same value with all service references replaced by the real service instances
-     */
-    public function resolveServices($value)
-    {
-        if (is_array($value)) {
-            foreach ($value as &$v) {
-                $v = $this->resolveServices($v);
-            }
-        } elseif (is_object($value) && $value instanceof Reference) {
-            $value = $this->get((string) $value, $value->getInvalidBehavior());
-        } elseif (is_object($value) && $value instanceof Definition) {
-            $value = $this->createService($value, null);
-        }
-
-        return $value;
-    }
-
-    /**
-     * Returns service ids for a given tag.
-     *
-     * @param string $name The tag name
-     *
-     * @return array An array of tags
-     */
-    public function findTaggedServiceIds($name)
-    {
-        $tags = array();
-        foreach ($this->getDefinitions() as $id => $definition) {
-            if ($definition->getTag($name)) {
-                $tags[$id] = $definition->getTag($name);
-            }
-        }
-
-        return $tags;
-    }
-
-    /**
-     * Returns the Service Conditionals.
-     *
-     * @param mixed $value An array of conditionals to return.
-     * @return array An array of Service conditionals
-     */
-    static public function getServiceConditionals($value)
-    {
-        $services = array();
-
-        if (is_array($value)) {
-            foreach ($value as $v) {
-                $services = array_unique(array_merge($services, self::getServiceConditionals($v)));
-            }
-        } elseif (is_object($value) && $value instanceof Reference && $value->getInvalidBehavior() === ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
-            $services[] = (string) $value;
-        }
-
-        return $services;
     }
 }

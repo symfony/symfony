@@ -136,23 +136,6 @@ abstract class AnnotationClassLoader implements LoaderInterface
         return $collection;
     }
 
-    protected function addRoute(RouteCollection $collection, $annot, $globals, \ReflectionClass $class, \ReflectionMethod $method)
-    {
-        if (null === $annot->getName()) {
-            $annot->setName($this->getDefaultRouteName($class, $method));
-        }
-
-        $defaults = array_merge($globals['defaults'], $annot->getDefaults());
-        $requirements = array_merge($globals['requirements'], $annot->getRequirements());
-        $options = array_merge($globals['options'], $annot->getOptions());
-
-        $route = new Route($globals['pattern'].$annot->getPattern(), $defaults, $requirements, $options);
-
-        $this->configureRoute($route, $class, $method, $annot);
-
-        $collection->add($annot->getName(), $route);
-    }
-
     /**
      * Returns true if this class supports the given resource.
      *
@@ -184,6 +167,23 @@ abstract class AnnotationClassLoader implements LoaderInterface
     {
     }
 
+    protected function addRoute(RouteCollection $collection, $annot, $globals, \ReflectionClass $class, \ReflectionMethod $method)
+    {
+        if (null === $annot->getName()) {
+            $annot->setName($this->getDefaultRouteName($class, $method));
+        }
+
+        $defaults = array_merge($globals['defaults'], $annot->getDefaults());
+        $requirements = array_merge($globals['requirements'], $annot->getRequirements());
+        $options = array_merge($globals['options'], $annot->getOptions());
+
+        $route = new Route($globals['pattern'].$annot->getPattern(), $defaults, $requirements, $options);
+
+        $this->configureRoute($route, $class, $method, $annot);
+
+        $collection->add($annot->getName(), $route);
+    }
+    
     /**
      * Gets the default route name for a class method.
      *

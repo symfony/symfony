@@ -56,6 +56,30 @@ class XmlDumper extends Dumper
     }
 
     /**
+     * Converts php types to xml types.
+     *
+     * @param mixed $value Value to convert
+     * @throws \RuntimeException When trying to dump object or resource
+     */
+    static public function phpToXml($value)
+    {
+        switch (true) {
+            case null === $value:
+                return 'null';
+            case true === $value:
+                return 'true';
+            case false === $value:
+                return 'false';
+            case is_object($value) && $value instanceof Parameter:
+                return '%'.$value.'%';
+            case is_object($value) || is_resource($value):
+                throw new \RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
+            default:
+                return (string) $value;
+        }
+    }
+
+    /**
      * Adds parameters.
      *
      * @param DOMElement $parent
@@ -273,29 +297,5 @@ class XmlDumper extends Dumper
         }
 
         return $args;
-    }
-
-    /**
-     * Converts php types to xml types.
-     *
-     * @param mixed $value Value to convert
-     * @throws \RuntimeException When trying to dump object or resource
-     */
-    static public function phpToXml($value)
-    {
-        switch (true) {
-            case null === $value:
-                return 'null';
-            case true === $value:
-                return 'true';
-            case false === $value:
-                return 'false';
-            case is_object($value) && $value instanceof Parameter:
-                return '%'.$value.'%';
-            case is_object($value) || is_resource($value):
-                throw new \RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
-            default:
-                return (string) $value;
-        }
     }
 }

@@ -59,6 +59,21 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
+     * Returns true if this class supports the given resource.
+     *
+     * @param mixed  $resource A resource
+     * @param string $type     The resource type
+     *
+     * @return Boolean True if this class supports the given resource, false otherwise
+     *
+     * @api
+     */
+    public function supports($resource, $type = null)
+    {
+        return is_string($resource) && 'xml' === pathinfo($resource, PATHINFO_EXTENSION) && (!$type || 'xml' === $type);
+    }
+
+    /**
      * Parses a node from a loaded XML file.
      *
      * @param RouteCollection $collection the collection to associate with the node
@@ -83,22 +98,7 @@ class XmlFileLoader extends FileLoader
                 throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));
         }
     }
-
-    /**
-     * Returns true if this class supports the given resource.
-     *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return Boolean True if this class supports the given resource, false otherwise
-     *
-     * @api
-     */
-    public function supports($resource, $type = null)
-    {
-        return is_string($resource) && 'xml' === pathinfo($resource, PATHINFO_EXTENSION) && (!$type || 'xml' === $type);
-    }
-
+    
     /**
      * Parses a route and adds it to the RouteCollection.
      *

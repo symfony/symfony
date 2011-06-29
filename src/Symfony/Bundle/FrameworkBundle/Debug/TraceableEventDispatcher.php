@@ -68,6 +68,33 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     /**
      * {@inheritDoc}
      */
+    public function getCalledListeners()
+    {
+        return $this->called;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getNotCalledListeners()
+    {
+        $notCalled = array();
+
+        foreach ($this->getListeners() as $name => $listeners) {
+            foreach ($listeners as $listener) {
+                $info = $this->getListenerInfo($listener, $name);
+                if (!isset($this->called[$name.'.'.$info['pretty']])) {
+                    $notCalled[$name.'.'.$info['pretty']] = $info;
+                }
+            }
+        }
+
+        return $notCalled;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     protected function doDispatch($listeners, $eventName, Event $event)
     {
         foreach ($listeners as $listener) {
@@ -113,33 +140,6 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
                 break;
             }
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getCalledListeners()
-    {
-        return $this->called;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getNotCalledListeners()
-    {
-        $notCalled = array();
-
-        foreach ($this->getListeners() as $name => $listeners) {
-            foreach ($listeners as $listener) {
-                $info = $this->getListenerInfo($listener, $name);
-                if (!isset($this->called[$name.'.'.$info['pretty']])) {
-                    $notCalled[$name.'.'.$info['pretty']] = $info;
-                }
-            }
-        }
-
-        return $notCalled;
     }
 
     /**

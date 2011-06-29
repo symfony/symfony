@@ -32,6 +32,14 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
      */
     private $container;
 
+    /**
+     * @see ContainerAwareInterface::setContainer()
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
     protected function getContainer()
     {
         if (null === $this->container) {
@@ -39,13 +47,5 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
         }
 
         return $this->container;
-    }
-
-    /**
-     * @see ContainerAwareInterface::setContainer()
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
     }
 }

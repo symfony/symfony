@@ -276,6 +276,73 @@ abstract class Client
     }
 
     /**
+     * Goes back in the browser history.
+     *
+     * @return Crawler
+     *
+     * @api
+     */
+    public function back()
+    {
+        return $this->requestFromRequest($this->history->back(), false);
+    }
+
+    /**
+     * Goes forward in the browser history.
+     *
+     * @return Crawler
+     *
+     * @api
+     */
+    public function forward()
+    {
+        return $this->requestFromRequest($this->history->forward(), false);
+    }
+
+    /**
+     * Reloads the current browser.
+     *
+     * @return Crawler
+     *
+     * @api
+     */
+    public function reload()
+    {
+        return $this->requestFromRequest($this->history->current(), false);
+    }
+
+    /**
+     * Follow redirects?
+     *
+     * @return Crawler
+     *
+     * @throws \LogicException If request was not a redirect
+     *
+     * @api
+     */
+    public function followRedirect()
+    {
+        if (empty($this->redirect)) {
+            throw new \LogicException('The request was not redirected.');
+        }
+
+        return $this->request('get', $this->redirect);
+    }
+
+    /**
+     * Restarts the client.
+     *
+     * It flushes all cookies.
+     *
+     * @api
+     */
+    public function restart()
+    {
+        $this->cookieJar->clear();
+        $this->history->clear();
+    }
+    
+    /**
      * Makes a request in another process.
      *
      * @param Request $request A Request instance
@@ -358,73 +425,6 @@ abstract class Client
         $crawler->addContent($content, $type);
 
         return $crawler;
-    }
-
-    /**
-     * Goes back in the browser history.
-     *
-     * @return Crawler
-     *
-     * @api
-     */
-    public function back()
-    {
-        return $this->requestFromRequest($this->history->back(), false);
-    }
-
-    /**
-     * Goes forward in the browser history.
-     *
-     * @return Crawler
-     *
-     * @api
-     */
-    public function forward()
-    {
-        return $this->requestFromRequest($this->history->forward(), false);
-    }
-
-    /**
-     * Reloads the current browser.
-     *
-     * @return Crawler
-     *
-     * @api
-     */
-    public function reload()
-    {
-        return $this->requestFromRequest($this->history->current(), false);
-    }
-
-    /**
-     * Follow redirects?
-     *
-     * @return Crawler
-     *
-     * @throws \LogicException If request was not a redirect
-     *
-     * @api
-     */
-    public function followRedirect()
-    {
-        if (empty($this->redirect)) {
-            throw new \LogicException('The request was not redirected.');
-        }
-
-        return $this->request('get', $this->redirect);
-    }
-
-    /**
-     * Restarts the client.
-     *
-     * It flushes all cookies.
-     *
-     * @api
-     */
-    public function restart()
-    {
-        $this->cookieJar->clear();
-        $this->history->clear();
     }
 
     /**

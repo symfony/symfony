@@ -112,6 +112,92 @@ class EntityChoiceList extends ArrayChoiceList
         parent::__construct($choices);
     }
 
+    public function getIdentifier()
+    {
+        return $this->identifier;
+    }
+
+    /**
+     * Returns the according entities for the choices
+     *
+     * If the choices were not initialized, they are initialized now. This
+     * is an expensive operation, except if the entities were passed in the
+     * "choices" option.
+     *
+     * @return array  An array of entities
+     */
+    public function getEntities()
+    {
+        if (!$this->loaded) {
+            $this->load();
+        }
+
+        return $this->entities;
+    }
+
+    /**
+     * Returns the entity for the given key
+     *
+     * If the underlying entities have composite identifiers, the choices
+     * are initialized. The key is expected to be the index in the choices
+     * array in this case.
+     *
+     * If they have single identifiers, they are either fetched from the
+     * internal entity cache (if filled) or loaded from the database.
+     *
+     * @param  string $key  The choice key (for entities with composite
+     *                      identifiers) or entity ID (for entities with single
+     *                      identifiers)
+     * @return object       The matching entity
+     */
+    public function getEntity($key)
+    {
+        if (!$this->loaded) {
+            $this->load();
+        }
+
+        try {
+            if (count($this->identifier) > 1) {
+                // $key is a collection index
+                $entities = $this->getEntities();
+
+                return isset($entities[$key]) ? $entities[$key] : null;
+            } else if ($this->entities) {
+                return isset($this->entities[$key]) ? $this->entities[$key] : null;
+            } else if ($qb = $this->queryBuilder) {
+                // should we clone the builder?
+                $alias = $qb->getRootAlias();
+                $where = $qb->expr()->eq($alias.'.'.current($this->identifier), $key);
+
+                return $qb->andWhere($where)->getQuery()->getSingleResult();
+            }
+
+            return $this->em->find($this->class, $key);
+        } catch (NoResultException $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the values of the identifier fields of an entity
+     *
+     * Doctrine must know about this entity, that is, the entity must already
+     * be persisted or added to the identity map before. Otherwise an
+     * exception is thrown.
+     *
+     * @param  object $entity  The entity for which to get the identifier
+     * @throws FormException   If the entity does not exist in Doctrine's
+     *                         identity map
+     */
+    public function getIdentifierValues($entity)
+    {
+        if (!$this->unitOfWork->isInIdentityMap($entity)) {
+            throw new FormException('Entities passed to the choice field must be managed');
+        }
+
+        return $this->unitOfWork->getEntityIdentifier($entity);
+    }
+
     /**
      * Initializes the choices and returns them
      *
@@ -194,72 +280,6 @@ class EntityChoiceList extends ArrayChoiceList
         }
     }
 
-    public function getIdentifier()
-    {
-        return $this->identifier;
-    }
-
-    /**
-     * Returns the according entities for the choices
-     *
-     * If the choices were not initialized, they are initialized now. This
-     * is an expensive operation, except if the entities were passed in the
-     * "choices" option.
-     *
-     * @return array  An array of entities
-     */
-    public function getEntities()
-    {
-        if (!$this->loaded) {
-            $this->load();
-        }
-
-        return $this->entities;
-    }
-
-    /**
-     * Returns the entity for the given key
-     *
-     * If the underlying entities have composite identifiers, the choices
-     * are initialized. The key is expected to be the index in the choices
-     * array in this case.
-     *
-     * If they have single identifiers, they are either fetched from the
-     * internal entity cache (if filled) or loaded from the database.
-     *
-     * @param  string $key  The choice key (for entities with composite
-     *                      identifiers) or entity ID (for entities with single
-     *                      identifiers)
-     * @return object       The matching entity
-     */
-    public function getEntity($key)
-    {
-        if (!$this->loaded) {
-            $this->load();
-        }
-
-        try {
-            if (count($this->identifier) > 1) {
-                // $key is a collection index
-                $entities = $this->getEntities();
-
-                return isset($entities[$key]) ? $entities[$key] : null;
-            } else if ($this->entities) {
-                return isset($this->entities[$key]) ? $this->entities[$key] : null;
-            } else if ($qb = $this->queryBuilder) {
-                // should we clone the builder?
-                $alias = $qb->getRootAlias();
-                $where = $qb->expr()->eq($alias.'.'.current($this->identifier), $key);
-
-                return $qb->andWhere($where)->getQuery()->getSingleResult();
-            }
-
-            return $this->em->find($this->class, $key);
-        } catch (NoResultException $e) {
-            return null;
-        }
-    }
-
     /**
      * Returns the \ReflectionProperty instance for a property of the
      * underlying class
@@ -275,25 +295,5 @@ class EntityChoiceList extends ArrayChoiceList
         }
 
         return $this->reflProperties[$property];
-    }
-
-    /**
-     * Returns the values of the identifier fields of an entity
-     *
-     * Doctrine must know about this entity, that is, the entity must already
-     * be persisted or added to the identity map before. Otherwise an
-     * exception is thrown.
-     *
-     * @param  object $entity  The entity for which to get the identifier
-     * @throws FormException   If the entity does not exist in Doctrine's
-     *                         identity map
-     */
-    public function getIdentifierValues($entity)
-    {
-        if (!$this->unitOfWork->isInIdentityMap($entity)) {
-            throw new FormException('Entities passed to the choice field must be managed');
-        }
-
-        return $this->unitOfWork->getEntityIdentifier($entity);
     }
 }

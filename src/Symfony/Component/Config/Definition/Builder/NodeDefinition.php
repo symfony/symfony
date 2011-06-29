@@ -196,20 +196,6 @@ abstract class NodeDefinition implements NodeParentInterface
     }
 
     /**
-     * Gets the builder for normalization rules.
-     *
-     * @return NormalizationBuilder
-     */
-    protected function normalization()
-    {
-        if (null === $this->normalization) {
-            $this->normalization = new NormalizationBuilder($this);
-        }
-
-        return $this->normalization;
-    }
-
-    /**
      * Sets an expression to run before the normalization.
      *
      * @return ExprBuilder
@@ -232,20 +218,6 @@ abstract class NodeDefinition implements NodeParentInterface
     }
 
     /**
-     * Gets the builder for validation rules.
-     *
-     * @return ValidationBuilder
-     */
-    protected function validation()
-    {
-        if (null === $this->validation) {
-            $this->validation = new ValidationBuilder($this);
-        }
-
-        return $this->validation;
-    }
-
-    /**
      * Sets an expression to run for the validation.
      *
      * The expression receives the value of the node and must return it. It can
@@ -260,20 +232,6 @@ abstract class NodeDefinition implements NodeParentInterface
     }
 
     /**
-     * Gets the builder for merging rules.
-     *
-     * @return MergeBuilder
-     */
-    protected function merge()
-    {
-        if (null === $this->merge) {
-            $this->merge = new MergeBuilder($this);
-        }
-
-        return $this->merge;
-    }
-
-    /**
      * Sets whether the node can be overwritten.
      *
      * @param Boolean $deny Whether the overwriting is forbidden or not
@@ -285,6 +243,48 @@ abstract class NodeDefinition implements NodeParentInterface
         $this->merge()->denyOverwrite($deny);
 
         return $this;
+    }
+
+    /**
+     * Gets the builder for normalization rules.
+     *
+     * @return NormalizationBuilder
+     */
+    protected function normalization()
+    {
+        if (null === $this->normalization) {
+            $this->normalization = new NormalizationBuilder($this);
+        }
+
+        return $this->normalization;
+    }
+
+    /**
+     * Gets the builder for validation rules.
+     *
+     * @return ValidationBuilder
+     */
+    protected function validation()
+    {
+        if (null === $this->validation) {
+            $this->validation = new ValidationBuilder($this);
+        }
+
+        return $this->validation;
+    }
+
+    /**
+     * Gets the builder for merging rules.
+     *
+     * @return MergeBuilder
+     */
+    protected function merge()
+    {
+        if (null === $this->merge) {
+            $this->merge = new MergeBuilder($this);
+        }
+
+        return $this->merge;
     }
 
     /**

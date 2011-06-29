@@ -66,31 +66,6 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
     }
 
     /**
-     * Compares two hashes using a constant-time algorithm to avoid (remote)
-     * timing attacks.
-     *
-     * This is the same implementation as used in the BasePasswordEncoder.
-     *
-     * @param string $hash1 The first hash
-     * @param string $hash2 The second hash
-     *
-     * @return Boolean true if the two hashes are the same, false otherwise
-     */
-    private function compareHashes($hash1, $hash2)
-    {
-        if (strlen($hash1) !== $c = strlen($hash2)) {
-            return false;
-        }
-
-        $result = 0;
-        for ($i = 0; $i < $c; $i++) {
-            $result |= ord($hash1[$i]) ^ ord($hash2[$i]);
-        }
-
-        return 0 === $result;
-    }
-
-    /**
      * {@inheritDoc}
      */
     protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token)
@@ -147,5 +122,30 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
     protected function generateCookieHash($class, $username, $expires, $password)
     {
         return hash('sha256', $class.$username.$expires.$password.$this->getKey());
+    }
+
+    /**
+     * Compares two hashes using a constant-time algorithm to avoid (remote)
+     * timing attacks.
+     *
+     * This is the same implementation as used in the BasePasswordEncoder.
+     *
+     * @param string $hash1 The first hash
+     * @param string $hash2 The second hash
+     *
+     * @return Boolean true if the two hashes are the same, false otherwise
+     */
+    private function compareHashes($hash1, $hash2)
+    {
+        if (strlen($hash1) !== $c = strlen($hash2)) {
+            return false;
+        }
+
+        $result = 0;
+        for ($i = 0; $i < $c; $i++) {
+            $result |= ord($hash1[$i]) ^ ord($hash2[$i]);
+        }
+
+        return 0 === $result;
     }
 }

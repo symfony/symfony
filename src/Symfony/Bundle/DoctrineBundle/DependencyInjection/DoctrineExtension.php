@@ -46,6 +46,26 @@ class DoctrineExtension extends AbstractDoctrineExtension
     }
 
     /**
+     * Returns the base path for the XSD files.
+     *
+     * @return string The XSD base path
+     */
+    public function getXsdValidationBasePath()
+    {
+        return __DIR__.'/../Resources/config/schema';
+    }
+
+    /**
+     * Returns the namespace to be used for this extension (XML namespace).
+     *
+     * @return string The XML namespace
+     */
+    public function getNamespace()
+    {
+        return 'http://symfony.com/schema/dic/doctrine';
+    }
+
+    /**
      * Loads the DBAL configuration.
      *
      * Usage example:
@@ -393,25 +413,5 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $cacheDef->addMethodCall('setNamespace', array($namespace));
 
         return $cacheDef;
-    }
-
-    /**
-     * Returns the base path for the XSD files.
-     *
-     * @return string The XSD base path
-     */
-    public function getXsdValidationBasePath()
-    {
-        return __DIR__.'/../Resources/config/schema';
-    }
-
-    /**
-     * Returns the namespace to be used for this extension (XML namespace).
-     *
-     * @return string The XML namespace
-     */
-    public function getNamespace()
-    {
-        return 'http://symfony.com/schema/dic/doctrine';
     }
 }

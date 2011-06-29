@@ -228,6 +228,29 @@ class Store implements StoreInterface
     }
 
     /**
+     * Purges data for the given URL.
+     *
+     * @param string $url A URL
+     *
+     * @return Boolean true if the URL exists and has been purged, false otherwise
+     */
+    public function purge($url)
+    {
+        if (file_exists($path = $this->getPath($this->getCacheKey(Request::create($url))))) {
+            unlink($path);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getPath($key)
+    {
+        return $this->root.DIRECTORY_SEPARATOR.substr($key, 0, 2).DIRECTORY_SEPARATOR.substr($key, 2, 2).DIRECTORY_SEPARATOR.substr($key, 4, 2).DIRECTORY_SEPARATOR.substr($key, 6);
+    }
+
+    /**
      * Determines whether two Request HTTP header sets are non-varying based on
      * the vary response header value provided.
      *
@@ -274,24 +297,6 @@ class Store implements StoreInterface
     }
 
     /**
-     * Purges data for the given URL.
-     *
-     * @param string $url A URL
-     *
-     * @return Boolean true if the URL exists and has been purged, false otherwise
-     */
-    public function purge($url)
-    {
-        if (file_exists($path = $this->getPath($this->getCacheKey(Request::create($url))))) {
-            unlink($path);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Loads data for the given key.
      *
      * @param string $key  The store key
@@ -334,11 +339,6 @@ class Store implements StoreInterface
         }
 
         chmod($path, 0644);
-    }
-
-    public function getPath($key)
-    {
-        return $this->root.DIRECTORY_SEPARATOR.substr($key, 0, 2).DIRECTORY_SEPARATOR.substr($key, 2, 2).DIRECTORY_SEPARATOR.substr($key, 4, 2).DIRECTORY_SEPARATOR.substr($key, 6);
     }
 
     /**

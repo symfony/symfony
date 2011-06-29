@@ -132,36 +132,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     }
 
     /**
-     * Evaluates a template.
-     *
-     * @param Storage $template   The template to render
-     * @param array   $parameters An array of parameters to pass to the template
-     *
-     * @return string|false The evaluated template, or false if the engine is unable to render the template
-     */
-    protected function evaluate(Storage $template, array $parameters = array())
-    {
-        $__template__ = $template;
-        if ($__template__ instanceof FileStorage) {
-            extract($parameters);
-            $view = $this;
-            ob_start();
-            require $__template__;
-
-            return ob_get_clean();
-        } elseif ($__template__ instanceof StringStorage) {
-            extract($parameters);
-            $view = $this;
-            ob_start();
-            eval('; ?>'.$__template__.'<?php ;');
-
-            return ob_get_clean();
-        }
-
-        return false;
-    }
-
-    /**
      * Gets a helper value.
      *
      * @param string $name The helper name
@@ -365,6 +335,68 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     }
 
     /**
+     * Convert a string from one encoding to another.
+     *
+     * @param string $string The string to convert
+     * @param string $to     The input encoding
+     * @param string $from   The output encoding
+     *
+     * @return string The string with the new encoding
+     *
+     * @throws \RuntimeException if no suitable encoding function is found (iconv or mbstring)
+     */
+    public function convertEncoding($string, $to, $from)
+    {
+        if (function_exists('iconv')) {
+            return iconv($from, $to, $string);
+        } elseif (function_exists('mb_convert_encoding')) {
+            return mb_convert_encoding($string, $to, $from);
+        }
+
+        throw new \RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');
+    }
+
+    /**
+     * Gets the loader associated with this engine.
+     *
+     * @return LoaderInterface A LoaderInterface instance
+     */
+    public function getLoader()
+    {
+        return $this->loader;
+    }
+    
+    /**
+     * Evaluates a template.
+     *
+     * @param Storage $template   The template to render
+     * @param array   $parameters An array of parameters to pass to the template
+     *
+     * @return string|false The evaluated template, or false if the engine is unable to render the template
+     */
+    protected function evaluate(Storage $template, array $parameters = array())
+    {
+        $__template__ = $template;
+        if ($__template__ instanceof FileStorage) {
+            extract($parameters);
+            $view = $this;
+            ob_start();
+            require $__template__;
+
+            return ob_get_clean();
+        } elseif ($__template__ instanceof StringStorage) {
+            extract($parameters);
+            $view = $this;
+            ob_start();
+            eval('; ?>'.$__template__.'<?php ;');
+
+            return ob_get_clean();
+        }
+
+        return false;
+    }
+
+    /**
      * Initializes the built-in escapers.
      *
      * Each function specifies a way for applying a transformation to a string
@@ -441,38 +473,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                     return $value;
                 },
         );
-    }
-
-    /**
-     * Convert a string from one encoding to another.
-     *
-     * @param string $string The string to convert
-     * @param string $to     The input encoding
-     * @param string $from   The output encoding
-     *
-     * @return string The string with the new encoding
-     *
-     * @throws \RuntimeException if no suitable encoding function is found (iconv or mbstring)
-     */
-    public function convertEncoding($string, $to, $from)
-    {
-        if (function_exists('iconv')) {
-            return iconv($from, $to, $string);
-        } elseif (function_exists('mb_convert_encoding')) {
-            return mb_convert_encoding($string, $to, $from);
-        }
-
-        throw new \RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');
-    }
-
-    /**
-     * Gets the loader associated with this engine.
-     *
-     * @return LoaderInterface A LoaderInterface instance
-     */
-    public function getLoader()
-    {
-        return $this->loader;
     }
 
     /**

@@ -110,6 +110,21 @@ class SecurityExtension extends Extension
         ));
     }
 
+    /**
+     * Returns the base path for the XSD files.
+     *
+     * @return string The XSD base path
+     */
+    public function getXsdValidationBasePath()
+    {
+        return __DIR__.'/../Resources/config/schema';
+    }
+
+    public function getNamespace()
+    {
+        return 'http://symfony.com/schema/dic/security';
+    }
+
     private function aclLoad($config, ContainerBuilder $container)
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
@@ -601,22 +616,6 @@ class SecurityExtension extends Extension
         }
 
         return $this->factories = $factories;
-    }
-
-
-    /**
-     * Returns the base path for the XSD files.
-     *
-     * @return string The XSD base path
-     */
-    public function getXsdValidationBasePath()
-    {
-        return __DIR__.'/../Resources/config/schema';
-    }
-
-    public function getNamespace()
-    {
-        return 'http://symfony.com/schema/dic/security';
     }
 }
 

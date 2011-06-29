@@ -143,58 +143,6 @@ class Serializer implements SerializerInterface
     }
 
     /**
-     * Normalizes an object into a set of arrays/scalars
-     *
-     * @param object $object object to normalize
-     * @param string $format format name, present to give the option to normalizers to act differently based on formats
-     * @return array|scalar
-     */
-    private function normalizeObject($object, $format = null)
-    {
-        if (!$this->normalizers) {
-            throw new LogicException('You must register at least one normalizer to be able to normalize objects.');
-        }
-        $class = get_class($object);
-        if (isset($this->normalizerCache[$class][$format])) {
-            return $this->normalizerCache[$class][$format]->normalize($object, $format);
-        }
-        foreach ($this->normalizers as $normalizer) {
-            if ($normalizer->supportsNormalization($object, $class, $format)) {
-                $this->normalizerCache[$class][$format] = $normalizer;
-
-                return $normalizer->normalize($object, $format);
-            }
-        }
-        throw new UnexpectedValueException('Could not normalize object of type '.$class.', no supporting normalizer found.');
-    }
-
-    /**
-     * Denormalizes data back into an object of the given class
-     *
-     * @param mixed $data data to restore
-     * @param string $class the expected class to instantiate
-     * @param string $format format name, present to give the option to normalizers to act differently based on formats
-     * @return object
-     */
-    private function denormalizeObject($data, $class, $format = null)
-    {
-        if (!$this->normalizers) {
-            throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
-        }
-        if (isset($this->denormalizerCache[$class][$format])) {
-            return $this->denormalizerCache[$class][$format]->denormalize($data, $class, $format);
-        }
-        foreach ($this->normalizers as $normalizer) {
-            if ($normalizer->supportsDenormalization($data, $class, $format)) {
-                $this->denormalizerCache[$class][$format] = $normalizer;
-
-                return $normalizer->denormalize($data, $class, $format);
-            }
-        }
-        throw new UnexpectedValueException('Could not denormalize object of type '.$class.', no supporting normalizer found.');
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function supportsSerialization($format)
@@ -248,5 +196,57 @@ class Serializer implements SerializerInterface
         }
 
         return $this->encoders[$format];
+    }
+
+    /**
+     * Normalizes an object into a set of arrays/scalars
+     *
+     * @param object $object object to normalize
+     * @param string $format format name, present to give the option to normalizers to act differently based on formats
+     * @return array|scalar
+     */
+    private function normalizeObject($object, $format = null)
+    {
+        if (!$this->normalizers) {
+            throw new LogicException('You must register at least one normalizer to be able to normalize objects.');
+        }
+        $class = get_class($object);
+        if (isset($this->normalizerCache[$class][$format])) {
+            return $this->normalizerCache[$class][$format]->normalize($object, $format);
+        }
+        foreach ($this->normalizers as $normalizer) {
+            if ($normalizer->supportsNormalization($object, $class, $format)) {
+                $this->normalizerCache[$class][$format] = $normalizer;
+
+                return $normalizer->normalize($object, $format);
+            }
+        }
+        throw new UnexpectedValueException('Could not normalize object of type '.$class.', no supporting normalizer found.');
+    }
+
+    /**
+     * Denormalizes data back into an object of the given class
+     *
+     * @param mixed $data data to restore
+     * @param string $class the expected class to instantiate
+     * @param string $format format name, present to give the option to normalizers to act differently based on formats
+     * @return object
+     */
+    private function denormalizeObject($data, $class, $format = null)
+    {
+        if (!$this->normalizers) {
+            throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
+        }
+        if (isset($this->denormalizerCache[$class][$format])) {
+            return $this->denormalizerCache[$class][$format]->denormalize($data, $class, $format);
+        }
+        foreach ($this->normalizers as $normalizer) {
+            if ($normalizer->supportsDenormalization($data, $class, $format)) {
+                $this->denormalizerCache[$class][$format] = $normalizer;
+
+                return $normalizer->denormalize($data, $class, $format);
+            }
+        }
+        throw new UnexpectedValueException('Could not denormalize object of type '.$class.', no supporting normalizer found.');
     }
 }

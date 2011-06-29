@@ -120,6 +120,11 @@ class MetadataFactory
         return $metadata;
     }
 
+    protected function getClassMetadataFactoryClass()
+    {
+        return 'Doctrine\\ORM\\Mapping\\ClassMetadataFactory';
+    }
+
     private function getBasePathForClass($name, $namespace, $path)
     {
         $namespace = str_replace('\\', '/', $namespace);
@@ -169,10 +174,5 @@ class MetadataFactory
         }
 
         return $metadata;
-    }
-
-    protected function getClassMetadataFactoryClass()
-    {
-        return 'Doctrine\\ORM\\Mapping\\ClassMetadataFactory';
     }
 }

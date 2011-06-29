@@ -19,7 +19,7 @@
 {% spaceless %}
     {% for choice, label in options %}
         {% if _form_is_choice_group(label) %}
-            <optgroup label="{{ choice }}">
+            <optgroup label="{{ choice|trans }}">
                 {% for nestedChoice, nestedLabel in label %}
                     <option value="{{ nestedChoice }}"{% if _form_is_choice_selected(form, nestedChoice) %} selected="selected"{% endif %}>{{ nestedLabel|trans }}</option>
                 {% endfor %}

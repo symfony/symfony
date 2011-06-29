@@ -334,8 +334,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@name="na&me"]
     [@required="required"]
     [
-        ./option[@value="&a"][@selected="selected"][.="Choice&A"]
-        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
+        ./option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
 '
@@ -357,9 +357,9 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@name="na&me"]
     [@required="required"]
     [
-        ./option[@value="&b"][not(@selected)][.="Choice&B"]
+        ./option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
         /following-sibling::option[@disabled="disabled"][not(@selected)][.="-- sep --"]
-        /following-sibling::option[@value="&a"][@selected="selected"][.="Choice&A"]
+        /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
     ]
     [count(./option)=3]
 '
@@ -382,8 +382,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [not(@required)]
     [
         ./option[@value=""][.="[trans][/trans]"]
-        /following-sibling::option[@value="&a"][@selected="selected"][.="Choice&A"]
-        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
+        /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
 '
@@ -406,8 +406,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [not(@required)]
     [
         ./option[@value=""][.="[trans][/trans]"]
-        /following-sibling::option[@value="&a"][not(@selected)][.="Choice&A"]
-        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
+        /following-sibling::option[@value="&a"][not(@selected)][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
 '
@@ -431,8 +431,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [not(@required)]
     [
         ./option[@value=""][not(@selected)][.="[trans]Select&Anything&Not&Me[/trans]"]
-        /following-sibling::option[@value="&a"][@selected="selected"][.="Choice&A"]
-        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
+        /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
 '
@@ -456,8 +456,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@required="required"]
     [
         ./option[@value=""][.="[trans]Test&Me[/trans]"]
-        /following-sibling::option[@value="&a"][@selected="selected"][.="Choice&A"]
-        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
+        /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
 '
@@ -480,8 +480,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@required="required"]
     [
         ./option[@value=""][.="[trans][/trans]"]
-        /following-sibling::option[@value="&a"][@selected="selected"][.="Choice&A"]
-        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
+        /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=3]
 '
@@ -503,15 +503,15 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
     [@name="na&me"]
-    [./optgroup[@label="Group&1"]
+    [./optgroup[@label="[trans]Group&1[/trans]"]
         [
-            ./option[@value="&a"][@selected="selected"][.="Choice&A"]
-            /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
+            ./option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+            /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
         ]
         [count(./option)=2]
     ]
-    [./optgroup[@label="Group&2"]
-        [./option[@value="&c"][not(@selected)][.="Choice&C"]]
+    [./optgroup[@label="[trans]Group&2[/trans]"]
+        [./option[@value="&c"][not(@selected)][.="[trans]Choice&C[/trans]"]]
         [count(./option)=1]
     ]
     [count(./optgroup)=2]
@@ -533,8 +533,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@name="na&me[]"]
     [@multiple="multiple"]
     [
-        ./option[@value="&a"][@selected="selected"][.="Choice&A"]
-        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
+        ./option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
 '
@@ -556,8 +556,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@name="na&me[]"]
     [@multiple="multiple"]
     [
-        ./option[@value="&a"][@selected="selected"][.="Choice&A"]
-        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
+        ./option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
 '
@@ -579,8 +579,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@name="na&me[]"]
     [@multiple="multiple"]
     [
-        ./option[@value="&a"][@selected="selected"][.="Choice&A"]
-        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
+        ./option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
 '
@@ -688,7 +688,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
     [@name="na&me"]
-    [./option[@value="AT"][@selected="selected"][.="Austria"]]
+    [./option[@value="AT"][@selected="selected"][.="[trans]Austria[/trans]"]]
     [count(./option)>200]
 '
         );
@@ -706,7 +706,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '/select
     [@name="na&me"]
     [./option[@value=""][not(@selected)][.="[trans]Select&Country[/trans]"]]
-    [./option[@value="AT"][@selected="selected"][.="Austria"]]
+    [./option[@value="AT"][@selected="selected"][.="[trans]Austria[/trans]"]]
     [count(./option)>201]
 '
         );
@@ -1226,7 +1226,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
     [@name="na&me"]
-    [./option[@value="de"][@selected="selected"][.="German"]]
+    [./option[@value="de"][@selected="selected"][.="[trans]German[/trans]"]]
     [count(./option)>200]
 '
         );
@@ -1241,7 +1241,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
     [@name="na&me"]
-    [./option[@value="de_AT"][@selected="selected"][.="German (Austria)"]]
+    [./option[@value="de_AT"][@selected="selected"][.="[trans]German (Austria)[/trans]"]]
     [count(./option)>200]
 '
         );
@@ -1592,8 +1592,8 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
     [@name="na&me"]
     [@required="required"]
     [./optgroup
-        [@label="Europe"]
-        [./option[@value="Europe/Vienna"][@selected="selected"][.="Vienna"]]
+        [@label="[trans]Europe[/trans]"]
+        [./option[@value="Europe/Vienna"][@selected="selected"][.="[trans]Vienna[/trans]"]]
     ]
     [count(./optgroup)>10]
     [count(.//option)>200]

@@ -114,7 +114,7 @@ EOF;
                     }
 
                     if ($prefix !== $parentPrefix) {
-                        $code[] = sprintf("        if (0 === strpos(\$pathinfo, '%s')) {", $prefix);
+                        $code[] = sprintf("        if (0 === strpos(\$pathinfo, %s)) {", var_export($prefix, true));
                         $indent = '    ';
                     }
                 }
@@ -151,14 +151,14 @@ EOF;
         $matches = false;
         if (!count($compiledRoute->getVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#', str_replace(array("\n", ' '), '', $compiledRoute->getRegex()), $m)) {
             if ($supportsRedirections && substr($m['url'], -1) === '/') {
-                $conditions[] = sprintf("rtrim(\$pathinfo, '/') === '%s'", rtrim(str_replace('\\', '', $m['url']), '/'));
+                $conditions[] = sprintf("rtrim(\$pathinfo, '/') === %s", var_export(rtrim(str_replace('\\', '', $m['url']), '/'), true));
                 $hasTrailingSlash = true;
             } else {
-                $conditions[] = sprintf("\$pathinfo === '%s'", str_replace('\\', '', $m['url']));
+                $conditions[] = sprintf("\$pathinfo === %s", var_export(str_replace('\\', '', $m['url']), true));
             }
         } else {
             if ($compiledRoute->getStaticPrefix() && $compiledRoute->getStaticPrefix() != $parentPrefix) {
-                $conditions[] = sprintf("0 === strpos(\$pathinfo, '%s')", $compiledRoute->getStaticPrefix());
+                $conditions[] = sprintf("0 === strpos(\$pathinfo, %s)", var_export($compiledRoute->getStaticPrefix(), true));
             }
 
             $regex = str_replace(array("\n", ' '), '', $compiledRoute->getRegex());
@@ -166,7 +166,7 @@ EOF;
                 $regex = substr($regex, 0, $pos).'/?$'.substr($regex, $pos + 2);
                 $hasTrailingSlash = true;
             }
-            $conditions[] = sprintf("preg_match('%s', \$pathinfo, \$matches)", $regex);
+            $conditions[] = sprintf("preg_match(%s, \$pathinfo, \$matches)", var_export($regex, true));
 
             $matches = true;
         }

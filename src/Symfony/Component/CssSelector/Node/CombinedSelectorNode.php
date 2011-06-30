@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\CssSelector\Node;
 
-use Symfony\Component\CssSelector\SyntaxError;
+use Symfony\Component\CssSelector\Exception\ParseException;
 
 /**
  * CombinedSelectorNode represents a combinator node.
@@ -60,12 +60,12 @@ class CombinedSelectorNode implements NodeInterface
 
     /**
      * {@inheritDoc}
-     * @throws SyntaxError When unknown combinator is found
+     * @throws ParseException When unknown combinator is found
      */
     public function toXpath()
     {
         if (!isset(self::$methodMapping[$this->combinator])) {
-            throw new SyntaxError(sprintf('Unknown combinator: %s', $this->combinator));
+            throw new ParseException(sprintf('Unknown combinator: %s', $this->combinator));
         }
 
         $method = '_xpath_'.self::$methodMapping[$this->combinator];

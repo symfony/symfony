@@ -47,6 +47,8 @@ class ChoiceFormField extends FormField
      * @param string $value The value of the field
      *
      * @throws \InvalidArgumentException When value type provided is not correct
+     *
+     * @api
      */
     public function select($value)
     {

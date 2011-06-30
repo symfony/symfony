@@ -22,6 +22,11 @@ class ValueToDuplicatesTransformerTest extends \PHPUnit_Framework_TestCase
         $this->transformer = new ValueToDuplicatesTransformer(array('a', 'b', 'c'));
     }
 
+    protected function tearDown()
+    {
+        $this->transformer = null;
+    }
+
     public function testTransform()
     {
         $output = array(

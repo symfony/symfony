@@ -80,6 +80,10 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection1->add('bar', new Route('/{bar}'));
         $collection2 = new RouteCollection();
         $collection2->addCollection($collection1, '/b');
+        $collection1 = new RouteCollection();
+        $collection1->add('foo1', new Route('/{foo1}'));
+        $collection1->add('bar1', new Route('/{bar1}'));
+        $collection2->addCollection($collection1, '/b');
         $collection->addCollection($collection2, '/a');
 
         // "dynamic" prefix
@@ -90,7 +94,15 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection2->addCollection($collection1, '/b');
         $collection->addCollection($collection2, '/{_locale}');
 
+        $collection->add('ababa', new Route('/ababa'));
+
+        // some more prefixes
+        $collection1 = new RouteCollection();
+        $collection1->add('foo', new Route('/{foo}'));
+        $collection->addCollection($collection1, '/aba');
+
         $dumper = new PhpMatcherDumper($collection, new RequestContext());
+
         $this->assertStringEqualsFile(__DIR__.'/../../Fixtures/dumper/url_matcher1.php', $dumper->dump(), '->dump() dumps basic routes to the correct PHP file.');
 
         // force HTTPS redirection

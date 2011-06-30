@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-class Collection extends \Symfony\Component\Validator\Constraint
+use Symfony\Component\Validator\Constraint;
+
+class Collection extends Constraint
 {
     public $fields;
     public $allowExtraFields = false;

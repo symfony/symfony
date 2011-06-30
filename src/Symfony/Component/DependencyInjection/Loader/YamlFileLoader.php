@@ -207,7 +207,7 @@ class YamlFileLoader extends FileLoader
 
             foreach ($service['tags'] as $tag) {
                 if (!isset($tag['name'])) {
-                    throw new \InvalidArgumentException(sprintf('A "tags" entry is missing a "name" key must be an array for service "%s" in %s.', $id, $file));
+                    throw new \InvalidArgumentException(sprintf('A "tags" entry is missing a "name" key for service "%s" in %s.', $id, $file));
                 }
 
                 $name = $tag['name'];
@@ -228,7 +228,7 @@ class YamlFileLoader extends FileLoader
      */
     private function loadFile($file)
     {
-        return $this->validate(Yaml::load($file), $file);
+        return $this->validate(Yaml::parse($file), $file);
     }
 
     /**

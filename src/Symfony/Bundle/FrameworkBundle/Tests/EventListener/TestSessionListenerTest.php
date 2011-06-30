@@ -35,6 +35,12 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
         $this->session  = $this->getSession();
     }
 
+    protected function tearDown()
+    {
+        $this->listener = null;
+        $this->session = null;
+    }
+
     public function testShouldSaveMasterRequestSession()
     {
         $this->sessionMustBeSaved();
@@ -56,7 +62,7 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
         $event = new FilterResponseEvent($kernel, $request, $type, $response);
 
-        $this->listener->onCoreResponse($event);
+        $this->listener->onKernelResponse($event);
 
         $this->assertSame($response, $event->getResponse());
     }

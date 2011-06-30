@@ -27,6 +27,11 @@ class DefaultCsrfProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider = new DefaultCsrfProvider('SECRET');
     }
 
+    protected function tearDown()
+    {
+        $this->provider = null;
+    }
+
     public function testGenerateCsrfToken()
     {
         $token = $this->provider->generateCsrfToken('foo');

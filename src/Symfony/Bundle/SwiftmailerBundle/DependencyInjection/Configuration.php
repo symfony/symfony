@@ -49,13 +49,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('transport')
-                    ->defaultValue('smtp')
-                    ->validate()
-                        ->ifNotInArray(array('smtp', 'mail', 'sendmail', 'gmail', null))
-                        ->thenInvalid('The %s transport is not supported')
-                    ->end()
-                ->end()
+                ->scalarNode('transport')->defaultValue('smtp')->end()
                 ->scalarNode('username')->defaultNull()->end()
                 ->scalarNode('password')->defaultNull()->end()
                 ->scalarNode('host')->defaultValue('localhost')->end()

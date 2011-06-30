@@ -117,11 +117,11 @@ class YamlDriver extends BaseYamlDriver
 
     protected function _findMappingFile($className)
     {
-        $defaultFileName = str_replace('\\', '.', $className) . $this->_fileExtension;
+        $defaultFileName = str_replace('\\', '.', $className).$this->_fileExtension;
         foreach ($this->_paths as $path) {
             if (!isset($this->_prefixes[$path])) {
-                if (file_exists($path . DIRECTORY_SEPARATOR . $defaultFileName)) {
-                    return $path . DIRECTORY_SEPARATOR . $defaultFileName;
+                if (file_exists($path.DIRECTORY_SEPARATOR.$defaultFileName)) {
+                    return $path.DIRECTORY_SEPARATOR.$defaultFileName;
                 }
 
                 continue;

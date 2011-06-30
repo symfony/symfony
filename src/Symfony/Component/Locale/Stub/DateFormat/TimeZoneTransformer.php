@@ -85,7 +85,7 @@ class TimeZoneTransformer extends Transformer
                 ));
             }
 
-            return 'Etc/GMT' . ($hours != 0 ? $signal . $hours : '');
+            return 'Etc/GMT'.($hours != 0 ? $signal.$hours : '');
         }
 
         throw new \InvalidArgumentException('The GMT time zone \'%s\' does not match with the supported formats GMT[+-]HH:MM or GMT[+-]HHMM.');

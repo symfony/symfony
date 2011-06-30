@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-class Choice extends \Symfony\Component\Validator\Constraint
+use Symfony\Component\Validator\Constraint;
+
+class Choice extends Constraint
 {
     public $choices;
     public $callback;

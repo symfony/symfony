@@ -19,7 +19,7 @@ class TemplateNameParserTest extends TestCase
 {
     protected $parser;
 
-    protected function  setUp()
+    protected function setUp()
     {
         $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
         $kernel
@@ -38,7 +38,7 @@ class TemplateNameParserTest extends TestCase
 
     protected function tearDown()
     {
-        unset($this->parser);
+        $this->parser = null;
     }
 
     /**

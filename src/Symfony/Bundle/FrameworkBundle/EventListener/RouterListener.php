@@ -42,7 +42,7 @@ class RouterListener
         $this->logger = $logger;
     }
 
-    public function onEarlyCoreRequest(GetResponseEvent $event)
+    public function onEarlyKernelRequest(GetResponseEvent $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;
@@ -64,7 +64,7 @@ class RouterListener
         $this->router->setContext($context);
     }
 
-    public function onCoreRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
 
@@ -84,15 +84,11 @@ class RouterListener
             $request->attributes->add($parameters);
         } catch (ResourceNotFoundException $e) {
             $message = sprintf('No route found for "%s %s"', $request->getMethod(), $request->getPathInfo());
-            if (null !== $this->logger) {
-                $this->logger->err($message);
-            }
+
             throw new NotFoundHttpException($message, $e);
         } catch (MethodNotAllowedException $e) {
             $message = sprintf('No route found for "%s %s": Method Not Allowed (Allow: %s)', $request->getMethod(), $request->getPathInfo(), strtoupper(implode(', ', $e->getAllowedMethods())));
-            if (null !== $this->logger) {
-                $this->logger->err($message);
-            }
+
             throw new MethodNotAllowedHttpException($e->getAllowedMethods(), $message, $e);
         }
 

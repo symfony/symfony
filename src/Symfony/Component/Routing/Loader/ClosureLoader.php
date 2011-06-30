@@ -19,6 +19,8 @@ use Symfony\Component\Config\Loader\Loader;
  * The Closure must return a RouteCollection instance.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class ClosureLoader extends Loader
 {
@@ -27,6 +29,8 @@ class ClosureLoader extends Loader
      *
      * @param \Closure $closure A Closure
      * @param string   $type    The resource type
+     *
+     * @api
      */
     public function load($closure, $type = null)
     {
@@ -40,6 +44,8 @@ class ClosureLoader extends Loader
      * @param string $type     The resource type
      *
      * @return Boolean True if this class supports the given resource, false otherwise
+     *
+     * @api
      */
     public function supports($resource, $type = null)
     {

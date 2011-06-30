@@ -60,20 +60,27 @@ class SwiftmailerExtension extends Extension
             $transport = $config['transport'];
         }
 
+        if (isset($config['disable_delivery']) && $config['disable_delivery']) {
+            $transport = 'null';
+        }
+
         if ('smtp' === $transport) {
             $loader->load('smtp.xml');
         }
 
-        $container->setParameter('swiftmailer.transport.name', $transport);
+        if (in_array($transport, array('smtp', 'mail', 'sendmail', 'null'))) {
+            // built-in transport
+            $transport = 'swiftmailer.transport.'.$transport;
+        }
 
-        $container->setAlias('swiftmailer.transport', 'swiftmailer.transport.'.$transport);
+        $container->setAlias('swiftmailer.transport', $transport);
 
         if (false === $config['port']) {
             $config['port'] = 'ssl' === $config['encryption'] ? 465 : 25;
         }
 
         foreach (array('encryption', 'port', 'host', 'username', 'password', 'auth_mode') as $key) {
-            $container->setParameter('swiftmailer.transport.'.$transport.'.'.$key, $config[$key]);
+            $container->setParameter('swiftmailer.transport.smtp.'.$key, $config[$key]);
         }
 
         // spool?
@@ -81,7 +88,7 @@ class SwiftmailerExtension extends Extension
             $type = $config['spool']['type'];
 
             $loader->load('spool.xml');
-            $container->setAlias('swiftmailer.transport.real', 'swiftmailer.transport.'.$transport);
+            $container->setAlias('swiftmailer.transport.real', $transport);
             $container->setAlias('swiftmailer.transport', 'swiftmailer.transport.spool');
             $container->setAlias('swiftmailer.spool', 'swiftmailer.spool.'.$type);
 
@@ -116,10 +123,6 @@ class SwiftmailerExtension extends Extension
             $container->getDefinition('swiftmailer.plugin.redirecting')->addTag('swiftmailer.plugin');
         } else {
             $container->setParameter('swiftmailer.single_address', null);
-        }
-
-        if (isset($config['disable_delivery']) && $config['disable_delivery']) {
-            $container->getDefinition('swiftmailer.plugin.blackhole')->addTag('swiftmailer.plugin');
         }
     }
 

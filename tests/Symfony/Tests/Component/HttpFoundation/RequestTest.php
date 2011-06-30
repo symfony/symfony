@@ -43,7 +43,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $request->request->get('foo'), '->initialize() takes an array of request parameters as its second argument');
 
         $request->initialize(array(), array(), array('foo' => 'bar'));
-        $this->assertEquals('bar', $request->attributes->get('foo'), '->initialize() takes an array of attributes as its thrid argument');
+        $this->assertEquals('bar', $request->attributes->get('foo'), '->initialize() takes an array of attributes as its third argument');
 
         $request->initialize(array(), array(), array(), array(), array(), array('HTTP_FOO' => 'bar'));
         $this->assertEquals('bar', $request->headers->get('FOO'), '->initialize() takes an array of HTTP headers as its fourth argument');
@@ -764,5 +764,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($request->hasPreviousSession());
         $request->setSession(new Session(new ArraySessionStorage()));
         $this->assertTrue($request->hasPreviousSession());
+    }
+
+    public function testToString()
+    {
+        $request = new Request();
+
+        $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
+
+        $this->assertContains('Accept-Language: zh, en-us; q=0.8, en; q=0.6', $request->__toString());
     }
 }

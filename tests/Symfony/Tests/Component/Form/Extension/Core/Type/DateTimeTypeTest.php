@@ -160,4 +160,40 @@ class DateTimeTypeTest extends LocalizedTestCase
 
         $this->assertEquals($dateTime->format('Y-m-d H:i:s'), $form->getData());
     }
+
+    public function testSubmit_stringSingleText()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'input' => 'string',
+            'widget' => 'single_text',
+        ));
+
+        $form->bind('2010-06-02 03:04:05');
+
+        $this->assertEquals('2010-06-02 03:04:00', $form->getData());
+        $this->assertEquals('2010-06-02 03:04:00', $form->getClientData());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testDifferentWidgets()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'date_widget' => 'single_text',
+            'time_widget' => 'choice',
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testDefinedOnlyOneWidget()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'date_widget' => 'single_text',
+        ));
+    }
 }

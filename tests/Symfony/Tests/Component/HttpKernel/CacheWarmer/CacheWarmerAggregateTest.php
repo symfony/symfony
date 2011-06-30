@@ -24,6 +24,11 @@ class CacheWarmerAggregateTest extends \PHPUnit_Framework_TestCase
         self::$cacheDir = tempnam(sys_get_temp_dir(), 'sf2_cache_warmer_dir');
     }
 
+    public static function tearDownAfterClass()
+    {
+        @unlink(self::$cacheDir);
+    }
+
     public function testInjectWarmersUsingConstructor()
     {
         $warmer = $this->getCacheWarmerMock();

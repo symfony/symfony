@@ -21,15 +21,14 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\SessionUnavailableException;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\CoreEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
+use Symfony\Component\Security\Http\HttpUtils;
 
 /**
  * The AbstractAuthenticationListener is the preferred base class for all
@@ -60,6 +59,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     private $successHandler;
     private $failureHandler;
     private $rememberMeServices;
+    private $httpUtils;
 
     /**
      * Constructor.
@@ -67,6 +67,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * @param SecurityContextInterface               $securityContext       A SecurityContext instance
      * @param AuthenticationManagerInterface         $authenticationManager An AuthenticationManagerInterface instance
      * @param SessionAuthenticationStrategyInterface $sessionStrategy
+     * @param HttpUtils                              $httpUtils             An HttpUtilsInterface instance
      * @param string                                 $providerKey
      * @param array                                  $options               An array of options for the processing of a
      *                                                                      successful, or failed authentication attempt
@@ -75,7 +76,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * @param LoggerInterface                        $logger                A LoggerInterface instance
      * @param EventDispatcherInterface               $dispatcher            An EventDispatcherInterface instance
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -99,6 +100,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         ), $options);
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
+        $this->httpUtils = $httpUtils;
     }
 
     /**
@@ -166,7 +168,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      */
     protected function requiresAuthentication(Request $request)
     {
-        return str_replace('{_locale}', $request->getSession()->getLocale(), $this->options['check_path']) === $request->getPathInfo();
+        return $this->httpUtils->checkRequestPath($request, $this->options['check_path']);
     }
 
     /**
@@ -183,7 +185,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     private function onFailure(GetResponseEvent $event, Request $request, AuthenticationException $failed)
     {
         if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Authentication request failed: %s', $failed->getMessage()));
+            $this->logger->info(sprintf('Authentication request failed: %s', $failed->getMessage()));
         }
 
         $this->securityContext->setToken(null);
@@ -196,32 +198,30 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             $this->options['failure_path'] = $this->options['login_path'];
         }
 
-        $path = str_replace('{_locale}', $request->getSession()->getLocale(), $this->options['failure_path']);
-
         if ($this->options['failure_forward']) {
             if (null !== $this->logger) {
-                $this->logger->debug(sprintf('Forwarding to %s', $path));
+                $this->logger->debug(sprintf('Forwarding to %s', $this->options['failure_path']));
             }
 
-            $subRequest = Request::create($path, 'get', array(), $request->cookies->all(), array(), $request->server->all());
+            $subRequest = $this->httpUtils->createRequest($request, $this->options['failure_path']);
             $subRequest->attributes->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed);
 
             return $event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
         }
 
         if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Redirecting to %s', $path));
+            $this->logger->debug(sprintf('Redirecting to %s', $this->options['failure_path']));
         }
 
         $request->getSession()->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed);
 
-        return new RedirectResponse(0 !== strpos($path, 'http') ? $request->getUriForPath($path) : $path, 302);
+        return $this->httpUtils->createRedirectResponse($request, $this->options['failure_path']);
     }
 
     private function onSuccess(GetResponseEvent $event, Request $request, TokenInterface $token)
     {
         if (null !== $this->logger) {
-            $this->logger->debug('User has been authenticated successfully');
+            $this->logger->info(sprintf('User "%s" has been authenticated successfully', $token->getUsername()));
         }
 
         $this->securityContext->setToken($token);
@@ -238,8 +238,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         if (null !== $this->successHandler) {
             $response = $this->successHandler->onAuthenticationSuccess($request, $token);
         } else {
-            $path = str_replace('{_locale}', $session->getLocale(), $this->determineTargetUrl($request));
-            $response = new RedirectResponse(0 !== strpos($path, 'http') ? $request->getUriForPath($path) : $path, 302);
+            $response = $this->httpUtils->createRedirectResponse($request, $this->determineTargetUrl($request));
         }
 
         if (null !== $this->rememberMeServices) {

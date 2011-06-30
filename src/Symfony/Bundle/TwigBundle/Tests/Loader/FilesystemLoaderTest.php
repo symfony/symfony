@@ -37,9 +37,18 @@ class FilesystemLoaderTest extends TestCase
 
         $this->parser->expects($this->once())
                 ->method('parse')
-                ->with('name.engine.format')
-                ->will($this->returnValue(new TemplateReference('', '', 'name', 'engine', 'format')))
+                ->with('name.format.engine')
+                ->will($this->returnValue(new TemplateReference('', '', 'name', 'format', 'engine')))
         ;
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->locator = null;
+        $this->parser = null;
+        $this->loader = null;
     }
 
     public function testTwigErrorIfLocatorThrowsInvalid()
@@ -50,7 +59,7 @@ class FilesystemLoaderTest extends TestCase
                       ->method('locate')
                       ->will($this->throwException($invalidException));
 
-        $this->loader->getCacheKey('name.engine.format');
+        $this->loader->getCacheKey('name.format.engine');
     }
 
     public function testTwigErrorIfLocatorReturnsFalse()
@@ -60,6 +69,6 @@ class FilesystemLoaderTest extends TestCase
                       ->method('locate')
                       ->will($this->returnValue(false));
 
-        $this->loader->getCacheKey('name.engine.format');
+        $this->loader->getCacheKey('name.format.engine');
     }
 }

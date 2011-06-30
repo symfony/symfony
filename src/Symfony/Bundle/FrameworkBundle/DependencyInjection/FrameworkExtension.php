@@ -127,7 +127,7 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseEvent',
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseForControllerResultEvent',
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseForExceptionEvent',
-            'Symfony\\Component\\HttpKernel\\CoreEvents',
+            'Symfony\\Component\\HttpKernel\\KernelEvents',
 
             'Symfony\\Bundle\\FrameworkBundle\\EventListener\\RouterListener',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameParser',
@@ -314,6 +314,7 @@ class FrameworkExtension extends Extension
         );
 
         $container->setParameter('templating.helper.code.file_link_format', str_replace('%', '%%', isset($links[$ide]) ? $links[$ide] : $ide));
+        $container->setParameter('templating.helper.form.resources', $config['form']['resources']);
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('templating_debug.xml');

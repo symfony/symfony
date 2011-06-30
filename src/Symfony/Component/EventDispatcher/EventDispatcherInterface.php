@@ -52,11 +52,10 @@ interface EventDispatcherInterface
      * interested in and added as a listener for these events.
      *
      * @param EventSubscriberInterface $subscriber The subscriber.
-     * @param integer $priority The higher this value, the earlier an event
-     *                          listener will be triggered in the chain.
-     *                          Defaults to 0.
+     *
+     * @api
      */
-    function addSubscriber(EventSubscriberInterface $subscriber, $priority = 0);
+    function addSubscriber(EventSubscriberInterface $subscriber);
 
     /**
      * Removes an event listener from the specified events.
@@ -80,8 +79,6 @@ interface EventDispatcherInterface
      *
      * @return array The event listeners for the specified event, or all event
      *               listeners by event name.
-     *
-     * @api
      */
     function getListeners($eventName = null);
 
@@ -92,8 +89,6 @@ interface EventDispatcherInterface
      *
      * @return Boolean TRUE if the specified event has any listeners, FALSE
      *                 otherwise.
-     *
-     * @api
      */
     function hasListeners($eventName = null);
 }

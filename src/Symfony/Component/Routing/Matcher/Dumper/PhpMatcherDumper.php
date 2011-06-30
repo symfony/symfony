@@ -73,15 +73,16 @@ EOF;
     {
         $code = array();
 
+        $routes = clone $routes;
         $routeIterator = $routes->getIterator();
         $keys = array_keys($routeIterator->getArrayCopy());
         $keysCount = count($keys);
 
         $i = 0;
-
         foreach ($routeIterator as $name => $route) {
             $i++;
 
+            $route = clone $route;
             if ($route instanceof RouteCollection) {
                 $prefix = $route->getPrefix();
                 $optimizable = $prefix && count($route->all()) > 1 && false === strpos($route->getPrefix(), '{');
@@ -111,8 +112,10 @@ EOF;
                         }
                     }
 
-                    $code[] = sprintf("        if (0 === strpos(\$pathinfo, '%s')) {", $prefix);
-                    $indent = '    ';
+                    if ($prefix !== $parentPrefix) {
+                        $code[] = sprintf("        if (0 === strpos(\$pathinfo, '%s')) {", $prefix);
+                        $indent = '    ';
+                    }
                 }
 
                 foreach ($this->compileRoutes($route, $supportsRedirections, $prefix) as $line) {
@@ -121,8 +124,7 @@ EOF;
                     }
                 }
 
-                if ($optimizable) {
-                    $code[] = "            throw 0 < count(\$allow) ? new MethodNotAllowedException(array_unique(\$allow)) : new ResourceNotFoundException();";
+                if ($optimizable && $prefix !== $parentPrefix) {
                     $code[] = "        }\n";
                 }
             } else {

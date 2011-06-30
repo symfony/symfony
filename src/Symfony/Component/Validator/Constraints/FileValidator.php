@@ -29,11 +29,7 @@ class FileValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        if ($value instanceof FileObject && null === $value->getPath()) {
-            return true;
-        }
-
-        $path = $value instanceof FileObject ? $value->getPath() : (string) $value;
+        $path = $value instanceof FileObject ? $value->getPathname() : (string) $value;
 
         if (!file_exists($path)) {
             $this->setMessage($constraint->notFoundMessage, array('{{ file }}' => $path));
@@ -66,9 +62,9 @@ class FileValidator extends ConstraintValidator
 
             if ($size > $limit) {
                 $this->setMessage($constraint->maxSizeMessage, array(
-                    '{{ size }}' => $size . $suffix,
-                    '{{ limit }}' => $limit . $suffix,
-                    '{{ file }}' => $path,
+                    '{{ size }}'    => $size.$suffix,
+                    '{{ limit }}'   => $limit.$suffix,
+                    '{{ file }}'    => $path,
                 ));
 
                 return false;
@@ -82,9 +78,9 @@ class FileValidator extends ConstraintValidator
 
             if (!in_array($value->getMimeType(), (array) $constraint->mimeTypes)) {
                 $this->setMessage($constraint->mimeTypesMessage, array(
-                    '{{ type }}' => '"'.$value->getMimeType().'"',
-                    '{{ types }}' => '"'.implode('", "', (array) $constraint->mimeTypes).'"',
-                    '{{ file }}' => $path,
+                    '{{ type }}'    => '"'.$value->getMimeType().'"',
+                    '{{ types }}'   => '"'.implode('", "', (array) $constraint->mimeTypes).'"',
+                    '{{ file }}'    => $path,
                 ));
 
                 return false;

@@ -42,6 +42,7 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
             throw new UnexpectedTypeException($value, '\DateTime');
         }
 
+        $value = clone $value;
         try {
             $value->setTimezone(new \DateTimeZone($this->outputTimezone));
         } catch (\Exception $e) {

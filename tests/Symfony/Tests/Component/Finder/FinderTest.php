@@ -26,6 +26,11 @@ class FinderTest extends Iterator\RealIteratorTestCase
         self::$tmpDir = sys_get_temp_dir().'/symfony2_finder';
     }
 
+    public function testCreate()
+    {
+        $this->assertInstanceOf('Symfony\Component\Finder\Finder', Finder::create());
+    }
+
     public function testDirectories()
     {
         $finder = new Finder();

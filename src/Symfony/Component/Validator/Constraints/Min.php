@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-class Min extends \Symfony\Component\Validator\Constraint
+use Symfony\Component\Validator\Constraint;
+
+class Min extends Constraint
 {
     public $message = 'This value should be {{ limit }} or more';
     public $limit;

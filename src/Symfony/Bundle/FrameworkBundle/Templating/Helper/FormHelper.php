@@ -25,18 +25,32 @@ use Symfony\Component\Form\Util\FormUtil;
  */
 class FormHelper extends Helper
 {
-    static protected $cache = array();
-
     protected $engine;
 
     protected $varStack;
 
-    protected $viewStack = array();
+    protected $context;
 
-    public function __construct(EngineInterface $engine)
+    protected $resources;
+
+    protected $themes;
+
+    protected $templates;
+
+    /**
+     * Constructor;
+     *
+     * @param EngineInterface $engine    The templating engine
+     * @param array           $resources An array of theme name
+     */
+    public function __construct(EngineInterface $engine, array $resources)
     {
         $this->engine = $engine;
-        $this->varStack = new \SplObjectStorage();
+        $this->resources = $resources;
+        $this->varStack = array();
+        $this->context = array();
+        $this->templates = array();
+        $this->themes = array();
     }
 
     public function isChoiceGroup($label)
@@ -50,35 +64,17 @@ class FormHelper extends Helper
     }
 
     /**
-     * Renders the attributes for the current view.
+     * Sets a theme for a given view.
      *
-     * @param Boolean $includeId Whether to render the id attribute
+     * The theme format is "<Bundle>:<Controller>".
      *
-     * @return string The HTML markup
+     * @param FormView     $view      A FormView instance
+     * @param string|array $resources A theme or an array of theme
      */
-    public function attributes($includeId = true)
+    public function setTheme(FormView $view, $themes)
     {
-        $html = '';
-        $attr = array();
-
-        if (count($this->viewStack) > 0) {
-            $view = end($this->viewStack);
-            $vars = $this->varStack[$view];
-
-            if (isset($vars['attr'])) {
-                $attr = $vars['attr'];
-            }
-
-            if (true === $includeId && isset($vars['id'])) {
-                $attr['id'] = $vars['id'];
-            }
-        }
-
-        foreach ($attr as $k => $v) {
-            $html .= ' '.$this->engine->escape($k).'="'.$this->engine->escape($v).'"';
-        }
-
-        return $html;
+        $this->themes[$view->get('id')] = (array) $themes;
+        $this->templates = array();
     }
 
     /**
@@ -202,80 +198,125 @@ class FormHelper extends Helper
         }
 
         $template = null;
-        $blocks = $view->get('types');
-        array_unshift($blocks, '_'.$view->get('id'));
 
-        foreach ($blocks as &$block) {
-            $block = $block.'_'.$section;
-            $template = $this->lookupTemplate($block);
+        $custom = '_'.$view->get('proto_id', $view->get('id'));
+        $rendering = $custom.$section;
+
+        if (isset($this->varStack[$rendering])) {
+            $typeIndex = $this->varStack[$rendering]['typeIndex'] - 1;
+            $types = $this->varStack[$rendering]['types'];
+            $variables = array_replace_recursive($this->varStack[$rendering]['variables'], $variables);
+        } else {
+            $types = $view->get('types');
+            $types[] = $custom;
+            $typeIndex = count($types) - 1;
+            $variables = array_replace_recursive($view->all(), $variables);
+            $this->varStack[$rendering]['types'] = $types;
+        }
+
+        $this->varStack[$rendering]['variables'] = $variables;
+
+        do {
+            $types[$typeIndex] .= '_'.$section;
+            $template = $this->lookupTemplate($view, $types[$typeIndex]);
 
             if ($template) {
-                break;
+
+                $this->varStack[$rendering]['typeIndex'] = $typeIndex;
+
+                $this->context[] = array(
+                    'variables' => $variables,
+                    'view'      => $view,
+                );
+
+                $html = $this->engine->render($template, $variables);
+
+                array_pop($this->context);
+                unset($this->varStack[$rendering]);
+
+                if ($mainTemplate) {
+                    $view->setRendered();
+                }
+
+                return $html;
             }
-        }
+        }  while (--$typeIndex >= 0);
 
-        if (!$template) {
-            throw new FormException(sprintf('Unable to render form as none of the following blocks exist: "%s".', implode('", "', $blocks)));
-        }
-
-        $html = $this->render($view, $template, $variables);
-
-        if ($mainTemplate) {
-            $view->setRendered();
-        }
-
-        return $html;
-    }
-
-    public function render(FormView $view, $template, array $variables = array())
-    {
-        $this->varStack[$view] = array_replace(
-            $view->all(),
-            isset($this->varStack[$view]) ? $this->varStack[$view] : array(),
-            $variables
-        );
-
-        $this->viewStack[] = $view;
-
-        $html = $this->engine->render($template, $this->varStack[$view]);
-
-        array_pop($this->viewStack);
-        unset($this->varStack[$view]);
-
-        return $html;
+        throw new FormException(sprintf(
+            'Unable to render the form as none of the following blocks exist: "%s".',
+            implode('", "', array_reverse($types))
+        ));
     }
 
     /**
-     * Returns the name of the template to use to render the block
+     * Render a block from a form element.
      *
-     * @param string $blockName The name of the block
+     * @param string $name
+     * @param array  $variables Additional variables (those would override the current context)
      *
-     * @return string|Boolean The template logical name or false when no template is found
+     * @throws FormException if the block is not found
+     * @throws FormException if the method is called out of a form element (no context)
      */
-    protected function lookupTemplate($blockName)
+    public function renderBlock($name, $variables = array())
     {
-        if (isset(self::$cache[$blockName])) {
-            return self::$cache[$blockName];
+        if (0 == count($this->context)) {
+            throw new FormException(sprintf('This method should only be called while rendering a form element.', $name));
         }
 
-        $template = $blockName.'.html.php';
-/*
-        if ($this->templateDir) {
-            $template = $this->templateDir.':'.$template;
-        }
-*/
-        $template = 'FrameworkBundle:Form:'.$template;
-        if (!$this->engine->exists($template)) {
-            $template = false;
+        $context = end($this->context);
+
+        $template = $this->lookupTemplate($context['view'], $name);
+
+        if (false === $template) {
+            throw new FormException(sprintf('No block "%s" found while rendering the form.', $name));
         }
 
-        self::$cache[$blockName] = $template;
+        $variables = array_replace_recursive($context['variables'], $variables);
 
-        return $template;
+        return $this->engine->render($template, $variables);
     }
 
     public function getName()
     {
         return 'form';
+    }
+
+    /**
+     * Returns the name of the template to use to render the block
+     *
+     * @param FormView $view  The form view
+     * @param string   $block The name of the block
+     *
+     * @return string|Boolean The template logical name or false when no template is found
+     */
+    protected function lookupTemplate(FormView $view, $block)
+    {
+        $file = $block.'.html.php';
+        $id = $view->get('id');
+
+        if (!isset($this->templates[$id][$block])) {
+            $template = false;
+
+            $themes = $view->hasParent() ? array() : $this->resources;
+
+            if (isset($this->themes[$id])) {
+                $themes = array_merge($themes, $this->themes[$id]);
+            }
+
+            for ($i = count($themes) - 1; $i >= 0; --$i) {
+                if ($this->engine->exists($templateName = $themes[$i].':'.$file)) {
+                    $template = $templateName;
+                    break;
+                }
+            }
+
+            if (false === $template && $view->hasParent()) {
+                $template = $this->lookupTemplate($view->getParent(), $block);
+            }
+
+            $this->templates[$id][$block] = $template;
+        }
+
+        return $this->templates[$id][$block];
     }
 }

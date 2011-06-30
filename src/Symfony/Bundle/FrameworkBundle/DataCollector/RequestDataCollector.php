@@ -59,7 +59,7 @@ class RequestDataCollector extends BaseRequestDataCollector
         }
     }
 
-    public function onCoreController(FilterControllerEvent $event)
+    public function onKernelController(FilterControllerEvent $event)
     {
         $this->controllers[$event->getRequest()] = $event->getController();
     }

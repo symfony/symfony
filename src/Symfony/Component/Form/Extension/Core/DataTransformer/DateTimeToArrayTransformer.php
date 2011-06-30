@@ -75,6 +75,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             throw new UnexpectedTypeException($dateTime, '\DateTime');
         }
 
+        $dateTime = clone $dateTime;
         if ($this->inputTimezone !== $this->outputTimezone) {
             try {
                 $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));

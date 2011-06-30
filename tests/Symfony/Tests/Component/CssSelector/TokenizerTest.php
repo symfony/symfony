@@ -36,6 +36,14 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("foo[class=foo Abar     ]", $this->tokensToString($this->tokenizer->tokenize('foo[class="foo \\65 bar"]')), '->tokenize() lexes an input string and returns an array of tokens');
     }
 
+    /**
+     * @expectedException Symfony\Component\CssSelector\Exception\ParseException
+     */
+    public function testTokenizeInvalidString()
+    {
+        $this->tokensToString($this->tokenizer->tokenize('/invalid'));
+    }
+
     public function getCssSelectors()
     {
         return array(

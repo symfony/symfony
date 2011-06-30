@@ -112,7 +112,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
             }
 
             if (null !== $this->logger) {
-                $this->logger->debug('Remember-me cookie accepted.');
+                $this->logger->info('Remember-me cookie accepted.');
             }
 
             return new RememberMeToken($user, $this->providerKey, $this->key);
@@ -122,11 +122,11 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
             throw $theft;
         } catch (UsernameNotFoundException $notFound) {
             if (null !== $this->logger) {
-                $this->logger->debug('User for remember-me cookie not found.');
+                $this->logger->info('User for remember-me cookie not found.');
             }
         } catch (UnsupportedUserException $unSupported) {
             if (null !== $this->logger) {
-                $this->logger->debug('User class for remember-me cookie not supported.');
+                $this->logger->warn('User class for remember-me cookie not supported.');
             }
         } catch (AuthenticationException $invalid) {
             if (null !== $this->logger) {

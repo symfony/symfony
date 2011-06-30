@@ -46,6 +46,9 @@ $container->loadFromExtension('framework', array(
                 'base_urls' => array('http://bar1.example.com', 'http://bar2.example.com'),
             ),
         ),
+        'form'              => array(
+            'resources'     => array('theme1', 'theme2')
+        ),
     ),
     'translator' => array(
         'enabled'  => true,

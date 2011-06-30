@@ -80,6 +80,11 @@ class NativeSessionStorage implements SessionStorageInterface
 
         session_start();
 
+        // set zero-lifetime (till browser closed) cookie properly
+        if (0 === $this->options['lifetime']) {
+            setcookie(session_name(), session_id(), 0);
+        }
+
         self::$sessionStarted = true;
     }
 

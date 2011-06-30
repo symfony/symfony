@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 /**
  * Constraint for the Unique Entity validator
  *
+ * @Annotation
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
 class UniqueEntity extends Constraint

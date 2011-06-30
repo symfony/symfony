@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
+/** @Annotation */
 class MinLength extends Constraint
 {
     public $message = 'This value is too short. It should have {{ limit }} characters or more';

@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
+/** @Annotation */
 class File extends Constraint
 {
     public $maxSize = null;

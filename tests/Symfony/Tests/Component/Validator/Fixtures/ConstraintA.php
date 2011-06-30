@@ -4,6 +4,7 @@ namespace Symfony\Tests\Component\Validator\Fixtures;
 
 use Symfony\Component\Validator\Constraint;
 
+/** @Annotation */
 class ConstraintA extends Constraint
 {
     public $property1;

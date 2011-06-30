@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
+/** @Annotation */
 class True extends Constraint
 {
     public $message = 'This value should be true';

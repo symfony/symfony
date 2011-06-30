@@ -6,6 +6,11 @@ one. It only discusses changes that need to be done when using the "public"
 API of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.
 
+RC3 to RC4
+----------
+* Annotation classes must be annotated with @Annotation 
+  (see the validator constraints for examples)
+
 beta5 to RC1
 ------------
 

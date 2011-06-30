@@ -1512,6 +1512,37 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testTimeText()
+    {
+        $form = $this->factory->createNamed('time', 'na&me', '04:05:06', array(
+            'property_path' => 'name',
+            'input' => 'string',
+            'widget' => 'text',
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./input
+            [@type="text"]
+            [@id="na&me_hour"]
+            [@name="na&me[hour]"]
+            [@value="04"]
+            [@size="1"]
+            [@required="required"]
+        /following-sibling::input
+            [@type="text"]
+            [@id="na&me_minute"]
+            [@name="na&me[minute]"]
+            [@value="05"]
+            [@size="1"]
+            [@required="required"]
+    ]
+    [count(./input)=2]
+'
+        );
+    }
+
     public function testTimeSingleText()
     {
         $form = $this->factory->createNamed('time', 'na&me', '04:05:06', array(
@@ -1524,7 +1555,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '/input
     [@type="text"]
     [@name="na&me"]
-    [@value="04:05:06"]
+    [@value="04:05:00"]
 '
         );
     }

@@ -136,7 +136,6 @@ class DateTimeTypeTest extends LocalizedTestCase
             'user_timezone' => 'Pacific/Tahiti',
             'date_widget' => 'choice',
             'time_widget' => 'choice',
-            // don't do this test with DateTime, because it leads to wrong results!
             'input' => 'string',
             'with_seconds' => true,
         ));
@@ -159,6 +158,26 @@ class DateTimeTypeTest extends LocalizedTestCase
         $dateTime->setTimezone(new \DateTimeZone('America/New_York'));
 
         $this->assertEquals($dateTime->format('Y-m-d H:i:s'), $form->getData());
+    }
+
+    public function testSubmit_differentTimezonesDateTime()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'data_timezone' => 'America/New_York',
+            'user_timezone' => 'Pacific/Tahiti',
+            'widget' => 'single_text',
+            'input' => 'datetime',
+        ));
+
+        $dateTime = new \DateTime('2010-06-02 03:04:05 America/New_York');
+
+        $form->bind('2010-06-02 03:04:05');
+
+        $outputTime = new \DateTime('2010-06-02 03:04:00 Pacific/Tahiti');
+        $outputTime->setTimezone(new \DateTimeZone('America/New_York'));
+
+        $this->assertDateTimeEquals($outputTime, $form->getData());
+        $this->assertEquals('2010-06-02 03:04:00', $form->getClientData());
     }
 
     public function testSubmit_stringSingleText()

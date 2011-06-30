@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
+/** @Annotation */
 class Max extends Constraint
 {
     public $message = 'This value should be {{ limit }} or less';

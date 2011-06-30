@@ -183,13 +183,29 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'data_timezone' => 'America/New_York',
             'user_timezone' => 'Pacific/Tahiti',
-            // don't do this test with DateTime, because it leads to wrong results!
             'input' => 'string',
             'widget' => 'single_text',
         ));
 
         $form->setData('2010-06-02');
 
+        $this->assertEquals('01.06.2010', $form->getClientData());
+    }
+
+    public function testSetData_differentTimezonesDateTime()
+    {
+        $form = $this->factory->create('date', null, array(
+            'data_timezone' => 'America/New_York',
+            'user_timezone' => 'Pacific/Tahiti',
+            'input' => 'datetime',
+            'widget' => 'single_text',
+        ));
+
+        $dateTime = new \DateTime('2010-06-02 America/New_York');
+
+        $form->setData($dateTime);
+
+        $this->assertDateTimeEquals($dateTime, $form->getData());
         $this->assertEquals('01.06.2010', $form->getClientData());
     }
 

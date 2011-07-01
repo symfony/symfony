@@ -36,11 +36,7 @@ class TimeType extends AbstractType
         }
 
         if ($options['widget'] === 'single_text') {
-            $builder->appendClientTransformer(new DateTimeToStringTransformer(
-                $options['data_timezone'],
-                $options['user_timezone'],
-                $format
-            ));
+            $builder->appendClientTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], $format));
         } else {
             $hourOptions = $minuteOptions = $secondOptions = array();
 
@@ -87,36 +83,20 @@ class TimeType extends AbstractType
                 $builder->add('second', $options['widget'], $secondOptions);
             }
 
-            $builder->appendClientTransformer(new DateTimeToArrayTransformer(
-                $options['data_timezone'],
-                $options['user_timezone'],
-                $parts,
-                $options['widget'] === 'text'
-            ));
+            $builder->appendClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], $parts, $options['widget'] === 'text'));
         }
 
         if ($options['input'] === 'string') {
             $builder->appendNormTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer(
-                    $options['data_timezone'],
-                    $options['data_timezone'],
-                    $format
-                )
+                new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], $format)
             ));
         } else if ($options['input'] === 'timestamp') {
             $builder->appendNormTransformer(new ReversedTransformer(
-                new DateTimeToTimestampTransformer(
-                    $options['data_timezone'],
-                    $options['data_timezone']
-                )
+                new DateTimeToTimestampTransformer($options['data_timezone'], $options['data_timezone'])
             ));
         } else if ($options['input'] === 'array') {
             $builder->appendNormTransformer(new ReversedTransformer(
-                new DateTimeToArrayTransformer(
-                    $options['data_timezone'],
-                    $options['data_timezone'],
-                    $parts
-                )
+                new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], $parts)
             ));
         }
 

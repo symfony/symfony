@@ -49,7 +49,7 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new ProjectLoader1();
         $loader->setResolver($resolver);
         try {
-            $loader->resolve(new \stdClass());
+            $loader->resolve('FOOBAR');
             $this->fail('->resolve() throws a FileLoaderLoadException if the resource cannot be loaded');
         } catch (FileLoaderLoadException $e) {
             $this->assertInstanceOf('Symfony\Component\Config\Exception\FileLoaderLoadException', $e, '->resolve() throws a FileLoaderLoadException if the resource cannot be loaded');

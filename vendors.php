@@ -28,8 +28,8 @@ $deps = array(
     array('doctrine-dbal', 'http://github.com/doctrine/dbal.git', 'origin/HEAD'),
     array('doctrine-common', 'http://github.com/doctrine/common.git', 'origin/HEAD'),
     array('monolog', 'http://github.com/Seldaek/monolog.git', 'origin/HEAD'),
-    array('swiftmailer', 'http://github.com/swiftmailer/swiftmailer.git', 'origin/4.1'),
-    array('twig', 'http://github.com/fabpot/Twig.git', 'origin/HEAD'),
+    array('swiftmailer', 'http://github.com/swiftmailer/swiftmailer.git', 'v4.1.0'),
+    array('twig', 'http://github.com/fabpot/Twig.git', 'v1.1.0'),
 );
 
 foreach ($deps as $dep) {

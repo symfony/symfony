@@ -32,6 +32,13 @@ class FileLoaderLoadException extends \Exception
             $message = sprintf('Cannot import resource "%s" from "%s".', $this->varToString($resource), $this->varToString($sourceResource));
         }
 
+        // Is the resource located inside a bundle?
+        if ('@' === $resource[0]) {
+            $parts = explode(DIRECTORY_SEPARATOR, $resource);
+            $bundle = substr($parts[0], 1);
+            $message .= ' '. sprintf('Make sure the "%s" bundle is correctly registered and loaded in the application kernel class.', $bundle);
+        }
+
         parent::__construct($message, $code, $previous);
     }
 

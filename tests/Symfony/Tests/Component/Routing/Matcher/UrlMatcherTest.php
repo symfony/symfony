@@ -150,6 +150,17 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('_locale' => 'fr', '_route' => 'foo', 'foo' => 'foo'), $matcher->match('/fr/b/foo'));
     }
 
+    public function testMatchNonAlpha()
+    {
+        $collection = new RouteCollection();
+        $chars = '!"$%éà &\'()*+,./:;<=>@ABCDEFGHIJKLMNOPQRSTUVWXYZ\\[]^_`abcdefghijklmnopqrstuvwxyz{|}~-';
+        $collection->add('foo', new Route('/{foo}/bar', array(), array('foo' => '['.preg_quote($chars).']+')));
+
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        $this->assertEquals(array('_route' => 'foo', 'foo' => $chars), $matcher->match('/'.urlencode($chars).'/bar'));
+        $this->assertEquals(array('_route' => 'foo', 'foo' => $chars), $matcher->match('/'.strtr($chars, array('%' => '%25', '+' => '%2B')).'/bar'));
+    }
+
     public function testMatchRegression()
     {
         $coll = new RouteCollection();

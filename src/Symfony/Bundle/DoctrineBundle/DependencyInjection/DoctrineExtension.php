@@ -372,9 +372,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 $memcachePort = !empty($cacheDriver['port']) ? $cacheDriver['port'] : '%doctrine.orm.cache.memcache_port%';
                 $cacheDef = new Definition($memcacheClass);
                 $memcacheInstance = new Definition($memcacheInstanceClass);
-                $memcacheInstance->addMethodCall('connect', array(
-                    $memcacheHost, $memcachePort
-                ));
+                $memcacheInstance->addMethodCall('connect', array($memcacheHost, $memcachePort));
+                $memcacheInstance->setPublic(false);
                 $container->setDefinition(sprintf('doctrine.orm.%s_memcache_instance', $entityManager['name']), $memcacheInstance);
                 $cacheDef->addMethodCall('setMemcache', array(new Reference(sprintf('doctrine.orm.%s_memcache_instance', $entityManager['name']))));
                 break;

@@ -55,6 +55,18 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
 
         $transformer->transform('1234');
     }
+	
+	public function testTransformOtherFormat()
+    {
+        $transformer = new DateTimeToStringTransformer('UTC', 'UTC', 'd/m/Y H:i:s');
+
+        $input = new \DateTime('2010-02-03 04:05:06 UTC');
+        $output = clone $input;
+        $output->setTimezone(new \DateTimeZone('UTC'));
+        $output = $output->format('d/m/Y H:i:s');
+
+        $this->assertEquals($output, $transformer->transform($input));
+    }
 
     public function testReverseTransform()
     {
@@ -100,5 +112,24 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
         $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $reverseTransformer->reverseTransform('2010-2010-2010', null);
+    }
+	
+	public function testReverseTransformOtherFormat()
+    {
+        $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', 'd/m/Y H:i:s');
+
+        $output = new \DateTime('2010-02-03 04:05:06 UTC');
+        $input = '03/02/2010 04:05:06';
+
+        $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
+    }
+	
+	public function testReverseTransformExpectsDateExists()
+    {
+        $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', 'Y-m-d H:i:s');
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
+
+        $reverseTransformer->reverseTransform('2011-02-29 04:05:06', null);
     }
 }

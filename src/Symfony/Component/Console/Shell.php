@@ -26,7 +26,7 @@ class Shell
     private $application;
     private $history;
     private $output;
-    private $hasreadline;
+    private $hasReadline;
     private $prompt;
 
     /**
@@ -41,7 +41,7 @@ class Shell
      */
     public function __construct(Application $application)
     {
-        $this->hasreadline = function_exists('readline') ? true : false;
+        $this->hasReadline = function_exists('readline') ? true : false;
         $this->application = $application;
         $this->history = getenv('HOME').'/.history_'.$application->getName();
         $this->output = new ConsoleOutput();
@@ -56,7 +56,7 @@ class Shell
         $this->application->setAutoExit(false);
         $this->application->setCatchExceptions(true);
 
-        if ($this->hasreadline) {
+        if ($this->hasReadline) {
             readline_read_history($this->history);
             readline_completion_function(array($this, 'autocompleter'));
         }
@@ -71,7 +71,7 @@ class Shell
                 break;
             }
 
-            if ($this->hasreadline) {
+            if ($this->hasReadline) {
                 readline_add_history($command);
                 readline_write_history($this->history);
             }
@@ -143,27 +143,14 @@ EOF;
      */
     private function readline()
     {
-        $completeLine = '';
-        if ($this->hasreadline) {
-            $completeLine = readline($this->prompt);
+        if ($this->hasReadline) {
+            $line = readline($this->prompt);
         } else {
             $this->output->write($this->prompt);
-            while (true) {
-                $line = fgets(STDIN, 1024);
-                if (!$line && strlen($line) == 0) {
-                    return false;
-                }
-
-                $line = rtrim($line);
-                $completeLine .= $line;
-                if (substr($line,-1) != '#') {
-                    break;
-                } else {
-                    $completeLine = substr($completeLine, 0, -1).PHP_EOL;
-                }
-            }
+            $line = fgets(STDIN, 1024);
+            $line = (!$line && strlen($line) == 0) ? false : rtrim($line);
         }
 
-        return $completeLine;
+        return $line;
     }
 }

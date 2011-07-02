@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\Command;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Yaml\Yaml;
 
-class TranslationUpdateCommand extends Command
+class TranslationUpdateCommand extends ContainerAwareCommand
 {
     /**
      * Compiled catalogue of messages
@@ -65,7 +65,7 @@ class TranslationUpdateCommand extends Command
         }
         
         // check format
-        $fileWriter = $this->container->get('translation.writer');
+        $fileWriter = $this->getContainer()->get('translation.writer');
         $supportedFormats = $fileWriter->getFormats();
         if (!in_array($input->getOption('output-format'), $supportedFormats)) {
             $output->writeln('<error>Wrong output format</error>');
@@ -83,13 +83,13 @@ class TranslationUpdateCommand extends Command
         
         // load any messages from templates
         $output->writeln('Parsing templates');
-        $extractor = $this->container->get('translation.extractor');
+        $extractor = $this->getContainer()->get('translation.extractor');
         $extractor->setPrefix($input->getOption('prefix'));
         $extractor->extractMessages($foundBundle->getPath() . '/Resources/views/', $catalogue);
         
         // load any existing messages from the translation files
         $output->writeln('Loading translation files');
-        $loader = $this->container->get('translation.loader');
+        $loader = $this->getContainer()->get('translation.loader');
         $loader->loadMessages($bundleTransPath, $catalogue);
         
         // show compiled list of messages

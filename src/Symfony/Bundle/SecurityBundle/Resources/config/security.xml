@@ -38,6 +38,8 @@
         <parameter key="security.matcher.class">Symfony\Component\HttpFoundation\RequestMatcher</parameter>
 
         <parameter key="security.role_hierarchy.class">Symfony\Component\Security\Core\Role\RoleHierarchy</parameter>
+
+        <parameter key="security.http_utils.class">Symfony\Component\Security\Http\HttpUtils</parameter>
     </parameters>
 
     <services>
@@ -98,7 +100,7 @@
 
         <!-- Firewall related services -->
         <service id="security.firewall" class="%security.firewall.class%">
-            <tag name="kernel.listener" event="core.request" method="onCoreRequest" priority="64" />
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="64" />
             <argument type="service" id="security.firewall.map" />
             <argument type="service" id="event_dispatcher" />
         </service>
@@ -113,7 +115,6 @@
             <argument type="service" id="security.exception_listener" />
         </service>
 
-
         <!-- Provisioning -->
         <service id="security.user.provider.entity" class="%security.user.provider.entity.class%" abstract="true" public="false">
             <argument type="service" id="security.user.entity_manager" />
@@ -124,5 +125,9 @@
         <service id="security.user.provider.in_memory.user" class="%security.user.provider.in_memory.user.class%" abstract="true" public="false" />
 
         <service id="security.user.provider.chain" class="%security.user.provider.chain.class%" abstract="true" public="false" />
+
+        <service id="security.http_utils" class="%security.http_utils.class%" public="false">
+            <argument type="service" id="router" on-invalid="null" />
+        </service>
     </services>
 </container>

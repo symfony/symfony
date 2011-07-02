@@ -166,6 +166,7 @@ class Request
             'SCRIPT_NAME'          => '',
             'SCRIPT_FILENAME'      => '',
             'SERVER_PROTOCOL'      => 'HTTP/1.1',
+            'REQUEST_TIME'         => time(),
         );
 
         $components = parse_url($uri);
@@ -207,7 +208,7 @@ class Request
             $query = array_replace($qs, $query);
         }
 
-        $uri = $components['path'] . ($queryString ? '?'.$queryString : '');
+        $uri = $components['path'].($queryString ? '?'.$queryString : '');
 
         $server = array_replace($defaults, $server, array(
             'REQUEST_METHOD'       => strtoupper($method),
@@ -321,11 +322,22 @@ class Request
         $_REQUEST = array_merge($_GET, $_POST);
     }
 
-    // Order of precedence: GET, PATH, POST, COOKIE
-    // Avoid using this method in controllers:
-    //  * slow
-    //  * prefer to get from a "named" source
-    // This method is mainly useful for libraries that want to provide some flexibility
+    /**
+     * Gets a "parameter" value.
+     *
+     * This method is mainly useful for libraries that want to provide some flexibility.
+     *
+     * Order of precedence: GET, PATH, POST, COOKIE
+     * Avoid using this method in controllers:
+     *  * slow
+     *  * prefer to get from a "named" source
+     *
+     * @param string    $key        the key
+     * @param mixed     $default    the default value
+     * @param type      $deep       is parameter deep in multidimensional array
+     *
+     * @return mixed
+     */
     public function get($key, $default = null, $deep = false)
     {
         return $this->query->get($key, $this->attributes->get($key, $this->request->get($key, $default, $deep), $deep), $deep);
@@ -1018,6 +1030,11 @@ class Request
         return rtrim($baseUrl, '/');
     }
 
+    /**
+     * Prepares base path.
+     *
+     * @return string base path
+     */
     protected function prepareBasePath()
     {
         $filename = basename($this->server->get('SCRIPT_FILENAME'));
@@ -1039,6 +1056,11 @@ class Request
         return rtrim($basePath, '/');
     }
 
+    /**
+     * Prepares path info.
+     *
+     * @return string path info
+     */
     protected function preparePathInfo()
     {
         $baseUrl = $this->getBaseUrl();
@@ -1064,6 +1086,9 @@ class Request
         return (string) $pathInfo;
     }
 
+    /**
+     * Initializes HTTP request formats.
+     */
     static protected function initializeFormats()
     {
         static::$formats = array(

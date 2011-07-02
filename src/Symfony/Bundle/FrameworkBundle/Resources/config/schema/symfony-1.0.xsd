@@ -90,11 +90,18 @@
             <xsd:element name="engine" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
             <xsd:element name="assets-base-url" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="package" type="package" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="form" type="form-resources" minOccurs="0" maxOccurs="1" />
         </xsd:sequence>
 
         <xsd:attribute name="assets-version" type="xsd:string" />
         <xsd:attribute name="assets-version-format" type="xsd:string" />
         <xsd:attribute name="cache" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="form-resources">
+        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+            <xsd:element name="resource" type="xsd:string" />
+        </xsd:choice>
     </xsd:complexType>
 
     <xsd:complexType name="package">
@@ -117,7 +124,7 @@
         <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="enable-annotations" type="xsd:boolean" />
     </xsd:complexType>
-    
+
     <xsd:complexType name="annotations">
         <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="debug" type="xsd:string" />

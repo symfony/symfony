@@ -23,6 +23,11 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator = new RegexValidator();
     }
 
+    protected function tearDown()
+    {
+        $this->validator = null;
+    }
+
     public function testNullIsValid()
     {
         $this->assertTrue($this->validator->isValid(null, new Regex(array('pattern' => '/^[0-9]+$/'))));
@@ -88,5 +93,14 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->validator->getMessageParameters(), array(
             '{{ value }}' => 'foobar',
         ));
+    }
+
+    public function testConstraintGetDefaultOption()
+    {
+        $constraint = new Regex(array(
+            'pattern' => '/^[0-9]+$/',
+        ));
+
+        $this->assertEquals('pattern', $constraint->getDefaultOption());
     }
 }

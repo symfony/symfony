@@ -2,9 +2,6 @@ twig:
     form:
         resources:
             - MyBundle::form.html.twig
-    extensions:
-        - twig.extension.debug
-        - twig.extension.text
     globals:
         foo: @bar
         pi:  3.14

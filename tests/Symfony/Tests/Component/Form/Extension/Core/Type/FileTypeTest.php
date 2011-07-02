@@ -25,23 +25,31 @@ class FileTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertEquals('', $view['file']->get('value'));
+        $this->assertEquals('', $view->get('value'));
     }
 
     private function createUploadedFileMock($name, $originalName, $valid)
     {
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
+        $file = $this
+            ->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
             ->disableOriginalConstructor()
-            ->getMock();
-        $file->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue($name));
-        $file->expects($this->any())
-            ->method('getOriginalName')
-            ->will($this->returnValue($originalName));
-        $file->expects($this->any())
+            ->getMock()
+        ;
+        $file
+            ->expects($this->any())
+            ->method('getBasename')
+            ->will($this->returnValue($name))
+        ;
+        $file
+            ->expects($this->any())
+            ->method('getClientOriginalName')
+            ->will($this->returnValue($originalName))
+        ;
+        $file
+            ->expects($this->any())
             ->method('isValid')
-            ->will($this->returnValue($valid));
+            ->will($this->returnValue($valid))
+        ;
 
         return $file;
     }

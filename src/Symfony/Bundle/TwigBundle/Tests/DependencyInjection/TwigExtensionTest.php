@@ -31,7 +31,7 @@ class TwigExtensionTest extends TestCase
         $this->compileContainer($container);
 
         $this->assertEquals('Twig_Environment', $container->getParameter('twig.class'), '->load() loads the twig.xml file');
-        $this->assertContains('div_layout.html.twig', $container->getParameter('twig.form.resources'), '->load() includes default template for form resources');
+        $this->assertContains('form_div_layout.html.twig', $container->getParameter('twig.form.resources'), '->load() includes default template for form resources');
 
         // Twig options
         $options = $container->getParameter('twig.options');
@@ -52,15 +52,9 @@ class TwigExtensionTest extends TestCase
 
         $this->assertEquals('Twig_Environment', $container->getParameter('twig.class'), '->load() loads the twig.xml file');
 
-        // Extensions
-        foreach (array('twig.extension.debug', 'twig.extension.text') as $id) {
-            $config = $container->getDefinition($id);
-            $this->assertEquals(array('twig.extension'), array_keys($config->getTags()), '->load() adds tags to extension definitions');
-        }
-
         // Form resources
         $resources = $container->getParameter('twig.form.resources');
-        $this->assertContains('div_layout.html.twig', $resources, '->load() includes default template for form resources');
+        $this->assertContains('form_div_layout.html.twig', $resources, '->load() includes default template for form resources');
         $this->assertContains('MyBundle::form.html.twig', $resources, '->load() merges new templates into form resources');
 
         // Globals

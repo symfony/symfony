@@ -35,6 +35,11 @@ class MonthChoiceListTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    protected function tearDown()
+    {
+        $this->formatter = null;
+    }
+
     public function testNumericMonthsIfPatternContainsNoMonth()
     {
         $this->formatter->setPattern('yy');

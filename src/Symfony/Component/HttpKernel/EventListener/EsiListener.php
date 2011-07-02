@@ -41,7 +41,7 @@ class EsiListener
      *
      * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
-    public function onCoreResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType() || null === $this->esi) {
             return;

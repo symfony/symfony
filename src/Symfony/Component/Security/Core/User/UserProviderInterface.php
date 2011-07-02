@@ -33,7 +33,7 @@ interface UserProviderInterface
     function loadUserByUsername($username);
 
     /**
-     * Loads the user for the account interface.
+     * Refreshes the user for the account interface.
      *
      * It is up to the implementation if it decides to reload the user data
      * from the database, or if it simply merges the passed User into the
@@ -44,7 +44,7 @@ interface UserProviderInterface
      *
      * @return UserInterface
      */
-    function loadUser(UserInterface $user);
+    function refreshUser(UserInterface $user);
 
     /**
      * Whether this provider supports the given user class

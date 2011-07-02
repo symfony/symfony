@@ -23,6 +23,11 @@ class CountryValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator = new CountryValidator();
     }
 
+    protected function tearDown()
+    {
+        $this->validator = null;
+    }
+
     public function testNullIsValid()
     {
         $this->assertTrue($this->validator->isValid(null, new Country()));

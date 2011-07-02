@@ -61,7 +61,7 @@ class ResizeFormListener implements EventSubscriberInterface
         $this->options = $options;
     }
 
-    public static function getSubscribedEvents()
+    static public function getSubscribedEvents()
     {
         return array(
             FormEvents::PRE_SET_DATA => 'preSetData',
@@ -83,11 +83,9 @@ class ResizeFormListener implements EventSubscriberInterface
             throw new UnexpectedTypeException($data, 'array or \Traversable');
         }
 
-        // First remove all rows except for the prototype row
+        // First remove all rows
         foreach ($form as $name => $child) {
-            if (!($this->allowAdd && '$$name$$' === $name)) {
-                $form->remove($name);
-            }
+            $form->remove($name);
         }
 
         // Then add all rows again in the correct order
@@ -111,10 +109,10 @@ class ResizeFormListener implements EventSubscriberInterface
             throw new UnexpectedTypeException($data, 'array or \Traversable');
         }
 
-        // Remove all empty rows except for the prototype row
+        // Remove all empty rows
         if ($this->allowDelete) {
             foreach ($form as $name => $child) {
-                if (!isset($data[$name]) && '$$name$$' !== $name) {
+                if (!isset($data[$name])) {
                     $form->remove($name);
                 }
             }

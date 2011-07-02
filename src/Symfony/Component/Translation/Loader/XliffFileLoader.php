@@ -56,7 +56,16 @@ class XliffFileLoader implements LoaderInterface
             throw new \Exception(implode("\n", $this->getXmlErrors()));
         }
 
-        $parts = explode('/', str_replace('\\', '/', __DIR__).'/schema/dic/xliff-core/xml.xsd');
+        $location = str_replace('\\', '/', __DIR__).'/schema/dic/xliff-core/xml.xsd';
+        $parts = explode('/', $location);
+        if (preg_match('#^phar://#i', $location)) {
+            $tmpfile = tempnam(sys_get_temp_dir(), 'sf2');
+            if ($tmpfile) {
+                file_put_contents($tmpfile, file_get_contents($location));
+                $tmpfiles[] = $tmpfile;
+                $parts = explode('/', str_replace('\\', '/', $tmpfile));
+            }
+        }
         $drive = '\\' === DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
         $location = 'file:///'.$drive.implode('/', array_map('rawurlencode', $parts));
 

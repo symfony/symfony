@@ -23,6 +23,11 @@ class NotNullValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator = new NotNullValidator();
     }
 
+    protected function tearDown()
+    {
+        $this->validator = null;
+    }
+
     /**
      * @dataProvider getValidValues
      */

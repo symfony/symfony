@@ -16,7 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 
 class WebTestCase extends BaseWebTestCase
 {
-    public static function assertRedirect($response, $location)
+    static public function assertRedirect($response, $location)
     {
         self::assertTrue($response->isRedirect());
         self::assertEquals('http://localhost'.$location, $response->headers->get('Location'));
@@ -41,16 +41,16 @@ class WebTestCase extends BaseWebTestCase
         $fs->remove($dir);
     }
 
-    protected function getKernelClass()
+    static protected function getKernelClass()
     {
         require_once __DIR__.'/app/AppKernel.php';
 
         return 'Symfony\Bundle\SecurityBundle\Tests\Functional\AppKernel';
     }
 
-    protected function createKernel(array $options = array())
+    static protected function createKernel(array $options = array())
     {
-        $class = $this->getKernelClass();
+        $class = self::getKernelClass();
 
         if (!isset($options['test_case'])) {
             throw new \InvalidArgumentException('The option "test_case" must be set.');

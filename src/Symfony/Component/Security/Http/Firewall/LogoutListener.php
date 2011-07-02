@@ -15,6 +15,7 @@ use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
 
 use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -31,18 +32,21 @@ class LogoutListener implements ListenerInterface
     private $targetUrl;
     private $handlers;
     private $successHandler;
+    private $httpUtils;
 
     /**
      * Constructor
      *
      * @param SecurityContextInterface      $securityContext
-     * @param string                        $logoutPath      The path that starts the logout process
-     * @param string                        $targetUrl       The URL to redirect to after logout
+     * @param HttpUtils                     $httpUtils        An HttpUtilsInterface instance
+     * @param string                        $logoutPath       The path that starts the logout process
+     * @param string                        $targetUrl        The URL to redirect to after logout
      * @param LogoutSuccessHandlerInterface $successHandler
      */
-    public function __construct(SecurityContextInterface $securityContext, $logoutPath, $targetUrl = '/', LogoutSuccessHandlerInterface $successHandler = null)
+    public function __construct(SecurityContextInterface $securityContext, HttpUtils $httpUtils, $logoutPath, $targetUrl = '/', LogoutSuccessHandlerInterface $successHandler = null)
     {
         $this->securityContext = $securityContext;
+        $this->httpUtils = $httpUtils;
         $this->logoutPath = $logoutPath;
         $this->targetUrl = $targetUrl;
         $this->successHandler = $successHandler;
@@ -69,7 +73,7 @@ class LogoutListener implements ListenerInterface
     {
         $request = $event->getRequest();
 
-        if ($this->logoutPath !== $request->getPathInfo()) {
+        if (!$this->httpUtils->checkRequestPath($request, $this->logoutPath)) {
             return;
         }
 
@@ -80,7 +84,7 @@ class LogoutListener implements ListenerInterface
                 throw new \RuntimeException('Logout Success Handler did not return a Response.');
             }
         } else {
-            $response = new RedirectResponse(0 !== strpos($this->targetUrl, 'http') ? $request->getUriForPath($this->targetUrl) : $this->targetUrl, 302);
+            $response = $this->httpUtils->createRedirectResponse($request, $this->targetUrl);
         }
 
         // handle multiple logout attempts gracefully

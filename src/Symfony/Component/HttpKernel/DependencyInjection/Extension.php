@@ -69,6 +69,17 @@ abstract class Extension implements ExtensionInterface
      *
      * This alias is also the mandatory prefix to use when using YAML.
      *
+     * This convention is to remove the "Extension" postfix from the class
+     * name and then lowercase and underscore the result. So:
+     *
+     *     AcmeHelloExtension
+     *
+     * becomes
+     *
+     *     acme_hello
+     *
+     * This can be overridden in a sub-class to specify the alias manually.
+     *
      * @return string The alias
      */
     public function getAlias()

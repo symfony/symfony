@@ -1,25 +1,119 @@
 How to update your project?
 ===========================
 
-This document explains how to upgrade from one Symfony2 PR version to the next
+This document explains how to upgrade from one Symfony2 version to the next
 one. It only discusses changes that need to be done when using the "public"
 API of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.
 
+RC3 to RC4
+----------
+* Annotation classes must be annotated with @Annotation 
+  (see the validator constraints for examples)
+
+beta5 to RC1
+------------
+
+* Renamed `Symfony\Bundle\FrameworkBundle\Command\Command` to
+  `Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand`
+
+* Removed the routing `AnnotGlobLoader` class
+
+* Some blocks in the Twig Form templates have been renamed to avoid
+  collisions:
+
+    * `container_attributes` to `widget_container_attributes`
+    * `attributes` to `widget_attributes`
+    * `options` to `widget_choice_options`
+
+* Event changes:
+
+    * All listeners must now be tagged with `kernel.event_listener` instead of
+      `kernel.listener`.
+    * Kernel events are now properly prefixed with `kernel` instead of `core`:
+
+        * Before:
+
+                <tag name="kernel.listener" event="core.request" method="onCoreRequest" />
+
+        * After:
+
+                <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
+
+        Note: the method can of course remain as `onCoreRequest`, but renaming it
+        as well for consistency with future projects makes sense.
+
+    * The `Symfony\Component\HttpKernel\CoreEvents` class has been renamed to
+      `Symfony\Component\HttpKernel\KernelEvents`
+
+* `TrueValidator` and `FalseValidator` constraints validators no longer accepts any value as valid data.
+
 beta4 to beta5
 --------------
+
+* `UserProviderInterface::loadUser()` has been renamed to
+  `UserProviderInterface::refreshUser()` to make the goal of the method
+  clearer.
+
+* The `$kernel` property on `WebTestCase` is now static. Change any instances
+  of `$this->kernel` in your functional tests to `self::$kernel`.
+
+* The AsseticBundle has been moved to its own repository (it still bundled
+  with Symfony SE).
+
+* Yaml Component:
+
+    * Exception classes have been moved to their own namespace
+    * `Yaml::load()` has been renamed to `Yaml::parse()`
+
+* The File classes from `HttpFoundation` have been refactored:
+
+    * `Symfony\Component\HttpFoundation\File\File` has a new API:
+
+       * It now extends `\SplFileInfo`:
+
+           * former `getName()` equivalent is `getBasename()`,
+           * former `getDirectory()` equivalent is `getPath()`,
+           * former `getPath()` equivalent is `getRealPath()`.
+
+       * the `move()` method now creates the target directory when it does not exist,
+
+       * `getExtension()` and `guessExtension()` do not return the extension
+          with a leading `.` anymore
+
+    * `Symfony\Component\HttpFoundation\File\UploadedFile` has a new API:
+
+        * The constructor has a new Boolean parameter that must be set to true
+          in test mode only in order to be able to move the file. This parameter
+          is not intended to be set to true from outside of the core files.
+
+        * `getMimeType()` now always returns the mime type of the underlying file.
+           Use `getClientMimeType()` to get the mime type from the request.
+
+        * `getSize()` now always returns the size of the underlying file.
+           Use `getClientSize()` to get the file size from the request.
+
+        * Use `getClientOriginalName()` to retrieve the original name from the
+          request.
+
+* The `extensions` setting for Twig has been removed. There is now only one
+  way to register Twig extensions, via the `twig.extension` tag.
 
 * The stack of Monolog handlers now bubbles the records by default. To stop
   the propagation you need to configure the bubbling explicitly.
 
-* Expanded the SerializerInterface, while reducing the number of public
+* Expanded the `SerializerInterface`, while reducing the number of public
   methods in the Serializer class itself breaking BC and adding component
   specific Exception classes.
 
-* The temporary storage for file uploads has been removed
+* The `FileType` Form class has been heavily changed:
 
-* The `Symfony\Component\HttpFoundation\File\File::getExtension()` and
-  `guessExtension()` methods do not return the extension with a `.` anymore.
+    * The temporary storage has been removed.
+
+    * The file type `type` option has also been removed (the new behavior is
+      the same as when the `type` was set to `file` before).
+
+    * The file input is now rendered as any other input field.
 
 * The `em` option of the Doctrine `EntityType` class now takes the entity
   manager name instead of the EntityManager instance. If you don't pass this
@@ -34,11 +128,11 @@ beta4 to beta5
 
     Before:
 
-        `TwigBundle:Form:div_layout.html.twig`
+        TwigBundle:Form:div_layout.html.twig
 
     After:
 
-        `div_layout.html.twig`
+        form_div_layout.html.twig
 
 * All settings regarding the cache warmers have been removed.
 

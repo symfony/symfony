@@ -24,32 +24,41 @@ use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 class UploadedFile extends File
 {
     /**
+     * Whether the test mode is activated.
+     *
+     * Local files are used in test mode hence the code should not enforce HTTP uploads.
+     *
+     * @var Boolean
+     */
+    private $test = false;
+
+    /**
      * The original name of the uploaded file.
      *
      * @var string
      */
-    protected $originalName;
+    private $originalName;
 
     /**
      * The mime type provided by the uploader.
      *
      * @var string
      */
-    protected $mimeType;
+    private $mimeType;
 
     /**
      * The file size provided by the uploader.
      *
-     * @var integer
+     * @var string
      */
-    protected $size;
+    private $size;
 
     /**
      * The UPLOAD_ERR_XXX constant provided by the uploader.
      *
      * @var integer
      */
-    protected $error;
+    private $error;
 
     /**
      * Accepts the information of the uploaded file as provided by the PHP global $_FILES.
@@ -59,67 +68,63 @@ class UploadedFile extends File
      * @param string  $mimeType     The type of the file as provided by PHP
      * @param integer $size         The file size
      * @param integer $error        The error constant of the upload (one of PHP's UPLOAD_ERR_XXX constants)
+     * @param Boolean $test         Whether the test mode is active
      *
      * @throws FileException         If file_uploads is disabled
      * @throws FileNotFoundException If the file does not exist
      */
-    public function __construct($path, $originalName, $mimeType = null, $size = null, $error = null)
+    public function __construct($path, $originalName, $mimeType = null, $size = null, $error = null, $test = false)
     {
         if (!ini_get('file_uploads')) {
             throw new FileException(sprintf('Unable to create UploadedFile because "file_uploads" is disabled in your php.ini file (%s)', get_cfg_var('cfg_file_path')));
         }
 
-        if (!is_file($path)) {
-            throw new FileNotFoundException($path);
-        }
-
-        $this->path = realpath($path);
         $this->originalName = basename($originalName);
         $this->mimeType = $mimeType ?: 'application/octet-stream';
         $this->size = $size;
         $this->error = $error ?: UPLOAD_ERR_OK;
+        $this->test = (Boolean) $test;
+
+        parent::__construct($path);
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function getMimeType()
-    {
-        return parent::getMimeType() ?: $this->mimeType;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getSize()
-    {
-        return null === $this->size ? parent::getSize() : $this->size;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getExtension()
-    {
-        if ($ext = pathinfo($this->getOriginalName(), PATHINFO_EXTENSION)) {
-            return $ext;
-        }
-
-        return '';
-    }
-
-    /**
-     * Gets the original uploaded name.
+     * Returns the original file name.
      *
-     * Warning: This name is not safe as it can have been manipulated by the end-user.
-     * Moreover, it can contain characters that are not allowed in file names.
-     * Never use it in a path.
+     * It is extracted from the request from which the file has been uploaded.
+     * Then is should not be considered as a safe value.
      *
-     * @return string
+     * @return string|null The original name
      */
-    public function getOriginalName()
+    public function getClientOriginalName()
     {
         return $this->originalName;
+    }
+
+    /**
+     * Returns the file mime type.
+     *
+     * It is extracted from the request from which the file has been uploaded.
+     * Then is should not be considered as a safe value.
+     *
+     * @return string|null The mime type
+     */
+    public function getClientMimeType()
+    {
+        return $this->mimeType;
+    }
+
+    /**
+     * Returns the file size.
+     *
+     * It is extracted from the request from which the file has been uploaded.
+     * Then is should not be considered as a safe value.
+     *
+     * @return integer|null The file size
+     */
+    public function getClientSize()
+    {
+        return $this->size;
     }
 
     /**
@@ -146,17 +151,21 @@ class UploadedFile extends File
     }
 
     /**
-     * {@inheritDoc}
+     * Moves the file to a new location.
+     *
+     * @param string $directory The destination folder
+     * @param string $name      The new file name
+     *
+     * @return File A File object representing the new file
+     *
+     * @throws FileException if the file has not been uploaded via Http
      */
     public function move($directory, $name = null)
     {
-        $newPath = $directory.DIRECTORY_SEPARATOR.(null === $name ? $this->getName() : $name);
-
-        if (!@move_uploaded_file($this->getPath(), $newPath)) {
-            $error = error_get_last();
-            throw new FileException(sprintf('Could not move file %s to %s (%s)', $this->getPath(), $newPath, strip_tags($error['message'])));
+        if (!$this->test && !is_uploaded_file($this->getPathname())) {
+            throw new FileException(sprintf('The file "%s" has not been uploaded via Http', $this->getPathname()));
         }
 
-        $this->path = realpath($newPath);
+        return parent::move($directory, $name);
     }
 }

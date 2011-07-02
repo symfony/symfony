@@ -102,6 +102,80 @@ class TimeTypeTest extends LocalizedTestCase
         $this->assertEquals($input, $form->getClientData());
     }
 
+    public function testSubmit_arraySingleText()
+    {
+        $form = $this->factory->create('time', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'input' => 'array',
+            'widget' => 'single_text',
+        ));
+
+        $data = array(
+            'hour' => '3',
+            'minute' => '4',
+        );
+
+        $form->bind('03:04');
+
+        $this->assertEquals($data, $form->getData());
+        $this->assertEquals('03:04:00', $form->getClientData());
+    }
+
+    public function testSubmit_arraySingleTextWithSeconds()
+    {
+        $form = $this->factory->create('time', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'input' => 'array',
+            'widget' => 'single_text',
+            'with_seconds' => true,
+        ));
+
+        $data = array(
+            'hour' => '3',
+            'minute' => '4',
+            'second' => '5',
+        );
+
+        $form->bind('03:04:05');
+
+        $this->assertEquals($data, $form->getData());
+        $this->assertEquals('03:04:05', $form->getClientData());
+    }
+
+    public function testSubmit_datetimeSingleText()
+    {
+        $form = $this->factory->create('time', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'input' => 'datetime',
+            'widget' => 'single_text',
+        ));
+
+        $form->bind('03:04:05');
+
+        $this->assertEquals(new \DateTime('03:04:05 UTC'), $form->getData());
+        $this->assertEquals('03:04:05', $form->getClientData());
+    }
+
+    public function testSubmit_stringSingleText()
+    {
+        $form = $this->factory->create('time', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'input' => 'string',
+            'widget' => 'single_text',
+        ));
+
+        $time = '03:04:05';
+
+        $form->bind($time);
+
+        $this->assertEquals($time, $form->getData());
+        $this->assertEquals($time, $form->getClientData());
+    }
+
     public function testSetData_withSeconds()
     {
         $form = $this->factory->create('time', null, array(

@@ -195,4 +195,20 @@ class FieldTypeTest extends TypeTestCase
         $this->assertSame($author, $form->getData());
         $this->assertEquals('Bernhard', $author->firstName);
     }
+
+    public function testGetAttributesIsEmpty()
+    {
+        $form = $this->factory->create('field', null, array('attr' => array()));
+
+        $this->assertEquals(0, count($form->getAttribute('attr')));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testAttributesException()
+    {
+        $form = $this->factory->create('field', null, array('attr' => ''));
+    }
+
 }

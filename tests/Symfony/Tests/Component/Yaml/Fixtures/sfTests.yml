@@ -32,45 +32,21 @@ brief: >
     Boolean
 yaml: |
     - false
-    - -
-    - off
-    - no
     - true
-    - +
-    - on
-    - yes
     - null
     - ~
     - 'false'
-    - '-'
-    - 'off'
-    - 'no'
     - 'true'
-    - '+'
-    - 'on'
-    - 'yes'
     - 'null'
     - '~'
 php: |
     array(
       false,
-      false,
-      false,
-      false,
-      true,
-      true,
-      true,
       true,
       null,
       null,
       'false',
-      '-',
-      'off',
-      'no',
       'true',
-      '+',
-      'on',
-      'yes',
       'null',
       '~',
     )

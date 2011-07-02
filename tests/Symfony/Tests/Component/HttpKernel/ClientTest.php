@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 require_once __DIR__.'/TestHttpKernel.php';
 
@@ -75,5 +76,33 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $response->headers->setCookie(new Cookie('foo1', 'bar1', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
         $domResponse = $m->invoke($client, $response);
         $this->assertEquals('foo=bar; expires=Sun, 15-Feb-2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly, foo1=bar1; expires=Sun, 15-Feb-2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly', $domResponse->getHeader('Set-Cookie'));
+    }
+
+    public function testUploadedFile()
+    {
+        $source = tempnam(sys_get_temp_dir(), 'source');
+        $target = sys_get_temp_dir().'/sf.moved.file';
+        @unlink($target);
+
+        $kernel = new TestHttpKernel();
+        $client = new Client($kernel);
+
+        $client->request('POST', '/', array(), array(new UploadedFile($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK)));
+
+        $files = $kernel->request->files->all();
+
+        $this->assertEquals(1, count($files));
+
+        $file = $files[0];
+
+        $this->assertEquals('original', $file->getClientOriginalName());
+        $this->assertEquals('mime/original', $file->getClientMimeType());
+        $this->assertEquals('123', $file->getClientSize());
+        $this->assertTrue($file->isValid());
+
+        $file->move(dirname($target), basename($target));
+
+        $this->assertFileExists($target);
+        unlink($target);
     }
 }

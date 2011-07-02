@@ -36,7 +36,7 @@ class TestSessionListener
         $this->container = $container;
     }
 
-    public function onCoreRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;
@@ -55,11 +55,11 @@ class TestSessionListener
 
     /**
      * Checks if session was initialized and saves if current request is master
-     * Runs on 'core.response' in test environment
+     * Runs on 'kernel.response' in test environment
      *
      * @param FilterResponseEvent $event
      */
-    public function onCoreResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;

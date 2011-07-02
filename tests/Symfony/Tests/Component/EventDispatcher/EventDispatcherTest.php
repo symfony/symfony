@@ -33,6 +33,12 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->listener = new TestEventListener();
     }
 
+    protected function tearDown()
+    {
+        $this->dispatcher = null;
+        $this->listener = null;
+    }
+
     public function testInitialState()
     {
         $this->assertEquals(array(), $this->dispatcher->getListeners());
@@ -168,6 +174,20 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->dispatcher->hasListeners(self::postFoo));
     }
 
+    public function testAddSubscriberWithPriorities()
+    {
+        $eventSubscriber = new TestEventSubscriber();
+        $this->dispatcher->addSubscriber($eventSubscriber);
+
+        $eventSubscriber = new TestEventSubscriberWithPriorities();
+        $this->dispatcher->addSubscriber($eventSubscriber);
+
+        $listeners = $this->dispatcher->getListeners('pre.foo');
+        $this->assertTrue($this->dispatcher->hasListeners(self::preFoo));
+        $this->assertEquals(2, count($listeners));
+        $this->assertInstanceOf('Symfony\Tests\Component\EventDispatcher\TestEventSubscriberWithPriorities', $listeners[0][0]);
+    }
+
     public function testRemoveSubscriber()
     {
         $eventSubscriber = new TestEventSubscriber();
@@ -205,5 +225,13 @@ class TestEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array('pre.foo' => 'preFoo', 'post.foo' => 'postFoo');
+    }
+}
+
+class TestEventSubscriberWithPriorities implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents()
+    {
+        return array('pre.foo' => array('preFoo', 10));
     }
 }

@@ -59,7 +59,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
     }
 
     /**
-     * This is a functinoal test as there is a large integration necessary to get the validator working.
+     * This is a functional test as there is a large integration necessary to get the validator working.
      */
     public function testValidateUniqueness()
     {

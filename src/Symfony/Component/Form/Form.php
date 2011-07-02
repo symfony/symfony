@@ -907,7 +907,6 @@ class Form implements \IteratorAggregate, FormInterface
         $view->setParent($parent);
 
         $types = (array) $this->types;
-        $childViews = array();
 
         foreach ($types as $type) {
             $type->buildView($view, $this);
@@ -917,8 +916,20 @@ class Form implements \IteratorAggregate, FormInterface
             }
         }
 
+        $childViews = array();
+
         foreach ($this->children as $key => $child) {
             $childViews[$key] = $child->createView($view);
+        }
+
+        if (null !== $prototype = $view->get('prototype')) {
+            $protoView = $prototype->getForm()->createView($view);
+            $protoTypes = $protoView->get('types');
+            $protoTypes[] = 'prototype';
+            $childViews[$prototype->getName()] = $protoView
+                ->set('types', $protoTypes)
+                ->set('proto_id', $view->get('id').'_prototype');
+            ;
         }
 
         $view->setChildren($childViews);

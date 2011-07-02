@@ -97,7 +97,7 @@ class ClassCollectionLoader
 
             // add namespace declaration for global code
             if (!$r->inNamespace()) {
-                $c = "\nnamespace\n{\n$c\n}\n";
+                $c = "\nnamespace\n{\n".self::stripComments($c)."\n}\n";
             } else {
                 $c = self::fixNamespaceDeclarations('<?php '.$c);
                 $c = preg_replace('/^\s*<\?php/', '', $c);
@@ -110,7 +110,7 @@ class ClassCollectionLoader
         if (!is_dir(dirname($cache))) {
             mkdir(dirname($cache), 0777, true);
         }
-        self::writeCacheFile($cache, self::stripComments('<?php '.$content));
+        self::writeCacheFile($cache, '<?php '.$content);
 
         if ($autoReload) {
             // save the resources
@@ -135,9 +135,13 @@ class ClassCollectionLoader
         $inNamespace = false;
         $tokens = token_get_all($source);
 
-        while ($token = array_shift($tokens)) {
+        for ($i = 0, $max = count($tokens); $i < $max; $i++) {
+            $token = $tokens[$i];
             if (is_string($token)) {
                 $output .= $token;
+            } elseif (in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
+                // strip comments
+                continue;
             } elseif (T_NAMESPACE === $token[0]) {
                 if ($inNamespace) {
                     $output .= "}\n";
@@ -145,12 +149,12 @@ class ClassCollectionLoader
                 $output .= $token[1];
 
                 // namespace name and whitespaces
-                while (($t = array_shift($tokens)) && is_array($t) && in_array($t[0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
+                while (($t = $tokens[++$i]) && is_array($t) && in_array($t[0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
                     $output .= $t[1];
                 }
                 if (is_string($t) && '{' === $t) {
                     $inNamespace = false;
-                    array_unshift($tokens, $t);
+                    --$i;
                 } else {
                     $output .= "\n{";
                     $inNamespace = true;

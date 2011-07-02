@@ -77,7 +77,8 @@ class Configuration implements ConfigurationInterface
                             'wrapper_class',
                             'platform_service',
                             'charset',
-                            'logging'
+                            'logging',
+                            'mapping_types',
                         ) as $key) {
                             if (array_key_exists($key, $v)) {
                                 $connection[$key] = $v[$key];
@@ -115,6 +116,7 @@ class Configuration implements ConfigurationInterface
             ->requiresAtLeastOneElement()
             ->useAttributeAsKey('name')
             ->prototype('array')
+                ->fixXmlConfig('mapping_type')
                 ->children()
                     ->scalarNode('dbname')->end()
                     ->scalarNode('host')->defaultValue('localhost')->end()
@@ -132,6 +134,10 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('wrapper_class')->end()
                     ->arrayNode('options')
                         ->useAttributeAsKey('key')
+                        ->prototype('scalar')->end()
+                    ->end()
+                    ->arrayNode('mapping_types')
+                        ->useAttributeAsKey('name')
                         ->prototype('scalar')->end()
                     ->end()
                 ->end()

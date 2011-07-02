@@ -11,14 +11,17 @@ $loader->registerNamespaces(array(
     'Doctrine\\Common' => __DIR__.'/vendor/doctrine-common/lib',
     'Doctrine\\DBAL'   => __DIR__.'/vendor/doctrine-dbal/lib',
     'Doctrine'         => __DIR__.'/vendor/doctrine/lib',
-    'Assetic'          => __DIR__.'/vendor/assetic/src',
     'Monolog'          => __DIR__.'/vendor/monolog/src',
 ));
 $loader->registerPrefixes(array(
-    'Swift_' => __DIR__.'/vendor/swiftmailer/lib/classes',
-    'Twig_'  => __DIR__.'/vendor/twig/lib',
+    'Twig_' => __DIR__.'/vendor/twig/lib',
 ));
 $loader->registerPrefixFallbacks(array(
-    __DIR__.'/../vendor/symfony/src/Symfony/Component/Locale/Resources/stubs',
+    __DIR__.'/src/Symfony/Component/Locale/Resources/stubs',
 ));
 $loader->register();
+
+if (is_file(__DIR__.'/vendor/swiftmailer/lib/classes/Swift.php')) {
+    require_once __DIR__.'/vendor/swiftmailer/lib/classes/Swift.php';
+    Swift::registerAutoload(__DIR__.'/vendor/swiftmailer/lib/swift_init.php');
+}

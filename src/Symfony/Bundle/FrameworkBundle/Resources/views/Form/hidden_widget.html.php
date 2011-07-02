@@ -1,6 +1,1 @@
-<input type="hidden"
-    <?php echo $view['form']->attributes() ?>
-    name="<?php echo $view->escape($full_name) ?>"
-    value="<?php echo $view->escape($value) ?>"
-    <?php if ($read_only): ?>disabled="disabled"<?php endif ?>
-/>
+<?php echo $view['form']->renderBlock('field_widget', array('type' => isset($type) ? $type : "hidden")) ?>

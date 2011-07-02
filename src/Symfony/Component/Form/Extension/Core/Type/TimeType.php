@@ -23,32 +23,51 @@ use Symfony\Component\Form\FormView;
 
 class TimeType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilder $builder, array $options)
     {
-        $hourOptions = $minuteOptions = $secondOptions = array();
-        $parts = array('hour', 'minute');
+        if ($options['widget'] === 'single_text') {
+            $builder->appendClientTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], 'H:i:s'));
+        } else if ($options['widget'] === 'choice') {
+            if (is_array($options['empty_value'])) {
+                $options['empty_value'] = array_merge(array('hour' => null, 'minute' => null, 'second' => null), $options['empty_value']);
+            } else {
+                $options['empty_value'] = array('hour' => $options['empty_value'], 'minute' => $options['empty_value'], 'second' => $options['empty_value']);
+            }
 
-        if ($options['widget'] === 'choice') {
-            $hourOptions['choice_list'] =  new PaddedChoiceList(
-                array_combine($options['hours'], $options['hours']), 2, '0', STR_PAD_LEFT
-            );
-            $minuteOptions['choice_list'] = new PaddedChoiceList(
-                array_combine($options['minutes'], $options['minutes']), 2, '0', STR_PAD_LEFT
-            );
+            $builder
+                ->add('hour', $options['widget'], array(
+                    'choice_list' => new PaddedChoiceList(
+                        array_combine($options['hours'], $options['hours']), 2, '0', STR_PAD_LEFT
+                    ),
+                    'empty_value' => $options['empty_value']['hour'],
+                    'required' => $options['required'],
+                ))
+                ->add('minute', $options['widget'], array(
+                    'choice_list' => new PaddedChoiceList(
+                        array_combine($options['minutes'], $options['minutes']), 2, '0', STR_PAD_LEFT
+                    ),
+                    'empty_value' => $options['empty_value']['minute'],
+                    'required' => $options['required'],
+                ))
+            ;
 
             if ($options['with_seconds']) {
-                $secondOptions['choice_list'] = new PaddedChoiceList(
-                    array_combine($options['seconds'], $options['seconds']), 2, '0', STR_PAD_LEFT
-                );
+                $builder->add('second', $options['widget'], array(
+                    'choice_list' => new PaddedChoiceList(
+                        array_combine($options['seconds'], $options['seconds']), 2, '0', STR_PAD_LEFT
+                    ),
+                    'empty_value' => $options['empty_value']['second'],
+                    'required' => $options['required'],
+                ));
             }
         }
 
-        $builder->add('hour', $options['widget'], $hourOptions)
-            ->add('minute', $options['widget'], $minuteOptions);
-
+        $parts = array('hour', 'minute');
         if ($options['with_seconds']) {
             $parts[] = 'second';
-            $builder->add('second', $options['widget'], $secondOptions);
         }
 
         if ($options['input'] === 'string') {
@@ -65,18 +84,24 @@ class TimeType extends AbstractType
             ));
         }
 
-        $builder
-            ->appendClientTransformer(new DateTimeToArrayTransformer(
+        if ($options['widget'] !== 'single_text') {
+            $builder->appendClientTransformer(new DateTimeToArrayTransformer(
                 $options['data_timezone'],
                 $options['user_timezone'],
                 $parts,
                 $options['widget'] === 'text'
-            ))
+            ));
+        }
+
+        $builder
             ->setAttribute('widget', $options['widget'])
             ->setAttribute('with_seconds', $options['with_seconds'])
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildView(FormView $view, FormInterface $form)
     {
         $view
@@ -85,23 +110,30 @@ class TimeType extends AbstractType
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         return array(
-            'hours'             => range(0, 23),
-            'minutes'           => range(0, 59),
-            'seconds'           => range(0, 59),
-            'widget'            => 'choice',
-            'input'             => 'datetime',
-            'with_seconds'      => false,
-            'data_timezone'     => null,
-            'user_timezone'     => null,
+            'hours'         => range(0, 23),
+            'minutes'       => range(0, 59),
+            'seconds'       => range(0, 59),
+            'widget'        => 'choice',
+            'input'         => 'datetime',
+            'with_seconds'  => false,
+            'data_timezone' => null,
+            'user_timezone' => null,
+            'empty_value'   => null,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
-            'by_reference'      => false,
+            'by_reference'  => false,
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getAllowedOptionValues(array $options)
     {
         return array(
@@ -112,12 +144,24 @@ class TimeType extends AbstractType
                 'array',
             ),
             'widget' => array(
+                'single_text',
                 'text',
                 'choice',
             ),
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getParent(array $options)
+    {
+        return $options['widget'] === 'single_text' ? 'field' : 'form';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'time';

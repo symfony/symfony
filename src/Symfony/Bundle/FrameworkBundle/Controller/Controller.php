@@ -41,7 +41,7 @@ class Controller extends ContainerAware
      */
     public function generateUrl($route, array $parameters = array(), $absolute = false)
     {
-        return $this->container->get('router')->generate($route, $parameters, $absolute);
+        return $this->get('router')->generate($route, $parameters, $absolute);
     }
 
     /**
@@ -55,7 +55,7 @@ class Controller extends ContainerAware
      */
     public function forward($controller, array $path = array(), array $query = array())
     {
-        return $this->container->get('http_kernel')->forward($controller, $path, $query);
+        return $this->get('http_kernel')->forward($controller, $path, $query);
     }
 
     /**
@@ -81,7 +81,7 @@ class Controller extends ContainerAware
      */
     public function renderView($view, array $parameters = array())
     {
-        return $this->container->get('templating')->render($view, $parameters);
+        return $this->get('templating')->render($view, $parameters);
     }
 
     /**
@@ -95,7 +95,7 @@ class Controller extends ContainerAware
      */
     public function render($view, array $parameters = array(), Response $response = null)
     {
-        return $this->container->get('templating')->renderResponse($view, $parameters, $response);
+        return $this->get('templating')->renderResponse($view, $parameters, $response);
     }
 
     /**
@@ -161,6 +161,39 @@ class Controller extends ContainerAware
         }
 
         return $this->get('doctrine');
+    }
+
+    /**
+     * Shortcut to get flash message to the session service.
+     *
+     * @param  string      $name 
+     * @param  null|string $default
+     * @return null|string
+     */
+    public function getFlash($name, $default = null)
+    {
+        return $this->get('session')->getFlash($name, $default);
+    }
+
+    /**
+     * Shortcut to add flash message to the session service.
+     *
+     * @param string $name 
+     * @param string $value
+     */
+    public function setFlash($name, $value)
+    {
+        $this->get('session')->setFlash($name, $value);
+    }
+
+    /**
+     * Shortcut to remove flash message to the session service.
+     *
+     * @param string $name 
+     */
+    public function removeFlash($name)
+    {
+        $this->get('session')->removeFlash($name);
     }
 
     /**

@@ -14,6 +14,21 @@
 {% endspaceless %}
 {% endblock field_row %}
 
+{% block prototype_row %}
+{% spaceless %}
+    <tr id="{{ id }}_container" style="display: none;">
+        <td colspan="2">
+            <table>
+                {{ form_row(form) }}
+            </table>
+        </td>
+        <td>
+            {# using colspan="2" would cause html5 validation to fail when the prototype is the only child #}
+        </td>
+    </tr>
+{% endspaceless %}
+{% endblock prototype_row %}
+
 {% block form_errors %}
 {% spaceless %}
     {% if errors|length > 0 %}

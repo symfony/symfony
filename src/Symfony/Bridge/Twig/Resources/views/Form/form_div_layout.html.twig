@@ -214,7 +214,7 @@
 
 {% block prototype_row %}
 {% spaceless %}
-    <script type="text/html" id="{{ proto_id }}">{{ form_row(form) }}</script>
+    <{{ protoPrefix }}script type="text/html" id="{{ proto_id }}">{{ form_row(form) }}</{{ protoPrefix }}script>
 {% endspaceless %}
 {% endblock prototype_row %}
 

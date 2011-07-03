@@ -28,13 +28,11 @@ class FormExtension extends \Twig_Extension
     protected $blocks;
     protected $environment;
     protected $themes;
-    protected $varStack;
     protected $template;
 
     public function __construct(array $resources = array())
     {
         $this->themes = new \SplObjectStorage();
-        $this->varStack = array();
         $this->blocks = new \SplObjectStorage();
         $this->resources = $resources;
     }
@@ -210,6 +208,10 @@ class FormExtension extends \Twig_Extension
      */
     protected function render(FormView $view, $section, array $variables = array())
     {
+        static $varStack = array();
+        static $rendered = array();
+        static $protoLevel = 0;
+
         $mainTemplate = in_array($section, array('widget', 'row'));
         if ($mainTemplate && $view->isRendered()) {
 
@@ -226,16 +228,21 @@ class FormExtension extends \Twig_Extension
         $custom = '_'.$view->get('proto_id', $view->get('id'));
         $rendering = $custom.$section;
         $blocks = $this->getBlocks($view);
+        $level = $protoLevel;
 
-        if (isset($this->varStack[$rendering])) {
-            $typeIndex = $this->varStack[$rendering]['typeIndex'] - 1;
-            $types = $this->varStack[$rendering]['types'];
-            $this->varStack[$rendering]['variables'] = array_replace_recursive($this->varStack[$rendering]['variables'], $variables);
+        if (isset($varStack[$rendering])) {
+            $typeIndex = $varStack[$rendering]['typeIndex'] - 1;
+            $types = $varStack[$rendering]['types'];
+            $varStack[$rendering]['variables'] = array_replace_recursive($varStack[$rendering]['variables'], $variables);
         } else {
             $types = $view->get('types');
             $types[] = $custom;
             $typeIndex = count($types) - 1;
-            $this->varStack[$rendering] = array (
+            if (!isset($rendered[$custom]) && in_array('prototype', $types)) {
+                $rendered[$custom] = 1;
+                $variables['protoPrefix'] = str_repeat('$', $protoLevel++);
+            }
+            $varStack[$rendering] = array (
                 'variables' => array_replace_recursive($view->all(), $variables),
                 'types'     => $types,
             );
@@ -246,15 +253,16 @@ class FormExtension extends \Twig_Extension
 
             if (isset($blocks[$types[$typeIndex]])) {
 
-                $this->varStack[$rendering]['typeIndex'] = $typeIndex;
+                $varStack[$rendering]['typeIndex'] = $typeIndex;
 
-                $html = $this->template->renderBlock($types[$typeIndex], $this->varStack[$rendering]['variables'], $blocks);
+                $html = $this->template->renderBlock($types[$typeIndex], $varStack[$rendering]['variables'], $blocks);
 
                 if ($mainTemplate) {
                     $view->setRendered();
                 }
 
-                unset($this->varStack[$rendering]);
+                unset($varStack[$rendering]);
+                $protoLevel = $level;
 
                 return $html;
             }

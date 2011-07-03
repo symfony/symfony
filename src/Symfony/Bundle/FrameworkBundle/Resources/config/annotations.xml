@@ -11,9 +11,7 @@
     </parameters>
 
     <services>
-        <service id="annotations.reader" class="%annotations.reader.class%" public="false">
-            <call method="setAutoloadAnnotations"><argument>true</argument></call>
-        </service>
+        <service id="annotations.reader" class="%annotations.reader.class%" public="false" />
 
         <service id="annotations.cached_reader" class="%annotations.cached_reader.class%" public="false">
             <argument type="service" id="annotations.reader" />

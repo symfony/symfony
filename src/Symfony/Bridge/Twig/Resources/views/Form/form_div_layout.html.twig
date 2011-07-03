@@ -214,9 +214,7 @@
 
 {% block prototype_row %}
 {% spaceless %}
-    <div id="{{ id }}_container" style="display: none;">
-    {{ form_row(form) }}
-    </div>
+    <script type="text/html" id="{{ proto_id }}">{{ form_row(form) }}</script>
 {% endspaceless %}
 {% endblock prototype_row %}
 

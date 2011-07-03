@@ -1,3 +1,3 @@
-<div id="<?php echo $view->escape($id) ?>_container" style="display: none;">
+<script type="text/html" id="<?php echo $view->escape($proto_id) ?>">
     <?php echo $view['form']->row($form) ?>
-</div>
+</script>

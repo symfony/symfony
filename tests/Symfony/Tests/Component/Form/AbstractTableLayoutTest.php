@@ -224,21 +224,4 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 '
         );
     }
-
-    public function testCollectionPrototype()
-    {
-        $form = $this->factory->createNamedBuilder('form', 'na&me', array('items' => array('one', 'two', 'three')))
-            ->add('items', 'collection', array('allow_add' => true))
-            ->getForm()
-            ->createView();
-
-        $html = $this->renderWidget($form);
-
-        $this->assertMatchesXpath($html,
-'//tr
-    [@id="na&me_items_-prototype-_container"]
-    [@style="display: none;"]
-'
-        );
-    }
 }

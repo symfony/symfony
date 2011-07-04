@@ -31,6 +31,7 @@ class BasicAuthenticationListener implements ListenerInterface
     private $providerKey;
     private $authenticationEntryPoint;
     private $logger;
+    private $ignoreFailure;
 
     public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
     {
@@ -43,6 +44,7 @@ class BasicAuthenticationListener implements ListenerInterface
         $this->providerKey = $providerKey;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
         $this->logger = $logger;
+        $this->ignoreFailure = false;
     }
 
     /**
@@ -76,6 +78,10 @@ class BasicAuthenticationListener implements ListenerInterface
 
             if (null !== $this->logger) {
                 $this->logger->info(sprintf('Authentication request failed for user "%s": %s', $username, $failed->getMessage()));
+            }
+
+            if ($this->ignoreFailure) {
+                return;
             }
 
             $event->setResponse($this->authenticationEntryPoint->start($request, $failed));

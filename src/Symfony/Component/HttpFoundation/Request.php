@@ -877,7 +877,7 @@ class Request
     /**
      * Gets a list of content types acceptable by the client browser
      *
-     * @return array Languages ordered in the user browser preferences
+     * @return array List of content types in preferable order
      */
     public function getAcceptableContentTypes()
     {

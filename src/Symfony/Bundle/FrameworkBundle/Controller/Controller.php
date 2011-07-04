@@ -123,7 +123,7 @@ class Controller extends ContainerAware
      */
     public function createForm($type, $data = null, array $options = array())
     {
-        return $this->get('form.factory')->create($type, $data, $options);
+        return $this->container->get('form.factory')->create($type, $data, $options);
     }
 
     /**
@@ -136,7 +136,7 @@ class Controller extends ContainerAware
      */
     public function createFormBuilder($data = null, array $options = array())
     {
-        return $this->get('form.factory')->createBuilder('form', $data, $options);
+        return $this->container->get('form.factory')->createBuilder('form', $data, $options);
     }
 
     /**
@@ -146,21 +146,23 @@ class Controller extends ContainerAware
      */
     public function getRequest()
     {
-        return $this->get('request');
+        return $this->container->get('request');
     }
 
     /**
      * Shortcut to return the Doctrine Registry service.
      *
      * @return Registry
+     *
+     * @throws \LogicException If DoctrineBundle is not available
      */
     public function getDoctrine()
     {
-        if (!$this->has('doctrine')) {
+        if (!$this->container->has('doctrine')) {
             throw new \LogicException('The DoctrineBundle is not installed in your application.');
         }
 
-        return $this->get('doctrine');
+        return $this->container->get('doctrine');
     }
 
     /**
@@ -180,7 +182,7 @@ class Controller extends ContainerAware
      *
      * @param  string $id The service id
      *
-     * @return object  The service
+     * @return object The service
      */
     public function get($id)
     {

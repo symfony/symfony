@@ -367,10 +367,6 @@ class Definition
      */
     public function addTag($name, array $attributes = array())
     {
-        if (!isset($this->tags[$name])) {
-            $this->tags[$name] = array();
-        }
-
         $this->tags[$name][] = $attributes;
 
         return $this;

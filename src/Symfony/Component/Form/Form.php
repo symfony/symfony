@@ -14,7 +14,6 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\Event\FilterDataEvent;
 use Symfony\Component\Form\Exception\FormException;
-use Symfony\Component\Form\Exception\FormNotBoundException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\HttpFoundation\Request;
@@ -676,11 +675,10 @@ class Form implements \IteratorAggregate, FormInterface
     public function isValid()
     {
         if (!$this->isBound()) {
-            throw new FormNotBoundException('Can not validate a form that is not bound');
+            throw new \LogicException('You cannot call isValid() on a form that is not bound.');
         }
 
         if ($this->hasErrors()) {
-
             return false;
         }
 

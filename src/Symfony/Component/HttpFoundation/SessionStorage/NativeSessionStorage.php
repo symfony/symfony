@@ -43,7 +43,6 @@ class NativeSessionStorage implements SessionStorageInterface
         $cookieDefaults = session_get_cookie_params();
 
         $this->options = array_merge(array(
-            'name'     => null,
             'lifetime' => $cookieDefaults['lifetime'],
             'path'     => $cookieDefaults['path'],
             'domain'   => $cookieDefaults['domain'],
@@ -51,7 +50,7 @@ class NativeSessionStorage implements SessionStorageInterface
             'httponly' => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
         ), $options);
 
-        // Skip setting new session name if user don't wan't it
+        // Skip setting new session name if user don't want it
         if (isset($this->options['name'])) {
             session_name($this->options['name']);
         }

@@ -209,7 +209,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertMatchesXpath($html,
 '/label
     [@for="na&me"]
-    [@class="my&class"]
+    [@class="my&class required"]
 '
         );
     }
@@ -228,7 +228,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertMatchesXpath($html,
 '/label
     [@for="na&me"]
-    [@class="my&class"]
+    [@class="my&class required"]
     [.="[trans]Custom label[/trans]"]
 '
         );

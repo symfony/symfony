@@ -265,6 +265,7 @@ class MonologExtension extends Extension
             if ($container && $service = $container->getDefinition($definition)) {
                 $service->setPublic(true);
             }
+
             return new Reference($definition);
         }
 

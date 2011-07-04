@@ -25,6 +25,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class ChoiceValidator extends ConstraintValidator
 {
+    /**
+     * {@inheritDoc}
+     */
     public function isValid($value, Constraint $constraint)
     {
         if (!$constraint->choices && !$constraint->callback) {
@@ -53,7 +56,7 @@ class ChoiceValidator extends ConstraintValidator
 
         if ($constraint->multiple) {
             foreach ($value as $_value) {
-                if (!in_array($_value, $choices, true)) {
+                if (!array_key_exists($_value, $choices) && !in_array($_value, $choices, true)) {
                     $this->setMessage($constraint->multipleMessage, array('{{ value }}' => $_value));
 
                     return false;
@@ -61,7 +64,6 @@ class ChoiceValidator extends ConstraintValidator
             }
 
             $count = count($value);
-
             if ($constraint->min !== null && $count < $constraint->min) {
                 $this->setMessage($constraint->minMessage, array('{{ limit }}' => $constraint->min));
 
@@ -73,7 +75,7 @@ class ChoiceValidator extends ConstraintValidator
 
                 return false;
             }
-        } elseif (!in_array($value, $choices, true)) {
+        } elseif (!array_key_exists($value, $choices) && !in_array($value, $choices, true)) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;

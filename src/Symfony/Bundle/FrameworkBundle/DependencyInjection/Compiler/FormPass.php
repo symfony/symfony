@@ -49,10 +49,6 @@ class FormPass implements CompilerPassInterface
                 ? $tag[0]['alias']
                 : $serviceId;
 
-            if (!isset($typeExtensions[$alias])) {
-                $typeExtensions[$alias] = array();
-            }
-
             $typeExtensions[$alias][] = $serviceId;
         }
 

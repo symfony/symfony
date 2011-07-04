@@ -18,9 +18,9 @@ Options:
 Help:
  The help command displays help for a given command:
  
-   ./symfony help list
+   ./app/console help list
  
  You can also output the help as XML by using the --xml option:
  
-   ./symfony help --xml list
+   ./app/console help --xml list
 

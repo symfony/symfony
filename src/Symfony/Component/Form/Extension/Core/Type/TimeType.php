@@ -28,51 +28,67 @@ class TimeType extends AbstractType
      */
     public function buildForm(FormBuilder $builder, array $options)
     {
-        if ($options['widget'] === 'single_text') {
-            $builder->appendClientTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], 'H:i:s'));
-        } else if ($options['widget'] === 'choice') {
-            if (is_array($options['empty_value'])) {
-                $options['empty_value'] = array_merge(array('hour' => null, 'minute' => null, 'second' => null), $options['empty_value']);
-            } else {
-                $options['empty_value'] = array('hour' => $options['empty_value'], 'minute' => $options['empty_value'], 'second' => $options['empty_value']);
-            }
+        $parts  = array('hour', 'minute');
+        $format = 'H:i:00';
+        if ($options['with_seconds']) {
+            $format  = 'H:i:s';
+            $parts[] = 'second';
+        }
 
-            $builder
-                ->add('hour', $options['widget'], array(
+        if ($options['widget'] === 'single_text') {
+            $builder->appendClientTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], $format));
+        } else {
+            $hourOptions = $minuteOptions = $secondOptions = array();
+
+            if ($options['widget'] === 'choice') {
+                if (is_array($options['empty_value'])) {
+                    $options['empty_value'] = array_merge(array('hour' => null, 'minute' => null, 'second' => null), $options['empty_value']);
+                } else {
+                    $options['empty_value'] = array('hour' => $options['empty_value'], 'minute' => $options['empty_value'], 'second' => $options['empty_value']);
+                }
+
+                // Only pass a subset of the options to children
+                $hourOptions = array(
                     'choice_list' => new PaddedChoiceList(
                         array_combine($options['hours'], $options['hours']), 2, '0', STR_PAD_LEFT
                     ),
                     'empty_value' => $options['empty_value']['hour'],
                     'required' => $options['required'],
-                ))
-                ->add('minute', $options['widget'], array(
+                );
+                $minuteOptions = array(
                     'choice_list' => new PaddedChoiceList(
                         array_combine($options['minutes'], $options['minutes']), 2, '0', STR_PAD_LEFT
                     ),
                     'empty_value' => $options['empty_value']['minute'],
                     'required' => $options['required'],
-                ))
+                );
+
+                if ($options['with_seconds']) {
+                    $secondOptions = array(
+                        'choice_list' => new PaddedChoiceList(
+                            array_combine($options['seconds'], $options['seconds']), 2, '0', STR_PAD_LEFT
+                        ),
+                        'empty_value' => $options['empty_value']['second'],
+                        'required' => $options['required'],
+                    );
+                }
+            }
+
+            $builder
+                ->add('hour', $options['widget'], $hourOptions)
+                ->add('minute', $options['widget'], $minuteOptions)
             ;
 
             if ($options['with_seconds']) {
-                $builder->add('second', $options['widget'], array(
-                    'choice_list' => new PaddedChoiceList(
-                        array_combine($options['seconds'], $options['seconds']), 2, '0', STR_PAD_LEFT
-                    ),
-                    'empty_value' => $options['empty_value']['second'],
-                    'required' => $options['required'],
-                ));
+                $builder->add('second', $options['widget'], $secondOptions);
             }
-        }
 
-        $parts = array('hour', 'minute');
-        if ($options['with_seconds']) {
-            $parts[] = 'second';
+            $builder->appendClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], $parts, $options['widget'] === 'text'));
         }
 
         if ($options['input'] === 'string') {
             $builder->appendNormTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], 'H:i:s')
+                new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], $format)
             ));
         } else if ($options['input'] === 'timestamp') {
             $builder->appendNormTransformer(new ReversedTransformer(
@@ -81,15 +97,6 @@ class TimeType extends AbstractType
         } else if ($options['input'] === 'array') {
             $builder->appendNormTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], $parts)
-            ));
-        }
-
-        if ($options['widget'] !== 'single_text') {
-            $builder->appendClientTransformer(new DateTimeToArrayTransformer(
-                $options['data_timezone'],
-                $options['user_timezone'],
-                $parts,
-                $options['widget'] === 'text'
             ));
         }
 

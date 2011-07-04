@@ -329,9 +329,12 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($form->isValid());
     }
 
+    /**
+     * @expectedException \LogicException
+     */
     public function testNotValidIfNotBound()
     {
-        $this->assertFalse($this->form->isValid());
+        $this->form->isValid();
     }
 
     public function testNotValidIfErrors()

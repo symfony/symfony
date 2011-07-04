@@ -75,27 +75,33 @@ class DateType extends AbstractType
                     $options['empty_value'] = array('year' => $options['empty_value'], 'month' => $options['empty_value'], 'day' => $options['empty_value']);
                 }
 
+                if (is_array($options['required'])) {
+                    $options['required'] = array_merge(array('year' => true, 'month' => true, 'day' => true), $options['required']);
+                } else {
+                    $options['required'] = array('year' => $options['required'], 'month' => $options['required'], 'day' => $options['required']);
+                }
+
                 // Only pass a subset of the options to children
                 $yearOptions = array(
                     'choice_list' => new PaddedChoiceList(
                         array_combine($options['years'], $options['years']), 4, '0', STR_PAD_LEFT
                     ),
                     'empty_value' => $options['empty_value']['year'],
-                    'required' => $options['required'],
+                    'required' => $options['required']['year'],
                 );
                 $monthOptions = array(
                     'choice_list' => new MonthChoiceList(
                         $formatter, $options['months']
                     ),
                     'empty_value' => $options['empty_value']['month'],
-                    'required' => $options['required'],
+                    'required' => $options['required']['month'],
                 );
                 $dayOptions = array(
                     'choice_list' => new PaddedChoiceList(
                         array_combine($options['days'], $options['days']), 2, '0', STR_PAD_LEFT
                     ),
                     'empty_value' => $options['empty_value']['day'],
-                    'required' => $options['required'],
+                    'required' => $options['required']['day'],
                 );
             }
 

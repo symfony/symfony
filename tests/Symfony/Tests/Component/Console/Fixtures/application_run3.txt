@@ -10,13 +10,13 @@ Options:
 Help:
  The list command lists all commands:
  
-   ./symfony list
+   ./app/console list
  
  You can also display the commands for a specific namespace:
  
-   ./symfony list test
+   ./app/console list test
  
  You can also output the information as XML by using the --xml option:
  
-   ./symfony list --xml
+   ./app/console list --xml
 

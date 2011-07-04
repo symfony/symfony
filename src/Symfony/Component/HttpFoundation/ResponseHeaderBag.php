@@ -19,6 +19,7 @@ namespace Symfony\Component\HttpFoundation;
 class ResponseHeaderBag extends HeaderBag
 {
     protected $computedCacheControl = array();
+    protected $cookies              = array();
 
     /**
      * Constructor.
@@ -100,6 +101,67 @@ class ResponseHeaderBag extends HeaderBag
     public function getCacheControlDirective($key)
     {
         return array_key_exists($key, $this->computedCacheControl) ? $this->computedCacheControl[$key] : null;
+    }
+
+    /**
+     * Sets a cookie.
+     *
+     * @param Cookie $cookie
+     * @return void
+     */
+    public function setCookie(Cookie $cookie)
+    {
+        $this->cookies[$cookie->getName()] = $cookie;
+    }
+
+    /**
+     * Removes a cookie from the array, but does not unset it in the browser
+     *
+     * @param string $name
+     * @return void
+     */
+    public function removeCookie($name)
+    {
+        unset($this->cookies[$name]);
+    }
+
+    /**
+     * Whether the array contains any cookie with this name
+     *
+     * @param string $name
+     * @return Boolean
+     */
+    public function hasCookie($name)
+    {
+        return isset($this->cookies[$name]);
+    }
+
+    /**
+     * Returns a cookie
+     *
+     * @param string $name
+     *
+     * @throws \InvalidArgumentException When the cookie does not exist
+     *
+     * @return Cookie
+     */
+    public function getCookie($name)
+    {
+        if (!$this->hasCookie($name)) {
+            throw new \InvalidArgumentException(sprintf('There is no cookie with name "%s".', $name));
+        }
+
+        return $this->cookies[$name];
+    }
+
+    /**
+     * Returns an array with all cookies
+     *
+     * @return array
+     */
+    public function getCookies()
+    {
+        return $this->cookies;
     }
 
     /**

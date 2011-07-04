@@ -95,7 +95,12 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
         }
 
         try {
-            $dateTime = new \DateTime(sprintf("%s %s", $value, $this->outputTimezone));
+            $dateTime = new \DateTime($value, new \DateTimeZone($this->outputTimezone));
+
+            // Force value to be in same format as given to transform
+            if ($value !== $dateTime->format($this->format)) {
+                $dateTime = new \DateTime($dateTime->format($this->format), new \DateTimeZone($this->outputTimezone));
+            }
 
             if ($this->inputTimezone !== $this->outputTimezone) {
                 $dateTime->setTimeZone(new \DateTimeZone($this->inputTimezone));

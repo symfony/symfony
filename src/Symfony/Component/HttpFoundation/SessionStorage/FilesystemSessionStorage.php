@@ -33,6 +33,9 @@ class FilesystemSessionStorage extends NativeSessionStorage
         parent::__construct($options);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function start()
     {
         if ($this->started) {
@@ -47,7 +50,7 @@ class FilesystemSessionStorage extends NativeSessionStorage
             $this->options['httponly']
         );
 
-        if (!ini_get('session.use_cookies') && isset($this->options['id']) && $this->options['id'] && $this->options['id'] != session_id()) {
+        if (!ini_get('session.use_cookies') && !empty($this->options['id']) && $this->options['id'] != session_id()) {
             session_id($this->options['id']);
         }
 
@@ -61,6 +64,9 @@ class FilesystemSessionStorage extends NativeSessionStorage
         $this->started = true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getId()
     {
         if (!$this->started) {
@@ -70,11 +76,17 @@ class FilesystemSessionStorage extends NativeSessionStorage
         return session_id();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function read($key, $default = null)
     {
         return array_key_exists($key, $this->data) ? $this->data[$key] : $default;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function remove($key)
     {
         $retval = $this->data[$key];
@@ -84,6 +96,9 @@ class FilesystemSessionStorage extends NativeSessionStorage
         return $retval;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function write($key, $data)
     {
         $this->data[$key] = $data;
@@ -95,6 +110,9 @@ class FilesystemSessionStorage extends NativeSessionStorage
         file_put_contents($this->path.'/'.session_id().'.session', serialize($this->data));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function regenerate($destroy = false)
     {
         if ($destroy) {

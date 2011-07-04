@@ -10,6 +10,22 @@ RC3 to RC4
 ----------
 * Annotation classes must be annotated with @Annotation 
   (see the validator constraints for examples)
+* Annotations are not using the PHP autoloading but their own mechanism. This allows much more control
+  about possible failure states. To make your code work you have to add the following lines to your
+  autoload.php:
+
+    AnnotationRegistry::registerLoader(function($class) use ($loader) {
+        $loader->loadClass($class);
+        return class_exists($class, false);
+    });
+    AnnotationRegistry::registerFile(
+        __DIR__.'/../vendor/doctrine/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php'
+    );
+
+  The `$loader` variable is an instance of the UniversalClassLoader. Additionally you might have to adjust
+  the ORM path to the DoctrineAnnotations.php. If you are not using the UniversalClassLoader see the
+  [Doctrine Annotations documentation](http://www.doctrine-project.org/docs/common/2.1/en/reference/annotations.html) 
+  for more details on how to register annotations.
 
 beta5 to RC1
 ------------

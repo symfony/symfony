@@ -40,15 +40,15 @@ class ListCommand extends Command
             ->setHelp(<<<EOF
 The <info>list</info> command lists all commands:
 
-  <info>./symfony list</info>
+  <info>./app/console list</info>
 
 You can also display the commands for a specific namespace:
 
-  <info>./symfony list test</info>
+  <info>./app/console list test</info>
 
 You can also output the information as XML by using the <comment>--xml</comment> option:
 
-  <info>./symfony list --xml</info>
+  <info>./app/console list --xml</info>
 EOF
             );
     }

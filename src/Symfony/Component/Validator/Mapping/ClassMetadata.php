@@ -204,10 +204,6 @@ class ClassMetadata extends ElementMetadata
     {
         $property = $metadata->getPropertyName();
 
-        if (!isset($this->members[$property])) {
-            $this->members[$property] = array();
-        }
-
         $this->members[$property][] = $metadata;
     }
 

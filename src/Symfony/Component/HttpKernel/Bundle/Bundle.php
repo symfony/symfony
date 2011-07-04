@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Bundle;
 
+use Symfony\Component\HttpKernel\DependencyInjection\AutoloadExtension;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Container;
@@ -84,13 +85,11 @@ abstract class Bundle extends ContainerAware implements BundleInterface
 
                 $this->extension = $extension;
             } else {
-                $this->extension = false;
+                $this->extension = new AutoloadExtension($this, Container::underscore($basename));
             }
         }
 
-        if ($this->extension) {
-            return $this->extension;
-        }
+        return $this->extension;
     }
 
     /**

@@ -31,10 +31,6 @@ class ChoiceType extends AbstractType
      */
     public function buildForm(FormBuilder $builder, array $options)
     {
-        if (!$options['choices'] && !$options['choice_list']) {
-            throw new FormException('Either the option "choices" or "choice_list" is required');
-        }
-
         if ($options['choice_list'] && !$options['choice_list'] instanceof ChoiceListInterface) {
             throw new FormException('The "choice_list" must be an instance of "Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface".');
         }

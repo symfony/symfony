@@ -14,6 +14,7 @@ namespace Symfony\Tests\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\FileValidator;
 use Symfony\Component\HttpFoundation\File\File as FileObject;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -58,6 +59,12 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidFile()
     {
         $this->assertTrue($this->validator->isValid($this->path, new File()));
+    }
+
+    public function testValidUploadedfile()
+    {
+        $file = new UploadedFile($this->path, 'originalName');
+        $this->assertTrue($this->validator->isValid($file, new File()));
     }
 
     public function testTooLargeBytes()
@@ -194,6 +201,33 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
             '{{ types }}'   => '"image/png", "image/jpg"',
             '{{ file }}'    => $this->path,
         ));
+    }
+
+    /**
+     * @dataProvider uploadedFileErrorProvider
+     */
+    public function testUploadedFileError($error, $message)
+    {
+        $file = new UploadedFile('/path/to/file', 'originalName', 'mime', 0, $error);
+
+        $options[$message] = 'myMessage';
+
+        $constraint = new File($options);
+
+        $this->assertFalse($this->validator->isValid($file, $constraint));
+        $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
+
+    }
+
+    public function uploadedFileErrorProvider()
+    {
+        return array(
+            array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage'),
+            array(UPLOAD_ERR_FORM_SIZE, 'uploadFormSizeErrorMessage'),
+            array(UPLOAD_ERR_PARTIAL, 'uploadErrorMessage'),
+            array(UPLOAD_ERR_NO_TMP_DIR, 'uploadErrorMessage'),
+            array(UPLOAD_ERR_EXTENSION, 'uploadErrorMessage'),
+        );
     }
 
     protected function assertFileValid($filename, File $constraint, $valid = true)

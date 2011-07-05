@@ -35,9 +35,12 @@ class DialogHelper extends Helper
     {
         $output->write($question);
 
-        $ret = trim(fgets(null === $this->inputStream ? STDIN : $this->inputStream));
+        if (false === $ret = fgets(null === $this->inputStream ? STDIN : $this->inputStream)) {
+            throw new \Exception('Aborted');
+        }
+        $ret = trim($ret);
 
-        return $ret ? $ret : $default;
+        return strlen($ret) > 0 ? $ret : $default;
     }
 
     /**

@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class TimeValidator extends ConstraintValidator
 {
-    const PATTERN = '/(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])/';
+    const PATTERN = '/^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/';
 
     public function isValid($value, Constraint $constraint)
     {

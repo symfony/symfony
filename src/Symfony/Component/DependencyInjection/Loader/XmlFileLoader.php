@@ -382,7 +382,19 @@ EOF
 
             // can it be handled by an extension?
             if (!$this->container->hasExtension($node->namespaceURI)) {
-                throw new \InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in %s).', $node->tagName, $file));
+                $extensionNamespaces = array_filter(array_map(
+                                            function($ext) {
+                                                return $ext->getNamespace();
+                                            },
+                                            $this->container->getExtensions()
+                                       ));
+                throw new \InvalidArgumentException(sprintf(
+                    'There is no extension able to load the configuration for "%s" (in %s). Looked for namespace "%s", found %s',
+                    $node->tagName,
+                    $file,
+                    $node->namespaceURI,
+                    $extensionNamespaces ? '"' . join($extensionNamespaces, '", "') . '"' : 'none'
+                ));
             }
         }
     }

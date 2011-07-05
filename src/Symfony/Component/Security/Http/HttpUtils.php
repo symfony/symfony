@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Http;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Encapsulates the logic needed to create sub-requests, redirect the user, and match URLs.
@@ -22,16 +22,16 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class HttpUtils
 {
-    private $urlGenerator;
+    private $router;
 
     /**
      * Constructor.
      *
-     * @param UrlGeneratorInterface $urlGenerator An UrlGeneratorInterface instance
+     * @param RouterInterface $router An RouterInterface instance
      */
-    public function __construct(UrlGeneratorInterface $urlGenerator = null)
+    public function __construct(RouterInterface $router = null)
     {
-        $this->urlGenerator = $urlGenerator;
+        $this->router = $router;
     }
 
     /**
@@ -82,7 +82,12 @@ class HttpUtils
     public function checkRequestPath(Request $request, $path)
     {
         if ('/' !== $path[0]) {
-            $path = preg_replace('#'.preg_quote($request->getBaseUrl(), '#').'#', '', $this->generateUrl($path));
+            try {
+                $parameters = $this->router->match($request->getPathInfo());
+
+                return $path === $parameters['_route'];
+            } catch (\Exception $e) {
+            }
         }
 
         return $path === $request->getPathInfo();
@@ -90,10 +95,10 @@ class HttpUtils
 
     private function generateUrl($route, $absolute = false)
     {
-        if (null === $this->urlGenerator) {
-            throw new \LogicException('You must provide a UrlGeneratorInterface instance to be able to use routes.');
+        if (null === $this->router) {
+            throw new \LogicException('You must provide a RouterInterface instance to be able to use routes.');
         }
 
-        return $this->urlGenerator->generate($route, array(), $absolute);
+        return $this->router->generate($route, array(), $absolute);
     }
 }

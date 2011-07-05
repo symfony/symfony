@@ -5,6 +5,30 @@
 このドキュメントでは、フレームワークの "パブリックな" APIを使っている場合に必要な変更点についてのみ説明しています。
 フレームワークのコアコードを "ハック" している場合は、変更履歴を注意深く追跡する必要があるでしょう。
 
+RC3 から RC4
+------------
+* Annotation クラスには、@Annotation を付加してください。
+  (例については Validator コンポーネントの制約クラスを参照してください)
+
+* アノテーションのオートロードには、PHP の機構ではなく独自の機構が使われるように変更されました。
+  これにより、失敗の状態についてより制御できるようになりました。
+  コードを動作させるようにするには、`autoload.php` ファイルの末尾に次のコードを追加してください:
+
+        use Doctrine\Common\Annotations\AnnotationRegistry;
+
+        AnnotationRegistry::registerLoader(function($class) use ($loader) {
+            $loader->loadClass($class);
+            return class_exists($class, false);
+        });
+
+        AnnotationRegistry::registerFile(
+            __DIR__.'/../vendor/doctrine/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php'
+        );
+
+  `$loader` 変数は `UniversalClassLoader` のインスタンスです。
+  また、ORM のパスを `DoctrineAnnotations.php` に変更しなければいけない場合もあります。
+  `UniversalClassLoader` を使っていない場合、アノテーションの登録の詳細については、[Doctrine アノテーションドキュメント](http://www.doctrine-project.org/docs/common/2.1/en/reference/annotations.html) を参照してください。
+
 beta5 から RC1
 --------------
 

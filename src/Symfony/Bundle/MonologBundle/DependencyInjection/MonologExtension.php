@@ -50,7 +50,7 @@ class MonologExtension extends Extension
             $logger = $container->getDefinition('monolog.logger_prototype');
 
             if (!empty($config['processors'])) {
-                $this->addProcessors($logger, $config['processors']);
+                $this->addProcessors($container, $logger, $config['processors']);
             }
 
             $handlers = array();

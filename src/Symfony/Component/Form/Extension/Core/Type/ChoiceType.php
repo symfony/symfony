@@ -31,7 +31,7 @@ class ChoiceType extends AbstractType
      */
     public function buildForm(FormBuilder $builder, array $options)
     {
-        if (!$options['choices'] && !$options['choice_list']) {
+        if (!isset($options['choices']) && !$options['choice_list']) {
             throw new FormException('Either the option "choices" or "choice_list" is required');
         }
 

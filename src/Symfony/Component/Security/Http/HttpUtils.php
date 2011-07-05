@@ -87,6 +87,7 @@ class HttpUtils
 
                 return $path === $parameters['_route'];
             } catch (\Exception $e) {
+                return false;
             }
         }
 

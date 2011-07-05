@@ -262,8 +262,8 @@ class MonologExtension extends Extension
     {
         if (0 === strpos($definition, '@')) {
             $definition = substr($definition, 1);
-            if ($container && $service = $container->getDefinition($definition)) {
-                $service->setPublic(true);
+            if ($container && $container->hasDefinition($definition)) {
+                $container->getDefinition($definition)->setPublic(true);
             }
 
             return new Reference($definition);

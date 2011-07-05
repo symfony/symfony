@@ -6,8 +6,20 @@ one. It only discusses changes that need to be done when using the "public"
 API of the framework. If you "hack" the core, you should probably follow the
 timeline closely anyway.
 
+RC4 to RC5
+----------
+
+* To avoid security issues, HTTP headers coming from proxies are not trusted
+  anymore by default (like `HTTP_X_FORWARDED_FOR`, `X_FORWARDED_PROTO`, and
+  `X_FORWARDED_HOST`). If your application is behind a reverse proxy, add the
+  following configuration:
+
+        framework:
+            proxy: true
+
 RC3 to RC4
 ----------
+
 * Annotation classes must be annotated with @Annotation 
   (see the validator constraints for examples)
 

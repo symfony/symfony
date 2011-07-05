@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage;
  */
 class Request
 {
+    static protected $trustProxy = false;
+
     /**
      * @var \Symfony\Component\HttpFoundation\ParameterBag
      */
@@ -323,6 +325,17 @@ class Request
     }
 
     /**
+     * Trusts $_SERVER entries coming from proxies.
+     *
+     * You should only call this method if your application
+     * is hosted behind a reverse proxy that you manage.
+     */
+    static public function trustProxyData()
+    {
+        self::$trustProxy = true;
+    }
+
+    /**
      * Gets a "parameter" value.
      *
      * This method is mainly useful for libraries that want to provide some flexibility.
@@ -397,7 +410,7 @@ class Request
         if ($proxy) {
             if ($this->server->has('HTTP_CLIENT_IP')) {
                 return $this->server->get('HTTP_CLIENT_IP');
-            } elseif ($this->server->has('HTTP_X_FORWARDED_FOR')) {
+            } elseif (self::$trustProxy && $this->server->has('HTTP_X_FORWARDED_FOR')) {
                 return $this->server->get('HTTP_X_FORWARDED_FOR');
             }
         }
@@ -600,9 +613,9 @@ class Request
         return (
             (strtolower($this->server->get('HTTPS')) == 'on' || $this->server->get('HTTPS') == 1)
             ||
-            (strtolower($this->headers->get('SSL_HTTPS')) == 'on' || $this->headers->get('SSL_HTTPS') == 1)
+            (self::$trustProxy && strtolower($this->headers->get('SSL_HTTPS')) == 'on' || $this->headers->get('SSL_HTTPS') == 1)
             ||
-            (strtolower($this->headers->get('X_FORWARDED_PROTO')) == 'https')
+            (self::$trustProxy && strtolower($this->headers->get('X_FORWARDED_PROTO')) == 'https')
         );
     }
 
@@ -613,7 +626,7 @@ class Request
      */
     public function getHost()
     {
-        if ($host = $this->headers->get('X_FORWARDED_HOST')) {
+        if (self::$trustProxy && $host = $this->headers->get('X_FORWARDED_HOST')) {
             $elements = explode(',', $host);
 
             $host = trim($elements[count($elements) - 1]);

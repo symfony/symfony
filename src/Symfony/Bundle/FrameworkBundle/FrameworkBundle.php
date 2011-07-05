@@ -24,7 +24,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CompilerDebugDum
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Scope;
-use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -34,6 +34,13 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class FrameworkBundle extends Bundle
 {
+    public function boot()
+    {
+        if ($this->container->getParameter('kernel.proxy')) {
+            Request::trustProxyData();
+        }
+    }
+
     public function build(ContainerBuilder $container)
     {
         parent::build($container);

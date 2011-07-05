@@ -21,6 +21,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RequestTest extends \PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {
+        Request::trustProxyData();
+    }
+
     /**
      * @covers Symfony\Component\HttpFoundation\Request::__construct
      */

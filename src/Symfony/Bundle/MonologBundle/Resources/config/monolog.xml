@@ -18,15 +18,25 @@
         <parameter key="monolog.handler.debug.class">Symfony\Bridge\Monolog\Handler\DebugHandler</parameter>
         <parameter key="monolog.handler.swift_mailer.class">Monolog\Handler\SwiftMailerHandler</parameter>
         <parameter key="monolog.handler.native_mailer.class">Monolog\Handler\NativeMailerHandler</parameter>
+        <parameter key="monolog.processor.web.class">Symfony\Bridge\Monolog\Processor\WebProcessor</parameter>
+        <parameter key="monolog.processor.introspection.class">Monolog\Processor\IntrospectionProcessor</parameter>
     </parameters>
 
     <services>
         <service id="monolog.logger" parent="monolog.logger_prototype" public="false">
             <argument index="0">app</argument>
         </service>
+
         <service id="logger" alias="monolog.logger" />
+
         <service id="monolog.logger_prototype" class="%monolog.logger.class%" abstract="true">
             <argument /><!-- Channel -->
         </service>
+
+        <service id="monolog.processor.web" class="%monolog.processor.web.class%" scope="request" public="false">
+            <argument type="service" id="request" />
+        </service>
+
+        <service id="monolog.processor.introspection" class="%monolog.processor.introspection.class%" public="false" />
     </services>
 </container>

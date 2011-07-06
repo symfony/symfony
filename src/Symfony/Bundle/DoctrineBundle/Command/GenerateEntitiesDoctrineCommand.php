@@ -99,7 +99,6 @@ EOT
         $repoGenerator = new EntityRepositoryGenerator();
         foreach ($metadata->getMetadata() as $m) {
             $output->writeln(sprintf('  > generating <comment>%s</comment>', $m->name));
-            $generator->setAnnotationPrefix('ORM\\');
             $generator->generate(array($m), $metadata->getPath());
 
             if ($m->customRepositoryClassName && false !== strpos($m->customRepositoryClassName, $metadata->getNamespace())) {

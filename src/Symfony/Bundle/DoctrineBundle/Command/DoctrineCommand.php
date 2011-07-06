@@ -29,6 +29,7 @@ abstract class DoctrineCommand extends ContainerAwareCommand
         $entityGenerator->setRegenerateEntityIfExists(false);
         $entityGenerator->setUpdateEntityIfExists(true);
         $entityGenerator->setNumSpaces(4);
+        $entityGenerator->setAnnotationPrefix('ORM\\');
 
         return $entityGenerator;
     }

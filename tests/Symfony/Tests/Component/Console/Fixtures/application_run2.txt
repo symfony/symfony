@@ -2,17 +2,17 @@ Usage:
  help [--xml] [command_name]
 
 Arguments:
- command           The command to execute
- command_name      The command name (default: help)
+ command               The command to execute
+ command_name          The command name (default: help)
 
 Options:
- --xml To output help as XML
- --help (-h) Display this help message.
- --quiet (-q) Do not output any message.
- --verbose (-v) Increase verbosity of messages.
- --version (-V) Display this program version.
- --ansi Force ANSI output.
- --no-ansi Disable ANSI output.
+ --xml                 To output help as XML
+ --help (-h)           Display this help message.
+ --quiet (-q)          Do not output any message.
+ --verbose (-v)        Increase verbosity of messages.
+ --version (-V)        Display this program version.
+ --ansi                Force ANSI output.
+ --no-ansi             Disable ANSI output.
  --no-interaction (-n) Do not ask any interactive question.
 
 Help:

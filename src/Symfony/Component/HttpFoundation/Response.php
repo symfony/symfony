@@ -98,7 +98,7 @@ class Response
      */
     public function __toString()
     {
-        $this->fixContentType();
+        $this->fixContent();
 
         return
             sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText)."\r\n".
@@ -119,7 +119,7 @@ class Response
      */
     public function sendHeaders()
     {
-        $this->fixContentType();
+        $this->fixContent();
 
         // status
         header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText));
@@ -172,7 +172,6 @@ class Response
         }
 
         $this->content = (string) $content;
-        $this->headers->set('Content-Length', strlen($this->content));
     }
 
     /**
@@ -749,6 +748,15 @@ class Response
         return in_array($this->statusCode, array(201, 204, 304));
     }
 
+    protected function fixContent()
+    {
+        if ($this->isInformational() || in_array($this->statusCode, array(204, 304))) {
+            $this->setContent('');
+        }
+        $this->fixContentType();
+        $this->fixContentLength();
+    }
+
     protected function fixContentType()
     {
         $charset = $this->charset ?: 'UTF-8';
@@ -757,6 +765,16 @@ class Response
         } elseif ('text/' === substr($this->headers->get('Content-Type'), 0, 5) && false === strpos($this->headers->get('Content-Type'), 'charset')) {
             // add the charset
             $this->headers->set('Content-Type', $this->headers->get('Content-Type').'; charset='.$charset);
+        }
+    }
+    
+    protected function fixContentLength()
+    {
+        if (!$this->headers->has('Content-Length')) {
+            $this->headers->set('Content-Length', strlen($this->content));
+        }
+        if ($this->headers->has('Transfer-Encoding')) {
+            $this->headers->remove('Content-Length');
         }
     }
 }

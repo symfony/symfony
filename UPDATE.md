@@ -12,6 +12,31 @@ RC4 to RC5
 * Removed the guesser for the Choice constraint as the constraint only knows
   about the valid keys, and not their values.
 
+* The configuration of MonologBundle has been refactored.
+
+    * Only services are supported for the processors. They are now registered
+      using the `monolog.processor` tag which accept three optionnal attributes:
+
+        * `handler`: the name of an handler to register it only for a specific handler
+        * `channel`: to register it only for one logging channel (exclusive with `handler`)
+        * `method`: The method used to process the record (`__invoke` is used if not set)
+
+    * The email_prototype for the `SwiftMailerHandler` only accept a service id now.
+
+        * Before:
+
+            email_prototype: @acme_demo.monolog.email_prototype
+
+        * After:
+
+            email_prototype: acme_demo.monolog.email_prototype
+
+          or if you want to use a factory for the prototype:
+
+            email_prototype:
+                id:     acme_demo.monolog.email_prototype
+                method: getPrototype
+
 * To avoid security issues, HTTP headers coming from proxies are not trusted
   anymore by default (like `HTTP_X_FORWARDED_FOR`, `X_FORWARDED_PROTO`, and
   `X_FORWARDED_HOST`). If your application is behind a reverse proxy, add the

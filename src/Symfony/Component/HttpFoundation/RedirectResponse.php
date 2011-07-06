@@ -33,7 +33,7 @@ class RedirectResponse extends Response
         }
 
         parent::__construct(
-            sprintf('<html><head><meta http-equiv="refresh" content="1;url=%s"/></head></html>', htmlspecialchars($url, ENT_QUOTES)),
+            sprintf('<html><head><meta http-equiv="refresh" content="1;url=%s"/></head><body>Redirect to <a href="%1$s">%1$s</a>.</body></html>', htmlspecialchars($url, ENT_QUOTES)),
             $status,
             array('Location' => $url)
         );

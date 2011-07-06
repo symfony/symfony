@@ -124,17 +124,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                         );
                 }
                 break;
-            case 'Symfony\Component\Validator\Constraints\Choice':
-                if (!$constraint->choices) {
-                    // choices probably defined as a callback
-                    break;
-                }
-
-                return new TypeGuess(
-                    'choice',
-                    array('choices' => $constraint->choices),
-                    Guess::HIGH_CONFIDENCE
-                );
             case 'Symfony\Component\Validator\Constraints\Country':
                 return new TypeGuess(
                     'country',

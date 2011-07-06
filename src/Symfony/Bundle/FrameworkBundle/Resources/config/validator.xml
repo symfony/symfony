@@ -23,6 +23,7 @@
         <service id="validator" class="%validator.class%">
             <argument type="service" id="validator.mapping.class_metadata_factory" />
             <argument type="service" id="validator.validator_factory" />
+            <argument type="collection" />
         </service>
 
         <service id="validator.mapping.class_metadata_factory" class="%validator.mapping.class_metadata_factory.class%" public="false">

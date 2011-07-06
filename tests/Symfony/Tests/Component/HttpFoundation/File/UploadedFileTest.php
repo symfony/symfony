@@ -190,4 +190,32 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($file->isValid());
     }
+
+    /**
+     * @dataProvider uploadedFileErrorProvider
+     */
+    public function testIsInvalidOnUploadError($error)
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'original.gif',
+            null,
+            filesize(__DIR__.'/Fixtures/test.gif'),
+            $error
+        );
+
+        $this->assertFalse($file->isValid());
+    }
+
+
+    public function uploadedFileErrorProvider()
+    {
+        return array(
+            array(UPLOAD_ERR_INI_SIZE),
+            array(UPLOAD_ERR_FORM_SIZE),
+            array(UPLOAD_ERR_PARTIAL),
+            array(UPLOAD_ERR_NO_TMP_DIR),
+            array(UPLOAD_ERR_EXTENSION),
+        );
+    }
 }

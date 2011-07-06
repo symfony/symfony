@@ -60,7 +60,7 @@
             </trans-unit>
             <trans-unit id="15">
                 <source>The file is too large ({{ size }}). Allowed maximum size is {{ limit }}</source>
-                <target>Le fichier est trop lourd ({{ size }}). La taille maximale autorisée est {{ limit }}</target>
+                <target>Le fichier est trop volumineux ({{ size }}). Sa taille ne doit pas dépasser {{ limit }}</target>
             </trans-unit>
             <trans-unit id="16">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}</source>
@@ -116,7 +116,7 @@
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file</source>
-                <target>Le fichier envoyé est trop gros. Merci d'essayer d'envoyer un fichier plus petit</target>
+                <target>Le fichier téléchargé est trop volumineux. Merci d'essayer d'envoyer un fichier plus petit</target>
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form</source>
@@ -125,6 +125,18 @@
             <trans-unit id="31">
                 <source>The two values should be equal</source>
                 <target>Les deux valeurs doivent être identiques</target>
+            </trans-unit>
+            <trans-unit id="32">
+                <source>The file is too large. Allowed maximum size is {{ limit }}</source>
+                <target>Le fichier est trop volumineux. Sa taille ne doit pas dépasser {{ limit }}</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>The file is too large</source>
+                <target>Le fichier est trop volumineux</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>The file could not be uploaded</source>
+                <target>Le téléchargement de ce fichier est impossible</target>
             </trans-unit>
         </body>
     </file>

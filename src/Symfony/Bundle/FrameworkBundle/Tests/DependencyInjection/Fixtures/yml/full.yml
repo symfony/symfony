@@ -2,8 +2,9 @@ framework:
     secret: s3cr3t
     form: ~
     csrf_protection:
-        enabled:    true
-        field_name: _csrf
+        enabled:       true
+        field_name:    _csrf
+        error_message: csrf_error
     esi:
         enabled: true
     profiler:

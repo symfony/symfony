@@ -53,7 +53,7 @@ class ChoiceValidator extends ConstraintValidator
 
         if ($constraint->multiple) {
             foreach ($value as $_value) {
-                if (!in_array($_value, $choices, true)) {
+                if (!array_key_exists($_value, $choices)) {
                     $this->setMessage($constraint->multipleMessage, array('{{ value }}' => $_value));
 
                     return false;
@@ -73,7 +73,7 @@ class ChoiceValidator extends ConstraintValidator
 
                 return false;
             }
-        } elseif (!in_array($value, $choices, true)) {
+        } elseif (!array_key_exists($value, $choices)) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;

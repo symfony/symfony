@@ -42,7 +42,7 @@ class GetterMetadata extends MemberMetadata
      */
     public function getValue($object)
     {
-        return $this->getReflectionMember()->invoke($object);
+        return $object->{$this->getName()}();
     }
 
     /**

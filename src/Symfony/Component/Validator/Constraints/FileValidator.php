@@ -16,6 +16,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\HttpFoundation\File\File as FileObject;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileValidator extends ConstraintValidator
 {
@@ -23,6 +24,33 @@ class FileValidator extends ConstraintValidator
     {
         if (null === $value || '' === $value) {
             return true;
+        }
+
+        if ($value instanceof UploadedFile && !$value->isValid()) {
+            switch ($value->getError()) {
+                case UPLOAD_ERR_INI_SIZE:
+                    $maxSize = trim(ini_get('upload_max_filesize'));
+                    switch (strtolower(substr($maxSize, -1))) {
+                        case 'g':
+                            $maxSize *= 1024;
+                        case 'm':
+                            $maxSize *= 1024;
+                        case 'k':
+                            $maxSize *= 1024;
+                    }
+                    $maxSize = $constraint->maxSize ? min($maxSize, $constraint->maxSize) : $maxSize;
+                    $this->setMessage($constraint->uploadIniSizeErrorMessage, array('{{ limit }}' => $maxSize.' bytes'));
+
+                    return false;
+                case UPLOAD_ERR_FORM_SIZE:
+                    $this->setMessage($constraint->uploadFormSizeErrorMessage);
+
+                    return false;
+                default:
+                    $this->setMessage($constraint->uploadErrorMessage);
+
+                    return false;
+            }
         }
 
         if (!is_scalar($value) && !$value instanceof FileObject && !(is_object($value) && method_exists($value, '__toString'))) {

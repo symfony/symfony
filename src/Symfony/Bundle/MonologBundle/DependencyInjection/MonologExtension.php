@@ -49,10 +49,6 @@ class MonologExtension extends Extension
 
             $logger = $container->getDefinition('monolog.logger_prototype');
 
-            if (!empty($config['processors'])) {
-                $this->addProcessors($container, $logger, $config['processors']);
-            }
-
             $handlers = array();
             foreach ($config['handlers'] as $name => $handler) {
                 $handlers[] = array('id' => $this->buildHandler($container, $name, $handler), 'priority' => $handler['priority'] );
@@ -238,9 +234,6 @@ class MonologExtension extends Extension
         if (!empty($handler['formatter'])) {
             $definition->addMethodCall('setFormatter', array(new Reference($handler['formatter'])));
         }
-        if (!empty($handler['processors'])) {
-            $this->addProcessors($container, $definition, $handler['processors']);
-        }
         $container->setDefinition($handlerId, $definition);
 
         return $handlerId;
@@ -249,13 +242,6 @@ class MonologExtension extends Extension
     private function getHandlerId($name)
     {
         return sprintf('monolog.handler.%s', $name);
-    }
-
-    private function addProcessors(ContainerBuilder $container, Definition $definition, array $processors)
-    {
-        foreach (array_reverse($processors) as $processor) {
-            $definition->addMethodCall('pushProcessor', array($this->parseDefinition($processor, $container)));
-        }
     }
 
     private function parseDefinition($definition, ContainerBuilder $container = null)

@@ -37,7 +37,6 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->fixXmlConfig('handler')
-            ->fixXmlConfig('processor')
             ->children()
                 ->arrayNode('handlers')
                     ->canBeUnset()
@@ -77,7 +76,6 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('email_prototype')->end() // swift_mailer
                             ->scalarNode('formatter')->end()
                         ->end()
-                        ->append($this->getProcessorsNode())
                         ->validate()
                             ->ifTrue(function($v) { return ('fingers_crossed' === $v['type'] || 'buffer' === $v['type']) && 1 !== count($v['handler']); })
                             ->thenInvalid('The handler has to be specified to use a FingersCrossedHandler or BufferHandler')
@@ -101,23 +99,8 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end()
-            ->append($this->getProcessorsNode())
         ;
 
         return $treeBuilder;
-    }
-
-    private function getProcessorsNode()
-    {
-        $treeBuilder = new TreeBuilder();
-        $node = $treeBuilder->root('processors');
-
-        $node
-            ->canBeUnset()
-            ->performNoDeepMerging()
-            ->prototype('scalar')->end()
-        ;
-
-        return $node;
     }
 }

@@ -21,15 +21,18 @@ use Symfony\Component\Form\CallbackValidator;
 class CsrfType extends AbstractType
 {
     private $csrfProvider;
+    private $errorMessage;
 
     /**
      * Constructor.
      *
      * @param CsrfProviderInterface $csrfProvider The provider to use to generate the token
+     * @param string                $errorMessage The error message for an invalid CSRF token
      */
-    public function __construct(CsrfProviderInterface $csrfProvider)
+    public function __construct(CsrfProviderInterface $csrfProvider, $errorMessage = 'The CSRF token is invalid. Please try to resubmit the form')
     {
         $this->csrfProvider = $csrfProvider;
+        $this->errorMessage = $errorMessage;
     }
 
     /**
@@ -44,13 +47,14 @@ class CsrfType extends AbstractType
     public function buildForm(FormBuilder $builder, array $options)
     {
         $csrfProvider = $options['csrf_provider'];
+        $errorMessage = $options['error_message'];
         $intention = $options['intention'];
 
-        $validator = function (FormInterface $form) use ($csrfProvider, $intention)
+        $validator = function (FormInterface $form) use ($csrfProvider, $errorMessage, $intention)
         {
             if ((!$form->hasParent() || $form->getParent()->isRoot())
                 && !$csrfProvider->isCsrfTokenValid($intention, $form->getData())) {
-                $form->addError(new FormError('The CSRF token is invalid. Please try to resubmit the form'));
+                $form->addError(new FormError($errorMessage));
                 $form->setData($csrfProvider->generateCsrfToken($intention));
             }
         };
@@ -68,6 +72,7 @@ class CsrfType extends AbstractType
     {
         return array(
             'csrf_provider' => $this->csrfProvider,
+            'error_message' => $this->errorMessage,
             'intention'     => null,
             'property_path' => false,
         );

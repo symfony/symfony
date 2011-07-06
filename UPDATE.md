@@ -20,10 +20,14 @@ RC4 to RC5
         framework:
             proxy: true
 
+ * To avoid hidden naming collisions, the AbstractType does not try to define
+   the name of form types magically. You now need to implement the `getName()`
+   method explicitly when creating a custom type.
+
 RC3 to RC4
 ----------
 
-* Annotation classes must be annotated with @Annotation 
+* Annotation classes must be annotated with @Annotation
   (see the validator constraints for examples)
 
 * Annotations are not using the PHP autoloading but their own mechanism. This

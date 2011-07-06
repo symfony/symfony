@@ -14,6 +14,8 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\Exception\CreationException;
+use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\PaddedChoiceList;
 use Symfony\Component\Form\Extension\Core\ChoiceList\MonthChoiceList;
 use Symfony\Component\Form\FormView;
@@ -30,15 +32,39 @@ class DateType extends AbstractType
      */
     public function buildForm(FormBuilder $builder, array $options)
     {
+        $format = $options['format'];
+        $pattern = null;
+
+        $allowedFormatOptionValues = array(
+            \IntlDateFormatter::FULL,
+            \IntlDateFormatter::LONG,
+            \IntlDateFormatter::MEDIUM,
+            \IntlDateFormatter::SHORT,
+        );
+
+        // If $format is not in the allowed options, it's considered as the pattern of the formatter if it is a string
+        if (!in_array($format, $allowedFormatOptionValues, true)) {
+            if (is_string($format)) {
+                $defaultOptions = $this->getDefaultOptions($options);
+
+                $format = $defaultOptions['format'];
+                $pattern = $options['format'];
+            } else {
+                throw new CreationException('The "format" option must be one of the IntlDateFormatter constants (FULL, LONG, MEDIUM, SHORT) or a string representing a custom pattern');
+            }
+        }
+
         $formatter = new \IntlDateFormatter(
             \Locale::getDefault(),
-            $options['format'],
+            $format,
             \IntlDateFormatter::NONE,
-            \DateTimeZone::UTC
+            \DateTimeZone::UTC,
+            \IntlDateFormatter::GREGORIAN,
+            $pattern
         );
 
         if ($options['widget'] === 'single_text') {
-            $builder->appendClientTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $options['format'], \IntlDateFormatter::NONE));
+            $builder->appendClientTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $format, \IntlDateFormatter::NONE, \IntlDateFormatter::GREGORIAN, $pattern));
         } else {
             $yearOptions = $monthOptions = $dayOptions = array();
 
@@ -99,8 +125,7 @@ class DateType extends AbstractType
 
         $builder
             ->setAttribute('formatter', $formatter)
-            ->setAttribute('widget', $options['widget'])
-        ;
+            ->setAttribute('widget', $options['widget']);
     }
 
     /**
@@ -164,12 +189,6 @@ class DateType extends AbstractType
                 'text',
                 'choice',
             ),
-            'format'    => array(
-                \IntlDateFormatter::FULL,
-                \IntlDateFormatter::LONG,
-                \IntlDateFormatter::MEDIUM,
-                \IntlDateFormatter::SHORT,
-             ),
         );
     }
 

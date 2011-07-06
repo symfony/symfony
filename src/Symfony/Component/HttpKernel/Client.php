@@ -106,8 +106,13 @@ EOF;
     /**
      * Filters an array of files.
      *
-     * This method marks all uploaded files as already moved thus avoiding
-     * UploadedFile's call to move_uploaded_file(), which would otherwise fail.
+     * This method created test instances of UploadedFile so that the move()
+     * method can be called on those instances.
+     *
+     * If the size of a file is greater than the allowed size (from php.ini) then
+     * an invalid UploadedFile is returned with an error set to UPLOAD_ERR_INI_SIZE.
+     *
+     * @see Symfony\Component\HttpFoundation\File\UploadedFile
      *
      * @param array $files An array of files
      *
@@ -120,15 +125,25 @@ EOF;
             if (is_array($value)) {
                 $filtered[$key] = $this->filterFiles($value);
             } elseif ($value instanceof UploadedFile) {
-                // Create a test mode UploadedFile
-                $filtered[$key] = new UploadedFile(
-                    $value->getPathname(),
-                    $value->getClientOriginalName(),
-                    $value->getClientMimeType(),
-                    $value->getClientSize(),
-                    $value->getError(),
-                    true
-                );
+                if ($value->isValid() && $value->getSize() > static::getMaxUploadFilesize()) {
+                    $filtered[$key] = new UploadedFile(
+                        '',
+                        $value->getClientOriginalName(),
+                        $value->getClientMimeType(),
+                        0,
+                        UPLOAD_ERR_INI_SIZE,
+                        true
+                    );
+                } else {
+                    $filtered[$key] = new UploadedFile(
+                        $value->getPathname(),
+                        $value->getClientOriginalName(),
+                        $value->getClientMimeType(),
+                        $value->getClientSize(),
+                        $value->getError(),
+                        true
+                    );
+                }
             } else {
                 $filtered[$key] = $value;
             }
@@ -156,5 +171,30 @@ EOF;
         }
 
         return new DomResponse($response->getContent(), $response->getStatusCode(), $headers);
+    }
+
+    /**
+     * Returns the maximum size of an uploaded file
+     *
+     * @return type The maximum size of an uploaded file in bytes
+     */
+    static protected function getMaxUploadFilesize()
+    {
+        $max = trim(ini_get('upload_max_filesize'));
+
+        if ('' === $max) {
+            return PHP_INT_MAX;
+        }
+
+        switch (strtolower(substr($max, -1))) {
+            case 'g':
+                $max *= 1024;
+            case 'm':
+                $max *= 1024;
+            case 'k':
+                $max *= 1024;
+        }
+
+        return (integer) $max;
     }
 }

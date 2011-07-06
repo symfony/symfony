@@ -9,6 +9,15 @@ timeline closely anyway.
 RC4 to RC5
 ----------
 
+* The configuration of MonologBundle has been refactored.
+
+    * Only services are supported for the processors. They are now registered
+      using the `monolog.processor` tag which accept three optionnal attributes:
+
+        * `handler`: the name of an handler to register it only for a specific handler
+        * `channel`: to register it only for one logging channel (exclusive with `handler`)
+        * `method`: The method used to process the record (`__invoke` is used if not set)
+
 * To avoid security issues, HTTP headers coming from proxies are not trusted
   anymore by default (like `HTTP_X_FORWARDED_FOR`, `X_FORWARDED_PROTO`, and
   `X_FORWARDED_HOST`). If your application is behind a reverse proxy, add the
@@ -20,7 +29,7 @@ RC4 to RC5
 RC3 to RC4
 ----------
 
-* Annotation classes must be annotated with @Annotation 
+* Annotation classes must be annotated with @Annotation
   (see the validator constraints for examples)
 
 * Annotations are not using the PHP autoloading but their own mechanism. This

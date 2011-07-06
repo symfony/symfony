@@ -216,4 +216,22 @@ class Registry implements RegistryInterface
     {
         return $this->getEntityManager($entityManagerName)->getRepository($entityName);
     }
+
+    /**
+     * Gets the entity manager associated with a given object.
+     *
+     * @param object $object A Doctrine Entity
+     *
+     * @return EntityManager|null
+     */
+    public function getEntityManagerForObject($object)
+    {
+        foreach ($this->entityManagers as $id) {
+            $em = $this->container->get($id);
+
+            if ($em->getConfiguration()->getMetadataDriverImpl()->isTransient($object)) {
+                return $em;
+            }
+        }
+    }
 }

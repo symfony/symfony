@@ -47,7 +47,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('charset')->end()
-                ->scalarNode('proxy')->defaultFalse()->end()
+                ->scalarNode('trust_proxy_headers')->defaultFalse()->end()
                 ->scalarNode('secret')->isRequired()->end()
                 ->scalarNode('exception_controller')->defaultValue('Symfony\\Bundle\\FrameworkBundle\\Controller\\ExceptionController::showAction')->end()
                 ->scalarNode('ide')->defaultNull()->end()

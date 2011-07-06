@@ -18,7 +18,7 @@ RC4 to RC5
   following configuration:
 
         framework:
-            proxy: true
+            trust_proxy_headers: true
 
  * To avoid hidden naming collisions, the AbstractType does not try to define
    the name of form types magically. You now need to implement the `getName()`

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConstraintValidatorsPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddValidatorInitializersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FormPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TemplatingPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass;
@@ -52,6 +53,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new RegisterKernelListenersPass());
         $container->addCompilerPass(new TemplatingPass());
         $container->addCompilerPass(new AddConstraintValidatorsPass());
+        $container->addCompilerPass(new AddValidatorInitializersPass());
         $container->addCompilerPass(new FormPass());
         $container->addCompilerPass(new TranslatorPass());
         $container->addCompilerPass(new AddCacheWarmerPass());

@@ -32,13 +32,15 @@ class GraphWalker
     protected $context;
     protected $validatorFactory;
     protected $metadataFactory;
+    protected $validatorInitializers = array();
     protected $validatedObjects = array();
 
-    public function __construct($root, ClassMetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $factory)
+    public function __construct($root, ClassMetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $factory, array $validatorInitializers = array())
     {
         $this->context = new ExecutionContext($root, $this, $metadataFactory);
         $this->validatorFactory = $factory;
         $this->metadataFactory = $metadataFactory;
+        $this->validatorInitializers = $validatorInitializers;
     }
 
     /**
@@ -60,6 +62,13 @@ class GraphWalker
      */
     public function walkObject(ClassMetadata $metadata, $object, $group, $propertyPath)
     {
+        foreach ($this->validatorInitializers as $initializer) {
+            if (!$initializer instanceof ObjectInitializerInterface) {
+                throw new \LogicException('Validator initializers must implement ObjectInitializerInterface.');
+            }
+            $initializer->initialize($object);
+        }
+
         $this->context->setCurrentClass($metadata->getClassName());
 
         if ($group === Constraint::DEFAULT_GROUP && $metadata->hasGroupSequence()) {

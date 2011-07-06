@@ -28,14 +28,17 @@ class Validator implements ValidatorInterface
 {
     protected $metadataFactory;
     protected $validatorFactory;
+    protected $validatorInitializers;
 
     public function __construct(
         ClassMetadataFactoryInterface $metadataFactory,
-        ConstraintValidatorFactoryInterface $validatorFactory
+        ConstraintValidatorFactoryInterface $validatorFactory,
+        array $validatorInitializers = array()
     )
     {
         $this->metadataFactory = $metadataFactory;
         $this->validatorFactory = $validatorFactory;
+        $this->validatorInitializers = $validatorInitializers;
     }
 
     /**
@@ -102,7 +105,7 @@ class Validator implements ValidatorInterface
 
     protected function validateGraph($root, \Closure $walk, $groups = null)
     {
-        $walker = new GraphWalker($root, $this->metadataFactory, $this->validatorFactory);
+        $walker = new GraphWalker($root, $this->metadataFactory, $this->validatorFactory, $this->validatorInitializers);
         $groups = $groups ? (array) $groups : array(Constraint::DEFAULT_GROUP);
 
         foreach ($groups as $group) {

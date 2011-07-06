@@ -124,7 +124,7 @@
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal</source>
-                <target>Les deux valeurs doivent être identiques</target>
+                <target>Obie wartości powinny być równe</target>
             </trans-unit>
             <trans-unit id="32">
                 <source>The file is too large. Allowed maximum size is {{ limit }}</source>

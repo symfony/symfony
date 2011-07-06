@@ -9,6 +9,9 @@ timeline closely anyway.
 RC4 to RC5
 ----------
 
+* Removed the guesser for the Choice constraint as the constraint only knows
+  about the valid keys, and not their values.
+
 * To avoid security issues, HTTP headers coming from proxies are not trusted
   anymore by default (like `HTTP_X_FORWARDED_FOR`, `X_FORWARDED_PROTO`, and
   `X_FORWARDED_HOST`). If your application is behind a reverse proxy, add the

@@ -27,21 +27,24 @@ class EnsureCsrfFieldListener
     private $name;
     private $intention;
     private $provider;
+    private $errorMessage;
 
     /**
      * Constructor.
      *
-     * @param FormFactoryInterface  $factory   The form factory
-     * @param string                $name      A name for the CSRF field
-     * @param string                $intention The intention string
-     * @param CsrfProviderInterface $provider  The CSRF provider
+     * @param FormFactoryInterface  $factory      The form factory
+     * @param string                $name         A name for the CSRF field
+     * @param string                $intention    The intention string
+     * @param CsrfProviderInterface $provider     The CSRF provider
+     * @param string                $errorMessage The error message for an invalid CSRF token
      */
-    public function __construct(FormFactoryInterface $factory, $name, $intention = null, CsrfProviderInterface $provider = null)
+    public function __construct(FormFactoryInterface $factory, $name, $intention = null, CsrfProviderInterface $provider = null, $errorMessage = null)
     {
         $this->factory = $factory;
         $this->name = $name;
         $this->intention = $intention;
         $this->provider = $provider;
+        $this->errorMessage = $errorMessage;
     }
 
     /**
@@ -59,6 +62,9 @@ class EnsureCsrfFieldListener
         }
         if ($this->provider) {
             $options['csrf_provider'] = $this->provider;
+        }
+        if ($this->errorMessage) {
+            $options['error_message'] = $this->errorMessage;
         }
 
         $form->add($this->factory->createNamed('csrf', $this->name, null, $options));

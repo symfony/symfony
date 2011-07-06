@@ -264,8 +264,6 @@ class YamlFileLoader extends FileLoader
                     $namespace,
                     $extensionNamespaces ? sprintf('"%s"', implode('", "', $extensionNamespaces)) : 'none'
                 ));
-
-                throw new \InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in %s).', $namespace, $file));
             }
         }
 

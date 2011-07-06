@@ -172,6 +172,7 @@ class Response
         }
 
         $this->content = (string) $content;
+        $this->headers->set('Content-Length', strlen($this->content));
     }
 
     /**

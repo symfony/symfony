@@ -73,7 +73,17 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('from_email')->end() // swift_mailer and native_mailer
                             ->scalarNode('to_email')->end() // swift_mailer and native_mailer
                             ->scalarNode('subject')->end() // swift_mailer and native_mailer
-                            ->scalarNode('email_prototype')->end() // swift_mailer
+                            ->arrayNode('email_prototype') // swift_mailer
+                                ->canBeUnset()
+                                ->beforeNormalization()
+                                    ->ifString()
+                                    ->then(function($v) { return array('id' => $v); })
+                                ->end()
+                                ->children()
+                                    ->scalarNode('id')->isRequired()->end()
+                                    ->scalarNode('factory-method')->defaultNull()->end()
+                                ->end()
+                            ->end()
                             ->scalarNode('formatter')->end()
                         ->end()
                         ->validate()

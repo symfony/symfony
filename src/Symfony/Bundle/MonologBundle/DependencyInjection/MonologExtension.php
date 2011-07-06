@@ -186,7 +186,11 @@ class MonologExtension extends Extension
 
         case 'swift_mailer':
             if (isset($handler['email_prototype'])) {
-                $prototype = $this->parseDefinition($handler['email_prototype']);
+                if (!empty($handler['email_prototype']['method'])) {
+                    $prototype = array(new Reference($handler['email_prototype']['id']), $handler['email_prototype']['method']);
+                } else {
+                    $prototype = new Reference($handler['email_prototype']['id']);
+                }
             } else {
                 $message = new Definition('Swift_Message');
                 $message->setFactoryService('mailer');
@@ -242,19 +246,5 @@ class MonologExtension extends Extension
     private function getHandlerId($name)
     {
         return sprintf('monolog.handler.%s', $name);
-    }
-
-    private function parseDefinition($definition, ContainerBuilder $container = null)
-    {
-        if (0 === strpos($definition, '@')) {
-            $definition = substr($definition, 1);
-            if ($container && $container->hasDefinition($definition)) {
-                $container->getDefinition($definition)->setPublic(true);
-            }
-
-            return new Reference($definition);
-        }
-
-        return $definition;
     }
 }

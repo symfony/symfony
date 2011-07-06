@@ -5,7 +5,7 @@ Arguments:
  namespace  The namespace name
 
 Options:
- --xml To output help as XML
+ --xml      To output help as XML
 
 Help:
  The list command lists all commands:

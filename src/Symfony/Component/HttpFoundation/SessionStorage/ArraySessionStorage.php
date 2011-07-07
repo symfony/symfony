@@ -13,6 +13,9 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
 
 /**
  * ArraySessionStorage.
+ * 
+ * NOTE: This class is for testing purposes only and has nothing to do with
+ * PHP's session support (though it might someday *long wistful sigh*).
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>

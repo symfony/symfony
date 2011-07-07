@@ -114,9 +114,10 @@ class Crawler extends \SplObjectStorage
         $dom = new \DOMDocument('1.0', $charset);
         $dom->validateOnParse = true;
 
-        libxml_use_internal_errors(true);
+        $old = libxml_use_internal_errors(true);
         $dom->loadHTML($content);
         libxml_clear_errors();
+        libxml_use_internal_errors($old);
         $this->addDocument($dom);
 
         $base = $this->filter('base')->extract(array('href'));
@@ -140,9 +141,10 @@ class Crawler extends \SplObjectStorage
         $dom->validateOnParse = true;
 
         // remove the default namespace to make XPath expressions simpler
-        libxml_use_internal_errors(true);
+        $old = libxml_use_internal_errors(true);
         $dom->loadXML(str_replace('xmlns', 'ns', $content));
         libxml_clear_errors();
+        libxml_use_internal_errors($old);
         $this->addDocument($dom);
     }
 

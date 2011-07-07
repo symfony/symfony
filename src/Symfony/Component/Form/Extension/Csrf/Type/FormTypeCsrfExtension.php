@@ -45,7 +45,8 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
             $builder->getFormFactory(),
             $options['csrf_field_name'],
             $options['intention'],
-            $options['csrf_provider']
+            $options['csrf_provider'],
+            $options['csrf_error_message']
         );
 
         // use a low priority so higher priority listeners don't remove the field
@@ -79,10 +80,11 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     public function getDefaultOptions(array $options)
     {
         return array(
-            'csrf_protection'   => $this->enabled,
-            'csrf_field_name'   => $this->fieldName,
-            'csrf_provider'     => null,
-            'intention'         => 'unknown',
+            'csrf_protection'    => $this->enabled,
+            'csrf_error_message' => null,
+            'csrf_field_name'    => $this->fieldName,
+            'csrf_provider'      => null,
+            'intention'          => 'unknown',
         );
     }
 

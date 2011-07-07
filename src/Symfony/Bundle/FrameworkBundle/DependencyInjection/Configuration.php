@@ -87,6 +87,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->booleanNode('enabled')->defaultTrue()->end()
                         ->scalarNode('field_name')->defaultValue('_token')->end()
+                        ->scalarNode('error_message')->defaultValue('The CSRF token is invalid. Please try to resubmit the form')->end()
                     ->end()
                 ->end()
             ->end()

@@ -35,6 +35,7 @@
     <xsd:complexType name="csrf_protection">
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="field-name" type="xsd:string" />
+        <xsd:attribute name="error-message" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="esi">

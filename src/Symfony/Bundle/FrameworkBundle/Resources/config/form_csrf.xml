@@ -17,6 +17,7 @@
         <service id="form.type.csrf" class="Symfony\Component\Form\Extension\Csrf\Type\CsrfType">
             <tag name="form.type" alias="csrf" />
             <argument type="service" id="form.csrf_provider" />
+            <argument>%form.type.csrf.error_message%</argument>
         </service>
         <service id="form.type_extension.csrf" class="Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension">
             <tag name="form.type_extension" alias="form" />

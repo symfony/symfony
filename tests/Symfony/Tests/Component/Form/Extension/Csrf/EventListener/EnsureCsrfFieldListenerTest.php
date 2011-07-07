@@ -80,4 +80,20 @@ class EnsureCsrfFieldListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new EnsureCsrfFieldListener($this->formFactory, '_token', null, $provider);
         $listener->ensureCsrfField($this->event);
     }
+
+    public function testErrorMessage()
+    {
+        $errorMessage = 'An error occurred.';
+
+        $this->formFactory->expects($this->once())
+            ->method('createNamed')
+            ->with('csrf', '_token', null, array('error_message' => $errorMessage))
+            ->will($this->returnValue($this->field));
+        $this->form->expects($this->once())
+            ->method('add')
+            ->with($this->isInstanceOf('Symfony\\Tests\\Component\\Form\\FormInterface'));
+
+        $listener = new EnsureCsrfFieldListener($this->formFactory, '_token', null, null, $errorMessage);
+        $listener->ensureCsrfField($this->event);
+    }
 }

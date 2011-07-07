@@ -54,6 +54,41 @@ class CsrfTypeTest extends TypeTestCase
         $this->assertEquals('token', $form->getData());
     }
 
+    public function testInvalidTokenCustomErrorMessage()
+    {
+        $this->provider->expects($this->once())
+            ->method('isCsrfTokenValid')
+            ->with('%INTENTION%', 'token')
+            ->will($this->returnValue(false));
+
+        $form = $this->factory->create('csrf', null, array(
+            'csrf_provider' => $this->provider,
+            'intention' => '%INTENTION%',
+            'error_message' => 'An error occurred.',
+        ));
+        $form->bind('token');
+
+        $formErrors = $form->getErrors();
+        $this->assertEquals('An error occurred.', $formErrors[0]->getMessageTemplate());
+    }
+
+    public function testInvalidTokenDefaultErrorMessage()
+    {
+        $this->provider->expects($this->once())
+            ->method('isCsrfTokenValid')
+            ->with('%INTENTION%', 'token')
+            ->will($this->returnValue(false));
+
+        $form = $this->factory->create('csrf', null, array(
+            'csrf_provider' => $this->provider,
+            'intention' => '%INTENTION%',
+        ));
+        $form->bind('token');
+
+        $formErrors = $form->getErrors();
+        $this->assertEquals('The CSRF token is invalid. Please try to resubmit the form', $formErrors[0]->getMessageTemplate());
+    }
+
     public function testValidateTokenOnBind()
     {
         $this->provider->expects($this->once())

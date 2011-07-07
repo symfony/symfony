@@ -29,15 +29,7 @@ class FileValidator extends ConstraintValidator
         if ($value instanceof UploadedFile && !$value->isValid()) {
             switch ($value->getError()) {
                 case UPLOAD_ERR_INI_SIZE:
-                    $maxSize = trim(ini_get('upload_max_filesize'));
-                    switch (strtolower(substr($maxSize, -1))) {
-                        case 'g':
-                            $maxSize *= 1024;
-                        case 'm':
-                            $maxSize *= 1024;
-                        case 'k':
-                            $maxSize *= 1024;
-                    }
+                    $maxSize = UploadedFile::getMaxFilesize();
                     $maxSize = $constraint->maxSize ? min($maxSize, $constraint->maxSize) : $maxSize;
                     $this->setMessage($constraint->uploadIniSizeErrorMessage, array('{{ limit }}' => $maxSize.' bytes'));
 

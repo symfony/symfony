@@ -125,7 +125,7 @@ EOF;
             if (is_array($value)) {
                 $filtered[$key] = $this->filterFiles($value);
             } elseif ($value instanceof UploadedFile) {
-                if ($value->isValid() && $value->getSize() > static::getMaxUploadFilesize()) {
+                if ($value->isValid() && $value->getSize() > UploadedFile::getMaxFilesize()) {
                     $filtered[$key] = new UploadedFile(
                         '',
                         $value->getClientOriginalName(),
@@ -171,30 +171,5 @@ EOF;
         }
 
         return new DomResponse($response->getContent(), $response->getStatusCode(), $headers);
-    }
-
-    /**
-     * Returns the maximum size of an uploaded file
-     *
-     * @return type The maximum size of an uploaded file in bytes
-     */
-    static protected function getMaxUploadFilesize()
-    {
-        $max = trim(ini_get('upload_max_filesize'));
-
-        if ('' === $max) {
-            return PHP_INT_MAX;
-        }
-
-        switch (strtolower(substr($max, -1))) {
-            case 'g':
-                $max *= 1024;
-            case 'm':
-                $max *= 1024;
-            case 'k':
-                $max *= 1024;
-        }
-
-        return (integer) $max;
     }
 }

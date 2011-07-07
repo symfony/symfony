@@ -110,24 +110,22 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     {
         $source = tempnam(sys_get_temp_dir(), 'source');
 
-        file_put_contents($source, 'foo');
-
         $kernel = new TestHttpKernel();
+        $client = new Client($kernel);
 
-        $client = $this
-            ->getMockBuilder('Symfony\Component\HttpKernel\Client')
-            ->setConstructorArgs(array($kernel))
-            ->setMethods(array('getMaxUploadFilesize'))
+        $file = $this
+            ->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
+            ->setConstructorArgs(array($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK))
+            ->setMethods(array('getSize'))
             ->getMock()
         ;
 
-        $client
-            ->staticExpects($this->once())
-            ->method('getMaxUploadFilesize')
-            ->will($this->returnValue(1))
+        $file->expects($this->once())
+            ->method('getSize')
+            ->will($this->returnValue(INF))
         ;
 
-        $client->request('POST', '/', array(), array(new UploadedFile($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK)));
+        $client->request('POST', '/', array(), array($file));
 
         $files = $kernel->request->files->all();
 

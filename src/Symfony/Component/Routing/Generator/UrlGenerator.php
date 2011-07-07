@@ -28,6 +28,12 @@ use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 class UrlGenerator implements UrlGeneratorInterface
 {
     protected $context;
+    protected $escapedChars = array(
+        '%' => '%25',
+        '+' => '%2B',
+        '#' => '%23',
+        '?' => '%3F',
+    );
 
     private $routes;
     private $cache;
@@ -125,7 +131,7 @@ class UrlGenerator implements UrlGeneratorInterface
                     }
 
                     if (!$isEmpty || !$optional) {
-                        $url = $token[1].strtr($tparams[$token[3]], array('%'=>'%25', '+'=>'%2B')).$url;
+                        $url = $token[1].strtr($tparams[$token[3]], $this->escapedChars).$url;
                     }
 
                     $optional = false;

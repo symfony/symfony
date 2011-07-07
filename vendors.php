@@ -27,7 +27,7 @@ $deps = array(
     array('doctrine', 'http://github.com/doctrine/doctrine2.git', '2.1.0'),
     array('doctrine-dbal', 'http://github.com/doctrine/dbal.git', '2.1.0'),
     array('doctrine-common', 'http://github.com/doctrine/common.git', '2.1.0'),
-    array('monolog', 'http://github.com/Seldaek/monolog.git', 'origin/HEAD'),
+    array('monolog', 'http://github.com/Seldaek/monolog.git', '1.0.0'),
     array('swiftmailer', 'http://github.com/swiftmailer/swiftmailer.git', 'v4.1.0'),
     array('twig', 'http://github.com/fabpot/Twig.git', 'v1.1.0'),
 );

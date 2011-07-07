@@ -187,7 +187,7 @@ class UploadedFile extends File
      *
      * @return type The maximum size of an uploaded file in bytes
      */
-    public static function getMaxFilesize()
+    static public function getMaxFilesize()
     {
         $max = trim(ini_get('upload_max_filesize'));
 

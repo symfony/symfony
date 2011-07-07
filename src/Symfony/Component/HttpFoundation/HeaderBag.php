@@ -49,7 +49,7 @@ class HeaderBag
         }
 
         $beautifier = function ($name) {
-            return preg_replace('/\-(.)/e', "'-'.strtoupper('\\1')", ucfirst($name));
+            return preg_replace_callback('/\-(.)/', function ($match) { return '-'.strtoupper($match[1]); }, ucfirst($name));
         };
 
         $max = max(array_map('strlen', array_keys($this->headers))) + 1;

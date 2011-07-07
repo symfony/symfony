@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-class Callback extends \Symfony\Component\Validator\Constraint
+use Symfony\Component\Validator\Constraint;
+
+/** @Annotation */
+class Callback extends Constraint
 {
     public $methods;
 

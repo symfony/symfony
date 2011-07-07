@@ -2,8 +2,10 @@
 
 namespace Symfony\Component\Serializer;
 
-use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Encoder\EncoderInterface;
+use Symfony\Component\Serializer\Encoder\DecoderInterface;
+use Symfony\Component\Serializer\Encoder\NormalizationAwareInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -37,6 +39,7 @@ interface SerializerInterface
      * @param mixed $data
      * @param string $type
      * @param string $format
+     * @api
      */
     function deserialize($data, $type, $format);
 
@@ -56,8 +59,8 @@ interface SerializerInterface
      * @param mixed $data
      * @param string $type
      * @param string $format
-     *
      * @return mixed
+     * @api
      */
     function denormalize($data, $type, $format = null);
 
@@ -80,4 +83,48 @@ interface SerializerInterface
      * @api
      */
     function decode($data, $format);
+
+    /**
+     * Checks whether the serializer can serialize to given format
+     *
+     * @param string $format format name
+     * @return Boolean
+     * @api
+     */
+    function supportsSerialization($format);
+
+    /**
+     * Checks whether the serializer can deserialize from given format
+     *
+     * @param string $format format name
+     * @return Boolean
+     * @api
+     */
+    function supportsDeserialization($format);
+
+    /**
+     * Checks whether the serializer can encode to given format
+     *
+     * @param string $format format name
+     * @return Boolean
+     * @api
+     */
+    function supportsEncoding($format);
+
+    /**
+     * Checks whether the serializer can decode from given format
+     *
+     * @param string $format format name
+     * @return Boolean
+     * @api
+     */
+    function supportsDecoding($format);
+
+    /**
+     * Get the encoder for the given format
+     *
+     * @return EncoderInterface
+     * @api
+     */
+    function getEncoder($format);
 }

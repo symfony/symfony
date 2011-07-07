@@ -674,15 +674,20 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function isValid()
     {
-        if (!$this->isBound() || $this->hasErrors()) {
+        if (!$this->isBound()) {
+            throw new \LogicException('You cannot call isValid() on a form that is not bound.');
+        }
 
+        if ($this->hasErrors()) {
             return false;
         }
 
-        foreach ($this->children as $child) {
-            if (!$child->isValid()) {
+        if (!$this->readOnly) {
+            foreach ($this->children as $child) {
+                if (!$child->isValid()) {
 
-                return false;
+                    return false;
+                }
             }
         }
 
@@ -905,7 +910,6 @@ class Form implements \IteratorAggregate, FormInterface
         $view->setParent($parent);
 
         $types = (array) $this->types;
-        $childViews = array();
 
         foreach ($types as $type) {
             $type->buildView($view, $this);
@@ -915,8 +919,20 @@ class Form implements \IteratorAggregate, FormInterface
             }
         }
 
+        $childViews = array();
+
         foreach ($this->children as $key => $child) {
             $childViews[$key] = $child->createView($view);
+        }
+
+        if (null !== $prototype = $view->get('prototype')) {
+            $protoView = $prototype->getForm()->createView($view);
+            $protoTypes = $protoView->get('types');
+            $protoTypes[] = 'prototype';
+            $childViews[$prototype->getName()] = $protoView
+                ->set('types', $protoTypes)
+                ->set('proto_id', $view->get('id').'_prototype');
+            ;
         }
 
         $view->setChildren($childViews);

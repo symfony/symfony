@@ -23,8 +23,10 @@ use Symfony\Component\Finder\Finder;
  * @author Francis Besset <francis.besset@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class CacheClearCommand extends Command
+class CacheClearCommand extends ContainerAwareCommand
 {
+    protected $name;
+
     /**
      * @see Command
      */
@@ -52,7 +54,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $realCacheDir = $this->container->getParameter('kernel.cache_dir');
+        $realCacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
         $oldCacheDir  = $realCacheDir.'_old';
 
         if (!is_writable($realCacheDir)) {
@@ -70,14 +72,22 @@ EOF
             rename($warmupDir, $realCacheDir);
         }
 
-        $this->container->get('filesystem')->remove($oldCacheDir);
+        $this->getContainer()->get('filesystem')->remove($oldCacheDir);
     }
 
     protected function warmup($warmupDir)
     {
-        $this->container->get('filesystem')->remove($warmupDir);
+        $this->getContainer()->get('filesystem')->remove($warmupDir);
 
-        $kernel = $this->getTempKernel($this->container->get('kernel'), $warmupDir);
+        $parent = $this->getContainer()->get('kernel');
+        $class = get_class($parent);
+        $namespace = '';
+        if (false !== $pos = strrpos($class, '\\')) {
+            $namespace = substr($class, 0, $pos);
+            $class = substr($class, $pos + 1);
+        }
+
+        $kernel = $this->getTempKernel($parent, $namespace, $class, $warmupDir);
         $kernel->boot();
 
         $warmer = $kernel->getContainer()->get('cache_warmer');
@@ -85,34 +95,45 @@ EOF
         $warmer->warmUp($warmupDir);
 
         // fix container files and classes
+        $regex = '/'.preg_quote($this->getTempKernelSuffix(), '/').'/';
         $finder = new Finder();
         foreach ($finder->files()->name(get_class($kernel->getContainer()).'*')->in($warmupDir) as $file) {
             $content = file_get_contents($file);
-            $content = preg_replace('/__.*__/', '', $content);
-            file_put_contents(preg_replace('/__.*__/', '', $file), $content);
+            $content = preg_replace($regex, '', $content);
+            file_put_contents(preg_replace($regex, '', $file), $content);
             unlink($file);
+        }
+
+        // fix meta references to the Kernel
+        foreach ($finder->files()->name('*.meta')->in($warmupDir) as $file) {
+            $content = preg_replace(
+                '/C\:\d+\:"'.preg_quote($class.$this->getTempKernelSuffix(), '"/').'"/',
+                sprintf('C:%s:"%s"', strlen($class), $class),
+                file_get_contents($file)
+            );
+            file_put_contents($file, $content);
         }
     }
 
-    protected function getTempKernel(KernelInterface $parent, $warmupDir)
+    protected function getTempKernelSuffix()
     {
-        $parentClass = get_class($parent);
-
-        $namespace = '';
-        if (false !== $pos = strrpos($parentClass, '\\')) {
-            $namespace = substr($parentClass, 0, $pos);
-            $parentClass = substr($parentClass, $pos + 1);
+        if (null === $this->name) {
+            $this->name = '__'.uniqid().'__';
         }
 
-        $rand = uniqid();
-        $class = $parentClass.$rand;
+        return $this->name;
+    }
+
+    protected function getTempKernel(KernelInterface $parent, $namespace, $class, $warmupDir)
+    {
+        $suffix = $this->getTempKernelSuffix();
         $rootDir = $parent->getRootDir();
         $code = <<<EOF
 <?php
 
 namespace $namespace
 {
-    class $class extends $parentClass
+    class $class$suffix extends $class
     {
         public function getCacheDir()
         {
@@ -126,17 +147,16 @@ namespace $namespace
 
         protected function getContainerClass()
         {
-            return parent::getContainerClass().'__{$rand}__';
+            return parent::getContainerClass().'$suffix';
         }
     }
 }
 EOF;
-        $this->container->get('filesystem')->mkdir($warmupDir);
+        $this->getContainer()->get('filesystem')->mkdir($warmupDir);
         file_put_contents($file = $warmupDir.'/kernel.tmp', $code);
         require_once $file;
         @unlink($file);
-
-        $class = "$namespace\\$class";
+        $class = "$namespace\\$class$suffix";
 
         return new $class($parent->getEnvironment(), $parent->isDebug());
     }

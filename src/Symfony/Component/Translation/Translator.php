@@ -71,10 +71,6 @@ class Translator implements TranslatorInterface
      */
     public function addResource($format, $resource, $locale, $domain = 'messages')
     {
-        if (!isset($this->resources[$locale])) {
-            $this->resources[$locale] = array();
-        }
-
         $this->resources[$locale][] = array($format, $resource, $domain);
     }
 

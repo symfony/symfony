@@ -19,13 +19,14 @@ use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 
 class CollectionType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilder $builder, array $options)
     {
         if ($options['allow_add'] && $options['prototype']) {
-            $builder->add('$$name$$', $options['type'], array_replace(array(
-                'property_path' => false,
-                'required'      => false,
-            ), $options['options']));
+            $prototype = $builder->create('$$name$$', $options['type'], $options['options']);
+            $builder->setAttribute('prototype', $prototype);
         }
 
         $listener = new ResizeFormListener(
@@ -43,14 +44,24 @@ class CollectionType extends AbstractType
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildView(FormView $view, FormInterface $form)
     {
         $view
             ->set('allow_add', $form->getAttribute('allow_add'))
             ->set('allow_delete', $form->getAttribute('allow_delete'))
         ;
+
+        if ($form->hasAttribute('prototype')) {
+            $view->set('prototype', $form->getAttribute('prototype'));
+        }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         return array(
@@ -62,6 +73,9 @@ class CollectionType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'collection';

@@ -17,7 +17,7 @@ class CodeHelperTest extends \PHPUnit_Framework_TestCase
 {
     protected static $helper;
 
-    public static function setUpBeforeClass()
+    static public function setUpBeforeClass()
     {
         self::$helper = new CodeHelper('format', '/root');
     }
@@ -54,5 +54,10 @@ class CodeHelperTest extends \PHPUnit_Framework_TestCase
             array('Closure', '<abbr title="Closure">Closure</abbr>'),
             array('Method', '<abbr title="Method">Method</abbr>()')
         );
+    }
+
+    public function testGetName()
+    {
+        $this->assertEquals('code', self::$helper->getName());
     }
 }

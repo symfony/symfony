@@ -12,8 +12,10 @@
 namespace Symfony\Component\Form\Extension\Csrf\Type;
 
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\Extension\Csrf\EventListener\EnsureCsrfFieldListener;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
 class FormTypeCsrfExtension extends AbstractTypeExtension
@@ -35,18 +37,23 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilder $builder, array $options)
     {
-        if ($options['csrf_protection']) {
-            $csrfOptions = array('intention' => $options['intention']);
-
-            if ($options['csrf_provider']) {
-                $csrfOptions['csrf_provider'] = $options['csrf_provider'];
-            }
-
-            $builder
-                ->add($options['csrf_field_name'], 'csrf', $csrfOptions)
-                ->setAttribute('csrf_field_name', $options['csrf_field_name'])
-            ;
+        if (!$options['csrf_protection']) {
+            return;
         }
+
+        $listener = new EnsureCsrfFieldListener(
+            $builder->getFormFactory(),
+            $options['csrf_field_name'],
+            $options['intention'],
+            $options['csrf_provider']
+        );
+
+        // use a low priority so higher priority listeners don't remove the field
+        $builder
+            ->setAttribute('csrf_field_name', $options['csrf_field_name'])
+            ->addEventListener(FormEvents::PRE_SET_DATA, array($listener, 'ensureCsrfField'), -10)
+            ->addEventListener(FormEvents::PRE_BIND, array($listener, 'ensureCsrfField'), -10)
+        ;
     }
 
     /**

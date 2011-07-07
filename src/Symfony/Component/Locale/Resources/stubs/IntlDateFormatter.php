@@ -15,4 +15,9 @@
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @see Symfony\Component\IntlDateFormatter\Stub\StubIntlDateFormatter
  */
-class IntlDateFormatter extends \Symfony\Component\Locale\Stub\StubIntlDateFormatter {}
+
+use Symfony\Component\Locale\Stub\StubIntlDateFormatter;
+
+class IntlDateFormatter extends StubIntlDateFormatter
+{
+}

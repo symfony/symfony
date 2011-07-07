@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormBuilder;
 
 class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 {
+    private $dispatcher;
     private $factory;
     private $form;
 
@@ -26,6 +27,13 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
         $this->form = $this->getForm();
+    }
+
+    protected function tearDown()
+    {
+        $this->dispatcher = null;
+        $this->factory = null;
+        $this->form = null;
     }
 
     protected function getBuilder($name = 'name')
@@ -65,30 +73,6 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->form->has('0'));
         $this->assertTrue($this->form->has('1'));
         $this->assertTrue($this->form->has('2'));
-    }
-
-    public function testPreSetDataRemovesPrototypeRowIfNotAllowAdd()
-    {
-        $this->form->add($this->getForm('$$name$$'));
-
-        $data = array();
-        $event = new DataEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', array(), false, false);
-        $listener->preSetData($event);
-
-        $this->assertFalse($this->form->has('$$name$$'));
-    }
-
-    public function testPreSetDataDoesNotRemovePrototypeRowIfAllowAdd()
-    {
-        $this->form->add($this->getForm('$$name$$'));
-
-        $data = array();
-        $event = new DataEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', array(), true, false);
-        $listener->preSetData($event);
-
-        $this->assertTrue($this->form->has('$$name$$'));
     }
 
     /**

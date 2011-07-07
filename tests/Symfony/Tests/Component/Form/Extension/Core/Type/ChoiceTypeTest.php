@@ -303,12 +303,25 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertEquals(array('0', '1'), $form->getClientData());
     }
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
-     */
-    public function testRequiresChoicesOrChoiceListOption()
+    public function testPassRequiredToView()
     {
-        $this->factory->create('choice', 'name');
+        $form = $this->factory->create('choice', null, array(
+            'choices' => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertTrue($view->get('required'));
+    }
+
+    public function testPassNonRequiredToView()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'required' => false,
+            'choices' => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertFalse($view->get('required'));
     }
 
     public function testPassMultipleToView()
@@ -331,6 +344,61 @@ class ChoiceTypeTest extends TypeTestCase
         $view = $form->createView();
 
         $this->assertTrue($view->get('expanded'));
+    }
+
+    public function testNotPassedEmptyValueToViewIsNull()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'choices' => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertNull($view->get('empty_value'));
+    }
+
+    public function testPassEmptyValueToViewIsEmpty()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'required' => false,
+            'choices' => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertEmpty($view->get('empty_value'));
+    }
+
+    /**
+     * @dataProvider getOptionsWithEmptyValue
+     */
+    public function testPassEmptyValueToView($multiple, $expanded, $required, $emptyValue, $viewValue)
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => $multiple,
+            'expanded' => $expanded,
+            'required' => $required,
+            'empty_value' => $emptyValue,
+            'choices' => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertEquals($viewValue, $view->get('empty_value'));
+    }
+
+    public function getOptionsWithEmptyValue()
+    {
+        return array(
+            array(false, false, false, 'foobar', 'foobar'),
+            array(true, false, false, 'foobar', null),
+            array(false, true, false, 'foobar', null),
+            array(false, false, true, 'foobar', 'foobar'),
+            array(false, false, true, '', ''),
+            array(false, false, true, null, null),
+            array(false, true, true, 'foobar', null),
+            array(true, true, false, 'foobar', null),
+            array(true, true, true, 'foobar', null),
+        );
     }
 
     public function testPassChoicesToView()

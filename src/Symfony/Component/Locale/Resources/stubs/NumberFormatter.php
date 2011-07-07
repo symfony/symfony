@@ -15,4 +15,9 @@
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @see Symfony\Component\Locale\Stub\StubNumberFormatter
  */
-class NumberFormatter extends \Symfony\Component\Locale\Stub\StubNumberFormatter {}
+
+use Symfony\Component\Locale\Stub\StubNumberFormatter;
+
+class NumberFormatter extends StubNumberFormatter
+{
+}

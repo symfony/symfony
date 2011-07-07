@@ -37,6 +37,16 @@ class ExceptionControllerTest extends TestCase
         $this->container = $this->getContainer();
     }
 
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->controller = null;
+        $this->container = null;
+        $this->flatten = null;
+        $this->kernel = null;
+    }
+
     /**
      * @dataProvider getDebugModes
      */

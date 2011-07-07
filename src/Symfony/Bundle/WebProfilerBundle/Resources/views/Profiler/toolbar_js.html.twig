@@ -8,10 +8,14 @@
         } else {
             xhr = new ActiveXObject('Microsoft.XMLHTTP');
         }
-        xhr.open('GET', '{{ path("_wdt", { "token": token }) }}', false);
+        xhr.open('GET', '{{ path("_wdt", { "token": token }) }}', true);
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.onreadystatechange = function(state) {
+            if (4 === xhr.readyState && 200 === xhr.status && -1 !== xhr.responseText.indexOf('sf-toolbarreset')) {
+                wdt.innerHTML = xhr.responseText;
+                wdt.style.display = 'block';
+            }
+        };
         xhr.send('');
-        wdt.innerHTML = xhr.responseText;
-        wdt.style.display = 'block';
     })();
 /*]]>*/</script>

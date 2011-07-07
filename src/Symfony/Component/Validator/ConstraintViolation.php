@@ -54,7 +54,7 @@ class ConstraintViolation
      */
     public function getMessage()
     {
-        return str_replace(array_keys($this->messageParameters), array_values($this->messageParameters), $this->messageTemplate);
+        return strtr($this->messageTemplate, $this->messageParameters);
     }
 
     public function getRoot()

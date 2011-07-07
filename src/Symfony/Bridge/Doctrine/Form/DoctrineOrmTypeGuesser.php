@@ -16,6 +16,7 @@ use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\Mapping\MappingException;
 
 class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 {
@@ -98,7 +99,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     public function guessMaxLength($class, $property)
     {
         $ret = $this->getMetadata($class);
-        if ($ret && !$ret[0]->hasAssociation($property)) {
+        if ($ret && $ret[0]->hasField($property) && !$ret[0]->hasAssociation($property)) {
             $mapping = $ret[0]->getFieldMapping($property);
 
             if (isset($mapping['length'])) {
@@ -122,8 +123,10 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 
         $this->cache[$class] = null;
         foreach ($this->registry->getEntityManagers() as $name => $em) {
-            if (!$em->getConfiguration()->getMetadataDriverImpl()->isTransient($class)) {
+            try {
                 return $this->cache[$class] = array($em->getClassMetadata($class), $name);
+            } catch (MappingException $e) {
+                // not an entity or mapped super class
             }
         }
     }

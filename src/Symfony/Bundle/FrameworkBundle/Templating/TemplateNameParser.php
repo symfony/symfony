@@ -62,11 +62,13 @@ class TemplateNameParser extends BaseTemplateNameParser
         }
 
         $elements = explode('.', $parts[2]);
-        if (3 !== count($elements)) {
+        if (3 > count($elements)) {
             throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.format.engine").', $name));
         }
+        $engine = array_pop($elements);
+        $format = array_pop($elements);
 
-        $template = new TemplateReference($parts[0], $parts[1], $elements[0], $elements[1], $elements[2]);
+        $template = new TemplateReference($parts[0], $parts[1], implode('.', $elements), $format, $engine);
 
         if ($template->get('bundle')) {
             try {
@@ -91,11 +93,13 @@ class TemplateNameParser extends BaseTemplateNameParser
         $parts = explode('/', strtr($file, '\\', '/'));
 
         $elements = explode('.', array_pop($parts));
-        if (3 !== count($elements)) {
+        if (3 > count($elements)) {
             return false;
         }
+        $engine = array_pop($elements);
+        $format = array_pop($elements);
 
-        return new TemplateReference('', implode('/', $parts), $elements[0], $elements[1], $elements[2]);
+        return new TemplateReference('', implode('/', $parts), implode('.', $elements), $format, $engine);
     }
 
 }

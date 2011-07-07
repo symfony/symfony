@@ -17,11 +17,17 @@ use Symfony\Component\Form\Extension\Core\EventListener\FixUrlProtocolListener;
 
 class UrlType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilder $builder, array $options)
     {
         $builder->addEventSubscriber(new FixUrlProtocolListener($options['default_protocol']));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         return array(
@@ -29,11 +35,17 @@ class UrlType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent(array $options)
     {
         return 'text';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'url';

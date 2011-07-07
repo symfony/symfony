@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage;
  */
 class Request
 {
+    static protected $trustProxy = false;
+
     /**
      * @var \Symfony\Component\HttpFoundation\ParameterBag
      */
@@ -166,6 +168,7 @@ class Request
             'SCRIPT_NAME'          => '',
             'SCRIPT_FILENAME'      => '',
             'SERVER_PROTOCOL'      => 'HTTP/1.1',
+            'REQUEST_TIME'         => time(),
         );
 
         $components = parse_url($uri);
@@ -207,7 +210,7 @@ class Request
             $query = array_replace($qs, $query);
         }
 
-        $uri = $components['path'] . ($queryString ? '?'.$queryString : '');
+        $uri = $components['path'].($queryString ? '?'.$queryString : '');
 
         $server = array_replace($defaults, $server, array(
             'REQUEST_METHOD'       => strtoupper($method),
@@ -321,11 +324,33 @@ class Request
         $_REQUEST = array_merge($_GET, $_POST);
     }
 
-    // Order of precedence: GET, PATH, POST, COOKIE
-    // Avoid using this method in controllers:
-    //  * slow
-    //  * prefer to get from a "named" source
-    // This method is mainly useful for libraries that want to provide some flexibility
+    /**
+     * Trusts $_SERVER entries coming from proxies.
+     *
+     * You should only call this method if your application
+     * is hosted behind a reverse proxy that you manage.
+     */
+    static public function trustProxyData()
+    {
+        self::$trustProxy = true;
+    }
+
+    /**
+     * Gets a "parameter" value.
+     *
+     * This method is mainly useful for libraries that want to provide some flexibility.
+     *
+     * Order of precedence: GET, PATH, POST, COOKIE
+     * Avoid using this method in controllers:
+     *  * slow
+     *  * prefer to get from a "named" source
+     *
+     * @param string    $key        the key
+     * @param mixed     $default    the default value
+     * @param type      $deep       is parameter deep in multidimensional array
+     *
+     * @return mixed
+     */
     public function get($key, $default = null, $deep = false)
     {
         return $this->query->get($key, $this->attributes->get($key, $this->request->get($key, $default, $deep), $deep), $deep);
@@ -385,7 +410,7 @@ class Request
         if ($proxy) {
             if ($this->server->has('HTTP_CLIENT_IP')) {
                 return $this->server->get('HTTP_CLIENT_IP');
-            } elseif ($this->server->has('HTTP_X_FORWARDED_FOR')) {
+            } elseif (self::$trustProxy && $this->server->has('HTTP_X_FORWARDED_FOR')) {
                 return $this->server->get('HTTP_X_FORWARDED_FOR');
             }
         }
@@ -588,9 +613,9 @@ class Request
         return (
             (strtolower($this->server->get('HTTPS')) == 'on' || $this->server->get('HTTPS') == 1)
             ||
-            (strtolower($this->headers->get('SSL_HTTPS')) == 'on' || $this->headers->get('SSL_HTTPS') == 1)
+            (self::$trustProxy && strtolower($this->headers->get('SSL_HTTPS')) == 'on' || $this->headers->get('SSL_HTTPS') == 1)
             ||
-            (strtolower($this->headers->get('X_FORWARDED_PROTO')) == 'https')
+            (self::$trustProxy && strtolower($this->headers->get('X_FORWARDED_PROTO')) == 'https')
         );
     }
 
@@ -601,7 +626,7 @@ class Request
      */
     public function getHost()
     {
-        if ($host = $this->headers->get('X_FORWARDED_HOST')) {
+        if (self::$trustProxy && $host = $this->headers->get('X_FORWARDED_HOST')) {
             $elements = explode(',', $host);
 
             $host = trim($elements[count($elements) - 1]);
@@ -865,7 +890,7 @@ class Request
     /**
      * Gets a list of content types acceptable by the client browser
      *
-     * @return array Languages ordered in the user browser preferences
+     * @return array List of content types in preferable order
      */
     public function getAcceptableContentTypes()
     {
@@ -1018,6 +1043,11 @@ class Request
         return rtrim($baseUrl, '/');
     }
 
+    /**
+     * Prepares base path.
+     *
+     * @return string base path
+     */
     protected function prepareBasePath()
     {
         $filename = basename($this->server->get('SCRIPT_FILENAME'));
@@ -1039,6 +1069,11 @@ class Request
         return rtrim($basePath, '/');
     }
 
+    /**
+     * Prepares path info.
+     *
+     * @return string path info
+     */
     protected function preparePathInfo()
     {
         $baseUrl = $this->getBaseUrl();
@@ -1064,6 +1099,9 @@ class Request
         return (string) $pathInfo;
     }
 
+    /**
+     * Initializes HTTP request formats.
+     */
     static protected function initializeFormats()
     {
         static::$formats = array(

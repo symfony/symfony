@@ -25,12 +25,11 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 
         $request = Request::create('/');
         $this->assertFalse($resolver->getController($request), '->getController() returns false when the request has no _controller attribute');
-        $this->assertEquals(array('Unable to look for the controller as the "_controller" parameter is missing'), $logger->getLogs('err'));
+        $this->assertEquals(array('Unable to look for the controller as the "_controller" parameter is missing'), $logger->getLogs('warn'));
 
         $request->attributes->set('_controller', 'Symfony\Tests\Component\HttpKernel\ControllerResolverTest::testGetController');
         $controller = $resolver->getController($request);
         $this->assertInstanceOf('Symfony\Tests\Component\HttpKernel\ControllerResolverTest', $controller[0], '->getController() returns a PHP callable');
-        $this->assertEquals(array('Using controller "Symfony\Tests\Component\HttpKernel\ControllerResolverTest::testGetController"'), $logger->getLogs('info'));
 
         $request->attributes->set('_controller', $lambda = function () {});
         $controller = $resolver->getController($request);

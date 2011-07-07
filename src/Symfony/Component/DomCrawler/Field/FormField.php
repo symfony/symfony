@@ -68,6 +68,8 @@ abstract class FormField
      * Sets the value of the field.
      *
      * @param string $value The value of the field
+     *
+     * @api
      */
     public function setValue($value)
     {

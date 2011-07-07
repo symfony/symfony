@@ -46,6 +46,13 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         $this->metadata = new ClassMetadata(self::CLASSNAME);
     }
 
+    protected function tearDown()
+    {
+        $this->factory = null;
+        $this->walker = null;
+        $this->metadata = null;
+    }
+
     public function testWalkObjectValidatesConstraints()
     {
         $this->metadata->addConstraint(new ConstraintA());

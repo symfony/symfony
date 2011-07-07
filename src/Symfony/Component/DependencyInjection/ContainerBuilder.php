@@ -143,10 +143,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         $namespace = $this->getExtension($extension)->getAlias();
 
-        if (!isset($this->extensionConfigs[$namespace])) {
-            $this->extensionConfigs[$namespace] = array();
-        }
-
         $this->extensionConfigs[$namespace][] = $this->getParameterBag()->resolveValue($values);
 
         return $this;
@@ -699,17 +695,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         $properties = $this->resolveServices($this->getParameterBag()->resolveValue($definition->getProperties()));
-        $outsideClass = new \ReflectionClass($service);
         foreach ($properties as $name => $value) {
-            $class = $outsideClass;
-            do {
-                if ($class->hasProperty($name)) {
-                    $property = $class->getProperty($name);
-                    $property->setAccessible(true);
-                    $property->setValue($service, $value);
-                    continue 2;
-                }
-            } while (false !== $class = $class->getParentClass());
+            $service->$name = $value;
         }
 
         if ($callable = $definition->getConfigurator()) {

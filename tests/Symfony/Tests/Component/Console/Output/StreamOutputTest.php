@@ -23,6 +23,11 @@ class StreamOutputTest extends \PHPUnit_Framework_TestCase
         $this->stream = fopen('php://memory', 'a', false);
     }
 
+    protected function tearDown()
+    {
+        $this->stream = null;
+    }
+
     public function testConstructor()
     {
         try {

@@ -6,10 +6,6 @@ $container->loadFromExtension('twig', array(
             'MyBundle::form.html.twig',
         )
      ),
-     'extensions' => array(
-         'twig.extension.debug',
-         'twig.extension.text',
-     ),
      'globals' => array(
          'foo' => '@bar',
          'pi'  => 3.14,

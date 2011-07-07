@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-class Language extends \Symfony\Component\Validator\Constraint
+use Symfony\Component\Validator\Constraint;
+
+/** @Annotation */
+class Language extends Constraint
 {
     public $message = 'This value is not a valid language';
 }

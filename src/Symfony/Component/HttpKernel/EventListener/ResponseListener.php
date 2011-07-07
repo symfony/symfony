@@ -34,13 +34,18 @@ class ResponseListener
      *
      * @param FilterResponseEvent $event    A FilterResponseEvent instance
      */
-    public function onCoreResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event)
     {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
         if ('HEAD' === $request->getMethod()) {
+            // cf. RFC2611 14.13
+            $length = $response->headers->get('Content-Length');
             $response->setContent('');
+            if ($length) {
+                $response->headers->set('Content-Length', $length);
+            }
         }
 
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {

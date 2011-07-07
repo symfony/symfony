@@ -200,6 +200,10 @@ abstract class Client
      */
     public function click(Link $link)
     {
+        if ($link instanceof Form) {
+            return $this->submit($link);
+        }
+
         return $this->request($link->getMethod(), $link->getUri());
     }
 

@@ -15,8 +15,6 @@ namespace Symfony\Component\ClassLoader;
  * A class loader that uses a mapping file to look up paths.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class MapFileClassLoader
 {
@@ -26,8 +24,6 @@ class MapFileClassLoader
      * Constructor.
      *
      * @param string $file Path to class mapping file
-     *
-     * @api
      */
     public function __construct($file)
     {
@@ -38,8 +34,6 @@ class MapFileClassLoader
      * Registers this instance as an autoloader.
      *
      * @param Boolean $prepend Whether to prepend the autoloader or not
-     *
-     * @api
      */
     public function register($prepend = false)
     {

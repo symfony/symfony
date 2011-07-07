@@ -89,7 +89,6 @@ class Response
         if (!$this->headers->has('Date')) {
             $this->setDate(new \DateTime(null, new \DateTimeZone('UTC')));
         }
-        $this->charset = 'UTF-8';
     }
 
     /**
@@ -120,6 +119,11 @@ class Response
      */
     public function sendHeaders()
     {
+        // headers have already been sent by the developer
+        if (headers_sent()) {
+            return;
+        }
+
         $this->fixContentType();
 
         // status
@@ -128,7 +132,7 @@ class Response
         // headers
         foreach ($this->headers->all() as $name => $values) {
             foreach ($values as $value) {
-                header($name.': '.$value);
+                header($name.': '.$value, false);
             }
         }
 
@@ -153,16 +157,26 @@ class Response
     {
         $this->sendHeaders();
         $this->sendContent();
+
+        if (function_exists('fastcgi_finish_request')) {
+            fastcgi_finish_request();
+        }
     }
 
     /**
      * Sets the response content
      *
-     * @param string $content
+     * Valid types are strings, numbers, and objects that implement a __toString() method.
+     *
+     * @param mixed $content
      */
     public function setContent($content)
     {
-        $this->content = $content;
+        if (null !== $content && !is_string($content) && !is_numeric($content) && !is_callable(array($content, '__toString'))) {
+            throw new \UnexpectedValueException('The Response content must be a string or object implementing __toString(), "'.gettype($content).'" given.');
+        }
+
+        $this->content = (string) $content;
     }
 
     /**
@@ -741,11 +755,12 @@ class Response
 
     protected function fixContentType()
     {
+        $charset = $this->charset ?: 'UTF-8';
         if (!$this->headers->has('Content-Type')) {
-            $this->headers->set('Content-Type', 'text/html; charset='.$this->charset);
+            $this->headers->set('Content-Type', 'text/html; charset='.$charset);
         } elseif ('text/' === substr($this->headers->get('Content-Type'), 0, 5) && false === strpos($this->headers->get('Content-Type'), 'charset')) {
             // add the charset
-            $this->headers->set('Content-Type', $this->headers->get('Content-Type').'; charset='.$this->charset);
+            $this->headers->set('Content-Type', $this->headers->get('Content-Type').'; charset='.$charset);
         }
     }
 }

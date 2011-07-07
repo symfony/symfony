@@ -48,7 +48,7 @@ class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->fail('->load() throws an InvalidArgumentException if the loaded file is not parseable');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the loaded file is not parseable');
-            $this->assertEquals('The nonvalid.ini file is not valid.', $e->getMessage(), '->load() throws an InvalidArgumentException if the loaded file is not parseable');
+            $this->assertEquals('The "nonvalid.ini" file is not valid.', $e->getMessage(), '->load() throws an InvalidArgumentException if the loaded file is not parseable');
         }
     }
 

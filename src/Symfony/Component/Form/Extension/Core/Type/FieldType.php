@@ -20,9 +20,13 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 use Symfony\Component\Form\Extension\Core\Validator\DefaultValidator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\Exception\FormException;
 
 class FieldType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilder $builder, array $options)
     {
         if (null === $options['property_path']) {
@@ -33,6 +37,9 @@ class FieldType extends AbstractType
             $options['property_path'] = null;
         } else {
             $options['property_path'] = new PropertyPath($options['property_path']);
+        }
+        if (!is_array($options['attr'])) {
+            throw new FormException('The "attr" option must be "array".');
         }
 
         $builder
@@ -46,6 +53,7 @@ class FieldType extends AbstractType
             ->setAttribute('max_length', $options['max_length'])
             ->setAttribute('pattern', $options['pattern'])
             ->setAttribute('label', $options['label'] ?: $this->humanize($builder->getName()))
+            ->setAttribute('attr', $options['attr'] ?: array())
             ->setData($options['data'])
             ->addValidator(new DefaultValidator())
         ;
@@ -55,6 +63,9 @@ class FieldType extends AbstractType
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildView(FormView $view, FormInterface $form)
     {
         $name = $form->getName();
@@ -70,7 +81,7 @@ class FieldType extends AbstractType
         }
 
         $types = array();
-        foreach (array_reverse((array) $form->getTypes()) as $type) {
+        foreach ($form->getTypes() as $type) {
             $types[] = $type->getName();
         }
 
@@ -88,11 +99,14 @@ class FieldType extends AbstractType
             ->set('size', null)
             ->set('label', $form->getAttribute('label'))
             ->set('multipart', false)
-            ->set('attr', array())
+            ->set('attr', $form->getAttribute('attr'))
             ->set('types', $types)
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions(array $options)
     {
         $defaultOptions = array(
@@ -108,6 +122,7 @@ class FieldType extends AbstractType
             'error_bubbling'    => false,
             'error_mapping'     => array(),
             'label'             => null,
+            'attr'              => array(),
         );
 
         $class = isset($options['data_class']) ? $options['data_class'] : null;
@@ -129,16 +144,25 @@ class FieldType extends AbstractType
         return $defaultOptions;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function createBuilder($name, FormFactoryInterface $factory, array $options)
     {
         return new FormBuilder($name, $factory, new EventDispatcher(), $options['data_class']);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent(array $options)
     {
         return null;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'field';

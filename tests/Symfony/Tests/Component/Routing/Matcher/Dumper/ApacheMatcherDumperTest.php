@@ -68,6 +68,11 @@ class ApacheMatcherDumperTest extends \PHPUnit_Framework_TestCase
             array(),
             array('_method' => 'post')
         ));
+        // complex
+        $collection->add('baz6', new Route(
+            '/test/baz',
+            array('foo' => 'bar baz')
+        ));
 
         $dumper = new ApacheMatcherDumper($collection);
 

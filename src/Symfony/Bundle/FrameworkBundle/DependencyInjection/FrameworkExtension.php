@@ -66,6 +66,8 @@ class FrameworkExtension extends Extension
         $container->setParameter('kernel.secret', $config['secret']);
         $container->setParameter('exception_listener.controller', $config['exception_controller']);
 
+        $container->setParameter('kernel.trust_proxy_headers', $config['trust_proxy_headers']);
+
         if (!empty($config['test'])) {
             $loader->load('test.xml');
         }
@@ -127,7 +129,7 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseEvent',
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseForControllerResultEvent',
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseForExceptionEvent',
-            'Symfony\\Component\\HttpKernel\\CoreEvents',
+            'Symfony\\Component\\HttpKernel\\KernelEvents',
 
             'Symfony\\Bundle\\FrameworkBundle\\EventListener\\RouterListener',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameParser',
@@ -155,14 +157,6 @@ class FrameworkExtension extends Extension
 
             $container->setParameter('form.type_extension.csrf.enabled', $config['csrf_protection']['enabled']);
             $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
-        }
-
-        if ($container->hasDefinition('session')) {
-            $container->removeDefinition('file.temporary_storage');
-            $container->setDefinition('file.temporary_storage', $container->getDefinition('file.temporary_storage.session'));
-            $container->removeDefinition('file.temporary_storage.session');
-        } else {
-            $container->removeDefinition('file.temporary_storage.session');
         }
     }
 
@@ -322,6 +316,7 @@ class FrameworkExtension extends Extension
         );
 
         $container->setParameter('templating.helper.code.file_link_format', str_replace('%', '%%', isset($links[$ide]) ? $links[$ide] : $ide));
+        $container->setParameter('templating.helper.form.resources', $config['form']['resources']);
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('templating_debug.xml');

@@ -16,7 +16,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Doctrine\ORM\Tools\EntityRepositoryGenerator;
-use Symfony\Bundle\DoctrineBundle\Mapping\MetadataFactory;
+use Symfony\Bundle\DoctrineBundle\Mapping\DisconnectedMetadataFactory;
 
 /**
  * Generate entity classes from mapping information
@@ -71,7 +71,7 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $manager = new MetadataFactory($this->container->get('doctrine'));
+        $manager = new DisconnectedMetadataFactory($this->getContainer()->get('doctrine'));
 
         try {
             $bundle = $this->getApplication()->getKernel()->getBundle($input->getArgument('name'));
@@ -82,7 +82,7 @@ EOT
             $name = strtr($input->getArgument('name'), '/', '\\');
 
             if (false !== $pos = strpos($name, ':')) {
-                $name = $this->container->get('doctrine')->getEntityNamespace(substr($name, 0, $pos)).'\\'.substr($name, $pos + 1);
+                $name = $this->getContainer()->get('doctrine')->getEntityNamespace(substr($name, 0, $pos)).'\\'.substr($name, $pos + 1);
             }
 
             if (class_exists($name)) {

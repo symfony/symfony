@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\Command;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Security\Acl\Dbal\Schema;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,7 +22,7 @@ use Doctrine\DBAL\DriverManager;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class InitAclCommand extends Command
+class InitAclCommand extends ContainerAwareCommand
 {
     /**
      * @see Command
@@ -39,15 +39,15 @@ class InitAclCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $connection = $this->container->get('security.acl.dbal.connection');
+        $connection = $this->getContainer()->get('security.acl.dbal.connection');
         $sm = $connection->getSchemaManager();
         $tableNames = $sm->listTableNames();
         $tables = array(
-            'class_table_name' => $this->container->getParameter('security.acl.dbal.class_table_name'),
-            'sid_table_name'   => $this->container->getParameter('security.acl.dbal.sid_table_name'),
-            'oid_table_name'   => $this->container->getParameter('security.acl.dbal.oid_table_name'),
-            'oid_ancestors_table_name' => $this->container->getParameter('security.acl.dbal.oid_ancestors_table_name'),
-            'entry_table_name' => $this->container->getParameter('security.acl.dbal.entry_table_name'),
+            'class_table_name' => $this->getContainer()->getParameter('security.acl.dbal.class_table_name'),
+            'sid_table_name'   => $this->getContainer()->getParameter('security.acl.dbal.sid_table_name'),
+            'oid_table_name'   => $this->getContainer()->getParameter('security.acl.dbal.oid_table_name'),
+            'oid_ancestors_table_name' => $this->getContainer()->getParameter('security.acl.dbal.oid_ancestors_table_name'),
+            'entry_table_name' => $this->getContainer()->getParameter('security.acl.dbal.entry_table_name'),
         );
 
         foreach ($tables as $table) {

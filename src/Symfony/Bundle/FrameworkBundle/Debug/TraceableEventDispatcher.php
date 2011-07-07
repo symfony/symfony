@@ -26,7 +26,6 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
 {
     private $logger;
     private $called;
-    private $container;
 
     /**
      * Constructor.
@@ -38,7 +37,6 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
     {
         parent::__construct($container);
 
-        $this->container = $container;
         $this->logger = $logger;
         $this->called = array();
     }
@@ -54,17 +52,14 @@ class TraceableEventDispatcher extends ContainerAwareEventDispatcher implements 
             if (is_string($listener)) {
                 $typeDefinition = '[string] '.$listener;
             } elseif (is_array($listener)) {
-                $typeDefinition = '[array] '.$listener[0].', '.$listener[1];
+                $typeDefinition = '[array] '.(is_object($listener[0]) ? get_class($listener[0]) : $listener[0]).'::'.$listener[1];
             } elseif (is_object($listener)) {
                 $typeDefinition = '[object] '.get_class($listener);
             } else {
                 $typeDefinition = '[?] '.var_export($listener, true);
             }
-            $msg = sprintf('The given callback (%s) for event "%s" is not callable.', $typeDefinition, $eventName);
-            if (null !== $this->logger) {
-                $this->logger->err($msg);
-            }
-            throw new \RuntimeException($msg);
+
+            throw new \RuntimeException(sprintf('The given callback (%s) for event "%s" is not callable.', $typeDefinition, $eventName));
         }
 
         parent::addListener($eventName, $listener, $priority);

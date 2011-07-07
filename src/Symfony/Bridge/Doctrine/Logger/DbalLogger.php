@@ -52,6 +52,6 @@ class DbalLogger extends DebugStack
      */
     public function log($message)
     {
-        $this->logger->info($message);
+        $this->logger->debug($message);
     }
 }

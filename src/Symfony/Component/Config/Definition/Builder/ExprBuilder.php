@@ -211,7 +211,7 @@ class ExprBuilder
      *
      * @return array
      */
-    public static function buildExpressions(array $expressions)
+    static public function buildExpressions(array $expressions)
     {
         foreach ($expressions as $k => $expr) {
             if ($expr instanceof ExprBuilder) {

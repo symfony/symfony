@@ -50,7 +50,6 @@ class CsrfExtension extends AbstractExtension
         return array(
             new Type\ChoiceTypeCsrfExtension(),
             new Type\DateTypeCsrfExtension(),
-            new Type\FileTypeCsrfExtension(),
             new Type\FormTypeCsrfExtension(),
             new Type\RepeatedTypeCsrfExtension(),
             new Type\TimeTypeCsrfExtension(),

@@ -30,6 +30,12 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         $this->dateTimeWithoutSeconds = new \DateTime('2010-02-03 04:05:00 UTC');
     }
 
+    protected function tearDown()
+    {
+        $this->dateTime = null;
+        $this->dateTimeWithoutSeconds = null;
+    }
+
     public static function assertEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = FALSE, $ignoreCase = FALSE)
     {
         if ($expected instanceof \DateTime && $actual instanceof \DateTime) {
@@ -121,6 +127,13 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         $dateTime->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
 
         $this->assertEquals($dateTime->format('d.m.Y H:i'), $transformer->transform($input));
+    }
+    
+    public function testTransform_differentPatterns()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::FULL, \IntlDateFormatter::FULL, \IntlDateFormatter::GREGORIAN, 'MM*yyyy*dd HH|mm|ss');
+
+        $this->assertEquals('02*2010*03 04|05|06', $transformer->transform($this->dateTime));
     }
 
     /**
@@ -216,6 +229,13 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         $dateTime->setTimezone(new \DateTimeZone('America/New_York'));
 
         $this->assertDateTimeEquals($dateTime, $transformer->reverseTransform('03.02.2010 04:05', null));
+    }
+    
+    public function testReverseTransform_differentPatterns()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::FULL, \IntlDateFormatter::FULL, \IntlDateFormatter::GREGORIAN, 'MM*yyyy*dd HH|mm|ss');
+
+        $this->assertDateTimeEquals($this->dateTime, $transformer->reverseTransform('02*2010*03 04|05|06', null));
     }
 
     public function testReverseTransform_empty()

@@ -66,47 +66,47 @@ class ChainUserProviderTest extends \PHPUnit_Framework_TestCase
         $provider->loadUserByUsername('foo');
     }
 
-    public function testloadUser()
+    public function testRefreshUser()
     {
         $provider1 = $this->getProvider();
         $provider1
             ->expects($this->once())
-            ->method('loadUser')
+            ->method('refreshUser')
             ->will($this->throwException(new UnsupportedUserException('unsupported')))
         ;
 
         $provider2 = $this->getProvider();
         $provider2
             ->expects($this->once())
-            ->method('loadUser')
+            ->method('refreshUser')
             ->will($this->returnValue($account = $this->getAccount()))
         ;
 
         $provider = new ChainUserProvider(array($provider1, $provider2));
-        $this->assertSame($account, $provider->loadUser($this->getAccount()));
+        $this->assertSame($account, $provider->refreshUser($this->getAccount()));
     }
 
     /**
      * @expectedException Symfony\Component\Security\Core\Exception\UnsupportedUserException
      */
-    public function testloadUserThrowsUnsupportedUserException()
+    public function testRefreshUserThrowsUnsupportedUserException()
     {
         $provider1 = $this->getProvider();
         $provider1
             ->expects($this->once())
-            ->method('loadUser')
+            ->method('refreshUser')
             ->will($this->throwException(new UnsupportedUserException('unsupported')))
         ;
 
         $provider2 = $this->getProvider();
         $provider2
             ->expects($this->once())
-            ->method('loadUser')
+            ->method('refreshUser')
             ->will($this->throwException(new UnsupportedUserException('unsupported')))
         ;
 
         $provider = new ChainUserProvider(array($provider1, $provider2));
-        $provider->loadUser($this->getAccount());
+        $provider->refreshUser($this->getAccount());
     }
 
     public function testSupportsClass()

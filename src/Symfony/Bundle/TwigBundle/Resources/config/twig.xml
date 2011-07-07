@@ -16,8 +16,6 @@
         <parameter key="twig.extension.routing.class">Symfony\Bridge\Twig\Extension\RoutingExtension</parameter>
         <parameter key="twig.extension.yaml.class">Symfony\Bridge\Twig\Extension\YamlExtension</parameter>
         <parameter key="twig.extension.form.class">Symfony\Bridge\Twig\Extension\FormExtension</parameter>
-        <parameter key="twig.extension.text.class">Twig_Extensions_Extension_Text</parameter>
-        <parameter key="twig.extension.debug.class">Twig_Extensions_Extension_Debug</parameter>
     </parameters>
 
     <services>
@@ -76,9 +74,5 @@
             <tag name="twig.extension" />
             <argument>%twig.form.resources%</argument>
         </service>
-
-        <service id="twig.extension.text" class="%twig.extension.text.class%" public="false" />
-
-        <service id="twig.extension.debug" class="%twig.extension.debug.class%" public="false" />
     </services>
 </container>

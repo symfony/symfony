@@ -23,6 +23,11 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator = new NotBlankValidator();
     }
 
+    protected function tearDown()
+    {
+        $this->validator = null;
+    }
+
     /**
      * @dataProvider getInvalidValues
      */

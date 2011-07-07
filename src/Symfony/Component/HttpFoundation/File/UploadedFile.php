@@ -181,4 +181,29 @@ class UploadedFile extends File
 
         throw new FileException(sprintf('The file "%s" has not been uploaded via Http', $this->getPathname()));
     }
+
+    /**
+     * Returns the maximum size of an uploaded file as configured in php.ini
+     *
+     * @return type The maximum size of an uploaded file in bytes
+     */
+    public static function getMaxFilesize()
+    {
+        $max = trim(ini_get('upload_max_filesize'));
+
+        if ('' === $max) {
+            return PHP_INT_MAX;
+        }
+
+        switch (strtolower(substr($max, -1))) {
+            case 'g':
+                $max *= 1024;
+            case 'm':
+                $max *= 1024;
+            case 'k':
+                $max *= 1024;
+        }
+
+        return (integer) $max;
+    }
 }

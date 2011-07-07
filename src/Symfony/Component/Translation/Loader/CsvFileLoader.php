@@ -22,9 +22,9 @@ use Symfony\Component\Config\Resource\FileResource;
  */
 class CsvFileLoader extends ArrayLoader implements LoaderInterface
 {
-    protected $delimiter = ';';
-    protected $enclosure = '"';
-    protected $escape    = '\\';
+    private $delimiter = ';';
+    private $enclosure = '"';
+    private $escape    = '\\';
 
     /**
      * {@inheritdoc}
@@ -67,13 +67,13 @@ class CsvFileLoader extends ArrayLoader implements LoaderInterface
     }
 
     /**
-     * Set the delimiter, enclosure and escape character for CSV
+     * Sets the delimiter, enclosure, and escape character for CSV.
      *
      * @param string $delimiter delimiter character
      * @param string $enclosure enclosure character
      * @param string $escape    escape character
      */
-    public function control($delimiter = ';', $enclosure = '"', $escape = '\\')
+    public function setCsvControl($delimiter = ';', $enclosure = '"', $escape = '\\')
     {
         $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;

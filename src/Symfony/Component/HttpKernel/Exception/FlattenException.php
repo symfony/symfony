@@ -169,14 +169,18 @@ class FlattenException
         }
     }
 
-    private function flattenArgs($args)
+    private function flattenArgs($args, $recursive = true)
     {
         $result = array();
         foreach ($args as $key => $value) {
             if (is_object($value)) {
                 $result[$key] = array('object', get_class($value));
             } elseif (is_array($value)) {
-                $result[$key] = array('array', $this->flattenArgs($value));
+                if ($recursive) {
+                    $result[$key] = array('array', $this->flattenArgs($value, false));
+                } else {
+                    $result[$key] = array('array', 'Elements count: ' . count($value));
+                }
             } elseif (null === $value) {
                 $result[$key] = array('null', null);
             } elseif (is_bool($value)) {

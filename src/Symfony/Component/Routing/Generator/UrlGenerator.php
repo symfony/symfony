@@ -29,6 +29,7 @@ class UrlGenerator implements UrlGeneratorInterface
 {
     protected $context;
     protected $decodedChars = array(
+        // %2F is not valid in a URL, so we don't encode it (which is fine as the requirements explicitely allowed it)
         '%2F' => '/',
     );
 

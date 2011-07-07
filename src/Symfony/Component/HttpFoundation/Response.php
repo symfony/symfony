@@ -119,6 +119,11 @@ class Response
      */
     public function sendHeaders()
     {
+        // headers have already been sent by the developer
+        if (headers_sent()) {
+            return;
+        }
+
         $this->fixContentType();
 
         // status

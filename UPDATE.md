@@ -45,9 +45,9 @@ RC4 to RC5
         framework:
             trust_proxy_headers: true
 
- * To avoid hidden naming collisions, the AbstractType does not try to define
-   the name of form types magically. You now need to implement the `getName()`
-   method explicitly when creating a custom type.
+* To avoid hidden naming collisions, the AbstractType does not try to define
+  the name of form types magically. You now need to implement the `getName()`
+  method explicitly when creating a custom type.
 
 RC3 to RC4
 ----------

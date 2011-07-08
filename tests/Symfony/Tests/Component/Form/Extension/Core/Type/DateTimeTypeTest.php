@@ -215,4 +215,23 @@ class DateTimeTypeTest extends LocalizedTestCase
             'date_widget' => 'single_text',
         ));
     }
+
+    public function testSubmit_differentPattern()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'date_format' => 'MM*yyyy*dd',
+            'date_widget' => 'single_text',
+            'time_widget' => 'single_text',
+            'input' => 'datetime',
+        ));
+
+        $dateTime = new \DateTime('2010-06-02 03:04');
+
+        $form->bind(array(
+            'date' => '06*2010*02',
+            'time' => '03:04',
+        ));
+
+        $this->assertDateTimeEquals($dateTime, $form->getData());
+    }
 }

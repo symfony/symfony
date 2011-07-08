@@ -119,12 +119,24 @@
                 <target>Wgrany plik był za duży. Proszę spróbować wgrać mniejszy plik</target>
             </trans-unit>
             <trans-unit id="30">
-                <source>The CSRF token is invalid</source>
-                <target>Token CSRF jest nieprawidłowy</target>
+                <source>The CSRF token is invalid. Please try to resubmit the form</source>
+                <target>Token CSRF jest nieprawidłowy. Proszę spróbować wysłać formularz ponownie</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal</source>
                 <target>Obie wartości powinny być równe</target>
+            </trans-unit>
+            <trans-unit id="32">
+                <source>The file is too large. Allowed maximum size is {{ limit }}</source>
+                <target>Plik jest za duży. Maksymalny dozwolony rozmiar to {{ limit }}</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>The file is too large</source>
+                <target>Plik jest za duży</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>The file could not be uploaded</source>
+                <target>Plik nie mógł być wgrany</target>
             </trans-unit>
         </body>
     </file>

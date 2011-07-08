@@ -66,7 +66,7 @@ class FrameworkExtension extends Extension
         $container->setParameter('kernel.secret', $config['secret']);
         $container->setParameter('exception_listener.controller', $config['exception_controller']);
 
-        $container->setParameter('kernel.proxy', $config['proxy']);
+        $container->setParameter('kernel.trust_proxy_headers', $config['trust_proxy_headers']);
 
         if (!empty($config['test'])) {
             $loader->load('test.xml');

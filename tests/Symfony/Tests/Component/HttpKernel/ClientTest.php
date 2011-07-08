@@ -105,4 +105,40 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($target);
         unlink($target);
     }
+
+    public function testUploadedFileWhenSizeExceedsUploadMaxFileSize()
+    {
+        $source = tempnam(sys_get_temp_dir(), 'source');
+
+        $kernel = new TestHttpKernel();
+        $client = new Client($kernel);
+
+        $file = $this
+            ->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
+            ->setConstructorArgs(array($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK))
+            ->setMethods(array('getSize'))
+            ->getMock()
+        ;
+
+        $file->expects($this->once())
+            ->method('getSize')
+            ->will($this->returnValue(INF))
+        ;
+
+        $client->request('POST', '/', array(), array($file));
+
+        $files = $kernel->request->files->all();
+
+        $this->assertEquals(1, count($files));
+
+        $file = $files[0];
+
+        $this->assertFalse($file->isValid());
+        $this->assertEquals(UPLOAD_ERR_INI_SIZE, $file->getError());
+        $this->assertEquals('mime/original', $file->getClientMimeType());
+        $this->assertEquals('original', $file->getClientOriginalName());
+        $this->assertEquals(0, $file->getClientSize());
+
+        unlink($source);
+    }
 }

@@ -470,10 +470,15 @@ class InputDefinition
         // find the largest option or argument name
         $max = 0;
         foreach ($this->getOptions() as $option) {
-            $max = strlen($option->getName()) + 2 > $max ? strlen($option->getName()) + 2 : $max;
+            $nameLength = strlen($option->getName()) + 2;
+            if ($option->getShortcut()) {
+                $nameLength += strlen($option->getShortcut()) + 3;
+            }
+
+            $max = max($max, $nameLength);
         }
         foreach ($this->getArguments() as $argument) {
-            $max = strlen($argument->getName()) > $max ? strlen($argument->getName()) : $max;
+            $max = max($max, strlen($argument->getName()));
         }
         ++$max;
 
@@ -488,7 +493,9 @@ class InputDefinition
                     $default = '';
                 }
 
-                $text[] = sprintf(" <info>%-${max}s</info> %s%s", $argument->getName(), $argument->getDescription(), $default);
+                $description = str_replace("\n", "\n".str_pad('', $max + 2, ' '), $argument->getDescription());
+
+                $text[] = sprintf(" <info>%-${max}s</info> %s%s", $argument->getName(), $description, $default);
             }
 
             $text[] = '';
@@ -505,7 +512,16 @@ class InputDefinition
                 }
 
                 $multiple = $option->isArray() ? '<comment> (multiple values allowed)</comment>' : '';
-                $text[] = sprintf(' %-'.$max.'s %s%s%s%s', '<info>--'.$option->getName().'</info>', $option->getShortcut() ? sprintf('(-%s) ', $option->getShortcut()) : '', $option->getDescription(), $default, $multiple);
+                $description = str_replace("\n", "\n".str_pad('', $max + 2, ' '), $option->getDescription());
+
+                $optionMax = $max - strlen($option->getName()) - 2;
+                $text[] = sprintf(" <info>%s</info> %-${optionMax}s%s%s%s",
+                    '--'.$option->getName(),
+                    $option->getShortcut() ? sprintf('(-%s) ', $option->getShortcut()) : '',
+                    $description,
+                    $default,
+                    $multiple
+                );
             }
 
             $text[] = '';

@@ -37,7 +37,7 @@ class FrameworkBundle extends Bundle
 {
     public function boot()
     {
-        if ($this->container->getParameter('kernel.proxy')) {
+        if ($this->container->getParameter('kernel.trust_proxy_headers')) {
             Request::trustProxyData();
         }
     }

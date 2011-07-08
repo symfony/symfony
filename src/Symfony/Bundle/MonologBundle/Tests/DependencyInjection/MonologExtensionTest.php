@@ -35,21 +35,6 @@ class MonologExtensionTest extends TestCase
         $this->assertDICConstructorArguments($handler, array('%kernel.logs_dir%/%kernel.environment%.log', \Monolog\Logger::DEBUG, true));
     }
 
-    public function testLoadWithProcessor()
-    {
-        $container = new ContainerBuilder();
-        $loader = new MonologExtension();
-
-        $loader->load(array(array('handlers' => array('main' => array('type' => 'stream', 'processors' => array('@monolog.processor.web'))))), $container);
-        $this->assertTrue($container->hasDefinition('monolog.handler.main'));
-
-        $handler = $container->getDefinition('monolog.handler.main');
-        $this->assertDICDefinitionMethodCallAt(0, $handler, 'pushProcessor', array(new Reference('monolog.processor.web')));
-
-        $this->assertTrue($container->getDefinition('monolog.processor.web')->isPublic());
-        $this->assertFalse($container->getDefinition('monolog.processor.introspection')->isPublic());
-    }
-
     public function testLoadWithCustomValues()
     {
         $container = new ContainerBuilder();

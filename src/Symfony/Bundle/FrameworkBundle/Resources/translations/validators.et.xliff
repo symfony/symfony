@@ -126,6 +126,18 @@
                 <source>The two values should be equal</source>
                 <target>Väärtused peaksid olema võrdsed</target>
             </trans-unit>
+            <trans-unit id="32">
+                <source>The file is too large. Allowed maximum size is {{ limit }}</source>
+                <target>Fail on liiga suur. Maksimaalne lubatud suurus on {{ limit }}</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>The file is too large</source>
+                <target>Fail on liiga suur</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>The file could not be uploaded</source>
+                <target>Faili ei saa üles laadida</target>
+             </trans-unit>
         </body>
     </file>
 </xliff>

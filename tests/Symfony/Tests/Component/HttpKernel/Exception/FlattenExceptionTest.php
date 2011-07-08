@@ -71,4 +71,19 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
             array(new \Exception('test', 123), 500),
         );
     }
+
+    public function testRecursionInArguments()
+    {
+        $a = array('foo', array(2, &$a));
+        $exception = $this->createException($a);
+
+        $flattened = FlattenException::create($exception);
+        $trace = $flattened->getTrace();
+        $this->assertContains('*DEEP NESTED ARRAY*', serialize($trace));
+    }
+
+    private function createException($foo)
+    {
+        return new \Exception();
+    }
 }

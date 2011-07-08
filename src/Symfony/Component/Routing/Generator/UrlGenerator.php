@@ -28,6 +28,10 @@ use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 class UrlGenerator implements UrlGeneratorInterface
 {
     protected $context;
+    protected $decodedChars = array(
+        // %2F is not valid in a URL, so we don't encode it (which is fine as the requirements explicitely allowed it)
+        '%2F' => '/',
+    );
 
     private $routes;
     private $cache;
@@ -125,7 +129,7 @@ class UrlGenerator implements UrlGeneratorInterface
                     }
 
                     if (!$isEmpty || !$optional) {
-                        $url = $token[1].strtr($tparams[$token[3]], array('%'=>'%25', '+'=>'%2B')).$url;
+                        $url = $token[1].strtr(rawurlencode($tparams[$token[3]]), $this->decodedChars).$url;
                     }
 
                     $optional = false;

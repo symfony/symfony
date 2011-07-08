@@ -50,11 +50,16 @@ class ExceptionHandler
      */
     public function handle(\Exception $exception)
     {
-        $exception = FlattenException::create($exception);
+        try {
+            $exception = FlattenException::create($exception);
 
-        $response = new Response($this->decorate($exception, $this->getContent($exception)), 500);
+            $response = new Response($this->decorate($exception, $this->getContent($exception)), 500);
 
-        $response->send();
+            $response->send();
+        } catch (\Exception $e) {
+            // something nasty happened and we cannot throw an exception here anymore
+            printf('Exception thrown when handling an exception (%s: %s)', get_class($exception), $exception->getMessage());
+        }
     }
 
     private function getContent($exception)

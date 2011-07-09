@@ -64,18 +64,44 @@ class UniqueEntityValidator extends ConstraintValidator
             if (!isset($class->reflFields[$fieldName])) {
                 throw new ConstraintDefinitionException("Only field names mapped by Doctrine can be validated for uniqueness.");
             }
-
-            $criteria[$fieldName] = $class->reflFields[$fieldName]->getValue($entity);
+            
+            $value = $class->reflFields[$fieldName]->getValue($entity);
+            
+            if ($value) {
+	            $criteria[$fieldName] = $value;
+            }
         }
-
+        
         $repository = $em->getRepository($className);
-        $result = $repository->findBy($criteria);
-
+        $qb = $repository->createQueryBuilder('e');
+        
+        // Construct query
+        $x = 0;
+        foreach($criteria as $key => $value) {
+        	$qb = $qb->orWhere($qb->expr()->eq("e.$key", '?' . $x++));
+        }
+        
+        $qb->setParameters(array_values($criteria));
+        
+        // Get result
+        $result = $qb->getQuery()->getResult();
+        
+        // If at least one field not unique
         if (count($result) > 0 && $result[0] !== $entity) {
             $oldPath = $this->context->getPropertyPath();
-            $this->context->setPropertyPath( empty($oldPath) ? $fields[0] : $oldPath.".".$fields[0]);
-            $this->context->addViolation($constraint->message, array(), $criteria[$fields[0]]);
-            $this->context->setPropertyPath($oldPath);
+            
+            // Browse all fields
+            foreach($criteria as $key => $value) {
+            	// Get getter name (can't access private member)
+            	$getter = 'get' . ucfirst($key);
+            	
+            	// If not unique
+            	if ($result[0]->$getter() == $value) {
+	            	$this->context->setPropertyPath( empty($oldPath) ? $key : $oldPath.".".$key);
+	            	$this->context->addViolation($constraint->message, array(), $value);
+    	        	$this->context->setPropertyPath($oldPath);
+            	}
+            }
         }
 
         return true; // all true, we added the violation already!

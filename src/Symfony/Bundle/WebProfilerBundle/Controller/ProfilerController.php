@@ -87,7 +87,7 @@ class ProfilerController extends ContainerAware
         $profiler->disable();
         $profiler->purge();
 
-        return new RedirectResponse($this->container->get('router')->generate('_profiler', array('token' => '-')));
+        return new RedirectResponse($this->container->get('router')->generate('_profiler_info', array('about' => 'purge')));
     }
 
     /**
@@ -100,16 +100,35 @@ class ProfilerController extends ContainerAware
         $profiler = $this->container->get('profiler');
         $profiler->disable();
 
+        $router = $this->container->get('router');
+
         $file = $this->container->get('request')->files->get('file');
-        if (!$file || UPLOAD_ERR_OK !== $file->getError()) {
-            throw new \RuntimeException('Problem uploading the data.');
+        if (!$file || !$file->isValid()) {
+            return new RedirectResponse($router->generate('_profiler_info', array('about' => 'upload_error')));
         }
 
         if (!$profile = $profiler->import(file_get_contents($file->getPath()))) {
-            throw new \RuntimeException('Problem uploading the data (token already exists).');
+            return new RedirectResponse($router->generate('_profiler_info', array('about' => 'already_exists')));
         }
 
-        return new RedirectResponse($this->container->get('router')->generate('_profiler', array('token' => $profile->getToken())));
+        return new RedirectResponse($router->generate('_profiler', array('token' => $profile->getToken())));
+    }
+
+    /**
+     * Displays information page.
+     *
+     * @param string $about
+     *
+     * @return Response A Response instance
+     */
+    public function infoAction($about)
+    {
+        $profiler = $this->container->get('profiler');
+        $profiler->disable();
+
+        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:info.html.twig', array(
+            'about' => $about
+        ));
     }
 
     /**

@@ -12,6 +12,10 @@
         <default key="_controller">WebProfilerBundle:Profiler:purge</default>
     </route>
 
+    <route id="_profiler_info" pattern="/info/{about}">
+        <default key="_controller">WebProfilerBundle:Profiler:info</default>
+    </route>
+
     <route id="_profiler_import" pattern="/import">
         <default key="_controller">WebProfilerBundle:Profiler:import</default>
     </route>

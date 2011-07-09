@@ -237,7 +237,7 @@ class Registry implements RegistryInterface
         foreach ($this->entityManagers as $id) {
             $em = $this->container->get($id);
 
-            if ($em->getConfiguration()->getMetadataDriverImpl()->isTransient($class)) {
+            if (!$em->getConfiguration()->getMetadataDriverImpl()->isTransient($class)) {
                 return $em;
             }
         }

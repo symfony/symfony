@@ -138,6 +138,39 @@ class InputDefinition
     }
 
     /**
+     * Remove an InputArgument from the definition by name or by position
+     *
+     * @param string|integer $name The InputArgument name or position
+     *
+     * @api
+     */
+    public function removeArgument($name)
+    {
+        $argument = $this->getArgument($name);
+
+        if ($argument->isArray()) {
+            $this->hasAnArrayArgument = false;
+        }
+
+        if ($argument->isRequired()) {
+            --$this->requiredCount;
+        }
+
+        unset($this->arguments[$argument->getName()]);
+    }
+
+    /**
+     * Remove arguments by name
+     *
+     * @param array $names Names and/or positions of InputArgument objects
+     *
+     * @api
+     */
+    public function removeArguments(array $names) {
+        array_map(array($this, 'removeArgument'), $names);
+    }
+
+    /**
      * Returns an InputArgument by name or by position.
      *
      * @param string|integer $name The InputArgument name or position
@@ -271,6 +304,35 @@ class InputDefinition
         if ($option->getShortcut()) {
             $this->shortcuts[$option->getShortcut()] = $option->getName();
         }
+    }
+
+    /**
+     * Remove an InputOption by name.
+     *
+     * @param string $name The InputOption name
+     *
+     * @api
+     */
+    public function removeOption($name)
+    {
+        $option = $this->getOption($name);
+
+        unset($this->options[$option->getName()]);
+
+        if ($option->getShortcut()) {
+            unset($this->shortcuts[$option->getShortcut()]);
+        }
+    }
+
+    /**
+     * Remove options by name
+     *
+     * @param array $names Names of InputOption objects
+     *
+     * @api
+     */
+    public function removeOptions(array $names) {
+        array_map(array($this, 'removeOption'), $names);
     }
 
     /**

@@ -340,6 +340,90 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertXmlStringEqualsXmlFile(self::$fixtures.'/definition_asxml.txt', $definition->asXml(), '->asText() returns a textual representation of the InputDefinition');
     }
 
+    public function testRemoveArgument()
+    {
+        $this->initializeArguments();
+
+        $definition = new InputDefinition(array(
+            $this->foo2, $this->foo, $this->bar
+        ));
+
+        $definition->removeArgument('foo');
+        $this->assertSame(2, $definition->getArgumentCount());
+        $this->assertSame(1, $definition->getArgumentRequiredCount());
+
+        $definition->removeArgument('foo2');
+        $this->assertSame(1, $definition->getArgumentCount());
+        $this->assertSame(0, $definition->getArgumentRequiredCount());
+
+        $definition->removeArgument('bar');
+        $this->assertSame(0, $definition->getArgumentCount());
+        $this->assertSame(0, $definition->getArgumentRequiredCount());
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testRemoveArgumentThatDoesNotExist()
+    {
+        $definition = new InputDefinition();
+        $definition->removeArgument('someArgumentThatDoesNotExist');
+    }
+
+    public function testRemoveArguments()
+    {
+        $this->initializeArguments();
+
+        $definition = new InputDefinition(array(
+            $this->foo2, $this->foo, $this->bar
+        ));
+
+        $definition->removeArguments(array('foo', 'foo2', 'bar'));
+        $this->assertSame(0, $definition->getArgumentCount());
+        $this->assertSame(0, $definition->getArgumentRequiredCount());
+    }
+
+    public function testRemoveOption()
+    {
+        $this->initializeOptions();
+
+        $definition = new InputDefinition(array(
+            $this->foo, $this->bar
+        ));
+
+        $definition->removeOption('foo');
+        $this->assertFalse($definition->hasOption('foo'));
+        $this->assertFalse($definition->hasShortcut('f'));
+
+        $definition->removeOption('bar');
+        $this->assertFalse($definition->hasOption('bar'));
+        $this->assertFalse($definition->hasShortcut('b'));
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testRemoveOptionThatDoesNotExist()
+    {
+        $definition = new InputDefinition();
+        $definition->removeOption('someOptionThatDoesNotExist');
+    }
+
+    public function testRemoveOptions()
+    {
+        $this->initializeOptions();
+
+        $definition = new InputDefinition(array(
+            $this->foo, $this->bar
+        ));
+
+        $definition->removeOptions(array('foo', 'bar'));
+        $this->assertFalse($definition->hasOption('foo'));
+        $this->assertFalse($definition->hasShortcut('f'));
+        $this->assertFalse($definition->hasOption('bar'));
+        $this->assertFalse($definition->hasShortcut('b'));
+    }
+
     protected function initializeArguments()
     {
         $this->foo = new InputArgument('foo');

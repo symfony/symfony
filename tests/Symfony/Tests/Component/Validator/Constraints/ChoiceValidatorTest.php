@@ -182,4 +182,15 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
             '{{ limit }}' => 2,
         ));
     }
+
+    public function testStrictIsFalse()
+    {
+        $constraint = new Choice(array(
+            'choices' => array(1, 2),
+            'strict' => false,
+        ));
+
+        $this->assertTrue($this->validator->isValid('2', $constraint));
+        $this->assertTrue($this->validator->isValid(2, $constraint));
+    }
 }

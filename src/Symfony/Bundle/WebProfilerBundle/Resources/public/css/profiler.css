@@ -13,7 +13,7 @@ body
 }
 body
 {
-    font: 1em "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;;
+    font: 1em "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
     text-align:left;
 }
 
@@ -102,7 +102,7 @@ fieldset
 
 abbr
 {
-    border-bottom: 1px dotted #000000;
+    border-bottom: 1px dotted #000;
     cursor: help;
 }
 
@@ -294,6 +294,7 @@ li
 {
     color:#313131;
     font-size:12px;
+    padding: 0
 }
 
 #resume .date
@@ -317,7 +318,7 @@ table th.value
 #content #main
 {
     padding: 0;
-    background-color:#FFFFFF;
+    background-color:#FFF;
     border:1px solid #dfdfdf;
 }
 
@@ -334,7 +335,7 @@ table th.value
 }
 
 .sf-exceptionreset .block_exception_detected .text_exception {
-    width: 520px;
+    width: auto;
 }
 
 .sf-exceptionreset .block_exception_detected .illustration_exception {
@@ -382,9 +383,12 @@ td.main, td.menu {
 {
     width:188px;
     margin-right:10px;
-    font-size:12px;
+}
+
+.search input, .search select
+{
     border:1px solid #dadada;
-    background:#FFFFFF url(../images/profiler/input_bg.gif) repeat-x left top;
+    background:#FFF url(../images/profiler/input_bg.gif) repeat-x left top;
     padding:5px 6px;
     color:#565656;
 }
@@ -403,7 +407,6 @@ td.main, td.menu {
     border: 0 solid #000;
     text-decoration: none;
     cursor: pointer;
-    background-color: transparent;
     white-space: nowrap;
     display: inline-block;
     text-align: center;
@@ -453,10 +456,15 @@ td.main, td.menu {
     padding-top: 15px;
     float: none;
     background: none repeat scroll 0 0 #f6f6f6;
-    color: #333333;
+    color: #333;
     margin: 20px 0;
     border: 1px solid #dfdfdf;
     border-left: none;
+}
+
+#navigation .search div
+{
+    margin-bottom: 10px
 }
 
 #navigation .search h3
@@ -467,9 +475,15 @@ td.main, td.menu {
     font-size: 13px;
 }
 
+#navigation .search h3 img
+{
+    margin: 0 5px 0 0;
+    vertical-align: middle;
+}
+
 #navigation .search form
 {
-    padding: 15px 0;
+    padding: 15px 0 15px 10px;
 }
 
 #navigation .search button
@@ -493,11 +507,6 @@ td.main, td.menu {
     font-size: 12px;
 }
 
-#navigation .search form
-{
-    padding-left: 10px;
-}
-
 #navigation .search input
 {
     width: 160px;
@@ -511,5 +520,11 @@ td.main, td.menu {
 
 #navigation .import input
 {
-    width: 100px;
+    width: 180px;
+}
+
+#navigation .import button
+{
+    float: none;
+    margin: 0
 }

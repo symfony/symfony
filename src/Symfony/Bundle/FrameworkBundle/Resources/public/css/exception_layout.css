@@ -53,7 +53,7 @@ img
 
 .header
 {
-    padding:30px 30px 20px 30px;
+    padding:30px 30px 20px;
 }
 
 .header_logo
@@ -83,7 +83,7 @@ img
     margin-right:10px; 
     font-size:12px; 
     border:1px solid #dadada; 
-    background:#FFFFFF url(../images/input_bg.gif) repeat-x left top;
+    background:#FFF url(../images/input_bg.gif) repeat-x left top;
     padding:5px 6px;
     color:#565656;
 }

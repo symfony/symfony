@@ -73,7 +73,7 @@ class ChoiceValidator extends ConstraintValidator
 
                 return false;
             }
-        } elseif (!in_array($value, $choices, true)) {
+        } elseif (!in_array($value, $choices, $constraint->strict)) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;

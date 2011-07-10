@@ -100,7 +100,7 @@
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not a valid time</source>
-                <target>Deze waarde is geen geldige tijd </target>
+                <target>Deze waarde is geen geldige tijd</target>
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid URL</source>

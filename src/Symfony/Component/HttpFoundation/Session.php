@@ -355,10 +355,14 @@ class Session implements \Serializable
 
     private function setPhpDefaultLocale($locale)
     {
+        // if either the class Locale doesn't exist, or an exception is thrown when
+        // setting the default locale, the intl module is not installed, and
+        // the call can be ignored:
         try {
-            \Locale::setDefault($this->locale);
+            if (class_exists('Locale', false)) {
+                \Locale::setDefault($locale);
+            }
         } catch (\Exception $e) {
-            // means that intl is not installed.
         }
     }
 }

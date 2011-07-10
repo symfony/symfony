@@ -19,15 +19,15 @@
                 <target>値は空でなければなりません</target>
             </trans-unit>
             <trans-unit id="5">
-                <source>This value should be one of the given choices</source>
-                <target>値は指定された選択肢のうちの1つでなければなりません</target>
+                <source>The value you selected is not a valid choice</source>
+                <target>選択された値は選択肢として有効な値ではありません</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You should select at least {{ limit }} choices</source>
+                <source>You must select at least {{ limit }} choices</source>
                 <target>{{ limit }}個以上選択してください</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You should select at most {{ limit }} choices</source>
+                <source>You must select at most {{ limit }} choices</source>
                 <target>{{ limit }}個以内で選択してください</target>
             </trans-unit>
             <trans-unit id="8">
@@ -125,10 +125,6 @@
             <trans-unit id="31">
                 <source>The two values should be equal</source>
                 <target>2つの値が同じでなければなりません</target>
-            </trans-unit>
-            <trans-unit id="32">
-                <source>The value you selected is not a valid choice</source>
-                <target>選択された値は選択肢として有効な値ではありません</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>One or more of the given values is invalid</source>

@@ -40,7 +40,7 @@
             </trans-unit>
             <trans-unit id="10">
                 <source>The fields {{ fields }} are missing</source>
-                <target>Поля {{ fields }} осутствуют</target>
+                <target>Поля {{ fields }} отсутствуют</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date</source>

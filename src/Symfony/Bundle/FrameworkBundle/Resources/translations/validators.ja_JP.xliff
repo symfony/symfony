@@ -126,6 +126,46 @@
                 <source>The two values should be equal</source>
                 <target>2つの値が同じでなければなりません</target>
             </trans-unit>
+            <trans-unit id="32">
+                <source>The value you selected is not a valid choice</source>
+                <target>選択された値は選択肢として有効な値ではありません</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>One or more of the given values is invalid</source>
+                <target>1つまたは複数の選択された値が正しくありません</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>This value is not a valid country</source>
+                <target>値は有効な国名ではありません</target>
+            </trans-unit>
+            <trans-unit id="35">
+                <source>The file is too large. Allowed maximum size is {{ limit }}</source>
+                <target>ファイルのサイズが大きすぎます。有効な最大サイズは{{ limit }}です</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>The file is too large</source>
+                <target>ファイルのサイズが大きすぎます</target>
+            </trans-unit>
+            <trans-unit id="37">
+                <source>The file could not be uploaded</source>
+                <target>ファイルをアップロードできませんでした</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This file is not a valid image</source>
+                <target>ファイルが画像ではありません</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This is not a valid IP address</source>
+                <target>値は有効なIPアドレスではありません</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid language</source>
+                <target>値は有効な言語名ではありません</target>
+            </trans-unit>
+            <trans-unit id="41">
+                <source>This value is not a valid locale</source>
+                <target>値は有効なロケールではありません</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -24,11 +24,11 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>You should select at least {{ limit }} choices</source>
-                <target>Você deveria selecionar {{ limit }} opções no mínimo</target>
+                <target>Você deveria selecionar no mínimo {{ limit }} opções</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You should select at most {{ limit }} choices</source>
-                <target>Você deveria selecionar {{ limit }} opções no máximo</target>
+                <target>Você deveria selecionar no máximo {{ limit }} opções</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>The fields {{ fields }} were not expected</source>
@@ -72,7 +72,7 @@
             </trans-unit>
             <trans-unit id="18">
                 <source>This value is too long. It should have {{ limit }} characters or less</source>
-                <target>O valor é muito longo. Deveria ter {{ limit }} caracteres ou menos</target>
+                <target>Este valor é muito longo. Deveria ter {{ limit }} caracteres ou menos</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>This value should be {{ limit }} or more</source>
@@ -80,7 +80,7 @@
             </trans-unit>
             <trans-unit id="20">
                 <source>This value is too short. It should have {{ limit }} characters or more</source>
-                <target>O valor é muito curto. Deveria ter {{ limit }} caracteres ou mais</target>
+                <target>Este valor é muito curto. Deveria ter {{ limit }} caracteres ou mais</target>
             </trans-unit>
             <trans-unit id="21">
                 <source>This value should not be blank</source>
@@ -120,7 +120,7 @@
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid</source>
-                <target>O token CSRF é inválido</target>
+                <target>O token de CSRF é inválido</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal</source>

@@ -58,20 +58,8 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         return $validatorFactory;
     }
 
-    /**
-     * This is a functional test as there is a large integration necessary to get the validator working.
-     */
-    public function testValidateUniqueness()
+    public function createValidator($entityManagerName, $em)
     {
-        $entityManagerName = "foo";
-        $em = $this->createTestEntityManager();
-        $schemaTool = new SchemaTool($em);
-        $schemaTool->createSchema(array(
-            $em->getClassMetadata('Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity')
-        ));
-
-        $entity1 = new SingleIdentEntity(1, 'Foo');
-
         $registry = $this->createRegistryMock($entityManagerName, $em);
 
         $uniqueValidator = new UniqueEntityValidator($registry);
@@ -82,8 +70,28 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $metadataFactory = $this->createMetadataFactoryMock($metadata);
         $validatorFactory = $this->createValidatorFactory($uniqueValidator);
 
-        $validator = new Validator($metadataFactory, $validatorFactory);
+        return new Validator($metadataFactory, $validatorFactory);
+    }
 
+    private function createSchema($em)
+    {
+        $schemaTool = new SchemaTool($em);
+        $schemaTool->createSchema(array(
+            $em->getClassMetadata('Symfony\Tests\Bridge\Doctrine\Form\Fixtures\SingleIdentEntity')
+        ));
+    }
+
+    /**
+     * This is a functional test as there is a large integration necessary to get the validator working.
+     */
+    public function testValidateUniqueness()
+    {
+        $entityManagerName = "foo";
+        $em = $this->createTestEntityManager();
+        $this->createSchema($em);
+        $validator = $this->createValidator($entityManagerName, $em);
+
+        $entity1 = new SingleIdentEntity(1, 'Foo');
         $violationsList = $validator->validate($entity1);
         $this->assertEquals(0, $violationsList->count(), "No violations found on entity before it is saved to the database.");
 
@@ -102,5 +110,23 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $this->assertEquals('This value is already used.', $violation->getMessage());
         $this->assertEquals('name', $violation->getPropertyPath());
         $this->assertEquals('Foo', $violation->getInvalidValue());
+    }
+
+    public function testValidateUniquenessWithNull()
+    {
+        $entityManagerName = "foo";
+        $em = $this->createTestEntityManager();
+        $this->createSchema($em);
+        $validator = $this->createValidator($entityManagerName, $em);
+
+        $entity1 = new SingleIdentEntity(1, null);
+        $entity2 = new SingleIdentEntity(2, null);
+
+        $em->persist($entity1);
+        $em->persist($entity2);
+        $em->flush();
+
+        $violationsList = $validator->validate($entity1);
+        $this->assertEquals(0, $violationsList->count(), "No violations found on entity having a null value.");
     }
 }

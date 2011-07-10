@@ -111,22 +111,30 @@
                 <target>Значение URL недопустимо</target>
             </trans-unit>
             <trans-unit id="28">
+                <source>This form should not contain extra fields</source>
+                <target>Эта форма не должна содержать дополнительных полей</target>
+            </trans-unit>
+            <trans-unit id="29">
+                <source>The uploaded file was too large. Please try to upload a smaller file</source>
+                <target>Загруженный файл слишком большой. Пожалуйста, попробуйте загрузить файл меньшего размера</target>
+            </trans-unit>
+            <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form</source>
                 <target>CSRF значение недопустимо. Пожалуйста, попробуйте повторить отправку формы</target>
             </trans-unit>
-            <trans-unit id="29">
+            <trans-unit id="31">
                 <source>The two values should be equal</source>
                 <target>Оба значения должны быть одинаковыми</target>
             </trans-unit>
-            <trans-unit id="30">
+            <trans-unit id="32">
                 <source>The file is too large. Allowed maximum size is {{ limit }}</source>
                 <target>Файл слишком большой. Максимальный допустимый размер {{ limit }}</target>
             </trans-unit>
-            <trans-unit id="31">
+            <trans-unit id="33">
                 <source>The file is too large</source>
                 <target>Файл слишком большой</target>
             </trans-unit>
-            <trans-unit id="32">
+            <trans-unit id="34">
                 <source>The file could not be uploaded</source>
                 <target>Файл не может быть загружен</target>
             </trans-unit>

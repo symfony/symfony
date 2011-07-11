@@ -196,6 +196,8 @@ class HttpCache implements HttpKernelInterface
             }
         }
 
+        $response->prepare();
+
         return $response;
     }
 
@@ -576,10 +578,6 @@ class HttpCache implements HttpKernelInterface
         }
 
         $response->headers->remove('X-Body-File');
-
-        if (!$response->headers->has('Transfer-Encoding')) {
-            $response->headers->set('Content-Length', strlen($response->getContent()));
-        }
     }
 
     protected function processResponseBody(Request $request, Response $response)

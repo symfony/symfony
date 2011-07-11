@@ -111,7 +111,7 @@
                 <target>Aquest valor hauria de ser una instància de la classe {{ class }}</target>
             </trans-unit>
             <trans-unit id="28">
-                <source>This field group should not contain extra fields</source>
+                <source>This form should not contain extra fields</source>
                 <target>Aquest grup de camps no hauria de contenir camps addicionals</target>
             </trans-unit>
             <trans-unit id="29">

@@ -111,7 +111,7 @@
                 <target>Această valoare trebuie să fie o instanță a clasei {{ class }}</target>
             </trans-unit>
             <trans-unit id="28">
-                <source>This field group should not contain extra fields</source>
+                <source>This form should not contain extra fields</source>
                 <target>Aceast  grup de câmpuri nu trebuie să conțină câmpuri suplimentare</target>
             </trans-unit>
             <trans-unit id="29">

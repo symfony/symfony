@@ -111,7 +111,7 @@
                 <target>הערך צריך להיות מסוג {{ class }}</target>
             </trans-unit>
             <trans-unit id="28">
-                <source>This field group should not contain extra fields</source>
+                <source>This form should not contain extra fields</source>
                 <target>קבוצה השדה לא יכילו שדות נוספת</target>
             </trans-unit>
             <trans-unit id="29">

@@ -111,7 +111,7 @@
                 <target>Ennek az értéknek a(z) {{ class }} osztály példányának kell lennie</target>
             </trans-unit>
             <trans-unit id="28">
-                <source>This field group should not contain extra fields</source>
+                <source>This form should not contain extra fields</source>
                 <target>Ez a mezőcsoport nem tartalmazhat extra mezőket</target>
             </trans-unit>
             <trans-unit id="29">

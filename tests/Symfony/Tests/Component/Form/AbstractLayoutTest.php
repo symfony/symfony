@@ -147,7 +147,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '
         );
     }
-/*
+
     public function testLabelOnForm()
     {
         $form = $this->factory->createNamed('date', 'na&me', null, array(
@@ -164,7 +164,7 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '
         );
     }
-*/
+
     public function testLabelWithCustomTextPassedAsOption()
     {
         $form = $this->factory->createNamed('text', 'na&me', null, array(

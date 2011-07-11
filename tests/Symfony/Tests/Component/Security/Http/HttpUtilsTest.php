@@ -31,14 +31,20 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($response->isRedirect('http://symfony.com/'));
 
         // route name
-        $utils = new HttpUtils($router = $this->getMock('Symfony\Component\Routing\RouterInterface'));
+        $utils = new HttpUtils($router = $this->getMockBuilder('Symfony\Component\Routing\Router')->disableOriginalConstructor()->getMock());
         $router
             ->expects($this->any())
             ->method('generate')
             ->with('foobar', array(), true)
             ->will($this->returnValue('http://localhost/foo/bar'))
         ;
+        $router
+            ->expects($this->any())
+            ->method('getContext')
+            ->will($this->returnValue($this->getMock('Symfony\Component\Routing\RequestContext')))
+        ;
         $response = $utils->createRedirectResponse($this->getRequest(), 'foobar');
+        $this->assertTrue($response->isRedirect('http://localhost/foo/bar'));
     }
 
     public function testCreateRequest()

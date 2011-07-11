@@ -111,7 +111,7 @@
                 <target>Este valor deveria ser uma instância da classe {{ class }}</target>
             </trans-unit>
             <trans-unit id="28">
-                <source>This field group should not contain extra fields</source>
+                <source>This form should not contain extra fields</source>
                 <target>Este grupo de campos não deveria conter campos adicionais</target>
             </trans-unit>
             <trans-unit id="29">

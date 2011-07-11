@@ -111,7 +111,7 @@
                 <target>Værdien skal være instans af klassen {{ class }}</target>
             </trans-unit>
             <trans-unit id="28">
-                <source>This field group should not contain extra fields</source>
+                <source>This form should not contain extra fields</source>
                 <target>Feltgruppen må ikke indeholde ekstra felter</target>
             </trans-unit>
             <trans-unit id="29">

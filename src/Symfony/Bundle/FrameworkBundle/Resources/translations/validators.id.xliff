@@ -111,7 +111,7 @@
                 <target>Nilai ini harus turunan dari kelas {{ class }}</target>
             </trans-unit>
             <trans-unit id="28">
-                <source>This field group should not contain extra fields</source>
+                <source>This form should not contain extra fields</source>
                 <target>Gabungan kolom tidak boleh mengandung kolom tambahan</target>
             </trans-unit>
             <trans-unit id="29">

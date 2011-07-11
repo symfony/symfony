@@ -98,7 +98,7 @@ class Response
      */
     public function __toString()
     {
-        $this->fixContent();
+        $this->prepare();
 
         return
             sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText)."\r\n".
@@ -115,6 +115,35 @@ class Response
     }
 
     /**
+     * Prepares the Response before it is sent to the client.
+     *
+     * This method tweaks the Response to ensure that it is
+     * compliant with RFC 2616.
+     */
+    public function prepare()
+    {
+        if ($this->isInformational() || in_array($this->statusCode, array(204, 304))) {
+            $this->setContent('');
+        }
+
+        // Fix Content-Type
+        $charset = $this->charset ?: 'UTF-8';
+        if (!$this->headers->has('Content-Type')) {
+            $this->headers->set('Content-Type', 'text/html; charset='.$charset);
+        } elseif ('text/' === substr($this->headers->get('Content-Type'), 0, 5) && false === strpos($this->headers->get('Content-Type'), 'charset')) {
+            // add the charset
+            $this->headers->set('Content-Type', $this->headers->get('Content-Type').'; charset='.$charset);
+        }
+
+        // Fix Content-Length
+        if ($this->headers->has('Transfer-Encoding')) {
+            $this->headers->remove('Content-Length');
+        } elseif (!$this->headers->has('Content-Length')) {
+            $this->headers->set('Content-Length', strlen($this->content));
+        }
+    }
+
+    /**
      * Sends HTTP headers.
      */
     public function sendHeaders()
@@ -124,7 +153,7 @@ class Response
             return;
         }
 
-        $this->fixContent();
+        $this->prepare();
 
         // status
         header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText));
@@ -751,36 +780,5 @@ class Response
     public function isEmpty()
     {
         return in_array($this->statusCode, array(201, 204, 304));
-    }
-
-    protected function fixContent()
-    {
-        if ($this->isInformational() || in_array($this->statusCode, array(204, 304))) {
-            $this->setContent('');
-        }
-        $this->fixContentType();
-        $this->fixContentLength();
-    }
-
-    protected function fixContentType()
-    {
-        $charset = $this->charset ?: 'UTF-8';
-        if (!$this->headers->has('Content-Type')) {
-            $this->headers->set('Content-Type', 'text/html; charset='.$charset);
-        } elseif ('text/' === substr($this->headers->get('Content-Type'), 0, 5) && false === strpos($this->headers->get('Content-Type'), 'charset')) {
-            // add the charset
-            $this->headers->set('Content-Type', $this->headers->get('Content-Type').'; charset='.$charset);
-        }
-    }
-
-    protected function fixContentLength()
-    {
-        if (!$this->headers->has('Content-Length')) {
-            $this->headers->set('Content-Length', strlen($this->content));
-        }
-
-        if ($this->headers->has('Transfer-Encoding')) {
-            $this->headers->remove('Content-Length');
-        }
     }
 }

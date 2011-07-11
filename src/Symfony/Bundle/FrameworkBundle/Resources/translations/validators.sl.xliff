@@ -111,7 +111,7 @@
                 <target>Vrednost bi morala biti instanca razreda {{ class }}</target>
             </trans-unit>
             <trans-unit id="28">
-                <source>This field group should not contain extra fields</source>
+                <source>This form should not contain extra fields</source>
                 <target>To področje ne sme vsebovati dodatnih polj</target>
             </trans-unit>
             <trans-unit id="29">

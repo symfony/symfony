@@ -18,6 +18,9 @@ namespace Symfony\Component\HttpFoundation;
  */
 class ResponseHeaderBag extends HeaderBag
 {
+    const COOKIES_FLAT  = 'flat';
+    const COOKIES_ARRAY = 'array';
+
     protected $computedCacheControl = array();
     protected $cookies              = array();
 
@@ -41,7 +44,7 @@ class ResponseHeaderBag extends HeaderBag
     public function __toString()
     {
         $cookies = '';
-        foreach ($this->cookies as $cookie) {
+        foreach ($this->getCookies() as $cookie) {
             $cookies .= 'Set-Cookie: '.$cookie."\r\n";
         }
 
@@ -111,57 +114,59 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function setCookie(Cookie $cookie)
     {
-        $this->cookies[$cookie->getName()] = $cookie;
+        $this->cookies[$cookie->getDomain()][$cookie->getPath()][$cookie->getName()] = $cookie;
     }
 
     /**
      * Removes a cookie from the array, but does not unset it in the browser
      *
      * @param string $name
+     * @param string $path
+     * @param string $domain
      * @return void
      */
-    public function removeCookie($name)
+    public function removeCookie($name, $path = null, $domain = null)
     {
-        unset($this->cookies[$name]);
-    }
+        unset($this->cookies[$domain][$path][$name]);
 
-    /**
-     * Whether the array contains any cookie with this name
-     *
-     * @param string $name
-     * @return Boolean
-     */
-    public function hasCookie($name)
-    {
-        return isset($this->cookies[$name]);
-    }
+        if (empty($this->cookies[$domain][$path])) {
+            unset($this->cookies[$domain][$path]);
 
-    /**
-     * Returns a cookie
-     *
-     * @param string $name
-     *
-     * @throws \InvalidArgumentException When the cookie does not exist
-     *
-     * @return Cookie
-     */
-    public function getCookie($name)
-    {
-        if (!$this->hasCookie($name)) {
-            throw new \InvalidArgumentException(sprintf('There is no cookie with name "%s".', $name));
+            if (empty($this->cookies[$domain])) {
+                unset($this->cookies[$domain]);
+            }
         }
-
-        return $this->cookies[$name];
     }
 
     /**
      * Returns an array with all cookies
      *
+     * @param string $format
+     *
+     * @throws \InvalidArgumentException When the $format is invalid
+     *
      * @return array
      */
-    public function getCookies()
+    public function getCookies($format = 'flat')
     {
-        return $this->cookies;
+        if (!in_array($format, array(static::COOKIES_FLAT, static::COOKIES_ARRAY))) {
+            throw new \InvalidArgumentException(sprintf('Format "%s" invalid (%s).', $format, implode(', ', array(static::COOKIES_FLAT, static::COOKIES_ARRAY))));
+        }
+
+        if (static::COOKIES_ARRAY === $format) {
+            return $this->cookies;
+        }
+
+        $return = array();
+        foreach ($this->cookies as $path) {
+            foreach ($path as $cookies) {
+                foreach ($cookies as $cookie) {
+                    $return[] = $cookie;
+                }
+            }
+        }
+
+        return $return;
     }
 
     /**

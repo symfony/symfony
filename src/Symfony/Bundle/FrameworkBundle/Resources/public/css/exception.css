@@ -18,7 +18,7 @@ build: 56
 }
 .sf-exceptionreset body
 {
-    font: 1em "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;;
+    font: 1em "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
     text-align:left;
     background-color:#efefef;
 }
@@ -33,6 +33,10 @@ build: 56
   line-height:20px;
   color:#868686;
   padding-bottom:20px
+}
+.sf-exceptionreset p:last-child
+{
+  padding:0
 }
 
 .sf-exceptionreset strong
@@ -94,7 +98,7 @@ build: 56
 .sf-exceptionreset #logs .traces li.error
 {
     font-style:normal;
-    color:#AA3333;
+    color:#A33;
     background:#f9ecec;
 }
 
@@ -121,7 +125,7 @@ build: 56
 }
 .sf-exceptionreset .block
 {
-    background-color:#FFFFFF;
+    background-color:#FFF;
     border:1px solid #dfdfdf;
     padding:40px 50px;
 }
@@ -198,7 +202,6 @@ build: 56
 
 .sf-exceptionreset li a:hover
 {
-    background:none;
     color:#313131;
     text-decoration:underline;
 }

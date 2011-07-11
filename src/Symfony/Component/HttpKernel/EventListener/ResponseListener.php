@@ -40,7 +40,7 @@ class ResponseListener
         $response = $event->getResponse();
 
         if ('HEAD' === $request->getMethod()) {
-            // cf. RFC2611 14.13
+            // cf. RFC2616 14.13
             $length = $response->headers->get('Content-Length');
             $response->setContent('');
             if ($length) {

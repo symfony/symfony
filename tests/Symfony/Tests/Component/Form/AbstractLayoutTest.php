@@ -147,7 +147,24 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 '
         );
     }
+/*
+    public function testLabelOnForm()
+    {
+        $form = $this->factory->createNamed('date', 'na&me', null, array(
+            'property_path' => 'name',
+        ));
+        $view = $form->createView();
+        $this->renderWidget($view, array('label' => 'foo'));
+        $html = $this->renderLabel($view);
 
+        $this->assertMatchesXpath($html,
+'/label
+    [@class=" required"]
+    [.="[trans]Na&me[/trans]"]
+'
+        );
+    }
+*/
     public function testLabelWithCustomTextPassedAsOption()
     {
         $form = $this->factory->createNamed('text', 'na&me', null, array(

@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpKernel\Exception;
 
 /**
- * NotFoundHttpException.
+ * AccessDeniedHttpException.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Christophe Coevoet <stof@notk.org>

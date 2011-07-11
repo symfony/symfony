@@ -71,8 +71,7 @@ class ExceptionListener
             '_controller' => $this->controller,
             'exception'   => $flattenException,
             'logger'      => $logger,
-            // when using CLI, we force the format to be TXT
-            'format'      => 0 === strncasecmp(PHP_SAPI, 'cli', 3) ? 'txt' : $request->getRequestFormat(),
+            'format'      => $request->getRequestFormat(),
         );
 
         $request = $request->duplicate(null, null, $attributes);

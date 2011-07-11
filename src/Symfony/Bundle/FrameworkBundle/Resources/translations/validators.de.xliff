@@ -4,11 +4,11 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false</source>
-                <target>Dieser Wert sollte falsch sein</target>
+                <target>Dieser Wert sollte false sein</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true</source>
-                <target>Dieser Wert sollte wahr sein</target>
+                <target>Dieser Wert sollte true sein</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}</source>
@@ -92,7 +92,7 @@
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should be null</source>
-                <target>Dieser Wert solle null sein</target>
+                <target>Dieser Wert sollte null sein</target>
             </trans-unit>
             <trans-unit id="24">
                 <source>This value is not valid</source>
@@ -116,7 +116,7 @@
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file</source>
-                <target>Die gesendete Datei ist zu groß. Versuchen Sie bitte eine kleinere Datei hochzuladen</target>
+                <target>Die hochgeladene Datei ist zu groß. Versuchen Sie bitte eine kleinere Datei hochzuladen</target>
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form</source>
@@ -124,7 +124,7 @@
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal</source>
-                <target>Beide Werte sollten identisch sein</target>
+                <target>Die beiden Werte sollten identisch sein</target>
             </trans-unit>
             <trans-unit id="32">
                 <source>The file is too large. Allowed maximum size is {{ limit }}</source>

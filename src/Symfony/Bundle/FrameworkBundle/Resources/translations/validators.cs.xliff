@@ -111,7 +111,7 @@
                 <target>Tato hodnota musí být instancí třídy {{ class }}</target>
             </trans-unit>
             <trans-unit id="28">
-                <source>This field group should not contain extra fields</source>
+                <source>This form should not contain extra fields</source>
                 <target>Tato skupina polí nesmí obsahovat další pole</target>
             </trans-unit>
             <trans-unit id="29">

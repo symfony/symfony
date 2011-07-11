@@ -111,7 +111,7 @@
                 <target>Táto hodnota by mala byť inštancia triedy {{ class }}</target>
             </trans-unit>
             <trans-unit id="28">
-                <source>This field group should not contain extra fields</source>
+                <source>This form should not contain extra fields</source>
                 <target>Polia by nemali obsahovať ďalšie prvky</target>
             </trans-unit>
             <trans-unit id="29">

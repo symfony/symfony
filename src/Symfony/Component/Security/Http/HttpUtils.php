@@ -48,6 +48,19 @@ class HttpUtils
         if (0 === strpos($path, '/')) {
             $path = $request->getUriForPath($path);
         } elseif (0 !== strpos($path, 'http')) {
+            // hack (don't have a better solution for now)
+            $context = $this->router->getContext();
+            try {
+                $parameters = $this->router->match($request->getPathInfo());
+            } catch (\Exception $e) {
+            }
+
+            if (isset($parameters['_locale'])) {
+                $context->setParameter('_locale', $parameters['_locale']);
+            } elseif ($session = $request->getSession()) {
+                $context->setParameter('_locale', $session->getLocale());
+            }
+
             $path = $this->generateUrl($path, true);
         }
 

@@ -185,9 +185,12 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
             ->with('Content-Type', 'text/html; charset=UTF-8');
         $headerMock->expects($this->at(1))
             ->method('set')
+            ->with('Content-Length', '3');
+        $headerMock->expects($this->at(2))
+            ->method('set')
             ->with('Content-Type', 'text/html; charset=Foo');
 
-        $response = new Response();
+        $response = new Response('foo');
         $response->headers = $headerMock;
 
         // verify first set()

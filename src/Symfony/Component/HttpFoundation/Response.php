@@ -772,12 +772,13 @@ class Response
             $this->headers->set('Content-Type', $this->headers->get('Content-Type').'; charset='.$charset);
         }
     }
-    
+
     protected function fixContentLength()
     {
         if (!$this->headers->has('Content-Length')) {
             $this->headers->set('Content-Length', strlen($this->content));
         }
+
         if ($this->headers->has('Transfer-Encoding')) {
             $this->headers->remove('Content-Length');
         }

@@ -59,6 +59,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
 {
     protected $reader;
     protected $routeAnnotationClass  = 'Symfony\\Component\\Routing\\Annotation\\Route';
+    protected $defaultRouteIndex;
 
     /**
      * Constructor.
@@ -126,6 +127,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
         $collection->addResource(new FileResource($class->getFileName()));
 
         foreach ($class->getMethods() as $method) {
+            $this->defaultRouteIndex = 0;
             foreach ($this->reader->getMethodAnnotations($method) as $annot) {
                 if ($annot instanceof $this->routeAnnotationClass) {
                     $this->addRoute($collection, $annot, $globals, $class, $method);
@@ -194,7 +196,13 @@ abstract class AnnotationClassLoader implements LoaderInterface
      */
     protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
     {
-        return strtolower(str_replace('\\', '_', $class->getName()).'_'.$method->getName());
+        $name = strtolower(str_replace('\\', '_', $class->getName()).'_'.$method->getName());
+        if ($this->defaultRouteIndex > 0) {
+            $name .= '_'.$this->defaultRouteIndex;
+        }
+        $this->defaultRouteIndex++;
+
+        return $name;
     }
 
     abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot);

@@ -138,6 +138,10 @@
                 <source>The file could not be uploaded</source>
                 <target>Plik nie mógł być wgrany</target>
             </trans-unit>
+            <trans-unit id="35">
+                <source>This value should be a valid number</source>
+                <target>Ta wartość powinna być poprawną liczbą</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

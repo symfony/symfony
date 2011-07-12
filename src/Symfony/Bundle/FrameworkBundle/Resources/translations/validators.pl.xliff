@@ -32,7 +32,7 @@
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid</source>
-                <target>One or more of the given values is invalid</target>
+                <target>Jedna lub więcej z podanych wartości jest nieprawidłowa</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>The fields {{ fields }} were not expected</source>
@@ -68,7 +68,7 @@
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}</source>
-                <target>Nieprawdidłowy typ mime pliku ({{ type }}). Dozwolone typy mime to {{ types }}</target>
+                <target>Nieprawidłowy typ mime pliku ({{ type }}). Dozwolone typy mime to {{ types }}</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less</source>
@@ -108,7 +108,7 @@
             </trans-unit>
             <trans-unit id="27">
                 <source>This value is not a valid URL</source>
-                <target>Ta wartość nie jest prawidłowym URL-em</target>
+                <target>Ta wartość nie jest prawidłowym adresem URL</target>
             </trans-unit>
             <trans-unit id="28">
                 <source>This form should not contain extra fields</source>
@@ -140,7 +140,7 @@
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number</source>
-                <target>Ta wartość powinna być poprawną liczbą</target>
+                <target>Ta wartość powinna być prawidłową liczbą</target>
             </trans-unit>
         </body>
     </file>

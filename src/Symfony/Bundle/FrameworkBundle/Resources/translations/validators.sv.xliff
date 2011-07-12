@@ -24,11 +24,11 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>You should select at least {{ limit }} choices</source>
-                <target>Du kan välja minst {{ limit }} val</target>
+                <target>Du ska välja minst {{ limit }} val</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You should select at most {{ limit }} choices</source>
-                <target>Du kan välja som mest {{ limit }} val</target>
+                <target>Du kan som mest välja {{ limit }} val</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>The fields {{ fields }} were not expected</source>

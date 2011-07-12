@@ -311,11 +311,11 @@ class FrameworkExtension extends Extension
         $loader->load('templating_php.xml');
 
         $links = array(
-            'textmate' => 'txmt://open?url=file://%f&line=%l',
-            'macvim'   => 'mvim://open?url=file://%f&line=%l',
+            'textmate' => 'txmt://open?url=file://%%f&line=%%l',
+            'macvim'   => 'mvim://open?url=file://%%f&line=%%l',
         );
 
-        $container->setParameter('templating.helper.code.file_link_format', str_replace('%', '%%', isset($links[$ide]) ? $links[$ide] : $ide));
+        $container->setParameter('templating.helper.code.file_link_format', isset($links[$ide]) ? $links[$ide] : $ide);
         $container->setParameter('templating.helper.form.resources', $config['form']['resources']);
 
         if ($container->getParameter('kernel.debug')) {

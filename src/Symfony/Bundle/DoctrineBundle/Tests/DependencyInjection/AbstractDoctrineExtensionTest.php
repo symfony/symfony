@@ -689,6 +689,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
             'kernel.debug'       => false,
             'kernel.bundles'     => $map,
             'kernel.cache_dir'   => sys_get_temp_dir(),
+            'kernel.environment' => 'test',
             'kernel.root_dir'    => __DIR__.'/../../../../../' // src dir
         )));
     }

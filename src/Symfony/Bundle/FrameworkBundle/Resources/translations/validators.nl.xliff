@@ -138,7 +138,7 @@
                 <source>The file could not be uploaded</source>
                 <target>Het bestand kon niet geüpload worden</target>
             </trans-unit>
-			<trans-unit id="35">
+            <trans-unit id="35">
                 <source>This value should be a valid number</source>
                 <target>Deze waarde moet een geldig getal zijn</target>
             </trans-unit>

@@ -182,21 +182,25 @@
 
 {# Labels #}
 
-{% block field_label %}
+{% block generic_label %}
 {% spaceless %}
     {% if required %}
         {% set attr = attr|merge({'class': attr.class|default('') ~ ' required'}) %}
     {% endif %}
-    <label for="{{ id }}"{% for attrname,attrvalue in attr %} {{attrname}}="{{attrvalue}}"{% endfor %}>{{ label|trans }}</label>
+    <label{% for attrname,attrvalue in attr %} {{attrname}}="{{attrvalue}}"{% endfor %}>{{ label|trans }}</label>
+{% endspaceless %}
+{% endblock %}
+
+{% block field_label %}
+{% spaceless %}
+    {% set attr = attr|merge({'for': id}) %}
+    {{ block('generic_label') }}
 {% endspaceless %}
 {% endblock field_label %}
 
 {% block form_label %}
 {% spaceless %}
-    {% if required %}
-        {% set attr = attr|merge({'class': attr.class|default('') ~ ' required'}) %}
-    {% endif %}
-    <label {% for attrname,attrvalue in attr %} {{attrname}}="{{attrvalue}}"{% endfor %}>{{ label|trans }}</label>
+    {{ block('generic_label') }}
 {% endspaceless %}
 {% endblock form_label %}
 

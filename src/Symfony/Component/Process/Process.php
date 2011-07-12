@@ -174,13 +174,13 @@ class Process
             $this->status = proc_get_status($process);
         }
 
-        $exitCode = proc_close($process);
+        $exitcode = proc_close($process);
 
         if ($this->status['signaled']) {
             throw new \RuntimeException(sprintf('The process stopped because of a "%s" signal.', $this->status['stopsig']));
         }
-        
-        return $this->exitcode = ($this->status["running"] ? $exitCode : $this->status["exitcode"]);
+
+        return $this->exitcode = $this->status['running'] ? $exitcode : $this->status['exitcode'];
     }
 
     /**

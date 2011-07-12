@@ -65,6 +65,12 @@ before to generate entities:
 
   <info>./app/console doctrine:generate:entities Blog/Entity --no-backup</info>
 
+<error>Important:</error> Even if you specified Inheritance options in your
+XML or YAML Mapping files the generator cannot generate the base and
+child classes for you correctly, because it doesn't know which
+class is supposed to extend which. You have to adjust the entity
+code manually for inheritance to work!
+
 EOT
         );
     }

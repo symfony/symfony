@@ -915,6 +915,26 @@ class Request
     }
 
     /**
+     * Returns true if the request is a POST request.
+     *
+     * @return Boolean true if the request is an POST request, false otherwise
+     */
+    public function isPost()
+    {
+        return 'POST' == $this->getMethod();
+    }
+
+    /**
+     * Returns true if the request is a GET request.
+     *
+     * @return Boolean true if the request is an GET request, false otherwise
+     */
+    public function isGet()
+    {
+        return 'GET' == $this->getMethod();
+    }
+
+    /**
      * Splits an Accept-* HTTP header.
      *
      * @param string $header  Header to split

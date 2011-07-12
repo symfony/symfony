@@ -187,6 +187,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertInstanceOf('Doctrine\Common\Annotations\FileCacheReader', $container->get('annotation_reader'));
     }
 
+    public function testFileLinkFormat()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertEquals('file%link%format', $container->getParameter('templating.helper.code.file_link_format'));
+    }
+
     public function testValidationAnnotations()
     {
         $container = $this->createContainerFromFile('validation_annotations');

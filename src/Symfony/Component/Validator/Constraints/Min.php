@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Constraint;
 class Min extends Constraint
 {
     public $message = 'This value should be {{ limit }} or more';
+    public $invalidMessage = 'This value should be a valid number';
     public $limit;
 
     /**

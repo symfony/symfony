@@ -24,7 +24,12 @@ class MinValidator extends ConstraintValidator
         }
 
         if (!is_numeric($value)) {
-            throw new UnexpectedTypeException($value, 'numeric');
+            $this->setMessage($constraint->invalidMessage, array(
+                '{{ value }}' => $value,
+                '{{ limit }}' => $constraint->limit,
+            ));
+
+            return false;
         }
 
         if ($value < $constraint->limit) {

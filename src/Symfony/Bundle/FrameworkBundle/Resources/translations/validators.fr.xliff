@@ -138,6 +138,10 @@
                 <source>The file could not be uploaded</source>
                 <target>Le téléchargement de ce fichier est impossible</target>
             </trans-unit>
+            <trans-unit id="35">
+                <source>This value should be a valid number</source>
+                <target>Cette valeur doit être un nombre</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

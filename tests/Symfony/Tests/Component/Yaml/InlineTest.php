@@ -48,6 +48,13 @@ class InlineTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testHashStringsResemblingExponentialNumericsShouldNotBeChangedToINF()
+    {
+        $value = '686e444';
+
+        $this->assertSame($value, Inline::parse(Inline::dump($value)));
+    }
+
     protected function getTestsForParse()
     {
         return array(
@@ -63,6 +70,8 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             '02333' => 02333,
             '.Inf' => -log(0),
             '-.Inf' => log(0),
+            "'686e444'" => '686e444',
+            '686e444' => 646e444,
             '123456789123456789' => '123456789123456789',
             '"foo\r\nbar"' => "foo\r\nbar",
             "'foo#bar'" => 'foo#bar',
@@ -121,6 +130,8 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             '1243' => 02333,
             '.Inf' => -log(0),
             '-.Inf' => log(0),
+            "'686e444'" => '686e444',
+            '.Inf' => 646e444,
             '"foo\r\nbar"' => "foo\r\nbar",
             "'foo#bar'" => 'foo#bar',
             "'foo # bar'" => 'foo # bar',

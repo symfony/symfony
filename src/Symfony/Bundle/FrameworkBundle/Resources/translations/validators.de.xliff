@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice</source>
-                <target>Der Wert, den sie gewählt haben ist keine gültige Wahl</target>
+                <target>Der Wert, den Sie gewählt haben, ist keine gültige Wahl</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choices</source>
@@ -104,7 +104,7 @@
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid time</source>
-                <target>Diser Wert entspricht keiner gültigen Zeitangabe</target>
+                <target>Dieser Wert entspricht keiner gültigen Zeitangabe</target>
             </trans-unit>
             <trans-unit id="27">
                 <source>This value is not a valid URL</source>

@@ -9,6 +9,10 @@ timeline closely anyway.
 RC4 to RC5
 ----------
 
+* `EntityUserProvider` class has been moved and FQCN changed from
+  `Symfony\Component\Security\Core\User\EntityUserProvider` to
+  `Symfony\Bridge\Doctrine\Security\User\EntityUserProvider`.
+
 * Removed the guesser for the Choice constraint as the constraint only knows
   about the valid keys, and not their values.
 

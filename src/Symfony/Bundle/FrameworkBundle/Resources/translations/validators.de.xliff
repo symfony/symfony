@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice</source>
-                <target>Der Wert, den Sie gewählt haben, ist keine gültige Wahl</target>
+                <target>Sie haben einen ungültigen Wert ausgewählt</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choices</source>

@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Security\User;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
  * Wrapper around a Doctrine EntityManager.

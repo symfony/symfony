@@ -147,26 +147,26 @@ class ResponseHeaderBag extends HeaderBag
      *
      * @return array
      */
-    public function getCookies($format = 'flat')
+    public function getCookies($format = self::COOKIES_FLAT)
     {
-        if (!in_array($format, array(static::COOKIES_FLAT, static::COOKIES_ARRAY))) {
-            throw new \InvalidArgumentException(sprintf('Format "%s" invalid (%s).', $format, implode(', ', array(static::COOKIES_FLAT, static::COOKIES_ARRAY))));
+        if (!in_array($format, array(self::COOKIES_FLAT, self::COOKIES_ARRAY))) {
+            throw new \InvalidArgumentException(sprintf('Format "%s" invalid (%s).', $format, implode(', ', array(self::COOKIES_FLAT, self::COOKIES_ARRAY))));
         }
 
-        if (static::COOKIES_ARRAY === $format) {
+        if (self::COOKIES_ARRAY === $format) {
             return $this->cookies;
         }
 
-        $return = array();
+        $flattenedCookies = array();
         foreach ($this->cookies as $path) {
             foreach ($path as $cookies) {
                 foreach ($cookies as $cookie) {
-                    $return[] = $cookie;
+                    $flattenedCookies[] = $cookie;
                 }
             }
         }
 
-        return $return;
+        return $flattenedCookies;
     }
 
     /**

@@ -33,6 +33,13 @@ interface ParameterBagInterface
     function add(array $parameters);
 
     /**
+     * Removes parameters from the service container parameters.
+     *
+     * @param array $parameters An array of parameters
+     */
+    function remove(array $parameters);
+
+    /**
      * Gets the service container parameters.
      *
      * @return array An array of parameters

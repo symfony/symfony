@@ -31,6 +31,8 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/{bar}', $route->getPattern(), '->setPattern() sets the pattern');
         $route->setPattern('');
         $this->assertEquals('/', $route->getPattern(), '->setPattern() adds a / at the beginning of the pattern if needed');
+        $route->setPattern('.{_format}');
+        $this->assertEquals('.{_format}', $route->getPattern(), '->setPattern() does not add a / at the beginning of the pattern for patterns starting with .');
         $route->setPattern('bar');
         $this->assertEquals('/bar', $route->getPattern(), '->setPattern() adds a / at the beginning of the pattern if needed');
         $this->assertEquals($route, $route->setPattern(''), '->setPattern() implements a fluent interface');

@@ -73,8 +73,14 @@ class Route
     {
         $this->pattern = trim($pattern);
 
-        // a route must start with a slash
-        if (empty($this->pattern) || '/' !== $this->pattern[0]) {
+        // A route must start with a slash
+        //
+        // Also ensure that we are able to use prefixes with route collections
+        // and still be able to refer to the prefix as a url resource.
+        //
+        // Prefix /articles with route .{_format} defined as a route part
+        // of the collection should match as /articles.json not /articles/.json
+        if (empty($this->pattern) || '/' !== $this->pattern[0] && '.' !== $this->pattern[0]) {
             $this->pattern = '/'.$this->pattern;
         }
 

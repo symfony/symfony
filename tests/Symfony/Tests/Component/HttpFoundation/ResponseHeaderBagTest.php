@@ -75,4 +75,47 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
 
         $this->assertContains("Set-Cookie: foo=deleted; expires=".gmdate("D, d-M-Y H:i:s T", time() - 31536001)."; httponly", explode("\r\n", $bag->__toString()));
     }
+
+    public function testCookiesWithSameNames()
+    {
+        $bag = new ResponseHeaderBag();
+        $bag->setCookie(new Cookie('foo', 'bar', 0, '/path/foo', 'foo.bar'));
+        $bag->setCookie(new Cookie('foo', 'bar', 0, '/path/bar', 'foo.bar'));
+        $bag->setCookie(new Cookie('foo', 'bar', 0, '/path/bar', 'bar.foo'));
+        $bag->setCookie(new Cookie('foo', 'bar'));
+
+        $this->assertEquals(4, count($bag->getCookies()));
+
+        $headers = explode("\r\n", $bag->__toString());
+        $this->assertContains("Set-Cookie: foo=bar; path=/path/foo; domain=foo.bar; httponly", $headers);
+        $this->assertContains("Set-Cookie: foo=bar; path=/path/foo; domain=foo.bar; httponly", $headers);
+        $this->assertContains("Set-Cookie: foo=bar; path=/path/bar; domain=bar.foo; httponly", $headers);
+        $this->assertContains("Set-Cookie: foo=bar; path=/; httponly", $headers);
+
+        $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
+        $this->assertTrue(isset($cookies['foo.bar']['/path/foo']['foo']));
+        $this->assertTrue(isset($cookies['foo.bar']['/path/bar']['foo']));
+        $this->assertTrue(isset($cookies['bar.foo']['/path/bar']['foo']));
+        $this->assertTrue(isset($cookies['']['/']['foo']));
+    }
+
+    public function testRemoveCookie()
+    {
+        $bag = new ResponseHeaderBag();
+        $bag->setCookie(new Cookie('foo', 'bar', 0, '/path/foo', 'foo.bar'));
+        $bag->setCookie(new Cookie('bar', 'foo', 0, '/path/bar', 'foo.bar'));
+
+        $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
+        $this->assertTrue(isset($cookies['foo.bar']['/path/foo']));
+
+        $bag->removeCookie('foo', '/path/foo', 'foo.bar');
+
+        $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
+        $this->assertFalse(isset($cookies['foo.bar']['/path/foo']));
+
+        $bag->removeCookie('bar', '/path/bar', 'foo.bar');
+
+        $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
+        $this->assertFalse(isset($cookies['foo.bar']));
+    }
 }

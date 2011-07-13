@@ -18,7 +18,11 @@ namespace Symfony\Component\HttpFoundation;
  */
 class ResponseHeaderBag extends HeaderBag
 {
+    const COOKIES_FLAT  = 'flat';
+    const COOKIES_ARRAY = 'array';
+
     protected $computedCacheControl = array();
+    protected $cookies              = array();
 
     /**
      * Constructor.
@@ -40,7 +44,7 @@ class ResponseHeaderBag extends HeaderBag
     public function __toString()
     {
         $cookies = '';
-        foreach ($this->cookies as $cookie) {
+        foreach ($this->getCookies() as $cookie) {
             $cookies .= 'Set-Cookie: '.$cookie."\r\n";
         }
 
@@ -100,6 +104,69 @@ class ResponseHeaderBag extends HeaderBag
     public function getCacheControlDirective($key)
     {
         return array_key_exists($key, $this->computedCacheControl) ? $this->computedCacheControl[$key] : null;
+    }
+
+    /**
+     * Sets a cookie.
+     *
+     * @param Cookie $cookie
+     * @return void
+     */
+    public function setCookie(Cookie $cookie)
+    {
+        $this->cookies[$cookie->getDomain()][$cookie->getPath()][$cookie->getName()] = $cookie;
+    }
+
+    /**
+     * Removes a cookie from the array, but does not unset it in the browser
+     *
+     * @param string $name
+     * @param string $path
+     * @param string $domain
+     * @return void
+     */
+    public function removeCookie($name, $path = null, $domain = null)
+    {
+        unset($this->cookies[$domain][$path][$name]);
+
+        if (empty($this->cookies[$domain][$path])) {
+            unset($this->cookies[$domain][$path]);
+
+            if (empty($this->cookies[$domain])) {
+                unset($this->cookies[$domain]);
+            }
+        }
+    }
+
+    /**
+     * Returns an array with all cookies
+     *
+     * @param string $format
+     *
+     * @throws \InvalidArgumentException When the $format is invalid
+     *
+     * @return array
+     */
+    public function getCookies($format = self::COOKIES_FLAT)
+    {
+        if (!in_array($format, array(self::COOKIES_FLAT, self::COOKIES_ARRAY))) {
+            throw new \InvalidArgumentException(sprintf('Format "%s" invalid (%s).', $format, implode(', ', array(self::COOKIES_FLAT, self::COOKIES_ARRAY))));
+        }
+
+        if (self::COOKIES_ARRAY === $format) {
+            return $this->cookies;
+        }
+
+        $flattenedCookies = array();
+        foreach ($this->cookies as $path) {
+            foreach ($path as $cookies) {
+                foreach ($cookies as $cookie) {
+                    $flattenedCookies[] = $cookie;
+                }
+            }
+        }
+
+        return $flattenedCookies;
     }
 
     /**

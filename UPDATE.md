@@ -13,6 +13,19 @@ RC4 to RC5
   `Symfony\Component\Security\Core\User\EntityUserProvider` to
   `Symfony\Bridge\Doctrine\Security\User\EntityUserProvider`.
 
+* Moved cookies management of HeaderBag in ResponseHeaderBag of the HttpFoundation.
+  To access a cookie in Request instance, please use Request::$cookies public attribute.
+
+* It is not possible to know if a cookie is present or get a cookie in ResponseHeaderBag
+  because getCookie() and hasCookie() methods were removed.
+
+* The method `ResponseHeaderBag::getCookie()` accepts an argument for the return format,
+  the possible values are `ResponseHeaderBag::COOKIES_FLAT` (default value) or `ResponseHeaderBag::COOKIES_ARRAY`
+    * ResponseHeaderBag::COOKIES_FLAT return a simple array
+        * array(0 => `a cookie instance`, 1 => `another cookie instance`)
+    * ResponseHeaderBag::COOKIES_ARRAY return a multidimensional array
+        * array(`the domain` => array(`the path` => array(`the cookie name` => `a cookie instance`)))
+
 * Removed the guesser for the Choice constraint as the constraint only knows
   about the valid keys, and not their values.
 

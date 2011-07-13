@@ -55,6 +55,17 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
         $this->filterResponse(new Request(), HttpKernelInterface::SUB_REQUEST);
     }
 
+    public function testDoesNotDeleteCookieIfUsingSessionLifetime()
+    {
+        $params = session_get_cookie_params();
+        session_set_cookie_params(0, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+
+        $response = $this->filterResponse(new Request(), HttpKernelInterface::MASTER_REQUEST);
+        $cookies = $response->headers->getCookies();
+
+        $this->assertEquals(0, reset($cookies)->getExpiresTime());
+    }
+
     private function filterResponse(Request $request, $type = HttpKernelInterface::MASTER_REQUEST)
     {
         $request->setSession($this->session);
@@ -65,6 +76,8 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->onKernelResponse($event);
 
         $this->assertSame($response, $event->getResponse());
+
+        return $response;
     }
 
     private function sessionMustNotBeSaved()

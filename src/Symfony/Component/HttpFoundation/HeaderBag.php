@@ -19,7 +19,6 @@ namespace Symfony\Component\HttpFoundation;
 class HeaderBag
 {
     protected $headers;
-    protected $cookies;
     protected $cacheControl;
 
     /**
@@ -30,7 +29,6 @@ class HeaderBag
     public function __construct(array $headers = array())
     {
         $this->cacheControl = array();
-        $this->cookies = array();
         $this->headers = array();
         foreach ($headers as $key => $values) {
             $this->set($key, $values);
@@ -198,67 +196,6 @@ class HeaderBag
         if ('cache-control' === $key) {
             $this->cacheControl = array();
         }
-    }
-
-    /**
-     * Sets a cookie.
-     *
-     * @param Cookie $cookie
-     * @return void
-     */
-    public function setCookie(Cookie $cookie)
-    {
-        $this->cookies[$cookie->getName()] = $cookie;
-    }
-
-    /**
-     * Removes a cookie from the array, but does not unset it in the browser
-     *
-     * @param string $name
-     * @return void
-     */
-    public function removeCookie($name)
-    {
-        unset($this->cookies[$name]);
-    }
-
-    /**
-     * Whether the array contains any cookie with this name
-     *
-     * @param string $name
-     * @return Boolean
-     */
-    public function hasCookie($name)
-    {
-        return isset($this->cookies[$name]);
-    }
-
-    /**
-     * Returns a cookie
-     *
-     * @param string $name
-     *
-     * @throws \InvalidArgumentException When the cookie does not exist
-     *
-     * @return Cookie
-     */
-    public function getCookie($name)
-    {
-        if (!$this->hasCookie($name)) {
-            throw new \InvalidArgumentException(sprintf('There is no cookie with name "%s".', $name));
-        }
-
-        return $this->cookies[$name];
-    }
-
-    /**
-     * Returns an array with all cookies
-     *
-     * @return array
-     */
-    public function getCookies()
-    {
-        return $this->cookies;
     }
 
     /**

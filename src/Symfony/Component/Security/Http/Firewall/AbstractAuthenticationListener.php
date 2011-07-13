@@ -126,17 +126,17 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             return;
         }
 
+        if (!$request->hasSession()) {
+            throw new \RuntimeException('This authentication method requires a session.');
+        }
+
         try {
-            if (null === $returnValue = $this->attemptAuthentication($request)) {
-                return;
-            }
-
-            if (!$request->hasSession()) {
-                throw new \RuntimeException('This authentication method requires a session.');
-            }
-
             if (!$request->hasPreviousSession()) {
                 throw new SessionUnavailableException('Your session has timed-out, or you have disabled cookies.');
+            }
+
+            if (null === $returnValue = $this->attemptAuthentication($request)) {
+                return;
             }
 
             if ($returnValue instanceof TokenInterface) {

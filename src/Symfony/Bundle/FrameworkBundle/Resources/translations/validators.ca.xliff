@@ -8,7 +8,7 @@
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true</source>
-                <target>Aquest valor hauria de ser veritable</target>
+                <target>Aquest valor hauria de ser cert</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}</source>
@@ -20,19 +20,19 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice</source>
-                <target>Seleccioni aquest valor entre les opcions mostrades</target>
+                <target>El valor seleccionat no és una opció vàlida</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choices</source>
-                <target>Hauria de seleccionar almenys {{ limit }} opcions</target>
+                <target>Ha de seleccionar almenys {{ limit }} opcions</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choices</source>
-                <target>Hauria de seleccionar com a màxim {{ limit }} opcions</target>
+                <target>Ha de seleccionar com a màxim {{ limit }} opcions</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid</source>
-                <target>One or more of the given values is invalid</target>
+                <target>Un o més dels valors facilitats són incorrectes</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>The fields {{ fields }} were not expected</source>
@@ -112,7 +112,7 @@
             </trans-unit>
             <trans-unit id="28">
                 <source>This form should not contain extra fields</source>
-                <target>Aquest grup de camps no hauria de contenir camps addicionals</target>
+                <target>Aquest formulari no hauria de contenir camps addicionals</target>
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file</source>

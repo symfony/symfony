@@ -19,7 +19,7 @@ RC4 to RC5
 * `ResponseHeaderBag::getCookie()` and `ResponseHeaderBag::hasCookie()`
   methods were removed.
 
-* The method `ResponseHeaderBag::getCookie()` now supports an argument for the
+* The method `ResponseHeaderBag::getCookies()` now supports an argument for the
   returned format (possible values are `ResponseHeaderBag::COOKIES_FLAT`
   (default value) or `ResponseHeaderBag::COOKIES_ARRAY`).
 

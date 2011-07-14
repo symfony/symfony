@@ -57,6 +57,9 @@ abstract class FileLoader implements LoaderInterface
      */
     protected function newConstraint($name, $options)
     {
+        // Hack to prevent loading of Constraints/0 or Constraints/1
+        if($name=='1') { $name = 'True'; } elseif($name=='0') { $name = 'False'; }
+
         if (strpos($name, '\\') !== false && class_exists($name)) {
             $className = (string) $name;
         } else if (strpos($name, ':') !== false) {

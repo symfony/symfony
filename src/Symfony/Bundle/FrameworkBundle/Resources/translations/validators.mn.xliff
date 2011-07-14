@@ -40,15 +40,15 @@
             </trans-unit>
             <trans-unit id="10">
                 <source>The fields {{ fields }} are missing</source>
-                <target>Талбаруу {{ fields }} дутуу байна</target>
+                <target>{{ fields }} талбарууд дутуу байна</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date</source>
-                <target>Энэ утга буруу date байна </target>
+                <target>Энэ утга буруу date төрөл байна </target>
             </trans-unit>
             <trans-unit id="12">
                 <source>This value is not a valid datetime</source>
-                <target>Энэ утга буруу цаг хугацаа байна</target>
+                <target>Энэ утга буруу цаг төрөл байна</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address</source>
@@ -60,11 +60,11 @@
             </trans-unit>
             <trans-unit id="15">
                 <source>The file is not readable</source>
-                <target>Файл readable биш байна</target>
+                <target>Файл уншигдахуйц биш байна</target>
             </trans-unit>
             <trans-unit id="16">
                 <source>The file is too large ({{ size }}). Allowed maximum size is {{ limit }}</source>
-                <target>Файл хэтэрхий том байна ({{ size }}). Зөвшөөрөгдөх дээд хэмжээ нь  {{ limit }} байна</target>
+                <target>Файл хэтэрхий том байна ({{ size }}). Зөвшөөрөгдөх дээд хэмжээ  {{ limit }} байна</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}</source>
@@ -72,15 +72,15 @@
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less</source>
-                <target>Энэ утга  {{ limit }} юмуу бага байна</target>
+                <target>Энэ утга  {{ limit }} юмуу эсвэл бага байна</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>This value is too long. It should have {{ limit }} characters or less</source>
-                <target>Энэ утга хэтэрхий урт байна. {{ limit }} тэмдэгтийн урттай юмуу бага байна</target>
+                <target>Энэ утга хэтэрхий урт байна. {{ limit }} тэмдэгтийн урттай юмуу эсвэл бага байна</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>This value should be {{ limit }} or more</source>
-                <target>Энэ утга {{ limit }} юмуу их байна</target>
+                <target>Энэ утга {{ limit }} юмуу эсвэл их байна</target>
             </trans-unit>
             <trans-unit id="21">
                 <source>This value is too short. It should have {{ limit }} characters or more</source>
@@ -88,7 +88,7 @@
             </trans-unit>
             <trans-unit id="22">
                 <source>This value should not be blank</source>
-                <target>Заавал оруулах талбар</target>
+                <target>Энэ утга хоосон байж болохгүй</target>
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should not be null</source>
@@ -104,7 +104,7 @@
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid time</source>
-                <target>Энэ утга буруу цаг байна</target>
+                <target>Энэ утга буруу цаг төрөл байна</target>
             </trans-unit>
             <trans-unit id="27">
                 <source>This value is not a valid URL</source>
@@ -120,7 +120,7 @@
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form</source>
-                <target>CSRF token буруу байна. Формоо дахин илгээж үзнэ үү</target>
+                <target>CSRF token буруу байна. Формоо дахин илгээнэ үү</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal</source>
@@ -152,7 +152,7 @@
             </trans-unit>
             <trans-unit id="38">
                 <source>This is not a valid IP address</source>
-                <target>Зөв IP хаяг биш байна</target>
+                <target>IP хаяг зөв биш байна</target>
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid language</source>

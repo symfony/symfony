@@ -32,18 +32,10 @@ class InlineTest extends \PHPUnit_Framework_TestCase
         }
 
         foreach ($this->getTestsForParse() as $yaml => $value) {
-            if ($value == 1230) {
-                continue;
-            }
-
             $this->assertEquals($value, Inline::parse(Inline::dump($value)), 'check consistency');
         }
 
         foreach ($testsForDump as $yaml => $value) {
-            if ($value == 1230) {
-                continue;
-            }
-
             $this->assertEquals($value, Inline::parse(Inline::dump($value)), 'check consistency');
         }
     }

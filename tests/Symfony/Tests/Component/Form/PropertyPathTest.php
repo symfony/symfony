@@ -385,13 +385,6 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         new PropertyPath('property.$form');
     }
 
-    public function testInvalidPropertyPath_empty()
-    {
-        $this->setExpectedException('Symfony\Component\Form\Exception\InvalidPropertyPathException');
-
-        new PropertyPath('');
-    }
-
     public function testInvalidPropertyPath_null()
     {
         $this->setExpectedException('Symfony\Component\Form\Exception\InvalidPropertyPathException');

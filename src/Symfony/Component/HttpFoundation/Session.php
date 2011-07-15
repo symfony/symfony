@@ -117,7 +117,7 @@ class Session implements \Serializable
      *
      * @return array Attributes
      */
-    public function getAttributes()
+    public function all()
     {
         return $this->attributes;
     }
@@ -127,7 +127,7 @@ class Session implements \Serializable
      *
      * @param array $attributes Attributes
      */
-    public function setAttributes(array $attributes)
+    public function replace(array $attributes)
     {
         if (false === $this->started) {
             $this->start();

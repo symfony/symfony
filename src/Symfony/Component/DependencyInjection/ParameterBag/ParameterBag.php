@@ -57,6 +57,18 @@ class ParameterBag implements ParameterBagInterface
     }
 
     /**
+     * Removes parameters from the service container parameters.
+     *
+     * @param array $parameters An array of parameters
+     */
+    public function remove(array $parameters)
+    {
+        foreach ($parameters as $parameter) {
+            unset($this->parameters[strtolower($parameter)]);
+        }
+    }
+
+    /**
      * Gets the service container parameters.
      *
      * @return array An array of parameters

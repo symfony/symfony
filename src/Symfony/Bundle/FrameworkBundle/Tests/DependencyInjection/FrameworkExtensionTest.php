@@ -78,7 +78,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
         $this->assertEquals('fr', $container->getParameter('session.default_locale'));
         $this->assertEquals('%session.default_locale%', $container->getDefinition('session')->getArgument(1));
-        $this->assertTrue($container->getDefinition('session')->hasMethodCall('start'));
+        $this->assertTrue($container->getDefinition('session_listener')->getArgument(1));
         $this->assertEquals('session.storage.native', (string) $container->getAlias('session.storage'));
 
         $options = $container->getParameter('session.storage.options');

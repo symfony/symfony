@@ -154,6 +154,10 @@ class RequestMatcher implements RequestMatcherInterface
      */
     protected function checkIp6($requestIp, $ip)
     {
+        if (!defined('AF_INET6')) {
+            throw new \RuntimeException('Unable to check Ipv6. Check that PHP was not compiled with option "disable-ipv6".');
+        }
+
         list($address, $netmask) = explode('/', $ip);
 
         $bytes_addr = unpack("n*", inet_pton($address));

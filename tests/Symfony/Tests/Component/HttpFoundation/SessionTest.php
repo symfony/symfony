@@ -74,7 +74,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->session->hasFlash('foo'));
     }
 
-    public function testAttribute()
+    public function testAll()
     {
         $this->assertFalse($this->session->has('foo'));
         $this->assertNull($this->session->get('foo'));
@@ -97,13 +97,13 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $this->session = $this->getSession();
 
-        $this->session->setAttributes($attrs);
+        $this->session->replace($attrs);
 
-        $this->assertSame($attrs, $this->session->getAttributes());
+        $this->assertSame($attrs, $this->session->all());
 
         $this->session->clear();
 
-        $this->assertSame(array(), $this->session->getAttributes());
+        $this->assertSame(array(), $this->session->all());
     }
 
     public function testMigrateAndInvalidate()
@@ -122,7 +122,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session = $this->getSession();
         $this->session->invalidate();
 
-        $this->assertSame(array(), $this->session->getAttributes());
+        $this->assertSame(array(), $this->session->all());
         $this->assertSame(array(), $this->session->getFlashes());
     }
 
@@ -198,7 +198,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('en', \Locale::getDefault());
 
         $this->assertSame(array(), $this->session->getFlashes());
-        $this->assertSame(array(), $this->session->getAttributes());
+        $this->assertSame(array(), $this->session->all());
     }
 
     public function testStorageRegenerate()

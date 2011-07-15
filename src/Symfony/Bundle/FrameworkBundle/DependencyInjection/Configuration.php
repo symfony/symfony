@@ -161,7 +161,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('session')
                     ->canBeUnset()
                     ->children()
-                        ->booleanNode('auto_start')->end()
+                        ->booleanNode('auto_start')->defaultFalse()->end()
                         ->scalarNode('default_locale')->defaultValue('en')->end()
                         ->scalarNode('storage_id')->defaultValue('session.storage.native')->end()
                         ->scalarNode('name')->end()

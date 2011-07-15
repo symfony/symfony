@@ -268,10 +268,7 @@ class FrameworkExtension extends Extension
         $loader->load('session.xml');
 
         // session
-        $session = $container->getDefinition('session');
-        if (!empty($config['auto_start'])) {
-            $session->addMethodCall('start');
-        }
+        $container->getDefinition('session_listener')->addArgument($config['auto_start']);
         $container->setParameter('session.default_locale', $config['default_locale']);
 
         // session storage

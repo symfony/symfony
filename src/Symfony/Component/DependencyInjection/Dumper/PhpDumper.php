@@ -750,7 +750,7 @@ EOF;
     public function getParameterBag()
     {
         if (null === \$this->parameterBag) {
-        	\$this->parameterBag = new FrozenParameterBag(\$this->parameters);
+            \$this->parameterBag = new FrozenParameterBag(\$this->parameters);
         }
 
         return \$this->parameterBag;

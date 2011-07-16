@@ -601,7 +601,7 @@ EOF;
      */
     private function startClass($class, $baseClass)
     {
-        $bagClass = $this->container->isFrozen() ? '' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
+        $bagClass = $this->container->isFrozen() ? 'use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
 
         return <<<EOF
 <?php
@@ -742,6 +742,18 @@ EOF;
     public function setParameter(\$name, \$value)
     {
         throw new \LogicException('Impossible to call set() on a frozen ParameterBag.');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getParameterBag()
+    {
+        if (null === \$this->parameterBag) {
+        	\$this->parameterBag = new FrozenParameterBag(\$this->parameters);
+        }
+
+        return \$this->parameterBag;
     }
 EOF;
         }

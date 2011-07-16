@@ -195,7 +195,7 @@ class ParameterBag implements ParameterBagInterface
 
         $self = $this;
 
-        return preg_replace_callback('/(?<!%)%([^%]+)%/', function ($match) use ($self, $resolving) {
+        return preg_replace_callback('/(?<!%)%([^%]+)%/', function ($match) use ($self, $resolving, $value) {
             $key = strtolower($match[1]);
             if (isset($resolving[$key])) {
                 throw new ParameterCircularReferenceException(array_keys($resolving));
@@ -203,10 +203,13 @@ class ParameterBag implements ParameterBagInterface
 
             $resolved = $self->get($key);
 
-            if (!is_string($resolved)) {
-                throw new RuntimeException('A parameter cannot contain a non-string parameter.');
+            if (!is_string($resolved) && !is_numeric($resolved)) {
+                $resolvingKeys = array_keys($resolving);
+
+                throw new RuntimeException(sprintf('A string value must be composed of strings and/or numbers, but found parameter "%s" of type %s inside string value "%s".', $key, gettype($resolved), $value));
             }
 
+            $resolved = (string) $resolved;
             $resolving[$key] = true;
 
             return $self->isResolved() ? $resolved : $self->resolveString($resolved, $resolving);

@@ -20,19 +20,19 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice</source>
-                <target>Seleccione este valor entre las opciones mostradas</target>
+                <target>El valor seleccionado no es una opción válida</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choices</source>
-                <target>Debería seleccionar al menos {{ limit }} opciones</target>
+                <target>Debe seleccionar al menos {{ limit }} opciones</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choices</source>
-                <target>Debería seleccionar como máximo {{ limit }} opciones</target>
+                <target>Debe seleccionar como máximo {{ limit }} opciones</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid</source>
-                <target>One or more of the given values is invalid</target>
+                <target>Uno o más de los valores indicados no son válidos</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>The fields {{ fields }} were not expected</source>
@@ -112,7 +112,7 @@
             </trans-unit>
             <trans-unit id="28">
                 <source>This form should not contain extra fields</source>
-                <target>Este grupo de campos no debería contener campos adicionales</target>
+                <target>Este formulario no debería contener campos adicionales</target>
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file</source>

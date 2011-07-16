@@ -204,8 +204,6 @@ class ParameterBag implements ParameterBagInterface
             $resolved = $self->get($key);
 
             if (!is_string($resolved) && !is_numeric($resolved)) {
-                $resolvingKeys = array_keys($resolving);
-
                 throw new RuntimeException(sprintf('A string value must be composed of strings and/or numbers, but found parameter "%s" of type %s inside string value "%s".', $key, gettype($resolved), $value));
             }
 

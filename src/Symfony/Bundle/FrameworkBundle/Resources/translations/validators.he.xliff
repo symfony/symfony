@@ -8,7 +8,7 @@
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true</source>
-                <target>הערך צריך להיות נכון</target>
+                <target>הערך צריך להיות אמת</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}</source>
@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice</source>
-                <target>הערך צריך להיות אחת האפשרויות נתון</target>
+                <target>הערך שבחרת הוא לא בחירה חוקית</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choices</source>
@@ -72,7 +72,7 @@
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less</source>
-                <target>הערך צריך להיות {{ limit }} או פחות</target>
+                <target>הערך צריך להיות {{ limit }} או פחות תווים</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>This value is too long. It should have {{ limit }} characters or less</source>
@@ -80,7 +80,7 @@
             </trans-unit>
             <trans-unit id="20">
                 <source>This value should be {{ limit }} or more</source>
-                <target>הערך צריך להיות {{ limit }} או יותר</target>
+                <target>הערך צריך להיות {{ limit }} או יותר תווים</target>
             </trans-unit>
             <trans-unit id="21">
                 <source>This value is too short. It should have {{ limit }} characters or more</source>

@@ -199,7 +199,7 @@ class FormHelper extends Helper
 
         $template = null;
 
-        $custom = '_'.$view->get('proto_id', $view->get('id'));
+        $custom = '_'.$view->get('id');
         $rendering = $custom.$section;
 
         if (isset($this->varStack[$rendering])) {

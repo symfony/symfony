@@ -223,7 +223,7 @@ class FormExtension extends \Twig_Extension
             }
         }
 
-        $custom = '_'.$view->get('proto_id', $view->get('id'));
+        $custom = '_'.$view->get('id');
         $rendering = $custom.$section;
         $blocks = $this->getBlocks($view);
 

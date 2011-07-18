@@ -163,7 +163,7 @@ class Configuration implements ConfigurationInterface
                                 'query_cache_driver', 'query-cache-driver',
                                 'auto_mapping', 'auto-mapping',
                                 'mappings', 'mapping',
-                                'connection'
+                                'connection', 'dql'
                             ) as $key) {
                                 if (array_key_exists($key, $v)) {
                                     $entityManager[$key] = $v[$key];

@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class Router extends BaseRouter
 {
-    private $container;
+    protected $container;
 
     /**
      * Constructor.

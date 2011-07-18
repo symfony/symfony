@@ -21,7 +21,7 @@ class DefaultValidator implements FormValidatorInterface
     {
         if (!$form->isSynchronized()) {
             $form->addError(new FormError(
-                $form->getAttribute('invalid_message_template'),
+                $form->getAttribute('invalid_message'),
                 $form->getAttribute('invalid_message_parameters')
             ));
         }

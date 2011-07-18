@@ -7,6 +7,5 @@ doctrine:
 
     orm:
         dql:
-            string_functions: 
+            string_functions:
                 test_string: Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestStringFunction
-

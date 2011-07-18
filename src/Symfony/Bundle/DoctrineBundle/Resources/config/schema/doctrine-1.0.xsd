@@ -90,6 +90,7 @@
             <xsd:element name="entity-manager" type="entity_manager" />
             <xsd:element name="mapping" type="mapping" />
             <xsd:element name="metadata-cache-driver" type="metadata_cache_driver" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="dql" type="dql" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
 
         <xsd:attribute name="auto-mapping" type="xsd:string" />

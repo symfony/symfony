@@ -100,6 +100,7 @@ class Client extends BaseClient
         return <<<EOF
 <?php
 
+require_once '/Users/fabien/work/symfony/2_0/blog/app/bootstrap.php';
 require_once '$path';
 
 \$kernel = unserialize('$kernel');

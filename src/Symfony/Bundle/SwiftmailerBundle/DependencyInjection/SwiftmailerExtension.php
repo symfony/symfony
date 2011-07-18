@@ -16,7 +16,6 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Definition\Processor;
 
 /**
  * SwiftmailerExtension is an extension for the SwiftMailer library.
@@ -45,9 +44,8 @@ class SwiftmailerExtension extends Extension
         $loader->load('swiftmailer.xml');
         $container->setAlias('mailer', 'swiftmailer.mailer');
 
-        $processor = new Processor();
         $configuration = new Configuration($container->getParameter('kernel.debug'));
-        $config = $processor->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration($configuration, $configs);
 
         if (null === $config['transport']) {
             $transport = 'null';

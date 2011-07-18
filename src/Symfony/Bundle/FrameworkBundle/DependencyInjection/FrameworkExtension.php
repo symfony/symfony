@@ -22,7 +22,6 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Definition\Processor;
 
 /**
  * FrameworkExtension.
@@ -56,9 +55,8 @@ class FrameworkExtension extends Extension
             $container->setAlias('debug.event_dispatcher', 'event_dispatcher');
         }
 
-        $processor = new Processor();
         $configuration = new Configuration($container->getParameter('kernel.debug'));
-        $config = $processor->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration($configuration, $configs);
 
         if (isset($config['charset'])) {
             $container->setParameter('kernel.charset', $config['charset']);

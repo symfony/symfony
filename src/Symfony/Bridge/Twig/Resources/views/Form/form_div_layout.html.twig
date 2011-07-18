@@ -9,6 +9,15 @@
 {% endspaceless %}
 {% endblock form_widget %}
 
+{% block collection_widget %}
+{% spaceless %}
+    {% if prototype is defined %}
+        {% set attr = attr|merge({'data-prototype': form_row(prototype) }) %}
+    {% endif %}
+    {{ block('form_widget') }}
+{% endspaceless %}
+{% endblock collection_widget %}
+
 {% block textarea_widget %}
 {% spaceless %}
     <textarea {{ block('widget_attributes') }}>{{ value }}</textarea>
@@ -221,12 +230,6 @@
     </div>
 {% endspaceless %}
 {% endblock field_row %}
-
-{% block prototype_row %}
-{% spaceless %}
-    <script type="text/html" id="{{ proto_id }}">{{ form_row(form) }}</script>
-{% endspaceless %}
-{% endblock prototype_row %}
 
 {% block hidden_row %}
     {{ form_widget(form) }}

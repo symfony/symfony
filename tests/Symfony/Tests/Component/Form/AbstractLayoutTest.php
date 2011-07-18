@@ -1692,9 +1692,10 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $html = $this->renderWidget($form);
 
         $this->assertMatchesXpath($html,
-'//script
-    [@id="na&me_items_prototype"]
-    [@type="text/html"]
+            '//div[@id="na&me_items"][@data-prototype]
+            |
+             //table[@id="na&me_items"][@data-prototype]
+
 '
         );
     }

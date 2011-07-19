@@ -417,7 +417,7 @@ abstract class Client
     /**
      * Restarts the client.
      *
-     * It flushes all cookies.
+     * It flushes history and all cookies.
      *
      * @api
      */

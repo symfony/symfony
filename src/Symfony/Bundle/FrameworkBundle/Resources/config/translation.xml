@@ -14,7 +14,7 @@
     </parameters>
 
     <services>
-        <service id="translator.real" class="%translator.class%">
+        <service id="translator.default" class="%translator.class%">
             <argument type="service" id="service_container" />
             <argument type="service" id="translator.selector" />
             <argument type="collection" /> <!-- translation loaders -->

@@ -18,7 +18,7 @@ class TranslatorPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('translator.real')) {
+        if (!$container->hasDefinition('translator.default')) {
             return;
         }
 
@@ -26,6 +26,6 @@ class TranslatorPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds('translation.loader') as $id => $attributes) {
             $loaders[$id] = $attributes[0]['alias'];
         }
-        $container->findDefinition('translator.real')->replaceArgument(2, $loaders);
+        $container->findDefinition('translator.default')->replaceArgument(2, $loaders);
     }
 }

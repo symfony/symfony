@@ -25,3 +25,6 @@ form_login_redirect_to_protected_resource_after_login:
 form_logout:
     pattern: /logout_path
 
+form_secure_action:
+    pattern: /secure-but-not-covered-by-access-control
+    defaults: { _controller: FormLoginBundle:Login:secure }

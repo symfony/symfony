@@ -77,6 +77,9 @@ RC4 to RC5
         Session::getAttributes() -> Session::all()
         Session::setAttributes() -> Session::replace()
 
+* {_locale} is not supported in paths in the access_control section anymore. You can
+  rewrite the paths using a regular expression such as "(?:[a-z]{2})".
+
 RC3 to RC4
 ----------
 

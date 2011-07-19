@@ -34,6 +34,11 @@ class LocalizedController extends ContainerAware
         throw new \RuntimeException('logoutAction() should never be called.');
     }
 
+    public function secureAction()
+    {
+        throw new \RuntimeException('secureAction() should never be called.');
+    }
+
     public function profileAction()
     {
         return new Response('Profile');

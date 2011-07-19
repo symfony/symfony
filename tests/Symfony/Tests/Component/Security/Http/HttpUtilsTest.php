@@ -61,6 +61,17 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $subRequest->server->get('Foo'));
 
         // route name
+        $utils = new HttpUtils($router = $this->getMockBuilder('Symfony\Component\Routing\Router')->disableOriginalConstructor()->getMock());
+        $router
+            ->expects($this->once())
+            ->method('generate')
+            ->will($this->returnValue('/foo/bar'))
+        ;
+        $router
+            ->expects($this->any())
+            ->method('getContext')
+            ->will($this->returnValue($this->getMock('Symfony\Component\Routing\RequestContext')))
+        ;
         $subRequest = $utils->createRequest($this->getRequest(), 'foobar');
         $this->assertEquals('/foo/bar', $subRequest->getPathInfo());
 

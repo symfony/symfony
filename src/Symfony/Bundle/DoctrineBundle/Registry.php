@@ -16,7 +16,6 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\ORMException;
-use Doctrine\ORM\Proxy\Proxy;
 
 /**
  * References all Doctrine connections and entity managers in a given Container.
@@ -219,19 +218,17 @@ class Registry implements RegistryInterface
     }
 
     /**
-     * Gets the entity manager associated with a given object.
+     * Gets the entity manager associated with a given class.
      *
-     * @param object $object A Doctrine Entity
+     * @param string $class A Doctrine Entity class name
      *
      * @return EntityManager|null
      */
-    public function getEntityManagerForObject($object)
+    public function getEntityManagerForClass($class)
     {
-        if ($object instanceof Proxy) {
-            $proxyClass = new \ReflectionClass($object);
+        $proxyClass = new \ReflectionClass($class);
+        if ($proxyClass->implementsInterface('Doctrine\ORM\Proxy\Proxy')) {
             $class = $proxyClass->getParentClass()->getName();
-        } else {
-            $class = get_class($object);
         }
 
         foreach ($this->entityManagers as $id) {

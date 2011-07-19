@@ -115,7 +115,7 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
         $dir = isset($_SERVER['KERNEL_DIR']) ? $_SERVER['KERNEL_DIR'] : static::getPhpUnitXmlDir();
 
         $finder = new Finder();
-        $finder->name('*Kernel.php')->in($dir);
+        $finder->name('*Kernel.php')->depth(0)->in($dir);
         if (!count($finder)) {
             throw new \RuntimeException('You must override the WebTestCase::createKernel() method.');
         }

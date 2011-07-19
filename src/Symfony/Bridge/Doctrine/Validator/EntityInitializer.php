@@ -32,7 +32,7 @@ class EntityInitializer implements ObjectInitializerInterface
     public function initialize($object)
     {
         if ($object instanceof Proxy) {
-            $this->registry->getEntityManagerForObject($object)->getUnitOfWork()->initializeObject($object);
+            $this->registry->getEntityManagerForClass(get_class($object))->getUnitOfWork()->initializeObject($object);
         }
     }
 }

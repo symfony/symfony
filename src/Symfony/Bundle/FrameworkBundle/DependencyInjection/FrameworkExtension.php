@@ -233,7 +233,7 @@ class FrameworkExtension extends Extension
         $loader->load('routing.xml');
 
         $container->setParameter('router.resource', $config['resource']);
-        $router = $container->findDefinition('router');
+        $router = $container->findDefinition('router.default');
 
         if (isset($config['type'])) {
             $argument = $router->getArgument(2);
@@ -250,7 +250,7 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
             'Symfony\\Component\\Routing\\Generator\\UrlGeneratorInterface',
             'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
-            $container->findDefinition('router')->getClass(),
+            $container->findDefinition('router.default')->getClass(),
         ));
     }
 

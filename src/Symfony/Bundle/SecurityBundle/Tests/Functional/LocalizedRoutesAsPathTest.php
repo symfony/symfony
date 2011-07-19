@@ -26,6 +26,30 @@ class LocalizedRoutesAsPathTest extends WebTestCase
         $this->assertEquals('Homepage', $client->followRedirect()->text());
     }
 
+    /**
+     * @dataProvider getLocales
+     */
+    public function testAccessRestrictedResource($locale)
+    {
+        $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => 'localized_routes.yml'));
+        $client->insulate();
+
+        $client->request('GET', '/'.$locale.'/secure/');
+        $this->assertRedirect($client->getResponse(), '/'.$locale.'/login');
+    }
+
+    /**
+     * @dataProvider getLocales
+     */
+    public function testAccessRestrictedResourceWithForward($locale)
+    {
+        $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => 'localized_routes_with_forward.yml'));
+        $client->insulate();
+
+        $crawler = $client->request('GET', '/'.$locale.'/secure/');
+        $this->assertEquals(1, count($crawler->selectButton('login')), (string) $client->getResponse());
+    }
+
     public function getLocales()
     {
         return array(array('en'), array('de'));

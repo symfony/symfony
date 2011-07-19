@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 abstract class WebTestCase extends \PHPUnit_Framework_TestCase
 {
+    static protected $class;
     static protected $kernel;
 
     /**
@@ -142,9 +143,11 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      */
     static protected function createKernel(array $options = array())
     {
-        $class = static::getKernelClass();
+        if (null === static::$class) {
+            static::$class = static::getKernelClass();
+        }
 
-        return new $class(
+        return new static::$class(
             isset($options['environment']) ? $options['environment'] : 'test',
             isset($options['debug']) ? $options['debug'] : true
         );

@@ -1,0 +1,19 @@
+localized_login_path:
+    pattern: /{_locale}/login
+    defaults: { _controller: FormLoginBundle:Localized:login }
+
+localized_check_path:
+    pattern: /{_locale}/login_check
+    defaults: { _controller: FormLoginBundle:Localized:loginCheck }
+    
+localized_default_target_path:
+    pattern: /{_locale}/profile
+    defaults: { _controller: FormLoginBundle:Localized:profile }
+
+localized_logout_path:
+    pattern: /{_locale}/logout
+    defaults: { _controller: FormLoginBundle:Localized:logout }
+    
+localized_logout_target_path:
+    pattern: /{_locale}/
+    defaults: { _controller: FormLoginBundle:Localized:homepage }

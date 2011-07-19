@@ -188,6 +188,10 @@ class Request
             $defaults['SERVER_PORT'] = $components['port'];
             $defaults['HTTP_HOST'] = $defaults['HTTP_HOST'].':'.$components['port'];
         }
+        
+        if (!isset($components['path'])) {
+            $components['path'] = '';
+        }
 
         if (in_array(strtoupper($method), array('POST', 'PUT', 'DELETE'))) {
             $request = $parameters;

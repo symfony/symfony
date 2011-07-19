@@ -42,23 +42,33 @@ class ExceptionHandler
     }
 
     /**
-     * Returns a Response for the given Exception.
+     * Sends a Response for the given Exception.
+     *
+     * @param \Exception $exception An \Exception instance
+     */
+    public function handle(\Exception $exception)
+    {
+        $response = new Response($this->getErrorMessage($exception), 500);
+
+        $response->send();
+    }
+
+    /**
+     * Gets the error message associated with the given Exception.
      *
      * @param \Exception $exception An \Exception instance
      *
-     * @return Response A Response instance
+     * @return string An HTML content describing the Exception
      */
-    public function handle(\Exception $exception)
+    public function getErrorMessage(\Exception $exception)
     {
         try {
             $exception = FlattenException::create($exception);
 
-            $response = new Response($this->decorate($exception, $this->getContent($exception)), 500);
-
-            $response->send();
+            return $this->decorate($exception, $this->getContent($exception));
         } catch (\Exception $e) {
             // something nasty happened and we cannot throw an exception here anymore
-            printf('Exception thrown when handling an exception (%s: %s)', get_class($exception), $exception->getMessage());
+            return sprintf('Exception thrown when handling an exception (%s: %s)', get_class($exception), $exception->getMessage());
         }
     }
 

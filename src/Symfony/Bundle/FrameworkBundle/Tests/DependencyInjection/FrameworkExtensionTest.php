@@ -129,11 +129,11 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('full');
 
-        $this->assertTrue($container->hasDefinition('translator.real'), '->registerTranslatorConfiguration() loads translation.xml');
-        $this->assertEquals('translator.real', (string) $container->getAlias('translator'), '->registerTranslatorConfiguration() redefines translator service from identity to real translator');
+        $this->assertTrue($container->hasDefinition('translator.default'), '->registerTranslatorConfiguration() loads translation.xml');
+        $this->assertEquals('translator.default', (string) $container->getAlias('translator'), '->registerTranslatorConfiguration() redefines translator service from identity to real translator');
 
         $resources = array();
-        foreach ($container->getDefinition('translator.real')->getMethodCalls() as $call) {
+        foreach ($container->getDefinition('translator.default')->getMethodCalls() as $call) {
             if ('addResource' == $call[0]) {
                 $resources[] = $call[1];
             }
@@ -145,7 +145,7 @@ abstract class FrameworkExtensionTest extends TestCase
             '->registerTranslatorConfiguration() finds FrameworkExtension translation resources'
         );
 
-        $calls = $container->getDefinition('translator.real')->getMethodCalls();
+        $calls = $container->getDefinition('translator.default')->getMethodCalls();
         $this->assertEquals('fr', $calls[0][1][0]);
     }
 

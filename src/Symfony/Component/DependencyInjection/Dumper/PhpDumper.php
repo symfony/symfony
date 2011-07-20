@@ -880,17 +880,16 @@ EOF;
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
                 $this->getServiceCallsFromArguments($argument, $calls, $behavior);
-            } else if ($argument instanceof Reference) {
-                $id = (string) $argument;
-
-                $refDef = $this->container->findDefinition($id);
-                if ($factoryId = $refDef->getFactoryService()) {
-                    if (isset($calls[$factoryId])) {
+            } else if ($argument instanceof Definition) {
+                if ($factoryId = $argument->getFactoryService()) {
+                    if (!isset($calls[$factoryId])) {
                         $calls[$factoryId] = 0;
                     }
                     $calls[$factoryId] += 1;
                     $behavior[$factoryId] = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
                 }
+            } else if ($argument instanceof Reference) {
+                $id = (string) $argument;
 
                 if (!isset($calls[$id])) {
                     $calls[$id] = 0;
@@ -1018,7 +1017,13 @@ EOF;
                 if (null !== $value->getFactoryClass()) {
                     return sprintf("call_user_func(array(%s, '%s')%s)", $this->dumpValue($value->getFactoryClass()), $value->getFactoryMethod(), count($arguments) > 0 ? ', '.implode(', ', $arguments) : '');
                 } elseif (null !== $value->getFactoryService()) {
-                    return sprintf("%s->%s(%s)", $this->getServiceCall($value->getFactoryService()), $value->getFactoryMethod(), implode(', ', $arguments));
+                    if (null !== $this->referenceVariables && isset($this->referenceVariables[$id = (string) $value->getFactoryService()])) {
+                        $factoryService = $this->dumpValue($this->referenceVariables[$id], $interpolate);
+                    } else {
+                        $factoryService = $this->getServiceCall($value->getFactoryService());
+                    }
+
+                    return sprintf("%s->%s(%s)", $factoryService, $value->getFactoryMethod(), implode(', ', $arguments));
                 } else {
                     throw new \RuntimeException('Cannot dump definitions which have factory method without factory service or factory class.');
                 }

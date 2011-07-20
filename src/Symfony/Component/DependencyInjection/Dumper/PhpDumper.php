@@ -44,6 +44,7 @@ class PhpDumper extends Dumper
     private $definitionVariables;
     private $referenceVariables;
     private $variableCount;
+    private $options;
     private $reservedVariables = array('instance', 'class');
 
     /**
@@ -70,7 +71,7 @@ class PhpDumper extends Dumper
      */
     public function dump(array $options = array())
     {
-        $options = array_merge(array(
+        $this->options = $options = array_merge(array(
             'class'                      => 'ProjectServiceContainer',
             'base_class'                 => 'Container',
             'limited_property_injection' => true,
@@ -373,12 +374,19 @@ class PhpDumper extends Dumper
 
     private function addServiceProperties($id, $definition, $variableName = 'instance')
     {
-        $code = '';
-        foreach ($definition->getProperties() as $name => $value) {
-            $declaringClass = $this->getReflectionProperty($definition->getClass(), $name)->getDeclaringClass()->getName();
-            $code .= sprintf("        \$%s = new \ReflectionProperty(%s, %s);\n", $refName = $this->getNextVariableName(), var_export($declaringClass, true), var_export($name, true));
-            $code .= sprintf("        \$%s->setAccessible(true);\n", $refName);
-            $code .= sprintf("        \$%s->setValue(\$%s, %s);\n", $refName, $variableName, $this->dumpValue($value));
+        if (!$this->options['limited_property_injection']) {
+            $code = '';
+            foreach ($definition->getProperties() as $name => $value) {
+                $declaringClass = $this->getReflectionProperty($definition->getClass(), $name)->getDeclaringClass()->getName();
+                $code .= sprintf("        \$%s = new \ReflectionProperty(%s, %s);\n", $refName = $this->getNextVariableName(), var_export($declaringClass, true), var_export($name, true));
+                $code .= sprintf("        \$%s->setAccessible(true);\n", $refName);
+                $code .= sprintf("        \$%s->setValue(\$%s, %s);\n", $refName, $variableName, $this->dumpValue($value));
+            }
+        } else {
+            $code = '';
+            foreach ($definition->getProperties() as $name => $value) {
+                $code .= sprintf("        \$%s->%s = %s;\n", $variableName, $name, $this->dumpValue($value));
+            }
         }
 
         return $code;

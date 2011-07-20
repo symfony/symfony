@@ -177,7 +177,7 @@ class HttpKernel extends BaseHttpKernel
         $path = http_build_query($attributes);
         $uri = $this->container->get('router')->generate('_internal', array(
             'controller' => $controller,
-            'path'       => $path ? $path : 'none',
+            'path'       => $path ?: 'none',
             '_format'    => $this->container->get('request')->getRequestFormat(),
         ));
 

@@ -18,6 +18,8 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 /**
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class ParameterBag implements ParameterBagInterface
 {
@@ -28,6 +30,8 @@ class ParameterBag implements ParameterBagInterface
      * Constructor.
      *
      * @param array $parameters An array of parameters
+     *
+     * @api
      */
     public function __construct(array $parameters = array())
     {
@@ -38,6 +42,8 @@ class ParameterBag implements ParameterBagInterface
 
     /**
      * Clears all parameters.
+     *
+     * @api
      */
     public function clear()
     {
@@ -48,6 +54,8 @@ class ParameterBag implements ParameterBagInterface
      * Adds parameters to the service container parameters.
      *
      * @param array $parameters An array of parameters
+     *
+     * @api
      */
     public function add(array $parameters)
     {
@@ -60,6 +68,8 @@ class ParameterBag implements ParameterBagInterface
      * Gets the service container parameters.
      *
      * @return array An array of parameters
+     *
+     * @api
      */
     public function all()
     {
@@ -74,6 +84,8 @@ class ParameterBag implements ParameterBagInterface
      * @return mixed  The parameter value
      *
      * @throws  ParameterNotFoundException if the parameter is not defined
+     *
+     * @api
      */
     public function get($name)
     {
@@ -91,6 +103,8 @@ class ParameterBag implements ParameterBagInterface
      *
      * @param string $name  The parameter name
      * @param mixed  $value The parameter value
+     *
+     * @api
      */
     public function set($name, $value)
     {
@@ -103,6 +117,8 @@ class ParameterBag implements ParameterBagInterface
      * @param  string  $name       The parameter name
      *
      * @return Boolean true if the parameter name is defined, false otherwise
+     *
+     * @api
      */
     public function has($name)
     {

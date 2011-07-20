@@ -13,7 +13,11 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-/** @Annotation */
+/**
+ * @Annotation
+ *
+ * @api
+ */
 class Blank extends Constraint
 {
     public $message = 'This value should be blank';

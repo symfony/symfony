@@ -20,9 +20,21 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @author Joseph Bielawski <stloyd@gmail.com>
+ *
+ * @api
  */
 class RegexValidator extends ConstraintValidator
 {
+    /**
+     * Checks if the passed value is valid.
+     *
+     * @param mixed      $value      The value that should be validated
+     * @param Constraint $constraint The constrain for the validation
+     *
+     * @return Boolean Whether or not the value is valid
+     *
+     * @api
+     */
     public function isValid($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {

@@ -20,6 +20,8 @@ use Symfony\Component\Validator\Constraint;
  * @Annotation
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  * @author Joseph Bielawski <stloyd@gmail.com>
+ *
+ * @api
  */
 class Ip extends Constraint
 {

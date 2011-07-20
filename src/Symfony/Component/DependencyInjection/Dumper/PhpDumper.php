@@ -883,6 +883,15 @@ EOF;
             } else if ($argument instanceof Reference) {
                 $id = (string) $argument;
 
+                $refDef = $this->container->findDefinition($id);
+                if ($factoryId = $refDef->getFactoryService()) {
+                    if (isset($calls[$factoryId])) {
+                        $calls[$factoryId] = 0;
+                    }
+                    $calls[$factoryId] += 1;
+                    $behavior[$factoryId] = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+                }
+
                 if (!isset($calls[$id])) {
                     $calls[$id] = 0;
                 }

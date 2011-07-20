@@ -15,6 +15,8 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
  * NativeSessionStorage.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class NativeSessionStorage implements SessionStorageInterface
 {
@@ -58,6 +60,8 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * Starts the session.
+     *
+     * @api
      */
     public function start()
     {
@@ -87,6 +91,8 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @api
      */
     public function getId()
     {
@@ -106,6 +112,8 @@ class NativeSessionStorage implements SessionStorageInterface
      * @param string $default Default value
      *
      * @return mixed Data associated with the key
+     *
+     * @api
      */
     public function read($key, $default = null)
     {
@@ -120,6 +128,8 @@ class NativeSessionStorage implements SessionStorageInterface
      * @param  string $key  A unique key identifying your data
      *
      * @return mixed Data associated with the key
+     *
+     * @api
      */
     public function remove($key)
     {
@@ -141,6 +151,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * @param string $key   A unique key identifying your data
      * @param mixed  $data  Data associated with your key
      *
+     * @api
      */
     public function write($key, $data)
     {
@@ -154,6 +165,7 @@ class NativeSessionStorage implements SessionStorageInterface
      *
      * @return Boolean True if session regenerated, false if error
      *
+     * @api
      */
     public function regenerate($destroy = false)
     {

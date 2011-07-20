@@ -688,6 +688,8 @@ EOF;
      */
     private function addFrozenConstructor()
     {
+        $defaultParameters = $this->container->getParameters() ? '$this->getDefaultParameters()' : 'array()';
+
         $code = <<<EOF
 
     /**
@@ -695,7 +697,7 @@ EOF;
      */
     public function __construct()
     {
-        \$this->parameters = \$this->getDefaultParameters();
+        \$this->parameters = $defaultParameters;
 
         \$this->services =
         \$this->scopedServices =

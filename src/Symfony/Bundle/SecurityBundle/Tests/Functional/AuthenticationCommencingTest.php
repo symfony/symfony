@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Bundle\Securitybundle\Tests\Functional;
+namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 class AuthenticationCommencingTest extends WebTestCase
 {

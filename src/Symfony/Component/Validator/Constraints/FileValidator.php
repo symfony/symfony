@@ -18,8 +18,21 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\HttpFoundation\File\File as FileObject;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * @api
+ */
 class FileValidator extends ConstraintValidator
 {
+    /**
+     * Checks if the passed value is valid.
+     *
+     * @param mixed      $value      The value that should be validated
+     * @param Constraint $constraint The constrain for the validation
+     *
+     * @return Boolean Whether or not the value is valid
+     *
+     * @api
+     */
     public function isValid($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {

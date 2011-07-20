@@ -23,6 +23,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ *
+ * @api
  */
 class Validator implements ValidatorInterface
 {
@@ -51,6 +53,8 @@ class Validator implements ValidatorInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @api
      */
     public function validate($object, $groups = null)
     {
@@ -65,6 +69,8 @@ class Validator implements ValidatorInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @api
      */
     public function validateProperty($object, $property, $groups = null)
     {
@@ -79,6 +85,8 @@ class Validator implements ValidatorInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @api
      */
     public function validatePropertyValue($class, $property, $value, $groups = null)
     {
@@ -93,6 +101,8 @@ class Validator implements ValidatorInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @api
      */
     public function validateValue($value, Constraint $constraint, $groups = null)
     {

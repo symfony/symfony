@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface;
  * Session.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class Session implements \Serializable
 {
@@ -48,6 +50,8 @@ class Session implements \Serializable
 
     /**
      * Starts the session storage.
+     *
+     * @api
      */
     public function start()
     {
@@ -78,6 +82,8 @@ class Session implements \Serializable
      * @param string $name The attribute name
      *
      * @return Boolean true if the attribute is defined, false otherwise
+     *
+     * @api
      */
     public function has($name)
     {
@@ -91,6 +97,8 @@ class Session implements \Serializable
      * @param mixed  $default The default value
      *
      * @return mixed
+     *
+     * @api
      */
     public function get($name, $default = null)
     {
@@ -102,6 +110,8 @@ class Session implements \Serializable
      *
      * @param string $name
      * @param mixed  $value
+     *
+     * @api
      */
     public function set($name, $value)
     {
@@ -116,6 +126,8 @@ class Session implements \Serializable
      * Returns attributes.
      *
      * @return array Attributes
+     *
+     * @api
      */
     public function all()
     {
@@ -126,6 +138,8 @@ class Session implements \Serializable
      * Sets attributes.
      *
      * @param array $attributes Attributes
+     *
+     * @api
      */
     public function replace(array $attributes)
     {
@@ -140,6 +154,8 @@ class Session implements \Serializable
      * Removes an attribute.
      *
      * @param string $name
+     *
+     * @api
      */
     public function remove($name)
     {
@@ -154,6 +170,8 @@ class Session implements \Serializable
 
     /**
      * Clears all attributes.
+     *
+     * @api
      */
     public function clear()
     {
@@ -168,6 +186,8 @@ class Session implements \Serializable
 
     /**
      * Invalidates the current session.
+     *
+     * @api
      */
     public function invalidate()
     {
@@ -178,6 +198,8 @@ class Session implements \Serializable
     /**
      * Migrates the current session to a new session id while maintaining all
      * session attributes.
+     *
+     * @api
      */
     public function migrate()
     {
@@ -188,6 +210,8 @@ class Session implements \Serializable
      * Returns the session ID
      *
      * @return mixed  The session ID
+     *
+     * @api
      */
     public function getId()
     {

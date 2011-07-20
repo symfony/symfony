@@ -182,7 +182,7 @@ class HttpKernel extends BaseHttpKernel
         ));
 
         if ($queryString = http_build_query($query)) {
-            $uri = $uri.'?'.$queryString;
+            $uri .= '?'.$queryString;
         }
 
         return $uri;

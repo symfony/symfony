@@ -23,6 +23,8 @@ use Symfony\Component\HttpFoundation\Response;
  * Cache provides HTTP caching.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class HttpCache implements HttpKernelInterface
 {
@@ -152,6 +154,8 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @api
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {

@@ -19,6 +19,8 @@ use Symfony\Component\EventDispatcher\Event;
  * Base class for events thrown in the HttpKernel component
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ *
+ * @api
  */
 class KernelEvent extends Event
 {
@@ -52,6 +54,8 @@ class KernelEvent extends Event
      * Returns the kernel in which this event was thrown
      *
      * @return Symfony\Component\HttpKernel\HttpKernelInterface
+     *
+     * @api
      */
     public function getKernel()
     {
@@ -62,6 +66,8 @@ class KernelEvent extends Event
      * Returns the request the kernel is currently processing
      *
      * @return Symfony\Component\HttpFoundation\Request
+     *
+     * @api
      */
     public function getRequest()
     {
@@ -73,6 +79,8 @@ class KernelEvent extends Event
      *
      * @return integer  One of HttpKernelInterface::MASTER_REQUEST and
      *                  HttpKernelInterface::SUB_REQUEST
+     *
+     * @api
      */
     public function getRequestType()
     {

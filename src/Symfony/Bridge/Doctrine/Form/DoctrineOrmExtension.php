@@ -27,6 +27,7 @@ class DoctrineOrmExtension extends AbstractExtension
     {
         return array(
             new Type\EntityType($this->registry),
+            new Type\EntityCollectionType($this->registry),
         );
     }
 

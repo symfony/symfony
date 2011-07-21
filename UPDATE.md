@@ -9,6 +9,9 @@ timeline closely anyway.
 RC4 to RC5
 ----------
 
+* The `exception_controller` setting has been moved from the `framework`
+  section to the `twig` one.
+
 * `EntityUserProvider` class has been moved and FQCN changed from
   `Symfony\Component\Security\Core\User\EntityUserProvider` to
   `Symfony\Bridge\Doctrine\Security\User\EntityUserProvider`.

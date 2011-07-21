@@ -153,14 +153,7 @@ class CollectionFormTest extends TypeTestCase
             ))
         ;
 
-        $data = array(
-            array(
-                'last_name' => 'Foo'
-            ),
-            array(
-                'last_name' => 'Bar'
-            ),
-        );
+        $data = array(array('last_name' => 'Foo'), array('last_name' => 'Bar'));
         $form->bind($data);
         $bound = $form->getData();
         $this->assertEquals(2, count($bound));
@@ -168,5 +161,21 @@ class CollectionFormTest extends TypeTestCase
         $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\Author', $bound[1]);
         $this->assertEquals('Foo', $bound[0]->getLastName());
         $this->assertEquals('Bar', $bound[1]->getLastName());
+    }
+
+    public function testObjectsAreCreatedWithDataClassOption()
+    {
+        $form = $this->factory
+            ->create('collection', null, array(
+                'type'      => new AuthorType(),
+                'allow_add' => true,
+                'options'   => array('data_class' => 'Symfony\Tests\Component\Form\Fixtures\Author')
+            ))
+        ;
+
+        $data = array(array('last_name' => 'Foo'), array('last_name' => 'Bar'));
+        $form->bind($data);
+        $bound = $form->getData();
+        $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\Author', $bound[0]);
     }
 }

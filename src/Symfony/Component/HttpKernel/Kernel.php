@@ -401,14 +401,9 @@ abstract class Kernel implements KernelInterface
             $this->boot();
         }
 
-        if ($this->classes) {
-            ClassCollectionLoader::load($this->classes, $this->getCacheDir(), $name, $this->debug, true, $extension);
+        if ($this->container->hasParameter('kernel.compiled_classes')) {
+            ClassCollectionLoader::load($this->container->getParameter('kernel.compiled_classes'), $this->getCacheDir(), $name, $this->debug, true, $extension);
         }
-    }
-
-    public function addClassesToCache(array $classes)
-    {
-        $this->classes = array_unique(array_merge($this->classes, $classes));
     }
 
     /**
@@ -649,8 +644,6 @@ abstract class Kernel implements KernelInterface
 
         $container->addCompilerPass(new AddClassesToCachePass($this));
         $container->compile();
-
-        $this->addClassesToCache($container->getParameter('kernel.compiled_classes'));
 
         return $container;
     }

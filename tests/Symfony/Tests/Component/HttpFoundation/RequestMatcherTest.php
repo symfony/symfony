@@ -71,7 +71,7 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testAnIpv6WithOptionDisabledIpv6()
     {
-        if (defined('AF_INET6')) {
+        if (!defined('AF_INET6')) {
             $this->markTestSkipped('Only works when PHP is compiled with the option "disable-ipv6".');
         }
 

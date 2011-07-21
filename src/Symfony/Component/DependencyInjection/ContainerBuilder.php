@@ -765,8 +765,17 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         $properties = $this->resolveServices($this->getParameterBag()->resolveValue($definition->getProperties()));
+        $outsideClass = new \ReflectionClass($service);
         foreach ($properties as $name => $value) {
-            $service->$name = $value;
+            $class = $outsideClass;
+            do {
+                if ($class->hasProperty($name)) {
+                    $property = $class->getProperty($name);
+                    $property->setAccessible(true);
+                    $property->setValue($service, $value);
+                    continue 2;
+                }
+            } while (false !== $class = $class->getParentClass());
         }
 
         if ($callable = $definition->getConfigurator()) {

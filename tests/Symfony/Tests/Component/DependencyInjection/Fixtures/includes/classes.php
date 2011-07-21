@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__.'/foo.php';
+
 function sc_configure($instance)
 {
     $instance->configure();

@@ -39,6 +39,8 @@ class TwigExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
+        $container->setParameter('twig.exception_listener.controller', $config['exception_controller']);
+
         $container->setParameter('twig.form.resources', $config['form']['resources']);
         $container->getDefinition('twig.loader')->addMethodCall('addPath', array(__DIR__.'/../../../Bridge/Twig/Resources/views/Form'));
 

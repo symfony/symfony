@@ -62,7 +62,6 @@ class FrameworkExtension extends Extension
             $container->setParameter('kernel.charset', $config['charset']);
         }
         $container->setParameter('kernel.secret', $config['secret']);
-        $container->setParameter('exception_listener.controller', $config['exception_controller']);
 
         $container->setParameter('kernel.trust_proxy_headers', $config['trust_proxy_headers']);
 

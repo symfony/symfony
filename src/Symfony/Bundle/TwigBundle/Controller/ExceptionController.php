@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Controller;
+namespace Symfony\Bundle\TwigBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Component\DependencyInjection\ContainerAware;
@@ -75,14 +75,14 @@ class ExceptionController extends ContainerAware
 
         // when not in debug, try to find a template for the specific HTTP status code and format
         if (!$debug) {
-            $template = new TemplateReference('FrameworkBundle', 'Exception', $name.$code, $format, 'twig');
+            $template = new TemplateReference('TwigBundle', 'Exception', $name.$code, $format, 'twig');
             if ($templating->exists($template)) {
                 return $template;
             }
         }
 
         // try to find a template for the given format
-        $template = new TemplateReference('FrameworkBundle', 'Exception', $name, $format, 'twig');
+        $template = new TemplateReference('TwigBundle', 'Exception', $name, $format, 'twig');
         if ($templating->exists($template)) {
             return $template;
         }
@@ -90,6 +90,6 @@ class ExceptionController extends ContainerAware
         // default to a generic HTML exception
         $this->container->get('request')->setRequestFormat('html');
 
-        return new TemplateReference('FrameworkBundle', 'Exception', $name, 'html', 'twig');
+        return new TemplateReference('TwigBundle', 'Exception', $name, 'html', 'twig');
     }
 }

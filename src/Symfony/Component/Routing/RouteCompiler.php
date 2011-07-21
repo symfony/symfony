@@ -32,7 +32,8 @@ class RouteCompiler implements RouteCompilerInterface
         $tokens = array();
         $variables = array();
         $pos = 0;
-        preg_match_all('#.\{([\w\d_]+)\}#', $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        preg_match_all('#.?\{([\w\d_]+)\}#', $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+
         foreach ($matches as $match) {
             if ($text = substr($pattern, $pos, $match[0][1] - $pos)) {
                 $tokens[] = array('text', $text);
@@ -50,7 +51,12 @@ class RouteCompiler implements RouteCompilerInterface
                 $regexp = sprintf('[^%s]+?', preg_quote(implode('', array_unique($seps)), '#'));
             }
 
-            $tokens[] = array('variable', $match[0][0][0], $regexp, $var);
+            if ($match[0][0][0] !== '{') {
+                $prefix = $match[0][0][0];
+            } else {
+                $prefix = '';
+            }
+            $tokens[] = array('variable', $prefix, $regexp, $var);
             $variables[] = $var;
         }
 

@@ -30,8 +30,10 @@ class CollectionType extends AbstractType
             $builder->setAttribute('prototype', $prototype);
         }
 
-        if ($options['class']) {
-            $listener = new ObjectFactoryListener($options['class']);
+        $dataClass = isset($options['options']['data_class']) ? $options['options']['data_class'] : null;
+        if ($dataClass || $options['class']) {
+            $class = $dataClass ? $dataClass : $options['class'];
+            $listener = new ObjectFactoryListener($class);
             $builder->addEventSubscriber($listener);
         }
 

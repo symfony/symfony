@@ -107,9 +107,13 @@ class FrameworkExtension extends Extension
         $this->addClassesToCompile(array(
             'Symfony\\Component\\HttpFoundation\\ParameterBag',
             'Symfony\\Component\\HttpFoundation\\HeaderBag',
+            'Symfony\\Component\\HttpFoundation\\FileBag',
+            'Symfony\\Component\\HttpFoundation\\ServerBag',
             'Symfony\\Component\\HttpFoundation\\Request',
             'Symfony\\Component\\HttpFoundation\\Response',
             'Symfony\\Component\\HttpFoundation\\ResponseHeaderBag',
+
+            'Symfony\\Component\\Config\\FileLocator',
 
             'Symfony\\Component\\EventDispatcher\\EventDispatcherInterface',
             'Symfony\\Component\\EventDispatcher\\EventDispatcher',
@@ -127,12 +131,14 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseForControllerResultEvent',
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseForExceptionEvent',
             'Symfony\\Component\\HttpKernel\\KernelEvents',
+            'Symfony\\Component\\HttpKernel\\Config\\FileLocator',
 
             'Symfony\\Bundle\\FrameworkBundle\\EventListener\\RouterListener',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameParser',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
             'Symfony\\Bundle\\FrameworkBundle\\ContainerAwareEventDispatcher',
+            'Symfony\\Bundle\\FrameworkBundle\\HttpKernel',
         ));
     }
 
@@ -249,6 +255,11 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\Routing\\RouterInterface',
             'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
             'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
+            'Symfony\\Component\\Routing\\Matcher\\RedirectableUrlMatcherInterface',
+            'Symfony\\Component\\Routing\\RequestContextAwareInterface',
+            'Symfony\\Component\\Routing\\RequestContext',
+            'Symfony\\Component\\Routing\\Router',
+            'Symfony\\Bundle\\FrameworkBundle\\Routing\\RedirectableUrlMatcher',
             $container->findDefinition('router.default')->getClass(),
         ));
     }
@@ -353,6 +364,7 @@ class FrameworkExtension extends Extension
         }
 
         $this->addClassesToCompile(array(
+            'Symfony\\Bundle\\FrameworkBundle\\Templating\\GlobalVariables',
             'Symfony\\Bundle\\FrameworkBundle\\Templating\\EngineInterface',
             'Symfony\\Component\\Templating\\TemplateNameParserInterface',
             'Symfony\\Component\\Templating\\TemplateNameParser',

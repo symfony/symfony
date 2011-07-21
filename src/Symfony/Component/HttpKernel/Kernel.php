@@ -402,7 +402,7 @@ abstract class Kernel implements KernelInterface
         }
 
         if ($this->container->hasParameter('kernel.compiled_classes')) {
-            ClassCollectionLoader::load($this->container->getParameter('kernel.compiled_classes'), $this->getCacheDir(), $name, $this->debug, true, $extension);
+            ClassCollectionLoader::load($this->container->getParameter('kernel.compiled_classes'), $this->getCacheDir(), $name, $this->debug, false, $extension);
         }
     }
 

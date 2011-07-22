@@ -13,6 +13,7 @@ namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\CollectionForm;
 use Symfony\Component\Form\Form;
+use Symfony\Tests\Component\Form\Fixtures\AuthorType;
 
 class CollectionFormTest extends TypeTestCase
 {
@@ -140,5 +141,41 @@ class CollectionFormTest extends TypeTestCase
         ;
 
         $this->assertTrue($form->createView()->get('multipart'));
+    }
+
+    public function testObjectsAreCreated()
+    {
+        $form = $this->factory
+            ->create('collection', null, array(
+                'type'      => new AuthorType(),
+                'allow_add' => true,
+                'class'     => 'Symfony\Tests\Component\Form\Fixtures\Author',
+            ))
+        ;
+
+        $data = array(array('last_name' => 'Foo'), array('last_name' => 'Bar'));
+        $form->bind($data);
+        $bound = $form->getData();
+        $this->assertEquals(2, count($bound));
+        $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\Author', $bound[0]);
+        $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\Author', $bound[1]);
+        $this->assertEquals('Foo', $bound[0]->getLastName());
+        $this->assertEquals('Bar', $bound[1]->getLastName());
+    }
+
+    public function testObjectsAreCreatedWithDataClassOption()
+    {
+        $form = $this->factory
+            ->create('collection', null, array(
+                'type'      => new AuthorType(),
+                'allow_add' => true,
+                'options'   => array('data_class' => 'Symfony\Tests\Component\Form\Fixtures\Author')
+            ))
+        ;
+
+        $data = array(array('last_name' => 'Foo'), array('last_name' => 'Bar'));
+        $form->bind($data);
+        $bound = $form->getData();
+        $this->assertInstanceOf('Symfony\Tests\Component\Form\Fixtures\Author', $bound[0]);
     }
 }

@@ -196,6 +196,7 @@ class FrameworkExtension extends Extension
         $supported = array(
             'sqlite' => 'Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage',
             'mysql'  => 'Symfony\Component\HttpKernel\Profiler\MysqlProfilerStorage',
+            'file'   => 'Symfony\Component\HttpKernel\Profiler\FileProfilerStorage',
         );
         list($class, ) = explode(':', $config['dsn']);
         if (!isset($supported[$class])) {

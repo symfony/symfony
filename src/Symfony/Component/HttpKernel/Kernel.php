@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
@@ -403,6 +402,14 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
+     * Used internally.
+     */
+    public function setClassCache(array $classes)
+    {
+        file_put_contents($this->getCacheDir().'/classes.map', sprintf('<?php return %s;', var_export($classes, true)));
+    }
+
+    /**
      * Gets the request start time (not available if debug is disabled).
      *
      * @return integer The request start timestamp
@@ -640,8 +647,6 @@ abstract class Kernel implements KernelInterface
 
         $container->addCompilerPass(new AddClassesToCachePass($this));
         $container->compile();
-
-        file_put_contents($this->getCacheDir().'/classes.map', sprintf('<?php return %s;', var_export($container->getParameter('kernel.compiled_classes'), true)));
 
         return $container;
     }

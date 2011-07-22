@@ -16,7 +16,6 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
-use Symfony\Component\Form\Extension\Core\EventListener\ObjectFactoryListener;
 
 class CollectionType extends AbstractType
 {
@@ -28,13 +27,6 @@ class CollectionType extends AbstractType
         if ($options['allow_add'] && $options['prototype']) {
             $prototype = $builder->create('$$name$$', $options['type'], $options['options']);
             $builder->setAttribute('prototype', $prototype->getForm());
-        }
-
-        $dataClass = isset($options['options']['data_class']) ? $options['options']['data_class'] : null;
-        if ($dataClass || $options['class']) {
-            $class = $dataClass ? $dataClass : $options['class'];
-            $listener = new ObjectFactoryListener($class);
-            $builder->addEventSubscriber($listener);
         }
 
         $listener = new ResizeFormListener(
@@ -88,7 +80,6 @@ class CollectionType extends AbstractType
             'prototype'     => true,
             'type'          => 'text',
             'options'       => array(),
-            'class'         => null,
         );
     }
 

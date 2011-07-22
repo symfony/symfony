@@ -27,7 +27,7 @@ class CollectionType extends AbstractType
     {
         if ($options['allow_add'] && $options['prototype']) {
             $prototype = $builder->create('$$name$$', $options['type'], $options['options']);
-            $builder->setAttribute('prototype', $prototype);
+            $builder->setAttribute('prototype', $prototype->getForm());
         }
 
         $dataClass = isset($options['options']['data_class']) ? $options['options']['data_class'] : null;
@@ -63,7 +63,17 @@ class CollectionType extends AbstractType
         ;
 
         if ($form->hasAttribute('prototype')) {
-            $view->set('prototype', $form->getAttribute('prototype'));
+            $view->set('prototype', $form->getAttribute('prototype')->createView($view));
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildViewBottomUp(FormView $view, FormInterface $form)
+    {
+        if ($form->hasAttribute('prototype') && $view->get('prototype')->get('multipart')) {
+            $view->set('multipart', true);
         }
     }
 

@@ -67,13 +67,13 @@ class Client extends BaseClient
      */
     protected function getScript($request)
     {
-        $kernel = serialize($this->kernel);
-        $request = serialize($request);
+        $kernel = str_replace("'", "\\'", serialize($this->kernel));
+        $request = str_replace("'", "\\'", serialize($request));
 
         $r = new \ReflectionClass('\\Symfony\\Component\\ClassLoader\\UniversalClassLoader');
-        $requirePath = $r->getFileName();
+        $requirePath = str_replace("'", "\\'", $r->getFileName());
 
-        $symfonyPath = realpath(__DIR__.'/../../..');
+        $symfonyPath = str_replace("'", "\\'", realpath(__DIR__.'/../../..'));
 
         return <<<EOF
 <?php

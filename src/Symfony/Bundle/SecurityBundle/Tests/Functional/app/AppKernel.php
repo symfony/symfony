@@ -11,8 +11,21 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
-use Symfony\Component\HttpKernel\Util\Filesystem;
+// get the autoload file
+$dir = __DIR__;
+$lastDir = null;
+while ($dir !== $lastDir) {
+    $lastDir = $dir;
 
+    if (file_exists($dir.'/autoload.php.dist')) {
+        require_once $dir.'/autoload.php.dist';
+        break;
+    }
+
+    $dir = dirname($dir);
+}
+
+use Symfony\Component\HttpKernel\Util\Filesystem;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -33,10 +46,11 @@ class AppKernel extends Kernel
         }
         $this->testCase = $testCase;
 
-        if (!file_exists($filename = __DIR__.'/'.$testCase.'/'.$rootConfig)) {
-            throw new \InvalidArgumentException(sprintf('The root config "%s" does not exist.', $filename));
+        $fs = new Filesystem();
+        if (!$fs->isAbsolutePath($rootConfig) && !file_exists($rootConfig = __DIR__.'/'.$testCase.'/'.$rootConfig)) {
+            throw new \InvalidArgumentException(sprintf('The root config "%s" does not exist.', $rootConfig));
         }
-        $this->rootConfig = $filename;
+        $this->rootConfig = $rootConfig;
 
         parent::__construct($environment, $debug);
     }
@@ -72,6 +86,16 @@ class AppKernel extends Kernel
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         $loader->load($this->rootConfig);
+    }
+
+    public function serialize()
+    {
+        return serialize(array($this->testCase, $this->rootConfig, $this->getEnvironment(), $this->isDebug()));
+    }
+
+    public function unserialize($str)
+    {
+        call_user_func_array(array($this, '__construct'), unserialize($str));
     }
 
     protected function getKernelParameters()

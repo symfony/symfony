@@ -76,6 +76,11 @@ class ExceptionListener
         $exception = $event->getException();
         $request = $event->getRequest();
 
+        // determine the actual cause for the exception
+        while (null !== $previous = $exception->getPrevious()) {
+            $exception = $previous;
+        }
+
         if ($exception instanceof AuthenticationException) {
             if (null !== $this->logger) {
                 $this->logger->info(sprintf('Authentication exception occurred; redirecting to authentication entry point (%s)', $exception->getMessage()));

@@ -21,7 +21,7 @@ class ListCommandTest extends \PHPUnit_Framework_TestCase
         $application = new Application();
 
         $commandTester = new CommandTester($command = $application->get('list'));
-        $commandTester->execute(array('command' => $command->getName()));
+        $commandTester->execute(array('command' => $command->getName()), array('decorated' => false));
         $this->assertRegExp('/help   Displays help for a command/', $commandTester->getDisplay(), '->execute() returns a list of available commands');
 
         $commandTester->execute(array('command' => $command->getName(), '--xml' => true));

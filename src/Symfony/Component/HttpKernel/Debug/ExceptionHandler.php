@@ -74,10 +74,12 @@ class ExceptionHandler
             $code = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : 500;
             $exception = FlattenException::create($exception);
 
-            if (404 == $code) {
-                $title = 'Sorry, the page you are looking for could not be found.';
-            } else {
-                $title = 'Whoops, looks like something went wrong.';
+            switch($code) {
+                case 404:
+                    $title = 'Sorry, the page you are looking for could not be found.';
+                    break;
+                default:
+                    $title = 'Whoops, looks like something went wrong.';
             }
 
             if ($this->debug) {
@@ -85,7 +87,11 @@ class ExceptionHandler
             }
         } catch (\Exception $e) {
             // something nasty happened and we cannot throw an exception here anymore
-            $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($exception), $exception->getMessage());
+            if ($this->debug) {
+                $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($exception), $exception->getMessage());
+            } else {
+                $title = 'Whoops, looks like something went wrong.';
+            }
         }
 
         return new Response($this->decorate($content, $title), $code);

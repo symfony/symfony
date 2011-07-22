@@ -9,6 +9,11 @@ timeline closely anyway.
 RC4 to RC5
 ----------
 
+* The `MapFileClassLoader` class was replaced with `MapClassLoader`.
+
+* The `session_listener` setting has been moved from the `web` section to
+  the `session` one.
+
 * The `exception_controller` setting has been moved from the `framework`
   section to the `twig` one.
 
@@ -21,7 +26,7 @@ RC4 to RC5
   `Symfony\Bridge\Doctrine\Security\User\EntityUserProvider`.
 
 * Cookies access from `HeaderBag` has been removed. Accessing Request cookies
-  must be done via `Request::$cookies``.
+  must be done via `Request::$cookies`.
 
 * `ResponseHeaderBag::getCookie()` and `ResponseHeaderBag::hasCookie()`
   methods were removed.

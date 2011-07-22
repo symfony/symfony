@@ -42,6 +42,6 @@ class AddClassesToCachePass implements CompilerPassInterface
             }
         }
 
-        $this->kernel->setClassCache($container->getParameterBag()->resolveValue(array_unique($classes)));
+        $this->kernel->setClassCache(array_unique($container->getParameterBag()->resolveValue($classes)));
     }
 }

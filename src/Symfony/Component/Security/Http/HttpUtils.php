@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Http;
 
+use Symfony\Component\Security\Core\SecurityContextInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\RouterInterface;
@@ -45,22 +47,10 @@ class HttpUtils
      */
     public function createRedirectResponse(Request $request, $path, $status = 302)
     {
-        if (0 === strpos($path, '/')) {
+        if ('/' === $path[0]) {
             $path = $request->getUriForPath($path);
         } elseif (0 !== strpos($path, 'http')) {
-            // hack (don't have a better solution for now)
-            $context = $this->router->getContext();
-            try {
-                $parameters = $this->router->match($request->getPathInfo());
-            } catch (\Exception $e) {
-            }
-
-            if (isset($parameters['_locale'])) {
-                $context->setParameter('_locale', $parameters['_locale']);
-            } elseif ($session = $request->getSession()) {
-                $context->setParameter('_locale', $session->getLocale());
-            }
-
+            $this->resetLocale($request);
             $path = $this->generateUrl($path, true);
         }
 
@@ -78,10 +68,26 @@ class HttpUtils
     public function createRequest(Request $request, $path)
     {
         if ($path && '/' !== $path[0] && 0 !== strpos($path, 'http')) {
+            $this->resetLocale($request);
             $path = $this->generateUrl($path, true);
         }
 
-        return Request::create($path, 'get', array(), $request->cookies->all(), array(), $request->server->all());
+        $newRequest = Request::create($path, 'get', array(), $request->cookies->all(), array(), $request->server->all());
+        if ($session = $request->getSession()) {
+            $newRequest->setSession($session);
+        }
+
+        if ($request->attributes->has(SecurityContextInterface::AUTHENTICATION_ERROR)) {
+            $newRequest->attributes->set(SecurityContextInterface::AUTHENTICATION_ERROR, $request->attributes->get(SecurityContextInterface::AUTHENTICATION_ERROR));
+        }
+        if ($request->attributes->has(SecurityContextInterface::ACCESS_DENIED_ERROR)) {
+            $newRequest->attributes->set(SecurityContextInterface::ACCESS_DENIED_ERROR, $request->attributes->get(SecurityContextInterface::ACCESS_DENIED_ERROR));
+        }
+        if ($request->attributes->has(SecurityContextInterface::LAST_USERNAME)) {
+            $newRequest->attributes->set(SecurityContextInterface::LAST_USERNAME, $request->attributes->get(SecurityContextInterface::LAST_USERNAME));
+        }
+
+        return $newRequest;
     }
 
     /**
@@ -105,6 +111,27 @@ class HttpUtils
         }
 
         return $path === $request->getPathInfo();
+    }
+
+    // hack (don't have a better solution for now)
+    private function resetLocale(Request $request)
+    {
+        $context = $this->router->getContext();
+        if ($context->getParameter('_locale')) {
+            return;
+        }
+
+        try {
+            $parameters = $this->router->match($request->getPathInfo());
+
+            if (isset($parameters['_locale'])) {
+                $context->setParameter('_locale', $parameters['_locale']);
+            } elseif ($session = $request->getSession()) {
+                $context->setParameter('_locale', $session->getLocale());
+            }
+        } catch (\Exception $e) {
+            // let's hope user doesn't use the locale in the path
+        }
     }
 
     private function generateUrl($route, $absolute = false)

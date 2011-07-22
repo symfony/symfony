@@ -1,22 +1,12 @@
 <?php
 
-/*
- * This file is part of the Symfony framework.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
-
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Controller;
 
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\ContainerAware;
 
-class LoginController extends ContainerAware
+class LocalizedController extends ContainerAware
 {
     public function loginAction()
     {
@@ -27,25 +17,35 @@ class LoginController extends ContainerAware
             $error = $this->container->get('request')->getSession()->get(SecurityContext::AUTHENTICATION_ERROR);
         }
 
-        return $this->container->get('templating')->renderResponse('FormLoginBundle:Login:login.html.twig', array(
+        return $this->container->get('templating')->renderResponse('FormLoginBundle:Localized:login.html.twig', array(
             // last username entered by the user
             'last_username' => $this->container->get('request')->getSession()->get(SecurityContext::LAST_USERNAME),
             'error'         => $error,
         ));
     }
 
-    public function afterLoginAction()
-    {
-        return $this->container->get('templating')->renderResponse('FormLoginBundle:Login:after_login.html.twig');
-    }
-
     public function loginCheckAction()
     {
-        return new Response('', 400);
+        throw new \RuntimeException('loginCheckAction() should never be called.');
+    }
+
+    public function logoutAction()
+    {
+        throw new \RuntimeException('logoutAction() should never be called.');
     }
 
     public function secureAction()
     {
-        throw new \Exception('Wrapper', 0, new \Exception('Another Wrapper', 0, new AccessDeniedException()));
+        throw new \RuntimeException('secureAction() should never be called.');
+    }
+
+    public function profileAction()
+    {
+        return new Response('Profile');
+    }
+
+    public function homepageAction()
+    {
+        return new Response('Homepage');
     }
 }

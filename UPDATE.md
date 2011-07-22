@@ -9,6 +9,9 @@ timeline closely anyway.
 RC4 to RC5
 ----------
 
+* The `MapFileClassLoader` has been removed in favor of a new
+  `MapClassLoader`.
+
 * The `exception_controller` setting has been moved from the `framework`
   section to the `twig` one.
 

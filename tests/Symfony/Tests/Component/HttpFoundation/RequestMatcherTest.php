@@ -142,7 +142,7 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($matcher->matches($request));
     }
 
-    public function testPathWithLocale()
+    public function testPathWithLocaleIsNotSupported()
     {
         $matcher = new RequestMatcher();
         $request = Request::create('/en/login');
@@ -152,9 +152,6 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
         $request->setSession($session);
 
         $matcher->matchPath('^/{_locale}/login$');
-        $this->assertTrue($matcher->matches($request));
-
-        $session->setLocale('de');
         $this->assertFalse($matcher->matches($request));
     }
 

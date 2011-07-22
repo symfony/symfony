@@ -104,11 +104,7 @@ class RequestMatcher implements RequestMatcherInterface
         }
 
         if (null !== $this->path) {
-            if (null !== $session = $request->getSession()) {
-                $path = strtr($this->path, array('{_locale}' => $session->getLocale(), '#' => '\\#'));
-            } else {
-                $path = str_replace('#', '\\#', $this->path);
-            }
+            $path = str_replace('#', '\\#', $this->path);
 
             if (!preg_match('#'.$path.'#', $request->getPathInfo())) {
                 return false;

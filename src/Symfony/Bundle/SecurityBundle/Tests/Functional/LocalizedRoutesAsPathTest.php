@@ -64,7 +64,7 @@ class LocalizedRoutesAsPathTest extends WebTestCase
 
     protected function tearDown()
     {
-        parent::setUp();
+        parent::tearDown();
 
         $this->deleteTmpDir('StandardFormLogin');
     }

@@ -134,8 +134,9 @@ class UrlGenerator implements UrlGeneratorInterface
         }
 
         // add a query string if needed
-        if ($extra = array_diff_key($originParameters, $variables, $defaults)) {
-            $url .= '?'.http_build_query($extra);
+        $extra = array_diff_key($originParameters, $variables, $defaults);
+        if ($extra && $query = http_build_query($extra)) {
+            $url .= '?'.$query;
         }
 
         $url = $this->context->getBaseUrl().$url;

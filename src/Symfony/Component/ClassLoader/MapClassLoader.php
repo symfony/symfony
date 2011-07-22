@@ -16,18 +16,18 @@ namespace Symfony\Component\ClassLoader;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class MapFileClassLoader
+class MapClassLoader
 {
     private $map = array();
 
     /**
      * Constructor.
      *
-     * @param string $file Path to class mapping file
+     * @param array $map A map where keys are classes and values the absolute file path
      */
-    public function __construct($file)
+    public function __construct(array $map)
     {
-        $this->map = require $file;
+        $this->map = $map;
     }
 
     /**

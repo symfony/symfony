@@ -20,11 +20,6 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      * Constructor.
      *
      * @param string  $dsn        A data source name
-     * @param string  $database   The name of the database
-     * @param string  $collection The collection inside the database
-     * @param string  $username   The username for the database
-     * @param string  $password   The password for the database
-     * @param integer $lifetime   The lifetime to use for the purge
      */
     public function __construct($dsn)
     {
@@ -32,7 +27,9 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * Internal convenience method that returns the instance of the 
+     * Internal convenience method that returns the instance of the MongoDB Collection
+     *
+     * @return \MongoCollection
      */
     protected function mongo()
     {
@@ -83,7 +80,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     function read($token)
     {
         $profile = $this->mongo()->findOne(array('token' => $token));
-        return $profile !== null ? $profile['profile'] : null;
+        return $profile !== null ? unserialize($profile['profile']) : null;
     }
 
     /**
